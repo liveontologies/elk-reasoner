@@ -1,0 +1,139 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.semanticweb.elk</groupId>
+	<artifactId>elk-reasoner</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>elk-reasoner</name>
+	<description>An OWL EL reasoner.</description>
+	<url>http://code.google.com/p/elk-reasoner/</url>
+
+	<scm>
+		<connection>scm:svn:http://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner</connection>
+		<developerConnection>scm:svn:https://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner</developerConnection>
+		<url>http://code.google.com/p/elk-reasoner/source/browse</url>
+	</scm>
+
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A commercial-friendly license</comments>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>Oxford University Computing Laboratory</name>
+		<url>http://www.comlab.ox.ac.uk</url>
+	</organization>
+
+	<inceptionYear>2011</inceptionYear>
+
+	<developers>
+		<developer>
+			<id>yevgeny</id>
+			<name>Yevgeny Kazakov</name>
+			<email>yevgeny.kazakov@comlab.ox.ac.uk</email>
+			<organization>Oxford University Computing Laboratory</organization>
+			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>0</timezone>
+		</developer>
+		<developer>
+			<id>markus</id>
+			<name>Markus Kroetzsch</name>
+			<email>markus.kroetzsch@comlab.ox.ac.uk</email>
+			<organization>Oxford University Computing Laboratory</organization>
+			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>0</timezone>
+		</developer>
+		<developer>
+			<id>fratisek</id>
+			<name>Frantisek Simancik</name>
+			<email>frantisek.simancik@comlab.ox.ac.uk</email>
+			<organization>Oxford University Computing Laboratory</organization>
+			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>0</timezone>
+		</developer>
+	</developers>
+
+	<dependencyManagement>
+		<dependencies>
+		</dependencies>
+	</dependencyManagement>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>sonatype</id>
+			<url>https://oss.sonatype.org/content/groups/public</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.owlapi</groupId>
+			<artifactId>owlapi-distribution</artifactId>
+			<version>3.2.3-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>1.5</version>
+				<configuration>
+					<connectionType>developerConnection</connectionType>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.0-beta-1</version>
+				<configuration>
+					<verbose>false</verbose>
+					<addSvnKeyWords>true</addSvnKeyWords>
+				</configuration>
+				<executions>
+					<execution>
+						<id>first</id>
+						<goals>
+							<goal>update-file-header</goal>
+						</goals>
+						<phase>process-sources</phase>
+						<configuration>
+							<licenseName>apache_v2</licenseName>
+							<roots>
+								<root>src/main/java</root>
+								<root>src/test/java</root>
+							</roots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
