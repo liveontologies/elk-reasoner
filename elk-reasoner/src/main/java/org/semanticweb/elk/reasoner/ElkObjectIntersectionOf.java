@@ -26,6 +26,10 @@
 package org.semanticweb.elk.reasoner;
 
 /**
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
+ * >Intersection of Class Expressions<a> in the OWL 2 specification.
+ * 
  * @author Yevgeny Kazakov
  * 
  */

@@ -26,6 +26,10 @@
 package org.semanticweb.elk.reasoner;
 
 /**
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Inverse-Functional_Object_Properties"
+ * >Inverse Functional Object Property Axiom<a> in the OWL 2 specification.
+ * 
  * @author Yevgeny Kazakov
  * 
  */

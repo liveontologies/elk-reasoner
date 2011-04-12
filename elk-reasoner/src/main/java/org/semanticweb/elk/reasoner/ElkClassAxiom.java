@@ -26,8 +26,11 @@
 package org.semanticweb.elk.reasoner;
 
 /**
- * @author Yevgeny Kazakov
+ * Corresponds to a <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Class_Expression_Axioms">Class Expression
+ * Axiom<a> in the OWL 2 specification.
  * 
+ * @author Yevgeny Kazakov
  */
 public abstract class ElkClassAxiom extends ElkObject {
 
@@ -40,9 +43,9 @@ public abstract class ElkClassAxiom extends ElkObject {
 	 * .reasoner.ELKObjectVisitor)
 	 */
 	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public final <O> O accept(ElkObjectVisitor<O> visitor) {
 
-		return accept( (ElkClassAxiomVisitor<O>) visitor );
+		return accept((ElkClassAxiomVisitor<O>) visitor);
 
 	}
 

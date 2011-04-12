@@ -26,6 +26,10 @@
 package org.semanticweb.elk.reasoner;
 
 /**
+ * Corresponds to a <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Class_Expressions">Class Expression<a> in
+ * the OWL 2 specification.
+ * 
  * @author Yevgeny Kazakov
  * 
  */
@@ -42,7 +46,7 @@ public abstract class ElkClassExpression extends ElkObject {
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 
-		return accept( (ElkClassExpressionVisitor<O>) visitor );
+		return accept((ElkClassExpressionVisitor<O>) visitor);
 
 	}
 

@@ -26,13 +26,12 @@
 package org.semanticweb.elk.reasoner;
 
 /**
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Existential_Quantification">Existential
+ * Quantification Object Property Restriction<a> in the OWL 2 specification.
+ * 
  * @author Yevgeny Kazakov
  * 
- *         Corresponds to ObjectSomeValuesFrom class expression in the OWL 2
- *         Specification.
- * @see <a href=
- *      "http://www.w3.org/TR/2009/REC-owl2-syntax-20091027/#Existential_Quantification"
- *      >ObjectSomeValuesFrom<a>
  */
 public class ElkObjectSomeValuesFrom extends ElkClassExpression {
 
@@ -45,7 +44,7 @@ public class ElkObjectSomeValuesFrom extends ElkClassExpression {
 	 */
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		
+
 		return visitor.visit(this);
 
 	}

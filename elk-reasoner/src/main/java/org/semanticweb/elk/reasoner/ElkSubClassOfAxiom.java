@@ -26,6 +26,10 @@
 package org.semanticweb.elk.reasoner;
 
 /**
+ * Corresponds to a <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Subclass_Axioms">Subclass Axiom<a> in the
+ * OWL 2 specification.
+ * 
  * @author Yevgeny Kazakov
  * 
  */

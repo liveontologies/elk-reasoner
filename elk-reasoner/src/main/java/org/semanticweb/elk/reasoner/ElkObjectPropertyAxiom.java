@@ -26,11 +26,15 @@
 package org.semanticweb.elk.reasoner;
 
 /**
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Object_Property_Axioms">Object Property
+ * Axiom<a> in the OWL 2 specification.
+ * 
  * @author Yevgeny Kazakov
- *
+ * 
  */
 public abstract class ElkObjectPropertyAxiom extends ElkObject {
-	
+
 	public abstract <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor);
 
 	/*
@@ -42,7 +46,7 @@ public abstract class ElkObjectPropertyAxiom extends ElkObject {
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 
-		return accept( (ElkObjectPropertyAxiomVisitor<O>) visitor );
+		return accept((ElkObjectPropertyAxiomVisitor<O>) visitor);
 
 	}
 

@@ -26,8 +26,11 @@
 package org.semanticweb.elk.reasoner;
 
 /**
- * @author Yevgeny Kazakov
+ * Corresponds to a <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Classes">Class<a> in the OWL 2
+ * specification.
  * 
+ * @author Yevgeny Kazakov
  */
 public class ElkClass extends ElkClassExpression {
 

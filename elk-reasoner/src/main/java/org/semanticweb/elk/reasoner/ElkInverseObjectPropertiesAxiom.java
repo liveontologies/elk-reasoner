@@ -26,19 +26,27 @@
 package org.semanticweb.elk.reasoner;
 
 /**
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Inverse_Object_Properties_2">Inverse
+ * Object Properties Axiom<a> in the OWL 2 specification.
+ * 
  * @author Yevgeny Kazakov
- *
+ * 
  */
 public class ElkInverseObjectPropertiesAxiom extends ElkObjectPropertyAxiom {
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ELKObjectPropertyAxiom#accept(org.semanticweb.elk.reasoner.ELKObjectPropertyAxiomVisitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.ELKObjectPropertyAxiom#accept(org.semanticweb
+	 * .elk.reasoner.ELKObjectPropertyAxiomVisitor)
 	 */
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		
+
 		return visitor.visit(this);
-		
+
 	}
 
 }
