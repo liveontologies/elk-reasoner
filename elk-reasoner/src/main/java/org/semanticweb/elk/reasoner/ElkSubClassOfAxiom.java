@@ -29,7 +29,7 @@ package org.semanticweb.elk.reasoner;
  * @author Yevgeny Kazakov
  * 
  */
-public class ELKEquivalentClassesAxiom extends ELKClassAxiom {
+public class ElkSubClassOfAxiom extends ElkClassAxiom {
 
 	/*
 	 * (non-Javadoc)
@@ -39,7 +39,7 @@ public class ELKEquivalentClassesAxiom extends ELKClassAxiom {
 	 * .reasoner.ELKClassAxiomVisitor)
 	 */
 	@Override
-	public <O> O accept(ELKClassAxiomVisitor<O> visitor) {
+	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
 
 		return visitor.visit(this);
 

@@ -28,13 +28,26 @@ package org.semanticweb.elk.reasoner;
 /**
  * @author Yevgeny Kazakov
  * 
+ *         Corresponds to ObjectSomeValuesFrom class expression in the OWL 2
+ *         Specification.
+ * @see <a href=
+ *      "http://www.w3.org/TR/2009/REC-owl2-syntax-20091027/#Existential_Quantification"
+ *      >ObjectSomeValuesFrom<a>
  */
-public interface ELKClassExpressionVisitor<O> {
+public class ElkObjectSomeValuesFrom extends ElkClassExpression {
 
-	O visit(ELKClass elkClass);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.ELKClassExpression#accept(org.semanticweb
+	 * .elk.reasoner.ELKClassExpressionVisitor)
+	 */
+	@Override
+	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		
+		return visitor.visit(this);
 
-	O visit(ELKObjectIntersectionOf elkObjectIntersectionOf);
-
-	O visit(ELKObjectSomeValuesFrom elkObjectSomeValuesFrom);
+	}
 
 }

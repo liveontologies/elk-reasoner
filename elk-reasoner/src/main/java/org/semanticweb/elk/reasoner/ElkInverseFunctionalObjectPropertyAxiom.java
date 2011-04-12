@@ -29,17 +29,18 @@ package org.semanticweb.elk.reasoner;
  * @author Yevgeny Kazakov
  * 
  */
-public class ELKObjectIntersectionOf extends ELKClassExpression {
+public class ElkInverseFunctionalObjectPropertyAxiom extends
+		ElkObjectPropertyAxiom {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.semanticweb.elk.reasoner.ELKClassExpression#accept(org.semanticweb
-	 * .elk.reasoner.ELKClassExpressionVisitor)
+	 * org.semanticweb.elk.reasoner.ELKObjectPropertyAxiom#accept(org.semanticweb
+	 * .elk.reasoner.ELKObjectPropertyAxiomVisitor)
 	 */
 	@Override
-	public <O> O accept(ELKClassExpressionVisitor<O> visitor) {
+	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 
 		return visitor.visit(this);
 

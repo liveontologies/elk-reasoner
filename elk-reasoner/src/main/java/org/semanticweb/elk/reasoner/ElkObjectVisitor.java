@@ -29,19 +29,8 @@ package org.semanticweb.elk.reasoner;
  * @author Yevgeny Kazakov
  * 
  */
-public class ELKObjectInverseOf extends ELKObjectPropertyExpression {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ELKObjectPropertyExpression#accept(org.
-	 * semanticweb.elk.reasoner.ELKObjectPropertyExpressionVisitor)
-	 */
-	@Override
-	public <O> O accept(ELKObjectPropertyExpressionVisitor<O> visitor) {
-
-		return visitor.visit(this);
-
-	}
+public interface ElkObjectVisitor<O> extends ElkClassAxiomVisitor<O>,
+		ElkClassExpressionVisitor<O>, ElkObjectPropertyAxiomVisitor<O>,
+		ElkObjectPropertyExpressionVisitor<O> {
 
 }

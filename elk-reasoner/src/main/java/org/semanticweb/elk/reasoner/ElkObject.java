@@ -27,10 +27,10 @@ package org.semanticweb.elk.reasoner;
 
 /**
  * @author Yevgeny Kazakov
- * 
+ *
  */
-public interface ELKObjectVisitor<O> extends ELKClassAxiomVisitor<O>,
-		ELKClassExpressionVisitor<O>, ELKObjectPropertyAxiomVisitor<O>,
-		ELKObjectPropertyExpressionVisitor<O> {
+public abstract class ElkObject {
+	
+	public abstract <O> O accept(ElkObjectVisitor<O> visitor);
 
 }

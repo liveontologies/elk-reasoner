@@ -29,12 +29,20 @@ package org.semanticweb.elk.reasoner;
  * @author Yevgeny Kazakov
  * 
  */
-public abstract class ELKClassExpression extends ELKObject {
+public class ElkClass extends ElkClassExpression {
 
-	public abstract <O> O accept(ELKClassExpressionVisitor<O> visitor);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.ELKClassExpression#accept(org.semanticweb
+	 * .elk.reasoner.ELKClassExpressionVisitor)
+	 */
+	@Override
+	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 
-	public <O> O accept(ELKObjectVisitor<O> visitor) {
-		return accept(visitor);
+		return visitor.visit(this);
+
 	}
 
 }

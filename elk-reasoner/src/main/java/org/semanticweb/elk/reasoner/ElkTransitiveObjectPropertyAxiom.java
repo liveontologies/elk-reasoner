@@ -28,24 +28,19 @@ package org.semanticweb.elk.reasoner;
 /**
  * @author Yevgeny Kazakov
  * 
- *         Corresponds to ObjectSomeValuesFrom class expression in the OWL 2
- *         Specification.
- * @see <a href=
- *      "http://www.w3.org/TR/2009/REC-owl2-syntax-20091027/#Existential_Quantification"
- *      >ObjectSomeValuesFrom<a>
  */
-public class ELKObjectSomeValuesFrom extends ELKClassExpression {
+public class ElkTransitiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.semanticweb.elk.reasoner.ELKClassExpression#accept(org.semanticweb
-	 * .elk.reasoner.ELKClassExpressionVisitor)
+	 * org.semanticweb.elk.reasoner.ELKObjectPropertyAxiom#accept(org.semanticweb
+	 * .elk.reasoner.ELKObjectPropertyAxiomVisitor)
 	 */
 	@Override
-	public <O> O accept(ELKClassExpressionVisitor<O> visitor) {
-		
+	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
+
 		return visitor.visit(this);
 
 	}

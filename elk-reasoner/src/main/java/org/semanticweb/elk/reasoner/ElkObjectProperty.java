@@ -29,10 +29,19 @@ package org.semanticweb.elk.reasoner;
  * @author Yevgeny Kazakov
  * 
  */
-public interface ELKClassAxiomVisitor<O> {
+public class ElkObjectProperty extends ElkObjectPropertyExpression {
 
-	O visit(ELKEquivalentClassesAxiom elkEquivalentClassesAxiom);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ELKObjectPropertyExpression#accept(org.
+	 * semanticweb.elk.reasoner.ELKObjectPropertyExpressionVisitor)
+	 */
+	@Override
+	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
 
-	O visit(ELKSubClassOfAxiom elkSubClassOfAxiom);
+		return visitor.visit(this);
+
+	}
 
 }
