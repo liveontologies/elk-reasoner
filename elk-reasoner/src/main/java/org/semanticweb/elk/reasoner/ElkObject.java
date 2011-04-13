@@ -25,12 +25,34 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 /**
  * @author Yevgeny Kazakov
- *
+ * 
  */
 public abstract class ElkObject {
-	
+
 	public abstract <O> O accept(ElkObjectVisitor<O> visitor);
+
+	public abstract int hashCode();
+
+	public abstract boolean equals(Object obj);
+
+	private static final Map<ElkObject, WeakReference<ElkObject>> elkObjectCache_ 
+	   = new WeakHashMap<ElkObject, WeakReference<ElkObject>>();
+
+	protected static ElkObject intern(ElkObject elkObject) {
+		WeakReference<ElkObject> reference = elkObjectCache_.get(elkObject);
+		if (reference != null) {
+			ElkObject cashedElkObject = reference.get();
+			if (cashedElkObject != null)
+				return cashedElkObject;
+		}
+		elkObjectCache_.put(elkObject, new WeakReference<ElkObject>(elkObject));
+		return elkObject;
+	}
 
 }

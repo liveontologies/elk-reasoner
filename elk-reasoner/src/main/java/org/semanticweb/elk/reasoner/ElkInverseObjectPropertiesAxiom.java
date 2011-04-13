@@ -49,4 +49,22 @@ public class ElkInverseObjectPropertiesAxiom extends ElkObjectPropertyAxiom {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

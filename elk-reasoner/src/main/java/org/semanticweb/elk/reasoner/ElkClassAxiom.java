@@ -43,7 +43,7 @@ public abstract class ElkClassAxiom extends ElkObject {
 	 * .reasoner.ELKObjectVisitor)
 	 */
 	@Override
-	public final <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
 
 		return accept((ElkClassAxiomVisitor<O>) visitor);
 

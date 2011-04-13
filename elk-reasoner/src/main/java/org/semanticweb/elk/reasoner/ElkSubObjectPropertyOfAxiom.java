@@ -34,7 +34,7 @@ package org.semanticweb.elk.reasoner;
  * 
  */
 public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -47,6 +47,24 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 
 		return visitor.visit(this);
 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

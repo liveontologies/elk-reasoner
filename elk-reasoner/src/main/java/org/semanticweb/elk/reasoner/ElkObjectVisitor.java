@@ -26,6 +26,8 @@
 package org.semanticweb.elk.reasoner;
 
 /**
+ * Visitor pattern interface for instances of {@link ElkObject}.
+ * 
  * @author Yevgeny Kazakov
  * 
  */

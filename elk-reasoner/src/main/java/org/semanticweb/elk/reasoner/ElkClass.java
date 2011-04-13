@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.reasoner;
 
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Classes">Class<a> in the OWL 2
@@ -33,6 +34,29 @@ package org.semanticweb.elk.reasoner;
  * @author Yevgeny Kazakov
  */
 public class ElkClass extends ElkClassExpression {
+
+	private final String classIri_;
+
+	private ElkClass(String classIri) {
+		this.classIri_ = classIri;
+	}
+
+	/**
+	 * Get the IRI of this class.
+	 * 
+	 * @return The IRI of this class.
+	 */
+	public String getIri() {
+		return classIri_;
+	}
+
+	public boolean equals(ElkClass elkClass) {
+		return elkClass.getIri().equals(classIri_);
+	}
+
+	static ElkClass create(String classIri) {
+		return (ElkClass) intern(new ElkClass(classIri));		
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -46,6 +70,30 @@ public class ElkClass extends ElkClassExpression {
 
 		return visitor.visit(this);
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return classIri_.hashCode();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (obj.getClass() != getClass())
+			return false;
+		return equals((ElkClass) obj);
 	}
 
 }
