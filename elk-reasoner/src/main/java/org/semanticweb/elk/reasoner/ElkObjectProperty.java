@@ -34,6 +34,53 @@ package org.semanticweb.elk.reasoner;
  * 
  */
 public class ElkObjectProperty extends ElkObjectPropertyExpression {
+	
+	private final String iri_;
+
+	private ElkObjectProperty(String iri) {
+		this.iri_ = iri;
+	}
+	
+	public static ElkObjectProperty create(String objectPropertyIri) {
+		return (ElkObjectProperty) factory.put(new ElkObjectProperty(objectPropertyIri));		
+	}
+
+
+	/**
+	 * Get the IRI of this object property.
+	 * 
+	 * @return The IRI of this object property.
+	 */
+	public String getIri() {
+		return iri_;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
+	 */
+	@Override
+	public int structuralHashCode() {
+		return iri_.hashCode();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
+	 */
+	@Override
+	public boolean structuralEquals(ElkObject object) {
+		if (this == object)
+			return true;
+		
+		if (object instanceof ElkObjectProperty)
+			return iri_.equals(((ElkObjectProperty) object).iri_);
+		
+		return false;
+	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -43,27 +90,7 @@ public class ElkObjectProperty extends ElkObjectPropertyExpression {
 	 */
 	@Override
 	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
-
 		return visitor.visit(this);
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

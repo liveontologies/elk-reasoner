@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.Arrays;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
@@ -34,7 +36,51 @@ package org.semanticweb.elk.reasoner;
  * 
  */
 public class ElkObjectIntersectionOf extends ElkClassExpression {
+	
+	protected final ElkClassExpression[] classExpressions;
+	
+	private ElkObjectIntersectionOf(ElkClassExpression... classExpressions) {
+		this.classExpressions = classExpressions;
+	}
+	
+	public static ElkObjectIntersectionOf create(ElkClassExpression... classExpressions) {
+		return (ElkObjectIntersectionOf) factory.put(
+				new ElkObjectIntersectionOf(classExpressions));	
+	}
+	
+	public ElkClassExpression[] getClassExpressions() {
+		return classExpressions;
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
+	 */
+	@Override
+	public int structuralHashCode() {
+		return computeCompositeHash(constructorHash_, classExpressions);
+	}
+	
+	private static final int constructorHash_ = "ElkObjectIntersectionOf".hashCode();
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
+	 */
+	@Override
+	public boolean structuralEquals(ElkObject object) {
+		if (this == object)
+			return true;
+		
+		if (object instanceof ElkObjectIntersectionOf)
+			return Arrays.equals(classExpressions,
+					((ElkObjectIntersectionOf) object).classExpressions);
+		
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -44,27 +90,7 @@ public class ElkObjectIntersectionOf extends ElkClassExpression {
 	 */
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-
 		return visitor.visit(this);
-
 	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	
 }

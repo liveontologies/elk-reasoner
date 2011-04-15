@@ -25,34 +25,45 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 /**
  * @author Yevgeny Kazakov
  * 
  */
+
 public abstract class ElkObject {
+	protected static ElkObjectFactory factory = new WeakCanonicalSet();
+	
+	public abstract int structuralHashCode();
+	
+	public abstract boolean structuralEquals(ElkObject object);
 
-	public abstract <O> O accept(ElkObjectVisitor<O> visitor);
-
-	public abstract int hashCode();
-
-	public abstract boolean equals(Object obj);
-
-	private static final Map<ElkObject, WeakReference<ElkObject>> elkObjectCache_ 
-	   = new WeakHashMap<ElkObject, WeakReference<ElkObject>>();
-
-	protected static ElkObject intern(ElkObject elkObject) {
-		WeakReference<ElkObject> reference = elkObjectCache_.get(elkObject);
-		if (reference != null) {
-			ElkObject cashedElkObject = reference.get();
-			if (cashedElkObject != null)
-				return cashedElkObject;
+	private static int nextHashCode_ = 0;
+	private final int hashCode_ = nextHashCode_++;
+	
+	public static int computeCompositeHash(int constructorHash, ElkObject... subObjects) {
+		int hash = constructorHash;
+		hash += (hash << 10);
+		hash ^= (hash >> 6);
+		
+		for (ElkObject o : subObjects) {
+		   hash += o.hashCode();
+		   hash += (hash << 10);
+		   hash ^= (hash >> 6);
 		}
-		elkObjectCache_.put(elkObject, new WeakReference<ElkObject>(elkObject));
-		return elkObject;
+		
+		hash += (hash << 3);
+		hash ^= (hash >> 11);
+		hash += (hash << 15);
+		return hash;
+	}
+				
+	public final int hashCode() {
+		return hashCode_;
 	}
 
+	public final boolean equals(Object obj) {
+		return this == obj;
+	}
+	
+	public abstract <O> O accept(ElkObjectVisitor<O> visitor);
 }

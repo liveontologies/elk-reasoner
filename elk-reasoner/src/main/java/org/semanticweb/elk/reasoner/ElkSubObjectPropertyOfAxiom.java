@@ -34,6 +34,68 @@ package org.semanticweb.elk.reasoner;
  * 
  */
 public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
+	protected final ElkObjectPropertyExpression subObjectPropertyExpression,
+											superObjectPropertyExpression;
+	
+	private ElkSubObjectPropertyOfAxiom(
+			ElkObjectPropertyExpression subObjectPropertyExpression,
+			ElkObjectPropertyExpression superObjectPropertyExpression)
+	{
+		this.subObjectPropertyExpression = subObjectPropertyExpression;
+		this.superObjectPropertyExpression = superObjectPropertyExpression;
+	}
+
+	public ElkObjectPropertyExpression getSubObjectPropertyExpression() {
+		return subObjectPropertyExpression;
+	}
+
+	public ElkObjectPropertyExpression getSuperObjectPropertyExpression() {
+		return superObjectPropertyExpression;
+	}
+
+	public static ElkSubObjectPropertyOfAxiom create(
+			ElkObjectPropertyExpression subObjectPropertyExpression,
+			ElkObjectPropertyExpression superObjectPropertyExpression)
+	{ 
+		return (ElkSubObjectPropertyOfAxiom) factory.put(
+				new ElkSubObjectPropertyOfAxiom(subObjectPropertyExpression,
+												superObjectPropertyExpression));		
+	}
+
+	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
+	 */
+	@Override
+	public int structuralHashCode() {
+		return computeCompositeHash(constructorHash_,
+									subObjectPropertyExpression,
+									superObjectPropertyExpression);
+	}
+	
+	private static final int constructorHash_ = "ElkSubObjectPropertyOfAxiom".hashCode();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
+	 */
+	@Override
+	public boolean structuralEquals(ElkObject object) {
+		if (this == object)
+			return true;
+		
+		if (object instanceof ElkSubObjectPropertyOfAxiom)
+			return subObjectPropertyExpression.equals(
+				((ElkSubObjectPropertyOfAxiom) object).subObjectPropertyExpression)
+				&& superObjectPropertyExpression.equals(
+				((ElkSubObjectPropertyOfAxiom) object).superObjectPropertyExpression);
+		
+		return false;
+	}
 	
 	/*
 	 * (non-Javadoc)
@@ -44,27 +106,7 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 	 */
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-
 		return visitor.visit(this);
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

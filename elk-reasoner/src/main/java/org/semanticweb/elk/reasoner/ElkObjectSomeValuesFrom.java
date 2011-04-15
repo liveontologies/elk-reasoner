@@ -35,6 +35,66 @@ package org.semanticweb.elk.reasoner;
  */
 public class ElkObjectSomeValuesFrom extends ElkClassExpression {
 
+	protected final ElkObjectPropertyExpression objectPropertyExpression;
+	protected final ElkClassExpression classExpression;
+
+	private ElkObjectSomeValuesFrom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkClassExpression classExpression)
+	{
+		this.objectPropertyExpression = objectPropertyExpression;
+		this.classExpression = classExpression;
+	}
+	
+	public static ElkObjectSomeValuesFrom create(
+					ElkObjectPropertyExpression objectPropertyExpression,
+					ElkClassExpression classExpression)
+	{
+		return (ElkObjectSomeValuesFrom) factory.put(
+				new ElkObjectSomeValuesFrom(objectPropertyExpression,
+											classExpression));		
+	}
+
+	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+		return objectPropertyExpression;
+	}
+	
+	public ElkClassExpression getClassExpression() {
+		return classExpression;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
+	 */
+	@Override
+	public int structuralHashCode() {
+		return computeCompositeHash(constructorHash_,
+									objectPropertyExpression, classExpression);
+	}
+	
+	private static final int constructorHash_ = "ElkObjectSomeValuesFrom".hashCode();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
+	 */
+	@Override
+	public boolean structuralEquals(ElkObject object) {
+		if (this == object)
+			return true;
+		
+		if (object instanceof ElkObjectSomeValuesFrom)
+			return objectPropertyExpression.equals(
+					((ElkObjectSomeValuesFrom) object).objectPropertyExpression)
+				&& classExpression.equals(
+					((ElkObjectSomeValuesFrom) object).classExpression);	
+		
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -44,27 +104,6 @@ public class ElkObjectSomeValuesFrom extends ElkClassExpression {
 	 */
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-
 		return visitor.visit(this);
-
 	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

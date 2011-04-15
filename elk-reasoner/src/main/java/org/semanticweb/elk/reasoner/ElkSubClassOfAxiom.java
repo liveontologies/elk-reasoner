@@ -35,6 +35,64 @@ package org.semanticweb.elk.reasoner;
  */
 public class ElkSubClassOfAxiom extends ElkClassAxiom {
 
+	protected final ElkClassExpression subClassExpression, superClassExpression;
+	
+	private ElkSubClassOfAxiom(	ElkClassExpression subClassExpression,
+								ElkClassExpression superClassExpression)
+	{
+		this.subClassExpression = subClassExpression;
+		this.superClassExpression = superClassExpression;
+	}
+
+	public ElkClassExpression getSubClassExpression() {
+		return subClassExpression;
+	}
+
+	public ElkClassExpression getSuperClassExpression() {
+		return superClassExpression;
+	}
+
+	public static ElkSubClassOfAxiom create(
+			ElkClassExpression subClassExpression,
+			ElkClassExpression superClassExpression)
+	{ 
+		return (ElkSubClassOfAxiom) factory.put(
+				new ElkSubClassOfAxiom(subClassExpression, superClassExpression));		
+	}
+
+	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
+	 */
+	@Override
+	public int structuralHashCode() {
+		return computeCompositeHash(constructorHash_,
+									subClassExpression, superClassExpression);
+	}
+	
+	private static final int constructorHash_ = "ElkSubClassOfAxiom".hashCode();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
+	 */
+	@Override
+	public boolean structuralEquals(ElkObject object) {
+		if (this == object)
+			return true;
+		
+		if (object instanceof ElkSubClassOfAxiom)
+			return subClassExpression.equals(
+					((ElkSubClassOfAxiom) object).subClassExpression)
+				&& superClassExpression.equals(
+						((ElkSubClassOfAxiom) object).superClassExpression);
+		
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -44,27 +102,6 @@ public class ElkSubClassOfAxiom extends ElkClassAxiom {
 	 */
 	@Override
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
-
 		return visitor.visit(this);
-
 	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

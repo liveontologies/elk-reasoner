@@ -53,7 +53,7 @@ public class ElkTransitiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
 	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
 	 */
 	@Override
-	public int hashCode() {
+	public int structuralHashCode() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -62,7 +62,7 @@ public class ElkTransitiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
 	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean structuralEquals(ElkObject obj) {
 		// TODO Auto-generated method stub
 		return false;
 	}

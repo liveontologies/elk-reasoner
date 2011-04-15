@@ -35,11 +35,16 @@ package org.semanticweb.elk.reasoner;
  */
 public class ElkClass extends ElkClassExpression {
 
-	private final String classIri_;
+	protected final String iri;
 
-	private ElkClass(String classIri) {
-		this.classIri_ = classIri;
+	protected ElkClass(String iri) {
+		this.iri = iri;
 	}
+	
+	public static ElkClass create(String iri) {
+		return (ElkClass) factory.put(new ElkClass(iri));		
+	}
+
 
 	/**
 	 * Get the IRI of this class.
@@ -47,17 +52,35 @@ public class ElkClass extends ElkClassExpression {
 	 * @return The IRI of this class.
 	 */
 	public String getIri() {
-		return classIri_;
+		return iri;
 	}
 
-	public boolean equals(ElkClass elkClass) {
-		return elkClass.getIri().equals(classIri_);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
+	 */
+	@Override
+	public int structuralHashCode() {
+		return iri.hashCode();
 	}
 
-	static ElkClass create(String classIri) {
-		return (ElkClass) intern(new ElkClass(classIri));		
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
+	 */
+	@Override
+	public boolean structuralEquals(ElkObject object) {
+		if (this == object)
+			return true;
+		
+		if (object instanceof ElkClass)
+			return iri.equals(((ElkClass) object).iri);
+		
+		return false;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -67,33 +90,7 @@ public class ElkClass extends ElkClassExpression {
 	 */
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-
 		return visitor.visit(this);
-
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return classIri_.hashCode();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (obj.getClass() != getClass())
-			return false;
-		return equals((ElkClass) obj);
-	}
-
+	
 }

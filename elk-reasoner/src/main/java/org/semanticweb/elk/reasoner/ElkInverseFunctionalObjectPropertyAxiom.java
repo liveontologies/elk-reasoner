@@ -54,7 +54,7 @@ public class ElkInverseFunctionalObjectPropertyAxiom extends
 	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
 	 */
 	@Override
-	public int hashCode() {
+	public int structuralHashCode() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -63,7 +63,7 @@ public class ElkInverseFunctionalObjectPropertyAxiom extends
 	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean structuralEquals(ElkObject obj) {
 		// TODO Auto-generated method stub
 		return false;
 	}
