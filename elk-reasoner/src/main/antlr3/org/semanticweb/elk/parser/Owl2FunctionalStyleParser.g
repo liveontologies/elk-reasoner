@@ -35,14 +35,17 @@ parser grammar Owl2FunctionalStyleParser;
 options {
   language = Java;
   tokenVocab = Owl2FunctionalStyleLexer;
+  k = 2;
 }
 
 @header {  
-  package org.semanticweb.elk.parser;  
+  package org.semanticweb.elk.parser;
+  
+  import org.semanticweb.elk.syntax.ElkClass;  
 }
 
 
-@members {    
+@members {
 }
 
 
@@ -69,19 +72,19 @@ nodeId
 /* an iri as defined in [RFC3987], enclosed in a pair of < (U+3C) and > 
 * (U+3E) characters
 */
-fullIri 
-    : IRI_REF
+fullIri returns [String value]
+    : x = IRI_REF          { $value = $x.text; }
     ; 
     /* See IRI_REF in [SPARQL] */
-iri 
-    : fullIri 
-    | abbreviatedIri
+iri returns [String value]
+    : x = fullIri          { $value = $x.value; }
+    | x = abbreviatedIri   { $value = $x.value; }
     ;
 /* a finite sequence of characters matching the PNAME_LN production of 
 * [SPARQL] 
 */
-abbreviatedIri 
-    : PNAME_LN
+abbreviatedIri returns [String value]
+    : x = PNAME_LN         { $value = $x.text; }
     ;
 /* a finite sequence of characters matching the as PNAME_NS production of 
 * [SPARQL] 
@@ -179,10 +182,10 @@ dtXmlLiterals
     ;
 /* 5 Entities and Literals */
 /* 5.1 Classes */
-clazz 
-    : iri
-    | OWL_THING
-    | OWL_NOTHING
+clazz returns [ElkClass value]
+    : x = iri         { $value = ElkClass.create($x.value); }
+    | OWL_THING       { $value = ElkClass.ELK_OWL_THING; }
+    | OWL_NOTHING     { $value = ElkClass.ELK_OWL_NOTHING; }
     ;
 /* 5.2 Datatypes */    
 datatype 

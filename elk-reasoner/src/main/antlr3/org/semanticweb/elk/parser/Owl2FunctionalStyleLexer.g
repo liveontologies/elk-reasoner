@@ -33,7 +33,7 @@
 lexer grammar Owl2FunctionalStyleLexer;
 
 options {
-  language = Java;
+  language = Java;  
 }
 tokens {
 /* Reserved Keywords */
@@ -396,7 +396,7 @@ tokens {
  *------------------------------------------------------------------*/
 
 WHITESPACE 
-    : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+   { $channel = HIDDEN; } 
+    : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+   { skip(); } 
     ;
 
 KEYWORD
