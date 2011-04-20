@@ -63,13 +63,13 @@ tokens {
   XSD_BOOLEAN;
   XSD_BYTE;
   XSD_DATE_TIME;
-  XSD_DATE_TIMEStamp;
+  XSD_DATE_TIME_STAMP;
   XSD_DECIMAL;
   XSD_DOUBLE;  
   XSD_FLOAT;
   XSD_HEX_BINARY;  
   XSD_INT;
-  XSD_INTeger;
+  XSD_INTEGER;
   XSD_LANGUAGE;
   XSD_LENGTH;
   XSD_LONG;
@@ -82,7 +82,7 @@ tokens {
   XSD_NAME;
   XSD_NC_NAME;
   XSD_NEGATIVE_INTEGER;
-  Xsd_NMTOKEN;
+  XSD_NMTOKEN;
   XSD_NON_NEGATIVE_INTEGER;
   XSD_NON_POSITIVE_INTEGER;
   XSD_NORMALIZED_STRING;
@@ -235,13 +235,13 @@ tokens {
   put("xsd:boolean",                      XSD_BOOLEAN);
   put("xsd:byte",                         XSD_BYTE);
   put("xsd:dateTime",                     XSD_DATE_TIME);
-  put("xsd:dateTimeStamp",                XSD_DATE_TIMEStamp);
+  put("xsd:dateTimeStamp",                XSD_DATE_TIME_STAMP);
   put("xsd:decimal",                      XSD_DECIMAL);
   put("xsd:double",                       XSD_DOUBLE);  
   put("xsd:float",                        XSD_FLOAT);
   put("xsd:hexBinary",                    XSD_HEX_BINARY);  
   put("xsd:int",                          XSD_INT);
-  put("xsd:integer",                      XSD_INTeger);
+  put("xsd:integer",                      XSD_INTEGER);
   put("xsd:language",                     XSD_LANGUAGE);
   put("xsd:length",                       XSD_LENGTH);
   put("xsd:long",                         XSD_LONG);
@@ -254,7 +254,7 @@ tokens {
   put("xsd:Name",                         XSD_NAME);
   put("xsd:NCName",                       XSD_NC_NAME);
   put("xsd:negativeInteger",              XSD_NEGATIVE_INTEGER);
-  put("xsd:NMTOKEN",                      Xsd_NMTOKEN);
+  put("xsd:NMTOKEN",                      XSD_NMTOKEN);
   put("xsd:nonNegativeInteger",           XSD_NON_NEGATIVE_INTEGER);
   put("xsd:nonPositiveInteger",           XSD_NON_POSITIVE_INTEGER);
   put("xsd:normalizedString",             XSD_NORMALIZED_STRING);
@@ -442,7 +442,7 @@ IRI_REF
     : '<' ( 
            ~( '<' 
             | '>' 
-            | '"' 
+            | '\"' 
             | '{' 
             | '}' 
             | '|' 

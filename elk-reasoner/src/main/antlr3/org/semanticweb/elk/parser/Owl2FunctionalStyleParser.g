@@ -129,7 +129,7 @@ dtRealsDecimalsIntegers
     : OWL_REAL
     | OWL_RATIONAL
     | XSD_DECIMAL
-    | XSD_INTeger
+    | XSD_INTEGER
     | XSD_NON_NEGATIVE_INTEGER
     | XSD_NON_POSITIVE_INTEGER
     | XSD_POSITIVE_INTEGER
@@ -157,7 +157,7 @@ dtStrings
     | XSD_LANGUAGE
     | XSD_NAME
     | XSD_NC_NAME
-    | Xsd_NMTOKEN
+    | XSD_NMTOKEN
     ;
 /* 4.4 Boolean Values */
 dtBooleans
@@ -174,7 +174,7 @@ dtIris
     ;
 /* 4.7 Time Instants */
 dtTimeInstants
-    : XSD_DATE_TIMEStamp
+    : XSD_DATE_TIME_STAMP
     ;
 /* 4.8 XML Literals */
 dtXmlLiterals
@@ -319,11 +319,11 @@ constrainingFacet
     | XSD_MAX_INCLUSIVE
     | XSD_MIN_EXCLUSIVE
     | XSD_MAX_EXCLUSIVE
-    | Xsd_length
+    | XSD_LENGTH
     | XSD_MIN_LENGTH
     | XSD_MAX_LENGTH
     | XSD_PATTERN
-    | Rdf_langRange
+    | RDF_LANG_RANGE
     ;
 restrictionValue 
     : literal
@@ -364,7 +364,7 @@ objectComplementOf
     ;
 /* 8.1.4 Enumeration of Individuals */    
 objectOneOf 
-    : OBJECT_ONE_OF OPEN_BRACE individual+CLOSE_BRACE
+    : OBJECT_ONE_OF OPEN_BRACE individual+ CLOSE_BRACE
     ;
 /* 8.2 Object Property Restrictions */
 /* 8.2.1 Existential Quantification */    
