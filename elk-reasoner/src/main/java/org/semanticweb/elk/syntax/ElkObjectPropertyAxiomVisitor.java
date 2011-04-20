@@ -23,31 +23,24 @@
 /**
  * @author Yevgeny Kazakov, Apr 8, 2011
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.syntax;
 
 /**
- * Corresponds to a <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Class_Expressions">Class Expression<a> in
- * the OWL 2 specification.
+ * Visitor pattern interface for instances of {@link ElkObjectPropertyAxiom}.
  * 
  * @author Yevgeny Kazakov
  * 
  */
-public abstract class ElkClassExpression extends ElkObject {
+public interface ElkObjectPropertyAxiomVisitor<O> {
 
-	public abstract <O> O accept(ElkClassExpressionVisitor<O> visitor);
+	O visit(ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ELKObject#accept(org.semanticweb.elk
-	 * .reasoner.ELKObjectVisitor)
-	 */
-	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	O visit(ElkInverseFunctionalObjectPropertyAxiom elkInverseFunctionalObjectPropertyAxiom);
+	
+	O visit(ElkInverseObjectPropertiesAxiom elkInverseObjectPropertiesAxiom);
 
-		return accept((ElkClassExpressionVisitor<O>) visitor);
-
-	}
-
+	O visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom);
+	
+	O visit(ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom);
+	
 }

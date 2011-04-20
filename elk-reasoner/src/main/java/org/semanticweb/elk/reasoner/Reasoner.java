@@ -20,27 +20,20 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, Apr 8, 2011
- */
 package org.semanticweb.elk.reasoner;
 
-/**
- * Visitor pattern interface for instances of {@link ElkObjectPropertyAxiom}.
- * 
- * @author Yevgeny Kazakov
- * 
- */
-public interface ElkObjectPropertyAxiomVisitor<O> {
+import java.util.List;
 
-	O visit(ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom);
+import org.semanticweb.elk.syntax.ElkClassExpression;
 
-	O visit(ElkInverseFunctionalObjectPropertyAxiom elkInverseFunctionalObjectPropertyAxiom);
+public class Reasoner {
+	final protected Indexer indexer = new Indexer();
+	final protected Saturator saturator = new Saturator();
 	
-	O visit(ElkInverseObjectPropertiesAxiom elkInverseObjectPropertiesAxiom);
-
-	O visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom);
-	
-	O visit(ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom);
-	
+	public void classify(List<ElkClassExpression> goals) {
+		indexer.reduceRoleHierarchy();
+		
+		for (ElkClassExpression e : goals)
+			saturator.saturate(indexer.getConcept(e));
+	}
 }

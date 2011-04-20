@@ -20,23 +20,22 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, Apr 8, 2011
- */
 package org.semanticweb.elk.reasoner;
 
-/**
- * Visitor pattern interface for instances of {@link ElkClassExpression}.
- * 
- * @author Yevgeny Kazakov
- * 
- */
-public interface ElkClassExpressionVisitor<O> {
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Set;
+import org.semanticweb.elk.util.ArraySet;
+import org.semanticweb.elk.util.Index;
 
-	O visit(ElkClass elkClass);
-
-	O visit(ElkObjectIntersectionOf elkObjectIntersectionOf);
-
-	O visit(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom);
-
+public class Context {
+	Set<Concept> derived;
+	Deque<Concept> queue;
+	Index<Role, Context> links;
+		
+	public Context() {
+		derived = new ArraySet<Concept> ();
+		queue = new LinkedList<Concept> ();
+		links =  new Index<Role, Context> ();
+	}
 }

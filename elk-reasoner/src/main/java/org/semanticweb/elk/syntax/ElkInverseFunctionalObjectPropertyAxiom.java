@@ -23,17 +23,18 @@
 /**
  * @author Yevgeny Kazakov, Apr 8, 2011
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.syntax;
 
 /**
- * Corresponds to a <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Transitive_Object_Properties">Transitive
- * Object Property Axiom<a> in the OWL 2 specification.
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Inverse-Functional_Object_Properties"
+ * >Inverse Functional Object Property Axiom<a> in the OWL 2 specification.
  * 
  * @author Yevgeny Kazakov
  * 
  */
-public class ElkTransitiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
+public class ElkInverseFunctionalObjectPropertyAxiom extends
+		ElkObjectPropertyAxiom {
 
 	/*
 	 * (non-Javadoc)

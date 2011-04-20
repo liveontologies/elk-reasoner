@@ -38,7 +38,7 @@
 
 //package org.cojen.util;
 
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.syntax;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;

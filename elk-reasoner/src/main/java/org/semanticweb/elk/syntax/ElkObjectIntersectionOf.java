@@ -23,36 +23,33 @@
 /**
  * @author Yevgeny Kazakov, Apr 8, 2011
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.syntax;
+
+import java.util.Arrays;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Object_Properties">Object Property<a> in
- * the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
+ * >Intersection of Class Expressions<a> in the OWL 2 specification.
  * 
  * @author Yevgeny Kazakov
  * 
  */
-public class ElkObjectProperty extends ElkObjectPropertyExpression {
+public class ElkObjectIntersectionOf extends ElkClassExpression {
 	
-	private final String iri_;
-
-	private ElkObjectProperty(String iri) {
-		this.iri_ = iri;
+	protected final ElkClassExpression[] classExpressions;
+	
+	private ElkObjectIntersectionOf(ElkClassExpression... classExpressions) {
+		this.classExpressions = classExpressions;
 	}
 	
-	public static ElkObjectProperty create(String objectPropertyIri) {
-		return (ElkObjectProperty) factory.put(new ElkObjectProperty(objectPropertyIri));		
+	public static ElkObjectIntersectionOf create(ElkClassExpression... classExpressions) {
+		return (ElkObjectIntersectionOf) factory.put(
+				new ElkObjectIntersectionOf(classExpressions));	
 	}
-
-
-	/**
-	 * Get the IRI of this object property.
-	 * 
-	 * @return The IRI of this object property.
-	 */
-	public String getIri() {
-		return iri_;
+	
+	public ElkClassExpression[] getClassExpressions() {
+		return classExpressions;
 	}
 
 	/*
@@ -62,9 +59,11 @@ public class ElkObjectProperty extends ElkObjectPropertyExpression {
 	 */
 	@Override
 	public int structuralHashCode() {
-		return iri_.hashCode();
+		return computeCompositeHash(constructorHash_, classExpressions);
 	}
-
+	
+	private static final int constructorHash_ = "ElkObjectIntersectionOf".hashCode();
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -75,22 +74,23 @@ public class ElkObjectProperty extends ElkObjectPropertyExpression {
 		if (this == object)
 			return true;
 		
-		if (object instanceof ElkObjectProperty)
-			return iri_.equals(((ElkObjectProperty) object).iri_);
+		if (object instanceof ElkObjectIntersectionOf)
+			return Arrays.equals(classExpressions,
+					((ElkObjectIntersectionOf) object).classExpressions);
 		
 		return false;
 	}
 	
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.semanticweb.elk.reasoner.ELKObjectPropertyExpression#accept(org.
-	 * semanticweb.elk.reasoner.ELKObjectPropertyExpressionVisitor)
+	 * @see
+	 * org.semanticweb.elk.reasoner.ELKClassExpression#accept(org.semanticweb
+	 * .elk.reasoner.ELKClassExpressionVisitor)
 	 */
 	@Override
-	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
+	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
+	
 }

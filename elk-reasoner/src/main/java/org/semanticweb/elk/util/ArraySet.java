@@ -20,34 +20,27 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, Apr 8, 2011
- */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.util;
 
-/**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Object_Property_Axioms">Object Property
- * Axiom<a> in the OWL 2 specification.
- * 
- * @author Yevgeny Kazakov
- * 
- */
-public abstract class ElkObjectPropertyAxiom extends ElkObject {
+import java.util.ArrayList;
+import java.util.Set;
 
-	public abstract <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor);
+public class ArraySet<T> extends ArrayList<T> implements Set<T> {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ELKObject#accept(org.semanticweb.elk
-	 * .reasoner.ELKObjectVisitor)
-	 */
-	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	private static final long serialVersionUID = 4210562273973502066L;
 
-		return accept((ElkObjectPropertyAxiomVisitor<O>) visitor);
-
+	public ArraySet() {
+		super();
 	}
-
+	
+	public ArraySet(int initialCapacity) {
+		super(initialCapacity);
+	}
+	
+	@Override
+	public boolean add(T element) {
+		if (!contains(element)) 
+			return super.add(element);
+		return false;
+	}
 }

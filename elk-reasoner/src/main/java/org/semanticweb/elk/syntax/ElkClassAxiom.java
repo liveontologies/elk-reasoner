@@ -23,18 +23,30 @@
 /**
  * @author Yevgeny Kazakov, Apr 8, 2011
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.syntax;
 
 /**
- * Visitor pattern interface for instances of {@link ElkClassAxiom}.
+ * Corresponds to a <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Class_Expression_Axioms">Class Expression
+ * Axiom<a> in the OWL 2 specification.
  * 
  * @author Yevgeny Kazakov
- * 
  */
-public interface ElkClassAxiomVisitor<O> {
+public abstract class ElkClassAxiom extends ElkObject {
 
-	O visit(ElkEquivalentClassesAxiom elkEquivalentClassesAxiom);
+	public abstract <O> O accept(ElkClassAxiomVisitor<O> visitor);
 
-	O visit(ElkSubClassOfAxiom elkSubClassOfAxiom);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ELKObject#accept(org.semanticweb.elk
+	 * .reasoner.ELKObjectVisitor)
+	 */
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+
+		return accept((ElkClassAxiomVisitor<O>) visitor);
+
+	}
 
 }

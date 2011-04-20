@@ -23,7 +23,7 @@
 /**
  * @author Yevgeny Kazakov, Apr 8, 2011
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.syntax;
 
 /**
  * Visitor pattern interface for instances of {@link ElkObject}.

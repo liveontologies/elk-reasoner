@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.syntax;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;

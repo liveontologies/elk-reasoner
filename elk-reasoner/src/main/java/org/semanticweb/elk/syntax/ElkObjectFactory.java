@@ -20,21 +20,8 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, Apr 8, 2011
- */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.syntax;
 
-/**
- * Visitor pattern interface for instances of {@link ElkObjectPropertyExpression}.
- * 
- * @author Yevgeny Kazakov
- *
- */
-public interface ElkObjectPropertyExpressionVisitor<O> {
-
-	O visit(ElkObjectProperty elkObjectProperty);
-	
-	O visit(ElkObjectInverseOf elkObjectInverseOf);
-		
+public interface ElkObjectFactory {
+	public ElkObject put(ElkObject object);
 }

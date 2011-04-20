@@ -20,8 +20,34 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+/**
+ * @author Yevgeny Kazakov, Apr 8, 2011
+ */
+package org.semanticweb.elk.syntax;
 
-public interface ElkObjectFactory {
-	public ElkObject put(ElkObject object);
+/**
+ * Corresponds to a <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Class_Expressions">Class Expression<a> in
+ * the OWL 2 specification.
+ * 
+ * @author Yevgeny Kazakov
+ * 
+ */
+public abstract class ElkClassExpression extends ElkObject {
+
+	public abstract <O> O accept(ElkClassExpressionVisitor<O> visitor);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ELKObject#accept(org.semanticweb.elk
+	 * .reasoner.ELKObjectVisitor)
+	 */
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+
+		return accept((ElkClassExpressionVisitor<O>) visitor);
+
+	}
+
 }

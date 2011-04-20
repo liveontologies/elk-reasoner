@@ -23,44 +23,33 @@
 /**
  * @author Yevgeny Kazakov, Apr 8, 2011
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.syntax;
+
+import java.util.Arrays;
 
 /**
- * Corresponds to a <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Subclass_Axioms">Subclass Axiom<a> in the
- * OWL 2 specification.
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Equivalent_Classes">Equivalent Class
+ * Axiom<a> in the OWL 2 specification.
  * 
  * @author Yevgeny Kazakov
  * 
  */
-public class ElkSubClassOfAxiom extends ElkClassAxiom {
-
-	protected final ElkClassExpression subClassExpression, superClassExpression;
+public class ElkEquivalentClassesAxiom extends ElkClassAxiom {
 	
-	private ElkSubClassOfAxiom(	ElkClassExpression subClassExpression,
-								ElkClassExpression superClassExpression)
-	{
-		this.subClassExpression = subClassExpression;
-		this.superClassExpression = superClassExpression;
-	}
-
-	public ElkClassExpression getSubClassExpression() {
-		return subClassExpression;
-	}
-
-	public ElkClassExpression getSuperClassExpression() {
-		return superClassExpression;
-	}
-
-	public static ElkSubClassOfAxiom create(
-			ElkClassExpression subClassExpression,
-			ElkClassExpression superClassExpression)
-	{ 
-		return (ElkSubClassOfAxiom) factory.put(
-				new ElkSubClassOfAxiom(subClassExpression, superClassExpression));		
-	}
-
+	protected final ElkClassExpression[] equivalentClassExpressions;
 	
+	private ElkEquivalentClassesAxiom(ElkClassExpression... equivalentClassExpressions) {
+		this.equivalentClassExpressions = equivalentClassExpressions;
+	}
+	
+	public static ElkEquivalentClassesAxiom create(ElkClassExpression... equivalentClassExpressions) { 
+		return (ElkEquivalentClassesAxiom) factory.put(new ElkEquivalentClassesAxiom(equivalentClassExpressions));		
+	}
+
+	public ElkClassExpression[] getEquivalentClassExpressions() {
+		return equivalentClassExpressions;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -69,11 +58,11 @@ public class ElkSubClassOfAxiom extends ElkClassAxiom {
 	 */
 	@Override
 	public int structuralHashCode() {
-		return computeCompositeHash(constructorHash_,
-									subClassExpression, superClassExpression);
+		return computeCompositeHash(constructorHash_, equivalentClassExpressions);
 	}
 	
-	private static final int constructorHash_ = "ElkSubClassOfAxiom".hashCode();
+	private static final int constructorHash_ = "ElkEquivalentClassesAxiom".hashCode();
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -84,11 +73,9 @@ public class ElkSubClassOfAxiom extends ElkClassAxiom {
 		if (this == object)
 			return true;
 		
-		if (object instanceof ElkSubClassOfAxiom)
-			return subClassExpression.equals(
-					((ElkSubClassOfAxiom) object).subClassExpression)
-				&& superClassExpression.equals(
-						((ElkSubClassOfAxiom) object).superClassExpression);
+		if (object instanceof ElkEquivalentClassesAxiom)
+			return Arrays.equals(equivalentClassExpressions,
+					((ElkEquivalentClassesAxiom) object).equivalentClassExpressions);
 		
 		return false;
 	}
