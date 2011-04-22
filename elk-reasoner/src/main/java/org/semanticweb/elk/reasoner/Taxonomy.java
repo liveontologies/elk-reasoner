@@ -20,21 +20,13 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util;
-
-import java.util.List;
-
+package org.semanticweb.elk.reasoner;
 
 /**
- * Multimap from Keys to Lists of Values 
- * 
  * @author Frantisek Simancik
  *
- * @param <Key>
- * @param <Value>
+ * @param <T>
  */
-
-public interface Index<Key, Value> {
-	void add(Key key, Value value);
-	List<Value> get(Key key);
+public interface Taxonomy<T> extends Iterable<EquivalenceClass<T>> {
+	public EquivalenceClass<T> getEquivalenceClass(T object);
 }

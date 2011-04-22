@@ -35,10 +35,10 @@ package org.semanticweb.elk.syntax;
  */
 public class ElkObjectProperty extends ElkObjectPropertyExpression {
 	
-	private final String iri_;
+	protected final String iri;
 
-	private ElkObjectProperty(String iri) {
-		this.iri_ = iri;
+	protected ElkObjectProperty(String iri) {
+		this.iri = iri;
 	}
 	
 	public static ElkObjectProperty create(String objectPropertyIri) {
@@ -52,8 +52,14 @@ public class ElkObjectProperty extends ElkObjectPropertyExpression {
 	 * @return The IRI of this object property.
 	 */
 	public String getIri() {
-		return iri_;
+		return iri;
 	}
+	
+	@Override
+	public String toString() {
+		return iri;
+	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -62,7 +68,7 @@ public class ElkObjectProperty extends ElkObjectPropertyExpression {
 	 */
 	@Override
 	public int structuralHashCode() {
-		return iri_.hashCode();
+		return iri.hashCode();
 	}
 
 	/*
@@ -76,7 +82,7 @@ public class ElkObjectProperty extends ElkObjectPropertyExpression {
 			return true;
 		
 		if (object instanceof ElkObjectProperty)
-			return iri_.equals(((ElkObjectProperty) object).iri_);
+			return iri.equals(((ElkObjectProperty) object).iri);
 		
 		return false;
 	}

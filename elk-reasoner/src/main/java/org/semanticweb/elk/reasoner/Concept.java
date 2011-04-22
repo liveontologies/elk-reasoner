@@ -22,82 +22,76 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.util.Set;
-import org.semanticweb.elk.syntax.ElkClass;
+import java.util.List;
+import java.util.ArrayList;
+
 import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.util.ArraySet;
 import org.semanticweb.elk.util.Pair;
 
-public class Concept {
-	
-	@Override
-	public int hashCode() {
-		return 1;
-	}
-	
-	//fields
-	protected final Set<ElkClassExpression> classExpressions;
-	protected final Set<Concept> toldSuperConcepts;
-	protected final Set<Conjunction> conjunctions;
-	protected final Set<Existential> existentials;
-	protected final Set<Universal> universals;
 
-	//methods
-	public Concept() {
-		classExpressions = new ArraySet<ElkClassExpression> ();
-		toldSuperConcepts = new ArraySet<Concept> ();
-		conjunctions = new ArraySet<Conjunction> ();
-		existentials = new ArraySet<Existential> ();
-		universals = new ArraySet<Universal> ();
+/**
+ * Represents all occurrences of an ElkClassExpression in an ontology  
+ * 
+ * @author Frantisek Simancik
+ *
+ */
+
+class Concept { 
+
+	protected final ElkClassExpression classExpression;
+	protected final List<Concept> toldSuperConcepts = new ArrayList<Concept> ();
+	protected final List<Conjunction> conjunctions = new ArrayList<Conjunction> ();
+	protected final List<Quantifier> existentials = new ArrayList<Quantifier> ();
+	protected final List<Quantifier> universals = new ArrayList<Quantifier> ();
+	
+	int positiveOccurrenceNo = 0;
+	int negativeOccurrenceNo = 0;
+
+	/**
+	 * Creates a Concept representing classExpression
+	 * 
+	 * @param classExpression
+	 */
+	public Concept(ElkClassExpression classExpression) {
+		this.classExpression = classExpression;
 	}
 	
-	public Concept(ElkClassExpression ce) {
-		this();
-		classExpressions.add(ce);
+	public ElkClassExpression getClassExpression() {
+		return classExpression;
 	}
 
-	public Set<ElkClassExpression> getClassExpressions() {
-		return classExpressions;
-	}
-
-	public Set<Concept> getToldSuperConcepts() {
+	public List<Concept> getToldSuperConcepts() {
 		return toldSuperConcepts;
 	}
 
-	public Set<Conjunction> getConjunctions() {
+	public List<Conjunction> getConjunctions() {
 		return conjunctions;
 	}
 
-	public Set<Existential> getExistentials() {
+	public List<Quantifier> getExistentials() {
 		return existentials;
 	}
 
-	public Set<Universal> getUniversals() {
+	public List<Quantifier> getUniversals() {
 		return universals;
 	}
 
-	public boolean containsAtomicClass() {
-		for (ElkClassExpression c : classExpressions)
-			if (c instanceof ElkClass)
-				return true;
-		return false;
-	}
+	private static int nextHashCode_ = 1;
+	private final int hash_ = nextHashCode_++;
 	
-	public Set<ElkClass> getAtomicClasses() {
-		Set<ElkClass> result = new ArraySet<ElkClass> ();
-		for (ElkClassExpression c : classExpressions)
-			if (c instanceof ElkClass)
-				result.add((ElkClass) c);
-		return result;
+	@Override
+	public int hashCode() {
+		return hash_;
 	}
 }
 
-class Conjunction extends Pair<Set<Concept>, Concept>{
-	public Conjunction(Set<Concept> premises, Concept conclusion) {
+
+class Conjunction extends Pair<List<Concept>, Concept>{
+	public Conjunction(List<Concept> premises, Concept conclusion) {
 		super(premises, conclusion);
 	}
 	
-	public Set<Concept> getPremises() {
+	public List<Concept> getPremises() {
 		return first;
 	}
 	
@@ -105,6 +99,7 @@ class Conjunction extends Pair<Set<Concept>, Concept>{
 		return second;
 	}
 }
+
 
 class Quantifier extends Pair<Role, Concept> {
 	public Quantifier(Role role, Concept concept) {
@@ -117,17 +112,5 @@ class Quantifier extends Pair<Role, Concept> {
 	
 	public Concept getConcept() {
 		return second;
-	}
-}
-
-class Existential extends Quantifier {
-	public Existential(Role role, Concept concept) {
-		super(role, concept);
-	}
-}
-
-class Universal extends Quantifier {
-	public Universal(Role role, Concept concept) {
-		super(role, concept);
 	}
 }

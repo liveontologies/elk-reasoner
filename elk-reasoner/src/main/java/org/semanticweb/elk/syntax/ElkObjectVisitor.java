@@ -31,8 +31,7 @@ package org.semanticweb.elk.syntax;
  * @author Yevgeny Kazakov
  * 
  */
-public interface ElkObjectVisitor<O> extends ElkClassAxiomVisitor<O>,
-		ElkClassExpressionVisitor<O>, ElkObjectPropertyAxiomVisitor<O>,
-		ElkObjectPropertyExpressionVisitor<O> {
+public interface ElkObjectVisitor<O> extends ElkAxiomVisitor<O>,
+		ElkClassExpressionVisitor<O>, ElkObjectPropertyExpressionVisitor<O> {
 
 }

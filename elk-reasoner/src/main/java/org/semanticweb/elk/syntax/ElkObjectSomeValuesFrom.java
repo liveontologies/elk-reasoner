@@ -62,6 +62,17 @@ public class ElkObjectSomeValuesFrom extends ElkClassExpression {
 	public ElkClassExpression getClassExpression() {
 		return classExpression;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder("ObjectSomeValuesFrom(");
+		result.append(objectPropertyExpression.toString());
+		result.append(" ");
+		result.append(classExpression.toString());
+		result.append(")");
+		return result.toString();
+	}
+
 
 	/*
 	 * (non-Javadoc)

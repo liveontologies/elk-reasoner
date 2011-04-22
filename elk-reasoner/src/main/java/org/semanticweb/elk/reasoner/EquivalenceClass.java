@@ -20,21 +20,40 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util;
+package org.semanticweb.elk.reasoner;
 
 import java.util.List;
-
+import java.util.ArrayList;
 
 /**
- * Multimap from Keys to Lists of Values 
- * 
  * @author Frantisek Simancik
  *
- * @param <Key>
- * @param <Value>
+ * @param <T>
  */
-
-public interface Index<Key, Value> {
-	void add(Key key, Value value);
-	List<Value> get(Key key);
+public class EquivalenceClass<T> {
+	protected List<T> members;
+	protected List<EquivalenceClass<T>> directSubClasses;
+	protected List<EquivalenceClass<T>> directSuperClasses;
+	
+	public EquivalenceClass() {
+		members = new ArrayList<T> ();
+		directSubClasses = new ArrayList<EquivalenceClass<T>> ();
+		directSuperClasses = new ArrayList<EquivalenceClass<T>> ();
+	}
+	
+	public T getCanonicalMember() {
+		return members.get(0);
+	}
+	
+	public List<T> getMembers() {
+		return members;
+	}
+	
+	public List<EquivalenceClass<T>> getDirectSuperClasses() {
+		return directSuperClasses;
+	}
+	
+	public List<EquivalenceClass<T>> getDirectSubClasses() {
+		return directSubClasses;
+	}
 }

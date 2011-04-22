@@ -20,21 +20,23 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util;
+package org.semanticweb.elk.syntax;
 
-import java.util.List;
+public abstract class ElkAxiom extends ElkObject {
 
+	public abstract <O> O accept(ElkAxiomVisitor<O> visitor);
 
-/**
- * Multimap from Keys to Lists of Values 
- * 
- * @author Frantisek Simancik
- *
- * @param <Key>
- * @param <Value>
- */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.reasoner.ELKObject#accept(org.semanticweb.elk
+	 * .reasoner.ELKObjectVisitor)
+	 */
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
 
-public interface Index<Key, Value> {
-	void add(Key key, Value value);
-	List<Value> get(Key key);
+		return accept((ElkAxiomVisitor<O>) visitor);
+
+	}
+
 }

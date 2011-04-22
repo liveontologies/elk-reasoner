@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.Arrays;
+
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.syntax.*;
 
@@ -37,29 +39,24 @@ public class ReasonerTest extends TestCase {
 		ElkObjectPropertyExpression has = ElkObjectProperty.create("has");
 		ElkClassExpression heart = ElkClass.create("Heart");
 		ElkClassExpression organ = ElkClass.create("Organ");
-		ElkClassExpression heartAndOrgan = ElkObjectIntersectionOf.create(heart, organ);
+		ElkClassExpression heartAndOrgan = ElkObjectIntersectionOf.create(Arrays.asList(heart, organ));
 		ElkClassExpression hasHeartAndOrgan = ElkObjectSomeValuesFrom.create(has, heartAndOrgan);		   
 
-		Indexer indexer = new Indexer();
-		indexer.addClassAxiom(ElkSubClassOfAxiom.create(human, hasHeartAndOrgan));		   
+		Reasoner reasoner = new Reasoner();
+		Indexer indexer = reasoner.indexer;
+		
+		reasoner.add(ElkSubClassOfAxiom.create(human, hasHeartAndOrgan));		   
 
-		assertFalse(indexer.getConcept(heart) == null);
 		assertTrue(indexer.getConcept(heartAndOrgan).getToldSuperConcepts().contains(indexer.getConcept(heart)));
 		assertTrue(indexer.getConcept(heartAndOrgan).getToldSuperConcepts().contains(indexer.getConcept(organ)));
 		assertTrue(indexer.getConcept(human).getToldSuperConcepts().contains(indexer.getConcept(hasHeartAndOrgan)));
-
 		assertTrue(indexer.getConcept(heart).getConjunctions().isEmpty());
 
-		indexer.addClassAxiom(ElkEquivalentClassesAxiom.create(human, hasHeartAndOrgan));
+		reasoner.add(ElkEquivalentClassesAxiom.create(Arrays.asList(human, hasHeartAndOrgan)));
 
 		assertTrue(indexer.getConcept(heartAndOrgan).getToldSuperConcepts().size() == 2);
 		assertFalse(indexer.getConcept(heart).getConjunctions().isEmpty());
 		assertNotSame(indexer.getConcept(human), indexer.getConcept(hasHeartAndOrgan));
-
-		ElkClassExpression heart2 = ElkClass.create("Heart2");
-		indexer.addClassAxiom(ElkEquivalentClassesAxiom.create(heart, heart2));
-
-		assertSame(indexer.getConcept(heart), indexer.getConcept(heart2));
 	}
 
 	public void testExistentials() {
@@ -71,10 +68,10 @@ public class ReasonerTest extends TestCase {
 		ElkObjectProperty s = ElkObjectProperty.create("S");
 		
 		Reasoner reasoner = new Reasoner();
-		reasoner.indexer.addClassAxiom(ElkEquivalentClassesAxiom.create(b, c));
-		reasoner.indexer.addClassAxiom(ElkSubClassOfAxiom.create(a, ElkObjectSomeValuesFrom.create(r, b)));
-		reasoner.indexer.addClassAxiom(ElkSubClassOfAxiom.create(ElkObjectSomeValuesFrom.create(s, c), d));
-		reasoner.indexer.addObjectPropertyAxiom(ElkSubObjectPropertyOfAxiom.create(r, s));
+		reasoner.add(ElkEquivalentClassesAxiom.create(Arrays.asList(b, c)));
+		reasoner.add(ElkSubClassOfAxiom.create(a, ElkObjectSomeValuesFrom.create(r, b)));
+		reasoner.add(ElkSubClassOfAxiom.create(ElkObjectSomeValuesFrom.create(s, c), d));
+		reasoner.add(ElkSubObjectPropertyOfAxiom.create(r, s));
 		
 		Concept A = reasoner.indexer.getConcept(a);
 		Concept D = reasoner.indexer.getConcept(d);
@@ -90,15 +87,15 @@ public class ReasonerTest extends TestCase {
 		ElkClass d = ElkClass.create("D");
 		
 		Reasoner reasoner = new Reasoner();
-		reasoner.indexer.addClassAxiom(ElkSubClassOfAxiom.create(a, b));
-		reasoner.indexer.addClassAxiom(ElkSubClassOfAxiom.create(a, c));
-		reasoner.indexer.addClassAxiom(ElkSubClassOfAxiom.create(ElkObjectIntersectionOf.create(b, c), d));
+		reasoner.add(ElkSubClassOfAxiom.create(a, b));
+		reasoner.add(ElkSubClassOfAxiom.create(a, c));
+		reasoner.add(ElkSubClassOfAxiom.create(ElkObjectIntersectionOf.create(Arrays.asList(b, c)), d));
 		
 		Concept A = reasoner.indexer.getConcept(a);
 		Concept B = reasoner.indexer.getConcept(b);
 		Concept C = reasoner.indexer.getConcept(c);
 		Concept D = reasoner.indexer.getConcept(d);
-		Concept I = reasoner.indexer.getConcept(ElkObjectIntersectionOf.create(b, c));
+		Concept I = reasoner.indexer.getConcept(ElkObjectIntersectionOf.create(Arrays.asList(b, c)));
 		
 		assertTrue("A SubClassOf B", A.getToldSuperConcepts().contains(B));
 		assertTrue("A SubClassOf C", A.getToldSuperConcepts().contains(C));

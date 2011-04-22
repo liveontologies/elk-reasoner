@@ -61,6 +61,16 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 				new ElkSubObjectPropertyOfAxiom(subObjectPropertyExpression,
 												superObjectPropertyExpression));		
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder("SubObjectPropertyOf(");
+		result.append(subObjectPropertyExpression.toString());
+		result.append(" ");
+		result.append(superObjectPropertyExpression.toString());
+		result.append(")");
+		return result.toString();
+	}
 
 	
 

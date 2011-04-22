@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.syntax;
 
+import java.util.List;
+
 /**
  * @author Yevgeny Kazakov
  * 
@@ -39,6 +41,10 @@ public abstract class ElkObject {
 
 	private static int nextHashCode_ = 0;
 	private final int hashCode_ = nextHashCode_++;
+	
+	public static int computeCompositeHash(int constructorHash, List<? extends ElkObject> subObjects) {
+		return computeCompositeHash(constructorHash, subObjects.toArray( new ElkObject[0] ));
+	}
 	
 	public static int computeCompositeHash(int constructorHash, ElkObject... subObjects) {
 		int hash = constructorHash;

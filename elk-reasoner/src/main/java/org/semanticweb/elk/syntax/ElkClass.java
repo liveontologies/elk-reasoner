@@ -59,7 +59,12 @@ public class ElkClass extends ElkClassExpression {
 	public String getIri() {
 		return iri;
 	}
-
+	
+	@Override
+	public String toString() {
+		return iri;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

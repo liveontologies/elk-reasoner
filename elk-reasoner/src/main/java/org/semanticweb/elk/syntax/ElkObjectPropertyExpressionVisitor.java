@@ -37,4 +37,5 @@ public interface ElkObjectPropertyExpressionVisitor<O> {
 	
 	O visit(ElkObjectInverseOf elkObjectInverseOf);
 		
+	O visit(ElkObjectPropertyChain elkObjectPropertyChain);
 }

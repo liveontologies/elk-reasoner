@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.syntax;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Corresponds to an <a href=
@@ -37,18 +37,29 @@ import java.util.Arrays;
  */
 public class ElkEquivalentClassesAxiom extends ElkClassAxiom {
 	
-	protected final ElkClassExpression[] equivalentClassExpressions;
+	protected final List<? extends ElkClassExpression> equivalentClassExpressions;
 	
-	private ElkEquivalentClassesAxiom(ElkClassExpression... equivalentClassExpressions) {
+	private ElkEquivalentClassesAxiom(List<? extends ElkClassExpression> equivalentClassExpressions) {
 		this.equivalentClassExpressions = equivalentClassExpressions;
 	}
 	
-	public static ElkEquivalentClassesAxiom create(ElkClassExpression... equivalentClassExpressions) { 
+	public static ElkEquivalentClassesAxiom create(List<? extends ElkClassExpression> equivalentClassExpressions) { 
 		return (ElkEquivalentClassesAxiom) factory.put(new ElkEquivalentClassesAxiom(equivalentClassExpressions));		
 	}
 
-	public ElkClassExpression[] getEquivalentClassExpressions() {
+	public List<? extends ElkClassExpression> getEquivalentClassExpressions() {
 		return equivalentClassExpressions;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder("EquivalentClasses(");
+		for (ElkClassExpression ce : equivalentClassExpressions) {
+			result.append(ce.toString());
+			result.append(" ");
+		}
+		result.setCharAt(result.length()-1, ')');
+		return result.toString();
 	}
 
 	/*
@@ -74,8 +85,8 @@ public class ElkEquivalentClassesAxiom extends ElkClassAxiom {
 			return true;
 		
 		if (object instanceof ElkEquivalentClassesAxiom)
-			return Arrays.equals(equivalentClassExpressions,
-					((ElkEquivalentClassesAxiom) object).equivalentClassExpressions);
+			return equivalentClassExpressions.equals(
+			((ElkEquivalentClassesAxiom) object).equivalentClassExpressions);
 		
 		return false;
 	}

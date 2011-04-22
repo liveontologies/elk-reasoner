@@ -34,6 +34,32 @@ package org.semanticweb.elk.syntax;
  * 
  */
 public class ElkTransitiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
+	
+	protected final ElkObjectPropertyExpression objectPropertyExpression;
+	
+	protected ElkTransitiveObjectPropertyAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression) {
+		this.objectPropertyExpression = objectPropertyExpression;
+	}
+	
+	public static ElkTransitiveObjectPropertyAxiom create(
+			ElkObjectPropertyExpression objectPropertyExpression) {
+		return (ElkTransitiveObjectPropertyAxiom) factory.put(
+				new ElkTransitiveObjectPropertyAxiom(objectPropertyExpression));	
+	}
+	
+	
+	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+		return objectPropertyExpression;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder("TransitiveObjectProperty(");
+		result.append(objectPropertyExpression.toString());
+		result.append(")");
+		return result.toString();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -54,16 +80,23 @@ public class ElkTransitiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
 	 */
 	@Override
 	public int structuralHashCode() {
-		// TODO Auto-generated method stub
-		return 0;
+		return computeCompositeHash(constructorHash_, objectPropertyExpression);
 	}
+	
+	private static final int constructorHash_ = "ElkTransitiveObjectPropertyAxiom".hashCode();
 
 	/* (non-Javadoc)
 	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean structuralEquals(ElkObject obj) {
-		// TODO Auto-generated method stub
+	public boolean structuralEquals(ElkObject object) {
+		if (this == object)
+			return true;
+		
+		if (object instanceof ElkTransitiveObjectPropertyAxiom)
+			return objectPropertyExpression.equals(
+					((ElkTransitiveObjectPropertyAxiom) object).objectPropertyExpression);
+		
 		return false;
 	}
 

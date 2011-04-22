@@ -32,7 +32,7 @@ package org.semanticweb.elk.syntax;
  * 
  * @author Yevgeny Kazakov
  */
-public abstract class ElkClassAxiom extends ElkObject {
+public abstract class ElkClassAxiom extends ElkAxiom {
 
 	public abstract <O> O accept(ElkClassAxiomVisitor<O> visitor);
 
@@ -43,7 +43,7 @@ public abstract class ElkClassAxiom extends ElkObject {
 	 * .reasoner.ELKObjectVisitor)
 	 */
 	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 
 		return accept((ElkClassAxiomVisitor<O>) visitor);
 

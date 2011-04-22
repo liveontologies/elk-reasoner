@@ -20,21 +20,8 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util;
+package org.semanticweb.elk.syntax;
 
-import java.util.List;
+public interface ElkAxiomVisitor<O> extends ElkClassAxiomVisitor<O>, ElkObjectPropertyAxiomVisitor<O> {
 
-
-/**
- * Multimap from Keys to Lists of Values 
- * 
- * @author Frantisek Simancik
- *
- * @param <Key>
- * @param <Value>
- */
-
-public interface Index<Key, Value> {
-	void add(Key key, Value value);
-	List<Value> get(Key key);
 }

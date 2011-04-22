@@ -22,56 +22,36 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
-import java.util.Set;
 import java.util.Map;
-import java.util.HashSet;
-import java.util.WeakHashMap;
 import java.lang.UnsupportedOperationException;
 
 import org.semanticweb.elk.syntax.*;
-import org.semanticweb.elk.util.ArraySet;
 
 class Indexer {
-	
-	protected List<ElkClassAxiom> classAxioms;
-	protected List<ElkObjectPropertyAxiom> objectPropertyAxioms;
-	
-	protected Map<ElkClassExpression, Concept> mapClassToConcept;
-	protected Map<ElkObjectPropertyExpression, Role> mapObjectPropertyToRole;
-	
-	protected Set<ElkObjectSomeValuesFrom> negativeExistentials;	
+	protected Map<ElkClassExpression, Concept> mapClassToConcept
+	 			= new HashMap<ElkClassExpression, Concept> ();
+	protected Map<ElkObjectPropertyExpression, Role> mapObjectPropertyToRole
+	 			= new HashMap<ElkObjectPropertyExpression, Role> ();
+	protected List<ElkObjectSomeValuesFrom> negativeExistentials
+				= new LinkedList<ElkObjectSomeValuesFrom> ();
 
-	Indexer() {
-		classAxioms = new Vector<ElkClassAxiom> ();
-		objectPropertyAxioms = new Vector<ElkObjectPropertyAxiom> ();
-		
-		mapClassToConcept = new WeakHashMap<ElkClassExpression, Concept> ();
-		mapObjectPropertyToRole = new WeakHashMap<ElkObjectPropertyExpression, Role> ();
-
-		//this should really be a WeakSet
-		negativeExistentials = new HashSet<ElkObjectSomeValuesFrom> ();
-	}
 	
-	void addClassAxiom(ElkClassAxiom axiom) {
-		axiom.accept(addClassAxiomVisitor);
-		classAxioms.add(axiom);
-	}
-	
-	void addObjectPropertyAxiom(ElkObjectPropertyAxiom axiom) {
-		axiom.accept(addObjectPropertyAxiomVisitor);
-		objectPropertyAxioms.add(axiom);
+	void indexAxiom(ElkAxiom axiom) {
+		axiom.accept(addAxiomVisitor);
 	}
 
 	void reduceRoleHierarchy() {
-		// expand negativeExistentials
+		// expand negativeExistentials - perhaps should first clear universals in all concepts 
 		for (ElkObjectSomeValuesFrom existential : negativeExistentials) {
 			Concept e = getConcept(existential);
 			Role r = getRole(existential.getObjectPropertyExpression());
 			Concept c = getConcept(existential.getClassExpression());
 			for (Role s : r.getSubRoles())
-				c.getUniversals().add(new Universal(s, e));
+				c.getUniversals().add(new Quantifier(s, e));
 		}
 	}
 
@@ -83,7 +63,7 @@ class Indexer {
 		}
 		return concept;
 	}
-	
+
 	protected Role getRole(ElkObjectPropertyExpression ope) {
 		Role role = mapObjectPropertyToRole.get(ope);
 		if (role == null) {
@@ -92,143 +72,143 @@ class Indexer {
 		}
 		return role;
 	}
-	
-	protected final ElkClassAxiomVisitor<Void>
-		addClassAxiomVisitor = new ElkClassAxiomVisitor<Void> () {
-	
-		public Void visit(ElkSubClassOfAxiom axiom) {
-			ElkClassExpression subClass = axiom.getSubClassExpression();
-			ElkClassExpression superClass = axiom.getSuperClassExpression();
-			
-			subClass.accept(negativeOccurrenceVisitor);
-			superClass.accept(positiveOccurrenceVisitor);
 
-			getConcept(subClass).getToldSuperConcepts().add(getConcept(superClass));
+	protected final ElkClassExpressionVisitor<Void> negativeOccurrenceVisitor =  
+	new ElkClassExpressionVisitor<Void> () {
+
+		public Void visit(ElkClass c) {
+			getConcept(c).negativeOccurrenceNo++;
 			
 			return null;
 		}
-	
-		public Void visit(ElkEquivalentClassesAxiom axiom) {
-			Concept canonical = null;
-			for (ElkClassExpression c : axiom.getEquivalentClassExpressions()) {
-				canonical = mapClassToConcept.get(c);
-				if (canonical != null)
-					break;
-			}
-			
-			if (canonical == null)
-				canonical = new Concept();
-			
-			for (ElkClassExpression c : axiom.getEquivalentClassExpressions()) {
-				Concept concept = mapClassToConcept.get(c);
-				if (concept == null) {
-					mapClassToConcept.put(c, canonical);
-					canonical.getClassExpressions().add(c);
-				}
-				else {
-					canonical.getToldSuperConcepts().add(concept);
-					concept.getToldSuperConcepts().add(canonical);
-				}
-				
-				c.accept(negativeOccurrenceVisitor);
-				c.accept(positiveOccurrenceVisitor);
-			}
-			
-			return null;
-		}
-	};
-	
-	protected final ElkClassExpressionVisitor<Void>
-		negativeOccurrenceVisitor = new ElkClassExpressionVisitor<Void> () {
-		
-			public Void visit(ElkClass c) {
-				getConcept(c);
-				return null;
-			}
 
-			public Void visit(ElkObjectIntersectionOf c) {
-				Set<Concept> premises = new ArraySet<Concept> (c.getClassExpressions().length);
+		public Void visit(ElkObjectIntersectionOf c) {
+			Concept concept = getConcept(c);
+			if (concept.negativeOccurrenceNo++ == 0) {
+
+				List<Concept> premises = 
+					new ArrayList<Concept> (c.getClassExpressions().size());
 				for (ElkClassExpression d : c.getClassExpressions()) {
 					d.accept(this);
 					premises.add(getConcept(d));
 				}
-				
-				Conjunction conjunction = new Conjunction(premises, getConcept(c));
-				for (Concept concept : premises)
-					concept.getConjunctions().add(conjunction);
-				
-				return null;
+
+				Conjunction conjunction = new Conjunction(premises, concept);
+				for (Concept p : premises)
+					p.getConjunctions().add(conjunction);
+
 			}
 
-			public Void visit(ElkObjectSomeValuesFrom c) {
-				getConcept(c);
+			return null;
+		}
+
+		public Void visit(ElkObjectSomeValuesFrom c) {
+			Concept concept = getConcept(c);
+			if (concept.negativeOccurrenceNo++ == 0) {
 				getRole(c.getObjectPropertyExpression());
 				c.getClassExpression().accept(this);
-
 				negativeExistentials.add(c);
-				return null;
 			}
-		};
-	
+
+			return null;
+		}
+	};
+
 	protected final ElkClassExpressionVisitor<Void>		
-		positiveOccurrenceVisitor = new ElkClassExpressionVisitor<Void> () {
+	positiveOccurrenceVisitor = new ElkClassExpressionVisitor<Void> () {
 
-			public Void visit(ElkClass c) {
-				getConcept(c);
-				return null;
-			}
+		public Void visit(ElkClass c) {
+			getConcept(c).positiveOccurrenceNo++;
+			
+			return null;
+		}
 
-			public Void visit(ElkObjectIntersectionOf c) {
-				Concept concept = getConcept(c);
+		public Void visit(ElkObjectIntersectionOf c) {
+			Concept concept = getConcept(c);
+			if (concept.positiveOccurrenceNo++ == 0) {
 				for (ElkClassExpression d : c.getClassExpressions()) {
 					d.accept(this);
 					concept.getToldSuperConcepts().add(getConcept(d));
 				}
-				return null;
 			}
+			
+			return null;
+		}
 
-			public Void visit(ElkObjectSomeValuesFrom c) {
+		public Void visit(ElkObjectSomeValuesFrom c) {
+			Concept concept = getConcept(c);
+			if (concept.positiveOccurrenceNo++ == 0) {
 				ElkObjectPropertyExpression r = c.getObjectPropertyExpression();
 				ElkClassExpression d = c.getClassExpression();
-				
 				d.accept(this);
-				getConcept(c).getExistentials().add(
-						new Existential(getRole(r), getConcept(d)));
-				
-				return null;
+				concept.getExistentials().add(
+						new Quantifier(getRole(r), getConcept(d)));
 			}
-		};
-		
-	protected final ElkObjectPropertyAxiomVisitor<Void>
-		addObjectPropertyAxiomVisitor = new ElkObjectPropertyAxiomVisitor<Void> () {
 
-			public Void visit(ElkFunctionalObjectPropertyAxiom axiom) {
-				throw new UnsupportedOperationException(
+			return null;
+		}
+	};
+
+	protected final ElkAxiomVisitor<Void>
+	addAxiomVisitor = new ElkAxiomVisitor<Void> () {
+
+		public Void visit(ElkSubClassOfAxiom axiom) {
+			ElkClassExpression subClass = axiom.getSubClassExpression();
+			ElkClassExpression superClass = axiom.getSuperClassExpression();
+
+			subClass.accept(negativeOccurrenceVisitor);
+			superClass.accept(positiveOccurrenceVisitor);
+
+			getConcept(subClass).getToldSuperConcepts().add(getConcept(superClass));
+
+			return null;
+		}
+
+		public Void visit(ElkEquivalentClassesAxiom axiom) {
+
+			Concept canonical = null;
+			for (ElkClassExpression c : axiom.getEquivalentClassExpressions()) {
+				Concept concept = getConcept(c);
+				if (canonical == null)
+					canonical = concept;
+				else {
+					concept.getToldSuperConcepts().add(canonical);
+					canonical.getToldSuperConcepts().add(concept);
+				}
+				c.accept(negativeOccurrenceVisitor);
+				c.accept(positiveOccurrenceVisitor);
+			}
+
+			return null;
+		}
+
+		public Void visit(ElkFunctionalObjectPropertyAxiom axiom) {
+			throw new UnsupportedOperationException(
 					"functional object property axioms");
-			}
+		}
 
-			public Void visit(ElkInverseFunctionalObjectPropertyAxiom axiom) {
-				throw new UnsupportedOperationException(
-					"inverse functional object property axioms");
-			}
+		public Void visit(ElkInverseFunctionalObjectPropertyAxiom axiom) {
+			throw new UnsupportedOperationException(
+			"inverse functional object property axioms");
+		}
 
-			public Void visit(ElkInverseObjectPropertiesAxiom axiom) {
-				throw new UnsupportedOperationException(
-					"inverse object property axioms");
-			}
+		public Void visit(ElkInverseObjectPropertiesAxiom axiom) {
+			throw new UnsupportedOperationException(
+			"inverse object property axioms");
+		}
 
-			public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
-				ElkObjectPropertyExpression subObjectProperty = axiom.getSubObjectPropertyExpression();
-				ElkObjectPropertyExpression superObjectProperty = axiom.getSuperObjectPropertyExpression();
-				
-				getRole(superObjectProperty).getToldSubRoles().add(getRole(subObjectProperty));			
+		public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
+			Role subRole = 	getRole(axiom.getSubObjectPropertyExpression());
+			Role superRole = getRole(axiom.getSuperObjectPropertyExpression());
 
-				return null;
-			}
+			superRole.getToldSubRoles().add(subRole);			
 
-			public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-				throw new UnsupportedOperationException(
-				"inverse functional object property axioms");
-			}	
-		};
+			return null;
+		}
+
+		public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
+			throw new UnsupportedOperationException(
+					"transitive object property axioms");
+		}	
+	};
 }

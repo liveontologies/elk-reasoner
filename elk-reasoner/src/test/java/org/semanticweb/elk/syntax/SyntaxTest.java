@@ -22,13 +22,15 @@
  */
 package org.semanticweb.elk.syntax;
 
+import java.util.Arrays;
+
 import junit.framework.TestCase;
 
 public class SyntaxTest extends TestCase {
 	public SyntaxTest( String testName ) {
 		super( testName );
 	}
-
+	
 	public void testFactory() {
 		ElkClassExpression heart = ElkClass.create("Heart");
 		ElkClassExpression organ = ElkClass.create("Organ");
@@ -47,9 +49,9 @@ public class SyntaxTest extends TestCase {
 		assertSame("hasHeart == hasHeart2", hasHeart, hasHeart2);
 		assertNotSame("hasHeart != hasOrgan", hasHeart, hasOrgan);
 
-		ElkClassExpression heartAndOrgan = ElkObjectIntersectionOf.create(heart, organ);
-		ElkClassExpression organAndHeart = ElkObjectIntersectionOf.create(organ, heart);
-		ElkClassExpression heart2AndOrgan = ElkObjectIntersectionOf.create(heart2, organ);
+		ElkClassExpression heartAndOrgan = ElkObjectIntersectionOf.create(Arrays.asList(heart, organ));
+		ElkClassExpression organAndHeart = ElkObjectIntersectionOf.create(Arrays.asList(organ, heart));
+		ElkClassExpression heart2AndOrgan = ElkObjectIntersectionOf.create(Arrays.asList(heart2, organ));
 
 		assertSame("heartAndOrgan == heart2AndOrgan", heartAndOrgan, heart2AndOrgan);
 		assertNotSame("heartAndOrgan == organAndHeart", heartAndOrgan, organAndHeart);

@@ -60,6 +60,15 @@ public class ElkSubClassOfAxiom extends ElkClassAxiom {
 				new ElkSubClassOfAxiom(subClassExpression, superClassExpression));		
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder("SubClassOf(");
+		result.append(subClassExpression.toString());
+		result.append(" ");
+		result.append(superClassExpression.toString());
+		result.append(")");
+		return result.toString();
+	}
 	
 
 	/*

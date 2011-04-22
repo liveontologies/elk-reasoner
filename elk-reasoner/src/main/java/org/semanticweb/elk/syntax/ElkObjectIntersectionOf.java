@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.syntax;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Corresponds to an <a href=
@@ -37,20 +37,34 @@ import java.util.Arrays;
  */
 public class ElkObjectIntersectionOf extends ElkClassExpression {
 	
-	protected final ElkClassExpression[] classExpressions;
+	protected final List<? extends ElkClassExpression> classExpressions;
 	
-	private ElkObjectIntersectionOf(ElkClassExpression... classExpressions) {
+	private ElkObjectIntersectionOf(
+			List<? extends ElkClassExpression> classExpressions) {
 		this.classExpressions = classExpressions;
 	}
 	
-	public static ElkObjectIntersectionOf create(ElkClassExpression... classExpressions) {
+	public static ElkObjectIntersectionOf create(
+			List<? extends ElkClassExpression> classExpressions) {
 		return (ElkObjectIntersectionOf) factory.put(
 				new ElkObjectIntersectionOf(classExpressions));	
 	}
 	
-	public ElkClassExpression[] getClassExpressions() {
+	public List<? extends ElkClassExpression> getClassExpressions() {
 		return classExpressions;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder("ObjectIntersectionOf(");
+		for (ElkClassExpression ce : classExpressions) {
+			result.append(ce.toString());
+			result.append(" ");
+		}
+		result.setCharAt(result.length()-1, ')');
+		return result.toString();
+	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -75,7 +89,7 @@ public class ElkObjectIntersectionOf extends ElkClassExpression {
 			return true;
 		
 		if (object instanceof ElkObjectIntersectionOf)
-			return Arrays.equals(classExpressions,
+			return classExpressions.equals(
 					((ElkObjectIntersectionOf) object).classExpressions);
 		
 		return false;

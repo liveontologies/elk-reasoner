@@ -22,20 +22,21 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Set;
+
 import org.semanticweb.elk.util.ArraySet;
 import org.semanticweb.elk.util.Index;
+import org.semanticweb.elk.util.HashIndex;
 
+
+/**
+ * @author Frantisek Simancik
+ *
+ */
 public class Context {
-	Set<Concept> derived;
-	Deque<Concept> queue;
-	Index<Role, Context> links;
-		
-	public Context() {
-		derived = new ArraySet<Concept> ();
-		queue = new LinkedList<Concept> ();
-		links =  new Index<Role, Context> ();
-	}
+	Set<Concept> derived = new ArraySet<Concept> ();
+	ArrayList<Concept> queue = new ArrayList<Concept> ();
+	Index<Role, Context> linksToParents = new HashIndex<Role, Context> ();
+	boolean saturated = true;
 }

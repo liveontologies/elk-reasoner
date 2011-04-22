@@ -23,10 +23,12 @@
 package org.semanticweb.elk.util;
 
 import java.util.List;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
- * Multimap from Keys to Lists of Values 
+ * 
+ * Implementation of Index backed by a HashMap
  * 
  * @author Frantisek Simancik
  *
@@ -34,7 +36,16 @@ import java.util.List;
  * @param <Value>
  */
 
-public interface Index<Key, Value> {
-	void add(Key key, Value value);
-	List<Value> get(Key key);
+public class HashIndex<Key, Value>  extends HashMap<Key, List<Value>> implements Index<Key, Value> {
+
+	private static final long serialVersionUID = -3456364969567004248L;
+
+	public void add(Key key, Value value) {
+		List<Value> list = get(key);
+		if (list == null) {
+			list = new ArrayList<Value> (1);
+			put(key, list);
+		}
+		list.add(value);
+	}
 }

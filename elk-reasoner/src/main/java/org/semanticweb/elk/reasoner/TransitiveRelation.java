@@ -20,21 +20,23 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util;
-
-import java.util.List;
-
+package org.semanticweb.elk.reasoner;
 
 /**
- * Multimap from Keys to Lists of Values 
+ * 
+ * Abstracts the methods needed for building Taxonomy<T>. An implementation
+ * must correctly implement at least one of getAllSubObjects() and 
+ * getAllSuperObjects() methods and indicate which via getImplementedDirection().  
  * 
  * @author Frantisek Simancik
  *
- * @param <Key>
- * @param <Value>
+ * @param <T>
  */
-
-public interface Index<Key, Value> {
-	void add(Key key, Value value);
-	List<Value> get(Key key);
+interface TransitiveRelation<T> {
+	Iterable<T> getAllSubObjects(T object);
+	Iterable<T> getAllSuperObjects(T object);
+	Iterable<T> getAllObjects();
+	
+	enum Direction { SUB_OBJECTS, SUPER_OBJECTS };
+	Direction getImplementedDirection();
 }

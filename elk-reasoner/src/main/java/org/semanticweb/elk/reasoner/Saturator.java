@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -29,18 +30,17 @@ import java.util.List;
 import java.util.Map;
 
 class Saturator {
-	protected Deque<Context> activeContexts;
-	protected Map<Concept, Context> mapConceptToContext;
-
-	Saturator() {
-		activeContexts = new LinkedList<Context> ();
-		mapConceptToContext = new HashMap<Concept, Context> ();
-	}
+	protected Deque<Context> activeContexts =
+		new LinkedList<Context> ();
+	protected Map<Concept, Context> mapConceptToContext =
+		new HashMap<Concept, Context> ();
+	protected ArrayList<Concept> localQueue = 
+		new ArrayList<Concept> ();
 	
 	void saturate(Concept concept) {
 		getContext(concept);
 		while (!activeContexts.isEmpty())
-			process(activeContexts.removeLast());
+			process(activeContexts.removeFirst());
 	}
 
 	protected Context getContext(Concept concept) {
@@ -55,54 +55,71 @@ class Saturator {
 
 	protected void enqueue(Context context, Concept concept) {
 		if (context.derived.add(concept)) {
-			if (context.queue.isEmpty())
+			if (context.saturated) {
 				activeContexts.add(context);
-			context.queue.addLast(concept);
+				context.saturated = false;
+			}
+			context.queue.add(concept);
 		}
 	}
-
-	protected void process(Context context) {
-		while (true) {
-			Concept concept = context.queue.peekFirst();	
-			if (concept == null)
-				return;
-
-			for (Concept c : concept.getToldSuperConcepts())
-				enqueue(context, c);
-
-			for (Conjunction conjunction : concept.getConjunctions()) {
-				boolean arePremisesSatisfied = true;
-
-				for (Concept premise : conjunction.getPremises())
-					if (!concept.equals(premise) && !context.derived.contains(premise)) {
-						arePremisesSatisfied = false;
-						break;
-					}
-
-				if (arePremisesSatisfied)
-					enqueue(context, conjunction.getConclusion());
-			}
-
-			for (Existential e : concept.getExistentials()) {
-				Context target = getContext(e.getConcept());
-				Role role = e.getRole();
-				target.links.put(role, context);
-
-				for (Concept c : target.derived) {
-					for (Universal u : c.getUniversals())
-						if (role.equals(u.getRole()))
-							enqueue(context, u.getConcept());
+	
+	void processToldSuperConcepts(Context context, Concept concept ) {
+		for (Concept c : concept.getToldSuperConcepts())
+			localQueue.add(c);
+	}
+	
+	void processConjunctions(Context context, Concept concept) {
+		for (Conjunction conjunction : concept.getConjunctions()) {
+			boolean arePremisesSatisfied = true;
+			for (Concept premise : conjunction.getPremises())
+				if (!context.derived.contains(premise)) {
+					arePremisesSatisfied = false;
+					break;
 				}
-			}
 
-			for (Universal u : concept.getUniversals()) {
-				List<Context> propagate = context.links.get(u.getRole());
-				if (propagate != null)
-					for (Context target : propagate)
-						enqueue(target, u.getConcept());
-			}
+			if (arePremisesSatisfied)
+				localQueue.add(conjunction.getConclusion());
+		}		
+	}
 
-			context.queue.removeFirst();
+	void processExistentials(Context context, Concept concept) {
+		for (Quantifier e : concept.getExistentials()) {
+			Context target = getContext(e.getConcept());
+			target.linksToParents.add(e.getRole(), context);
+
+			for (Concept c : target.derived) {
+				for (Quantifier u : c.getUniversals())
+					if (e.getRole() == u.getRole())
+						localQueue.add(u.getConcept());
+			}
 		}
+	}
+	
+	void processUniversals(Context context, Concept concept) {
+		for (Quantifier u : concept.getUniversals()) {
+			List<Context> parents = context.linksToParents.get(u.getRole());
+			if (parents != null)
+				for (Context target : parents)
+					enqueue(target, u.getConcept());
+		}
+	}
+	
+	protected void process(Context context) {
+		while (!context.queue.isEmpty()) {
+			int last = context.queue.size()-1;
+			Concept concept = context.queue.get(last);
+			context.queue.remove(last);
+			
+			processToldSuperConcepts(context, concept);
+			processConjunctions(context, concept);
+			processExistentials(context, concept);
+			processUniversals(context, concept);
+			
+			for (Concept c : localQueue)
+				enqueue(context, c);
+			localQueue.clear();
+		}
+		context.queue.trimToSize();
+		context.saturated = true;
 	}
 }

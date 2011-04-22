@@ -22,42 +22,52 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Set;
 
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 import org.semanticweb.elk.util.ArraySet;
 
+/**
+ * Represents all occurrences of an ElkObjectPropertyExpression in an ontology  
+ * 
+ * @author Frantisek Simancik
+ *
+ */
+
 class Role {
-	//fields
 	protected final ElkObjectPropertyExpression objectPropertyExpression;
-	protected final Set<Role> toldSubRoles;
+	protected final List<Role> toldSubRoles = new ArrayList<Role> ();
 	protected Set<Role> subRoles = null;
 
-	//methods
-	Role(ElkObjectPropertyExpression objectPropertyExpression) {
+	/**
+	 * Creates a Role representing objectPropertyExpression
+	 * 
+	 * @param objectPropertyExpression
+	 */
+	public Role(ElkObjectPropertyExpression objectPropertyExpression) {
 		this.objectPropertyExpression  = objectPropertyExpression;
-		toldSubRoles = new ArraySet<Role> ();
 	}
 	
-	ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getObjectPropertyExpression() {
 		return objectPropertyExpression;
 	}
-	
-	Set<Role> getToldSubRoles() {
+
+	public List<Role> getToldSubRoles() {
 		return toldSubRoles;
 	}
-	
-	Set<Role> getSubRoles() {
+
+	public Set<Role> getSubRoles() {
 		if (subRoles == null)
 			computeSubRoles();
 		return subRoles;
 	}
 	
-	void computeSubRoles() {
+	protected void computeSubRoles() {
 		subRoles = new ArraySet<Role> ();
-		Deque<Role> queue = new ArrayDeque<Role> ();
+		ArrayDeque<Role> queue = new ArrayDeque<Role> ();
 		subRoles.add(this);
 		queue.addLast(this);
 		while (!queue.isEmpty()) {
@@ -66,5 +76,13 @@ class Role {
 				if (subRoles.add(r))
 					queue.addLast(r);
 		}
+	}
+	
+	private static int nextHashCode_ = 1;
+	private final int hash_ = nextHashCode_++;
+	
+	@Override
+	public int hashCode() {
+		return hash_;
 	}
 }
