@@ -27,11 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.UnbufferedTokenStream;
-import org.semanticweb.elk.parser.Owl2FunctionalStyleLexer;
-import org.semanticweb.elk.parser.Owl2FunctionalStyleParser;
-
+import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleLexer;
+import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassExpression;
@@ -86,7 +84,7 @@ public class Reasoner {
 			indexer.reduceRoleHierarchy();
 			
 			System.err.println("//classifying");
-			int step = 0;
+//			int step = 0;
 			for (Map.Entry<ElkClassExpression, Concept> entry : indexer.mapClassToConcept.entrySet()) {
 				if (entry.getKey() instanceof ElkClass) {
 //					if (++step % 1000 == 0) System.err.println("//" + step);

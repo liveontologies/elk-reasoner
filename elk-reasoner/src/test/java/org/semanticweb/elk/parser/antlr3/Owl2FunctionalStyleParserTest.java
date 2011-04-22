@@ -23,13 +23,16 @@
 /**
  * @author Yevgeny Kazakov, Apr 20, 2011
  */
-package org.semanticweb.elk.parser;
+package org.semanticweb.elk.parser.antlr3;
 
 import junit.framework.TestCase;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.UnbufferedTokenStream;
+import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleLexer;
+import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleParser;
+import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.syntax.ElkClass;
 
 /**
@@ -41,6 +44,39 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		super(testName);
 	}
 
+	public void parseOntologyDocument(String string)
+			throws RecognitionException {
+		Reasoner reasoner = new Reasoner();
+		Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
+				new ANTLRStringStream(string));
+		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
+		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
+		parser.ontologyDocument(reasoner);
+	}
+
+	public void testOntologyDocument() {
+		String testString = "Ontology(<http://www.example.org/>"
+			// Testing if literal parsing is ambiguous
+			+ "Annotation(rdfs:comment \"String literal with langauge\"@en)"
+			+ "Annotation(rdfs:comment \"String literal no language\")"
+			+ "Annotation(rdfs:label \"Typed literal\"^^xsd:string)"
+			// Testing if DataSomeValuesFrom parsing is ambiguous
+//			+ "SubClassOf(a:2DFigure \n"
+//			+ "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)"
+//			+ ")\n" 
+//			+ "SubClassOf(a:1DFigure "
+//			+ "   DataSomeValuesFrom(a:hasLength xsd:integer)" 
+//			+ ")" 
+			+ ")";
+		
+		try {
+			parseOntologyDocument(testString);
+		} catch (RecognitionException e) {
+			assertFalse(true);
+			e.printStackTrace();
+		}
+	}
+
 	public ElkClass parseElkClass(String string) throws RecognitionException {
 		Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
 				new ANTLRStringStream(string));
@@ -49,17 +85,16 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		return parser.clazz();
 	}
 
-	public void testClazz() {		
+	public void testClazz() {
 		try {
 			ElkClass clazz = parseElkClass("owl:Thing");
 			assertNotNull(clazz);
 			assertSame(ElkClass.ELK_OWL_THING, clazz);
 		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			assertFalse(true);
+			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 }
