@@ -62,6 +62,35 @@ import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
 
 
 @members {
+  // Make sure that exception is thrown on parsing error
+  @Override
+  public void reportError(RecognitionException e) {
+    displayRecognitionError(this.getTokenNames(), e);
+    Thrower.sneakyThrow(e);
+  }
+
+  /**
+   * See "Puzzle 43: Exceptionally Unsafe" from Bloch Gafter, <i>Java Puzzlers</i>. Addison Wesley 2005.
+   */
+  static class Thrower {
+    private static Throwable t;
+    private Thrower() throws Throwable {
+      throw t;
+    }
+    public static synchronized void sneakyThrow(Throwable t) {
+      Thrower.t = t;
+      try {
+        Thrower.class.newInstance();
+      } catch (InstantiationException e) {
+        throw new IllegalArgumentException(e);
+      } catch (IllegalAccessException e) {
+        throw new IllegalArgumentException(e);
+      } finally {
+        Thrower.t = null; // Avoid memory leak
+      }
+    }
+  }
+  
 }
 
 
@@ -121,7 +150,7 @@ prefixDeclaration
     : PREFIX OPEN_BRACE prefixName EQUALS fullIri CLOSE_BRACE
     ;
 ontology[Reasoner reasoner] 
-    : ONTOLOGY OPEN_BRACE ( ontologyIri ( versionIri )? )?
+    : ONTOLOGY OPEN_BRACE ( ontologyIri versionIri? )?
        directlyImportsDocuments
        ontologyAnnotations
        axioms[$reasoner] 
@@ -218,9 +247,13 @@ datatype
     ;
 /* 5.3 Object Properties */       
 objectProperty returns [ElkObjectProperty value]
-    : x = iri						{ $value = ElkObjectProperty.create($x.value); }
-    | OWL_TOP_OBJECT_PROPERTY
-    | OWL_BOTTOM_OBJECT_PROPERTY
+    : x = iri	{ $value = ElkObjectProperty.create($x.value); }
+    | OWL_TOP_OBJECT_PROPERTY { 
+        $value = ElkObjectProperty.ELK_OWL_TOP_OBJECT_PROPERTY; 
+      }
+    | OWL_BOTTOM_OBJECT_PROPERTY { 
+        $value = ElkObjectProperty.ELK_OWL_BOTTOM_OBJECT_PROPERTY; 
+      }
     ;
 /* 5.4 Data Properties */    
 dataProperty 
@@ -254,24 +287,13 @@ namedIndividual
 anonymousIndividual 
     : nodeId
     ;
-/* 5.7 Literals */    
-literal 
-    : typedLiteral 
-    | stringLiteralNoLanguage 
-    | stringLiteralWithLanguage
-    ;    
-typedLiteral 
-    : lexicalForm REFERENCE datatype
-    ;
-lexicalForm 
-    : QUOTED_STRING
-    ;
-stringLiteralNoLanguage 
-    : QUOTED_STRING
-    ;
-stringLiteralWithLanguage 
-    : QUOTED_STRING languageTag
-    ;
+/* 5.7 Literals */
+literal
+    : QUOTED_STRING      
+        ( REFERENCE datatype
+        | languageTag?
+        )
+    ; 
 /* 5.8 Entity Declarations and Typing */    
 declaration 
     : DECLARATION OPEN_BRACE axiomAnnotations entity CLOSE_BRACE
@@ -346,7 +368,7 @@ restrictionValue
     ;
 /* 8 Class Expressions */
 classExpression returns [ElkClassExpression value]
-    : x = clazz 				{ $value = $x.value; } 
+    : x = clazz 				        { $value = $x.value; } 
     | y = objectIntersectionOf  { $value = $y.value; } 
     | objectUnionOf 
     | objectComplementOf 
@@ -368,9 +390,13 @@ classExpression returns [ElkClassExpression value]
 /* 8.1 Propositional Connectives and Enumeration of Individuals */
 /* 8.1.1 Intersection of Class Expressions */
 objectIntersectionOf returns [ElkObjectIntersectionOf value]  
-    : OBJECT_INTERSECTION_OF OPEN_BRACE
-    	x = classExpression { Vector<ElkClassExpression> v = new Vector<ElkClassExpression> (); v.add($x.value); }
-    	(x = classExpression { v.add($x.value); })+ CLOSE_BRACE { $value = ElkObjectIntersectionOf.create(v); }	
+    : OBJECT_INTERSECTION_OF OPEN_BRACE {
+          Vector<ElkClassExpression> v = new Vector<ElkClassExpression> ();
+        }
+    	    x = classExpression   { v.add($x.value); }
+    	  ( x = classExpression   { v.add($x.value); } )+ 
+    	  { $value = ElkObjectIntersectionOf.create(v); }
+    	CLOSE_BRACE	
     ;
 /* 8.1.2 Union of Class Expressions */
 objectUnionOf 
@@ -387,20 +413,31 @@ objectOneOf
 /* 8.2 Object Property Restrictions */
 /* 8.2.1 Existential Quantification */    
 objectSomeValuesFrom returns [ElkObjectSomeValuesFrom value]
-    : OBJECT_SOME_VALUES_FROM OPEN_BRACE x = objectPropertyExpression y = classExpression CLOSE_BRACE
+    : OBJECT_SOME_VALUES_FROM OPEN_BRACE 
+         x = objectPropertyExpression 
+         y = classExpression 
+      CLOSE_BRACE
     	{ $value = ElkObjectSomeValuesFrom.create($x.value, $y.value); }
     ;
 /* 8.2.2 Universal Quantification */
 objectAllValuesFrom 
-    : OBJECT_ALL_VALUES_FROM OPEN_BRACE objectPropertyExpression classExpression CLOSE_BRACE
+    : OBJECT_ALL_VALUES_FROM OPEN_BRACE 
+        objectPropertyExpression 
+        classExpression 
+      CLOSE_BRACE
     ;
 /* 8.2.3 Individual Value Restriction */
 objectHasValue 
-    : OBJECT_HAS_VALUE OPEN_BRACE objectPropertyExpression individual CLOSE_BRACE
+    : OBJECT_HAS_VALUE OPEN_BRACE 
+        objectPropertyExpression 
+        individual 
+      CLOSE_BRACE
     ;
 /* 8.2.4 Self-Restriction */
 objectHasSelf 
-    : OBJECT_HAS_SELF OPEN_BRACE objectPropertyExpression CLOSE_BRACE
+    : OBJECT_HAS_SELF OPEN_BRACE 
+        objectPropertyExpression 
+      CLOSE_BRACE
     ;
 /* 8.3 Object Property Cardinality Restrictions */
 /* 8.3.1 Minimum Cardinality */
@@ -408,7 +445,7 @@ objectMinCardinality
     : OBJECT_MIN_CARDINALITY OPEN_BRACE 
         NON_NEGATIVE_INTEGER 
         objectPropertyExpression 
-        ( classExpression )? 
+        classExpression? 
       CLOSE_BRACE
     ;
 /* 8.3.2 Maximum Cardinality */
@@ -416,7 +453,7 @@ objectMaxCardinality
     : OBJECT_MAX_CARDINALITY OPEN_BRACE 
         NON_NEGATIVE_INTEGER 
         objectPropertyExpression 
-        ( classExpression )? 
+        classExpression? 
       CLOSE_BRACE
     ;
 /* 8.3.3 Exact Cardinality */    
@@ -424,21 +461,30 @@ objectExactCardinality
     : OBJECT_EXACT_CARDINALITY OPEN_BRACE 
         NON_NEGATIVE_INTEGER 
         objectPropertyExpression 
-        ( classExpression )? 
+        classExpression? 
       CLOSE_BRACE
     ;
 /* 8.4 Data Property Restrictions */
 /* 8.4.1 Existential Quantification */
 dataSomeValuesFrom 
-    : DATA_SOME_VALUES_FROM OPEN_BRACE dataPropertyExpression+ dataRange CLOSE_BRACE
+    : DATA_SOME_VALUES_FROM OPEN_BRACE 
+        dataPropertyExpression+ 
+        dataRange 
+      CLOSE_BRACE
     ;
 /* 8.4.2 Universal Quantification */
 dataAllValuesFrom 
-    : DATA_ALL_VALUES_FROM OPEN_BRACE dataPropertyExpression+ dataRange CLOSE_BRACE
+    : DATA_ALL_VALUES_FROM OPEN_BRACE 
+        dataPropertyExpression+ 
+        dataRange 
+      CLOSE_BRACE
     ;
 /* 8.4.3 Literal Value Restriction */
 dataHasValue 
-    : DATA_HAS_VALUE OPEN_BRACE dataPropertyExpression literal CLOSE_BRACE
+    : DATA_HAS_VALUE OPEN_BRACE 
+        dataPropertyExpression 
+        literal 
+      CLOSE_BRACE
     ;
 /* 8.5 Data Property Cardinality Restrictions */
 /* 8.5.1 Minimum Cardinality */
@@ -446,7 +492,7 @@ dataMinCardinality
     : DATA_MIN_CARDINALITY OPEN_BRACE 
         NON_NEGATIVE_INTEGER 
         dataPropertyExpression 
-        ( dataRange )? 
+        dataRange? 
       CLOSE_BRACE
     ;
 /* 8.5.2 Maximum Cardinality */
@@ -454,7 +500,7 @@ dataMaxCardinality
     : DATA_MAX_CARDINALITY OPEN_BRACE 
         NON_NEGATIVE_INTEGER 
         dataPropertyExpression 
-        ( dataRange )? 
+        dataRange? 
       CLOSE_BRACE
     ;
 /* 8.5.3 Exact Cardinality */
@@ -462,13 +508,13 @@ dataExactCardinality
     : DATA_EXACT_CARDINALITY OPEN_BRACE 
         NON_NEGATIVE_INTEGER 
         dataPropertyExpression 
-        ( dataRange )? 
+        dataRange? 
       CLOSE_BRACE
     ;
 /* 9 Axioms */
 axiom returns [ElkAxiom value]
-	: declaration 
-    | x = classAxiom 			{ $value = $x.value; } 
+	  : declaration 
+    | x = classAxiom 			      { $value = $x.value; } 
     | y = objectPropertyAxiom 	{ $value = $y.value; }
     | dataPropertyAxiom 
     | datatypeDefinition 
@@ -481,8 +527,8 @@ axiomAnnotations
     ;    
 /* 9.1 Class Expression Axioms */    
 classAxiom returns [ElkClassAxiom value]
-    : x = subClassOf		 { $value = $x.value; }
-    | y = equivalentClasses	 { $value = $y.value; } 
+    : x = subClassOf		        { $value = $x.value; }
+    | y = equivalentClasses	    { $value = $y.value; } 
     | disjointClasses 
     | disjointUnion
     ;
@@ -496,17 +542,19 @@ subClassOf returns [ElkSubClassOfAxiom value]
 		{ $value = ElkSubClassOfAxiom.create($x.value, $y.value); }
     ;
 subClassExpression returns [ElkClassExpression value]
-    : x = classExpression	{ $value = $x.value; }
+    : x = classExpression	      { $value = $x.value; }
     ;
 superClassExpression returns [ElkClassExpression value]
-    : x = classExpression	{ $value = $x.value; }
+    : x = classExpression	      { $value = $x.value; }
     ;
 /* 9.1.2 Equivalent Classes */
 equivalentClasses returns [ElkEquivalentClassesAxiom value] 
     : EQUIVALENT_CLASSES OPEN_BRACE 
-        axiomAnnotations 
-        x = classExpression { Vector<ElkClassExpression> v = new Vector<ElkClassExpression> (); v.add($x.value); } 
-        (x = classExpression { v.add($x.value); })+ 
+        axiomAnnotations { 
+           Vector<ElkClassExpression> v = new Vector<ElkClassExpression> (); 
+         }          
+          x = classExpression    { v.add($x.value); } 
+        ( x = classExpression    { v.add($x.value); } )+ 
       CLOSE_BRACE
 		{ $value = ElkEquivalentClassesAxiom.create(v); }      
     ;
@@ -520,14 +568,18 @@ disjointClasses
     ;
 /* 9.1.4 Disjoint Union of Class Expressions */
 disjointUnion 
-    : DISJOINT_UNION OPEN_BRACE axiomAnnotations clazz disjointClassExpressions CLOSE_BRACE
+    : DISJOINT_UNION OPEN_BRACE 
+        axiomAnnotations 
+        clazz 
+        disjointClassExpressions 
+      CLOSE_BRACE
     ;
 disjointClassExpressions 
     : classExpression classExpression+
     ;
 /* 9.2 Object Property Axioms */    
 objectPropertyAxiom returns [ElkObjectPropertyAxiom value]
-    : x = subObjectPropertyOf 			{ $value = $x.value; }
+    : x = subObjectPropertyOf 			  { $value = $x.value; }
     | equivalentObjectProperties 
     | disjointObjectProperties 
     | inverseObjectProperties 
@@ -539,30 +591,33 @@ objectPropertyAxiom returns [ElkObjectPropertyAxiom value]
     | irreflexiveObjectProperty 
     | symmetricObjectProperty 
     | asymmetricObjectProperty 
-    | y = transitiveObjectProperty		{ $value = $y.value; }
+    | y = transitiveObjectProperty		{ $value = $x.value; }
     ;
 /* 9.2.1 Object Subproperties */
 subObjectPropertyOf returns [ElkSubObjectPropertyOfAxiom value]
-    : SUB_OBJECT_PROPERTY_OF OPEN_BRACE 
+    : SUB_OBJECT_PROPERTY_OF OPEN_BRACE {
+          boolean isChain = false;
+        }
         axiomAnnotations 
-        x = subObjectPropertyExpression 
-        y = superObjectPropertyExpression 
-      CLOSE_BRACE
-      	{ $value = ElkSubObjectPropertyOfAxiom.create($x.value, $y.value); }
-    ;
-subObjectPropertyExpression returns [ElkObjectPropertyExpression value] 
-    : x = objectPropertyExpression 	{ $value = $x.value; }
-    | y = propertyExpressionChain { $value = $y.value; }
+        ( x = objectPropertyExpression { isChain = false; } 
+        | y = propertyExpressionChain {isChain = true;} 
+        ) z = objectPropertyExpression 
+      CLOSE_BRACE { 
+        if (isChain)
+          $value = null;
+          // $value = ElkSubObjectPropertyOfAxiom.create(y, z);
+        else          
+      	  $value = ElkSubObjectPropertyOfAxiom.create($x.value, $z.value); 
+      }	  
     ;
 propertyExpressionChain returns [ElkObjectPropertyChain value] 
-    : OBJECT_PROPERTY_CHAIN OPEN_BRACE 
-        x = objectPropertyExpression 
-        	{ Vector<ElkObjectPropertyExpression> v = new Vector<ElkObjectPropertyExpression> (2); v.add($x.value); } 
-        (x = objectPropertyExpression { v.add($x.value); })+
+    : OBJECT_PROPERTY_CHAIN OPEN_BRACE {
+          Vector<ElkObjectPropertyExpression> v = 
+             new Vector<ElkObjectPropertyExpression> (2); 
+        } 
+          x = objectPropertyExpression { v.add($x.value); } 
+        ( x = objectPropertyExpression { v.add($x.value); } )+
       CLOSE_BRACE { $value = ElkObjectPropertyChain.create(v); }
-    ;
-superObjectPropertyExpression returns [ElkObjectPropertyExpression value] 
-    : x = objectPropertyExpression	{ $value = $x.value; }
     ;
 /* 9.2.2 Equivalent Object Properties */    
 equivalentObjectProperties 
@@ -650,7 +705,9 @@ asymmetricObjectProperty
 transitiveObjectProperty returns [ElkTransitiveObjectPropertyAxiom value] 
     : TRANSITIVE_OBJECT_PROPERTY OPEN_BRACE 
         axiomAnnotations 
-        x = objectPropertyExpression { $value = ElkTransitiveObjectPropertyAxiom.create($x.value); } 
+        x = objectPropertyExpression { 
+          $value = ElkTransitiveObjectPropertyAxiom.create($x.value); 
+        } 
       CLOSE_BRACE
     ;
 /* 9.3 Data Property Axioms */    
@@ -717,7 +774,11 @@ functionalDataProperty
     ;
 /* 9.4 Datatype Definitions */
 datatypeDefinition 
-    : DATATYPE_DEFINITION OPEN_BRACE axiomAnnotations datatype dataRange CLOSE_BRACE
+    : DATATYPE_DEFINITION OPEN_BRACE 
+        axiomAnnotations 
+        datatype 
+        dataRange 
+      CLOSE_BRACE
     ;
 /* 9.5 Keys */
 hasKey 
@@ -749,15 +810,27 @@ targetValue
     ;
 /* 9.6.1 Individual Equality */
 sameIndividual 
-    : SAME_INDIVIDUAL OPEN_BRACE axiomAnnotations individual individual+ CLOSE_BRACE
+    : SAME_INDIVIDUAL OPEN_BRACE 
+        axiomAnnotations 
+        individual 
+        individual+ 
+      CLOSE_BRACE
     ;
 /* 9.6.2 Individual Inequality */
 differentIndividuals 
-    : DIFFERENT_INDIVIDUALS OPEN_BRACE axiomAnnotations individual individual+ CLOSE_BRACE
+    : DIFFERENT_INDIVIDUALS OPEN_BRACE 
+        axiomAnnotations 
+        individual 
+        individual+ 
+      CLOSE_BRACE
     ;
 /* 9.6.3 Class Assertions */
 classAssertion 
-    : CLASS_ASSERTION OPEN_BRACE axiomAnnotations classExpression individual CLOSE_BRACE
+    : CLASS_ASSERTION OPEN_BRACE 
+        axiomAnnotations 
+        classExpression 
+        individual 
+      CLOSE_BRACE
     ;
 /* 9.6.4 Positive Object Property Assertions */
 objectPropertyAssertion 
@@ -845,11 +918,19 @@ superAnnotationProperty
     ;
 /* 10.2.3 Annotation Property Domain */
 annotationPropertyDomain 
-    : ANNOTATION_PROPERTY_DOMAIN OPEN_BRACE axiomAnnotations annotationProperty iri CLOSE_BRACE
+    : ANNOTATION_PROPERTY_DOMAIN OPEN_BRACE 
+        axiomAnnotations 
+        annotationProperty 
+        iri 
+      CLOSE_BRACE
     ;
 /* 10.2.4 Annotation Property Range */
 annotationPropertyRange 
-    : ANNOTATION_PROPERTY_RANGE OPEN_BRACE axiomAnnotations annotationProperty iri CLOSE_BRACE
+    : ANNOTATION_PROPERTY_RANGE OPEN_BRACE 
+        axiomAnnotations 
+        annotationProperty 
+        iri 
+      CLOSE_BRACE
     ;
 
 

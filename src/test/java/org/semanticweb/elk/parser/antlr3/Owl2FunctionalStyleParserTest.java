@@ -30,7 +30,9 @@ import junit.framework.TestCase;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.UnbufferedTokenStream;
-import org.semanticweb.elk.syntax.ElkAxiom;
+import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleLexer;
+import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleParser;
+import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.syntax.ElkClass;
 
 /**
@@ -42,37 +44,56 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		super(testName);
 	}
 
-	public Owl2FunctionalStyleParser getParser(String string) throws RecognitionException {
+	public void parseOntologyDocument(String testString)
+			throws RecognitionException {
 		Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
-				new ANTLRStringStream(string));
+				new ANTLRStringStream(testString));
 		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
-		return new Owl2FunctionalStyleParser(tokens);
+		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
+		parser.ontologyDocument(new Reasoner());
 	}
 
-	public void testClazz() {		
+	public void testOntologyDocument() {
+		String testString = "Ontology(<http://www.example.org/>"
+			// Testing if literal parsing is ambiguous
+			+ "Annotation(rdfs:comment \"String literal with langauge\"@en)"
+			+ "Annotation(rdfs:comment \"String literal no language\")"
+			+ "Annotation(rdfs:label \"Typed literal\"^^xsd:string)"
+			// Testing if DataSomeValuesFrom parsing is ambiguous
+//			+ "SubClassOf(a:2DFigure \n"
+//			+ "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)"
+//			+ ")\n" 
+//			+ "SubClassOf(a:1DFigure "
+//			+ "   DataSomeValuesFrom(a:hasLength xsd:integer)" 
+//			+ ")" 
+			+ ")";
+		
 		try {
-			Owl2FunctionalStyleParser parser = getParser("owl:Thing");
-			ElkClass clazz = parser.clazz();
+			parseOntologyDocument(testString);
+		} catch (RecognitionException e) {
+			assertFalse(true);
+			e.printStackTrace();
+		}
+	}
+
+	public ElkClass parseElkClass(String testString) throws RecognitionException {
+		Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
+				new ANTLRStringStream(testString));
+		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
+		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
+		return parser.clazz();
+	}
+
+	public void testClazz() {
+		try {
+			ElkClass clazz = parseElkClass("owl:Thing");
 			assertNotNull(clazz);
 			assertSame(ElkClass.ELK_OWL_THING, clazz);
 		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			assertFalse(true);
-		}
-		
-	}
-	
-	public void testTransitiveObjectPropertyAxiom() {
-		try {
-			Owl2FunctionalStyleParser parser = getParser("TransitiveObjectProperty(<R>)");
-			ElkAxiom axiom = parser.axiom();
-			assertNotNull(axiom);
-		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			assertFalse(true);
 		}
+
 	}
-	
+
 }

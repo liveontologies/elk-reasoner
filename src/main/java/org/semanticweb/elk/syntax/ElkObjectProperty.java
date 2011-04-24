@@ -44,7 +44,12 @@ public class ElkObjectProperty extends ElkObjectPropertyExpression {
 	public static ElkObjectProperty create(String objectPropertyIri) {
 		return (ElkObjectProperty) factory.put(new ElkObjectProperty(objectPropertyIri));		
 	}
-
+	
+	public static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = 
+		new ElkObjectProperty("owl:TobObjectProperty");
+	
+	public static final ElkObjectProperty ELK_OWL_BOTTOM_OBJECT_PROPERTY = 
+		new ElkObjectProperty("owl:BottomObjectProperty");
 
 	/**
 	 * Get the IRI of this object property.

@@ -140,6 +140,7 @@
 					<addSvnKeyWords>true</addSvnKeyWords>
 					<extraExtensions>
 						<g>java</g>
+						<jj>java</jj>
 					</extraExtensions>
 				</configuration>
 				<executions>
@@ -155,6 +156,7 @@
 								<root>src/main/java</root>
 								<root>src/test/java</root>
 								<root>src/main/antlr3</root>
+								<root>src/main/javacc</root>
 							</roots>
 						</configuration>
 					</execution>
