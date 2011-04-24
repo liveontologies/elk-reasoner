@@ -62,6 +62,7 @@ import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
 
 
 @members {
+  // Make sure that exception is thrown on parsing error
   @Override
   public void reportError(RecognitionException e) {
     displayRecognitionError(this.getTokenNames(), e);
@@ -89,7 +90,7 @@ import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
       }
     }
   }
-
+  
 }
 
 
@@ -246,9 +247,13 @@ datatype
     ;
 /* 5.3 Object Properties */       
 objectProperty returns [ElkObjectProperty value]
-    : x = iri						{ $value = ElkObjectProperty.create($x.value); }
-    | OWL_TOP_OBJECT_PROPERTY
-    | OWL_BOTTOM_OBJECT_PROPERTY
+    : x = iri	{ $value = ElkObjectProperty.create($x.value); }
+    | OWL_TOP_OBJECT_PROPERTY { 
+        $value = ElkObjectProperty.ELK_OWL_TOP_OBJECT_PROPERTY; 
+      }
+    | OWL_BOTTOM_OBJECT_PROPERTY { 
+        $value = ElkObjectProperty.ELK_OWL_BOTTOM_OBJECT_PROPERTY; 
+      }
     ;
 /* 5.4 Data Properties */    
 dataProperty 
@@ -508,7 +513,7 @@ dataExactCardinality
     ;
 /* 9 Axioms */
 axiom returns [ElkAxiom value]
-	: declaration 
+	  : declaration 
     | x = classAxiom 			      { $value = $x.value; } 
     | y = objectPropertyAxiom 	{ $value = $y.value; }
     | dataPropertyAxiom 
@@ -590,16 +595,20 @@ objectPropertyAxiom returns [ElkObjectPropertyAxiom value]
     ;
 /* 9.2.1 Object Subproperties */
 subObjectPropertyOf returns [ElkSubObjectPropertyOfAxiom value]
-    : SUB_OBJECT_PROPERTY_OF OPEN_BRACE 
+    : SUB_OBJECT_PROPERTY_OF OPEN_BRACE {
+          boolean isChain = false;
+        }
         axiomAnnotations 
-        x = subObjectPropertyExpression 
-        y = superObjectPropertyExpression 
-      CLOSE_BRACE
-      	{ $value = ElkSubObjectPropertyOfAxiom.create($x.value, $y.value); }
-    ;
-subObjectPropertyExpression returns [ElkObjectPropertyExpression value] 
-    : x = objectPropertyExpression 	   { $value = $x.value; }
-    | y = propertyExpressionChain      { $value = $y.value; }
+        ( x = objectPropertyExpression { isChain = false; } 
+        | y = propertyExpressionChain {isChain = true;} 
+        ) z = objectPropertyExpression 
+      CLOSE_BRACE { 
+        if (isChain)
+          $value = null;
+          // $value = ElkSubObjectPropertyOfAxiom.create(y, z);
+        else          
+      	  $value = ElkSubObjectPropertyOfAxiom.create($x.value, $z.value); 
+      }	  
     ;
 propertyExpressionChain returns [ElkObjectPropertyChain value] 
     : OBJECT_PROPERTY_CHAIN OPEN_BRACE {
@@ -609,9 +618,6 @@ propertyExpressionChain returns [ElkObjectPropertyChain value]
           x = objectPropertyExpression { v.add($x.value); } 
         ( x = objectPropertyExpression { v.add($x.value); } )+
       CLOSE_BRACE { $value = ElkObjectPropertyChain.create(v); }
-    ;
-superObjectPropertyExpression returns [ElkObjectPropertyExpression value] 
-    : x = objectPropertyExpression	   { $value = $x.value; }
     ;
 /* 9.2.2 Equivalent Object Properties */    
 equivalentObjectProperties 

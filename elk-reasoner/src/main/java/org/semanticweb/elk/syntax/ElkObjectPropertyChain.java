@@ -24,7 +24,7 @@ package org.semanticweb.elk.syntax;
 
 import java.util.List;
 
-public class ElkObjectPropertyChain extends ElkObjectPropertyExpression {
+public class ElkObjectPropertyChain extends ElkObject {
 
 	protected final List<? extends ElkObjectPropertyExpression> objectPropertyExpressions;
 	
@@ -56,7 +56,7 @@ public class ElkObjectPropertyChain extends ElkObjectPropertyExpression {
 	
 	
 	@Override
-	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

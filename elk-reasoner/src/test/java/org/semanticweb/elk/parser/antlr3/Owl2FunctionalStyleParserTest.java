@@ -44,14 +44,13 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		super(testName);
 	}
 
-	public void parseOntologyDocument(String string)
+	public void parseOntologyDocument(String testString)
 			throws RecognitionException {
-		Reasoner reasoner = new Reasoner();
 		Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
-				new ANTLRStringStream(string));
+				new ANTLRStringStream(testString));
 		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
-		parser.ontologyDocument(reasoner);
+		parser.ontologyDocument(new Reasoner());
 	}
 
 	public void testOntologyDocument() {
@@ -77,9 +76,9 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		}
 	}
 
-	public ElkClass parseElkClass(String string) throws RecognitionException {
+	public ElkClass parseElkClass(String testString) throws RecognitionException {
 		Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
-				new ANTLRStringStream(string));
+				new ANTLRStringStream(testString));
 		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
 		return parser.clazz();

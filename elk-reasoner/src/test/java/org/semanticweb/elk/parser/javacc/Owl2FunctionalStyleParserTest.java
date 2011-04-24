@@ -28,9 +28,10 @@ package org.semanticweb.elk.parser.javacc;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
-
 import junit.framework.TestCase;
+
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.syntax.ElkClass;
 
 /**
  * @author Yevgeny Kazakov
@@ -43,9 +44,9 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 	}
 
 	public void parseOntologyDocument(String testString) throws ParseException {
-		InputStream stream = new ByteArrayInputStream(testString.getBytes());
-		new Owl2FunctionalStyleParser(stream);
-		Owl2FunctionalStyleParser.ontologyDocument();		
+		InputStream stream = new ByteArrayInputStream(testString.getBytes());		
+		Owl2FunctionalStyleParser.Init(stream);
+		Owl2FunctionalStyleParser.ontologyDocument(new Reasoner());		
 	}
 
 	public void testOntologyDocument() {
@@ -55,12 +56,12 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 				+ "Annotation(rdfs:comment \"String literal no language\")"
 				+ "Annotation(rdfs:label \"Typed literal\"^^xsd:string)"
 				// Testing if DataSomeValuesFrom parsing is ambiguous
-				+ "SubClassOf(a:2DFigure \n"
-				+ "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)"
-				+ ")\n"
-				+ "SubClassOf(a:1DFigure "
-				+ "   DataSomeValuesFrom(a:hasLength xsd:integer)"
-				+ ")"
+//				+ "SubClassOf(a:2DFigure \n"
+//				+ "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)"
+//				+ ")\n"
+//				+ "SubClassOf(a:1DFigure "
+//				+ "   DataSomeValuesFrom(a:hasLength xsd:integer)"
+//				+ ")"
 				+ ")";
 
 		try {
@@ -69,6 +70,24 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 			assertFalse(true);
 			e.printStackTrace();
 		}
+	}
+	
+	public ElkClass parseElkClass(String testString) throws ParseException {
+		InputStream stream = new ByteArrayInputStream(testString.getBytes());
+		Owl2FunctionalStyleParser.Init(stream);
+		return Owl2FunctionalStyleParser.clazz();		
+	}
+
+	public void testClazz() {
+		try {
+			ElkClass clazz = parseElkClass("owl:Thing");
+			assertNotNull(clazz);
+			assertSame(ElkClass.ELK_OWL_THING, clazz);
+		} catch (ParseException e) {
+			assertFalse(true);
+			e.printStackTrace();
+		}
+
 	}
 
 }
