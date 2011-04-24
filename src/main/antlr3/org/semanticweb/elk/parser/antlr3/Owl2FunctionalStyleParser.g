@@ -39,7 +39,7 @@ options {
 }
 
 @header {  
-package org.semanticweb.elk.parser;
+package org.semanticweb.elk.parser.antlr3;
   
 import java.util.Vector;
 import org.semanticweb.elk.reasoner.Reasoner;  

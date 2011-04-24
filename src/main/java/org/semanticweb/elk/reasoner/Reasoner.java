@@ -29,8 +29,8 @@ import java.util.Map;
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.UnbufferedTokenStream;
-import org.semanticweb.elk.parser.Owl2FunctionalStyleLexer;
-import org.semanticweb.elk.parser.Owl2FunctionalStyleParser;
+import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleLexer;
+import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleParser;
 
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;

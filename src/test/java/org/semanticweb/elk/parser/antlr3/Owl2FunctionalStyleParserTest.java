@@ -23,7 +23,7 @@
 /**
  * @author Yevgeny Kazakov, Apr 20, 2011
  */
-package org.semanticweb.elk.parser;
+package org.semanticweb.elk.parser.antlr3;
 
 import junit.framework.TestCase;
 
