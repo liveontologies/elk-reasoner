@@ -28,5 +28,6 @@ interface Derivable {
 
 interface DerivableVisitor<O>  {
 	O visit(Concept concept);
-	O visit(Existential existential);
+	O visit(ForwardLink forwardLink);
+	O visit(BackwardLink backwardLink);
 }

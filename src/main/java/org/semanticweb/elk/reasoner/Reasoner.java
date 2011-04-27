@@ -26,60 +26,30 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.ANTLRInputStream;
-import org.antlr.runtime.UnbufferedTokenStream;
-import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleLexer;
-import org.semanticweb.elk.parser.antlr3.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.syntax.ElkSubClassOfAxiom;
 
 
 public class Reasoner {
+	public static int TRANSITIVITY = 0;  
+	
+	
 	final protected Indexer indexer = new Indexer();
 	final protected Saturator saturator = new Saturator();
 	
 	public void add(ElkAxiom elkAxiom) {
-		if (elkAxiom != null)
+		if (elkAxiom != null) {
 			indexer.indexAxiom(elkAxiom);
+		}
 	}
 	
 	public Taxonomy<ElkClass> classify() {
+		indexer.preprocessRBox();
 		return new TransitiveReduction<ElkClass> (new AtomicClassifier());
 	}
 	
-	public static void main(String[] argv) throws Exception {
-		Reasoner reasoner = new Reasoner();
-		
-		{
-			Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
-//				new ANTLRInputStream(System.in));
-//			 	new ANTLRFileStream("/auto/users/frasim/local/data/snomed_simplified.owl"));
-//				new ANTLRFileStream("/auto/users/frasim/local/condor_data/EL-GALEN.owl"));
-				new ANTLRFileStream("/auto/users/frasim/local/cel-galen.owl"));					
-			
-			UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
-			Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
 
-			parser.ontologyDocument(reasoner);
-		}
-				
-		Taxonomy<ElkClass> taxonomy = reasoner.classify();
-
-		System.out.println("Ontology(");
-		for (EquivalenceClass<ElkClass> eqClass : taxonomy) {
-			if (eqClass.getMembers().size() > 1)
-				System.out.println(ElkEquivalentClassesAxiom.create(eqClass.getMembers()));
-			for (EquivalenceClass<ElkClass> superClass : eqClass.getDirectSuperClasses())
-				System.out.println(ElkSubClassOfAxiom.create(eqClass.getCanonicalMember(), superClass.getCanonicalMember()));
-		}
-		System.out.println(")");
-	}
-	
-	
 	protected class AtomicClassifier implements TransitiveRelation<ElkClass> {
 		final List<ElkClass> atomicClasses = new LinkedList<ElkClass> ();
 		

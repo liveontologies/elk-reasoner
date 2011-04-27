@@ -34,19 +34,19 @@ package org.semanticweb.elk.syntax;
  * 
  */
 public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
-	protected final ElkObjectPropertyExpression subObjectPropertyExpression,
-											superObjectPropertyExpression;
+	protected final ElkObject subObject;
+	protected final ElkObjectPropertyExpression superObjectPropertyExpression;
 	
 	private ElkSubObjectPropertyOfAxiom(
-			ElkObjectPropertyExpression subObjectPropertyExpression,
+			ElkObject subObject,
 			ElkObjectPropertyExpression superObjectPropertyExpression)
 	{
-		this.subObjectPropertyExpression = subObjectPropertyExpression;
+		this.subObject = subObject;
 		this.superObjectPropertyExpression = superObjectPropertyExpression;
 	}
 
-	public ElkObjectPropertyExpression getSubObjectPropertyExpression() {
-		return subObjectPropertyExpression;
+	public ElkObject getSubObject() {
+		return subObject;
 	}
 
 	public ElkObjectPropertyExpression getSuperObjectPropertyExpression() {
@@ -54,18 +54,18 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 	}
 
 	public static ElkSubObjectPropertyOfAxiom create(
-			ElkObjectPropertyExpression subObjectPropertyExpression,
+			ElkObject subObject,
 			ElkObjectPropertyExpression superObjectPropertyExpression)
 	{ 
 		return (ElkSubObjectPropertyOfAxiom) factory.put(
-				new ElkSubObjectPropertyOfAxiom(subObjectPropertyExpression,
+				new ElkSubObjectPropertyOfAxiom(subObject,
 												superObjectPropertyExpression));		
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder("SubObjectPropertyOf(");
-		result.append(subObjectPropertyExpression.toString());
+		result.append(subObject.toString());
 		result.append(" ");
 		result.append(superObjectPropertyExpression.toString());
 		result.append(")");
@@ -82,7 +82,7 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 	@Override
 	public int structuralHashCode() {
 		return computeCompositeHash(constructorHash_,
-									subObjectPropertyExpression,
+									subObject,
 									superObjectPropertyExpression);
 	}
 	
@@ -99,8 +99,8 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 			return true;
 		
 		if (object instanceof ElkSubObjectPropertyOfAxiom)
-			return subObjectPropertyExpression.equals(
-				((ElkSubObjectPropertyOfAxiom) object).subObjectPropertyExpression)
+			return subObject.equals(
+				((ElkSubObjectPropertyOfAxiom) object).subObject)
 				&& superObjectPropertyExpression.equals(
 				((ElkSubObjectPropertyOfAxiom) object).superObjectPropertyExpression);
 		

@@ -591,7 +591,7 @@ objectPropertyAxiom returns [ElkObjectPropertyAxiom value]
     | irreflexiveObjectProperty 
     | symmetricObjectProperty 
     | asymmetricObjectProperty 
-    | y = transitiveObjectProperty		{ $value = $x.value; }
+    | y = transitiveObjectProperty		{ $value = $y.value; }
     ;
 /* 9.2.1 Object Subproperties */
 subObjectPropertyOf returns [ElkSubObjectPropertyOfAxiom value]
@@ -604,8 +604,7 @@ subObjectPropertyOf returns [ElkSubObjectPropertyOfAxiom value]
         ) z = objectPropertyExpression 
       CLOSE_BRACE { 
         if (isChain)
-          $value = null;
-          // $value = ElkSubObjectPropertyOfAxiom.create(y, z);
+          $value = ElkSubObjectPropertyOfAxiom.create($y.value, $z.value);
         else          
       	  $value = ElkSubObjectPropertyOfAxiom.create($x.value, $z.value); 
       }	  

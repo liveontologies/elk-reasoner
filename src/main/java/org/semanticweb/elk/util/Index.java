@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.util;
 
-import java.util.List;
+import java.util.Collection;
 
 
 /**
@@ -35,6 +35,9 @@ import java.util.List;
  */
 
 public interface Index<Key, Value> {
-	void add(Key key, Value value);
-	List<Value> get(Key key);
+	boolean add(Key key, Value value);
+	boolean add(Pair<Key, Value> pair);
+	boolean contains(Key key, Value value);
+	boolean contains(Pair<Key, Value> pair);
+	Collection<Value> get(Key key);
 }

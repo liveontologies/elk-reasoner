@@ -22,8 +22,8 @@
  */
 package org.semanticweb.elk.util;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -36,16 +36,32 @@ import java.util.HashMap;
  * @param <Value>
  */
 
-public class HashIndex<Key, Value>  extends HashMap<Key, List<Value>> implements Index<Key, Value> {
+public class HashIndex<Key, Value>  extends HashMap<Key, Collection<Value>> implements Index<Key, Value> {
 
 	private static final long serialVersionUID = -3456364969567004248L;
 
-	public void add(Key key, Value value) {
-		List<Value> list = get(key);
-		if (list == null) {
-			list = new ArrayList<Value> (1);
-			put(key, list);
+	public boolean add(Key key, Value value) {
+		Collection<Value> collection = get(key);
+		if (collection == null) {
+			collection = new ArraySet<Value> (1);
+			put(key, collection);
 		}
-		list.add(value);
+		return collection.add(value);
+	}
+
+	public boolean add(Pair<Key, Value> pair) {
+		return add(pair.first, pair.second);
+	}
+
+	public boolean contains(Key key, Value value) {
+		Collection<Value> collection = get(key);
+		if (collection == null)
+			return false;
+		else
+			return collection.contains(value);
+	}
+	
+	public boolean contains(Pair<Key, Value> pair) {
+		return contains(pair.first, pair.second);
 	}
 }

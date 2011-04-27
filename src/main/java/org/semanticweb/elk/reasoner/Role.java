@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 import org.semanticweb.elk.util.ArraySet;
+import org.semanticweb.elk.util.Pair;
 
 /**
  * Represents all occurrences of an ElkObjectPropertyExpression in an ontology  
@@ -41,9 +42,12 @@ class Role {
 	protected final ElkObjectPropertyExpression objectPropertyExpression;
 	protected final List<Role> toldSubRoles = new ArrayList<Role> ();
 	protected final List<Role> toldSuperRoles = new ArrayList<Role> ();
+	protected final List<Pair<Role, Role>> rightPropertyChains = new ArrayList<Pair<Role, Role>> ();
+	protected final List<Pair<Role, Role>> leftPropertyChains = new ArrayList<Pair<Role, Role>> ();
 	
-	protected boolean isTransitive = false;
-
+	protected Set<Role> subRoles = null;
+	
+	
 	/**
 	 * Creates a Role representing objectPropertyExpression
 	 * 
@@ -64,16 +68,15 @@ class Role {
 	public List<Role> getToldSuperRoles() {
 		return toldSuperRoles;
 	}
-	
-	public boolean isTransitive() {
-		return isTransitive;
+
+	public List<Pair<Role, Role>> getRightPropertyChains() {
+		return rightPropertyChains;
 	}
 
-	public void setTransitive(boolean isTransitive) {
-		this.isTransitive = isTransitive;
+	public List<Pair<Role, Role>> getLeftPropertyChains() {
+		return leftPropertyChains;
 	}
 	
-/*	
 	public Set<Role> getSubRoles() {
 		if (subRoles == null)
 			computeSubRoles();
@@ -92,9 +95,8 @@ class Role {
 					queue.addLast(r);
 		}
 	}
-*/	
-	
-	private static int nextHashCode_ = 1;
+
+	private static int nextHashCode_ = 0;
 	private final int hash_ = nextHashCode_++;
 	
 	@Override

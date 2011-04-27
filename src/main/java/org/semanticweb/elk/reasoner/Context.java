@@ -28,6 +28,7 @@ import java.util.Set;
 import org.semanticweb.elk.util.ArraySet;
 import org.semanticweb.elk.util.Index;
 import org.semanticweb.elk.util.HashIndex;
+import org.semanticweb.elk.util.Pair;
 
 
 /**
@@ -36,10 +37,11 @@ import org.semanticweb.elk.util.HashIndex;
  */
 class Context implements DerivableVisitor<Boolean> {
 	Set<Concept> derivedConcepts = new ArraySet<Concept> ();
-	Set<Existential> derivedExistentials = new ArraySet<Existential> ();
+	Index<Role, Context> forwardLinks = new HashIndex<Role, Context> ();
+//	ArraySet<ForwardLink> forwardLinks=  new ArraySet<ForwardLink> ();
+	Index<Role, Context> backwardLinks = new HashIndex<Role, Context> ();
 	
 	ArrayList<Derivable> queue = new ArrayList<Derivable> ();
-	Index<Role, Context> linksToParents = new HashIndex<Role, Context> ();
 	
 	boolean saturated = true;
 
@@ -47,7 +49,45 @@ class Context implements DerivableVisitor<Boolean> {
 		return derivedConcepts.add(concept);
 	}
 
-	public Boolean visit(Existential existential) {
-		return derivedExistentials.add(existential);
+	public Boolean visit(ForwardLink forwardLink) {
+		return forwardLinks.add(forwardLink);
+	}
+
+	public Boolean visit(BackwardLink backwardLink) {
+		return backwardLinks.add(backwardLink);
+	}
+}
+
+class Link extends Pair<Role, Context> {
+	public Link(Role role, Context context) {
+		super(role, context);
+	}
+	
+	public Role getRole() {
+		return first;
+	}
+	
+	public Context getContext() {
+		return second;
+	}
+}
+
+class ForwardLink extends Link implements Derivable {
+	public ForwardLink(Role role, Context context) {
+		super(role, context);
+	}
+
+	public <O> O accept(DerivableVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+}
+
+class BackwardLink extends Link implements Derivable {
+	public BackwardLink(Role role, Context context) {
+		super(role, context);
+	}
+
+	public <O> O accept(DerivableVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

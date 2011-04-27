@@ -29,15 +29,40 @@ import java.util.Map;
 import java.lang.UnsupportedOperationException;
 
 import org.semanticweb.elk.syntax.*;
+import org.semanticweb.elk.util.Pair;
+import org.semanticweb.elk.util.Triple;
 
 class Indexer {
 	protected Map<ElkClassExpression, Concept> mapClassToConcept
 	 			= new HashMap<ElkClassExpression, Concept> ();
-	protected Map<ElkObjectPropertyExpression, Role> mapObjectPropertyToRole
+		protected Map<ElkObjectPropertyExpression, Role> mapObjectPropertyToRole
 	 			= new HashMap<ElkObjectPropertyExpression, Role> ();
+	
+	protected List<Triple<Role, Role, Role>> roleChains
+				= new ArrayList<Triple<Role, Role, Role>> ();
 	
 	void indexAxiom(ElkAxiom axiom) {
 		axiom.accept(addAxiomVisitor);
+	}
+	
+	void preprocessRBox() {
+		switch (Reasoner.TRANSITIVITY) {
+
+		case 0 :
+			for (Triple<Role, Role, Role> t : roleChains) {
+				t.getFirst().getLeftPropertyChains().add(new Pair<Role, Role> (t.getSecond(), t.getThird()));
+				t.getSecond().getRightPropertyChains().add(new Pair<Role, Role> (t.getFirst(), t.getThird()));
+			}
+			break;
+
+		case 1 :
+			for (Triple<Role, Role, Role> t : roleChains)
+				for (Role rightRole : t.getSecond().getSubRoles()) {
+					t.getFirst().getLeftPropertyChains().add(new Pair<Role, Role> (rightRole, t.getThird()));
+					rightRole.getRightPropertyChains().add(new Pair<Role, Role> (t.getFirst(), t.getThird()));
+				}
+			break;
+		}
 	}
 
 	protected Concept getConcept(ElkClassExpression ce) {
@@ -129,7 +154,7 @@ class Indexer {
 				ElkClassExpression d = c.getClassExpression();
 				d.accept(this);
 				concept.getExistentials().add(
-						new Existential(getRole(r), getConcept(d)));
+						new Quantifier(getRole(r), getConcept(d)));
 			}
 
 			return null;
@@ -184,19 +209,95 @@ class Indexer {
 			"inverse object property axioms");
 		}
 
-		public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
-			Role subRole = 	getRole(axiom.getSubObjectPropertyExpression());
-			Role superRole = getRole(axiom.getSuperObjectPropertyExpression());
+		public Void visit(final ElkSubObjectPropertyOfAxiom axiom) {
+			ElkObjectVisitor<Void> visitor = new ElkObjectVisitor<Void>() {
+				
+				final Role superRole = getRole(axiom.getSuperObjectPropertyExpression());	
 
-			subRole.getToldSuperRoles().add(superRole);
-			superRole.getToldSubRoles().add(subRole);		
+				public Void visit(
+						ElkEquivalentClassesAxiom elkEquivalentClassesAxiom) {
+					return null;
+				}
+
+				public Void visit(ElkSubClassOfAxiom elkSubClassOfAxiom) {
+					return null;
+				}
+
+				public Void visit(
+						ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom) {
+					return null;
+				}
+
+				public Void visit(
+						ElkInverseFunctionalObjectPropertyAxiom elkInverseFunctionalObjectPropertyAxiom) {
+					return null;
+				}
+
+				public Void visit(
+						ElkInverseObjectPropertiesAxiom elkInverseObjectPropertiesAxiom) {
+					return null;
+				}
+
+				public Void visit(
+						ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom) {
+					return null;
+				}
+
+				public Void visit(
+						ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
+					return null;
+				}
+
+				public Void visit(ElkClass elkClass) {
+					return null;
+				}
+
+				public Void visit(
+						ElkObjectIntersectionOf elkObjectIntersectionOf) {
+					return null;
+				}
+
+				public Void visit(
+						ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
+					return null;
+				}
+
+				public Void visit(ElkObjectProperty elkObjectProperty) {
+					Role subRole = getRole((ElkObjectPropertyExpression) axiom.getSubObject());
+					subRole.getToldSuperRoles().add(superRole);
+					superRole.getToldSubRoles().add(subRole);
+					return null;
+				}
+
+				public Void visit(ElkObjectInverseOf elkObjectInverseOf) {
+					return null;
+				}
+
+				public Void visit(
+						ElkObjectPropertyChain elkObjectPropertyChain) {
+					
+					if (elkObjectPropertyChain.getObjectPropertyExpressions().size() != 2)
+						throw new UnsupportedOperationException("ObjectPropertyChain of length != 2");
+			
+					Role leftSubRole = getRole(elkObjectPropertyChain.getObjectPropertyExpressions().get(0));
+					Role rightSubRole = getRole(elkObjectPropertyChain.getObjectPropertyExpressions().get(1));
+					roleChains.add(new Triple<Role, Role, Role> (leftSubRole, rightSubRole, superRole));
+					
+					return null;
+					
+				}
+				
+			};
+			
+			axiom.getSubObject().accept(visitor);
 			
 			return null;
 		}
 
 		public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-			getRole(axiom.getObjectPropertyExpression()).setTransitive(true);
-			
+			Role role = getRole(axiom.getObjectPropertyExpression());
+			roleChains.add(new Triple<Role, Role, Role> (role, role, role));
+
 			return null;
 		}	
 	};

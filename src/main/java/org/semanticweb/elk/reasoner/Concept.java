@@ -41,7 +41,7 @@ class Concept implements Derivable {
 	protected final ElkClassExpression classExpression;
 	protected final List<Concept> toldSuperConcepts = new ArrayList<Concept> ();
 	protected final List<Conjunction> conjunctions = new ArrayList<Conjunction> ();
-	protected final List<Existential> existentials = new ArrayList<Existential> ();
+	protected final List<Quantifier> existentials = new ArrayList<Quantifier> ();
 	protected final List<Quantifier> universals = new ArrayList<Quantifier> ();
 	
 	int positiveOccurrenceNo = 0;
@@ -68,7 +68,7 @@ class Concept implements Derivable {
 		return conjunctions;
 	}
 
-	public List<Existential> getExistentials() {
+	public List<Quantifier> getExistentials() {
 		return existentials;
 	}
 
@@ -76,7 +76,7 @@ class Concept implements Derivable {
 		return universals;
 	}
 
-	private static int nextHashCode_ = 1;
+	private static int nextHashCode_ = 0;
 	private final int hash_ = nextHashCode_++;
 	
 	@Override
@@ -116,15 +116,5 @@ class Quantifier extends Pair<Role, Concept> {
 	
 	public Concept getConcept() {
 		return second;
-	}
-}
-
-class Existential extends Quantifier implements Derivable {
-	public Existential(Role role, Concept concept) {
-		super(role, concept);
-	}
-
-	public <O> O accept(DerivableVisitor<O> visitor) {
-		return visitor.visit(this);
 	}
 }
