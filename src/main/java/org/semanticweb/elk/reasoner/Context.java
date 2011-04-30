@@ -28,66 +28,61 @@ import java.util.Set;
 import org.semanticweb.elk.util.ArraySet;
 import org.semanticweb.elk.util.Index;
 import org.semanticweb.elk.util.HashIndex;
-import org.semanticweb.elk.util.Pair;
+import org.semanticweb.elk.util.Triple;
 
 
 /**
  * @author Frantisek Simancik
  *
  */
-class Context implements DerivableVisitor<Boolean> {
+
+class Context implements Queueable {
 	Set<Concept> derivedConcepts = new ArraySet<Concept> ();
-	Index<Role, Context> forwardLinks = new HashIndex<Role, Context> ();
-//	ArraySet<ForwardLink> forwardLinks=  new ArraySet<ForwardLink> ();
-	Index<Role, Context> backwardLinks = new HashIndex<Role, Context> ();
+	Index<Role, Link> forwardLinks = new HashIndex<Role, Link> ();
+	Index<Role, Link> backwardLinks = new HashIndex<Role, Link> ();
 	
-	ArrayList<Derivable> queue = new ArrayList<Derivable> ();
+	ArrayList<Concept> localQueue = new ArrayList<Concept> ();
 	
 	boolean saturated = true;
-
-	public Boolean visit(Concept concept) {
-		return derivedConcepts.add(concept);
+	
+	public void accept(QueueableVisitor visitor) {
+		visitor.visit(this);
 	}
-
-	public Boolean visit(ForwardLink forwardLink) {
-		return forwardLinks.add(forwardLink);
-	}
-
-	public Boolean visit(BackwardLink backwardLink) {
-		return backwardLinks.add(backwardLink);
+	
+	private static int nextHashCode_ = 0;
+	private final int hash_ = nextHashCode_++;
+	
+	@Override
+	public int hashCode() {
+		return hash_;
 	}
 }
 
-class Link extends Pair<Role, Context> {
-	public Link(Role role, Context context) {
-		super(role, context);
+class Link extends Triple<Context, Context, Role> implements Queueable {
+	int length;
+	
+	public Link(Context source, Context target, Role role) {
+		this(source, target, role, 1);
 	}
 	
-	public Role getRole() {
+	public Link(Context source, Context target, Role role, int length) {
+		super(source, target, role);
+		this.length = length;
+	}
+	
+	public Context getSource() {
 		return first;
 	}
 	
-	public Context getContext() {
+	public Context getTarget() {
 		return second;
 	}
-}
-
-class ForwardLink extends Link implements Derivable {
-	public ForwardLink(Role role, Context context) {
-		super(role, context);
+	
+	public Role getRole() {
+		return third;
 	}
 
-	public <O> O accept(DerivableVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-}
-
-class BackwardLink extends Link implements Derivable {
-	public BackwardLink(Role role, Context context) {
-		super(role, context);
-	}
-
-	public <O> O accept(DerivableVisitor<O> visitor) {
-		return visitor.visit(this);
+	public void accept(QueueableVisitor visitor) {
+		visitor.visit(this);
 	}
 }

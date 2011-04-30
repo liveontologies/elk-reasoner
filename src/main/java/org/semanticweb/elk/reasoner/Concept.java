@@ -36,7 +36,7 @@ import org.semanticweb.elk.util.Pair;
  *
  */
 
-class Concept implements Derivable { 
+class Concept { 
 
 	protected final ElkClassExpression classExpression;
 	protected final List<Concept> toldSuperConcepts = new ArrayList<Concept> ();
@@ -84,9 +84,6 @@ class Concept implements Derivable {
 		return hash_;
 	}
 
-	public <O> O accept(DerivableVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
 }
 
 

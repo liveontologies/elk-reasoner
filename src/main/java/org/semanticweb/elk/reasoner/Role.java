@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 import org.semanticweb.elk.util.ArraySet;
-import org.semanticweb.elk.util.Pair;
+import org.semanticweb.elk.util.Triple;
 
 /**
  * Represents all occurrences of an ElkObjectPropertyExpression in an ontology  
@@ -42,8 +42,12 @@ class Role {
 	protected final ElkObjectPropertyExpression objectPropertyExpression;
 	protected final List<Role> toldSubRoles = new ArrayList<Role> ();
 	protected final List<Role> toldSuperRoles = new ArrayList<Role> ();
-	protected final List<Pair<Role, Role>> rightPropertyChains = new ArrayList<Pair<Role, Role>> ();
-	protected final List<Pair<Role, Role>> leftPropertyChains = new ArrayList<Pair<Role, Role>> ();
+	
+	protected final List<RoleChain> leftPropertyChains = new ArrayList<RoleChain> ();
+	protected final List<RoleChain> rightPropertyChains = new ArrayList<RoleChain> ();
+	protected final List<RoleChain> superPropertyChains = new ArrayList<RoleChain> ();
+	
+	protected boolean transitive;
 	
 	protected Set<Role> subRoles = null;
 	
@@ -69,15 +73,19 @@ class Role {
 		return toldSuperRoles;
 	}
 
-	public List<Pair<Role, Role>> getRightPropertyChains() {
+	public List<RoleChain> getRightPropertyChains() {
 		return rightPropertyChains;
 	}
 
-	public List<Pair<Role, Role>> getLeftPropertyChains() {
+	public List<RoleChain> getLeftPropertyChains() {
 		return leftPropertyChains;
 	}
 	
-	public Set<Role> getSubRoles() {
+	public List<RoleChain> getSuperPropertyChains() {
+		return superPropertyChains;
+	}
+
+	public Set<Role> getAllSubRoles() {
 		if (subRoles == null)
 			computeSubRoles();
 		return subRoles;
@@ -102,5 +110,25 @@ class Role {
 	@Override
 	public int hashCode() {
 		return hash_;
+	}
+}
+
+class RoleChain extends Triple<Role, Role, Role> {
+	boolean isLeftLinear = false;
+	
+	RoleChain(Role leftSubRole, Role rightSubRole, Role superRole) {
+		super(leftSubRole, rightSubRole, superRole);
+	}
+	
+	Role getLeftSubRole() {
+		return first;
+	}
+	
+	Role getRightSubRole() {
+		return second;
+	}
+	
+	Role getSuperRole() {
+		return third;
 	}
 }

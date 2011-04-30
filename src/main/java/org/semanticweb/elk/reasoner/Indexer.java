@@ -29,42 +29,19 @@ import java.util.Map;
 import java.lang.UnsupportedOperationException;
 
 import org.semanticweb.elk.syntax.*;
-import org.semanticweb.elk.util.Pair;
-import org.semanticweb.elk.util.Triple;
 
 class Indexer {
 	protected Map<ElkClassExpression, Concept> mapClassToConcept
 	 			= new HashMap<ElkClassExpression, Concept> ();
-		protected Map<ElkObjectPropertyExpression, Role> mapObjectPropertyToRole
+	protected Map<ElkObjectPropertyExpression, Role> mapObjectPropertyToRole
 	 			= new HashMap<ElkObjectPropertyExpression, Role> ();
 	
-	protected List<Triple<Role, Role, Role>> roleChains
-				= new ArrayList<Triple<Role, Role, Role>> ();
-	
+	protected RoleBox roleBox = new RoleBox();
+		
 	void indexAxiom(ElkAxiom axiom) {
 		axiom.accept(addAxiomVisitor);
 	}
 	
-	void preprocessRBox() {
-		switch (Reasoner.TRANSITIVITY) {
-
-		case 0 :
-			for (Triple<Role, Role, Role> t : roleChains) {
-				t.getFirst().getLeftPropertyChains().add(new Pair<Role, Role> (t.getSecond(), t.getThird()));
-				t.getSecond().getRightPropertyChains().add(new Pair<Role, Role> (t.getFirst(), t.getThird()));
-			}
-			break;
-
-		case 1 :
-			for (Triple<Role, Role, Role> t : roleChains)
-				for (Role rightRole : t.getSecond().getSubRoles()) {
-					t.getFirst().getLeftPropertyChains().add(new Pair<Role, Role> (rightRole, t.getThird()));
-					rightRole.getRightPropertyChains().add(new Pair<Role, Role> (t.getFirst(), t.getThird()));
-				}
-			break;
-		}
-	}
-
 	protected Concept getConcept(ElkClassExpression ce) {
 		Concept concept = mapClassToConcept.get(ce);
 		if (concept == null) {
@@ -263,7 +240,7 @@ class Indexer {
 				}
 
 				public Void visit(ElkObjectProperty elkObjectProperty) {
-					Role subRole = getRole((ElkObjectPropertyExpression) axiom.getSubObject());
+					Role subRole = getRole(elkObjectProperty);
 					subRole.getToldSuperRoles().add(superRole);
 					superRole.getToldSubRoles().add(subRole);
 					return null;
@@ -276,15 +253,15 @@ class Indexer {
 				public Void visit(
 						ElkObjectPropertyChain elkObjectPropertyChain) {
 					
-					if (elkObjectPropertyChain.getObjectPropertyExpressions().size() != 2)
-						throw new UnsupportedOperationException("ObjectPropertyChain of length != 2");
-			
-					Role leftSubRole = getRole(elkObjectPropertyChain.getObjectPropertyExpressions().get(0));
-					Role rightSubRole = getRole(elkObjectPropertyChain.getObjectPropertyExpressions().get(1));
-					roleChains.add(new Triple<Role, Role, Role> (leftSubRole, rightSubRole, superRole));
-					
+					if (elkObjectPropertyChain.getObjectPropertyExpressions().size() == 2) {
+						Role leftSubRole = getRole(elkObjectPropertyChain.getObjectPropertyExpressions().get(0));
+						Role rightSubRole = getRole(elkObjectPropertyChain.getObjectPropertyExpressions().get(1));
+						roleBox.roleChains.add(new RoleChain(leftSubRole, rightSubRole, superRole));
+					}
+					else
+						System.err.println("Unsupported role chain of length != 2");
+
 					return null;
-					
 				}
 				
 			};
@@ -295,8 +272,7 @@ class Indexer {
 		}
 
 		public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-			Role role = getRole(axiom.getObjectPropertyExpression());
-			roleChains.add(new Triple<Role, Role, Role> (role, role, role));
+			roleBox.transitiveRoles.add(getRole(axiom.getObjectPropertyExpression()));
 
 			return null;
 		}	

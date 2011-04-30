@@ -32,39 +32,44 @@ import org.semanticweb.elk.syntax.ElkClassExpression;
 
 
 public class Reasoner {
-	public static int TRANSITIVITY = 0;  
-	
-	
 	final protected Indexer indexer = new Indexer();
-	final protected Saturator saturator = new Saturator();
+	final Saturator saturator = new Saturator();
+	
+	final boolean detectLeftLinearity;
+	
+	public Reasoner(boolean detectLeftLinearity) {
+		this.detectLeftLinearity = detectLeftLinearity;
+	}
+	
+	public Reasoner() {
+		this(false);
+	}
 	
 	public void add(ElkAxiom elkAxiom) {
 		if (elkAxiom != null) {
+//			System.err.println(elkAxiom);
 			indexer.indexAxiom(elkAxiom);
 		}
 	}
 	
 	public Taxonomy<ElkClass> classify() {
-		indexer.preprocessRBox();
+		indexer.roleBox.preprocess(detectLeftLinearity);
 		return new TransitiveReduction<ElkClass> (new AtomicClassifier());
 	}
 	
 
 	protected class AtomicClassifier implements TransitiveRelation<ElkClass> {
 		final List<ElkClass> atomicClasses = new LinkedList<ElkClass> ();
-		
+				
 		public AtomicClassifier() {
-			System.err.println("//classifying");
-			int step = 0;
+			
 			for (Map.Entry<ElkClassExpression, Concept> entry : indexer.mapClassToConcept.entrySet()) {
 				if (entry.getKey() instanceof ElkClass) {
-					if (++step % 1000 == 0) System.err.println("//" + step);
 					atomicClasses.add((ElkClass) entry.getKey());
 					saturator.saturate(entry.getValue());
 				}
 				
 			}
-			System.err.println("//done");
 		}
 
 		public Iterable<ElkClass> getAllSubObjects(ElkClass object) {

@@ -28,19 +28,31 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.semanticweb.elk.util.Pair;
-
 class Saturator {
 	
-	protected Deque<Context> activeContexts =
-		new LinkedList<Context> ();
+	protected Deque<Queueable> globalQueue =
+		new LinkedList<Queueable> ();
+	
 	protected Map<Concept, Context> mapConceptToContext =
 		new HashMap<Concept, Context> ();
-
+	
+	protected Map<Link, Link> linkSet = new HashMap<Link, Link> (); 
+	
+	int initRulesNo = 0;
+	int subsumptionRulesNo = 0;
+	int conjunctionRulesNo = 0;
+	int existentialRulesNo = 0;
+	int universalRulesNo = 0;
+	int hierarchyRulesNo = 0;
+	int transitivityRulesNo = 0;
+	
+	int subsumptionDerivedNo = 0;
+	int linkDerivedNo = 0;
+	
 	void saturate(Concept concept) {
 		getContext(concept);
-		while (!activeContexts.isEmpty())
-			process(activeContexts.removeFirst());
+		while (!globalQueue.isEmpty())
+			globalQueue.removeFirst().accept(processor);
 	}
 
 	protected Context getContext(Concept concept) {
@@ -49,156 +61,121 @@ class Saturator {
 			context = new Context();
 			mapConceptToContext.put(concept, context);
 			enqueue(context, concept);
+			initRulesNo++;
 		}
 		return context;
 	}
 	
-	protected void enqueue(Context context, Derivable derivable) {
-	//	if (derivable.accept(context)) {
-			if (context.saturated) {
-				activeContexts.add(context);
-				context.saturated = false;
-			}
-			context.queue.add(derivable);
-//		}
-	}
-	
-	protected void process(final Context context) {
-	
-		DerivableVisitor<Void> processor = new DerivableVisitor<Void> () {
-			
-			public Void visit(Concept concept) {
-				if (!context.derivedConcepts.add(concept))
-					return null;
-				
-				//process told super concepts
-				for (Concept c : concept.getToldSuperConcepts())
-					enqueue(context, c);
-
-				//process conjunctions
-				for (Conjunction conjunction : concept.getConjunctions()) {
-					boolean arePremisesSatisfied = true;
-					for (Concept premise : conjunction.getPremises())
-						if (!context.derivedConcepts.contains(premise)) {
-							arePremisesSatisfied = false;
-							break;
-						}
-
-
-					if (arePremisesSatisfied)
-						enqueue(context, conjunction.getConclusion());
-				}
-
-				//process existentials
-				for (Quantifier e : concept.getExistentials()) {
-					enqueue(context, new ForwardLink(e.getRole(), getContext(e.getConcept())));
-				}
-
-				//process universals
-				for (Quantifier u : concept.getUniversals()) {
-					Collection<Context> parents = context.backwardLinks.get(u.getRole());
-					if (parents != null)
-						for (Context c : parents)
-							enqueue(c, u.getConcept());
-				}
-				
-				return null;
-			}
-			
-			public Void visit(ForwardLink link) {
-				if (!context.forwardLinks.add(link))
-					return null;
-			
-				switch (Reasoner.TRANSITIVITY) {
-				
-				case 0:
-					link.getContext().backwardLinks.add(link.getRole(), context);
-					
-					//process universals
-					for (Concept c : link.getContext().derivedConcepts)
-						for (Quantifier u : c.getUniversals())
-							if (link.getRole() == u.getRole())
-								enqueue(context, u.getConcept());
-					
-					
-					//process told super roles
-					for (Role r : link.getRole().getToldSuperRoles())
-						enqueue(context, new ForwardLink(r, link.getContext()));
-					
-					//process role chains on right
-					for (Pair<Role, Role> p : link.getRole().getRightPropertyChains()) {
-						Collection<Context> parents = context.backwardLinks.get(p.getFirst());
-						if (parents != null)
-							for (Context c : parents)
-								enqueue(c, new ForwardLink(p.getSecond(), link.getContext()));
-					}
-					
-					//process role chains on left
-					for (Pair<Role, Role> p : link.getRole().getRightPropertyChains()) {
-						Collection<Context> children = link.getContext().forwardLinks.get(p.getFirst());
-						if (children != null)
-							for (Context c : children)
-								enqueue(context, new ForwardLink(p.getSecond(), c));
-/*
-						for (ForwardLink l : link.getContext().forwardLinks)
-							if (l.getRole() == p.getFirst())
-								enqueue(context, new ForwardLink(p.getSecond(), l.getContext()));
-*/								
-					}
-					
-					break;
-				
-				case 1:
-					enqueue(link.getContext(), new BackwardLink(link.getRole(), context));
-				
-					//process role chains on right
-					for (Pair<Role, Role> p : link.getRole().getRightPropertyChains()) {
-						Collection<Context> parents = context.backwardLinks.get(p.getFirst());
-						if (parents != null)
-							for (Context c : parents)
-								enqueue(link.getContext(), new BackwardLink(p.getSecond(), c));
-					}
-					break;
-				}
-				
-				return null;
-			}
-			
-			public Void visit(BackwardLink link) {
-				if (!context.backwardLinks.add(link))
-					return null;
-
-				//process universals
-				for (Concept c : context.derivedConcepts)
-					for (Quantifier u : c.getUniversals())
-						if (link.getRole() == u.getRole())
-							enqueue(link.getContext(), u.getConcept());
-
-				//process told superroles
-				for (Role r : link.getRole().getToldSuperRoles())
-					enqueue(context, new BackwardLink(r, link.getContext()));
-
-				//process role chains on left
-				for (Pair<Role, Role> p : link.getRole().getLeftPropertyChains()) {
-					Collection<Context> children = context.forwardLinks.get(p.getFirst());
-					if (children != null)
-						for (Context c : children)
-							enqueue(c, new BackwardLink(p.getSecond(), link.getContext()));
-				}
-
-				return null;
-			}
-
-		};
-		
-		
-		while (!context.queue.isEmpty()) {
-			int last = context.queue.size()-1;
-			Derivable toProcess = context.queue.get(last);
-			context.queue.remove(last);
-			toProcess.accept(processor);
+	protected void enqueue(Context context, Concept concept) {
+		if (context.saturated) {
+			globalQueue.add(context);
+			context.saturated = false;
 		}
-		context.queue.trimToSize();
-		context.saturated = true;
+		context.localQueue.add(concept);
 	}
+	
+	protected void enqueue(Link link) {
+		globalQueue.add(link);
+	}
+	
+	QueueableVisitor processor = new QueueableVisitor () {
+		
+		public void visit(Context context) {
+			while (!context.localQueue.isEmpty()) {
+				int last = context.localQueue.size()-1;
+				Concept concept = context.localQueue.get(last);
+				context.localQueue.remove(last);
+				
+				if (context.derivedConcepts.add(concept)) {
+					subsumptionDerivedNo++;
+					
+					//process told super concepts
+					for (Concept c : concept.getToldSuperConcepts()) {
+						enqueue(context, c);
+						subsumptionRulesNo++;
+					}
+
+					//process conjunctions
+					for (Conjunction conjunction : concept.getConjunctions()) {
+						boolean arePremisesSatisfied = true;
+						for (Concept premise : conjunction.getPremises())
+							if (!context.derivedConcepts.contains(premise)) {
+								arePremisesSatisfied = false;
+								break;
+							}
+
+
+						if (arePremisesSatisfied) {
+							enqueue(context, conjunction.getConclusion());
+							conjunctionRulesNo++;
+						}
+					}
+
+					//process existentials
+					for (Quantifier e : concept.getExistentials()) {
+						enqueue(new Link(context, getContext(e.getConcept()), e.getRole()));
+						existentialRulesNo++;
+					}
+
+					//process universals
+					for (Quantifier u : concept.getUniversals()) {
+						Collection<Link> toParents = context.backwardLinks.get(u.getRole());
+						if (toParents != null)
+							for (Link l : toParents) {
+								enqueue(l.getSource(), u.getConcept());
+								universalRulesNo++;
+							}
+					}
+				}
+			}
+			context.localQueue.trimToSize();
+			context.saturated = true;
+		}
+		
+		public void visit(Link link) {
+			if (linkSet.get(link) == null) {
+				linkSet.put(link, link);
+				linkDerivedNo++;
+				
+				link.getSource().forwardLinks.add(link.getRole(), link);
+				link.getTarget().backwardLinks.add(link.getRole(), link);
+				
+				//process universals
+				for (Concept c : link.getTarget().derivedConcepts)
+					for (Quantifier u : c.getUniversals())
+						if (link.getRole() == u.getRole()) {
+							enqueue(link.getSource(), u.getConcept());
+							universalRulesNo++;
+						}
+			
+				//process told super roles
+				for (Role r : link.getRole().getToldSuperRoles()) {
+					enqueue(new Link(link.getSource(), link.getTarget(), r, link.length));
+					hierarchyRulesNo++;
+				}
+				
+				//process left role chains
+				for (RoleChain p : link.getRole().getLeftPropertyChains()) {
+					Collection<Link> toChildren = link.getTarget().forwardLinks.get(p.getRightSubRole());
+					if (toChildren != null)
+						for (Link l : toChildren) 
+							if (l.length == 1 || !p.isLeftLinear) {
+								enqueue(new Link(link.getSource(), l.getTarget(), p.getSuperRole(), link.length+l.length));
+								transitivityRulesNo++;
+							}
+				}
+				
+				//process right role chains
+				for (RoleChain p : link.getRole().getRightPropertyChains()) 
+					if (link.length == 1 || !p.isLeftLinear) {
+						Collection<Link> toParents = link.getSource().backwardLinks.get(p.getLeftSubRole());
+						if (toParents != null)
+							for (Link l : toParents) {
+								enqueue(new Link(l.getSource(), link.getTarget(), p.getSuperRole(), link.length+l.length));
+								transitivityRulesNo++;
+							}
+					}
+			}
+		}
+	};
 }

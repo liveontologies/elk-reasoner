@@ -22,9 +22,9 @@
  */
 package org.semanticweb.elk.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * 
@@ -43,7 +43,7 @@ public class HashIndex<Key, Value>  extends HashMap<Key, Collection<Value>> impl
 	public boolean add(Key key, Value value) {
 		Collection<Value> collection = get(key);
 		if (collection == null) {
-			collection = new ArraySet<Value> (1);
+			collection = new LinkedList<Value> ();
 			put(key, collection);
 		}
 		return collection.add(value);

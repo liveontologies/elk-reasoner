@@ -110,4 +110,77 @@ public class ReasonerTest extends TestCase {
 		assertTrue("A contains D", context.derivedConcepts.contains(D));
 	}
 	
+	public void testTransitivity() {
+		Reasoner reasoner = new Reasoner(false);
+		
+		int n = 10;
+		ElkClass a[] = new ElkClass[n];
+		for (int i = 0; i < n; i++)
+			a[i] = ElkClass.create("A" + i);
+		
+		ElkObjectProperty r = ElkObjectProperty.create("R");
+		reasoner.add(ElkTransitiveObjectPropertyAxiom.create(r));
+	
+		for (int i = 1; i < n; i++)
+		reasoner.add(ElkSubClassOfAxiom.create(a[i-1], ElkObjectSomeValuesFrom.create(r, a[i])));
+			
+		ElkClass b = ElkClass.create("B");
+		ElkClass c = ElkClass.create("C");
+		reasoner.add(ElkSubClassOfAxiom.create(a[n-1], b));
+		reasoner.add(ElkSubClassOfAxiom.create(ElkObjectSomeValuesFrom.create(r, b), c));
+
+		reasoner.classify();
+		
+		Concept C = reasoner.indexer.getConcept(c);
+		for (int i = 0; i < n-1; i++)
+			assertTrue(reasoner.saturator.getContext(reasoner.indexer.getConcept(a[i])).derivedConcepts.contains(C));
+	}
+	
+	public void testRoleChains() {
+		Reasoner reasoner = new Reasoner(true);
+		int n = 100;
+		ElkClass a[] = new ElkClass[n+1];
+		for (int i = 0; i <= n; i++)
+			a[i] = ElkClass.create("A" + i);
+		
+		ElkObjectProperty r[] = new ElkObjectProperty[n];
+		ElkObjectProperty s[] = new ElkObjectProperty[n];
+		ElkObjectProperty t[] = new ElkObjectProperty[n];
+		for (int i = 0; i < n; i++) {
+			r[i] = ElkObjectProperty.create("R" + i);
+			s[i] = ElkObjectProperty.create("S" + i);
+			t[i] = ElkObjectProperty.create("T" + i);
+		}
+		
+		for (int i = 0; i < n; i++)
+			reasoner.add(ElkSubClassOfAxiom.create(a[i], ElkObjectSomeValuesFrom.create(r[i], a[i+1])));
+		
+		reasoner.add(ElkSubObjectPropertyOfAxiom.create(r[0], s[0]));
+		for (int i = 1; i < n; i++)
+			reasoner.add(ElkSubObjectPropertyOfAxiom.create(ElkObjectPropertyChain.create(Arrays.asList(s[i-1], r[i])), s[i]));
+		
+		reasoner.add(ElkSubObjectPropertyOfAxiom.create(r[n-1], t[n-1]));
+		for (int i = n-2; i >= 0; i--)
+			reasoner.add(ElkSubObjectPropertyOfAxiom.create(ElkObjectPropertyChain.create(Arrays.asList(r[i], t[i+1])), t[i]));
+		
+		ElkObjectProperty S = ElkObjectProperty.create("S");
+		ElkObjectProperty T = ElkObjectProperty.create("T");
+		reasoner.add(ElkSubObjectPropertyOfAxiom.create(s[n-1], S));
+		for (int i = 0; i < n; i++) 
+			reasoner.add(ElkSubObjectPropertyOfAxiom.create(t[i], T));
+		
+		ElkClass b = ElkClass.create("B");
+		ElkClass c = ElkClass.create("C");
+		reasoner.add(ElkSubClassOfAxiom.create(ElkObjectSomeValuesFrom.create(S, a[n]), b));
+		reasoner.add(ElkSubClassOfAxiom.create(ElkObjectSomeValuesFrom.create(T, a[n]), c));
+		
+		reasoner.classify();
+		
+		Concept B = reasoner.indexer.getConcept(b);
+		Concept C = reasoner.indexer.getConcept(c);
+		assertTrue(reasoner.saturator.getContext(reasoner.indexer.getConcept(a[0])).derivedConcepts.contains(B));
+		for (int i = 0; i < n; i++) {
+			assertTrue(reasoner.saturator.getContext(reasoner.indexer.getConcept(a[i])).derivedConcepts.contains(C));
+		}
+	}
 }

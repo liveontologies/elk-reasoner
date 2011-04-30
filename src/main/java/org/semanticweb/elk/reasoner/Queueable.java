@@ -22,12 +22,11 @@
  */
 package org.semanticweb.elk.reasoner;
 
-interface Derivable {
-	<O> O accept(DerivableVisitor<O> visitor);
+interface Queueable {
+	void accept(QueueableVisitor visitor);
 }
 
-interface DerivableVisitor<O>  {
-	O visit(Concept concept);
-	O visit(ForwardLink forwardLink);
-	O visit(BackwardLink backwardLink);
+interface QueueableVisitor  {
+	void visit(Context Context);
+	void visit(Link link);
 }
