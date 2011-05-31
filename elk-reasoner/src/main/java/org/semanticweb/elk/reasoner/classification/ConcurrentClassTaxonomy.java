@@ -75,35 +75,33 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 		Context rootContext = saturation.getContext(root);
 		ArraySet<ElkClass> equivalent = new ArraySet<ElkClass>();
 		Collection<Context> directContexts = new LinkedList<Context>();
-		for (IndexedClassExpression ice : rootContext.getDerived())
-			for (IndexedClassExpression derived : 
-			ice.representedIndexedClassExpressions) {
-				if (derived.classExpression instanceof ElkClass) {
-					ElkClass derivedClass = (ElkClass) derived.classExpression;
-					Context derivedContext = saturation.getContext(derived);
-					Set<IndexedClassExpression> derivedDerived = derivedContext
-					.getDerived();
-					if (derivedDerived.contains(root)) {
-						equivalent.add(derivedClass);
-						// uses that hash codes for members of ElkClass are unique!
-						if (derivedClass.hashCode() < canonical.hashCode())
-							canonical = derivedClass;
-					} else {
-						boolean addThis = true;
-						Iterator<Context> e = directContexts.iterator();
-						while (e.hasNext()) {
-							Context previousContext = e.next();
-							if (previousContext.getDerived().contains(derived)) {
-								addThis = false;
-								break;
-							}
-							if (derivedDerived.contains(previousContext.getRoot()))
-								e.remove();
+		for (IndexedClassExpression derived : rootContext.getDerived()) {
+			if (derived.classExpression instanceof ElkClass) {
+				ElkClass derivedClass = (ElkClass) derived.classExpression;
+				Context derivedContext = saturation.getContext(derived);
+				Set<IndexedClassExpression> derivedDerived = derivedContext
+				.getDerived();
+				if (derivedDerived.contains(root)) {
+					equivalent.add(derivedClass);
+					// uses that hash codes for members of ElkClass are unique!
+					if (derivedClass.hashCode() < canonical.hashCode())
+						canonical = derivedClass;
+				} else {
+					boolean addThis = true;
+					Iterator<Context> e = directContexts.iterator();
+					while (e.hasNext()) {
+						Context previousContext = e.next();
+						if (previousContext.getDerived().contains(derived)) {
+							addThis = false;
+							break;
 						}
-						if (addThis)
-							directContexts.add(derivedContext);
+						if (derivedDerived.contains(previousContext.getRoot()))
+							e.remove();
 					}
+					if (addThis)
+						directContexts.add(derivedContext);
 				}
+			}
 		}
 
 		node = new ClassNode(equivalent);

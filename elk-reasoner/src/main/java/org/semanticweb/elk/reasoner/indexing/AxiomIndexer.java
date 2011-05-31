@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import org.codehaus.plexus.util.FastMap;
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
@@ -57,21 +56,8 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 	public Void visit(ElkEquivalentClassesAxiom axiom) {
 		IndexedClassExpression first = null;
 		for (ElkClassExpression c : axiom.getEquivalentClassExpressions()) {
-			IndexedClassExpression canonical = c.accept(negativeClassExpressionIndexer).canonicalIndexedClassExpression;
-			c.accept(positiveClassExpressionIndexer);
-			if (first == null)
-				first = canonical;
-			
-			if (first != canonical) {
-				for (IndexedClassExpression i : canonical.representedIndexedClassExpressions) {
-					first.representedIndexedClassExpressions.add(i);
-					i.canonicalIndexedClassExpression = first;
-				}
-				canonical.representedIndexedClassExpressions = null;
-			}
-
 //			implement EquivalentClassesAxiom as two SubClassOfAxioms			
-/*	
+
 			IndexedClassExpression ice = c.accept(negativeClassExpressionIndexer);
 			c.accept(positiveClassExpressionIndexer);
 			if (first == null)
@@ -80,7 +66,6 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 				ice.superClassExpressions.add(first);
 				first.superClassExpressions.add(ice);
 			}
-*/
 		}
 		return null;
 	}

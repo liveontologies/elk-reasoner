@@ -24,10 +24,8 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.util.ArraySet;
 import org.semanticweb.elk.util.HashMultimap;
 import org.semanticweb.elk.util.Multimap;
 
@@ -50,20 +48,6 @@ public class IndexedClassExpression {
 	/** The represented class expression. */
 	public final ElkClassExpression classExpression;
 	
-	
-	/** 
-	 * The canonical IndexedClassExpression that represents the told equivalence 
-	 * class of this IndexedClassExpression.
-	 */
-	public IndexedClassExpression canonicalIndexedClassExpression;
-	
-	/**
-	 * The set of all IndexedClassExpressions that are represented by this
-	 * IndexedClassExpression. null if is this IndexedClassExpression is not
-	 * canonical.
-	 */
-	public List<IndexedClassExpression> representedIndexedClassExpressions;
-
 	/**
 	 * A list of all indexed class expressions for (told) superclasses of this
 	 * class expression.
@@ -109,9 +93,6 @@ public class IndexedClassExpression {
 	 */
 	public IndexedClassExpression(ElkClassExpression classExpression) {
 		this.classExpression = classExpression;
-		this.canonicalIndexedClassExpression = this;
-		this.representedIndexedClassExpressions = new ArrayList<IndexedClassExpression> (1);
-		this.representedIndexedClassExpressions.add(this);
 		this.superClassExpressions = new ArrayList<IndexedClassExpression>(0);
 		this.negConjunctionsByConjunct = 
 			new HashMultimap<IndexedClassExpression, IndexedClassExpression>(1);
@@ -134,29 +115,14 @@ public class IndexedClassExpression {
 	/** Global register for calculating hash codes. */
 	private static int lastHashCode_ = 0;
 
-
-	/** (non-Javadoc)
-	 * Two IndexedClassExpressions are equal if they have the same canonical representants.
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof IndexedClassExpression)
-			return canonicalIndexedClassExpression == 
-				((IndexedClassExpression) obj).canonicalIndexedClassExpression;
-		
-		return false;
-	}
-	
 	/** Hash code for this object. */
 	private final int hashCode_ = ++lastHashCode_;
 
 	/**
 	 * Get an integer hash code to be used for this object. 
-	 * 
-	 * @return integer hash code of the canonical representant of this IndexedClassExpression
 	 */
 	@Override
 	public final int hashCode() {
-		return canonicalIndexedClassExpression.hashCode_;
+		return hashCode_;
 	}
 }

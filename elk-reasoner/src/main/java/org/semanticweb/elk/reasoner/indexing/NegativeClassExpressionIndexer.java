@@ -44,6 +44,8 @@ class NegativeClassExpressionIndexer implements
 		ElkClassExpressionVisitor<IndexedClassExpression> {
 
 	protected final AxiomIndexer axiomIndexer;
+	
+	public IndexedClassExpression target;
 
 	NegativeClassExpressionIndexer(AxiomIndexer axiomIndexer) {
 		this.axiomIndexer = axiomIndexer;

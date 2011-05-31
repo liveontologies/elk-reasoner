@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.Quantifier;
+import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.util.LazySetIntersection;
 import org.semanticweb.elk.util.Pair;
 import org.semanticweb.elk.util.Multimap;
@@ -55,6 +56,7 @@ public class ConcurrentSaturation implements Saturation {
 	// bounded buffer for concepts added for saturation
 	protected final BlockingQueue<IndexedClassExpression> conceptBuffer;
 
+	
 	public ConcurrentSaturation(int bufferSize) {
 		this.contextLookup = new ConcurrentHashMap<IndexedClassExpression, Context>();
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
@@ -73,7 +75,7 @@ public class ConcurrentSaturation implements Saturation {
 	public Context getContext(IndexedClassExpression ice) {
 		Context context = contextLookup.get(ice);
 		if (context == null) {
-			context = new Context(ice.canonicalIndexedClassExpression);
+			context = new Context(ice);
 			Context previous = contextLookup.putIfAbsent(ice, context);
 			if (previous != null)
 				return (previous);
@@ -149,14 +151,13 @@ public class ConcurrentSaturation implements Saturation {
 	}
 
 	protected void processConcept(Context context, IndexedClassExpression ice) {
-		IndexedClassExpression canonical = ice.canonicalIndexedClassExpression;
-		if (context.derived.add(canonical))
-			for (IndexedClassExpression represented : canonical.representedIndexedClassExpressions) {
-				processImplications(context, represented);
-				processConjunctions(context, represented);
-				processExistentials(context, represented);
-				processUniversals(context, represented);
-			}
+		if (context.derived.add(ice)) {
+			processImplications(context, ice);
+			processConjunctions(context, ice);
+			processExistentials(context, ice);
+			processUniversals(context, ice);
+			
+		}
 	}
 
 	protected void processLink(Context context,

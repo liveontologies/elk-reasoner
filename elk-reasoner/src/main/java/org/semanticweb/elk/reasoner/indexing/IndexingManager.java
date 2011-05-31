@@ -62,8 +62,8 @@ public class IndexingManager {
 		public void run() {
 			for (;;) {
 				Future<? extends ElkAxiom> futureAxiom = futureAxiomBuffer.poll();
-				axiomBufferSize.decrementAndGet();
 				if (futureAxiom != null) {
+					axiomBufferSize.decrementAndGet();
 					try {
 						futureAxiom.get().accept(axiomIndexer);
 					} catch (InterruptedException e) {
