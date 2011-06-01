@@ -34,6 +34,7 @@ import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.util.ArrayHashMap;
 
 /**
  * @author Yevgeny Kazakov
@@ -43,29 +44,12 @@ public class SerialIndex implements Index {
 
 	protected final Map<ElkClassExpression, IndexedClassExpression> mapClassToConcept;
 	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> mapObjectPropertyToRole;
-	protected final List<ElkObjectSomeValuesFrom> negativeExistentials;
 
 	public SerialIndex() {
-		mapClassToConcept = new HashMap<ElkClassExpression, IndexedClassExpression>(
+		mapClassToConcept = new ArrayHashMap<ElkClassExpression, IndexedClassExpression>(
 				119);
-		mapObjectPropertyToRole = new HashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
+		mapObjectPropertyToRole = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
 				119);
-		negativeExistentials = new ArrayList<ElkObjectSomeValuesFrom>();
-	}
-
-	public void reduceRoleHierarchy() {
-		// 
-		for (ElkObjectSomeValuesFrom existential : negativeExistentials) {
-			IndexedClassExpression firstElement = getIndexed(existential);
-			IndexedObjectProperty relation = getIndexed((ElkObjectProperty) existential
-					.getObjectPropertyExpression());
-			IndexedClassExpression secondElement = getIndexed(existential
-					.getClassExpression());
-			for (IndexedObjectProperty subRelation : relation.getSubRelation()) {
-				secondElement.negExistentialsByObjectProperty.add(subRelation, firstElement);
-				subRelation.negExistentialsByClassExpression.add(secondElement, firstElement);
-			}
-		}
 	}
 
 	public IndexedClassExpression getIndexed(ElkClassExpression classExpression) {
@@ -87,13 +71,15 @@ public class SerialIndex implements Index {
 		}
 		return indexedObjectProperty;
 	}
-
-	public void addNegativeExistential(ElkObjectSomeValuesFrom classExpression) {
-		negativeExistentials.add(classExpression);
+	
+	public void computeRoleHierarchy() {
+		for (IndexedObjectProperty iop : mapObjectPropertyToRole.values()) {
+			iop.computeSubObjectProperties();
+			iop.computeSuperObjectProperties();
+		}
 	}
 
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
 		return mapClassToConcept.values();
 	}
-
 }

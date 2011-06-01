@@ -76,7 +76,7 @@ public class Reasoner {
 
 	public void finishLoading() {
 		indexingManager.waitCompletion();
-		index.reduceRoleHierarchy();
+		index.computeRoleHierarchy();
 	}
 
 	public void saturate() {

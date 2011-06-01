@@ -29,8 +29,6 @@ import java.util.Set;
 
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.util.ArrayHashSet;
-import org.semanticweb.elk.util.HashMultimap;
-import org.semanticweb.elk.util.Multimap;
 
 /**
  * Represents all occurrences of an ElkObjectPropertyExpression in an ontology.
@@ -50,32 +48,42 @@ public class IndexedObjectProperty {
 	/** The represented object property expression. */
 	public final ElkObjectProperty objectProperty;
 
-	// TODO Consistently rename "role" into "object property" in the code.
 	/**
-	 * A list of all indexed class expressions for (told) subroles of this
-	 * object property expression.
+	 * A list of all (told) subproperties of this object property.
 	 */
 	public final List<IndexedObjectProperty> subObjectProperties;
 
 	/**
-	 * Cache for the subproperties that this object property expression has
+	 * A list of all (told) superproperties of this object property.
+	 */
+	public final List<IndexedObjectProperty> superObjectProperties;
+	
+	public boolean isTransitive; 
+
+	/**
+	 * Cache for the subproperties that this object property has
 	 * based on the transitive closure of the property hierarchy.
 	 */
 	protected Set<IndexedObjectProperty> inferredSubObjectProperties = null;
 
-	public final Multimap<IndexedClassExpression, IndexedClassExpression> negExistentialsByClassExpression;
+	/**
+	 * Cache for the superproperties that this object property has
+	 * based on the transitive closure of the property hierarchy.
+	 */
+	protected Set<IndexedObjectProperty> inferredSuperObjectProperties = null;
 
+	
 	/**
 	 * Creates an object representing an ElkObjectPropertyExpression.
 	 * 
 	 * @param objectPropertyExpression
 	 */
 	public IndexedObjectProperty(
-			ElkObjectProperty objectPropertyExpression) {
-		this.objectProperty = objectPropertyExpression;
+			ElkObjectProperty objectProperty) {
+		this.objectProperty = objectProperty;
 		this.subObjectProperties = new ArrayList<IndexedObjectProperty>();
-		this.negExistentialsByClassExpression = new HashMultimap<IndexedClassExpression,
-														IndexedClassExpression>(1);
+		this.superObjectProperties = new ArrayList<IndexedObjectProperty>();
+		this.isTransitive = false;
 	}
 
 	/**
@@ -95,31 +103,59 @@ public class IndexedObjectProperty {
 	 * 
 	 * @return Set of subproperties
 	 */
-	public Set<IndexedObjectProperty> getSubRelation() {
+	public Set<IndexedObjectProperty> getSubObjectProperties() {
 		if (inferredSubObjectProperties == null) {
-			computeSubRoles();
+			computeSubObjectProperties();
 		}
 		return inferredSubObjectProperties;
+	}
+	
+	/**
+	 * Return the set of all IndexedObjectProperty objects that are inferred to
+	 * be superproperties of this object, based on the told property hierarchy.
+	 * 
+	 * @return Set of superproperties
+	 */
+	public Set<IndexedObjectProperty> getSuperObjectProperties() {
+		if (inferredSuperObjectProperties == null) {
+			computeSuperObjectProperties();
+		}
+		return inferredSuperObjectProperties;
 	}
 
 	/**
 	 * Compute the subproperties of this object and store them in the internal
 	 * cache.
 	 */
-	public Multimap<IndexedClassExpression, IndexedClassExpression> getPropagations() {
-		return this.negExistentialsByClassExpression;
-	}
-
-	protected void computeSubRoles() {
+	protected void computeSubObjectProperties() {
 		inferredSubObjectProperties = new ArrayHashSet<IndexedObjectProperty>();
 		ArrayDeque<IndexedObjectProperty> queue = new ArrayDeque<IndexedObjectProperty>();
 		inferredSubObjectProperties.add(this);
 		queue.addLast(this);
 		while (!queue.isEmpty()) {
-			IndexedObjectProperty indexedObjectProperty = queue.removeLast();
-			for (IndexedObjectProperty r : indexedObjectProperty.subObjectProperties) {
-				if (inferredSubObjectProperties.add(r)) {
-					queue.addLast(r);
+			IndexedObjectProperty r = queue.removeLast();
+			for (IndexedObjectProperty s : r.subObjectProperties) {
+				if (inferredSubObjectProperties.add(s)) {
+					queue.addLast(s);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Compute the superproperties of this object and store them in the internal
+	 * cache.
+	 */
+	protected void computeSuperObjectProperties() {
+		inferredSuperObjectProperties = new ArrayHashSet<IndexedObjectProperty>();
+		ArrayDeque<IndexedObjectProperty> queue = new ArrayDeque<IndexedObjectProperty>();
+		inferredSuperObjectProperties.add(this);
+		queue.addLast(this);
+		while (!queue.isEmpty()) {
+			IndexedObjectProperty r = queue.removeLast();
+			for (IndexedObjectProperty s : r.superObjectProperties) {
+				if (inferredSuperObjectProperties.add(s)) {
+					queue.addLast(s);
 				}
 			}
 		}

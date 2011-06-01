@@ -26,7 +26,7 @@ import java.util.Set;
 
 /**
  * 
- * Implementation of Index backed by an ArrayHashMap
+ * Implementation of Multimap backed by an ArrayHashMap
  * 
  * @author Frantisek Simancik
  * 
@@ -34,14 +34,14 @@ import java.util.Set;
  * @param <Value>
  */
 
-public class HashMultimap<Key, Value> extends ArrayHashMap<Key, Set<Value>>
+public class HashSetMultimap<Key, Value> extends ArrayHashMap<Key, Set<Value>>
 		implements Multimap<Key, Value> {
 
-	public HashMultimap() {
+	public HashSetMultimap() {
 		super();
 	}
 
-	public HashMultimap(int i) {
+	public HashSetMultimap(int i) {
 		super(i);
 	}
 

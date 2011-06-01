@@ -96,12 +96,13 @@ class NegativeClassExpressionIndexer implements
 
 	
 	public IndexedClassExpression visit(ElkObjectSomeValuesFrom classExpression) {
+		
 		IndexedClassExpression result = axiomIndexer.index.getIndexed(classExpression);
 		if (result.negativeOccurrenceNo++ == 0) {
-			classExpression.getObjectPropertyExpression().accept(
+			IndexedObjectProperty r = classExpression.getObjectPropertyExpression().accept(
 					axiomIndexer.objectPropertyExpressionIndexer);
-			classExpression.getClassExpression().accept(this);
-			axiomIndexer.index.addNegativeExistential(classExpression);
+			IndexedClassExpression c = classExpression.getClassExpression().accept(this);
+			c.negExistentials.add(new Quantifier(r, result));
 		}
 		return result;
 	}

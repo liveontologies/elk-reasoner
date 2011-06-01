@@ -35,14 +35,11 @@ import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
  */
 public interface Index {
 
-	void reduceRoleHierarchy();
-
 	IndexedClassExpression getIndexed(ElkClassExpression classExpression);
 
 	IndexedObjectProperty getIndexed(ElkObjectProperty objectProperty);
-
-	// this won't be needed in the next implementation of complex RIAs
-	void addNegativeExistential(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom);
+	
+	void computeRoleHierarchy();
 
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions();
 

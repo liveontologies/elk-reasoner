@@ -96,17 +96,20 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
 
-		IndexedObjectProperty subRole = axiom.getSubObjectPropertyExpression().accept(
+		IndexedObjectProperty subProperty = axiom.getSubObjectPropertyExpression().accept(
 				objectPropertyExpressionIndexer);
-		IndexedObjectProperty superRole = axiom.getSuperObjectPropertyExpression().accept(
+		IndexedObjectProperty superProperty = axiom.getSuperObjectPropertyExpression().accept(
 				objectPropertyExpressionIndexer);
-		superRole.subObjectProperties.add(subRole);
+		
+		subProperty.superObjectProperties.add(superProperty);
+		superProperty.subObjectProperties.add(subProperty);
 
 		return null;
 	}
 
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-
-		throw new UnsupportedOperationException("Not yet implemented");
+		axiom.getObjectPropertyExpression().accept(objectPropertyExpressionIndexer).isTransitive = true;
+		
+		return null;
 	}
 }
