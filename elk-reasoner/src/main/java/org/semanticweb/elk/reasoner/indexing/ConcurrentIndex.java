@@ -43,31 +43,12 @@ public class ConcurrentIndex implements Index {
 
 	protected final ConcurrentMap<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
 	protected final ConcurrentMap<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
-	protected final Queue<ElkObjectSomeValuesFrom> negativeExistentials;
 
 	public ConcurrentIndex() {
 		indexedClassExpressionLookup = new ConcurrentHashMap<ElkClassExpression, IndexedClassExpression>();
 		indexedObjectPropertyLookup = new ConcurrentHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>();
-		negativeExistentials = new ConcurrentLinkedQueue<ElkObjectSomeValuesFrom>();
 	}
 
-	public void reduceRoleHierarchy() {
-		for (;;) {
-			ElkObjectSomeValuesFrom existential = negativeExistentials.poll();
-			if (existential == null)
-				break;
-			IndexedClassExpression firstElement = getIndexed(existential);
-			IndexedObjectProperty relation = getIndexed((ElkObjectProperty) existential
-					.getObjectPropertyExpression());
-			IndexedClassExpression secondElement = getIndexed(existential
-					.getClassExpression());
-			for (IndexedObjectProperty subRelation : relation.getSubRelation()) {
-				secondElement.negExistentialsByObjectProperty.add(subRelation,
-						firstElement);
-				subRelation.getPropagations().add(secondElement, firstElement);
-			}
-		}
-	}
 
 	public IndexedClassExpression getIndexed(ElkClassExpression classExpression) {
 		IndexedClassExpression indexedClassExpression = indexedClassExpressionLookup
@@ -95,12 +76,15 @@ public class ConcurrentIndex implements Index {
 		return indexedObjectProperty;
 	}
 
-	public void addNegativeExistential(ElkObjectSomeValuesFrom classExpression) {
-		negativeExistentials.add(classExpression);
+	public void computeRoleHierarchy() {
+		for (IndexedObjectProperty iop : indexedObjectPropertyLookup.values()) {
+			iop.computeSubObjectProperties();
+			iop.computeSuperObjectProperties();
+		}
 	}
 
+	
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
 		return indexedClassExpressionLookup.values();
 	}
-
 }

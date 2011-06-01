@@ -106,11 +106,11 @@ public class ConcurrentSaturation implements Saturation {
 
 	protected void enqueueLink(Context context, IndexedObjectProperty relation,
 			Context parent) {
-		if (!context.linksToParents.contains(relation, parent)) {
+//		if (!context.linksToParents.contains(relation, parent)) {
 			context.linkQueue.add(new Pair<IndexedObjectProperty, Context>(
 					relation, parent));
 			activateContext(context);
-		}
+//		}
 	}
 
 	public void compute() {
@@ -165,10 +165,9 @@ public class ConcurrentSaturation implements Saturation {
 		IndexedObjectProperty relation = link.getFirst();
 		Context target = link.getSecond();
 		if (context.linksToParents.add(relation, target)) {
-			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-					relation.getPropagations().keySet(), context.derived))
-				for (IndexedClassExpression conclusion : relation
-						.getPropagations().get(common))
+			for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty>(
+					relation.getSuperObjectProperties(), context.propagationsOverLinks.keySet()))
+				for (IndexedClassExpression conclusion : context.propagationsOverLinks.get(common))
 					enqueueConcept(target, conclusion);
 		}
 	}
@@ -195,13 +194,11 @@ public class ConcurrentSaturation implements Saturation {
 	}
 
 	void processUniversals(Context context, IndexedClassExpression ice) {
-		Multimap<IndexedObjectProperty, IndexedClassExpression> universals = ice.negExistentialsByObjectProperty;
-		Multimap<IndexedObjectProperty, Context> linksToParents = context.linksToParents;
-		for (IndexedObjectProperty parentProperty : new LazySetIntersection<IndexedObjectProperty>(
-				universals.keySet(), linksToParents.keySet()))
-			for (Context target : linksToParents.get(parentProperty))
-				for (IndexedClassExpression conclusion : universals
-						.get(parentProperty))
-					enqueueConcept(target, conclusion);
+		for (Quantifier e : ice.negExistentials) 
+			if (context.propagationsOverLinks.add(e.getRelation(), e.getElement()))
+				for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty>(
+						e.getRelation().getSubObjectProperties(), context.linksToParents.keySet()))
+					for (Context target : context.linksToParents.get(common))
+						enqueueConcept(target, e.getElement());
 	}
 }

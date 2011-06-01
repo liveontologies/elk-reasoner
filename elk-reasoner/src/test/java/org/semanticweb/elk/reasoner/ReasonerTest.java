@@ -28,6 +28,7 @@ import java.util.concurrent.Future;
 import junit.framework.TestCase;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.Context;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
@@ -64,9 +65,14 @@ public class ReasonerTest extends TestCase {
 
 		IndexedClassExpression A = reasoner.index.getIndexed(a.get());
 		IndexedClassExpression D = reasoner.index.getIndexed(d.get());
-		reasoner.index.reduceRoleHierarchy();
+		reasoner.index.computeRoleHierarchy();
 		reasoner.saturationManager.submit(A);
 		reasoner.saturationManager.waitCompletion();
+		
+		IndexedObjectProperty R = reasoner.index.getIndexed(r.get());
+		IndexedObjectProperty S = reasoner.index.getIndexed(r.get());
+		assertTrue("R subrole S", R.getSuperObjectProperties().contains(S));
+		assertTrue("S superrole R", S.getSubObjectProperties().contains(R));
 		assertTrue("A contains D", reasoner.saturation.getContext(A)
 				.getDerived().contains(D));
 	}

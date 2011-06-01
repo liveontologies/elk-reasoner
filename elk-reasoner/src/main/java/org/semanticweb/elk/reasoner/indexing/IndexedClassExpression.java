@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.util.HashMultimap;
+import org.semanticweb.elk.util.HashSetMultimap;
 import org.semanticweb.elk.util.Multimap;
 
 /**
@@ -70,7 +70,7 @@ public class IndexedClassExpression {
 	 * A list of Quantifier objects representing all existential role
 	 * restrictions that this class expressions is a told superclass of.
 	 */
-	public final Multimap<IndexedObjectProperty, IndexedClassExpression> negExistentialsByObjectProperty;
+	public final List<Quantifier> negExistentials;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -93,12 +93,11 @@ public class IndexedClassExpression {
 	 */
 	public IndexedClassExpression(ElkClassExpression classExpression) {
 		this.classExpression = classExpression;
-		this.superClassExpressions = new ArrayList<IndexedClassExpression>(0);
+		this.superClassExpressions = new ArrayList<IndexedClassExpression>(1);
 		this.negConjunctionsByConjunct = 
-			new HashMultimap<IndexedClassExpression, IndexedClassExpression>(1);
-		this.posExistentials = new ArrayList<Quantifier>(0);
-		this.negExistentialsByObjectProperty = 
-			new HashMultimap<IndexedObjectProperty, IndexedClassExpression>(1);
+			new HashSetMultimap<IndexedClassExpression, IndexedClassExpression>(1);
+		this.posExistentials = new ArrayList<Quantifier>(1);
+		this.negExistentials = new ArrayList<Quantifier> (1);
 	}
 
 	/**

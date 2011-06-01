@@ -30,7 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.util.ArrayHashSet;
-import org.semanticweb.elk.util.HashMultimap;
+import org.semanticweb.elk.util.HashListMultimap;
+import org.semanticweb.elk.util.HashSetMultimap;
 import org.semanticweb.elk.util.Pair;
 import org.semanticweb.elk.util.Multimap;
 
@@ -44,6 +45,7 @@ public class Context {
 	final Queue<Pair<IndexedObjectProperty, Context>> linkQueue;
 	final Set<IndexedClassExpression> derived;
 	final Multimap<IndexedObjectProperty, Context> linksToParents;
+	final Multimap<IndexedObjectProperty, IndexedClassExpression> propagationsOverLinks;
 	// Context is active iff one of its queues is not empty or it is being
 	// processed
 	private AtomicBoolean isActive;
@@ -51,10 +53,13 @@ public class Context {
 	public Context(IndexedClassExpression root) {
 		this.root = root;
 		this.conceptQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
-		this.linkQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, Context>>();
+		this.linkQueue = 
+			new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, Context>>();
 		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
-		this.linksToParents = new HashMultimap<IndexedObjectProperty, Context>(
-				1);
+		this.linksToParents = 
+			new HashListMultimap<IndexedObjectProperty, Context>(1);
+		this.propagationsOverLinks = 
+			new HashListMultimap<IndexedObjectProperty, IndexedClassExpression> (1);
 		this.isActive = new AtomicBoolean(false);
 	}
 

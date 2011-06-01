@@ -70,7 +70,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		indexingManager.submit(constructor
 				.getFutureElkSubObjectPropertyOfAxiom(r, s));
 		indexingManager.waitCompletion();
-		index.reduceRoleHierarchy();
+		index.computeRoleHierarchy();
 
 		IndexedClassExpression A = index.getIndexed(a.get());
 		IndexedClassExpression D = index.getIndexed(d.get());
@@ -105,7 +105,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(
 				constructor.getFutureElkObjectIntersectionOf(b, c), d));
 		indexingManager.waitCompletion();
-		index.reduceRoleHierarchy();
+		index.computeRoleHierarchy();
 
 		IndexedClassExpression A = index.getIndexed(a.get());
 		IndexedClassExpression B = index.getIndexed(b.get());
