@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.util.ArrayHashSet;
+import org.semanticweb.elk.util.HashGenerator;
 
 /**
  * Represents all occurrences of an ElkObjectPropertyExpression in an ontology.
@@ -57,29 +58,27 @@ public class IndexedObjectProperty {
 	 * A list of all (told) superproperties of this object property.
 	 */
 	public final List<IndexedObjectProperty> superObjectProperties;
-	
-	public boolean isTransitive; 
+
+	public boolean isTransitive;
 
 	/**
-	 * Cache for the subproperties that this object property has
-	 * based on the transitive closure of the property hierarchy.
+	 * Cache for the subproperties that this object property has based on the
+	 * transitive closure of the property hierarchy.
 	 */
 	protected Set<IndexedObjectProperty> inferredSubObjectProperties = null;
 
 	/**
-	 * Cache for the superproperties that this object property has
-	 * based on the transitive closure of the property hierarchy.
+	 * Cache for the superproperties that this object property has based on the
+	 * transitive closure of the property hierarchy.
 	 */
 	protected Set<IndexedObjectProperty> inferredSuperObjectProperties = null;
 
-	
 	/**
 	 * Creates an object representing an ElkObjectPropertyExpression.
 	 * 
 	 * @param objectPropertyExpression
 	 */
-	public IndexedObjectProperty(
-			ElkObjectProperty objectProperty) {
+	public IndexedObjectProperty(ElkObjectProperty objectProperty) {
 		this.objectProperty = objectProperty;
 		this.subObjectProperties = new ArrayList<IndexedObjectProperty>();
 		this.superObjectProperties = new ArrayList<IndexedObjectProperty>();
@@ -87,8 +86,8 @@ public class IndexedObjectProperty {
 	}
 
 	/**
-	 * Represent the object's ElkObjectProperty as a string. This
-	 * implementation reflects the fact that we generally consider only one
+	 * Represent the object's ElkObjectProperty as a string. This implementation
+	 * reflects the fact that we generally consider only one
 	 * IndexedObjectProperty for each ElkObjectPropertyExpression.
 	 * 
 	 * @return string representation
@@ -109,7 +108,7 @@ public class IndexedObjectProperty {
 		}
 		return inferredSubObjectProperties;
 	}
-	
+
 	/**
 	 * Return the set of all IndexedObjectProperty objects that are inferred to
 	 * be superproperties of this object, based on the told property hierarchy.
@@ -141,7 +140,7 @@ public class IndexedObjectProperty {
 			}
 		}
 	}
-	
+
 	/**
 	 * Compute the superproperties of this object and store them in the internal
 	 * cache.
@@ -161,14 +160,11 @@ public class IndexedObjectProperty {
 		}
 	}
 
-	private static int lastHashCode = 0;
-	private final int hashCode_ = ++lastHashCode;
+	/** Hash code for this object. */
+	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	/**
-	 * Get an integer hash code to be used for this object. Care will be taken
-	 * that there is never more than one IndexedClassExpression per
-	 * ElkObjectProperty, so it is viable to use a running number as a hash
-	 * here.
+	 * Get an integer hash code to be used for this object.
 	 * 
 	 * @return integer hash code
 	 */

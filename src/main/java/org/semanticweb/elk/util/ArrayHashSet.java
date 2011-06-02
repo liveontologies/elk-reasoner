@@ -119,12 +119,8 @@ public class ArrayHashSet<E> implements Set<E> {
 			return capacity;
 	}
 
-	static int getIndex(Object key, int length) {
-		int h = key.hashCode();
-		// rehashing like in the HashMap implementation
-		h ^= (h >>> 20) ^ (h >>> 12);
-		h ^= (h >>> 7) ^ (h >>> 4);
-		return h & (length - 1);
+	static int getIndex(Object o, int length) {
+		return o.hashCode() & (length - 1);
 	}
 
 	public boolean contains(Object o) {
@@ -148,14 +144,14 @@ public class ArrayHashSet<E> implements Set<E> {
 		}
 	}
 
-	private boolean addElement(E[] data, E o) {
-		int i = getIndex(o, data.length);
+	private boolean addElement(E[] data, E e) {
+		int i = getIndex(e, data.length);
 		for (;;) {
 			Object probe = data[i];
 			if (probe == null) {
-				data[i] = o;
+				data[i] = e;
 				return true;
-			} else if (o.equals(probe))
+			} else if (e.equals(probe))
 				return false;
 			if (i == 0)
 				i = data.length - 1;

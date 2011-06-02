@@ -30,6 +30,7 @@ import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.HashListMultimap;
 import org.semanticweb.elk.util.Multimap;
 import org.semanticweb.elk.util.Pair;
@@ -51,7 +52,7 @@ import org.semanticweb.elk.util.Pair;
 abstract public class IndexedClassExpression {
 	/** The represented class expression. */
 	public final ElkClassExpression classExpression;
-	
+
 	/**
 	 * A list of all indexed class expressions for (told) superclasses of this
 	 * class expression.
@@ -76,7 +77,7 @@ abstract public class IndexedClassExpression {
 	 * first time.
 	 */
 	int positiveOccurrenceNo = 0;
-	
+
 	public boolean occursPositively() {
 		return positiveOccurrenceNo > 0;
 	}
@@ -87,7 +88,7 @@ abstract public class IndexedClassExpression {
 	 * first time.
 	 */
 	int negativeOccurrenceNo = 0;
-	
+
 	public boolean occursNegatively() {
 		return negativeOccurrenceNo > 0;
 	}
@@ -103,26 +104,31 @@ abstract public class IndexedClassExpression {
 		this.negConjunctionsByConjunct = null;
 		this.negExistentialsWithRelation = null;
 	}
-	
-	public void addSuperClassExpression(IndexedClassExpression superClassExpression) {
+
+	public void addSuperClassExpression(
+			IndexedClassExpression superClassExpression) {
 		if (superClassExpressions == null)
-			superClassExpressions = new ArrayList<IndexedClassExpression> (1);
+			superClassExpressions = new ArrayList<IndexedClassExpression>(1);
 		superClassExpressions.add(superClassExpression);
 	}
-	
-	public void addNegativeConjunctionByConjunct(IndexedObjectIntersectionOf conjunctions, 
+
+	public void addNegativeConjunctionByConjunct(
+			IndexedObjectIntersectionOf conjunctions,
 			IndexedClassExpression conjunct) {
 		if (negConjunctionsByConjunct == null)
-			negConjunctionsByConjunct = 
-				new HashListMultimap<IndexedClassExpression, IndexedObjectIntersectionOf>();
+			negConjunctionsByConjunct = new HashListMultimap<IndexedClassExpression, IndexedObjectIntersectionOf>();
 		negConjunctionsByConjunct.add(conjunct, conjunctions);
 	}
-	
-	public void addNegativeExistentialWithRelation(IndexedObjectSomeValuesFrom existential,
+
+	public void addNegativeExistentialWithRelation(
+			IndexedObjectSomeValuesFrom existential,
 			IndexedObjectProperty relation) {
 		if (negExistentialsWithRelation == null)
-			negExistentialsWithRelation = new ArrayList<Pair<IndexedObjectSomeValuesFrom,IndexedObjectProperty>> (1);
-		negExistentialsWithRelation.add(new Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty> (existential, relation));
+			negExistentialsWithRelation = new ArrayList<Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty>>(
+					1);
+		negExistentialsWithRelation
+				.add(new Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty>(
+						existential, relation));
 	}
 
 	/**
@@ -136,38 +142,38 @@ abstract public class IndexedClassExpression {
 		return "[" + classExpression.toString() + "]";
 	}
 
-	/** Global register for calculating hash codes. */
-	private static int lastHashCode_ = 0;
-
 	/** Hash code for this object. */
-	private final int hashCode_ = ++lastHashCode_;
+	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	/**
-	 * Get an integer hash code to be used for this object. 
+	 * Get an integer hash code to be used for this object.
 	 */
 	@Override
 	public final int hashCode() {
 		return hashCode_;
 	}
-	
+
 	static IndexedClassExpression create(ElkClassExpression classExpression) {
-		return classExpression.accept(new ElkClassExpressionVisitor<IndexedClassExpression> () {
+		return classExpression
+				.accept(new ElkClassExpressionVisitor<IndexedClassExpression>() {
 
-			public IndexedClassExpression visit(ElkClass elkClass) {
-				return new IndexedClass(elkClass);
-			}
+					public IndexedClassExpression visit(ElkClass elkClass) {
+						return new IndexedClass(elkClass);
+					}
 
-			public IndexedClassExpression visit(
-					ElkObjectIntersectionOf elkObjectIntersectionOf) {
-				return new IndexedObjectIntersectionOf(elkObjectIntersectionOf);
-			}
+					public IndexedClassExpression visit(
+							ElkObjectIntersectionOf elkObjectIntersectionOf) {
+						return new IndexedObjectIntersectionOf(
+								elkObjectIntersectionOf);
+					}
 
-			public IndexedClassExpression visit(
-					ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-				return new IndexedObjectSomeValuesFrom(elkObjectSomeValuesFrom);
-			}
-		});
+					public IndexedClassExpression visit(
+							ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
+						return new IndexedObjectSomeValuesFrom(
+								elkObjectSomeValuesFrom);
+					}
+				});
 	}
-	
+
 	abstract public <O> O accept(IndexedClassExpressionVisitor<O> visitor);
 }

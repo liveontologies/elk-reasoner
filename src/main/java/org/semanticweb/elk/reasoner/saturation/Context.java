@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.util.ArrayHashSet;
+import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.HashListMultimap;
 import org.semanticweb.elk.util.HashSetMultimap;
 import org.semanticweb.elk.util.Multimap;
@@ -65,8 +66,10 @@ public class Context {
 		this.linkQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, Context>>();
 		this.propagationQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom>>();
 		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
-		this.linksByObjectProperty = new HashListMultimap<IndexedObjectProperty, Context>(1);
-		this.propagationsByObjectProperty = new HashSetMultimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom>(1);
+		this.linksByObjectProperty = new HashListMultimap<IndexedObjectProperty, Context>(
+				1);
+		this.propagationsByObjectProperty = new HashSetMultimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom>(
+				1);
 		this.isActive = new AtomicBoolean(false);
 	}
 
@@ -101,13 +104,10 @@ public class Context {
 		return derived;
 	}
 
-	private static int lastHashCode = 0;
-	private final int hashCode_ = ++lastHashCode;
+	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	/**
-	 * Get an integer hash code to be used for this object. Care will be taken
-	 * that there is never more than one Context per IndexedClassExpression
-	 * root, so it is viable to use a running number as a hash here.
+	 * Get an integer hash code to be used for this object.
 	 * 
 	 * @return integer hash code
 	 */

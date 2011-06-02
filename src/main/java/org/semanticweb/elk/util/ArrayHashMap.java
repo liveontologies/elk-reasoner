@@ -131,11 +131,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	}
 
 	static int getIndex(Object key, int length) {
-		int h = key.hashCode();
-		// rehashing like in the HashMap implementation
-		h ^= (h >>> 20) ^ (h >>> 12);
-		h ^= (h >>> 7) ^ (h >>> 4);
-		return h & (length - 1);
+		return key.hashCode() & (length - 1);
 	}
 
 	public boolean containsKey(Object key) {
@@ -172,8 +168,13 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	public V get(Object key) {
 		if (key == null)
 			throw new NullPointerException();
-		K[] keys = this.keys;
-		V[] values = this.values;
+		// copy keys and values when they have the same size 
+		for (;;) {
+			K[] keys = this.keys;
+			V[] values = this.values;
+			if (keys.length == values.length)
+				break;
+		}
 		int i = getIndex(key, keys.length);
 		int j = i;
 		for (;;) {
@@ -191,12 +192,13 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		}
 	}
 
+	// TODO: make sure it is thread-safe to get the value while putting it
 	V putKeyValue(K[] keys, V[] values, K key, V value) {
 		int i = getIndex(key, keys.length);
 		for (;;) {
 			K probe = keys[i];
-			if (probe == null) {
-				keys[i] = key;
+			if (probe == null) {				
+				keys[i] = key;	
 				values[i] = value;
 				return null;
 			} else if (key.equals(probe)) {
