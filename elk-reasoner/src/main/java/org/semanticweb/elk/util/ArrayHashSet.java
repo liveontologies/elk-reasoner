@@ -33,7 +33,7 @@ import java.util.Set;
 
 /**
  * hash sets using array and linear probing for resolving hash collision see [1]
- * p.526.
+ * p.526. Reuses some code from the implementation of {@link java.util.HashMap}.
  * 
  * [1] Donald E. Knuth, The Art of Computer Programming, Volume 3, Sorting and
  * Searching, Second Edition
@@ -43,22 +43,57 @@ import java.util.Set;
  */
 public class ArrayHashSet<E> implements Set<E> {
 
-	// the data stored in the set
+	/**
+	 * The default initial capacity - MUST be a power of two.
+	 */
+	static final int DEFAULT_INITIAL_CAPACITY = 16;
+
+	/**
+	 * The maximum capacity, used if a higher value is implicitly specified by
+	 * either of the constructors with arguments. MUST be a power of two <=
+	 * 1<<30.
+	 */
+	static final int MAXIMUM_CAPACITY = 1 << 30;
+
+	/**
+	 * The table for the elements; the length MUST always be a power of two.
+	 */
 	protected transient E[] data;
-	// the number of the elements in the set
+
+	/**
+	 * The number of elements contained in this set.
+	 */
 	protected transient int size;
+
+	/**
+	 * The next size value at which to resize the table.
+	 * 
+	 * @serial
+	 */
+	int threshold;
 
 	@SuppressWarnings("unchecked")
 	public ArrayHashSet(int initialCapacity) {
 		if (initialCapacity < 0)
 			throw new IllegalArgumentException("Illegal Capacity: "
 					+ initialCapacity);
-		this.data = (E[]) new Object[initialCapacity];
+		if (initialCapacity > MAXIMUM_CAPACITY)
+			initialCapacity = MAXIMUM_CAPACITY;
+		// Find a power of 2 >= initialCapacity
+		int capacity = 1;
+		while (capacity < initialCapacity)
+			capacity <<= 1;
+		this.data = (E[]) new Object[capacity];
 		this.size = 0;
+		this.threshold = computeThreshold(capacity);
 	}
 
+	@SuppressWarnings("unchecked")
 	public ArrayHashSet() {
-		this(113);
+		int capacity = DEFAULT_INITIAL_CAPACITY;
+		this.data = (E[]) new Object[capacity];
+		this.size = 0;
+		this.threshold = computeThreshold(capacity);
 	}
 
 	public int size() {
@@ -69,19 +104,34 @@ public class ArrayHashSet<E> implements Set<E> {
 		return size == 0;
 	}
 
-	private int getIndex(int length, Object o) {
-		int index = (o.hashCode() * 129) % length;
-		if (index < 0)
-			return -index;
+	/**
+	 * Computes a maximum number of elements for a given capacity after which to
+	 * resize the table.
+	 * 
+	 * @param capacity
+	 *            the capacity of the table.
+	 * @return the threshold for the given capacity.
+	 */
+	static int computeThreshold(int capacity) {
+		if (capacity > 128)
+			return (3 * capacity) / 4; // max 75% filled
 		else
-			return index;
+			return capacity;
+	}
+
+	static int getIndex(Object key, int length) {
+		int h = key.hashCode();
+		// rehashing like in the HashMap implementation
+		h ^= (h >>> 20) ^ (h >>> 12);
+		h ^= (h >>> 7) ^ (h >>> 4);
+		return h & (length - 1);
 	}
 
 	public boolean contains(Object o) {
 		if (o == null)
 			throw new NullPointerException();
 		E[] data = this.data;
-		int i = getIndex(data.length, o);
+		int i = getIndex(o, data.length);
 		int j = i; // for cycle detection
 		for (;;) {
 			Object probe = data[i];
@@ -99,7 +149,7 @@ public class ArrayHashSet<E> implements Set<E> {
 	}
 
 	private boolean addElement(E[] data, E o) {
-		int i = getIndex(data.length, o);
+		int i = getIndex(o, data.length);
 		for (;;) {
 			Object probe = data[i];
 			if (probe == null) {
@@ -114,26 +164,30 @@ public class ArrayHashSet<E> implements Set<E> {
 		}
 	}
 
-	public void ensureCapacity(int size) {
+	public void resize() {
 		int oldCapacity = data.length;
-		if (size > oldCapacity || (size > 128 && size > 3 * oldCapacity / 4)) {
-			E oldData[] = data;
-			int newCapacity = (size * 2) + 1;
-			@SuppressWarnings("unchecked")
-			E newData[] = (E[]) new Object[newCapacity];
-			for (int i = 0; i < oldCapacity; i++) {
-				E e = oldData[i];
-				if (e != null)
-					addElement(newData, e);
-			}
-			this.data = newData;
+		if (oldCapacity == MAXIMUM_CAPACITY)
+			throw new IllegalArgumentException(
+					"The set cannot grow beyond the capacity: "
+							+ MAXIMUM_CAPACITY);
+		E oldData[] = data;
+		int newCapacity = oldCapacity << 1;
+		@SuppressWarnings("unchecked")
+		E newData[] = (E[]) new Object[newCapacity];
+		for (int i = 0; i < oldCapacity; i++) {
+			E e = oldData[i];
+			if (e != null)
+				addElement(newData, e);
 		}
+		this.data = newData;
+		this.threshold = computeThreshold(newCapacity);
 	}
 
 	public boolean add(E e) {
 		if (e == null)
 			throw new NullPointerException();
-		ensureCapacity(size + 1);
+		if (size == threshold)
+			resize();
 		boolean result = addElement(data, e);
 		if (result)
 			size++;
@@ -189,7 +243,7 @@ public class ArrayHashSet<E> implements Set<E> {
 		// next element to return
 		E nextElement;
 
-		ElementIterator() {			
+		ElementIterator() {
 			this.expectedSize = size;
 			this.dataSnapshot = data;
 			cursor = 0;
@@ -201,7 +255,7 @@ public class ArrayHashSet<E> implements Set<E> {
 					&& (nextElement = dataSnapshot[cursor]) == null; cursor++)
 				;
 		}
-		
+
 		public boolean hasNext() {
 			return nextElement != null;
 		}

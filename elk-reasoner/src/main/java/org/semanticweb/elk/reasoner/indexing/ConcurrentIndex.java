@@ -25,15 +25,12 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 
 /**
  * @author Yevgeny Kazakov
