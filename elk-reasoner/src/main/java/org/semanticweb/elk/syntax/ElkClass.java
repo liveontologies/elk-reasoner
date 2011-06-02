@@ -68,7 +68,7 @@ public class ElkClass extends ElkClassExpression {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHashCode()
 	 */
 	@Override
 	public int structuralHashCode() {
