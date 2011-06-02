@@ -27,6 +27,8 @@ package org.semanticweb.elk.syntax;
 
 import java.util.List;
 
+import org.semanticweb.elk.util.HashGenerator;
+
 /**
  * @author Yevgeny Kazakov
  * 
@@ -38,9 +40,8 @@ public abstract class ElkObject {
 	public abstract int structuralHashCode();
 	
 	public abstract boolean structuralEquals(ElkObject object);
-
-	private static int nextHashCode_ = 0;
-	private final int hashCode_ = ++nextHashCode_;
+	
+	private final int hashCode_ = HashGenerator.generateNextHashCode();;
 	
 	public static int computeCompositeHash(int constructorHash, List<? extends ElkObject> subObjects) {
 		return computeCompositeHash(constructorHash, subObjects.toArray( new ElkObject[0] ));
