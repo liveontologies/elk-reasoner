@@ -35,8 +35,13 @@ import org.semanticweb.elk.util.Multimap;
 import org.semanticweb.elk.util.Pair;
 
 /**
- * @author Frantisek Simancik
+ * Objects of this class are used to manage subsumption relations between class
+ * expressions that are derived during saturation. Besides storing consequences,
+ * they also provide facilities for managing the processing of new derivations,
+ * ensuring that only new derivations are used when searching for applicable
+ * derivation rules.
  * 
+ * @author Frantisek Simancik
  */
 public class Context {
 	final IndexedClassExpression root;
@@ -46,22 +51,22 @@ public class Context {
 	final Set<IndexedClassExpression> derived;
 	final Multimap<IndexedObjectProperty, Context> linksByObjectProperty;
 	final Multimap<IndexedObjectProperty, IndexedClassExpression> propagationsByObjectProperty;
-	// Context is active iff one of its queues is not empty or it is being
-	// processed
+	/**
+	 * A context is active iff one of its queues is not empty or it is being
+	 * processed.
+	 */
 	private AtomicBoolean isActive;
 
 	public Context(IndexedClassExpression root) {
 		this.root = root;
 		this.classQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
-		this.linkQueue = 
-			new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, Context>>();
-		this.propagationQueue = 
-			new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, IndexedClassExpression>>();
+		this.linkQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, Context>>();
+		this.propagationQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, IndexedClassExpression>>();
 		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
-		this.linksByObjectProperty = 
-			new HashSetMultimap<IndexedObjectProperty, Context>(1);
-		this.propagationsByObjectProperty = 
-			new HashSetMultimap<IndexedObjectProperty, IndexedClassExpression> (1);
+		this.linksByObjectProperty = new HashSetMultimap<IndexedObjectProperty, Context>(
+				1);
+		this.propagationsByObjectProperty = new HashSetMultimap<IndexedObjectProperty, IndexedClassExpression>(
+				1);
 		this.isActive = new AtomicBoolean(false);
 	}
 
