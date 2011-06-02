@@ -26,6 +26,7 @@
 package org.semanticweb.elk.reasoner.classification;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -93,6 +94,10 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 		this.nodeLookup = new ConcurrentHashMap<ElkClass, ClassNode>();
 		this.assignParentsQueue = new ConcurrentLinkedQueue<Pair<ClassNode, Collection<Context>>>();
 		this.activeNodes = new ConcurrentLinkedQueue<ClassNode>();
+	}
+	
+	public Collection<ClassNode> getNodes() {
+		return Collections.unmodifiableCollection(nodeLookup.values());
 	}
 
 	/**
