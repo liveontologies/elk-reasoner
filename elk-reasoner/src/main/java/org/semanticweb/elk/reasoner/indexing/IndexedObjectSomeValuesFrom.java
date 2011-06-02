@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,22 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, May 13, 2011
- */
 package org.semanticweb.elk.reasoner.indexing;
 
-import org.semanticweb.elk.util.Pair;
+import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 
-/**
- * @author Yevgeny Kazakov
- * 
- */
-public class Quantifier extends Pair<IndexedObjectProperty, IndexedClassExpression> {
-	public Quantifier(IndexedObjectProperty indexedObjectProperty, IndexedClassExpression indexedClassExpression) {
-		super(indexedObjectProperty, indexedClassExpression);
+public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
+ 	public IndexedObjectProperty relation; 
+	public IndexedClassExpression filler;
+	
+	public IndexedObjectSomeValuesFrom(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
+		super(elkObjectSomeValuesFrom);
+		relation = null;
+		filler = null;
 	}
 
-	public IndexedObjectProperty getRelation() {
-		return first;
-	}
-
-	public IndexedClassExpression getElement() {
-		return second;
+	@Override
+	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

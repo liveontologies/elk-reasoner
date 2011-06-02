@@ -38,44 +38,44 @@ import org.semanticweb.elk.util.ArrayHashMap;
  */
 public class SerialIndex implements Index {
 
-	protected final Map<ElkClassExpression, IndexedClassExpression> mapClassToConcept;
-	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> mapObjectPropertyToRole;
+	protected final Map<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
+	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
 
 	public SerialIndex() {
-		mapClassToConcept = new ArrayHashMap<ElkClassExpression, IndexedClassExpression>(
+		indexedClassExpressionLookup = new ArrayHashMap<ElkClassExpression, IndexedClassExpression>(
 				1024);
-		mapObjectPropertyToRole = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
+		indexedObjectPropertyLookup = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
 				128);
 	}
 
 	public IndexedClassExpression getIndexed(ElkClassExpression classExpression) {
-		IndexedClassExpression indexedClassExpression = mapClassToConcept
+		IndexedClassExpression indexedClassExpression = indexedClassExpressionLookup
 				.get(classExpression);
 		if (indexedClassExpression == null) {
-			indexedClassExpression = new IndexedClassExpression(classExpression);
-			mapClassToConcept.put(classExpression, indexedClassExpression);
+			indexedClassExpression = IndexedClassExpression.create(classExpression);
+			indexedClassExpressionLookup.put(classExpression, indexedClassExpression);
 		}
 		return indexedClassExpression;
 	}
 
 	public IndexedObjectProperty getIndexed(ElkObjectProperty objectProperty) {
-		IndexedObjectProperty indexedObjectProperty = mapObjectPropertyToRole
+		IndexedObjectProperty indexedObjectProperty = indexedObjectPropertyLookup
 				.get(objectProperty);
 		if (indexedObjectProperty == null) {
 			indexedObjectProperty = new IndexedObjectProperty(objectProperty);
-			mapObjectPropertyToRole.put(objectProperty, indexedObjectProperty);
+			indexedObjectPropertyLookup.put(objectProperty, indexedObjectProperty);
 		}
 		return indexedObjectProperty;
 	}
 
 	public void computeRoleHierarchy() {
-		for (IndexedObjectProperty iop : mapObjectPropertyToRole.values()) {
+		for (IndexedObjectProperty iop : indexedObjectPropertyLookup.values()) {
 			iop.computeSubObjectProperties();
 			iop.computeSuperObjectProperties();
 		}
 	}
 
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
-		return mapClassToConcept.values();
+		return indexedClassExpressionLookup.values();
 	}
 }

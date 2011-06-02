@@ -63,8 +63,8 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 			if (first == null)
 				first = ice;
 			else {
-				ice.superClassExpressions.add(first);
-				first.superClassExpressions.add(ice);
+				ice.addSuperClassExpression(first);
+				first.addSuperClassExpression(ice);
 			}
 		}
 		return null;
@@ -74,7 +74,7 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 
 		IndexedClassExpression subClass = axiom.getSubClassExpression().accept(negativeClassExpressionIndexer);
 		IndexedClassExpression superClass = axiom.getSuperClassExpression().accept(positiveClassExpressionIndexer);
-		subClass.superClassExpressions.add(superClass);
+		subClass.addSuperClassExpression(superClass);
 
 		return null;
 	}

@@ -52,7 +52,7 @@ class NegativeClassExpressionIndexer implements
 	}
 
 	public IndexedClassExpression visit(ElkClass elkClass) {
-		IndexedClassExpression result = axiomIndexer.index.getIndexed(elkClass);
+		IndexedClass result = (IndexedClass) axiomIndexer.index.getIndexed(elkClass);
 		result.negativeOccurrenceNo++;
 		return result;
 	}
@@ -60,8 +60,8 @@ class NegativeClassExpressionIndexer implements
 	public IndexedClassExpression visit(
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
 
-		IndexedClassExpression result = axiomIndexer.index
-				.getIndexed(elkObjectIntersectionOf);
+		IndexedObjectIntersectionOf result = (IndexedObjectIntersectionOf) 
+			axiomIndexer.index.getIndexed(elkObjectIntersectionOf);
 		if (result.negativeOccurrenceNo++ == 0) {
 
 			int conjunctionSize = elkObjectIntersectionOf.getClassExpressions()
@@ -84,10 +84,8 @@ class NegativeClassExpressionIndexer implements
 					prefixConjunction = ElkObjectIntersectionOf.create(
 							arguments).accept(this);
 				} else {
-					prefixConjunction.negConjunctionsByConjunct.add(indexedElement,
-							result);
-					indexedElement.negConjunctionsByConjunct.add(prefixConjunction,
-							result);
+					prefixConjunction.addNegativeConjunctionByConjunct(result, indexedElement);
+					indexedElement.addNegativeConjunctionByConjunct(result, prefixConjunction);
 				}
 			}
 		}
@@ -97,12 +95,13 @@ class NegativeClassExpressionIndexer implements
 	
 	public IndexedClassExpression visit(ElkObjectSomeValuesFrom classExpression) {
 		
-		IndexedClassExpression result = axiomIndexer.index.getIndexed(classExpression);
+		IndexedObjectSomeValuesFrom result = (IndexedObjectSomeValuesFrom)
+			axiomIndexer.index.getIndexed(classExpression);
 		if (result.negativeOccurrenceNo++ == 0) {
 			IndexedObjectProperty r = classExpression.getObjectPropertyExpression().accept(
 					axiomIndexer.objectPropertyExpressionIndexer);
 			IndexedClassExpression c = classExpression.getClassExpression().accept(this);
-			c.negExistentials.add(new Quantifier(r, result));
+			c.addNegativeExistentialWithRelation(result, r);
 		}
 		return result;
 	}
