@@ -28,6 +28,9 @@ public class Triple<First, Second, Third> {
 	protected final Third third;
 	
 	public Triple(First first, Second second, Third third) {
+		if (first == null || second == null || third == null)
+			throw new NullPointerException(
+					"Null compononent for org.semanticweb.elk.util.Triple");
 		this.first = first;
 		this.second = second;
 		this.third = third;
@@ -49,9 +52,9 @@ public class Triple<First, Second, Third> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((first == null) ? 0 : first.hashCode());
-		result = prime * result + ((second == null) ? 0 : second.hashCode());
-		result = prime * result + ((third == null) ? 0 : third.hashCode());
+		result = prime * result + first.hashCode();
+		result = prime * result + second.hashCode();
+		result = prime * result + third.hashCode();
 		return result;
 	}
 
@@ -65,20 +68,11 @@ public class Triple<First, Second, Third> {
 			return false;
 		
 		Triple<?,?,?> other = (Triple<?,?,?>) obj;
-		if (first == null) {
-			if (other.first != null)
-				return false;
-		} else if (!first.equals(other.first))
+		if (!first.equals(other.first))
 			return false;
-		if (second == null) {
-			if (other.second != null)
-				return false;
-		} else if (!second.equals(other.second))
+		if (!second.equals(other.second))
 			return false;
-		if (third == null) {
-			if (other.third != null)
-				return false;
-		} else if (!third.equals(other.third))
+		if (!third.equals(other.third))
 			return false;
 		return true;
 	}
