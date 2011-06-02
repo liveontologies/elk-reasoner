@@ -28,13 +28,16 @@ package org.semanticweb.elk.reasoner.classification;
 import org.semanticweb.elk.syntax.ElkClass;
 
 /**
- * @author Yevgeny Kazakov
+ * Classes that implement this interface represent a class hierarchy based on
+ * ElkClass objects. For each such object, the taxonomy holds a ClassNode object
+ * from which direct sub- and superclasses can be retrieved.
  * 
+ * @author Yevgeny Kazakov
  */
 public interface ClassTaxonomy {
 
 	ClassNode getNode(ElkClass elkClass);
-	
+
 	void compute();
 
 }

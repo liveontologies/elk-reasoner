@@ -33,19 +33,52 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.semanticweb.elk.syntax.ElkClass;
 
 /**
- * @author Yevgeny Kazakov
+ * Class for storing information about a class in the context of classification.
+ * It is the main data container for ClassTaxonomy objects. Like most such data
+ * containers in ELK, it is read-only for public access but provides
+ * package-private ways of modifying it. Modifications of this class happen in
+ * implementations of ClassTaxonomy only.
  * 
+ * @author Yevgeny Kazakov
  */
 public class ClassNode {
 
+	/**
+	 * Members are ElkClass objects that are equivalent.
+	 */
 	final ArrayList<ElkClass> members;
-	ArrayList<ClassNode> parents;
-	ArrayList<ClassNode> children;
-	// to add children concurrently
+	/**
+	 * Parents are ElkClass objects that are immediate superclasses to the
+	 * members without being equivalent.
+	 */
+	final ArrayList<ClassNode> parents;
+	/**
+	 * Children are ElkClass objects that are immediate subclasses to the
+	 * members without being equivalent.
+	 */
+	final ArrayList<ClassNode> children;
+
+	/**
+	 * A thread-safe queue to remember children that are still to be written
+	 * into
+	 * {@link org.semanticweb.elk.reasoner.classification.ClassNode#children
+	 * children}.
+	 */
 	final Queue<ClassNode> childQueue;
-	// true if childQueue is not empty
+
+	/**
+	 * True if
+	 * {@link org.semanticweb.elk.reasoner.classification.ClassNode#childQueue
+	 * childQueue} is not empty.
+	 */
 	private AtomicBoolean isActive;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param equivalent
+	 *            non-empty list of equivalent ElkClass objects
+	 */
 	public ClassNode(final ArrayList<ElkClass> equivalent) {
 		this.members = equivalent;
 		this.children = new ArrayList<ClassNode>();
@@ -54,38 +87,110 @@ public class ClassNode {
 		this.isActive = new AtomicBoolean(false);
 	}
 
-	protected void enqueueChild(ClassNode child) {
-		childQueue.add(child);
-	}
-
-	protected boolean tryActivate() {
+	/**
+	 * Try to set the activation flag from false to true and return true if this
+	 * was successful (i.e. if the flag was not true already).
+	 * 
+	 * @return true if activation state changed
+	 */
+	boolean tryActivate() {
 		return isActive.compareAndSet(false, true);
 	}
 
-	protected boolean tryDeactivate() {
+	/**
+	 * Try to set the activation flag from true to false and return true if this
+	 * was successful (i.e. if the flag was not true already).
+	 * 
+	 * @return true if activation state changed
+	 */
+	boolean tryDeactivate() {
 		return isActive.compareAndSet(true, false);
 	}
 
-	public synchronized void addParent(ClassNode parent) {
+	/**
+	 * Add a parent node.
+	 * 
+	 * @param parent
+	 *            node to add
+	 */
+	synchronized void addParent(ClassNode parent) {
 		this.parents.add(parent);
 	}
 
-	public synchronized void addChild(ClassNode child) {
+	/**
+	 * Add a child class to the queue. This method can operate asynchronously,
+	 * but
+	 * {@link org.semanticweb.elk.reasoner.classification.ClassNode#processQueuedChildren
+	 * processQueuedChildren()} must be called eventually to write the data into
+	 * the children array.
+	 * 
+	 * @param child
+	 */
+	void enqueueChild(ClassNode child) {
+		childQueue.add(child);
+	}
+
+	/**
+	 * Process the queued children of to write them to the children array.
+	 */
+	synchronized void processQueuedChildren() {
+		for (;;) {
+			ClassNode child = childQueue.poll();
+			if (child == null) {
+				break;
+			}
+			addChild(child);
+		}
+	}
+
+	/**
+	 * Add a child node. This method is synchronized. To queue children for
+	 * being added, the method
+	 * {@link org.semanticweb.elk.reasoner.classification.ClassNode#enqueueChild
+	 * enqueueChild()} should be used.
+	 * 
+	 * @param child
+	 *            node to add
+	 */
+	private void addChild(ClassNode child) {
 		this.children.add(child);
 	}
 
+	/**
+	 * Get a list of ElkClass objects that this ClassNode represents.
+	 * 
+	 * @return list of equivalent ElkClass objects
+	 */
 	public ArrayList<ElkClass> getMembers() {
 		return members;
 	}
 
+	/**
+	 * Get one ElkClass object to canonically represent the classes in this
+	 * ClassNode.
+	 * 
+	 * @return canonical ElkClass object
+	 */
 	public ElkClass getCanonicalMember() {
 		return members.get(0);
 	}
 
+	/**
+	 * Get a list of ElkClass objects that are direct parents of this ClassNode
+	 * in the class hierarchy.
+	 * 
+	 * @return list of direct parent classes
+	 */
 	public ArrayList<ClassNode> getParents() {
 		return parents;
 	}
 
+	/**
+	 * Get a list of ElkClass objects that are direct children of this ClassNode
+	 * in the class hierarchy.
+	 * 
+	 * @return list of direct child classes
+	 */
 	public ArrayList<ClassNode> getChildren() {
 		return children;
 	}

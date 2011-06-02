@@ -43,20 +43,50 @@ import org.semanticweb.elk.util.ArraySet;
 import org.semanticweb.elk.util.Pair;
 
 /**
- * @author Yevgeny Kazakov
+ * Class taxonomy that is suitable for concurrent processing.
  * 
+ * @author Yevgeny Kazakov
  */
 public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 
+	/**
+	 * The Index that associates ElkClasses to IndexedClassExpression of a
+	 * saturation.
+	 */
 	private Index index;
+
+	/**
+	 * The Saturation on which the class hierarchy is based.
+	 */
 	private Saturation saturation;
-	// lookup table for nodes
+
+	/**
+	 * Lookup table for ClassNode objects.
+	 */
 	protected final ConcurrentMap<ElkClass, ClassNode> nodeLookup;
-	// queue for assigning nodes with parents
+
+	/**
+	 * Queue for assigning parents to ClassNode objects. The collection of
+	 * contexts consists of the direct parent contexts of the ClassNode.
+	 */
 	protected final Queue<Pair<ClassNode, Collection<Context>>> assignParentsQueue;
-	// queue for active nodes (with new children)
+
+	/**
+	 * Queue for active ClassNode objects for which new children still have to
+	 * be processed.
+	 */
 	protected final Queue<ClassNode> activeNodes;
 
+	/**
+	 * Constructor. Note that it is not checked that the given Saturation object
+	 * is actually saturated.
+	 * 
+	 * @param index
+	 *            that is used to associate ElkClasses to
+	 *            IndexedClassExpressions
+	 * @param saturation
+	 *            based on which the hierarchy is computed
+	 */
 	public ConcurrentClassTaxonomy(Index index, Saturation saturation) {
 		this.index = index;
 		this.saturation = saturation;
@@ -65,27 +95,49 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 		this.activeNodes = new ConcurrentLinkedQueue<ClassNode>();
 	}
 
+	/**
+	 * Obtain a ClassNode object for a given ElkClass. If no object exists yet
+	 * for the given class, then a new one is created based on the information
+	 * that the Saturation holds for the indexed class expression that
+	 * represents this ElkClass. The node that is returned may not contain all
+	 * required information. Only after
+	 * {@link org.semanticweb.elk.reasoner.classification.ConcurrentClassTaxonomy#compute
+	 * compute()} has been called is it ensured that this method returns
+	 * complete ClassNode objects for previously added ElkClasses.
+	 * 
+	 * @param elkClass
+	 * @return ClassNode object for elkClass, possibly still incomplete 
+	 */
 	public ClassNode getNode(ElkClass elkClass) {
 		ClassNode node = nodeLookup.get(elkClass);
-		if (node != null)
+		if (node != null) {
 			return node;
-		// equivalent ElkClass with the smallest hash
+		}
+
+		// Equivalent ElkClass with the smallest hash (may change below)
 		ElkClass canonical = elkClass;
 		IndexedClassExpression root = index.getIndexed(elkClass);
 		Context rootContext = saturation.getContext(root);
+
+		// Classes equivalent to elkClass
 		ArraySet<ElkClass> equivalent = new ArraySet<ElkClass>();
+		// Contexts of direct superclasses of elkClass
 		Collection<Context> directContexts = new LinkedList<Context>();
+
 		for (IndexedClassExpression derived : rootContext.getDerived()) {
 			if (derived.classExpression instanceof ElkClass) {
 				ElkClass derivedClass = (ElkClass) derived.classExpression;
 				Context derivedContext = saturation.getContext(derived);
+
 				Set<IndexedClassExpression> derivedDerived = derivedContext
-				.getDerived();
+						.getDerived();
 				if (derivedDerived.contains(root)) {
 					equivalent.add(derivedClass);
-					// uses that hash codes for members of ElkClass are unique!
-					if (derivedClass.hashCode() < canonical.hashCode())
+					// Uses that hash codes for members of ElkClass are globally
+					// unique!
+					if (derivedClass.hashCode() < canonical.hashCode()) {
 						canonical = derivedClass;
+					}
 				} else {
 					boolean addThis = true;
 					Iterator<Context> e = directContexts.iterator();
@@ -95,24 +147,32 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 							addThis = false;
 							break;
 						}
-						if (derivedDerived.contains(previousContext.getRoot()))
+						if (derivedDerived.contains(previousContext.getRoot())) {
 							e.remove();
+						}
 					}
-					if (addThis)
+					if (addThis) {
 						directContexts.add(derivedContext);
+					}
 				}
 			}
 		}
 
 		node = new ClassNode(equivalent);
 		ClassNode previousNode = nodeLookup.putIfAbsent(canonical, node);
-		if (previousNode != null)
+		if (previousNode != null) { // can happen in concurrent processing
 			return previousNode;
-		for (ElkClass member : equivalent)
-			if (member != canonical)
+		}
+
+		for (ElkClass member : equivalent) {
+			if (member != canonical) {
 				nodeLookup.put(member, node);
-		assignParentsQueue.add(new Pair<ClassNode, Collection<Context>>(node,
-				directContexts));
+				assignParentsQueue
+						.add(new Pair<ClassNode, Collection<Context>>(node,
+								directContexts));
+			}
+		}
+
 		return node;
 	}
 
@@ -126,26 +186,27 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 	}
 
 	private void activateNode(ClassNode node) {
-		if (node.tryActivate())
+		if (node.tryActivate()) {
 			activeNodes.add(node);
+		}
 	}
 
 	private void deactivateNode(ClassNode node) {
-		if (node.tryDeactivate())
-			if (!node.childQueue.isEmpty())
+		if (node.tryDeactivate()) {
+			if (!node.childQueue.isEmpty()) {
 				activateNode(node);
+			}
+		}
 	}
 
 	protected void processChildren(ClassNode node) {
-		for (;;) {
-			ClassNode child = node.childQueue.poll();
-			if (child == null)
-				break;
-			node.addChild(child);
-		}
+		node.processQueuedChildren();
 		deactivateNode(node);
 	}
 
+	/**
+	 * Complete ClassNode data for all ElkClasses that have been used with this class so far.
+	 */
 	public void compute() {
 		for (;;) {
 			ClassNode activeNode = activeNodes.poll();
