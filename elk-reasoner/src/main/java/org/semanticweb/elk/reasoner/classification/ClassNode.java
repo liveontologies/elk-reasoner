@@ -26,6 +26,8 @@
 package org.semanticweb.elk.reasoner.classification;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -157,12 +159,13 @@ public class ClassNode {
 	}
 
 	/**
-	 * Get a list of ElkClass objects that this ClassNode represents.
+	 * Get an unmodifiable list of ElkClass objects that this ClassNode
+	 * represents.
 	 * 
 	 * @return list of equivalent ElkClass objects
 	 */
-	public ArrayList<ElkClass> getMembers() {
-		return members;
+	public List<ElkClass> getMembers() {
+		return Collections.unmodifiableList(members);
 	}
 
 	/**
@@ -176,23 +179,23 @@ public class ClassNode {
 	}
 
 	/**
-	 * Get a list of ElkClass objects that are direct parents of this ClassNode
-	 * in the class hierarchy.
+	 * Get an unmodifiable list of ElkClass objects that are direct parents of
+	 * this ClassNode in the class hierarchy.
 	 * 
 	 * @return list of direct parent classes
 	 */
-	public ArrayList<ClassNode> getParents() {
-		return parents;
+	public List<ClassNode> getParents() {
+		return Collections.unmodifiableList(parents);
 	}
 
 	/**
-	 * Get a list of ElkClass objects that are direct children of this ClassNode
-	 * in the class hierarchy.
+	 * Get an unmodifiable list of ElkClass objects that are direct children of
+	 * this ClassNode in the class hierarchy.
 	 * 
 	 * @return list of direct child classes
 	 */
-	public ArrayList<ClassNode> getChildren() {
-		return children;
+	public List<ClassNode> getChildren() {
+		return Collections.unmodifiableList(children);
 	}
 
 }
