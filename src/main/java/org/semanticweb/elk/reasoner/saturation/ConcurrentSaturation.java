@@ -77,7 +77,7 @@ public class ConcurrentSaturation implements Saturation {
 			Context previous = contextLookup.putIfAbsent(ice, context);
 			if (previous != null)
 				return (previous);
-			enqueueConcept(context, ice);
+			enqueueClass(context, ice);
 		}
 		return context;
 	}
@@ -91,24 +91,33 @@ public class ConcurrentSaturation implements Saturation {
 
 	private void deactivateContext(Context context) {
 		if (context.tryDeactivate())
-			if (!context.linkQueue.isEmpty() || !context.conceptQueue.isEmpty())
+			if (!context.linkQueue.isEmpty() || !context.classQueue.isEmpty())
 				activateContext(context);
 	}
 
-	protected void enqueueConcept(Context context, IndexedClassExpression ice) {
+	protected void enqueueClass(Context context, IndexedClassExpression ice) {
 		if (!context.derived.contains(ice)) {
-			context.conceptQueue.add(ice);
+			context.classQueue.add(ice);
 			activateContext(context);
 		}
 	}
 
 	protected void enqueueLink(Context context, IndexedObjectProperty relation,
-			Context parent) {
-//		if (!context.linksToParents.contains(relation, parent)) {
+			Context linkTarget) {
+		if (!context.linksByObjectProperty.contains(relation, linkTarget)) {
 			context.linkQueue.add(new Pair<IndexedObjectProperty, Context>(
-					relation, parent));
+					relation, linkTarget));
 			activateContext(context);
-//		}
+		}
+	}
+	
+	protected void enqueuePropagation(Context context, IndexedObjectProperty relation,
+			IndexedClassExpression propClass) {
+		if (!context.propagationsByObjectProperty.contains(relation, propClass)) {
+			context.propagationQueue.add(new Pair<IndexedObjectProperty, IndexedClassExpression>(
+					relation, propClass));
+			activateContext(context);
+		}
 	}
 
 	public void compute() {
@@ -130,73 +139,105 @@ public class ConcurrentSaturation implements Saturation {
 	protected void process(Context context) {
 		// synchronized (context) {
 		for (;;) {
-			IndexedClassExpression indexedClassExpression = context.conceptQueue
-					.poll();
+			IndexedClassExpression indexedClassExpression = 
+				context.classQueue.poll();
 			if (indexedClassExpression != null) {
-				processConcept(context, indexedClassExpression);
+				processClass(context, indexedClassExpression);
 				continue;
 			}
-			Pair<IndexedObjectProperty, Context> link = context.linkQueue
-					.poll();
+
+			Pair<IndexedObjectProperty, Context> link =
+				context.linkQueue.poll();
 			if (link != null) {
-				processLink(context, link);
+				processLink(context, link.getFirst(), link.getSecond());
 				continue;
 			}
+			
+			Pair<IndexedObjectProperty, IndexedClassExpression> propagation =
+				context.propagationQueue.poll();
+			if (propagation != null) {
+				processPropagation(context, propagation.getFirst(), propagation.getSecond());
+				continue;
+			}
+			
 			break;
 		}
 		deactivateContext(context);
 		// }
 	}
 
-	protected void processConcept(Context context, IndexedClassExpression ice) {
+	protected void processClass(Context context, IndexedClassExpression ice) {
 		if (context.derived.add(ice)) {
 			processImplications(context, ice);
-			processConjunctions(context, ice);
-			processExistentials(context, ice);
-			processUniversals(context, ice);
+			processNegativeConjunctions(context, ice);
+			processPositiveExistentials(context, ice);
+			processNegativeExistentials(context, ice);
 			
 		}
 	}
+	
+	protected void propagateOverLink(Context context, 
+			IndexedObjectProperty linkRelation, Context linkTarget,
+			IndexedObjectProperty propRelation, IndexedClassExpression propClass) {
+		
+		enqueueClass(linkTarget, propClass);
+		
+	// transitive object properties 	
+//	/*	
+		if (propRelation.isTransitive)
+			enqueuePropagation(linkTarget, propRelation, propClass);
+		else
+			for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty> (
+					linkRelation.getSuperObjectProperties(), propRelation.getSubObjectProperties()))
+				if (common.isTransitive)
+					enqueuePropagation(linkTarget, common, propClass);
+//	*/
+	}
 
-	protected void processLink(Context context,
-			Pair<IndexedObjectProperty, Context> link) {
-		IndexedObjectProperty relation = link.getFirst();
-		Context target = link.getSecond();
-		if (context.linksToParents.add(relation, target)) {
-			for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty>(
-					relation.getSuperObjectProperties(), context.propagationsOverLinks.keySet()))
-				for (IndexedClassExpression conclusion : context.propagationsOverLinks.get(common))
-					enqueueConcept(target, conclusion);
+	protected void processLink(Context context, IndexedObjectProperty linkRelation,
+			Context linkTarget) {
+		if (context.linksByObjectProperty.add(linkRelation, linkTarget)) {
+			for (IndexedObjectProperty propRelation : new LazySetIntersection<IndexedObjectProperty>(
+					linkRelation.getSuperObjectProperties(), context.propagationsByObjectProperty.keySet()))
+				for (IndexedClassExpression propClass : context.propagationsByObjectProperty.get(propRelation))
+					propagateOverLink(context, linkRelation, linkTarget, propRelation, propClass);
 		}
 	}
+	
+	protected void processPropagation(Context context, IndexedObjectProperty propRelation, 
+			IndexedClassExpression propClass) {
+		if (context.propagationsByObjectProperty.add(propRelation, propClass))
+			for (IndexedObjectProperty linkRelation : new LazySetIntersection<IndexedObjectProperty>(
+					propRelation.getSubObjectProperties(), context.linksByObjectProperty.keySet()))
+				for (Context linkTarget : context.linksByObjectProperty.get(linkRelation))
+					propagateOverLink(context, linkRelation, linkTarget, propRelation, propClass);
 
-	void processImplications(Context context, IndexedClassExpression ice) {
-		for (IndexedClassExpression implied : ice.superClassExpressions)
-			enqueueConcept(context, implied);
 	}
 
-	void processConjunctions(Context context, IndexedClassExpression ice) {
+	protected void processImplications(Context context, IndexedClassExpression ice) {
+		for (IndexedClassExpression implied : ice.superClassExpressions)
+			enqueueClass(context, implied);
+	}
+
+	protected void processNegativeConjunctions(Context context, IndexedClassExpression ice) {
 		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 				ice.negConjunctionsByConjunct.keySet(), context.derived)) {
 			for (IndexedClassExpression conclusion : ice.negConjunctionsByConjunct
 					.get(common))
-				enqueueConcept(context, conclusion);
+				enqueueClass(context, conclusion);
 		}
 	}
 
-	void processExistentials(Context context, IndexedClassExpression ice) {
+	protected void processPositiveExistentials(Context context, IndexedClassExpression ice) {
 		for (Quantifier e : ice.posExistentials) {
 			Context target = getContext(e.getElement());
 			enqueueLink(target, e.getRelation(), context);
 		}
 	}
 
-	void processUniversals(Context context, IndexedClassExpression ice) {
-		for (Quantifier e : ice.negExistentials) 
-			if (context.propagationsOverLinks.add(e.getRelation(), e.getElement()))
-				for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty>(
-						e.getRelation().getSubObjectProperties(), context.linksToParents.keySet()))
-					for (Context target : context.linksToParents.get(common))
-						enqueueConcept(target, e.getElement());
+	protected void processNegativeExistentials(Context context, IndexedClassExpression ice) {
+		for (Quantifier e : ice.negExistentials) {
+			processPropagation(context, e.getRelation(), e.getElement());
+		}
 	}
 }

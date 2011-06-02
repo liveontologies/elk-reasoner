@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.util.ArrayHashSet;
-import org.semanticweb.elk.util.HashListMultimap;
+import org.semanticweb.elk.util.HashSetMultimap;
 import org.semanticweb.elk.util.Multimap;
 import org.semanticweb.elk.util.Pair;
 
@@ -40,25 +40,28 @@ import org.semanticweb.elk.util.Pair;
  */
 public class Context {
 	final IndexedClassExpression root;
-	final Queue<IndexedClassExpression> conceptQueue;
+	final Queue<IndexedClassExpression> classQueue;
 	final Queue<Pair<IndexedObjectProperty, Context>> linkQueue;
+	final Queue<Pair<IndexedObjectProperty, IndexedClassExpression>> propagationQueue;
 	final Set<IndexedClassExpression> derived;
-	final Multimap<IndexedObjectProperty, Context> linksToParents;
-	final Multimap<IndexedObjectProperty, IndexedClassExpression> propagationsOverLinks;
+	final Multimap<IndexedObjectProperty, Context> linksByObjectProperty;
+	final Multimap<IndexedObjectProperty, IndexedClassExpression> propagationsByObjectProperty;
 	// Context is active iff one of its queues is not empty or it is being
 	// processed
 	private AtomicBoolean isActive;
 
 	public Context(IndexedClassExpression root) {
 		this.root = root;
-		this.conceptQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
+		this.classQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
 		this.linkQueue = 
 			new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, Context>>();
+		this.propagationQueue = 
+			new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, IndexedClassExpression>>();
 		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
-		this.linksToParents = 
-			new HashListMultimap<IndexedObjectProperty, Context>(1);
-		this.propagationsOverLinks = 
-			new HashListMultimap<IndexedObjectProperty, IndexedClassExpression> (1);
+		this.linksByObjectProperty = 
+			new HashSetMultimap<IndexedObjectProperty, Context>(1);
+		this.propagationsByObjectProperty = 
+			new HashSetMultimap<IndexedObjectProperty, IndexedClassExpression> (1);
 		this.isActive = new AtomicBoolean(false);
 	}
 
