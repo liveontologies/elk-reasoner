@@ -63,20 +63,19 @@ public class ConcurrentIndexerTest extends TestCase {
 				hasHeartAndOrgan));
 		indexingManager.waitCompletion();
 
-		assertTrue(index.getIndexed(heartAndOrgan.get()).superClassExpressions
+		assertTrue(((IndexedObjectIntersectionOf) index.getIndexed(heartAndOrgan.get())).conjuncts
 				.contains(index.getIndexed(heart.get())));
-		assertTrue(index.getIndexed(heartAndOrgan.get()).superClassExpressions
+		assertTrue(((IndexedObjectIntersectionOf)index.getIndexed(heartAndOrgan.get())).conjuncts
 				.contains(index.getIndexed(organ.get())));
 		assertTrue(index.getIndexed(human.get()).superClassExpressions
 				.contains(index.getIndexed(hasHeartAndOrgan.get())));
-		assertTrue(index.getIndexed(heart.get()).negConjunctionsByConjunct
-				.isEmpty());
+		assertTrue(index.getIndexed(heart.get()).negConjunctionsByConjunct == null);
 
 		indexingManager.submit(constructor.getFutureElkEquivalentClassesAxiom(
 				human, hasHeartAndOrgan));
 		indexingManager.waitCompletion();
 
-		assertTrue(index.getIndexed(heartAndOrgan.get()).superClassExpressions
+		assertTrue(((IndexedObjectIntersectionOf) index.getIndexed(heartAndOrgan.get())).conjuncts
 				.size() == 2);
 		assertFalse(index.getIndexed(heart.get()).negConjunctionsByConjunct
 				.isEmpty());

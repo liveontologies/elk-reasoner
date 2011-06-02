@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,30 +20,10 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, May 13, 2011
- */
 package org.semanticweb.elk.reasoner.indexing;
 
-import java.util.List;
-
-import org.semanticweb.elk.util.Pair;
-
-/**
- * @author Yevgeny Kazakov
- * 
- */
-
-public class Conjunction extends Pair<List<IndexedClassExpression>, IndexedClassExpression> {
-	public Conjunction(List<IndexedClassExpression> premises, IndexedClassExpression conclusion) {
-		super(premises, conclusion);
-	}
-
-	public List<IndexedClassExpression> getPremises() {
-		return first;
-	}
-
-	public IndexedClassExpression getConclusion() {
-		return second;
-	}
+public interface IndexedClassExpressionVisitor<O> {
+	O visit(IndexedClass indexedClass);
+	O visit(IndexedObjectIntersectionOf indexedObjectIntersectionOf);
+	O visit(IndexedObjectSomeValuesFrom indexedObjectSomeValuesFrom);
 }

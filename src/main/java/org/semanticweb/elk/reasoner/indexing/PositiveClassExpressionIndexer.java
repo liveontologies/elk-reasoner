@@ -44,18 +44,19 @@ public class PositiveClassExpressionIndexer implements
 		this.axiomIndexer = axiomIndexer;
 	}
 
-	public IndexedClassExpression visit(ElkClass elkClass) {
-		IndexedClassExpression result = axiomIndexer.index.getIndexed(elkClass);
+	public IndexedClassExpression visit(ElkClass classExpression) {
+		IndexedClass result = (IndexedClass) axiomIndexer.index.getIndexed(classExpression);
 		result.positiveOccurrenceNo++;
 		return result;
 	}
 
 	public IndexedClassExpression visit(ElkObjectIntersectionOf classExpression) {
 
-		IndexedClassExpression result = axiomIndexer.index.getIndexed(classExpression);
+		IndexedObjectIntersectionOf result = (IndexedObjectIntersectionOf)
+			axiomIndexer.index.getIndexed(classExpression);
 		if (result.positiveOccurrenceNo++ == 0) {
 			for (ElkClassExpression d : classExpression.getClassExpressions()) {
-				result.superClassExpressions.add(d.accept(this));
+				result.addConjunct(d.accept(this));
 			}
 		}
 		return result;
@@ -63,12 +64,12 @@ public class PositiveClassExpressionIndexer implements
 	
 	public IndexedClassExpression visit(ElkObjectSomeValuesFrom classExpression) {
 
-		IndexedClassExpression result = axiomIndexer.index.getIndexed(classExpression);
+		IndexedObjectSomeValuesFrom result = (IndexedObjectSomeValuesFrom) 
+			axiomIndexer.index.getIndexed(classExpression);
 		if (result.positiveOccurrenceNo++ == 0) {
-			IndexedObjectProperty r = classExpression.getObjectPropertyExpression().accept(
+			result.relation = classExpression.getObjectPropertyExpression().accept(
 					axiomIndexer.objectPropertyExpressionIndexer);
-			IndexedClassExpression c = classExpression.getClassExpression().accept(this);
-			result.posExistentials.add(new Quantifier(r, c));
+			result.filler = classExpression.getClassExpression().accept(this);
 		}
 		return result;
 	}

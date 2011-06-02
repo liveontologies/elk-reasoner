@@ -25,9 +25,14 @@ package org.semanticweb.elk.reasoner.indexing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.util.HashSetMultimap;
+import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
+import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.util.HashListMultimap;
 import org.semanticweb.elk.util.Multimap;
+import org.semanticweb.elk.util.Pair;
 
 /**
  * Represents all occurrences of an ElkClassExpression in an ontology. To this
@@ -43,8 +48,7 @@ import org.semanticweb.elk.util.Multimap;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-public class IndexedClassExpression {
-
+abstract public class IndexedClassExpression {
 	/** The represented class expression. */
 	public final ElkClassExpression classExpression;
 	
@@ -52,39 +56,41 @@ public class IndexedClassExpression {
 	 * A list of all indexed class expressions for (told) superclasses of this
 	 * class expression.
 	 */
-	public final List<IndexedClassExpression> superClassExpressions;
+	public List<IndexedClassExpression> superClassExpressions;
 
 	/**
 	 * A list of Conjunction objects that have this class expression in their
 	 * premise.
 	 */
-	public final Multimap<IndexedClassExpression, IndexedClassExpression> negConjunctionsByConjunct;
-
-	/**
-	 * A list of Quantifier objects representing all existential role
-	 * restrictions that this class expressions is a told subclass of.
-	 */
-	public final List<Quantifier> posExistentials;
+	public Multimap<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
 
 	/**
 	 * A list of Quantifier objects representing all existential role
 	 * restrictions that this class expressions is a told superclass of.
 	 */
-	public final List<Quantifier> negExistentials;
+	public List<Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty>> negExistentialsWithRelation;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
 	 * operations are only needed when encountering objects positively for the
 	 * first time.
 	 */
-	public int positiveOccurrenceNo = 0;
+	int positiveOccurrenceNo = 0;
+	
+	public boolean occursPositively() {
+		return positiveOccurrenceNo > 0;
+	}
 
 	/**
 	 * This counts how often this object occurred negatively. Some indexing
 	 * operations are only needed when encountering objects negatively for the
 	 * first time.
 	 */
-	public int negativeOccurrenceNo = 0;
+	int negativeOccurrenceNo = 0;
+	
+	public boolean occursNegatively() {
+		return negativeOccurrenceNo > 0;
+	}
 
 	/**
 	 * Creates a Concept that represents an ElkClassExpression.
@@ -93,11 +99,30 @@ public class IndexedClassExpression {
 	 */
 	public IndexedClassExpression(ElkClassExpression classExpression) {
 		this.classExpression = classExpression;
-		this.superClassExpressions = new ArrayList<IndexedClassExpression>(1);
-		this.negConjunctionsByConjunct = 
-			new HashSetMultimap<IndexedClassExpression, IndexedClassExpression>(1);
-		this.posExistentials = new ArrayList<Quantifier>(1);
-		this.negExistentials = new ArrayList<Quantifier> (1);
+		this.superClassExpressions = null;
+		this.negConjunctionsByConjunct = null;
+		this.negExistentialsWithRelation = null;
+	}
+	
+	public void addSuperClassExpression(IndexedClassExpression superClassExpression) {
+		if (superClassExpressions == null)
+			superClassExpressions = new ArrayList<IndexedClassExpression> (1);
+		superClassExpressions.add(superClassExpression);
+	}
+	
+	public void addNegativeConjunctionByConjunct(IndexedObjectIntersectionOf conjunctions, 
+			IndexedClassExpression conjunct) {
+		if (negConjunctionsByConjunct == null)
+			negConjunctionsByConjunct = 
+				new HashListMultimap<IndexedClassExpression, IndexedObjectIntersectionOf>();
+		negConjunctionsByConjunct.add(conjunct, conjunctions);
+	}
+	
+	public void addNegativeExistentialWithRelation(IndexedObjectSomeValuesFrom existential,
+			IndexedObjectProperty relation) {
+		if (negExistentialsWithRelation == null)
+			negExistentialsWithRelation = new ArrayList<Pair<IndexedObjectSomeValuesFrom,IndexedObjectProperty>> (1);
+		negExistentialsWithRelation.add(new Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty> (existential, relation));
 	}
 
 	/**
@@ -124,4 +149,25 @@ public class IndexedClassExpression {
 	public final int hashCode() {
 		return hashCode_;
 	}
+	
+	static IndexedClassExpression create(ElkClassExpression classExpression) {
+		return classExpression.accept(new ElkClassExpressionVisitor<IndexedClassExpression> () {
+
+			public IndexedClassExpression visit(ElkClass elkClass) {
+				return new IndexedClass(elkClass);
+			}
+
+			public IndexedClassExpression visit(
+					ElkObjectIntersectionOf elkObjectIntersectionOf) {
+				return new IndexedObjectIntersectionOf(elkObjectIntersectionOf);
+			}
+
+			public IndexedClassExpression visit(
+					ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
+				return new IndexedObjectSomeValuesFrom(elkObjectSomeValuesFrom);
+			}
+		});
+	}
+	
+	abstract public <O> O accept(IndexedClassExpressionVisitor<O> visitor);
 }

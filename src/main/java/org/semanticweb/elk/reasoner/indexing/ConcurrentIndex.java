@@ -51,7 +51,7 @@ public class ConcurrentIndex implements Index {
 		IndexedClassExpression indexedClassExpression = indexedClassExpressionLookup
 				.get(classExpression);
 		if (indexedClassExpression == null) {
-			indexedClassExpression = new IndexedClassExpression(classExpression);
+			indexedClassExpression = IndexedClassExpression.create(classExpression);
 			IndexedClassExpression previous = indexedClassExpressionLookup
 					.putIfAbsent(classExpression, indexedClassExpression);
 			if (previous != null)
