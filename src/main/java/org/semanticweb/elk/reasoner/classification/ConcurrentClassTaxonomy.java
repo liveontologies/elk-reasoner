@@ -95,7 +95,7 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 		this.assignParentsQueue = new ConcurrentLinkedQueue<Pair<ClassNode, Collection<Context>>>();
 		this.activeNodes = new ConcurrentLinkedQueue<ClassNode>();
 	}
-	
+
 	public Collection<ClassNode> getNodes() {
 		return Collections.unmodifiableCollection(nodeLookup.values());
 	}
@@ -111,7 +111,7 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 	 * complete ClassNode objects for previously added ElkClasses.
 	 * 
 	 * @param elkClass
-	 * @return ClassNode object for elkClass, possibly still incomplete 
+	 * @return ClassNode object for elkClass, possibly still incomplete
 	 */
 	public ClassNode getNode(ElkClass elkClass) {
 		ClassNode node = nodeLookup.get(elkClass);
@@ -172,10 +172,9 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 		for (ElkClass member : equivalent) {
 			if (member != canonical) {
 				nodeLookup.put(member, node);
-				assignParentsQueue
-						.add(new Pair<ClassNode, Collection<Context>>(node,
-								directContexts));
 			}
+			assignParentsQueue.add(new Pair<ClassNode, Collection<Context>>(
+					node, directContexts));
 		}
 
 		return node;
@@ -210,7 +209,8 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 	}
 
 	/**
-	 * Complete ClassNode data for all ElkClasses that have been used with this class so far.
+	 * Complete ClassNode data for all ElkClasses that have been used with this
+	 * class so far.
 	 */
 	public void compute() {
 		for (;;) {
