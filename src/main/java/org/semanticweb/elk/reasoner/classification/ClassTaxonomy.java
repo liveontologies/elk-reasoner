@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.reasoner.classification;
 
+import java.util.Collection;
+
 import org.semanticweb.elk.syntax.ElkClass;
 
 /**
@@ -36,7 +38,14 @@ import org.semanticweb.elk.syntax.ElkClass;
  */
 public interface ClassTaxonomy {
 
-	ClassNode getNode(ElkClass elkClass);
+	public ClassNode getNode(ElkClass elkClass);
+	
+	/**
+	 * Obtain an unmodifiable Collection of all nodes in this ClassTaxonomy
+	 *
+	 * @return an unmodifiable Collection
+	 */
+	public Collection<ClassNode> getNodes();
 
 	void compute();
 
