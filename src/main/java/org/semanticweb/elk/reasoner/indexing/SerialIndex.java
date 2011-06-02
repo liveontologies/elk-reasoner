@@ -25,15 +25,11 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.util.ArrayHashMap;
 
 /**
@@ -47,9 +43,9 @@ public class SerialIndex implements Index {
 
 	public SerialIndex() {
 		mapClassToConcept = new ArrayHashMap<ElkClassExpression, IndexedClassExpression>(
-				119);
+				1024);
 		mapObjectPropertyToRole = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
-				119);
+				128);
 	}
 
 	public IndexedClassExpression getIndexed(ElkClassExpression classExpression) {
@@ -71,7 +67,7 @@ public class SerialIndex implements Index {
 		}
 		return indexedObjectProperty;
 	}
-	
+
 	public void computeRoleHierarchy() {
 		for (IndexedObjectProperty iop : mapObjectPropertyToRole.values()) {
 			iop.computeSubObjectProperties();

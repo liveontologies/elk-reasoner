@@ -31,9 +31,8 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.util.ArrayHashSet;
 import org.semanticweb.elk.util.HashListMultimap;
-import org.semanticweb.elk.util.HashSetMultimap;
-import org.semanticweb.elk.util.Pair;
 import org.semanticweb.elk.util.Multimap;
+import org.semanticweb.elk.util.Pair;
 
 /**
  * @author Frantisek Simancik

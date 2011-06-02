@@ -36,10 +36,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.Quantifier;
-import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.util.LazySetIntersection;
 import org.semanticweb.elk.util.Pair;
-import org.semanticweb.elk.util.Multimap;
 
 /**
  * @author Yevgeny Kazakov

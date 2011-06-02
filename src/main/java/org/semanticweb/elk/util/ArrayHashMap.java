@@ -36,7 +36,7 @@ import java.util.Set;
 
 /**
  * hash maps using array and linear probing for resolving hash collision see [1]
- * p.526.
+ * p.526. Reuses some code from the implementation of HashMap.
  * 
  * [1] Donald E. Knuth, The Art of Computer Programming, Volume 3, Sorting and
  * Searching, Second Edition
@@ -46,25 +46,65 @@ import java.util.Set;
  */
 public class ArrayHashMap<K, V> implements Map<K, V> {
 
-	// the keys of the map
+	/**
+	 * The default initial capacity - MUST be a power of two.
+	 */
+	static final int DEFAULT_INITIAL_CAPACITY = 16;
+
+	/**
+	 * The maximum capacity, used if a higher value is implicitly specified by
+	 * either of the constructors with arguments. MUST be a power of two <=
+	 * 1<<30.
+	 */
+	static final int MAXIMUM_CAPACITY = 1 << 30;
+
+	/**
+	 * The table for the keys; the length MUST always be a power of two.
+	 */
 	protected transient K[] keys;
-	// the values of the map
+
+	/**
+	 * The table for the values; the length MUST be equal to the length of keys
+	 * and MUST always be a power of two.
+	 */
 	protected transient V[] values;
-	// the number of key-value entries in the set
+
+	/**
+	 * The number of key-value entries contained in this map.
+	 */
 	protected transient int size;
+
+	/**
+	 * The next size value at which to resize (capacity * load factor).
+	 * 
+	 * @serial
+	 */
+	int threshold;
 
 	@SuppressWarnings("unchecked")
 	public ArrayHashMap(int initialCapacity) {
 		if (initialCapacity < 0)
 			throw new IllegalArgumentException("Illegal Capacity: "
 					+ initialCapacity);
-		this.keys = (K[]) new Object[initialCapacity];
-		this.values = (V[]) new Object[initialCapacity];
+		if (initialCapacity > MAXIMUM_CAPACITY)
+			initialCapacity = MAXIMUM_CAPACITY;
+		// Find a power of 2 >= initialCapacity
+		int capacity = 1;
+		while (capacity < initialCapacity)
+			capacity <<= 1;
+		this.threshold = computeThreshold(capacity);
+		this.keys = (K[]) new Object[capacity];
+		this.values = (V[]) new Object[capacity];
 		this.size = 0;
 	}
 
+	@SuppressWarnings("unchecked")
 	public ArrayHashMap() {
-		this(113);
+		int capacity = DEFAULT_INITIAL_CAPACITY;
+		this.threshold = computeThreshold(capacity);
+		this.keys = (K[]) new Object[capacity];
+		this.values = (V[]) new Object[capacity];
+		this.size = 0;
 	}
 
 	public int size() {
@@ -75,22 +115,37 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		return size == 0;
 	}
 
-	private int getIndex(int length, Object o) {
-		int index = (o.hashCode() * 129) % length;
-		if (index < 0)
-			return -index;
+	/**
+	 * Computes a maximum number of elements for a given capacity after which to
+	 * resize the tables.
+	 * 
+	 * @param capacity
+	 *            the capacity of the tables.
+	 * @return the threshold for the given capacity.
+	 */
+	static int computeThreshold(int capacity) {
+		if (capacity > 128)
+			return (3 * capacity) / 4; // max 75%
 		else
-			return index;
+			return capacity;
+	}
+
+	static int getIndex(Object key, int length) {
+		int h = key.hashCode();
+		// rehashing like in the HashMap implementation
+		h ^= (h >>> 20) ^ (h >>> 12);
+		h ^= (h >>> 7) ^ (h >>> 4);
+		return h & (length - 1);
 	}
 
 	public boolean containsKey(Object key) {
 		if (key == null)
 			throw new NullPointerException();
 		K[] keys = this.keys;
-		int i = getIndex(keys.length, key);
+		int i = getIndex(key, keys.length);
 		int j = i; // for cycle detection
 		for (;;) {
-			Object probe = keys[i];
+			K probe = keys[i];
 			if (probe == null)
 				return false;
 			else if (key.equals(probe))
@@ -119,10 +174,10 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 			throw new NullPointerException();
 		K[] keys = this.keys;
 		V[] values = this.values;
-		int i = getIndex(keys.length, key);
+		int i = getIndex(key, keys.length);
 		int j = i;
 		for (;;) {
-			Object probe = keys[i];
+			K probe = keys[i];
 			if (probe == null)
 				return null;
 			else if (key.equals(probe))
@@ -136,10 +191,10 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	private V putKeyValue(K[] keys, V[] values, K key, V value) {
-		int i = getIndex(keys.length, key);
+	V putKeyValue(K[] keys, V[] values, K key, V value) {
+		int i = getIndex(key, keys.length);
 		for (;;) {
-			Object probe = keys[i];
+			K probe = keys[i];
 			if (probe == null) {
 				keys[i] = key;
 				values[i] = value;
@@ -156,30 +211,33 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	public void ensureCapacity(int size) {
+	public void resize() {
 		int oldCapacity = keys.length;
-		if (size > oldCapacity || (size > 128 && size > 3 * oldCapacity / 4)) {
-			K oldKeys[] = keys;
-			V oldValues[] = values;
-			int newCapacity = (size * 2) + 1;
-			@SuppressWarnings("unchecked")
-			K newKeys[] = (K[]) new Object[newCapacity];
-			@SuppressWarnings("unchecked")
-			V newValues[] = (V[]) new Object[newCapacity];
-			for (int i = 0; i < oldCapacity; i++) {
-				K key = oldKeys[i];
-				if (key != null)
-					putKeyValue(newKeys, newValues, key, oldValues[i]);
-			}
-			this.keys = newKeys;
-			this.values = newValues;
+		if (oldCapacity == MAXIMUM_CAPACITY)
+			throw new IllegalArgumentException(
+					"Map cannot grow beyond capacity: " + MAXIMUM_CAPACITY);
+		K oldKeys[] = keys;
+		V oldValues[] = values;
+		int newCapacity = oldCapacity << 1;
+		@SuppressWarnings("unchecked")
+		K newKeys[] = (K[]) new Object[newCapacity];
+		@SuppressWarnings("unchecked")
+		V newValues[] = (V[]) new Object[newCapacity];
+		for (int i = 0; i < oldCapacity; i++) {
+			K key = oldKeys[i];
+			if (key != null)
+				putKeyValue(newKeys, newValues, key, oldValues[i]);
 		}
+		this.keys = newKeys;
+		this.values = newValues;
+		this.threshold = computeThreshold(newCapacity);
 	}
 
 	public V put(K key, V value) {
 		if (key == null)
 			throw new NullPointerException();
-		ensureCapacity(size + 1);
+		if (size == threshold)
+			resize();
 		V result = putKeyValue(keys, values, key, value);
 		if (result == null)
 			size++;
@@ -291,7 +349,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 
 		ValueIterator() {
 			this.expectedSize = size;
-			this.valuesSnapshot = values;			
+			this.valuesSnapshot = values;
 			cursor = 0;
 			seekNext();
 		}
@@ -351,7 +409,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 			this.expectedSize = size;
 			this.keysSnapshot = keys;
 			this.valuesSnapshot = values;
-			this.cursor = 0;			
+			this.cursor = 0;
 			seekNext();
 		}
 

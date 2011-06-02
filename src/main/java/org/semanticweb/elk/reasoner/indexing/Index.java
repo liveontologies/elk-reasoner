@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 
 /**
  * @author Yevgeny Kazakov
