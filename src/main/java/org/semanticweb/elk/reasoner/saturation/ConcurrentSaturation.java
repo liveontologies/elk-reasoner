@@ -80,7 +80,7 @@ public class ConcurrentSaturation implements Saturation {
 			Context previous = contextLookup.putIfAbsent(ice, context);
 			if (previous != null)
 				return (previous);
-			enqueueDerived(context, ice);
+			enqueueDerived(context, ice, true);
 		}
 		return context;
 	}
@@ -94,13 +94,20 @@ public class ConcurrentSaturation implements Saturation {
 
 	private void deactivateContext(Context context) {
 		if (context.tryDeactivate())
-			if (!context.linkQueue.isEmpty() || !context.derivedQueue.isEmpty())
+			if (!context.linkQueue.isEmpty()
+					|| !context.propagationQueue.isEmpty()
+					|| !context.positivelyDerivedQueue.isEmpty()
+					|| !context.negativelyDerivedQueue.isEmpty()
+					)
 				activateContext(context);
 	}
 
-	protected void enqueueDerived(Context context, IndexedClassExpression ice) {
+	protected void enqueueDerived(Context context, IndexedClassExpression ice, boolean polarity) {
 		if (!context.derived.contains(ice)) {
-			context.derivedQueue.add(ice);
+			if (polarity)
+				context.positivelyDerivedQueue.add(ice);
+			else
+				context.negativelyDerivedQueue.add(ice);
 			activateContext(context);
 		}
 	}
@@ -142,10 +149,16 @@ public class ConcurrentSaturation implements Saturation {
 	protected void process(Context context) {
 		// synchronized (context) {
 		for (;;) {
-			IndexedClassExpression indexedClassExpression = 
-				context.derivedQueue.poll();
-			if (indexedClassExpression != null) {
-				processClass(context, indexedClassExpression);
+			IndexedClassExpression ice = 
+				context.positivelyDerivedQueue.poll();
+			if (ice != null) {
+				processClass(context, ice, true);
+				continue;
+			}
+			
+			ice = context.negativelyDerivedQueue.poll();
+			if (ice != null) {
+				processClass(context, ice, false);
 				continue;
 			}
 
@@ -168,28 +181,33 @@ public class ConcurrentSaturation implements Saturation {
 		deactivateContext(context);
 		// }
 	}
-
+	
 	protected void propagateOverLink(Context context, 
 			IndexedObjectProperty linkRelation, Context linkTarget,
 			IndexedObjectProperty propRelation, IndexedObjectSomeValuesFrom propClass) {
-		
-		enqueueDerived(linkTarget, propClass);
-		
-	// transitive object properties 	
-		if (propRelation.isTransitive)
-			enqueuePropagation(linkTarget, propRelation, propClass);
-		
-		else if (linkRelation.transitiveSuperObjectProperties != null && 
-				propRelation.transitiveSubObjectProperties != null)
-			for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty> (
-					linkRelation.transitiveSuperObjectProperties, 
-					propRelation.transitiveSubObjectProperties))
-				enqueuePropagation(linkTarget, common, propClass);
+
+		enqueueDerived(linkTarget, propClass, false);
+
+		// transitive object properties 	
+
+		if (linkRelation.transitiveSuperObjectProperties != null && 
+				propRelation.transitiveSubObjectProperties != null) {
+			if (propRelation.isTransitive)
+				enqueuePropagation(linkTarget, propRelation, propClass);
+			else
+				for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty> (
+						linkRelation.transitiveSuperObjectProperties, 
+						propRelation.transitiveSubObjectProperties))
+					enqueuePropagation(linkTarget, common, propClass);
+		}
 	}
+	
+	public static int derivedLinks = 0;
 
 	protected void processLink(Context context, IndexedObjectProperty linkRelation,
 			Context linkTarget) {
 		if (context.linksByObjectProperty.add(linkRelation, linkTarget)) {
+			derivedLinks++;
 			for (IndexedObjectProperty propRelation : new LazySetIntersection<IndexedObjectProperty>(
 					linkRelation.inferredSuperObjectProperties, context.propagationsByObjectProperty.keySet()))
 				for (IndexedObjectSomeValuesFrom propClass : context.propagationsByObjectProperty.get(propRelation))
@@ -207,63 +225,56 @@ public class ConcurrentSaturation implements Saturation {
 		}
 	}
 	
-	protected void processClass(Context context, IndexedClassExpression ice) {
+	protected void processClass(Context context, IndexedClassExpression ice, boolean polarity) {
 		if (context.derived.add(ice)) {
-			ice.accept(new ClassProcessor(context));
-		}
-	}
-	
-	protected class ClassProcessor implements IndexedClassExpressionVisitor<Void> {
-		final Context context;
-		ClassProcessor(Context context) {
-			this.context = context;
-		}
-		
-		public Void visit(IndexedClass ice) {
-			doAlways(ice);
-			return null;
-		}
-		public Void visit(IndexedObjectIntersectionOf ice) {
-			doAlways(ice);
 			
-			if (ice.occursPositively())
-				for (IndexedClassExpression conjunct : ice.conjuncts)
-					enqueueDerived(context, conjunct);
+			if (polarity)
+				ice.accept(new PositivelyDerivedProcessor(context));
 			
-			return null;
-		}
-		public Void visit(IndexedObjectSomeValuesFrom ice) {
-			doAlways(ice);
-			
-			if (ice.occursPositively())
-				enqueueLink(getContext(ice.filler), ice.relation, context);
-				
-			return null;
-		}
-		
-		protected void doAlways(IndexedClassExpression ice) {
 			//process subsumptions
 			if (ice.superClassExpressions != null) {
 				for (IndexedClassExpression implied : ice.superClassExpressions)
-					enqueueDerived(context, implied);
+					enqueueDerived(context, implied, true);
 			}
 			
 			//process negative conjunctions 
 			if (ice.negConjunctionsByConjunct != null) {
 				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-						ice.negConjunctionsByConjunct.keySet(), context.derived)) {
+						ice.negConjunctionsByConjunct.keySet(), context.derived))
 					for (IndexedClassExpression conclusion : ice.negConjunctionsByConjunct
 							.get(common))
-						enqueueDerived(context, conclusion);
-				}
+						enqueueDerived(context, conclusion, false);
 			}
 			
 			//process negative existentials
 			if (ice.negExistentialsWithRelation != null) {
-				for (Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty> e : ice.negExistentialsWithRelation) {
+				for (Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty> e : ice.negExistentialsWithRelation)
 					processPropagation(context, e.getSecond(), e.getFirst());
-				}
 			}
+		}
+	}
+	
+	protected class PositivelyDerivedProcessor implements IndexedClassExpressionVisitor<Void> {
+		final Context context;
+		PositivelyDerivedProcessor(Context context) {
+			this.context = context;
+		}
+		
+		public Void visit(IndexedClass ice) {
+			return null;
+		}
+		
+		public Void visit(IndexedObjectIntersectionOf ice) {
+			for (IndexedClassExpression conjunct : ice.conjuncts)
+				enqueueDerived(context, conjunct, true);
+			
+			return null;
+		}
+		
+		public Void visit(IndexedObjectSomeValuesFrom ice) {
+			enqueueLink(getContext(ice.filler), ice.relation, context);
+				
+			return null;
 		}
 	}
 }

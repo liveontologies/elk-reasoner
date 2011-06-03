@@ -48,7 +48,8 @@ import org.semanticweb.elk.util.Pair;
  */
 public class Context {
 	final IndexedClassExpression root;
-	final Queue<IndexedClassExpression> derivedQueue;
+	final Queue<IndexedClassExpression> positivelyDerivedQueue;
+	final Queue<IndexedClassExpression> negativelyDerivedQueue; 
 	final Queue<Pair<IndexedObjectProperty, Context>> linkQueue;
 	final Queue<Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom>> propagationQueue;
 	final Set<IndexedClassExpression> derived;
@@ -62,7 +63,8 @@ public class Context {
 
 	public Context(IndexedClassExpression root) {
 		this.root = root;
-		this.derivedQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
+		this.positivelyDerivedQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
+		this.negativelyDerivedQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
 		this.linkQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, Context>>();
 		this.propagationQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom>>();
 		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
