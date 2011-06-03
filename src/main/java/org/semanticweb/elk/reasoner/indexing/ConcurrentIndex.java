@@ -74,10 +74,8 @@ public class ConcurrentIndex implements Index {
 	}
 
 	public void computeRoleHierarchy() {
-		for (IndexedObjectProperty iop : indexedObjectPropertyLookup.values()) {
-			iop.computeSubObjectProperties();
-			iop.computeSuperObjectProperties();
-		}
+		for (IndexedObjectProperty iop : indexedObjectPropertyLookup.values())
+			iop.computeSubAndSuperProperties();
 	}
 
 	

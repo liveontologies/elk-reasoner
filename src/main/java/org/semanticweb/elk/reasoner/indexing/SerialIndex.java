@@ -69,10 +69,8 @@ public class SerialIndex implements Index {
 	}
 
 	public void computeRoleHierarchy() {
-		for (IndexedObjectProperty iop : indexedObjectPropertyLookup.values()) {
-			iop.computeSubObjectProperties();
-			iop.computeSuperObjectProperties();
-		}
+		for (IndexedObjectProperty iop : indexedObjectPropertyLookup.values()) 
+			iop.computeSubAndSuperProperties();
 	}
 
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {

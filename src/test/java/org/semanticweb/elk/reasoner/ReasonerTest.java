@@ -71,8 +71,8 @@ public class ReasonerTest extends TestCase {
 		
 		IndexedObjectProperty R = reasoner.index.getIndexed(r.get());
 		IndexedObjectProperty S = reasoner.index.getIndexed(r.get());
-		assertTrue("R subrole S", R.getSuperObjectProperties().contains(S));
-		assertTrue("S superrole R", S.getSubObjectProperties().contains(R));
+		assertTrue("R subrole S", R.inferredSuperObjectProperties.contains(S));
+		assertTrue("S superrole R", S.inferredSubObjectProperties.contains(R));
 		assertTrue("A contains D", reasoner.saturation.getContext(A)
 				.getDerived().contains(D));
 	}

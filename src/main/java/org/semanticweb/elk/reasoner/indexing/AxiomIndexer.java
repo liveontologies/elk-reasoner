@@ -101,8 +101,8 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 		IndexedObjectProperty superProperty = axiom.getSuperObjectPropertyExpression().accept(
 				objectPropertyExpressionIndexer);
 		
-		subProperty.superObjectProperties.add(superProperty);
-		superProperty.subObjectProperties.add(subProperty);
+		subProperty.addSuperObjectProperty(superProperty);
+		superProperty.addSubObjectProperty(subProperty);
 
 		return null;
 	}
