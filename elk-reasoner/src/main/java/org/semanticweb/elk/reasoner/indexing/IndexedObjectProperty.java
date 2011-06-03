@@ -52,12 +52,12 @@ public class IndexedObjectProperty {
 	/**
 	 * A list of all (told) subproperties of this object property.
 	 */
-	public final List<IndexedObjectProperty> subObjectProperties;
+	public List<IndexedObjectProperty> subObjectProperties;
 
 	/**
 	 * A list of all (told) superproperties of this object property.
 	 */
-	public final List<IndexedObjectProperty> superObjectProperties;
+	public List<IndexedObjectProperty> superObjectProperties;
 
 	public boolean isTransitive;
 
@@ -65,23 +65,27 @@ public class IndexedObjectProperty {
 	 * Cache for the subproperties that this object property has based on the
 	 * transitive closure of the property hierarchy.
 	 */
-	protected Set<IndexedObjectProperty> inferredSubObjectProperties = null;
+	public Set<IndexedObjectProperty> inferredSubObjectProperties;
 
 	/**
 	 * Cache for the superproperties that this object property has based on the
 	 * transitive closure of the property hierarchy.
 	 */
-	protected Set<IndexedObjectProperty> inferredSuperObjectProperties = null;
+	public Set<IndexedObjectProperty> inferredSuperObjectProperties;
 
 	/**
 	 * Creates an object representing an ElkObjectPropertyExpression.
 	 * 
 	 * @param objectPropertyExpression
 	 */
+	
+	public Set<IndexedObjectProperty> transitiveSubObjectProperties;
+	
+	public Set<IndexedObjectProperty> transitiveSuperObjectProperties;
+	
+	
 	public IndexedObjectProperty(ElkObjectProperty objectProperty) {
 		this.objectProperty = objectProperty;
-		this.subObjectProperties = new ArrayList<IndexedObjectProperty>();
-		this.superObjectProperties = new ArrayList<IndexedObjectProperty>();
 		this.isTransitive = false;
 	}
 
@@ -96,68 +100,67 @@ public class IndexedObjectProperty {
 		return "[" + objectProperty.toString() + "]";
 	}
 
-	/**
-	 * Return the set of all IndexedObjectProperty objects that are inferred to
-	 * be subproperties of this object, based on the told property hierarchy.
-	 * 
-	 * @return Set of subproperties
-	 */
-	public Set<IndexedObjectProperty> getSubObjectProperties() {
-		if (inferredSubObjectProperties == null) {
-			computeSubObjectProperties();
-		}
-		return inferredSubObjectProperties;
+	public void addSubObjectProperty(IndexedObjectProperty iop) {
+		if (subObjectProperties == null)
+			subObjectProperties = new ArrayList<IndexedObjectProperty> (1);
+		subObjectProperties.add(iop);
 	}
+	
+	public void addSuperObjectProperty(IndexedObjectProperty iop) {
+		if (superObjectProperties == null)
+			superObjectProperties = new ArrayList<IndexedObjectProperty> (1);
+		superObjectProperties.add(iop);
+	}
+	
 
 	/**
-	 * Return the set of all IndexedObjectProperty objects that are inferred to
-	 * be superproperties of this object, based on the told property hierarchy.
-	 * 
-	 * @return Set of superproperties
+	 * Compute the subproperties and the superproperties of this object.
 	 */
-	public Set<IndexedObjectProperty> getSuperObjectProperties() {
-		if (inferredSuperObjectProperties == null) {
-			computeSuperObjectProperties();
-		}
-		return inferredSuperObjectProperties;
-	}
-
-	/**
-	 * Compute the subproperties of this object and store them in the internal
-	 * cache.
-	 */
-	protected void computeSubObjectProperties() {
+	
+	protected void computeSubAndSuperProperties() {
+		//compute all subproperties
 		inferredSubObjectProperties = new ArrayHashSet<IndexedObjectProperty>();
 		ArrayDeque<IndexedObjectProperty> queue = new ArrayDeque<IndexedObjectProperty>();
 		inferredSubObjectProperties.add(this);
 		queue.addLast(this);
 		while (!queue.isEmpty()) {
 			IndexedObjectProperty r = queue.removeLast();
-			for (IndexedObjectProperty s : r.subObjectProperties) {
-				if (inferredSubObjectProperties.add(s)) {
-					queue.addLast(s);
-				}
-			}
+			if (r.subObjectProperties != null)
+				for (IndexedObjectProperty s : r.subObjectProperties)
+					if (inferredSubObjectProperties.add(s))
+						queue.addLast(s);
 		}
-	}
+		
+		//find transitive subproperties
+		transitiveSubObjectProperties = null;
+		for (IndexedObjectProperty iop : inferredSubObjectProperties)
+			if (iop.isTransitive) {
+				if (transitiveSubObjectProperties == null)
+					transitiveSubObjectProperties = new ArrayHashSet<IndexedObjectProperty> ();
+				transitiveSubObjectProperties.add(iop);
+			}
 
-	/**
-	 * Compute the superproperties of this object and store them in the internal
-	 * cache.
-	 */
-	protected void computeSuperObjectProperties() {
+		//infer all superproperties
 		inferredSuperObjectProperties = new ArrayHashSet<IndexedObjectProperty>();
-		ArrayDeque<IndexedObjectProperty> queue = new ArrayDeque<IndexedObjectProperty>();
+		queue.clear();
 		inferredSuperObjectProperties.add(this);
 		queue.addLast(this);
 		while (!queue.isEmpty()) {
 			IndexedObjectProperty r = queue.removeLast();
-			for (IndexedObjectProperty s : r.superObjectProperties) {
-				if (inferredSuperObjectProperties.add(s)) {
-					queue.addLast(s);
-				}
-			}
+			if (r.superObjectProperties != null)
+				for (IndexedObjectProperty s : r.superObjectProperties)
+					if (inferredSuperObjectProperties.add(s))
+						queue.addLast(s);
 		}
+		
+		//find transitive superproperties
+		transitiveSuperObjectProperties = null;
+		for (IndexedObjectProperty iop : inferredSuperObjectProperties)
+			if (iop.isTransitive) {
+				if (transitiveSuperObjectProperties == null)
+					transitiveSuperObjectProperties = new ArrayHashSet<IndexedObjectProperty> ();
+				transitiveSuperObjectProperties.add(iop);
+			}
 	}
 
 	/** Hash code for this object. */

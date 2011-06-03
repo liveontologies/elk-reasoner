@@ -116,11 +116,11 @@ public class ConcurrentSaturation implements Saturation {
 	
 	protected void enqueuePropagation(Context context, IndexedObjectProperty relation,
 			IndexedObjectSomeValuesFrom propClass) {
-		if (!context.propagationsByObjectProperty.contains(relation, propClass)) {
+//		if (!context.propagationsByObjectProperty.contains(relation, propClass)) {
 			context.propagationQueue.add(new Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom>(
 					relation, propClass));
 			activateContext(context);
-		}
+//		}
 	}
 
 	public void compute() {
@@ -171,26 +171,28 @@ public class ConcurrentSaturation implements Saturation {
 
 	protected void propagateOverLink(Context context, 
 			IndexedObjectProperty linkRelation, Context linkTarget,
-			IndexedObjectProperty propRelation, IndexedClassExpression propClass) {
+			IndexedObjectProperty propRelation, IndexedObjectSomeValuesFrom propClass) {
 		
 		enqueueDerived(linkTarget, propClass);
 		
 	// transitive object properties 	
-//		if (propRelation.isTransitive)
-//			enqueuePropagation(linkTarget, propRelation, propClass);
-//		else
-//			for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty> (
-//					linkRelation.getSuperObjectProperties(), propRelation.getSubObjectProperties()))
-//				if (common.isTransitive)
-//					enqueuePropagation(linkTarget, common, propClass);
+		if (propRelation.isTransitive)
+			enqueuePropagation(linkTarget, propRelation, propClass);
+		
+		else if (linkRelation.transitiveSuperObjectProperties != null && 
+				propRelation.transitiveSubObjectProperties != null)
+			for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty> (
+					linkRelation.transitiveSuperObjectProperties, 
+					propRelation.transitiveSubObjectProperties))
+				enqueuePropagation(linkTarget, common, propClass);
 	}
 
 	protected void processLink(Context context, IndexedObjectProperty linkRelation,
 			Context linkTarget) {
 		if (context.linksByObjectProperty.add(linkRelation, linkTarget)) {
 			for (IndexedObjectProperty propRelation : new LazySetIntersection<IndexedObjectProperty>(
-					linkRelation.getSuperObjectProperties(), context.propagationsByObjectProperty.keySet()))
-				for (IndexedClassExpression propClass : context.propagationsByObjectProperty.get(propRelation))
+					linkRelation.inferredSuperObjectProperties, context.propagationsByObjectProperty.keySet()))
+				for (IndexedObjectSomeValuesFrom propClass : context.propagationsByObjectProperty.get(propRelation))
 					propagateOverLink(context, linkRelation, linkTarget, propRelation, propClass);
 		}
 	}
@@ -199,7 +201,7 @@ public class ConcurrentSaturation implements Saturation {
 			IndexedObjectSomeValuesFrom propClass) {
 		if (context.propagationsByObjectProperty.add(propRelation, propClass)) {
 			for (IndexedObjectProperty linkRelation : new LazySetIntersection<IndexedObjectProperty>(
-					propRelation.getSubObjectProperties(), context.linksByObjectProperty.keySet()))
+					propRelation.inferredSubObjectProperties, context.linksByObjectProperty.keySet()))
 				for (Context linkTarget : context.linksByObjectProperty.get(linkRelation))
 					propagateOverLink(context, linkRelation, linkTarget, propRelation, propClass);
 		}
@@ -240,7 +242,7 @@ public class ConcurrentSaturation implements Saturation {
 		}
 		
 		protected void doAlways(IndexedClassExpression ice) {
-			//process implications
+			//process subsumptions
 			if (ice.superClassExpressions != null) {
 				for (IndexedClassExpression implied : ice.superClassExpressions)
 					enqueueDerived(context, implied);

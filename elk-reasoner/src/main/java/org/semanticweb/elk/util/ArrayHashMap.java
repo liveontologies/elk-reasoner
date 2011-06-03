@@ -61,13 +61,13 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	/**
 	 * The table for the keys; the length MUST always be a power of two.
 	 */
-	protected transient K[] keys;
+	protected volatile transient K[] keys;
 
 	/**
 	 * The table for the values; the length MUST be equal to the length of keys
 	 * and MUST always be a power of two.
 	 */
-	protected transient V[] values;
+	protected volatile transient V[] values;
 
 	/**
 	 * The number of key-value entries contained in this map.
