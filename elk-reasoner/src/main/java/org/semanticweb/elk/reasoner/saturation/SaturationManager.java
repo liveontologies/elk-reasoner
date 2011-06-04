@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,30 +31,42 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 
 public class SaturationManager {
 	// the saturator used for jobs
-	protected final Saturation saturation;
+	protected final SaturationComputation saturation;
 	// maximum number of concurrent workers
 	protected final int maxWorkers;
 	// thread executor service used
 	protected final ExecutorService executor;
 	// number of currently running jobs
 	protected AtomicInteger workerCount;
+	// bounded buffer for concepts added for saturation
+	protected final BlockingQueue<IndexedClassExpression> conceptBuffer;
 
-	public SaturationManager(Saturation saturation, ExecutorService executor,
-			int nWorkers) {
-		this.saturation = saturation;
+	public SaturationManager(ExecutorService executor, int nWorkers) {
+		this.saturation = new ConcurrentSaturation();
 		this.maxWorkers = nWorkers;
 		this.executor = executor;
 		this.workerCount = new AtomicInteger(0);
+		this.conceptBuffer = new ArrayBlockingQueue<IndexedClassExpression>(512);
 	}
 
 	// class for concurrent saturation jobs
 	protected class Worker implements Runnable {
 		public void run() {
-			saturation.compute();
+			for (;;) {
+				IndexedClassExpression nextTarget = conceptBuffer.poll();
+				if (nextTarget != null) {
+					saturation.addTarget(nextTarget);
+					saturation.compute();
+					continue;
+				}
+				break;
+			}
 			if (workerCount.decrementAndGet() == 0)
 				synchronized (workerCount) {
 					workerCount.notify();
 				}
+			if (!conceptBuffer.isEmpty())
+				addWorker();
 		}
 	}
 
@@ -67,11 +81,14 @@ public class SaturationManager {
 	}
 
 	public void submit(IndexedClassExpression target) {
-		saturation.addTarget(target);
+		try {
+			conceptBuffer.put(target);
+		} catch (InterruptedException e) {
+		}
 		addWorker();
 	}
 
-	public void waitCompletion() {
+	void waitCompletion() {
 		synchronized (workerCount) {
 			while (workerCount.get() > 0)
 				try {
@@ -82,6 +99,7 @@ public class SaturationManager {
 	}
 
 	public Saturation getSaturation() {
+		waitCompletion();
 		return saturation;
 	}
 }

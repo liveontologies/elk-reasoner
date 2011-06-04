@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,30 +21,23 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, May 15, 2011
+ * @author Yevgeny Kazakov, Jun 4, 2011
  */
 package org.semanticweb.elk.reasoner.classification;
-
-import java.util.Collection;
 
 import org.semanticweb.elk.syntax.ElkClass;
 
 /**
- * Classes that implement this interface represent a class hierarchy based on
- * ElkClass objects. For each such object, the taxonomy holds a ClassNode object
- * from which direct sub- and superclasses can be retrieved.
+ * Interface for controlling the process of computation for a taxonomy. It
+ * should be visible only within this package.
  * 
  * @author Yevgeny Kazakov
+ * 
  */
-public interface ClassTaxonomy {
+interface ClassTaxonomyComputation extends ClassTaxonomy {
 
-	public ClassNode getNode(ElkClass elkClass);
-	
-	/**
-	 * Obtain an unmodifiable Collection of all nodes in this ClassTaxonomy
-	 *
-	 * @return an unmodifiable Collection
-	 */
-	public Collection<ClassNode> getNodes();	
+	void addTarget(ElkClass elkClass);
+
+	void compute();
 
 }

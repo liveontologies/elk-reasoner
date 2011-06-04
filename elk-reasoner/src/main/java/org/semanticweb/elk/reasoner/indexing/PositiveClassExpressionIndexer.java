@@ -45,7 +45,7 @@ public class PositiveClassExpressionIndexer implements
 	}
 
 	public IndexedClassExpression visit(ElkClass classExpression) {
-		IndexedClass result = (IndexedClass) axiomIndexer.index.getIndexed(classExpression);
+		IndexedClass result = (IndexedClass) axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
 		result.positiveOccurrenceNo++;
 		return result;
 	}
@@ -53,7 +53,7 @@ public class PositiveClassExpressionIndexer implements
 	public IndexedClassExpression visit(ElkObjectIntersectionOf classExpression) {
 
 		IndexedObjectIntersectionOf result = (IndexedObjectIntersectionOf)
-			axiomIndexer.index.getIndexed(classExpression);
+			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
 		if (result.positiveOccurrenceNo++ == 0) {
 			for (ElkClassExpression d : classExpression.getClassExpressions()) {
 				result.addConjunct(d.accept(this));
@@ -65,7 +65,7 @@ public class PositiveClassExpressionIndexer implements
 	public IndexedClassExpression visit(ElkObjectSomeValuesFrom classExpression) {
 
 		IndexedObjectSomeValuesFrom result = (IndexedObjectSomeValuesFrom) 
-			axiomIndexer.index.getIndexed(classExpression);
+			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
 		if (result.positiveOccurrenceNo++ == 0) {
 			result.relation = classExpression.getObjectPropertyExpression().accept(
 					axiomIndexer.objectPropertyExpressionIndexer);

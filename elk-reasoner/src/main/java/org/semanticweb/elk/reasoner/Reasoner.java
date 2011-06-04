@@ -28,12 +28,9 @@ import java.util.concurrent.Future;
 
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassificationManager;
-import org.semanticweb.elk.reasoner.classification.ConcurrentClassTaxonomy;
-import org.semanticweb.elk.reasoner.indexing.Index;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexingManager;
-import org.semanticweb.elk.reasoner.indexing.SerialIndex;
-import org.semanticweb.elk.reasoner.saturation.ConcurrentSaturation;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.Saturation;
 import org.semanticweb.elk.reasoner.saturation.SaturationManager;
 import org.semanticweb.elk.syntax.ElkAxiom;
@@ -41,32 +38,22 @@ import org.semanticweb.elk.syntax.ElkClass;
 
 public class Reasoner {
 	// executor used to run the jobs
-	private final ExecutorService executor;
+	protected final ExecutorService executor;
+	// number of workers for concurrent jobs
+	protected final int nWorkers;
 
-	final protected Index index;
-	final protected IndexingManager indexingManager;
+	protected final IndexingManager indexingManager;
 
-	final protected Saturation saturation;
-	final protected SaturationManager saturationManager;
+	protected ClassTaxonomy classTaxonomy = null;
 
-	final protected ClassTaxonomy classTaxonomy;
-	final protected ClassificationManager classificationManager;
-
-	public Reasoner(int nWorkers) {
-		executor = Executors.newCachedThreadPool();
-		index = new SerialIndex();
-		// use 1 index worker since index is not thread-safe
-		indexingManager = new IndexingManager(index, executor, 1);
-		saturation = new ConcurrentSaturation(512);
-		saturationManager = new SaturationManager(saturation, executor,
-				nWorkers);
-		classTaxonomy = new ConcurrentClassTaxonomy(index, saturation);
-		classificationManager = new ClassificationManager(classTaxonomy,
-				executor, nWorkers);
+	public Reasoner(ExecutorService executor, int nWorkers) {
+		this.executor = executor;
+		this.nWorkers = nWorkers;
+		indexingManager = new IndexingManager(executor, 1);
 	}
 
 	public Reasoner() {
-		this(16);
+		this(Executors.newCachedThreadPool(), 16);
 	}
 
 	public void load(Future<? extends ElkAxiom> futureAxiom) {
@@ -75,29 +62,26 @@ public class Reasoner {
 	}
 
 	public void finishLoading() {
-		indexingManager.waitCompletion();
-		index.computeRoleHierarchy();
-	}
-
-	public void saturate() {
-		for (IndexedClassExpression indexedClassExpression : index
-				.getIndexedClassExpressions())
-			if (indexedClassExpression.classExpression instanceof ElkClass)
-				saturationManager.submit(indexedClassExpression);
-		saturationManager.waitCompletion();
+		indexingManager.computeRoleHierarchy();
 	}
 
 	public void classify() {
-		for (IndexedClassExpression indexedClassExpression : index
+		OntologyIndex ontologyIndex = indexingManager.getOntologyIndex();
+		SaturationManager saturationManager = new SaturationManager(executor,
+				nWorkers);
+		for (IndexedClassExpression indexedClassExpression : ontologyIndex
+				.getIndexedClassExpressions())
+			if (indexedClassExpression.classExpression instanceof ElkClass)
+				saturationManager.submit(indexedClassExpression);
+		Saturation saturation = saturationManager.getSaturation();
+		ClassificationManager classificationManager = new ClassificationManager(
+				executor, nWorkers, ontologyIndex, saturation);
+		for (IndexedClassExpression indexedClassExpression : ontologyIndex
 				.getIndexedClassExpressions())
 			if (indexedClassExpression.classExpression instanceof ElkClass)
 				classificationManager
 						.submit((ElkClass) indexedClassExpression.classExpression);
-		classificationManager.waitCompletion();
-	}
-
-	public Index getIndex() {
-		return index;
+		classTaxonomy = classificationManager.getClassTaxonomy();
 	}
 
 	public ClassTaxonomy getTaxonomy() {

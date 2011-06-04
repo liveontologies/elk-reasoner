@@ -27,9 +27,11 @@ import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
+import org.semanticweb.elk.reasoner.classification.ClassNode;
+import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.Context;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.FutureElkObjectFactory;
@@ -63,18 +65,17 @@ public class ReasonerTest extends TestCase {
 		reasoner.load(constructor.getFutureElkSubObjectPropertyOfAxiom(r, s));
 		reasoner.finishLoading();
 
-		IndexedClassExpression A = reasoner.index.getIndexed(a.get());
-		IndexedClassExpression D = reasoner.index.getIndexed(d.get());
-		reasoner.index.computeRoleHierarchy();
-		reasoner.saturationManager.submit(A);
-		reasoner.saturationManager.waitCompletion();
-		
-		IndexedObjectProperty R = reasoner.index.getIndexed(r.get());
-		IndexedObjectProperty S = reasoner.index.getIndexed(r.get());
+		OntologyIndex index = reasoner.indexingManager.getOntologyIndex();
+		reasoner.classify();
+
+		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+
+		IndexedObjectProperty R = index.getIndexedObjectProperty(r.get());
+		IndexedObjectProperty S = index.getIndexedObjectProperty(r.get());
 		assertTrue("R subrole S", R.inferredSuperObjectProperties.contains(S));
 		assertTrue("S superrole R", S.inferredSubObjectProperties.contains(R));
-		assertTrue("A contains D", reasoner.saturation.getContext(A)
-				.getDerived().contains(D));
+		assertTrue("A contains D", taxonomy.getNode(a.get()).getParents()
+				.contains(taxonomy.getNode(d.get())));
 	}
 
 	public void testConjunctions() throws InterruptedException,
@@ -90,12 +91,13 @@ public class ReasonerTest extends TestCase {
 		reasoner.load(constructor.getFutureElkSubClassOfAxiom(
 				constructor.getFutureElkObjectIntersectionOf(b, c), d));
 		reasoner.finishLoading();
-
-		IndexedClassExpression A = reasoner.index.getIndexed(a.get());
-		IndexedClassExpression B = reasoner.index.getIndexed(b.get());
-		IndexedClassExpression C = reasoner.index.getIndexed(c.get());
-		IndexedClassExpression D = reasoner.index.getIndexed(d.get());
-		IndexedClassExpression I = reasoner.index.getIndexed(constructor
+		OntologyIndex index = reasoner.indexingManager.getOntologyIndex();
+		
+		IndexedClassExpression A = index.getIndexedClassExpression(a.get());
+		IndexedClassExpression B = index.getIndexedClassExpression(b.get());
+		IndexedClassExpression C = index.getIndexedClassExpression(c.get());
+		IndexedClassExpression D = index.getIndexedClassExpression(d.get());
+		IndexedClassExpression I = index.getIndexedClassExpression(constructor
 				.getFutureElkObjectIntersectionOf(b, c).get());
 
 		assertTrue("A SubClassOf B", A.superClassExpressions.contains(B));
@@ -103,13 +105,14 @@ public class ReasonerTest extends TestCase {
 		assertFalse("A SubClassOf D", A.superClassExpressions.contains(D));
 		assertTrue("I SubClassOf D", I.superClassExpressions.contains(D));
 
-		Context context = reasoner.saturation.getContext(A);
-		reasoner.saturationManager.submit(A);
-		reasoner.saturationManager.waitCompletion();
-		assertTrue("A contains A", context.getDerived().contains(A));
-		assertTrue("A contains B", context.getDerived().contains(B));
-		assertTrue("A contains C", context.getDerived().contains(C));
-		assertTrue("A contains I", context.getDerived().contains(I));
-		assertTrue("A contains D", context.getDerived().contains(D));
+		reasoner.classify();
+
+		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+		ClassNode aNode = taxonomy.getNode(a.get());
+		
+		assertTrue("A contains A", aNode.getMembers().contains(a.get()));
+		assertTrue("A contains B", aNode.getParents().contains(taxonomy.getNode(b.get())));
+		assertTrue("A contains C", aNode.getParents().contains(taxonomy.getNode(c.get())));		
+		assertTrue("A contains D", aNode.getParents().contains(taxonomy.getNode(d.get())));
 	}
 }

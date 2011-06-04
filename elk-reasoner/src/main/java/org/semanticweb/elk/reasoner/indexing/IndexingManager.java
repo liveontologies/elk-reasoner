@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,47 +31,40 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.semanticweb.elk.syntax.ElkAxiom;
 
 public class IndexingManager {
-	// indexer for axioms
-	private final AxiomIndexer axiomIndexer;
+	// ontology index used
+	private final OntologyIndexComputation ontologyIndex;
 	// maximum number of concurrent workers
 	private final int maxWorkers;
 	// thread executor service used
 	private final ExecutorService executor;
+	// number of currently running jobs
+	private final AtomicInteger workerCount;
 	// buffer for future axioms required to be indexed
 	private final Queue<Future<? extends ElkAxiom>> futureAxiomBuffer;
 	// the number of axioms in the queue
 	private final AtomicInteger axiomBufferSize;
 	// minimal size of the buffer before running the indexing job
 	private final int bufferThreshold;
-	// number of currently running jobs
-	private final AtomicInteger workerCount;
 
-	public IndexingManager(Index index, ExecutorService executor, int nWorkers) {
-		this.axiomIndexer = new AxiomIndexer(index);
+	public IndexingManager(ExecutorService executor, int nWorkers) {
+		this.ontologyIndex = new SerialOntologyIndex();
 		this.maxWorkers = nWorkers;
 		this.executor = executor;
+		this.workerCount = new AtomicInteger(0);
 		this.futureAxiomBuffer = new ConcurrentLinkedQueue<Future<? extends ElkAxiom>>();
 		this.axiomBufferSize = new AtomicInteger(0);
 		this.bufferThreshold = 512;
-		this.workerCount = new AtomicInteger(0);
 	}
 
 	// class for concurrent indexing jobs
 	private class Worker implements Runnable {
 		public void run() {
 			for (;;) {
-				Future<? extends ElkAxiom> futureAxiom = futureAxiomBuffer.poll();
+				Future<? extends ElkAxiom> futureAxiom = futureAxiomBuffer
+						.poll();
 				if (futureAxiom != null) {
 					axiomBufferSize.decrementAndGet();
-					try {
-						futureAxiom.get().accept(axiomIndexer);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (ExecutionException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					ontologyIndex.addTarget(futureAxiom);
 					continue;
 				}
 				break;
@@ -100,7 +92,7 @@ public class IndexingManager {
 			addWorker();
 	}
 
-	public void waitCompletion() {
+	void waitCompletion() {
 		addWorker();
 		synchronized (workerCount) {
 			while (workerCount.get() > 0)
@@ -109,6 +101,15 @@ public class IndexingManager {
 				} catch (InterruptedException e) {
 				}
 		}
+	}
+
+	public void computeRoleHierarchy() {
+		waitCompletion();
+		ontologyIndex.computeRoleHierarchy();
+	}
+
+	public OntologyIndex getOntologyIndex() {
+		return ontologyIndex;
 	}
 
 }

@@ -168,7 +168,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	public V get(Object key) {
 		if (key == null)
 			throw new NullPointerException();
-		// copy keys and values when they have the same size 
+		// copy keys and values when they have the same size
 		for (;;) {
 			K[] keys = this.keys;
 			V[] values = this.values;
@@ -197,8 +197,8 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		int i = getIndex(key, keys.length);
 		for (;;) {
 			K probe = keys[i];
-			if (probe == null) {				
-				keys[i] = key;	
+			if (probe == null) {
+				keys[i] = key;
 				values[i] = value;
 				return null;
 			} else if (key.equals(probe)) {
@@ -283,7 +283,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		// current cursor
 		int cursor;
 		// reference to the next key
-		K nextKey;
+		K nextKey = null;
 
 		KeyIterator() {
 			this.expectedSize = size;
@@ -347,7 +347,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		// current cursor
 		int cursor;
 		// reference to the next key
-		V nextValue;
+		V nextValue = null;
 
 		ValueIterator() {
 			this.expectedSize = size;

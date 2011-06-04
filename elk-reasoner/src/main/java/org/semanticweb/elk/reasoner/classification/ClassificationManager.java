@@ -30,6 +30,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.Saturation;
 import org.semanticweb.elk.syntax.ElkClass;
 
 /**
@@ -38,23 +40,24 @@ import org.semanticweb.elk.syntax.ElkClass;
  */
 public class ClassificationManager {
 	// the saturator used for jobs
-	protected final ClassTaxonomy classTaxonomy;
+	protected final ClassTaxonomyComputation classTaxonomy;
 	// maximum number of concurrent workers
 	protected final int maxWorkers;
 	// thread executor service used
 	protected final ExecutorService executor;
-	// bounded buffer for classes added for classification
-	protected final BlockingQueue<ElkClass> classBuffer;
 	// number of currently running jobs
 	protected AtomicInteger workerCount;
+	// bounded buffer for classes added for classification
+	protected final BlockingQueue<ElkClass> classBuffer;
 
-	public ClassificationManager(ClassTaxonomy classTaxonomy,
-			ExecutorService executor, int nWorkers) {
-		this.classTaxonomy = classTaxonomy;
+	public ClassificationManager(ExecutorService executor, int nWorkers,
+			OntologyIndex ontologyIndex, Saturation saturation) {
+		this.classTaxonomy = new ConcurrentClassTaxonomy(ontologyIndex,
+				saturation);
 		this.maxWorkers = nWorkers;
 		this.executor = executor;
-		this.classBuffer = new ArrayBlockingQueue<ElkClass>(256);
 		this.workerCount = new AtomicInteger(0);
+		this.classBuffer = new ArrayBlockingQueue<ElkClass>(256);
 	}
 
 	// class for concurrent classification jobs
@@ -62,10 +65,9 @@ public class ClassificationManager {
 		public void run() {
 			for (;;) {
 				classTaxonomy.compute();
-				ElkClass elkClass = classBuffer.poll();
-				if (elkClass != null) {
-					classTaxonomy.getNode(elkClass);
-					addWorker();
+				ElkClass nextClass = classBuffer.poll();
+				if (nextClass != null) {
+					classTaxonomy.addTarget(nextClass);
 					continue;
 				}
 				break;
@@ -74,6 +76,8 @@ public class ClassificationManager {
 				synchronized (workerCount) {
 					workerCount.notify();
 				}
+			if (!classBuffer.isEmpty())
+				addWorker();
 		}
 	}
 
@@ -87,15 +91,15 @@ public class ClassificationManager {
 				executor.execute(worker);
 	}
 
-	public void submit(ElkClass elkClass) {		
+	public void submit(ElkClass target) {
 		try {
-			classBuffer.put(elkClass);
+			classBuffer.put(target);
 		} catch (InterruptedException e) {
 		}
 		addWorker();
 	}
 
-	public void waitCompletion() {
+	void waitCompletion() {
 		synchronized (workerCount) {
 			while (workerCount.get() > 0)
 				try {
@@ -106,6 +110,7 @@ public class ClassificationManager {
 	}
 
 	public ClassTaxonomy getClassTaxonomy() {
+		waitCompletion();
 		return classTaxonomy;
 	}
 

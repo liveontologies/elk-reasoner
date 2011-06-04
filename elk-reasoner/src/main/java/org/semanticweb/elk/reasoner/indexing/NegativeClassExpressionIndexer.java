@@ -52,7 +52,7 @@ class NegativeClassExpressionIndexer implements
 	}
 
 	public IndexedClassExpression visit(ElkClass elkClass) {
-		IndexedClass result = (IndexedClass) axiomIndexer.index.getIndexed(elkClass);
+		IndexedClass result = (IndexedClass) axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(elkClass);
 		result.negativeOccurrenceNo++;
 		return result;
 	}
@@ -61,7 +61,7 @@ class NegativeClassExpressionIndexer implements
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
 
 		IndexedObjectIntersectionOf result = (IndexedObjectIntersectionOf) 
-			axiomIndexer.index.getIndexed(elkObjectIntersectionOf);
+			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(elkObjectIntersectionOf);
 		if (result.negativeOccurrenceNo++ == 0) {
 
 			int conjunctionSize = elkObjectIntersectionOf.getClassExpressions()
@@ -96,7 +96,7 @@ class NegativeClassExpressionIndexer implements
 	public IndexedClassExpression visit(ElkObjectSomeValuesFrom classExpression) {
 		
 		IndexedObjectSomeValuesFrom result = (IndexedObjectSomeValuesFrom)
-			axiomIndexer.index.getIndexed(classExpression);
+			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
 		if (result.negativeOccurrenceNo++ == 0) {
 			IndexedObjectProperty r = classExpression.getObjectPropertyExpression().accept(
 					axiomIndexer.objectPropertyExpressionIndexer);
