@@ -25,8 +25,12 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
@@ -36,44 +40,77 @@ import org.semanticweb.elk.util.ArrayHashMap;
  * @author Yevgeny Kazakov
  * 
  */
-public class SerialIndex implements Index {
+public class SerialOntologyIndex implements OntologyIndexComputation {
+
+	// indexer for axioms
+	private final AxiomIndexer axiomIndexer;
 
 	protected final Map<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
 	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
 
-	public SerialIndex() {
+	public SerialOntologyIndex() {
+		this.axiomIndexer = new AxiomIndexer(this);
+
 		indexedClassExpressionLookup = new ArrayHashMap<ElkClassExpression, IndexedClassExpression>(
 				1024);
 		indexedObjectPropertyLookup = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
 				128);
 	}
 
-	public IndexedClassExpression getIndexed(ElkClassExpression classExpression) {
+	public void addTarget(Future<? extends ElkAxiom> futureAxiom) {
+		try {
+			futureAxiom.get().accept(axiomIndexer);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public IndexedClassExpression getIndexedClassExpression(
+			ElkClassExpression classExpression) {
+		return indexedClassExpressionLookup.get(classExpression);
+	}
+
+	public IndexedObjectProperty getIndexedObjectProperty(
+			ElkObjectProperty objectProperty) {
+		return indexedObjectPropertyLookup.get(objectProperty);
+	}
+
+	public IndexedClassExpression getCreateIndexedClassExpression(
+			ElkClassExpression classExpression) {
 		IndexedClassExpression indexedClassExpression = indexedClassExpressionLookup
 				.get(classExpression);
 		if (indexedClassExpression == null) {
-			indexedClassExpression = IndexedClassExpression.create(classExpression);
-			indexedClassExpressionLookup.put(classExpression, indexedClassExpression);
+			indexedClassExpression = IndexedClassExpression
+					.create(classExpression);
+			indexedClassExpressionLookup.put(classExpression,
+					indexedClassExpression);
 		}
 		return indexedClassExpression;
 	}
 
-	public IndexedObjectProperty getIndexed(ElkObjectProperty objectProperty) {
+	public IndexedObjectProperty getCreateIndexedObjectProperty(
+			ElkObjectProperty objectProperty) {
 		IndexedObjectProperty indexedObjectProperty = indexedObjectPropertyLookup
 				.get(objectProperty);
 		if (indexedObjectProperty == null) {
 			indexedObjectProperty = new IndexedObjectProperty(objectProperty);
-			indexedObjectPropertyLookup.put(objectProperty, indexedObjectProperty);
+			indexedObjectPropertyLookup.put(objectProperty,
+					indexedObjectProperty);
 		}
 		return indexedObjectProperty;
 	}
 
 	public void computeRoleHierarchy() {
-		for (IndexedObjectProperty iop : indexedObjectPropertyLookup.values()) 
+		for (IndexedObjectProperty iop : indexedObjectPropertyLookup.values())
 			iop.computeSubAndSuperProperties();
 	}
 
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
-		return indexedClassExpressionLookup.values();
+		return Collections.unmodifiableCollection(indexedClassExpressionLookup
+				.values());
 	}
 }

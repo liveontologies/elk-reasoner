@@ -54,33 +54,34 @@ public class ConcurrentIndexerTest extends TestCase {
 		Future<? extends ElkClassExpression> hasHeartAndOrgan = constructor
 				.getFutureElkObjectSomeValuesFrom(has, heartAndOrgan);
 
-		final ExecutorService executor = Executors.newCachedThreadPool();
-		Index index = new ConcurrentIndex();
-		IndexingManager indexingManager = new IndexingManager(index, executor,
-				8);
+		final ExecutorService executor = Executors.newCachedThreadPool();		
+		IndexingManager indexingManager = new IndexingManager(executor, 8);
 
 		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(human,
 				hasHeartAndOrgan));
 		indexingManager.waitCompletion();
+		OntologyIndex ontologyIndex = indexingManager.getOntologyIndex();
 
-		assertTrue(((IndexedObjectIntersectionOf) index.getIndexed(heartAndOrgan.get())).conjuncts
-				.contains(index.getIndexed(heart.get())));
-		assertTrue(((IndexedObjectIntersectionOf)index.getIndexed(heartAndOrgan.get())).conjuncts
-				.contains(index.getIndexed(organ.get())));
-		assertTrue(index.getIndexed(human.get()).superClassExpressions
-				.contains(index.getIndexed(hasHeartAndOrgan.get())));
-		assertTrue(index.getIndexed(heart.get()).negConjunctionsByConjunct == null);
+		assertTrue(((IndexedObjectIntersectionOf) ontologyIndex
+				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts
+				.contains(ontologyIndex.getIndexedClassExpression(heart.get())));
+		assertTrue(((IndexedObjectIntersectionOf) ontologyIndex
+				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts
+				.contains(ontologyIndex.getIndexedClassExpression(organ.get())));
+		assertTrue(ontologyIndex.getIndexedClassExpression(human.get()).superClassExpressions
+				.contains(ontologyIndex.getIndexedClassExpression(hasHeartAndOrgan.get())));
+		assertTrue(ontologyIndex.getIndexedClassExpression(heart.get()).negConjunctionsByConjunct == null);
 
 		indexingManager.submit(constructor.getFutureElkEquivalentClassesAxiom(
 				human, hasHeartAndOrgan));
 		indexingManager.waitCompletion();
 
-		assertTrue(((IndexedObjectIntersectionOf) index.getIndexed(heartAndOrgan.get())).conjuncts
-				.size() == 2);
-		assertFalse(index.getIndexed(heart.get()).negConjunctionsByConjunct
+		assertTrue(((IndexedObjectIntersectionOf) ontologyIndex
+				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts.size() == 2);
+		assertFalse(ontologyIndex.getIndexedClassExpression(heart.get()).negConjunctionsByConjunct
 				.isEmpty());
-		assertNotSame(index.getIndexed(human.get()),
-				index.getIndexed(hasHeartAndOrgan.get()));
+		assertNotSame(ontologyIndex.getIndexedClassExpression(human.get()),
+				ontologyIndex.getIndexedClassExpression(hasHeartAndOrgan.get()));
 
 		executor.shutdown();
 	}

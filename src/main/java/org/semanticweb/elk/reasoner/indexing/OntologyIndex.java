@@ -20,27 +20,26 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * @author Yevgeny Kazakov, May 13, 2011
+ */
 package org.semanticweb.elk.reasoner.indexing;
 
-import org.semanticweb.elk.syntax.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
-import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 
-public class ObjectPropertyExpressionIndexer implements
-		ElkObjectPropertyExpressionVisitor<IndexedObjectProperty> {
-	
-	protected AxiomIndexer axiomIndexer;
-	
-	public ObjectPropertyExpressionIndexer(AxiomIndexer axiomIndexer) {
-		this.axiomIndexer = axiomIndexer;
-	}
+/**
+ * Interface providing read-only to the index of the ontology.
+ * 
+ * @author Yevgeny Kazakov
+ * 
+ */
+public interface OntologyIndex {
 
-	public IndexedObjectProperty visit(ElkObjectProperty elkObjectProperty) {
-		return axiomIndexer.ontologyIndex.getCreateIndexedObjectProperty(elkObjectProperty);
-	}
+	IndexedClassExpression getIndexedClassExpression(ElkClassExpression representative);
 
-	public IndexedObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
-		throw new UnsupportedOperationException("Not supported");
-	}
+	IndexedObjectProperty getIndexedObjectProperty(ElkObjectProperty representative);
+
+	public Iterable<IndexedClassExpression> getIndexedClassExpressions();
 
 }

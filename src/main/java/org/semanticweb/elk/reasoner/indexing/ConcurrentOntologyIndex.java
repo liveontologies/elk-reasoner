@@ -25,9 +25,13 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
@@ -36,22 +40,50 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
  * @author Yevgeny Kazakov
  * 
  */
-public class ConcurrentIndex implements Index {
+public class ConcurrentOntologyIndex implements OntologyIndexComputation {
+
+	// indexer for axioms
+	private final AxiomIndexer axiomIndexer;
 
 	protected final ConcurrentMap<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
 	protected final ConcurrentMap<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
 
-	public ConcurrentIndex() {
+	public ConcurrentOntologyIndex() {
+		this.axiomIndexer = new AxiomIndexer(this);
+
 		indexedClassExpressionLookup = new ConcurrentHashMap<ElkClassExpression, IndexedClassExpression>();
 		indexedObjectPropertyLookup = new ConcurrentHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>();
 	}
 
+	public void addTarget(Future<? extends ElkAxiom> futureAxiom) {
+		try {
+			futureAxiom.get().accept(axiomIndexer);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-	public IndexedClassExpression getIndexed(ElkClassExpression classExpression) {
+	public IndexedClassExpression getIndexedClassExpression(
+			ElkClassExpression classExpression) {
+		return indexedClassExpressionLookup.get(classExpression);
+	}
+
+	public IndexedObjectProperty getIndexedObjectProperty(
+			ElkObjectProperty objectProperty) {
+		return indexedObjectPropertyLookup.get(objectProperty);
+	}
+
+	public IndexedClassExpression getCreateIndexedClassExpression(
+			ElkClassExpression classExpression) {
 		IndexedClassExpression indexedClassExpression = indexedClassExpressionLookup
 				.get(classExpression);
 		if (indexedClassExpression == null) {
-			indexedClassExpression = IndexedClassExpression.create(classExpression);
+			indexedClassExpression = IndexedClassExpression
+					.create(classExpression);
 			IndexedClassExpression previous = indexedClassExpressionLookup
 					.putIfAbsent(classExpression, indexedClassExpression);
 			if (previous != null)
@@ -60,13 +92,14 @@ public class ConcurrentIndex implements Index {
 		return indexedClassExpression;
 	}
 
-	public IndexedObjectProperty getIndexed(ElkObjectProperty ope) {
+	public IndexedObjectProperty getCreateIndexedObjectProperty(
+			ElkObjectProperty objectProperty) {
 		IndexedObjectProperty indexedObjectProperty = indexedObjectPropertyLookup
-				.get(ope);
+				.get(objectProperty);
 		if (indexedObjectProperty == null) {
-			indexedObjectProperty = new IndexedObjectProperty(ope);
+			indexedObjectProperty = new IndexedObjectProperty(objectProperty);
 			IndexedObjectProperty previous = indexedObjectPropertyLookup
-					.putIfAbsent(ope, indexedObjectProperty);
+					.putIfAbsent(objectProperty, indexedObjectProperty);
 			if (previous != null)
 				return (previous);
 		}
@@ -78,8 +111,8 @@ public class ConcurrentIndex implements Index {
 			iop.computeSubAndSuperProperties();
 	}
 
-	
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
-		return indexedClassExpressionLookup.values();
+		return Collections.unmodifiableCollection(indexedClassExpressionLookup
+				.values());
 	}
 }

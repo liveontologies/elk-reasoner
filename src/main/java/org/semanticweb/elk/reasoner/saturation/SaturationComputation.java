@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,25 +21,23 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, May 13, 2011
+ * @author Yevgeny Kazakov, Jun 4, 2011
  */
-package org.semanticweb.elk.reasoner.indexing;
+package org.semanticweb.elk.reasoner.saturation;
 
-import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.syntax.ElkObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 
 /**
+ * Interface for controlling the process of computation for a saturation. It
+ * should be visible only within this package.
+ * 
  * @author Yevgeny Kazakov
  * 
  */
-public interface Index {
+interface SaturationComputation extends Saturation {
 
-	IndexedClassExpression getIndexed(ElkClassExpression classExpression);
+	void addTarget(IndexedClassExpression root);
 
-	IndexedObjectProperty getIndexed(ElkObjectProperty objectProperty);
-	
-	void computeRoleHierarchy();
-
-	public Iterable<IndexedClassExpression> getIndexedClassExpressions();
+	void compute();
 
 }

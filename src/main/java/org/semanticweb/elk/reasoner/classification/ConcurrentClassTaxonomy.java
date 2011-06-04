@@ -35,8 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
-import org.semanticweb.elk.reasoner.indexing.Index;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.Context;
 import org.semanticweb.elk.reasoner.saturation.Saturation;
 import org.semanticweb.elk.syntax.ElkClass;
@@ -48,13 +48,14 @@ import org.semanticweb.elk.util.Pair;
  * 
  * @author Yevgeny Kazakov
  */
-public class ConcurrentClassTaxonomy implements ClassTaxonomy {
+class ConcurrentClassTaxonomy implements ClassTaxonomy,
+		ClassTaxonomyComputation {
 
 	/**
 	 * The Index that associates ElkClasses to IndexedClassExpression of a
 	 * saturation.
 	 */
-	private Index index;
+	private OntologyIndex ontologyIndex;
 
 	/**
 	 * The Saturation on which the class hierarchy is based.
@@ -82,18 +83,22 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 	 * Constructor. Note that it is not checked that the given Saturation object
 	 * is actually saturated.
 	 * 
-	 * @param index
+	 * @param ontologyIndex
 	 *            that is used to associate ElkClasses to
 	 *            IndexedClassExpressions
 	 * @param saturation
 	 *            based on which the hierarchy is computed
 	 */
-	public ConcurrentClassTaxonomy(Index index, Saturation saturation) {
-		this.index = index;
+	ConcurrentClassTaxonomy(OntologyIndex ontologyIndex, Saturation saturation) {
+		this.ontologyIndex = ontologyIndex;
 		this.saturation = saturation;
 		this.nodeLookup = new ConcurrentHashMap<ElkClass, ClassNode>();
 		this.assignParentsQueue = new ConcurrentLinkedQueue<Pair<ClassNode, Collection<Context>>>();
 		this.activeNodes = new ConcurrentLinkedQueue<ClassNode>();
+	}
+
+	public void addTarget(ElkClass target) {
+		getNode(target);
 	}
 
 	public Collection<ClassNode> getNodes() {
@@ -121,7 +126,7 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 
 		// Equivalent ElkClass with the smallest hash (may change below)
 		ElkClass canonical = elkClass;
-		IndexedClassExpression root = index.getIndexed(elkClass);
+		IndexedClassExpression root = ontologyIndex.getIndexedClassExpression(elkClass);
 		Context rootContext = saturation.getContext(root);
 
 		// Classes equivalent to elkClass
@@ -138,9 +143,8 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 						.getDerived();
 				if (derivedDerived.contains(root)) {
 					equivalent.add(derivedClass);
-					// Uses that hash codes for members of ElkClass are globally
-					// unique!
-					if (derivedClass.hashCode() < canonical.hashCode()) {
+					// Uses that ElkClass is uniquely identified by its iri
+					if (derivedClass.getIri().compareTo(canonical.getIri()) < 0) {
 						canonical = derivedClass;
 					}
 				} else {
@@ -222,11 +226,10 @@ public class ConcurrentClassTaxonomy implements ClassTaxonomy {
 			Pair<ClassNode, Collection<Context>> parentAssignment = assignParentsQueue
 					.poll();
 			if (parentAssignment != null) {
-				assignParents(parentAssignment.getFirst(), parentAssignment
-						.getSecond());
+				assignParents(parentAssignment.getFirst(),
+						parentAssignment.getSecond());
 				continue;
 			}
-
 			break;
 		}
 	}

@@ -29,14 +29,19 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 
 /**
  * @author Yevgeny Kazakov
- *
+ * 
  */
 public interface Saturation {
-	
-	void addTarget(IndexedClassExpression root);
-	
-	void compute();
-	
-	Context getContext(IndexedClassExpression root);	
+
+	/**
+	 * Returns a context which has as root the given indexed class expression,
+	 * or <tt>null</tt> if such context does not exist.
+	 * 
+	 * @param root
+	 *            the input indexed class expression for which to return the
+	 *            context having it as a root
+	 * @return context which root is the input indexed class expression.
+	 */
+	Context getContext(IndexedClassExpression root);
 
 }
