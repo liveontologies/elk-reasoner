@@ -24,25 +24,31 @@ package org.semanticweb.elk.syntax;
 
 import java.util.List;
 
+
 public class ElkObjectPropertyChain extends ElkObject {
 
+	private static final int constructorHash_ = "ElkObjectPropertyChain"
+		.hashCode();
+	
 	protected final List<? extends ElkObjectPropertyExpression> objectPropertyExpressions;
-	
-	private ElkObjectPropertyChain(List<? extends ElkObjectPropertyExpression>
-								objectPropertyExpressions) {
+
+	private ElkObjectPropertyChain(
+			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
 		this.objectPropertyExpressions = objectPropertyExpressions;
+		this.structuralHashCode = ElkObject.computeCompositeHash(constructorHash_,
+				objectPropertyExpressions);
 	}
-	
-	public static ElkObjectPropertyChain create(List<? extends ElkObjectPropertyExpression>
-								objectPropertyExpressions) {
-		return (ElkObjectPropertyChain) factory.put(
-				new ElkObjectPropertyChain(objectPropertyExpressions));	
+
+	public static ElkObjectPropertyChain create(
+			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
+		return (ElkObjectPropertyChain) factory.put(new ElkObjectPropertyChain(
+				objectPropertyExpressions));
 	}
-	
+
 	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions() {
 		return objectPropertyExpressions;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder("ObjectPropertyChain(");
@@ -50,31 +56,23 @@ public class ElkObjectPropertyChain extends ElkObject {
 			result.append(ope.toString());
 			result.append(" ");
 		}
-		result.setCharAt(result.length()-1, ')');
+		result.setCharAt(result.length() - 1, ')');
 		return result.toString();
 	}
-	
-	
+
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
-	@Override
-	public int structuralHashCode() {
-		return computeCompositeHash(constructorHash_, objectPropertyExpressions);
-	}
-	
-	private static final int constructorHash_ = "ElkObjectPropertyChain".hashCode();
-	
 	public boolean structuralEquals(ElkObject object) {
 		if (this == object)
 			return true;
-		
+
 		if (object instanceof ElkObjectPropertyChain)
-			return objectPropertyExpressions.equals(
-					((ElkObjectPropertyChain) object).objectPropertyExpressions);		
-		
+			return objectPropertyExpressions
+					.equals(((ElkObjectPropertyChain) object).objectPropertyExpressions);
+
 		return false;
 	}
 }

@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.util.HashGenerator;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Object_Subproperties">Object Subproperty
@@ -35,14 +37,18 @@ package org.semanticweb.elk.syntax;
  */
 public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 	protected final ElkObjectPropertyExpression subObjectPropertyExpression,
-											superObjectPropertyExpression;
-	
+			superObjectPropertyExpression;
+
+	private static final int constructorHash_ = "ElkSubObjectPropertyOfAxiom"
+			.hashCode();
+
 	private ElkSubObjectPropertyOfAxiom(
 			ElkObjectPropertyExpression subObjectPropertyExpression,
-			ElkObjectPropertyExpression superObjectPropertyExpression)
-	{
+			ElkObjectPropertyExpression superObjectPropertyExpression) {
 		this.subObjectPropertyExpression = subObjectPropertyExpression;
 		this.superObjectPropertyExpression = superObjectPropertyExpression;
+		this.structuralHashCode = HashGenerator.computeListHash(constructorHash_,
+				subObjectPropertyExpression, superObjectPropertyExpression);
 	}
 
 	public ElkObjectPropertyExpression getSubObjectPropertyExpression() {
@@ -55,13 +61,13 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 
 	public static ElkSubObjectPropertyOfAxiom create(
 			ElkObjectPropertyExpression subObjectPropertyExpression,
-			ElkObjectPropertyExpression superObjectPropertyExpression)
-	{ 
-		return (ElkSubObjectPropertyOfAxiom) factory.put(
-				new ElkSubObjectPropertyOfAxiom(subObjectPropertyExpression,
-												superObjectPropertyExpression));		
+			ElkObjectPropertyExpression superObjectPropertyExpression) {
+		return (ElkSubObjectPropertyOfAxiom) factory
+				.put(new ElkSubObjectPropertyOfAxiom(
+						subObjectPropertyExpression,
+						superObjectPropertyExpression));
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder("SubObjectPropertyOf(");
@@ -72,41 +78,26 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 		return result.toString();
 	}
 
-	
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		return computeCompositeHash(constructorHash_,
-									subObjectPropertyExpression,
-									superObjectPropertyExpression);
-	}
-	
-	private static final int constructorHash_ = "ElkSubObjectPropertyOfAxiom".hashCode();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
+	 * @see
+	 * org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
 	 */
 	@Override
 	public boolean structuralEquals(ElkObject object) {
 		if (this == object)
 			return true;
-		
+
 		if (object instanceof ElkSubObjectPropertyOfAxiom)
-			return subObjectPropertyExpression.equals(
-				((ElkSubObjectPropertyOfAxiom) object).subObjectPropertyExpression)
-				&& superObjectPropertyExpression.equals(
-				((ElkSubObjectPropertyOfAxiom) object).superObjectPropertyExpression);
-		
+			return subObjectPropertyExpression
+					.equals(((ElkSubObjectPropertyOfAxiom) object).subObjectPropertyExpression)
+					&& superObjectPropertyExpression
+							.equals(((ElkSubObjectPropertyOfAxiom) object).superObjectPropertyExpression);
+
 		return false;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

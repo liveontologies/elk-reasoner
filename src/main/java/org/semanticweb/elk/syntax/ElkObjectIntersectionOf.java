@@ -28,6 +28,7 @@ package org.semanticweb.elk.syntax;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
@@ -38,11 +39,16 @@ import java.util.List;
  */
 public class ElkObjectIntersectionOf extends ElkClassExpression {
 
+	private static final int constructorHash_ = "ElkObjectIntersectionOf"
+		.hashCode();
+	
 	protected final List<? extends ElkClassExpression> classExpressions;
 
 	private ElkObjectIntersectionOf(
 			List<? extends ElkClassExpression> classExpressions) {
 		this.classExpressions = classExpressions;
+		this.structuralHashCode = ElkObject.computeCompositeHash(constructorHash_,
+				classExpressions);
 	}
 
 	public static ElkObjectIntersectionOf create(
@@ -79,19 +85,6 @@ public class ElkObjectIntersectionOf extends ElkClassExpression {
 		result.setCharAt(result.length() - 1, ')');
 		return result.toString();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		return computeCompositeHash(constructorHash_, classExpressions);
-	}
-
-	private static final int constructorHash_ = "ElkObjectIntersectionOf"
-			.hashCode();
 
 	/*
 	 * (non-Javadoc)

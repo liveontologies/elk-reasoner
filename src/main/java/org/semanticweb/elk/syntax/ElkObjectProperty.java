@@ -39,6 +39,7 @@ public class ElkObjectProperty extends ElkObjectPropertyExpression {
 
 	protected ElkObjectProperty(String iri) {
 		this.iri = iri;
+		this.structuralHashCode = iri.hashCode();
 	}
 	
 	public static ElkObjectProperty create(String objectPropertyIri) {
@@ -63,17 +64,6 @@ public class ElkObjectProperty extends ElkObjectPropertyExpression {
 	@Override
 	public String toString() {
 		return iri;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		return iri.hashCode();
 	}
 
 	/*

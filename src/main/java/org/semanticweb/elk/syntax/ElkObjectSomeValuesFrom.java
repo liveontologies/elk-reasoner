@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.util.HashGenerator;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Existential_Quantification">Existential
@@ -38,31 +40,34 @@ public class ElkObjectSomeValuesFrom extends ElkClassExpression {
 	protected final ElkObjectPropertyExpression objectPropertyExpression;
 	protected final ElkClassExpression classExpression;
 
+	private static final int constructorHash_ = "ElkObjectSomeValuesFrom"
+			.hashCode();
+
 	private ElkObjectSomeValuesFrom(
 			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression)
-	{
+			ElkClassExpression classExpression) {
 		this.objectPropertyExpression = objectPropertyExpression;
 		this.classExpression = classExpression;
+		this.structuralHashCode = HashGenerator.computeListHash(constructorHash_,
+				objectPropertyExpression, classExpression);
 	}
-	
+
 	public static ElkObjectSomeValuesFrom create(
-					ElkObjectPropertyExpression objectPropertyExpression,
-					ElkClassExpression classExpression)
-	{
-		return (ElkObjectSomeValuesFrom) factory.put(
-				new ElkObjectSomeValuesFrom(objectPropertyExpression,
-											classExpression));		
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkClassExpression classExpression) {
+		return (ElkObjectSomeValuesFrom) factory
+				.put(new ElkObjectSomeValuesFrom(objectPropertyExpression,
+						classExpression));
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
 		return objectPropertyExpression;
 	}
-	
+
 	public ElkClassExpression getClassExpression() {
 		return classExpression;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder("ObjectSomeValuesFrom(");
@@ -73,39 +78,26 @@ public class ElkObjectSomeValuesFrom extends ElkClassExpression {
 		return result.toString();
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		return computeCompositeHash(constructorHash_,
-									objectPropertyExpression, classExpression);
-	}
-	
-	private static final int constructorHash_ = "ElkObjectSomeValuesFrom".hashCode();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
+	 * @see
+	 * org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
 	 */
 	@Override
 	public boolean structuralEquals(ElkObject object) {
 		if (this == object)
 			return true;
-		
+
 		if (object instanceof ElkObjectSomeValuesFrom)
-			return objectPropertyExpression.equals(
-					((ElkObjectSomeValuesFrom) object).objectPropertyExpression)
-				&& classExpression.equals(
-					((ElkObjectSomeValuesFrom) object).classExpression);	
-		
+			return objectPropertyExpression
+					.equals(((ElkObjectSomeValuesFrom) object).objectPropertyExpression)
+					&& classExpression
+							.equals(((ElkObjectSomeValuesFrom) object).classExpression);
+
 		return false;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
