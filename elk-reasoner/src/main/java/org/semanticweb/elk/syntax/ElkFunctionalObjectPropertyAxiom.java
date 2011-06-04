@@ -34,7 +34,7 @@ package org.semanticweb.elk.syntax;
  * 
  */
 public class ElkFunctionalObjectPropertyAxiom extends ElkObjectPropertyAxiom {
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -47,15 +47,6 @@ public class ElkFunctionalObjectPropertyAxiom extends ElkObjectPropertyAxiom {
 
 		return visitor.visit(this);
 
-	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	/* (non-Javadoc)

@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.util.HashGenerator;
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Subclass_Axioms">Subclass Axiom<a> in the
@@ -35,13 +37,17 @@ package org.semanticweb.elk.syntax;
  */
 public class ElkSubClassOfAxiom extends ElkClassAxiom {
 
-	protected final ElkClassExpression subClassExpression, superClassExpression;
-	
-	private ElkSubClassOfAxiom(	ElkClassExpression subClassExpression,
-								ElkClassExpression superClassExpression)
-	{
+	protected final ElkClassExpression subClassExpression,
+			superClassExpression;
+
+	private static final int constructorHash_ = "ElkSubClassOfAxiom".hashCode();
+
+	private ElkSubClassOfAxiom(ElkClassExpression subClassExpression,
+			ElkClassExpression superClassExpression) {
 		this.subClassExpression = subClassExpression;
 		this.superClassExpression = superClassExpression;
+		this.structuralHashCode = HashGenerator.computeListHash(constructorHash_,
+				subClassExpression, superClassExpression);
 	}
 
 	public ElkClassExpression getSubClassExpression() {
@@ -54,10 +60,9 @@ public class ElkSubClassOfAxiom extends ElkClassAxiom {
 
 	public static ElkSubClassOfAxiom create(
 			ElkClassExpression subClassExpression,
-			ElkClassExpression superClassExpression)
-	{ 
-		return (ElkSubClassOfAxiom) factory.put(
-				new ElkSubClassOfAxiom(subClassExpression, superClassExpression));		
+			ElkClassExpression superClassExpression) {
+		return (ElkSubClassOfAxiom) factory.put(new ElkSubClassOfAxiom(
+				subClassExpression, superClassExpression));
 	}
 
 	@Override
@@ -69,39 +74,27 @@ public class ElkSubClassOfAxiom extends ElkClassAxiom {
 		result.append(")");
 		return result.toString();
 	}
-	
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		return computeCompositeHash(constructorHash_,
-									subClassExpression, superClassExpression);
-	}
-	
-	private static final int constructorHash_ = "ElkSubClassOfAxiom".hashCode();
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
+	 * @see
+	 * org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
 	 */
 	@Override
 	public boolean structuralEquals(ElkObject object) {
 		if (this == object)
 			return true;
-		
+
 		if (object instanceof ElkSubClassOfAxiom)
-			return subClassExpression.equals(
-					((ElkSubClassOfAxiom) object).subClassExpression)
-				&& superClassExpression.equals(
-						((ElkSubClassOfAxiom) object).superClassExpression);
-		
+			return subClassExpression
+					.equals(((ElkSubClassOfAxiom) object).subClassExpression)
+					&& superClassExpression
+							.equals(((ElkSubClassOfAxiom) object).superClassExpression);
+
 		return false;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

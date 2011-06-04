@@ -50,4 +50,74 @@ public class HashGenerator {
 		h ^= (h >>> 20) ^ (h >>> 12);
 		return h ^ (h >>> 7) ^ (h >>> 4);
 	}
+
+	/**
+	 * Compute a hash code from an initial hash code and a list of objects that
+	 * supply further hashes. The computed hash takes the order of inputs into
+	 * account.
+	 * 
+	 * @param initialHash
+	 * @param hashObjects
+	 * @return
+	 */
+	public static int computeListHash(int initialHash,
+			StructuralHashObject... hashObjects) {
+		int hash = initialHash;
+		hash += (hash << 10);
+		hash ^= (hash >> 6);
+
+		for (StructuralHashObject o : hashObjects) {
+			hash += o.structuralHashCode();
+			hash += (hash << 10);
+			hash ^= (hash >> 6);
+		}
+
+		hash += (hash << 3);
+		hash ^= (hash >> 11);
+		hash += (hash << 15);
+		return hash;
+	}
+
+	/**
+	 * Compute a hash code from an initial hash code and a list of objects that
+	 * supply further hashes. The computed hash does not depend on the order of
+	 * the list, but is combined with the initialHash in an order-dependent way.
+	 * 
+	 * @param initialHash
+	 * @param hashObjects
+	 * @return
+	 */
+	public static int computeSetHash(int initialHash,
+			StructuralHashObject... hashObjects) {
+		int hash = initialHash;
+		hash += (hash << 10);
+		hash ^= (hash >> 6);
+
+		int setHash = 0;
+		for (StructuralHashObject o : hashObjects) {
+			setHash ^= o.structuralHashCode();
+		}
+
+		hash += setHash;
+		hash += (hash << 10);
+		hash ^= (hash >> 6);
+
+		hash += (hash << 3);
+		hash ^= (hash >> 11);
+		hash += (hash << 15);
+		return hash;
+	}
+
+	/**
+	 * Combine two hash codes into one in a way that does not depend on their
+	 * order.
+	 * 
+	 * @param hash1
+	 * @param hash2
+	 * @return
+	 */
+	public static int combineSetHash(int hash1, int hash2) {
+		return hash1 ^ hash2;
+	}
+
 }

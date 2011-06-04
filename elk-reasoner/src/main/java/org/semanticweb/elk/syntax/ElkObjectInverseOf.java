@@ -49,15 +49,6 @@ public class ElkObjectInverseOf extends ElkObjectPropertyExpression {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
 	 */
 	@Override

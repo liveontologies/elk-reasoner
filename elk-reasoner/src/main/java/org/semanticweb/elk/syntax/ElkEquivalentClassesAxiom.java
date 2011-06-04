@@ -28,6 +28,7 @@ package org.semanticweb.elk.syntax;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Equivalent_Classes">Equivalent Class
@@ -38,11 +39,16 @@ import java.util.List;
  */
 public class ElkEquivalentClassesAxiom extends ElkClassAxiom {
 
+	private static final int constructorHash_ = "ElkEquivalentClassesAxiom"
+		.hashCode();
+	
 	protected final List<? extends ElkClassExpression> equivalentClassExpressions;
 
 	private ElkEquivalentClassesAxiom(
 			List<? extends ElkClassExpression> equivalentClassExpressions) {
 		this.equivalentClassExpressions = equivalentClassExpressions;
+		this.structuralHashCode = ElkObject.computeCompositeHash(constructorHash_,
+				equivalentClassExpressions);
 	}
 
 	public static ElkEquivalentClassesAxiom create(
@@ -79,20 +85,6 @@ public class ElkEquivalentClassesAxiom extends ElkClassAxiom {
 		result.setCharAt(result.length() - 1, ')');
 		return result.toString();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHhashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		return computeCompositeHash(constructorHash_,
-				equivalentClassExpressions);
-	}
-
-	private static final int constructorHash_ = "ElkEquivalentClassesAxiom"
-			.hashCode();
 
 	/*
 	 * (non-Javadoc)

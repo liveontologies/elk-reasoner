@@ -25,45 +25,30 @@
  */
 package org.semanticweb.elk.syntax;
 
+
 import java.util.List;
 
 import org.semanticweb.elk.util.HashGenerator;
+import org.semanticweb.elk.util.StructuralHashObject;
 
 /**
  * @author Yevgeny Kazakov
  * 
  */
 
-public abstract class ElkObject {
+public abstract class ElkObject implements StructuralHashObject {
 	protected static ElkObjectFactory factory = new WeakCanonicalSet();
 	
-	public abstract int structuralHashCode();
+	protected int structuralHashCode;
+
+	public final int structuralHashCode() {
+		return structuralHashCode;
+	}
 	
 	public abstract boolean structuralEquals(ElkObject object);
 	
-	private final int hashCode_ = HashGenerator.generateNextHashCode();;
+	private final int hashCode_ = HashGenerator.generateNextHashCode();
 	
-	public static int computeCompositeHash(int constructorHash, List<? extends ElkObject> subObjects) {
-		return computeCompositeHash(constructorHash, subObjects.toArray( new ElkObject[0] ));
-	}
-	
-	public static int computeCompositeHash(int constructorHash, ElkObject... subObjects) {
-		int hash = constructorHash;
-		hash += (hash << 10);
-		hash ^= (hash >> 6);
-		
-		for (ElkObject o : subObjects) {
-		   hash += o.hashCode();
-		   hash += (hash << 10);
-		   hash ^= (hash >> 6);
-		}
-		
-		hash += (hash << 3);
-		hash ^= (hash >> 11);
-		hash += (hash << 15);
-		return hash;
-	}
-				
 	public final int hashCode() {
 		return hashCode_;
 	}
@@ -73,4 +58,8 @@ public abstract class ElkObject {
 	}
 	
 	public abstract <O> O accept(ElkObjectVisitor<O> visitor);
+
+	public static int computeCompositeHash(int constructorHash, List<? extends StructuralHashObject> subObjects) {
+		return HashGenerator.computeListHash(constructorHash, subObjects.toArray( new ElkObject[0] ));
+	}
 }

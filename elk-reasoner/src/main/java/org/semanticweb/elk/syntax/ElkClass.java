@@ -37,8 +37,9 @@ public class ElkClass extends ElkClassExpression {
 
 	protected final String iri;
 
-	protected ElkClass(String iri) {
+	private ElkClass(String iri) {
 		this.iri = iri;
+		this.structuralHashCode = iri.hashCode();
 	}
 	
 	public static ElkClass create(String iri) {
@@ -63,16 +64,6 @@ public class ElkClass extends ElkClassExpression {
 	@Override
 	public String toString() {
 		return iri;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralHashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		return iri.hashCode();
 	}
 
 	/*

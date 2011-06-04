@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.util.HashGenerator;
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Transitive_Object_Properties">Transitive
@@ -34,25 +36,30 @@ package org.semanticweb.elk.syntax;
  * 
  */
 public class ElkTransitiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
-	
+
 	protected final ElkObjectPropertyExpression objectPropertyExpression;
-	
+
+	private static final int constructorHash_ = "ElkTransitiveObjectPropertyAxiom"
+			.hashCode();
+
 	protected ElkTransitiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		this.objectPropertyExpression = objectPropertyExpression;
+		this.structuralHashCode = HashGenerator.computeListHash(constructorHash_,
+				objectPropertyExpression);
 	}
-	
+
 	public static ElkTransitiveObjectPropertyAxiom create(
 			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkTransitiveObjectPropertyAxiom) factory.put(
-				new ElkTransitiveObjectPropertyAxiom(objectPropertyExpression));	
+		return (ElkTransitiveObjectPropertyAxiom) factory
+				.put(new ElkTransitiveObjectPropertyAxiom(
+						objectPropertyExpression));
 	}
-	
-	
+
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
 		return objectPropertyExpression;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder("TransitiveObjectProperty(");
@@ -75,28 +82,20 @@ public class ElkTransitiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.reasoner.ElkObject#hashCode()
-	 */
-	@Override
-	public int structuralHashCode() {
-		return computeCompositeHash(constructorHash_, objectPropertyExpression);
-	}
-	
-	private static final int constructorHash_ = "ElkTransitiveObjectPropertyAxiom".hashCode();
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean structuralEquals(ElkObject object) {
 		if (this == object)
 			return true;
-		
+
 		if (object instanceof ElkTransitiveObjectPropertyAxiom)
-			return objectPropertyExpression.equals(
-					((ElkTransitiveObjectPropertyAxiom) object).objectPropertyExpression);
-		
+			return objectPropertyExpression
+					.equals(((ElkTransitiveObjectPropertyAxiom) object).objectPropertyExpression);
+
 		return false;
 	}
 
