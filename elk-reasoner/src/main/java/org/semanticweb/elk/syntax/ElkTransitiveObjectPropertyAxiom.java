@@ -45,8 +45,9 @@ public class ElkTransitiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
 	protected ElkTransitiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		this.objectPropertyExpression = objectPropertyExpression;
-		this.structuralHashCode = HashGenerator.computeListHash(constructorHash_,
-				objectPropertyExpression);
+		this.structuralHashCode = HashGenerator
+				.combineListHash(constructorHash_, objectPropertyExpression
+						.structuralHashCode());
 	}
 
 	public static ElkTransitiveObjectPropertyAxiom create(

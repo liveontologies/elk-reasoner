@@ -46,8 +46,9 @@ public class ElkSubClassOfAxiom extends ElkClassAxiom {
 			ElkClassExpression superClassExpression) {
 		this.subClassExpression = subClassExpression;
 		this.superClassExpression = superClassExpression;
-		this.structuralHashCode = HashGenerator.computeListHash(constructorHash_,
-				subClassExpression, superClassExpression);
+		this.structuralHashCode = HashGenerator.combineListHash(
+				constructorHash_, subClassExpression.structuralHashCode(),
+				superClassExpression.structuralHashCode());
 	}
 
 	public ElkClassExpression getSubClassExpression() {

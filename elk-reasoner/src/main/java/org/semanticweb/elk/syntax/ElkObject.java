@@ -60,6 +60,6 @@ public abstract class ElkObject implements StructuralHashObject {
 	public abstract <O> O accept(ElkObjectVisitor<O> visitor);
 
 	public static int computeCompositeHash(int constructorHash, List<? extends StructuralHashObject> subObjects) {
-		return HashGenerator.computeListHash(constructorHash, subObjects.toArray( new ElkObject[0] ));
+		return HashGenerator.combineListHash(constructorHash, HashGenerator.combineListHash(subObjects));
 	}
 }
