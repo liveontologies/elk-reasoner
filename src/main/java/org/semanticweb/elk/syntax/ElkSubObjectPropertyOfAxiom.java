@@ -47,8 +47,10 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 			ElkObjectPropertyExpression superObjectPropertyExpression) {
 		this.subObjectPropertyExpression = subObjectPropertyExpression;
 		this.superObjectPropertyExpression = superObjectPropertyExpression;
-		this.structuralHashCode = HashGenerator.computeListHash(constructorHash_,
-				subObjectPropertyExpression, superObjectPropertyExpression);
+		this.structuralHashCode = HashGenerator.combineListHash(
+				constructorHash_, subObjectPropertyExpression
+						.structuralHashCode(), superObjectPropertyExpression
+						.structuralHashCode());
 	}
 
 	public ElkObjectPropertyExpression getSubObjectPropertyExpression() {

@@ -48,8 +48,10 @@ public class ElkObjectSomeValuesFrom extends ElkClassExpression {
 			ElkClassExpression classExpression) {
 		this.objectPropertyExpression = objectPropertyExpression;
 		this.classExpression = classExpression;
-		this.structuralHashCode = HashGenerator.computeListHash(constructorHash_,
-				objectPropertyExpression, classExpression);
+		this.structuralHashCode = HashGenerator.combineListHash(
+				constructorHash_,
+				objectPropertyExpression.structuralHashCode(), classExpression
+						.structuralHashCode());
 	}
 
 	public static ElkObjectSomeValuesFrom create(

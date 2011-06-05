@@ -25,6 +25,9 @@
  */
 package org.semanticweb.elk.util;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Class used to generate strong hash codes for newly created objects.
  * 
@@ -52,72 +55,75 @@ public class HashGenerator {
 	}
 
 	/**
-	 * Compute a hash code from an initial hash code and a list of objects that
-	 * supply further hashes. The computed hash takes the order of inputs into
-	 * account.
+	 * Combine many hash codes into one in a way that does not depend on their
+	 * order.
 	 * 
-	 * @param initialHash
+	 * @param hashes
+	 * @return
+	 */
+	public static int combineSetHash(int... hashes) {
+		int hash = 0;
+		for (int h : hashes) {
+			hash = hash ^ h;
+		}
+		return hash;
+	}
+
+	/**
+	 * Combine the hash codes of a collection of structural hash objects into
+	 * one in a way that does not depend on their order.
+	 * 
 	 * @param hashObjects
 	 * @return
 	 */
-	public static int computeListHash(int initialHash,
-			StructuralHashObject... hashObjects) {
-		int hash = initialHash;
-		hash += (hash << 10);
-		hash ^= (hash >> 6);
+	public static int combineSetHash(
+			Collection<? extends StructuralHashObject> hashObjects) {
+		int hash = 0;
+		for (StructuralHashObject o : hashObjects) {
+			hash ^= o.structuralHashCode();
+		}
+		return hash;
+	}
 
+	/**
+	 * Combine many hash codes into one in a way that depends on their order.
+	 * 
+	 * @param hashes
+	 * @return
+	 */
+	public static int combineListHash(int... hashes) {
+		int hash = 0;
+		for (int h : hashes) {
+			hash += h;
+			hash += (hash << 10);
+			hash ^= (hash >> 6);
+		}
+		hash += (hash << 3);
+		hash ^= (hash >> 11);
+		hash += (hash << 15);
+
+		return hash;
+	}
+	
+	/**
+	 * Combine the hash codes of a collection of structural hash objects into
+	 * one in a way that depends on their order.
+	 * 
+	 * @param hashObjects
+	 * @return
+	 */
+	public static int combineListHash(
+			List<? extends StructuralHashObject> hashObjects) {
+		int hash = 0;
 		for (StructuralHashObject o : hashObjects) {
 			hash += o.structuralHashCode();
 			hash += (hash << 10);
 			hash ^= (hash >> 6);
 		}
-
 		hash += (hash << 3);
 		hash ^= (hash >> 11);
 		hash += (hash << 15);
 		return hash;
-	}
-
-	/**
-	 * Compute a hash code from an initial hash code and a list of objects that
-	 * supply further hashes. The computed hash does not depend on the order of
-	 * the list, but is combined with the initialHash in an order-dependent way.
-	 * 
-	 * @param initialHash
-	 * @param hashObjects
-	 * @return
-	 */
-	public static int computeSetHash(int initialHash,
-			StructuralHashObject... hashObjects) {
-		int hash = initialHash;
-		hash += (hash << 10);
-		hash ^= (hash >> 6);
-
-		int setHash = 0;
-		for (StructuralHashObject o : hashObjects) {
-			setHash ^= o.structuralHashCode();
-		}
-
-		hash += setHash;
-		hash += (hash << 10);
-		hash ^= (hash >> 6);
-
-		hash += (hash << 3);
-		hash ^= (hash >> 11);
-		hash += (hash << 15);
-		return hash;
-	}
-
-	/**
-	 * Combine two hash codes into one in a way that does not depend on their
-	 * order.
-	 * 
-	 * @param hash1
-	 * @param hash2
-	 * @return
-	 */
-	public static int combineSetHash(int hash1, int hash2) {
-		return hash1 ^ hash2;
 	}
 
 }
