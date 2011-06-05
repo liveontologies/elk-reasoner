@@ -55,8 +55,10 @@ public class HashGenerator {
 	}
 
 	/**
-	 * Combine many hash codes into one in a way that does not depend on their
-	 * order.
+	 * Combine many hash codes with an associative commutative hash function.
+	 * Associativity ensures that the result of this functions can be further
+	 * combined with other hash codes for getting the same result as if all hash
+	 * codes had been combined in one step.
 	 * 
 	 * @param hashes
 	 * @return
@@ -64,14 +66,17 @@ public class HashGenerator {
 	public static int combineSetHash(int... hashes) {
 		int hash = 0;
 		for (int h : hashes) {
-			hash = hash ^ h;
+			hash = hash + h;
 		}
 		return hash;
 	}
 
 	/**
-	 * Combine the hash codes of a collection of structural hash objects into
-	 * one in a way that does not depend on their order.
+	 * Combine the hash codes of a collection of structural hash objects with an
+	 * associative commutative hash function. Associativity ensures that the
+	 * result of this functions can be further combined with other hash codes
+	 * for getting the same result as if all hash codes had been combined in one
+	 * step.
 	 * 
 	 * @param hashObjects
 	 * @return
@@ -80,7 +85,7 @@ public class HashGenerator {
 			Collection<? extends StructuralHashObject> hashObjects) {
 		int hash = 0;
 		for (StructuralHashObject o : hashObjects) {
-			hash ^= o.structuralHashCode();
+			hash += o.structuralHashCode();
 		}
 		return hash;
 	}
@@ -104,7 +109,7 @@ public class HashGenerator {
 
 		return hash;
 	}
-	
+
 	/**
 	 * Combine the hash codes of a collection of structural hash objects into
 	 * one in a way that depends on their order.
