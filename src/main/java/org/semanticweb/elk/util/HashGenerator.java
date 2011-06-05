@@ -40,7 +40,7 @@ public class HashGenerator {
 	 * The counter incremented with each generated hash code which will be used
 	 * for generating a hash code
 	 */
-	static int counter = 0;
+	private static int counter = 0;
 
 	/**
 	 * Generates the next hash code.
