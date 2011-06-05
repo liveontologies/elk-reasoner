@@ -29,23 +29,32 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Class used to generate strong hash codes for newly created objects.
+ * Class used to generate strong hash codes for newly created objects, and for
+ * combining multiple hash codes into new ones in various ways.
  * 
  * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public class HashGenerator {
 
 	/**
 	 * The counter incremented with each generated hash code which will be used
-	 * for generating a hash code
+	 * for generating a hash code by generateNextHashCode().
 	 */
 	private static int counter = 0;
 
 	/**
-	 * Generates the next hash code.
+	 * Generate a new "hash code" integer. Consecutive calls to this method
+	 * create a sequence of integers with near-uniform distribution. These codes
+	 * may be used as hash codes for objects that are managed in such a way that
+	 * no two objects of different content can occur. Different hash codes then
+	 * guarantee that the objects are not equal, even if the hash code does is
+	 * not based on the hashed object at all. Obviously, hash codes of this form
+	 * are not stable over multiple runs of the program, and can therefore not
+	 * be used for comparing objects across runs (e.g. in testing). However,
+	 * they can be useful in hash-based data structures.
 	 * 
-	 * @return the generated hash code.
+	 * @return the generated hash code
 	 */
 	public static int generateNextHashCode() {
 		// we use a strategy from the java.util.HashMap
@@ -93,6 +102,10 @@ public class HashGenerator {
 	/**
 	 * Combine many hash codes into one in a way that depends on their order.
 	 * 
+	 * The current implementation is based on the Jenkins One-at-a-Time hash,
+	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
+	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
+	 * 
 	 * @param hashes
 	 * @return
 	 */
@@ -113,6 +126,10 @@ public class HashGenerator {
 	/**
 	 * Combine the hash codes of a collection of structural hash objects into
 	 * one in a way that depends on their order.
+	 * 
+	 * The current implementation is based on the Jenkins One-at-a-Time hash,
+	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
+	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
 	 * 
 	 * @param hashObjects
 	 * @return
