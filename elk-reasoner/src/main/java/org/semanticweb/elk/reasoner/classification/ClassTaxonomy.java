@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.classification;
 import java.util.Collection;
 
 import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.util.StructuralHashObject;
 
 /**
  * Classes that implement this interface represent a class hierarchy based on
@@ -36,7 +37,7 @@ import org.semanticweb.elk.syntax.ElkClass;
  * 
  * @author Yevgeny Kazakov
  */
-public interface ClassTaxonomy {
+public interface ClassTaxonomy extends StructuralHashObject {
 
 	public ClassNode getNode(ElkClass elkClass);
 	

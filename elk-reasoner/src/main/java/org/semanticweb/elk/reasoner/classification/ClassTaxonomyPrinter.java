@@ -26,8 +26,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -77,12 +75,10 @@ public class ClassTaxonomyPrinter {
 	 */
 	public static void dumpClassTaxomomy(ClassTaxonomy classTaxonomy,
 			Writer writer, boolean addHash) throws IOException {
+		processClassTaxomomy(classTaxonomy, writer);
 		if (addHash) {
-			String hash = processClassTaxomomy(classTaxonomy, writer,
-					getMessageDigest());
-			writer.write("\n\n# Hash code: " + hash + "\n");
-		} else {
-			processClassTaxomomy(classTaxonomy, writer, null);
+			writer.write("\n\n# Hash code: " + getHashString(classTaxonomy)
+					+ "\n");
 		}
 	}
 
@@ -96,26 +92,18 @@ public class ClassTaxonomyPrinter {
 	 * @return hash string
 	 */
 	public static String getHashString(ClassTaxonomy classTaxonomy) {
-		try {
-			return processClassTaxomomy(classTaxonomy, null, getMessageDigest());
-		} catch (IOException e) {
-			assert (false);
-			return "";
-		}
+		return Integer.toHexString(classTaxonomy.structuralHashCode());
 	}
 
 	/**
-	 * Process a taxonomy and write a normalized serialization or build a hash
-	 * string, depending on the given parameters.
+	 * Process a taxonomy and write a normalized serialization.
 	 * 
 	 * @param classTaxonomy
 	 * @param writer
-	 * @param messageDigest
-	 * @return
 	 * @throws IOException
 	 */
-	protected static String processClassTaxomomy(ClassTaxonomy classTaxonomy,
-			Writer writer, MessageDigest messageDigest) throws IOException {
+	protected static void processClassTaxomomy(ClassTaxonomy classTaxonomy,
+			Writer writer) throws IOException {
 		TreeMap<String, ElkClass> orderedElkClasses = new TreeMap<String, ElkClass>();
 		HashMap<ElkClass, ElkClass> firstElkClasses = new HashMap<ElkClass, ElkClass>();
 		TreeMap<String, ElkClass> orderedEquivalentClasses = new TreeMap<String, ElkClass>();
@@ -150,99 +138,36 @@ public class ClassTaxonomyPrinter {
 			}
 
 			processClassAxioms(elkClass, orderedEquivalentClasses,
-					orderedSubClasses, writer, messageDigest);
+					orderedSubClasses, writer);
 		}
 
-		if (messageDigest != null) {
-			return getHex(messageDigest.digest());
-		} else {
-			return "";
-		}
 	}
 
 	/**
 	 * Process axioms related to one ElkClass, where the relevant related
 	 * classes are given in two ordered collections of equivalent classes and
-	 * subclasses, respectively. The method either serializes the axioms to the
-	 * Writer, or adds the serialization to the MessageDigest, or both,
-	 * depending on which if these objects are not null.
+	 * subclasses, respectively. The method serializes the axioms to the Writer.
 	 * 
 	 * @param elkClass
 	 * @param orderedEquivalentClasses
 	 * @param orderedSubClasses
 	 * @param writer
-	 * @param messageDigest
 	 * @throws IOException
 	 */
 	protected static void processClassAxioms(ElkClass elkClass,
 			SortedMap<String, ElkClass> orderedEquivalentClasses,
-			SortedMap<String, ElkClass> orderedSubClasses, Writer writer,
-			MessageDigest messageDigest) throws IOException {
+			SortedMap<String, ElkClass> orderedSubClasses, Writer writer)
+			throws IOException {
 		for (ElkClass elkClassMember : orderedEquivalentClasses.values()) {
 			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = ElkEquivalentClassesAxiom
 					.create(elkClass, elkClassMember);
-			writeToWriterOrDigest(elkEquivalentClassesAxiom.toString() + "\n",
-					writer, messageDigest);
+			writer.write(elkEquivalentClassesAxiom.toString() + "\n");
 		}
 		for (ElkClass elkSubClass : orderedSubClasses.values()) {
 			ElkSubClassOfAxiom elkSubClassAxiom = ElkSubClassOfAxiom.create(
 					elkSubClass, elkClass);
-			writeToWriterOrDigest(elkSubClassAxiom.toString() + "\n", writer,
-					messageDigest);
+			writer.write(elkSubClassAxiom.toString() + "\n");
 		}
 	}
 
-	/**
-	 * Write a string to the given Writer and/or add it to the given
-	 * MessageDigest, provided that the respective objects are not null.
-	 * 
-	 * @param string
-	 * @param writer
-	 * @param messageDigest
-	 * @throws IOException
-	 */
-	protected static void writeToWriterOrDigest(String string, Writer writer,
-			MessageDigest messageDigest) throws IOException {
-		if (writer != null) {
-			writer.write(string);
-		}
-		if (messageDigest != null) {
-			messageDigest.update(string.getBytes());
-		}
-	}
-
-	/**
-	 * Get a MessageDigest with the standard hashing algorithm we use.
-	 * 
-	 * @return
-	 */
-	protected static MessageDigest getMessageDigest() {
-		try {
-			return MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			assert (false);
-			return null;
-		}
-	}
-
-	protected static final String HEXES = "0123456789ABCDEF";
-
-	/**
-	 * Convert a byte array to a string that shows its entries in Hex format.
-	 * Based on code from http://www.rgagnon.com/javadetails/java-0596.html.
-	 * 
-	 * @param raw
-	 * @return
-	 */
-	protected static String getHex(byte[] raw) {
-		if (raw == null) {
-			return null;
-		}
-		final StringBuilder hex = new StringBuilder(2 * raw.length);
-		for (final byte b : raw) {
-			hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(
-					HEXES.charAt((b & 0x0F)));
-		}
-		return hex.toString();
-	}
 }
