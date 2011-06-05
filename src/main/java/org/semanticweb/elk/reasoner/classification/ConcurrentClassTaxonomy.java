@@ -41,6 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.Context;
 import org.semanticweb.elk.reasoner.saturation.Saturation;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.util.ArraySet;
+import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.Pair;
 
 /**
@@ -232,5 +233,9 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy,
 			}
 			break;
 		}
+	}
+
+	public int structuralHashCode() {
+		return HashGenerator.combineSetHash(nodeLookup.values());
 	}
 }

@@ -33,6 +33,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.util.HashGenerator;
+import org.semanticweb.elk.util.StructuralHashObject;
 
 /**
  * Class for storing information about a class in the context of classification.
@@ -43,7 +45,7 @@ import org.semanticweb.elk.syntax.ElkClass;
  * 
  * @author Yevgeny Kazakov
  */
-public class ClassNode {
+public class ClassNode implements StructuralHashObject {
 
 	/**
 	 * Members are ElkClass objects that are equivalent.
@@ -196,6 +198,24 @@ public class ClassNode {
 	 */
 	public List<ClassNode> getChildren() {
 		return Collections.unmodifiableList(children);
+	}
+
+	public int structuralHashCode() {
+		int memberHash = HashGenerator.combineSetHash(members);
+		
+		int subClassHash = "subClassOf".hashCode();
+		for (ClassNode o : children) {
+			int subMemberHash = HashGenerator.combineSetHash(o.getMembers());
+			subClassHash = HashGenerator.combineSetHash(subClassHash,subMemberHash);
+		}
+		
+		int superClassHash = "superClassOf".hashCode();
+		for (ClassNode o : parents) {
+			int superMemberHash = HashGenerator.combineSetHash(o.getMembers());
+			superClassHash = HashGenerator.combineSetHash(superClassHash,superMemberHash);
+		}
+
+		return HashGenerator.combineListHash(memberHash, subClassHash, superClassHash);
 	}
 
 }
