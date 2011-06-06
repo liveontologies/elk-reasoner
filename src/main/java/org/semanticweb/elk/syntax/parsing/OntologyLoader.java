@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,23 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util;
+/**
+ * @author Yevgeny Kazakov, Jun 6, 2011
+ */
+package org.semanticweb.elk.syntax.parsing;
 
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.concurrent.Future;
 
-public class ArraySet<T> extends ArrayList<T> implements Set<T> {
+import org.semanticweb.elk.syntax.ElkAxiom;
 
-	private static final long serialVersionUID = 4210562273973502066L;
-
-	public ArraySet() {
-		super();
-	}
+/**
+ * Generic interface used for loading ontologies.
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
+public interface OntologyLoader {
 	
-	public ArraySet(int initialCapacity) {
-		super(initialCapacity);
-	}
-	
-	@Override
-	public boolean add(T element) {
-		if (!contains(element)) 
-			return super.add(element);
-		return false;
-	}
+	public void loadFutureAxiom(Future<? extends ElkAxiom> futureAxiom);	
+
 }

@@ -38,7 +38,7 @@
 			<id>yevgeny</id>
 			<name>Yevgeny Kazakov</name>
 			<email>yevgeny.kazakov@comlab.ox.ac.uk</email>
-			<organization>Oxford University Computing Laboratory</organization>
+			<organization>Department of Computer Science, University of Oxford</organization>
 			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
 			<roles>
 				<role>developer</role>
@@ -49,7 +49,7 @@
 			<id>markus</id>
 			<name>Markus Kroetzsch</name>
 			<email>markus.kroetzsch@comlab.ox.ac.uk</email>
-			<organization>Oxford University Computing Laboratory</organization>
+			<organization>Department of Computer Science, University of Oxford</organization>
 			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
 			<roles>
 				<role>developer</role>
@@ -60,7 +60,7 @@
 			<id>fratisek</id>
 			<name>Frantisek Simancik</name>
 			<email>frantisek.simancik@comlab.ox.ac.uk</email>
-			<organization>Oxford University Computing Laboratory</organization>
+			<organization>Department of Computer Science, University of Oxford</organization>
 			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
 			<roles>
 				<role>developer</role>
@@ -90,6 +90,12 @@
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
@@ -134,10 +140,10 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>1.0-beta-1</version>
+				<version>1.0-beta-2</version>
 				<configuration>
 					<verbose>false</verbose>
-					<addSvnKeyWords>true</addSvnKeyWords>
+					<addSvnKeyWords>true</addSvnKeyWords>					
 					<extraExtensions>
 						<g>java</g>
 						<jj>java</jj>

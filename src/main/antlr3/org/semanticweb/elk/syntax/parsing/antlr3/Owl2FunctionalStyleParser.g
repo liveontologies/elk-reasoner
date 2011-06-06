@@ -39,12 +39,12 @@ options {
 }
 
 @header {  
-package org.semanticweb.elk.parser.antlr3;
+package org.semanticweb.elk.syntax.parsing.antlr3;
   
 import java.util.Vector;
 import java.util.concurrent.Future;
 
-import org.semanticweb.elk.reasoner.Reasoner;    
+import org.semanticweb.elk.syntax.parsing.OntologyLoader;    
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;  
 import org.semanticweb.elk.syntax.ElkClassAxiom;
@@ -149,17 +149,17 @@ ontologyAnnotations
     : annotation*
     ;
 /* 3.7 Functional-Style Syntax */    
-ontologyDocument[Reasoner reasoner] 
-    : prefixDeclaration* ontology[$reasoner]
+ontologyDocument[OntologyLoader loader] 
+    : prefixDeclaration* ontology[$loader]
     ;
 prefixDeclaration 
     : PREFIX OPEN_BRACE prefixName EQUALS fullIri CLOSE_BRACE
     ;
-ontology[Reasoner reasoner] 
+ontology[OntologyLoader loader] 
     : ONTOLOGY OPEN_BRACE ( ontologyIri versionIri? )?
        directlyImportsDocuments
        ontologyAnnotations
-       axioms[$reasoner]    { reasoner.finishLoading(); }
+       axioms[$loader]
       CLOSE_BRACE
     ;
 ontologyIri 
@@ -171,8 +171,8 @@ versionIri
 directlyImportsDocuments 
     : ( IMPORT OPEN_BRACE iri CLOSE_BRACE )*
     ;
-axioms[Reasoner reasoner]
-	: (x = axiom { $reasoner.load($x.value); })*  
+axioms[OntologyLoader loader]
+	: (x = axiom { $loader.loadFutureAxiom($x.value); })*  
     ;
 /* 4 Datatype Maps */
 /* 4.1 Real Numbers, Decimal Numbers, and Integers */ 
