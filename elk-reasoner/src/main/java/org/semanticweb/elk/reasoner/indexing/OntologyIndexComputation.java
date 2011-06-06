@@ -44,8 +44,5 @@ interface OntologyIndexComputation extends OntologyIndex {
 
 	IndexedClassExpression getCreateIndexedClassExpression(ElkClassExpression representative);
 
-	IndexedObjectProperty getCreateIndexedObjectProperty(ElkObjectProperty representative);
-	
-	void computeRoleHierarchy();
-
+	IndexedObjectPropertyPack getCreateIndexedObjectProperty(ElkObjectProperty representative);
 }

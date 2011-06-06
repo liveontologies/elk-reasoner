@@ -67,8 +67,12 @@ class ConcurrentSaturation implements SaturationComputation {
 		getCreateContext(root);
 	}
 
-	public Context getContext(IndexedClassExpression ice) {
-		return contextLookup.get(ice);
+	public Context getContext(IndexedClassExpression root) {
+		return contextLookup.get(root);
+	}
+	
+	public SaturatedObjectProperty getSaturatedObjectProperty(IndexedObjectProperty root) {
+		return root.getSaturatedObjectProperty();
 	}
 
 	/**
@@ -203,14 +207,17 @@ class ConcurrentSaturation implements SaturationComputation {
 
 		// transitive object properties
 
-		if (linkRelation.transitiveSuperObjectProperties != null
-				&& propRelation.transitiveSubObjectProperties != null) {
-			if (propRelation.isTransitive)
+		SaturatedObjectProperty satLinkRelation = getSaturatedObjectProperty(linkRelation);
+		SaturatedObjectProperty satPropRelation = getSaturatedObjectProperty(propRelation);
+		
+		if (satLinkRelation.getTransitiveSuperObjectProperties() != null
+				&& satPropRelation.getTransitiveSubObjectProperties() != null) {
+			if (propRelation.isTransitive())
 				enqueuePropagation(linkTarget, propRelation, propClass);
 			else
 				for (IndexedObjectProperty common : new LazySetIntersection<IndexedObjectProperty>(
-						linkRelation.transitiveSuperObjectProperties,
-						propRelation.transitiveSubObjectProperties))
+						satLinkRelation.getTransitiveSuperObjectProperties(),
+						satPropRelation.getTransitiveSubObjectProperties()))
 					enqueuePropagation(linkTarget, common, propClass);
 		}
 	}
@@ -222,7 +229,7 @@ class ConcurrentSaturation implements SaturationComputation {
 		if (context.linksByObjectProperty.add(linkRelation, linkTarget)) {
 			derivedLinks++;
 			for (IndexedObjectProperty propRelation : new LazySetIntersection<IndexedObjectProperty>(
-					linkRelation.inferredSuperObjectProperties,
+					getSaturatedObjectProperty(linkRelation).getSuperObjectProperties(),
 					context.propagationsByObjectProperty.keySet()))
 				for (IndexedObjectSomeValuesFrom propClass : context.propagationsByObjectProperty
 						.get(propRelation))
@@ -236,7 +243,7 @@ class ConcurrentSaturation implements SaturationComputation {
 			IndexedObjectSomeValuesFrom propClass) {
 		if (context.propagationsByObjectProperty.add(propRelation, propClass)) {
 			for (IndexedObjectProperty linkRelation : new LazySetIntersection<IndexedObjectProperty>(
-					propRelation.inferredSubObjectProperties,
+					getSaturatedObjectProperty(propRelation).getSubObjectProperties(),
 					context.linksByObjectProperty.keySet()))
 				for (Context linkTarget : context.linksByObjectProperty
 						.get(linkRelation))

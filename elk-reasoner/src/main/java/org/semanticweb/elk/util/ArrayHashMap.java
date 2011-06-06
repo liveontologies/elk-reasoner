@@ -475,7 +475,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		}
 
 		public boolean contains(Object o) {
-			if (!(o instanceof Map.Entry))
+			if (!(o instanceof Map.Entry<?, ?>))
 				return false;
 			Object k = ((Map.Entry<?, ?>) o).getKey();
 			return ArrayHashMap.this.containsKey(k);

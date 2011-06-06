@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 
-public class SaturationManager {
+public class ClassExpressionSaturationManager {
 	// the saturator used for jobs
 	protected final SaturationComputation saturation;
 	// maximum number of concurrent workers
@@ -41,14 +41,14 @@ public class SaturationManager {
 	// bounded buffer for concepts added for saturation
 	protected final BlockingQueue<IndexedClassExpression> conceptBuffer;
 
-	public SaturationManager(ExecutorService executor, int nWorkers) {
+	public ClassExpressionSaturationManager(ExecutorService executor, int nWorkers) {
 		this.saturation = new ConcurrentSaturation();
 		this.maxWorkers = nWorkers;
 		this.executor = executor;
 		this.workerCount = new AtomicInteger(0);
 		this.conceptBuffer = new ArrayBlockingQueue<IndexedClassExpression>(512);
 	}
-
+	
 	// class for concurrent saturation jobs
 	protected class Worker implements Runnable {
 		public void run() {
@@ -98,7 +98,7 @@ public class SaturationManager {
 		}
 	}
 
-	public Saturation getSaturation() {
+	public Saturation computeSaturation() {
 		waitCompletion();
 		return saturation;
 	}

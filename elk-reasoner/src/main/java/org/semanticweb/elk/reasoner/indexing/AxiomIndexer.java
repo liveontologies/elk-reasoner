@@ -96,19 +96,19 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
 
-		IndexedObjectProperty subProperty = axiom.getSubObjectPropertyExpression().accept(
+		IndexedObjectPropertyPack subProperty = axiom.getSubObjectPropertyExpression().accept(
 				objectPropertyExpressionIndexer);
-		IndexedObjectProperty superProperty = axiom.getSuperObjectPropertyExpression().accept(
+		IndexedObjectPropertyPack superProperty = axiom.getSuperObjectPropertyExpression().accept(
 				objectPropertyExpressionIndexer);
 		
-		subProperty.addSuperObjectProperty(superProperty);
-		superProperty.addSubObjectProperty(subProperty);
+		subProperty.addToldSuperObjectProperty(superProperty);
+		superProperty.addToldSubObjectProperty(subProperty);
 
 		return null;
 	}
 
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-		axiom.getObjectPropertyExpression().accept(objectPropertyExpressionIndexer).isTransitive = true;
+		axiom.getObjectPropertyExpression().accept(objectPropertyExpressionIndexer).setTransitive();
 		
 		return null;
 	}
