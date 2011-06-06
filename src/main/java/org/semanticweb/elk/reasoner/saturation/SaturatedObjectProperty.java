@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,30 +20,19 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, May 13, 2011
- */
+
 package org.semanticweb.elk.reasoner.saturation;
 
-import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
+import java.util.Set;
+
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 
-/**
- * @author Yevgeny Kazakov
- * 
- */
-public interface Saturation {
+public interface SaturatedObjectProperty {
+	Set<IndexedObjectProperty> getSubObjectProperties();
 
-	/**
-	 * Returns a context which has as root the given indexed class expression,
-	 * or <tt>null</tt> if such context does not exist.
-	 * 
-	 * @param root
-	 *            the input indexed class expression for which to return the
-	 *            context having it as a root
-	 * @return context which root is the input indexed class expression.
-	 */
-	Context getContext(IndexedClassExpression root);
-	
-	SaturatedObjectProperty getSaturatedObjectProperty(IndexedObjectProperty root);
+	Set<IndexedObjectProperty> getSuperObjectProperties();
+		
+	Set<IndexedObjectProperty> getTransitiveSubObjectProperties();
+		
+	Set<IndexedObjectProperty> getTransitiveSuperObjectProperties();
 }

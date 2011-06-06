@@ -35,11 +35,13 @@ import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassificationManager;
-import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.IndexingManager;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationManager;
+import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturationManager;
 import org.semanticweb.elk.reasoner.saturation.Saturation;
-import org.semanticweb.elk.reasoner.saturation.SaturationManager;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.parsing.OntologyLoader;
@@ -91,7 +93,7 @@ public class Reasoner {
 			logger.info("Loading finished");
 		}
 		Statistics.logMemoryUsage(logger);
-		indexingManager.computeRoleHierarchy();
+		indexingManager.waitCompletion();
 	}
 
 	public void loadOntologyFromFile(String fileName) throws ParseException,
@@ -112,17 +114,25 @@ public class Reasoner {
 
 	public void classify() {
 		// Saturation stage
-		OntologyIndex ontologyIndex = indexingManager.getOntologyIndex();
-		SaturationManager saturationManager = new SaturationManager(executor,
-				nWorkers);
+		OntologyIndex ontologyIndex = indexingManager.computeOntologyIndex();
+	
+		ObjectPropertySaturationManager objectPropertySaturationManager =
+			new ObjectPropertySaturationManager();
+	
+		ClassExpressionSaturationManager classExpressionSaturationManager = 
+			new ClassExpressionSaturationManager(executor, nWorkers);
+
 		if (logger.isInfoEnabled()) {
 			logger.info("Saturation started");
 		}
-		for (IndexedClassExpression indexedClassExpression : ontologyIndex
-				.getIndexedClassExpressions())
-			if (indexedClassExpression.classExpression instanceof ElkClass)
-				saturationManager.submit(indexedClassExpression);
-		Saturation saturation = saturationManager.getSaturation();
+
+		for (IndexedObjectProperty iop : ontologyIndex.getIndexedObjectProperties())
+			objectPropertySaturationManager.submit(iop);
+		objectPropertySaturationManager.computeSaturation();
+
+		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
+			classExpressionSaturationManager.submit(ic);
+		Saturation saturation = classExpressionSaturationManager.computeSaturation();
 		if (logger.isInfoEnabled()) {
 			logger.info("Saturation finished");
 		}
@@ -133,11 +143,8 @@ public class Reasoner {
 		}
 		ClassificationManager classificationManager = new ClassificationManager(
 				executor, nWorkers, ontologyIndex, saturation);
-		for (IndexedClassExpression indexedClassExpression : ontologyIndex
-				.getIndexedClassExpressions())
-			if (indexedClassExpression.classExpression instanceof ElkClass)
-				classificationManager
-						.submit((ElkClass) indexedClassExpression.classExpression);
+		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
+			classificationManager.submit((ElkClass) ic.classExpression);
 		classTaxonomy = classificationManager.getClassTaxonomy();
 		if (logger.isInfoEnabled()) {
 			logger.info("Transitive reduction finished");

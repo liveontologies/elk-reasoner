@@ -60,7 +60,7 @@ public class ConcurrentIndexerTest extends TestCase {
 		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(human,
 				hasHeartAndOrgan));
 		indexingManager.waitCompletion();
-		OntologyIndex ontologyIndex = indexingManager.getOntologyIndex();
+		OntologyIndex ontologyIndex = indexingManager.computeOntologyIndex();
 
 		assertTrue(((IndexedObjectIntersectionOf) ontologyIndex
 				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts

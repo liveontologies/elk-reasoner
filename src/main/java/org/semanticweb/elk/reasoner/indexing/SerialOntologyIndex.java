@@ -26,7 +26,9 @@
 package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -46,14 +48,14 @@ public class SerialOntologyIndex implements OntologyIndexComputation {
 	private final AxiomIndexer axiomIndexer;
 
 	protected final Map<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
-	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
+	protected final Map<ElkObjectPropertyExpression, IndexedObjectPropertyPack> indexedObjectPropertyLookup;
 
 	public SerialOntologyIndex() {
 		this.axiomIndexer = new AxiomIndexer(this);
 
 		indexedClassExpressionLookup = new ArrayHashMap<ElkClassExpression, IndexedClassExpression>(
 				1024);
-		indexedObjectPropertyLookup = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
+		indexedObjectPropertyLookup = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectPropertyPack>(
 				128);
 	}
 
@@ -61,10 +63,8 @@ public class SerialOntologyIndex implements OntologyIndexComputation {
 		try {
 			futureAxiom.get().accept(axiomIndexer);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -92,25 +92,59 @@ public class SerialOntologyIndex implements OntologyIndexComputation {
 		return indexedClassExpression;
 	}
 
-	public IndexedObjectProperty getCreateIndexedObjectProperty(
+	public IndexedObjectPropertyPack getCreateIndexedObjectProperty(
 			ElkObjectProperty objectProperty) {
-		IndexedObjectProperty indexedObjectProperty = indexedObjectPropertyLookup
+		IndexedObjectPropertyPack indexedObjectProperty = indexedObjectPropertyLookup
 				.get(objectProperty);
 		if (indexedObjectProperty == null) {
-			indexedObjectProperty = new IndexedObjectProperty(objectProperty);
+			indexedObjectProperty = new IndexedObjectPropertyPack(objectProperty);
 			indexedObjectPropertyLookup.put(objectProperty,
 					indexedObjectProperty);
 		}
 		return indexedObjectProperty;
 	}
 
-	public void computeRoleHierarchy() {
-		for (IndexedObjectProperty iop : indexedObjectPropertyLookup.values())
-			iop.computeSubAndSuperProperties();
-	}
+	public Iterable<? extends IndexedClass> getIndexedClasses() {
+		return new Iterable<IndexedClass> () {
 
-	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
-		return Collections.unmodifiableCollection(indexedClassExpressionLookup
+			public Iterator<IndexedClass> iterator() {
+				return new Iterator<IndexedClass> () {
+					Iterator<IndexedClassExpression> i = indexedClassExpressionLookup.values().iterator();
+					IndexedClass next = find_next();
+					
+					public boolean hasNext() {
+						return next != null;
+					}
+
+					public IndexedClass next() {
+						if (next != null) {
+							IndexedClass result = next;
+							next = find_next();
+							return result;
+						}
+						throw new NoSuchElementException();
+					}
+
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+					
+					private IndexedClass find_next() {
+						while (i.hasNext()) {
+							IndexedClassExpression ice = i.next();
+							if (ice instanceof IndexedClass)
+								return (IndexedClass) ice;
+						}
+						return null;
+					}
+					
+				};
+			}
+		};
+	}
+	
+	public Iterable<? extends IndexedObjectProperty> getIndexedObjectProperties() {
+		return Collections.unmodifiableCollection(indexedObjectPropertyLookup
 				.values());
 	}
 }

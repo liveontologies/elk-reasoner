@@ -92,7 +92,7 @@ public class IndexingManager {
 			addWorker();
 	}
 
-	void waitCompletion() {
+	public void waitCompletion() {
 		addWorker();
 		synchronized (workerCount) {
 			while (workerCount.get() > 0)
@@ -103,12 +103,8 @@ public class IndexingManager {
 		}
 	}
 
-	public void computeRoleHierarchy() {
+	public OntologyIndex computeOntologyIndex() {
 		waitCompletion();
-		ontologyIndex.computeRoleHierarchy();
-	}
-
-	public OntologyIndex getOntologyIndex() {
 		return ontologyIndex;
 	}
 

@@ -57,18 +57,22 @@ public class ReasonerTest extends TestCase {
 				+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"
 				+ "SubObjectPropertyOf(:R :S)" + ")");
 
-		OntologyIndex index = reasoner.indexingManager.getOntologyIndex();
+		
 		ElkClass a = constructor.getFutureElkClass(":A").get();
 		ElkClass d = constructor.getFutureElkClass(":D").get();
 		ElkObjectProperty r = constructor.getFutureElkObjectProperty(":R").get();
+		ElkObjectProperty s = constructor.getFutureElkObjectProperty(":S").get();
 
 		reasoner.classify();
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 
+		OntologyIndex index = reasoner.indexingManager.computeOntologyIndex();
+
 		IndexedObjectProperty R = index.getIndexedObjectProperty(r);
-		IndexedObjectProperty S = index.getIndexedObjectProperty(r);
-		assertTrue("R subrole S", R.inferredSuperObjectProperties.contains(S));
-		assertTrue("S superrole R", S.inferredSubObjectProperties.contains(R));
+		IndexedObjectProperty S = index.getIndexedObjectProperty(s);
+
+		assertTrue("R subrole S", R.getToldSuperObjectProperties().contains(S));
+		assertTrue("S superrole R", S.getToldSubObjectProperties().contains(R));
 		assertTrue("A contains D",
 				taxonomy.getNode(a).getParents().contains(taxonomy.getNode(d)));
 	}
@@ -87,7 +91,7 @@ public class ReasonerTest extends TestCase {
 		Future<ElkClass> c = constructor.getFutureElkClass(":C");
 		Future<ElkClass> d = constructor.getFutureElkClass(":D");
 		
-		OntologyIndex index = reasoner.indexingManager.getOntologyIndex();
+		OntologyIndex index = reasoner.indexingManager.computeOntologyIndex();
 
 		IndexedClassExpression A = index.getIndexedClassExpression(a.get());
 		IndexedClassExpression B = index.getIndexedClassExpression(b.get());

@@ -37,9 +37,11 @@ import org.semanticweb.elk.syntax.ElkObjectProperty;
 public interface OntologyIndex {
 
 	IndexedClassExpression getIndexedClassExpression(ElkClassExpression representative);
-
+	
 	IndexedObjectProperty getIndexedObjectProperty(ElkObjectProperty representative);
-
-	public Iterable<IndexedClassExpression> getIndexedClassExpressions();
+	
+	public Iterable<? extends IndexedClass> getIndexedClasses();
+	
+	public Iterable<? extends IndexedObjectProperty> getIndexedObjectProperties();
 
 }
