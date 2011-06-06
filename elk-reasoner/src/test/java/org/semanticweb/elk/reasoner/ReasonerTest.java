@@ -22,11 +22,13 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
+import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassNode;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
@@ -46,53 +48,47 @@ public class ReasonerTest extends TestCase {
 	}
 
 	public void testExistentials() throws InterruptedException,
-			ExecutionException {
-		Future<ElkClass> a = constructor.getFutureElkClass("A");
-		Future<ElkClass> b = constructor.getFutureElkClass("B");
-		Future<ElkClass> c = constructor.getFutureElkClass("C");
-		Future<ElkClass> d = constructor.getFutureElkClass("D");
-		Future<ElkObjectProperty> r = constructor
-				.getFutureElkObjectProperty("R");
-		Future<ElkObjectProperty> s = constructor
-				.getFutureElkObjectProperty("S");
+			ExecutionException, ParseException, IOException {
 
 		Reasoner reasoner = new Reasoner();
-		reasoner.load(constructor.getFutureElkEquivalentClassesAxiom(b, c));
-		reasoner.load(constructor.getFutureElkSubClassOfAxiom(a,
-				constructor.getFutureElkObjectSomeValuesFrom(r, b)));
-		reasoner.load(constructor.getFutureElkSubClassOfAxiom(
-				constructor.getFutureElkObjectSomeValuesFrom(s, c), d));
-		reasoner.load(constructor.getFutureElkSubObjectPropertyOfAxiom(r, s));
-		reasoner.finishLoading();
+		reasoner.loadOntologyFromString("Ontology("
+				+ "EquivalentClasses(:B :C)"
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"
+				+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"
+				+ "SubObjectPropertyOf(:R :S)" + ")");
 
 		OntologyIndex index = reasoner.indexingManager.getOntologyIndex();
-		reasoner.classify();
+		ElkClass a = constructor.getFutureElkClass(":A").get();
+		ElkClass d = constructor.getFutureElkClass(":D").get();
+		ElkObjectProperty r = constructor.getFutureElkObjectProperty(":R").get();
 
+		reasoner.classify();
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 
-		IndexedObjectProperty R = index.getIndexedObjectProperty(r.get());
-		IndexedObjectProperty S = index.getIndexedObjectProperty(r.get());
+		IndexedObjectProperty R = index.getIndexedObjectProperty(r);
+		IndexedObjectProperty S = index.getIndexedObjectProperty(r);
 		assertTrue("R subrole S", R.inferredSuperObjectProperties.contains(S));
 		assertTrue("S superrole R", S.inferredSubObjectProperties.contains(R));
-		assertTrue("A contains D", taxonomy.getNode(a.get()).getParents()
-				.contains(taxonomy.getNode(d.get())));
+		assertTrue("A contains D",
+				taxonomy.getNode(a).getParents().contains(taxonomy.getNode(d)));
 	}
 
 	public void testConjunctions() throws InterruptedException,
-			ExecutionException {
-		Future<ElkClass> a = constructor.getFutureElkClass("A");
-		Future<ElkClass> b = constructor.getFutureElkClass("B");
-		Future<ElkClass> c = constructor.getFutureElkClass("C");
-		Future<ElkClass> d = constructor.getFutureElkClass("D");
+			ExecutionException, ParseException, IOException {
 
 		final Reasoner reasoner = new Reasoner();
-		reasoner.load(constructor.getFutureElkSubClassOfAxiom(a, b));
-		reasoner.load(constructor.getFutureElkSubClassOfAxiom(a, c));
-		reasoner.load(constructor.getFutureElkSubClassOfAxiom(
-				constructor.getFutureElkObjectIntersectionOf(b, c), d));
-		reasoner.finishLoading();
-		OntologyIndex index = reasoner.indexingManager.getOntologyIndex();
+		reasoner.loadOntologyFromString("Ontology(" 
+				+ "SubClassOf(:A :B)"
+				+ "SubClassOf(:A :C)"
+				+ "SubClassOf(ObjectIntersectionOf(:B :C) :D)" + ")");
+
+		Future<ElkClass> a = constructor.getFutureElkClass(":A");
+		Future<ElkClass> b = constructor.getFutureElkClass(":B");
+		Future<ElkClass> c = constructor.getFutureElkClass(":C");
+		Future<ElkClass> d = constructor.getFutureElkClass(":D");
 		
+		OntologyIndex index = reasoner.indexingManager.getOntologyIndex();
+
 		IndexedClassExpression A = index.getIndexedClassExpression(a.get());
 		IndexedClassExpression B = index.getIndexedClassExpression(b.get());
 		IndexedClassExpression C = index.getIndexedClassExpression(c.get());
@@ -109,10 +105,13 @@ public class ReasonerTest extends TestCase {
 
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(a.get());
-		
+
 		assertTrue("A contains A", aNode.getMembers().contains(a.get()));
-		assertTrue("A contains B", aNode.getParents().contains(taxonomy.getNode(b.get())));
-		assertTrue("A contains C", aNode.getParents().contains(taxonomy.getNode(c.get())));		
-		assertTrue("A contains D", aNode.getParents().contains(taxonomy.getNode(d.get())));
+		assertTrue("A contains B",
+				aNode.getParents().contains(taxonomy.getNode(b.get())));
+		assertTrue("A contains C",
+				aNode.getParents().contains(taxonomy.getNode(c.get())));
+		assertTrue("A contains D",
+				aNode.getParents().contains(taxonomy.getNode(d.get())));
 	}
 }

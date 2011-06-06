@@ -21,33 +21,43 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 22, 2011
+ * @author Yevgeny Kazakov, Apr 20, 2011
  */
-package org.semanticweb.elk.parser.javacc;
+package org.semanticweb.elk.syntax.parsing.antlr3;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
-import org.semanticweb.elk.reasoner.Reasoner;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.UnbufferedTokenStream;
+import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.parsing.OntologyLoader;
 
 /**
  * @author Yevgeny Kazakov
  * 
  */
 public class Owl2FunctionalStyleParserTest extends TestCase {
-
 	public Owl2FunctionalStyleParserTest(String testName) {
 		super(testName);
 	}
 
-	public void parseOntologyDocument(String testString) throws ParseException {
-		InputStream stream = new ByteArrayInputStream(testString.getBytes());
-		Owl2FunctionalStyleParser.Init(stream);
-		Owl2FunctionalStyleParser.ontologyDocument(new Reasoner());
+	class DummyOntologyLoader implements OntologyLoader {
+		public void loadFutureAxiom(Future<? extends ElkAxiom> futureAxiom) {
+		}
+	}
+	
+	public void parseOntologyDocument(String testString)
+			throws RecognitionException {
+		Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
+				new ANTLRStringStream(testString));
+		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
+		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
+		parser.ontologyDocument(new DummyOntologyLoader());
 	}
 
 	public void testOntologyDocument() {
@@ -67,17 +77,20 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 
 		try {
 			parseOntologyDocument(testString);
-		} catch (ParseException e) {
+		} catch (RecognitionException e) {
 			assertFalse(true);
 			e.printStackTrace();
 		}
 	}
 
-	public ElkClass parseElkClass(String testString) throws ParseException,
-			InterruptedException, ExecutionException {
-		InputStream stream = new ByteArrayInputStream(testString.getBytes());
-		Owl2FunctionalStyleParser.Init(stream);
-		return Owl2FunctionalStyleParser.clazz().get();
+	public ElkClass parseElkClass(String testString)
+			throws RecognitionException, InterruptedException,
+			ExecutionException {
+		Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
+				new ANTLRStringStream(testString));
+		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
+		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
+		return parser.clazz().get();
 	}
 
 	public void testClazz() throws InterruptedException, ExecutionException {
@@ -85,7 +98,7 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 			ElkClass clazz = parseElkClass("owl:Thing");
 			assertNotNull(clazz);
 			assertSame(ElkClass.ELK_OWL_THING, clazz);
-		} catch (ParseException e) {
+		} catch (RecognitionException e) {
 			assertFalse(true);
 			e.printStackTrace();
 		}

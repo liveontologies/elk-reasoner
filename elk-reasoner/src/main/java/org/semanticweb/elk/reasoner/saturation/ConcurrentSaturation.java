@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpressionVisitor;
@@ -52,6 +53,9 @@ class ConcurrentSaturation implements SaturationComputation {
 	protected final Queue<Context> activeContexts;
 	// the size of the queue
 	protected final AtomicInteger activeContextCount;
+	// logger for events
+	protected final static Logger logger = Logger
+			.getLogger(ConcurrentSaturation.class);
 
 	ConcurrentSaturation() {
 		this.contextLookup = new ConcurrentHashMap<IndexedClassExpression, Context>();
@@ -87,6 +91,9 @@ class ConcurrentSaturation implements SaturationComputation {
 			Context previous = contextLookup.putIfAbsent(root, context);
 			if (previous != null)
 				return (previous);
+			if (logger.isTraceEnabled()) {
+				logger.trace("Created context for " + root);
+			}
 			enqueueDerived(context, root, true);
 		}
 		return context;

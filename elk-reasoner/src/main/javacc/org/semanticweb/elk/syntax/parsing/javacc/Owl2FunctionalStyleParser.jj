@@ -30,7 +30,9 @@
  * @author Yevgeny Kazakov, Apr 19, 2011
  */
 
-options{  UNICODE_INPUT = true;
+options
+{
+  UNICODE_INPUT = true;
   CACHE_TOKENS = true;  
 }  
 
@@ -41,7 +43,7 @@ package org.semanticweb.elk.parser.javacc;
 import java.util.Vector;
 import java.util.concurrent.Future;
 
-import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.syntax.parsing.OntologyLoader;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassAxiom;
@@ -329,7 +331,8 @@ String fullIri():
   Token t;
 }{
     t = <IRI_REF> {
-      return t.image;    }
+      return t.image;
+    }
 } 
     /* See IRI_REF in [SPARQL] */
 String iri():
@@ -363,9 +366,9 @@ void ontologyAnnotations():
     ( annotation() )*
 }
 /* 3.7 Functional-Style Syntax */    
-void ontologyDocument(Reasoner reasoner):
+void ontologyDocument(OntologyLoader loader):
 {}{
-    ( prefixDeclaration() )* ontology(reasoner)
+    ( prefixDeclaration() )* ontology(loader)
 }
 void prefixDeclaration():
 {}{
@@ -375,13 +378,13 @@ void prefixDeclaration():
       fullIri()
     <CLOSE_BRACE>
 }
-void ontology(Reasoner reasoner):
+void ontology(OntologyLoader loader):
 {}{
     <ONTOLOGY> <OPEN_BRACE> ( ontologyIri() ( versionIri() )? )?
        directlyImportsDocuments()
        ontologyAnnotations()
-       axioms(reasoner)
-       { reasoner.finishLoading(); }    <CLOSE_BRACE>
+       axioms(loader)       
+    <CLOSE_BRACE>
 }
 void ontologyIri():
 {}{
@@ -395,10 +398,11 @@ void directlyImportsDocuments():
 {}{
     ( <IMPORT> <OPEN_BRACE> iri() <CLOSE_BRACE> )*
 }
-void axioms(Reasoner reasoner):
-{    Future<? extends ElkAxiom> x; 
+void axioms(OntologyLoader loader):
+{
+    Future<? extends ElkAxiom> x; 
 }{
-    ( x = axiom() { reasoner.load(x); } )*
+    ( x = axiom() { loader.loadFutureAxiom(x); } )*
 }
 /* 4 Datatype Maps */
 /* 4.1 Real Numbers, Decimal Numbers, and Integers */ 
@@ -499,11 +503,13 @@ Future<? extends ElkObjectProperty> objectProperty():
     }     
 |   <OWL_TOP_OBJECT_PROPERTY> {
       return constructor.getFuture(
-        ElkObjectProperty.ELK_OWL_TOP_OBJECT_PROPERTY);    }
+        ElkObjectProperty.ELK_OWL_TOP_OBJECT_PROPERTY);
+    }
 |   <OWL_BOTTOM_OBJECT_PROPERTY> {
       return constructor.getFuture(
         ElkObjectProperty.ELK_OWL_BOTTOM_OBJECT_PROPERTY);
-    }  
+    }
+  
 }
 /* 5.4 Data Properties */    
 void dataProperty():
@@ -571,7 +577,8 @@ Future<? extends ElkObjectPropertyExpression> objectPropertyExpression():
 {
   Future<? extends ElkObjectPropertyExpression> x;
 }{ (
-    x = objectProperty()|   x = inverseObjectProperty()
+    x = objectProperty()
+|   x = inverseObjectProperty()
    ) { return x; }
 }
 /* 6.1.1 Inverse Object Properties */    
@@ -580,7 +587,8 @@ Future<? extends ElkObjectInverseOf> inverseObjectProperty():
     <OBJECT_INVERSE_OF> <OPEN_BRACE>
       objectProperty()
     <CLOSE_BRACE> {
-      return null;    } 
+      return null;
+    } 
 }
 /* 6.2 Data Property Expressions */    
 void dataPropertyExpression():
@@ -725,7 +733,8 @@ Future<? extends ElkObjectSomeValuesFrom> objectSomeValuesFrom():
       x = objectPropertyExpression()
       y = classExpression()
     <CLOSE_BRACE> {
-      return constructor.getFutureElkObjectSomeValuesFrom(x, y);    }
+      return constructor.getFutureElkObjectSomeValuesFrom(x, y);
+    }
 }
 /* 8.2.2 Universal Quantification */
 void objectAllValuesFrom():
@@ -836,7 +845,8 @@ Future<? extends ElkAxiom> axiom():
 {
   Future<? extends ElkAxiom> x = null;
 }{ (
-    declaration()|   x = classAxiom()   
+    declaration()
+|   x = classAxiom()   
 |   x = objectPropertyAxiom()
 |   dataPropertyAxiom()
 |   datatypeDefinition()
@@ -870,7 +880,8 @@ Future<? extends ElkSubClassOfAxiom> subClassOf():
         x = classExpression() 
         y = classExpression() 
     <CLOSE_BRACE> {
-      return constructor.getFutureElkSubClassOfAxiom(x, y);    }    
+      return constructor.getFutureElkSubClassOfAxiom(x, y);
+    }    
 }
 /* 9.1.2 Equivalent Classes */
 Future<? extends ElkEquivalentClassesAxiom> equivalentClasses():
@@ -885,7 +896,8 @@ Future<? extends ElkEquivalentClassesAxiom> equivalentClasses():
         ( x = classExpression() { v.add(x); } )+ 
     <CLOSE_BRACE> {
       return constructor.getFutureElkEquivalentClassesAxiom(v);
-    }    }
+    }    
+}
 /* 9.1.3 Disjoint Classes */
 void disjointClasses():
 {}{
@@ -938,7 +950,8 @@ Future<? extends ElkSubObjectPropertyOfAxiom> subObjectPropertyOf():
 }{
     <SUB_OBJECT_PROPERTY_OF> <OPEN_BRACE> 
         axiomAnnotations() 
-        (          x = objectPropertyExpression() { isChain = false; }
+        (
+          x = objectPropertyExpression() { isChain = false; }
         | y = propertyExpressionChain()  { isChain = true; }
         ) 
         z = objectPropertyExpression() 
@@ -960,7 +973,8 @@ Future<? extends ElkObjectPropertyChain> propertyExpressionChain():
     <OBJECT_PROPERTY_CHAIN> <OPEN_BRACE> 
           x = objectPropertyExpression() { v.add(x); }        
         ( x = objectPropertyExpression() { v.add(x); } )+ 
-    <CLOSE_BRACE> {      return constructor.getFutureElkObjectPropertyChain(v);  
+    <CLOSE_BRACE> {
+      return constructor.getFutureElkObjectPropertyChain(v);  
     }
 }
 /* 9.2.2 Equivalent Object Properties */    

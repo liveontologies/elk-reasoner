@@ -197,7 +197,7 @@ tokens {
 
 
 @header {
-  package org.semanticweb.elk.parser.antlr3;
+  package org.semanticweb.elk.syntax.parsing.antlr3;
   
   import java.util.Hashtable;
 }
