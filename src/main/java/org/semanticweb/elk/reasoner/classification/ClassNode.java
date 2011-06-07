@@ -201,18 +201,18 @@ public class ClassNode implements StructuralHashObject {
 	}
 
 	public int structuralHashCode() {
-		int memberHash = HashGenerator.combineSetHash(members);
+		int memberHash = HashGenerator.combineMultisetHash(true, members);
 		
 		int subClassHash = "subClassOf".hashCode();
 		for (ClassNode o : children) {
-			int subMemberHash = HashGenerator.combineSetHash(o.getMembers());
-			subClassHash = HashGenerator.combineSetHash(subClassHash,subMemberHash);
+			int subMemberHash = HashGenerator.combineMultisetHash(true, o.getMembers());
+			subClassHash = HashGenerator.combineListHash(subClassHash,subMemberHash);
 		}
 		
 		int superClassHash = "superClassOf".hashCode();
 		for (ClassNode o : parents) {
-			int superMemberHash = HashGenerator.combineSetHash(o.getMembers());
-			superClassHash = HashGenerator.combineSetHash(superClassHash,superMemberHash);
+			int superMemberHash = HashGenerator.combineMultisetHash(true, o.getMembers());
+			superClassHash = HashGenerator.combineListHash(superClassHash,superMemberHash);
 		}
 
 		return HashGenerator.combineListHash(memberHash, subClassHash, superClassHash);

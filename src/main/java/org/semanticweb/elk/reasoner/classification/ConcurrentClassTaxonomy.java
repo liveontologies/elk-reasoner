@@ -236,6 +236,6 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy,
 	}
 
 	public int structuralHashCode() {
-		return HashGenerator.combineSetHash(nodeLookup.values());
+		return HashGenerator.combineMultisetHash(true, nodeLookup.values());
 	}
 }

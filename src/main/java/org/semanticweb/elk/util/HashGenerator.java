@@ -26,6 +26,7 @@
 package org.semanticweb.elk.util;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -69,13 +70,26 @@ public class HashGenerator {
 	 * combined with other hash codes for getting the same result as if all hash
 	 * codes had been combined in one step.
 	 * 
+	 * If finalize is false, then the method as such represents an associative
+	 * commutative hash, i.e. the return value can be combined with other
+	 * set-based hash codes in any order without making a difference. If
+	 * finalize is true, then the method combines its arguments with a
+	 * commutative hash, but shuffles the overall result. The method as such
+	 * then is neither an associative nor a commutative operation. This mode of
+	 * operation should be used whenever no further elements are to be added to
+	 * the set of hashes.
+	 * 
+	 * @param finalize
 	 * @param hashes
 	 * @return
 	 */
-	public static int combineSetHash(int... hashes) {
+	public static int combineMultisetHash(boolean finalize, int... hashes) {
 		int hash = 0;
 		for (int h : hashes) {
 			hash = hash + h;
+		}
+		if (finalize) {
+			hash = combineListHash(hash);
 		}
 		return hash;
 	}
@@ -87,14 +101,52 @@ public class HashGenerator {
 	 * for getting the same result as if all hash codes had been combined in one
 	 * step.
 	 * 
+	 * If finalize is false, then the method as such represents an associative
+	 * commutative hash, i.e. the return value can be combined with other
+	 * set-based hash codes in any order without making a difference. If
+	 * finalize is true, then the method combines its arguments with a
+	 * commutative hash, but shuffles the overall result. The method as such
+	 * then is neither an associative nor a commutative operation. This mode of
+	 * operation should be used whenever no further elements are to be added to
+	 * the set of hashes.
+	 * 
+	 * @param finalize
 	 * @param hashObjects
 	 * @return
 	 */
-	public static int combineSetHash(
-			Collection<? extends StructuralHashObject> hashObjects) {
+	public static int combineMultisetHash(boolean finalize,
+			Iterable<? extends StructuralHashObject> hashObjects) {
+		return combineMultisetHash(finalize, hashObjects.iterator());
+	}
+
+	/**
+	 * Combine the hash codes of a collection of structural hash objects with an
+	 * associative commutative hash function. Associativity ensures that the
+	 * result of this functions can be further combined with other hash codes
+	 * for getting the same result as if all hash codes had been combined in one
+	 * step.
+	 * 
+	 * If finalize is false, then the method as such represents an associative
+	 * commutative hash, i.e. the return value can be combined with other
+	 * set-based hash codes in any order without making a difference. If
+	 * finalize is true, then the method combines its arguments with a
+	 * commutative hash, but shuffles the overall result. The method as such
+	 * then is neither an associative nor a commutative operation. This mode of
+	 * operation should be used whenever no further elements are to be added to
+	 * the set of hashes.
+	 * 
+	 * @param finalize
+	 * @param hashObjects
+	 * @return
+	 */
+	public static int combineMultisetHash(boolean finalize,
+			Iterator<? extends StructuralHashObject> hashObjectIterator) {
 		int hash = 0;
-		for (StructuralHashObject o : hashObjects) {
-			hash += o.structuralHashCode();
+		while (hashObjectIterator.hasNext()) {
+			hash += hashObjectIterator.next().structuralHashCode();
+		}
+		if (finalize) {
+			hash = combineListHash(hash);
 		}
 		return hash;
 	}
@@ -136,9 +188,25 @@ public class HashGenerator {
 	 */
 	public static int combineListHash(
 			List<? extends StructuralHashObject> hashObjects) {
+		return combineListHash(hashObjects.iterator());
+	}
+
+	/**
+	 * Combine the hash codes of a collection of structural hash objects into
+	 * one in a way that depends on their order.
+	 * 
+	 * The current implementation is based on the Jenkins One-at-a-Time hash,
+	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
+	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
+	 * 
+	 * @param hashObjects
+	 * @return
+	 */
+	public static int combineListHash(
+			Iterator<? extends StructuralHashObject> hashObjectIterator) {
 		int hash = 0;
-		for (StructuralHashObject o : hashObjects) {
-			hash += o.structuralHashCode();
+		while (hashObjectIterator.hasNext()) {
+			hash += hashObjectIterator.next().structuralHashCode();
 			hash += (hash << 10);
 			hash ^= (hash >> 6);
 		}
