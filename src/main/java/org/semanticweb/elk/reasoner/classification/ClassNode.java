@@ -206,13 +206,13 @@ public class ClassNode implements StructuralHashObject {
 		int subClassHash = "subClassOf".hashCode();
 		for (ClassNode o : children) {
 			int subMemberHash = HashGenerator.combineMultisetHash(true, o.getMembers());
-			subClassHash = HashGenerator.combineListHash(subClassHash,subMemberHash);
+			subClassHash = HashGenerator.combineMultisetHash(false,subClassHash,subMemberHash);
 		}
 		
 		int superClassHash = "superClassOf".hashCode();
 		for (ClassNode o : parents) {
 			int superMemberHash = HashGenerator.combineMultisetHash(true, o.getMembers());
-			superClassHash = HashGenerator.combineListHash(superClassHash,superMemberHash);
+			superClassHash = HashGenerator.combineMultisetHash(false,superClassHash,superMemberHash);
 		}
 
 		return HashGenerator.combineListHash(memberHash, subClassHash, superClassHash);
