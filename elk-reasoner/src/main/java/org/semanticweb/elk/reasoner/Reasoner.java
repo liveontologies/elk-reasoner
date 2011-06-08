@@ -45,7 +45,6 @@ import org.semanticweb.elk.reasoner.saturation.Saturation;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.parsing.OntologyLoader;
-import org.semanticweb.elk.util.ElkTimer;
 import org.semanticweb.elk.util.Statistics;
 
 public class Reasoner {
