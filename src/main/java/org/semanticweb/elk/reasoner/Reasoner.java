@@ -45,6 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.Saturation;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.parsing.OntologyLoader;
+import org.semanticweb.elk.util.ElkTimer;
 import org.semanticweb.elk.util.Statistics;
 
 public class Reasoner {
@@ -83,15 +84,11 @@ public class Reasoner {
 
 	public void loadOntologyFromStream(InputStream stream)
 			throws ParseException, IOException {
-		if (logger.isInfoEnabled()) {
-			logger.info("Loading started");
-		}
+		Statistics.logOperationStart("Loading", logger);
 		Owl2FunctionalStyleParser.Init(stream);
 		Owl2FunctionalStyleParser.ontologyDocument(ontologyLoader);
 		stream.close();
-		if (logger.isInfoEnabled()) {
-			logger.info("Loading finished");
-		}
+		Statistics.logOperationFinish("Loading", logger);
 		Statistics.logMemoryUsage(logger);
 		indexingManager.waitCompletion();
 	}
@@ -122,9 +119,7 @@ public class Reasoner {
 		ClassExpressionSaturationManager classExpressionSaturationManager = 
 			new ClassExpressionSaturationManager(executor, nWorkers);
 
-		if (logger.isInfoEnabled()) {
-			logger.info("Saturation started");
-		}
+		Statistics.logOperationStart("Saturation", logger);
 
 		for (IndexedObjectProperty iop : ontologyIndex.getIndexedObjectProperties())
 			objectPropertySaturationManager.submit(iop);
@@ -133,22 +128,20 @@ public class Reasoner {
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
 			classExpressionSaturationManager.submit(ic);
 		Saturation saturation = classExpressionSaturationManager.computeSaturation();
-		if (logger.isInfoEnabled()) {
-			logger.info("Saturation finished");
-		}
+
+		Statistics.logOperationFinish("Saturation", logger);
 		Statistics.logMemoryUsage(logger);
+		
 		// Transitive reduction stage
-		if (logger.isInfoEnabled()) {
-			logger.info("Transitive reduction started");
-		}
+		Statistics.logOperationStart("Transitive reduction", logger);
+		
 		ClassificationManager classificationManager = new ClassificationManager(
 				executor, nWorkers, ontologyIndex, saturation);
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
 			classificationManager.submit((ElkClass) ic.classExpression);
 		classTaxonomy = classificationManager.getClassTaxonomy();
-		if (logger.isInfoEnabled()) {
-			logger.info("Transitive reduction finished");
-		}
+		
+		Statistics.logOperationFinish("Transitive reduction", logger);
 		Statistics.logMemoryUsage(logger);
 	}
 
