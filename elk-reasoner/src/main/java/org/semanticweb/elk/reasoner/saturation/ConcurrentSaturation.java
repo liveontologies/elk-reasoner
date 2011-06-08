@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.util.ElkTimer;
 import org.semanticweb.elk.util.LazySetIntersection;
 import org.semanticweb.elk.util.Pair;
 
@@ -164,6 +165,7 @@ class ConcurrentSaturation implements SaturationComputation {
 
 	protected void process(Context context) {
 		// synchronized (context) {
+		ElkTimer.startNamedTimer("ConcurrentSaturation#process");
 		for (;;) {
 			IndexedClassExpression ice = context.positivelyDerivedQueue.poll();
 			if (ice != null) {
@@ -195,6 +197,7 @@ class ConcurrentSaturation implements SaturationComputation {
 			break;
 		}
 		deactivateContext(context);
+		ElkTimer.stopNamedTimer("ConcurrentSaturation#process");
 		// }
 	}
 
