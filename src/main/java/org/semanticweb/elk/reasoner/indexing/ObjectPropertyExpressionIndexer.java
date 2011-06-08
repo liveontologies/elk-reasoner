@@ -26,8 +26,14 @@ import org.semanticweb.elk.syntax.ElkObjectInverseOf;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 
-public class ObjectPropertyExpressionIndexer implements
-		ElkObjectPropertyExpressionVisitor<IndexedObjectPropertyPack> {
+/**
+ * For indexing object properties.
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
+class ObjectPropertyExpressionIndexer implements
+		ElkObjectPropertyExpressionVisitor<IndexedObjectProperty> {
 	
 	protected AxiomIndexer axiomIndexer;
 	
@@ -35,11 +41,11 @@ public class ObjectPropertyExpressionIndexer implements
 		this.axiomIndexer = axiomIndexer;
 	}
 
-	public IndexedObjectPropertyPack visit(ElkObjectProperty elkObjectProperty) {
+	public IndexedObjectProperty visit(ElkObjectProperty elkObjectProperty) {
 		return axiomIndexer.ontologyIndex.getCreateIndexedObjectProperty(elkObjectProperty);
 	}
 
-	public IndexedObjectPropertyPack visit(ElkObjectInverseOf elkObjectInverseOf) {
-		throw new UnsupportedOperationException("Not supported");
+	public IndexedObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
+		throw new UnsupportedOperationException();
 	}
 }

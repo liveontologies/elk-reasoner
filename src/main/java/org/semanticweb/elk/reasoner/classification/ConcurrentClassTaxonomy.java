@@ -37,8 +37,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.Context;
-import org.semanticweb.elk.reasoner.saturation.Saturation;
+import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.util.ArraySet;
 import org.semanticweb.elk.util.HashGenerator;
@@ -59,11 +58,6 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy,
 	private OntologyIndex ontologyIndex;
 
 	/**
-	 * The Saturation on which the class hierarchy is based.
-	 */
-	private Saturation saturation;
-
-	/**
 	 * Lookup table for ClassNode objects.
 	 */
 	protected final ConcurrentMap<ElkClass, ClassNode> nodeLookup;
@@ -72,7 +66,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy,
 	 * Queue for assigning parents to ClassNode objects. The collection of
 	 * contexts consists of the direct parent contexts of the ClassNode.
 	 */
-	protected final Queue<Pair<ClassNode, Collection<Context>>> assignParentsQueue;
+	protected final Queue<Pair<ClassNode, Collection<SaturatedClassExpression>>> assignParentsQueue;
 
 	/**
 	 * Queue for active ClassNode objects for which new children still have to
@@ -90,11 +84,10 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy,
 	 * @param saturation
 	 *            based on which the hierarchy is computed
 	 */
-	ConcurrentClassTaxonomy(OntologyIndex ontologyIndex, Saturation saturation) {
+	ConcurrentClassTaxonomy(OntologyIndex ontologyIndex) {
 		this.ontologyIndex = ontologyIndex;
-		this.saturation = saturation;
 		this.nodeLookup = new ConcurrentHashMap<ElkClass, ClassNode>();
-		this.assignParentsQueue = new ConcurrentLinkedQueue<Pair<ClassNode, Collection<Context>>>();
+		this.assignParentsQueue = new ConcurrentLinkedQueue<Pair<ClassNode, Collection<SaturatedClassExpression>>>();
 		this.activeNodes = new ConcurrentLinkedQueue<ClassNode>();
 	}
 
@@ -128,20 +121,20 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy,
 		// Equivalent ElkClass with the smallest hash (may change below)
 		ElkClass canonical = elkClass;
 		IndexedClassExpression root = ontologyIndex.getIndexedClassExpression(elkClass);
-		Context rootContext = saturation.getContext(root);
+		SaturatedClassExpression rootContext = root.getSaturated();
 
 		// Classes equivalent to elkClass
 		ArraySet<ElkClass> equivalent = new ArraySet<ElkClass>();
 		// Contexts of direct superclasses of elkClass
-		Collection<Context> directContexts = new LinkedList<Context>();
+		Collection<SaturatedClassExpression> directContexts = new LinkedList<SaturatedClassExpression>();
 
-		for (IndexedClassExpression derived : rootContext.getDerived()) {
-			if (derived.classExpression instanceof ElkClass) {
-				ElkClass derivedClass = (ElkClass) derived.classExpression;
-				Context derivedContext = saturation.getContext(derived);
+		for (IndexedClassExpression derived : rootContext.getSuperClassExpressions()) {
+			if (derived.getClassExpression() instanceof ElkClass) {
+				ElkClass derivedClass = (ElkClass) derived.getClassExpression();
+				SaturatedClassExpression derivedContext = derived.getSaturated();
 
 				Set<IndexedClassExpression> derivedDerived = derivedContext
-						.getDerived();
+						.getSuperClassExpressions();
 				if (derivedDerived.contains(root)) {
 					equivalent.add(derivedClass);
 					// Uses that ElkClass is uniquely identified by its iri
@@ -150,10 +143,10 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy,
 					}
 				} else {
 					boolean addThis = true;
-					Iterator<Context> e = directContexts.iterator();
+					Iterator<SaturatedClassExpression> e = directContexts.iterator();
 					while (e.hasNext()) {
-						Context previousContext = e.next();
-						if (previousContext.getDerived().contains(derived)) {
+						SaturatedClassExpression previousContext = e.next();
+						if (previousContext.getSuperClassExpressions().contains(derived)) {
 							addThis = false;
 							break;
 						}
@@ -178,16 +171,16 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy,
 			if (member != canonical) {
 				nodeLookup.put(member, node);
 			}
-			assignParentsQueue.add(new Pair<ClassNode, Collection<Context>>(
+			assignParentsQueue.add(new Pair<ClassNode, Collection<SaturatedClassExpression>>(
 					node, directContexts));
 		}
 
 		return node;
 	}
 
-	protected void assignParents(ClassNode node, Collection<Context> parents) {
-		for (Context parentContext : parents) {
-			ClassNode parentNode = getNode((ElkClass) parentContext.getRoot().classExpression);
+	protected void assignParents(ClassNode node, Collection<SaturatedClassExpression> parents) {
+		for (SaturatedClassExpression parentContext : parents) {
+			ClassNode parentNode = getNode((ElkClass) parentContext.getRoot().getClassExpression());
 			node.addParent(parentNode);
 			parentNode.enqueueChild(node);
 			activateNode(parentNode);
@@ -224,7 +217,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy,
 				processChildren(activeNode);
 				continue;
 			}
-			Pair<ClassNode, Collection<Context>> parentAssignment = assignParentsQueue
+			Pair<ClassNode, Collection<SaturatedClassExpression>> parentAssignment = assignParentsQueue
 					.poll();
 			if (parentAssignment != null) {
 				assignParents(parentAssignment.getFirst(),

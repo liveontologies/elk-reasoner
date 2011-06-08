@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
  * @author Yevgeny Kazakov
  * 
  */
-interface SaturationComputation extends Saturation {
+interface SaturationComputation {
 
 	void addTarget(IndexedClassExpression root);
 

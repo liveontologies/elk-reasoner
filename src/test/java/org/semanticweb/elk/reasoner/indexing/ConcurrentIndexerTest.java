@@ -68,7 +68,7 @@ public class ConcurrentIndexerTest extends TestCase {
 		assertTrue(((IndexedObjectIntersectionOf) ontologyIndex
 				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts
 				.contains(ontologyIndex.getIndexedClassExpression(organ.get())));
-		assertTrue(ontologyIndex.getIndexedClassExpression(human.get()).superClassExpressions
+		assertTrue(ontologyIndex.getIndexedClassExpression(human.get()).toldSuperClassExpressions
 				.contains(ontologyIndex.getIndexedClassExpression(hasHeartAndOrgan.get())));
 		assertTrue(ontologyIndex.getIndexedClassExpression(heart.get()).negConjunctionsByConjunct == null);
 

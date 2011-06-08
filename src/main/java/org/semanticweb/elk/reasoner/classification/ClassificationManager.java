@@ -31,7 +31,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.Saturation;
 import org.semanticweb.elk.syntax.ElkClass;
 
 /**
@@ -51,9 +50,8 @@ public class ClassificationManager {
 	protected final BlockingQueue<ElkClass> classBuffer;
 
 	public ClassificationManager(ExecutorService executor, int nWorkers,
-			OntologyIndex ontologyIndex, Saturation saturation) {
-		this.classTaxonomy = new ConcurrentClassTaxonomy(ontologyIndex,
-				saturation);
+			OntologyIndex ontologyIndex) {
+		this.classTaxonomy = new ConcurrentClassTaxonomy(ontologyIndex);
 		this.maxWorkers = nWorkers;
 		this.executor = executor;
 		this.workerCount = new AtomicInteger(0);

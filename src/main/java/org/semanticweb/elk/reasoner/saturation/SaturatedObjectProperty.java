@@ -23,16 +23,89 @@
 
 package org.semanticweb.elk.reasoner.saturation;
 
+import java.util.ArrayDeque;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
+import org.semanticweb.elk.util.ArrayHashSet;
 
-public interface SaturatedObjectProperty {
-	Set<IndexedObjectProperty> getSubObjectProperties();
+public class SaturatedObjectProperty {
+	
+	protected final IndexedObjectProperty root;
+	protected Set<IndexedObjectProperty> derivedSubObjectProperties;
+	protected Set<IndexedObjectProperty> derivedSuperObjectProperties;
+	protected Set<IndexedObjectProperty> transitiveSubObjectProperties;
+	protected Set<IndexedObjectProperty> transitiveSuperObjectProperties;
 
-	Set<IndexedObjectProperty> getSuperObjectProperties();
-		
-	Set<IndexedObjectProperty> getTransitiveSubObjectProperties();
-		
-	Set<IndexedObjectProperty> getTransitiveSuperObjectProperties();
+	public SaturatedObjectProperty(IndexedObjectProperty root) {
+		this.root = root;
+		compute();
+	}
+
+	public Set<IndexedObjectProperty> getSubObjectProperties() {
+		return derivedSubObjectProperties;
+	}
+
+
+	public Set<IndexedObjectProperty> getSuperObjectProperties() {
+		return derivedSuperObjectProperties;
+	}
+
+
+	public Set<IndexedObjectProperty> getTransitiveSubObjectProperties() {
+		return transitiveSubObjectProperties;
+	}
+
+
+	public Set<IndexedObjectProperty> getTransitiveSuperObjectProperties() {
+		return transitiveSuperObjectProperties;
+	}
+
+
+	protected void compute() {		
+		//compute all subproperties
+
+		derivedSubObjectProperties = new ArrayHashSet<IndexedObjectProperty>();
+		ArrayDeque<IndexedObjectProperty> queue = new ArrayDeque<IndexedObjectProperty>();
+		derivedSubObjectProperties.add(root);
+		queue.addLast(root);
+		while (!queue.isEmpty()) {
+			IndexedObjectProperty r = queue.removeLast();
+			if (r.getToldSubObjectProperties() != null)
+				for (IndexedObjectProperty s : r.getToldSubObjectProperties())
+					if (derivedSubObjectProperties.add(s))
+						queue.addLast(s);
+		}
+
+		//find transitive subproperties
+		transitiveSubObjectProperties = null;
+		for (IndexedObjectProperty r : derivedSubObjectProperties)
+			if (r.isTransitive()) {
+				if (transitiveSubObjectProperties == null)
+					transitiveSubObjectProperties = new ArrayHashSet<IndexedObjectProperty> ();
+				transitiveSubObjectProperties.add(r);
+			}
+
+		//compute all superproperties
+		derivedSuperObjectProperties = new ArrayHashSet<IndexedObjectProperty>();
+		queue.clear();
+		derivedSuperObjectProperties.add(root);
+		queue.addLast(root);
+		while (!queue.isEmpty()) {
+			IndexedObjectProperty r = queue.removeLast();
+			if (r.getToldSuperObjectProperties() != null)
+				for (IndexedObjectProperty s : r.getToldSuperObjectProperties())
+					if (derivedSuperObjectProperties.add(s))
+						queue.addLast(s);
+		}
+
+		//find transitive superproperties
+		transitiveSuperObjectProperties = null;
+		for (IndexedObjectProperty r : derivedSuperObjectProperties)
+			if (r.isTransitive()) {
+				if (transitiveSuperObjectProperties == null)
+					transitiveSuperObjectProperties = new ArrayHashSet<IndexedObjectProperty> ();
+				transitiveSuperObjectProperties.add(r);
+			}
+	}
 }

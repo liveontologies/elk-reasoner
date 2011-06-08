@@ -35,9 +35,10 @@ import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 
 /**
- * For indexing negative occurrences of class expressions
+ * For indexing negative occurrences of class expressions.
  * 
  * @author Yevgeny Kazakov
+ * @author Frantisek Simancik
  * 
  */
 class NegativeClassExpressionIndexer implements
@@ -77,7 +78,7 @@ class NegativeClassExpressionIndexer implements
 				} else if (i < conjunctionSize) {
 					List<ElkClassExpression> arguments = new ArrayList<ElkClassExpression>(
 							2);
-					arguments.add(prefixConjunction.classExpression);
+					arguments.add(prefixConjunction.elkClassExpression);
 					arguments.add(element);
 					prefixConjunction = ElkObjectIntersectionOf.create(
 							arguments).accept(this);
@@ -96,10 +97,10 @@ class NegativeClassExpressionIndexer implements
 		IndexedObjectSomeValuesFrom result = (IndexedObjectSomeValuesFrom)
 			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
 		if (result.negativeOccurrenceNo++ == 0) {
-			IndexedObjectProperty r = classExpression.getObjectPropertyExpression().accept(
-					axiomIndexer.objectPropertyExpressionIndexer);
-			IndexedClassExpression c = classExpression.getClassExpression().accept(this);
-			c.addNegativeExistentialWithRelation(result, r);
+			result.setRelation(classExpression.getObjectPropertyExpression().accept(
+					axiomIndexer.objectPropertyExpressionIndexer));
+			result.setFiller(classExpression.getClassExpression().accept(this));
+			result.getFiller().addNegativeExistential(result);
 		}
 		return result;
 	}

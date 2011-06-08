@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 Oxford University Computing Laboratory
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,52 +20,158 @@
  * limitations under the License.
  * #L%
  */
+
 package org.semanticweb.elk.reasoner.indexing;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.saturation.SaturatedObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
+import org.semanticweb.elk.util.HashGenerator;
 
 /**
- * Represents all occurrences of an ElkObjectProperty in an ontology.
- * To this end, objects of this class keeps a list of sub- and super- 
- * object properties. The data structures are optimized for quickly retrieving
- * the relevant relationships during inferencing.
+ * Represents all occurrences of an ElkObjectPropertyExpression in an ontology.
+ * To this end, objects of this class keeps a list of sub and super property
+ * expressions. The data structures are optimized for quickly retrieving the
+ * relevant relationships during inferencing.
+ * 
+ * This class is mainly a data container that provides direct public access to
+ * its content. The task of updating index structures consistently in a global
+ * sense is left to callers.
  * 
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
 
-public interface IndexedObjectProperty {
-	/**
-	 * The represented object property expression.
-	 */
-	ElkObjectProperty getElkObjectProperty();
+public class IndexedObjectProperty {
+	
+	protected final ElkObjectProperty elkObjectProperty;
+	protected List<IndexedObjectProperty> toldSubObjectProperties;
+	protected List<IndexedObjectProperty> toldSuperObjectProperties;
+	protected boolean isTransitive;
+	
 	
 	/**
-	 * List of all told subproperties of this object property.
+	 * Creates an object representing the given ElkObjectProperty.
 	 */
-	List<IndexedObjectProperty> getToldSubObjectProperties();
+	protected IndexedObjectProperty(ElkObjectProperty elkObjectProperty) {
+		this.elkObjectProperty = elkObjectProperty;
+	}
 
+	
+	/**
+	 * @return The represented object property expression.
+	 */
+	public ElkObjectProperty getElkObjectProperty() {
+		return elkObjectProperty;
+	}
+	
+	
+	/**
+	 * @return All told sub object properties of this object property, possibly null.
+	 */
+	public List<IndexedObjectProperty> getToldSubObjectProperties() {
+		return toldSubObjectProperties;
+	}
+
+	
 	/** 
-	 * List of all told superproperties of this object property.
+	 * @return All told super object properties of this object property, possibly null.
 	 */
-	List<IndexedObjectProperty> getToldSuperObjectProperties();
+	public List<IndexedObjectProperty> getToldSuperObjectProperties() {
+		return toldSuperObjectProperties;
+	}
+	
 
 	/**
-	 * True iff this object property is told transitive.
+	 * @return True if this object property is told transitive.
 	 */
-	boolean isTransitive();
+	public boolean isTransitive() {
+		return isTransitive;
+	}
+
+
+	protected void addToldSubObjectProperty(IndexedObjectProperty subObjectProperty) {
+		if (toldSubObjectProperties == null)
+			toldSubObjectProperties = new ArrayList<IndexedObjectProperty> (1);
+		toldSubObjectProperties.add(subObjectProperty);
+	}
+
+		
+	protected void addToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
+		if (toldSuperObjectProperties == null)
+			toldSuperObjectProperties = new ArrayList<IndexedObjectProperty> (1);
+		toldSuperObjectProperties.add(superObjectProperty);
+	}
+		
+	
+	protected void setTransitive() {
+		isTransitive = true;
+	}
+	
+	
+	
+	
+	protected final AtomicReference<SaturatedObjectProperty> saturated =
+		new AtomicReference<SaturatedObjectProperty> ();
 	
 	/**
-	 * Gets the SaturatedObjectProperty of this object property,
+	 * @return The corresponding saturated object property, 
 	 * null if none was assigned.
 	 */
-	SaturatedObjectProperty getSaturatedObjectProperty();
+	public SaturatedObjectProperty getSaturated() {
+		return saturated.get();
+	}
+	
+	
+	/**
+	 * Sets the corresponding saturated object property if none
+	 * was yet assigned. 
+	 * 
+	 * @return True if the operation succeeded. 
+	 */
+	public boolean setSaturated(SaturatedObjectProperty saturatedObjectProperty) {
+		return saturated.compareAndSet(null, saturatedObjectProperty);
+	}
+	
+	
+	/**
+	 * Resets the corresponding saturated object property to null.  
+	 */
+	public void resetSaturated() {
+		saturated.set(null);
+	}
+
+		
+
+	
+	
+	/**
+	 * Represent the object's ElkObjectProperty as a string. This implementation
+	 * reflects the fact that we generally consider only one
+	 * IndexedObjectProperty for each ElkObjectPropertyExpression.
+	 * 
+	 * @return String representation.
+	 */
+	@Override
+	public String toString() {
+		return "[" + elkObjectProperty.toString() + "]";
+	}
+	
+		
+	/** Hash code for this object. */
+	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	/**
-	 * Sets the SaturatedObjectProperty of this object property. 
+	 * Get an integer hash code to be used for this object.
+	 * 
+	 * @return Hash code.
 	 */
-	void setSaturatedObjectProperty(SaturatedObjectProperty sop);
+	@Override
+	public final int hashCode() {
+		return hashCode_;
+	}
+	
 }
