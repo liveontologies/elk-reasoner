@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 public class ObjectPropertySaturationManager {
 	
 	public void submit(IndexedObjectProperty iop) {
-		iop.setSaturatedObjectProperty(new SaturatedObjectPropertyImpl(iop));
+		iop.setSaturated(new SaturatedObjectProperty(iop));
 	}
 	
 	public void computeSaturation() {

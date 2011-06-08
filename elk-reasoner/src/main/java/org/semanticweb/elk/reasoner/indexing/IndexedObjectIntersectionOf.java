@@ -27,19 +27,42 @@ import java.util.List;
 
 import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 
+/**
+ * Represents all occurrences of an ElkObjectIntersectionOf in an ontology.
+ * 
+ * @author Frantisek Simancik
+ *
+ */
 public class IndexedObjectIntersectionOf extends IndexedClassExpression {
-	public List<IndexedClassExpression> conjuncts;
 	
-	public IndexedObjectIntersectionOf(ElkObjectIntersectionOf elkObjectIntersectionOf) {
+	protected List<IndexedClassExpression> conjuncts;
+	
+	
+	/**
+	 * Creates an object that represents the given ElkObjectIntersecionOf. 
+	 */
+	protected IndexedObjectIntersectionOf(ElkObjectIntersectionOf elkObjectIntersectionOf) {
 		super(elkObjectIntersectionOf);
-		conjuncts = null;
 	}
 	
-	public void addConjunct(IndexedClassExpression conjuct) {
+	
+	/**
+	 * @return The indexed class expressions that are the conjuncts of this object intersection. 
+	 */
+	public List<IndexedClassExpression> getConjuncts() {
+		return conjuncts;
+	}
+
+
+	protected void addConjunct(IndexedClassExpression conjunct) {
 		if (conjuncts == null)
 			conjuncts = new ArrayList<IndexedClassExpression> (2);
-		conjuncts.add(conjuct); 
+		conjuncts.add(conjunct); 
 	}
+	
+	
+	
+	
 	
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {

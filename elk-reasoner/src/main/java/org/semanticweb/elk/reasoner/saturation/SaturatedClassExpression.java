@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.util.ArrayHashSet;
-import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.HashListMultimap;
 import org.semanticweb.elk.util.HashSetMultimap;
 import org.semanticweb.elk.util.Multimap;
@@ -46,38 +45,48 @@ import org.semanticweb.elk.util.Pair;
  * 
  * @author Frantisek Simancik
  */
-public class Context {
-	final IndexedClassExpression root;
-	final Queue<IndexedClassExpression> positivelyDerivedQueue;
-	final Queue<IndexedClassExpression> negativelyDerivedQueue; 
-	final Queue<Pair<IndexedObjectProperty, Context>> linkQueue;
-	final Queue<Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom>> propagationQueue;
-	final Set<IndexedClassExpression> derived;
-	final Multimap<IndexedObjectProperty, Context> linksByObjectProperty;
-	final Multimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom> propagationsByObjectProperty;
+public class SaturatedClassExpression {
+	protected final IndexedClassExpression root;
+	protected final Queue<IndexedClassExpression> positivelyDerivedQueue;
+	protected final Queue<IndexedClassExpression> negativelyDerivedQueue; 
+	protected final Queue<Pair<IndexedObjectProperty, SaturatedClassExpression>> linkQueue;
+	protected final Queue<Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom>> propagationQueue;
+	protected final Set<IndexedClassExpression> derived;
+	protected final Multimap<IndexedObjectProperty, SaturatedClassExpression> linksByObjectProperty;
+	protected final Multimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom> propagationsByObjectProperty;
 	/**
 	 * A context is active iff one of its queues is not empty or it is being
 	 * processed.
 	 */
 	private AtomicBoolean isActive;
 
-	public Context(IndexedClassExpression root) {
+	public SaturatedClassExpression(IndexedClassExpression root) {
 		this.root = root;
 		this.positivelyDerivedQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
 		this.negativelyDerivedQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
-		this.linkQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, Context>>();
+		this.linkQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, SaturatedClassExpression>>();
 		this.propagationQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom>>();
 		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
-		this.linksByObjectProperty = new HashListMultimap<IndexedObjectProperty, Context>(
+		this.linksByObjectProperty = new HashListMultimap<IndexedObjectProperty, SaturatedClassExpression>(
 				1);
 		this.propagationsByObjectProperty = new HashSetMultimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom>(
 				1);
 		this.isActive = new AtomicBoolean(false);
 	}
 
+	
 	public IndexedClassExpression getRoot() {
 		return root;
 	}
+
+	
+	/**
+	 * @return the set of derived indexed class expressions
+	 */
+	public Set<IndexedClassExpression> getSuperClassExpressions() {
+		return derived;
+	}
+
 
 	/**
 	 * Sets the context as active if it was false. This method is thread safe:
@@ -85,36 +94,19 @@ public class Context {
 	 * 
 	 * @return true if the context was not active; returns false otherwise
 	 */
-	protected boolean tryActivate() {
+	boolean tryActivate() {
 		return isActive.compareAndSet(false, true);
 	}
 
+	
 	/**
 	 * Sets the context as not active if it was active. This method is thread
 	 * safe: for two concurrent executions only one succeeds.
 	 * 
 	 * @return true if the context was active; returns false otherwise
 	 */
-	protected boolean tryDeactivate() {
+	boolean tryDeactivate() {
 		return isActive.compareAndSet(true, false);
 	}
 
-	/**
-	 * @return the set of derived indexed class expressions
-	 */
-	public Set<IndexedClassExpression> getDerived() {
-		return derived;
-	}
-
-	private final int hashCode_ = HashGenerator.generateNextHashCode();
-
-	/**
-	 * Get an integer hash code to be used for this object.
-	 * 
-	 * @return integer hash code
-	 */
-	@Override
-	public final int hashCode() {
-		return hashCode_;
-	}
 }

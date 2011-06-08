@@ -100,10 +100,10 @@ public class ReasonerTest extends TestCase {
 		IndexedClassExpression I = index.getIndexedClassExpression(constructor
 				.getFutureElkObjectIntersectionOf(b, c).get());
 
-		assertTrue("A SubClassOf B", A.superClassExpressions.contains(B));
-		assertTrue("A SubClassOf C", A.superClassExpressions.contains(C));
-		assertFalse("A SubClassOf D", A.superClassExpressions.contains(D));
-		assertTrue("I SubClassOf D", I.superClassExpressions.contains(D));
+		assertTrue("A SubClassOf B", A.getToldSuperClassExpressions().contains(B));
+		assertTrue("A SubClassOf C", A.getToldSuperClassExpressions().contains(C));
+		assertFalse("A SubClassOf D", A.getToldSuperClassExpressions().contains(D));
+		assertTrue("I SubClassOf D", I.getToldSuperClassExpressions().contains(D));
 
 		reasoner.classify();
 

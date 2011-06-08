@@ -24,7 +24,9 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
@@ -33,7 +35,6 @@ import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.HashListMultimap;
 import org.semanticweb.elk.util.Multimap;
-import org.semanticweb.elk.util.Pair;
 
 /**
  * Represents all occurrences of an ElkClassExpression in an ontology. To this
@@ -50,26 +51,11 @@ import org.semanticweb.elk.util.Pair;
  * @author Markus Kroetzsch
  */
 abstract public class IndexedClassExpression {
-	/** The represented class expression. */
-	public final ElkClassExpression classExpression;
-
-	/**
-	 * A list of all indexed class expressions for (told) superclasses of this
-	 * class expression.
-	 */
-	public List<IndexedClassExpression> superClassExpressions;
-
-	/**
-	 * A list of Conjunction objects that have this class expression in their
-	 * premise.
-	 */
-	public Multimap<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
-
-	/**
-	 * A list of Quantifier objects representing all existential role
-	 * restrictions that this class expressions is a told superclass of.
-	 */
-	public List<Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty>> negExistentialsWithRelation;
+	
+	protected final ElkClassExpression elkClassExpression;
+	protected List<IndexedClassExpression> toldSuperClassExpressions;
+	protected Multimap<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
+	protected List<IndexedObjectSomeValuesFrom> negExistentials;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -78,10 +64,6 @@ abstract public class IndexedClassExpression {
 	 */
 	int positiveOccurrenceNo = 0;
 
-	public boolean occursPositively() {
-		return positiveOccurrenceNo > 0;
-	}
-
 	/**
 	 * This counts how often this object occurred negatively. Some indexing
 	 * operations are only needed when encountering objects negatively for the
@@ -89,70 +71,137 @@ abstract public class IndexedClassExpression {
 	 */
 	int negativeOccurrenceNo = 0;
 
-	public boolean occursNegatively() {
-		return negativeOccurrenceNo > 0;
+	
+	/**
+	 * Creates an object that represents the given an ElkClassExpression.
+	 */
+	protected IndexedClassExpression(ElkClassExpression classExpression) {
+		this.elkClassExpression = classExpression;
 	}
+	
+	
+	/** 
+	 * @return The represented class expression.
+	 */ 
+	public ElkClassExpression getClassExpression() {
+		return elkClassExpression;
+	}
+	
 
 	/**
-	 * Creates a Concept that represents an ElkClassExpression.
-	 * 
-	 * @param classExpression
+	 * @return All told super class expressions of this class expression.
 	 */
-	public IndexedClassExpression(ElkClassExpression classExpression) {
-		this.classExpression = classExpression;
-		this.superClassExpressions = null;
-		this.negConjunctionsByConjunct = null;
-		this.negExistentialsWithRelation = null;
+	public List<IndexedClassExpression> getToldSuperClassExpressions() {
+		return toldSuperClassExpressions;
+	}
+	
+	
+	/**
+	 * @return Indexed conjunctions that occur negatively and contain this class expression,
+	 *  indexed by the second conjunct.
+	 */
+	public Multimap<IndexedClassExpression, IndexedObjectIntersectionOf> getNegConjunctionsByConjunct() {
+		return negConjunctionsByConjunct;
 	}
 
-	public void addSuperClassExpression(
+
+	/**
+	 * @return Indexed existentials that occur negatively and have this class expression as the filler.
+	 */
+	public List<IndexedObjectSomeValuesFrom> getNegExistentials() {
+		return negExistentials;
+	}
+	
+	
+	protected void addToldSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
-		if (superClassExpressions == null)
-			superClassExpressions = new ArrayList<IndexedClassExpression>(1);
-		superClassExpressions.add(superClassExpression);
+		if (toldSuperClassExpressions == null)
+			toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(1);
+		toldSuperClassExpressions.add(superClassExpression);
 	}
 
-	public void addNegativeConjunctionByConjunct(
-			IndexedObjectIntersectionOf conjunctions,
+	
+	protected void addNegativeConjunctionByConjunct(
+			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
 		if (negConjunctionsByConjunct == null)
 			negConjunctionsByConjunct = new HashListMultimap<IndexedClassExpression, IndexedObjectIntersectionOf>();
-		negConjunctionsByConjunct.add(conjunct, conjunctions);
+		negConjunctionsByConjunct.add(conjunct, conjunction);
 	}
 
-	public void addNegativeExistentialWithRelation(
-			IndexedObjectSomeValuesFrom existential,
-			IndexedObjectProperty relation) {
-		if (negExistentialsWithRelation == null)
-			negExistentialsWithRelation = new ArrayList<Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty>>(
-					1);
-		negExistentialsWithRelation
-				.add(new Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty>(
-						existential, relation));
+	
+	protected void addNegativeExistential(IndexedObjectSomeValuesFrom existential) {
+		if (negExistentials == null)
+			negExistentials = new ArrayList<IndexedObjectSomeValuesFrom> (1);
+		negExistentials.add(existential);
 	}
 
+	
+	
+
+	
+	protected final AtomicReference<SaturatedClassExpression> saturated =
+		new AtomicReference<SaturatedClassExpression> ();
+	
+	
+	/**
+	 * @return The corresponding saturated object property, 
+	 * null if none was assigned.
+	 */
+	public SaturatedClassExpression getSaturated() {
+		return saturated.get();
+	}
+	
+	
+	/**
+	 * Sets the corresponding saturated class expression if none
+	 * was yet assigned. 
+	 * 
+	 * @return True if the operation succeeded. 
+	 */
+	public boolean setSaturated(SaturatedClassExpression saturatedClassExpression) {
+		return saturated.compareAndSet(null, saturatedClassExpression);
+	}
+	
+	
+	/**
+	 * Resets the corresponding saturated object property to null.  
+	 */
+	public void resetSaturated() {
+		saturated.set(null);
+	}
+
+
+	
+	
+	
+	
 	/**
 	 * Represent the object's ElkClassExpression as a string. This
 	 * implementation reflects the fact that we generally consider only one
 	 * IndexedClassExpression for each ElkClassExpression.
 	 * 
-	 * @return string representation
+	 * @return String representation.
 	 */
 	public String toString() {
-		return "[" + classExpression.toString() + "]";
+		return "[" + elkClassExpression.toString() + "]";
 	}
 
+	
 	/** Hash code for this object. */
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	/**
 	 * Get an integer hash code to be used for this object.
+	 * 
+	 * @return Hash code.
 	 */
 	@Override
 	public final int hashCode() {
 		return hashCode_;
 	}
 
+	
 	static IndexedClassExpression create(ElkClassExpression classExpression) {
 		return classExpression
 				.accept(new ElkClassExpressionVisitor<IndexedClassExpression>() {

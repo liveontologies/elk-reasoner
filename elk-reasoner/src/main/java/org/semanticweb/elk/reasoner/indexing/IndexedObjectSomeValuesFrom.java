@@ -24,16 +24,56 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 
+/**
+ * Represents all occurrences of an ElkObjectSomeValuesFrom in an ontology.
+ * 
+ * @author Frantisek Simancik
+ *
+ */
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
- 	public IndexedObjectProperty relation; 
-	public IndexedClassExpression filler;
+ 	
+	protected IndexedObjectProperty relation; 
 	
-	public IndexedObjectSomeValuesFrom(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
+	protected IndexedClassExpression filler;
+
+
+	/**
+	 * Creates an object that represents the given ElkObjectIntersecionOf. 
+	 */
+	protected IndexedObjectSomeValuesFrom(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
 		super(elkObjectSomeValuesFrom);
-		relation = null;
-		filler = null;
+	}
+	
+	
+	/**
+	 * @return The indexed object property comprising this ObjectSomeValuesFrom.
+	 */
+	public IndexedObjectProperty getRelation() {
+		return relation;
+	}
+	
+	
+	/**
+	 * @return The indexed class expression comprising this ObjectSomeValuesFrom. 
+	 */
+	public IndexedClassExpression getFiller() {
+		return filler;
 	}
 
+
+	protected void setRelation(IndexedObjectProperty relation) {
+		this.relation = relation;
+	}
+
+	
+	protected void setFiller(IndexedClassExpression filler) {
+		this.filler = filler;
+	}
+
+	
+	
+	
+	
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);

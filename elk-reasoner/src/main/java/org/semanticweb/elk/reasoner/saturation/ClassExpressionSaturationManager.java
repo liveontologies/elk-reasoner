@@ -98,8 +98,7 @@ public class ClassExpressionSaturationManager {
 		}
 	}
 
-	public Saturation computeSaturation() {
+	public void computeSaturation() {
 		waitCompletion();
-		return saturation;
 	}
 }

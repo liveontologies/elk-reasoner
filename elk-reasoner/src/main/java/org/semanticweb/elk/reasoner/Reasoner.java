@@ -41,7 +41,6 @@ import org.semanticweb.elk.reasoner.indexing.IndexingManager;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationManager;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturationManager;
-import org.semanticweb.elk.reasoner.saturation.Saturation;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.parsing.OntologyLoader;
@@ -126,7 +125,7 @@ public class Reasoner {
 
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
 			classExpressionSaturationManager.submit(ic);
-		Saturation saturation = classExpressionSaturationManager.computeSaturation();
+		classExpressionSaturationManager.computeSaturation();
 
 		Statistics.logOperationFinish("Saturation", logger);
 		Statistics.logMemoryUsage(logger);
@@ -135,9 +134,9 @@ public class Reasoner {
 		Statistics.logOperationStart("Transitive reduction", logger);
 		
 		ClassificationManager classificationManager = new ClassificationManager(
-				executor, nWorkers, ontologyIndex, saturation);
+				executor, nWorkers, ontologyIndex);
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
-			classificationManager.submit((ElkClass) ic.classExpression);
+			classificationManager.submit((ElkClass) ic.getClassExpression());
 		classTaxonomy = classificationManager.getClassTaxonomy();
 		
 		Statistics.logOperationFinish("Transitive reduction", logger);

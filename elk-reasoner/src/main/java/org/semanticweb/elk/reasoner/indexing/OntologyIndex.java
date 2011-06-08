@@ -32,7 +32,8 @@ import org.semanticweb.elk.syntax.ElkObjectProperty;
  * Interface providing read-only to the index of the ontology.
  * 
  * @author Yevgeny Kazakov
- * 
+ * @author Frantisek Simancik
+ *
  */
 public interface OntologyIndex {
 
@@ -40,8 +41,10 @@ public interface OntologyIndex {
 	
 	IndexedObjectProperty getIndexedObjectProperty(ElkObjectProperty representative);
 	
-	public Iterable<? extends IndexedClass> getIndexedClasses();
+	Iterable<IndexedClass> getIndexedClasses();
 	
-	public Iterable<? extends IndexedObjectProperty> getIndexedObjectProperties();
+	Iterable<IndexedClassExpression> getIndexedClassExpressions();
+	
+	Iterable<IndexedObjectProperty> getIndexedObjectProperties();
 
 }

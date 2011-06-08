@@ -84,10 +84,9 @@ public class ConcurrentSaturatorTest extends TestCase {
 			new ClassExpressionSaturationManager(executor, 16);
 
 		classExpressionSaturationManager.submit(A);
-		Saturation saturation = classExpressionSaturationManager.computeSaturation();
-		Context context = saturation.getContext(A);
+		classExpressionSaturationManager.computeSaturation();
 
-		assertTrue("A contains D", context.getDerived().contains(D));
+		assertTrue("A contains D", A.getSaturated().getSuperClassExpressions().contains(D));
 
 		executor.shutdown();
 	}
@@ -116,24 +115,23 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression I = ontologyIndex.getIndexedClassExpression(constructor
 				.getFutureElkObjectIntersectionOf(b, c).get());
 
-		assertTrue("A SubClassOf B", A.superClassExpressions.contains(B));
-		assertTrue("A SubClassOf C", A.superClassExpressions.contains(C));
-		assertFalse("A SubClassOf D", A.superClassExpressions.contains(D));
-		assertTrue("I SubClassOf D", I.superClassExpressions.contains(D));
+		assertTrue("A SubClassOf B", A.getToldSuperClassExpressions().contains(B));
+		assertTrue("A SubClassOf C", A.getToldSuperClassExpressions().contains(C));
+		assertFalse("A SubClassOf D", A.getToldSuperClassExpressions().contains(D));
+		assertTrue("I SubClassOf D", I.getToldSuperClassExpressions().contains(D));
 
 		final ClassExpressionSaturationManager saturationManager = new ClassExpressionSaturationManager(
 				executor, 16);
 
 		saturationManager.submit(A);
-		saturationManager.waitCompletion();
-		Saturation saturation = saturationManager.computeSaturation();
-		Context context = saturation.getContext(A);
+		saturationManager.computeSaturation();
+		SaturatedClassExpression context =A.getSaturated();
 
-		assertTrue("A contains A", context.getDerived().contains(A));
-		assertTrue("A contains B", context.getDerived().contains(B));
-		assertTrue("A contains C", context.getDerived().contains(C));
-		assertTrue("A contains I", context.getDerived().contains(I));
-		assertTrue("A contains D", context.getDerived().contains(D));
+		assertTrue("A contains A", context.getSuperClassExpressions().contains(A));
+		assertTrue("A contains B", context.getSuperClassExpressions().contains(B));
+		assertTrue("A contains C", context.getSuperClassExpressions().contains(C));
+		assertTrue("A contains I", context.getSuperClassExpressions().contains(I));
+		assertTrue("A contains D", context.getSuperClassExpressions().contains(D));
 	}
 
 }

@@ -26,9 +26,7 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -38,42 +36,31 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.util.ElkTimer;
 import org.semanticweb.elk.util.LazySetIntersection;
 import org.semanticweb.elk.util.Pair;
 
 /**
  * @author Yevgeny Kazakov
- * 
+ * @author Frantisek Simancik
+ *
  */
 class ConcurrentSaturation implements SaturationComputation {
 
-	// lookup table for contexts
-	protected final ConcurrentMap<IndexedClassExpression, Context> contextLookup;
 	// queue for active contexts
-	protected final Queue<Context> activeContexts;
+	protected final Queue<SaturatedClassExpression> activeContexts;
 	// the size of the queue
 	protected final AtomicInteger activeContextCount;
 	// logger for events
 	protected final static Logger logger = Logger
 			.getLogger(ConcurrentSaturation.class);
 
-	ConcurrentSaturation() {
-		this.contextLookup = new ConcurrentHashMap<IndexedClassExpression, Context>();
-		this.activeContexts = new ConcurrentLinkedQueue<Context>();
+	protected ConcurrentSaturation() {
+		this.activeContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
 		this.activeContextCount = new AtomicInteger(0);
 	}
 
 	public void addTarget(IndexedClassExpression root) {
 		getCreateContext(root);
-	}
-
-	public Context getContext(IndexedClassExpression root) {
-		return contextLookup.get(root);
-	}
-	
-	public SaturatedObjectProperty getSaturatedObjectProperty(IndexedObjectProperty root) {
-		return root.getSaturatedObjectProperty();
 	}
 
 	/**
@@ -89,29 +76,27 @@ class ConcurrentSaturation implements SaturationComputation {
 	 * @return context which root is the input indexed class expression.
 	 * 
 	 */
-	Context getCreateContext(IndexedClassExpression root) {
-		Context context = contextLookup.get(root);
-		if (context == null) {
-			context = new Context(root);
-			Context previous = contextLookup.putIfAbsent(root, context);
-			if (previous != null)
-				return (previous);
-			if (logger.isTraceEnabled()) {
-				logger.trace("Created context for " + root);
+	protected SaturatedClassExpression getCreateContext(IndexedClassExpression root) {
+		if (root.getSaturated() == null) {
+			SaturatedClassExpression sce = new SaturatedClassExpression(root);
+			if (root.setSaturated(sce)) {
+				if (logger.isTraceEnabled()) {
+					logger.trace("Created context for " + root);
+				}
+				enqueueDerived(sce, root, true);
 			}
-			enqueueDerived(context, root, true);
 		}
-		return context;
+		return root.getSaturated();
 	}
 
-	private void activateContext(Context context) {
+	protected void activateContext(SaturatedClassExpression context) {
 		if (context.tryActivate()) {
 			activeContexts.add(context);
 			activeContextCount.incrementAndGet();
 		}
 	}
 
-	private void deactivateContext(Context context) {
+	protected void deactivateContext(SaturatedClassExpression context) {
 		if (context.tryDeactivate())
 			if (!context.linkQueue.isEmpty()
 					|| !context.propagationQueue.isEmpty()
@@ -120,8 +105,8 @@ class ConcurrentSaturation implements SaturationComputation {
 				activateContext(context);
 	}
 
-	protected void enqueueDerived(Context context, IndexedClassExpression ice,
-			boolean polarity) {
+	protected void enqueueDerived(SaturatedClassExpression context,
+			IndexedClassExpression ice, boolean polarity) {
 		if (!context.derived.contains(ice)) {
 			if (polarity)
 				context.positivelyDerivedQueue.add(ice);
@@ -131,16 +116,17 @@ class ConcurrentSaturation implements SaturationComputation {
 		}
 	}
 
-	protected void enqueueLink(Context context, IndexedObjectProperty relation,
-			Context linkTarget) {
+	protected void enqueueLink(SaturatedClassExpression context,
+			IndexedObjectProperty relation, SaturatedClassExpression linkTarget) {
 		// if (!context.linksByObjectProperty.contains(relation, linkTarget)) {
-		context.linkQueue.add(new Pair<IndexedObjectProperty, Context>(
-				relation, linkTarget));
+		context.linkQueue
+				.add(new Pair<IndexedObjectProperty, SaturatedClassExpression>(
+						relation, linkTarget));
 		activateContext(context);
 		// }
 	}
 
-	protected void enqueuePropagation(Context context,
+	protected void enqueuePropagation(SaturatedClassExpression context,
 			IndexedObjectProperty relation,
 			IndexedObjectSomeValuesFrom propClass) {
 		// if (!context.propagationsByObjectProperty.contains(relation,
@@ -154,7 +140,7 @@ class ConcurrentSaturation implements SaturationComputation {
 
 	public void compute() {
 		for (;;) {
-			Context context = activeContexts.poll();
+			SaturatedClassExpression context = activeContexts.poll();
 			if (context != null) {
 				process(context);
 				continue;
@@ -163,7 +149,7 @@ class ConcurrentSaturation implements SaturationComputation {
 		}
 	}
 
-	protected void process(Context context) {
+	protected void process(SaturatedClassExpression context) {
 		// synchronized (context) {
 		for (;;) {
 			IndexedClassExpression ice = context.positivelyDerivedQueue.poll();
@@ -178,7 +164,7 @@ class ConcurrentSaturation implements SaturationComputation {
 				continue;
 			}
 
-			Pair<IndexedObjectProperty, Context> link = context.linkQueue
+			Pair<IndexedObjectProperty, SaturatedClassExpression> link = context.linkQueue
 					.poll();
 			if (link != null) {
 				processLink(context, link.getFirst(), link.getSecond());
@@ -188,8 +174,8 @@ class ConcurrentSaturation implements SaturationComputation {
 			Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom> propagation = context.propagationQueue
 					.poll();
 			if (propagation != null) {
-				processPropagation(context, propagation.getFirst(),
-						propagation.getSecond());
+				processPropagation(context, propagation.getFirst(), propagation
+						.getSecond());
 				continue;
 			}
 
@@ -199,8 +185,9 @@ class ConcurrentSaturation implements SaturationComputation {
 		// }
 	}
 
-	protected void propagateOverLink(Context context,
-			IndexedObjectProperty linkRelation, Context linkTarget,
+	protected void propagateOverLink(SaturatedClassExpression context,
+			IndexedObjectProperty linkRelation,
+			SaturatedClassExpression linkTarget,
 			IndexedObjectProperty propRelation,
 			IndexedObjectSomeValuesFrom propClass) {
 
@@ -208,9 +195,9 @@ class ConcurrentSaturation implements SaturationComputation {
 
 		// transitive object properties
 
-		SaturatedObjectProperty satLinkRelation = getSaturatedObjectProperty(linkRelation);
-		SaturatedObjectProperty satPropRelation = getSaturatedObjectProperty(propRelation);
-		
+		SaturatedObjectProperty satLinkRelation = linkRelation.getSaturated();
+		SaturatedObjectProperty satPropRelation = propRelation.getSaturated();
+
 		if (satLinkRelation.getTransitiveSuperObjectProperties() != null
 				&& satPropRelation.getTransitiveSubObjectProperties() != null) {
 			if (propRelation.isTransitive())
@@ -225,12 +212,13 @@ class ConcurrentSaturation implements SaturationComputation {
 
 	public static int derivedLinks = 0;
 
-	protected void processLink(Context context,
-			IndexedObjectProperty linkRelation, Context linkTarget) {
+	protected void processLink(SaturatedClassExpression context,
+			IndexedObjectProperty linkRelation,
+			SaturatedClassExpression linkTarget) {
 		if (context.linksByObjectProperty.add(linkRelation, linkTarget)) {
 			derivedLinks++;
 			for (IndexedObjectProperty propRelation : new LazySetIntersection<IndexedObjectProperty>(
-					getSaturatedObjectProperty(linkRelation).getSuperObjectProperties(),
+					linkRelation.getSaturated().getSuperObjectProperties(),
 					context.propagationsByObjectProperty.keySet()))
 				for (IndexedObjectSomeValuesFrom propClass : context.propagationsByObjectProperty
 						.get(propRelation))
@@ -239,55 +227,57 @@ class ConcurrentSaturation implements SaturationComputation {
 		}
 	}
 
-	protected void processPropagation(Context context,
+	protected void processPropagation(SaturatedClassExpression context,
 			IndexedObjectProperty propRelation,
 			IndexedObjectSomeValuesFrom propClass) {
 		if (context.propagationsByObjectProperty.add(propRelation, propClass)) {
 			for (IndexedObjectProperty linkRelation : new LazySetIntersection<IndexedObjectProperty>(
-					getSaturatedObjectProperty(propRelation).getSubObjectProperties(),
+					propRelation.getSaturated().getSubObjectProperties(),
 					context.linksByObjectProperty.keySet()))
-				for (Context linkTarget : context.linksByObjectProperty
+				for (SaturatedClassExpression linkTarget : context.linksByObjectProperty
 						.get(linkRelation))
 					propagateOverLink(context, linkRelation, linkTarget,
 							propRelation, propClass);
 		}
 	}
 
-	protected void processClass(Context context, IndexedClassExpression ice,
-			boolean polarity) {
+	protected void processClass(SaturatedClassExpression context,
+			IndexedClassExpression ice, boolean polarity) {
 		if (context.derived.add(ice)) {
 
 			if (polarity)
 				ice.accept(new PositivelyDerivedProcessor(context));
 
 			// process subsumptions
-			if (ice.superClassExpressions != null) {
-				for (IndexedClassExpression implied : ice.superClassExpressions)
+			if (ice.getToldSuperClassExpressions() != null) {
+				for (IndexedClassExpression implied : ice
+						.getToldSuperClassExpressions())
 					enqueueDerived(context, implied, true);
 			}
 
 			// process negative conjunctions
-			if (ice.negConjunctionsByConjunct != null) {
+			if (ice.getNegConjunctionsByConjunct() != null) {
 				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-						ice.negConjunctionsByConjunct.keySet(), context.derived))
-					for (IndexedClassExpression conclusion : ice.negConjunctionsByConjunct
-							.get(common))
+						ice.getNegConjunctionsByConjunct().keySet(),
+						context.derived))
+					for (IndexedClassExpression conclusion : ice
+							.getNegConjunctionsByConjunct().get(common))
 						enqueueDerived(context, conclusion, false);
 			}
 
 			// process negative existentials
-			if (ice.negExistentialsWithRelation != null) {
-				for (Pair<IndexedObjectSomeValuesFrom, IndexedObjectProperty> e : ice.negExistentialsWithRelation)
-					processPropagation(context, e.getSecond(), e.getFirst());
+			if (ice.getNegExistentials() != null) {
+				for (IndexedObjectSomeValuesFrom e : ice.getNegExistentials())
+					processPropagation(context, e.getRelation(), e);
 			}
 		}
 	}
 
 	protected class PositivelyDerivedProcessor implements
 			IndexedClassExpressionVisitor<Void> {
-		final Context context;
+		final SaturatedClassExpression context;
 
-		PositivelyDerivedProcessor(Context context) {
+		PositivelyDerivedProcessor(SaturatedClassExpression context) {
 			this.context = context;
 		}
 
@@ -296,14 +286,14 @@ class ConcurrentSaturation implements SaturationComputation {
 		}
 
 		public Void visit(IndexedObjectIntersectionOf ice) {
-			for (IndexedClassExpression conjunct : ice.conjuncts)
+			for (IndexedClassExpression conjunct : ice.getConjuncts())
 				enqueueDerived(context, conjunct, true);
 
 			return null;
 		}
 
 		public Void visit(IndexedObjectSomeValuesFrom ice) {
-			enqueueLink(getCreateContext(ice.filler), ice.relation, context);
+			enqueueLink(getCreateContext(ice.getFiller()), ice.getRelation(), context);
 
 			return null;
 		}

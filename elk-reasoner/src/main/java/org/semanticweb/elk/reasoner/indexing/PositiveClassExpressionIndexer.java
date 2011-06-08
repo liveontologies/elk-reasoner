@@ -32,15 +32,18 @@ import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 
 /**
+ * For indexing positive occurrences of class expressions.
+ * 
  * @author Yevgeny Kazakov
+ * @author Frantisek Simancik
  * 
  */
-public class PositiveClassExpressionIndexer implements
+class PositiveClassExpressionIndexer implements
 		ElkClassExpressionVisitor<IndexedClassExpression> {
 
 	protected final AxiomIndexer axiomIndexer;
 
-	PositiveClassExpressionIndexer(AxiomIndexer axiomIndexer) {
+	protected PositiveClassExpressionIndexer(AxiomIndexer axiomIndexer) {
 		this.axiomIndexer = axiomIndexer;
 	}
 
@@ -67,9 +70,9 @@ public class PositiveClassExpressionIndexer implements
 		IndexedObjectSomeValuesFrom result = (IndexedObjectSomeValuesFrom) 
 			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
 		if (result.positiveOccurrenceNo++ == 0) {
-			result.relation = classExpression.getObjectPropertyExpression().accept(
-					axiomIndexer.objectPropertyExpressionIndexer);
-			result.filler = classExpression.getClassExpression().accept(this);
+			result.setRelation(classExpression.getObjectPropertyExpression().accept(
+					axiomIndexer.objectPropertyExpressionIndexer));
+			result.setFiller(classExpression.getClassExpression().accept(this));
 		}
 		return result;
 	}

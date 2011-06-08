@@ -42,20 +42,20 @@ import org.semanticweb.elk.util.ArrayHashMap;
  * @author Yevgeny Kazakov
  * 
  */
-public class SerialOntologyIndex implements OntologyIndexComputation {
+class SerialOntologyIndex implements OntologyIndexComputation {
 
 	// indexer for axioms
 	private final AxiomIndexer axiomIndexer;
 
 	protected final Map<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
-	protected final Map<ElkObjectPropertyExpression, IndexedObjectPropertyPack> indexedObjectPropertyLookup;
+	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
 
 	public SerialOntologyIndex() {
 		this.axiomIndexer = new AxiomIndexer(this);
 
 		indexedClassExpressionLookup = new ArrayHashMap<ElkClassExpression, IndexedClassExpression>(
 				1024);
-		indexedObjectPropertyLookup = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectPropertyPack>(
+		indexedObjectPropertyLookup = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
 				128);
 	}
 
@@ -92,19 +92,19 @@ public class SerialOntologyIndex implements OntologyIndexComputation {
 		return indexedClassExpression;
 	}
 
-	public IndexedObjectPropertyPack getCreateIndexedObjectProperty(
+	public IndexedObjectProperty getCreateIndexedObjectProperty(
 			ElkObjectProperty objectProperty) {
-		IndexedObjectPropertyPack indexedObjectProperty = indexedObjectPropertyLookup
+		IndexedObjectProperty indexedObjectProperty = indexedObjectPropertyLookup
 				.get(objectProperty);
 		if (indexedObjectProperty == null) {
-			indexedObjectProperty = new IndexedObjectPropertyPack(objectProperty);
+			indexedObjectProperty = new IndexedObjectProperty(objectProperty);
 			indexedObjectPropertyLookup.put(objectProperty,
 					indexedObjectProperty);
 		}
 		return indexedObjectProperty;
 	}
 
-	public Iterable<? extends IndexedClass> getIndexedClasses() {
+	public Iterable<IndexedClass> getIndexedClasses() {
 		return new Iterable<IndexedClass> () {
 
 			public Iterator<IndexedClass> iterator() {
@@ -143,7 +143,14 @@ public class SerialOntologyIndex implements OntologyIndexComputation {
 		};
 	}
 	
-	public Iterable<? extends IndexedObjectProperty> getIndexedObjectProperties() {
+
+	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
+		return Collections.unmodifiableCollection(indexedClassExpressionLookup
+				.values());
+	}
+
+	
+	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
 		return Collections.unmodifiableCollection(indexedObjectPropertyLookup
 				.values());
 	}

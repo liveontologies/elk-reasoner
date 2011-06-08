@@ -36,17 +36,20 @@ import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
 
 /**
- * @author Yevgeny Kazakov
+ * For indexing axioms.
  * 
+ * @author Yevgeny Kazakov
+ * @author Frantisek Simancik
+ *
  */
-public class AxiomIndexer implements ElkAxiomVisitor<Void> {
+class AxiomIndexer implements ElkAxiomVisitor<Void> {
 
-	final OntologyIndexComputation ontologyIndex;
-	final NegativeClassExpressionIndexer negativeClassExpressionIndexer;
-	final PositiveClassExpressionIndexer positiveClassExpressionIndexer;
-	final ObjectPropertyExpressionIndexer objectPropertyExpressionIndexer;
+	protected final OntologyIndexComputation ontologyIndex;
+	protected final NegativeClassExpressionIndexer negativeClassExpressionIndexer;
+	protected final PositiveClassExpressionIndexer positiveClassExpressionIndexer;
+	protected final ObjectPropertyExpressionIndexer objectPropertyExpressionIndexer;
 
-	AxiomIndexer(OntologyIndexComputation ontologyIndex) {
+	protected AxiomIndexer(OntologyIndexComputation ontologyIndex) {
 		this.ontologyIndex = ontologyIndex;
 		negativeClassExpressionIndexer = new NegativeClassExpressionIndexer(this);
 		positiveClassExpressionIndexer = new PositiveClassExpressionIndexer(this);
@@ -63,8 +66,8 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 			if (first == null)
 				first = ice;
 			else {
-				ice.addSuperClassExpression(first);
-				first.addSuperClassExpression(ice);
+				ice.addToldSuperClassExpression(first);
+				first.addToldSuperClassExpression(ice);
 			}
 		}
 		return null;
@@ -74,7 +77,7 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 
 		IndexedClassExpression subClass = axiom.getSubClassExpression().accept(negativeClassExpressionIndexer);
 		IndexedClassExpression superClass = axiom.getSuperClassExpression().accept(positiveClassExpressionIndexer);
-		subClass.addSuperClassExpression(superClass);
+		subClass.addToldSuperClassExpression(superClass);
 
 		return null;
 	}
@@ -96,9 +99,9 @@ public class AxiomIndexer implements ElkAxiomVisitor<Void> {
 
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
 
-		IndexedObjectPropertyPack subProperty = axiom.getSubObjectPropertyExpression().accept(
+		IndexedObjectProperty subProperty = axiom.getSubObjectPropertyExpression().accept(
 				objectPropertyExpressionIndexer);
-		IndexedObjectPropertyPack superProperty = axiom.getSuperObjectPropertyExpression().accept(
+		IndexedObjectProperty superProperty = axiom.getSuperObjectPropertyExpression().accept(
 				objectPropertyExpressionIndexer);
 		
 		subProperty.addToldSuperObjectProperty(superProperty);

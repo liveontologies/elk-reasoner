@@ -24,12 +24,25 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import org.semanticweb.elk.syntax.ElkClass;
 
+/**
+ * Represents all occurrences of an ElkClass in an ontology.
+ * 
+ * @author Frantisek Simancik
+ *
+ */
 public class IndexedClass extends IndexedClassExpression {
 
-	public IndexedClass(ElkClass elkClass) {
+	/**
+	 * Creates an object representing the given ElkObjectProperty.
+	 */
+	protected IndexedClass(ElkClass elkClass) {
 		super(elkClass);
 	}
 
+	
+	
+	
+	
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
