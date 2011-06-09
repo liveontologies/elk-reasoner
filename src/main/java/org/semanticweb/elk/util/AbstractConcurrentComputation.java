@@ -34,39 +34,65 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * 
  */
-public abstract class ConcurrentComputationManager<Input> {
+public abstract class AbstractConcurrentComputation<Input> {
 	// thread executor service used
 	protected final ExecutorService executor;
 	// maximum number of concurrent workers
 	protected final int maxWorkers;
-	// number of currently running jobs
+	// minimal size of the buffer before running jobs
+	protected final int bufferThreshold;
+
+
+	protected final boolean hasBoundedCapacity;
+	protected final int underfullLimit;
+	protected final int overfullLimit;
+
+	
+	// number of currently running jobs	
 	protected final AtomicInteger workerCount;
 	// buffer for inputs to be processed
 	protected final Queue<Input> buffer;
 	// the number of inputs in the buffer
 	protected final AtomicInteger bufferSize;
-	// maximal buffer capacity before a submit is allowed
-	protected final int bufferCapacity;
-	// minimal size of the buffer before running jobs
-	protected final int bufferThreshold;
 	
 	
 	protected abstract void process(Input nextElement);
 	
-	
-	public ConcurrentComputationManager(ExecutorService executor, int workerNo, int bufferCapacity, int bufferThreshold) {
+
+	public AbstractConcurrentComputation(ExecutorService executor, int maxWorkers, int bufferThreshold, int bufferCapacity) {
 		this.executor = executor;
-		this.maxWorkers = workerNo;
-		this.workerCount = new AtomicInteger(0);
-		this.buffer = new LinkedBlockingQueue<Input>();
-		this.bufferSize = new AtomicInteger(0);
-		this.bufferCapacity = bufferCapacity;
+		this.maxWorkers = maxWorkers;
 		this.bufferThreshold = bufferThreshold;
+		
+		hasBoundedCapacity = (bufferCapacity != 0);
+		int overfullLowerBound = Math.max(bufferThreshold + 16, 128);
+		overfullLimit = Math.max(bufferCapacity, overfullLowerBound);
+		underfullLimit = overfullLimit / 2;
+		
+		workerCount = new AtomicInteger(0);
+		buffer = new LinkedBlockingQueue<Input> ();
+		bufferSize = new AtomicInteger(0);
 	}
 	
+
+	public void submit(Input input) {
+		waitCapacity();
+		addJob(input);
+	}
+
 	
-	public ConcurrentComputationManager(ExecutorService executor, int workerNo, int bufferCapacity) {
-		this(executor, workerNo, bufferCapacity, 0);
+	public void waitCompletion() {
+		synchronized (workerCount) {			
+			while (bufferSize.get() > 0 || workerCount.get() > 0) {
+				addWorker();
+				try {
+					workerCount.wait();
+				}
+				catch (InterruptedException e) {
+				}
+			}
+		}
+		// bufferSize == 0 && workerCount == 0
 	}
 	
 	
@@ -76,7 +102,7 @@ public abstract class ConcurrentComputationManager<Input> {
 			for (;;) {
 				Input nextInput = buffer.poll();
 				if (nextInput != null) {
-					if (bufferSize.getAndDecrement() == bufferCapacity)
+					if (bufferSize.getAndDecrement() == underfullLimit)
 						synchronized (bufferSize) {
 							bufferSize.notify();
 						}
@@ -92,9 +118,11 @@ public abstract class ConcurrentComputationManager<Input> {
 		}
 	}
 
+	
 	// we are going to use one worker instance to start jobs
 	protected Worker worker = new Worker();
 
+	
 	protected void addWorker() {
 		int n = workerCount.get();
 		if (n < maxWorkers)
@@ -102,38 +130,24 @@ public abstract class ConcurrentComputationManager<Input> {
 				executor.execute(worker);
 	}
 	
+	
 	protected void waitCapacity() {
-		if (bufferCapacity != 0 && bufferSize.get() > 2*bufferCapacity)
+		if (hasBoundedCapacity && bufferSize.get() > overfullLimit)
 			synchronized (bufferSize) {
-				while (bufferSize.get() > bufferCapacity)
+				while (bufferSize.get() > underfullLimit)
 					try {
 						bufferSize.wait();
 					}
-				catch (InterruptedException e) {
-				}
+					catch (InterruptedException e) {
+					}
 			}
 	}
-	
 
-	protected void add(Input input) {
+	
+	protected void addJob(Input input) {
 		buffer.add(input);
 		if (bufferSize.incrementAndGet() > bufferThreshold)
 			addWorker();
 	}
-	
-	public void submit(Input input) {
-		waitCapacity();
-		add(input);
-	}
-	
-	public void waitCompletion() {
-		addWorker();
-		synchronized (workerCount) {
-			while (workerCount.get() > 0)
-				try {
-					workerCount.wait();
-				} catch (InterruptedException e) {
-				}
-		}
-	}
+
 }

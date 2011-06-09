@@ -44,12 +44,12 @@ import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
  */
 class AxiomIndexer implements ElkAxiomVisitor<Void> {
 
-	protected final OntologyIndexComputation ontologyIndex;
+	protected final OntologyIndex ontologyIndex;
 	protected final NegativeClassExpressionIndexer negativeClassExpressionIndexer;
 	protected final PositiveClassExpressionIndexer positiveClassExpressionIndexer;
 	protected final ObjectPropertyExpressionIndexer objectPropertyExpressionIndexer;
 
-	protected AxiomIndexer(OntologyIndexComputation ontologyIndex) {
+	protected AxiomIndexer(OntologyIndex ontologyIndex) {
 		this.ontologyIndex = ontologyIndex;
 		negativeClassExpressionIndexer = new NegativeClassExpressionIndexer(this);
 		positiveClassExpressionIndexer = new PositiveClassExpressionIndexer(this);

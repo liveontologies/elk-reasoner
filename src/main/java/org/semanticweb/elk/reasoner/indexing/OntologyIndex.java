@@ -29,22 +29,26 @@ import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 
 /**
- * Interface providing read-only to the index of the ontology.
+ * Interface for public and protected methods of the index of the ontology.
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
  *
  */
-public interface OntologyIndex {
+public abstract class OntologyIndex  {
 
-	IndexedClassExpression getIndexedClassExpression(ElkClassExpression representative);
+	public abstract IndexedClassExpression getIndexedClassExpression(ElkClassExpression representative);
 	
-	IndexedObjectProperty getIndexedObjectProperty(ElkObjectProperty representative);
+	public abstract IndexedObjectProperty getIndexedObjectProperty(ElkObjectProperty representative);
 	
-	Iterable<IndexedClass> getIndexedClasses();
+	public abstract Iterable<IndexedClass> getIndexedClasses();
 	
-	Iterable<IndexedClassExpression> getIndexedClassExpressions();
+	public abstract Iterable<IndexedClassExpression> getIndexedClassExpressions();
 	
-	Iterable<IndexedObjectProperty> getIndexedObjectProperties();
+	public abstract Iterable<IndexedObjectProperty> getIndexedObjectProperties();
+	
+	protected abstract IndexedClassExpression getCreateIndexedClassExpression(ElkClassExpression representative);
+
+	protected abstract IndexedObjectProperty getCreateIndexedObjectProperty(ElkObjectProperty representative);
 
 }

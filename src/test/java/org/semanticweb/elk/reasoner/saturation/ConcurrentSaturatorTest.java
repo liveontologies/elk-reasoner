@@ -29,10 +29,11 @@ import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
+import org.semanticweb.elk.reasoner.indexing.IndexComputation;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.IndexingManager;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.FutureElkObjectFactory;
@@ -57,34 +58,35 @@ public class ConcurrentSaturatorTest extends TestCase {
 		Future<ElkObjectProperty> s = constructor
 				.getFutureElkObjectProperty("S");
 
+		OntologyIndex ontologyIndex = new SerialOntologyIndex();
+		
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		final IndexingManager indexingManager = new IndexingManager(executor, 8);
-		indexingManager.submit(constructor.getFutureElkEquivalentClassesAxiom(
+		final IndexComputation indexComputation = new IndexComputation(executor, 8, ontologyIndex);
+		indexComputation.submit(constructor.getFutureElkEquivalentClassesAxiom(
 				b, c));
-		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(a,
+		indexComputation.submit(constructor.getFutureElkSubClassOfAxiom(a,
 				constructor.getFutureElkObjectSomeValuesFrom(r, b)));
-		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(
+		indexComputation.submit(constructor.getFutureElkSubClassOfAxiom(
 				constructor.getFutureElkObjectSomeValuesFrom(s, c), d));
-		indexingManager.submit(constructor
+		indexComputation.submit(constructor
 				.getFutureElkSubObjectPropertyOfAxiom(r, s));
-		indexingManager.waitCompletion();
+		indexComputation.waitCompletion();
 
-		final OntologyIndex ontologyIndex = indexingManager.computeOntologyIndex();
 		IndexedClassExpression A = ontologyIndex.getIndexedClassExpression(a.get());
 		IndexedClassExpression D = ontologyIndex.getIndexedClassExpression(d.get());
 		
-		final ObjectPropertySaturationManager objectPropertySaturationManager =
-			new ObjectPropertySaturationManager();
+		final ObjectPropertySaturation objectPropertySaturation =
+			new ObjectPropertySaturation(executor, 16);
 		
 		for (IndexedObjectProperty  iop : ontologyIndex.getIndexedObjectProperties())
-			objectPropertySaturationManager.submit(iop);
-		objectPropertySaturationManager.computeSaturation();
+			objectPropertySaturation.submit(iop);
+		objectPropertySaturation.waitCompletion();
 
-		final ClassExpressionSaturationManager classExpressionSaturationManager =
-			new ClassExpressionSaturationManager(executor, 16);
+		final ClassExpressionSaturation classExpressionSaturation =
+			new ClassExpressionSaturation(executor, 16);
 
-		classExpressionSaturationManager.submit(A);
-		classExpressionSaturationManager.computeSaturation();
+		classExpressionSaturation.submit(A);
+		classExpressionSaturation.waitCompletion();
 
 		assertTrue("A contains D", A.getSaturated().getSuperClassExpressions().contains(D));
 
@@ -98,15 +100,15 @@ public class ConcurrentSaturatorTest extends TestCase {
 		Future<ElkClass> c = constructor.getFutureElkClass("C");
 		Future<ElkClass> d = constructor.getFutureElkClass("D");
 
+		final OntologyIndex ontologyIndex = new SerialOntologyIndex();
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		final IndexingManager indexingManager = new IndexingManager(executor, 8);
+		final IndexComputation indexingManager = new IndexComputation(executor, 8, ontologyIndex);
 
 		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(a, b));
 		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(a, c));
 		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(
 				constructor.getFutureElkObjectIntersectionOf(b, c), d));
 		indexingManager.waitCompletion();
-		final OntologyIndex ontologyIndex = indexingManager.computeOntologyIndex();
 
 		IndexedClassExpression A = ontologyIndex.getIndexedClassExpression(a.get());
 		IndexedClassExpression B = ontologyIndex.getIndexedClassExpression(b.get());
@@ -120,11 +122,11 @@ public class ConcurrentSaturatorTest extends TestCase {
 		assertFalse("A SubClassOf D", A.getToldSuperClassExpressions().contains(D));
 		assertTrue("I SubClassOf D", I.getToldSuperClassExpressions().contains(D));
 
-		final ClassExpressionSaturationManager saturationManager = new ClassExpressionSaturationManager(
+		final ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
 				executor, 16);
 
-		saturationManager.submit(A);
-		saturationManager.computeSaturation();
+		classExpressionSaturation.submit(A);
+		classExpressionSaturation.waitCompletion();
 		SaturatedClassExpression context =A.getSaturated();
 
 		assertTrue("A contains A", context.getSuperClassExpressions().contains(A));

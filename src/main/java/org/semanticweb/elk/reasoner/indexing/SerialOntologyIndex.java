@@ -29,10 +29,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
-import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
@@ -42,44 +39,32 @@ import org.semanticweb.elk.util.ArrayHashMap;
  * @author Yevgeny Kazakov
  * 
  */
-class SerialOntologyIndex implements OntologyIndexComputation {
-
-	// indexer for axioms
-	private final AxiomIndexer axiomIndexer;
+public class SerialOntologyIndex extends OntologyIndex {
 
 	protected final Map<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
 	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
 
 	public SerialOntologyIndex() {
-		this.axiomIndexer = new AxiomIndexer(this);
-
 		indexedClassExpressionLookup = new ArrayHashMap<ElkClassExpression, IndexedClassExpression>(
 				1024);
 		indexedObjectPropertyLookup = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
 				128);
 	}
 
-	public void addTarget(Future<? extends ElkAxiom> futureAxiom) {
-		try {
-			futureAxiom.get().accept(axiomIndexer);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-	}
-
+	@Override
 	public IndexedClassExpression getIndexedClassExpression(
 			ElkClassExpression classExpression) {
 		return indexedClassExpressionLookup.get(classExpression);
 	}
 
+	@Override
 	public IndexedObjectProperty getIndexedObjectProperty(
 			ElkObjectProperty objectProperty) {
 		return indexedObjectPropertyLookup.get(objectProperty);
 	}
 
-	public IndexedClassExpression getCreateIndexedClassExpression(
+	@Override
+	protected IndexedClassExpression getCreateIndexedClassExpression(
 			ElkClassExpression classExpression) {
 		IndexedClassExpression indexedClassExpression = indexedClassExpressionLookup
 				.get(classExpression);
@@ -92,7 +77,8 @@ class SerialOntologyIndex implements OntologyIndexComputation {
 		return indexedClassExpression;
 	}
 
-	public IndexedObjectProperty getCreateIndexedObjectProperty(
+	@Override
+	protected IndexedObjectProperty getCreateIndexedObjectProperty(
 			ElkObjectProperty objectProperty) {
 		IndexedObjectProperty indexedObjectProperty = indexedObjectPropertyLookup
 				.get(objectProperty);
@@ -104,6 +90,7 @@ class SerialOntologyIndex implements OntologyIndexComputation {
 		return indexedObjectProperty;
 	}
 
+	@Override
 	public Iterable<IndexedClass> getIndexedClasses() {
 		return new Iterable<IndexedClass> () {
 
@@ -143,13 +130,13 @@ class SerialOntologyIndex implements OntologyIndexComputation {
 		};
 	}
 	
-
+	@Override
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
 		return Collections.unmodifiableCollection(indexedClassExpressionLookup
 				.values());
 	}
 
-	
+	@Override
 	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
 		return Collections.unmodifiableCollection(indexedObjectPropertyLookup
 				.values());

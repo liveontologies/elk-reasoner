@@ -27,7 +27,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.semanticweb.elk.syntax.ElkAxiom;
-import org.semanticweb.elk.util.ConcurrentComputationManager;
+import org.semanticweb.elk.syntax.parsing.OntologyLoader;
+import org.semanticweb.elk.util.AbstractConcurrentComputation;
 
 /**
  * Experimental version of indexing manager.
@@ -35,15 +36,17 @@ import org.semanticweb.elk.util.ConcurrentComputationManager;
  * @author Frantisek Simancik
  *
  */
-public class IndexingManager2 extends
-		ConcurrentComputationManager<Future<? extends ElkAxiom>> {
+public class IndexComputation
+		extends	AbstractConcurrentComputation<Future<? extends ElkAxiom>>
+		implements OntologyLoader {
 
-	protected SerialOntologyIndex ontologyIndex;
+	protected OntologyIndex ontologyIndex;
 	protected AxiomIndexer axiomIndexer;
 
-	public IndexingManager2(ExecutorService executor, int workerNo) {
-		super(executor, workerNo, 0, 512);
-		this.ontologyIndex = new SerialOntologyIndex();
+	public IndexComputation(ExecutorService executor, int workerNo,
+			OntologyIndex ontologyIndex) {
+		super(executor, workerNo, 512, 0);
+		this.ontologyIndex = ontologyIndex;
 		this.axiomIndexer = new AxiomIndexer(ontologyIndex);
 	}
 
@@ -57,9 +60,10 @@ public class IndexingManager2 extends
 			e.printStackTrace();
 		}
 	}
-	
-	public OntologyIndex computeOntologyIndex() {
-		waitCompletion();
-		return ontologyIndex;
+
+	public void loadFutureAxiom(Future<? extends ElkAxiom> futureAxiom) {
+		if (futureAxiom != null)
+			submit(futureAxiom);
 	}
+	
 }
