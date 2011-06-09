@@ -37,10 +37,10 @@ import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassificationManager;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.IndexingManager;
+import org.semanticweb.elk.reasoner.indexing.IndexingManager2;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationManager;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturationManager;
+import org.semanticweb.elk.reasoner.saturation.SaturationComputation;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.parsing.OntologyLoader;
@@ -52,7 +52,7 @@ public class Reasoner {
 	// number of workers for concurrent jobs
 	protected final int nWorkers;
 
-	protected final IndexingManager indexingManager;
+	protected final IndexingManager2 indexingManager;
 
 	protected final OntologyLoader ontologyLoader;
 
@@ -64,7 +64,7 @@ public class Reasoner {
 	public Reasoner(ExecutorService executor, int nWorkers) {
 		this.executor = executor;
 		this.nWorkers = nWorkers;
-		this.indexingManager = new IndexingManager(executor, 1);
+		this.indexingManager = new IndexingManager2(executor, 1);
 		this.ontologyLoader = new OntologyLoaderImpl();
 	}
 
@@ -114,8 +114,8 @@ public class Reasoner {
 		ObjectPropertySaturationManager objectPropertySaturationManager =
 			new ObjectPropertySaturationManager();
 	
-		ClassExpressionSaturationManager classExpressionSaturationManager = 
-			new ClassExpressionSaturationManager(executor, nWorkers);
+		SaturationComputation classExpressionSaturationManager = 
+			new SaturationComputation(executor, nWorkers);
 
 		Statistics.logOperationStart("Saturation", logger);
 
@@ -125,7 +125,7 @@ public class Reasoner {
 
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
 			classExpressionSaturationManager.submit(ic);
-		classExpressionSaturationManager.computeSaturation();
+		classExpressionSaturationManager.waitCompletion();
 
 		Statistics.logOperationFinish("Saturation", logger);
 		Statistics.logMemoryUsage(logger);
