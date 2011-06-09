@@ -28,67 +28,57 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassificationManager;
+import org.semanticweb.elk.reasoner.indexing.IndexComputation;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.IndexingManager2;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturationManager;
-import org.semanticweb.elk.reasoner.saturation.SaturationComputation;
-import org.semanticweb.elk.syntax.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
 import org.semanticweb.elk.syntax.ElkClass;
-import org.semanticweb.elk.syntax.parsing.OntologyLoader;
 import org.semanticweb.elk.util.Statistics;
 
 public class Reasoner {
 	// executor used to run the jobs
 	protected final ExecutorService executor;
 	// number of workers for concurrent jobs
-	protected final int nWorkers;
+	protected final int workerNo;
 
-	protected final IndexingManager2 indexingManager;
-
-	protected final OntologyLoader ontologyLoader;
-
-	protected ClassTaxonomy classTaxonomy = null;
-
+	protected final OntologyIndex ontologyIndex;
+	
+	protected ClassTaxonomy classTaxonomy;
+	
 	// logger for events
 	protected final static Logger logger = Logger.getLogger(Reasoner.class);
 
-	public Reasoner(ExecutorService executor, int nWorkers) {
+	public Reasoner(ExecutorService executor, int workerNo) {
 		this.executor = executor;
-		this.nWorkers = nWorkers;
-		this.indexingManager = new IndexingManager2(executor, 1);
-		this.ontologyLoader = new OntologyLoaderImpl();
+		this.workerNo = workerNo;
+		this.ontologyIndex = new SerialOntologyIndex();
+	
 	}
 
 	public Reasoner() {
 		this(Executors.newCachedThreadPool(), 16);
 	}
 
-	class OntologyLoaderImpl implements OntologyLoader {
-
-		public void loadFutureAxiom(Future<? extends ElkAxiom> futureAxiom) {
-			if (futureAxiom != null)
-				indexingManager.submit(futureAxiom);
-		}
-	}
-
 	public void loadOntologyFromStream(InputStream stream)
 			throws ParseException, IOException {
 		Statistics.logOperationStart("Loading", logger);
+		
+		IndexComputation indexComputation = new IndexComputation(executor, 1, ontologyIndex);
 		Owl2FunctionalStyleParser.Init(stream);
-		Owl2FunctionalStyleParser.ontologyDocument(ontologyLoader);
+		Owl2FunctionalStyleParser.ontologyDocument(indexComputation);
 		stream.close();
+		indexComputation.waitCompletion();
 		Statistics.logOperationFinish("Loading", logger);
 		Statistics.logMemoryUsage(logger);
-		indexingManager.waitCompletion();
 	}
 
 	public void loadOntologyFromFile(String fileName) throws ParseException,
@@ -109,23 +99,22 @@ public class Reasoner {
 
 	public void classify() {
 		// Saturation stage
-		OntologyIndex ontologyIndex = indexingManager.computeOntologyIndex();
 	
-		ObjectPropertySaturationManager objectPropertySaturationManager =
-			new ObjectPropertySaturationManager();
+		ObjectPropertySaturation objectPropertySaturation =
+			new ObjectPropertySaturation(executor, workerNo);
 	
-		SaturationComputation classExpressionSaturationManager = 
-			new SaturationComputation(executor, nWorkers);
+		ClassExpressionSaturation classExpressionSaturation = 
+			new ClassExpressionSaturation(executor, workerNo);
 
 		Statistics.logOperationStart("Saturation", logger);
 
 		for (IndexedObjectProperty iop : ontologyIndex.getIndexedObjectProperties())
-			objectPropertySaturationManager.submit(iop);
-		objectPropertySaturationManager.computeSaturation();
+			objectPropertySaturation.submit(iop);
+		objectPropertySaturation.waitCompletion();
 
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
-			classExpressionSaturationManager.submit(ic);
-		classExpressionSaturationManager.waitCompletion();
+			classExpressionSaturation.submit(ic);
+		classExpressionSaturation.waitCompletion();
 
 		Statistics.logOperationFinish("Saturation", logger);
 		Statistics.logMemoryUsage(logger);
@@ -134,7 +123,7 @@ public class Reasoner {
 		Statistics.logOperationStart("Transitive reduction", logger);
 		
 		ClassificationManager classificationManager = new ClassificationManager(
-				executor, nWorkers, ontologyIndex);
+				executor, workerNo, ontologyIndex);
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
 			classificationManager.submit((ElkClass) ic.getClassExpression());
 		classTaxonomy = classificationManager.getClassTaxonomy();

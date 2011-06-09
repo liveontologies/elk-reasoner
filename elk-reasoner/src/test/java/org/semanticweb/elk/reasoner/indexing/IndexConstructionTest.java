@@ -35,11 +35,11 @@ import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.FutureElkObjectFactory;
 import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
 
-public class ConcurrentIndexerTest extends TestCase {
+public class IndexConstructionTest extends TestCase {
 
 	final FutureElkObjectFactory constructor = new FutureElkObjectFactoryImpl();
 
-	public ConcurrentIndexerTest(String testName) {
+	public IndexConstructionTest(String testName) {
 		super(testName);
 	}
 
@@ -54,13 +54,14 @@ public class ConcurrentIndexerTest extends TestCase {
 		Future<? extends ElkClassExpression> hasHeartAndOrgan = constructor
 				.getFutureElkObjectSomeValuesFrom(has, heartAndOrgan);
 
+		OntologyIndex ontologyIndex = new SerialOntologyIndex();
+		
 		final ExecutorService executor = Executors.newCachedThreadPool();		
-		IndexingManager indexingManager = new IndexingManager(executor, 8);
+		IndexComputation indexComputation = new IndexComputation(executor, 1, ontologyIndex);
 
-		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(human,
+		indexComputation.submit(constructor.getFutureElkSubClassOfAxiom(human,
 				hasHeartAndOrgan));
-		indexingManager.waitCompletion();
-		OntologyIndex ontologyIndex = indexingManager.computeOntologyIndex();
+		indexComputation.waitCompletion();
 
 		assertTrue(((IndexedObjectIntersectionOf) ontologyIndex
 				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts
@@ -72,9 +73,9 @@ public class ConcurrentIndexerTest extends TestCase {
 				.contains(ontologyIndex.getIndexedClassExpression(hasHeartAndOrgan.get())));
 		assertTrue(ontologyIndex.getIndexedClassExpression(heart.get()).negConjunctionsByConjunct == null);
 
-		indexingManager.submit(constructor.getFutureElkEquivalentClassesAxiom(
+		indexComputation.submit(constructor.getFutureElkEquivalentClassesAxiom(
 				human, hasHeartAndOrgan));
-		indexingManager.waitCompletion();
+		indexComputation.waitCompletion();
 
 		assertTrue(((IndexedObjectIntersectionOf) ontologyIndex
 				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts.size() == 2);

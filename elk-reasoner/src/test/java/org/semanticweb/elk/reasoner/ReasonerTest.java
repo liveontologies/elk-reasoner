@@ -66,7 +66,7 @@ public class ReasonerTest extends TestCase {
 		reasoner.classify();
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 
-		OntologyIndex index = reasoner.indexingManager.computeOntologyIndex();
+		OntologyIndex index = reasoner.ontologyIndex;
 
 		IndexedObjectProperty R = index.getIndexedObjectProperty(r);
 		IndexedObjectProperty S = index.getIndexedObjectProperty(s);
@@ -91,7 +91,7 @@ public class ReasonerTest extends TestCase {
 		Future<ElkClass> c = constructor.getFutureElkClass(":C");
 		Future<ElkClass> d = constructor.getFutureElkClass(":D");
 		
-		OntologyIndex index = reasoner.indexingManager.computeOntologyIndex();
+		OntologyIndex index = reasoner.ontologyIndex;
 
 		IndexedClassExpression A = index.getIndexedClassExpression(a.get());
 		IndexedClassExpression B = index.getIndexedClassExpression(b.get());
