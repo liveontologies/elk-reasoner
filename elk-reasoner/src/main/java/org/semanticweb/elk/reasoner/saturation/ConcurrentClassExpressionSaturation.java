@@ -44,7 +44,7 @@ import org.semanticweb.elk.util.Pair;
  * @author Frantisek Simancik
  *
  */
-class ConcurrentSaturation implements SaturationComputation {
+class ConcurrentClassExpressionSaturation implements ClassExpressionSaturation {
 
 	// queue for active contexts
 	protected final Queue<SaturatedClassExpression> activeContexts;
@@ -52,9 +52,9 @@ class ConcurrentSaturation implements SaturationComputation {
 	protected final AtomicInteger activeContextCount;
 	// logger for events
 	protected final static Logger logger = Logger
-			.getLogger(ConcurrentSaturation.class);
+			.getLogger(ConcurrentClassExpressionSaturation.class);
 
-	protected ConcurrentSaturation() {
+	protected ConcurrentClassExpressionSaturation() {
 		this.activeContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
 		this.activeContextCount = new AtomicInteger(0);
 	}

@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 
 public class ClassExpressionSaturationManager {
 	// the saturator used for jobs
-	protected final SaturationComputation saturation;
+	protected final ClassExpressionSaturation saturation;
 	// maximum number of concurrent workers
 	protected final int maxWorkers;
 	// thread executor service used
@@ -42,7 +42,7 @@ public class ClassExpressionSaturationManager {
 	protected final BlockingQueue<IndexedClassExpression> conceptBuffer;
 
 	public ClassExpressionSaturationManager(ExecutorService executor, int nWorkers) {
-		this.saturation = new ConcurrentSaturation();
+		this.saturation = new ConcurrentClassExpressionSaturation();
 		this.maxWorkers = nWorkers;
 		this.executor = executor;
 		this.workerCount = new AtomicInteger(0);
