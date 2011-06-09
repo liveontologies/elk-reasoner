@@ -129,6 +129,7 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 		// }
 	}
 
+	@Override
 	protected void process(SaturatedClassExpression context) {
 		// synchronized (context) {
 		for (;;) {

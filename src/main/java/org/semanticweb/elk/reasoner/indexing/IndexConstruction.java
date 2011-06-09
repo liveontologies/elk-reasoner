@@ -36,14 +36,14 @@ import org.semanticweb.elk.util.AbstractConcurrentComputation;
  * @author Frantisek Simancik
  *
  */
-public class IndexComputation
+public class IndexConstruction
 		extends	AbstractConcurrentComputation<Future<? extends ElkAxiom>>
 		implements OntologyLoader {
 
 	protected OntologyIndex ontologyIndex;
 	protected AxiomIndexer axiomIndexer;
 
-	public IndexComputation(ExecutorService executor, int workerNo,
+	public IndexConstruction(ExecutorService executor, int workerNo,
 			OntologyIndex ontologyIndex) {
 		super(executor, workerNo, 512, 0);
 		this.ontologyIndex = ontologyIndex;

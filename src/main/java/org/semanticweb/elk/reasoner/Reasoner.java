@@ -34,7 +34,7 @@ import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassificationManager;
-import org.semanticweb.elk.reasoner.indexing.IndexComputation;
+import org.semanticweb.elk.reasoner.indexing.IndexConstruction;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -72,11 +72,11 @@ public class Reasoner {
 			throws ParseException, IOException {
 		Statistics.logOperationStart("Loading", logger);
 		
-		IndexComputation indexComputation = new IndexComputation(executor, 1, ontologyIndex);
+		IndexConstruction indexConstruction = new IndexConstruction(executor, 1, ontologyIndex);
 		Owl2FunctionalStyleParser.Init(stream);
-		Owl2FunctionalStyleParser.ontologyDocument(indexComputation);
+		Owl2FunctionalStyleParser.ontologyDocument(indexConstruction);
 		stream.close();
-		indexComputation.waitCompletion();
+		indexConstruction.waitCompletion();
 		Statistics.logOperationFinish("Loading", logger);
 		Statistics.logMemoryUsage(logger);
 	}
