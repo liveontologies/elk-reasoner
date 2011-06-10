@@ -144,7 +144,7 @@ public class Reasoner {
 		ClassTaxonomyComputation classification = new ClassTaxonomyComputation(executor, workerNo);
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
 			classification.submit(ic);
-		classTaxonomy = classification.computateTaxonomy();
+		classTaxonomy = classification.computeTaxonomy();
 
 		Statistics.logOperationFinish("Transitive reduction", logger);
 		Statistics.logMemoryUsage(logger);

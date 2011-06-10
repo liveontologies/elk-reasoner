@@ -26,9 +26,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.syntax.ElkClass;
@@ -39,20 +40,21 @@ public class ClassTaxonomyComputation
 
 	protected final ConcurrentClassTaxonomy classTaxonomy;
 	
+	protected final static Logger logger = Logger.getLogger(Reasoner.class);
+	
+	private final Linker linker;
+	
 	
 	public ClassTaxonomyComputation(ExecutorService executor, int maxWorkers) {
 		super(executor, maxWorkers, 0, 512);
 		this.classTaxonomy = new ConcurrentClassTaxonomy();
+		this.linker = new Linker();
 	}
 	
 	
-	public ClassTaxonomy computateTaxonomy() {
+	public ClassTaxonomy computeTaxonomy() {
 		waitCompletion();
-		Linker linker = new Linker();
-		for (Map.Entry<ElkClass, ClassNode> e: classTaxonomy.nodeLookup.entrySet())
-			linker.submit(e.getValue());
-//		for (ClassNode node : classTaxonomy.getNodes())
-//			linker.submit(node);
+		linker.start();
 		linker.waitCompletion();
 		return classTaxonomy;
 	}
@@ -61,6 +63,7 @@ public class ClassTaxonomyComputation
 	protected ClassNode getNode(IndexedClass indexedClass) {
 		return classTaxonomy.getNode(indexedClass.getClassExpression());
 	}
+	
 	
 	protected void process(IndexedClass root) {
 		List<ElkClass> equivalent = new ArrayList<ElkClass>();
@@ -99,32 +102,38 @@ public class ClassTaxonomyComputation
 		ClassNode node = new ClassNode(equivalent);
 		node.parentIndexClasses = parents;
 		
+		linker.submit(node);
+		
 		for (ElkClass ec : equivalent)
 			classTaxonomy.nodeLookup.put(ec, node);
 	}
 	
-
-	protected class Linker extends AbstractConcurrentComputation<ClassNode> {
+	
+	private class Linker extends AbstractConcurrentComputation<ClassNode> {
 
 		public Linker() {
-			super(ClassTaxonomyComputation.this.executor, ClassTaxonomyComputation.this.maxWorkers, 0, 512);
+			super(ClassTaxonomyComputation.this.executor, ClassTaxonomyComputation.this.maxWorkers, 0, 0);
+		}
+		
+		@Override 
+		public void submit(ClassNode node) {
+			buffer.add(node);
+		}
+		
+		public void start() {
+			for (int i = 0; i < maxWorkers; i++)
+				addWorker();
 		}
 
 		@Override
 		protected void process(ClassNode node) {
-			List<IndexedClass> parents;
-			synchronized (node) {
-				if (node.parentIndexClasses == null)
-					return;
-				parents = node.parentIndexClasses;
-				node.parentIndexClasses = null;
-			}
-			
-			for (IndexedClass ic : parents) {
+			for (IndexedClass ic : node.parentIndexClasses) {
 				ClassNode parent = getNode(ic);
 				node.addParent(parent);
 				parent.addChild(node);
 			}
+			node.parentIndexClasses = null;
 		}
+
 	}
 }
