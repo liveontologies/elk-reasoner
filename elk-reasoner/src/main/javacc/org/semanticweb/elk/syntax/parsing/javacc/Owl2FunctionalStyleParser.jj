@@ -42,8 +42,10 @@ package org.semanticweb.elk.parser.javacc;
 
 import java.util.Vector;
 import java.util.concurrent.Future;
+import java.util.concurrent.ExecutorService;
 
 import org.semanticweb.elk.syntax.parsing.OntologyLoader;
+import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassAxiom;
@@ -62,22 +64,32 @@ import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.FutureElkObjectFactory;
 import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
 
+
 public class Owl2FunctionalStyleParser {
     static boolean initialized = false;
+    static OntologyLoader ontologyLoader;
 
     private static FutureElkObjectFactory constructor =
         new FutureElkObjectFactoryImpl();
 
-    public static void Init(java.io.InputStream stream, String encoding) {
-        if (initialized)
+    public static void Init(ElkAxiomProcessor elkAxiomProcessor, ExecutorService executor, int workerNo, java.io.InputStream stream, String encoding) {
+        if (initialized) {
             ReInit(stream, encoding);
-        else
+        } else {
             new Owl2FunctionalStyleParser(stream, encoding);
+        }
+        ontologyLoader = new OntologyLoader(executor, workerNo, elkAxiomProcessor);
         initialized = true;
     }
 
-    public static void Init(java.io.InputStream stream) {
-        Init(stream, null);
+    public static void Init(ElkAxiomProcessor elkAxiomProcessor, ExecutorService executor, int workerNo, java.io.InputStream stream) {
+        Init(elkAxiomProcessor, executor, workerNo, stream, null);
+    }
+    
+    public static void waitCompletion() {
+		if (initialized) {
+    		ontologyLoader.waitCompletion();
+    	}
     }
     
 }
@@ -366,9 +378,9 @@ void ontologyAnnotations():
     ( annotation() )*
 }
 /* 3.7 Functional-Style Syntax */    
-void ontologyDocument(OntologyLoader loader):
+void ontologyDocument():
 {}{
-    ( prefixDeclaration() )* ontology(loader)
+    ( prefixDeclaration() )* ontology()
 }
 void prefixDeclaration():
 {}{
@@ -378,12 +390,12 @@ void prefixDeclaration():
       fullIri()
     <CLOSE_BRACE>
 }
-void ontology(OntologyLoader loader):
+void ontology():
 {}{
     <ONTOLOGY> <OPEN_BRACE> ( ontologyIri() ( versionIri() )? )?
        directlyImportsDocuments()
        ontologyAnnotations()
-       axioms(loader)       
+       axioms()       
     <CLOSE_BRACE>
 }
 void ontologyIri():
@@ -398,11 +410,11 @@ void directlyImportsDocuments():
 {}{
     ( <IMPORT> <OPEN_BRACE> iri() <CLOSE_BRACE> )*
 }
-void axioms(OntologyLoader loader):
+void axioms():
 {
     Future<? extends ElkAxiom> x; 
 }{
-    ( x = axiom() { loader.loadFutureAxiom(x); } )*
+    ( x = axiom() { ontologyLoader.loadFutureAxiom(x); } )*
 }
 /* 4 Datatype Maps */
 /* 4.1 Real Numbers, Decimal Numbers, and Integers */ 

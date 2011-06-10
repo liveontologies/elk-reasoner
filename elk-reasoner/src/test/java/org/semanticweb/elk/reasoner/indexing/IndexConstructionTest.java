@@ -34,6 +34,7 @@ import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.FutureElkObjectFactory;
 import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.parsing.OntologyLoader;
 
 public class IndexConstructionTest extends TestCase {
 
@@ -55,9 +56,10 @@ public class IndexConstructionTest extends TestCase {
 				.getFutureElkObjectSomeValuesFrom(has, heartAndOrgan);
 
 		OntologyIndex ontologyIndex = new SerialOntologyIndex();
-		
-		final ExecutorService executor = Executors.newCachedThreadPool();		
-		IndexComputation indexComputation = new IndexComputation(executor, 1, ontologyIndex);
+
+		final ExecutorService executor = Executors.newCachedThreadPool();
+		OntologyLoader indexComputation = new OntologyLoader(executor, 1,
+				ontologyIndex.getAxiomIndexer());
 
 		indexComputation.submit(constructor.getFutureElkSubClassOfAxiom(human,
 				hasHeartAndOrgan));
@@ -70,7 +72,8 @@ public class IndexConstructionTest extends TestCase {
 				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts
 				.contains(ontologyIndex.getIndexedClassExpression(organ.get())));
 		assertTrue(ontologyIndex.getIndexedClassExpression(human.get()).toldSuperClassExpressions
-				.contains(ontologyIndex.getIndexedClassExpression(hasHeartAndOrgan.get())));
+				.contains(ontologyIndex
+						.getIndexedClassExpression(hasHeartAndOrgan.get())));
 		assertTrue(ontologyIndex.getIndexedClassExpression(heart.get()).negConjunctionsByConjunct == null);
 
 		indexComputation.submit(constructor.getFutureElkEquivalentClassesAxiom(
@@ -78,7 +81,8 @@ public class IndexConstructionTest extends TestCase {
 		indexComputation.waitCompletion();
 
 		assertTrue(((IndexedObjectIntersectionOf) ontologyIndex
-				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts.size() == 2);
+				.getIndexedClassExpression(heartAndOrgan.get())).conjuncts
+				.size() == 2);
 		assertFalse(ontologyIndex.getIndexedClassExpression(heart.get()).negConjunctionsByConjunct
 				.isEmpty());
 		assertNotSame(ontologyIndex.getIndexedClassExpression(human.get()),

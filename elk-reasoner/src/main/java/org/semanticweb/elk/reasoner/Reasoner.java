@@ -34,13 +34,13 @@ import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassificationManager;
-import org.semanticweb.elk.reasoner.indexing.IndexConstruction;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
+import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.util.Statistics;
 
@@ -51,9 +51,9 @@ public class Reasoner {
 	protected final int workerNo;
 
 	protected final OntologyIndex ontologyIndex;
-	
+
 	protected ClassTaxonomy classTaxonomy;
-	
+
 	// logger for events
 	protected final static Logger logger = Logger.getLogger(Reasoner.class);
 
@@ -61,54 +61,72 @@ public class Reasoner {
 		this.executor = executor;
 		this.workerNo = workerNo;
 		this.ontologyIndex = new SerialOntologyIndex();
+	}
 	
+	public OntologyIndex getOntologyIndex() {
+		return ontologyIndex;
 	}
 
 	public Reasoner() {
 		this(Executors.newCachedThreadPool(), 16);
 	}
+	
+	public void loadOntologyFromStream(InputStream stream, ElkAxiomProcessor elkAxiomProcessor)
+	throws ParseException, IOException {
+		Statistics.logOperationStart("Loading", logger);
+
+		Owl2FunctionalStyleParser.Init(elkAxiomProcessor, executor, 1, stream);
+		Owl2FunctionalStyleParser.ontologyDocument();
+		stream.close();
+		Owl2FunctionalStyleParser.waitCompletion();
+		Statistics.logOperationFinish("Loading", logger);
+		Statistics.logMemoryUsage(logger);		
+	}
 
 	public void loadOntologyFromStream(InputStream stream)
 			throws ParseException, IOException {
-		Statistics.logOperationStart("Loading", logger);
-		
-		IndexConstruction indexConstruction = new IndexConstruction(executor, 1, ontologyIndex);
-		Owl2FunctionalStyleParser.Init(stream);
-		Owl2FunctionalStyleParser.ontologyDocument(indexConstruction);
-		stream.close();
-		indexConstruction.waitCompletion();
-		Statistics.logOperationFinish("Loading", logger);
-		Statistics.logMemoryUsage(logger);
+		loadOntologyFromStream(stream, ontologyIndex.getAxiomIndexer());
 	}
 
-	public void loadOntologyFromFile(String fileName) throws ParseException,
+	public void loadOntologyFromFile(String fileName, ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
 			IOException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Loading ontology from " + fileName);
 		}
-		loadOntologyFromStream(new FileInputStream(fileName));
+		loadOntologyFromStream(new FileInputStream(fileName), elkAxiomProcessor);
+	}
+	
+	public void loadOntologyFromFile(String fileName) throws ParseException,
+	IOException {
+		loadOntologyFromFile(fileName, ontologyIndex.getAxiomIndexer());
 	}
 
-	public void loadOntologyFromString(String text) throws ParseException,
+	public void loadOntologyFromString(String text, ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
 			IOException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Loading ontology from string");
 		}
-		loadOntologyFromStream(new ByteArrayInputStream(text.getBytes()));
+		loadOntologyFromStream(new ByteArrayInputStream(text.getBytes()), elkAxiomProcessor);
+	}
+	
+	public void loadOntologyFromString(String text) throws ParseException,
+	IOException {
+		loadOntologyFromString(text, ontologyIndex.getAxiomIndexer());
 	}
 
 	public void classify() {
 		// Saturation stage
-	
-		ObjectPropertySaturation objectPropertySaturation =
-			new ObjectPropertySaturation(executor, workerNo);
-	
-		ClassExpressionSaturation classExpressionSaturation = 
-			new ClassExpressionSaturation(executor, workerNo);
+
+		ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
+				executor, workerNo);
+
+		ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
+				executor, workerNo);
 
 		Statistics.logOperationStart("Saturation", logger);
 
-		for (IndexedObjectProperty iop : ontologyIndex.getIndexedObjectProperties())
+		for (IndexedObjectProperty iop : ontologyIndex
+				.getIndexedObjectProperties())
 			objectPropertySaturation.submit(iop);
 		objectPropertySaturation.waitCompletion();
 
@@ -118,16 +136,16 @@ public class Reasoner {
 
 		Statistics.logOperationFinish("Saturation", logger);
 		Statistics.logMemoryUsage(logger);
-		
+
 		// Transitive reduction stage
 		Statistics.logOperationStart("Transitive reduction", logger);
-		
+
 		ClassificationManager classificationManager = new ClassificationManager(
 				executor, workerNo, ontologyIndex);
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
 			classificationManager.submit((ElkClass) ic.getClassExpression());
 		classTaxonomy = classificationManager.getClassTaxonomy();
-		
+
 		Statistics.logOperationFinish("Transitive reduction", logger);
 		Statistics.logMemoryUsage(logger);
 	}

@@ -20,23 +20,47 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, Jun 6, 2011
- */
 package org.semanticweb.elk.syntax.parsing;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.semanticweb.elk.syntax.ElkAxiom;
+import org.semanticweb.elk.syntax.ElkAxiomProcessor;
+import org.semanticweb.elk.util.AbstractConcurrentComputation;
 
 /**
- * Generic interface used for loading ontologies.
+ * Experimental version of indexing manager.
  * 
- * @author Yevgeny Kazakov
- *
+ * @author Frantisek Simancik
+ * @author Markus Kroetzsch
  */
-public interface OntologyLoader {
-	
-	public void loadFutureAxiom(Future<? extends ElkAxiom> futureAxiom);	
+public class OntologyLoader extends
+		AbstractConcurrentComputation<Future<? extends ElkAxiom>> {
+
+	protected ElkAxiomProcessor elkAxiomProcessor;
+
+	public OntologyLoader(ExecutorService executor, int workerNo,
+			ElkAxiomProcessor elkAxiomProcessor) {
+		super(executor, workerNo, 512, 0);
+		this.elkAxiomProcessor = elkAxiomProcessor;
+	}
+
+	@Override
+	protected void process(Future<? extends ElkAxiom> futureAxiom) {
+		try {
+			elkAxiomProcessor.process(futureAxiom.get());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void loadFutureAxiom(Future<? extends ElkAxiom> futureAxiom) {
+		if (futureAxiom != null)
+			submit(futureAxiom);
+	}
 
 }
