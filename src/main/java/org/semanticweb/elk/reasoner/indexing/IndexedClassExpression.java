@@ -52,7 +52,6 @@ import org.semanticweb.elk.util.Multimap;
  */
 abstract public class IndexedClassExpression {
 	
-	protected final ElkClassExpression elkClassExpression;
 	protected List<IndexedClassExpression> toldSuperClassExpressions;
 	protected Multimap<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
 	protected List<IndexedObjectSomeValuesFrom> negExistentials;
@@ -72,20 +71,10 @@ abstract public class IndexedClassExpression {
 	int negativeOccurrenceNo = 0;
 
 	
-	/**
-	 * Creates an object that represents the given an ElkClassExpression.
-	 */
-	protected IndexedClassExpression(ElkClassExpression classExpression) {
-		this.elkClassExpression = classExpression;
-	}
-	
-	
 	/** 
 	 * @return The represented class expression.
 	 */ 
-	public ElkClassExpression getClassExpression() {
-		return elkClassExpression;
-	}
+	abstract public ElkClassExpression getClassExpression();
 	
 
 	/**
@@ -184,7 +173,7 @@ abstract public class IndexedClassExpression {
 	 * @return String representation.
 	 */
 	public String toString() {
-		return "[" + elkClassExpression.toString() + "]";
+		return "[" + getClassExpression().toString() + "]";
 	}
 
 	

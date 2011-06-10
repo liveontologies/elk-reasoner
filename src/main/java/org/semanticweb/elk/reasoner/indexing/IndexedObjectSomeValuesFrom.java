@@ -31,6 +31,8 @@ import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
  *
  */
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
+	
+	protected final ElkObjectSomeValuesFrom elkObjectSomeValuesFrom;
  	
 	protected IndexedObjectProperty relation; 
 	
@@ -41,10 +43,16 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 * Creates an object that represents the given ElkObjectIntersecionOf. 
 	 */
 	protected IndexedObjectSomeValuesFrom(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-		super(elkObjectSomeValuesFrom);
+		this.elkObjectSomeValuesFrom = elkObjectSomeValuesFrom;
 	}
 	
 	
+	@Override
+	public ElkObjectSomeValuesFrom getClassExpression() {
+		return elkObjectSomeValuesFrom;
+	}
+
+
 	/**
 	 * @return The indexed object property comprising this ObjectSomeValuesFrom.
 	 */

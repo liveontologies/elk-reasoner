@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.classification;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.syntax.ElkClass;

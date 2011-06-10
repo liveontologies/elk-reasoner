@@ -78,7 +78,7 @@ class NegativeClassExpressionIndexer implements
 				} else if (i < conjunctionSize) {
 					List<ElkClassExpression> arguments = new ArrayList<ElkClassExpression>(
 							2);
-					arguments.add(prefixConjunction.elkClassExpression);
+					arguments.add(prefixConjunction.getClassExpression());
 					arguments.add(element);
 					prefixConjunction = ElkObjectIntersectionOf.create(
 							arguments).accept(this);

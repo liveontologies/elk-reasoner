@@ -31,15 +31,21 @@ import org.semanticweb.elk.syntax.ElkClass;
  *
  */
 public class IndexedClass extends IndexedClassExpression {
+	
+	protected final ElkClass elkClass;
 
 	/**
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
 	protected IndexedClass(ElkClass elkClass) {
-		super(elkClass);
+		this.elkClass = elkClass;
 	}
 
-	
+
+	@Override
+	public ElkClass getClassExpression() {
+		return elkClass;
+	}
 	
 	
 	
