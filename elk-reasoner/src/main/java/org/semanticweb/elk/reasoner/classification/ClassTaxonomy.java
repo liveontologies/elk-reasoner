@@ -26,6 +26,7 @@
 package org.semanticweb.elk.reasoner.classification;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.util.StructuralHashObject;
@@ -40,12 +41,12 @@ import org.semanticweb.elk.util.StructuralHashObject;
 public interface ClassTaxonomy extends StructuralHashObject {
 
 	public ClassNode getNode(ElkClass elkClass);
-	
+
 	/**
-	 * Obtain an unmodifiable Collection of all nodes in this ClassTaxonomy
-	 *
+	 * Obtain an unmodifiable Set of all nodes in this ClassTaxonomy.
+	 * 
 	 * @return an unmodifiable Collection
 	 */
-	public Collection<ClassNode> getNodes();	
+	public Set<ClassNode> getNodes();
 
 }
