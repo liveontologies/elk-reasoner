@@ -41,7 +41,7 @@ import org.semanticweb.elk.util.HashGenerator;
  * @author Frantisek Simancik
  *
  */
-class ConcurrentClassTaxonomy implements ClassTaxonomy {
+class ConcurrentClassTaxonomy extends ClassTaxonomy {
 
 	protected final ConcurrentMap<ElkClass, ClassNode> nodeLookup;
 

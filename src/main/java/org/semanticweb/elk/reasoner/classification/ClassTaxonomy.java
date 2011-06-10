@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.classification;
 import java.util.Set;
 
 import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.StructuralHashObject;
 
 /**
@@ -36,16 +37,75 @@ import org.semanticweb.elk.util.StructuralHashObject;
  * from which direct sub- and superclasses can be retrieved.
  * 
  * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  */
-public interface ClassTaxonomy extends StructuralHashObject {
+public abstract class ClassTaxonomy implements StructuralHashObject {
 
-	public ClassNode getNode(ElkClass elkClass);
+	public abstract ClassNode getNode(ElkClass elkClass);
 
 	/**
 	 * Obtain an unmodifiable Set of all nodes in this ClassTaxonomy.
 	 * 
 	 * @return an unmodifiable Collection
 	 */
-	public Set<ClassNode> getNodes();
+	public abstract Set<ClassNode> getNodes();
+
+	/**
+	 * Compute a hash code based on all subclass relationships that are
+	 * expressed through the children of all class nodes. The result is not the
+	 * same as a hash over any set of axioms that represent the taxonomy.
+	 * However, the result must always be the same as the result of
+	 * getParentBasedTaxonomyHash().
+	 * 
+	 * @return children-based hash code representing the taxonomy
+	 */
+	public int getChildrenBasedTaxonomyHash() {
+		int result = 0;
+		int subClassHash = "subClassOf".hashCode();
+
+		for (ClassNode classNode : getNodes()) {
+			int memberHash = HashGenerator.combineMultisetHash(true, classNode
+					.getMembers());
+			for (ClassNode o : classNode.getChildren()) {
+				int subMemberHash = HashGenerator.combineMultisetHash(true, o
+						.getMembers());
+				int subClassAxiomHash = HashGenerator.combineListHash(
+						subClassHash, subMemberHash, memberHash);
+				result = HashGenerator.combineMultisetHash(false, result,
+						subClassAxiomHash);
+			}
+		}
+
+		return HashGenerator.combineListHash(result);
+	}
+
+	/**
+	 * Compute a hash code based on all subclass relationships that are
+	 * expressed through the parents of all class nodes. The result is not the
+	 * same as a hash over any set of axioms that represent the taxonomy.
+	 * However, the result must always be the same as the result of
+	 * getChildrenBasedTaxonomyHash().
+	 * 
+	 * @return parent-based hash code representing the taxonomy
+	 */
+	public int getParentBasedTaxonomyHash() {
+		int result = 0;
+		int subClassHash = "subClassOf".hashCode();
+
+		for (ClassNode classNode : getNodes()) {
+			int memberHash = HashGenerator.combineMultisetHash(true, classNode
+					.getMembers());
+			for (ClassNode o : classNode.getParents()) {
+				int superMemberHash = HashGenerator.combineMultisetHash(true, o
+						.getMembers());
+				int subClassAxiomHash = HashGenerator.combineListHash(
+						subClassHash, memberHash, superMemberHash);
+				result = HashGenerator.combineMultisetHash(false, result,
+						subClassAxiomHash);
+			}
+		}
+
+		return HashGenerator.combineListHash(result);
+	}
 
 }
