@@ -35,6 +35,8 @@ import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
  */
 public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	
+	protected final ElkObjectIntersectionOf elkObjectIntersectionOf;
+	
 	protected List<IndexedClassExpression> conjuncts;
 	
 	
@@ -42,7 +44,13 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	 * Creates an object that represents the given ElkObjectIntersecionOf. 
 	 */
 	protected IndexedObjectIntersectionOf(ElkObjectIntersectionOf elkObjectIntersectionOf) {
-		super(elkObjectIntersectionOf);
+		this.elkObjectIntersectionOf = elkObjectIntersectionOf;
+	}
+	
+
+	@Override
+	public ElkObjectIntersectionOf getClassExpression() {
+		return elkObjectIntersectionOf;
 	}
 	
 	
@@ -68,4 +76,6 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
+
 }

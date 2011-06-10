@@ -28,10 +28,8 @@ package org.semanticweb.elk.reasoner.classification;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.StructuralHashObject;
@@ -50,32 +48,19 @@ public class ClassNode implements StructuralHashObject {
 	/**
 	 * Members are ElkClass objects that are equivalent.
 	 */
-	final ArrayList<ElkClass> members;
+	final List<ElkClass> members;
 	/**
 	 * Parents are ElkClass objects that are immediate superclasses to the
 	 * members without being equivalent.
 	 */
-	final ArrayList<ClassNode> parents;
+	final List<ClassNode> parents;
 	/**
 	 * Children are ElkClass objects that are immediate subclasses to the
 	 * members without being equivalent.
 	 */
-	final ArrayList<ClassNode> children;
-
-	/**
-	 * A thread-safe queue to remember children that are still to be written
-	 * into
-	 * {@link org.semanticweb.elk.reasoner.classification.ClassNode#children
-	 * children}.
-	 */
-	final Queue<ClassNode> childQueue;
-
-	/**
-	 * True if
-	 * {@link org.semanticweb.elk.reasoner.classification.ClassNode#childQueue
-	 * childQueue} is not empty.
-	 */
-	private AtomicBoolean isActive;
+	final List<ClassNode> children;
+	
+	List<IndexedClass> parentIndexClasses;
 
 	/**
 	 * Constructor.
@@ -83,81 +68,29 @@ public class ClassNode implements StructuralHashObject {
 	 * @param equivalent
 	 *            non-empty list of equivalent ElkClass objects
 	 */
-	public ClassNode(final ArrayList<ElkClass> equivalent) {
+	public ClassNode(final List<ElkClass> equivalent) {
 		this.members = equivalent;
 		this.children = new ArrayList<ClassNode>();
 		this.parents = new ArrayList<ClassNode>();
-		this.childQueue = new ConcurrentLinkedQueue<ClassNode>();
-		this.isActive = new AtomicBoolean(false);
 	}
 
-	/**
-	 * Try to set the activation flag from false to true and return true if this
-	 * was successful (i.e. if the flag was not true already).
-	 * 
-	 * @return true if activation state changed
-	 */
-	boolean tryActivate() {
-		return isActive.compareAndSet(false, true);
-	}
-
-	/**
-	 * Try to set the activation flag from true to false and return true if this
-	 * was successful (i.e. if the flag was not true already).
-	 * 
-	 * @return true if activation state changed
-	 */
-	boolean tryDeactivate() {
-		return isActive.compareAndSet(true, false);
-	}
 
 	/**
 	 * Add a parent node.
 	 * 
-	 * @param parent
-	 *            node to add
+	 * @param parent node to add
 	 */
-	synchronized void addParent(ClassNode parent) {
-		this.parents.add(parent);
+	void addParent(ClassNode parent) {
+		parents.add(parent);
 	}
 
 	/**
-	 * Add a child class to the queue. This method can operate asynchronously,
-	 * but
-	 * {@link org.semanticweb.elk.reasoner.classification.ClassNode#processQueuedChildren
-	 * processQueuedChildren()} must be called eventually to write the data into
-	 * the children array.
+	 * Add a child node.
 	 * 
-	 * @param child
+	 * @param child node to add
 	 */
-	void enqueueChild(ClassNode child) {
-		childQueue.add(child);
-	}
-
-	/**
-	 * Process the queued children of to write them to the children array.
-	 */
-	synchronized void processQueuedChildren() {
-		for (;;) {
-			ClassNode child = childQueue.poll();
-			if (child == null) {
-				break;
-			}
-			addChild(child);
-		}
-	}
-
-	/**
-	 * Add a child node. This method is synchronized. To queue children for
-	 * being added, the method
-	 * {@link org.semanticweb.elk.reasoner.classification.ClassNode#enqueueChild
-	 * enqueueChild()} should be used.
-	 * 
-	 * @param child
-	 *            node to add
-	 */
-	private void addChild(ClassNode child) {
-		this.children.add(child);
+	synchronized void addChild(ClassNode child) {
+		children.add(child);
 	}
 
 	/**

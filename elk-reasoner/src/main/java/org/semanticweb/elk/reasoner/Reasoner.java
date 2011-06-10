@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
-import org.semanticweb.elk.reasoner.classification.ClassificationManager;
+import org.semanticweb.elk.reasoner.classification.ClassTaxonomyComputation;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -41,7 +41,6 @@ import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
-import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.parsing.ConcurrentFutureElkAxiomLoader;
 import org.semanticweb.elk.util.Statistics;
 
@@ -142,11 +141,10 @@ public class Reasoner {
 		// Transitive reduction stage
 		Statistics.logOperationStart("Transitive reduction", logger);
 
-		ClassificationManager classificationManager = new ClassificationManager(
-				executor, workerNo, ontologyIndex);
+		ClassTaxonomyComputation classification = new ClassTaxonomyComputation(executor, workerNo);
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
-			classificationManager.submit((ElkClass) ic.getClassExpression());
-		classTaxonomy = classificationManager.getClassTaxonomy();
+			classification.submit(ic);
+		classTaxonomy = classification.computateTaxonomy();
 
 		Statistics.logOperationFinish("Transitive reduction", logger);
 		Statistics.logMemoryUsage(logger);
