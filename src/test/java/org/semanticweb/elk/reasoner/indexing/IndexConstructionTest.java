@@ -34,7 +34,7 @@ import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.FutureElkObjectFactory;
 import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
-import org.semanticweb.elk.syntax.parsing.OntologyLoader;
+import org.semanticweb.elk.syntax.parsing.ConcurrentFutureElkAxiomLoader;
 
 public class IndexConstructionTest extends TestCase {
 
@@ -58,7 +58,7 @@ public class IndexConstructionTest extends TestCase {
 		OntologyIndex ontologyIndex = new SerialOntologyIndex();
 
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		OntologyLoader indexComputation = new OntologyLoader(executor, 1,
+		ConcurrentFutureElkAxiomLoader indexComputation = new ConcurrentFutureElkAxiomLoader(executor, 1,
 				ontologyIndex.getAxiomIndexer());
 
 		indexComputation.submit(constructor.getFutureElkSubClassOfAxiom(human,

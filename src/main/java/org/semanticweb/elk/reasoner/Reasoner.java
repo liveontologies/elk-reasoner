@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.parsing.ConcurrentFutureElkAxiomLoader;
 import org.semanticweb.elk.util.Statistics;
 
 public class Reasoner {
@@ -75,10 +76,11 @@ public class Reasoner {
 	throws ParseException, IOException {
 		Statistics.logOperationStart("Loading", logger);
 
-		Owl2FunctionalStyleParser.Init(elkAxiomProcessor, executor, 1, stream);
-		Owl2FunctionalStyleParser.ontologyDocument();
+		ConcurrentFutureElkAxiomLoader loader = new ConcurrentFutureElkAxiomLoader(executor, 1, elkAxiomProcessor);
+		Owl2FunctionalStyleParser.Init(stream);
+		Owl2FunctionalStyleParser.ontologyDocument(loader);
 		stream.close();
-		Owl2FunctionalStyleParser.waitCompletion();
+		loader.waitCompletion();
 		Statistics.logOperationFinish("Loading", logger);
 		Statistics.logMemoryUsage(logger);		
 	}

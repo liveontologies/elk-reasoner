@@ -20,29 +20,20 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.syntax.preprocessing;
+package org.semanticweb.elk.syntax.parsing;
+
+import java.util.concurrent.Future;
 
 import org.semanticweb.elk.syntax.ElkAxiom;
-import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 
-public class MultiplyingAxiomProcessor implements ElkAxiomProcessor {
-	
-	protected ElkAxiomProcessor subProcessor;
-	protected int multiplicity;
-	protected RenamingExpressionVisitor renamingVisitor;
-	
-	public MultiplyingAxiomProcessor(ElkAxiomProcessor subProcessor, int multiplicity) {
-		this.subProcessor = subProcessor;
-		this.multiplicity = multiplicity;
-		renamingVisitor = new RenamingExpressionVisitor("");
-	}
+/**
+ * Interface for classes that process Future objects for ElkAxioms. Typically
+ * this is used for loading ontologies.
+ * 
+ * @author Markus Kroetzsch
+ */
+public interface FutureElkAxiomConsumer {
 
-	public void process(ElkAxiom elkAxiom) {
-		subProcessor.process(elkAxiom);
-		for (int i=1; i<multiplicity; ++i) {
-			renamingVisitor.setPostfix("X" + i);
-			subProcessor.process(elkAxiom.accept(renamingVisitor));
-		}
-	}
+	public void submit(Future<? extends ElkAxiom> futureAxiom);
 
 }
