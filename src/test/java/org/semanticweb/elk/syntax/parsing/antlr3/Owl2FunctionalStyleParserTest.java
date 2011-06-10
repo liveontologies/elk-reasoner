@@ -26,7 +26,7 @@
 package org.semanticweb.elk.syntax.parsing.antlr3;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.Executors;
 
 import junit.framework.TestCase;
 
@@ -34,6 +34,7 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.UnbufferedTokenStream;
 import org.semanticweb.elk.syntax.ElkAxiom;
+import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.parsing.OntologyLoader;
 
@@ -46,18 +47,20 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		super(testName);
 	}
 
-	class DummyOntologyLoader implements OntologyLoader {
-		public void loadFutureAxiom(Future<? extends ElkAxiom> futureAxiom) {
+	class DummyAxiomProcessor implements ElkAxiomProcessor {
+		public void process(ElkAxiom elkAxiom) {
 		}
 	}
-	
+
 	public void parseOntologyDocument(String testString)
 			throws RecognitionException {
 		Owl2FunctionalStyleLexer lex = new Owl2FunctionalStyleLexer(
 				new ANTLRStringStream(testString));
 		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
-		parser.ontologyDocument(new DummyOntologyLoader());
+		OntologyLoader dummyOntologyLoader = new OntologyLoader(Executors
+				.newCachedThreadPool(), 1, new DummyAxiomProcessor());
+		parser.ontologyDocument(dummyOntologyLoader);
 	}
 
 	public void testOntologyDocument() {

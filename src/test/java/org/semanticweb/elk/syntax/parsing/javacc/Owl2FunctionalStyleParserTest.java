@@ -28,15 +28,15 @@ package org.semanticweb.elk.syntax.parsing.javacc;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.Executors;
 
 import junit.framework.TestCase;
 
 import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.syntax.ElkAxiom;
+import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClass;
-import org.semanticweb.elk.syntax.parsing.OntologyLoader;
 
 /**
  * @author Yevgeny Kazakov
@@ -47,16 +47,17 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 	public Owl2FunctionalStyleParserTest(String testName) {
 		super(testName);
 	}
-	
-	class DummyOntologyLoader implements OntologyLoader {
-		public void loadFutureAxiom(Future<? extends ElkAxiom> futureAxiom) {
+
+	class DummyAxiomProcessor implements ElkAxiomProcessor {
+		public void process(ElkAxiom elkAxiom) {
 		}
 	}
 
 	public void parseOntologyDocument(String testString) throws ParseException {
 		InputStream stream = new ByteArrayInputStream(testString.getBytes());
-		Owl2FunctionalStyleParser.Init(stream);
-		Owl2FunctionalStyleParser.ontologyDocument(new DummyOntologyLoader());
+		Owl2FunctionalStyleParser.Init(new DummyAxiomProcessor(), Executors
+				.newCachedThreadPool(), 1, stream);
+		Owl2FunctionalStyleParser.ontologyDocument();
 	}
 
 	public void testOntologyDocument() {
@@ -85,7 +86,8 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 	public ElkClass parseElkClass(String testString) throws ParseException,
 			InterruptedException, ExecutionException {
 		InputStream stream = new ByteArrayInputStream(testString.getBytes());
-		Owl2FunctionalStyleParser.Init(stream);
+		Owl2FunctionalStyleParser.Init(new DummyAxiomProcessor(), Executors
+				.newCachedThreadPool(), 1, stream);
 		return Owl2FunctionalStyleParser.clazz().get();
 	}
 

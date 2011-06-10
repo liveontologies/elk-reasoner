@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 
@@ -50,5 +51,7 @@ public abstract class OntologyIndex  {
 	protected abstract IndexedClassExpression getCreateIndexedClassExpression(ElkClassExpression representative);
 
 	protected abstract IndexedObjectProperty getCreateIndexedObjectProperty(ElkObjectProperty representative);
+	
+	public abstract ElkAxiomProcessor getAxiomIndexer();
 
 }

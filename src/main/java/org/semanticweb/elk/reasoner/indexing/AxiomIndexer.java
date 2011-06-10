@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+import org.semanticweb.elk.syntax.ElkAxiom;
+import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
@@ -36,32 +38,51 @@ import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
 
 /**
- * For indexing axioms.
+ * An ElkAxiomProcessor that updates an OntologyIndex for the given ElkAxioms.
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
- *
+ * @author Markus Kroetzsch
+ * 
  */
-class AxiomIndexer implements ElkAxiomVisitor<Void> {
+class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 	protected final OntologyIndex ontologyIndex;
 	protected final NegativeClassExpressionIndexer negativeClassExpressionIndexer;
 	protected final PositiveClassExpressionIndexer positiveClassExpressionIndexer;
 	protected final ObjectPropertyExpressionIndexer objectPropertyExpressionIndexer;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param ontologyIndex
+	 *            to add indexed axioms to
+	 */
 	protected AxiomIndexer(OntologyIndex ontologyIndex) {
 		this.ontologyIndex = ontologyIndex;
-		negativeClassExpressionIndexer = new NegativeClassExpressionIndexer(this);
-		positiveClassExpressionIndexer = new PositiveClassExpressionIndexer(this);
-		objectPropertyExpressionIndexer = new ObjectPropertyExpressionIndexer(this);
+		negativeClassExpressionIndexer = new NegativeClassExpressionIndexer(
+				this);
+		positiveClassExpressionIndexer = new PositiveClassExpressionIndexer(
+				this);
+		objectPropertyExpressionIndexer = new ObjectPropertyExpressionIndexer(
+				this);
 	}
 
+	/**
+	 * Index the given axiom.
+	 */
+	public void process(ElkAxiom elkAxiom) {
+		elkAxiom.accept(this);
+	}
+
+	
 	public Void visit(ElkEquivalentClassesAxiom axiom) {
 		IndexedClassExpression first = null;
 		for (ElkClassExpression c : axiom.getEquivalentClassExpressions()) {
-//			implement EquivalentClassesAxiom as two SubClassOfAxioms			
+			// implement EquivalentClassesAxiom as two SubClassOfAxioms
 
-			IndexedClassExpression ice = c.accept(negativeClassExpressionIndexer);
+			IndexedClassExpression ice = c
+					.accept(negativeClassExpressionIndexer);
 			c.accept(positiveClassExpressionIndexer);
 			if (first == null)
 				first = ice;
@@ -75,8 +96,10 @@ class AxiomIndexer implements ElkAxiomVisitor<Void> {
 
 	public Void visit(ElkSubClassOfAxiom axiom) {
 
-		IndexedClassExpression subClass = axiom.getSubClassExpression().accept(negativeClassExpressionIndexer);
-		IndexedClassExpression superClass = axiom.getSuperClassExpression().accept(positiveClassExpressionIndexer);
+		IndexedClassExpression subClass = axiom.getSubClassExpression().accept(
+				negativeClassExpressionIndexer);
+		IndexedClassExpression superClass = axiom.getSuperClassExpression()
+				.accept(positiveClassExpressionIndexer);
 		subClass.addToldSuperClassExpression(superClass);
 
 		return null;
@@ -99,11 +122,13 @@ class AxiomIndexer implements ElkAxiomVisitor<Void> {
 
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
 
-		IndexedObjectProperty subProperty = axiom.getSubObjectPropertyExpression().accept(
-				objectPropertyExpressionIndexer);
-		IndexedObjectProperty superProperty = axiom.getSuperObjectPropertyExpression().accept(
-				objectPropertyExpressionIndexer);
-		
+		IndexedObjectProperty subProperty = axiom
+				.getSubObjectPropertyExpression().accept(
+						objectPropertyExpressionIndexer);
+		IndexedObjectProperty superProperty = axiom
+				.getSuperObjectPropertyExpression().accept(
+						objectPropertyExpressionIndexer);
+
 		subProperty.addToldSuperObjectProperty(superProperty);
 		superProperty.addToldSubObjectProperty(subProperty);
 
@@ -111,8 +136,9 @@ class AxiomIndexer implements ElkAxiomVisitor<Void> {
 	}
 
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-		axiom.getObjectPropertyExpression().accept(objectPropertyExpressionIndexer).setTransitive();
-		
+		axiom.getObjectPropertyExpression().accept(
+				objectPropertyExpressionIndexer).setTransitive();
+
 		return null;
 	}
 }

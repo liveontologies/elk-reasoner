@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
@@ -88,6 +89,11 @@ public class SerialOntologyIndex extends OntologyIndex {
 					indexedObjectProperty);
 		}
 		return indexedObjectProperty;
+	}
+	
+	@Override
+	public ElkAxiomProcessor getAxiomIndexer() {
+		return new AxiomIndexer(this);
 	}
 
 	@Override
