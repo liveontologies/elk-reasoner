@@ -36,12 +36,13 @@ import org.semanticweb.elk.util.AbstractConcurrentComputation;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-public class OntologyLoader extends
-		AbstractConcurrentComputation<Future<? extends ElkAxiom>> {
+public class ConcurrentFutureElkAxiomLoader extends
+		AbstractConcurrentComputation<Future<? extends ElkAxiom>> implements
+		FutureElkAxiomConsumer {
 
 	protected ElkAxiomProcessor elkAxiomProcessor;
 
-	public OntologyLoader(ExecutorService executor, int workerNo,
+	public ConcurrentFutureElkAxiomLoader(ExecutorService executor, int workerNo,
 			ElkAxiomProcessor elkAxiomProcessor) {
 		super(executor, workerNo, 512, 0);
 		this.elkAxiomProcessor = elkAxiomProcessor;
@@ -57,10 +58,11 @@ public class OntologyLoader extends
 			e.printStackTrace();
 		}
 	}
-
-	public void loadFutureAxiom(Future<? extends ElkAxiom> futureAxiom) {
-		if (futureAxiom != null)
-			submit(futureAxiom);
+	
+	public void submit(Future<? extends ElkAxiom> futureAxiom) {
+		if (futureAxiom != null) {
+			super.submit(futureAxiom);
+		}
 	}
 
 }

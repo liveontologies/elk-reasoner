@@ -37,7 +37,7 @@ import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.FutureElkObjectFactory;
 import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
-import org.semanticweb.elk.syntax.parsing.OntologyLoader;
+import org.semanticweb.elk.syntax.parsing.ConcurrentFutureElkAxiomLoader;
 
 public class ConcurrentSaturatorTest extends TestCase {
 
@@ -61,7 +61,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		OntologyIndex ontologyIndex = new SerialOntologyIndex();
 
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		final OntologyLoader indexComputation = new OntologyLoader(
+		final ConcurrentFutureElkAxiomLoader indexComputation = new ConcurrentFutureElkAxiomLoader(
 				executor, 8, ontologyIndex.getAxiomIndexer());
 		indexComputation.submit(constructor.getFutureElkEquivalentClassesAxiom(
 				b, c));
@@ -107,7 +107,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		final OntologyIndex ontologyIndex = new SerialOntologyIndex();
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		final OntologyLoader indexingManager = new OntologyLoader(
+		final ConcurrentFutureElkAxiomLoader indexingManager = new ConcurrentFutureElkAxiomLoader(
 				executor, 8, ontologyIndex.getAxiomIndexer());
 
 		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(a, b));
