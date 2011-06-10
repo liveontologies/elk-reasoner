@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.classification;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
@@ -70,7 +71,7 @@ public class ClassNode implements StructuralHashObject {
 	 */
 	public ClassNode(final List<ElkClass> equivalent) {
 		this.members = equivalent;
-		this.children = new ArrayList<ClassNode>();
+		this.children = new LinkedList<ClassNode>();
 		this.parents = new ArrayList<ClassNode>();
 	}
 

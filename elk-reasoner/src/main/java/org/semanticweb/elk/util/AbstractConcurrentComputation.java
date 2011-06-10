@@ -23,8 +23,8 @@
 package org.semanticweb.elk.util;
 
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -70,7 +70,7 @@ public abstract class AbstractConcurrentComputation<Input> {
 		underfullLimit = overfullLimit / 2;
 		
 		workerCount = new AtomicInteger(0);
-		buffer = new LinkedBlockingQueue<Input> ();
+		buffer = new ConcurrentLinkedQueue<Input> ();
 		bufferSize = new AtomicInteger(0);
 	}
 	
