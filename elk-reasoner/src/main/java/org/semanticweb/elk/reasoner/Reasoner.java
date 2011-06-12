@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,7 @@ import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomyComputation;
+import org.semanticweb.elk.reasoner.classification.ClassTaxonomyPrinter;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -55,14 +57,14 @@ public class Reasoner {
 	protected ClassTaxonomy classTaxonomy;
 
 	// logger for events
-	protected final static Logger logger = Logger.getLogger(Reasoner.class);
+	protected final static Logger LOGGER_ = Logger.getLogger(Reasoner.class);
 
 	public Reasoner(ExecutorService executor, int workerNo) {
 		this.executor = executor;
 		this.workerNo = workerNo;
 		this.ontologyIndex = new SerialOntologyIndex();
 	}
-	
+
 	public OntologyIndex getOntologyIndex() {
 		return ontologyIndex;
 	}
@@ -70,18 +72,20 @@ public class Reasoner {
 	public Reasoner() {
 		this(Executors.newCachedThreadPool(), 16);
 	}
-	
-	public void loadOntologyFromStream(InputStream stream, ElkAxiomProcessor elkAxiomProcessor)
-	throws ParseException, IOException {
-		Statistics.logOperationStart("Loading", logger);
 
-		ConcurrentFutureElkAxiomLoader loader = new ConcurrentFutureElkAxiomLoader(executor, 1, elkAxiomProcessor);
+	public void loadOntologyFromStream(InputStream stream,
+			ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
+			IOException {
+		Statistics.logOperationStart("Loading", LOGGER_);
+
+		ConcurrentFutureElkAxiomLoader loader = new ConcurrentFutureElkAxiomLoader(
+				executor, 1, elkAxiomProcessor);
 		Owl2FunctionalStyleParser.Init(stream);
 		Owl2FunctionalStyleParser.ontologyDocument(loader);
 		stream.close();
 		loader.waitCompletion();
-		Statistics.logOperationFinish("Loading", logger);
-		Statistics.logMemoryUsage(logger);		
+		Statistics.logOperationFinish("Loading", LOGGER_);
+		Statistics.logMemoryUsage(LOGGER_);
 	}
 
 	public void loadOntologyFromStream(InputStream stream)
@@ -89,29 +93,43 @@ public class Reasoner {
 		loadOntologyFromStream(stream, ontologyIndex.getAxiomIndexer());
 	}
 
-	public void loadOntologyFromFile(String fileName, ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
+	public void loadOntologyFromFile(File file,
+			ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
 			IOException {
-		if (logger.isInfoEnabled()) {
-			logger.info("Loading ontology from " + fileName);
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Loading ontology from " + file);
 		}
-		loadOntologyFromStream(new FileInputStream(fileName), elkAxiomProcessor);
-	}
-	
-	public void loadOntologyFromFile(String fileName) throws ParseException,
-	IOException {
-		loadOntologyFromFile(fileName, ontologyIndex.getAxiomIndexer());
+		loadOntologyFromStream(new FileInputStream(file), elkAxiomProcessor);
 	}
 
-	public void loadOntologyFromString(String text, ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
+	public void loadOntologyFromFile(String fileName,
+			ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
 			IOException {
-		if (logger.isInfoEnabled()) {
-			logger.info("Loading ontology from string");
-		}
-		loadOntologyFromStream(new ByteArrayInputStream(text.getBytes()), elkAxiomProcessor);
+		loadOntologyFromFile(new File(fileName), elkAxiomProcessor);
 	}
-	
+
+	public void loadOntologyFromFile(File file) throws ParseException,
+			IOException {
+		loadOntologyFromFile(file, ontologyIndex.getAxiomIndexer());
+	}
+
+	public void loadOntologyFromFile(String fileName) throws ParseException,
+			IOException {
+		loadOntologyFromFile(new File(fileName));
+	}
+
+	public void loadOntologyFromString(String text,
+			ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
+			IOException {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Loading ontology from string");
+		}
+		loadOntologyFromStream(new ByteArrayInputStream(text.getBytes()),
+				elkAxiomProcessor);
+	}
+
 	public void loadOntologyFromString(String text) throws ParseException,
-	IOException {
+			IOException {
 		loadOntologyFromString(text, ontologyIndex.getAxiomIndexer());
 	}
 
@@ -124,7 +142,9 @@ public class Reasoner {
 		ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
 				executor, workerNo);
 
-		Statistics.logOperationStart("Saturation", logger);
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info("Saturation using " + workerNo + " workers");
+		Statistics.logOperationStart("Saturation", LOGGER_);
 
 		for (IndexedObjectProperty iop : ontologyIndex
 				.getIndexedObjectProperties())
@@ -135,23 +155,36 @@ public class Reasoner {
 			classExpressionSaturation.submit(ic);
 		classExpressionSaturation.waitCompletion();
 
-		Statistics.logOperationFinish("Saturation", logger);
-		Statistics.logMemoryUsage(logger);
+		Statistics.logOperationFinish("Saturation", LOGGER_);
+		Statistics.logMemoryUsage(LOGGER_);
 
 		// Transitive reduction stage
-		Statistics.logOperationStart("Transitive reduction", logger);
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info("Transitive reduction using " + workerNo + " workers");
+		Statistics.logOperationStart("Transitive reduction", LOGGER_);
 
-		ClassTaxonomyComputation classification = new ClassTaxonomyComputation(executor, workerNo);
+		ClassTaxonomyComputation classification = new ClassTaxonomyComputation(
+				executor, workerNo);
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
 			classification.submit(ic);
 		classTaxonomy = classification.computeTaxonomy();
 
-		Statistics.logOperationFinish("Transitive reduction", logger);
-		Statistics.logMemoryUsage(logger);
+		Statistics.logOperationFinish("Transitive reduction", LOGGER_);
+		Statistics.logMemoryUsage(LOGGER_);
 	}
 
 	public ClassTaxonomy getTaxonomy() {
 		return classTaxonomy;
+	}
+
+	public void writeTaxonomyToFile(File file) throws IOException {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Writing taxonomy to " + file);
+		}
+		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
+		ClassTaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
+				file.getPath(), true);
+		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
 	}
 
 	public void shutdown() {

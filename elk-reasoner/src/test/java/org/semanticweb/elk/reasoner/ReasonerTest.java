@@ -51,17 +51,21 @@ public class ReasonerTest extends TestCase {
 			ExecutionException, ParseException, IOException {
 
 		Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString("Ontology("
-				+ "EquivalentClasses(:B :C)"
-				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"
-				+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"
-				+ "SubObjectPropertyOf(:R :S)" + ")");
+		reasoner.loadOntologyFromString(""//
+				+ "Ontology("//
+				+ "EquivalentClasses(:B :C)"//
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+				+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"//
+				+ "SubObjectPropertyOf(:R :S)"//
+				+ ")"//
+		);
 
-		
 		ElkClass a = constructor.getFutureElkClass(":A").get();
 		ElkClass d = constructor.getFutureElkClass(":D").get();
-		ElkObjectProperty r = constructor.getFutureElkObjectProperty(":R").get();
-		ElkObjectProperty s = constructor.getFutureElkObjectProperty(":S").get();
+		ElkObjectProperty r = constructor.getFutureElkObjectProperty(":R")
+				.get();
+		ElkObjectProperty s = constructor.getFutureElkObjectProperty(":S")
+				.get();
 
 		reasoner.classify();
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
@@ -81,8 +85,7 @@ public class ReasonerTest extends TestCase {
 			ExecutionException, ParseException, IOException {
 
 		final Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString("Ontology(" 
-				+ "SubClassOf(:A :B)"
+		reasoner.loadOntologyFromString("Ontology(" + "SubClassOf(:A :B)"
 				+ "SubClassOf(:A :C)"
 				+ "SubClassOf(ObjectIntersectionOf(:B :C) :D)" + ")");
 
@@ -90,7 +93,7 @@ public class ReasonerTest extends TestCase {
 		Future<ElkClass> b = constructor.getFutureElkClass(":B");
 		Future<ElkClass> c = constructor.getFutureElkClass(":C");
 		Future<ElkClass> d = constructor.getFutureElkClass(":D");
-		
+
 		OntologyIndex index = reasoner.ontologyIndex;
 
 		IndexedClassExpression A = index.getIndexedClassExpression(a.get());
@@ -100,10 +103,14 @@ public class ReasonerTest extends TestCase {
 		IndexedClassExpression I = index.getIndexedClassExpression(constructor
 				.getFutureElkObjectIntersectionOf(b, c).get());
 
-		assertTrue("A SubClassOf B", A.getToldSuperClassExpressions().contains(B));
-		assertTrue("A SubClassOf C", A.getToldSuperClassExpressions().contains(C));
-		assertFalse("A SubClassOf D", A.getToldSuperClassExpressions().contains(D));
-		assertTrue("I SubClassOf D", I.getToldSuperClassExpressions().contains(D));
+		assertTrue("A SubClassOf B",
+				A.getToldSuperClassExpressions().contains(B));
+		assertTrue("A SubClassOf C",
+				A.getToldSuperClassExpressions().contains(C));
+		assertFalse("A SubClassOf D", A.getToldSuperClassExpressions()
+				.contains(D));
+		assertTrue("I SubClassOf D",
+				I.getToldSuperClassExpressions().contains(D));
 
 		reasoner.classify();
 

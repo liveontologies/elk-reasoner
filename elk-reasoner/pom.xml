@@ -8,7 +8,7 @@
 	<packaging>jar</packaging>
 
 	<name>elk-reasoner</name>
-	<description>An OWL EL reasoner.</description>
+	<description>An Java-based OWL EL reasoner.</description>
 	<url>http://code.google.com/p/elk-reasoner/</url>
 
 	<scm>
@@ -107,6 +107,11 @@
 			<artifactId>javacc-maven-plugin</artifactId>
 			<version>2.6</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.jopt-simple</groupId>
+			<artifactId>jopt-simple</artifactId>
+			<version>3.3</version>
+		</dependency>
 	</dependencies>
 
 	<reporting>
@@ -143,7 +148,7 @@
 				<version>1.0-beta-2</version>
 				<configuration>
 					<verbose>false</verbose>
-					<addSvnKeyWords>true</addSvnKeyWords>					
+					<addSvnKeyWords>true</addSvnKeyWords>
 					<extraExtensions>
 						<g>java</g>
 						<jj>java</jj>
@@ -193,7 +198,28 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/standalone.xml</descriptor>
+					</descriptors>
+					<archive>
+						<manifest>
+							<mainClass>org.semanticweb.elk.ElkCli</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
 </project>
