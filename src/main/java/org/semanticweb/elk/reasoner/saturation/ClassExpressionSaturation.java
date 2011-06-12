@@ -43,7 +43,7 @@ import org.semanticweb.elk.util.Pair;
  */
 public class ClassExpressionSaturation extends AbstractConcurrentComputation<SaturatedClassExpression> {
 
-	protected final static Logger logger = Logger
+	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturation.class);
 
 	public ClassExpressionSaturation(ExecutorService executor, int workerNo) {
@@ -72,8 +72,8 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 		if (root.getSaturated() == null) {
 			SaturatedClassExpression sce = new SaturatedClassExpression(root);
 			if (root.setSaturated(sce)) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("Created context for " + root);
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace("Created context for " + root);
 				}
 				enqueueDerived(sce, root, true);
 			}
