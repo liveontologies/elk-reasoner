@@ -47,7 +47,7 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 			.getLogger(ClassExpressionSaturation.class);
 
 	public ClassExpressionSaturation(ExecutorService executor, int workerNo) {
-		super(executor, workerNo, 0, 512);
+		super(executor, workerNo, 256, 512);
 	}
 
 	public void submit(IndexedClassExpression root) {
