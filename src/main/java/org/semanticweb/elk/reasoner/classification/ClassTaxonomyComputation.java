@@ -46,7 +46,7 @@ public class ClassTaxonomyComputation
 	
 	
 	public ClassTaxonomyComputation(ExecutorService executor, int maxWorkers) {
-		super(executor, maxWorkers, 0, 512);
+		super(executor, maxWorkers, 256, 512);
 		this.classTaxonomy = new ConcurrentClassTaxonomy();
 		this.linker = new Linker();
 	}
