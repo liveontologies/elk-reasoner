@@ -55,8 +55,8 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 
 	public void parseOntologyDocument(String testString) throws ParseException {
 		InputStream stream = new ByteArrayInputStream(testString.getBytes());
-		Owl2FunctionalStyleParser.Init(stream);
-		Owl2FunctionalStyleParser.ontologyDocument(new DummyFutureElkAxiomConsumer());
+		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
+		parser.ontologyDocument(new DummyFutureElkAxiomConsumer());
 	}
 
 	public void testOntologyDocument() {
@@ -85,8 +85,8 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 	public ElkClass parseElkClass(String testString) throws ParseException,
 			InterruptedException, ExecutionException {
 		InputStream stream = new ByteArrayInputStream(testString.getBytes());
-		Owl2FunctionalStyleParser.Init(stream);
-		return Owl2FunctionalStyleParser.clazz().get();
+		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
+		return parser.clazz().get();
 	}
 
 	public void testClazz() throws InterruptedException, ExecutionException {
