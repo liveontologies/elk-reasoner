@@ -80,8 +80,8 @@ public class Reasoner {
 
 		ConcurrentFutureElkAxiomLoader loader = new ConcurrentFutureElkAxiomLoader(
 				executor, 1, elkAxiomProcessor);
-		Owl2FunctionalStyleParser.Init(stream);
-		Owl2FunctionalStyleParser.ontologyDocument(loader);
+		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
+		parser.ontologyDocument(loader);
 		stream.close();
 		loader.waitCompletion();
 		Statistics.logOperationFinish("Loading", LOGGER_);
