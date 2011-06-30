@@ -18,7 +18,6 @@
 			<outputDirectory>/</outputDirectory>
 			<useProjectArtifact>true</useProjectArtifact>
 			<unpack>true</unpack>
-			<scope>runtime</scope>
 		</dependencySet>
 	</dependencySets>
 </assembly>
