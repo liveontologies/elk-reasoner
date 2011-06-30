@@ -8,9 +8,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<groupId>org.semanticweb.elk</groupId>
 	<artifactId>elk-owlapi</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 
 	<name>ELK OWL API</name>
 	<description>ELK bindings for OWL API</description>
