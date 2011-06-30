@@ -1,13 +1,175 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.semanticweb.elk</groupId>
-  <version>1.0-SNAPSHOT</version>
-  <artifactId>elk-parent</artifactId>
-  <packaging>pom</packaging>
-  <modules>
-    <module>elk-reasoner</module>
-  </modules>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.semanticweb.elk</groupId>
+	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>elk-parent</artifactId>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>elk-reasoner</module>
+		<module>elk-owlapi</module>
+		<module>elk-protege</module>
+	</modules>
+
+	<name>ELK</name>
+	<description>An Java-based OWL EL reasoner.</description>
+	<url>http://code.google.com/p/elk-reasoner/</url>
+
+	<scm>
+		<connection>scm:svn:http://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner
+        </connection>
+		<developerConnection>scm:svn:https://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner
+        </developerConnection>
+		<url>http://code.google.com/p/elk-reasoner/source/browse</url>
+	</scm>
+
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A commercial-friendly license</comments>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>Department of Computer Science, University of Oxford</name>
+		<url>http://www.cs.ox.ac.uk</url>
+	</organization>
+
+	<inceptionYear>2011</inceptionYear>
+
+	<developers>
+		<developer>
+			<id>yevgeny</id>
+			<name>Yevgeny Kazakov</name>
+			<email>yevgeny.kazakov@comlab.ox.ac.uk</email>
+			<organization>Department of Computer Science, University of Oxford
+            </organization>
+			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>0</timezone>
+		</developer>
+		<developer>
+			<id>markus</id>
+			<name>Markus Kroetzsch</name>
+			<email>markus.kroetzsch@comlab.ox.ac.uk</email>
+			<organization>Department of Computer Science, University of Oxford
+            </organization>
+			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>0</timezone>
+		</developer>
+		<developer>
+			<id>fratisek</id>
+			<name>Frantisek Simancik</name>
+			<email>frantisek.simancik@comlab.ox.ac.uk</email>
+			<organization>Department of Computer Science, University of Oxford
+            </organization>
+			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>0</timezone>
+		</developer>
+	</developers>
+
+	<dependencyManagement>
+		<dependencies>
+		</dependencies>
+	</dependencyManagement>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>elk-reasoner-snapshots</id>
+			<url>http://elk-reasoner.googlecode.com/svn/m2/snapshots</url>
+		</repository>
+		<repository>
+			<id>elk-reasoner-releases</id>
+			<url>http://elk-reasoner.googlecode.com/svn/m2/releases</url>
+		</repository>
+	</repositories>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.6</version>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-scm-plugin</artifactId>
+					<version>1.5</version>
+					<configuration>
+						<connectionType>developerConnection</connectionType>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>1.0-beta-2</version>
+					<configuration>
+						<verbose>false</verbose>
+						<addSvnKeyWords>true</addSvnKeyWords>
+						<extraExtensions>
+							<g>java</g>
+							<jj>java</jj>
+						</extraExtensions>
+					</configuration>
+					<executions>
+						<execution>
+							<id>first</id>
+							<goals>
+								<goal>update-file-header</goal>
+							</goals>
+							<phase>process-sources</phase>
+							<configuration>
+								<licenseName>apache_v2</licenseName>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.6</version>
+					<dependencies>
+						<dependency>
+							<groupId>com.google.code.maven-svn-wagon</groupId>
+							<artifactId>maven-svn-wagon</artifactId>
+							<version>1.4</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>elk-reasoner.googlecode.com</id>
+			<url>svn:https://elk-reasoner.googlecode.com/svn/m2/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>elk-reasoner.googlecode.com</id>
+			<url>svn:https://elk-reasoner.googlecode.com/svn/m2/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>
