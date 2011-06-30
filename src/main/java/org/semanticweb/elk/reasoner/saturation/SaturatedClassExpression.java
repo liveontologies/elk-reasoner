@@ -95,6 +95,8 @@ public class SaturatedClassExpression {
 	 * @return true if the context was not active; returns false otherwise
 	 */
 	boolean tryActivate() {
+		if (isActive.get())
+			return false;
 		return isActive.compareAndSet(false, true);
 	}
 
@@ -106,6 +108,8 @@ public class SaturatedClassExpression {
 	 * @return true if the context was active; returns false otherwise
 	 */
 	boolean tryDeactivate() {
+		if (!isActive.get())
+			return false;
 		return isActive.compareAndSet(true, false);
 	}
 
