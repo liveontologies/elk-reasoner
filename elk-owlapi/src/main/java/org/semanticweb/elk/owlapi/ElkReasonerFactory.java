@@ -30,55 +30,39 @@ import org.semanticweb.owlapi.reasoner.IllegalConfigurationException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 
 /**
  * @author Yevgeny Kazakov
- *
+ * 
  */
 public class ElkReasonerFactory implements OWLReasonerFactory {
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.owlapi.reasoner.OWLReasonerFactory#getReasonerName()
-	 */
 	public String getReasonerName() {
-		// TODO Auto-generated method stub
-		return null;
+		return getClass().getPackage().getImplementationTitle();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.owlapi.reasoner.OWLReasonerFactory#createNonBufferingReasoner(org.semanticweb.owlapi.model.OWLOntology)
-	 */
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ElkReasoner(ontology, false, null);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.owlapi.reasoner.OWLReasonerFactory#createReasoner(org.semanticweb.owlapi.model.OWLOntology)
-	 */
 	public OWLReasoner createReasoner(OWLOntology ontology) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ElkReasoner(ontology, true, null);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.owlapi.reasoner.OWLReasonerFactory#createNonBufferingReasoner(org.semanticweb.owlapi.model.OWLOntology, org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration)
-	 */
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		// TODO Auto-generated method stub
-		return null;
+		ReasonerProgressMonitor progressMonitor = null;
+		if (config != null)
+			progressMonitor = config.getProgressMonitor();
+		return new ElkReasoner(ontology, false, progressMonitor);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.owlapi.reasoner.OWLReasonerFactory#createReasoner(org.semanticweb.owlapi.model.OWLOntology, org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration)
-	 */
 	public OWLReasoner createReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		// TODO Auto-generated method stub
-		return null;
+		return new ElkReasoner(ontology, true, config.getProgressMonitor());
 	}
 
 }
