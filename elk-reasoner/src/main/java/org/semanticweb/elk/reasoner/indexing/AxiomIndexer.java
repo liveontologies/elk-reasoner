@@ -51,6 +51,8 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	protected final NegativeClassExpressionIndexer negativeClassExpressionIndexer;
 	protected final PositiveClassExpressionIndexer positiveClassExpressionIndexer;
 	protected final ObjectPropertyExpressionIndexer objectPropertyExpressionIndexer;
+	
+	protected final int multiplicity;
 
 	/**
 	 * Constructor.
@@ -58,8 +60,12 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	 * @param ontologyIndex
 	 *            to add indexed axioms to
 	 */
-	protected AxiomIndexer(OntologyIndex ontologyIndex) {
+	protected AxiomIndexer(OntologyIndex ontologyIndex, int multiplicity) {
+		assert (multiplicity == 1 || multiplicity == -1);
+		
 		this.ontologyIndex = ontologyIndex;
+		this.multiplicity = multiplicity;
+		
 		negativeClassExpressionIndexer = new NegativeClassExpressionIndexer(
 				this);
 		positiveClassExpressionIndexer = new PositiveClassExpressionIndexer(
@@ -74,36 +80,50 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	public void process(ElkAxiom elkAxiom) {
 		elkAxiom.accept(this);
 	}
+	
+	
+	protected void indexSubClassOfAxiom(ElkClassExpression elkSubClass, ElkClassExpression elkSuperClass) {
+		IndexedClassExpression subClass = ontologyIndex.getIndexed(elkSubClass);
+		IndexedClassExpression superClass = ontologyIndex.getIndexed(elkSuperClass);
+
+		if (multiplicity == 1) {
+			if (subClass == null)
+				subClass = ontologyIndex.createIndexed(elkSubClass);
+			if (superClass == null)
+				superClass = ontologyIndex.createIndexed(elkSuperClass);
+			subClass.addToldSuperClassExpression(superClass);	
+		}
+		
+		if (multiplicity == -1) {
+			if (subClass == null || superClass == null || !subClass.removeToldSuperClassExpression(superClass))
+				return;
+		}
+		
+		subClass.accept(negativeClassExpressionIndexer);
+		superClass.accept(positiveClassExpressionIndexer);
+	}
 
 	
+	public Void visit(ElkSubClassOfAxiom axiom) {
+		indexSubClassOfAxiom(axiom.getSubClassExpression(), axiom.getSuperClassExpression());
+		return null;
+	}
+	
 	public Void visit(ElkEquivalentClassesAxiom axiom) {
-		IndexedClassExpression first = null;
+		ElkClassExpression first = null;
 		for (ElkClassExpression c : axiom.getEquivalentClassExpressions()) {
 			// implement EquivalentClassesAxiom as two SubClassOfAxioms
 
-			IndexedClassExpression ice = c
-					.accept(negativeClassExpressionIndexer);
-			c.accept(positiveClassExpressionIndexer);
 			if (first == null)
-				first = ice;
+				first = c;
 			else {
-				ice.addToldSuperClassExpression(first);
-				first.addToldSuperClassExpression(ice);
+				indexSubClassOfAxiom(first, c);
+				indexSubClassOfAxiom(c, first);
 			}
 		}
 		return null;
 	}
 
-	public Void visit(ElkSubClassOfAxiom axiom) {
-
-		IndexedClassExpression subClass = axiom.getSubClassExpression().accept(
-				negativeClassExpressionIndexer);
-		IndexedClassExpression superClass = axiom.getSuperClassExpression()
-				.accept(positiveClassExpressionIndexer);
-		subClass.addToldSuperClassExpression(superClass);
-
-		return null;
-	}
 
 	public Void visit(ElkFunctionalObjectPropertyAxiom axiom) {
 
@@ -122,23 +142,44 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
 
-		IndexedObjectProperty subProperty = axiom
-				.getSubObjectPropertyExpression().accept(
-						objectPropertyExpressionIndexer);
-		IndexedObjectProperty superProperty = axiom
-				.getSuperObjectPropertyExpression().accept(
-						objectPropertyExpressionIndexer);
+		IndexedObjectProperty subProperty = ontologyIndex.getIndexed(axiom.getSubObjectPropertyExpression());
+		IndexedObjectProperty superProperty = ontologyIndex.getIndexed(axiom.getSuperObjectPropertyExpression());
 
-		subProperty.addToldSuperObjectProperty(superProperty);
-		superProperty.addToldSubObjectProperty(subProperty);
+		if (multiplicity == 1) {
+			if (subProperty == null)
+				subProperty = ontologyIndex.createIndexed(axiom.getSubObjectPropertyExpression());
+			if (superProperty == null)
+				superProperty = ontologyIndex.createIndexed(axiom.getSuperObjectPropertyExpression());
+			subProperty.addToldSuperObjectProperty(superProperty);	
+			superProperty.addToldSubObjectProperty(subProperty);
+		}
+		
+		if (multiplicity == -1) {
+			if (subProperty == null || superProperty == null || !subProperty.removeToldSuperObjectProperty(superProperty))
+				return null;
+			superProperty.removeToldSubObjectProperty(subProperty);
+		}
+		
+		objectPropertyExpressionIndexer.visit(subProperty);
+		objectPropertyExpressionIndexer.visit(superProperty);
 
 		return null;
 	}
 
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-		axiom.getObjectPropertyExpression().accept(
-				objectPropertyExpressionIndexer).setTransitive();
+		IndexedObjectProperty iop = ontologyIndex.getIndexed(axiom.getObjectPropertyExpression());
 
+		if (multiplicity == 1) {
+			if (iop == null)
+				iop = ontologyIndex.createIndexed(axiom.getObjectPropertyExpression());
+			iop.addTransitive();
+		}
+		if (multiplicity == -1) {
+			if (iop == null || !iop.removeTransitive())
+				return null;
+		}
+
+		objectPropertyExpressionIndexer.visit(iop);
 		return null;
 	}
 }

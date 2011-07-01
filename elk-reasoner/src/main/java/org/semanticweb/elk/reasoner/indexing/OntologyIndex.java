@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.syntax.ElkObjectProperty;
+import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 
 /**
  * Interface for public and protected methods of the index of the ontology.
@@ -38,9 +38,20 @@ import org.semanticweb.elk.syntax.ElkObjectProperty;
  */
 public abstract class OntologyIndex  {
 
-	public abstract IndexedClassExpression getIndexedClassExpression(ElkClassExpression representative);
+	public abstract IndexedClassExpression getIndexed(ElkClassExpression representative);
 	
-	public abstract IndexedObjectProperty getIndexedObjectProperty(ElkObjectProperty representative);
+	public abstract IndexedObjectProperty getIndexed(ElkObjectPropertyExpression representative);
+	
+	
+	protected abstract IndexedClassExpression createIndexed(ElkClassExpression representative);
+
+	protected abstract IndexedObjectProperty createIndexed(ElkObjectPropertyExpression representative);
+	
+	protected abstract void removeIfNoOccurrence(IndexedClassExpression ice);
+	
+	protected abstract void removeIfNoOccurrence(IndexedObjectProperty iop);
+
+	
 	
 	public abstract Iterable<IndexedClass> getIndexedClasses();
 	
@@ -48,10 +59,10 @@ public abstract class OntologyIndex  {
 	
 	public abstract Iterable<IndexedObjectProperty> getIndexedObjectProperties();
 	
-	protected abstract IndexedClassExpression getCreateIndexedClassExpression(ElkClassExpression representative);
-
-	protected abstract IndexedObjectProperty getCreateIndexedObjectProperty(ElkObjectProperty representative);
 	
-	public abstract ElkAxiomProcessor getAxiomIndexer();
+	
+	public abstract ElkAxiomProcessor getAxiomInserter();
+	
+	public abstract ElkAxiomProcessor getAxiomDeleter();
 
 }

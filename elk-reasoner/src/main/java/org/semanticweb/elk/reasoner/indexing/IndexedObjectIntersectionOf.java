@@ -23,9 +23,9 @@
 package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.ElkClassExpression;
+
 
 /**
  * Represents all occurrences of an ElkObjectIntersectionOf in an ontology.
@@ -35,42 +35,26 @@ import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
  */
 public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	
-	protected final ElkObjectIntersectionOf elkObjectIntersectionOf;
-	
-	protected List<IndexedClassExpression> conjuncts;
+	protected final IndexedClassExpression firstConjunct, secondConjunct;
 	
 	
-	/**
-	 * Creates an object that represents the given ElkObjectIntersecionOf. 
-	 */
-	protected IndexedObjectIntersectionOf(ElkObjectIntersectionOf elkObjectIntersectionOf) {
-		this.elkObjectIntersectionOf = elkObjectIntersectionOf;
+	protected IndexedObjectIntersectionOf(IndexedClassExpression firstConjunct, IndexedClassExpression secondConjunct) {
+		super (new ArrayList<ElkClassExpression> (1));
+		this.firstConjunct = firstConjunct;
+		this.secondConjunct = secondConjunct;
 	}
-	
 
-	@Override
-	public ElkObjectIntersectionOf getClassExpression() {
-		return elkObjectIntersectionOf;
+	
+	
+	public IndexedClassExpression getFirstConjunct() {
+		return firstConjunct;
 	}
 	
-	
-	/**
-	 * @return The indexed class expressions that are the conjuncts of this object intersection. 
-	 */
-	public List<IndexedClassExpression> getConjuncts() {
-		return conjuncts;
+	public IndexedClassExpression getSecondConjunct() {
+		return secondConjunct;
 	}
 
 
-	protected void addConjunct(IndexedClassExpression conjunct) {
-		if (conjuncts == null)
-			conjuncts = new ArrayList<IndexedClassExpression> (2);
-		conjuncts.add(conjunct); 
-	}
-	
-	
-	
-	
 	
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {

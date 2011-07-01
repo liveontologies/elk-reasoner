@@ -61,7 +61,7 @@ public class ClassTaxonomyComputation
 	
 	
 	protected ClassNode getNode(IndexedClass indexedClass) {
-		return classTaxonomy.getNode(indexedClass.getClassExpression());
+		return classTaxonomy.getNode(indexedClass.getElkClass());
 	}
 	
 	
@@ -74,7 +74,7 @@ public class ClassTaxonomyComputation
 				IndexedClass superClass = (IndexedClass) superClassExpression;
 				
 				if (superClass.getSaturated().getSuperClassExpressions().contains(root))
-					equivalent.add(superClass.getClassExpression());
+					equivalent.add(superClass.getElkClass());
 				else {
 					boolean addThis = true;
 					Iterator<IndexedClass> i = parents.iterator();
@@ -94,8 +94,9 @@ public class ClassTaxonomyComputation
 				}
 			}
 		
-		ElkClass rootElkClass = root.getClassExpression(); 
+		ElkClass rootElkClass = root.getElkClass(); 
 		for (ElkClass ec : equivalent)
+			// TODO comparison shouldn't be on hash code
 			if (ec.hashCode() < rootElkClass.hashCode())
 				return;
 		

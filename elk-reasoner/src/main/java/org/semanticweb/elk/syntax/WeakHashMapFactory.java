@@ -26,6 +26,12 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
+// TODO reimplement with ArrayHashSet when it supports removals
+
+/**
+ * @author Frantisek
+ *
+ */
 public class WeakHashMapFactory implements ElkObjectFactory {
 	private static class WeakWrapper extends WeakReference<ElkObject> {
         private int hash_;

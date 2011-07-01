@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import org.semanticweb.elk.syntax.ElkObjectInverseOf;
-import org.semanticweb.elk.syntax.ElkObjectProperty;
-import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 
 /**
  * For indexing object properties.
@@ -32,8 +29,7 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
  * @author Frantisek Simancik
  * 
  */
-class ObjectPropertyExpressionIndexer implements
-		ElkObjectPropertyExpressionVisitor<IndexedObjectProperty> {
+class ObjectPropertyExpressionIndexer {
 	
 	protected AxiomIndexer axiomIndexer;
 	
@@ -41,11 +37,10 @@ class ObjectPropertyExpressionIndexer implements
 		this.axiomIndexer = axiomIndexer;
 	}
 
-	public IndexedObjectProperty visit(ElkObjectProperty elkObjectProperty) {
-		return axiomIndexer.ontologyIndex.getCreateIndexedObjectProperty(elkObjectProperty);
-	}
-
-	public IndexedObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
-		throw new UnsupportedOperationException();
+	public void visit(IndexedObjectProperty indexedObjectProperty) {
+		indexedObjectProperty.occurrenceNo += axiomIndexer.multiplicity;
+		assert indexedObjectProperty.occurrenceNo >= 0;
+		
+		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedObjectProperty);
 	}
 }

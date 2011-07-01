@@ -50,7 +50,12 @@ public class IndexedObjectProperty {
 	protected final ElkObjectProperty elkObjectProperty;
 	protected List<IndexedObjectProperty> toldSubObjectProperties;
 	protected List<IndexedObjectProperty> toldSuperObjectProperties;
-	protected boolean isTransitive;
+	protected int isTransitive = 0;
+	
+	/**
+	 * This counts how often this object occurred in the ontology.
+	 */
+	protected int occurrenceNo = 0;
 	
 	
 	/**
@@ -89,7 +94,7 @@ public class IndexedObjectProperty {
 	 * @return True if this object property is told transitive.
 	 */
 	public boolean isTransitive() {
-		return isTransitive;
+		return isTransitive > 0;
 	}
 
 
@@ -98,19 +103,47 @@ public class IndexedObjectProperty {
 			toldSubObjectProperties = new ArrayList<IndexedObjectProperty> (1);
 		toldSubObjectProperties.add(subObjectProperty);
 	}
+	
+	protected boolean removeToldSubObjectProperty(IndexedObjectProperty subObjectProperty) {
+		boolean success = false;
+		if (toldSubObjectProperties != null) {
+			success = toldSubObjectProperties.remove(subObjectProperty);
+			if (toldSubObjectProperties.isEmpty())
+				toldSubObjectProperties = null;
+		}
+		return success;
+	}
 
-		
+	
 	protected void addToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
 		if (toldSuperObjectProperties == null)
 			toldSuperObjectProperties = new ArrayList<IndexedObjectProperty> (1);
 		toldSuperObjectProperties.add(superObjectProperty);
 	}
-		
+
+	protected boolean removeToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
+		boolean success = false;
+		if (toldSuperObjectProperties != null) {
+			success = toldSuperObjectProperties.remove(superObjectProperty);
+			if (toldSuperObjectProperties.isEmpty())
+				toldSuperObjectProperties = null;
+		}
+		return success;
+	}
+
 	
-	protected void setTransitive() {
-		isTransitive = true;
+	protected void addTransitive() {
+		isTransitive++;
 	}
 	
+	protected boolean removeTransitive() {
+		if (isTransitive > 0) {
+			isTransitive--;
+			return true;
+		}
+		return false;
+	}
+
 	
 	
 	

@@ -72,8 +72,8 @@ public class ReasonerTest extends TestCase {
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
-		IndexedObjectProperty R = index.getIndexedObjectProperty(r);
-		IndexedObjectProperty S = index.getIndexedObjectProperty(s);
+		IndexedObjectProperty R = index.getIndexed(r);
+		IndexedObjectProperty S = index.getIndexed(s);
 
 		assertTrue("R subrole S", R.getToldSuperObjectProperties().contains(S));
 		assertTrue("S superrole R", S.getToldSubObjectProperties().contains(R));
@@ -86,31 +86,31 @@ public class ReasonerTest extends TestCase {
 
 		final Reasoner reasoner = new Reasoner();
 		reasoner.loadOntologyFromString("Ontology(" + "SubClassOf(:A :B)"
-				+ "SubClassOf(:A :C)"
-				+ "SubClassOf(ObjectIntersectionOf(:B :C) :D)" + ")");
+				+ "SubClassOf(:A :C)" + "SubClassOf(:A :D)"
+				+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)" + ")");
 
 		Future<ElkClass> a = constructor.getFutureElkClass(":A");
 		Future<ElkClass> b = constructor.getFutureElkClass(":B");
 		Future<ElkClass> c = constructor.getFutureElkClass(":C");
 		Future<ElkClass> d = constructor.getFutureElkClass(":D");
+		Future<ElkClass> e = constructor.getFutureElkClass(":E");
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
-		IndexedClassExpression A = index.getIndexedClassExpression(a.get());
-		IndexedClassExpression B = index.getIndexedClassExpression(b.get());
-		IndexedClassExpression C = index.getIndexedClassExpression(c.get());
-		IndexedClassExpression D = index.getIndexedClassExpression(d.get());
-		IndexedClassExpression I = index.getIndexedClassExpression(constructor
-				.getFutureElkObjectIntersectionOf(b, c).get());
+		IndexedClassExpression A = index.getIndexed(a.get());
+		IndexedClassExpression B = index.getIndexed(b.get());
+		IndexedClassExpression C = index.getIndexed(c.get());
+		IndexedClassExpression D = index.getIndexed(d.get());
+		IndexedClassExpression E = index.getIndexed(e.get());
 
 		assertTrue("A SubClassOf B",
 				A.getToldSuperClassExpressions().contains(B));
 		assertTrue("A SubClassOf C",
 				A.getToldSuperClassExpressions().contains(C));
-		assertFalse("A SubClassOf D", A.getToldSuperClassExpressions()
-				.contains(D));
-		assertTrue("I SubClassOf D",
-				I.getToldSuperClassExpressions().contains(D));
+		assertTrue("A SubClassOf D",
+				A.getToldSuperClassExpressions().contains(D));
+		assertFalse("A SubClassOf E", A.getToldSuperClassExpressions()
+				.contains(E));
 
 		reasoner.classify();
 
@@ -124,5 +124,7 @@ public class ReasonerTest extends TestCase {
 				aNode.getParents().contains(taxonomy.getNode(c.get())));
 		assertTrue("A contains D",
 				aNode.getParents().contains(taxonomy.getNode(d.get())));
+		assertTrue("A contains E",
+				aNode.getParents().contains(taxonomy.getNode(e.get())));
 	}
 }
