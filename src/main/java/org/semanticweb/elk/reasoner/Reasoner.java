@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
+import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.parsing.ConcurrentFutureElkAxiomLoader;
 import org.semanticweb.elk.util.Statistics;
@@ -131,6 +132,14 @@ public class Reasoner {
 	public void loadOntologyFromString(String text) throws ParseException,
 			IOException {
 		loadOntologyFromString(text, ontologyIndex.getAxiomIndexer());
+	}
+	
+	public void addAxiom(ElkAxiom axiom) {
+		ontologyIndex.getAxiomIndexer().process(axiom);
+	}
+	
+	public void removeAxiom(ElkAxiom axiom) {
+		// TODO implement axiom removal
 	}
 
 	public void classify() {
