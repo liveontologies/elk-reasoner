@@ -39,6 +39,6 @@ public interface Multimap<Key, Value> {
 	boolean add(Key key, Value value);
 	boolean contains(Key key, Value value);
 	Collection<Value> get(Key key);
-	Set<Key> keySet();
 	boolean isEmpty();
+	Set<Key> keySet();
 }

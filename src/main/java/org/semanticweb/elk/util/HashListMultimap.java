@@ -23,7 +23,7 @@
 package org.semanticweb.elk.util;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * 
@@ -36,8 +36,7 @@ import java.util.List;
  */
 
 
-public class HashListMultimap<Key, Value> extends ArrayHashMap<Key, List<Value>>
-	implements Multimap<Key, Value> {
+public class HashListMultimap<Key, Value> extends AbstractHashMultimap<Key, Value> {
 
 	public HashListMultimap() {
 		super();
@@ -47,20 +46,8 @@ public class HashListMultimap<Key, Value> extends ArrayHashMap<Key, List<Value>>
 		super(i);
 	}
 
-	public boolean contains(Key key, Value value) {
-		List<Value> record = get(key);
-		if (record == null)
-			return false;
-		else
-			return record.contains(value);
-	}
-
-	public boolean add(Key key, Value value) {
-		List<Value> record = get(key);
-		if (record == null) {
-			record = new ArrayList<Value>();
-			put(key, record);
-		}
-		return record.add(value);
+	@Override
+	protected Collection<Value> newRecord() {
+		return new ArrayList<Value> ();
 	}
 }

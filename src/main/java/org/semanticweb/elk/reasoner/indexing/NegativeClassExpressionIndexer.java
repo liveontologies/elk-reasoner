@@ -25,14 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.semanticweb.elk.syntax.ElkClass;
-import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
-import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 
 /**
  * For indexing negative occurrences of class expressions.
@@ -42,7 +34,7 @@ import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
  * 
  */
 class NegativeClassExpressionIndexer implements
-		ElkClassExpressionVisitor<IndexedClassExpression> {
+		IndexedClassExpressionVisitor<Void> {
 
 	protected final AxiomIndexer axiomIndexer;
 	
@@ -50,12 +42,7 @@ class NegativeClassExpressionIndexer implements
 		this.axiomIndexer = axiomIndexer;
 	}
 
-	public IndexedClassExpression visit(ElkClass elkClass) {
-		IndexedClass result = (IndexedClass) axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(elkClass);
-		result.negativeOccurrenceNo++;
-		return result;
-	}
-
+/*
 	public IndexedClassExpression visit(
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
 
@@ -103,6 +90,61 @@ class NegativeClassExpressionIndexer implements
 			result.getFiller().addNegativeExistential(result);
 		}
 		return result;
+	}
+*/
+	
+	public Void visit(IndexedClass indexedClass) {
+		indexedClass.negativeOccurrenceNo += axiomIndexer.multiplicity;
+		assert indexedClass.negativeOccurrenceNo >= 0;
+		
+		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedClass);
+		return null;
+	}
+
+	public Void visit(IndexedObjectIntersectionOf indexedObjectIntersectionOf) {
+		int oldOccurrenceNo = indexedObjectIntersectionOf.negativeOccurrenceNo;
+		indexedObjectIntersectionOf.negativeOccurrenceNo += axiomIndexer.multiplicity;
+		assert indexedObjectIntersectionOf.negativeOccurrenceNo >= 0;
+		
+		if (oldOccurrenceNo == 0 && indexedObjectIntersectionOf.negativeOccurrenceNo == 1) {
+			indexedObjectIntersectionOf.firstConjunct.addNegConjunctionByConjunct(
+					indexedObjectIntersectionOf, indexedObjectIntersectionOf.secondConjunct);
+			indexedObjectIntersectionOf.secondConjunct.addNegConjunctionByConjunct(
+					indexedObjectIntersectionOf, indexedObjectIntersectionOf.firstConjunct);
+		}
+		
+		if (oldOccurrenceNo == 1 && indexedObjectIntersectionOf.negativeOccurrenceNo == 0) {
+			indexedObjectIntersectionOf.firstConjunct.removeNegConjunctionByConjunct(
+					indexedObjectIntersectionOf, indexedObjectIntersectionOf.secondConjunct);
+			indexedObjectIntersectionOf.secondConjunct.removeNegConjunctionByConjunct(
+					indexedObjectIntersectionOf, indexedObjectIntersectionOf.firstConjunct);
+		}
+
+		indexedObjectIntersectionOf.firstConjunct.accept(this);
+		indexedObjectIntersectionOf.secondConjunct.accept(this);
+		
+		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedObjectIntersectionOf);
+		return null;
+	}
+
+	public Void visit(IndexedObjectSomeValuesFrom indexedObjectSomeValuesFrom) {
+		int oldOccurrenceNo = indexedObjectSomeValuesFrom.negativeOccurrenceNo;
+		indexedObjectSomeValuesFrom.negativeOccurrenceNo += axiomIndexer.multiplicity;
+		assert indexedObjectSomeValuesFrom.negativeOccurrenceNo >= 0;
+		
+		if (oldOccurrenceNo == 0 && indexedObjectSomeValuesFrom.negativeOccurrenceNo == 1) {
+			indexedObjectSomeValuesFrom.filler.addNegExistential(indexedObjectSomeValuesFrom);
+		}
+		
+		if (oldOccurrenceNo == 1 && indexedObjectSomeValuesFrom.negativeOccurrenceNo == 0) {
+			indexedObjectSomeValuesFrom.filler.removeNegExistential(indexedObjectSomeValuesFrom);
+		}
+		
+		axiomIndexer.objectPropertyExpressionIndexer.visit(indexedObjectSomeValuesFrom.relation);
+		indexedObjectSomeValuesFrom.filler.accept(this);
+
+		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedObjectSomeValuesFrom);
+		return null;
 	}
 
 }

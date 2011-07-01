@@ -238,9 +238,8 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 						ice.getNegConjunctionsByConjunct().keySet(),
 						context.derived))
-					for (IndexedClassExpression conclusion : ice
-							.getNegConjunctionsByConjunct().get(common))
-						enqueueDerived(context, conclusion, false);
+					enqueueDerived(context, ice
+							.getNegConjunctionsByConjunct().get(common), false);
 			}
 
 			// process negative existentials
@@ -264,8 +263,8 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 		}
 
 		public Void visit(IndexedObjectIntersectionOf ice) {
-			for (IndexedClassExpression conjunct : ice.getConjuncts())
-				enqueueDerived(context, conjunct, true);
+			enqueueDerived(context, ice.getFirstConjunct(), true);
+			enqueueDerived(context, ice.getSecondConjunct(), true);
 
 			return null;
 		}

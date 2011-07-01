@@ -22,7 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
+import java.util.ArrayList;
+
+import org.semanticweb.elk.syntax.ElkClassExpression;
+
 
 /**
  * Represents all occurrences of an ElkObjectSomeValuesFrom in an ontology.
@@ -32,27 +35,18 @@ import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
  */
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	
-	protected final ElkObjectSomeValuesFrom elkObjectSomeValuesFrom;
- 	
-	protected IndexedObjectProperty relation; 
+	protected final IndexedObjectProperty relation; 
 	
-	protected IndexedClassExpression filler;
+	protected final IndexedClassExpression filler;
 
 
-	/**
-	 * Creates an object that represents the given ElkObjectIntersecionOf. 
-	 */
-	protected IndexedObjectSomeValuesFrom(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-		this.elkObjectSomeValuesFrom = elkObjectSomeValuesFrom;
+	protected IndexedObjectSomeValuesFrom(IndexedObjectProperty relation, IndexedClassExpression filler) {
+		super (new ArrayList<ElkClassExpression> (1));
+		this.relation = relation;
+		this.filler = filler;
 	}
 	
 	
-	@Override
-	public ElkObjectSomeValuesFrom getClassExpression() {
-		return elkObjectSomeValuesFrom;
-	}
-
-
 	/**
 	 * @return The indexed object property comprising this ObjectSomeValuesFrom.
 	 */
@@ -69,18 +63,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 
-	protected void setRelation(IndexedObjectProperty relation) {
-		this.relation = relation;
-	}
-
-	
-	protected void setFiller(IndexedClassExpression filler) {
-		this.filler = filler;
-	}
-
-	
-	
-	
 	
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {

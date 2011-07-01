@@ -23,18 +23,14 @@
 package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
-import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
-import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.util.HashGenerator;
-import org.semanticweb.elk.util.HashListMultimap;
-import org.semanticweb.elk.util.Multimap;
 
 /**
  * Represents all occurrences of an ElkClassExpression in an ontology. To this
@@ -52,33 +48,34 @@ import org.semanticweb.elk.util.Multimap;
  */
 abstract public class IndexedClassExpression {
 	
+	protected final List<ElkClassExpression> representatives;
+	
 	protected List<IndexedClassExpression> toldSuperClassExpressions;
-	protected Multimap<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
+	protected Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
 	protected List<IndexedObjectSomeValuesFrom> negExistentials;
-
+	
 	/**
 	 * This counts how often this object occurred positively. Some indexing
 	 * operations are only needed when encountering objects positively for the
 	 * first time.
 	 */
-	int positiveOccurrenceNo = 0;
+	protected int positiveOccurrenceNo = 0;
 
 	/**
 	 * This counts how often this object occurred negatively. Some indexing
 	 * operations are only needed when encountering objects negatively for the
 	 * first time.
 	 */
-	int negativeOccurrenceNo = 0;
+	protected int negativeOccurrenceNo = 0;
+	
+	
+	protected IndexedClassExpression(List<ElkClassExpression> representatives) {
+		this.representatives = representatives;
+	}
 
 	
-	/** 
-	 * @return The represented class expression.
-	 */ 
-	abstract public ElkClassExpression getClassExpression();
-	
-
 	/**
-	 * @return All told super class expressions of this class expression.
+	 * @return All told super class expressions of this class expression, possibly null.
 	 */
 	public List<IndexedClassExpression> getToldSuperClassExpressions() {
 		return toldSuperClassExpressions;
@@ -87,18 +84,29 @@ abstract public class IndexedClassExpression {
 	
 	/**
 	 * @return Indexed conjunctions that occur negatively and contain this class expression,
-	 *  indexed by the second conjunct.
+	 *  indexed by the second conjunct, possibly null.
 	 */
-	public Multimap<IndexedClassExpression, IndexedObjectIntersectionOf> getNegConjunctionsByConjunct() {
+	public Map<IndexedClassExpression, IndexedObjectIntersectionOf> getNegConjunctionsByConjunct() {
 		return negConjunctionsByConjunct;
 	}
 
 
 	/**
-	 * @return Indexed existentials that occur negatively and have this class expression as the filler.
+	 * @return Indexed existentials that occur negatively and have this class expression as the filler, possibly null.
 	 */
 	public List<IndexedObjectSomeValuesFrom> getNegExistentials() {
 		return negExistentials;
+	}
+
+	
+	
+	
+	protected void addRepresentative(ElkClassExpression classExpression) {
+		representatives.add(classExpression);
+	}
+	
+	protected List<ElkClassExpression> getRepresentantatives() {
+		return representatives;
 	}
 	
 	
@@ -108,25 +116,55 @@ abstract public class IndexedClassExpression {
 			toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(1);
 		toldSuperClassExpressions.add(superClassExpression);
 	}
-
 	
-	protected void addNegativeConjunctionByConjunct(
+	protected boolean removeToldSuperClassExpression(
+			IndexedClassExpression superClassExpression) {
+		boolean success = false;
+		if (toldSuperClassExpressions != null) {
+			success = toldSuperClassExpressions.remove(superClassExpression);
+			if (toldSuperClassExpressions.isEmpty())
+				toldSuperClassExpressions = null;
+		}
+		return success;
+	}
+	
+	protected void addNegConjunctionByConjunct(
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
 		if (negConjunctionsByConjunct == null)
-			negConjunctionsByConjunct = new HashListMultimap<IndexedClassExpression, IndexedObjectIntersectionOf>();
-		negConjunctionsByConjunct.add(conjunct, conjunction);
+			// TODO possibly replace by ArrayHashMap when it supports removal
+			negConjunctionsByConjunct = new HashMap<IndexedClassExpression, IndexedObjectIntersectionOf> (4);
+		negConjunctionsByConjunct.put(conjunct, conjunction);
+	}
+	
+	protected boolean removeNegConjunctionByConjunct(
+			IndexedObjectIntersectionOf conjunction,
+			IndexedClassExpression conjunct) {
+		boolean success = false;
+		if (negConjunctionsByConjunct != null) {
+			success = (negConjunctionsByConjunct.remove(conjunct) != null);
+			if (negConjunctionsByConjunct.isEmpty())
+				negConjunctionsByConjunct = null;
+		}
+		return success;
 	}
 
 	
-	protected void addNegativeExistential(IndexedObjectSomeValuesFrom existential) {
+	protected void addNegExistential(IndexedObjectSomeValuesFrom existential) {
 		if (negExistentials == null)
 			negExistentials = new ArrayList<IndexedObjectSomeValuesFrom> (1);
 		negExistentials.add(existential);
 	}
-
 	
-	
+	protected boolean removeNegExistential(IndexedObjectSomeValuesFrom existential) {
+		boolean success = false;
+		if (negExistentials != null) {
+			success = negExistentials.remove(existential);
+			if (negExistentials.isEmpty())
+				negExistentials = null;
+		}
+		return success;
+	}
 
 	
 	protected final AtomicReference<SaturatedClassExpression> saturated =
@@ -163,20 +201,6 @@ abstract public class IndexedClassExpression {
 
 	
 	
-	
-	
-	/**
-	 * Represent the object's ElkClassExpression as a string. This
-	 * implementation reflects the fact that we generally consider only one
-	 * IndexedClassExpression for each ElkClassExpression.
-	 * 
-	 * @return String representation.
-	 */
-	public String toString() {
-		return "[" + getClassExpression().toString() + "]";
-	}
-
-	
 	/** Hash code for this object. */
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
@@ -188,29 +212,6 @@ abstract public class IndexedClassExpression {
 	@Override
 	public final int hashCode() {
 		return hashCode_;
-	}
-
-	
-	static IndexedClassExpression create(ElkClassExpression classExpression) {
-		return classExpression
-				.accept(new ElkClassExpressionVisitor<IndexedClassExpression>() {
-
-					public IndexedClassExpression visit(ElkClass elkClass) {
-						return new IndexedClass(elkClass);
-					}
-
-					public IndexedClassExpression visit(
-							ElkObjectIntersectionOf elkObjectIntersectionOf) {
-						return new IndexedObjectIntersectionOf(
-								elkObjectIntersectionOf);
-					}
-
-					public IndexedClassExpression visit(
-							ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-						return new IndexedObjectSomeValuesFrom(
-								elkObjectSomeValuesFrom);
-					}
-				});
 	}
 
 	abstract public <O> O accept(IndexedClassExpressionVisitor<O> visitor);

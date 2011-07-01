@@ -25,16 +25,24 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
+import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassExpression;
+import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
+import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.ElkObjectInverseOf;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
-import org.semanticweb.elk.util.ArrayHashMap;
+import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.util.Pair;
 
 /**
  * @author Yevgeny Kazakov
@@ -44,56 +52,70 @@ public class SerialOntologyIndex extends OntologyIndex {
 
 	protected final Map<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
 	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
+	private final Map<Pair<IndexedClassExpression, IndexedClassExpression>, IndexedObjectIntersectionOf> indexedObjectIntersectionOfLookup; 
 
 	public SerialOntologyIndex() {
-		indexedClassExpressionLookup = new ArrayHashMap<ElkClassExpression, IndexedClassExpression>(
+		// TODO possibly replace by ArrayHashMap when it supports removals
+		indexedClassExpressionLookup = new HashMap<ElkClassExpression, IndexedClassExpression>(
 				1024);
-		indexedObjectPropertyLookup = new ArrayHashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
+		indexedObjectPropertyLookup = new HashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
 				128);
+		indexedObjectIntersectionOfLookup = new HashMap<Pair<IndexedClassExpression, IndexedClassExpression>, IndexedObjectIntersectionOf> (1024);
 	}
 
 	@Override
-	public IndexedClassExpression getIndexedClassExpression(
+	public IndexedClassExpression getIndexed(
 			ElkClassExpression classExpression) {
 		return indexedClassExpressionLookup.get(classExpression);
 	}
 
 	@Override
-	public IndexedObjectProperty getIndexedObjectProperty(
-			ElkObjectProperty objectProperty) {
-		return indexedObjectPropertyLookup.get(objectProperty);
+	public IndexedObjectProperty getIndexed(
+			ElkObjectPropertyExpression objectPropertyExpression) {
+		return indexedObjectPropertyLookup.get(objectPropertyExpression);
 	}
 
 	@Override
-	protected IndexedClassExpression getCreateIndexedClassExpression(
+	protected IndexedClassExpression createIndexed(
 			ElkClassExpression classExpression) {
-		IndexedClassExpression indexedClassExpression = indexedClassExpressionLookup
-				.get(classExpression);
-		if (indexedClassExpression == null) {
-			indexedClassExpression = IndexedClassExpression
-					.create(classExpression);
-			indexedClassExpressionLookup.put(classExpression,
-					indexedClassExpression);
-		}
-		return indexedClassExpression;
+		return classExpression.accept(indexedClassExpressionCreator);
 	}
 
 	@Override
-	protected IndexedObjectProperty getCreateIndexedObjectProperty(
-			ElkObjectProperty objectProperty) {
-		IndexedObjectProperty indexedObjectProperty = indexedObjectPropertyLookup
-				.get(objectProperty);
-		if (indexedObjectProperty == null) {
-			indexedObjectProperty = new IndexedObjectProperty(objectProperty);
-			indexedObjectPropertyLookup.put(objectProperty,
-					indexedObjectProperty);
-		}
-		return indexedObjectProperty;
+	protected IndexedObjectProperty createIndexed(
+			ElkObjectPropertyExpression objectPropertyExpression) {
+		return objectPropertyExpression.accept(indexedObjectPropertyCreator);
 	}
 	
 	@Override
-	public ElkAxiomProcessor getAxiomIndexer() {
-		return new AxiomIndexer(this);
+	protected void removeIfNoOccurrence(IndexedClassExpression ice) {
+		if (ice.negativeOccurrenceNo == 0 && ice.positiveOccurrenceNo == 0) {
+			for (ElkClassExpression c : ice.getRepresentantatives())
+				indexedClassExpressionLookup.remove(c);
+			
+			if (ice instanceof IndexedObjectIntersectionOf) {
+				IndexedObjectIntersectionOf i = (IndexedObjectIntersectionOf) ice;
+				indexedObjectIntersectionOfLookup.remove(
+						new Pair<IndexedClassExpression,IndexedClassExpression>
+						(i.getFirstConjunct(), i.getSecondConjunct()));
+			}
+		}
+	}
+	
+	@Override
+	protected void removeIfNoOccurrence(IndexedObjectProperty iop) {
+		if (iop.occurrenceNo == 0)
+			indexedObjectPropertyLookup.remove(iop.getElkObjectProperty());
+	}
+	
+	@Override
+	public ElkAxiomProcessor getAxiomInserter() {
+		return new AxiomIndexer(this, 1);
+	}
+	
+	@Override
+	public ElkAxiomProcessor getAxiomDeleter() {
+		return new AxiomIndexer(this, -1);
 	}
 
 	@Override
@@ -147,4 +169,94 @@ public class SerialOntologyIndex extends OntologyIndex {
 		return Collections.unmodifiableCollection(indexedObjectPropertyLookup
 				.values());
 	}
+
+
+
+	private final ElkClassExpressionVisitor<IndexedClassExpression>
+	indexedClassExpressionCreator = 
+		new ElkClassExpressionVisitor<IndexedClassExpression> () {
+
+		public IndexedClassExpression visit(ElkClass elkClass) {
+			IndexedClass result = new IndexedClass(elkClass);
+			indexedClassExpressionLookup.put(elkClass, result);
+			return result;
+		}
+
+		public IndexedClassExpression visit(ElkObjectIntersectionOf elkObjectIntersectionOf) {
+			ArrayList<IndexedClassExpression> conjuncts = new ArrayList<IndexedClassExpression> (
+					elkObjectIntersectionOf.getClassExpressions().size());
+
+			for (ElkClassExpression c : elkObjectIntersectionOf.getClassExpressions()) {
+				IndexedClassExpression ice = getIndexed(c);
+				if (ice == null)
+					ice = c.accept(this);
+				conjuncts.add(ice);
+			}
+
+			IndexedClassExpression result = null;
+			for (IndexedClassExpression ice : conjuncts) {
+				if (result == null) {
+					result = ice;
+					continue;
+				}
+
+				// TODO comparison shouldn't be on hash code
+				IndexedClassExpression firstConjunct, secondConjunct;
+				if (result.hashCode() < ice.hashCode()) {
+					firstConjunct = result;
+					secondConjunct = ice;
+				}
+				else {
+					firstConjunct = ice;
+					secondConjunct = result;
+				}
+
+				Pair<IndexedClassExpression, IndexedClassExpression> p =
+					new Pair<IndexedClassExpression, IndexedClassExpression>(firstConjunct, secondConjunct);
+				result = indexedObjectIntersectionOfLookup.get(p);
+				if (result == null) {
+					result = new IndexedObjectIntersectionOf(firstConjunct, secondConjunct);
+					indexedObjectIntersectionOfLookup.put(p, (IndexedObjectIntersectionOf) result);
+				}
+			}
+
+			result.getRepresentantatives().add(elkObjectIntersectionOf);
+			indexedClassExpressionLookup.put(elkObjectIntersectionOf, result);
+			return result;
+		}
+
+		public IndexedClassExpression visit(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
+			IndexedObjectProperty relation = getIndexed(elkObjectSomeValuesFrom.getObjectPropertyExpression());
+			if (relation == null)
+				relation = createIndexed(elkObjectSomeValuesFrom.getObjectPropertyExpression());
+
+			IndexedClassExpression filler = getIndexed(elkObjectSomeValuesFrom.getClassExpression());
+			if (filler == null)
+				filler = createIndexed(elkObjectSomeValuesFrom.getClassExpression()); 
+
+			IndexedObjectSomeValuesFrom result = new IndexedObjectSomeValuesFrom(relation, filler);
+			result.getRepresentantatives().add(elkObjectSomeValuesFrom);
+			indexedClassExpressionLookup.put(elkObjectSomeValuesFrom, result);
+			return result;
+		}
+	};
+
+	
+	
+	private final ElkObjectPropertyExpressionVisitor<IndexedObjectProperty>
+	indexedObjectPropertyCreator =
+		new ElkObjectPropertyExpressionVisitor<IndexedObjectProperty>() {
+
+		public IndexedObjectProperty visit(
+				ElkObjectProperty elkObjectProperty) {
+			IndexedObjectProperty result = new IndexedObjectProperty(elkObjectProperty);
+			indexedObjectPropertyLookup.put(elkObjectProperty, result);
+			return result;
+		}
+
+		public IndexedObjectProperty visit(
+				ElkObjectInverseOf elkObjectInverseOf) {
+			throw new UnsupportedOperationException();
+		}
+	};
 }

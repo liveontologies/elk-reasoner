@@ -22,7 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+import java.util.Collections;
+
 import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.ElkClassExpression;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -32,21 +35,33 @@ import org.semanticweb.elk.syntax.ElkClass;
  */
 public class IndexedClass extends IndexedClassExpression {
 	
-	protected final ElkClass elkClass;
-
 	/**
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
 	protected IndexedClass(ElkClass elkClass) {
-		this.elkClass = elkClass;
+		super(Collections.singletonList((ElkClassExpression) elkClass));
 	}
 
 
-	@Override
-	public ElkClass getClassExpression() {
-		return elkClass;
+	/** 
+	 * @return The represented ElkClass.
+	 */ 
+	public ElkClass getElkClass() {
+		return (ElkClass) representatives.get(0);
 	}
 	
+	
+	/**
+	 * Represent the object's ElkClass as a string. This
+	 * implementation reflects the fact that we generally consider only one
+	 * IndexedClass for each ElkClass.
+	 * 
+	 * @return String representation.
+	 */
+	public String toString() {
+		return "[" + getElkClass().toString() + "]";
+	}
+
 	
 	
 	@Override

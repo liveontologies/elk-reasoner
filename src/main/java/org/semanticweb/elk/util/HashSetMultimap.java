@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.util;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * 
@@ -34,9 +34,8 @@ import java.util.Set;
  * @param <Value>
  */
 
-public class HashSetMultimap<Key, Value> extends ArrayHashMap<Key, Set<Value>>
-		implements Multimap<Key, Value> {
-
+public class HashSetMultimap<Key, Value> extends AbstractHashMultimap<Key, Value> {
+	
 	public HashSetMultimap() {
 		super();
 	}
@@ -45,20 +44,8 @@ public class HashSetMultimap<Key, Value> extends ArrayHashMap<Key, Set<Value>>
 		super(i);
 	}
 
-	public boolean contains(Key key, Value value) {
-		Set<Value> record = get(key);
-		if (record == null)
-			return false;
-		else
-			return record.contains(value);
-	}
-
-	public boolean add(Key key, Value value) {
-		Set<Value> record = get(key);
-		if (record == null) {
-			record = new ArrayHashSet<Value>(1);
-			put(key, record);
-		}
-		return record.add(value);
+	@Override
+	protected Collection<Value> newRecord() {
+		return new ArrayHashSet<Value>();
 	}
 }

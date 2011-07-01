@@ -25,11 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import org.semanticweb.elk.syntax.ElkClass;
-import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
-import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 
 /**
  * For indexing positive occurrences of class expressions.
@@ -39,7 +34,7 @@ import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
  * 
  */
 class PositiveClassExpressionIndexer implements
-		ElkClassExpressionVisitor<IndexedClassExpression> {
+		IndexedClassExpressionVisitor<Void> {
 
 	protected final AxiomIndexer axiomIndexer;
 
@@ -47,33 +42,33 @@ class PositiveClassExpressionIndexer implements
 		this.axiomIndexer = axiomIndexer;
 	}
 
-	public IndexedClassExpression visit(ElkClass classExpression) {
-		IndexedClass result = (IndexedClass) axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
-		result.positiveOccurrenceNo++;
-		return result;
+	public Void visit(IndexedClass indexedClass) {
+		indexedClass.positiveOccurrenceNo += axiomIndexer.multiplicity;
+		assert indexedClass.negativeOccurrenceNo >= 0;
+		
+		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedClass);
+		return null;
 	}
 
-	public IndexedClassExpression visit(ElkObjectIntersectionOf classExpression) {
-
-		IndexedObjectIntersectionOf result = (IndexedObjectIntersectionOf)
-			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
-		if (result.positiveOccurrenceNo++ == 0) {
-			for (ElkClassExpression d : classExpression.getClassExpressions()) {
-				result.addConjunct(d.accept(this));
-			}
-		}
-		return result;
+	public Void visit(IndexedObjectIntersectionOf indexedObjectIntersectionOf) {
+		indexedObjectIntersectionOf.positiveOccurrenceNo += axiomIndexer.multiplicity;
+		assert indexedObjectIntersectionOf.negativeOccurrenceNo >= 0;
+		
+		indexedObjectIntersectionOf.firstConjunct.accept(this);
+		indexedObjectIntersectionOf.secondConjunct.accept(this);
+		
+		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedObjectIntersectionOf);
+		return null;
 	}
-	
-	public IndexedClassExpression visit(ElkObjectSomeValuesFrom classExpression) {
 
-		IndexedObjectSomeValuesFrom result = (IndexedObjectSomeValuesFrom) 
-			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
-		if (result.positiveOccurrenceNo++ == 0) {
-			result.setRelation(classExpression.getObjectPropertyExpression().accept(
-					axiomIndexer.objectPropertyExpressionIndexer));
-			result.setFiller(classExpression.getClassExpression().accept(this));
-		}
-		return result;
+	public Void visit(IndexedObjectSomeValuesFrom indexedObjectSomeValuesFrom) {
+		indexedObjectSomeValuesFrom.positiveOccurrenceNo += axiomIndexer.multiplicity;
+		assert indexedObjectSomeValuesFrom.negativeOccurrenceNo >= 0;
+		
+		axiomIndexer.objectPropertyExpressionIndexer.visit(indexedObjectSomeValuesFrom.relation);
+		indexedObjectSomeValuesFrom.filler.accept(this);
+		
+		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedObjectSomeValuesFrom);
+		return null;
 	}
 }

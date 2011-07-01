@@ -54,6 +54,8 @@ public class Reasoner {
 	protected final int workerNo;
 
 	protected final OntologyIndex ontologyIndex;
+	
+	protected final ElkAxiomProcessor axiomInserter, axiomDeleter;
 
 	protected ClassTaxonomy classTaxonomy;
 
@@ -64,6 +66,8 @@ public class Reasoner {
 		this.executor = executor;
 		this.workerNo = workerNo;
 		this.ontologyIndex = new SerialOntologyIndex();
+		axiomInserter = ontologyIndex.getAxiomInserter();
+		axiomDeleter = ontologyIndex.getAxiomDeleter();
 	}
 
 	public OntologyIndex getOntologyIndex() {
@@ -91,7 +95,7 @@ public class Reasoner {
 
 	public void loadOntologyFromStream(InputStream stream)
 			throws ParseException, IOException {
-		loadOntologyFromStream(stream, ontologyIndex.getAxiomIndexer());
+		loadOntologyFromStream(stream, axiomInserter);
 	}
 
 	public void loadOntologyFromFile(File file,
@@ -111,7 +115,7 @@ public class Reasoner {
 
 	public void loadOntologyFromFile(File file) throws ParseException,
 			IOException {
-		loadOntologyFromFile(file, ontologyIndex.getAxiomIndexer());
+		loadOntologyFromFile(file, axiomInserter);
 	}
 
 	public void loadOntologyFromFile(String fileName) throws ParseException,
@@ -131,15 +135,15 @@ public class Reasoner {
 
 	public void loadOntologyFromString(String text) throws ParseException,
 			IOException {
-		loadOntologyFromString(text, ontologyIndex.getAxiomIndexer());
+		loadOntologyFromString(text, axiomInserter);
 	}
 	
 	public void addAxiom(ElkAxiom axiom) {
-		ontologyIndex.getAxiomIndexer().process(axiom);
+		axiomInserter.process(axiom);
 	}
 	
 	public void removeAxiom(ElkAxiom axiom) {
-		// TODO implement axiom removal
+		axiomDeleter.process(axiom);
 	}
 
 	public void classify() {
