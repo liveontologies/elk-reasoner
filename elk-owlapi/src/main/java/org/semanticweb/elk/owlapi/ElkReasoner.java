@@ -31,11 +31,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.classification.ClassNode;
 import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.util.Statistics;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -73,35 +75,48 @@ import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
 import org.semanticweb.owlapi.util.Version;
 
 /**
+ * {@link OWLReasoner} interface implementation for ELK {@link Reasoner}
+ * 
  * @author Yevgeny Kazakov
  * 
  */
 public class ElkReasoner implements OWLReasoner {
 
+	// OWL API related objects
 	protected final OWLOntology owlOntology;
 	protected final OWLOntologyManager manager;
 	protected final OWLDataFactory owlDataFactory;
-	protected Reasoner reasoner; // TODO make field final
+	// the ELK reasoner instance used for reasoning
+	protected Reasoner reasoner; // TODO use only one reasoner object
+	// ELK progress monitor implementation to display progress
+	protected final ProgressMonitor elkProgressMonitor;
+	// isClassified == true iff ontology is classified
 	protected boolean isClassified = false;
-	protected final boolean buffering;
+	// isBufferingMode == true iff the buffering mode for reasoner is {@link
+	// BufferingMode.BUFFERING}
+	protected final boolean isBufferingMode;
+	// listener to implement addition and removal of axioms
 	protected final OntologyChangeListener ontologyChangeListener;
-	protected final ProgressMonitor progressMonitor;
+	// list to accumulate the unprocessed changes to the ontology
 	protected final List<OWLOntologyChange> pendingChanges;
-	protected boolean isSynced = false;
 
-	public ElkReasoner(OWLOntology ontology, boolean buffering,
+	protected boolean isSynced = false;
+	// logger the messages
+	protected final static Logger LOGGER_ = Logger.getLogger(ElkReasoner.class);
+
+	public ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
 			ReasonerProgressMonitor progressMonitor) {
 		this.owlOntology = ontology;
 		this.manager = ontology.getOWLOntologyManager();
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
 		this.reasoner = new Reasoner();
 		this.ontologyChangeListener = new OntologyChangeListener();
-		this.buffering = buffering;
+		this.isBufferingMode = isBufferingMode;
 		manager.addOntologyChangeListener(ontologyChangeListener);
 		if (progressMonitor == null)
-			this.progressMonitor = new DummyProgressMonitor();
+			this.elkProgressMonitor = new DummyProgressMonitor();
 		else
-			this.progressMonitor = new ElkReasonerProgressMonitor(
+			this.elkProgressMonitor = new ElkReasonerProgressMonitor(
 					progressMonitor);
 		this.pendingChanges = new ArrayList<OWLOntologyChange>();
 	}
@@ -110,7 +125,7 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			reasoner.addAxiom(Converter.convert(ax));
 		} catch (RuntimeException e) {
-			System.out.println("Axiom ignored: " + ax.toString() + ": "
+			LOGGER_.warn("Axiom ignored: " + ax.toString() + ": "
 					+ e.getMessage());
 		}
 	}
@@ -119,7 +134,7 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			reasoner.removeAxiom(Converter.convert(ax));
 		} catch (RuntimeException e) {
-			System.out.println("Axiom ignored: " + ax.toString() + ": "
+			LOGGER_.warn("Axiom ignored: " + ax.toString() + ": "
 					+ e.getMessage());
 		}
 	}
@@ -140,7 +155,8 @@ public class ElkReasoner implements OWLReasoner {
 					else
 						status = ReasonerProgressMonitor.LOADING + " "
 								+ currentOntology + " of " + ontCount;
-					progressMonitor.start(status);
+					Statistics.logOperationStart(status, LOGGER_);
+					elkProgressMonitor.start(status);
 					Set<OWLAxiom> axioms = ont.getAxioms();
 					int axiomCount = axioms.size();
 					int currentAxiom = 0;
@@ -149,13 +165,12 @@ public class ElkReasoner implements OWLReasoner {
 						if (ax.isLogicalAxiom()
 								|| ax.isOfType(AxiomType.DECLARATION))
 							addAxiom(ax);
-						progressMonitor.report(currentAxiom, axiomCount);
+						elkProgressMonitor.report(currentAxiom, axiomCount);
 					}
-					progressMonitor.finish();
+					elkProgressMonitor.finish();
+					Statistics.logOperationFinish(status, LOGGER_);
 				}
-
 			} catch (ReasonerInterruptedException e) {
-				System.out.println("interrupted.");
 			}
 			isClassified = false;
 			isSynced = true;
@@ -166,7 +181,8 @@ public class ElkReasoner implements OWLReasoner {
 	protected void reloadChanges() {
 		if (!pendingChanges.isEmpty()) {
 			String status = ReasonerProgressMonitor.LOADING;
-			progressMonitor.start(status);
+			Statistics.logOperationStart(status, LOGGER_);
+			elkProgressMonitor.start(status);
 			int axiomCount = pendingChanges.size();
 			int currentAxiom = 0;
 			for (OWLOntologyChange change : pendingChanges) {
@@ -176,9 +192,10 @@ public class ElkReasoner implements OWLReasoner {
 					removeAxiom(change.getAxiom());
 				}
 				currentAxiom++;
-				progressMonitor.report(currentAxiom, axiomCount);
+				elkProgressMonitor.report(currentAxiom, axiomCount);
 			}
-			progressMonitor.finish();
+			elkProgressMonitor.finish();
+			Statistics.logOperationFinish(status, LOGGER_);
 			pendingChanges.clear();
 		}
 	}
@@ -225,7 +242,7 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	public BufferingMode getBufferingMode() {
-		return buffering ? BufferingMode.BUFFERING
+		return isBufferingMode ? BufferingMode.BUFFERING
 				: BufferingMode.NON_BUFFERING;
 	}
 
