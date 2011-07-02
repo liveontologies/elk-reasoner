@@ -72,6 +72,15 @@ abstract public class IndexedClassExpression {
 	protected IndexedClassExpression(List<ElkClassExpression> representatives) {
 		this.representatives = representatives;
 	}
+	
+	
+	public boolean occursNegatively() {
+		return negativeOccurrenceNo > 0;
+	}
+	
+	public boolean occursPositively() {
+		return positiveOccurrenceNo > 0;
+	}
 
 	
 	/**

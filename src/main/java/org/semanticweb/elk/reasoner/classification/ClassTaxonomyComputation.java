@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.classification;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +43,8 @@ public class ClassTaxonomyComputation
 	
 	protected final static Logger logger = Logger.getLogger(Reasoner.class);
 	
+	private ClassNode topNode;
+	
 	private final Linker linker;
 	
 	
@@ -54,6 +57,11 @@ public class ClassTaxonomyComputation
 	
 	public ClassTaxonomy computeTaxonomy() {
 		waitCompletion();
+		topNode = classTaxonomy.getNode(ElkClass.ELK_OWL_THING);
+		if (topNode == null) {
+			topNode = new ClassNode(Collections.singletonList(ElkClass.ELK_OWL_THING));
+			classTaxonomy.nodeLookup.put(ElkClass.ELK_OWL_THING, topNode);
+		}
 		linker.start();
 		linker.waitCompletion();
 		return classTaxonomy;
@@ -128,11 +136,17 @@ public class ClassTaxonomyComputation
 
 		@Override
 		protected void process(ClassNode node) {
+			if (node.parentIndexClasses.isEmpty() && node != topNode) {
+				node.addParent(topNode);
+				topNode.addChild(node);
+			}
+			
 			for (IndexedClass ic : node.parentIndexClasses) {
 				ClassNode parent = getNode(ic);
 				node.addParent(parent);
 				parent.addChild(node);
 			}
+			
 			node.parentIndexClasses = null;
 		}
 

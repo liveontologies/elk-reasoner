@@ -79,7 +79,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 				.get());
 
 		final ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
-				executor, 16);
+				executor, 16, ontologyIndex);
 
 		for (IndexedObjectProperty iop : ontologyIndex
 				.getIndexedObjectProperties())
@@ -87,7 +87,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		objectPropertySaturation.waitCompletion();
 
 		final ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
-				executor, 16);
+				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.submit(A);
 		classExpressionSaturation.waitCompletion();
@@ -138,7 +138,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 				D));
 
 		final ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
-				executor, 16);
+				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.submit(A);
 		classExpressionSaturation.waitCompletion();

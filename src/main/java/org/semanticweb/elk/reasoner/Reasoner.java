@@ -150,10 +150,10 @@ public class Reasoner {
 		// Saturation stage
 
 		ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
-				executor, workerNo);
+				executor, workerNo, ontologyIndex);
 
 		ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
-				executor, workerNo);
+				executor, workerNo, ontologyIndex);
 
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("Saturation using " + workerNo + " workers");

@@ -259,4 +259,5 @@ public class SerialOntologyIndex extends OntologyIndex {
 			throw new UnsupportedOperationException();
 		}
 	};
+
 }

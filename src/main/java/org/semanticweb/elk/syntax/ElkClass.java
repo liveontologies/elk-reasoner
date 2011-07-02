@@ -47,10 +47,10 @@ public class ElkClass extends ElkClassExpression {
 	}
 
 	public static final ElkClass ELK_OWL_THING = 
-		new ElkClass("owl:Thing");
+		ElkClass.create("owl:Thing");
 	
 	public static final ElkClass ELK_OWL_NOTHING = 
-		new ElkClass("owl:Nothing");
+		ElkClass.create("owl:Nothing");
 
 	/**
 	 * Get the IRI of this class.
