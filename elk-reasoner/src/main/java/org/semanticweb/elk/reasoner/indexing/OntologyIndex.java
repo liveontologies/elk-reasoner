@@ -42,6 +42,7 @@ public abstract class OntologyIndex  {
 	
 	public abstract IndexedObjectProperty getIndexed(ElkObjectPropertyExpression representative);
 	
+
 	
 	protected abstract IndexedClassExpression createIndexed(ElkClassExpression representative);
 

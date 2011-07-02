@@ -31,6 +31,8 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.util.AbstractConcurrentComputation;
 import org.semanticweb.elk.util.LazySetIntersection;
 import org.semanticweb.elk.util.Pair;
@@ -45,9 +47,14 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturation.class);
+	
+	protected final OntologyIndex ontologyIndex;
 
-	public ClassExpressionSaturation(ExecutorService executor, int workerNo) {
+	public ClassExpressionSaturation(ExecutorService executor, int workerNo, OntologyIndex ontologyIndex) {
 		super(executor, workerNo, 256, 512);
+		this.ontologyIndex = ontologyIndex;
+		for (IndexedClassExpression ice : ontologyIndex.getIndexedClassExpressions())
+			ice.resetSaturated();
 	}
 
 	public void submit(IndexedClassExpression root) {
@@ -76,6 +83,9 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 					LOGGER_.trace("Created context for " + root);
 				}
 				enqueueDerived(sce, root, true);
+				IndexedClassExpression top = ontologyIndex.getIndexed(ElkClass.ELK_OWL_THING);
+				if (top != null && top.occursNegatively())
+					enqueueDerived(sce, top, false);
 			}
 		}
 		return root.getSaturated();

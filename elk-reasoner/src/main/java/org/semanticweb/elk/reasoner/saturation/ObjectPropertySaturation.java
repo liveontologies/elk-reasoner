@@ -26,6 +26,7 @@ import java.util.ArrayDeque;
 import java.util.concurrent.ExecutorService;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.util.AbstractConcurrentComputation;
 import org.semanticweb.elk.util.ArrayHashSet;
 
@@ -36,8 +37,13 @@ import org.semanticweb.elk.util.ArrayHashSet;
 public class ObjectPropertySaturation 
 		extends AbstractConcurrentComputation<IndexedObjectProperty> {
 
-	public ObjectPropertySaturation(ExecutorService executor, int maxWorkers) {
+	protected OntologyIndex ontologyIndex;
+	
+	public ObjectPropertySaturation(ExecutorService executor, int maxWorkers, OntologyIndex ontologyIndex) {
 		super(executor, maxWorkers, 0, 128);
+		this.ontologyIndex = ontologyIndex;
+		for (IndexedObjectProperty iop : ontologyIndex.getIndexedObjectProperties())
+			iop.resetSaturated();
 	}
 
 	@Override

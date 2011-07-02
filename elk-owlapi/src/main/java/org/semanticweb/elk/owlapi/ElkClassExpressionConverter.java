@@ -34,9 +34,9 @@ public final class ElkClassExpressionConverter implements
 
 	public OWLClass visit(ElkClass elkClass) {
 		String iri = elkClass.getIri();
-		if (iri.equals("owl:Thing"))
+		if (elkClass.equals(ElkClass.ELK_OWL_THING))
 			return owlDataFactory.getOWLThing();
-		else if (iri.equals("owl:Nothing"))
+		else if (elkClass.equals(ElkClass.ELK_OWL_NOTHING))
 			return owlDataFactory.getOWLNothing();
 		else
 			return owlDataFactory.getOWLClass(IRI.create(iri));
