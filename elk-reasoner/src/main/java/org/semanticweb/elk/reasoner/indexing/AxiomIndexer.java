@@ -47,7 +47,7 @@ import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
  */
 class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
-	protected final OntologyIndex ontologyIndex;
+	protected final OntologyIndexModifier ontologyIndex;
 	protected final NegativeClassExpressionIndexer negativeClassExpressionIndexer;
 	protected final PositiveClassExpressionIndexer positiveClassExpressionIndexer;
 	protected final ObjectPropertyExpressionIndexer objectPropertyExpressionIndexer;
@@ -60,7 +60,7 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	 * @param ontologyIndex
 	 *            to add indexed axioms to
 	 */
-	protected AxiomIndexer(OntologyIndex ontologyIndex, int multiplicity) {
+	protected AxiomIndexer(OntologyIndexModifier ontologyIndex, int multiplicity) {
 		assert (multiplicity == 1 || multiplicity == -1);
 		
 		this.ontologyIndex = ontologyIndex;

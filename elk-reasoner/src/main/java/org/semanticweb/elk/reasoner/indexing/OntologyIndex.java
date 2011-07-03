@@ -36,23 +36,11 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
  * @author Frantisek Simancik
  *
  */
-public abstract class OntologyIndex  {
+public interface OntologyIndex  {
 
 	public abstract IndexedClassExpression getIndexed(ElkClassExpression representative);
 	
 	public abstract IndexedObjectProperty getIndexed(ElkObjectPropertyExpression representative);
-	
-
-	
-	protected abstract IndexedClassExpression createIndexed(ElkClassExpression representative);
-
-	protected abstract IndexedObjectProperty createIndexed(ElkObjectPropertyExpression representative);
-	
-	protected abstract void removeIfNoOccurrence(IndexedClassExpression ice);
-	
-	protected abstract void removeIfNoOccurrence(IndexedObjectProperty iop);
-
-	
 	
 	public abstract Iterable<IndexedClass> getIndexedClasses();		
 	
@@ -61,8 +49,6 @@ public abstract class OntologyIndex  {
 	public abstract Iterable<IndexedClassExpression> getIndexedClassExpressions();		
 	
 	public abstract Iterable<IndexedObjectProperty> getIndexedObjectProperties();
-	
-	
 	
 	public abstract ElkAxiomProcessor getAxiomInserter();
 	
