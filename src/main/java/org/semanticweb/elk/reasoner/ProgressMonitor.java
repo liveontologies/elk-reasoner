@@ -40,7 +40,7 @@ public interface ProgressMonitor {
 	 * be called only once until the method {@link #finish()} is called.
 	 * 
 	 * @param message
-	 *            a description of the process.
+	 *            the description of the process.
 	 */
 	public void start(String message);
 
@@ -49,14 +49,14 @@ public interface ProgressMonitor {
 	 * 
 	 * @param state
 	 *            the current value of the progress. Must not be larger then
-	 *            {@code max}.
+	 *            {@code maxState}.
 	 * @param maxState
 	 *            the maximal (estimated) value of the progress.
 	 */
 	public void report(int state, int maxState);
 
 	/**
-	 * Indicates that the process is finished. Should be be only called if the
+	 * Indicates that the process is finished. Should be called only if the
 	 * method {@link #start(String)} was called before.
 	 * 
 	 */
