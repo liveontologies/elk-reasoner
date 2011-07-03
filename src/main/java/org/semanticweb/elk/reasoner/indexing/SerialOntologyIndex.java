@@ -48,7 +48,7 @@ import org.semanticweb.elk.util.Pair;
  * @author Yevgeny Kazakov
  * 
  */
-public class SerialOntologyIndex extends OntologyIndex {
+public class SerialOntologyIndex extends OntologyIndexModifier {
 
 	protected final Map<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
 	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
@@ -65,12 +65,10 @@ public class SerialOntologyIndex extends OntologyIndex {
 				1024);
 	}
 
-	@Override
 	public IndexedClassExpression getIndexed(ElkClassExpression classExpression) {
 		return indexedClassExpressionLookup.get(classExpression);
 	}
 
-	@Override
 	public IndexedObjectProperty getIndexed(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		return indexedObjectPropertyLookup.get(objectPropertyExpression);
@@ -112,17 +110,14 @@ public class SerialOntologyIndex extends OntologyIndex {
 			indexedObjectPropertyLookup.remove(iop.getElkObjectProperty());
 	}
 
-	@Override
 	public ElkAxiomProcessor getAxiomInserter() {
 		return new AxiomIndexer(this, 1);
 	}
 
-	@Override
 	public ElkAxiomProcessor getAxiomDeleter() {
 		return new AxiomIndexer(this, -1);
 	}
 
-	@Override
 	public Iterable<IndexedClass> getIndexedClasses() {
 		return new Iterable<IndexedClass>() {
 
@@ -163,18 +158,15 @@ public class SerialOntologyIndex extends OntologyIndex {
 		};
 	}
 
-	@Override
 	public int getIndexedClassCount() {
 		return indexedClassCount;
 	}
 
-	@Override
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
 		return Collections.unmodifiableCollection(indexedClassExpressionLookup
 				.values());
 	}
 
-	@Override
 	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
 		return Collections.unmodifiableCollection(indexedObjectPropertyLookup
 				.values());
