@@ -54,9 +54,11 @@ public abstract class OntologyIndex  {
 
 	
 	
-	public abstract Iterable<IndexedClass> getIndexedClasses();
+	public abstract Iterable<IndexedClass> getIndexedClasses();		
 	
-	public abstract Iterable<IndexedClassExpression> getIndexedClassExpressions();
+	public abstract int getIndexedClassCount();
+	
+	public abstract Iterable<IndexedClassExpression> getIndexedClassExpressions();		
 	
 	public abstract Iterable<IndexedObjectProperty> getIndexedObjectProperties();
 	

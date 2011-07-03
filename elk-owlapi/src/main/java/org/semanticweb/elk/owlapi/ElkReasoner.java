@@ -201,7 +201,7 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	protected void classifyOntology() {
-		reasoner.classify();
+		reasoner.classify(elkProgressMonitor);
 		isClassified = true;
 	}
 

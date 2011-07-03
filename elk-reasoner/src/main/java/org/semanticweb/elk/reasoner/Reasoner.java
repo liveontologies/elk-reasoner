@@ -54,7 +54,7 @@ public class Reasoner {
 	protected final int workerNo;
 
 	protected final OntologyIndex ontologyIndex;
-	
+
 	protected final ElkAxiomProcessor axiomInserter, axiomDeleter;
 
 	protected ClassTaxonomy classTaxonomy;
@@ -137,18 +137,22 @@ public class Reasoner {
 			IOException {
 		loadOntologyFromString(text, axiomInserter);
 	}
-	
+
 	public void addAxiom(ElkAxiom axiom) {
 		axiomInserter.process(axiom);
 	}
-	
+
 	public void removeAxiom(ElkAxiom axiom) {
 		axiomDeleter.process(axiom);
 	}
 
-	public void classify() {
-		// Saturation stage
+	public void classify(ProgressMonitor progressMonitor) {
+		// number of indexed classes
+		final int maxIndexedClassCount = ontologyIndex.getIndexedClassCount();
+		// variable used in progress monitors
+		int progress;
 
+		// Saturation stage
 		ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
 				executor, workerNo, ontologyIndex);
 
@@ -158,16 +162,21 @@ public class Reasoner {
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("Saturation using " + workerNo + " workers");
 		Statistics.logOperationStart("Saturation", LOGGER_);
+		progressMonitor.start("Saturation");
 
 		for (IndexedObjectProperty iop : ontologyIndex
 				.getIndexedObjectProperties())
 			objectPropertySaturation.submit(iop);
 		objectPropertySaturation.waitCompletion();
 
-		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
+		progress = 0;
+		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
 			classExpressionSaturation.submit(ic);
+			progressMonitor.report(++progress, maxIndexedClassCount);
+		}
 		classExpressionSaturation.waitCompletion();
 
+		progressMonitor.finish();
 		Statistics.logOperationFinish("Saturation", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 
@@ -175,15 +184,25 @@ public class Reasoner {
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("Transitive reduction using " + workerNo + " workers");
 		Statistics.logOperationStart("Transitive reduction", LOGGER_);
+		progressMonitor.start("Transitive reduction");
 
 		ClassTaxonomyComputation classification = new ClassTaxonomyComputation(
 				executor, workerNo);
-		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
+		progress = 0;
+		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
 			classification.submit(ic);
+			progressMonitor.report(++progress, maxIndexedClassCount);
+		}
+
 		classTaxonomy = classification.computeTaxonomy();
 
+		progressMonitor.finish();
 		Statistics.logOperationFinish("Transitive reduction", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
+	}
+
+	public void classify() {
+		classify(new DummyProgressMonitor());
 	}
 
 	public ClassTaxonomy getTaxonomy() {
