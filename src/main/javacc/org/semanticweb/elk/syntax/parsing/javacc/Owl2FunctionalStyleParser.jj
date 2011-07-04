@@ -49,6 +49,8 @@ import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassAxiom;
 import org.semanticweb.elk.syntax.ElkClassExpression;
+import org.semanticweb.elk.syntax.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.ElkEntity;
 import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectInverseOf;
@@ -560,19 +562,28 @@ void literal():
     )    
 }    
 
-/* 5.8 Entity Declarations and Typing */    
-void declaration():
-{}{
-    <DECLARATION> <OPEN_BRACE> axiomAnnotations() entity() <CLOSE_BRACE>
+/* 5.8 Entity Declarations and Typing */
+Future<? extends ElkDeclarationAxiom> declaration():
+{
+  Future<? extends ElkEntity> x;  
+}{
+    <DECLARATION> <OPEN_BRACE> axiomAnnotations()
+    x = entity()
+    <CLOSE_BRACE> {      
+      return constructor.getFutureElkDeclarationAxiom(x);
+    } 
 }
-void entity():
-{}{
-    <CLASS> <OPEN_BRACE> clazz() <CLOSE_BRACE> 
+Future<? extends ElkEntity> entity():
+{
+  Future<? extends ElkEntity> x = null;
+}{ (
+    <CLASS> <OPEN_BRACE> x = clazz() <CLOSE_BRACE> 
 |   <DATATYPE> <OPEN_BRACE> datatype() <CLOSE_BRACE>
-|   <OBJECT_PROPERTY> <OPEN_BRACE> objectProperty() <CLOSE_BRACE>
+|   <OBJECT_PROPERTY> <OPEN_BRACE> x = objectProperty() <CLOSE_BRACE>
 |   <DATA_PROPERTY> <OPEN_BRACE> dataProperty() <CLOSE_BRACE>
 |   <ANNOTATION_PROPERTY> <OPEN_BRACE> annotationProperty() <CLOSE_BRACE>
 |   <NAMED_INDIVIDUAL> <OPEN_BRACE> namedIndividual() <CLOSE_BRACE>
+   ) { return x; }
 }
 /* 6 Property Expressions */    
 Future<? extends ElkObjectPropertyExpression> objectPropertyExpression():

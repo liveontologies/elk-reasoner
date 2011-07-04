@@ -45,19 +45,18 @@ import org.semanticweb.elk.util.HashGenerator;
  * @author Markus Kroetzsch
  */
 
-public class IndexedObjectProperty {
-	
+public class IndexedObjectProperty implements IndexedEntity {
+
 	protected final ElkObjectProperty elkObjectProperty;
 	protected List<IndexedObjectProperty> toldSubObjectProperties;
 	protected List<IndexedObjectProperty> toldSuperObjectProperties;
 	protected int isTransitive = 0;
-	
+
 	/**
 	 * This counts how often this object occurred in the ontology.
 	 */
 	protected int occurrenceNo = 0;
-	
-	
+
 	/**
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
@@ -65,30 +64,28 @@ public class IndexedObjectProperty {
 		this.elkObjectProperty = elkObjectProperty;
 	}
 
-	
 	/**
 	 * @return The represented object property expression.
 	 */
 	public ElkObjectProperty getElkObjectProperty() {
 		return elkObjectProperty;
 	}
-	
-	
+
 	/**
-	 * @return All told sub object properties of this object property, possibly null.
+	 * @return All told sub object properties of this object property, possibly
+	 *         null.
 	 */
 	public List<IndexedObjectProperty> getToldSubObjectProperties() {
 		return toldSubObjectProperties;
 	}
 
-	
-	/** 
-	 * @return All told super object properties of this object property, possibly null.
+	/**
+	 * @return All told super object properties of this object property,
+	 *         possibly null.
 	 */
 	public List<IndexedObjectProperty> getToldSuperObjectProperties() {
 		return toldSuperObjectProperties;
 	}
-	
 
 	/**
 	 * @return True if this object property is told transitive.
@@ -97,14 +94,15 @@ public class IndexedObjectProperty {
 		return isTransitive > 0;
 	}
 
-
-	protected void addToldSubObjectProperty(IndexedObjectProperty subObjectProperty) {
+	protected void addToldSubObjectProperty(
+			IndexedObjectProperty subObjectProperty) {
 		if (toldSubObjectProperties == null)
-			toldSubObjectProperties = new ArrayList<IndexedObjectProperty> (1);
+			toldSubObjectProperties = new ArrayList<IndexedObjectProperty>(1);
 		toldSubObjectProperties.add(subObjectProperty);
 	}
-	
-	protected boolean removeToldSubObjectProperty(IndexedObjectProperty subObjectProperty) {
+
+	protected boolean removeToldSubObjectProperty(
+			IndexedObjectProperty subObjectProperty) {
 		boolean success = false;
 		if (toldSubObjectProperties != null) {
 			success = toldSubObjectProperties.remove(subObjectProperty);
@@ -114,14 +112,15 @@ public class IndexedObjectProperty {
 		return success;
 	}
 
-	
-	protected void addToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
+	protected void addToldSuperObjectProperty(
+			IndexedObjectProperty superObjectProperty) {
 		if (toldSuperObjectProperties == null)
-			toldSuperObjectProperties = new ArrayList<IndexedObjectProperty> (1);
+			toldSuperObjectProperties = new ArrayList<IndexedObjectProperty>(1);
 		toldSuperObjectProperties.add(superObjectProperty);
 	}
 
-	protected boolean removeToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
+	protected boolean removeToldSuperObjectProperty(
+			IndexedObjectProperty superObjectProperty) {
 		boolean success = false;
 		if (toldSuperObjectProperties != null) {
 			success = toldSuperObjectProperties.remove(superObjectProperty);
@@ -131,11 +130,10 @@ public class IndexedObjectProperty {
 		return success;
 	}
 
-	
 	protected void addTransitive() {
 		isTransitive++;
 	}
-	
+
 	protected boolean removeTransitive() {
 		if (isTransitive > 0) {
 			isTransitive--;
@@ -144,43 +142,33 @@ public class IndexedObjectProperty {
 		return false;
 	}
 
-	
-	
-	
-	protected final AtomicReference<SaturatedObjectProperty> saturated =
-		new AtomicReference<SaturatedObjectProperty> ();
-	
+	protected final AtomicReference<SaturatedObjectProperty> saturated = new AtomicReference<SaturatedObjectProperty>();
+
 	/**
-	 * @return The corresponding saturated object property, 
-	 * null if none was assigned.
+	 * @return The corresponding saturated object property, null if none was
+	 *         assigned.
 	 */
 	public SaturatedObjectProperty getSaturated() {
 		return saturated.get();
 	}
-	
-	
+
 	/**
-	 * Sets the corresponding saturated object property if none
-	 * was yet assigned. 
+	 * Sets the corresponding saturated object property if none was yet
+	 * assigned.
 	 * 
-	 * @return True if the operation succeeded. 
+	 * @return True if the operation succeeded.
 	 */
 	public boolean setSaturated(SaturatedObjectProperty saturatedObjectProperty) {
 		return saturated.compareAndSet(null, saturatedObjectProperty);
 	}
-	
-	
+
 	/**
-	 * Resets the corresponding saturated object property to null.  
+	 * Resets the corresponding saturated object property to null.
 	 */
 	public void resetSaturated() {
 		saturated.set(null);
 	}
 
-		
-
-	
-	
 	/**
 	 * Represent the object's ElkObjectProperty as a string. This implementation
 	 * reflects the fact that we generally consider only one
@@ -192,8 +180,7 @@ public class IndexedObjectProperty {
 	public String toString() {
 		return "[" + elkObjectProperty.toString() + "]";
 	}
-	
-		
+
 	/** Hash code for this object. */
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
@@ -206,5 +193,9 @@ public class IndexedObjectProperty {
 	public final int hashCode() {
 		return hashCode_;
 	}
-	
+
+	public <O> O accept(IndexedEntityVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
 }

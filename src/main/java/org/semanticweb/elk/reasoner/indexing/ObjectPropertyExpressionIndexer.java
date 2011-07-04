@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-
 /**
  * For indexing object properties.
  * 
@@ -30,9 +29,9 @@ package org.semanticweb.elk.reasoner.indexing;
  * 
  */
 class ObjectPropertyExpressionIndexer {
-	
+
 	protected AxiomIndexer axiomIndexer;
-	
+
 	public ObjectPropertyExpressionIndexer(AxiomIndexer axiomIndexer) {
 		this.axiomIndexer = axiomIndexer;
 	}
@@ -40,7 +39,7 @@ class ObjectPropertyExpressionIndexer {
 	public void visit(IndexedObjectProperty indexedObjectProperty) {
 		indexedObjectProperty.occurrenceNo += axiomIndexer.multiplicity;
 		assert indexedObjectProperty.occurrenceNo >= 0;
-		
+
 		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedObjectProperty);
 	}
 }

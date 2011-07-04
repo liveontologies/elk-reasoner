@@ -26,6 +26,7 @@
 package org.semanticweb.elk.reasoner.indexing;
 
 import org.semanticweb.elk.syntax.ElkClassExpression;
+import org.semanticweb.elk.syntax.ElkEntity;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 
 /**
@@ -35,6 +36,8 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
  *
  */
 abstract class OntologyIndexModifier implements OntologyIndex {
+	
+	abstract IndexedEntity createIndexed(ElkEntity representative);
 	
 	abstract IndexedClassExpression createIndexed(ElkClassExpression representative);
 

@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,50 +21,59 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, May 13, 2011
+ * @author Yevgeny Kazakov, Jul 3, 2011
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-
 /**
- * For indexing positive occurrences of class expressions.
+ * For indexing all occurrences of class expressions
  * 
  * @author Yevgeny Kazakov
- * @author Frantisek Simancik
  * 
  */
-class PositiveClassExpressionIndexer implements
+class ClassExpressionIndexer implements
 		IndexedClassExpressionVisitor<Void> {
 
 	protected final AxiomIndexer axiomIndexer;
 
-	protected PositiveClassExpressionIndexer(AxiomIndexer axiomIndexer) {
+	/**
+	 * @param axiomIndexer
+	 */
+	public ClassExpressionIndexer(AxiomIndexer axiomIndexer) {
 		this.axiomIndexer = axiomIndexer;
 	}
 
 	public Void visit(IndexedClass indexedClass) {
-		indexedClass.positiveOccurrenceNo += axiomIndexer.multiplicity;
-		assert indexedClass.negativeOccurrenceNo >= 0;
-		
+		indexedClass.occurrenceNo += axiomIndexer.multiplicity;
+		assert indexedClass.occurrenceNo >= 0;
+
+		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedClass);
 		return null;
 	}
 
 	public Void visit(IndexedObjectIntersectionOf indexedObjectIntersectionOf) {
-		indexedObjectIntersectionOf.positiveOccurrenceNo += axiomIndexer.multiplicity;
-		assert indexedObjectIntersectionOf.negativeOccurrenceNo >= 0;
-		
+		indexedObjectIntersectionOf.occurrenceNo += axiomIndexer.multiplicity;
+		assert indexedObjectIntersectionOf.occurrenceNo >= 0;
+
 		indexedObjectIntersectionOf.firstConjunct.accept(this);
 		indexedObjectIntersectionOf.secondConjunct.accept(this);
-		
+
+		axiomIndexer.ontologyIndex
+				.removeIfNoOccurrence(indexedObjectIntersectionOf);
 		return null;
 	}
 
 	public Void visit(IndexedObjectSomeValuesFrom indexedObjectSomeValuesFrom) {
-		indexedObjectSomeValuesFrom.positiveOccurrenceNo += axiomIndexer.multiplicity;
-		assert indexedObjectSomeValuesFrom.negativeOccurrenceNo >= 0;
-				
+		indexedObjectSomeValuesFrom.occurrenceNo += axiomIndexer.multiplicity;
+		assert indexedObjectSomeValuesFrom.occurrenceNo >= 0;
+
+		axiomIndexer.objectPropertyExpressionIndexer
+				.visit(indexedObjectSomeValuesFrom.relation);
 		indexedObjectSomeValuesFrom.filler.accept(this);
-		
+
+		axiomIndexer.ontologyIndex
+				.removeIfNoOccurrence(indexedObjectSomeValuesFrom);
 		return null;
 	}
+
 }
