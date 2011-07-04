@@ -43,7 +43,7 @@ public class ClassTaxonomyComputation
 	
 	protected final static Logger logger = Logger.getLogger(Reasoner.class);
 	
-	private ClassNode topNode;
+	private ClassNode topNode, bottomNode;
 	
 	private final Linker linker;
 	
@@ -57,13 +57,25 @@ public class ClassTaxonomyComputation
 	
 	public ClassTaxonomy computeTaxonomy() {
 		waitCompletion();
+		
 		topNode = classTaxonomy.getNode(ElkClass.ELK_OWL_THING);
 		if (topNode == null) {
 			topNode = new ClassNode(Collections.singletonList(ElkClass.ELK_OWL_THING));
 			classTaxonomy.nodeLookup.put(ElkClass.ELK_OWL_THING, topNode);
 		}
+		bottomNode = classTaxonomy.getNode(ElkClass.ELK_OWL_NOTHING);
+		if (bottomNode == null) {
+			bottomNode = new ClassNode(Collections.singletonList(ElkClass.ELK_OWL_NOTHING));
+			classTaxonomy.nodeLookup.put(ElkClass.ELK_OWL_NOTHING, bottomNode);
+		}
+		
 		linker.start();
 		linker.waitCompletion();
+		
+		for (ClassNode node : classTaxonomy.getNodes())
+			if (node.getChildren().isEmpty() && node != bottomNode)
+				node.addChild(bottomNode);
+		
 		return classTaxonomy;
 	}
 	
