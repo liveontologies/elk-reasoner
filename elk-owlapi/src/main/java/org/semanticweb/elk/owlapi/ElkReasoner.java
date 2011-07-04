@@ -72,6 +72,7 @@ import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 import org.semanticweb.owlapi.reasoner.TimeOutException;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
+import org.semanticweb.owlapi.reasoner.impl.OWLObjectPropertyNode;
 import org.semanticweb.owlapi.util.Version;
 
 /**
@@ -238,7 +239,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	public Node<OWLObjectPropertyExpression> getBottomObjectPropertyNode() {
 		// TODO Auto-generated method stub
-		return null;
+		return new OWLObjectPropertyNode(owlDataFactory.getOWLBottomObjectProperty());
 	}
 
 	public BufferingMode getBufferingMode() {
@@ -501,7 +502,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	public Node<OWLObjectPropertyExpression> getTopObjectPropertyNode() {
 		// TODO Auto-generated method stub
-		return null;
+		return new OWLObjectPropertyNode(owlDataFactory.getOWLTopObjectProperty());
 	}
 
 	public NodeSet<OWLClass> getTypes(OWLNamedIndividual arg0, boolean arg1)
