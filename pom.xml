@@ -84,6 +84,7 @@
 		<dependencies>
 		</dependencies>
 	</dependencyManagement>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -157,6 +158,18 @@
 						</dependency>
 					</dependencies>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.0-beta-3</version>
+					<dependencies>
+						<dependency>
+							<groupId>com.google.code.maven-svn-wagon</groupId>
+							<artifactId>maven-svn-wagon</artifactId>
+							<version>1.4</version>
+						</dependency>
+					</dependencies>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -170,6 +183,10 @@
 			<id>elk-reasoner.googlecode.com</id>
 			<url>svn:https://elk-reasoner.googlecode.com/svn/m2/snapshots</url>
 		</snapshotRepository>
+		<site>
+			<id>elk-reasoner.googlecode.com</id>
+			<url>svn:https://elk-reasoner.googlecode.com/svn/m2/site</url>
+		</site>
 	</distributionManagement>
 
 </project>

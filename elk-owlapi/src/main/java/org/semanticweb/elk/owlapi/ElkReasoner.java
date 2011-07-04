@@ -207,12 +207,7 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	ClassNode getElkClassNode(ElkClass cls) {
-		ClassNode result = reasoner.getTaxonomy().getNode(cls);
-		if (result != null)
-			return result;
-		List<ElkClass> singleton = new ArrayList<ElkClass>(1);
-		singleton.add(cls);
-		return new ClassNode(singleton);
+		return reasoner.getTaxonomy().getNode(cls);
 	}
 
 	/* Methods required by the OWLReasoner interface */

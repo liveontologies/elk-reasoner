@@ -19,11 +19,11 @@
 			<artifactId>owlapi-all</artifactId>
 			<version>3.2.3</version>
 			<scope>compile</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-reasoner</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${parent.version}</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
