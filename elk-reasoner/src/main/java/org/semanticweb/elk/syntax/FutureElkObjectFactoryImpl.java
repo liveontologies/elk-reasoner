@@ -230,6 +230,27 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 				futureObjectPropertyExpression, futureClassExpression);
 	}
 
+	class FutureElkDeclarationAxiom extends
+			DelayedConstructor<ElkDeclarationAxiom> {
+
+		protected final Future<? extends ElkEntity> futureEntity;
+
+		FutureElkDeclarationAxiom(final Future<? extends ElkEntity> futureEntity) {
+			this.futureEntity = futureEntity;
+		}
+
+		public ElkDeclarationAxiom get() throws InterruptedException,
+				ExecutionException {
+			return ElkDeclarationAxiom.create(futureEntity.get());
+		}
+
+	}
+
+	public Future<ElkDeclarationAxiom> getFutureElkDeclarationAxiom(
+			Future<? extends ElkEntity> futureEntity) {
+		return new FutureElkDeclarationAxiom(futureEntity);
+	}
+
 	class FutureElkTransitiveObjectPropertyAxiom extends
 			DelayedConstructor<ElkTransitiveObjectPropertyAxiom> {
 

@@ -97,7 +97,6 @@ class NegativeClassExpressionIndexer implements
 		indexedClass.negativeOccurrenceNo += axiomIndexer.multiplicity;
 		assert indexedClass.negativeOccurrenceNo >= 0;
 		
-		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedClass);
 		return null;
 	}
 
@@ -119,11 +118,10 @@ class NegativeClassExpressionIndexer implements
 			indexedObjectIntersectionOf.secondConjunct.removeNegConjunctionByConjunct(
 					indexedObjectIntersectionOf, indexedObjectIntersectionOf.firstConjunct);
 		}
-
+		
 		indexedObjectIntersectionOf.firstConjunct.accept(this);
 		indexedObjectIntersectionOf.secondConjunct.accept(this);
 		
-		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedObjectIntersectionOf);
 		return null;
 	}
 
@@ -140,10 +138,8 @@ class NegativeClassExpressionIndexer implements
 			indexedObjectSomeValuesFrom.filler.removeNegExistential(indexedObjectSomeValuesFrom);
 		}
 		
-		axiomIndexer.objectPropertyExpressionIndexer.visit(indexedObjectSomeValuesFrom.relation);
 		indexedObjectSomeValuesFrom.filler.accept(this);
-
-		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedObjectSomeValuesFrom);
+		
 		return null;
 	}
 

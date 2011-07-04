@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,19 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.syntax;
+/**
+ * @author Yevgeny Kazakov, Jul 3, 2011
+ */
+package org.semanticweb.elk.reasoner.indexing;
 
-public interface ElkAxiomVisitor<O> extends ElkClassAxiomVisitor<O>,
-		ElkObjectPropertyAxiomVisitor<O> {
+/**
+ * @author Yevgeny Kazakov
+ * 
+ */
+public interface IndexedEntityVisitor<O> {
+
+	O visit(IndexedClass indexedClass);
+
+	O visit(IndexedObjectProperty indexedObjectProperty);
 	
-	O visit(ElkDeclarationAxiom elkDeclarationAxiom);
-
 }

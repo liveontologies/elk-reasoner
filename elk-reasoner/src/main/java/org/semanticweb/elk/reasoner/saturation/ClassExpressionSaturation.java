@@ -41,19 +41,22 @@ import org.semanticweb.elk.util.Pair;
  * Experimental version of Saturation Manager.
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
-public class ClassExpressionSaturation extends AbstractConcurrentComputation<SaturatedClassExpression> {
+public class ClassExpressionSaturation extends
+		AbstractConcurrentComputation<SaturatedClassExpression> {
 
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturation.class);
-	
+
 	protected final OntologyIndex ontologyIndex;
 
-	public ClassExpressionSaturation(ExecutorService executor, int workerNo, OntologyIndex ontologyIndex) {
+	public ClassExpressionSaturation(ExecutorService executor, int workerNo,
+			OntologyIndex ontologyIndex) {
 		super(executor, workerNo, 256, 512);
 		this.ontologyIndex = ontologyIndex;
-		for (IndexedClassExpression ice : ontologyIndex.getIndexedClassExpressions())
+		for (IndexedClassExpression ice : ontologyIndex
+				.getIndexedClassExpressions())
 			ice.resetSaturated();
 	}
 
@@ -75,7 +78,8 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 	 * @return context which root is the input indexed class expression.
 	 * 
 	 */
-	protected SaturatedClassExpression getCreateContext(IndexedClassExpression root) {
+	protected SaturatedClassExpression getCreateContext(
+			IndexedClassExpression root) {
 		if (root.getSaturated() == null) {
 			SaturatedClassExpression sce = new SaturatedClassExpression(root);
 			if (root.setSaturated(sce)) {
@@ -83,7 +87,8 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 					LOGGER_.trace("Created context for " + root);
 				}
 				enqueueDerived(sce, root, true);
-				IndexedClassExpression top = ontologyIndex.getIndexed(ElkClass.ELK_OWL_THING);
+				IndexedClassExpression top = ontologyIndex
+						.getIndexedClassExpression(ElkClass.ELK_OWL_THING);
 				if (top != null && top.occursNegatively())
 					enqueueDerived(sce, top, false);
 			}
@@ -165,8 +170,8 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 			Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom> propagation = context.propagationQueue
 					.poll();
 			if (propagation != null) {
-				processPropagation(context, propagation.getFirst(), propagation
-						.getSecond());
+				processPropagation(context, propagation.getFirst(),
+						propagation.getSecond());
 				continue;
 			}
 
@@ -248,8 +253,8 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 						ice.getNegConjunctionsByConjunct().keySet(),
 						context.derived))
-					enqueueDerived(context, ice
-							.getNegConjunctionsByConjunct().get(common), false);
+					enqueueDerived(context, ice.getNegConjunctionsByConjunct()
+							.get(common), false);
 			}
 
 			// process negative existentials
@@ -280,11 +285,11 @@ public class ClassExpressionSaturation extends AbstractConcurrentComputation<Sat
 		}
 
 		public Void visit(IndexedObjectSomeValuesFrom ice) {
-			enqueueLink(getCreateContext(ice.getFiller()), ice.getRelation(), context);
+			enqueueLink(getCreateContext(ice.getFiller()), ice.getRelation(),
+					context);
 
 			return null;
 		}
 	}
-	
-	
+
 }

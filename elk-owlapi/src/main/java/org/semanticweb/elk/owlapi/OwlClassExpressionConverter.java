@@ -79,13 +79,7 @@ public class OwlClassExpressionConverter implements
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.semanticweb.owlapi.model.OWLClassExpressionVisitorEx#visit(org.
-	 * semanticweb.owlapi.model.OWLObjectSomeValuesFrom)
-	 */
+	
 	public ElkObjectSomeValuesFrom visit(OWLObjectSomeValuesFrom ce) {
 		OwlPropertyExpressionConverter peConverter = OwlPropertyExpressionConverter
 				.getInstance();

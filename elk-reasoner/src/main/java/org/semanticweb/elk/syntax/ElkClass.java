@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.syntax;
 
-
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Classes">Class<a> in the OWL 2
@@ -33,7 +32,7 @@ package org.semanticweb.elk.syntax;
  * 
  * @author Yevgeny Kazakov
  */
-public class ElkClass extends ElkClassExpression {
+public class ElkClass extends ElkClassExpression implements ElkEntity {
 
 	protected final String iri;
 
@@ -91,6 +90,13 @@ public class ElkClass extends ElkClassExpression {
 	 */
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.semanticweb.elk.syntax.ElkEntity#accept(org.semanticweb.elk.syntax.ElkEntityVisitor)
+	 */
+	public <O> O accept(ElkEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

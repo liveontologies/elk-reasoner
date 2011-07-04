@@ -74,6 +74,9 @@ public interface FutureElkObjectFactory {
 			Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression,
 			Future<? extends ElkClassExpression> futureClassExpression);
 
+	public Future<ElkDeclarationAxiom> getFutureElkDeclarationAxiom(
+			Future<? extends ElkEntity> futureEntity);
+
 	public Future<ElkTransitiveObjectPropertyAxiom> getFutureElkTransitiveObjectPropertyAxiom(
 			Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression);
 

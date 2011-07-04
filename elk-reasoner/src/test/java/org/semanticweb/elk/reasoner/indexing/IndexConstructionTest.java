@@ -53,10 +53,10 @@ public class IndexConstructionTest extends TestCase {
 		inserter.process(ElkSubClassOfAxiom.create(ElkObjectIntersectionOf.create(a, b), d));
 		inserter.process(ElkEquivalentClassesAxiom.create(ElkObjectSomeValuesFrom.create(r, c), a));
 		
-		IndexedClassExpression A = index.getIndexed(a);
-		IndexedClassExpression B = index.getIndexed(b);
-		IndexedClassExpression C = index.getIndexed(c);
-		IndexedObjectProperty R = index.getIndexed(r);
+		IndexedClassExpression A = index.getIndexedClassExpression(a);
+		IndexedClassExpression B = index.getIndexedClassExpression(b);
+		IndexedClassExpression C = index.getIndexedClassExpression(c);
+		IndexedObjectProperty R = index.getIndexedObjectPropertyExpression(r);
 		assertEquals(2, A.negativeOccurrenceNo);
 		assertEquals(1, A.positiveOccurrenceNo);
 		assertEquals(1, B.negativeOccurrenceNo);
@@ -74,13 +74,13 @@ public class IndexConstructionTest extends TestCase {
 		assertEquals(0, A.positiveOccurrenceNo);
 		assertEquals(0, R.occurrenceNo);
 		assertNull(C.getNegExistentials());
-		assertNull(index.getIndexed(c));
-		assertNull(index.getIndexed(r));
+		assertNull(index.getIndexedEntity(c));
+		assertNull(index.getIndexedEntity(r));
 		
 		deleter.process(ElkSubClassOfAxiom.create(ElkObjectIntersectionOf.create(a, b), d));
 		assertEquals(0, A.negativeOccurrenceNo);
 		assertNull(A.getNegConjunctionsByConjunct());
-		assertNull(index.getIndexed(a));
+		assertNull(index.getIndexedEntity(a));
 	}
 	
 	public void testConjunctionSharing() {
@@ -98,8 +98,8 @@ public class IndexConstructionTest extends TestCase {
 		inserter.process(ElkSubClassOfAxiom.create(x, d));
 		inserter.process(ElkSubClassOfAxiom.create(y, d));
 		
-		assertSame(index.getIndexed(x), index.getIndexed(y));
-		assertEquals(2, index.getIndexed(x).getToldSuperClassExpressions().size());
+		assertSame(index.getIndexedClassExpression(x), index.getIndexedClassExpression(y));
+		assertEquals(2, index.getIndexedClassExpression(x).getToldSuperClassExpressions().size());
 	}
 
 }

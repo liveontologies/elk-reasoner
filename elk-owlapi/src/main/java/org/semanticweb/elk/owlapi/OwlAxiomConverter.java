@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClassExpression;
+import org.semanticweb.elk.syntax.ElkDeclarationAxiom;
 import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.syntax.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
@@ -197,9 +198,9 @@ public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 	}
 
 	public ElkAxiom visit(OWLDeclarationAxiom axiom) {
-		// TODO Support this axiom type
-		throw new ConverterException(axiom.getAxiomType().getName()
-				+ " not supported");
+		OwlEntityConverter entConverter = OwlEntityConverter.getInstance();
+		return ElkDeclarationAxiom.create(axiom.getEntity()
+				.accept(entConverter));
 	}
 
 	public ElkAxiom visit(OWLAnnotationAssertionAxiom axiom) {

@@ -31,10 +31,11 @@ import org.semanticweb.elk.syntax.ElkClassExpression;
  * Represents all occurrences of an ElkClass in an ontology.
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
-public class IndexedClass extends IndexedClassExpression {
-	
+public class IndexedClass extends IndexedClassExpression implements
+		IndexedEntity {
+
 	/**
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
@@ -42,19 +43,17 @@ public class IndexedClass extends IndexedClassExpression {
 		super(Collections.singletonList((ElkClassExpression) elkClass));
 	}
 
-
-	/** 
+	/**
 	 * @return The represented ElkClass.
-	 */ 
+	 */
 	public ElkClass getElkClass() {
 		return (ElkClass) representatives.get(0);
 	}
-	
-	
+
 	/**
-	 * Represent the object's ElkClass as a string. This
-	 * implementation reflects the fact that we generally consider only one
-	 * IndexedClass for each ElkClass.
+	 * Represent the object's ElkClass as a string. This implementation reflects
+	 * the fact that we generally consider only one IndexedClass for each
+	 * ElkClass.
 	 * 
 	 * @return String representation.
 	 */
@@ -62,10 +61,12 @@ public class IndexedClass extends IndexedClassExpression {
 		return "[" + getElkClass().toString() + "]";
 	}
 
-	
-	
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	public <O> O accept(IndexedEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

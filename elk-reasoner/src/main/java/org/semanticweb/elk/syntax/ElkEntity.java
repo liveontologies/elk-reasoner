@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,28 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * @author Yevgeny Kazakov, Jul 3, 2011
+ */
 package org.semanticweb.elk.syntax;
 
-public interface ElkAxiomVisitor<O> extends ElkClassAxiomVisitor<O>,
-		ElkObjectPropertyAxiomVisitor<O> {
-	
-	O visit(ElkDeclarationAxiom elkDeclarationAxiom);
+/**
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Entities.2C_Literals.2C_and_Anonymous_Individuals"
+ * >Entity<a> in the OWL 2 specification.
+ * 
+ * @author Yevgeny Kazakov
+ * 
+ */
+public interface ElkEntity {
 
+	/**
+	 * Get the IRI of this entity.
+	 * 
+	 * @return The IRI of this entity.
+	 */
+	public String getIri();
+	
+	public <O> O accept(ElkEntityVisitor<O> visitor);
+	
 }

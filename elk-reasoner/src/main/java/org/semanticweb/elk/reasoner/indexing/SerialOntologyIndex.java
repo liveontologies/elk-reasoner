@@ -36,6 +36,8 @@ import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
+import org.semanticweb.elk.syntax.ElkEntity;
+import org.semanticweb.elk.syntax.ElkEntityVisitor;
 import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectInverseOf;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
@@ -65,13 +67,40 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 				1024);
 	}
 
-	public IndexedClassExpression getIndexed(ElkClassExpression classExpression) {
+	public IndexedClassExpression getIndexedClassExpression(
+			ElkClassExpression classExpression) {
 		return indexedClassExpressionLookup.get(classExpression);
 	}
 
-	public IndexedObjectProperty getIndexed(
+	public IndexedObjectProperty getIndexedObjectPropertyExpression(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		return indexedObjectPropertyLookup.get(objectPropertyExpression);
+	}
+
+	private class IndexedEntityGetter implements
+			ElkEntityVisitor<IndexedEntity> {
+
+		// TODO implement without a cast
+
+		public IndexedEntity visit(ElkClass elkClass) {
+			return (IndexedEntity) getIndexedClassExpression(elkClass);
+		}
+
+		public IndexedEntity visit(ElkObjectProperty elkObjectProperty) {
+			return (IndexedEntity) getIndexedObjectPropertyExpression(elkObjectProperty);
+		}
+
+	}
+
+	private IndexedEntityGetter indexedEntityGetter = new IndexedEntityGetter();
+
+	public IndexedEntity getIndexedEntity(ElkEntity entity) {
+		return entity.accept(indexedEntityGetter);
+	}
+
+	@Override
+	protected IndexedEntity createIndexed(ElkEntity entity) {
+		return entity.accept(indexedEntityCreator);
 	}
 
 	@Override
@@ -88,7 +117,7 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 	@Override
 	protected void removeIfNoOccurrence(IndexedClassExpression ice) {
-		if (ice.negativeOccurrenceNo == 0 && ice.positiveOccurrenceNo == 0) {
+		if (ice.occurrenceNo == 0) {
 			for (ElkClassExpression c : ice.getRepresentantatives()) {
 				indexedClassExpressionLookup.remove(c);
 				if (c instanceof ElkClass)
@@ -172,13 +201,29 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 				.values());
 	}
 
-	private final ElkClassExpressionVisitor<IndexedClassExpression> indexedClassExpressionCreator = new ElkClassExpressionVisitor<IndexedClassExpression>() {
-
-		public IndexedClassExpression visit(ElkClass elkClass) {
+	private class IndexedEntityCreator implements
+			ElkEntityVisitor<IndexedEntity> {
+		public IndexedClass visit(ElkClass elkClass) {
 			IndexedClass result = new IndexedClass(elkClass);
 			indexedClassExpressionLookup.put(elkClass, result);
 			indexedClassCount++;
 			return result;
+		}
+
+		public IndexedObjectProperty visit(ElkObjectProperty elkObjectProperty) {
+			IndexedObjectProperty result = new IndexedObjectProperty(
+					elkObjectProperty);
+			indexedObjectPropertyLookup.put(elkObjectProperty, result);
+			return result;
+		}
+	}
+
+	private final IndexedEntityCreator indexedEntityCreator = new IndexedEntityCreator();
+
+	private class IndexedClassExpressionCreator implements
+			ElkClassExpressionVisitor<IndexedClassExpression> {
+		public IndexedClass visit(ElkClass elkClass) {
+			return indexedEntityCreator.visit(elkClass);
 		}
 
 		public IndexedClassExpression visit(
@@ -188,7 +233,7 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 			for (ElkClassExpression c : elkObjectIntersectionOf
 					.getClassExpressions()) {
-				IndexedClassExpression ice = getIndexed(c);
+				IndexedClassExpression ice = getIndexedClassExpression(c);
 				if (ice == null)
 					ice = c.accept(this);
 				conjuncts.add(ice);
@@ -229,13 +274,13 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 		public IndexedClassExpression visit(
 				ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-			IndexedObjectProperty relation = getIndexed(elkObjectSomeValuesFrom
+			IndexedObjectProperty relation = getIndexedObjectPropertyExpression(elkObjectSomeValuesFrom
 					.getObjectPropertyExpression());
 			if (relation == null)
 				relation = createIndexed(elkObjectSomeValuesFrom
 						.getObjectPropertyExpression());
 
-			IndexedClassExpression filler = getIndexed(elkObjectSomeValuesFrom
+			IndexedClassExpression filler = getIndexedClassExpression(elkObjectSomeValuesFrom
 					.getClassExpression());
 			if (filler == null)
 				filler = createIndexed(elkObjectSomeValuesFrom
@@ -247,20 +292,22 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 			indexedClassExpressionLookup.put(elkObjectSomeValuesFrom, result);
 			return result;
 		}
-	};
+	}
 
-	private final ElkObjectPropertyExpressionVisitor<IndexedObjectProperty> indexedObjectPropertyCreator = new ElkObjectPropertyExpressionVisitor<IndexedObjectProperty>() {
+	private final IndexedClassExpressionCreator indexedClassExpressionCreator = new IndexedClassExpressionCreator();
+
+	private class IndexedObjectPropertyCreator implements
+			ElkObjectPropertyExpressionVisitor<IndexedObjectProperty> {
 
 		public IndexedObjectProperty visit(ElkObjectProperty elkObjectProperty) {
-			IndexedObjectProperty result = new IndexedObjectProperty(
-					elkObjectProperty);
-			indexedObjectPropertyLookup.put(elkObjectProperty, result);
-			return result;
+			return indexedEntityCreator.visit(elkObjectProperty);
 		}
 
 		public IndexedObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
 			throw new UnsupportedOperationException();
 		}
 	};
+
+	private final IndexedObjectPropertyCreator indexedObjectPropertyCreator = new IndexedObjectPropertyCreator();
 
 }

@@ -47,13 +47,20 @@ import org.semanticweb.elk.util.HashGenerator;
  * @author Markus Kroetzsch
  */
 abstract public class IndexedClassExpression {
-	
+
 	protected final List<ElkClassExpression> representatives;
-	
+
 	protected List<IndexedClassExpression> toldSuperClassExpressions;
 	protected Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
 	protected List<IndexedObjectSomeValuesFrom> negExistentials;
-	
+
+	// TODO: some of the occurrence counters are relevant only for subclasses
+
+	/**
+	 * This counts how often this object occurred in the ontology.
+	 */
+	protected int occurrenceNo = 0;
+
 	/**
 	 * This counts how often this object occurred positively. Some indexing
 	 * operations are only needed when encountering objects positively for the
@@ -67,65 +74,62 @@ abstract public class IndexedClassExpression {
 	 * first time.
 	 */
 	protected int negativeOccurrenceNo = 0;
-	
-	
+
 	protected IndexedClassExpression(List<ElkClassExpression> representatives) {
 		this.representatives = representatives;
 	}
-	
-	
+
+	public boolean occurs() {
+		return occurrenceNo > 0;
+	}
+
 	public boolean occursNegatively() {
 		return negativeOccurrenceNo > 0;
 	}
-	
+
 	public boolean occursPositively() {
 		return positiveOccurrenceNo > 0;
 	}
 
-	
 	/**
-	 * @return All told super class expressions of this class expression, possibly null.
+	 * @return All told super class expressions of this class expression,
+	 *         possibly null.
 	 */
 	public List<IndexedClassExpression> getToldSuperClassExpressions() {
 		return toldSuperClassExpressions;
 	}
-	
-	
+
 	/**
-	 * @return Indexed conjunctions that occur negatively and contain this class expression,
-	 *  indexed by the second conjunct, possibly null.
+	 * @return Indexed conjunctions that occur negatively and contain this class
+	 *         expression, indexed by the second conjunct, possibly null.
 	 */
 	public Map<IndexedClassExpression, IndexedObjectIntersectionOf> getNegConjunctionsByConjunct() {
 		return negConjunctionsByConjunct;
 	}
 
-
 	/**
-	 * @return Indexed existentials that occur negatively and have this class expression as the filler, possibly null.
+	 * @return Indexed existentials that occur negatively and have this class
+	 *         expression as the filler, possibly null.
 	 */
 	public List<IndexedObjectSomeValuesFrom> getNegExistentials() {
 		return negExistentials;
 	}
 
-	
-	
-	
 	protected void addRepresentative(ElkClassExpression classExpression) {
 		representatives.add(classExpression);
 	}
-	
+
 	protected List<ElkClassExpression> getRepresentantatives() {
 		return representatives;
 	}
-	
-	
+
 	protected void addToldSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		if (toldSuperClassExpressions == null)
 			toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(1);
 		toldSuperClassExpressions.add(superClassExpression);
 	}
-	
+
 	protected boolean removeToldSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		boolean success = false;
@@ -136,16 +140,17 @@ abstract public class IndexedClassExpression {
 		}
 		return success;
 	}
-	
+
 	protected void addNegConjunctionByConjunct(
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
 		if (negConjunctionsByConjunct == null)
 			// TODO possibly replace by ArrayHashMap when it supports removal
-			negConjunctionsByConjunct = new HashMap<IndexedClassExpression, IndexedObjectIntersectionOf> (4);
+			negConjunctionsByConjunct = new HashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
+					4);
 		negConjunctionsByConjunct.put(conjunct, conjunction);
 	}
-	
+
 	protected boolean removeNegConjunctionByConjunct(
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
@@ -158,14 +163,14 @@ abstract public class IndexedClassExpression {
 		return success;
 	}
 
-	
 	protected void addNegExistential(IndexedObjectSomeValuesFrom existential) {
 		if (negExistentials == null)
-			negExistentials = new ArrayList<IndexedObjectSomeValuesFrom> (1);
+			negExistentials = new ArrayList<IndexedObjectSomeValuesFrom>(1);
 		negExistentials.add(existential);
 	}
-	
-	protected boolean removeNegExistential(IndexedObjectSomeValuesFrom existential) {
+
+	protected boolean removeNegExistential(
+			IndexedObjectSomeValuesFrom existential) {
 		boolean success = false;
 		if (negExistentials != null) {
 			success = negExistentials.remove(existential);
@@ -175,41 +180,34 @@ abstract public class IndexedClassExpression {
 		return success;
 	}
 
-	
-	protected final AtomicReference<SaturatedClassExpression> saturated =
-		new AtomicReference<SaturatedClassExpression> ();
-	
-	
+	protected final AtomicReference<SaturatedClassExpression> saturated = new AtomicReference<SaturatedClassExpression>();
+
 	/**
-	 * @return The corresponding saturated object property, 
-	 * null if none was assigned.
+	 * @return The corresponding saturated object property, null if none was
+	 *         assigned.
 	 */
 	public SaturatedClassExpression getSaturated() {
 		return saturated.get();
 	}
-	
-	
+
 	/**
-	 * Sets the corresponding saturated class expression if none
-	 * was yet assigned. 
+	 * Sets the corresponding saturated class expression if none was yet
+	 * assigned.
 	 * 
-	 * @return True if the operation succeeded. 
+	 * @return True if the operation succeeded.
 	 */
-	public boolean setSaturated(SaturatedClassExpression saturatedClassExpression) {
+	public boolean setSaturated(
+			SaturatedClassExpression saturatedClassExpression) {
 		return saturated.compareAndSet(null, saturatedClassExpression);
 	}
-	
-	
+
 	/**
-	 * Resets the corresponding saturated object property to null.  
+	 * Resets the corresponding saturated object property to null.
 	 */
 	public void resetSaturated() {
 		saturated.set(null);
 	}
 
-
-	
-	
 	/** Hash code for this object. */
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
 

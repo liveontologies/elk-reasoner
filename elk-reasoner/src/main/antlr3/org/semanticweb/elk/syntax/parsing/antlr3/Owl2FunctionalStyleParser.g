@@ -49,6 +49,8 @@ import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;  
 import org.semanticweb.elk.syntax.ElkClassAxiom;
 import org.semanticweb.elk.syntax.ElkClassExpression;
+import org.semanticweb.elk.syntax.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.ElkEntity;
 import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
@@ -129,7 +131,7 @@ fullIri returns [String value]
     /* See IRI_REF in [SPARQL] */
 iri returns [String value]
     : x = fullIri          { $value = $x.value; }
-    | x = abbreviatedIri   { $value = $x.value; }
+    | y = abbreviatedIri   { $value = $y.value; }
     ;
 /* a finite sequence of characters matching the PNAME_LN production of 
 * [SPARQL] 
@@ -301,13 +303,16 @@ literal
         )
     ; 
 /* 5.8 Entity Declarations and Typing */    
-declaration 
-    : DECLARATION OPEN_BRACE axiomAnnotations entity CLOSE_BRACE
+declaration returns [Future<? extends ElkDeclarationAxiom> value]
+    : DECLARATION OPEN_BRACE axiomAnnotations x = entity CLOSE_BRACE
+      { $value = constructor.getFutureElkDeclarationAxiom($x.value); }
     ;
-entity 
-    : CLASS OPEN_BRACE clazz CLOSE_BRACE 
+entity returns [Future<? extends ElkEntity> value]
+    : CLASS OPEN_BRACE x = clazz CLOSE_BRACE 
+      { $value = $x.value; }
     | DATATYPE OPEN_BRACE datatype CLOSE_BRACE
-    | OBJECT_PROPERTY OPEN_BRACE objectProperty CLOSE_BRACE
+    | OBJECT_PROPERTY OPEN_BRACE z = objectProperty CLOSE_BRACE 
+      { $value = $z.value; }
     | DATA_PROPERTY OPEN_BRACE dataProperty CLOSE_BRACE
     | ANNOTATION_PROPERTY OPEN_BRACE annotationProperty CLOSE_BRACE
     | NAMED_INDIVIDUAL OPEN_BRACE namedIndividual CLOSE_BRACE
@@ -599,7 +604,7 @@ objectPropertyAxiom returns [Future<? extends ElkObjectPropertyAxiom> value]
     | irreflexiveObjectProperty 
     | symmetricObjectProperty 
     | asymmetricObjectProperty 
-    | y = transitiveObjectProperty		{ $value = $x.value; }
+    | y = transitiveObjectProperty		{ $value = $y.value; }
     ;
 /* 9.2.1 Object Subproperties */
 subObjectPropertyOf returns [Future<? extends ElkSubObjectPropertyOfAxiom> value]
