@@ -73,8 +73,10 @@ public class ClassTaxonomyComputation
 		linker.waitCompletion();
 		
 		for (ClassNode node : classTaxonomy.getNodes())
-			if (node.getChildren().isEmpty() && node != bottomNode)
+			if (node.getChildren().isEmpty() && node != bottomNode) {
 				node.addChild(bottomNode);
+				bottomNode.addParent(node);
+			}
 		
 		return classTaxonomy;
 	}
