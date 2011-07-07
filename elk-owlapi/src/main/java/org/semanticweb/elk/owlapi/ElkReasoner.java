@@ -209,8 +209,12 @@ public class ElkReasoner implements OWLReasoner {
 		isClassified = true;
 	}
 
-	ClassNode getElkClassNode(ElkClass cls) {
-		return reasoner.getTaxonomy().getNode(cls);
+	ClassNode getDirectElkClassNode(ElkClass cls) {
+		return reasoner.getDirectTaxonomy().getNode(cls);
+	}
+	
+	ClassNode getTransitiveElkClassNode(ElkClass cls) {
+		return reasoner.getTransitiveTaxonomy().getNode(cls);
 	}
 
 	/* Methods required by the OWLReasoner interface */
@@ -227,7 +231,7 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	public Node<OWLClass> getBottomClassNode() {
-		return Converter.convert(getElkClassNode(ElkClass.ELK_OWL_NOTHING));
+		return Converter.convert(getDirectElkClassNode(ElkClass.ELK_OWL_NOTHING));
 	}
 
 	public Node<OWLDataProperty> getBottomDataPropertyNode() {
@@ -298,7 +302,7 @@ public class ElkReasoner implements OWLReasoner {
 			ReasonerInterruptedException, TimeOutException {
 		if (ce.isAnonymous())
 			return null;
-		return Converter.convert(getElkClassNode(Converter.convert(ce
+		return Converter.convert(getDirectElkClassNode(Converter.convert(ce
 				.asOWLClass())));
 	}
 
@@ -431,9 +435,14 @@ public class ElkReasoner implements OWLReasoner {
 			ClassExpressionNotInProfileException {
 		if (ce.isAnonymous())
 			return null;
-		// TODO take direct into account
-		return Converter.convert(getElkClassNode(
-				Converter.convert(ce.asOWLClass())).getChildren());
+
+		ElkClass elkClass = Converter.convert(ce.asOWLClass());
+		
+		ClassNode elkClassNode = (direct) ? 
+				getDirectElkClassNode(elkClass) : 
+				getTransitiveElkClassNode(elkClass);
+				
+		return Converter.convert(elkClassNode.getChildren());
 	}
 
 	public NodeSet<OWLDataProperty> getSubDataProperties(OWLDataProperty arg0,
@@ -458,9 +467,14 @@ public class ElkReasoner implements OWLReasoner {
 			ReasonerInterruptedException, TimeOutException {
 		if (ce.isAnonymous())
 			return null;
-		// TODO take direct into account
-		return Converter.convert(getElkClassNode(
-				Converter.convert(ce.asOWLClass())).getParents());
+
+		ElkClass elkClass = Converter.convert(ce.asOWLClass());
+		
+		ClassNode elkClassNode = (direct) ? 
+				getDirectElkClassNode(elkClass) : 
+				getTransitiveElkClassNode(elkClass);
+				
+		return Converter.convert(elkClassNode.getParents());
 	}
 
 	public NodeSet<OWLDataProperty> getSuperDataProperties(
@@ -490,7 +504,7 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	public Node<OWLClass> getTopClassNode() {
-		return Converter.convert(getElkClassNode(ElkClass.ELK_OWL_THING));
+		return Converter.convert(getDirectElkClassNode(ElkClass.ELK_OWL_THING));
 	}
 
 	public Node<OWLDataProperty> getTopDataPropertyNode() {
@@ -519,7 +533,7 @@ public class ElkReasoner implements OWLReasoner {
 	public Node<OWLClass> getUnsatisfiableClasses()
 			throws ReasonerInterruptedException, TimeOutException,
 			InconsistentOntologyException {
-		return Converter.convert(getElkClassNode(ElkClass.ELK_OWL_NOTHING));
+		return Converter.convert(getDirectElkClassNode(ElkClass.ELK_OWL_NOTHING));
 	}
 
 	public void interrupt() {
@@ -571,7 +585,7 @@ public class ElkReasoner implements OWLReasoner {
 			return true;
 		else {
 			OWLClassNode botNode = Converter
-					.convert(getElkClassNode(ElkClass.ELK_OWL_NOTHING));
+					.convert(getDirectElkClassNode(ElkClass.ELK_OWL_NOTHING));
 			return (!botNode.contains(classExpression.asOWLClass()));
 		}
 	}

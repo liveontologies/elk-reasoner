@@ -57,7 +57,8 @@ public class Reasoner {
 
 	protected final ElkAxiomProcessor axiomInserter, axiomDeleter;
 
-	protected ClassTaxonomy classTaxonomy;
+	protected ClassTaxonomy directClassTaxonomy;
+	protected ClassTaxonomy transitiveClassTaxonomy;
 
 	// logger for events
 	protected final static Logger LOGGER_ = Logger.getLogger(Reasoner.class);
@@ -180,33 +181,51 @@ public class Reasoner {
 		Statistics.logOperationFinish("Saturation", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 
-		// Transitive reduction stage
+		// Reduction stage
+		directClassTaxonomy = computeTaxonomy(progressMonitor, maxIndexedClassCount, true);
+		transitiveClassTaxonomy = computeTaxonomy(progressMonitor, maxIndexedClassCount, 
+				false);
+	}
+
+	private ClassTaxonomy computeTaxonomy(ProgressMonitor progressMonitor, 
+			int maxIndexedClassCount, boolean direct) {
+		
+		int progress = 0;
+		String kind = direct ? "direct" : "transitive";
+		
 		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Transitive reduction using " + workerNo + " workers");
-		Statistics.logOperationStart("Transitive reduction", LOGGER_);
-		progressMonitor.start("Transitive reduction");
+			LOGGER_.info("Computing taxonomy (" + kind + ") using " + workerNo + " workers");
+
+		Statistics.logOperationStart("Computing taxonomy (" + kind + ")", LOGGER_);
+		progressMonitor.start("Computing taxonomy (" + kind + ")");
 
 		ClassTaxonomyComputation classification = new ClassTaxonomyComputation(
-				executor, workerNo);
-		progress = 0;
+				executor, workerNo, direct);
+
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
 			classification.submit(ic);
 			progressMonitor.report(++progress, maxIndexedClassCount);
 		}
 
-		classTaxonomy = classification.computeTaxonomy();
+		ClassTaxonomy taxonomy = classification.computeTaxonomy();
 
 		progressMonitor.finish();
-		Statistics.logOperationFinish("Transitive reduction", LOGGER_);
+		Statistics.logOperationFinish("Computing taxonomy (" + kind + ")", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
+		
+		return taxonomy;
 	}
 
 	public void classify() {
 		classify(new DummyProgressMonitor());
 	}
 
-	public ClassTaxonomy getTaxonomy() {
-		return classTaxonomy;
+	public ClassTaxonomy getDirectTaxonomy() {
+		return directClassTaxonomy;
+	}
+	
+	public ClassTaxonomy getTransitiveTaxonomy() {
+		return transitiveClassTaxonomy;
 	}
 
 	public void writeTaxonomyToFile(File file) throws IOException {
@@ -214,7 +233,7 @@ public class Reasoner {
 			LOGGER_.info("Writing taxonomy to " + file);
 		}
 		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
-		ClassTaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
+		ClassTaxonomyPrinter.dumpClassTaxomomyToFile(this.getDirectTaxonomy(),
 				file.getPath(), true);
 		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
 	}

@@ -68,7 +68,7 @@ public class ReasonerTest extends TestCase {
 				.get();
 
 		reasoner.classify();
-		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+		ClassTaxonomy taxonomy = reasoner.getDirectTaxonomy();
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
@@ -114,7 +114,7 @@ public class ReasonerTest extends TestCase {
 
 		reasoner.classify();
 
-		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+		ClassTaxonomy taxonomy = reasoner.getDirectTaxonomy();
 		ClassNode aNode = taxonomy.getNode(a.get());
 
 		assertTrue("A contains A", aNode.getMembers().contains(a.get()));
@@ -126,5 +126,52 @@ public class ReasonerTest extends TestCase {
 				aNode.getParents().contains(taxonomy.getNode(d.get())));
 		assertTrue("A contains E",
 				aNode.getParents().contains(taxonomy.getNode(e.get())));
+	}
+	
+	public void testAncestors() throws InterruptedException,
+			ExecutionException, ParseException, IOException {
+
+		final Reasoner reasoner = new Reasoner();
+		reasoner.loadOntologyFromString("Ontology(" 
+				+ "SubClassOf(:A :B)"
+				+ "SubClassOf(:A :C)" 
+				+ "SubClassOf(:B :D)" 
+				+ "SubClassOf(:C :D))");
+
+		Future<ElkClass> a = constructor.getFutureElkClass(":A");
+		Future<ElkClass> b = constructor.getFutureElkClass(":B");
+		Future<ElkClass> c = constructor.getFutureElkClass(":C");
+		Future<ElkClass> d = constructor.getFutureElkClass(":D");
+
+		OntologyIndex index = reasoner.ontologyIndex;
+
+		IndexedClassExpression A = index.getIndexedClassExpression(a.get());
+		IndexedClassExpression B = index.getIndexedClassExpression(b.get());
+		IndexedClassExpression C = index.getIndexedClassExpression(c.get());
+		IndexedClassExpression D = index.getIndexedClassExpression(d.get());
+
+		assertTrue("A SubClassOf B",
+				A.getToldSuperClassExpressions().contains(B));
+		assertTrue("A SubClassOf C",
+				A.getToldSuperClassExpressions().contains(C));
+		assertTrue("C SubClassOf D",
+				C.getToldSuperClassExpressions().contains(D));
+		assertTrue("B SubClassOf D",
+				B.getToldSuperClassExpressions().contains(D));
+
+		reasoner.classify();
+
+		ClassTaxonomy taxonomy = reasoner.getTransitiveTaxonomy();
+		ClassNode aNode = taxonomy.getNode(a.get());
+
+		assertTrue("A contains A", aNode.getMembers().contains(a.get()));
+		assertTrue("A contains B",
+				aNode.getParents().contains(taxonomy.getNode(b.get())));
+		assertTrue("A contains C",
+				aNode.getParents().contains(taxonomy.getNode(c.get())));
+		assertTrue("A contains D",
+				aNode.getParents().contains(taxonomy.getNode(d.get())));
+		assertEquals("A has exactly three parents", 3,
+				aNode.getParents().size());
 	}
 }
