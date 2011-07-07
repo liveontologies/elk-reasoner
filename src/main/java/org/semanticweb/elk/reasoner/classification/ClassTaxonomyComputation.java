@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.classification;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +40,14 @@ import org.semanticweb.elk.util.AbstractConcurrentComputation;
 public class ClassTaxonomyComputation
 	extends AbstractConcurrentComputation<IndexedClass> {
 
+	private enum HashCodeComparator implements Comparator<IndexedClass> {
+		INSTANCE;
+		
+		public int compare(IndexedClass o1, IndexedClass o2) {
+			return o1.hashCode() - o2.hashCode();
+		}
+	}
+	
 	protected final ConcurrentClassTaxonomy classTaxonomy;
 	
 	protected final static Logger logger = Logger.getLogger(Reasoner.class);
@@ -47,11 +56,13 @@ public class ClassTaxonomyComputation
 	
 	private final Linker linker;
 	
+	private final boolean direct;
 	
-	public ClassTaxonomyComputation(ExecutorService executor, int maxWorkers) {
+	public ClassTaxonomyComputation(ExecutorService executor, int maxWorkers, boolean direct) {
 		super(executor, maxWorkers, 256, 512);
 		this.classTaxonomy = new ConcurrentClassTaxonomy();
 		this.linker = new Linker();
+		this.direct = direct;
 	}
 	
 	
@@ -91,13 +102,15 @@ public class ClassTaxonomyComputation
 		List<ElkClass> equivalent = new ArrayList<ElkClass>();
 		List<IndexedClass> parents = new LinkedList<IndexedClass> ();
 
-		for (IndexedClassExpression superClassExpression : root.getSaturated().getSuperClassExpressions())
+		for (IndexedClassExpression superClassExpression : root.getSaturated().getSuperClassExpressions()) {
 			if (superClassExpression instanceof IndexedClass) {
 				IndexedClass superClass = (IndexedClass) superClassExpression;
 				
-				if (superClass.getSaturated().getSuperClassExpressions().contains(root))
+				if (superClass.getSaturated().getSuperClassExpressions().contains(root)) {
 					equivalent.add(superClass.getElkClass());
-				else {
+				} else if (!direct) {
+					parents.add(superClass);
+				} else {
 					boolean addThis = true;
 					Iterator<IndexedClass> i = parents.iterator();
 					while (i.hasNext()) {
@@ -115,6 +128,26 @@ public class ClassTaxonomyComputation
 					}
 				}
 			}
+		}
+		
+		if (!direct) {
+			// Remove duplicate ancestors
+			Collections.sort(parents, HashCodeComparator.INSTANCE);
+			
+			Iterator<IndexedClass> i = parents.iterator();
+			IndexedClass last = null;
+			while (i.hasNext()) {
+				IndexedClass current = i.next();
+				if (current == null) {
+					i.remove();
+					logger.error("null item removed from parent list");
+				} else if (current.equals(last)) {
+					i.remove();
+				} else {
+					last = current;
+				}
+			}
+		}
 		
 		ElkClass rootElkClass = root.getElkClass(); 
 		for (ElkClass ec : equivalent)
