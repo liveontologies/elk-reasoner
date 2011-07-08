@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owlapi</artifactId>
-			<version>${parent.version}</version>
+			<version>${project.parent.version}</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
@@ -55,6 +55,9 @@
 					<instructions>
 						<Export-Package>org.semanticweb.elk.protege</Export-Package>
 						<Private-Package>org.semanticweb.elk.*</Private-Package>
+						<Implementation-Title>${project.parent.name}</Implementation-Title>
+						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
 						<Bundle-SymbolicName>${project.artifactId};singleton:=true</Bundle-SymbolicName>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Import-Package>!joptsimple,!org.antlr.runtime,*</Import-Package>
