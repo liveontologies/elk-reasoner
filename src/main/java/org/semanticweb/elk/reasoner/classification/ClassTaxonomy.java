@@ -66,7 +66,7 @@ public abstract class ClassTaxonomy implements StructuralHashObject {
 		for (ClassNode classNode : getNodes()) {
 			int memberHash = HashGenerator.combineMultisetHash(true, classNode
 					.getMembers());
-			for (ClassNode o : classNode.getChildren()) {
+			for (ClassNode o : classNode.getDirectSubNodes()) {
 				int subMemberHash = HashGenerator.combineMultisetHash(true, o
 						.getMembers());
 				int subClassAxiomHash = HashGenerator.combineListHash(
@@ -95,7 +95,7 @@ public abstract class ClassTaxonomy implements StructuralHashObject {
 		for (ClassNode classNode : getNodes()) {
 			int memberHash = HashGenerator.combineMultisetHash(true, classNode
 					.getMembers());
-			for (ClassNode o : classNode.getParents()) {
+			for (ClassNode o : classNode.getDirectSuperNodes()) {
 				int superMemberHash = HashGenerator.combineMultisetHash(true, o
 						.getMembers());
 				int subClassAxiomHash = HashGenerator.combineListHash(

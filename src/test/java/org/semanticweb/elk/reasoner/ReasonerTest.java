@@ -68,7 +68,7 @@ public class ReasonerTest extends TestCase {
 				.get();
 
 		reasoner.classify();
-		ClassTaxonomy taxonomy = reasoner.getDirectTaxonomy();
+		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
@@ -77,8 +77,8 @@ public class ReasonerTest extends TestCase {
 
 		assertTrue("R subrole S", R.getToldSuperObjectProperties().contains(S));
 		assertTrue("S superrole R", S.getToldSubObjectProperties().contains(R));
-		assertTrue("A contains D",
-				taxonomy.getNode(a).getParents().contains(taxonomy.getNode(d)));
+		assertTrue("A contains D", taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(d)));
 	}
 
 	public void testConjunctions() throws InterruptedException,
@@ -114,28 +114,26 @@ public class ReasonerTest extends TestCase {
 
 		reasoner.classify();
 
-		ClassTaxonomy taxonomy = reasoner.getDirectTaxonomy();
+		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(a.get());
 
 		assertTrue("A contains A", aNode.getMembers().contains(a.get()));
 		assertTrue("A contains B",
-				aNode.getParents().contains(taxonomy.getNode(b.get())));
+				aNode.getDirectSuperNodes().contains(taxonomy.getNode(b.get())));
 		assertTrue("A contains C",
-				aNode.getParents().contains(taxonomy.getNode(c.get())));
+				aNode.getDirectSuperNodes().contains(taxonomy.getNode(c.get())));
 		assertTrue("A contains D",
-				aNode.getParents().contains(taxonomy.getNode(d.get())));
+				aNode.getDirectSuperNodes().contains(taxonomy.getNode(d.get())));
 		assertTrue("A contains E",
-				aNode.getParents().contains(taxonomy.getNode(e.get())));
+				aNode.getDirectSuperNodes().contains(taxonomy.getNode(e.get())));
 	}
-	
+
 	public void testAncestors() throws InterruptedException,
 			ExecutionException, ParseException, IOException {
 
 		final Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString("Ontology(" 
-				+ "SubClassOf(:A :B)"
-				+ "SubClassOf(:A :C)" 
-				+ "SubClassOf(:B :D)" 
+		reasoner.loadOntologyFromString("Ontology(" + "SubClassOf(:A :B)"
+				+ "SubClassOf(:A :C)" + "SubClassOf(:B :D)"
 				+ "SubClassOf(:C :D))");
 
 		Future<ElkClass> a = constructor.getFutureElkClass(":A");
@@ -161,17 +159,26 @@ public class ReasonerTest extends TestCase {
 
 		reasoner.classify();
 
-		ClassTaxonomy taxonomy = reasoner.getTransitiveTaxonomy();
+		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(a.get());
+		ClassNode bNode = taxonomy.getNode(b.get());
 
 		assertTrue("A contains A", aNode.getMembers().contains(a.get()));
-		assertTrue("A contains B",
-				aNode.getParents().contains(taxonomy.getNode(b.get())));
-		assertTrue("A contains C",
-				aNode.getParents().contains(taxonomy.getNode(c.get())));
-		assertTrue("A contains D",
-				aNode.getParents().contains(taxonomy.getNode(d.get())));
-		assertEquals("A has exactly three parents", 3,
-				aNode.getParents().size());
+		assertTrue("A direct subclass of B", aNode.getDirectSuperNodes()
+				.contains(taxonomy.getNode(b.get())));
+		assertTrue("A direct subclass of C", aNode.getDirectSuperNodes()
+				.contains(taxonomy.getNode(c.get())));
+		assertFalse("A not direct subclass of D", aNode.getDirectSuperNodes()
+				.contains(taxonomy.getNode(d.get())));
+		assertTrue("B direct subclass of D", bNode.getDirectSuperNodes()
+				.contains(taxonomy.getNode(d.get())));
+		assertTrue("A indirect subclass of B", aNode.getDirectSuperNodes()
+				.contains(taxonomy.getNode(b.get())));
+		assertTrue("A indirect subclass of D", aNode.getAllSuperNodes()
+				.contains(taxonomy.getNode(d.get())));
+		assertEquals("A has exactly two direct super-classes", 2, aNode
+				.getDirectSuperNodes().size());
+		assertEquals("A has exactly four super-classes: B, C, D and owl:Thing",
+				4, aNode.getAllSuperNodes().size());
 	}
 }
