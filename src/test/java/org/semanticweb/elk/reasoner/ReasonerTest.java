@@ -28,7 +28,6 @@ import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
-import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassNode;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
@@ -38,6 +37,7 @@ import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.FutureElkObjectFactory;
 import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.parsing.javacc.ParseException;
 
 public class ReasonerTest extends TestCase {
 

@@ -35,8 +35,8 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.syntax.parsing.javacc.ParseException;
 
 /**
  * 

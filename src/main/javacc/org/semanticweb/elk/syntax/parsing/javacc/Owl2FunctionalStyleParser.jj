@@ -39,7 +39,7 @@ options
 
 PARSER_BEGIN(Owl2FunctionalStyleParser)
 
-package org.semanticweb.elk.parser.javacc;
+package org.semanticweb.elk.syntax.parsing.javacc;
 
 import java.util.Vector;
 import java.util.concurrent.Future;
