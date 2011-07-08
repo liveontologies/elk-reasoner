@@ -75,7 +75,8 @@ public class Reasoner {
 	}
 
 	public Reasoner() {
-		this(Executors.newCachedThreadPool(), 16);
+		this(Executors.newCachedThreadPool(), 2 * Runtime.getRuntime()
+				.availableProcessors());
 	}
 
 	public void loadOntologyFromStream(InputStream stream,
