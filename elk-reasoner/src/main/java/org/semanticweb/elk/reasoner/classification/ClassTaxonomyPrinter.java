@@ -131,7 +131,7 @@ public class ClassTaxonomyPrinter {
 							elkClassMember);
 				}
 			}
-			for (ClassNode classNodeChild : classNode.getChildren()) {
+			for (ClassNode classNodeChild : classNode.getDirectSubNodes()) {
 				ElkClass firstClass = firstElkClasses.get(classNodeChild
 						.getCanonicalMember());
 				orderedSubClasses.put(firstClass.toString(), firstClass);

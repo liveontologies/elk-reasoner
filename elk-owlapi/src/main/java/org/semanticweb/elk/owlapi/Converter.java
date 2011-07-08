@@ -4,7 +4,6 @@
 package org.semanticweb.elk.owlapi;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.classification.ClassNode;
@@ -142,7 +141,7 @@ public class Converter {
 		return new OWLClassNode(owlClasses);
 	}
 	
-	public static OWLClassNodeSet convert(List<ClassNode> nodes) {
+	public static OWLClassNodeSet convert(Iterable<ClassNode> nodes) {
 		Set<Node<OWLClass>> owlNodes = new HashSet<Node<OWLClass>>();
 		for (ClassNode node : nodes) {
 			owlNodes.add(convert(node));					

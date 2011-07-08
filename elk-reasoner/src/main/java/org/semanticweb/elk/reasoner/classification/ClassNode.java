@@ -29,9 +29,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.util.ArrayHashSet;
 import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.StructuralHashObject;
 
@@ -45,22 +48,22 @@ import org.semanticweb.elk.util.StructuralHashObject;
  * @author Yevgeny Kazakov
  */
 public class ClassNode implements StructuralHashObject {
-
+	// TODO: return members, sub-nodes and super-nodes in the methods as sets
 	/**
-	 * Members are ElkClass objects that are equivalent.
+	 * Equivalent ElkClass objects that are representatives of this node.
 	 */
 	final List<ElkClass> members;
 	/**
-	 * Parents are ElkClass objects that are immediate superclasses to the
-	 * members without being equivalent.
+	 * ElkClass nodes whose members are direct super-classes of the members of
+	 * this node.
 	 */
-	final List<ClassNode> parents;
+	final List<ClassNode> directSuperNodes;
 	/**
-	 * Children are ElkClass objects that are immediate subclasses to the
-	 * members without being equivalent.
+	 * ElkClass nodes whose members are direct sub-classes of the members of
+	 * this node.
 	 */
-	final List<ClassNode> children;
-	
+	final List<ClassNode> directSubNodes;
+
 	List<IndexedClass> parentIndexClasses;
 
 	/**
@@ -71,34 +74,35 @@ public class ClassNode implements StructuralHashObject {
 	 */
 	public ClassNode(final List<ElkClass> equivalent) {
 		this.members = equivalent;
-		this.children = new LinkedList<ClassNode>();
-		this.parents = new ArrayList<ClassNode>();
-	}
-
-
-	/**
-	 * Add a parent node.
-	 * 
-	 * @param parent node to add
-	 */
-	void addParent(ClassNode parent) {
-		parents.add(parent);
+		this.directSubNodes = new ArrayList<ClassNode>();
+		this.directSuperNodes = new ArrayList<ClassNode>();
 	}
 
 	/**
-	 * Add a child node.
+	 * Add a direct super-class node. This method is not thread safe.
 	 * 
-	 * @param child node to add
+	 * @param superNode
+	 *            node to add
 	 */
-	synchronized void addChild(ClassNode child) {
-		children.add(child);
+	void addDirectSuperNode(ClassNode superNode) {
+		directSuperNodes.add(superNode);
+	}
+
+	/**
+	 * Add a direct sub-class node. This method is thread safe.
+	 * 
+	 * @param subNode
+	 *            node to add
+	 */
+	synchronized void addDirectSubNode(ClassNode subNode) {
+		directSubNodes.add(subNode);
 	}
 
 	/**
 	 * Get an unmodifiable list of ElkClass objects that this ClassNode
 	 * represents.
 	 * 
-	 * @return list of equivalent ElkClass objects
+	 * @return collection of equivalent ElkClass objects
 	 */
 	public List<ElkClass> getMembers() {
 		return Collections.unmodifiableList(members);
@@ -115,41 +119,100 @@ public class ClassNode implements StructuralHashObject {
 	}
 
 	/**
-	 * Get an unmodifiable list of ElkClass objects that are direct parents of
-	 * this ClassNode in the class hierarchy.
+	 * Get an unmodifiable list of nodes for ElkClass objects that are direct
+	 * sub-classes of this ClassNode.
 	 * 
-	 * @return list of direct parent classes
+	 * @return list of nodes for direct super-classes of this node members
 	 */
-	public List<ClassNode> getParents() {
-		return Collections.unmodifiableList(parents);
+	public List<ClassNode> getDirectSuperNodes() {
+		return Collections.unmodifiableList(directSuperNodes);
 	}
 
 	/**
-	 * Get an unmodifiable list of ElkClass objects that are direct children of
-	 * this ClassNode in the class hierarchy.
+	 * Computes an unmodifiable set of nodes for ElkClass objects that are
+	 * (possibly indirect) super-classes of members of this ClassNode. This is
+	 * the smallest set of nodes that contains all direct super-nodes of this
+	 * node, and all direct super-nodes of every node in this set.
 	 * 
-	 * @return list of direct child classes
+	 * @return set of nodes for sub-classes of this node members
 	 */
-	public List<ClassNode> getChildren() {
-		return Collections.unmodifiableList(children);
+	public Set<ClassNode> getAllSuperNodes() {
+		Set<ClassNode> result = new ArrayHashSet<ClassNode>();
+		Queue<ClassNode> todo = new LinkedList<ClassNode>();
+		todo.add(this);
+		for (;;) {
+			ClassNode next = todo.poll();
+			if (next == null)
+				break;
+			for (ClassNode nextSuperNode : next.getDirectSuperNodes()) {
+				result.add(nextSuperNode);
+				todo.add(nextSuperNode);
+			}
+		}
+		return Collections.unmodifiableSet(result);
+	}
+
+	/**
+	 * Get an unmodifiable list of nodes for ElkClass objects that are direct
+	 * super-classes of this ClassNode.
+	 * 
+	 * @return list of nodes for direct sub-classes of this node members
+	 */
+	public List<ClassNode> getDirectSubNodes() {
+		return Collections.unmodifiableList(directSubNodes);
+	}
+
+	/**
+	 * Computes an unmodifiable set of nodes for ElkClass objects that are
+	 * (possibly indirect) sub-classes of members of this ClassNode. This is the
+	 * smallest set of nodes that contains all direct sub-nodes of this node,
+	 * and all direct sub-nodes of every node in this set.
+	 * 
+	 * @return set of nodes for sub-classes of this node members
+	 */
+	public Set<ClassNode> getAllSubNodes() {
+		Set<ClassNode> result = new ArrayHashSet<ClassNode>();
+		Queue<ClassNode> todo = new LinkedList<ClassNode>();
+		todo.add(this);
+		for (;;) {
+			ClassNode next = todo.poll();
+			if (next == null)
+				break;
+			for (ClassNode nextSubNode : next.getDirectSubNodes()) {
+				result.add(nextSubNode);
+				todo.add(nextSubNode);
+			}
+		}
+		return Collections.unmodifiableSet(result);
 	}
 
 	public int structuralHashCode() {
 		int memberHash = HashGenerator.combineMultisetHash(true, members);
-		
+
 		int subClassHash = "subClassOf".hashCode();
-		for (ClassNode o : children) {
-			int subMemberHash = HashGenerator.combineMultisetHash(true, o.getMembers());
-			subClassHash = HashGenerator.combineMultisetHash(false,subClassHash,subMemberHash);
-		}
-		
-		int superClassHash = "superClassOf".hashCode();
-		for (ClassNode o : parents) {
-			int superMemberHash = HashGenerator.combineMultisetHash(true, o.getMembers());
-			superClassHash = HashGenerator.combineMultisetHash(false,superClassHash,superMemberHash);
+		for (ClassNode o : directSubNodes) {
+			int subMemberHash = HashGenerator.combineMultisetHash(true,
+					o.getMembers());
+			subClassHash = HashGenerator.combineMultisetHash(false,
+					subClassHash, subMemberHash);
 		}
 
-		return HashGenerator.combineListHash(memberHash, subClassHash, superClassHash);
+		int superClassHash = "superClassOf".hashCode();
+		for (ClassNode o : directSuperNodes) {
+			int superMemberHash = HashGenerator.combineMultisetHash(true,
+					o.getMembers());
+			superClassHash = HashGenerator.combineMultisetHash(false,
+					superClassHash, superMemberHash);
+		}
+
+		return HashGenerator.combineListHash(memberHash, subClassHash,
+				superClassHash);
+	}
+
+	private final int hashCode_ = HashGenerator.generateNextHashCode();
+
+	public final int hashCode() {
+		return hashCode_;
 	}
 
 }
