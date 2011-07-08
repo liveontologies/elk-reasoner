@@ -32,8 +32,6 @@ import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
-import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
-import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.parsing.FutureElkAxiomConsumer;

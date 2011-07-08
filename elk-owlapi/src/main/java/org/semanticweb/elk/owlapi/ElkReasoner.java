@@ -393,7 +393,7 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	public String getReasonerName() {
-		return getClass().getPackage().getImplementationTitle();
+		return ElkReasoner.class.getPackage().getImplementationTitle();
 	}
 
 	public Version getReasonerVersion() {

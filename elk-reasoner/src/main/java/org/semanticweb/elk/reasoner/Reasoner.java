@@ -31,8 +31,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.parser.javacc.Owl2FunctionalStyleParser;
-import org.semanticweb.elk.parser.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomyComputation;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomyPrinter;
@@ -45,6 +43,8 @@ import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.parsing.ConcurrentFutureElkAxiomLoader;
+import org.semanticweb.elk.syntax.parsing.javacc.Owl2FunctionalStyleParser;
+import org.semanticweb.elk.syntax.parsing.javacc.ParseException;
 import org.semanticweb.elk.util.Statistics;
 
 public class Reasoner {

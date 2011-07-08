@@ -39,7 +39,7 @@ import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 public class ElkReasonerFactory implements OWLReasonerFactory {
 
 	public String getReasonerName() {
-		return getClass().getPackage().getImplementationTitle();
+		return ElkReasonerFactory.class.getPackage().getImplementationTitle();
 	}
 
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology) {

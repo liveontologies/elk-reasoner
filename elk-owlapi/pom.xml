@@ -28,4 +28,23 @@
 		</dependency>
 	</dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Implementation-Title>${project.parent.name}</Implementation-Title>
+							<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+							<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
