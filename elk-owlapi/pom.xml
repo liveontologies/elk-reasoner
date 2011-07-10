@@ -9,6 +9,7 @@
 	</parent>
 
 	<artifactId>elk-owlapi</artifactId>
+	<packaging>jar</packaging>
 
 	<name>ELK OWL API</name>
 	<description>ELK bindings for OWL API</description>

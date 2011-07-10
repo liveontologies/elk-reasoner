@@ -45,10 +45,10 @@
 		<developer>
 			<id>yevgeny</id>
 			<name>Yevgeny Kazakov</name>
-			<email>yevgeny.kazakov@comlab.ox.ac.uk</email>
+			<email>yevgeny.kazakov@cs.ox.ac.uk</email>
 			<organization>Department of Computer Science, University of Oxford
             </organization>
-			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
+			<organizationUrl>http://www.cs.ox.ac.uk</organizationUrl>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -57,10 +57,10 @@
 		<developer>
 			<id>markus</id>
 			<name>Markus Kroetzsch</name>
-			<email>markus.kroetzsch@comlab.ox.ac.uk</email>
+			<email>markus.kroetzsch@cs.ox.ac.uk</email>
 			<organization>Department of Computer Science, University of Oxford
             </organization>
-			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
+			<organizationUrl>http://www.cs.ox.ac.uk</organizationUrl>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -69,10 +69,10 @@
 		<developer>
 			<id>frantisek</id>
 			<name>Frantisek Simancik</name>
-			<email>frantisek.simancik@comlab.ox.ac.uk</email>
+			<email>frantisek.simancik@cs.ox.ac.uk</email>
 			<organization>Department of Computer Science, University of Oxford
             </organization>
-			<organizationUrl>http://www.comlab.ox.ac.uk</organizationUrl>
+			<organizationUrl>http://www.cs.ox.ac.uk</organizationUrl>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -84,6 +84,24 @@
 		<dependencies>
 		</dependencies>
 	</dependencyManagement>
+
+	<issueManagement>
+		<system>Google Code</system>
+		<url>http://code.google.com/p/elk-reasoner/issues/list</url>
+	</issueManagement>
+
+	<mailingLists>
+		<mailingList>
+			<name>ELK-reasoner announcements</name>
+			<subscribe>elk-reasoner-users+subscribe@googlegroups.com</subscribe>
+			<archive>http://groups.google.com/group/elk-reasoner-users</archive>
+		</mailingList>
+		<mailingList>
+			<name>ELK-reasoner announcements</name>
+			<subscribe>elk-reasoner-discussion+subscribe@googlegroups.com</subscribe>
+			<archive>http://groups.google.com/group/elk-reasoner-discussion</archive>
+		</mailingList>
+	</mailingLists>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -143,6 +161,10 @@
 							<phase>process-sources</phase>
 							<configuration>
 								<licenseName>apache_v2</licenseName>
+								<roots>
+									<root>src/main/java</root>
+									<root>src/test/java</root>
+								</roots>
 							</configuration>
 						</execution>
 					</executions>
@@ -173,6 +195,12 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
 	</build>
 
 	<distributionManagement>

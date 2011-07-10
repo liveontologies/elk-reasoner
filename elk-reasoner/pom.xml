@@ -7,13 +7,13 @@
 		<artifactId>elk-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	
+
 	<name>ELK Reasoner</name>
-    <description>ELK consequence-based reasoning engine</description>
+	<description>ELK consequence-based reasoning engine</description>
 
 	<artifactId>elk-reasoner</artifactId>
 	<packaging>jar</packaging>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -45,7 +45,7 @@
 	</dependencies>
 
 	<build>
-		<plugins>			
+		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -54,8 +54,6 @@
 						<id>first</id>
 						<configuration>
 							<roots>
-								<root>src/main/java</root>
-								<root>src/test/java</root>
 								<root>src/main/antlr3</root>
 								<root>src/main/javacc</root>
 							</roots>
@@ -81,7 +79,7 @@
 				<version>2.6</version>
 				<executions>
 					<execution>
-						<id>javacc</id>						
+						<id>javacc</id>
 						<goals>
 							<goal>javacc</goal>
 						</goals>
@@ -109,6 +107,6 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>		
+		</plugins>
 	</build>
 </project>
