@@ -138,6 +138,7 @@
 							<id>first</id>
 							<goals>
 								<goal>update-file-header</goal>
+								<goal>update-project-license</goal>
 							</goals>
 							<phase>process-sources</phase>
 							<configuration>
