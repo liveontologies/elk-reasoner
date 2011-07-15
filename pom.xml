@@ -193,24 +193,21 @@
 						</dependency>
 					</dependencies>
 				</plugin>
+				<plugin>
+					<artifactId>maven-release-plugin</artifactId>
+					<configuration>
+						<tagBase>
+							https://elk-reasoner.googlecode.com/svn/tags
+                    </tagBase>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<tagBase>
-						https://elk-reasoner.googlecode.com/svn/tags
-					</tagBase>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<configuration>
-						<preparationGoals>clean verify</preparationGoals>
-					</configuration>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
