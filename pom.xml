@@ -18,9 +18,9 @@
 	<url>http://code.google.com/p/elk-reasoner/</url>
 
 	<scm>
-		<connection>svn:http://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner
+		<connection>scm:svn:http://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner
         </connection>
-		<developerConnection>svn:https://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner
+		<developerConnection>scm:svn:https://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner
         </developerConnection>
 		<url>http://code.google.com/p/elk-reasoner/source/browse</url>
 	</scm>
