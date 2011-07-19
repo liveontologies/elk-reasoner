@@ -213,8 +213,6 @@
 						https://elk-reasoner.googlecode.com/svn/tags
                     </tagBase>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<preparationGoals>clean install verify</preparationGoals>
-					<goals>clean install site javadoc:javadoc assembly:assembly deploy</goals>
 				</configuration>
 			</plugin>
 		</plugins>
