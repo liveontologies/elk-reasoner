@@ -3,7 +3,7 @@
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.semanticweb.elk</groupId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<artifactId>elk-parent</artifactId>
 	<packaging>pom</packaging>
 
@@ -193,21 +193,23 @@
 						</dependency>
 					</dependencies>
 				</plugin>
-				<plugin>
-					<artifactId>maven-release-plugin</artifactId>
-					<configuration>
-						<tagBase>
-							https://elk-reasoner.googlecode.com/svn/tags
-                    </tagBase>
-						<autoVersionSubmodules>true</autoVersionSubmodules>
-					</configuration>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<tagBase>
+						https://elk-reasoner.googlecode.com/svn/tags
+                    </tagBase>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<preparationGoals>clean install verify</preparationGoals>
+					<goals>clean install site javadoc:javadoc assembly:assembly deploy</goals>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
