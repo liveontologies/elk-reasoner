@@ -44,4 +44,6 @@ public interface ElkClassExpressionVisitor<O> {
 
 	O visit(ElkObjectOneOf elkObjectOneOf);
 
+	O visit(ElkObjectHasSelf elkObjectHasSelf);
+
 }

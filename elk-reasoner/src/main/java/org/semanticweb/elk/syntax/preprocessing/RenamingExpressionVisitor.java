@@ -37,15 +37,19 @@ import org.semanticweb.elk.syntax.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectInverseOf;
 import org.semanticweb.elk.syntax.ElkObjectOneOf;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
+import org.semanticweb.elk.syntax.ElkObjectPropertyChain;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.syntax.ElkSubClassOfAxiom;
+import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
 
@@ -60,6 +64,32 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 		ElkObjectPropertyExpressionVisitor<ElkObjectPropertyExpression>,
 		ElkAxiomVisitor<ElkAxiom> {
 
+	class RenamingSubObjectPropertyExpressionVisitor
+			implements
+			ElkSubObjectPropertyExpressionVisitor<ElkSubObjectPropertyExpression> {
+
+		public ElkSubObjectPropertyExpression visit(
+				ElkObjectProperty elkObjectProperty) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public ElkSubObjectPropertyExpression visit(
+				ElkObjectInverseOf elkObjectInverseOf) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public ElkSubObjectPropertyExpression visit(
+				ElkObjectPropertyChain elkObjectPropertyChain) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+	}
+
+	protected RenamingSubObjectPropertyExpressionVisitor renamingSubObjectPropertyExpressionVisitor;
+
 	protected String postfix;
 
 	public RenamingExpressionVisitor(String postfix) {
@@ -68,6 +98,7 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	public void setPostfix(String postfix) {
 		this.postfix = postfix;
+		this.renamingSubObjectPropertyExpressionVisitor = new RenamingSubObjectPropertyExpressionVisitor();
 	}
 
 	public ElkEquivalentClassesAxiom visit(
@@ -137,10 +168,13 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	public ElkAxiom visit(
 			ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom) {
-		return ElkSubObjectPropertyOfAxiom.create(elkSubObjectPropertyOfAxiom
-				.getSubObjectPropertyExpression().accept(this),
-				elkSubObjectPropertyOfAxiom.getSuperObjectPropertyExpression()
-						.accept(this));
+		return ElkSubObjectPropertyOfAxiom
+				.create(elkSubObjectPropertyOfAxiom
+						.getSubObjectPropertyExpression()
+						.accept(this.renamingSubObjectPropertyExpressionVisitor),
+						elkSubObjectPropertyOfAxiom
+								.getSuperObjectPropertyExpression()
+								.accept(this));
 	}
 
 	public ElkAxiom visit(
@@ -166,6 +200,17 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 	}
 
 	public ElkClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkSubObjectPropertyExpression visit(
+			ElkObjectPropertyChain elkObjectPropertyChain) {
 		// TODO Auto-generated method stub
 		return null;
 	}

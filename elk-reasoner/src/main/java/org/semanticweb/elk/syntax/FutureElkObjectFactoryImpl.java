@@ -263,8 +263,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 		return new FutureElkObjectIntersectionOf(futureClassExpressions);
 	}
 
-	class FutureElkObjectOneOf extends
-			DelayedConstructor<ElkObjectOneOf> {
+	class FutureElkObjectOneOf extends DelayedConstructor<ElkObjectOneOf> {
 
 		protected final List<Future<? extends ElkIndividual>> futureIndividuals;
 
@@ -275,8 +274,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkObjectOneOf get() throws InterruptedException,
 				ExecutionException {
-			return ElkObjectOneOf
-					.create(unfutureList(futureIndividuals));
+			return ElkObjectOneOf.create(unfutureList(futureIndividuals));
 		}
 
 	}
@@ -351,6 +349,27 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 			final Future<? extends ElkIndividual> futureIndividual) {
 		return new FutureElkObjectHasValue(futureObjectPropertyExpression,
 				futureIndividual);
+	}
+
+	class FutureElkObjectHasSelf extends DelayedConstructor<ElkObjectHasSelf> {
+		protected final Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression;
+
+		FutureElkObjectHasSelf(
+				final Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression) {
+			this.futureObjectPropertyExpression = futureObjectPropertyExpression;
+		}
+
+		public ElkObjectHasSelf get() throws InterruptedException,
+				ExecutionException {
+			return ElkObjectHasSelf
+					.create(futureObjectPropertyExpression.get());
+		}
+
+	}
+
+	public Future<ElkObjectHasSelf> getFutureElkObjectHasSelf(
+			final Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression) {
+		return new FutureElkObjectHasSelf(futureObjectPropertyExpression);
 	}
 
 	class FutureElkDeclarationAxiom extends

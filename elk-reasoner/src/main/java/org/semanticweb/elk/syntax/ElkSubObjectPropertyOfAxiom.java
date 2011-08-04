@@ -62,7 +62,7 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 	}
 
 	public static ElkSubObjectPropertyOfAxiom create(
-			ElkObjectPropertyExpression subObjectPropertyExpression,
+			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression) {
 		return (ElkSubObjectPropertyOfAxiom) factory
 				.put(new ElkSubObjectPropertyOfAxiom(
