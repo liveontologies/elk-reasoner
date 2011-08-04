@@ -37,7 +37,7 @@ import java.util.concurrent.Future;
  * achieve maximal sharing and improved performance.
  * 
  * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface FutureElkObjectFactory {
 
@@ -56,13 +56,15 @@ public interface FutureElkObjectFactory {
 
 	public Future<ElkObjectProperty> getFutureElkObjectProperty(
 			String objectPropertyIri);
-	
+
 	public Future<ElkObjectInverseOf> getFutureElkObjectInverseOf(
 			Future<? extends ElkObjectProperty> futureObjectProperty);
-	
-	public Future<ElkNamedIndividual> getFutureElkNamedIndividual(String individualIri);
-	
-	public Future<ElkAnonymousIndividual> getFutureElkAnonymousIndividual(String individualNodeId);
+
+	public Future<ElkNamedIndividual> getFutureElkNamedIndividual(
+			String individualIri);
+
+	public Future<ElkAnonymousIndividual> getFutureElkAnonymousIndividual(
+			String individualNodeId);
 
 	public Future<ElkClass> getFutureElkClass(String classIri);
 
@@ -76,11 +78,18 @@ public interface FutureElkObjectFactory {
 			Future<? extends ElkClassExpression> firstFutureClassExpression,
 			Future<? extends ElkClassExpression> secondFutureClassExpression,
 			Future<? extends ElkClassExpression>... otherFutureClassExpressions);
+	
+	public Future<ElkObjectOneOf> getFutureElkObjectOneOf(
+			List<Future<? extends ElkIndividual>> futureIndividuals);
+
+	public Future<ElkObjectOneOf> getFutureElkObjectOneOf(
+			Future<? extends ElkIndividual> firstFutureIndividual,
+			Future<? extends ElkIndividual>... otherFutureIndividuals);
 
 	public Future<ElkObjectSomeValuesFrom> getFutureElkObjectSomeValuesFrom(
 			Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression,
 			Future<? extends ElkClassExpression> futureClassExpression);
-	
+
 	public Future<ElkObjectHasValue> getFutureElkObjectHasValue(
 			Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression,
 			Future<? extends ElkIndividual> futureIndividual);

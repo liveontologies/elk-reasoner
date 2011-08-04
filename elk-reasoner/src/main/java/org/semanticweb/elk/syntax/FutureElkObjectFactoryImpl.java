@@ -263,6 +263,41 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 		return new FutureElkObjectIntersectionOf(futureClassExpressions);
 	}
 
+	class FutureElkObjectOneOf extends
+			DelayedConstructor<ElkObjectOneOf> {
+
+		protected final List<Future<? extends ElkIndividual>> futureIndividuals;
+
+		FutureElkObjectOneOf(
+				List<Future<? extends ElkIndividual>> futureIndividuals) {
+			this.futureIndividuals = futureIndividuals;
+		}
+
+		public ElkObjectOneOf get() throws InterruptedException,
+				ExecutionException {
+			return ElkObjectOneOf
+					.create(unfutureList(futureIndividuals));
+		}
+
+	}
+
+	public Future<ElkObjectOneOf> getFutureElkObjectOneOf(
+			List<Future<? extends ElkIndividual>> futureIndividuals) {
+		return new FutureElkObjectOneOf(futureIndividuals);
+	}
+
+	public Future<ElkObjectOneOf> getFutureElkObjectOneOf(
+			Future<? extends ElkIndividual> firstFutureIndividual,
+			Future<? extends ElkIndividual>... otherFutureIndividuals) {
+		List<Future<? extends ElkIndividual>> futureIndividuals = new ArrayList<Future<? extends ElkIndividual>>(
+				1 + otherFutureIndividuals.length);
+		futureIndividuals.add(firstFutureIndividual);
+		for (int i = 0; i > otherFutureIndividuals.length; ++i) {
+			futureIndividuals.add(otherFutureIndividuals[i]);
+		}
+		return new FutureElkObjectOneOf(futureIndividuals);
+	}
+
 	class FutureElkObjectSomeValuesFrom extends
 			DelayedConstructor<ElkObjectSomeValuesFrom> {
 		protected final Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression;
@@ -291,8 +326,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 				futureObjectPropertyExpression, futureClassExpression);
 	}
 
-	class FutureElkObjectHasValue extends
-			DelayedConstructor<ElkObjectHasValue> {
+	class FutureElkObjectHasValue extends DelayedConstructor<ElkObjectHasValue> {
 		protected final Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression;
 		protected final Future<? extends ElkIndividual> futureIndividual;
 
@@ -315,8 +349,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 	public Future<ElkObjectHasValue> getFutureElkObjectHasValue(
 			final Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression,
 			final Future<? extends ElkIndividual> futureIndividual) {
-		return new FutureElkObjectHasValue(
-				futureObjectPropertyExpression, futureIndividual);
+		return new FutureElkObjectHasValue(futureObjectPropertyExpression,
+				futureIndividual);
 	}
 
 	class FutureElkDeclarationAxiom extends

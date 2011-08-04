@@ -42,6 +42,7 @@ import org.semanticweb.elk.syntax.ElkNamedIndividual;
 import org.semanticweb.elk.syntax.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.ElkObjectOneOf;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
@@ -306,6 +307,11 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 		}
 
 		public IndexedClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
 			// TODO Auto-generated method stub
 			return null;
 		}
