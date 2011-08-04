@@ -59,6 +59,10 @@ public interface FutureElkObjectFactory {
 	
 	public Future<ElkObjectInverseOf> getFutureElkObjectInverseOf(
 			Future<? extends ElkObjectProperty> futureObjectProperty);
+	
+	public Future<ElkNamedIndividual> getFutureElkNamedIndividual(String individualIri);
+	
+	public Future<ElkAnonymousIndividual> getFutureElkAnonymousIndividual(String individualNodeId);
 
 	public Future<ElkClass> getFutureElkClass(String classIri);
 
@@ -76,6 +80,10 @@ public interface FutureElkObjectFactory {
 	public Future<ElkObjectSomeValuesFrom> getFutureElkObjectSomeValuesFrom(
 			Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression,
 			Future<? extends ElkClassExpression> futureClassExpression);
+	
+	public Future<ElkObjectHasValue> getFutureElkObjectHasValue(
+			Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression,
+			Future<? extends ElkIndividual> futureIndividual);
 
 	public Future<ElkDeclarationAxiom> getFutureElkDeclarationAxiom(
 			Future<? extends ElkEntity> futureEntity);

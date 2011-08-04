@@ -168,6 +168,46 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 		return new FutureElkObjectPropertyChain(futureObjectPropertyExpressions);
 	}
 
+	class FutureElkNamedIndividual extends
+			DelayedConstructor<ElkNamedIndividual> {
+
+		protected final String individualIri;
+
+		FutureElkNamedIndividual(final String individualIri) {
+			this.individualIri = individualIri;
+		}
+
+		public ElkNamedIndividual get() {
+			return ElkNamedIndividual.create(individualIri);
+		}
+
+	}
+
+	public Future<ElkNamedIndividual> getFutureElkNamedIndividual(
+			final String individualIri) {
+		return new FutureElkNamedIndividual(individualIri);
+	}
+
+	class FutureElkAnonymousIndividual extends
+			DelayedConstructor<ElkAnonymousIndividual> {
+
+		protected final String individualNodeId;
+
+		FutureElkAnonymousIndividual(final String individualNodeId) {
+			this.individualNodeId = individualNodeId;
+		}
+
+		public ElkAnonymousIndividual get() {
+			return ElkAnonymousIndividual.create(individualNodeId);
+		}
+
+	}
+
+	public Future<ElkAnonymousIndividual> getFutureElkAnonymousIndividual(
+			final String individualNodeId) {
+		return new FutureElkAnonymousIndividual(individualNodeId);
+	}
+
 	class FutureElkClass extends DelayedConstructor<ElkClass> {
 
 		protected final String classIri;
@@ -249,6 +289,34 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 			final Future<? extends ElkClassExpression> futureClassExpression) {
 		return new FutureElkObjectSomeValuesFrom(
 				futureObjectPropertyExpression, futureClassExpression);
+	}
+
+	class FutureElkObjectHasValue extends
+			DelayedConstructor<ElkObjectHasValue> {
+		protected final Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression;
+		protected final Future<? extends ElkIndividual> futureIndividual;
+
+		FutureElkObjectHasValue(
+				final Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression,
+				final Future<? extends ElkIndividual> futureIndividual) {
+			this.futureObjectPropertyExpression = futureObjectPropertyExpression;
+			this.futureIndividual = futureIndividual;
+		}
+
+		public ElkObjectHasValue get() throws InterruptedException,
+				ExecutionException {
+			return ElkObjectHasValue.create(
+					futureObjectPropertyExpression.get(),
+					futureIndividual.get());
+		}
+
+	}
+
+	public Future<ElkObjectHasValue> getFutureElkObjectHasValue(
+			final Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression,
+			final Future<? extends ElkIndividual> futureIndividual) {
+		return new FutureElkObjectHasValue(
+				futureObjectPropertyExpression, futureIndividual);
 	}
 
 	class FutureElkDeclarationAxiom extends
