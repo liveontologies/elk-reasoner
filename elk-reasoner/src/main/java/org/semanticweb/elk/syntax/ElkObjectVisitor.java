@@ -32,9 +32,6 @@ package org.semanticweb.elk.syntax;
  * 
  */
 public interface ElkObjectVisitor<O> extends ElkAxiomVisitor<O>,
-		ElkClassExpressionVisitor<O>, ElkObjectPropertyExpressionVisitor<O>,
-		ElkIndividualVisitor<O> {
-
-	O visit(ElkObjectPropertyChain elkObjectPropertyChain);
-
+		ElkClassExpressionVisitor<O>, ElkSubObjectPropertyExpressionVisitor<O> {
+	
 }

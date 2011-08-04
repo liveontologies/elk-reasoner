@@ -33,7 +33,7 @@ package org.semanticweb.elk.syntax;
  * @author Yevgeny Kazakov
  *
  */
-public abstract class ElkObjectPropertyExpression extends ElkObject {
+public abstract class ElkObjectPropertyExpression extends ElkSubObjectPropertyExpression {
 	
 	public abstract <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor);
 
@@ -44,7 +44,7 @@ public abstract class ElkObjectPropertyExpression extends ElkObject {
 	 * .reasoner.ELKObjectVisitor)
 	 */
 	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {
 
 		return accept( (ElkObjectPropertyExpressionVisitor<O>) visitor);		
 		

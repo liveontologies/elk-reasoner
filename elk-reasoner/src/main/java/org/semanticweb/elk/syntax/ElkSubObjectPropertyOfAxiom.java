@@ -36,14 +36,14 @@ import org.semanticweb.elk.util.HashGenerator;
  * 
  */
 public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
-	protected final ElkObjectPropertyExpression subObjectPropertyExpression,
-			superObjectPropertyExpression;
+	protected final ElkSubObjectPropertyExpression subObjectPropertyExpression;
+	protected final ElkObjectPropertyExpression superObjectPropertyExpression;
 
 	private static final int constructorHash_ = "ElkSubObjectPropertyOfAxiom"
 			.hashCode();
 
 	private ElkSubObjectPropertyOfAxiom(
-			ElkObjectPropertyExpression subObjectPropertyExpression,
+			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression) {
 		this.subObjectPropertyExpression = subObjectPropertyExpression;
 		this.superObjectPropertyExpression = superObjectPropertyExpression;
@@ -53,7 +53,7 @@ public class ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 						.structuralHashCode());
 	}
 
-	public ElkObjectPropertyExpression getSubObjectPropertyExpression() {
+	public ElkSubObjectPropertyExpression getSubObjectPropertyExpression() {
 		return subObjectPropertyExpression;
 	}
 

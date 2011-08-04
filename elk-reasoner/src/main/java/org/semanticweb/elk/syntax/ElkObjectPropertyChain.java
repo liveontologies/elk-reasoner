@@ -25,7 +25,7 @@ package org.semanticweb.elk.syntax;
 import java.util.List;
 
 
-public class ElkObjectPropertyChain extends ElkObject {
+public class ElkObjectPropertyChain extends ElkSubObjectPropertyExpression {
 
 	private static final int constructorHash_ = "ElkObjectPropertyChain"
 		.hashCode();
@@ -61,7 +61,7 @@ public class ElkObjectPropertyChain extends ElkObject {
 	}
 
 	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
