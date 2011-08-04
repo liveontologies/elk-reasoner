@@ -78,7 +78,7 @@ public interface FutureElkObjectFactory {
 			Future<? extends ElkClassExpression> firstFutureClassExpression,
 			Future<? extends ElkClassExpression> secondFutureClassExpression,
 			Future<? extends ElkClassExpression>... otherFutureClassExpressions);
-	
+
 	public Future<ElkObjectOneOf> getFutureElkObjectOneOf(
 			List<Future<? extends ElkIndividual>> futureIndividuals);
 
@@ -93,7 +93,7 @@ public interface FutureElkObjectFactory {
 	public Future<ElkObjectHasValue> getFutureElkObjectHasValue(
 			Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression,
 			Future<? extends ElkIndividual> futureIndividual);
-	
+
 	public Future<ElkObjectHasSelf> getFutureElkObjectHasSelf(
 			Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression);
 
@@ -103,6 +103,22 @@ public interface FutureElkObjectFactory {
 	public Future<ElkTransitiveObjectPropertyAxiom> getFutureElkTransitiveObjectPropertyAxiom(
 			Future<? extends ElkObjectPropertyExpression> futureObjectPropertyExpression);
 
+	public Future<ElkEquivalentObjectPropertiesAxiom> getFutureElkEquivalentObjectPropertiesAxiom(
+			List<Future<? extends ElkObjectPropertyExpression>> futureEquivalentObjectPropertyExpressions);
+
+	public Future<ElkEquivalentObjectPropertiesAxiom> getFutureElkEquivalentObjectPropertiesAxiom(
+			Future<? extends ElkObjectPropertyExpression> firstFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression> secondFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression>... otherFutureObjectPropertyExpressions);
+	
+	public Future<ElkDisjointObjectPropertiesAxiom> getFutureElkDisjointObjectPropertiesAxiom(
+			List<Future<? extends ElkObjectPropertyExpression>> futureDisjointObjectPropertyExpressions);
+
+	public Future<ElkDisjointObjectPropertiesAxiom> getFutureElkDisjointObjectPropertiesAxiom(
+			Future<? extends ElkObjectPropertyExpression> firstFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression> secondFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression>... otherFutureObjectPropertyExpressions);
+
 	public Future<ElkSubObjectPropertyOfAxiom> getFutureElkSubObjectPropertyOfAxiom(
 			Future<? extends ElkObjectPropertyExpression> futureSubObjectPropertyExpression,
 			Future<? extends ElkObjectPropertyExpression> futureSuperObjectPropertyExpression);
@@ -111,6 +127,22 @@ public interface FutureElkObjectFactory {
 			List<Future<? extends ElkClassExpression>> futureEquivalentClassExpressions);
 
 	public Future<ElkEquivalentClassesAxiom> getFutureElkEquivalentClassesAxiom(
+			Future<? extends ElkClassExpression> firstFutureClassExpression,
+			Future<? extends ElkClassExpression> secondFutureClassExpression,
+			Future<? extends ElkClassExpression>... otherFutureClassExpressions);
+
+	public Future<ElkDisjointClassesAxiom> getFutureElkDisjointClassesAxiom(
+			List<Future<? extends ElkClassExpression>> futureClassExpressions);
+
+	public Future<ElkDisjointClassesAxiom> getFutureElkDisjointClassesAxiom(
+			Future<? extends ElkClassExpression> firstFutureClassExpression,
+			Future<? extends ElkClassExpression> secondFutureClassExpression,
+			Future<? extends ElkClassExpression>... otherFutureClassExpressions);
+
+	public Future<ElkDisjointUnionAxiom> getFutureElkDisjointUnionAxiom(
+			List<Future<? extends ElkClassExpression>> futureClassExpressions);
+
+	public Future<ElkDisjointUnionAxiom> getFutureElkDisjointUnionAxiom(
 			Future<? extends ElkClassExpression> firstFutureClassExpression,
 			Future<? extends ElkClassExpression> secondFutureClassExpression,
 			Future<? extends ElkClassExpression>... otherFutureClassExpressions);

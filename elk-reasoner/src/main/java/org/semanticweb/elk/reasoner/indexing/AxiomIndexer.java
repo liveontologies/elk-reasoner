@@ -32,7 +32,11 @@ import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.syntax.ElkDisjointObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseObjectPropertiesAxiom;
@@ -335,6 +339,28 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		}
 
 		ie.accept(entityIndexer);
+		return null;
+	}
+
+	public Void visit(ElkDisjointClassesAxiom elkDisjointClasses) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

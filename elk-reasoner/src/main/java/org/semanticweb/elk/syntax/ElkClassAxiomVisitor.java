@@ -27,14 +27,18 @@ package org.semanticweb.elk.syntax;
 
 /**
  * Visitor pattern interface for instances of {@link ElkClassAxiom}.
- * 
+ *
  * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch 
  */
 public interface ElkClassAxiomVisitor<O> {
 
 	O visit(ElkEquivalentClassesAxiom elkEquivalentClassesAxiom);
 
 	O visit(ElkSubClassOfAxiom elkSubClassOfAxiom);
+
+	O visit(ElkDisjointClassesAxiom elkDisjointClasses);
+
+	O visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom);
 
 }

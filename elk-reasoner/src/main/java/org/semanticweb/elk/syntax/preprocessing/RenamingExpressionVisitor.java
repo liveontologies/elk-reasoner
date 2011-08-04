@@ -30,9 +30,13 @@ import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.syntax.ElkDisjointObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.syntax.ElkEntity;
 import org.semanticweb.elk.syntax.ElkEntityVisitor;
 import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseObjectPropertiesAxiom;
@@ -211,6 +215,28 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	public ElkSubObjectPropertyExpression visit(
 			ElkObjectPropertyChain elkObjectPropertyChain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(ElkDisjointClassesAxiom elkDisjointClasses) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}

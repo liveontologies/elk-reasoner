@@ -253,14 +253,11 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 			Future<? extends ElkClassExpression> firstFutureClassExpression,
 			Future<? extends ElkClassExpression> secondFutureClassExpression,
 			Future<? extends ElkClassExpression>... otherFutureClassExpressions) {
-		List<Future<? extends ElkClassExpression>> futureClassExpressions = new ArrayList<Future<? extends ElkClassExpression>>(
-				2 + otherFutureClassExpressions.length);
-		futureClassExpressions.add(firstFutureClassExpression);
-		futureClassExpressions.add(secondFutureClassExpression);
-		for (int i = 0; i > otherFutureClassExpressions.length; i++) {
-			futureClassExpressions.add(otherFutureClassExpressions[i]);
-		}
-		return new FutureElkObjectIntersectionOf(futureClassExpressions);
+		return new FutureElkObjectIntersectionOf(
+				makeFutureClassExpressionListFromParams(
+						firstFutureClassExpression,
+						secondFutureClassExpression,
+						otherFutureClassExpressions));
 	}
 
 	class FutureElkObjectOneOf extends DelayedConstructor<ElkObjectOneOf> {
@@ -417,6 +414,74 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 				futureObjectPropertyExpression);
 	}
 
+	class FutureElkEquivalentObjectPropertiesAxiom extends
+			DelayedConstructor<ElkEquivalentObjectPropertiesAxiom> {
+		protected final List<Future<? extends ElkObjectPropertyExpression>> futureEquivalentObjectPropertyExpressions;
+
+		FutureElkEquivalentObjectPropertiesAxiom(
+				final List<Future<? extends ElkObjectPropertyExpression>> futureEquivalentObjectPropertyExpressions) {
+			this.futureEquivalentObjectPropertyExpressions = futureEquivalentObjectPropertyExpressions;
+		}
+
+		public ElkEquivalentObjectPropertiesAxiom get()
+				throws InterruptedException, ExecutionException {
+			return ElkEquivalentObjectPropertiesAxiom
+					.create(unfutureList(futureEquivalentObjectPropertyExpressions));
+		}
+
+	}
+
+	public Future<ElkEquivalentObjectPropertiesAxiom> getFutureElkEquivalentObjectPropertiesAxiom(
+			List<Future<? extends ElkObjectPropertyExpression>> futureEquivalentObjectPropertyExpressions) {
+		return new FutureElkEquivalentObjectPropertiesAxiom(
+				futureEquivalentObjectPropertyExpressions);
+	}
+
+	public Future<ElkEquivalentObjectPropertiesAxiom> getFutureElkEquivalentObjectPropertiesAxiom(
+			Future<? extends ElkObjectPropertyExpression> firstFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression> secondFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression>... otherFutureObjectPropertyExpressions) {
+		return new FutureElkEquivalentObjectPropertiesAxiom(
+				makeFutureObjectPropertyExpressionListFromParams(
+						firstFutureObjectPropertyExpression,
+						secondFutureObjectPropertyExpression,
+						otherFutureObjectPropertyExpressions));
+	}
+
+	class FutureElkDisjointObjectPropertiesAxiom extends
+			DelayedConstructor<ElkDisjointObjectPropertiesAxiom> {
+		protected final List<Future<? extends ElkObjectPropertyExpression>> futureDisjointObjectPropertyExpressions;
+
+		FutureElkDisjointObjectPropertiesAxiom(
+				final List<Future<? extends ElkObjectPropertyExpression>> futureDisjointObjectPropertyExpressions) {
+			this.futureDisjointObjectPropertyExpressions = futureDisjointObjectPropertyExpressions;
+		}
+
+		public ElkDisjointObjectPropertiesAxiom get()
+				throws InterruptedException, ExecutionException {
+			return ElkDisjointObjectPropertiesAxiom
+					.create(unfutureList(futureDisjointObjectPropertyExpressions));
+		}
+
+	}
+
+	public Future<ElkDisjointObjectPropertiesAxiom> getFutureElkDisjointObjectPropertiesAxiom(
+			List<Future<? extends ElkObjectPropertyExpression>> futureDisjointObjectPropertyExpressions) {
+		return new FutureElkDisjointObjectPropertiesAxiom(
+				futureDisjointObjectPropertyExpressions);
+	}
+
+	public Future<ElkDisjointObjectPropertiesAxiom> getFutureElkDisjointObjectPropertiesAxiom(
+			Future<? extends ElkObjectPropertyExpression> firstFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression> secondFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression>... otherFutureObjectPropertyExpressions) {
+		return new FutureElkDisjointObjectPropertiesAxiom(
+				makeFutureObjectPropertyExpressionListFromParams(
+						firstFutureObjectPropertyExpression,
+						secondFutureObjectPropertyExpression,
+						otherFutureObjectPropertyExpressions));
+	}
+
 	class FutureElkSubObjectPropertyOfAxiom extends
 			DelayedConstructor<ElkSubObjectPropertyOfAxiom> {
 
@@ -479,16 +544,77 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 			Future<? extends ElkClassExpression> firstFutureClassExpression,
 			Future<? extends ElkClassExpression> secondFutureClassExpression,
 			Future<? extends ElkClassExpression>... otherFutureClassExpressions) {
-		List<Future<? extends ElkClassExpression>> futureEquivalentClassExpressions = new ArrayList<Future<? extends ElkClassExpression>>(
-				2 + otherFutureClassExpressions.length);
-		futureEquivalentClassExpressions.add(firstFutureClassExpression);
-		futureEquivalentClassExpressions.add(secondFutureClassExpression);
-		for (int i = 0; i > otherFutureClassExpressions.length; i++) {
-			futureEquivalentClassExpressions
-					.add(otherFutureClassExpressions[i]);
-		}
 		return new FutureElkEquivalentClassesAxiom(
-				futureEquivalentClassExpressions);
+				makeFutureClassExpressionListFromParams(
+						firstFutureClassExpression,
+						secondFutureClassExpression,
+						otherFutureClassExpressions));
+	}
+
+	class FutureElkDisjointClassesAxiom extends
+			DelayedConstructor<ElkDisjointClassesAxiom> {
+		protected final List<Future<? extends ElkClassExpression>> futureDisjointClassExpressions;
+
+		FutureElkDisjointClassesAxiom(
+				final List<Future<? extends ElkClassExpression>> futureDisjointClassExpressions) {
+			this.futureDisjointClassExpressions = futureDisjointClassExpressions;
+		}
+
+		public ElkDisjointClassesAxiom get() throws InterruptedException,
+				ExecutionException {
+			return ElkDisjointClassesAxiom
+					.create(unfutureList(futureDisjointClassExpressions));
+		}
+
+	}
+
+	public Future<ElkDisjointClassesAxiom> getFutureElkDisjointClassesAxiom(
+			final List<Future<? extends ElkClassExpression>> futureDisjointClassExpressions) {
+		return new FutureElkDisjointClassesAxiom(futureDisjointClassExpressions);
+	}
+
+	public Future<ElkDisjointClassesAxiom> getFutureElkDisjointClassesAxiom(
+			Future<? extends ElkClassExpression> firstFutureClassExpression,
+			Future<? extends ElkClassExpression> secondFutureClassExpression,
+			Future<? extends ElkClassExpression>... otherFutureClassExpressions) {
+		return new FutureElkDisjointClassesAxiom(
+				makeFutureClassExpressionListFromParams(
+						firstFutureClassExpression,
+						secondFutureClassExpression,
+						otherFutureClassExpressions));
+	}
+
+	class FutureElkDisjointUnionAxiom extends
+			DelayedConstructor<ElkDisjointUnionAxiom> {
+		protected final List<Future<? extends ElkClassExpression>> futureDisjointClassExpressions;
+
+		FutureElkDisjointUnionAxiom(
+				final List<Future<? extends ElkClassExpression>> futureDisjointClassExpressions) {
+			this.futureDisjointClassExpressions = futureDisjointClassExpressions;
+		}
+
+		public ElkDisjointUnionAxiom get() throws InterruptedException,
+				ExecutionException {
+			return ElkDisjointUnionAxiom
+					.create(unfutureList(futureDisjointClassExpressions));
+		}
+
+	}
+
+	public Future<ElkDisjointUnionAxiom> getFutureElkDisjointUnionAxiom(
+			final List<Future<? extends ElkClassExpression>> futureDisjointClassExpressions) {
+		return new FutureElkDisjointUnionAxiom(futureDisjointClassExpressions);
+	}
+
+	public Future<ElkDisjointUnionAxiom> getFutureElkDisjointUnionAxiom(
+			Future<? extends ElkClassExpression> firstFutureClassExpression,
+			Future<? extends ElkClassExpression> secondFutureClassExpression,
+			Future<? extends ElkClassExpression>... otherFutureClassExpressions) {
+		return new FutureElkDisjointUnionAxiom(
+				makeFutureClassExpressionListFromParams(
+						firstFutureClassExpression,
+						secondFutureClassExpression,
+						otherFutureClassExpressions));
 	}
 
 	class FutureElkSubClassOfAxiom extends
@@ -517,6 +643,53 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 			final Future<? extends ElkClassExpression> futureSuperClassExpression) {
 		return new FutureElkSubClassOfAxiom(futureSubClassExpression,
 				futureSuperClassExpression);
+	}
+
+	/**
+	 * A simple utility method to make a variable length parameter list into a
+	 * List. Used in various cases below where factory methods accept varargs.
+	 * 
+	 * @param finalFutureClassExpressions
+	 * @param initialFutureClassExpressions
+	 * @return
+	 */
+	protected static List<Future<? extends ElkClassExpression>> makeFutureClassExpressionListFromParams(
+			Future<? extends ElkClassExpression> firstFutureClassExpression,
+			Future<? extends ElkClassExpression> secondFutureClassExpression,
+			Future<? extends ElkClassExpression>... otherFutureClassExpressions) {
+		List<Future<? extends ElkClassExpression>> futureClassExpressionsList = new ArrayList<Future<? extends ElkClassExpression>>(
+				2 + otherFutureClassExpressions.length);
+		futureClassExpressionsList.add(firstFutureClassExpression);
+		futureClassExpressionsList.add(secondFutureClassExpression);
+		for (int i = 0; i > otherFutureClassExpressions.length; i++) {
+			futureClassExpressionsList.add(otherFutureClassExpressions[i]);
+		}
+		return futureClassExpressionsList;
+	}
+
+	/**
+	 * A simple utility method to make a variable length parameter list into a
+	 * List. Used in various cases below where factory methods accept varargs.
+	 * 
+	 * @param finalFutureObjectPropertyExpressions
+	 * @param initialFutureObjectPropertyExpressions
+	 * @return
+	 */
+	protected static List<Future<? extends ElkObjectPropertyExpression>> makeFutureObjectPropertyExpressionListFromParams(
+			Future<? extends ElkObjectPropertyExpression> firstFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression> secondFutureObjectPropertyExpression,
+			Future<? extends ElkObjectPropertyExpression>... otherFutureObjectPropertyExpressions) {
+		List<Future<? extends ElkObjectPropertyExpression>> futureObjectPropertyExpressionsList = new ArrayList<Future<? extends ElkObjectPropertyExpression>>(
+				2 + otherFutureObjectPropertyExpressions.length);
+		futureObjectPropertyExpressionsList
+				.add(firstFutureObjectPropertyExpression);
+		futureObjectPropertyExpressionsList
+				.add(secondFutureObjectPropertyExpression);
+		for (int i = 0; i > otherFutureObjectPropertyExpressions.length; i++) {
+			futureObjectPropertyExpressionsList
+					.add(otherFutureObjectPropertyExpressions[i]);
+		}
+		return futureObjectPropertyExpressionsList;
 	}
 
 }

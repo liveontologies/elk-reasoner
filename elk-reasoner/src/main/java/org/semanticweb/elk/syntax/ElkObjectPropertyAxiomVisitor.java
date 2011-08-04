@@ -42,5 +42,9 @@ public interface ElkObjectPropertyAxiomVisitor<O> {
 	O visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom);
 	
 	O visit(ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom);
-	
+
+	O visit(ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties);
+
+	O visit(ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom);
+
 }
