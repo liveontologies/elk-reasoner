@@ -35,7 +35,6 @@ import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomyComputation;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomyPrinter;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
@@ -165,11 +164,8 @@ public class Reasoner {
 		Statistics.logOperationStart("Saturation", LOGGER_);
 		progressMonitor.start("Saturation");
 
-		for (IndexedObjectProperty iop : ontologyIndex
-				.getIndexedObjectProperties())
-			objectPropertySaturation.submit(iop);
-		objectPropertySaturation.waitCompletion();
-
+		objectPropertySaturation.compute();
+		
 		progress = 0;
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
 			classExpressionSaturation.submit(ic);

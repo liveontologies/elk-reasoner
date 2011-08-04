@@ -67,8 +67,7 @@ class ClassExpressionIndexer implements
 		indexedObjectSomeValuesFrom.occurrenceNo += axiomIndexer.multiplicity;
 		assert indexedObjectSomeValuesFrom.occurrenceNo >= 0;
 
-		axiomIndexer.objectPropertyExpressionIndexer
-				.visit(indexedObjectSomeValuesFrom.relation);
+		indexedObjectSomeValuesFrom.relation.accept(axiomIndexer.objectPropertyExpressionIndexer);
 		indexedObjectSomeValuesFrom.filler.accept(this);
 
 		axiomIndexer.ontologyIndex

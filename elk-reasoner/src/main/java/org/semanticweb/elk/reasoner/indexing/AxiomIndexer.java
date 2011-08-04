@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+import java.util.List;
+
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
@@ -34,7 +36,12 @@ import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.syntax.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.ElkObjectProperty;
+import org.semanticweb.elk.syntax.ElkObjectPropertyChain;
+import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.ElkSubClassOfAxiom;
+import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
 
@@ -87,23 +94,29 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 	protected void indexSubClassOfAxiom(ElkClassExpression elkSubClass,
 			ElkClassExpression elkSuperClass) {
-		IndexedClassExpression subClass = ontologyIndex
-				.getIndexedClassExpression(elkSubClass);
-		IndexedClassExpression superClass = ontologyIndex
-				.getIndexedClassExpression(elkSuperClass);
-
+		
+		IndexedClassExpression subClass = null;
+		IndexedClassExpression superClass = null;
+		
 		if (multiplicity == 1) {
+			subClass = ontologyIndex.getIndexedClassExpression(elkSubClass);
 			if (subClass == null)
 				subClass = ontologyIndex.createIndexed(elkSubClass);
+			
+			superClass = ontologyIndex.getIndexedClassExpression(elkSuperClass);
 			if (superClass == null)
 				superClass = ontologyIndex.createIndexed(elkSuperClass);
+			
 			subClass.addToldSuperClassExpression(superClass);
 		}
 
 		if (multiplicity == -1) {
-			if (subClass == null || superClass == null
-					|| !subClass.removeToldSuperClassExpression(superClass))
+			subClass = ontologyIndex.getIndexedClassExpression(elkSubClass);
+			superClass = ontologyIndex.getIndexedClassExpression(elkSuperClass);
+			if (subClass == null || superClass == null)
 				return;
+			
+			subClass.removeToldSuperClassExpression(superClass);
 		}
 
 		subClass.accept(classExpressionIndexer);
@@ -147,59 +160,151 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
+	
+	protected void indexSubObjectPropertyOfAxiom(
+			ElkObjectPropertyExpression elkSubProperty,
+			ElkObjectPropertyExpression elkSuperProperty) {
 
-	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
-
-		IndexedObjectProperty subProperty = ontologyIndex
-				.getIndexedObjectPropertyExpression(axiom
-						.getSubObjectPropertyExpression());
-		IndexedObjectProperty superProperty = ontologyIndex
-				.getIndexedObjectPropertyExpression(axiom
-						.getSuperObjectPropertyExpression());
+		IndexedObjectProperty subProperty = null;
+		IndexedObjectProperty superProperty = null;
 
 		if (multiplicity == 1) {
+			subProperty = ontologyIndex.getIndexedObjectProperty(elkSubProperty);
 			if (subProperty == null)
-				subProperty = ontologyIndex.createIndexed(axiom
-						.getSubObjectPropertyExpression());
+				subProperty = ontologyIndex.createIndexed(elkSubProperty);
+			
+			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
 			if (superProperty == null)
-				superProperty = ontologyIndex.createIndexed(axiom
-						.getSuperObjectPropertyExpression());
+				superProperty = ontologyIndex.createIndexed(elkSuperProperty);
+			
 			subProperty.addToldSuperObjectProperty(superProperty);
 			superProperty.addToldSubObjectProperty(subProperty);
 		}
 
 		if (multiplicity == -1) {
-			if (subProperty == null
-					|| superProperty == null
-					|| !subProperty
-							.removeToldSuperObjectProperty(superProperty))
-				return null;
+			subProperty = ontologyIndex.getIndexedObjectProperty(elkSubProperty);
+			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
+			if (subProperty == null || superProperty == null)
+				return;
+			
+			subProperty.removeToldSuperObjectProperty(superProperty);
 			superProperty.removeToldSubObjectProperty(subProperty);
 		}
 
-		objectPropertyExpressionIndexer.visit(subProperty);
-		objectPropertyExpressionIndexer.visit(superProperty);
+		subProperty.accept(objectPropertyExpressionIndexer);
+		superProperty.accept(objectPropertyExpressionIndexer);
+	}
+	
+	protected void indexSubPropertyChainOfAxiom(
+			ElkObjectPropertyExpression elkLeftSubProperty,
+			ElkObjectPropertyExpression elkRightSubProperty,
+			ElkObjectPropertyExpression elkSuperProperty) {
+
+		IndexedObjectProperty leftSubProperty = null;
+		IndexedObjectProperty rightSubProperty = null;
+		IndexedObjectProperty superProperty = null;
+		
+		if (multiplicity == 1) {
+			leftSubProperty = ontologyIndex.getIndexedObjectProperty(elkLeftSubProperty);
+			if (leftSubProperty == null)
+				leftSubProperty = ontologyIndex.createIndexed(elkLeftSubProperty);
+			
+			rightSubProperty = ontologyIndex.getIndexedObjectProperty(elkRightSubProperty);
+			if (rightSubProperty == null)
+				rightSubProperty = ontologyIndex.createIndexed(elkRightSubProperty);
+			
+			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
+			if (superProperty == null)
+				superProperty = ontologyIndex.createIndexed(elkSuperProperty);
+			
+			ontologyIndex.addComplexRoleInclusion(new ComplexRoleInclusion(leftSubProperty, rightSubProperty, superProperty));			
+		}
+		
+		if (multiplicity == -1) {
+			leftSubProperty = ontologyIndex.getIndexedObjectProperty(elkLeftSubProperty);
+			rightSubProperty = ontologyIndex.getIndexedObjectProperty(elkRightSubProperty);
+			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
+			if (leftSubProperty == null || rightSubProperty == null || superProperty == null)
+				return;
+			
+			ontologyIndex.removeComplexRoleInclusion(new ComplexRoleInclusion(leftSubProperty, rightSubProperty, superProperty));
+		}
+		
+		leftSubProperty.accept(objectPropertyExpressionIndexer);
+		rightSubProperty.accept(objectPropertyExpressionIndexer);
+		superProperty.accept(objectPropertyExpressionIndexer);
+	}
+			
+	
+	protected void indexSubPropertyChainOfAxiom(
+			ElkObjectPropertyChain propertyChain,
+			ElkObjectPropertyExpression elkSuperProperty) {
+
+		IndexedObjectProperty leftSubProperty = null;
+		IndexedPropertyExpression rightSubProperty = null;
+		IndexedObjectProperty superProperty = null;
+
+		if (multiplicity == 1) {
+			leftSubProperty = ontologyIndex.getIndexedObjectProperty(propertyChain.getObjectPropertyExpressions().get(0));
+			if (leftSubProperty == null)
+				ontologyIndex.createIndexed(propertyChain.getObjectPropertyExpressions().get(0));
+			
+			rightSubProperty = ontologyIndex.getIndexedPropertyChain(propertyChain);
+			if (rightSubProperty == null)
+				ontologyIndex.createIndexed(propertyChain);
+			
+			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
+			if (superProperty == null)
+				ontologyIndex.createIndexed(elkSuperProperty);
+
+			ontologyIndex.addComplexRoleInclusion(new ComplexRoleInclusion(leftSubProperty, rightSubProperty, superProperty));			
+		}
+
+		if (multiplicity == -1) {
+			leftSubProperty = ontologyIndex.getIndexedObjectProperty(propertyChain.getObjectPropertyExpressions().get(0));
+			rightSubProperty = ontologyIndex.getIndexedPropertyChain(propertyChain);
+			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
+			if (leftSubProperty == null || rightSubProperty == null || superProperty == null)
+				return;
+
+			ontologyIndex.removeComplexRoleInclusion(new ComplexRoleInclusion(leftSubProperty, rightSubProperty, superProperty));
+		}
+
+		leftSubProperty.accept(objectPropertyExpressionIndexer);
+		rightSubProperty.accept(objectPropertyExpressionIndexer);
+		superProperty.accept(objectPropertyExpressionIndexer);
+	}
+
+	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
+		final ElkObjectPropertyExpression superProperty = axiom.getSuperObjectPropertyExpression();
+		axiom.getSubObjectPropertyExpression().accept(
+				new ElkSubObjectPropertyExpressionVisitor<Void>() {
+
+					public Void visit(ElkObjectProperty subProperty) {
+						indexSubObjectPropertyOfAxiom(subProperty, superProperty);
+						return null;
+					}
+
+					public Void visit(ElkObjectInverseOf subProperty) {
+						throw new UnsupportedOperationException("Not yet implemented");
+					}
+
+					public Void visit(ElkObjectPropertyChain subPropertyChain) {
+						List<? extends ElkObjectPropertyExpression> opes = subPropertyChain.getObjectPropertyExpressions();
+						if (opes.size() == 2)
+							indexSubPropertyChainOfAxiom(opes.get(0), opes.get(1), superProperty);
+						else
+							indexSubPropertyChainOfAxiom(subPropertyChain, superProperty);
+						return null;
+					}
+				});
 
 		return null;
 	}
 
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-		IndexedObjectProperty iop = ontologyIndex
-				.getIndexedObjectPropertyExpression(axiom
-						.getObjectPropertyExpression());
-
-		if (multiplicity == 1) {
-			if (iop == null)
-				iop = ontologyIndex.createIndexed(axiom
-						.getObjectPropertyExpression());
-			iop.addTransitive();
-		}
-		if (multiplicity == -1) {
-			if (iop == null || !iop.removeTransitive())
-				return null;
-		}
-
-		objectPropertyExpressionIndexer.visit(iop);
+		ElkObjectPropertyExpression ope = axiom.getObjectPropertyExpression();
+		indexSubPropertyChainOfAxiom(ope, ope, ope);
 		return null;
 	}
 
@@ -210,8 +315,7 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		}
 
 		public Void visit(IndexedObjectProperty indexedObjectProperty) {
-			objectPropertyExpressionIndexer.visit(indexedObjectProperty);
-			return null;
+			return indexedObjectProperty.accept(objectPropertyExpressionIndexer);
 		}
 	}
 

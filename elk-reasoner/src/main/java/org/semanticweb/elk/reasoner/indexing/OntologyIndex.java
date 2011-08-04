@@ -25,9 +25,12 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+import java.util.Collection;
+
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkEntity;
+import org.semanticweb.elk.syntax.ElkObjectPropertyChain;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 
 /**
@@ -39,22 +42,28 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
  */
 public interface OntologyIndex  {
 
-	public abstract IndexedEntity getIndexedEntity(ElkEntity representative);
+	IndexedEntity getIndexedEntity(ElkEntity representative);
 	
-	public abstract IndexedClassExpression getIndexedClassExpression(ElkClassExpression representative);
+	IndexedClassExpression getIndexedClassExpression(ElkClassExpression representative);
 	
-	public abstract IndexedObjectProperty getIndexedObjectPropertyExpression(ElkObjectPropertyExpression representative);
+	IndexedObjectProperty getIndexedObjectProperty(ElkObjectPropertyExpression representative);
 	
-	public abstract Iterable<IndexedClass> getIndexedClasses();		
+	IndexedPropertyChain getIndexedPropertyChain(ElkObjectPropertyChain representative);
 	
-	public abstract int getIndexedClassCount();
+	Iterable<IndexedClass> getIndexedClasses();		
 	
-	public abstract Iterable<IndexedClassExpression> getIndexedClassExpressions();		
+	int getIndexedClassCount();
 	
-	public abstract Iterable<IndexedObjectProperty> getIndexedObjectProperties();
+	Iterable<IndexedClassExpression> getIndexedClassExpressions();		
 	
-	public abstract ElkAxiomProcessor getAxiomInserter();
+	Iterable<IndexedObjectProperty> getIndexedObjectProperties();
 	
-	public abstract ElkAxiomProcessor getAxiomDeleter();
+	Iterable<IndexedPropertyChain> getNamedIndexedPropertyChains();
+	
+	Collection<ComplexRoleInclusion> getComplexRoleInclusions();
+	
+	ElkAxiomProcessor getAxiomInserter();
+	
+	ElkAxiomProcessor getAxiomDeleter();
 
 }

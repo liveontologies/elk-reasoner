@@ -30,7 +30,6 @@ import java.util.concurrent.Future;
 import junit.framework.TestCase;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
 import org.semanticweb.elk.syntax.ElkClass;
@@ -81,10 +80,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		final ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
 				executor, 16, ontologyIndex);
 
-		for (IndexedObjectProperty iop : ontologyIndex
-				.getIndexedObjectProperties())
-			objectPropertySaturation.submit(iop);
-		objectPropertySaturation.waitCompletion();
+		objectPropertySaturation.compute();
 
 		final ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
 				executor, 16, ontologyIndex);

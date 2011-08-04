@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.semanticweb.elk.reasoner.saturation.Derivable;
+import org.semanticweb.elk.reasoner.saturation.QueueableVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.util.HashGenerator;
@@ -46,7 +48,7 @@ import org.semanticweb.elk.util.HashGenerator;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-abstract public class IndexedClassExpression {
+abstract public class IndexedClassExpression implements Derivable {
 
 	protected final List<ElkClassExpression> representatives;
 
@@ -222,4 +224,8 @@ abstract public class IndexedClassExpression {
 	}
 
 	abstract public <O> O accept(IndexedClassExpressionVisitor<O> visitor);
+	
+	public <O> O accept(QueueableVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 }

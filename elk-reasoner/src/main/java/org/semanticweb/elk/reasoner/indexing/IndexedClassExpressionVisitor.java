@@ -22,6 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+/**
+ * @author Frantisek Simancik
+ *
+ */
 public interface IndexedClassExpressionVisitor<O> {
 	O visit(IndexedClass indexedClass);
 	O visit(IndexedObjectIntersectionOf indexedObjectIntersectionOf);

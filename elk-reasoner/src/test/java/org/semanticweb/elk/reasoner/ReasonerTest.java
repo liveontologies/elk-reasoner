@@ -72,8 +72,8 @@ public class ReasonerTest extends TestCase {
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
-		IndexedObjectProperty R = index.getIndexedObjectPropertyExpression(r);
-		IndexedObjectProperty S = index.getIndexedObjectPropertyExpression(s);
+		IndexedObjectProperty R = index.getIndexedObjectProperty(r);
+		IndexedObjectProperty S = index.getIndexedObjectProperty(s);
 
 		assertTrue("R subrole S", R.getToldSuperObjectProperties().contains(S));
 		assertTrue("S superrole R", S.getToldSubObjectProperties().contains(R));

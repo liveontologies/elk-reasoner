@@ -25,11 +25,8 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
-import org.semanticweb.elk.reasoner.saturation.SaturatedObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
-import org.semanticweb.elk.util.HashGenerator;
 
 /**
  * Represents all occurrences of an ElkObjectPropertyExpression in an ontology.
@@ -45,30 +42,23 @@ import org.semanticweb.elk.util.HashGenerator;
  * @author Markus Kroetzsch
  */
 
-public class IndexedObjectProperty implements IndexedEntity {
+public class IndexedObjectProperty extends IndexedPropertyExpression implements IndexedEntity {
 
-	protected final ElkObjectProperty elkObjectProperty;
 	protected List<IndexedObjectProperty> toldSubObjectProperties;
 	protected List<IndexedObjectProperty> toldSuperObjectProperties;
-	protected int isTransitive = 0;
-
-	/**
-	 * This counts how often this object occurred in the ontology.
-	 */
-	protected int occurrenceNo = 0;
 
 	/**
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
 	protected IndexedObjectProperty(ElkObjectProperty elkObjectProperty) {
-		this.elkObjectProperty = elkObjectProperty;
+		super(elkObjectProperty);
 	}
 
 	/**
 	 * @return The represented object property expression.
 	 */
 	public ElkObjectProperty getElkObjectProperty() {
-		return elkObjectProperty;
+		return (ElkObjectProperty) representative;
 	}
 
 	/**
@@ -85,13 +75,6 @@ public class IndexedObjectProperty implements IndexedEntity {
 	 */
 	public List<IndexedObjectProperty> getToldSuperObjectProperties() {
 		return toldSuperObjectProperties;
-	}
-
-	/**
-	 * @return True if this object property is told transitive.
-	 */
-	public boolean isTransitive() {
-		return isTransitive > 0;
 	}
 
 	protected void addToldSubObjectProperty(
@@ -130,45 +113,6 @@ public class IndexedObjectProperty implements IndexedEntity {
 		return success;
 	}
 
-	protected void addTransitive() {
-		isTransitive++;
-	}
-
-	protected boolean removeTransitive() {
-		if (isTransitive > 0) {
-			isTransitive--;
-			return true;
-		}
-		return false;
-	}
-
-	protected final AtomicReference<SaturatedObjectProperty> saturated = new AtomicReference<SaturatedObjectProperty>();
-
-	/**
-	 * @return The corresponding saturated object property, null if none was
-	 *         assigned.
-	 */
-	public SaturatedObjectProperty getSaturated() {
-		return saturated.get();
-	}
-
-	/**
-	 * Sets the corresponding saturated object property if none was yet
-	 * assigned.
-	 * 
-	 * @return True if the operation succeeded.
-	 */
-	public boolean setSaturated(SaturatedObjectProperty saturatedObjectProperty) {
-		return saturated.compareAndSet(null, saturatedObjectProperty);
-	}
-
-	/**
-	 * Resets the corresponding saturated object property to null.
-	 */
-	public void resetSaturated() {
-		saturated.set(null);
-	}
-
 	/**
 	 * Represent the object's ElkObjectProperty as a string. This implementation
 	 * reflects the fact that we generally consider only one
@@ -178,23 +122,15 @@ public class IndexedObjectProperty implements IndexedEntity {
 	 */
 	@Override
 	public String toString() {
-		return "[" + elkObjectProperty.toString() + "]";
-	}
-
-	/** Hash code for this object. */
-	private final int hashCode_ = HashGenerator.generateNextHashCode();
-
-	/**
-	 * Get an integer hash code to be used for this object.
-	 * 
-	 * @return Hash code.
-	 */
-	@Override
-	public final int hashCode() {
-		return hashCode_;
+		return "[" + getElkObjectProperty().toString() + "]";
 	}
 
 	public <O> O accept(IndexedEntityVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(IndexedPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

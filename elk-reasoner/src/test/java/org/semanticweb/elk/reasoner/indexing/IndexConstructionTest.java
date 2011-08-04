@@ -56,7 +56,7 @@ public class IndexConstructionTest extends TestCase {
 		IndexedClassExpression A = index.getIndexedClassExpression(a);
 		IndexedClassExpression B = index.getIndexedClassExpression(b);
 		IndexedClassExpression C = index.getIndexedClassExpression(c);
-		IndexedObjectProperty R = index.getIndexedObjectPropertyExpression(r);
+		IndexedObjectProperty R = index.getIndexedObjectProperty(r);
 		assertEquals(2, A.negativeOccurrenceNo);
 		assertEquals(1, A.positiveOccurrenceNo);
 		assertEquals(1, B.negativeOccurrenceNo);
@@ -67,7 +67,6 @@ public class IndexConstructionTest extends TestCase {
 		assertTrue(A.getNegConjunctionsByConjunct().containsKey(B));
 		assertTrue(C.getNegExistentials().get(0).getRelation() == R);
 		
-		deleter.process(ElkSubClassOfAxiom.create(c, a));
 		deleter.process(ElkEquivalentClassesAxiom.create(ElkObjectSomeValuesFrom.create(r, c), a));
 		
 		assertEquals(1, A.negativeOccurrenceNo);

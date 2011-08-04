@@ -28,13 +28,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.util.ArrayHashSet;
 import org.semanticweb.elk.util.HashListMultimap;
 import org.semanticweb.elk.util.HashSetMultimap;
 import org.semanticweb.elk.util.Multimap;
-import org.semanticweb.elk.util.Pair;
 
 /**
  * Objects of this class are used to manage subsumption relations between class
@@ -45,32 +43,25 @@ import org.semanticweb.elk.util.Pair;
  * 
  * @author Frantisek Simancik
  */
-public class SaturatedClassExpression {
+public class SaturatedClassExpression implements Linkable {
 	protected final IndexedClassExpression root;
-	protected final Queue<IndexedClassExpression> positivelyDerivedQueue;
-	protected final Queue<IndexedClassExpression> negativelyDerivedQueue; 
-	protected final Queue<Pair<IndexedObjectProperty, SaturatedClassExpression>> linkQueue;
-	protected final Queue<Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom>> propagationQueue;
+	protected final Queue<Queueable> queue;
+	// TODO use Derivable instead of IndexedClassExpression here
 	protected final Set<IndexedClassExpression> derived;
-	protected final Multimap<IndexedObjectProperty, SaturatedClassExpression> linksByObjectProperty;
-	protected final Multimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom> propagationsByObjectProperty;
+	protected final Multimap<IndexedPropertyExpression, Linkable> linksByObjectProperty;
+	protected final Multimap<IndexedPropertyExpression, Queueable> propagationsByObjectProperty;
 	/**
-	 * A context is active iff one of its queues is not empty or it is being
+	 * A context is active iff its queue is not empty or it is being
 	 * processed.
 	 */
 	private AtomicBoolean isActive;
 
 	public SaturatedClassExpression(IndexedClassExpression root) {
 		this.root = root;
-		this.positivelyDerivedQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
-		this.negativelyDerivedQueue = new ConcurrentLinkedQueue<IndexedClassExpression>();
-		this.linkQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, SaturatedClassExpression>>();
-		this.propagationQueue = new ConcurrentLinkedQueue<Pair<IndexedObjectProperty, IndexedObjectSomeValuesFrom>>();
-		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
-		this.linksByObjectProperty = new HashListMultimap<IndexedObjectProperty, SaturatedClassExpression>(
-				1);
-		this.propagationsByObjectProperty = new HashSetMultimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom>(
-				1);
+		this.queue = new ConcurrentLinkedQueue<Queueable> ();
+		this.derived = new ArrayHashSet<IndexedClassExpression> (13);
+		this.linksByObjectProperty = new HashListMultimap<IndexedPropertyExpression, Linkable> (1);
+		this.propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyExpression, Queueable> (1);
 		this.isActive = new AtomicBoolean(false);
 	}
 
@@ -84,7 +75,7 @@ public class SaturatedClassExpression {
 	 * @return the set of derived indexed class expressions
 	 */
 	public Set<IndexedClassExpression> getSuperClassExpressions() {
-		return derived;
+		return (Set<IndexedClassExpression>) derived;
 	}
 
 
