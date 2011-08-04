@@ -70,7 +70,7 @@ public class ElkObjectInverseOf extends ElkObjectPropertyExpression {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
+	 * @see org.semanticweb.elk.reasoner.ElkObject#structuralEquals(java.lang.Object)
 	 */
 	@Override
 	public boolean structuralEquals(ElkObject object) {
