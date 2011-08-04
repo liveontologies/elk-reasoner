@@ -56,6 +56,9 @@ public interface FutureElkObjectFactory {
 
 	public Future<ElkObjectProperty> getFutureElkObjectProperty(
 			String objectPropertyIri);
+	
+	public Future<ElkObjectInverseOf> getFutureElkObjectInverseOf(
+			Future<? extends ElkObjectProperty> futureObjectProperty);
 
 	public Future<ElkClass> getFutureElkClass(String classIri);
 

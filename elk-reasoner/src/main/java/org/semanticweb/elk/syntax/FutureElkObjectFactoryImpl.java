@@ -39,7 +39,7 @@ import java.util.concurrent.TimeoutException;
  * is called.
  * 
  * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
@@ -123,6 +123,27 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 	public Future<ElkObjectProperty> getFutureElkObjectProperty(
 			final String objectPropertyIri) {
 		return new FutureElkObjectProperty(objectPropertyIri);
+	}
+
+	class FutureElkObjectInverseOf extends
+			DelayedConstructor<ElkObjectInverseOf> {
+
+		protected final Future<? extends ElkObjectProperty> futureObjectProperty;
+
+		FutureElkObjectInverseOf(
+				Future<? extends ElkObjectProperty> futureObjectProperty) {
+			this.futureObjectProperty = futureObjectProperty;
+		}
+
+		public ElkObjectInverseOf get() throws InterruptedException,
+				ExecutionException {
+			return ElkObjectInverseOf.create(futureObjectProperty.get());
+		}
+	}
+
+	public Future<ElkObjectInverseOf> getFutureElkObjectInverseOf(
+			Future<? extends ElkObjectProperty> futureObjectProperty) {
+		return new FutureElkObjectInverseOf(futureObjectProperty);
 	}
 
 	class FutureElkObjectPropertyChain extends

@@ -25,15 +25,36 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.util.HashGenerator;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Inverse_Object_Properties">Inverse Object
  * Property<a> in the OWL 2 specification.
  * 
  * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public class ElkObjectInverseOf extends ElkObjectPropertyExpression {
+
+	protected final ElkObjectProperty objectProperty;
+
+	private static final int constructorHash_ = "ElkObjectInverseOf".hashCode();
+
+	private ElkObjectInverseOf(ElkObjectProperty objectProperty) {
+		this.objectProperty = objectProperty;
+		this.structuralHashCode = HashGenerator.combineListHash(
+				constructorHash_, objectProperty.structuralHashCode());
+	}
+
+	public static ElkObjectInverseOf create(ElkObjectProperty objectProperty) {
+		return (ElkObjectInverseOf) factory.put(new ElkObjectInverseOf(
+				objectProperty));
+	}
+
+	public ElkObjectProperty getObjectProperty() {
+		return objectProperty;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -43,18 +64,32 @@ public class ElkObjectInverseOf extends ElkObjectPropertyExpression {
 	 */
 	@Override
 	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
-
 		return visitor.visit(this);
-
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.semanticweb.elk.reasoner.ElkObject#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean structuralEquals(ElkObject obj) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean structuralEquals(ElkObject object) {
+		if (this == object) {
+			return true;
+		} else if (object instanceof ElkObjectInverseOf) {
+			return objectProperty
+					.equals(((ElkObjectInverseOf) object).objectProperty);
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder("ObjectInverseOf(");
+		result.append(objectProperty.toString());
+		result.append(")");
+		return result.toString();
 	}
 
 }
