@@ -36,5 +36,7 @@ public interface ElkEntityVisitor<O> {
 	O visit(ElkClass elkClass);
 
 	O visit(ElkObjectProperty elkObjectProperty);
+	
+	O visit(ElkNamedIndividual elkNamedIndividual);
 
 }

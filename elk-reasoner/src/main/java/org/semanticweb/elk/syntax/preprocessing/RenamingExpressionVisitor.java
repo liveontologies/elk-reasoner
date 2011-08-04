@@ -36,6 +36,8 @@ import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.syntax.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectInverseOf;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
@@ -148,7 +150,18 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 	}
 
 	public ElkDeclarationAxiom visit(ElkDeclarationAxiom elkDeclarationAxiom) {
-		return ElkDeclarationAxiom.create(elkDeclarationAxiom.getEntity());
+		return ElkDeclarationAxiom.create(elkDeclarationAxiom.getEntity()
+				.accept(this));
+	}
+
+	public ElkClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkEntity visit(ElkNamedIndividual elkNamedIndividual) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

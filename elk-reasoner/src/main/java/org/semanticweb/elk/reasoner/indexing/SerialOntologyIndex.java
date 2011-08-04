@@ -38,6 +38,8 @@ import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkEntity;
 import org.semanticweb.elk.syntax.ElkEntityVisitor;
+import org.semanticweb.elk.syntax.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.ElkObjectInverseOf;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
@@ -88,6 +90,11 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 		public IndexedEntity visit(ElkObjectProperty elkObjectProperty) {
 			return (IndexedEntity) getIndexedObjectPropertyExpression(elkObjectProperty);
+		}
+
+		public IndexedEntity visit(ElkNamedIndividual elkNamedIndividual) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -216,6 +223,11 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 			indexedObjectPropertyLookup.put(elkObjectProperty, result);
 			return result;
 		}
+
+		public IndexedEntity visit(ElkNamedIndividual elkNamedIndividual) {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	private final IndexedEntityCreator indexedEntityCreator = new IndexedEntityCreator();
@@ -291,6 +303,11 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 			result.getRepresentantatives().add(elkObjectSomeValuesFrom);
 			indexedClassExpressionLookup.put(elkObjectSomeValuesFrom, result);
 			return result;
+		}
+
+		public IndexedClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 

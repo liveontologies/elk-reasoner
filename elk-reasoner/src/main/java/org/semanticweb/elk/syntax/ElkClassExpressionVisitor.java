@@ -29,6 +29,7 @@ package org.semanticweb.elk.syntax;
  * Visitor pattern interface for instances of {@link ElkClassExpression}.
  * 
  * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  * 
  */
 public interface ElkClassExpressionVisitor<O> {
@@ -38,5 +39,7 @@ public interface ElkClassExpressionVisitor<O> {
 	O visit(ElkObjectIntersectionOf elkObjectIntersectionOf);
 
 	O visit(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom);
+
+	O visit(ElkObjectHasValue elkObjectHasValue);
 
 }
