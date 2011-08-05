@@ -617,8 +617,7 @@ subObjectPropertyOf returns [Future<? extends ElkSubObjectPropertyOfAxiom> value
         ) z = objectPropertyExpression 
       CLOSE_BRACE { 
         if (isChain)
-          $value = null;
-          // $value = ElkSubObjectPropertyOfAxiom.create(y, z);
+          $value = constructor.getFutureElkSubObjectPropertyOfAxiom($y.value, $z.value);
         else          
       	  $value = constructor.getFutureElkSubObjectPropertyOfAxiom($x.value, $z.value); 
       }	  
