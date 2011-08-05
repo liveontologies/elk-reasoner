@@ -485,11 +485,11 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 	class FutureElkSubObjectPropertyOfAxiom extends
 			DelayedConstructor<ElkSubObjectPropertyOfAxiom> {
 
-		protected final Future<? extends ElkObjectPropertyExpression> futureSubObjectPropertyExpression;
+		protected final Future<? extends ElkSubObjectPropertyExpression> futureSubObjectPropertyExpression;
 		protected final Future<? extends ElkObjectPropertyExpression> futureSuperObjectPropertyExpression;
 
 		FutureElkSubObjectPropertyOfAxiom(
-				final Future<? extends ElkObjectPropertyExpression> futureSubObjectPropertyExpression,
+				final Future<? extends ElkSubObjectPropertyExpression> futureSubObjectPropertyExpression,
 				final Future<? extends ElkObjectPropertyExpression> futureSuperObjectPropertyExpression) {
 			this.futureSubObjectPropertyExpression = futureSubObjectPropertyExpression;
 			this.futureSuperObjectPropertyExpression = futureSuperObjectPropertyExpression;
@@ -510,7 +510,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 	}
 
 	public Future<ElkSubObjectPropertyOfAxiom> getFutureElkSubObjectPropertyOfAxiom(
-			final Future<? extends ElkObjectPropertyExpression> futureSubObjectPropertyExpression,
+			final Future<? extends ElkSubObjectPropertyExpression> futureSubObjectPropertyExpression,
 			final Future<? extends ElkObjectPropertyExpression> futureSuperObjectPropertyExpression) {
 		return new FutureElkSubObjectPropertyOfAxiom(
 				futureSubObjectPropertyExpression,

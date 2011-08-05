@@ -120,7 +120,7 @@ public interface FutureElkObjectFactory {
 			Future<? extends ElkObjectPropertyExpression>... otherFutureObjectPropertyExpressions);
 
 	public Future<ElkSubObjectPropertyOfAxiom> getFutureElkSubObjectPropertyOfAxiom(
-			Future<? extends ElkObjectPropertyExpression> futureSubObjectPropertyExpression,
+			Future<? extends ElkSubObjectPropertyExpression> futureSubObjectPropertyExpression,
 			Future<? extends ElkObjectPropertyExpression> futureSuperObjectPropertyExpression);
 
 	public Future<ElkEquivalentClassesAxiom> getFutureElkEquivalentClassesAxiom(

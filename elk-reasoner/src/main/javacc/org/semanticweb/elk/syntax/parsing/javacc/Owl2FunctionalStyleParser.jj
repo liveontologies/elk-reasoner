@@ -58,6 +58,7 @@ import org.semanticweb.elk.syntax.ElkObjectProperty;
 import org.semanticweb.elk.syntax.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.ElkObjectPropertyChain;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.syntax.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
@@ -956,24 +957,17 @@ Future<? extends ElkObjectPropertyAxiom> objectPropertyAxiom():
 /* 9.2.1 Object Subproperties */
 Future<? extends ElkSubObjectPropertyOfAxiom> subObjectPropertyOf():
 {
-  Future<? extends ElkObjectPropertyChain> y = null;
-  Future<? extends ElkObjectPropertyExpression> x = null;
+  Future<? extends ElkSubObjectPropertyExpression> x = null;
   Future<? extends ElkObjectPropertyExpression> z;
-  boolean isChain;  
 }{
     <SUB_OBJECT_PROPERTY_OF> <OPEN_BRACE> 
         axiomAnnotations() 
         (
-          x = objectPropertyExpression() { isChain = false; }
-        | y = propertyExpressionChain()  { isChain = true; }
+          x = objectPropertyExpression()
+        | x = propertyExpressionChain()
         ) 
         z = objectPropertyExpression() 
     <CLOSE_BRACE> {
-      if (isChain)
-        // TODO: support role chains
-        return null;
-        // ElkSubObjectPropertyOfAxiom.create(y, z);
-      else
         return constructor.getFutureElkSubObjectPropertyOfAxiom(x, z);
     }
 }
