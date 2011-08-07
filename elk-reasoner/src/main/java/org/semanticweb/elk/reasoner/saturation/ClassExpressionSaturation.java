@@ -23,18 +23,20 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.indexing.ComplexRoleInclusion;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.IndexedPropertyComposition;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.util.AbstractConcurrentComputation;
+import org.semanticweb.elk.util.HashSetMultimap;
 import org.semanticweb.elk.util.LazySetIntersection;
 
 /**
@@ -45,11 +47,18 @@ import org.semanticweb.elk.util.LazySetIntersection;
  */
 public class ClassExpressionSaturation extends
 		AbstractConcurrentComputation<SaturatedClassExpression> {
-
+	
+	AtomicInteger derivedNo = new AtomicInteger(0);
+	AtomicInteger backLinkNo = new AtomicInteger(0);
+	AtomicInteger propNo = new AtomicInteger(0);
+	AtomicInteger forwLinkNo = new AtomicInteger(0);
+	
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturation.class);
 
 	protected final OntologyIndex ontologyIndex;
+	
+	protected final IndexedClassExpression owlThing;
 
 	public ClassExpressionSaturation(ExecutorService executor, int workerNo,
 			OntologyIndex ontologyIndex) {
@@ -58,6 +67,9 @@ public class ClassExpressionSaturation extends
 		for (IndexedClassExpression ice : ontologyIndex
 				.getIndexedClassExpressions())
 			ice.resetSaturated();
+		
+		owlThing = ontologyIndex
+		.getIndexedClassExpression(ElkClass.ELK_OWL_THING);
 	}
 
 	public void submit(IndexedClassExpression root) {
@@ -87,10 +99,9 @@ public class ClassExpressionSaturation extends
 					LOGGER_.trace("Created context for " + root);
 				}
 				enqueue(sce, root);
-				IndexedClassExpression top = ontologyIndex
-						.getIndexedClassExpression(ElkClass.ELK_OWL_THING);
-				if (top != null && top.occursNegatively())
-					enqueue(sce, top);
+				
+				if (owlThing != null && owlThing.occursNegatively())
+					enqueue(sce, owlThing);
 			}
 		}
 		return root.getSaturated();
@@ -116,14 +127,14 @@ public class ClassExpressionSaturation extends
 			SaturatedClassExpression context = (SaturatedClassExpression) target;
 			
 			// this check is not necessary
-			if (context.derived.contains(item))
-				return;
-			
+//			if (context.derived.contains(item))
+//				return;
+
 			context.queue.add(item);
 			activateContext(context);
 		}
 	}
-
+	
 	@Override
 	protected void process(SaturatedClassExpression context) {
 		final QueueProcessor queueProcessor = new QueueProcessor(context); 
@@ -144,6 +155,8 @@ public class ClassExpressionSaturation extends
 		}
 		
 		protected void processClass(IndexedClassExpression ice) {
+			derivedNo.incrementAndGet();
+			
 			// process subsumptions
 			if (ice.getToldSuperClassExpressions() != null) {
 				for (IndexedClassExpression implied : ice
@@ -161,31 +174,59 @@ public class ClassExpressionSaturation extends
 			}
 
 			// process negative existentials
-			if (ice.getNegExistentials() != null) {
+			if (context.backwardLinksByObjectProperty != null && ice.getNegExistentials() != null) {
 				for (IndexedObjectSomeValuesFrom e : ice.getNegExistentials())
-					enqueue(context, new Propagation(e.getRelation(), new DecomposedClassExpression(e)));
+					new Propagation(e.getRelation(), new DecomposedClassExpression(e)).accept(this);
 			}
 
+		}
+		
+		protected void materializeIncomingLinks() {
+			if (context.materializeIncomingLinks)
+				return;
+			
+			context.materializeIncomingLinks = true;
+			if (context.backwardLinksByObjectProperty != null)
+			for (IndexedPropertyExpression linkRelation : context.backwardLinksByObjectProperty.keySet())
+				if (linkRelation.getSaturated().propertyChainsByLeftSubProperty != null)
+					for (Linkable target : context.backwardLinksByObjectProperty.get(linkRelation))
+						enqueue(target, new ForwardLink(linkRelation, context));
 		}
 		
 		public Void visit(BackwardLink backwardLink) {
 			IndexedPropertyExpression linkRelation = backwardLink.getRelation();
 			Linkable target = backwardLink.getTarget();
-			if (context.linksByObjectProperty.add(linkRelation, target)) {
+			
+			if (context.backwardLinksByObjectProperty == null) {
+				context.backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyExpression, Linkable> ();
+	
+				//start deriving propagations
+				for (IndexedClassExpression ice : context.derived)
+					if (ice.getNegExistentials() != null)
+						for (IndexedObjectSomeValuesFrom e : ice.getNegExistentials())
+							new Propagation(e.getRelation(), new DecomposedClassExpression(e)).accept(this);
+			}
+			
+			if (context.backwardLinksByObjectProperty.add(linkRelation, target)) {
+				backLinkNo.incrementAndGet();
+				if (context.propagationsByObjectProperty != null)
 				for (IndexedPropertyExpression propRelation : new LazySetIntersection<IndexedPropertyExpression>(
 						linkRelation.getSaturated().getSuperObjectProperties(),
 						context.propagationsByObjectProperty.keySet()))
 					for (Queueable carry : context.propagationsByObjectProperty
 							.get(propRelation))
 						enqueue(target, carry);
+			
+				if (context.materializeIncomingLinks && linkRelation.getSaturated().propertyChainsByLeftSubProperty != null)
+					enqueue(target, new ForwardLink(linkRelation, context));
 
-				for (ComplexRoleInclusion ria : linkRelation.getSaturated().getRightSubPropertyInComplexInclusions())
-					for (IndexedPropertyExpression propRelation : new LazySetIntersection<IndexedPropertyExpression>(
-							ria.getSuperProperty().getSaturated().getSuperObjectProperties(),
-							context.propagationsByObjectProperty.keySet()))
-						for (Queueable carry : context.propagationsByObjectProperty
-								.get(propRelation))
-							enqueue(target, new Propagation(ria.getLeftSubProperty(), carry));
+				if (linkRelation.getSaturated().propertyChainsByRightSubProperty != null && context.forwardLinksByObjectProperty != null)
+					for (IndexedPropertyExpression forwardRelation : new LazySetIntersection<IndexedPropertyExpression>(
+							linkRelation.getSaturated().propertyChainsByRightSubProperty.keySet(),
+							context.forwardLinksByObjectProperty.keySet()))
+						for (IndexedPropertyComposition ria : linkRelation.getSaturated().propertyChainsByRightSubProperty.get(forwardRelation))
+							for (Linkable forwardTarget : context.forwardLinksByObjectProperty.get(forwardRelation))
+								enqueue(forwardTarget, new BackwardLink(ria.getSuperProperty(), target));
 			}
 
 			return null;
@@ -194,25 +235,21 @@ public class ClassExpressionSaturation extends
 		public Void visit(Propagation propagation) {
 			IndexedPropertyExpression propRelation = propagation.getRelation();
 			Queueable carry = propagation.getCarry();
+			
+			if (context.propagationsByObjectProperty == null) {
+				context.propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyExpression, Queueable>();
+				materializeIncomingLinks();
+			}
+			
 			if (context.propagationsByObjectProperty.add(propRelation, carry)) {
+				propNo.incrementAndGet();
+				if (context.backwardLinksByObjectProperty != null)
 				for (IndexedPropertyExpression linkRelation : new LazySetIntersection<IndexedPropertyExpression>(
 						propRelation.getSaturated().getSubObjectProperties(),
-						context.linksByObjectProperty.keySet()))
-					for (Linkable target : context.linksByObjectProperty
+						context.backwardLinksByObjectProperty.keySet()))
+					for (Linkable target : context.backwardLinksByObjectProperty
 							.get(linkRelation))
 						enqueue(target, carry);
-
-				for (ComplexRoleInclusion ria : propRelation.getSaturated().getSuperPropertyInComplexInclusions()) {
-					IndexedPropertyExpression rightSubProperty = ria.getRightSubProperty();
-					if (!ria.isSafe())
-						enqueue(context, new Propagation(rightSubProperty, new ForwardLink(rightSubProperty, context)));
-					for (IndexedPropertyExpression linkRelation : new LazySetIntersection<IndexedPropertyExpression>(
-							rightSubProperty.getSaturated().getSubObjectProperties(),
-							context.linksByObjectProperty.keySet()))
-						for (Linkable target : context.linksByObjectProperty
-								.get(linkRelation))
-							enqueue(target, new Propagation(ria.getLeftSubProperty(), carry));
-				}
 			}
 
 			return null;
@@ -234,7 +271,27 @@ public class ClassExpressionSaturation extends
 		}
 
 		public Void visit(ForwardLink forwardLink) {
-			enqueue(forwardLink.getTarget(), new BackwardLink(forwardLink.getRelation(), context));
+			IndexedPropertyExpression linkRelation = forwardLink.getRelation();
+			Linkable target = forwardLink.getTarget();
+			
+			if (context.forwardLinksByObjectProperty == null) {
+				context.forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyExpression, Linkable>();
+				materializeIncomingLinks();
+			}
+			
+			if (context.forwardLinksByObjectProperty.add(linkRelation, target)) {
+				forwLinkNo.incrementAndGet();
+/*
+				if (context.backwardLinksByObjectProperty != null)
+				for (IndexedPropertyExpression backwardRelation : new LazySetIntersection<IndexedPropertyExpression>(
+						linkRelation.getSaturated().propertyChainsByLeftSubProperty.keySet(),
+						context.backwardLinksByObjectProperty.keySet()))
+					for (IndexedPropertyChain ria : linkRelation.getSaturated().propertyChainsByLeftSubProperty.get(backwardRelation))
+						for (Linkable backwardTarget : context.backwardLinksByObjectProperty.get(backwardRelation))
+							enqueue(target, new BackwardLink(ria.getSuperProperty(), backwardTarget));
+*/
+			}
+
 			return null;
 		}
 
@@ -260,5 +317,15 @@ public class ClassExpressionSaturation extends
 				return null;
 			}
 		}
+	}
+	
+	@Override
+	public void waitCompletion() {
+		super.waitCompletion();
+		System.err.println("derived: " + derivedNo);
+		System.err.println("backLnk: " + backLinkNo);
+		System.err.println("  props: " + propNo);
+		System.err.println("forwLnk: " + forwLinkNo);
+		
 	}
 }

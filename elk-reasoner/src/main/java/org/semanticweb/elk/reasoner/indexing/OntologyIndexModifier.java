@@ -27,8 +27,8 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkEntity;
-import org.semanticweb.elk.syntax.ElkObjectPropertyChain;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
 
 /**
  * Interface for methods required for index creation.
@@ -38,21 +38,22 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
  */
 abstract class OntologyIndexModifier implements OntologyIndex {
 	
-	abstract IndexedEntity createIndexed(ElkEntity representative);
+	abstract IndexedEntity createIndexed(
+			ElkEntity representative);
 	
-	abstract IndexedClassExpression createIndexed(ElkClassExpression representative);
+	abstract IndexedClassExpression createIndexed(
+			ElkClassExpression representative);
 
-	abstract IndexedObjectProperty createIndexed(ElkObjectPropertyExpression representative);
+	abstract IndexedObjectProperty createIndexed(
+			ElkObjectPropertyExpression representative);
 	
-	abstract IndexedPropertyChain createIndexed(ElkObjectPropertyChain representative);
+	abstract IndexedPropertyComposition createIndexed(
+			ElkSubObjectPropertyOfAxiom representative);
 	
-	abstract void removeIfNoOccurrence(IndexedClassExpression ice);
+	abstract void remove(IndexedClassExpression ice);
 	 
-	abstract void removeIfNoOccurrence(IndexedObjectProperty iop);
+	abstract void remove(IndexedObjectProperty iop);
 	
-	abstract void removeIfNoOccurrence(IndexedPropertyChain ipc);
+	abstract void remove(IndexedPropertyComposition ipc);
 	
-	abstract void addComplexRoleInclusion(ComplexRoleInclusion ria);
-	
-	abstract boolean removeComplexRoleInclusion(ComplexRoleInclusion ria);
 }

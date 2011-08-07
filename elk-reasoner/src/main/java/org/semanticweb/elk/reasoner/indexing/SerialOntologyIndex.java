@@ -26,13 +26,9 @@
 package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClass;
@@ -51,7 +47,10 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyChain;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.util.Pair;
+
+import com.google.common.collect.Iterables;
 
 /**
  * @author Yevgeny Kazakov
@@ -60,45 +59,202 @@ import org.semanticweb.elk.util.Pair;
  */
 public class SerialOntologyIndex extends OntologyIndexModifier {
 
-	protected final Map<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
-	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
-	protected final Map<ElkObjectPropertyChain, IndexedPropertyChain> indexedPropertyChainLookup;
-	protected final Map<Pair<IndexedClassExpression, IndexedClassExpression>, IndexedObjectIntersectionOf> indexedObjectIntersectionOfLookup;
-	protected final List<ComplexRoleInclusion> complexRoleInclusionLookup;
-	private int indexedClassCount;
+	protected final Map<ElkClassExpression, IndexedClassExpression>
+		indexedClassExpressionLookup;
 
+	protected final Map<Pair<IndexedClassExpression, IndexedClassExpression>,
+						IndexedObjectIntersectionOf>
+		indexedObjectIntersectionOfLookup;
+
+	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty>
+		indexedObjectPropertyLookup;
+	
+	protected final Map<ElkSubObjectPropertyOfAxiom,
+						IndexedPropertyComposition>
+		indexedPropertyCompositionLookup;
+	
+	protected int indexedClassCount;
+
+	
+	
+	
 	public SerialOntologyIndex() {
 		// TODO possibly replace by ArrayHashMap when it supports removals
-		indexedClassExpressionLookup = new HashMap<ElkClassExpression, IndexedClassExpression>(
-				1024);
-		indexedObjectPropertyLookup = new HashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
-				128);
-		indexedPropertyChainLookup = new HashMap<ElkObjectPropertyChain, IndexedPropertyChain> (16);
-		indexedObjectIntersectionOfLookup = new HashMap<Pair<IndexedClassExpression, IndexedClassExpression>, IndexedObjectIntersectionOf>(
-				1024);
+		indexedClassExpressionLookup =
+			new HashMap<ElkClassExpression,
+						IndexedClassExpression>(1024);
 		
-		// TODO possibly replace by a more efficient multiset datastructure
-		complexRoleInclusionLookup =  new ArrayList<ComplexRoleInclusion> ();
+		indexedObjectPropertyLookup =
+			new HashMap<ElkObjectPropertyExpression,
+						IndexedObjectProperty>(128);
+		
+		indexedPropertyCompositionLookup = 
+			new HashMap<ElkSubObjectPropertyOfAxiom,
+						IndexedPropertyComposition>(16);
+		
+		indexedObjectIntersectionOfLookup = 
+			new HashMap<Pair<IndexedClassExpression, IndexedClassExpression>,
+						IndexedObjectIntersectionOf>(1024);
 	}
 
+
+	
 	public IndexedClassExpression getIndexedClassExpression(
 			ElkClassExpression classExpression) {
 		return indexedClassExpressionLookup.get(classExpression);
 	}
 
+	
 	public IndexedObjectProperty getIndexedObjectProperty(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		return indexedObjectPropertyLookup.get(objectPropertyExpression);
 	}
 	
-	public IndexedPropertyChain getIndexedPropertyChain(
-			ElkObjectPropertyChain objectPropertyChain) {
-		return indexedPropertyChainLookup.get(objectPropertyChain);
+	
+	public IndexedPropertyComposition getIndexedPropertyChain(
+			ElkSubObjectPropertyOfAxiom axiom) {
+		return indexedPropertyCompositionLookup.get(axiom);
 	}
 
+	
+	public IndexedEntity getIndexedEntity(ElkEntity entity) {
+		return entity.accept(indexedEntityGetter);
+	}
 
+	
+	
+	
+	
+	
+	@Override
+	protected IndexedEntity createIndexed(ElkEntity entity) {
+		return entity.accept(indexedEntityCreator);
+	}
+
+	
+	@Override
+	protected IndexedClassExpression createIndexed(
+			ElkClassExpression classExpression) {
+		return classExpression.accept(indexedClassExpressionCreator);
+	}
+
+	
+	@Override
+	protected IndexedObjectProperty createIndexed(
+			ElkObjectPropertyExpression objectPropertyExpression) {
+		return objectPropertyExpression.accept(indexedObjectPropertyCreator);
+	}
+	
+
+	@Override
+	protected IndexedPropertyComposition createIndexed(ElkSubObjectPropertyOfAxiom representative) {
+		// asserts that that the property inclusion is complex
+		assert representative.getSubObjectPropertyExpression() instanceof ElkObjectPropertyChain;
+		
+		List<? extends ElkObjectPropertyExpression> chain = ((ElkObjectPropertyChain) representative.getSubObjectPropertyExpression()).getObjectPropertyExpressions();
+		int n = chain.size();
+		
+		IndexedObjectProperty superProperty = getIndexedObjectProperty(representative.getSuperObjectPropertyExpression());
+		if (superProperty == null)
+			superProperty = createIndexed(representative.getSuperObjectPropertyExpression()); 
+		
+		IndexedPropertyExpression last = getIndexedObjectProperty(chain.get(n-1));
+		if (last == null)
+			last = createIndexed(chain.get(n-1));
+		
+		for (int i = n-2; i >= 0; i--) {
+			IndexedObjectProperty next = getIndexedObjectProperty(chain.get(i));
+			if (next == null)
+				next = createIndexed(chain.get(i));
+			
+			if (i == 0)
+				last = new IndexedPropertyComposition(next, last, superProperty, representative);
+				
+			else
+				last = new IndexedPropertyComposition(next, last);
+		}
+		indexedPropertyCompositionLookup.put(representative, (IndexedPropertyComposition) last);
+		return (IndexedPropertyComposition) last;
+	}
+	
+
+	
+	
+	@Override
+	protected void remove(IndexedClassExpression ice) {
+		for (ElkClassExpression c : ice.getRepresentantatives()) {
+			indexedClassExpressionLookup.remove(c);
+			if (c instanceof ElkClass)
+				indexedClassCount--;
+		}
+
+		if (ice instanceof IndexedObjectIntersectionOf) {
+			IndexedObjectIntersectionOf i = (IndexedObjectIntersectionOf) ice;
+			indexedObjectIntersectionOfLookup.remove(
+					new Pair<IndexedClassExpression, IndexedClassExpression>(
+							i.getFirstConjunct(), i.getSecondConjunct()));
+		}
+	}
+
+	
+	@Override
+	protected void remove(IndexedObjectProperty iop) {
+		indexedObjectPropertyLookup.remove(iop.representative);
+	}
+	
+	
+	@Override
+	protected void remove(IndexedPropertyComposition ria) {
+		if (!ria.isAuxiliary())
+			indexedPropertyCompositionLookup.remove(ria.representative);
+	}
+
+	
+	
+	
+	public ElkAxiomProcessor getAxiomInserter() {
+		return new AxiomIndexer(this, 1);
+	}
+
+	
+	public ElkAxiomProcessor getAxiomDeleter() {
+		return new AxiomIndexer(this, -1);
+	}
+
+	
+	
+	public Iterable<IndexedClass> getIndexedClasses() {
+		return Iterables.unmodifiableIterable(Iterables.filter(
+				indexedClassExpressionLookup.values(), IndexedClass.class));
+	}
+
+	public int getIndexedClassCount() {
+		return indexedClassCount;
+	}
+
+	
+	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
+		return Iterables.unmodifiableIterable(Iterables.concat(
+				indexedClassExpressionLookup.values(),
+				indexedObjectIntersectionOfLookup.values()
+		));
+	}
+
+	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
+		return Iterables.unmodifiableIterable(
+				indexedObjectPropertyLookup.values()
+		);
+	}
+	
+	public Iterable<IndexedPropertyComposition> getIndexedPropertyChains() {
+		return Iterables.unmodifiableIterable(Iterables.concat(
+				indexedPropertyCompositionLookup.values()
+		));
+	}
+
+	
 	private class IndexedEntityGetter implements
-			ElkEntityVisitor<IndexedEntity> {
+	ElkEntityVisitor<IndexedEntity> {
 
 		// TODO implement without a cast
 
@@ -119,124 +275,9 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 	private IndexedEntityGetter indexedEntityGetter = new IndexedEntityGetter();
 
-	public IndexedEntity getIndexedEntity(ElkEntity entity) {
-		return entity.accept(indexedEntityGetter);
-	}
-
-	@Override
-	protected IndexedEntity createIndexed(ElkEntity entity) {
-		return entity.accept(indexedEntityCreator);
-	}
-
-	@Override
-	protected IndexedClassExpression createIndexed(
-			ElkClassExpression classExpression) {
-		return classExpression.accept(indexedClassExpressionCreator);
-	}
-
-	@Override
-	protected IndexedObjectProperty createIndexed(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		return objectPropertyExpression.accept(indexedObjectPropertyCreator);
-	}
-	
-	
-
-	@Override
-	protected void removeIfNoOccurrence(IndexedClassExpression ice) {
-		if (ice.occurrenceNo == 0) {
-			for (ElkClassExpression c : ice.getRepresentantatives()) {
-				indexedClassExpressionLookup.remove(c);
-				if (c instanceof ElkClass)
-					indexedClassCount--;
-			}
-
-			if (ice instanceof IndexedObjectIntersectionOf) {
-				IndexedObjectIntersectionOf i = (IndexedObjectIntersectionOf) ice;
-				indexedObjectIntersectionOfLookup
-						.remove(new Pair<IndexedClassExpression, IndexedClassExpression>(
-								i.getFirstConjunct(), i.getSecondConjunct()));
-			}
-		}
-	}
-
-	@Override
-	protected void removeIfNoOccurrence(IndexedObjectProperty iop) {
-		if (iop.occurrenceNo == 0)
-			indexedObjectPropertyLookup.remove(iop.representative);
-	}
-	
-	@Override
-	protected void removeIfNoOccurrence(IndexedPropertyChain ipc) {
-		if (ipc.occurrenceNo == 0)
-			if (ipc.representative != null)
-				indexedPropertyChainLookup.remove(ipc.representative);
-	}
-
-	public ElkAxiomProcessor getAxiomInserter() {
-		return new AxiomIndexer(this, 1);
-	}
-
-	public ElkAxiomProcessor getAxiomDeleter() {
-		return new AxiomIndexer(this, -1);
-	}
-
-	public Iterable<IndexedClass> getIndexedClasses() {
-		return new Iterable<IndexedClass>() {
-
-			public Iterator<IndexedClass> iterator() {
-				return new Iterator<IndexedClass>() {
-					Iterator<IndexedClassExpression> i = indexedClassExpressionLookup
-							.values().iterator();
-					IndexedClass next = findNext();
-
-					public boolean hasNext() {
-						return next != null;
-					}
-
-					public IndexedClass next() {
-						if (next != null) {
-							IndexedClass result = next;
-							next = findNext();
-							return result;
-						}
-						throw new NoSuchElementException();
-					}
-
-					public void remove() {
-						throw new UnsupportedOperationException();
-					}
-
-					private IndexedClass findNext() {
-						while (i.hasNext()) {
-							IndexedClassExpression ice = i.next();
-							if (ice instanceof IndexedClass)
-								return (IndexedClass) ice;
-						}
-						return null;
-					}
-
-				};
-			}
-		};
-	}
-
-	public int getIndexedClassCount() {
-		return indexedClassCount;
-	}
-
-	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
-		return Collections.unmodifiableCollection(indexedClassExpressionLookup
-				.values());
-	}
-
-	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
-		return Collections.unmodifiableCollection(indexedObjectPropertyLookup
-				.values());
-	}
-
 	private class IndexedEntityCreator implements
 			ElkEntityVisitor<IndexedEntity> {
+		
 		public IndexedClass visit(ElkClass elkClass) {
 			IndexedClass result = new IndexedClass(elkClass);
 			indexedClassExpressionLookup.put(elkClass, result);
@@ -261,6 +302,7 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 	private class IndexedClassExpressionCreator implements
 			ElkClassExpressionVisitor<IndexedClassExpression> {
+		
 		public IndexedClass visit(ElkClass elkClass) {
 			return indexedEntityCreator.visit(elkClass);
 		}
@@ -363,49 +405,5 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 	};
 
 	private final IndexedObjectPropertyCreator indexedObjectPropertyCreator = new IndexedObjectPropertyCreator();
-
-
-	@Override
-	IndexedPropertyChain createIndexed(ElkObjectPropertyChain representative) {
-		List<? extends ElkObjectPropertyExpression> chain = representative.getObjectPropertyExpressions();
-		int n = chain.size();
-		assert n >= 3;
-		
-		IndexedPropertyExpression last = getIndexedObjectProperty(chain.get(n-1));
-		if (last == null)
-			last = createIndexed(chain.get(n-1));
-		
-		for (int i = n-2; i >= 1; i--) {
-			IndexedObjectProperty next = getIndexedObjectProperty(chain.get(i));
-			if (next == null)
-				next = createIndexed(chain.get(i));
-			
-			IndexedPropertyChain ipc = new IndexedPropertyChain(next, last, (i == 1) ? representative : null);
-			addComplexRoleInclusion(new ComplexRoleInclusion(next, last, ipc));
-			last = ipc;
-		}
-		
-		indexedPropertyChainLookup.put(representative, (IndexedPropertyChain) last);
-		return (IndexedPropertyChain) last;
-	}
-
-	@Override
-	void addComplexRoleInclusion(ComplexRoleInclusion ria) {
-		complexRoleInclusionLookup.add(ria);
-	}
-
-	@Override
-	boolean removeComplexRoleInclusion(ComplexRoleInclusion ria) {
-		return complexRoleInclusionLookup.remove(ria);
-	}
-
-	public Iterable<IndexedPropertyChain> getNamedIndexedPropertyChains() {
-		return Collections.unmodifiableCollection(indexedPropertyChainLookup
-				.values());
-	}
-
-	public Collection<ComplexRoleInclusion> getComplexRoleInclusions() {
-		return Collections.unmodifiableCollection(complexRoleInclusionLookup);
-	}
 
 }

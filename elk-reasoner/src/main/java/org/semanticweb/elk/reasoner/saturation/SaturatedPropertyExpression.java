@@ -25,23 +25,23 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.ComplexRoleInclusion;
+import org.semanticweb.elk.reasoner.indexing.IndexedPropertyComposition;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.util.ArrayHashSet;
+import org.semanticweb.elk.util.HashListMultimap;
+import org.semanticweb.elk.util.Multimap;
 
 public class SaturatedPropertyExpression {
 	protected final IndexedPropertyExpression root;
 	protected final Set<IndexedPropertyExpression> derivedSubObjectProperties;
 	protected final Set<IndexedPropertyExpression> derivedSuperObjectProperties;
-	protected final Set<ComplexRoleInclusion> rightSubPropertyInComplexInclusions;
-	protected final Set<ComplexRoleInclusion> superPropertyInComplexInclusions;
+	protected Multimap<IndexedPropertyExpression, IndexedPropertyComposition> propertyChainsByLeftSubProperty;
+	protected Multimap<IndexedPropertyExpression, IndexedPropertyComposition> propertyChainsByRightSubProperty;
 
 	public SaturatedPropertyExpression(IndexedPropertyExpression iop) {
 		this.root = iop;
 		this.derivedSuperObjectProperties = new ArrayHashSet<IndexedPropertyExpression>();
 		this.derivedSubObjectProperties = new ArrayHashSet<IndexedPropertyExpression>();
-		this.rightSubPropertyInComplexInclusions = new ArrayHashSet<ComplexRoleInclusion>();
-		this.superPropertyInComplexInclusions = new ArrayHashSet<ComplexRoleInclusion>();
 	}
 	
 	public IndexedPropertyExpression getRoot() {
@@ -57,13 +57,16 @@ public class SaturatedPropertyExpression {
 		return derivedSuperObjectProperties;
 	}
 
-	
-	public Set<ComplexRoleInclusion> getRightSubPropertyInComplexInclusions() {
-		return rightSubPropertyInComplexInclusions;
+	protected boolean addPropertyChainByLeftSubProperty(IndexedPropertyComposition propertyChain, IndexedPropertyExpression leftSubProperty) {
+		if (propertyChainsByLeftSubProperty == null)
+			propertyChainsByLeftSubProperty = new HashListMultimap<IndexedPropertyExpression, IndexedPropertyComposition> ();
+		return propertyChainsByLeftSubProperty.add(leftSubProperty, propertyChain);
 	}
 
-	
-	public Set<ComplexRoleInclusion> getSuperPropertyInComplexInclusions() {
-		return superPropertyInComplexInclusions;
+	protected boolean addPropertyChainByRightSubProperty(IndexedPropertyComposition propertyChain, IndexedPropertyExpression rightSubProperty) {
+		if (propertyChainsByRightSubProperty == null)
+			propertyChainsByRightSubProperty = new HashListMultimap<IndexedPropertyExpression, IndexedPropertyComposition> ();
+		return propertyChainsByRightSubProperty.add(rightSubProperty, propertyChain);
 	}
+
 }

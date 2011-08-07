@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
@@ -79,14 +79,14 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		this.ontologyIndex = ontologyIndex;
 		this.multiplicity = multiplicity;
 
-		classExpressionIndexer = new ClassExpressionIndexer(this);
-
-		negativeClassExpressionIndexer = new NegativeClassExpressionIndexer(
-				this);
-		positiveClassExpressionIndexer = new PositiveClassExpressionIndexer(
-				this);
-		objectPropertyExpressionIndexer = new ObjectPropertyExpressionIndexer(
-				this);
+		classExpressionIndexer =
+			new ClassExpressionIndexer(this);
+		negativeClassExpressionIndexer = 
+			new NegativeClassExpressionIndexer(this);
+		positiveClassExpressionIndexer = 
+			new PositiveClassExpressionIndexer(this);
+		objectPropertyExpressionIndexer =
+			new ObjectPropertyExpressionIndexer(this);
 	}
 
 	/**
@@ -94,39 +94,6 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	 */
 	public void process(ElkAxiom elkAxiom) {
 		elkAxiom.accept(this);
-	}
-
-	protected void indexSubClassOfAxiom(ElkClassExpression elkSubClass,
-			ElkClassExpression elkSuperClass) {
-		
-		IndexedClassExpression subClass = null;
-		IndexedClassExpression superClass = null;
-		
-		if (multiplicity == 1) {
-			subClass = ontologyIndex.getIndexedClassExpression(elkSubClass);
-			if (subClass == null)
-				subClass = ontologyIndex.createIndexed(elkSubClass);
-			
-			superClass = ontologyIndex.getIndexedClassExpression(elkSuperClass);
-			if (superClass == null)
-				superClass = ontologyIndex.createIndexed(elkSuperClass);
-			
-			subClass.addToldSuperClassExpression(superClass);
-		}
-
-		if (multiplicity == -1) {
-			subClass = ontologyIndex.getIndexedClassExpression(elkSubClass);
-			superClass = ontologyIndex.getIndexedClassExpression(elkSuperClass);
-			if (subClass == null || superClass == null)
-				return;
-			
-			subClass.removeToldSuperClassExpression(superClass);
-		}
-
-		subClass.accept(classExpressionIndexer);
-		superClass.accept(classExpressionIndexer);
-		subClass.accept(negativeClassExpressionIndexer);
-		superClass.accept(positiveClassExpressionIndexer);
 	}
 
 	public Void visit(ElkSubClassOfAxiom axiom) {
@@ -165,6 +132,121 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 	
+	public Void visit(final ElkSubObjectPropertyOfAxiom axiom) {
+		axiom.getSubObjectPropertyExpression().accept(
+				new ElkSubObjectPropertyExpressionVisitor<Void>() {
+
+					public Void visit(ElkObjectProperty subProperty) {
+						indexSubObjectPropertyOfAxiom(subProperty, axiom.getSuperObjectPropertyExpression());
+						return null;
+					}
+
+					public Void visit(ElkObjectInverseOf subProperty) {
+						throw new UnsupportedOperationException("Not yet implemented");
+					}
+
+					public Void visit(ElkObjectPropertyChain subPropertyChain) {
+						indexPropertyComposition(axiom);
+						return null;
+					}
+				});
+
+		return null;
+	}
+
+	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
+		ElkObjectPropertyExpression ope = axiom.getObjectPropertyExpression();
+		indexPropertyComposition(ElkSubObjectPropertyOfAxiom.create(
+				ElkObjectPropertyChain.create(Arrays.asList(ope, ope)), ope));
+		return null;
+	}
+
+	public Void visit(ElkDeclarationAxiom axiom) {
+
+		IndexedEntity ie = ontologyIndex.getIndexedEntity(axiom.getEntity());
+
+		if (multiplicity == 1) {
+			if (ie == null)
+				ie = ontologyIndex.createIndexed(axiom.getEntity());
+		}
+		if (multiplicity == -1) {
+			if (ie == null)
+				return null;
+		}
+
+		ie.accept(new IndexedEntityVisitor<Void> () {
+
+			public Void visit(IndexedClass indexedClass) {
+				return indexedClass.accept(classExpressionIndexer);
+			}
+
+			public Void visit(IndexedObjectProperty indexedObjectProperty) {
+				return indexedObjectProperty.accept(objectPropertyExpressionIndexer);
+			}
+		});
+		
+		return null;
+	}
+
+	public Void visit(ElkDisjointClassesAxiom elkDisjointClasses) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+	
+	
+	protected void indexSubClassOfAxiom(
+			ElkClassExpression elkSubClass,
+			ElkClassExpression elkSuperClass) {
+		
+		IndexedClassExpression subClass = null;
+		IndexedClassExpression superClass = null;
+		
+		if (multiplicity == 1) {
+			subClass = ontologyIndex.getIndexedClassExpression(elkSubClass);
+			if (subClass == null)
+				subClass = ontologyIndex.createIndexed(elkSubClass);
+			
+			superClass = ontologyIndex.getIndexedClassExpression(elkSuperClass);
+			if (superClass == null)
+				superClass = ontologyIndex.createIndexed(elkSuperClass);
+			
+			subClass.addToldSuperClassExpression(superClass);
+		}
+
+		if (multiplicity == -1) {
+			subClass = ontologyIndex.getIndexedClassExpression(elkSubClass);
+			superClass = ontologyIndex.getIndexedClassExpression(elkSuperClass);
+			if (subClass == null || superClass == null)
+				return;
+			
+			subClass.removeToldSuperClassExpression(superClass);
+		}
+
+		subClass.accept(classExpressionIndexer);
+		superClass.accept(classExpressionIndexer);
+		subClass.accept(negativeClassExpressionIndexer);
+		superClass.accept(positiveClassExpressionIndexer);
+	}
+	
 	protected void indexSubObjectPropertyOfAxiom(
 			ElkObjectPropertyExpression elkSubProperty,
 			ElkObjectPropertyExpression elkSuperProperty) {
@@ -199,169 +281,24 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		superProperty.accept(objectPropertyExpressionIndexer);
 	}
 	
-	protected void indexSubPropertyChainOfAxiom(
-			ElkObjectPropertyExpression elkLeftSubProperty,
-			ElkObjectPropertyExpression elkRightSubProperty,
-			ElkObjectPropertyExpression elkSuperProperty) {
+	protected void indexPropertyComposition(
+			ElkSubObjectPropertyOfAxiom axiom) {
 
-		IndexedObjectProperty leftSubProperty = null;
-		IndexedObjectProperty rightSubProperty = null;
-		IndexedObjectProperty superProperty = null;
-		
+		IndexedPropertyComposition ipc = null;
+
 		if (multiplicity == 1) {
-			leftSubProperty = ontologyIndex.getIndexedObjectProperty(elkLeftSubProperty);
-			if (leftSubProperty == null)
-				leftSubProperty = ontologyIndex.createIndexed(elkLeftSubProperty);
-			
-			rightSubProperty = ontologyIndex.getIndexedObjectProperty(elkRightSubProperty);
-			if (rightSubProperty == null)
-				rightSubProperty = ontologyIndex.createIndexed(elkRightSubProperty);
-			
-			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
-			if (superProperty == null)
-				superProperty = ontologyIndex.createIndexed(elkSuperProperty);
-			
-			ontologyIndex.addComplexRoleInclusion(new ComplexRoleInclusion(leftSubProperty, rightSubProperty, superProperty));			
+			ipc = ontologyIndex.getIndexedPropertyChain(axiom);
+			if (ipc == null)
+				ipc = ontologyIndex.createIndexed(axiom);
 		}
-		
+
 		if (multiplicity == -1) {
-			leftSubProperty = ontologyIndex.getIndexedObjectProperty(elkLeftSubProperty);
-			rightSubProperty = ontologyIndex.getIndexedObjectProperty(elkRightSubProperty);
-			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
-			if (leftSubProperty == null || rightSubProperty == null || superProperty == null)
+			ipc = ontologyIndex.getIndexedPropertyChain(axiom);
+			if (ipc == null)
 				return;
-			
-			ontologyIndex.removeComplexRoleInclusion(new ComplexRoleInclusion(leftSubProperty, rightSubProperty, superProperty));
 		}
-		
-		leftSubProperty.accept(objectPropertyExpressionIndexer);
-		rightSubProperty.accept(objectPropertyExpressionIndexer);
-		superProperty.accept(objectPropertyExpressionIndexer);
+
+		ipc.accept(objectPropertyExpressionIndexer);
 	}
-			
 	
-	protected void indexSubPropertyChainOfAxiom(
-			ElkObjectPropertyChain propertyChain,
-			ElkObjectPropertyExpression elkSuperProperty) {
-
-		IndexedObjectProperty leftSubProperty = null;
-		IndexedPropertyExpression rightSubProperty = null;
-		IndexedObjectProperty superProperty = null;
-
-		if (multiplicity == 1) {
-			leftSubProperty = ontologyIndex.getIndexedObjectProperty(propertyChain.getObjectPropertyExpressions().get(0));
-			if (leftSubProperty == null)
-				ontologyIndex.createIndexed(propertyChain.getObjectPropertyExpressions().get(0));
-			
-			rightSubProperty = ontologyIndex.getIndexedPropertyChain(propertyChain);
-			if (rightSubProperty == null)
-				ontologyIndex.createIndexed(propertyChain);
-			
-			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
-			if (superProperty == null)
-				ontologyIndex.createIndexed(elkSuperProperty);
-
-			ontologyIndex.addComplexRoleInclusion(new ComplexRoleInclusion(leftSubProperty, rightSubProperty, superProperty));			
-		}
-
-		if (multiplicity == -1) {
-			leftSubProperty = ontologyIndex.getIndexedObjectProperty(propertyChain.getObjectPropertyExpressions().get(0));
-			rightSubProperty = ontologyIndex.getIndexedPropertyChain(propertyChain);
-			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
-			if (leftSubProperty == null || rightSubProperty == null || superProperty == null)
-				return;
-
-			ontologyIndex.removeComplexRoleInclusion(new ComplexRoleInclusion(leftSubProperty, rightSubProperty, superProperty));
-		}
-
-		leftSubProperty.accept(objectPropertyExpressionIndexer);
-		rightSubProperty.accept(objectPropertyExpressionIndexer);
-		superProperty.accept(objectPropertyExpressionIndexer);
-	}
-
-	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
-		final ElkObjectPropertyExpression superProperty = axiom.getSuperObjectPropertyExpression();
-		axiom.getSubObjectPropertyExpression().accept(
-				new ElkSubObjectPropertyExpressionVisitor<Void>() {
-
-					public Void visit(ElkObjectProperty subProperty) {
-						indexSubObjectPropertyOfAxiom(subProperty, superProperty);
-						return null;
-					}
-
-					public Void visit(ElkObjectInverseOf subProperty) {
-						throw new UnsupportedOperationException("Not yet implemented");
-					}
-
-					public Void visit(ElkObjectPropertyChain subPropertyChain) {
-						List<? extends ElkObjectPropertyExpression> opes = subPropertyChain.getObjectPropertyExpressions();
-						if (opes.size() == 2)
-							indexSubPropertyChainOfAxiom(opes.get(0), opes.get(1), superProperty);
-						else
-							indexSubPropertyChainOfAxiom(subPropertyChain, superProperty);
-						return null;
-					}
-				});
-
-		return null;
-	}
-
-	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-		ElkObjectPropertyExpression ope = axiom.getObjectPropertyExpression();
-		indexSubPropertyChainOfAxiom(ope, ope, ope);
-		return null;
-	}
-
-	private class EntityIndexer implements IndexedEntityVisitor<Void> {
-
-		public Void visit(IndexedClass indexedClass) {
-			return indexedClass.accept(classExpressionIndexer);
-		}
-
-		public Void visit(IndexedObjectProperty indexedObjectProperty) {
-			return indexedObjectProperty.accept(objectPropertyExpressionIndexer);
-		}
-	}
-
-	private EntityIndexer entityIndexer = new EntityIndexer();
-
-	public Void visit(ElkDeclarationAxiom axiom) {
-
-		IndexedEntity ie = ontologyIndex.getIndexedEntity(axiom.getEntity());
-
-		if (multiplicity == 1) {
-			if (ie == null)
-				ie = ontologyIndex.createIndexed(axiom.getEntity());
-		}
-		if (multiplicity == -1) {
-			if (ie == null)
-				return null;
-		}
-
-		ie.accept(entityIndexer);
-		return null;
-	}
-
-	public Void visit(ElkDisjointClassesAxiom elkDisjointClasses) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(
-			ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(
-			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

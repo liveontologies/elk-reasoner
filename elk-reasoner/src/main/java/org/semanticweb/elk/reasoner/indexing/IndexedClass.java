@@ -37,7 +37,7 @@ public class IndexedClass extends IndexedClassExpression implements
 		IndexedEntity {
 
 	/**
-	 * Creates an object representing the given ElkObjectProperty.
+	 * Creates an object representing the given ElkClass.
 	 */
 	protected IndexedClass(ElkClass elkClass) {
 		super(Collections.singletonList((ElkClassExpression) elkClass));

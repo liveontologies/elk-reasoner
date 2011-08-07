@@ -35,6 +35,8 @@ import java.util.Set;
  * @param <Value>
  */
 
+// TODO use Multimap from google.common instead
+
 public interface Multimap<Key, Value> {
 	boolean add(Key key, Value value);
 	boolean contains(Key key, Value value);

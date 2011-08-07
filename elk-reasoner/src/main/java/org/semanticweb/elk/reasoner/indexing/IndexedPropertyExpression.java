@@ -26,11 +26,10 @@ package org.semanticweb.elk.reasoner.indexing;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.saturation.SaturatedPropertyExpression;
-import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.util.HashGenerator;
 
 /**
- * Represents all occurrences of an ElkObjectPropertyExpression in an ontology.
+ * Represents all occurrences of an ElkSubObjectPropertyExpression in an ontology.
  * To this end, objects of this class keeps a list of sub and super property
  * expressions. The data structures are optimized for quickly retrieving the
  * relevant relationships during inferencing.
@@ -44,22 +43,15 @@ import org.semanticweb.elk.util.HashGenerator;
  */
 
 public abstract class IndexedPropertyExpression {
-	
-	protected final ElkSubObjectPropertyExpression representative;
-
 	/**
 	 * This counts how often this object occurred in the ontology.
 	 */
 	protected int occurrenceNo = 0;
 	
-	public IndexedPropertyExpression(ElkSubObjectPropertyExpression representative) {
-		this.representative = representative;
-	}
-
 	protected final AtomicReference<SaturatedPropertyExpression> saturated = new AtomicReference<SaturatedPropertyExpression>();
 
 	/**
-	 * @return The corresponding saturated object property, null if none was
+	 * @return The corresponding SaturatedObjecProperty, null if none was
 	 *         assigned.
 	 */
 	public SaturatedPropertyExpression getSaturated() {
@@ -67,7 +59,7 @@ public abstract class IndexedPropertyExpression {
 	}
 
 	/**
-	 * Sets the corresponding saturated object property if none was yet
+	 * Sets the corresponding SaturatedObjectProperty if none was yet
 	 * assigned.
 	 * 
 	 * @return True if the operation succeeded.
@@ -77,19 +69,13 @@ public abstract class IndexedPropertyExpression {
 	}
 
 	/**
-	 * Resets the corresponding saturated object property to null.
+	 * Resets the corresponding SaturatedObjectProperty to null.
 	 */
 	public void resetSaturated() {
 		saturated.set(null);
 	}
 
-	/**
-	 * Represent the object's ElkObjectProperty as a string. This implementation
-	 * reflects the fact that we generally consider only one
-	 * IndexedObjectProperty for each ElkObjectPropertyExpression.
-	 * 
-	 * @return String representation.
-	 */
+
 
 	/** Hash code for this object. */
 	private final int hashCode_ = HashGenerator.generateNextHashCode();

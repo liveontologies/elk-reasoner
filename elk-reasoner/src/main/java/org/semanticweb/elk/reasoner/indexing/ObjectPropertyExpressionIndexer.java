@@ -28,10 +28,11 @@ package org.semanticweb.elk.reasoner.indexing;
  * @author Frantisek Simancik
  * 
  */
-class ObjectPropertyExpressionIndexer implements IndexedPropertyExpressionVisitor<Void> {
+class ObjectPropertyExpressionIndexer
+		implements IndexedPropertyExpressionVisitor<Void> {
 
 	protected AxiomIndexer axiomIndexer;
-
+	
 	public ObjectPropertyExpressionIndexer(AxiomIndexer axiomIndexer) {
 		this.axiomIndexer = axiomIndexer;
 	}
@@ -39,19 +40,23 @@ class ObjectPropertyExpressionIndexer implements IndexedPropertyExpressionVisito
 	public Void visit(IndexedObjectProperty indexedObjectProperty) {
 		indexedObjectProperty.occurrenceNo += axiomIndexer.multiplicity;
 		assert indexedObjectProperty.occurrenceNo >= 0;
+		if (indexedObjectProperty.occurrenceNo == 0)
+			axiomIndexer.ontologyIndex.remove(indexedObjectProperty);
 
-		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedObjectProperty);
 		return null;
 	}
 
-	public Void visit(IndexedPropertyChain indexedPropertyChain) {
-		indexedPropertyChain.occurrenceNo += axiomIndexer.multiplicity;
-		assert indexedPropertyChain.occurrenceNo >= 0;
+	public Void visit(IndexedPropertyComposition indexedPropertyComposition) {
+		indexedPropertyComposition.occurrenceNo += axiomIndexer.multiplicity;
+		assert indexedPropertyComposition.occurrenceNo >= 0;
+		if (indexedPropertyComposition.occurrenceNo == 0)
+			axiomIndexer.ontologyIndex.remove(indexedPropertyComposition);
 		
-		indexedPropertyChain.leftComponent.accept(this);
-		indexedPropertyChain.rightComponent.accept(this);
+		indexedPropertyComposition.leftProperty.accept(this);
+		indexedPropertyComposition.rightProperty.accept(this);
+		if (!indexedPropertyComposition.isAuxiliary())
+			indexedPropertyComposition.superProperty.accept(this);
 		
-		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedPropertyChain);
 		return null;
 	}
 }

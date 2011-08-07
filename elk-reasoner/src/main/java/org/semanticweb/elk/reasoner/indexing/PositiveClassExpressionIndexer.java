@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
+// TODO this is not needed in the current implementation.
 
 /**
  * For indexing positive occurrences of class expressions.

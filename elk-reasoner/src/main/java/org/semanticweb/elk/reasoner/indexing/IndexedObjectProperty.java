@@ -29,21 +29,15 @@ import java.util.List;
 import org.semanticweb.elk.syntax.ElkObjectProperty;
 
 /**
- * Represents all occurrences of an ElkObjectPropertyExpression in an ontology.
- * To this end, objects of this class keeps a list of sub and super property
- * expressions. The data structures are optimized for quickly retrieving the
- * relevant relationships during inferencing.
- * 
- * This class is mainly a data container that provides direct public access to
- * its content. The task of updating index structures consistently in a global
- * sense is left to callers.
+ * Represents all occurrences of an ElkObjectProperty in an ontology.
  * 
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
 
 public class IndexedObjectProperty extends IndexedPropertyExpression implements IndexedEntity {
-
+	protected final ElkObjectProperty representative;
+	
 	protected List<IndexedObjectProperty> toldSubObjectProperties;
 	protected List<IndexedObjectProperty> toldSuperObjectProperties;
 
@@ -51,14 +45,14 @@ public class IndexedObjectProperty extends IndexedPropertyExpression implements 
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
 	protected IndexedObjectProperty(ElkObjectProperty elkObjectProperty) {
-		super(elkObjectProperty);
+		representative = elkObjectProperty;
 	}
 
 	/**
 	 * @return The represented object property expression.
 	 */
 	public ElkObjectProperty getElkObjectProperty() {
-		return (ElkObjectProperty) representative;
+		return representative;
 	}
 
 	/**

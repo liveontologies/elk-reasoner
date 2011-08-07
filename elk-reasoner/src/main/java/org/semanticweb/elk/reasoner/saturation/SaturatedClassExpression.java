@@ -30,8 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.util.ArrayHashSet;
-import org.semanticweb.elk.util.HashListMultimap;
-import org.semanticweb.elk.util.HashSetMultimap;
 import org.semanticweb.elk.util.Multimap;
 
 /**
@@ -46,10 +44,15 @@ import org.semanticweb.elk.util.Multimap;
 public class SaturatedClassExpression implements Linkable {
 	protected final IndexedClassExpression root;
 	protected final Queue<Queueable> queue;
+
 	// TODO use Derivable instead of IndexedClassExpression here
 	protected final Set<IndexedClassExpression> derived;
-	protected final Multimap<IndexedPropertyExpression, Linkable> linksByObjectProperty;
-	protected final Multimap<IndexedPropertyExpression, Queueable> propagationsByObjectProperty;
+	
+	protected Multimap<IndexedPropertyExpression, Linkable> backwardLinksByObjectProperty;
+	protected Multimap<IndexedPropertyExpression, Linkable> forwardLinksByObjectProperty;
+	protected Multimap<IndexedPropertyExpression, Queueable> propagationsByObjectProperty;
+	protected boolean materializeIncomingLinks = false;
+	
 	/**
 	 * A context is active iff its queue is not empty or it is being
 	 * processed.
@@ -60,8 +63,6 @@ public class SaturatedClassExpression implements Linkable {
 		this.root = root;
 		this.queue = new ConcurrentLinkedQueue<Queueable> ();
 		this.derived = new ArrayHashSet<IndexedClassExpression> (13);
-		this.linksByObjectProperty = new HashListMultimap<IndexedPropertyExpression, Linkable> (1);
-		this.propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyExpression, Queueable> (1);
 		this.isActive = new AtomicBoolean(false);
 	}
 

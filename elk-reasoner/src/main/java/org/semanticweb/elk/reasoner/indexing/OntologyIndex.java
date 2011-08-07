@@ -25,13 +25,11 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import java.util.Collection;
-
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkEntity;
-import org.semanticweb.elk.syntax.ElkObjectPropertyChain;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
 
 /**
  * Interface for public and protected methods of the index of the ontology.
@@ -41,29 +39,43 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
  *
  */
 public interface OntologyIndex  {
-
+	
 	IndexedEntity getIndexedEntity(ElkEntity representative);
 	
-	IndexedClassExpression getIndexedClassExpression(ElkClassExpression representative);
+	IndexedClassExpression getIndexedClassExpression(
+			ElkClassExpression representative);
 	
-	IndexedObjectProperty getIndexedObjectProperty(ElkObjectPropertyExpression representative);
+	IndexedObjectProperty getIndexedObjectProperty(
+			ElkObjectPropertyExpression representative);
 	
-	IndexedPropertyChain getIndexedPropertyChain(ElkObjectPropertyChain representative);
+	IndexedPropertyComposition getIndexedPropertyChain(
+			ElkSubObjectPropertyOfAxiom representative);
 	
+	/**
+	 * @return All IndexedClasses occurring in the ontology
+	 *  without repetitions.
+	 */
 	Iterable<IndexedClass> getIndexedClasses();		
 	
 	int getIndexedClassCount();
 	
+	/**
+	 * @return All IndexedClassExpressions with possible repetitions.
+	 */
 	Iterable<IndexedClassExpression> getIndexedClassExpressions();		
 	
+	/**
+	 * @return All IndexedObjectProperties occurring in the ontology
+	 * without repetitions.
+	 */
 	Iterable<IndexedObjectProperty> getIndexedObjectProperties();
 	
-	Iterable<IndexedPropertyChain> getNamedIndexedPropertyChains();
-	
-	Collection<ComplexRoleInclusion> getComplexRoleInclusions();
+	/**
+	 * @return All IndexedPropertyCompositions without repetitions.
+	 */
+	Iterable<IndexedPropertyComposition> getIndexedPropertyChains();
 	
 	ElkAxiomProcessor getAxiomInserter();
 	
 	ElkAxiomProcessor getAxiomDeleter();
-
 }

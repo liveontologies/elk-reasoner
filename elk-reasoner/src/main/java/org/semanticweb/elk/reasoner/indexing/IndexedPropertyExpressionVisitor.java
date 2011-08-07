@@ -28,5 +28,5 @@ package org.semanticweb.elk.reasoner.indexing;
  */
 public interface IndexedPropertyExpressionVisitor<O> {
 	O visit(IndexedObjectProperty indexedObjectProperty);
-	O visit(IndexedPropertyChain indexedPropertyChain);
+	O visit(IndexedPropertyComposition indexedPropertyChain);
 }

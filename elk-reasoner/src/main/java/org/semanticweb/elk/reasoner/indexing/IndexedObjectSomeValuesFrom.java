@@ -40,7 +40,9 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	protected final IndexedClassExpression filler;
 
 
-	protected IndexedObjectSomeValuesFrom(IndexedObjectProperty relation, IndexedClassExpression filler) {
+	protected IndexedObjectSomeValuesFrom(
+			IndexedObjectProperty relation,
+			IndexedClassExpression filler) {
 		super (new ArrayList<ElkClassExpression> (1));
 		this.relation = relation;
 		this.filler = filler;

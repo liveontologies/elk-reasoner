@@ -42,57 +42,6 @@ class NegativeClassExpressionIndexer implements
 		this.axiomIndexer = axiomIndexer;
 	}
 
-/*
-	public IndexedClassExpression visit(
-			ElkObjectIntersectionOf elkObjectIntersectionOf) {
-
-		IndexedObjectIntersectionOf result = (IndexedObjectIntersectionOf) 
-			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(elkObjectIntersectionOf);
-		if (result.negativeOccurrenceNo++ == 0) {
-
-			int conjunctionSize = elkObjectIntersectionOf.getClassExpressions()
-					.size();
-			assert conjunctionSize > 1;
-			int i = 0;
-			IndexedClassExpression prefixConjunction = null;
-			for (ElkClassExpression element : elkObjectIntersectionOf
-					.getClassExpressions()) {
-				i++;
-				IndexedClassExpression indexedElement = element.accept(this);
-				if (i == 1) {
-					prefixConjunction = indexedElement;
-					continue;
-				} else if (i < conjunctionSize) {
-					List<ElkClassExpression> arguments = new ArrayList<ElkClassExpression>(
-							2);
-					arguments.add(prefixConjunction.getClassExpression());
-					arguments.add(element);
-					prefixConjunction = ElkObjectIntersectionOf.create(
-							arguments).accept(this);
-				} else {
-					prefixConjunction.addNegativeConjunctionByConjunct(result, indexedElement);
-					indexedElement.addNegativeConjunctionByConjunct(result, prefixConjunction);
-				}
-			}
-		}
-		return result;
-	}
-
-	
-	public IndexedClassExpression visit(ElkObjectSomeValuesFrom classExpression) {
-		
-		IndexedObjectSomeValuesFrom result = (IndexedObjectSomeValuesFrom)
-			axiomIndexer.ontologyIndex.getCreateIndexedClassExpression(classExpression);
-		if (result.negativeOccurrenceNo++ == 0) {
-			result.setRelation(classExpression.getObjectPropertyExpression().accept(
-					axiomIndexer.objectPropertyExpressionIndexer));
-			result.setFiller(classExpression.getClassExpression().accept(this));
-			result.getFiller().addNegativeExistential(result);
-		}
-		return result;
-	}
-*/
-	
 	public Void visit(IndexedClass indexedClass) {
 		indexedClass.negativeOccurrenceNo += axiomIndexer.multiplicity;
 		assert indexedClass.negativeOccurrenceNo >= 0;

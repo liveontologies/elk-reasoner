@@ -34,11 +34,16 @@ import org.semanticweb.elk.syntax.ElkClassExpression;
  *
  */
 public class IndexedObjectIntersectionOf extends IndexedClassExpression {
-	
+	/**
+	 * There are only two conjuncts. This reflects the fact that conjunctions
+	 * are binarized during indexing construction. The conjuncts may not
+	 * correspond to any ElkClassExpression in the ontology.
+	 */
 	protected final IndexedClassExpression firstConjunct, secondConjunct;
 	
-	
-	protected IndexedObjectIntersectionOf(IndexedClassExpression firstConjunct, IndexedClassExpression secondConjunct) {
+	protected IndexedObjectIntersectionOf(
+			IndexedClassExpression firstConjunct,
+			IndexedClassExpression secondConjunct) {
 		super (new ArrayList<ElkClassExpression> (1));
 		this.firstConjunct = firstConjunct;
 		this.secondConjunct = secondConjunct;
@@ -60,6 +65,5 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
 
 }

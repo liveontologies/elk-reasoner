@@ -49,7 +49,10 @@ import org.semanticweb.elk.util.HashGenerator;
  * @author Markus Kroetzsch
  */
 abstract public class IndexedClassExpression implements Derivable {
-
+	/**
+	 * list of ElkClassExpressions that are represented by this object, possibly
+	 * empty
+	 */
 	protected final List<ElkClassExpression> representatives;
 
 	protected List<IndexedClassExpression> toldSuperClassExpressions;
@@ -79,10 +82,6 @@ abstract public class IndexedClassExpression implements Derivable {
 
 	protected IndexedClassExpression(List<ElkClassExpression> representatives) {
 		this.representatives = representatives;
-	}
-
-	public boolean occurs() {
-		return occurrenceNo > 0;
 	}
 
 	public boolean occursNegatively() {
@@ -182,10 +181,14 @@ abstract public class IndexedClassExpression implements Derivable {
 		return success;
 	}
 
-	protected final AtomicReference<SaturatedClassExpression> saturated = new AtomicReference<SaturatedClassExpression>();
+	/**
+	 * 
+	 */
+	protected final AtomicReference<SaturatedClassExpression> saturated =
+		new AtomicReference<SaturatedClassExpression>();
 
 	/**
-	 * @return The corresponding saturated object property, null if none was
+	 * @return The corresponding SaturatedClassExpression, null if none was
 	 *         assigned.
 	 */
 	public SaturatedClassExpression getSaturated() {
@@ -193,8 +196,7 @@ abstract public class IndexedClassExpression implements Derivable {
 	}
 
 	/**
-	 * Sets the corresponding saturated class expression if none was yet
-	 * assigned.
+	 * Sets the corresponding SaturatedClassExpression if none was yet assigned.
 	 * 
 	 * @return True if the operation succeeded.
 	 */
@@ -204,7 +206,7 @@ abstract public class IndexedClassExpression implements Derivable {
 	}
 
 	/**
-	 * Resets the corresponding saturated object property to null.
+	 * Resets the corresponding SaturatedClassExpression to null.
 	 */
 	public void resetSaturated() {
 		saturated.set(null);
@@ -224,7 +226,7 @@ abstract public class IndexedClassExpression implements Derivable {
 	}
 
 	abstract public <O> O accept(IndexedClassExpressionVisitor<O> visitor);
-	
+
 	public <O> O accept(QueueableVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

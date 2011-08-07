@@ -42,36 +42,35 @@ class ClassExpressionIndexer implements
 	public ClassExpressionIndexer(AxiomIndexer axiomIndexer) {
 		this.axiomIndexer = axiomIndexer;
 	}
+	
+	protected void updateOccurrenceNo(IndexedClassExpression ice) {
+		ice.occurrenceNo += axiomIndexer.multiplicity;
+		assert ice.occurrenceNo >= 0;
+		if (ice.occurrenceNo == 0)
+			axiomIndexer.ontologyIndex.remove(ice);
+	}
 
 	public Void visit(IndexedClass indexedClass) {
-		indexedClass.occurrenceNo += axiomIndexer.multiplicity;
-		assert indexedClass.occurrenceNo >= 0;
-
-		axiomIndexer.ontologyIndex.removeIfNoOccurrence(indexedClass);
+		updateOccurrenceNo(indexedClass);
+		
 		return null;
 	}
 
 	public Void visit(IndexedObjectIntersectionOf indexedObjectIntersectionOf) {
-		indexedObjectIntersectionOf.occurrenceNo += axiomIndexer.multiplicity;
-		assert indexedObjectIntersectionOf.occurrenceNo >= 0;
+		updateOccurrenceNo(indexedObjectIntersectionOf);
 
 		indexedObjectIntersectionOf.firstConjunct.accept(this);
 		indexedObjectIntersectionOf.secondConjunct.accept(this);
 
-		axiomIndexer.ontologyIndex
-				.removeIfNoOccurrence(indexedObjectIntersectionOf);
 		return null;
 	}
 
 	public Void visit(IndexedObjectSomeValuesFrom indexedObjectSomeValuesFrom) {
-		indexedObjectSomeValuesFrom.occurrenceNo += axiomIndexer.multiplicity;
-		assert indexedObjectSomeValuesFrom.occurrenceNo >= 0;
-
+		updateOccurrenceNo(indexedObjectSomeValuesFrom);
+		
 		indexedObjectSomeValuesFrom.relation.accept(axiomIndexer.objectPropertyExpressionIndexer);
 		indexedObjectSomeValuesFrom.filler.accept(this);
 
-		axiomIndexer.ontologyIndex
-				.removeIfNoOccurrence(indexedObjectSomeValuesFrom);
 		return null;
 	}
 
