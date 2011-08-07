@@ -31,17 +31,37 @@ import org.semanticweb.elk.util.ArrayHashSet;
 import org.semanticweb.elk.util.HashListMultimap;
 import org.semanticweb.elk.util.Multimap;
 
+/**
+ * 
+ * This object is used for fast retrieval of property inclusions and compositions 
+ * which are needed during ClassExpressionSaturation. 
+ * 
+ * @author Frantisek Simancik
+ *
+ */
 public class SaturatedPropertyExpression {
 	protected final IndexedPropertyExpression root;
-	protected final Set<IndexedPropertyExpression> derivedSubObjectProperties;
-	protected final Set<IndexedPropertyExpression> derivedSuperObjectProperties;
-	protected Multimap<IndexedPropertyExpression, IndexedPropertyComposition> propertyChainsByLeftSubProperty;
-	protected Multimap<IndexedPropertyExpression, IndexedPropertyComposition> propertyChainsByRightSubProperty;
+	
+	protected final Set<IndexedPropertyExpression>
+		derivedSubObjectProperties;
+	
+	protected final Set<IndexedPropertyExpression>
+		derivedSuperObjectProperties;
+	
+	protected Multimap<	IndexedPropertyExpression,
+						IndexedPropertyComposition>
+		propertyCompositionsByLeftSubProperty;
+	
+	protected Multimap<	IndexedPropertyExpression,
+						IndexedPropertyComposition>
+		propertyCompositionsByRightSubProperty;
 
 	public SaturatedPropertyExpression(IndexedPropertyExpression iop) {
 		this.root = iop;
-		this.derivedSuperObjectProperties = new ArrayHashSet<IndexedPropertyExpression>();
-		this.derivedSubObjectProperties = new ArrayHashSet<IndexedPropertyExpression>();
+		this.derivedSuperObjectProperties =
+			new ArrayHashSet<IndexedPropertyExpression>();
+		this.derivedSubObjectProperties =
+			new ArrayHashSet<IndexedPropertyExpression>();
 	}
 	
 	public IndexedPropertyExpression getRoot() {
@@ -57,16 +77,28 @@ public class SaturatedPropertyExpression {
 		return derivedSuperObjectProperties;
 	}
 
-	protected boolean addPropertyChainByLeftSubProperty(IndexedPropertyComposition propertyChain, IndexedPropertyExpression leftSubProperty) {
-		if (propertyChainsByLeftSubProperty == null)
-			propertyChainsByLeftSubProperty = new HashListMultimap<IndexedPropertyExpression, IndexedPropertyComposition> ();
-		return propertyChainsByLeftSubProperty.add(leftSubProperty, propertyChain);
+	protected boolean addPropertyChainByLeftSubProperty(
+			IndexedPropertyComposition propertyChain,
+			IndexedPropertyExpression leftSubProperty) {
+		
+		if (propertyCompositionsByLeftSubProperty == null)
+			propertyCompositionsByLeftSubProperty = new HashListMultimap
+				<IndexedPropertyExpression, IndexedPropertyComposition> ();
+		
+		return propertyCompositionsByLeftSubProperty.add(
+				leftSubProperty, propertyChain);
 	}
 
-	protected boolean addPropertyChainByRightSubProperty(IndexedPropertyComposition propertyChain, IndexedPropertyExpression rightSubProperty) {
-		if (propertyChainsByRightSubProperty == null)
-			propertyChainsByRightSubProperty = new HashListMultimap<IndexedPropertyExpression, IndexedPropertyComposition> ();
-		return propertyChainsByRightSubProperty.add(rightSubProperty, propertyChain);
+	protected boolean addPropertyChainByRightSubProperty(
+			IndexedPropertyComposition propertyChain,
+			IndexedPropertyExpression rightSubProperty) {
+		
+		if (propertyCompositionsByRightSubProperty == null)
+			propertyCompositionsByRightSubProperty = new HashListMultimap
+				<IndexedPropertyExpression, IndexedPropertyComposition> ();
+		
+		return propertyCompositionsByRightSubProperty.add(
+				rightSubProperty, propertyChain);
 	}
 
 }

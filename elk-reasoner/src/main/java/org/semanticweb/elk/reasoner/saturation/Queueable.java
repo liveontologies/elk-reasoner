@@ -23,8 +23,10 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 /**
+ * Common interface for objects that can be queued during
+ * ClassExpressionSaturation.
+ * 
  * @author Frantisek Simancik
- *
  */
 public interface Queueable {
 	<O> O accept(QueueableVisitor<O> visitor);

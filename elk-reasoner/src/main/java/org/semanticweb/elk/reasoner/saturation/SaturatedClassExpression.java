@@ -43,15 +43,27 @@ import org.semanticweb.elk.util.Multimap;
  */
 public class SaturatedClassExpression implements Linkable {
 	protected final IndexedClassExpression root;
+	
 	protected final Queue<Queueable> queue;
 
 	// TODO use Derivable instead of IndexedClassExpression here
 	protected final Set<IndexedClassExpression> derived;
 	
-	protected Multimap<IndexedPropertyExpression, Linkable> backwardLinksByObjectProperty;
-	protected Multimap<IndexedPropertyExpression, Linkable> forwardLinksByObjectProperty;
-	protected Multimap<IndexedPropertyExpression, Queueable> propagationsByObjectProperty;
-	protected boolean materializeIncomingLinks = false;
+	protected Multimap<IndexedPropertyExpression, Linkable>
+		backwardLinksByObjectProperty;
+	
+	protected Multimap<IndexedPropertyExpression, Linkable>
+		forwardLinksByObjectProperty;
+	
+	protected Multimap<IndexedPropertyExpression, Queueable>
+		propagationsByObjectProperty;
+	
+	/**
+	 * If set to true, then composition rules will be applied
+	 * to derive all incoming links. This is usually needed only when
+	 * at least one propagation has been derived at this object.
+	 */
+	protected boolean deriveBackwardLinks = false;
 	
 	/**
 	 * A context is active iff its queue is not empty or it is being
@@ -76,7 +88,7 @@ public class SaturatedClassExpression implements Linkable {
 	 * @return the set of derived indexed class expressions
 	 */
 	public Set<IndexedClassExpression> getSuperClassExpressions() {
-		return (Set<IndexedClassExpression>) derived;
+		return derived;
 	}
 
 

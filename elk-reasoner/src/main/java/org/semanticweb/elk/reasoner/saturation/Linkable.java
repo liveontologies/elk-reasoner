@@ -23,6 +23,10 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 /**
+ * Common interface for object that can be linked to during
+ * ClassExpressionSaturation. SaturatedClassExpression is the
+ * only Linkable class in the current implementation.
+ * 
  * @author Frantisek Simancik
  *
  */

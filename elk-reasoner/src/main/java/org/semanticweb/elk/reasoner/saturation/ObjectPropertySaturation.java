@@ -23,22 +23,19 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.ArrayDeque;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyComposition;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.util.AbstractConcurrentComputation;
-import org.semanticweb.elk.util.HashListMultimap;
-import org.semanticweb.elk.util.Multimap;
 
 /**
+ * Computes the transitive closure of object property inclusions. Can also
+ * be used for checking safety for left-linear composition, although this is
+ * not used in the current implementation.
+ * 
  * @author Frantisek Simancik
  *
  */
@@ -47,116 +44,108 @@ public class ObjectPropertySaturation {
 	protected final ExecutorService executor;
 	protected final int maxWorkers;
 	protected final OntologyIndex ontologyIndex;
-	
-	protected final List<IndexedPropertyComposition> allPropertyChains;
+
+	// Safety for left-linear composition is not used in the current implementation.
+/*
 	protected final Multimap<IndexedPropertyExpression, IndexedPropertyComposition> subChains;
-	
 	final AtomicInteger safeRiaNo = new AtomicInteger(0);
 	final AtomicInteger unsafeRiaNo = new AtomicInteger(0);
+*/
 	
 	public ObjectPropertySaturation(ExecutorService executor, int maxWorkers, OntologyIndex ontologyIndex) {
 		this.executor = executor;
 		this.maxWorkers = maxWorkers;
 		this.ontologyIndex = ontologyIndex;  
 		
-		this.allPropertyChains = Collections.synchronizedList(new LinkedList<IndexedPropertyComposition> ());
-		this.subChains = new HashListMultimap<IndexedPropertyExpression, IndexedPropertyComposition> ();
+//		this.subChains = new HashListMultimap<IndexedPropertyExpression, IndexedPropertyComposition> ();
 	}
 	
+	/**
+	 * 
+	 */
 	public void compute() {
 		RoleHierarchyComputation roleHierarchyComputation = new RoleHierarchyComputation(executor, maxWorkers);
 		
-		for (IndexedObjectProperty iop : ontologyIndex.getIndexedObjectProperties())
+		for (IndexedObjectProperty iop : ontologyIndex.getIndexedObjectProperties()) {
+			iop.resetSaturated();
 			roleHierarchyComputation.submit(iop);
-
-		for (IndexedPropertyComposition ipc : ontologyIndex.getIndexedPropertyChains())
-			roleHierarchyComputation.submit(ipc);
+		}
+		
+		for (IndexedPropertyComposition ipc : ontologyIndex.getIndexedPropertyChains()) {		
+			ipc.resetSaturated();
+			if (ipc.isAuxiliary()) {
+				SaturatedPropertyExpression saturated = new SaturatedPropertyExpression(ipc);
+				ipc.setSaturated(saturated);
+				saturated.derivedSubObjectProperties.add(ipc);
+				saturated.derivedSuperObjectProperties.add(ipc);
+			}
+		}
 		
 		roleHierarchyComputation.waitCompletion();
 		
-		if (!allPropertyChains.isEmpty()) {
-		
-			for (IndexedPropertyComposition ria : allPropertyChains) {
-				for (IndexedPropertyExpression rightProperty : ria.getRightProperty().getSaturated().getSubObjectProperties())
-					for (IndexedPropertyExpression leftProperty : ria.getLeftProperty().getSaturated().getSubObjectProperties()) {
-						rightProperty.getSaturated().addPropertyChainByLeftSubProperty(ria, leftProperty);
-						leftProperty.getSaturated().addPropertyChainByRightSubProperty(ria, rightProperty);
-					}
-				for (IndexedPropertyExpression superProperty : ria.getSuperProperty().getSaturated().getSuperObjectProperties())
-					subChains.add(superProperty, ria);
-			}
-			
-			ComplexRiaSafetyChecker complexRiaSafetyChecker = new ComplexRiaSafetyChecker(executor, maxWorkers);
-			
-			for (IndexedPropertyComposition ria : allPropertyChains)
-				complexRiaSafetyChecker.submit(ria);
-			
-			complexRiaSafetyChecker.waitCompletion();
+		for (IndexedPropertyComposition ria : ontologyIndex.getIndexedPropertyChains()) {
+			for (IndexedPropertyExpression rightProperty : ria.getRightProperty().getSaturated().getSubObjectProperties())
+				for (IndexedPropertyExpression leftProperty : ria.getLeftProperty().getSaturated().getSubObjectProperties()) {
+					rightProperty.getSaturated().addPropertyChainByLeftSubProperty(ria, leftProperty);
+					leftProperty.getSaturated().addPropertyChainByRightSubProperty(ria, rightProperty);
+				}
+/*
+			for (IndexedPropertyExpression superProperty : ria.getSuperProperty().getSaturated().getSuperObjectProperties())
+				subChains.add(superProperty, ria);
+*/				
 		}
+
+/*
+		ComplexRiaSafetyChecker complexRiaSafetyChecker = new ComplexRiaSafetyChecker(executor, maxWorkers);
+
+		for (IndexedPropertyComposition ria : allPropertyChains)
+			complexRiaSafetyChecker.submit(ria);
+
+		complexRiaSafetyChecker.waitCompletion();
+
 		System.err.println("  safe RIAs: " + safeRiaNo);
 		System.err.println("unsafe RIAs: " + unsafeRiaNo);
+*/
 	}
 
-	class RoleHierarchyComputation extends AbstractConcurrentComputation<IndexedPropertyExpression> {
+	
+	class RoleHierarchyComputation extends AbstractConcurrentComputation<IndexedObjectProperty> {
 		RoleHierarchyComputation(ExecutorService executor, int maxWorkers) { 
 			super(executor, maxWorkers, 0, 128);
 		}
 		
-		final IndexedPropertyExpressionVisitor<Void> processor =  new IndexedPropertyExpressionVisitor<Void>() {
-			
-			public Void visit(IndexedPropertyComposition ipc) {
-				allPropertyChains.add(ipc);
-				
-				ipc.resetSaturated();
-				if (ipc.getSuperProperty() == ipc) {
-					SaturatedPropertyExpression saturated = new SaturatedPropertyExpression(ipc);
-					ipc.setSaturated(saturated);
-					saturated.derivedSubObjectProperties.add(ipc);
-					saturated.derivedSuperObjectProperties.add(ipc);
-				}
-				if (ipc.getRightProperty() instanceof IndexedPropertyComposition)
-					addJob(ipc.getRightProperty());
-				return null;
-			}
-			
-			public Void visit(IndexedObjectProperty iop) {
-				iop.resetSaturated();
-				SaturatedPropertyExpression saturated = new SaturatedPropertyExpression(iop);
-				iop.setSaturated(saturated);
-
-				//compute all subproperties
-				ArrayDeque<IndexedObjectProperty> queue = new ArrayDeque<IndexedObjectProperty>();
-				saturated.derivedSubObjectProperties.add(iop);
-				queue.addLast(iop);
-				while (!queue.isEmpty()) {
-					IndexedObjectProperty r = queue.removeLast();
-					if (r.getToldSubObjectProperties() != null)
-						for (IndexedObjectProperty s : r.getToldSubObjectProperties())
-							if (saturated.derivedSubObjectProperties.add(s))
-								queue.addLast(s);
-				}
-
-				//compute all superproperties
-				queue.clear();
-				saturated.derivedSuperObjectProperties.add(iop);
-				queue.addLast(iop);
-				while (!queue.isEmpty()) {
-					IndexedObjectProperty r = queue.removeLast();
-					if (r.getToldSuperObjectProperties() != null)
-						for (IndexedObjectProperty s : r.getToldSuperObjectProperties())
-							if (saturated.derivedSuperObjectProperties.add(s))
-								queue.addLast(s);
-				}
-				return null;
-			}
-		}; 
-
 		@Override
-		protected void process(IndexedPropertyExpression ipc) {
-			ipc.accept(processor);
+		protected void process(IndexedObjectProperty iop) {
+			SaturatedPropertyExpression saturated = new SaturatedPropertyExpression(iop);
+			iop.setSaturated(saturated);
+
+			//compute all subproperties
+			ArrayDeque<IndexedObjectProperty> queue = new ArrayDeque<IndexedObjectProperty>();
+			saturated.derivedSubObjectProperties.add(iop);
+			queue.addLast(iop);
+			while (!queue.isEmpty()) {
+				IndexedObjectProperty r = queue.removeLast();
+				if (r.getToldSubObjectProperties() != null)
+					for (IndexedObjectProperty s : r.getToldSubObjectProperties())
+						if (saturated.derivedSubObjectProperties.add(s))
+							queue.addLast(s);
+			}
+
+			//compute all superproperties
+			queue.clear();
+			saturated.derivedSuperObjectProperties.add(iop);
+			queue.addLast(iop);
+			while (!queue.isEmpty()) {
+				IndexedObjectProperty r = queue.removeLast();
+				if (r.getToldSuperObjectProperties() != null)
+					for (IndexedObjectProperty s : r.getToldSuperObjectProperties())
+						if (saturated.derivedSuperObjectProperties.add(s))
+							queue.addLast(s);
+			}
 		}
 	}
-	
+
+/*
 	class ComplexRiaSafetyChecker extends AbstractConcurrentComputation<IndexedPropertyComposition> {
 
 		public ComplexRiaSafetyChecker(ExecutorService executor, int maxWorkers) {
@@ -196,4 +185,5 @@ public class ObjectPropertySaturation {
 			safeRiaNo.incrementAndGet();
 		}
 	}
+	*/
 }

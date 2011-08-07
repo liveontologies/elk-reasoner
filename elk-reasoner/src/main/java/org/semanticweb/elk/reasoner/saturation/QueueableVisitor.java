@@ -29,9 +29,9 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
  *
  */
 public interface QueueableVisitor<O> {
-	O visit(BackwardLink backwardLink);
+	O visit(IndexedClassExpression indexedClassExpression);
 	O visit(DecomposedClassExpression compositeClassExpression);
+	O visit(BackwardLink backwardLink);
 	O visit(ForwardLink forwardLink);
 	O visit(Propagation propagation);
-	O visit(IndexedClassExpression indexedClassExpression);
 }

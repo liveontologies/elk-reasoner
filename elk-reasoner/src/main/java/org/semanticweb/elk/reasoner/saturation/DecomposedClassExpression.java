@@ -24,6 +24,15 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 
+/**
+ * Wrapper used for indicating that this IndexedClassExpression has been
+ * derived by a composition rule. Decomposition rules need not be applied
+ * to such expression.
+ *  
+ * 
+ * @author Frantisek Simancik
+ *
+ */
 public class DecomposedClassExpression implements Queueable {
 	protected final IndexedClassExpression classExpression;
 
@@ -40,7 +49,7 @@ public class DecomposedClassExpression implements Queueable {
 
 	@Override
 	public int hashCode() {
-		return 19 + classExpression.hashCode();
+		return 19123433 + classExpression.hashCode();
 	}
 
 	@Override
