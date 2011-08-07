@@ -98,7 +98,7 @@
 				<configuration>
 					<finalName>elk</finalName>
 					<descriptors>
-						<descriptor>src/main/assembly/standalone.xml</descriptor>
+						<descriptor>${basedir}/src/main/assembly/standalone.xml</descriptor>
 					</descriptors>
 					<archive>
 						<manifest>

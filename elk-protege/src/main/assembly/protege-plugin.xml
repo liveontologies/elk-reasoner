@@ -1,0 +1,23 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+	<id>protege-plugin</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<files>
+		<file>
+			<source>${basedir}/target/${plugin.name}.jar</source>
+			<filtered>true</filtered>
+		</file>
+		<file>
+			<source>${basedir}/src/main/resources/README.txt</source>
+			<filtered>true</filtered>
+		</file>
+		<file>
+			<source>${basedir}/LICENSE.txt</source>
+			<filtered>true</filtered>
+		</file>
+	</files>
+</assembly>
