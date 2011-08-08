@@ -9,6 +9,8 @@
 		<module>elk-reasoner</module>
 		<module>elk-owlapi</module>
 		<module>elk-protege</module>
+		<module>elk-standalone</module>
+		<module>elk-distribution</module>
 	</modules>
 
 	<name>ELK</name>

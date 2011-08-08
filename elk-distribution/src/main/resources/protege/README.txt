@@ -23,8 +23,9 @@ versions of Protégé.
 
 INSTALLATION:
 
-To install, place the file ${plugin.name}.jar to the plugins folder of the 
-Protégé installation. The plug-in supports Protégé 4 Auto Update feature
-which can be used for upgrading to newer versions according to the
+To install, place the file ${project.groupId}.jar to the plugins folder
+of the Protégé installation. The plug-in supports Protégé 4 Auto Update 
+feature which can be used for upgrading to newer versions according to the 
 instructions here:
-http://protegewiki.stanford.edu/wiki/EnablePluginAutoUpdate
+
+    http://protegewiki.stanford.edu/wiki/EnablePluginAutoUpdate

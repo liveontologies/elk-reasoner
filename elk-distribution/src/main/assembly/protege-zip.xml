@@ -8,11 +8,7 @@
 	</formats>
 	<files>
 		<file>
-			<source>${basedir}/target/${plugin.name}.jar</source>
-			<filtered>true</filtered>
-		</file>
-		<file>
-			<source>${basedir}/src/main/resources/README.txt</source>
+			<source>${basedir}/src/main/resources/protege/README.txt</source>
 			<filtered>true</filtered>
 		</file>
 		<file>
@@ -20,4 +16,13 @@
 			<filtered>true</filtered>
 		</file>
 	</files>
+	<dependencySets>
+		<dependencySet>
+			<includes>
+				<include>*:elk-protege:*</include>
+			</includes>
+			<outputFileNameMapping>${artifact.groupId}.${artifact.extension}</outputFileNameMapping>
+			<useProjectArtifact>false</useProjectArtifact>
+		</dependencySet>
+	</dependencySets>
 </assembly>

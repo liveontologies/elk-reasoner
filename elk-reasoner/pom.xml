@@ -92,29 +92,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<finalName>elk</finalName>
-					<descriptors>
-						<descriptor>${basedir}/src/main/assembly/standalone.xml</descriptor>
-					</descriptors>
-					<archive>
-						<manifest>
-							<mainClass>org.semanticweb.elk.ElkCli</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+			</plugin>			
 		</plugins>
 	</build>
 </project>
