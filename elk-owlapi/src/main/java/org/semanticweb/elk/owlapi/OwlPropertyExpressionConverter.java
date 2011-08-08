@@ -25,8 +25,9 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import org.semanticweb.elk.syntax.ElkObjectProperty;
-import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -56,7 +57,7 @@ public class OwlPropertyExpressionConverter implements
 		else if (property.isOWLBottomObjectProperty())
 			return ElkObjectProperty.ELK_OWL_BOTTOM_OBJECT_PROPERTY;
 		else
-			return ElkObjectProperty.create(property.getIRI().toString());
+			return ElkObjectPropertyImpl.create(property.getIRI().toString());
 	}
 
 	public ElkObjectPropertyExpression visit(OWLObjectInverseOf property) {

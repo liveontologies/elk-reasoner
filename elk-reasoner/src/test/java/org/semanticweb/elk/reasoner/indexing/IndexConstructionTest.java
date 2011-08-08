@@ -25,13 +25,15 @@ package org.semanticweb.elk.reasoner.indexing;
 import junit.framework.TestCase;
 
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
-import org.semanticweb.elk.syntax.ElkClass;
-import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
-import org.semanticweb.elk.syntax.ElkObjectProperty;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.syntax.ElkSubClassOfAxiom;
+import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
+import org.semanticweb.elk.syntax.implementation.ElkEquivalentClassesAxiomImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectIntersectionOfImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectSomeValuesFromImpl;
+import org.semanticweb.elk.syntax.implementation.ElkSubClassOfAxiomImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
 
 public class IndexConstructionTest extends TestCase {
 
@@ -40,19 +42,21 @@ public class IndexConstructionTest extends TestCase {
 	}
 
 	public void testIndexer() {
-		ElkClass a = ElkClass.create("A");
-		ElkClass b = ElkClass.create("B");
-		ElkClass c = ElkClass.create("C");
-		ElkClass d = ElkClass.create("D");
-		ElkObjectProperty r = ElkObjectProperty.create("R");
-		
+		ElkClass a = ElkClassImpl.create("A");
+		ElkClass b = ElkClassImpl.create("B");
+		ElkClass c = ElkClassImpl.create("C");
+		ElkClass d = ElkClassImpl.create("D");
+		ElkObjectProperty r = ElkObjectPropertyImpl.create("R");
+
 		OntologyIndex index = new SerialOntologyIndex();
 		ElkAxiomProcessor inserter = index.getAxiomInserter();
 		ElkAxiomProcessor deleter = index.getAxiomDeleter();
-		
-		inserter.process(ElkSubClassOfAxiom.create(ElkObjectIntersectionOf.create(a, b), d));
-		inserter.process(ElkEquivalentClassesAxiom.create(ElkObjectSomeValuesFrom.create(r, c), a));
-		
+
+		inserter.process(ElkSubClassOfAxiomImpl.create(
+				ElkObjectIntersectionOfImpl.create(a, b), d));
+		inserter.process(ElkEquivalentClassesAxiomImpl.create(
+				ElkObjectSomeValuesFromImpl.create(r, c), a));
+
 		IndexedClassExpression A = index.getIndexedClassExpression(a);
 		IndexedClassExpression B = index.getIndexedClassExpression(b);
 		IndexedClassExpression C = index.getIndexedClassExpression(c);
@@ -66,39 +70,44 @@ public class IndexConstructionTest extends TestCase {
 		assertEquals(2, R.occurrenceNo);
 		assertTrue(A.getNegConjunctionsByConjunct().containsKey(B));
 		assertTrue(C.getNegExistentials().get(0).getRelation() == R);
-		
-		deleter.process(ElkEquivalentClassesAxiom.create(ElkObjectSomeValuesFrom.create(r, c), a));
-		
+
+		deleter.process(ElkEquivalentClassesAxiomImpl.create(
+				ElkObjectSomeValuesFromImpl.create(r, c), a));
+
 		assertEquals(1, A.negativeOccurrenceNo);
 		assertEquals(0, A.positiveOccurrenceNo);
 		assertEquals(0, R.occurrenceNo);
 		assertNull(C.getNegExistentials());
 		assertNull(index.getIndexedEntity(c));
 		assertNull(index.getIndexedEntity(r));
-		
-		deleter.process(ElkSubClassOfAxiom.create(ElkObjectIntersectionOf.create(a, b), d));
+
+		deleter.process(ElkSubClassOfAxiomImpl.create(
+				ElkObjectIntersectionOfImpl.create(a, b), d));
 		assertEquals(0, A.negativeOccurrenceNo);
 		assertNull(A.getNegConjunctionsByConjunct());
 		assertNull(index.getIndexedEntity(a));
 	}
-	
+
 	public void testConjunctionSharing() {
-		ElkClass a = ElkClass.create("A");
-		ElkClass b = ElkClass.create("B");
-		ElkClass c = ElkClass.create("C");
-		ElkClass d = ElkClass.create("D");
-		
-		ElkClassExpression x = ElkObjectIntersectionOf.create(a, b, c);
-		ElkClassExpression y = ElkObjectIntersectionOf.create(ElkObjectIntersectionOf.create(b, a), c);
-		
+		ElkClass a = ElkClassImpl.create("A");
+		ElkClass b = ElkClassImpl.create("B");
+		ElkClass c = ElkClassImpl.create("C");
+		ElkClass d = ElkClassImpl.create("D");
+
+		ElkClassExpression x = ElkObjectIntersectionOfImpl.create(a, b, c);
+		ElkClassExpression y = ElkObjectIntersectionOfImpl.create(
+				ElkObjectIntersectionOfImpl.create(b, a), c);
+
 		OntologyIndex index = new SerialOntologyIndex();
 		ElkAxiomProcessor inserter = index.getAxiomInserter();
-		
-		inserter.process(ElkSubClassOfAxiom.create(x, d));
-		inserter.process(ElkSubClassOfAxiom.create(y, d));
-		
-		assertSame(index.getIndexedClassExpression(x), index.getIndexedClassExpression(y));
-		assertEquals(2, index.getIndexedClassExpression(x).getToldSuperClassExpressions().size());
+
+		inserter.process(ElkSubClassOfAxiomImpl.create(x, d));
+		inserter.process(ElkSubClassOfAxiomImpl.create(y, d));
+
+		assertSame(index.getIndexedClassExpression(x),
+				index.getIndexedClassExpression(y));
+		assertEquals(2, index.getIndexedClassExpression(x)
+				.getToldSuperClassExpressions().size());
 	}
 
 }

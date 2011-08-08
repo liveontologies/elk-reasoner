@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.classification.ClassNode;
-import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.util.Statistics;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;

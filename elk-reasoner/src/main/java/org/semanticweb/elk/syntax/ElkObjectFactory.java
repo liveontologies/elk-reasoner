@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkObject;
+
 public interface ElkObjectFactory {
 	public ElkObject put(ElkObject object);
 }

@@ -30,9 +30,11 @@ import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.semanticweb.elk.syntax.ElkClass;
-import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.syntax.ElkSubClassOfAxiom;
+import org.semanticweb.elk.syntax.implementation.ElkEquivalentClassesAxiomImpl;
+import org.semanticweb.elk.syntax.implementation.ElkSubClassOfAxiomImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
@@ -159,12 +161,12 @@ public class ClassTaxonomyPrinter {
 			SortedMap<String, ElkClass> orderedSubClasses, Writer writer)
 			throws IOException {
 		for (ElkClass elkClassMember : orderedEquivalentClasses.values()) {
-			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = ElkEquivalentClassesAxiom
+			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = ElkEquivalentClassesAxiomImpl
 					.create(elkClass, elkClassMember);
 			writer.write(elkEquivalentClassesAxiom.toString() + "\n");
 		}
 		for (ElkClass elkSubClass : orderedSubClasses.values()) {
-			ElkSubClassOfAxiom elkSubClassAxiom = ElkSubClassOfAxiom.create(
+			ElkSubClassOfAxiom elkSubClassAxiom = ElkSubClassOfAxiomImpl.create(
 					elkSubClass, elkClass);
 			writer.write(elkSubClassAxiom.toString() + "\n");
 		}

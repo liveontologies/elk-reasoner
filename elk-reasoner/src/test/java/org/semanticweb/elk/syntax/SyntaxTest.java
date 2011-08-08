@@ -24,6 +24,15 @@ package org.semanticweb.elk.syntax;
 
 import java.util.Arrays;
 
+import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectIntersectionOfImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectSomeValuesFromImpl;
+import org.semanticweb.elk.syntax.implementation.ElkSubClassOfAxiomImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkClassAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+
 import junit.framework.TestCase;
 
 public class SyntaxTest extends TestCase {
@@ -32,33 +41,33 @@ public class SyntaxTest extends TestCase {
 	}
 	
 	public void testFactory() {
-		ElkClassExpression heart = ElkClass.create("Heart");
-		ElkClassExpression organ = ElkClass.create("Organ");
-		ElkClassExpression heart2 = ElkClass.create("Heart");
+		ElkClassExpression heart = ElkClassImpl.create("Heart");
+		ElkClassExpression organ = ElkClassImpl.create("Organ");
+		ElkClassExpression heart2 = ElkClassImpl.create("Heart");
 
 		assertSame("heart == heart2", heart, heart2);
 		assertNotSame("heart != organ", organ);
 
-		ElkClassExpression human = ElkClass.create("Human");
-		ElkObjectPropertyExpression has = ElkObjectProperty.create("has");
+		ElkClassExpression human = ElkClassImpl.create("Human");
+		ElkObjectPropertyExpression has = ElkObjectPropertyImpl.create("has");
 
-		ElkClassExpression hasHeart = ElkObjectSomeValuesFrom.create(has, heart);		   
-		ElkClassExpression hasOrgan = ElkObjectSomeValuesFrom.create(has, organ);
-		ElkClassExpression hasHeart2 = ElkObjectSomeValuesFrom.create(has, heart2);
+		ElkClassExpression hasHeart = ElkObjectSomeValuesFromImpl.create(has, heart);		   
+		ElkClassExpression hasOrgan = ElkObjectSomeValuesFromImpl.create(has, organ);
+		ElkClassExpression hasHeart2 = ElkObjectSomeValuesFromImpl.create(has, heart2);
 
 		assertSame("hasHeart == hasHeart2", hasHeart, hasHeart2);
 		assertNotSame("hasHeart != hasOrgan", hasHeart, hasOrgan);
 
-		ElkClassExpression heartAndOrgan = ElkObjectIntersectionOf.create(Arrays.asList(heart, organ));
-		ElkClassExpression organAndHeart = ElkObjectIntersectionOf.create(Arrays.asList(organ, heart));
-		ElkClassExpression heart2AndOrgan = ElkObjectIntersectionOf.create(Arrays.asList(heart2, organ));
+		ElkClassExpression heartAndOrgan = ElkObjectIntersectionOfImpl.create(Arrays.asList(heart, organ));
+		ElkClassExpression organAndHeart = ElkObjectIntersectionOfImpl.create(Arrays.asList(organ, heart));
+		ElkClassExpression heart2AndOrgan = ElkObjectIntersectionOfImpl.create(Arrays.asList(heart2, organ));
 
 		assertSame("heartAndOrgan == heart2AndOrgan", heartAndOrgan, heart2AndOrgan);
 		assertNotSame("heartAndOrgan == organAndHeart", heartAndOrgan, organAndHeart);
 
-		ElkClassAxiom humanHasHeart = ElkSubClassOfAxiom.create(human, hasHeart);
-		ElkClassAxiom humanHasOrgan = ElkSubClassOfAxiom.create(human, hasOrgan);
-		ElkClassAxiom humanHasHeart2 = ElkSubClassOfAxiom.create(human, hasHeart2);
+		ElkClassAxiom humanHasHeart = ElkSubClassOfAxiomImpl.create(human, hasHeart);
+		ElkClassAxiom humanHasOrgan = ElkSubClassOfAxiomImpl.create(human, hasOrgan);
+		ElkClassAxiom humanHasHeart2 = ElkSubClassOfAxiomImpl.create(human, hasHeart2);
 
 		assertSame("humanHasHeart == humanHasHeart2", humanHasHeart, humanHasHeart2);
 		assertNotSame("humanHasHeart != humanHasOrgan", humanHasHeart, humanHasOrgan);

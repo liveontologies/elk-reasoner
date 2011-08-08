@@ -26,8 +26,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
+import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 import org.semanticweb.elk.util.AbstractConcurrentComputation;
 
 /**
@@ -42,8 +42,8 @@ public class ConcurrentFutureElkAxiomLoader extends
 
 	protected ElkAxiomProcessor elkAxiomProcessor;
 
-	public ConcurrentFutureElkAxiomLoader(ExecutorService executor, int workerNo,
-			ElkAxiomProcessor elkAxiomProcessor) {
+	public ConcurrentFutureElkAxiomLoader(ExecutorService executor,
+			int workerNo, ElkAxiomProcessor elkAxiomProcessor) {
 		super(executor, workerNo, 512, 0);
 		this.elkAxiomProcessor = elkAxiomProcessor;
 	}
@@ -58,7 +58,7 @@ public class ConcurrentFutureElkAxiomLoader extends
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void submit(Future<? extends ElkAxiom> futureAxiom) {
 		if (futureAxiom != null) {
 			super.submit(futureAxiom);

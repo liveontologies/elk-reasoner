@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkObject;
+
 /**
  * Visitor pattern interface for instances of {@link ElkObject}.
  * 

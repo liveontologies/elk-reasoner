@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyComposition;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.util.AbstractConcurrentComputation;
 import org.semanticweb.elk.util.HashSetMultimap;
 import org.semanticweb.elk.util.LazySetIntersection;

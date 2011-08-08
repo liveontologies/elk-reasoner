@@ -25,6 +25,10 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+
 /**
  * Visitor pattern interface for instances of {@link ElkObjectPropertyExpression}.
  * 

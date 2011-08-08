@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.util.HashGenerator;
 
 /**

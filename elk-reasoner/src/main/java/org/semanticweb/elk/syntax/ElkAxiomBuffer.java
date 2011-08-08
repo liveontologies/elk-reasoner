@@ -24,6 +24,8 @@ package org.semanticweb.elk.syntax;
 
 import java.util.ArrayList;
 
+import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
+
 /**
  * Simple axiom processor that merely buffers axioms to send them to another
  * processor later on. This is useful for performance measurements, in

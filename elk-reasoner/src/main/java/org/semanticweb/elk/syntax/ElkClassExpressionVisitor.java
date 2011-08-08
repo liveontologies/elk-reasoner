@@ -25,6 +25,14 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
+
 /**
  * Visitor pattern interface for instances of {@link ElkClassExpression}.
  * 

@@ -25,10 +25,13 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import org.semanticweb.elk.syntax.ElkClass;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
-import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -74,6 +77,21 @@ public final class ElkClassExpressionConverter implements
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
 		// TODO Support this constructor
 		throw new ConverterException("Not yet implemented.");
+	}
+
+	public OWLClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

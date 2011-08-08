@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.classification;
 
 import java.util.Set;
 
-import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.StructuralHashObject;
 

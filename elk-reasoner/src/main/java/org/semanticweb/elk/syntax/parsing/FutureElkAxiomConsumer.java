@@ -24,7 +24,7 @@ package org.semanticweb.elk.syntax.parsing;
 
 import java.util.concurrent.Future;
 
-import org.semanticweb.elk.syntax.ElkAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 
 /**
  * Interface for classes that process Future objects for ElkAxioms. Typically

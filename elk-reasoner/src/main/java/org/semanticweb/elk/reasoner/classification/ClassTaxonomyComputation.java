@@ -32,7 +32,7 @@ import java.util.concurrent.ExecutorService;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
-import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.util.AbstractConcurrentComputation;
 
 public class ClassTaxonomyComputation extends

@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.Collections;
 
-import org.semanticweb.elk.syntax.ElkClass;
-import org.semanticweb.elk.syntax.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.

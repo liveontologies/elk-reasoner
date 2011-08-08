@@ -27,27 +27,30 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.Arrays;
 
-import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
-import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.syntax.ElkDeclarationAxiom;
-import org.semanticweb.elk.syntax.ElkDisjointClassesAxiom;
-import org.semanticweb.elk.syntax.ElkDisjointObjectPropertiesAxiom;
-import org.semanticweb.elk.syntax.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.syntax.ElkEquivalentObjectPropertiesAxiom;
-import org.semanticweb.elk.syntax.ElkFunctionalObjectPropertyAxiom;
-import org.semanticweb.elk.syntax.ElkInverseFunctionalObjectPropertyAxiom;
-import org.semanticweb.elk.syntax.ElkInverseObjectPropertiesAxiom;
-import org.semanticweb.elk.syntax.ElkObjectInverseOf;
-import org.semanticweb.elk.syntax.ElkObjectProperty;
-import org.semanticweb.elk.syntax.ElkObjectPropertyChain;
-import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
-import org.semanticweb.elk.syntax.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyChainImpl;
+import org.semanticweb.elk.syntax.implementation.ElkSubObjectPropertyOfAxiomImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointUnionAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkEquivalentObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkFunctionalObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
 
 /**
  * An ElkAxiomProcessor that updates an OntologyIndex for the given ElkAxioms.
@@ -104,7 +107,7 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 	public Void visit(ElkEquivalentClassesAxiom axiom) {
 		ElkClassExpression first = null;
-		for (ElkClassExpression c : axiom.getEquivalentClassExpressions()) {
+		for (ElkClassExpression c : axiom.getClassExpressions()) {
 			// implement EquivalentClassesAxiom as two SubClassOfAxioms
 
 			if (first == null)
@@ -156,8 +159,8 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
 		ElkObjectPropertyExpression ope = axiom.getObjectPropertyExpression();
-		indexPropertyComposition(ElkSubObjectPropertyOfAxiom.create(
-				ElkObjectPropertyChain.create(Arrays.asList(ope, ope)), ope));
+		indexPropertyComposition(ElkSubObjectPropertyOfAxiomImpl.create(
+				ElkObjectPropertyChainImpl.create(Arrays.asList(ope, ope)), ope));
 		return null;
 	}
 
@@ -299,6 +302,12 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		}
 
 		ipc.accept(objectPropertyExpressionIndexer);
+	}
+
+	public Void visit(
+			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

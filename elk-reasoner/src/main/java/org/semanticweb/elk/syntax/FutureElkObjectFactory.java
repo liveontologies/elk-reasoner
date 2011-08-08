@@ -28,6 +28,32 @@ package org.semanticweb.elk.syntax;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.semanticweb.elk.syntax.interfaces.ElkAnonymousIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointUnionAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkEntity;
+import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkEquivalentObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
+
 /**
  * Factory for ElkObjects designed to delay the creation of Elk objects. The
  * constructors return "lazy" representation of expressions by wrapping into an

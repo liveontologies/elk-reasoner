@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyExpression;
+
 /**
  * Visitor pattern interface for instances of {@link ElkSubObjectPropertyExpression}.
  * @author Frantisek

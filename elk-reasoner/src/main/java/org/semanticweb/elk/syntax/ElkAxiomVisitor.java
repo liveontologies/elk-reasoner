@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
+
 public interface ElkAxiomVisitor<O> extends ElkClassAxiomVisitor<O>,
 		ElkObjectPropertyAxiomVisitor<O> {
 	

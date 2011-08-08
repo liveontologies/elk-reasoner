@@ -22,8 +22,8 @@
  */
 package org.semanticweb.elk.syntax.preprocessing;
 
-import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
+import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 
 public class MultiplyingAxiomProcessor implements ElkAxiomProcessor {
 	

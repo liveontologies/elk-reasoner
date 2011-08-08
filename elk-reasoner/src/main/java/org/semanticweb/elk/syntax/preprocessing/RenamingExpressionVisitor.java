@@ -24,38 +24,48 @@ package org.semanticweb.elk.syntax.preprocessing;
 
 import java.util.ArrayList;
 
-import org.semanticweb.elk.syntax.ElkAxiom;
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
-import org.semanticweb.elk.syntax.ElkClass;
-import org.semanticweb.elk.syntax.ElkClassExpression;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
-import org.semanticweb.elk.syntax.ElkDeclarationAxiom;
-import org.semanticweb.elk.syntax.ElkDisjointClassesAxiom;
-import org.semanticweb.elk.syntax.ElkDisjointObjectPropertiesAxiom;
-import org.semanticweb.elk.syntax.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.syntax.ElkEntity;
 import org.semanticweb.elk.syntax.ElkEntityVisitor;
-import org.semanticweb.elk.syntax.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.syntax.ElkEquivalentObjectPropertiesAxiom;
-import org.semanticweb.elk.syntax.ElkFunctionalObjectPropertyAxiom;
-import org.semanticweb.elk.syntax.ElkInverseFunctionalObjectPropertyAxiom;
-import org.semanticweb.elk.syntax.ElkInverseObjectPropertiesAxiom;
-import org.semanticweb.elk.syntax.ElkNamedIndividual;
-import org.semanticweb.elk.syntax.ElkObjectHasSelf;
-import org.semanticweb.elk.syntax.ElkObjectHasValue;
-import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
-import org.semanticweb.elk.syntax.ElkObjectInverseOf;
-import org.semanticweb.elk.syntax.ElkObjectOneOf;
-import org.semanticweb.elk.syntax.ElkObjectProperty;
-import org.semanticweb.elk.syntax.ElkObjectPropertyChain;
-import org.semanticweb.elk.syntax.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.syntax.ElkSubClassOfAxiom;
-import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.syntax.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.syntax.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
+import org.semanticweb.elk.syntax.implementation.ElkDeclarationAxiomImpl;
+import org.semanticweb.elk.syntax.implementation.ElkEquivalentClassesAxiomImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectIntersectionOfImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectSomeValuesFromImpl;
+import org.semanticweb.elk.syntax.implementation.ElkSubClassOfAxiomImpl;
+import org.semanticweb.elk.syntax.implementation.ElkSubObjectPropertyOfAxiomImpl;
+import org.semanticweb.elk.syntax.implementation.ElkTransitiveObjectPropertyAxiomImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointUnionAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkEntity;
+import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkEquivalentObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkFunctionalObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
 
 /**
  * A visitor for creating variants of ElkAxiom, ElkClassExpression and
@@ -109,20 +119,20 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom) {
 		ArrayList<ElkClassExpression> newClassExpressions = new ArrayList<ElkClassExpression>();
 		for (ElkClassExpression classExpression : elkEquivalentClassesAxiom
-				.getEquivalentClassExpressions()) {
+				.getClassExpressions()) {
 			newClassExpressions.add(classExpression.accept(this));
 		}
-		return ElkEquivalentClassesAxiom.create(newClassExpressions);
+		return ElkEquivalentClassesAxiomImpl.create(newClassExpressions);
 	}
 
 	public ElkSubClassOfAxiom visit(ElkSubClassOfAxiom elkSubClassOfAxiom) {
-		return ElkSubClassOfAxiom.create(elkSubClassOfAxiom
+		return ElkSubClassOfAxiomImpl.create(elkSubClassOfAxiom
 				.getSubClassExpression().accept(this), elkSubClassOfAxiom
 				.getSuperClassExpression().accept(this));
 	}
 
 	public ElkClass visit(ElkClass classExpression) {
-		return ElkClass.create(classExpression.getIri() + postfix);
+		return ElkClassImpl.create(classExpression.getIri() + postfix);
 	}
 
 	public ElkObjectIntersectionOf visit(ElkObjectIntersectionOf classExpression) {
@@ -131,7 +141,7 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 				.getClassExpressions()) {
 			newSubClassExpressions.add(subClassExpression.accept(this));
 		}
-		return ElkObjectIntersectionOf.create(newSubClassExpressions);
+		return ElkObjectIntersectionOfImpl.create(newSubClassExpressions);
 	}
 
 	public ElkObjectSomeValuesFrom visit(ElkObjectSomeValuesFrom classExpression) {
@@ -139,11 +149,12 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 				.accept(this);
 		ElkObjectPropertyExpression newProperty = classExpression
 				.getObjectPropertyExpression().accept(this);
-		return ElkObjectSomeValuesFrom.create(newProperty, newClass);
+		return ElkObjectSomeValuesFromImpl.create(newProperty, newClass);
 	}
 
 	public ElkObjectProperty visit(ElkObjectProperty elkObjectProperty) {
-		return ElkObjectProperty.create(elkObjectProperty.getIri() + postfix);
+		return ElkObjectPropertyImpl.create(elkObjectProperty.getIri()
+				+ postfix);
 	}
 
 	public ElkObjectPropertyExpression visit(
@@ -172,7 +183,7 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	public ElkAxiom visit(
 			ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom) {
-		return ElkSubObjectPropertyOfAxiom
+		return ElkSubObjectPropertyOfAxiomImpl
 				.create(elkSubObjectPropertyOfAxiom
 						.getSubObjectPropertyExpression()
 						.accept(this.renamingSubObjectPropertyExpressionVisitor),
@@ -183,13 +194,13 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	public ElkAxiom visit(
 			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
-		return ElkTransitiveObjectPropertyAxiom
+		return ElkTransitiveObjectPropertyAxiomImpl
 				.create(elkTransitiveObjectPropertyAxiom
 						.getObjectPropertyExpression().accept(this));
 	}
 
 	public ElkDeclarationAxiom visit(ElkDeclarationAxiom elkDeclarationAxiom) {
-		return ElkDeclarationAxiom.create(elkDeclarationAxiom.getEntity()
+		return ElkDeclarationAxiomImpl.create(elkDeclarationAxiom.getEntity()
 				.accept(this));
 	}
 
@@ -237,6 +248,12 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	public ElkAxiom visit(
 			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}

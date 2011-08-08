@@ -26,6 +26,8 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
+import org.semanticweb.elk.syntax.interfaces.ElkObject;
+
 // TODO reimplement with ArrayHashSet when it supports removals
 
 /**

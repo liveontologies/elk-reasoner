@@ -33,8 +33,8 @@ import junit.framework.TestCase;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.UnbufferedTokenStream;
-import org.semanticweb.elk.syntax.ElkAxiom;
-import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.parsing.FutureElkAxiomConsumer;
 
 /**

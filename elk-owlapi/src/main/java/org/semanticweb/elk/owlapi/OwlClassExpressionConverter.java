@@ -28,10 +28,13 @@ package org.semanticweb.elk.owlapi;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.syntax.ElkClass;
-import org.semanticweb.elk.syntax.ElkClassExpression;
-import org.semanticweb.elk.syntax.ElkObjectIntersectionOf;
-import org.semanticweb.elk.syntax.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectIntersectionOfImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectSomeValuesFromImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLClassExpressionVisitorEx;
@@ -78,7 +81,7 @@ public class OwlClassExpressionConverter implements
 		else if (ce.isOWLNothing())
 			return ElkClass.ELK_OWL_NOTHING;
 		else
-			return ElkClass.create(ce.getIRI().toString());
+			return ElkClassImpl.create(ce.getIRI().toString());
 	}
 
 	public ElkObjectIntersectionOf visit(OWLObjectIntersectionOf ce) {
@@ -87,7 +90,7 @@ public class OwlClassExpressionConverter implements
 		for (OWLClassExpression cce : owlConjuncts) {
 			elkConjuncts.add(cce.accept(this));
 		}
-		return ElkObjectIntersectionOf.create(elkConjuncts);
+		return ElkObjectIntersectionOfImpl.create(elkConjuncts);
 	}
 
 	public ElkClassExpression visit(OWLObjectUnionOf ce) {
@@ -105,7 +108,7 @@ public class OwlClassExpressionConverter implements
 	public ElkObjectSomeValuesFrom visit(OWLObjectSomeValuesFrom ce) {
 		OwlPropertyExpressionConverter peConverter = OwlPropertyExpressionConverter
 				.getInstance();
-		return ElkObjectSomeValuesFrom.create(
+		return ElkObjectSomeValuesFromImpl.create(
 				ce.getProperty().accept(peConverter),
 				ce.getFiller().accept(this));
 	}

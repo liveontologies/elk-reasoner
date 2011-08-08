@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
+
 /**
  * This simple interface describes any class that can process ElkAxioms.
  * 

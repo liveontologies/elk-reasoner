@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import org.semanticweb.elk.syntax.ElkEntity;
+import org.semanticweb.elk.syntax.interfaces.ElkEntity;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;

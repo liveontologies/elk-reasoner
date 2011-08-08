@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkAnonymousIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
+
 /**
  * Visitor interface for ELKIndividual. 
  * 

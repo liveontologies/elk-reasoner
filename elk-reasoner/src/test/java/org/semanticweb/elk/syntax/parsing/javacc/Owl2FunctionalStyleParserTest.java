@@ -32,8 +32,8 @@ import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
-import org.semanticweb.elk.syntax.ElkAxiom;
-import org.semanticweb.elk.syntax.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.parsing.FutureElkAxiomConsumer;
 
 /**

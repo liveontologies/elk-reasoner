@@ -25,6 +25,12 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkClassAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDisjointUnionAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
+
 /**
  * Visitor pattern interface for instances of {@link ElkClassAxiom}.
  *

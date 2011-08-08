@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.semanticweb.elk.reasoner.saturation.Derivable;
 import org.semanticweb.elk.reasoner.saturation.QueueableVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
-import org.semanticweb.elk.syntax.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.util.HashGenerator;
 
 /**

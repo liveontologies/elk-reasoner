@@ -48,6 +48,8 @@ import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.semanticweb.elk.syntax.interfaces.ElkObject;
+
 /**
  * A thread-safe Set that manages canonical objects: sharable objects that are
  * typically immutable. Call the {@link #put put} method for supplying the
