@@ -395,7 +395,7 @@ public class ClassExpressionSaturation extends
 
 	}		
 
-/*	
+	
 	@Override
 	public void waitCompletion() {
 		super.waitCompletion();
@@ -404,6 +404,5 @@ public class ClassExpressionSaturation extends
 		System.err.println("  props: " + propNo);
 		System.err.println("forwLnk: " + forwLinkNo);
 	}
-*/
 	
 }

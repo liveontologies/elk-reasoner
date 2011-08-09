@@ -98,7 +98,7 @@ public class ObjectPropertySaturation {
 /*
 		ComplexRiaSafetyChecker complexRiaSafetyChecker = new ComplexRiaSafetyChecker(executor, maxWorkers);
 
-		for (IndexedPropertyComposition ria : allPropertyChains)
+		for (IndexedPropertyComposition ria : ontologyIndex.getIndexedPropertyChains())
 			complexRiaSafetyChecker.submit(ria);
 
 		complexRiaSafetyChecker.waitCompletion();

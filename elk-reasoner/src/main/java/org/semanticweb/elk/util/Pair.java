@@ -27,9 +27,8 @@ public class Pair<First, Second> {
 	protected final Second second;
 	
 	public Pair(First first, Second second) {
-		if (first == null || second == null)
-			throw new NullPointerException(
-					"Null compononent for org.semanticweb.elk.util.Pair");
+		assert first != null;
+		assert second != null;
 		this.first = first;
 		this.second = second;
 	}

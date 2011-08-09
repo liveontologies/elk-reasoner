@@ -37,9 +37,7 @@ public class DecomposedClassExpression implements Queueable {
 	protected final IndexedClassExpression classExpression;
 
 	public DecomposedClassExpression(IndexedClassExpression classExpression) {
-		if (classExpression == null)
-			throw new NullPointerException(
-				"Null compononent for org.semanticweb.elk.reasoner.saturation.DecomposedClassExpression");
+		assert classExpression != null;
 		this.classExpression = classExpression;
 	}
 	

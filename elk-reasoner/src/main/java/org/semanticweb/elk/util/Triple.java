@@ -28,9 +28,9 @@ public class Triple<First, Second, Third> {
 	protected final Third third;
 	
 	public Triple(First first, Second second, Third third) {
-		if (first == null || second == null || third == null)
-			throw new NullPointerException(
-					"Null compononent for org.semanticweb.elk.util.Triple");
+		assert first != null;
+		assert second != null;
+		assert third != null;
 		this.first = first;
 		this.second = second;
 		this.third = third;

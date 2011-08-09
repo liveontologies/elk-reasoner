@@ -48,9 +48,8 @@ import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.util.Iterables;
 import org.semanticweb.elk.util.Pair;
-
-import com.google.common.collect.Iterables;
 
 /**
  * @author Yevgeny Kazakov
@@ -224,8 +223,8 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 	
 	
 	public Iterable<IndexedClass> getIndexedClasses() {
-		return Iterables.unmodifiableIterable(Iterables.filter(
-				indexedClassExpressionLookup.values(), IndexedClass.class));
+		return Iterables.filter(
+				indexedClassExpressionLookup.values(), IndexedClass.class);
 	}
 
 	public int getIndexedClassCount() {
@@ -234,22 +233,18 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 	
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
-		return Iterables.unmodifiableIterable(Iterables.concat(
+		return Iterables.concat(
 				indexedClassExpressionLookup.values(),
 				indexedObjectIntersectionOfLookup.values()
-		));
+		);
 	}
 
 	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
-		return Iterables.unmodifiableIterable(
-				indexedObjectPropertyLookup.values()
-		);
+		return indexedObjectPropertyLookup.values();
 	}
 	
 	public Iterable<IndexedPropertyComposition> getIndexedPropertyChains() {
-		return Iterables.unmodifiableIterable(Iterables.concat(
-				indexedPropertyCompositionLookup.values()
-		));
+		return Iterables.concat(indexedPropertyCompositionLookup.values());
 	}
 
 	
