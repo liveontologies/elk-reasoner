@@ -29,7 +29,6 @@ import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkClassAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.util.HashGenerator;
 
@@ -49,7 +48,8 @@ public class ElkSubClassOfAxiomImpl extends ElkObjectImpl implements
 
 	private static final int constructorHash_ = "ElkSubClassOfAxiom".hashCode();
 
-	private ElkSubClassOfAxiomImpl(ElkClassExpression subClassExpression,
+	/* package-private */ElkSubClassOfAxiomImpl(
+			ElkClassExpression subClassExpression,
 			ElkClassExpression superClassExpression) {
 		this.subClassExpression = subClassExpression;
 		this.superClassExpression = superClassExpression;
@@ -66,13 +66,6 @@ public class ElkSubClassOfAxiomImpl extends ElkObjectImpl implements
 		return superClassExpression;
 	}
 
-	public static ElkSubClassOfAxiom create(
-			ElkClassExpression subClassExpression,
-			ElkClassExpression superClassExpression) {
-		return (ElkSubClassOfAxiom) factory.put(new ElkSubClassOfAxiomImpl(
-				subClassExpression, superClassExpression));
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder("SubClassOf(");
@@ -83,7 +76,7 @@ public class ElkSubClassOfAxiomImpl extends ElkObjectImpl implements
 		return result.toString();
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkSubClassOfAxiom) {

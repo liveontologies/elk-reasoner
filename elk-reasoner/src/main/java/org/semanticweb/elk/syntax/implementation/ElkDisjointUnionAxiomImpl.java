@@ -29,7 +29,6 @@ import org.semanticweb.elk.syntax.ElkClassAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 
 /**
  * Corresponds to an <a href=
@@ -44,27 +43,11 @@ public class ElkDisjointUnionAxiomImpl extends ElkClassExpressionListObject
 	private static final int constructorHash_ = "ElkDisjointUnionAxiom"
 			.hashCode();
 
-	private ElkDisjointUnionAxiomImpl(
+	/* package-private */ElkDisjointUnionAxiomImpl(
 			List<? extends ElkClassExpression> disjointClassExpressions) {
 		super(disjointClassExpressions);
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, disjointClassExpressions);
-	}
-
-	public static ElkDisjointUnionAxiomImpl create(
-			List<? extends ElkClassExpression> disjointClassExpressions) {
-		return (ElkDisjointUnionAxiomImpl) factory
-				.put(new ElkDisjointUnionAxiomImpl(disjointClassExpressions));
-	}
-
-	public static ElkDisjointUnionAxiom create(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
-		return (ElkDisjointUnionAxiom) factory
-				.put(new ElkDisjointUnionAxiomImpl(ElkDisjointUnionAxiomImpl
-						.varArgsToList(firstClassExpression,
-								secondClassExpression, otherClassExpressions)));
 	}
 
 	@Override
@@ -72,7 +55,7 @@ public class ElkDisjointUnionAxiomImpl extends ElkClassExpressionListObject
 		return buildFssString("DisjointUnion");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkDisjointUnionAxiom) {

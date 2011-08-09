@@ -31,71 +31,76 @@ import org.semanticweb.elk.syntax.interfaces.ElkObject;
 // TODO reimplement with ArrayHashSet when it supports removals
 
 /**
- * @author Frantisek
- *
+ * Implementation of the ElkObjectManager that uses Java's WeakReferences in a
+ * HashMap.
+ * 
+ * @author Frantisek Simancik
  */
-public class WeakHashMapFactory implements ElkObjectFactory {
+public class WeakHashMapFactory implements ElkObjectManager {
+
 	private static class WeakWrapper extends WeakReference<ElkObject> {
-        private int hash_;
+		private int hash_;
 
-        private WeakWrapper(ElkObject object, ReferenceQueue<ElkObject> queue) {
-        	super(object, queue);
-        	hash_ = object.structuralHashCode();
-        }
-        
-        public boolean equals(Object object) {
-        	if (this == object)
-        		return true;
-        	
-        	if (object instanceof WeakWrapper) {
-        		ElkObject a = this.get();
-        		ElkObject b = ((WeakWrapper) object).get();
-        	
-        		if (a == b) 
-        			return true;
-        		if (a != null && b != null)
-        			return a.structuralEquals(b);
-        	}
-        		        		
-        	return false;
-       	}
+		private WeakWrapper(ElkObject object, ReferenceQueue<ElkObject> queue) {
+			super(object, queue);
+			hash_ = object.structuralHashCode();
+		}
 
-       	public int hashCode() {
-       		return hash_;
-       	}
+		public boolean equals(Object object) {
+			if (this == object)
+				return true;
+
+			if (object instanceof WeakWrapper) {
+				ElkObject a = this.get();
+				ElkObject b = ((WeakWrapper) object).get();
+
+				if (a == b)
+					return true;
+				if (a != null && b != null)
+					return a.structuralEquals(b);
+			}
+
+			return false;
+		}
+
+		public int hashCode() {
+			return hash_;
+		}
 	}
-	
-    private HashMap<WeakWrapper, WeakWrapper> wrapperCache_ = new HashMap<WeakWrapper, WeakWrapper> ();
-    private ReferenceQueue<ElkObject> referenceQueue_ = new ReferenceQueue<ElkObject> ();
-    
-    public ElkObject put(ElkObject object) {
-    	processQueue();
-    	
-    	if (object == null)
-    		return null;
-    	
-    	WeakWrapper key = new WeakWrapper(object, referenceQueue_);
-    	WeakWrapper value = wrapperCache_.get(key);
-    	
-    	if (value != null) {
-    		ElkObject result = value.get();
-    		if (result != null)
-    			return result;
-    	}
-    	
-    	wrapperCache_.put(key, key);
-    	return object;
-    }
-    
-    private final void processQueue() {
-        WeakWrapper w = null;
 
-        while ((w = (WeakWrapper) referenceQueue_.poll()) != null) {
-            wrapperCache_.remove(w);
-        }
-    }
-    
-    public int size() {
-    	return wrapperCache_.size();
-    }
+	private HashMap<WeakWrapper, WeakWrapper> wrapperCache_ = new HashMap<WeakWrapper, WeakWrapper>();
+	private ReferenceQueue<ElkObject> referenceQueue_ = new ReferenceQueue<ElkObject>();
+
+	public ElkObject getCanonicalElkObject(ElkObject object) {
+		processQueue();
+
+		if (object == null)
+			return null;
+
+		WeakWrapper key = new WeakWrapper(object, referenceQueue_);
+		WeakWrapper value = wrapperCache_.get(key);
+
+		if (value != null) {
+			ElkObject result = value.get();
+			if (result != null)
+				return result;
+		}
+
+		wrapperCache_.put(key, key);
+		return object;
+	}
+
+	private final void processQueue() {
+		WeakWrapper w = null;
+
+		while ((w = (WeakWrapper) referenceQueue_.poll()) != null) {
+			wrapperCache_.remove(w);
+		}
+	}
+
+//// Not part of the interface, not needed in the implementation:
+//	private int size() {
+//		return wrapperCache_.size();
+//	}
+
 }

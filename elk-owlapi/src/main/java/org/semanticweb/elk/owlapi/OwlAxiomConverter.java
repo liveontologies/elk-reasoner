@@ -28,14 +28,10 @@ package org.semanticweb.elk.owlapi;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.syntax.implementation.ElkDeclarationAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkEquivalentClassesAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkSubClassOfAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkSubObjectPropertyOfAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkTransitiveObjectPropertyAxiomImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
@@ -90,13 +86,29 @@ import org.semanticweb.owlapi.model.SWRLRule;
  */
 public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 
-	private static final OwlAxiomConverter converter_ = new OwlAxiomConverter();
+	protected final ElkObjectFactory objectFactory;
+	protected final OwlClassExpressionConverter classExpressionConverter;
+	protected final OwlPropertyExpressionConverter propertyExpressionConverter;
+	protected final OwlEntityConverter entityConverter;
 
-	private OwlAxiomConverter() {
+	public OwlAxiomConverter(ElkObjectFactory objectFactory) {
+		this.objectFactory = objectFactory;
+		this.propertyExpressionConverter = new OwlPropertyExpressionConverter(
+				objectFactory);
+		this.classExpressionConverter = new OwlClassExpressionConverter(
+				objectFactory, this.propertyExpressionConverter);
+		this.entityConverter = new OwlEntityConverter(objectFactory,
+				this.classExpressionConverter, this.propertyExpressionConverter);
 	}
 
-	static OwlAxiomConverter getInstance() {
-		return converter_;
+	public OwlAxiomConverter(ElkObjectFactory objectFactory,
+			OwlClassExpressionConverter classExpressionConverter,
+			OwlPropertyExpressionConverter propertyExpressionConverter,
+			OwlEntityConverter entityConverter) {
+		this.objectFactory = objectFactory;
+		this.propertyExpressionConverter = propertyExpressionConverter;
+		this.classExpressionConverter = classExpressionConverter;
+		this.entityConverter = entityConverter;
 	}
 
 	public ElkAxiom visit(OWLSubAnnotationPropertyOfAxiom axiom) {
@@ -118,11 +130,9 @@ public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 	}
 
 	public ElkSubClassOfAxiom visit(OWLSubClassOfAxiom axiom) {
-		OwlClassExpressionConverter ceConverter = OwlClassExpressionConverter
-				.getInstance();
-		return ElkSubClassOfAxiomImpl.create(
-				axiom.getSubClass().accept(ceConverter), axiom.getSuperClass()
-						.accept(ceConverter));
+		return objectFactory.getSubClassOfAxiom(
+				axiom.getSubClass().accept(classExpressionConverter), axiom
+						.getSuperClass().accept(classExpressionConverter));
 	}
 
 	public ElkAxiom visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
@@ -210,11 +220,9 @@ public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 	}
 
 	public ElkSubObjectPropertyOfAxiom visit(OWLSubObjectPropertyOfAxiom axiom) {
-		OwlPropertyExpressionConverter peConverter = OwlPropertyExpressionConverter
-				.getInstance();
-		return ElkSubObjectPropertyOfAxiomImpl.create(axiom.getSubProperty()
-				.accept(peConverter),
-				axiom.getSuperProperty().accept(peConverter));
+		return objectFactory.getSubObjectPropertyOfAxiom(axiom.getSubProperty()
+				.accept(propertyExpressionConverter), axiom.getSuperProperty()
+				.accept(propertyExpressionConverter));
 	}
 
 	public ElkAxiom visit(OWLDisjointUnionAxiom axiom) {
@@ -224,9 +232,8 @@ public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 	}
 
 	public ElkAxiom visit(OWLDeclarationAxiom axiom) {
-		OwlEntityConverter entConverter = OwlEntityConverter.getInstance();
-		return ElkDeclarationAxiomImpl.create(axiom.getEntity().accept(
-				entConverter));
+		return objectFactory.getDeclarationAxiom(axiom.getEntity().accept(
+				entityConverter));
 	}
 
 	public ElkAxiom visit(OWLAnnotationAssertionAxiom axiom) {
@@ -266,15 +273,14 @@ public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 	}
 
 	public ElkEquivalentClassesAxiom visit(OWLEquivalentClassesAxiom axiom) {
-		OwlClassExpressionConverter ceConverter = OwlClassExpressionConverter
-				.getInstance();
 		List<OWLClassExpression> owlClassExpressions = axiom
 				.getClassExpressionsAsList();
 		List<ElkClassExpression> elkClassExpressions = new ArrayList<ElkClassExpression>();
 		for (OWLClassExpression owlClassExpression : owlClassExpressions) {
-			elkClassExpressions.add(owlClassExpression.accept(ceConverter));
+			elkClassExpressions.add(owlClassExpression
+					.accept(classExpressionConverter));
 		}
-		return ElkEquivalentClassesAxiomImpl.create(elkClassExpressions);
+		return objectFactory.getEquivalentClassesAxiom(elkClassExpressions);
 	}
 
 	public ElkAxiom visit(OWLDataPropertyAssertionAxiom axiom) {
@@ -285,10 +291,8 @@ public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 
 	public ElkTransitiveObjectPropertyAxiom visit(
 			OWLTransitiveObjectPropertyAxiom axiom) {
-		OwlPropertyExpressionConverter peConverter = OwlPropertyExpressionConverter
-				.getInstance();
-		return ElkTransitiveObjectPropertyAxiomImpl.create(axiom.getProperty()
-				.accept(peConverter));
+		return objectFactory.getTransitiveObjectPropertyAxiom(axiom
+				.getProperty().accept(propertyExpressionConverter));
 	}
 
 	public ElkAxiom visit(OWLIrreflexiveObjectPropertyAxiom axiom) {

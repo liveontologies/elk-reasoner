@@ -63,14 +63,17 @@ import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.syntax.FutureElkObjectFactory;
-import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.interfaces.FutureElkObjectFactory;
+import org.semanticweb.elk.syntax.implementation.FutureElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
 
 public class Owl2FunctionalStyleParser {
     boolean initialized = false;
-
-    private static FutureElkObjectFactory constructor =
-        new FutureElkObjectFactoryImpl();
+    
+    private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+    private final static FutureElkObjectFactory constructor =
+        new FutureElkObjectFactoryImpl(objectFactory);
 
     public void Init(java.io.InputStream stream, String encoding) {
         if (initialized) {
@@ -481,8 +484,8 @@ Future<? extends ElkClass> clazz():
   String x;
 }{
     x = iri()     { return constructor.getFutureElkClass(x); }  
-|   <OWL_THING>   { return constructor.getFuture(ElkClass.ELK_OWL_THING); }
-|   <OWL_NOTHING> { return constructor.getFuture(ElkClass.ELK_OWL_NOTHING); }
+|   <OWL_THING>   { return constructor.getFuture(objectFactory.getOwlThing()); }
+|   <OWL_NOTHING> { return constructor.getFuture(objectFactory.getOwlNothing()); }
 }
 /* 5.2 Datatypes */    
 void datatype():
@@ -508,11 +511,11 @@ Future<? extends ElkObjectProperty> objectProperty():
     }     
 |   <OWL_TOP_OBJECT_PROPERTY> {
       return constructor.getFuture(
-        ElkObjectProperty.ELK_OWL_TOP_OBJECT_PROPERTY);
+        objectFactory.getOwlTopObjectProperty());
     }
 |   <OWL_BOTTOM_OBJECT_PROPERTY> {
       return constructor.getFuture(
-        ElkObjectProperty.ELK_OWL_BOTTOM_OBJECT_PROPERTY);
+        objectFactory.getOwlBottomObjectProperty());
     }
   
 }

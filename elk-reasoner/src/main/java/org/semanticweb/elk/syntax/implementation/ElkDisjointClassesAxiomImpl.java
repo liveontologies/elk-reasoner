@@ -29,7 +29,6 @@ import org.semanticweb.elk.syntax.ElkClassAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointClassesAxiom;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 
 /**
  * Corresponds to an <a href=
@@ -44,28 +43,11 @@ public class ElkDisjointClassesAxiomImpl extends ElkClassExpressionListObject
 	private static final int constructorHash_ = "ElkDisjointClassesAxiom"
 			.hashCode();
 
-	private ElkDisjointClassesAxiomImpl(
+	/* package-private */ElkDisjointClassesAxiomImpl(
 			List<? extends ElkClassExpression> disjointClassExpressions) {
 		super(disjointClassExpressions);
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, disjointClassExpressions);
-	}
-
-	public static ElkDisjointClassesAxiomImpl create(
-			List<? extends ElkClassExpression> disjointClassExpressions) {
-		return (ElkDisjointClassesAxiomImpl) factory
-				.put(new ElkDisjointClassesAxiomImpl(disjointClassExpressions));
-	}
-
-	public static ElkDisjointClassesAxiom create(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
-		return (ElkDisjointClassesAxiom) factory
-				.put(new ElkDisjointClassesAxiomImpl(
-						ElkClassExpressionListObject.varArgsToList(
-								firstClassExpression, secondClassExpression,
-								otherClassExpressions)));
 	}
 
 	@Override
@@ -73,7 +55,7 @@ public class ElkDisjointClassesAxiomImpl extends ElkClassExpressionListObject
 		return buildFssString("DisjointClasses");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkDisjointClassesAxiom) {

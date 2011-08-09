@@ -25,8 +25,6 @@
  */
 package org.semanticweb.elk.syntax.interfaces;
 
-import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
-
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Classes">Class<a> in the OWL 2
@@ -35,16 +33,4 @@ import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
  * @author Yevgeny Kazakov
  */
 public interface ElkClass extends ElkClassExpression, ElkEntity {
-
-	/**
-	 * TODO Find a better architecture for this.
-	 */
-	public static final ElkClass ELK_OWL_THING = 
-		ElkClassImpl.create("owl:Thing");
-	/**
-	 * TODO Find a better architecture for this.
-	 */
-	public static final ElkClass ELK_OWL_NOTHING = 
-		ElkClassImpl.create("owl:Nothing");
-	
 }

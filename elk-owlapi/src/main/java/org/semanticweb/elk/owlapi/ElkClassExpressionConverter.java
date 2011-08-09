@@ -27,6 +27,7 @@ package org.semanticweb.elk.owlapi;
 
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
@@ -48,20 +49,18 @@ public final class ElkClassExpressionConverter implements
 		ElkClassExpressionVisitor<OWLClassExpression> {
 
 	final OWLDataFactory owlDataFactory = OWLManager.getOWLDataFactory();
-	private static final ElkClassExpressionConverter converter = new ElkClassExpressionConverter();
 
-	private ElkClassExpressionConverter() {
-	}
+	protected final ElkObjectFactory objectFactory;
 
-	static ElkClassExpressionConverter getInstance() {
-		return converter;
+	public ElkClassExpressionConverter(ElkObjectFactory objectFactory) {
+		this.objectFactory = objectFactory;
 	}
 
 	public OWLClass visit(ElkClass elkClass) {
 		String iri = elkClass.getIri();
-		if (elkClass.equals(ElkClass.ELK_OWL_THING))
+		if (elkClass.equals(objectFactory.getOwlThing()))
 			return owlDataFactory.getOWLThing();
-		else if (elkClass.equals(ElkClass.ELK_OWL_NOTHING))
+		else if (elkClass.equals(objectFactory.getOwlNothing()))
 			return owlDataFactory.getOWLNothing();
 		else
 			return owlDataFactory.getOWLClass(IRI.create(iri));

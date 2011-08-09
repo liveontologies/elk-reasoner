@@ -33,15 +33,18 @@ import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.syntax.FutureElkObjectFactory;
-import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.implementation.FutureElkObjectFactoryImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.FutureElkObjectFactory;
 import org.semanticweb.elk.syntax.parsing.javacc.ParseException;
 
 public class ReasonerTest extends TestCase {
 
-	final FutureElkObjectFactory constructor = new FutureElkObjectFactoryImpl();
+	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+	final FutureElkObjectFactory constructor = new FutureElkObjectFactoryImpl(objectFactory);
 
 	public ReasonerTest(String testName) {
 		super(testName);

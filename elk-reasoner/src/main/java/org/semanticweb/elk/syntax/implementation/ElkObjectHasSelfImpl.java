@@ -24,7 +24,6 @@ package org.semanticweb.elk.syntax.implementation;
 
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.util.HashGenerator;
@@ -36,11 +35,12 @@ import org.semanticweb.elk.util.HashGenerator;
  * 
  * @author Markus Kroetzsch
  */
-public class ElkObjectHasSelfImpl extends ElkObjectPropertyExpressionObject implements ElkObjectHasSelf {
+public class ElkObjectHasSelfImpl extends ElkObjectPropertyExpressionObject
+		implements ElkObjectHasSelf {
 
 	private static final int constructorHash_ = "ElkObjectHasSelf".hashCode();
 
-	private ElkObjectHasSelfImpl(
+	/* package-private */ElkObjectHasSelfImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
 		this.structuralHashCode = HashGenerator
@@ -48,18 +48,12 @@ public class ElkObjectHasSelfImpl extends ElkObjectPropertyExpressionObject impl
 						objectPropertyExpression.structuralHashCode());
 	}
 
-	public static ElkObjectHasSelfImpl create(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkObjectHasSelfImpl) factory.put(new ElkObjectHasSelfImpl(
-				objectPropertyExpression));
-	}
-
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkObjectHasSelf) {
-			return objectPropertyExpression
-					.equals(((ElkObjectHasSelf) object).getObjectPropertyExpression());
+			return objectPropertyExpression.equals(((ElkObjectHasSelf) object)
+					.getObjectPropertyExpression());
 		} else {
 			return false;
 		}
@@ -69,7 +63,7 @@ public class ElkObjectHasSelfImpl extends ElkObjectPropertyExpressionObject impl
 	public String toString() {
 		return buildFssString("ObjectHasSelf");
 	}
-	
+
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
@@ -77,6 +71,5 @@ public class ElkObjectHasSelfImpl extends ElkObjectPropertyExpressionObject impl
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
 
 }

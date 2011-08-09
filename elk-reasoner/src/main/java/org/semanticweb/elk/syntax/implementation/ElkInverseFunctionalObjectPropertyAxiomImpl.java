@@ -29,7 +29,6 @@ import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.util.HashGenerator;
 
@@ -48,7 +47,7 @@ public class ElkInverseFunctionalObjectPropertyAxiomImpl extends
 	private static final int constructorHash_ = "ElkFunctionalObjectPropertyAxiom"
 			.hashCode();
 
-	protected ElkInverseFunctionalObjectPropertyAxiomImpl(
+	/* package-private */ElkInverseFunctionalObjectPropertyAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
 		this.structuralHashCode = HashGenerator
@@ -56,19 +55,12 @@ public class ElkInverseFunctionalObjectPropertyAxiomImpl extends
 						objectPropertyExpression.structuralHashCode());
 	}
 
-	public static ElkInverseFunctionalObjectPropertyAxiomImpl create(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkInverseFunctionalObjectPropertyAxiomImpl) factory
-				.put(new ElkInverseFunctionalObjectPropertyAxiomImpl(
-						objectPropertyExpression));
-	}
-
 	@Override
 	public String toString() {
 		return buildFssString("InverseFunctionalObjectProperty");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkInverseFunctionalObjectPropertyAxiomImpl) {

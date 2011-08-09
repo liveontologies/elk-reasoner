@@ -29,15 +29,6 @@ import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkEntityVisitor;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
-import org.semanticweb.elk.syntax.implementation.ElkDeclarationAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkEquivalentClassesAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectIntersectionOfImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectSomeValuesFromImpl;
-import org.semanticweb.elk.syntax.implementation.ElkSubClassOfAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkSubObjectPropertyOfAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkTransitiveObjectPropertyAxiomImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
@@ -52,6 +43,7 @@ import org.semanticweb.elk.syntax.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
@@ -106,8 +98,12 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	protected String postfix;
 
-	public RenamingExpressionVisitor(String postfix) {
+	protected final ElkObjectFactory objectFactory;
+
+	public RenamingExpressionVisitor(ElkObjectFactory objectFactory,
+			String postfix) {
 		this.postfix = postfix;
+		this.objectFactory = objectFactory;
 	}
 
 	public void setPostfix(String postfix) {
@@ -122,17 +118,17 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 				.getClassExpressions()) {
 			newClassExpressions.add(classExpression.accept(this));
 		}
-		return ElkEquivalentClassesAxiomImpl.create(newClassExpressions);
+		return objectFactory.getEquivalentClassesAxiom(newClassExpressions);
 	}
 
 	public ElkSubClassOfAxiom visit(ElkSubClassOfAxiom elkSubClassOfAxiom) {
-		return ElkSubClassOfAxiomImpl.create(elkSubClassOfAxiom
+		return objectFactory.getSubClassOfAxiom(elkSubClassOfAxiom
 				.getSubClassExpression().accept(this), elkSubClassOfAxiom
 				.getSuperClassExpression().accept(this));
 	}
 
 	public ElkClass visit(ElkClass classExpression) {
-		return ElkClassImpl.create(classExpression.getIri() + postfix);
+		return objectFactory.getClass(classExpression.getIri() + postfix);
 	}
 
 	public ElkObjectIntersectionOf visit(ElkObjectIntersectionOf classExpression) {
@@ -141,7 +137,7 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 				.getClassExpressions()) {
 			newSubClassExpressions.add(subClassExpression.accept(this));
 		}
-		return ElkObjectIntersectionOfImpl.create(newSubClassExpressions);
+		return objectFactory.getObjectIntersectionOf(newSubClassExpressions);
 	}
 
 	public ElkObjectSomeValuesFrom visit(ElkObjectSomeValuesFrom classExpression) {
@@ -149,11 +145,11 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 				.accept(this);
 		ElkObjectPropertyExpression newProperty = classExpression
 				.getObjectPropertyExpression().accept(this);
-		return ElkObjectSomeValuesFromImpl.create(newProperty, newClass);
+		return objectFactory.getObjectSomeValuesFrom(newProperty, newClass);
 	}
 
 	public ElkObjectProperty visit(ElkObjectProperty elkObjectProperty) {
-		return ElkObjectPropertyImpl.create(elkObjectProperty.getIri()
+		return objectFactory.getObjectProperty(elkObjectProperty.getIri()
 				+ postfix);
 	}
 
@@ -183,10 +179,11 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	public ElkAxiom visit(
 			ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom) {
-		return ElkSubObjectPropertyOfAxiomImpl
-				.create(elkSubObjectPropertyOfAxiom
-						.getSubObjectPropertyExpression()
-						.accept(this.renamingSubObjectPropertyExpressionVisitor),
+		return objectFactory
+				.getSubObjectPropertyOfAxiom(
+						elkSubObjectPropertyOfAxiom
+								.getSubObjectPropertyExpression()
+								.accept(this.renamingSubObjectPropertyExpressionVisitor),
 						elkSubObjectPropertyOfAxiom
 								.getSuperObjectPropertyExpression()
 								.accept(this));
@@ -194,14 +191,14 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	public ElkAxiom visit(
 			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
-		return ElkTransitiveObjectPropertyAxiomImpl
-				.create(elkTransitiveObjectPropertyAxiom
+		return objectFactory
+				.getTransitiveObjectPropertyAxiom(elkTransitiveObjectPropertyAxiom
 						.getObjectPropertyExpression().accept(this));
 	}
 
 	public ElkDeclarationAxiom visit(ElkDeclarationAxiom elkDeclarationAxiom) {
-		return ElkDeclarationAxiomImpl.create(elkDeclarationAxiom.getEntity()
-				.accept(this));
+		return objectFactory.getDeclarationAxiom(elkDeclarationAxiom
+				.getEntity().accept(this));
 	}
 
 	public ElkClassExpression visit(ElkObjectHasValue elkObjectHasValue) {

@@ -23,7 +23,7 @@
 /**
  * @author Yevgeny Kazakov, May 27, 2011
  */
-package org.semanticweb.elk.syntax;
+package org.semanticweb.elk.syntax.implementation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,26 +32,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.semanticweb.elk.syntax.implementation.ElkAnonymousIndividualImpl;
-import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
-import org.semanticweb.elk.syntax.implementation.ElkDeclarationAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkDisjointClassesAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkDisjointObjectPropertiesAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkDisjointUnionAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkEquivalentClassesAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkEquivalentObjectPropertiesAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkNamedIndividualImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectHasSelfImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectHasValueImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectIntersectionOfImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectInverseOfImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectOneOfImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyChainImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectSomeValuesFromImpl;
-import org.semanticweb.elk.syntax.implementation.ElkSubClassOfAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkSubObjectPropertyOfAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkTransitiveObjectPropertyAxiomImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
@@ -64,6 +44,7 @@ import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkIndividual;
 import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
@@ -77,6 +58,7 @@ import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.FutureElkObjectFactory;
 
 /**
  * An implementation of {@link FutureElkObjectFactory} interface where the
@@ -88,6 +70,12 @@ import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
  * @author Markus Kroetzsch
  */
 public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
+
+	protected final ElkObjectFactory objectFactory;
+
+	public FutureElkObjectFactoryImpl(ElkObjectFactory objectFactory) {
+		this.objectFactory = objectFactory;
+	}
 
 	private <E> List<E> unfutureList(List<Future<? extends E>> futureList)
 			throws InterruptedException, ExecutionException {
@@ -162,7 +150,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 		}
 
 		public ElkObjectProperty get() {
-			return ElkObjectPropertyImpl.create(objectPropertyIri);
+			return objectFactory.getObjectProperty(objectPropertyIri);
 		}
 	}
 
@@ -183,7 +171,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkObjectInverseOf get() throws InterruptedException,
 				ExecutionException {
-			return ElkObjectInverseOfImpl.create(futureObjectProperty.get());
+			return objectFactory.getObjectInverseOf(futureObjectProperty.get());
 		}
 	}
 
@@ -204,8 +192,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkObjectPropertyChain get() throws InterruptedException,
 				ExecutionException {
-			return ElkObjectPropertyChainImpl
-					.create(unfutureList(futureObjectPropertyExpressions));
+			return objectFactory
+					.getObjectPropertyChain(unfutureList(futureObjectPropertyExpressions));
 		}
 	}
 
@@ -224,7 +212,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 		}
 
 		public ElkNamedIndividual get() {
-			return ElkNamedIndividualImpl.create(individualIri);
+			return objectFactory.getNamedIndividual(individualIri);
 		}
 
 	}
@@ -244,7 +232,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 		}
 
 		public ElkAnonymousIndividual get() {
-			return ElkAnonymousIndividualImpl.create(individualNodeId);
+			return objectFactory.getAnonymousIndividual(individualNodeId);
 		}
 
 	}
@@ -263,7 +251,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 		}
 
 		public ElkClass get() {
-			return ElkClassImpl.create(classIri);
+			return objectFactory.getClass(classIri);
 		}
 
 	}
@@ -284,8 +272,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkObjectIntersectionOf get() throws InterruptedException,
 				ExecutionException {
-			return ElkObjectIntersectionOfImpl
-					.create(unfutureList(futureClassExpressions));
+			return objectFactory
+					.getObjectIntersectionOf(unfutureList(futureClassExpressions));
 		}
 
 	}
@@ -317,7 +305,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkObjectOneOf get() throws InterruptedException,
 				ExecutionException {
-			return ElkObjectOneOfImpl.create(unfutureList(futureIndividuals));
+			return objectFactory
+					.getObjectOneOf(unfutureList(futureIndividuals));
 		}
 
 	}
@@ -353,7 +342,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkObjectSomeValuesFrom get() throws InterruptedException,
 				ExecutionException {
-			return ElkObjectSomeValuesFromImpl.create(
+			return objectFactory.getObjectSomeValuesFrom(
 					futureObjectPropertyExpression.get(),
 					futureClassExpression.get());
 		}
@@ -380,7 +369,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkObjectHasValue get() throws InterruptedException,
 				ExecutionException {
-			return ElkObjectHasValueImpl.create(
+			return objectFactory.getObjectHasValue(
 					futureObjectPropertyExpression.get(),
 					futureIndividual.get());
 		}
@@ -404,8 +393,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkObjectHasSelf get() throws InterruptedException,
 				ExecutionException {
-			return ElkObjectHasSelfImpl
-					.create(futureObjectPropertyExpression.get());
+			return objectFactory
+					.getObjectHasSelf(futureObjectPropertyExpression.get());
 		}
 
 	}
@@ -426,7 +415,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkDeclarationAxiom get() throws InterruptedException,
 				ExecutionException {
-			return ElkDeclarationAxiomImpl.create(futureEntity.get());
+			return objectFactory.getDeclarationAxiom(futureEntity.get());
 		}
 
 	}
@@ -448,8 +437,9 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkTransitiveObjectPropertyAxiom get()
 				throws InterruptedException, ExecutionException {
-			return ElkTransitiveObjectPropertyAxiomImpl
-					.create(futureObjectPropertyExpression.get());
+			return objectFactory
+					.getTransitiveObjectPropertyAxiom(futureObjectPropertyExpression
+							.get());
 		}
 
 	}
@@ -471,8 +461,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkEquivalentObjectPropertiesAxiom get()
 				throws InterruptedException, ExecutionException {
-			return ElkEquivalentObjectPropertiesAxiomImpl
-					.create(unfutureList(futureEquivalentObjectPropertyExpressions));
+			return objectFactory
+					.getEquivalentObjectPropertiesAxiom(unfutureList(futureEquivalentObjectPropertyExpressions));
 		}
 
 	}
@@ -505,8 +495,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkDisjointObjectPropertiesAxiom get()
 				throws InterruptedException, ExecutionException {
-			return ElkDisjointObjectPropertiesAxiomImpl
-					.create(unfutureList(futureDisjointObjectPropertyExpressions));
+			return objectFactory
+					.getDisjointObjectPropertiesAxiom(unfutureList(futureDisjointObjectPropertyExpressions));
 		}
 
 	}
@@ -543,7 +533,7 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkSubObjectPropertyOfAxiom get() {
 			try {
-				return ElkSubObjectPropertyOfAxiomImpl.create(
+				return objectFactory.getSubObjectPropertyOfAxiom(
 						futureSubObjectPropertyExpression.get(),
 						futureSuperObjectPropertyExpression.get());
 			} catch (InterruptedException e) {
@@ -574,8 +564,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkEquivalentClassesAxiom get() throws InterruptedException,
 				ExecutionException {
-			return ElkEquivalentClassesAxiomImpl
-					.create(unfutureList(futureEquivalentClassExpressions));
+			return objectFactory
+					.getEquivalentClassesAxiom(unfutureList(futureEquivalentClassExpressions));
 		}
 
 	}
@@ -608,8 +598,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkDisjointClassesAxiom get() throws InterruptedException,
 				ExecutionException {
-			return ElkDisjointClassesAxiomImpl
-					.create(unfutureList(futureDisjointClassExpressions));
+			return objectFactory
+					.getDisjointClassesAxiom(unfutureList(futureDisjointClassExpressions));
 		}
 
 	}
@@ -641,8 +631,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkDisjointUnionAxiom get() throws InterruptedException,
 				ExecutionException {
-			return ElkDisjointUnionAxiomImpl
-					.create(unfutureList(futureDisjointClassExpressions));
+			return objectFactory
+					.getDisjointUnionAxiom(unfutureList(futureDisjointClassExpressions));
 		}
 
 	}
@@ -678,7 +668,8 @@ public class FutureElkObjectFactoryImpl implements FutureElkObjectFactory {
 
 		public ElkSubClassOfAxiom get() throws InterruptedException,
 				ExecutionException {
-			return ElkSubClassOfAxiomImpl.create(futureSubClassExpression.get(),
+			return objectFactory.getSubClassOfAxiom(
+					futureSubClassExpression.get(),
 					futureSuperClassExpression.get());
 		}
 

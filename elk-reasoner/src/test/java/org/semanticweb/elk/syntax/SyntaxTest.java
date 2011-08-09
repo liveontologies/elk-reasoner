@@ -24,52 +24,65 @@ package org.semanticweb.elk.syntax;
 
 import java.util.Arrays;
 
-import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectIntersectionOfImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectSomeValuesFromImpl;
-import org.semanticweb.elk.syntax.implementation.ElkSubClassOfAxiomImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 
 import junit.framework.TestCase;
 
 public class SyntaxTest extends TestCase {
-	public SyntaxTest( String testName ) {
-		super( testName );
+	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+
+	public SyntaxTest(String testName) {
+		super(testName);
 	}
-	
+
 	public void testFactory() {
-		ElkClassExpression heart = ElkClassImpl.create("Heart");
-		ElkClassExpression organ = ElkClassImpl.create("Organ");
-		ElkClassExpression heart2 = ElkClassImpl.create("Heart");
+		ElkClassExpression heart = objectFactory.getClass("Heart");
+		ElkClassExpression organ = objectFactory.getClass("Organ");
+		ElkClassExpression heart2 = objectFactory.getClass("Heart");
 
 		assertSame("heart == heart2", heart, heart2);
 		assertNotSame("heart != organ", organ);
 
-		ElkClassExpression human = ElkClassImpl.create("Human");
-		ElkObjectPropertyExpression has = ElkObjectPropertyImpl.create("has");
+		ElkClassExpression human = objectFactory.getClass("Human");
+		ElkObjectPropertyExpression has = objectFactory
+				.getObjectProperty("has");
 
-		ElkClassExpression hasHeart = ElkObjectSomeValuesFromImpl.create(has, heart);		   
-		ElkClassExpression hasOrgan = ElkObjectSomeValuesFromImpl.create(has, organ);
-		ElkClassExpression hasHeart2 = ElkObjectSomeValuesFromImpl.create(has, heart2);
+		ElkClassExpression hasHeart = objectFactory.getObjectSomeValuesFrom(
+				has, heart);
+		ElkClassExpression hasOrgan = objectFactory.getObjectSomeValuesFrom(
+				has, organ);
+		ElkClassExpression hasHeart2 = objectFactory.getObjectSomeValuesFrom(
+				has, heart2);
 
 		assertSame("hasHeart == hasHeart2", hasHeart, hasHeart2);
 		assertNotSame("hasHeart != hasOrgan", hasHeart, hasOrgan);
 
-		ElkClassExpression heartAndOrgan = ElkObjectIntersectionOfImpl.create(Arrays.asList(heart, organ));
-		ElkClassExpression organAndHeart = ElkObjectIntersectionOfImpl.create(Arrays.asList(organ, heart));
-		ElkClassExpression heart2AndOrgan = ElkObjectIntersectionOfImpl.create(Arrays.asList(heart2, organ));
+		ElkClassExpression heartAndOrgan = objectFactory
+				.getObjectIntersectionOf(Arrays.asList(heart, organ));
+		ElkClassExpression organAndHeart = objectFactory
+				.getObjectIntersectionOf(Arrays.asList(organ, heart));
+		ElkClassExpression heart2AndOrgan = objectFactory
+				.getObjectIntersectionOf(Arrays.asList(heart2, organ));
 
-		assertSame("heartAndOrgan == heart2AndOrgan", heartAndOrgan, heart2AndOrgan);
-		assertNotSame("heartAndOrgan == organAndHeart", heartAndOrgan, organAndHeart);
+		assertSame("heartAndOrgan == heart2AndOrgan", heartAndOrgan,
+				heart2AndOrgan);
+		assertNotSame("heartAndOrgan == organAndHeart", heartAndOrgan,
+				organAndHeart);
 
-		ElkClassAxiom humanHasHeart = ElkSubClassOfAxiomImpl.create(human, hasHeart);
-		ElkClassAxiom humanHasOrgan = ElkSubClassOfAxiomImpl.create(human, hasOrgan);
-		ElkClassAxiom humanHasHeart2 = ElkSubClassOfAxiomImpl.create(human, hasHeart2);
+		ElkClassAxiom humanHasHeart = objectFactory.getSubClassOfAxiom(human,
+				hasHeart);
+		ElkClassAxiom humanHasOrgan = objectFactory.getSubClassOfAxiom(human,
+				hasOrgan);
+		ElkClassAxiom humanHasHeart2 = objectFactory.getSubClassOfAxiom(human,
+				hasHeart2);
 
-		assertSame("humanHasHeart == humanHasHeart2", humanHasHeart, humanHasHeart2);
-		assertNotSame("humanHasHeart != humanHasOrgan", humanHasHeart, humanHasOrgan);
+		assertSame("humanHasHeart == humanHasHeart2", humanHasHeart,
+				humanHasHeart2);
+		assertNotSame("humanHasHeart != humanHasOrgan", humanHasHeart,
+				humanHasOrgan);
 	}
 }

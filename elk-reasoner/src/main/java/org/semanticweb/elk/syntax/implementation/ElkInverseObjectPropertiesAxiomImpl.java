@@ -29,7 +29,6 @@ import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseObjectPropertiesAxiom;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.util.HashGenerator;
 
@@ -50,7 +49,7 @@ public class ElkInverseObjectPropertiesAxiomImpl extends ElkObjectImpl
 	private static final int constructorHash_ = "ElkSubObjectPropertyOfAxiom"
 			.hashCode();
 
-	private ElkInverseObjectPropertiesAxiomImpl(
+	/* package-private */ElkInverseObjectPropertiesAxiomImpl(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression) {
 		this.firstObjectPropertyExpression = firstObjectPropertyExpression;
@@ -69,15 +68,6 @@ public class ElkInverseObjectPropertiesAxiomImpl extends ElkObjectImpl
 		return secondObjectPropertyExpression;
 	}
 
-	public static ElkInverseObjectPropertiesAxiomImpl create(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression) {
-		return (ElkInverseObjectPropertiesAxiomImpl) factory
-				.put(new ElkInverseObjectPropertiesAxiomImpl(
-						firstObjectPropertyExpression,
-						secondObjectPropertyExpression));
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder("InverseObjectProperties(");
@@ -88,7 +78,7 @@ public class ElkInverseObjectPropertiesAxiomImpl extends ElkObjectImpl
 		return result.toString();
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkInverseObjectPropertiesAxiomImpl) {

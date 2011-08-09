@@ -30,7 +30,6 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkEntity;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
 
 /**
@@ -44,17 +43,12 @@ import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
 public class ElkObjectPropertyImpl extends ElkIriObject implements ElkEntity,
 		ElkObjectProperty {
 
-	protected ElkObjectPropertyImpl(String iri) {
+	/* package-private */ElkObjectPropertyImpl(String iri) {
 		super(iri);
 		this.structuralHashCode = iri.hashCode();
 	}
 
-	public static ElkObjectPropertyImpl create(String objectPropertyIri) {
-		return (ElkObjectPropertyImpl) factory.put(new ElkObjectPropertyImpl(
-				objectPropertyIri));
-	}
-
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkObjectProperty) {

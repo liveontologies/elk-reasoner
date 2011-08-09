@@ -25,7 +25,6 @@ package org.semanticweb.elk.syntax.implementation;
 import org.semanticweb.elk.syntax.ElkIndividualVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkAnonymousIndividual;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 
 /**
  * Corresponds to an <a href=
@@ -34,17 +33,14 @@ import org.semanticweb.elk.syntax.interfaces.ElkObject;
  * 
  * @author Markus Kroetzsch
  */
-public class ElkAnonymousIndividualImpl extends ElkObjectImpl implements ElkAnonymousIndividual {
+public class ElkAnonymousIndividualImpl extends ElkObjectImpl implements
+		ElkAnonymousIndividual {
 
 	protected final String nodeId;
 
-	private ElkAnonymousIndividualImpl(String nodeId) {
+	/* package-private */ElkAnonymousIndividualImpl(String nodeId) {
 		this.nodeId = nodeId;
 		this.structuralHashCode = nodeId.hashCode();
-	}
-
-	public static ElkAnonymousIndividualImpl create(String nodeId) {
-		return (ElkAnonymousIndividualImpl) factory.put(new ElkAnonymousIndividualImpl(nodeId));
 	}
 
 	public String getNodeId() {
@@ -56,7 +52,7 @@ public class ElkAnonymousIndividualImpl extends ElkObjectImpl implements ElkAnon
 		return nodeId;
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkAnonymousIndividual) {

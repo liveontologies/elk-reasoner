@@ -27,7 +27,6 @@ import java.util.List;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkIndividual;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
 
 /**
@@ -42,7 +41,8 @@ public class ElkObjectOneOfImpl extends ElkObjectListObject<ElkIndividual>
 
 	private static final int constructorHash_ = "ElkObjectOneOf".hashCode();
 
-	private ElkObjectOneOfImpl(List<? extends ElkIndividual> individuals) {
+	/* package-private */ElkObjectOneOfImpl(
+			List<? extends ElkIndividual> individuals) {
 		super(individuals);
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, individuals);
@@ -52,24 +52,12 @@ public class ElkObjectOneOfImpl extends ElkObjectListObject<ElkIndividual>
 		return elkObjects;
 	}
 
-	public static ElkObjectOneOfImpl create(
-			List<? extends ElkIndividual> individuals) {
-		return (ElkObjectOneOfImpl) factory.put(new ElkObjectOneOfImpl(
-				individuals));
-	}
-
-	public static ElkObjectOneOf create(ElkIndividual firstIndividual,
-			ElkIndividual... otherIndividuals) {
-		return (ElkObjectOneOf) factory.put(new ElkObjectOneOfImpl(
-				varArgsToList(firstIndividual, otherIndividuals)));
-	}
-
 	@Override
 	public String toString() {
 		return buildFssString("ObjectOneOf");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkObjectOneOf) {

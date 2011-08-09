@@ -30,8 +30,7 @@ import java.util.Arrays;
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyChainImpl;
-import org.semanticweb.elk.syntax.implementation.ElkSubObjectPropertyOfAxiomImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
@@ -43,6 +42,7 @@ import org.semanticweb.elk.syntax.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
@@ -71,6 +71,14 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	protected final int multiplicity;
 
 	/**
+	 * Object factory that is used internally to replace some syntactic
+	 * constructs with other logically equivalent constructs. ElkObjects created
+	 * in this class are only used for this purpose (temporarily), hence we can
+	 * use any factory implementation here.
+	 */
+	protected final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+
+	/**
 	 * Constructor.
 	 * 
 	 * @param ontologyIndex
@@ -82,14 +90,13 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		this.ontologyIndex = ontologyIndex;
 		this.multiplicity = multiplicity;
 
-		classExpressionIndexer =
-			new ClassExpressionIndexer(this);
-		negativeClassExpressionIndexer = 
-			new NegativeClassExpressionIndexer(this);
-		positiveClassExpressionIndexer = 
-			new PositiveClassExpressionIndexer(this);
-		objectPropertyExpressionIndexer =
-			new ObjectPropertyExpressionIndexer(this);
+		classExpressionIndexer = new ClassExpressionIndexer(this);
+		negativeClassExpressionIndexer = new NegativeClassExpressionIndexer(
+				this);
+		positiveClassExpressionIndexer = new PositiveClassExpressionIndexer(
+				this);
+		objectPropertyExpressionIndexer = new ObjectPropertyExpressionIndexer(
+				this);
 	}
 
 	/**
@@ -134,18 +141,20 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
-	
+
 	public Void visit(final ElkSubObjectPropertyOfAxiom axiom) {
 		axiom.getSubObjectPropertyExpression().accept(
 				new ElkSubObjectPropertyExpressionVisitor<Void>() {
 
 					public Void visit(ElkObjectProperty subProperty) {
-						indexSubObjectPropertyOfAxiom(subProperty, axiom.getSuperObjectPropertyExpression());
+						indexSubObjectPropertyOfAxiom(subProperty,
+								axiom.getSuperObjectPropertyExpression());
 						return null;
 					}
 
 					public Void visit(ElkObjectInverseOf subProperty) {
-						throw new UnsupportedOperationException("Not yet implemented");
+						throw new UnsupportedOperationException(
+								"Not yet implemented");
 					}
 
 					public Void visit(ElkObjectPropertyChain subPropertyChain) {
@@ -159,8 +168,9 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
 		ElkObjectPropertyExpression ope = axiom.getObjectPropertyExpression();
-		indexPropertyComposition(ElkSubObjectPropertyOfAxiomImpl.create(
-				ElkObjectPropertyChainImpl.create(Arrays.asList(ope, ope)), ope));
+		indexPropertyComposition(objectFactory.getSubObjectPropertyOfAxiom(
+				objectFactory.getObjectPropertyChain(Arrays.asList(ope, ope)),
+				ope));
 		return null;
 	}
 
@@ -177,17 +187,18 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 				return null;
 		}
 
-		ie.accept(new IndexedEntityVisitor<Void> () {
+		ie.accept(new IndexedEntityVisitor<Void>() {
 
 			public Void visit(IndexedClass indexedClass) {
 				return indexedClass.accept(classExpressionIndexer);
 			}
 
 			public Void visit(IndexedObjectProperty indexedObjectProperty) {
-				return indexedObjectProperty.accept(objectPropertyExpressionIndexer);
+				return indexedObjectProperty
+						.accept(objectPropertyExpressionIndexer);
 			}
 		});
-		
+
 		return null;
 	}
 
@@ -212,26 +223,22 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
-	
-	
-	protected void indexSubClassOfAxiom(
-			ElkClassExpression elkSubClass,
+
+	protected void indexSubClassOfAxiom(ElkClassExpression elkSubClass,
 			ElkClassExpression elkSuperClass) {
-		
+
 		IndexedClassExpression subClass = null;
 		IndexedClassExpression superClass = null;
-		
+
 		if (multiplicity == 1) {
 			subClass = ontologyIndex.getIndexedClassExpression(elkSubClass);
 			if (subClass == null)
 				subClass = ontologyIndex.createIndexed(elkSubClass);
-			
+
 			superClass = ontologyIndex.getIndexedClassExpression(elkSuperClass);
 			if (superClass == null)
 				superClass = ontologyIndex.createIndexed(elkSuperClass);
-			
+
 			subClass.addToldSuperClassExpression(superClass);
 		}
 
@@ -240,7 +247,7 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 			superClass = ontologyIndex.getIndexedClassExpression(elkSuperClass);
 			if (subClass == null || superClass == null)
 				return;
-			
+
 			subClass.removeToldSuperClassExpression(superClass);
 		}
 
@@ -249,7 +256,7 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		subClass.accept(negativeClassExpressionIndexer);
 		superClass.accept(positiveClassExpressionIndexer);
 	}
-	
+
 	protected void indexSubObjectPropertyOfAxiom(
 			ElkObjectPropertyExpression elkSubProperty,
 			ElkObjectPropertyExpression elkSuperProperty) {
@@ -258,24 +265,28 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		IndexedObjectProperty superProperty = null;
 
 		if (multiplicity == 1) {
-			subProperty = ontologyIndex.getIndexedObjectProperty(elkSubProperty);
+			subProperty = ontologyIndex
+					.getIndexedObjectProperty(elkSubProperty);
 			if (subProperty == null)
 				subProperty = ontologyIndex.createIndexed(elkSubProperty);
-			
-			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
+
+			superProperty = ontologyIndex
+					.getIndexedObjectProperty(elkSuperProperty);
 			if (superProperty == null)
 				superProperty = ontologyIndex.createIndexed(elkSuperProperty);
-			
+
 			subProperty.addToldSuperObjectProperty(superProperty);
 			superProperty.addToldSubObjectProperty(subProperty);
 		}
 
 		if (multiplicity == -1) {
-			subProperty = ontologyIndex.getIndexedObjectProperty(elkSubProperty);
-			superProperty = ontologyIndex.getIndexedObjectProperty(elkSuperProperty);
+			subProperty = ontologyIndex
+					.getIndexedObjectProperty(elkSubProperty);
+			superProperty = ontologyIndex
+					.getIndexedObjectProperty(elkSuperProperty);
 			if (subProperty == null || superProperty == null)
 				return;
-			
+
 			subProperty.removeToldSuperObjectProperty(superProperty);
 			superProperty.removeToldSubObjectProperty(subProperty);
 		}
@@ -283,9 +294,8 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		subProperty.accept(objectPropertyExpressionIndexer);
 		superProperty.accept(objectPropertyExpressionIndexer);
 	}
-	
-	protected void indexPropertyComposition(
-			ElkSubObjectPropertyOfAxiom axiom) {
+
+	protected void indexPropertyComposition(ElkSubObjectPropertyOfAxiom axiom) {
 
 		IndexedPropertyComposition ipc = null;
 
@@ -309,5 +319,5 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

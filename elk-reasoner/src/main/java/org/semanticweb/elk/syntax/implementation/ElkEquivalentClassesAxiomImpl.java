@@ -32,7 +32,6 @@ import org.semanticweb.elk.syntax.ElkClassAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 
 /**
  * Corresponds to an <a href=
@@ -49,29 +48,11 @@ public class ElkEquivalentClassesAxiomImpl extends ElkClassExpressionListObject
 	private static final int constructorHash_ = "ElkEquivalentClassesAxiom"
 			.hashCode();
 
-	private ElkEquivalentClassesAxiomImpl(
+	/* package-private */ElkEquivalentClassesAxiomImpl(
 			List<? extends ElkClassExpression> equivalentClassExpressions) {
 		super(equivalentClassExpressions);
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, equivalentClassExpressions);
-	}
-
-	public static ElkEquivalentClassesAxiomImpl create(
-			List<? extends ElkClassExpression> equivalentClassExpressions) {
-		return (ElkEquivalentClassesAxiomImpl) factory
-				.put(new ElkEquivalentClassesAxiomImpl(
-						equivalentClassExpressions));
-	}
-
-	public static ElkEquivalentClassesAxiomImpl create(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
-		return (ElkEquivalentClassesAxiomImpl) factory
-				.put(new ElkEquivalentClassesAxiomImpl(
-						ElkClassExpressionListObject.varArgsToList(
-								firstClassExpression, secondClassExpression,
-								otherClassExpressions)));
 	}
 
 	@Override
@@ -79,7 +60,7 @@ public class ElkEquivalentClassesAxiomImpl extends ElkClassExpressionListObject
 		return buildFssString("EquivalentClasses");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkEquivalentClassesAxiom) {

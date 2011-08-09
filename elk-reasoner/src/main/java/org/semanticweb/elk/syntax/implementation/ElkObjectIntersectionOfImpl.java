@@ -30,7 +30,6 @@ import java.util.List;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
 
 /**
@@ -47,27 +46,11 @@ public class ElkObjectIntersectionOfImpl extends ElkClassExpressionListObject
 	private static final int constructorHash_ = "ElkObjectIntersectionOf"
 			.hashCode();
 
-	private ElkObjectIntersectionOfImpl(
+	/* package-private */ElkObjectIntersectionOfImpl(
 			List<? extends ElkClassExpression> classExpressions) {
 		super(classExpressions);
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, classExpressions);
-	}
-
-	public static ElkObjectIntersectionOfImpl create(
-			List<? extends ElkClassExpression> classExpressions) {
-		return (ElkObjectIntersectionOfImpl) factory
-				.put(new ElkObjectIntersectionOfImpl(classExpressions));
-	}
-
-	public static ElkObjectIntersectionOfImpl create(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
-		return (ElkObjectIntersectionOfImpl) factory
-				.put(new ElkObjectIntersectionOfImpl(varArgsToList(
-						firstClassExpression, secondClassExpression,
-						otherClassExpressions)));
 	}
 
 	@Override
@@ -75,7 +58,7 @@ public class ElkObjectIntersectionOfImpl extends ElkClassExpressionListObject
 		return buildFssString("ObjectIntersectionOf");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkObjectIntersectionOf) {

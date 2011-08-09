@@ -28,7 +28,6 @@ import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkEquivalentObjectPropertiesAxiom;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 
 /**
@@ -45,29 +44,11 @@ public class ElkEquivalentObjectPropertiesAxiomImpl extends
 	private static final int constructorHash_ = "ElkEquivalentObjectPropertiesAxiom"
 			.hashCode();
 
-	private ElkEquivalentObjectPropertiesAxiomImpl(
+	/* package-private */ElkEquivalentObjectPropertiesAxiomImpl(
 			List<? extends ElkObjectPropertyExpression> equivalentObjectPropertyExpressions) {
 		super(equivalentObjectPropertyExpressions);
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, equivalentObjectPropertyExpressions);
-	}
-
-	public static ElkEquivalentObjectPropertiesAxiomImpl create(
-			List<? extends ElkObjectPropertyExpression> equivalentObjectPropertyExpressions) {
-		return (ElkEquivalentObjectPropertiesAxiomImpl) factory
-				.put(new ElkEquivalentObjectPropertiesAxiomImpl(
-						equivalentObjectPropertyExpressions));
-	}
-
-	public static ElkEquivalentObjectPropertiesAxiom create(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression,
-			ElkObjectPropertyExpression... otherObjectPropertyExpressions) {
-		return (ElkEquivalentObjectPropertiesAxiom) factory
-				.put(new ElkEquivalentObjectPropertiesAxiomImpl(varArgsToList(
-						firstObjectPropertyExpression,
-						secondObjectPropertyExpression,
-						otherObjectPropertyExpressions)));
 	}
 
 	@Override
@@ -75,7 +56,7 @@ public class ElkEquivalentObjectPropertiesAxiomImpl extends
 		return buildFssString("EquivalentObjectProperties");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkEquivalentObjectPropertiesAxiom) {

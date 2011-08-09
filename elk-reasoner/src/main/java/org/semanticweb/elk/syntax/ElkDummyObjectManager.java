@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,17 @@ package org.semanticweb.elk.syntax;
 
 import org.semanticweb.elk.syntax.interfaces.ElkObject;
 
-public interface ElkObjectFactory {
-	public ElkObject put(ElkObject object);
+/**
+ * Implementation of the ElkObjectManager interface that does not keep track of
+ * existing objects and rather allows for multiple instances of structurally
+ * equivalent ElkObjects. This reduces the management overhead.
+ * 
+ * @author Markus Kroetzsch
+ */
+public class ElkDummyObjectManager implements ElkObjectManager {
+
+	public ElkObject getCanonicalElkObject(ElkObject object) {
+		return object;
+	}
+
 }

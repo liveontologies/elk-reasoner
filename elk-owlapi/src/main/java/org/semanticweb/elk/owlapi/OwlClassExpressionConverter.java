@@ -28,11 +28,9 @@ package org.semanticweb.elk.owlapi;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.syntax.implementation.ElkClassImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectIntersectionOfImpl;
-import org.semanticweb.elk.syntax.implementation.ElkObjectSomeValuesFromImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -65,23 +63,23 @@ import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 public class OwlClassExpressionConverter implements
 		OWLClassExpressionVisitorEx<ElkClassExpression> {
 
-	private static final OwlClassExpressionConverter converter_ = new OwlClassExpressionConverter();
+	protected final ElkObjectFactory objectFactory;
+	protected final OwlPropertyExpressionConverter propertyExpressionConverter;
 
-	private OwlClassExpressionConverter() {
-	}
-
-	static OwlClassExpressionConverter getInstance() {
-		return converter_;
+	public OwlClassExpressionConverter(ElkObjectFactory objectFactory,
+			OwlPropertyExpressionConverter propertyExpressionConverter) {
+		this.objectFactory = objectFactory;
+		this.propertyExpressionConverter = propertyExpressionConverter;
 	}
 
 	public ElkClass visit(OWLClass ce) {
 		// TODO use visitors?
 		if (ce.isOWLThing())
-			return ElkClass.ELK_OWL_THING;
+			return objectFactory.getOwlThing();
 		else if (ce.isOWLNothing())
-			return ElkClass.ELK_OWL_NOTHING;
+			return objectFactory.getOwlThing();
 		else
-			return ElkClassImpl.create(ce.getIRI().toString());
+			return objectFactory.getClass(ce.getIRI().toString());
 	}
 
 	public ElkObjectIntersectionOf visit(OWLObjectIntersectionOf ce) {
@@ -90,7 +88,7 @@ public class OwlClassExpressionConverter implements
 		for (OWLClassExpression cce : owlConjuncts) {
 			elkConjuncts.add(cce.accept(this));
 		}
-		return ElkObjectIntersectionOfImpl.create(elkConjuncts);
+		return objectFactory.getObjectIntersectionOf(elkConjuncts);
 	}
 
 	public ElkClassExpression visit(OWLObjectUnionOf ce) {
@@ -104,13 +102,11 @@ public class OwlClassExpressionConverter implements
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
-	
+
 	public ElkObjectSomeValuesFrom visit(OWLObjectSomeValuesFrom ce) {
-		OwlPropertyExpressionConverter peConverter = OwlPropertyExpressionConverter
-				.getInstance();
-		return ElkObjectSomeValuesFromImpl.create(
-				ce.getProperty().accept(peConverter),
-				ce.getFiller().accept(this));
+		return objectFactory.getObjectSomeValuesFrom(
+				ce.getProperty().accept(propertyExpressionConverter), ce
+						.getFiller().accept(this));
 	}
 
 	public ElkClassExpression visit(OWLObjectAllValuesFrom ce) {

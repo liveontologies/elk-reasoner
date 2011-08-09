@@ -61,14 +61,17 @@ import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.syntax.FutureElkObjectFactory;
-import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.interfaces.FutureElkObjectFactory;
+import org.semanticweb.elk.syntax.implementation.FutureElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
 }
 
 
 @members {
-  private static FutureElkObjectFactory constructor =
-        new FutureElkObjectFactoryImpl();
+    private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+    private final static FutureElkObjectFactory constructor =
+        new FutureElkObjectFactoryImpl(objectFactory);
 
   // Make sure that exception is thrown on parsing error
   @Override
@@ -237,8 +240,8 @@ dtXmlLiterals
 /* 5.1 Classes */
 clazz returns [Future<? extends ElkClass> value]
     : x = iri         { $value = constructor.getFutureElkClass($x.value); }
-    | OWL_THING       { $value = constructor.getFuture(ElkClass.ELK_OWL_THING); }
-    | OWL_NOTHING     { $value = constructor.getFuture(ElkClass.ELK_OWL_NOTHING); }
+    | OWL_THING       { $value = constructor.getFuture(objectFactory.getOwlThing()); }
+    | OWL_NOTHING     { $value = constructor.getFuture(objectFactory.getOwlNothing()); }
     ;
 /* 5.2 Datatypes */    
 datatype 
@@ -257,10 +260,10 @@ datatype
 objectProperty returns [Future<? extends ElkObjectProperty> value]
     : x = iri	{ $value = constructor.getFutureElkObjectProperty($x.value); }
     | OWL_TOP_OBJECT_PROPERTY { 
-        $value = constructor.getFuture(ElkObjectProperty.ELK_OWL_TOP_OBJECT_PROPERTY); 
+        $value = constructor.getFuture(objectFactory.getOwlTopObjectProperty()); 
       }
     | OWL_BOTTOM_OBJECT_PROPERTY { 
-        $value = constructor.getFuture(ElkObjectProperty.ELK_OWL_BOTTOM_OBJECT_PROPERTY); 
+        $value = constructor.getFuture(objectFactory.getOwlBottomObjectProperty()); 
       }
     ;
 /* 5.4 Data Properties */    

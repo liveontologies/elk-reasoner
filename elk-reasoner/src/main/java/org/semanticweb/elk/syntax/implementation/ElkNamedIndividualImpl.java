@@ -27,7 +27,6 @@ import org.semanticweb.elk.syntax.ElkIndividualVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkEntity;
 import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 
 /**
  * Corresponds to an <a href=
@@ -39,17 +38,12 @@ import org.semanticweb.elk.syntax.interfaces.ElkObject;
 public class ElkNamedIndividualImpl extends ElkIriObject implements
 		ElkEntity, ElkNamedIndividual {
 
-	private ElkNamedIndividualImpl(String iri) {
+	/* package-private */ElkNamedIndividualImpl(String iri) {
 		super(iri);
 		this.structuralHashCode = iri.hashCode();
 	}
 
-	public static ElkNamedIndividualImpl create(String iri) {
-		return (ElkNamedIndividualImpl) factory.put(new ElkNamedIndividualImpl(
-				iri));
-	}
-
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkNamedIndividual) {

@@ -30,7 +30,6 @@ import org.semanticweb.elk.syntax.ElkEntityVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkEntity;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 
 /**
  * Corresponds to a <a href=
@@ -42,16 +41,12 @@ import org.semanticweb.elk.syntax.interfaces.ElkObject;
  */
 public class ElkClassImpl extends ElkIriObject implements ElkEntity, ElkClass {
 
-	private ElkClassImpl(String iri) {
+	/* package-private */ElkClassImpl(String iri) {
 		super(iri);
 		this.structuralHashCode = iri.hashCode();
 	}
 
-	public static ElkClassImpl create(String iri) {
-		return (ElkClassImpl) factory.put(new ElkClassImpl(iri));
-	}
-
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkClass) {

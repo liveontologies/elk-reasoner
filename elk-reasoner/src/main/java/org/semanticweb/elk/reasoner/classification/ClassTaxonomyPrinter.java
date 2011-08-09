@@ -30,10 +30,10 @@ import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.semanticweb.elk.syntax.implementation.ElkEquivalentClassesAxiomImpl;
-import org.semanticweb.elk.syntax.implementation.ElkSubClassOfAxiomImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 
 /**
@@ -160,14 +160,15 @@ public class ClassTaxonomyPrinter {
 			SortedMap<String, ElkClass> orderedEquivalentClasses,
 			SortedMap<String, ElkClass> orderedSubClasses, Writer writer)
 			throws IOException {
+		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 		for (ElkClass elkClassMember : orderedEquivalentClasses.values()) {
-			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = ElkEquivalentClassesAxiomImpl
-					.create(elkClass, elkClassMember);
+			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = objectFactory
+					.getEquivalentClassesAxiom(elkClass, elkClassMember);
 			writer.write(elkEquivalentClassesAxiom.toString() + "\n");
 		}
 		for (ElkClass elkSubClass : orderedSubClasses.values()) {
-			ElkSubClassOfAxiom elkSubClassAxiom = ElkSubClassOfAxiomImpl.create(
-					elkSubClass, elkClass);
+			ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
+					.getSubClassOfAxiom(elkSubClass, elkClass);
 			writer.write(elkSubClassAxiom.toString() + "\n");
 		}
 	}

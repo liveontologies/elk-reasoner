@@ -28,7 +28,6 @@ package org.semanticweb.elk.syntax.implementation;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.util.HashGenerator;
@@ -48,22 +47,17 @@ public class ElkObjectInverseOfImpl extends ElkObjectImpl implements
 
 	private static final int constructorHash_ = "ElkObjectInverseOf".hashCode();
 
-	private ElkObjectInverseOfImpl(ElkObjectProperty objectProperty) {
+	/* package-private */ElkObjectInverseOfImpl(ElkObjectProperty objectProperty) {
 		this.objectProperty = objectProperty;
 		this.structuralHashCode = HashGenerator.combineListHash(
 				constructorHash_, objectProperty.structuralHashCode());
-	}
-
-	public static ElkObjectInverseOfImpl create(ElkObjectProperty objectProperty) {
-		return (ElkObjectInverseOfImpl) factory.put(new ElkObjectInverseOfImpl(
-				objectProperty));
 	}
 
 	public ElkObjectProperty getObjectProperty() {
 		return objectProperty;
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkObjectInverseOf) {

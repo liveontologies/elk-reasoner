@@ -54,131 +54,110 @@ import org.semanticweb.elk.util.Pair;
 /**
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
- *
+ * 
  */
 public class SerialOntologyIndex extends OntologyIndexModifier {
 
-	protected final Map<ElkClassExpression, IndexedClassExpression>
-		indexedClassExpressionLookup;
+	protected final Map<ElkClassExpression, IndexedClassExpression> indexedClassExpressionLookup;
 
-	protected final Map<Pair<IndexedClassExpression, IndexedClassExpression>,
-						IndexedObjectIntersectionOf>
-		indexedObjectIntersectionOfLookup;
+	protected final Map<Pair<IndexedClassExpression, IndexedClassExpression>, IndexedObjectIntersectionOf> indexedObjectIntersectionOfLookup;
 
-	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty>
-		indexedObjectPropertyLookup;
-	
-	protected final Map<ElkSubObjectPropertyOfAxiom,
-						IndexedPropertyComposition>
-		indexedPropertyCompositionLookup;
-	
+	protected final Map<ElkObjectPropertyExpression, IndexedObjectProperty> indexedObjectPropertyLookup;
+
+	protected final Map<ElkSubObjectPropertyOfAxiom, IndexedPropertyComposition> indexedPropertyCompositionLookup;
+
 	protected int indexedClassCount;
 
-	
-	
-	
 	public SerialOntologyIndex() {
 		// TODO possibly replace by ArrayHashMap when it supports removals
-		indexedClassExpressionLookup =
-			new HashMap<ElkClassExpression,
-						IndexedClassExpression>(1024);
-		
-		indexedObjectPropertyLookup =
-			new HashMap<ElkObjectPropertyExpression,
-						IndexedObjectProperty>(128);
-		
-		indexedPropertyCompositionLookup = 
-			new HashMap<ElkSubObjectPropertyOfAxiom,
-						IndexedPropertyComposition>(16);
-		
-		indexedObjectIntersectionOfLookup = 
-			new HashMap<Pair<IndexedClassExpression, IndexedClassExpression>,
-						IndexedObjectIntersectionOf>(1024);
+		indexedClassExpressionLookup = new HashMap<ElkClassExpression, IndexedClassExpression>(
+				1024);
+
+		indexedObjectPropertyLookup = new HashMap<ElkObjectPropertyExpression, IndexedObjectProperty>(
+				128);
+
+		indexedPropertyCompositionLookup = new HashMap<ElkSubObjectPropertyOfAxiom, IndexedPropertyComposition>(
+				16);
+
+		indexedObjectIntersectionOfLookup = new HashMap<Pair<IndexedClassExpression, IndexedClassExpression>, IndexedObjectIntersectionOf>(
+				1024);
 	}
 
-
-	
 	public IndexedClassExpression getIndexedClassExpression(
 			ElkClassExpression classExpression) {
 		return indexedClassExpressionLookup.get(classExpression);
 	}
 
-	
 	public IndexedObjectProperty getIndexedObjectProperty(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		return indexedObjectPropertyLookup.get(objectPropertyExpression);
 	}
-	
-	
+
 	public IndexedPropertyComposition getIndexedPropertyChain(
 			ElkSubObjectPropertyOfAxiom axiom) {
 		return indexedPropertyCompositionLookup.get(axiom);
 	}
 
-	
 	public IndexedEntity getIndexedEntity(ElkEntity entity) {
 		return entity.accept(indexedEntityGetter);
 	}
 
-	
-	
-	
-	
-	
 	@Override
 	protected IndexedEntity createIndexed(ElkEntity entity) {
 		return entity.accept(indexedEntityCreator);
 	}
 
-	
 	@Override
 	protected IndexedClassExpression createIndexed(
 			ElkClassExpression classExpression) {
 		return classExpression.accept(indexedClassExpressionCreator);
 	}
 
-	
 	@Override
 	protected IndexedObjectProperty createIndexed(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		return objectPropertyExpression.accept(indexedObjectPropertyCreator);
 	}
-	
 
 	@Override
-	protected IndexedPropertyComposition createIndexed(ElkSubObjectPropertyOfAxiom representative) {
+	protected IndexedPropertyComposition createIndexed(
+			ElkSubObjectPropertyOfAxiom representative) {
 		// asserts that that the property inclusion is complex
 		assert representative.getSubObjectPropertyExpression() instanceof ElkObjectPropertyChain;
-		
-		List<? extends ElkObjectPropertyExpression> chain = ((ElkObjectPropertyChain) representative.getSubObjectPropertyExpression()).getObjectPropertyExpressions();
+
+		List<? extends ElkObjectPropertyExpression> chain = ((ElkObjectPropertyChain) representative
+				.getSubObjectPropertyExpression())
+				.getObjectPropertyExpressions();
 		int n = chain.size();
-		
-		IndexedObjectProperty superProperty = getIndexedObjectProperty(representative.getSuperObjectPropertyExpression());
+
+		IndexedObjectProperty superProperty = getIndexedObjectProperty(representative
+				.getSuperObjectPropertyExpression());
 		if (superProperty == null)
-			superProperty = createIndexed(representative.getSuperObjectPropertyExpression()); 
-		
-		IndexedPropertyExpression last = getIndexedObjectProperty(chain.get(n-1));
+			superProperty = createIndexed(representative
+					.getSuperObjectPropertyExpression());
+
+		IndexedPropertyExpression last = getIndexedObjectProperty(chain
+				.get(n - 1));
 		if (last == null)
-			last = createIndexed(chain.get(n-1));
-		
-		for (int i = n-2; i >= 0; i--) {
+			last = createIndexed(chain.get(n - 1));
+
+		for (int i = n - 2; i >= 0; i--) {
 			IndexedObjectProperty next = getIndexedObjectProperty(chain.get(i));
 			if (next == null)
 				next = createIndexed(chain.get(i));
-			
+
 			if (i == 0)
-				last = new IndexedPropertyComposition(next, last, superProperty, representative);
-				
+				last = new IndexedPropertyComposition(next, last,
+						superProperty, representative);
+
 			else
 				last = new IndexedPropertyComposition(next, last);
 		}
-		indexedPropertyCompositionLookup.put(representative, (IndexedPropertyComposition) last);
+		indexedPropertyCompositionLookup.put(representative,
+				(IndexedPropertyComposition) last);
 		return (IndexedPropertyComposition) last;
 	}
-	
 
-	
-	
 	@Override
 	protected void remove(IndexedClassExpression ice) {
 		for (ElkClassExpression c : ice.getRepresentantatives()) {
@@ -189,39 +168,31 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 		if (ice instanceof IndexedObjectIntersectionOf) {
 			IndexedObjectIntersectionOf i = (IndexedObjectIntersectionOf) ice;
-			indexedObjectIntersectionOfLookup.remove(
-					new Pair<IndexedClassExpression, IndexedClassExpression>(
+			indexedObjectIntersectionOfLookup
+					.remove(new Pair<IndexedClassExpression, IndexedClassExpression>(
 							i.getFirstConjunct(), i.getSecondConjunct()));
 		}
 	}
 
-	
 	@Override
 	protected void remove(IndexedObjectProperty iop) {
 		indexedObjectPropertyLookup.remove(iop.representative);
 	}
-	
-	
+
 	@Override
 	protected void remove(IndexedPropertyComposition ria) {
 		if (!ria.isAuxiliary())
 			indexedPropertyCompositionLookup.remove(ria.representative);
 	}
 
-	
-	
-	
 	public ElkAxiomProcessor getAxiomInserter() {
 		return new AxiomIndexer(this, 1);
 	}
 
-	
 	public ElkAxiomProcessor getAxiomDeleter() {
 		return new AxiomIndexer(this, -1);
 	}
 
-	
-	
 	public Iterable<IndexedClass> getIndexedClasses() {
 		return Iterables.filter(
 				indexedClassExpressionLookup.values(), IndexedClass.class);
@@ -231,7 +202,6 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 		return indexedClassCount;
 	}
 
-	
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
 		return Iterables.concat(
 				indexedClassExpressionLookup.values(),
@@ -242,14 +212,13 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
 		return indexedObjectPropertyLookup.values();
 	}
-	
+
 	public Iterable<IndexedPropertyComposition> getIndexedPropertyChains() {
 		return Iterables.concat(indexedPropertyCompositionLookup.values());
 	}
 
-	
 	private class IndexedEntityGetter implements
-	ElkEntityVisitor<IndexedEntity> {
+			ElkEntityVisitor<IndexedEntity> {
 
 		// TODO implement without a cast
 
@@ -272,7 +241,7 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 	private class IndexedEntityCreator implements
 			ElkEntityVisitor<IndexedEntity> {
-		
+
 		public IndexedClass visit(ElkClass elkClass) {
 			IndexedClass result = new IndexedClass(elkClass);
 			indexedClassExpressionLookup.put(elkClass, result);
@@ -297,7 +266,7 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 	private class IndexedClassExpressionCreator implements
 			ElkClassExpressionVisitor<IndexedClassExpression> {
-		
+
 		public IndexedClass visit(ElkClass elkClass) {
 			return indexedEntityCreator.visit(elkClass);
 		}

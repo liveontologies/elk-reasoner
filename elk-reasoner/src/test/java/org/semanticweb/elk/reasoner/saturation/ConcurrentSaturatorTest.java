@@ -32,15 +32,18 @@ import junit.framework.TestCase;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
-import org.semanticweb.elk.syntax.FutureElkObjectFactory;
-import org.semanticweb.elk.syntax.FutureElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.implementation.FutureElkObjectFactoryImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.FutureElkObjectFactory;
 import org.semanticweb.elk.syntax.parsing.ConcurrentFutureElkAxiomLoader;
 
 public class ConcurrentSaturatorTest extends TestCase {
 
-	final FutureElkObjectFactory constructor = new FutureElkObjectFactoryImpl();
+	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+	final FutureElkObjectFactory constructor = new FutureElkObjectFactoryImpl(objectFactory);
 
 	public ConcurrentSaturatorTest(String testName) {
 		super(testName);

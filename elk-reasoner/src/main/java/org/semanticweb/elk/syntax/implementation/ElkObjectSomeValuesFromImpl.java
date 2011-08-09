@@ -28,7 +28,6 @@ package org.semanticweb.elk.syntax.implementation;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.util.HashGenerator;
@@ -48,7 +47,7 @@ public class ElkObjectSomeValuesFromImpl extends
 	private static final int constructorHash_ = "ElkObjectSomeValuesFrom"
 			.hashCode();
 
-	private ElkObjectSomeValuesFromImpl(
+	/* package-private */ElkObjectSomeValuesFromImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
 		super(objectPropertyExpression, classExpression);
@@ -58,20 +57,12 @@ public class ElkObjectSomeValuesFromImpl extends
 				classExpression.structuralHashCode());
 	}
 
-	public static ElkObjectSomeValuesFromImpl create(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
-		return (ElkObjectSomeValuesFromImpl) factory
-				.put(new ElkObjectSomeValuesFromImpl(objectPropertyExpression,
-						classExpression));
-	}
-
 	@Override
 	public String toString() {
 		return buildFssString("ObjectSomeValuesFrom");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkObjectSomeValuesFrom) {

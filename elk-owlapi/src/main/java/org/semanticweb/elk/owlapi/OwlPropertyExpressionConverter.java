@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
@@ -41,23 +41,20 @@ import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitorEx;
  */
 public class OwlPropertyExpressionConverter implements
 		OWLPropertyExpressionVisitorEx<ElkObjectPropertyExpression> {
+	
+	protected final ElkObjectFactory objectFactory;
 
-	private static final OwlPropertyExpressionConverter converter_ = new OwlPropertyExpressionConverter();
-
-	private OwlPropertyExpressionConverter() {
-	}
-
-	static OwlPropertyExpressionConverter getInstance() {
-		return converter_;
+	public OwlPropertyExpressionConverter(ElkObjectFactory objectFactory) {
+		this.objectFactory = objectFactory;
 	}
 
 	public ElkObjectProperty visit(OWLObjectProperty property) {
 		if (property.isOWLTopObjectProperty())
-			return ElkObjectProperty.ELK_OWL_TOP_OBJECT_PROPERTY;
+			return objectFactory.getOwlTopObjectProperty();
 		else if (property.isOWLBottomObjectProperty())
-			return ElkObjectProperty.ELK_OWL_BOTTOM_OBJECT_PROPERTY;
+			return objectFactory.getOwlBottomObjectProperty();
 		else
-			return ElkObjectPropertyImpl.create(property.getIRI().toString());
+			return objectFactory.getObjectProperty(property.getIRI().toString());
 	}
 
 	public ElkObjectPropertyExpression visit(OWLObjectInverseOf property) {

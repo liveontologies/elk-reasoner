@@ -27,23 +27,19 @@ package org.semanticweb.elk.syntax.implementation;
 
 import java.util.List;
 
-import org.semanticweb.elk.syntax.ElkObjectFactory;
-import org.semanticweb.elk.syntax.WeakCanonicalSet;
 import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.util.HashGenerator;
 import org.semanticweb.elk.util.StructuralHashObject;
 
 /**
  * Basic implementation of hashable objects in ELK, typically syntactic
- * structures like axioms or class expressions. In addition to a structural hash
- * code that reflects the content of an ELKObject, this class also provides a
- * basic hash code that acts as an ID for the actual Java object and which is
- * used in managing such objects.
+ * structures like axioms or class expressions. ElkObjects are immutable and
+ * their equality is based on their actual structural content.
  * 
  * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  */
 public abstract class ElkObjectImpl implements ElkObject {
-	protected static ElkObjectFactory factory = new WeakCanonicalSet();
 
 	/**
 	 * Structural hash code for this object. Must be initialized on
@@ -55,14 +51,12 @@ public abstract class ElkObjectImpl implements ElkObject {
 		return structuralHashCode;
 	}
 
-	private final int hashCode_ = HashGenerator.generateNextHashCode();
-
 	public final int hashCode() {
-		return hashCode_;
+		return structuralHashCode;
 	}
 
 	public final boolean equals(Object obj) {
-		return this == obj;
+		return structuralEquals(obj);
 	}
 
 	/**

@@ -33,8 +33,10 @@ import junit.framework.TestCase;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.UnbufferedTokenStream;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.parsing.FutureElkAxiomConsumer;
 
 /**
@@ -97,7 +99,8 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		try {
 			ElkClass clazz = parseElkClass("owl:Thing");
 			assertNotNull(clazz);
-			assertSame(ElkClass.ELK_OWL_THING, clazz);
+			ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+			assertSame(objectFactory.getOwlThing(), clazz);
 		} catch (RecognitionException e) {
 			assertFalse(true);
 			e.printStackTrace();

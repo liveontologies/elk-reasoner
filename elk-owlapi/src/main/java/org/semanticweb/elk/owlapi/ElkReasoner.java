@@ -36,7 +36,9 @@ import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.classification.ClassNode;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.util.Statistics;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
@@ -103,6 +105,10 @@ public class ElkReasoner implements OWLReasoner {
 	protected final OntologyChangeListener ontologyChangeListener;
 	// list to accumulate the unprocessed changes to the ontology
 	protected final List<OWLOntologyChange> pendingChanges;
+	// ELK object factory used to create any ElkObjects
+	protected final ElkObjectFactory objectFactory;
+	// Converter handler to use
+	protected final Converter converter;
 
 	protected boolean isSynced = false;
 	// logger the messages
@@ -123,11 +129,13 @@ public class ElkReasoner implements OWLReasoner {
 			this.elkProgressMonitor = new ElkReasonerProgressMonitor(
 					progressMonitor);
 		this.pendingChanges = new ArrayList<OWLOntologyChange>();
+		this.objectFactory = new ElkObjectFactoryImpl();
+		this.converter = new Converter(this.objectFactory);
 	}
 
 	protected void addAxiom(OWLAxiom ax) {
 		try {
-			reasoner.addAxiom(Converter.convert(ax));
+			reasoner.addAxiom(converter.convert(ax));
 		} catch (RuntimeException e) {
 			LOGGER_.warn("Axiom ignored: " + ax.toString() + ": "
 					+ e.getMessage());
@@ -136,7 +144,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	protected void removeAxiom(OWLAxiom ax) {
 		try {
-			reasoner.removeAxiom(Converter.convert(ax));
+			reasoner.removeAxiom(converter.convert(ax));
 		} catch (RuntimeException e) {
 			LOGGER_.warn("Axiom ignored: " + ax.toString() + ": "
 					+ e.getMessage());
@@ -227,7 +235,8 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	public Node<OWLClass> getBottomClassNode() {
-		return Converter.convert(getElkClassNode(ElkClass.ELK_OWL_NOTHING));
+		return converter
+				.convert(getElkClassNode(objectFactory.getOwlNothing()));
 	}
 
 	public Node<OWLDataProperty> getBottomDataPropertyNode() {
@@ -300,7 +309,7 @@ public class ElkReasoner implements OWLReasoner {
 			ReasonerInterruptedException, TimeOutException {
 		if (ce.isAnonymous())
 			return null;
-		return Converter.convert(getElkClassNode(Converter.convert(ce
+		return converter.convert(getElkClassNode(converter.convert(ce
 				.asOWLClass())));
 	}
 
@@ -434,11 +443,11 @@ public class ElkReasoner implements OWLReasoner {
 		if (ce.isAnonymous())
 			return null;
 
-		ClassNode ceClassNode = getElkClassNode(Converter.convert(ce
+		ClassNode ceClassNode = getElkClassNode(converter.convert(ce
 				.asOWLClass()));
 
-		return (direct) ? Converter.convert(ceClassNode.getDirectSubNodes())
-				: Converter.convert(ceClassNode.getAllSubNodes());
+		return (direct) ? converter.convert(ceClassNode.getDirectSubNodes())
+				: converter.convert(ceClassNode.getAllSubNodes());
 	}
 
 	public NodeSet<OWLDataProperty> getSubDataProperties(OWLDataProperty arg0,
@@ -464,11 +473,11 @@ public class ElkReasoner implements OWLReasoner {
 		if (ce.isAnonymous())
 			return null;
 
-		ClassNode ceClassNode = getElkClassNode(Converter.convert(ce
+		ClassNode ceClassNode = getElkClassNode(converter.convert(ce
 				.asOWLClass()));
 
-		return (direct) ? Converter.convert(ceClassNode.getDirectSuperNodes())
-				: Converter.convert(ceClassNode.getAllSuperNodes());
+		return (direct) ? converter.convert(ceClassNode.getDirectSuperNodes())
+				: converter.convert(ceClassNode.getAllSuperNodes());
 	}
 
 	public NodeSet<OWLDataProperty> getSuperDataProperties(
@@ -493,7 +502,7 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	public Node<OWLClass> getTopClassNode() {
-		return Converter.convert(getElkClassNode(ElkClass.ELK_OWL_THING));
+		return converter.convert(getElkClassNode(objectFactory.getOwlThing()));
 	}
 
 	public Node<OWLDataProperty> getTopDataPropertyNode() {
@@ -517,7 +526,8 @@ public class ElkReasoner implements OWLReasoner {
 	public Node<OWLClass> getUnsatisfiableClasses()
 			throws ReasonerInterruptedException, TimeOutException,
 			InconsistentOntologyException {
-		return Converter.convert(getElkClassNode(ElkClass.ELK_OWL_NOTHING));
+		return converter
+				.convert(getElkClassNode(objectFactory.getOwlNothing()));
 	}
 
 	public void interrupt() {
@@ -568,8 +578,8 @@ public class ElkReasoner implements OWLReasoner {
 		if (classExpression.isAnonymous())
 			return true;
 		else {
-			OWLClassNode botNode = Converter
-					.convert(getElkClassNode(ElkClass.ELK_OWL_NOTHING));
+			OWLClassNode botNode = converter
+					.convert(getElkClassNode(objectFactory.getOwlNothing()));
 			return (!botNode.contains(classExpression.asOWLClass()));
 		}
 	}

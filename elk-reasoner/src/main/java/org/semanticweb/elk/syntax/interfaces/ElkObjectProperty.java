@@ -25,8 +25,6 @@
  */
 package org.semanticweb.elk.syntax.interfaces;
 
-import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
-
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Object_Properties">Object Property<a> in
@@ -37,16 +35,4 @@ import org.semanticweb.elk.syntax.implementation.ElkObjectPropertyImpl;
  */
 public interface ElkObjectProperty extends ElkObjectPropertyExpression,
 		ElkEntity {
-
-	/**
-	 * TODO Find a better architecture for this.
-	 */
-	public static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = ElkObjectPropertyImpl
-			.create("owl:TobObjectProperty");
-	/**
-	 * TODO Find a better architecture for this.
-	 */
-	public static final ElkObjectProperty ELK_OWL_BOTTOM_OBJECT_PROPERTY = ElkObjectPropertyImpl
-			.create("owl:BottomObjectProperty");
-
 }

@@ -28,7 +28,6 @@ import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointObjectPropertiesAxiom;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 
 /**
@@ -45,29 +44,11 @@ public class ElkDisjointObjectPropertiesAxiomImpl extends
 	private static final int constructorHash_ = "ElkDisjointObjectPropertiesAxiom"
 			.hashCode();
 
-	private ElkDisjointObjectPropertiesAxiomImpl(
+	/* package-private */ElkDisjointObjectPropertiesAxiomImpl(
 			List<? extends ElkObjectPropertyExpression> disjointObjectPropertyExpressions) {
 		super(disjointObjectPropertyExpressions);
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, disjointObjectPropertyExpressions);
-	}
-
-	public static ElkDisjointObjectPropertiesAxiomImpl create(
-			List<? extends ElkObjectPropertyExpression> disjointObjectPropertyExpressions) {
-		return (ElkDisjointObjectPropertiesAxiomImpl) factory
-				.put(new ElkDisjointObjectPropertiesAxiomImpl(
-						disjointObjectPropertyExpressions));
-	}
-
-	public static ElkDisjointObjectPropertiesAxiom create(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression,
-			ElkObjectPropertyExpression... otherObjectPropertyExpressions) {
-		return (ElkDisjointObjectPropertiesAxiom) factory
-				.put(new ElkDisjointObjectPropertiesAxiomImpl(varArgsToList(
-						firstObjectPropertyExpression,
-						secondObjectPropertyExpression,
-						otherObjectPropertyExpressions)));
 	}
 
 	@Override
@@ -75,7 +56,7 @@ public class ElkDisjointObjectPropertiesAxiomImpl extends
 		return buildFssString("DisjointObjectProperties");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkDisjointObjectPropertiesAxiom) {

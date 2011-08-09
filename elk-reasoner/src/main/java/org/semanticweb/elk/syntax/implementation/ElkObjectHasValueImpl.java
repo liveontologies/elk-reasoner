@@ -25,7 +25,6 @@ package org.semanticweb.elk.syntax.implementation;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkIndividual;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.util.HashGenerator;
@@ -45,7 +44,7 @@ public class ElkObjectHasValueImpl extends ElkObjectPropertyExpressionObject
 
 	private static final int constructorHash_ = "ElkObjectHasValue".hashCode();
 
-	private ElkObjectHasValueImpl(
+	/* package-private */ElkObjectHasValueImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual individual) {
 		super(objectPropertyExpression);
@@ -54,13 +53,6 @@ public class ElkObjectHasValueImpl extends ElkObjectPropertyExpressionObject
 				constructorHash_,
 				objectPropertyExpression.structuralHashCode(),
 				individual.structuralHashCode());
-	}
-
-	public static ElkObjectHasValueImpl create(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkIndividual individual) {
-		return (ElkObjectHasValueImpl) factory.put(new ElkObjectHasValueImpl(
-				objectPropertyExpression, individual));
 	}
 
 	public ElkIndividual getIndividual() {
@@ -77,7 +69,7 @@ public class ElkObjectHasValueImpl extends ElkObjectPropertyExpressionObject
 		return result.toString();
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkObjectHasValue) {

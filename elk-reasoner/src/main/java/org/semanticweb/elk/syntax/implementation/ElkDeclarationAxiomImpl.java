@@ -29,7 +29,6 @@ import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkEntity;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 
 /**
  * Corresponds to a <a href=
@@ -45,21 +44,16 @@ public class ElkDeclarationAxiomImpl extends ElkObjectImpl implements
 
 	protected final ElkEntity entity;
 
-	private ElkDeclarationAxiomImpl(ElkEntity entity) {
+	/* package-private */ElkDeclarationAxiomImpl(ElkEntity entity) {
 		this.entity = entity;
 		this.structuralHashCode = entity.hashCode();
-	}
-
-	public static ElkDeclarationAxiomImpl create(ElkEntity entity) {
-		return (ElkDeclarationAxiomImpl) factory
-				.put(new ElkDeclarationAxiomImpl(entity));
 	}
 
 	public ElkEntity getEntity() {
 		return entity;
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkDeclarationAxiom) {
@@ -68,7 +62,7 @@ public class ElkDeclarationAxiomImpl extends ElkObjectImpl implements
 			return false;
 		}
 	}
-	
+
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

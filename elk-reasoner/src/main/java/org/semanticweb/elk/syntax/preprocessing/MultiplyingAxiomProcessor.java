@@ -23,23 +23,32 @@
 package org.semanticweb.elk.syntax.preprocessing;
 
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
+import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 
+/**
+ * Simple axiom processor that creates multiple copies of each processed axiom
+ * and forwards them to another axiom processor. Useful for testing.
+ * 
+ * @author Markus Kroetzsch
+ */
 public class MultiplyingAxiomProcessor implements ElkAxiomProcessor {
-	
+
 	protected ElkAxiomProcessor subProcessor;
 	protected int multiplicity;
 	protected RenamingExpressionVisitor renamingVisitor;
-	
-	public MultiplyingAxiomProcessor(ElkAxiomProcessor subProcessor, int multiplicity) {
+
+	public MultiplyingAxiomProcessor(ElkAxiomProcessor subProcessor,
+			int multiplicity) {
 		this.subProcessor = subProcessor;
 		this.multiplicity = multiplicity;
-		renamingVisitor = new RenamingExpressionVisitor("");
+		renamingVisitor = new RenamingExpressionVisitor(
+				new ElkObjectFactoryImpl(), "");
 	}
 
 	public void process(ElkAxiom elkAxiom) {
 		subProcessor.process(elkAxiom);
-		for (int i=1; i<multiplicity; ++i) {
+		for (int i = 1; i < multiplicity; ++i) {
 			renamingVisitor.setPostfix("X" + i);
 			subProcessor.process(elkAxiom.accept(renamingVisitor));
 		}

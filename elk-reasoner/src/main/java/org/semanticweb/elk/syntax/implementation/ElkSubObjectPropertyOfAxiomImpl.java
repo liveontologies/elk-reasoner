@@ -28,7 +28,6 @@ package org.semanticweb.elk.syntax.implementation;
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
@@ -52,7 +51,7 @@ public class ElkSubObjectPropertyOfAxiomImpl extends ElkObjectImpl implements
 	private static final int constructorHash_ = "ElkSubObjectPropertyOfAxiom"
 			.hashCode();
 
-	private ElkSubObjectPropertyOfAxiomImpl(
+	/* package-private */ElkSubObjectPropertyOfAxiomImpl(
 			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression) {
 		this.subObjectPropertyExpression = subObjectPropertyExpression;
@@ -71,15 +70,6 @@ public class ElkSubObjectPropertyOfAxiomImpl extends ElkObjectImpl implements
 		return superObjectPropertyExpression;
 	}
 
-	public static ElkSubObjectPropertyOfAxiomImpl create(
-			ElkSubObjectPropertyExpression subObjectPropertyExpression,
-			ElkObjectPropertyExpression superObjectPropertyExpression) {
-		return (ElkSubObjectPropertyOfAxiomImpl) factory
-				.put(new ElkSubObjectPropertyOfAxiomImpl(
-						subObjectPropertyExpression,
-						superObjectPropertyExpression));
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder("SubObjectPropertyOf(");
@@ -90,7 +80,7 @@ public class ElkSubObjectPropertyOfAxiomImpl extends ElkObjectImpl implements
 		return result.toString();
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkSubObjectPropertyOfAxiom) {

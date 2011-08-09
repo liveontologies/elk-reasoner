@@ -33,6 +33,7 @@ import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
@@ -59,116 +60,112 @@ import org.semanticweb.owlapi.reasoner.impl.OWLClassNodeSet;
  * Facade class for conversion between OWL and ELK objects.
  * 
  * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public class Converter {
 
+	protected final ElkObjectFactory objectFactory;
+	protected final OwlClassExpressionConverter classExpressionConverter;
+	protected final OwlPropertyExpressionConverter propertyExpressionConverter;
+	protected final OwlEntityConverter entityConverter;
+	protected final OwlAxiomConverter axiomConverter;
+	
+	protected final ElkClassExpressionConverter elkClassExpressionConverter;
+
+	public Converter(ElkObjectFactory objectFactory) {
+		this.objectFactory = objectFactory;
+		this.propertyExpressionConverter = new OwlPropertyExpressionConverter(
+				objectFactory);
+		this.classExpressionConverter = new OwlClassExpressionConverter(
+				objectFactory, this.propertyExpressionConverter);
+		this.entityConverter = new OwlEntityConverter(objectFactory,
+				this.classExpressionConverter, this.propertyExpressionConverter);
+		this.axiomConverter = new OwlAxiomConverter(objectFactory,
+				classExpressionConverter, propertyExpressionConverter,
+				entityConverter);
+		this.elkClassExpressionConverter = new ElkClassExpressionConverter(objectFactory);
+	}
+
 	/* OWL to ELK */
 
-	public static ElkClass convert(OWLClass cls) {
-		OwlClassExpressionConverter converter = OwlClassExpressionConverter
-				.getInstance();
-		return converter.visit(cls);
+	public ElkClass convert(OWLClass cls) {
+		return classExpressionConverter.visit(cls);
 	}
 
-	public static ElkObjectIntersectionOf convert(OWLObjectIntersectionOf ce) {
-		OwlClassExpressionConverter converter = OwlClassExpressionConverter
-				.getInstance();
-		return converter.visit(ce);
+	public ElkObjectIntersectionOf convert(OWLObjectIntersectionOf ce) {
+		return classExpressionConverter.visit(ce);
 	}
 
-	public static ElkObjectSomeValuesFrom convert(OWLObjectSomeValuesFrom ce) {
-		OwlClassExpressionConverter converter = OwlClassExpressionConverter
-				.getInstance();
-		return converter.visit(ce);
+	public ElkObjectSomeValuesFrom convert(OWLObjectSomeValuesFrom ce) {
+		return classExpressionConverter.visit(ce);
 	}
 
-	public static ElkClassExpression convert(OWLClassExpression ce) {
-		OwlClassExpressionConverter converter = OwlClassExpressionConverter
-				.getInstance();
-		return ce.accept(converter);
+	public ElkClassExpression convert(OWLClassExpression ce) {
+		return ce.accept(classExpressionConverter);
 	}
 
-	public static ElkObjectProperty convert(OWLObjectProperty op) {
-		OwlPropertyExpressionConverter converter = OwlPropertyExpressionConverter
-				.getInstance();
-		return converter.visit(op);
+	public ElkObjectProperty convert(OWLObjectProperty op) {
+		return propertyExpressionConverter.visit(op);
 	}
 
-	public static ElkObjectPropertyExpression convert(
-			OWLObjectPropertyExpression pe) {
-		OwlPropertyExpressionConverter converter = OwlPropertyExpressionConverter
-				.getInstance();
-		return pe.accept(converter);
+	public ElkObjectPropertyExpression convert(OWLObjectPropertyExpression pe) {
+		return pe.accept(propertyExpressionConverter);
 	}
 
-	public static ElkEquivalentClassesAxiom convert(OWLEquivalentClassesAxiom ax) {
-		OwlAxiomConverter converter = OwlAxiomConverter.getInstance();
-		return converter.visit(ax);
+	public ElkEquivalentClassesAxiom convert(OWLEquivalentClassesAxiom ax) {
+		return axiomConverter.visit(ax);
 	}
 
-	public static ElkSubClassOfAxiom convert(OWLSubClassOfAxiom ax) {
-		OwlAxiomConverter converter = OwlAxiomConverter.getInstance();
-		return converter.visit(ax);
+	public ElkSubClassOfAxiom convert(OWLSubClassOfAxiom ax) {
+		return axiomConverter.visit(ax);
 	}
 
-	public static ElkSubObjectPropertyOfAxiom convert(
+	public ElkSubObjectPropertyOfAxiom convert(
 			OWLSubObjectPropertyOfAxiom ax) {
-		OwlAxiomConverter converter = OwlAxiomConverter.getInstance();
-		return converter.visit(ax);
+		return axiomConverter.visit(ax);
 	}
 
-	public static ElkTransitiveObjectPropertyAxiom convert(
+	public ElkTransitiveObjectPropertyAxiom convert(
 			OWLTransitiveObjectPropertyAxiom ax) {
-		OwlAxiomConverter converter = OwlAxiomConverter.getInstance();
-		return converter.visit(ax);
+		return axiomConverter.visit(ax);
 	}
 
-	public static ElkAxiom convert(OWLAxiom ax) {
-		OwlAxiomConverter converter = OwlAxiomConverter.getInstance();
-		return ax.accept(converter);
+	public ElkAxiom convert(OWLAxiom ax) {
+		return ax.accept(axiomConverter);
 	}
 
 	/* ELK to OWL */
 
-	public static OWLClass convert(ElkClass cls) {
-		ElkClassExpressionConverter converter = ElkClassExpressionConverter
-				.getInstance();
-		return converter.visit(cls);
+	public OWLClass convert(ElkClass cls) {
+		return elkClassExpressionConverter.visit(cls);
 	}
 
-	public static OWLObjectIntersectionOf convert(ElkObjectIntersectionOf ce) {
-		ElkClassExpressionConverter converter = ElkClassExpressionConverter
-				.getInstance();
-		return converter.visit(ce);
+	public OWLObjectIntersectionOf convert(ElkObjectIntersectionOf ce) {
+		return elkClassExpressionConverter.visit(ce);
 	}
 
-	public static OWLObjectSomeValuesFrom convert(ElkObjectSomeValuesFrom ce) {
-		ElkClassExpressionConverter converter = ElkClassExpressionConverter
-				.getInstance();
-		return converter.visit(ce);
+	public OWLObjectSomeValuesFrom convert(ElkObjectSomeValuesFrom ce) {
+		return elkClassExpressionConverter.visit(ce);
 	}
 
-	public static OWLClassExpression convert(ElkClassExpression ce) {
-		ElkClassExpressionConverter converter = ElkClassExpressionConverter
-				.getInstance();
-		return ce.accept(converter);
+	public OWLClassExpression convert(ElkClassExpression ce) {
+		return ce.accept(elkClassExpressionConverter);
 	}
-	
-	public static OWLClassNode convert(ClassNode node) {
+
+	public OWLClassNode convert(ClassNode node) {
 		Set<OWLClass> owlClasses = new HashSet<OWLClass>();
 		for (ElkClass cls : node.getMembers()) {
 			owlClasses.add(convert(cls));
 		}
 		return new OWLClassNode(owlClasses);
 	}
-	
-	public static OWLClassNodeSet convert(Iterable<ClassNode> nodes) {
+
+	public OWLClassNodeSet convert(Iterable<ClassNode> nodes) {
 		Set<Node<OWLClass>> owlNodes = new HashSet<Node<OWLClass>>();
 		for (ClassNode node : nodes) {
-			owlNodes.add(convert(node));					
+			owlNodes.add(convert(node));
 		}
 		return new OWLClassNodeSet(owlNodes);
-	}	
+	}
 
 }

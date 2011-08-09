@@ -26,28 +26,20 @@ import java.util.List;
 
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.syntax.interfaces.ElkObject;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 
 public class ElkObjectPropertyChainImpl extends
-		ElkObjectPropertyExpressionListObject implements
-		ElkObjectPropertyChain {
+		ElkObjectPropertyExpressionListObject implements ElkObjectPropertyChain {
 
 	private static final int constructorHash_ = "ElkObjectPropertyChain"
 			.hashCode();
 
-	private ElkObjectPropertyChainImpl(
+	/* package-private */ElkObjectPropertyChainImpl(
 			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
 		super(objectPropertyExpressions);
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, objectPropertyExpressions);
-	}
-
-	public static ElkObjectPropertyChainImpl create(
-			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
-		return (ElkObjectPropertyChainImpl) factory
-				.put(new ElkObjectPropertyChainImpl(objectPropertyExpressions));
 	}
 
 	@Override
@@ -55,7 +47,7 @@ public class ElkObjectPropertyChainImpl extends
 		return buildFssString("ObjectPropertyChain");
 	}
 
-	public boolean structuralEquals(ElkObject object) {
+	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkObjectPropertyChain) {

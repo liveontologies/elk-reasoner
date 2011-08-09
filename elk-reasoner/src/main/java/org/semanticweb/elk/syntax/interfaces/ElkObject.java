@@ -45,7 +45,7 @@ public interface ElkObject extends StructuralHashObject {
 	 * @param object
 	 * @return True if objects are structurally equal
 	 */
-	public abstract boolean structuralEquals(ElkObject object);
+	public abstract boolean structuralEquals(Object object);
 
 	public abstract <O> O accept(ElkObjectVisitor<O> visitor);
 
