@@ -16,7 +16,7 @@
 				<include>*:jopt-simple:*</include>
 			</includes>
 			<outputDirectory>/</outputDirectory>
-			<useProjectArtifact>true</useProjectArtifact>
+			<useProjectArtifact>false</useProjectArtifact>
 			<unpack>true</unpack>
 		</dependencySet>
 	</dependencySets>
