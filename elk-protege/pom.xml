@@ -23,12 +23,12 @@
 		<dependency>
 			<groupId>org.protege</groupId>
 			<artifactId>protege-editor-core-application</artifactId>
-			<version>4.1-rc5</version>
+			<version>4.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.protege</groupId>
 			<artifactId>protege-editor-owl</artifactId>
-			<version>4.1-rc5</version>
+			<version>4.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
