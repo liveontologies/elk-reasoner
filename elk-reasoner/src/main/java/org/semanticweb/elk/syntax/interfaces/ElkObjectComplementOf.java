@@ -29,7 +29,7 @@ package org.semanticweb.elk.syntax.interfaces;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkObjectComplementOf extends ElkObject {
+public interface ElkObjectComplementOf extends ElkClassExpression {
 
 	/**
 	 * Get the class expression that this expression refers to.

@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
- * $Id: ElkObjectIntersectionOf.java 68 2011-06-04 21:49:01Z mak@aifb.uni-karlsruhe.de $
- * $HeadURL: https://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner/src/main/java/org/semanticweb/elk/syntax/ElkObjectIntersectionOf.java $
+ * $Id$
+ * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, Apr 8, 2011
- */
 package org.semanticweb.elk.syntax.implementation;
 
 import java.util.List;
@@ -30,22 +27,20 @@ import java.util.List;
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectUnionOf;
 
 /**
- * ELK implementation of ElkObjectIntersectionOf.
+ * ELK implementation of ElkObjectUnionOf.
  * 
- * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  * 
  */
-public class ElkObjectIntersectionOfImpl extends ElkClassExpressionListObject
-		implements ElkObjectIntersectionOf {
+public class ElkObjectUnionOfImpl extends ElkClassExpressionListObject
+		implements ElkObjectUnionOf {
 
-	private static final int constructorHash_ = "ElkObjectIntersectionOf"
-			.hashCode();
+	private static final int constructorHash_ = "ElkObjectUnionOf".hashCode();
 
-	/* package-private */ElkObjectIntersectionOfImpl(
-			List<? extends ElkClassExpression> classExpressions) {
+	ElkObjectUnionOfImpl(List<? extends ElkClassExpression> classExpressions) {
 		super(classExpressions);
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, classExpressions);
@@ -53,14 +48,14 @@ public class ElkObjectIntersectionOfImpl extends ElkClassExpressionListObject
 
 	@Override
 	public String toString() {
-		return buildFssString("ObjectIntersectionOf");
+		return buildFssString("ObjectUnionOf");
 	}
 
 	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
-		} else if (object instanceof ElkObjectIntersectionOf) {
-			return elkObjects.equals(((ElkObjectIntersectionOf) object)
+		} else if (object instanceof ElkObjectUnionOf) {
+			return elkObjects.equals(((ElkObjectUnionOf) object)
 					.getClassExpressions());
 		} else {
 			return false;

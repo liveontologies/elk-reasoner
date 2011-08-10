@@ -28,6 +28,7 @@ package org.semanticweb.elk.syntax;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectAllValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
@@ -50,6 +51,8 @@ public interface ElkClassExpressionVisitor<O> {
 	O visit(ElkClass elkClass);
 
 	O visit(ElkObjectAllValuesFrom elkObjectAllValuesFrom);
+	
+	O visit(ElkObjectComplementOf elkObjectComplementOf);
 
 	O visit(ElkObjectExactCardinality elkObjectExactCardinality);
 

@@ -25,28 +25,32 @@ package org.semanticweb.elk.syntax.implementation;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 
-public abstract class ElkObjectPropertyExpressionClassExpressionObject extends
-		ElkObjectPropertyExpressionObject {
+public abstract class ElkObjectCardinalityRestriction extends
+		ElkObjectPropertyExpressionClassExpressionObject {
 
-	protected final ElkClassExpression classExpression;
+	protected final int cardinality;
 
-	/* package-private */ElkObjectPropertyExpressionClassExpressionObject(
+	ElkObjectCardinalityRestriction(
 			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
-		super(objectPropertyExpression);
-		this.classExpression = classExpression;
+			int cardinality, ElkClassExpression classExpression) {
+		super(objectPropertyExpression, classExpression);
+		this.cardinality = cardinality;
 	}
 
-	public ElkClassExpression getClassExpression() {
-		return classExpression;
+	public int getCardinality() {
+		return cardinality;
 	}
 
 	public String buildFssString(String operatorName) {
 		StringBuilder result = new StringBuilder(operatorName);
 		result.append("(");
-		result.append(objectPropertyExpression.toString());
+		result.append(cardinality);
 		result.append(" ");
-		result.append(classExpression.toString());
+		result.append(objectPropertyExpression.toString());
+		if (classExpression != null) {
+			result.append(" ");
+			result.append(classExpression.toString());
+		}
 		result.append(")");
 		return result.toString();
 	}
