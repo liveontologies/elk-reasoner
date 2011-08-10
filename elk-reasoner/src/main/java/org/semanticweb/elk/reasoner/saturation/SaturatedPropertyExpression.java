@@ -25,11 +25,9 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.IndexedPropertyComposition;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.util.ArrayHashSet;
 import org.semanticweb.elk.util.HashListMultimap;
-import org.semanticweb.elk.util.Multimap;
 
 /**
  * 
@@ -48,14 +46,15 @@ public class SaturatedPropertyExpression {
 	protected final Set<IndexedPropertyExpression>
 		derivedSuperObjectProperties;
 	
-	protected Multimap<	IndexedPropertyExpression,
-						IndexedPropertyComposition>
+	protected HashListMultimap<IndexedPropertyExpression,
+			IndexedPropertyExpression>
 		propertyCompositionsByLeftSubProperty;
 	
-	protected Multimap<	IndexedPropertyExpression,
-						IndexedPropertyComposition>
+	protected HashListMultimap<IndexedPropertyExpression,
+			IndexedPropertyExpression>
 		propertyCompositionsByRightSubProperty;
 
+	
 	public SaturatedPropertyExpression(IndexedPropertyExpression iop) {
 		this.root = iop;
 		this.derivedSuperObjectProperties =
@@ -72,33 +71,8 @@ public class SaturatedPropertyExpression {
 		return derivedSubObjectProperties;
 	}
 
-
 	public Set<IndexedPropertyExpression> getSuperObjectProperties() {
 		return derivedSuperObjectProperties;
-	}
-
-	protected boolean addPropertyChainByLeftSubProperty(
-			IndexedPropertyComposition propertyChain,
-			IndexedPropertyExpression leftSubProperty) {
-		
-		if (propertyCompositionsByLeftSubProperty == null)
-			propertyCompositionsByLeftSubProperty = new HashListMultimap
-				<IndexedPropertyExpression, IndexedPropertyComposition> ();
-		
-		return propertyCompositionsByLeftSubProperty.add(
-				leftSubProperty, propertyChain);
-	}
-
-	protected boolean addPropertyChainByRightSubProperty(
-			IndexedPropertyComposition propertyChain,
-			IndexedPropertyExpression rightSubProperty) {
-		
-		if (propertyCompositionsByRightSubProperty == null)
-			propertyCompositionsByRightSubProperty = new HashListMultimap
-				<IndexedPropertyExpression, IndexedPropertyComposition> ();
-		
-		return propertyCompositionsByRightSubProperty.add(
-				rightSubProperty, propertyChain);
 	}
 
 }

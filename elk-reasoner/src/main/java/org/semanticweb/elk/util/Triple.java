@@ -50,7 +50,7 @@ public class Triple<First, Second, Third> {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
+		final int prime = 945194447;
 		int result = 1;
 		result = prime * result + first.hashCode();
 		result = prime * result + second.hashCode();

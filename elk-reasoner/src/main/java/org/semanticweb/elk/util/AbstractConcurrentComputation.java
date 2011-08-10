@@ -92,7 +92,7 @@ public abstract class AbstractConcurrentComputation<Input> {
 				}
 			}
 		}
-		// bufferSize == 0 && workerCount == 0
+		// assert bufferSize == 0 && workerCount == 0;
 	}
 	
 	

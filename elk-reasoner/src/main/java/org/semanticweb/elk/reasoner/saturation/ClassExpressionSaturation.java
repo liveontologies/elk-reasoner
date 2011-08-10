@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,7 +32,6 @@ import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.IndexedPropertyComposition;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
@@ -202,18 +202,18 @@ public class ClassExpressionSaturation extends
 					for (IndexedPropertyExpression forwardRelation : new LazySetIntersection<IndexedPropertyExpression>(
 							linkRelation.getSaturated().propertyCompositionsByRightSubProperty
 									.keySet(),
-							context.forwardLinksByObjectProperty.keySet()))
+							context.forwardLinksByObjectProperty.keySet())) {
 
-						for (IndexedPropertyComposition ria : linkRelation
-								.getSaturated().propertyCompositionsByRightSubProperty
-								.get(forwardRelation))
-
-							for (Linkable forwardTarget : context.forwardLinksByObjectProperty
-									.get(forwardRelation))
-
+						Collection<IndexedPropertyExpression> compositions = 
+							linkRelation.getSaturated().propertyCompositionsByRightSubProperty.get(forwardRelation);
+						Collection<Linkable> forwardTargets = 
+							context.forwardLinksByObjectProperty.get(forwardRelation);
+						
+						for (IndexedPropertyExpression composition : compositions)
+							for (Linkable forwardTarget : forwardTargets)
 								enqueue(forwardTarget,
-										new BackwardLink(
-												ria.getSuperProperty(), target));
+									new BackwardLink(composition, target));
+					}
 				}
 
 			}
@@ -242,19 +242,17 @@ public class ClassExpressionSaturation extends
 					for (IndexedPropertyExpression backwardRelation : new LazySetIntersection<IndexedPropertyExpression>(
 							linkRelation.getSaturated().propertyCompositionsByLeftSubProperty
 									.keySet(),
-							context.backwardLinksByObjectProperty.keySet()))
+							context.backwardLinksByObjectProperty.keySet())) {
 
-						for (IndexedPropertyComposition ria : linkRelation
-								.getSaturated().propertyCompositionsByLeftSubProperty
-								.get(backwardRelation))
-
-							for (Linkable backwardTarget : context.backwardLinksByObjectProperty
-									.get(backwardRelation))
-
-								enqueue(target,
-										new BackwardLink(
-												ria.getSuperProperty(),
-												backwardTarget));
+						Collection<IndexedPropertyExpression> compositions =
+							linkRelation.getSaturated().propertyCompositionsByLeftSubProperty.get(backwardRelation);
+						Collection<Linkable> backwardTargets =
+							context.backwardLinksByObjectProperty.get(backwardRelation);
+						
+						for (IndexedPropertyExpression composition : compositions)
+							for (Linkable backwardTarget : backwardTargets)
+								enqueue(target,	new BackwardLink(composition, backwardTarget));
+					}
 				}
 
 			}
@@ -340,7 +338,8 @@ public class ClassExpressionSaturation extends
 
 		}
 
-		private ClassExpressionDecomposer classExpressionDecomposer = new ClassExpressionDecomposer();
+		private ClassExpressionDecomposer classExpressionDecomposer =
+			new ClassExpressionDecomposer();
 
 		private class ClassExpressionDecomposer implements
 				IndexedClassExpressionVisitor<Void> {
