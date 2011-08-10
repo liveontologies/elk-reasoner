@@ -30,6 +30,7 @@ import junit.framework.TestCase;
 
 import org.semanticweb.elk.reasoner.classification.ClassNode;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
+import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -130,6 +131,29 @@ public class ReasonerTest extends TestCase {
 		assertTrue("A contains E",
 				aNode.getDirectSuperNodes().contains(taxonomy.getNode(e.get())));
 	}
+	
+	public void testPropertyChains() throws ParseException, IOException {
+		Reasoner reasoner = new Reasoner();
+		reasoner.loadOntologyFromString(""//
+				+ "Ontology("//
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
+				+ "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
+				+ "SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))"//
+				+ "SubClassOf(:D ObjectSomeValuesFrom(:R4 :E))"//
+				+ "SubClassOf(ObjectIntersectionOf(owl:Thing ObjectSomeValuesFrom(:T owl:Thing)) :X)"//
+				+ "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
+				+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
+				+ ")"//
+		);
+		
+		reasoner.classify();
+
+		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+		ClassNode aNode = taxonomy.getNode(objectFactory.getClass(":A"));
+		assertTrue("A SubClassOf X", aNode.getDirectSuperNodes().contains(
+				taxonomy.getNode(objectFactory.getClass(":X"))));
+	}
+
 
 	public void testAncestors() throws InterruptedException,
 			ExecutionException, ParseException, IOException {

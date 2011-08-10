@@ -388,13 +388,13 @@ public class ClassExpressionSaturation extends
 
 	}
 
-	@Override
-	public void waitCompletion() {
-		super.waitCompletion();
-		System.err.println("derived: " + derivedNo);
-		System.err.println("backLnk: " + backLinkNo);
-		System.err.println("  props: " + propNo);
-		System.err.println("forwLnk: " + forwLinkNo);
-	}
+//	@Override
+//	public void waitCompletion() {
+//		super.waitCompletion();
+//		System.err.println("derived: " + derivedNo);
+//		System.err.println("backLnk: " + backLinkNo);
+//		System.err.println("  props: " + propNo);
+//		System.err.println("forwLnk: " + forwLinkNo);
+//	}
 
 }
