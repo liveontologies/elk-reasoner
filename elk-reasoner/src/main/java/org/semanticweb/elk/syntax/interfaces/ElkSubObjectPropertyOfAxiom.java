@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -30,13 +30,22 @@ package org.semanticweb.elk.syntax.interfaces;
  * "http://www.w3.org/TR/owl2-syntax/#Object_Subproperties">Object Subproperty
  * Axiom<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 
+	/**
+	 * Get the sub object property expression of this axiom.
+	 * 
+	 * @return sub object property expression
+	 */
 	public ElkSubObjectPropertyExpression getSubObjectPropertyExpression();
 
+	/**
+	 * Get the super object property expression of this axiom.
+	 * 
+	 * @return super object property expression
+	 */
 	public ElkObjectPropertyExpression getSuperObjectPropertyExpression();
 
 }

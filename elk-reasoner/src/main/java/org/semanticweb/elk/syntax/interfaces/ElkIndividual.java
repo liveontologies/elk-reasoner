@@ -20,6 +20,9 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * @author Markus Kroetzsch, Aug 8, 2011
+ */
 package org.semanticweb.elk.syntax.interfaces;
 
 import org.semanticweb.elk.syntax.ElkIndividualVisitor;
@@ -33,6 +36,12 @@ import org.semanticweb.elk.syntax.ElkIndividualVisitor;
  */
 public interface ElkIndividual extends ElkObject {
 
+	/**
+	 * Accept an ElkIndividualVisitor.
+	 * 
+	 * @param visitor
+	 * @return
+	 */
 	public abstract <O> O accept(ElkIndividualVisitor<O> visitor);
 
 }

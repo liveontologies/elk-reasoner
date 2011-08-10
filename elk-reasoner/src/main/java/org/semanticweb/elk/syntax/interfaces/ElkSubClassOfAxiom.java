@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -30,13 +30,22 @@ package org.semanticweb.elk.syntax.interfaces;
  * "http://www.w3.org/TR/owl2-syntax/#Subclass_Axioms">Subclass Axiom<a> in the
  * OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkSubClassOfAxiom extends ElkClassAxiom {
 
+	/**
+	 * Get the sub class expression of this axiom.
+	 * 
+	 * @return sub class expression
+	 */
 	public ElkClassExpression getSubClassExpression();
 
+	/**
+	 * Get the super class expression of this axiom.
+	 * 
+	 * @return super class expression
+	 */
 	public ElkClassExpression getSuperClassExpression();
 
 }

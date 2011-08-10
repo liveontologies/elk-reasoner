@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -32,12 +32,17 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
  * "http://www.w3.org/TR/owl2-syntax/#Object_Property_Expressions">Object
  * Property Expression<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkObjectPropertyExpression extends
 		ElkSubObjectPropertyExpression {
 
+	/**
+	 * Accept an ElkObjectPropertyExpressionVisitor.
+	 * 
+	 * @param visitor
+	 * @return
+	 */
 	public abstract <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor);
 
 }

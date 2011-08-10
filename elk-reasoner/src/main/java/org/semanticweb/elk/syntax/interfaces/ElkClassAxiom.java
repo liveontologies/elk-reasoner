@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -32,10 +32,16 @@ import org.semanticweb.elk.syntax.ElkClassAxiomVisitor;
  * "http://www.w3.org/TR/owl2-syntax/#Class_Expression_Axioms">Class Expression
  * Axiom<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  */
 public interface ElkClassAxiom extends ElkAxiom {
 
+	/**
+	 * Accept an ElkClassAxiomVisitor. 
+	 * 
+	 * @param visitor
+	 * @return
+	 */
 	public abstract <O> O accept(ElkClassAxiomVisitor<O> visitor);
 
 }

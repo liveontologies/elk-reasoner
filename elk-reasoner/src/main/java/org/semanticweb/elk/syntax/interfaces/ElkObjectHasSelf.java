@@ -20,6 +20,9 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * @author Markus Kroetzsch, Aug 8, 2011
+ */
 package org.semanticweb.elk.syntax.interfaces;
 
 /**
@@ -31,6 +34,11 @@ package org.semanticweb.elk.syntax.interfaces;
  */
 public interface ElkObjectHasSelf extends ElkClassExpression {
 
+	/**
+	 * Get the object property expression that this expression refers to.
+	 * 
+	 * @return object property expression
+	 */
 	public ElkObjectPropertyExpression getObjectPropertyExpression();
 
 }

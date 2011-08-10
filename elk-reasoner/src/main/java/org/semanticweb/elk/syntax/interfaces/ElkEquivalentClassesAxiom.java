@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -32,11 +32,17 @@ import java.util.List;
  * "http://www.w3.org/TR/owl2-syntax/#Equivalent_Classes">Equivalent Class
  * Axiom<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkEquivalentClassesAxiom extends ElkClassAxiom {
 
+	/**
+	 * Get the list of equivalent class expressions that this axiom refers to.
+	 * The order of class expressions does not affect the semantics but it is
+	 * relevant to the syntax of OWL.
+	 * 
+	 * @return list of equivalent class expressions
+	 */
 	public List<? extends ElkClassExpression> getClassExpressions();
 
 }

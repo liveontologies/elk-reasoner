@@ -20,16 +20,28 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * @author Markus Kroetzsch, Aug 8, 2011
+ */
 package org.semanticweb.elk.syntax.interfaces;
 
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
 
 /**
- * @author Frantisek Simancik
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Object_Subproperties">sub object property
+ * expressions<a> in the OWL 2 specification.
  * 
+ * @author Markus Kroetzsch
  */
 public interface ElkSubObjectPropertyExpression extends ElkObject {
 
+	/**
+	 * Accept an ElkSubObjectPropertyExpressionVisitor.
+	 * 
+	 * @param visitor
+	 * @return
+	 */
 	public abstract <O> O accept(
 			ElkSubObjectPropertyExpressionVisitor<O> visitor);
 

@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -30,8 +30,7 @@ package org.semanticweb.elk.syntax.interfaces;
  * "http://www.w3.org/TR/owl2-syntax/#Object_Properties">Object Property<a> in
  * the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkObjectProperty extends ElkObjectPropertyExpression,
 		ElkEntity {

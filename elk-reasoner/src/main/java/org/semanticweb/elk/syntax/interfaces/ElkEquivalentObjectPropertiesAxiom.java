@@ -20,6 +20,9 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * @author Markus Kroetzsch, Aug 8, 2011
+ */
 package org.semanticweb.elk.syntax.interfaces;
 
 import java.util.List;
@@ -34,6 +37,13 @@ import java.util.List;
 public interface ElkEquivalentObjectPropertiesAxiom extends
 		ElkObjectPropertyAxiom {
 
+	/**
+	 * Get the list of equivalent object property expressions that this axiom
+	 * refers to. The order of object property expressions does not affect the
+	 * semantics but it is relevant to the syntax of OWL.
+	 * 
+	 * @return list of equivalent object property expressions
+	 */
 	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions();
 
 }

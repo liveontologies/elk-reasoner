@@ -20,6 +20,9 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * @author Markus Kroetzsch, Aug 8, 2011
+ */
 package org.semanticweb.elk.syntax.interfaces;
 
 /**

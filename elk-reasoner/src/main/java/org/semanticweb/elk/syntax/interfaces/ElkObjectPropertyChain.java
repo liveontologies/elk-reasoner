@@ -20,12 +20,29 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * @author Markus Kroetzsch, Aug 8, 2011
+ */
 package org.semanticweb.elk.syntax.interfaces;
 
 import java.util.List;
 
+/**
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Object_Subproperties">object property
+ * chains<a> in the OWL 2 specification.
+ * 
+ * @author Markus Kroetzsch
+ */
 public interface ElkObjectPropertyChain extends ElkSubObjectPropertyExpression {
 
+	/**
+	 * Get the list of object property expressions that this expression refers
+	 * to. The order of object property expressions is important for the syntax
+	 * and semantics of OWL.
+	 * 
+	 * @return list of object property expressions
+	 */
 	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions();
 
 }

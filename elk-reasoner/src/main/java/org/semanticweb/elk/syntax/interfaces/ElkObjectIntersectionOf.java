@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -32,11 +32,18 @@ import java.util.List;
  * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
  * >Intersection of Class Expressions<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  * 
  */
 public interface ElkObjectIntersectionOf extends ElkClassExpression {
 
+	/**
+	 * Get the list of class expressions that this expression refers to. The
+	 * order of class expressions does not affect the semantics but it is
+	 * relevant to the syntax of OWL.
+	 * 
+	 * @return list of class expressions
+	 */
 	public List<? extends ElkClassExpression> getClassExpressions();
 
 }

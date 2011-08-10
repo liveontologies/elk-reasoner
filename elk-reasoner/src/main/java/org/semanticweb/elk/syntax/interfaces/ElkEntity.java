@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Jul 3, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -32,8 +32,7 @@ import org.semanticweb.elk.syntax.ElkEntityVisitor;
  * "http://www.w3.org/TR/owl2-syntax/#Entities.2C_Literals.2C_and_Anonymous_Individuals"
  * >Entity<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkEntity {
 
@@ -43,7 +42,13 @@ public interface ElkEntity {
 	 * @return The IRI of this entity.
 	 */
 	public String getIri();
-	
+
+	/**
+	 * Accept an ElkEntityVisitor.
+	 * 
+	 * @param visitor
+	 * @return
+	 */
 	public <O> O accept(ElkEntityVisitor<O> visitor);
-	
+
 }

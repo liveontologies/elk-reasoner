@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -35,9 +35,10 @@ import org.semanticweb.elk.util.StructuralHashObject;
  * basic hash code that acts as an ID for the actual Java object and which is
  * used in managing such objects.
  * 
- * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  */
 public interface ElkObject extends StructuralHashObject {
+
 	/**
 	 * Compare the structure of two ELKObjects and return true if they are
 	 * structurally equivalent.
@@ -47,6 +48,12 @@ public interface ElkObject extends StructuralHashObject {
 	 */
 	public abstract boolean structuralEquals(Object object);
 
+	/**
+	 * Accept an ElkObjectVisitor.
+	 * 
+	 * @param visitor
+	 * @return
+	 */
 	public abstract <O> O accept(ElkObjectVisitor<O> visitor);
 
 }

@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -30,12 +30,16 @@ package org.semanticweb.elk.syntax.interfaces;
  * "http://www.w3.org/TR/owl2-syntax/#Transitive_Object_Properties">Transitive
  * Object Property Axiom<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkTransitiveObjectPropertyAxiom extends
 		ElkObjectPropertyAxiom {
 
+	/**
+	 * Get the object property expression that this axiom refers to.
+	 * 
+	 * @return object property expression
+	 */
 	public ElkObjectPropertyExpression getObjectPropertyExpression();
 
 }

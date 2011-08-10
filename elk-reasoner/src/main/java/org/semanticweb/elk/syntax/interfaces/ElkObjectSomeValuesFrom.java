@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -30,13 +30,22 @@ package org.semanticweb.elk.syntax.interfaces;
  * "http://www.w3.org/TR/owl2-syntax/#Existential_Quantification">Existential
  * Quantification Object Property Restriction<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkObjectSomeValuesFrom extends ElkClassExpression {
 
+	/**
+	 * Get the object property expression that this expression refers to.
+	 * 
+	 * @return object property expression
+	 */
 	public ElkObjectPropertyExpression getObjectPropertyExpression();
 
+	/**
+	 * Get the class expression that this expression refers to.
+	 * 
+	 * @return class expression
+	 */
 	public ElkClassExpression getClassExpression();
 
 }

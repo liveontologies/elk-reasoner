@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -32,11 +32,16 @@ import org.semanticweb.elk.syntax.ElkObjectPropertyAxiomVisitor;
  * "http://www.w3.org/TR/owl2-syntax/#Object_Property_Axioms">Object Property
  * Axiom<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkObjectPropertyAxiom extends ElkAxiom {
 
+	/**
+	 * Accept an ElkObjectPropertyAxiomVisitor.
+	 * 
+	 * @param visitor
+	 * @return
+	 */
 	public abstract <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor);
 
 }

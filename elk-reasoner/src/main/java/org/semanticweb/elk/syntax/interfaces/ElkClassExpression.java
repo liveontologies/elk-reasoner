@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -32,11 +32,17 @@ import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
  * "http://www.w3.org/TR/owl2-syntax/#Class_Expressions">Class Expression<a> in
  * the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  * 
  */
 public interface ElkClassExpression extends ElkObject {
 
+	/**
+	 * Accept an ElkClassExpressionVisitor. 
+	 * 
+	 * @param visitor
+	 * @return
+	 */
 	public abstract <O> O accept(ElkClassExpressionVisitor<O> visitor);
 
 }

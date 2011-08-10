@@ -20,6 +20,9 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * @author Markus Kroetzsch, Aug 8, 2011
+ */
 package org.semanticweb.elk.syntax.interfaces;
 
 import java.util.List;
@@ -33,6 +36,13 @@ import java.util.List;
  */
 public interface ElkObjectOneOf extends ElkClassExpression {
 
+	/**
+	 * Get the list of individuals that this expression refers to. The order of
+	 * individuals does not affect the semantics but it is relevant to the
+	 * syntax of OWL.
+	 * 
+	 * @return list of individuals
+	 */
 	public List<? extends ElkIndividual> getIndividuals();
 
 }

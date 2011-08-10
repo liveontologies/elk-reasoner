@@ -21,7 +21,7 @@
  * #L%
  */
 /**
- * @author Yevgeny Kazakov, Apr 8, 2011
+ * @author Markus Kroetzsch, Aug 8, 2011
  */
 package org.semanticweb.elk.syntax.interfaces;
 
@@ -30,11 +30,15 @@ package org.semanticweb.elk.syntax.interfaces;
  * "http://www.w3.org/TR/owl2-syntax/#Inverse_Object_Properties">Inverse Object
  * Property<a> in the OWL 2 specification.
  * 
- * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
 public interface ElkObjectInverseOf extends ElkObjectPropertyExpression {
 
+	/**
+	 * Get the object property expression that this expression refers to.
+	 * 
+	 * @return object property expression
+	 */
 	public ElkObjectProperty getObjectProperty();
 
 }
