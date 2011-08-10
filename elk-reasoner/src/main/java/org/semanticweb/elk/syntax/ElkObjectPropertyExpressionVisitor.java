@@ -30,15 +30,16 @@ import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 
 /**
- * Visitor pattern interface for instances of {@link ElkObjectPropertyExpression}.
+ * Visitor pattern interface for instances of
+ * {@link ElkObjectPropertyExpression}.
  * 
  * @author Yevgeny Kazakov
- *
+ * 
  */
 public interface ElkObjectPropertyExpressionVisitor<O> {
 
-	O visit(ElkObjectProperty elkObjectProperty);
-	
 	O visit(ElkObjectInverseOf elkObjectInverseOf);
-	
+
+	O visit(ElkObjectProperty elkObjectProperty);
+
 }

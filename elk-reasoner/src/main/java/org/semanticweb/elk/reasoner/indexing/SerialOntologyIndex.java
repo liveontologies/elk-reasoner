@@ -38,15 +38,20 @@ import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkEntity;
 import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectAllValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMinCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.util.Iterables;
 import org.semanticweb.elk.util.Pair;
@@ -349,6 +354,35 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 		}
 
 		public IndexedClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkObjectExactCardinality elkObjectExactCardinality) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkObjectMaxCardinality elkObjectMaxCardinality) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkObjectMinCardinality elkObjectMaxCardinality) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
 			// TODO Auto-generated method stub
 			return null;
 		}

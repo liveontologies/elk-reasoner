@@ -27,11 +27,16 @@ package org.semanticweb.elk.syntax;
 
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectAllValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMinCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectUnionOf;
 
 /**
  * Visitor pattern interface for instances of {@link ElkClassExpression}.
@@ -44,14 +49,24 @@ public interface ElkClassExpressionVisitor<O> {
 
 	O visit(ElkClass elkClass);
 
-	O visit(ElkObjectIntersectionOf elkObjectIntersectionOf);
+	O visit(ElkObjectAllValuesFrom elkObjectAllValuesFrom);
 
-	O visit(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom);
+	O visit(ElkObjectExactCardinality elkObjectExactCardinality);
+
+	O visit(ElkObjectHasSelf elkObjectHasSelf);
 
 	O visit(ElkObjectHasValue elkObjectHasValue);
 
+	O visit(ElkObjectIntersectionOf elkObjectIntersectionOf);
+
+	O visit(ElkObjectMaxCardinality elkObjectMaxCardinality);
+
+	O visit(ElkObjectMinCardinality elkObjectMaxCardinality);
+
 	O visit(ElkObjectOneOf elkObjectOneOf);
 
-	O visit(ElkObjectHasSelf elkObjectHasSelf);
+	O visit(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom);
+
+	O visit(ElkObjectUnionOf elkObjectUnionOf);
 
 }

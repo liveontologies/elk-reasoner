@@ -31,9 +31,12 @@ import org.semanticweb.elk.syntax.ElkAxiomProcessor;
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.syntax.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointUnionAxiom;
@@ -42,14 +45,21 @@ import org.semanticweb.elk.syntax.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkIrreflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
 
 /**
@@ -316,6 +326,61 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 	public Void visit(
 			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkIrreflexiveObjectPropertyAxiom elkIrreflexiveObjectPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkObjectPropertyDomainAxiom elkObjectPropertyDomainAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkObjectPropertyRangeAxiom elkObjectPropertyRangeAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}

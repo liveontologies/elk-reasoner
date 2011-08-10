@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,20 +29,20 @@ import java.util.List;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
- * >Intersection of Class Expressions<a> in the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Individual_Inequality">individual
+ * inequality axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkObjectIntersectionOf extends ElkClassExpression {
+public interface ElkDifferentIndividualsAxiom extends ElkAssertionAxiom {
 
 	/**
-	 * Get the list of class expressions that this expression refers to. The
-	 * order of class expressions does not affect the semantics but it is
-	 * relevant to the syntax of OWL.
+	 * Get the list of individuals that this axiom refers to. The order of
+	 * individuals does not affect the semantics but it is relevant to the
+	 * syntax of OWL.
 	 * 
-	 * @return list of class expressions
+	 * @return list of individuals
 	 */
-	public List<? extends ElkClassExpression> getClassExpressions();
+	public List<? extends ElkIndividual> getIndividuals();
 
 }

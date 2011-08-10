@@ -2,8 +2,8 @@
  * #%L
  * elk-reasoner
  * 
- * $Id$
- * $HeadURL$
+ * $Id: ElkObjectSomeValuesFrom.java 295 2011-08-10 11:43:29Z mak@aifb.uni-karlsruhe.de $
+ * $HeadURL: https://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner/src/main/java/org/semanticweb/elk/syntax/interfaces/ElkObjectSomeValuesFrom.java $
  * %%
  * Copyright (C) 2011 Oxford University Computing Laboratory
  * %%
@@ -25,24 +25,27 @@
  */
 package org.semanticweb.elk.syntax.interfaces;
 
-import java.util.List;
-
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
- * >Intersection of Class Expressions<a> in the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Object_Property_Range">Object Property
+ * Range<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkObjectIntersectionOf extends ElkClassExpression {
+public interface ElkObjectPropertyRangeAxiom extends ElkObjectPropertyAxiom {
 
 	/**
-	 * Get the list of class expressions that this expression refers to. The
-	 * order of class expressions does not affect the semantics but it is
-	 * relevant to the syntax of OWL.
+	 * Get the object property expression that this axiom refers to.
 	 * 
-	 * @return list of class expressions
+	 * @return object property expression
 	 */
-	public List<? extends ElkClassExpression> getClassExpressions();
+	public ElkObjectPropertyExpression getObjectPropertyExpression();
+
+	/**
+	 * Get the class expression that this axiom refers to.
+	 * 
+	 * @return class expression
+	 */
+	public ElkClassExpression getClassExpression();
 
 }

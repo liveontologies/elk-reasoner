@@ -30,9 +30,7 @@ import org.semanticweb.elk.syntax.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.util.HashGenerator;
 
 /**
- * Corresponds to a <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Reflexive_Object_Properties">Reflexive
- * Object Property Axiom<a> in the OWL 2 specification.
+ * ELK implementation of ElkReflexiveObjectPropertyAxiom.
  * 
  * @author Markus Kroetzsch
  * 

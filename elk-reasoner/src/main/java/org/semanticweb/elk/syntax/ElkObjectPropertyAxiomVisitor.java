@@ -25,23 +25,34 @@
  */
 package org.semanticweb.elk.syntax;
 
+import org.semanticweb.elk.syntax.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkIrreflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyDomainAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
 
 /**
  * Visitor pattern interface for instances of {@link ElkObjectPropertyAxiom}.
  * 
  * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch 
  */
 public interface ElkObjectPropertyAxiomVisitor<O> {
+
+	O visit(ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom);
+
+	O visit(ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom);
+
+	O visit(ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties);
 
 	O visit(ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom);
 
@@ -49,14 +60,18 @@ public interface ElkObjectPropertyAxiomVisitor<O> {
 
 	O visit(ElkInverseObjectPropertiesAxiom elkInverseObjectPropertiesAxiom);
 
-	O visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom);
+	O visit(ElkIrreflexiveObjectPropertyAxiom elkIrreflexiveObjectPropertyAxiom);
 
-	O visit(ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom);
+	O visit(ElkObjectPropertyDomainAxiom elkObjectPropertyDomainAxiom);
+
+	O visit(ElkObjectPropertyRangeAxiom elkObjectPropertyRangeAxiom);
 
 	O visit(ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom);
 
-	O visit(ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties);
+	O visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom);
+	
+	O visit(ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom);
 
-	O visit(ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom);
+	O visit(ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom);
 
 }

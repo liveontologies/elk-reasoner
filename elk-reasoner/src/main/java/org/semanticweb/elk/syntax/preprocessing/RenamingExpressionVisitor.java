@@ -29,10 +29,13 @@ import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkEntityVisitor;
 import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.syntax.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointUnionAxiom;
@@ -42,21 +45,33 @@ import org.semanticweb.elk.syntax.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkIrreflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectAllValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMinCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.syntax.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
 
 /**
@@ -251,6 +266,93 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 
 	public ElkAxiom visit(
 			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkIrreflexiveObjectPropertyAxiom elkIrreflexiveObjectPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkObjectPropertyDomainAxiom elkObjectPropertyDomainAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkObjectPropertyRangeAxiom elkObjectPropertyRangeAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkClassExpression visit(
+			ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkClassExpression visit(
+			ElkObjectExactCardinality elkObjectExactCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkClassExpression visit(
+			ElkObjectMaxCardinality elkObjectMaxCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkClassExpression visit(
+			ElkObjectMinCardinality elkObjectMaxCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(
+			ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkAxiom visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -20,33 +20,29 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, Apr 8, 2011
- */
 package org.semanticweb.elk.syntax.implementation;
 
 import org.semanticweb.elk.syntax.ElkAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.syntax.ElkObjectVisitor;
+import org.semanticweb.elk.syntax.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.util.HashGenerator;
 
 /**
- * ELK implementation of ElkTransitiveObjectPropertyAxiom.
+ * ELK implementation of ElkAsymmetricObjectPropertyAxiom.
  * 
- * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * 
  */
-public class ElkTransitiveObjectPropertyAxiomImpl extends
+public class ElkAsymmetricObjectPropertyAxiomImpl extends
 		ElkObjectPropertyExpressionObject implements
-		ElkTransitiveObjectPropertyAxiom {
+		ElkAsymmetricObjectPropertyAxiom {
 
-	private static final int constructorHash_ = "ElkTransitiveObjectPropertyAxiom"
+	private static final int constructorHash_ = "ElkAsymmetricObjectPropertyAxiom"
 			.hashCode();
 
-	/* package-private */ElkTransitiveObjectPropertyAxiomImpl(
+	/* package-private */ElkAsymmetricObjectPropertyAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
 		this.structuralHashCode = HashGenerator
@@ -56,15 +52,15 @@ public class ElkTransitiveObjectPropertyAxiomImpl extends
 
 	@Override
 	public String toString() {
-		return buildFssString("TransitiveObjectProperty");
+		return buildFssString("AsymmetricObjectProperty");
 	}
 
 	public boolean structuralEquals(Object object) {
 		if (this == object) {
 			return true;
-		} else if (object instanceof ElkTransitiveObjectPropertyAxiom) {
+		} else if (object instanceof ElkAsymmetricObjectPropertyAxiom) {
 			return objectPropertyExpression
-					.equals(((ElkTransitiveObjectPropertyAxiom) object)
+					.equals(((ElkAsymmetricObjectPropertyAxiom) object)
 							.getObjectPropertyExpression());
 		} else {
 			return false;

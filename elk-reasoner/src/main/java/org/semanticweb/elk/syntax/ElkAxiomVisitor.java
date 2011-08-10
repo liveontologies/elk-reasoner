@@ -24,9 +24,15 @@ package org.semanticweb.elk.syntax;
 
 import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
 
+/**
+ * Super interface of all visitors for ElkAxioms.
+ * 
+ * @author Markus Kroetzsch
+ * @param <O>
+ */
 public interface ElkAxiomVisitor<O> extends ElkClassAxiomVisitor<O>,
-		ElkObjectPropertyAxiomVisitor<O> {
-	
+		ElkObjectPropertyAxiomVisitor<O>, ElkAssertionAxiomVisitor<O> {
+
 	O visit(ElkDeclarationAxiom elkDeclarationAxiom);
 
 }

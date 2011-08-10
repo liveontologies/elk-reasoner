@@ -27,9 +27,12 @@ import java.util.List;
 import org.semanticweb.elk.syntax.ElkObjectManager;
 import org.semanticweb.elk.syntax.WeakCanonicalSet;
 import org.semanticweb.elk.syntax.interfaces.ElkAnonymousIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointObjectPropertiesAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkDisjointUnionAxiom;
@@ -40,21 +43,34 @@ import org.semanticweb.elk.syntax.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkIndividual;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkIrreflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.syntax.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectAllValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectComplementOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectInverseOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMinCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.syntax.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.syntax.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
 
 /**
@@ -334,6 +350,135 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		return (ElkTransitiveObjectPropertyAxiom) objectManager
 				.getCanonicalElkObject(new ElkTransitiveObjectPropertyAxiomImpl(
+						objectPropertyExpression));
+	}
+
+	public ElkAsymmetricObjectPropertyAxiom getAsymmetricObjectPropertyAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression) {
+		return (ElkAsymmetricObjectPropertyAxiom) objectManager
+				.getCanonicalElkObject(new ElkAsymmetricObjectPropertyAxiomImpl(
+						objectPropertyExpression));
+	}
+
+	public ElkClassAssertionAxiom getClassAssertionAxiom(
+			ElkClassExpression classExpression, ElkIndividual individual) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
+			List<? extends ElkIndividual> individuals) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
+			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
+			ElkIndividual... otherIndividuals) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression) {
+		return (ElkIrreflexiveObjectPropertyAxiom) objectManager
+				.getCanonicalElkObject(new ElkIrreflexiveObjectPropertyAxiomImpl(
+						objectPropertyExpression));
+	}
+
+	public ElkNegativeObjectPropertyAssertionAxiom getNegativeObjectPropertyAssertionAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectAllValuesFrom getObjectAllValuesFrom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkClassExpression classExpression) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectComplementOf getObjectComplementOf(
+			ElkClassExpression classExpression) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectExactCardinality getObjectExactCardinality(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			int cardinality, ElkClassExpression classExpression) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectMaxCardinality getObjectMaxCardinality(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			int cardinality, ElkClassExpression classExpression) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectMinCardinality getObjectMinCardinality(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			int cardinality, ElkClassExpression classExpression) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectPropertyAssertionAxiom getObjectPropertyAssertionAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkClassExpression classExpression) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkClassExpression classExpression) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectUnionOf getObjectUnionOf(
+			List<? extends ElkClassExpression> classExpressions) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkObjectUnionOf getObjectUnionOf(
+			ElkClassExpression firstClassExpression,
+			ElkClassExpression secondClassExpression,
+			ElkClassExpression... otherClassExpressions) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkSameIndividualAxiom getSameIndividualAxiom(
+			List<? extends ElkIndividual> individuals) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkSameIndividualAxiom getSameIndividualAxiom(
+			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
+			ElkIndividual... otherIndividuals) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression) {
+		return (ElkSymmetricObjectPropertyAxiom) objectManager
+				.getCanonicalElkObject(new ElkSymmetricObjectPropertyAxiomImpl(
 						objectPropertyExpression));
 	}
 }

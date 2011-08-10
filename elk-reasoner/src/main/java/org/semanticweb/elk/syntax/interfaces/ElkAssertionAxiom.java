@@ -2,8 +2,8 @@
  * #%L
  * elk-reasoner
  * 
- * $Id$
- * $HeadURL$
+ * $Id: ElkClassAxiom.java 295 2011-08-10 11:43:29Z mak@aifb.uni-karlsruhe.de $
+ * $HeadURL: https://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner/src/main/java/org/semanticweb/elk/syntax/interfaces/ElkClassAxiom.java $
  * %%
  * Copyright (C) 2011 Oxford University Computing Laboratory
  * %%
@@ -25,24 +25,23 @@
  */
 package org.semanticweb.elk.syntax.interfaces;
 
-import java.util.List;
+import org.semanticweb.elk.syntax.ElkAssertionAxiomVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
- * >Intersection of Class Expressions<a> in the OWL 2 specification.
+ * Corresponds to a <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Assertions">Assertions<a> in the OWL 2
+ * specification.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkObjectIntersectionOf extends ElkClassExpression {
+public interface ElkAssertionAxiom extends ElkAxiom {
 
 	/**
-	 * Get the list of class expressions that this expression refers to. The
-	 * order of class expressions does not affect the semantics but it is
-	 * relevant to the syntax of OWL.
+	 * Accept an ElkAssertionAxiomVisitor.
 	 * 
-	 * @return list of class expressions
+	 * @param visitor
+	 * @return
 	 */
-	public List<? extends ElkClassExpression> getClassExpressions();
+	public abstract <O> O accept(ElkAssertionAxiomVisitor<O> visitor);
 
 }

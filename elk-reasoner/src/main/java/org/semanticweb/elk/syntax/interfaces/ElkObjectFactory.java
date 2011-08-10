@@ -35,14 +35,6 @@ import java.util.List;
 public interface ElkObjectFactory {
 
 	/**
-	 * Create an ElkClass.
-	 * 
-	 * @param iri
-	 * @return
-	 */
-	public abstract ElkClass getClass(String iri);
-
-	/**
 	 * Create an ElkAnonymousIndividual.
 	 * 
 	 * @param nodeId
@@ -51,12 +43,60 @@ public interface ElkObjectFactory {
 	public abstract ElkAnonymousIndividual getAnonymousIndividual(String nodeId);
 
 	/**
+	 * Create an ElkAsymmetricObjectPropertyAxiom.
+	 * 
+	 * @param objectPropertyExpression
+	 * @return
+	 */
+	public abstract ElkAsymmetricObjectPropertyAxiom getAsymmetricObjectPropertyAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression);
+
+	/**
+	 * Create an ElkClass.
+	 * 
+	 * @param iri
+	 * @return
+	 */
+	public abstract ElkClass getClass(String iri);
+
+	/**
+	 * Create an ElkClassAssertionAxiom.
+	 * 
+	 * @param classExpression
+	 * @param individual
+	 * @return
+	 */
+	public abstract ElkClassAssertionAxiom getClassAssertionAxiom(
+			ElkClassExpression classExpression, ElkIndividual individual);
+
+	/**
 	 * Create an ElkDeclarationAxiom.
 	 * 
 	 * @param entity
 	 * @return
 	 */
 	public abstract ElkDeclarationAxiom getDeclarationAxiom(ElkEntity entity);
+
+	/**
+	 * Create an ElkDifferentIndividualsAxiom.
+	 * 
+	 * @param individuals
+	 * @return
+	 */
+	public abstract ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
+			List<? extends ElkIndividual> individuals);
+
+	/**
+	 * Create an ElkDifferentIndividualsAxiom.
+	 * 
+	 * @param firstIndividual
+	 * @param secondIndividual
+	 * @param otherIndividuals
+	 * @return
+	 */
+	public abstract ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
+			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
+			ElkIndividual... otherIndividuals);
 
 	/**
 	 * Create an ElkDisjointClassesAxiom.
@@ -198,12 +238,66 @@ public interface ElkObjectFactory {
 			ElkObjectPropertyExpression secondObjectPropertyExpression);
 
 	/**
+	 * Create an ElkIrreflexiveObjectPropertyAxiom.
+	 * 
+	 * @param objectPropertyExpression
+	 * @return
+	 */
+	public abstract ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression);
+
+	/**
 	 * Create an ElkNamedIndividual.
 	 * 
 	 * @param iri
 	 * @return
 	 */
 	public abstract ElkNamedIndividual getNamedIndividual(String iri);
+
+	/**
+	 * Create an ElkNegativeObjectPropertyAssertionAxiom.
+	 * 
+	 * @param objectPropertyExpression
+	 * @param firstIndividual
+	 * @param secondIndividual
+	 * @return
+	 */
+	public abstract ElkNegativeObjectPropertyAssertionAxiom getNegativeObjectPropertyAssertionAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkIndividual firstIndividual, ElkIndividual secondIndividual);
+
+	/**
+	 * Create an ElkObjectAllValuesFrom.
+	 * 
+	 * @param objectPropertyExpression
+	 * @param classExpression
+	 * @return
+	 */
+	public abstract ElkObjectAllValuesFrom getObjectAllValuesFrom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkClassExpression classExpression);
+
+	/**
+	 * Create an ElkObjectComplementOf.
+	 * 
+	 * @param classExpression
+	 * @return
+	 */
+	public abstract ElkObjectComplementOf getObjectComplementOf(
+			ElkClassExpression classExpression);
+
+	/**
+	 * Create an ElkObjectExactCardinality.
+	 * 
+	 * @param objectPropertyExpression
+	 * @param cardinality
+	 * @param classExpression
+	 *            can be null for unqualified cardinality restrictions
+	 * @return
+	 */
+	public abstract ElkObjectExactCardinality getObjectExactCardinality(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			int cardinality, ElkClassExpression classExpression);
 
 	/**
 	 * Create an ElkObjectHasSelf.
@@ -276,6 +370,52 @@ public interface ElkObjectFactory {
 			ElkIndividual firstIndividual, ElkIndividual... otherIndividuals);
 
 	/**
+	 * Create an ElkObjectMaxCardinality.
+	 * 
+	 * @param objectPropertyExpression
+	 * @param cardinality
+	 * @param classExpression
+	 *            can be null for unqualified cardinality restrictions
+	 * @return
+	 */
+	public abstract ElkObjectMaxCardinality getObjectMaxCardinality(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			int cardinality, ElkClassExpression classExpression);
+
+	/**
+	 * Create an ElkObjectMinCardinality.
+	 * 
+	 * @param objectPropertyExpression
+	 * @param cardinality
+	 * @param classExpression
+	 *            can be null for unqualified cardinality restrictions
+	 * @return
+	 */
+	public abstract ElkObjectMinCardinality getObjectMinCardinality(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			int cardinality, ElkClassExpression classExpression);
+
+	/**
+	 * Create an ElkObjectProperty.
+	 * 
+	 * @param objectPropertyIri
+	 * @return
+	 */
+	public abstract ElkObjectProperty getObjectProperty(String objectPropertyIri);
+
+	/**
+	 * Create an ElkObjectPropertyAssertionAxiom.
+	 * 
+	 * @param objectPropertyExpression
+	 * @param firstIndividual
+	 * @param secondIndividual
+	 * @return
+	 */
+	public abstract ElkObjectPropertyAssertionAxiom getObjectPropertyAssertionAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkIndividual firstIndividual, ElkIndividual secondIndividual);
+
+	/**
 	 * Create an ElkObjectPropertyChain.
 	 * 
 	 * @param objectPropertyExpressions
@@ -285,12 +425,26 @@ public interface ElkObjectFactory {
 			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions);
 
 	/**
-	 * Create an ElkObjectProperty.
+	 * Create an ElkObjectPropertyDomainAxiom.
 	 * 
-	 * @param objectPropertyIri
+	 * @param objectPropertyExpression
+	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectProperty getObjectProperty(String objectPropertyIri);
+	public abstract ElkObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkClassExpression classExpression);
+
+	/**
+	 * Create an ElkObjectPropertyRangeAxiom.
+	 * 
+	 * @param objectPropertyExpression
+	 * @param classExpression
+	 * @return
+	 */
+	public abstract ElkObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkClassExpression classExpression);
 
 	/**
 	 * Create an ElkObjectSomeValuesFrom.
@@ -302,6 +456,28 @@ public interface ElkObjectFactory {
 	public abstract ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
+	
+	/**
+	 * Create an ElkObjectUnionOf.
+	 * 
+	 * @param classExpressions
+	 * @return
+	 */
+	public abstract ElkObjectUnionOf getObjectUnionOf(
+			List<? extends ElkClassExpression> classExpressions);
+
+	/**
+	 * Create an ElkObjectUnionOf.
+	 * 
+	 * @param firstClassExpression
+	 * @param secondClassExpression
+	 * @param otherClassExpressions
+	 * @return
+	 */
+	public abstract ElkObjectUnionOf getObjectUnionOf(
+			ElkClassExpression firstClassExpression,
+			ElkClassExpression secondClassExpression,
+			ElkClassExpression... otherClassExpressions);
 
 	/**
 	 * Create the ElkObjectProperty representing owl:BottomObjectProperty.
@@ -339,6 +515,27 @@ public interface ElkObjectFactory {
 	 */
 	public abstract ElkReflexiveObjectPropertyAxiom getReflexiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
+	
+	/**
+	 * Create an ElkSameIndividualAxiom.
+	 * 
+	 * @param individuals
+	 * @return
+	 */
+	public abstract ElkSameIndividualAxiom getSameIndividualAxiom(
+			List<? extends ElkIndividual> individuals);
+	
+	/**
+	 * Create an ElkSameIndividualAxiom.
+	 * 
+	 * @param firstIndividual
+	 * @param secondIndividual
+	 * @param otherIndividuals
+	 * @return
+	 */
+	public abstract ElkSameIndividualAxiom getSameIndividualAxiom(
+			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
+			ElkIndividual... otherIndividuals);
 
 	/**
 	 * Create an ElkSubClassOfAxiom.
@@ -361,6 +558,15 @@ public interface ElkObjectFactory {
 	public abstract ElkSubObjectPropertyOfAxiom getSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression);
+
+	/**
+	 * Create an ElkSymmetricObjectPropertyAxiom.
+	 * 
+	 * @param objectPropertyExpression
+	 * @return
+	 */
+	public abstract ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
+			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
 	 * Create an ElkTransitiveObjectPropertyAxiom.
