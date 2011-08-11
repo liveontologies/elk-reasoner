@@ -39,6 +39,7 @@ import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkEntity;
 import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectAllValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
@@ -383,6 +384,12 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 		}
 
 		public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkObjectComplementOf elkObjectComplementOf) {
 			// TODO Auto-generated method stub
 			return null;
 		}

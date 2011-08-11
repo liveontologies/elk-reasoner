@@ -49,6 +49,7 @@ import org.semanticweb.elk.syntax.interfaces.ElkIrreflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.syntax.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectAllValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
@@ -353,6 +354,11 @@ public class RenamingExpressionVisitor implements ElkEntityVisitor<ElkEntity>,
 	}
 
 	public ElkAxiom visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ElkClassExpression visit(ElkObjectComplementOf elkObjectComplementOf) {
 		// TODO Auto-generated method stub
 		return null;
 	}

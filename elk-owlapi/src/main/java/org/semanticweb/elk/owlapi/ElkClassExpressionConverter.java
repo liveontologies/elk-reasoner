@@ -27,12 +27,18 @@ package org.semanticweb.elk.owlapi;
 
 import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectAllValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectComplementOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectMinCardinality;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.syntax.interfaces.ElkObjectUnionOf;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -89,6 +95,40 @@ public final class ElkClassExpressionConverter implements
 	}
 
 	public OWLClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(
+			ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkObjectComplementOf elkObjectComplementOf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(
+			ElkObjectExactCardinality elkObjectExactCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(
+			ElkObjectMaxCardinality elkObjectMaxCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(
+			ElkObjectMinCardinality elkObjectMaxCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
 		// TODO Auto-generated method stub
 		return null;
 	}
