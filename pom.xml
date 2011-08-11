@@ -95,6 +95,28 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<version>2.6</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>changes-report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.6</version>
+			</plugin>
+		</plugins>
+	</reporting>
+
 	<issueManagement>
 		<system>Google Code</system>
 		<url>http://code.google.com/p/elk-reasoner/issues/list</url>
@@ -127,16 +149,6 @@
 			<url>http://elk-reasoner.googlecode.com/svn/m2/releases</url>
 		</repository>
 	</repositories>
-
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.6</version>
-			</plugin>
-		</plugins>
-	</reporting>
 
 	<build>
 		<pluginManagement>

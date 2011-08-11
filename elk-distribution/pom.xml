@@ -53,6 +53,39 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>generate-changes-file</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>announcement-generate</goal>
+						</goals>
+						<configuration>
+							<announcementFile>Changes.txt</announcementFile>
+							<template>changes.vm</template>
+							<templateDirectory>templates</templateDirectory>
+							<outputDirectory>${basedir}/target</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-protege-version-info</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>announcement-generate</goal>
+						</goals>
+						<configuration>
+							<announcementFile>version-info.txt</announcementFile>
+							<template>version-info.vm</template>
+							<templateDirectory>templates</templateDirectory>
+							<outputDirectory>${basedir}/target</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>

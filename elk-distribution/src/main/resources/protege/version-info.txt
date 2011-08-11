@@ -1,6 +1,0 @@
-ELK is an ontology reasoner for the OWL 2 EL profile, currently with some 
-limitations. For further information see
- 
-          http://code.google.com/p/elk-reasoner/
-
-Changes in version ${project.version}:

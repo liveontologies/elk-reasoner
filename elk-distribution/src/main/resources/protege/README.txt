@@ -1,5 +1,5 @@
 ELK is an ontology reasoner that aims to support the OWL 2 EL profile.
-See http://code.google.com/p/elk-reasoner/ for further information.
+See ${project.parent.url} for further information.
 
 ELK plug-in for Protégé is Copyright (c) ${project.inceptionYear} 
 ${project.organization.name}

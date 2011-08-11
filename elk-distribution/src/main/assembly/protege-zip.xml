@@ -15,6 +15,10 @@
 			<source>${basedir}/LICENSE.txt</source>
 			<filtered>true</filtered>
 		</file>
+		<file>
+			<source>${basedir}/target/Changes.txt</source>
+			<filtered>false</filtered>
+		</file>
 	</files>
 	<dependencySets>
 		<dependencySet>
