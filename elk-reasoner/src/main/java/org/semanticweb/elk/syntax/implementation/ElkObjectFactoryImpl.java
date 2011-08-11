@@ -369,15 +369,18 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
 			List<? extends ElkIndividual> individuals) {
-		// TODO Auto-generated method stub
-		return null;
+		return (ElkDifferentIndividualsAxiom) objectManager
+				.getCanonicalElkObject(new ElkDifferentIndividualsAxiomImpl(
+						individuals));
 	}
 
 	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
 			ElkIndividual... otherIndividuals) {
-		// TODO Auto-generated method stub
-		return null;
+		return (ElkDifferentIndividualsAxiom) objectManager
+				.getCanonicalElkObject(new ElkDifferentIndividualsAxiomImpl(
+						ElkObjectListObject.varArgsToList(firstIndividual,
+								secondIndividual, otherIndividuals)));
 	}
 
 	public ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
@@ -479,15 +482,18 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	public ElkSameIndividualAxiom getSameIndividualAxiom(
 			List<? extends ElkIndividual> individuals) {
-		// TODO Auto-generated method stub
-		return null;
+		return (ElkSameIndividualAxiom) objectManager
+				.getCanonicalElkObject(new ElkSameIndividualAxiomImpl(
+						individuals));
 	}
 
 	public ElkSameIndividualAxiom getSameIndividualAxiom(
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
 			ElkIndividual... otherIndividuals) {
-		// TODO Auto-generated method stub
-		return null;
+		return (ElkSameIndividualAxiom) objectManager
+				.getCanonicalElkObject(new ElkSameIndividualAxiomImpl(
+						ElkObjectListObject.varArgsToList(firstIndividual,
+								secondIndividual, otherIndividuals)));
 	}
 
 	public ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
