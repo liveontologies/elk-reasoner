@@ -14,9 +14,7 @@
 ## KIND, either express or implied.  See the License for the
 ## specific language governing permissions and limitations
 ## under the License.
-#foreach($tmp in $releases)
-    #set($index = $releases.size() - $velocityCount)
-    #set($release = $releases.get($index))
+#foreach($release in $releases)    
 ELK Reasoner ${release.version}:
 -------------------
 #if ($release.getActions().size() == 0)
@@ -37,12 +35,12 @@ New features:
 #set($dueto="")
 #end
 - ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+
 #set($issue="")
 #set($dueto="")
 #end 
 #end
 #if ($release.getActions('fix').size() !=0)
-
 Fixed Bugs:
 #foreach($actionItem in $release.getActions('fix'))
 #set($action=$actionItem.getAction())
@@ -57,6 +55,7 @@ Fixed Bugs:
 #set($dueto="")
 #end
 - ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+
 #set($issue="")
 #set($dueto="")
 #end
@@ -76,6 +75,7 @@ Changes:
 #set($dueto="")
 #end
 - ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+
 #set($issue="")
 #set($dueto="")
 #end
@@ -96,12 +96,12 @@ Removed:
 #set($dueto="")
 #end
 - ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+
 #set($issue="")
 #set($dueto="")
 #end
 #end
 #end
 ## End of main loop
-
 
 #end

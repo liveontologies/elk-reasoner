@@ -2,27 +2,27 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<properties>
-		<title>Changes Tester Project</title>
-		<author email="jruiz@exist.com">Johnny R. Ruiz III</author>
+		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-		<release version="0.1.0" date="2005-03-01" description="Subsequent release">
-			<action dev="jruiz" type="add">
-				Added additional documentation on how to configure the plugin.
+		<release version="0.1.1" date="in SVN" description="Subsequent release">
+			<action dev="frantisek" type="add">
+				Support for object property chain
+				inclusion axioms.
 			</action>
-			<action dev="aramirez" type="fix" issue="MPJIRA-11">
-				Enable retrieving component-specific issues.
+			<action dev="markus" type="update">
+				Re-engineering of ELK OWL object
+				hierarchy using interfaces.
 			</action>
-			<action dev="jruiz" type="remove" due-to="Allan Ramirez"
-				due-to-email="aramirez@exist.com">
-				The element type " link " must be terminated by the matching end-tag.
-				Deleted the erroneous code.
+			<action dev="yevgeny" type="add">
+				Support for Protege 4 auto-update
+				functionality for ELK Protege plugin.
 			</action>
 		</release>
-
-		<release version="0.1.1" date="2005-01-01" description="First release">
-			<action dev="jruiz" type="update">
-				Uploaded documentation on how to use the plugin.
+		<release version="0.1.0" date="2011-07-19" description="First public release">
+			<action dev="yevgeny" type="add">
+				Initial public release of ELK
+				reasoner.
 			</action>
 		</release>
 	</body>
