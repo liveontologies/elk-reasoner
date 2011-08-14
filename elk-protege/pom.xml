@@ -11,7 +11,7 @@
 	<artifactId>elk-protege</artifactId>
 	<packaging>bundle</packaging>
 
-	<name>ELK Protege Plug-in</name>
+	<name>ELK Reasoner Protege Plug-in</name>
 	<description>ELK plug-in for Protege ontology editor</description>
 
 	<dependencies>
@@ -77,7 +77,7 @@
 						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
-						<Update-Url>file:///tmp/update.properties</Update-Url>
+						<Update-Url>http://elk-reasoner.googlecode.com/svn/resources/update.properties</Update-Url>
 						<Import-Package>!joptsimple,!org.antlr.runtime,*</Import-Package>
 					</instructions>
 				</configuration>

@@ -239,6 +239,7 @@
 	</build>
 
 	<distributionManagement>
+		<downloadUrl>http://code.google.com/p/elk-reasoner/downloads/list</downloadUrl>
 		<repository>
 			<id>elk-reasoner.googlecode.com</id>
 			<url>svn:https://elk-reasoner.googlecode.com/svn/m2/releases</url>

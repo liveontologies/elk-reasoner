@@ -156,6 +156,14 @@
 			<plugin>
 				<groupId>com.googlecode.maven-gcu-plugin</groupId>
 				<artifactId>maven-gcu-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>deploy</phase>
+						<goals>
+							<goal>upload</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<serverId>elk-reasoner.googlecode.com</serverId>
 					<failsOnError>true</failsOnError>
@@ -181,6 +189,32 @@
 							</labels>
 						</upload>
 					</uploads>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>wagon-maven-plugin</artifactId>
+				<version>1.0-beta-3</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.google.code.maven-svn-wagon</groupId>
+						<artifactId>maven-svn-wagon</artifactId>
+						<version>1.4</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<phase>deploy</phase>
+						<goals>
+							<goal>upload</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<serverId>elk-reasoner.googlecode.com</serverId>
+					<fromDir>${basedir}/target</fromDir>
+					<includes>update.properties,version-info.txt</includes>
+					<url>svn:https://elk-reasoner.googlecode.com/svn/resources</url>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -16,7 +16,12 @@
 			</action>
 			<action dev="yevgeny" type="add">
 				Support for Protege 4 auto-update
-				functionality for ELK Protege plugin.
+				feature for ELK Protege plugin.
+			</action>
+			<action dev="yevgeny" type="add">
+				Automated project distribution
+				management
+				through Apache Maven
 			</action>
 		</release>
 		<release version="0.1.0" date="2011-07-19" description="First public release">
