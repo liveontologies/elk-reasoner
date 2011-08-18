@@ -14,16 +14,10 @@
 ## KIND, either express or implied.  See the License for the
 ## specific language governing permissions and limitations
 ## under the License.
-The ELK Reasoner team is pleased to announce 
-        the ELK Protege plug-in ${release.version} release!
+The ${developmentTeam} is pleased to announce the ELK Reasoner ${release.version} release!
 
-ELK is an ontology reasoner for the OWL 2 EL profile, currently with some 
-limitations. For further information see
- 
-          ${project.parent.url}
+${introduction}
 
-Changes in this version:
-------------------------
 #if ($release.getActions().size() == 0)
 No detail
 #else

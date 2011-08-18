@@ -4,9 +4,11 @@
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
 	<id>protege-plugin</id>
 	<formats>
+		<!-- the type of the archive -->
 		<format>zip</format>
 	</formats>
 	<files>
+		<!-- the additional files to be bundled in the archive -->
 		<file>
 			<source>${basedir}/src/main/resources/protege/README.txt</source>
 			<filtered>true</filtered>
@@ -21,11 +23,14 @@
 		</file>
 	</files>
 	<dependencySets>
+		<!-- the description of the maven packages to be bundled in the archive -->
 		<dependencySet>
 			<includes>
 				<include>*:elk-protege:*</include>
 			</includes>
+			<!-- we omit the version numbers in the included artifact names -->
 			<outputFileNameMapping>${artifact.groupId}.${artifact.extension}</outputFileNameMapping>
+			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
 	</dependencySets>
