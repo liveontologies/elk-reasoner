@@ -16,25 +16,39 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<version>1.0.1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.protege</groupId>
 			<artifactId>protege-editor-core-application</artifactId>
 			<version>4.1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.protege</groupId>
 			<artifactId>protege-editor-owl</artifactId>
 			<version>4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.owlapi</groupId>
+			<artifactId>owlapi-all</artifactId>
+			<version>3.2.4</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owlapi</artifactId>
 			<version>0.1.1-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
@@ -78,7 +92,7 @@
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
 						<Update-Url>http://elk-reasoner.googlecode.com/svn/resources/update.properties</Update-Url>
-						<Import-Package>!joptsimple,!org.antlr.runtime,*</Import-Package>
+						<Import-Package>*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

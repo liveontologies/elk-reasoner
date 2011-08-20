@@ -23,7 +23,7 @@
 /**
  * @author Yevgeny Kazakov, Jun 11, 2011
  */
-package org.semanticweb.elk;
+package org.semanticweb.elk.cli;
 
 import static java.util.Arrays.asList;
 
@@ -46,7 +46,7 @@ import org.semanticweb.elk.syntax.parsing.javacc.ParseException;
  * @author Yevgeny Kazakov
  * 
  */
-public class ElkCli {
+public class Main {
 
 	/**
 	 * @param args
@@ -70,6 +70,8 @@ public class ElkCli {
 				.acceptsAll(asList("w", "concurrent-workers"),
 						"number of concurrent classification workers")
 				.withOptionalArg().ofType(Integer.class).defaultsTo(4);
+		OptionSpec<Void> version = parser.acceptsAll(asList("version", "v"),
+				"print version information");
 		OptionSpec<Void> help = parser.acceptsAll(asList("h", "help", "?"),
 				"show help");
 
@@ -77,6 +79,9 @@ public class ElkCli {
 
 		if (options.has(help))
 			parser.printHelpOn(System.out);
+		else if (options.has(version))
+			System.out.println(Main.class.getPackage().getImplementationTitle()
+					+ " " + Main.class.getPackage().getImplementationVersion());
 		else if (!options.has(inputOntologyFile))
 			parser.printHelpOn(System.out);
 		else {

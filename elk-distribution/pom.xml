@@ -108,6 +108,7 @@
 				<configuration>
 					<!-- the changes filtered source changes file -->
 					<xmlPath>${basedir}/target/changes.xml</xmlPath>
+					<templateDirectory>templates</templateDirectory>
 				</configuration>
 				<executions>
 					<execution>
@@ -128,7 +129,6 @@
 						<configuration>
 							<announcementFile>Changes.txt</announcementFile>
 							<template>changes.vm</template>
-							<templateDirectory>templates</templateDirectory>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</execution>
@@ -142,8 +142,7 @@
 						</goals>
 						<configuration>
 							<announcementFile>version-info.txt</announcementFile>
-							<template>version-info.vm</template>
-							<templateDirectory>templates</templateDirectory>
+							<template>version-info.vm</template>							
 							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</execution>
@@ -157,7 +156,6 @@
 						<configuration>
 							<announcementFile>announcement.txt</announcementFile>
 							<template>announcement.vm</template>
-							<templateDirectory>templates</templateDirectory>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</execution>
@@ -270,8 +268,8 @@
 							<serverId>elk-reasoner.googlecode.com</serverId>
 							<fromDir>${basedir}/target</fromDir>
 							<includes>update.properties,version-info.txt</includes>
-							<!-- uploading the update.properties and version-info.txt files
-							     to the resources folder of the googlecode svn -->
+							<!-- uploading the update.properties and version-info.txt files to 
+								the resources folder of the googlecode svn -->
 							<url>svn:https://elk-reasoner.googlecode.com/svn/resources</url>
 						</configuration>
 					</execution>

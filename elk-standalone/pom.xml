@@ -9,41 +9,48 @@
 	</parent>
 
 	<artifactId>elk-standalone</artifactId>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 
-	<name>ELK Standalone</name>
+	<name>ELK Reasoner Standalone</name>
 	<description>The module for the stand-alone ELK executable</description>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
-			<artifactId>elk-reasoner</artifactId>
+			<artifactId>elk-cli</artifactId>
 			<version>0.1.1-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.4</version>
 				<executions>
 					<execution>
-						<id>produce-standalone-jar</id>
 						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<descriptors>
-								<descriptor>${basedir}/src/main/assembly/standalone.xml</descriptor>
-							</descriptors>
-							<archive>
-								<manifest>
-									<mainClass>org.semanticweb.elk.ElkCli</mainClass>
-								</manifest>
-							</archive>
+							<artifactSet>
+								<excludes>
+									<exclude>org.antlr:*</exclude>
+									<exclude>antlr:*</exclude>
+								</excludes>
+							</artifactSet>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>org.semanticweb.elk.cli.Main</Main-Class>
+										<Implementation-Version>${pom.version}</Implementation-Version>
+										<Implementation-Title>${pom.name}</Implementation-Title>
+									</manifestEntries>
+								</transformer>
+							</transformers>
 						</configuration>
 					</execution>
 				</executions>

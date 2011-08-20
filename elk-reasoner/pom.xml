@@ -19,22 +19,11 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
-			<artifactId>antlr3-maven-plugin</artifactId>
-			<version>3.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.mojo</groupId>
-			<artifactId>javacc-maven-plugin</artifactId>
-			<version>2.6</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.jopt-simple</groupId>
-			<artifactId>jopt-simple</artifactId>
-			<version>3.3</version>
+			<artifactId>antlr-runtime</artifactId>
+			<version>3.4</version>
 		</dependency>
 	</dependencies>
 
@@ -60,7 +49,7 @@
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr3-maven-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.4</version>
 				<executions>
 					<execution>
 						<goals>
