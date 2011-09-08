@@ -23,6 +23,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-owl-model</artifactId>
+			<version>0.1.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-reasoner</artifactId>
 			<version>0.1.1-SNAPSHOT</version>
 		</dependency>

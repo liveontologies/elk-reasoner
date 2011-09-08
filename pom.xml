@@ -7,12 +7,14 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>elk-owl-parent</module>
+		<module>elk-util-parent</module>
 		<module>elk-reasoner</module>
 		<module>elk-owlapi</module>
 		<module>elk-protege</module>
+		<module>elk-cli</module>
 		<module>elk-standalone</module>
 		<module>elk-distribution</module>
-		<module>elk-cli</module>
 	</modules>
 
 	<name>ELK</name>

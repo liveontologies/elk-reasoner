@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
-import org.semanticweb.elk.syntax.ElkClassExpressionVisitor;
-import org.semanticweb.elk.syntax.ElkEntityVisitor;
-import org.semanticweb.elk.syntax.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.interfaces.ElkClass;
 import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkEntity;
@@ -54,6 +51,9 @@ import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.syntax.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.syntax.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.syntax.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.syntax.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.util.Iterables;
 import org.semanticweb.elk.util.Pair;
 

@@ -28,8 +28,6 @@ package org.semanticweb.elk.reasoner.indexing;
 import java.util.Arrays;
 
 import org.semanticweb.elk.syntax.ElkAxiomProcessor;
-import org.semanticweb.elk.syntax.ElkAxiomVisitor;
-import org.semanticweb.elk.syntax.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.syntax.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkAxiom;
@@ -61,6 +59,8 @@ import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.syntax.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.syntax.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.syntax.visitors.ElkSubObjectPropertyExpressionVisitor;
 
 /**
  * An ElkAxiomProcessor that updates an OntologyIndex for the given ElkAxioms.
