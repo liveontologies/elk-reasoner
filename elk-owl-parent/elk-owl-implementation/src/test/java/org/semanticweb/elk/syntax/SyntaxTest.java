@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.syntax;
+package org.semanticweb.elk.owl;
 
 import java.util.Arrays;
 
