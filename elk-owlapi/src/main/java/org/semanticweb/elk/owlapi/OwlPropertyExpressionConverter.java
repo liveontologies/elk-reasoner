@@ -25,9 +25,9 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;

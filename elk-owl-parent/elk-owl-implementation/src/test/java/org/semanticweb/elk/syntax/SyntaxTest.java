@@ -24,11 +24,11 @@ package org.semanticweb.elk.syntax;
 
 import java.util.Arrays;
 
-import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.syntax.interfaces.ElkClassAxiom;
-import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 
 import junit.framework.TestCase;
 

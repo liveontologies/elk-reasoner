@@ -24,12 +24,12 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import junit.framework.TestCase;
 
-import org.semanticweb.elk.syntax.ElkAxiomProcessor;
-import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.syntax.interfaces.ElkClass;
-import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class IndexConstructionTest extends TestCase {
 	

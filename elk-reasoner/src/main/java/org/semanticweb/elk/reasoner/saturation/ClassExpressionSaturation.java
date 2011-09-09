@@ -27,6 +27,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpressionVisitor;
@@ -34,11 +36,9 @@ import org.semanticweb.elk.reasoner.indexing.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.util.AbstractConcurrentComputation;
-import org.semanticweb.elk.util.HashSetMultimap;
-import org.semanticweb.elk.util.LazySetIntersection;
+import org.semanticweb.elk.util.collections.HashSetMultimap;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.concurrent.AbstractConcurrentComputation;
 
 /**
  * Experimental version of Saturation Manager.

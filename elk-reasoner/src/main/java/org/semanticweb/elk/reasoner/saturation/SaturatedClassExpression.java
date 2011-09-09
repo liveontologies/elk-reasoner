@@ -29,8 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
-import org.semanticweb.elk.util.ArrayHashSet;
-import org.semanticweb.elk.util.Multimap;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * Objects of this class are used to manage subsumption relations between class

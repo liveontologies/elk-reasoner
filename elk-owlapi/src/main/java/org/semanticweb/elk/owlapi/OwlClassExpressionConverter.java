@@ -28,11 +28,11 @@ package org.semanticweb.elk.owlapi;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.syntax.interfaces.ElkClass;
-import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLClassExpressionVisitorEx;

@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
-import org.semanticweb.elk.syntax.interfaces.ElkClass;
-import org.semanticweb.elk.util.ArrayHashSet;
-import org.semanticweb.elk.util.HashGenerator;
-import org.semanticweb.elk.util.StructuralHashObject;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.semanticweb.elk.util.hashing.StructuralHashObject;
 
 /**
  * Class for storing information about a class in the context of classification.

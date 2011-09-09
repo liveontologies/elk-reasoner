@@ -34,9 +34,9 @@ import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyComposition;
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.util.AbstractConcurrentComputation;
-import org.semanticweb.elk.util.HashListMultimap;
-import org.semanticweb.elk.util.Pair;
+import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.Pair;
+import org.semanticweb.elk.util.concurrent.AbstractConcurrentComputation;
 
 /**
  * Computes the transitive closure of object property inclusions. Sets up

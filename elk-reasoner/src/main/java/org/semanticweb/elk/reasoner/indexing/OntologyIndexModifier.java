@@ -25,10 +25,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkEntity;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 
 /**
  * Interface for methods required for index creation.

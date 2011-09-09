@@ -30,11 +30,11 @@ import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.syntax.interfaces.ElkClass;
-import org.semanticweb.elk.syntax.interfaces.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.syntax.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is

@@ -27,9 +27,9 @@ package org.semanticweb.elk.reasoner.classification;
 
 import java.util.Set;
 
-import org.semanticweb.elk.syntax.interfaces.ElkClass;
-import org.semanticweb.elk.util.HashGenerator;
-import org.semanticweb.elk.util.StructuralHashObject;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.semanticweb.elk.util.hashing.StructuralHashObject;
 
 /**
  * Classes that implement this interface represent a class hierarchy based on

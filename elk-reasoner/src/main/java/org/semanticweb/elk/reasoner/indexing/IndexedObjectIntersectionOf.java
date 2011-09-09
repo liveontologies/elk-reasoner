@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.ArrayList;
 
-import org.semanticweb.elk.syntax.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
 
 /**

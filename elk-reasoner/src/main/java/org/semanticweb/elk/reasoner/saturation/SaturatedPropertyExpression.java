@@ -26,8 +26,8 @@ package org.semanticweb.elk.reasoner.saturation;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
-import org.semanticweb.elk.util.ArrayHashSet;
-import org.semanticweb.elk.util.HashListMultimap;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.HashListMultimap;
 
 /**
  * 

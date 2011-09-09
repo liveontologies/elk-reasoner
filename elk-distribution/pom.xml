@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.1.1-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-distribution</artifactId>
@@ -17,13 +17,13 @@
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-standalone</artifactId>
-			<version>0.1.1-SNAPSHOT</version>
+			<version>0.2.0-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-protege</artifactId>
-			<version>0.1.1-SNAPSHOT</version>
+			<version>0.2.0-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
 	</dependencies>
@@ -48,8 +48,8 @@
 		<plugins>
 			<plugin>
 				<!-- the plugin used to generate the modified plugin versions, such as 
-					release.version used src/main/resources/templates/*.vm and parsedVersion.osgiVersion 
-					used in src/main/update.properties -->
+					release.version used templates/*.vm and parsedVersion.osgiVersion used in 
+					src/main/update.properties -->
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<version>1.7</version>
@@ -142,7 +142,7 @@
 						</goals>
 						<configuration>
 							<announcementFile>version-info.txt</announcementFile>
-							<template>version-info.vm</template>							
+							<template>version-info.vm</template>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</execution>
@@ -164,6 +164,7 @@
 			<plugin>
 				<!-- the plugin for assembling of the distribution zip files -->
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<!-- creating the distribution archive for elk-standalone -->

@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.indexing;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.saturation.SaturatedPropertyExpression;
-import org.semanticweb.elk.util.HashGenerator;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Represents all occurrences of an ElkSubObjectPropertyExpression in an ontology.

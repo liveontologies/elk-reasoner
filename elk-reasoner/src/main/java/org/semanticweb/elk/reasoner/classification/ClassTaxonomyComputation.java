@@ -30,12 +30,12 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
-import org.semanticweb.elk.syntax.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.syntax.interfaces.ElkClass;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.util.AbstractConcurrentComputation;
+import org.semanticweb.elk.util.concurrent.AbstractConcurrentComputation;
 
 public class ClassTaxonomyComputation extends
 		AbstractConcurrentComputation<IndexedClass> {

@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.indexing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.syntax.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 /**
  * Represents all occurrences of an ElkObjectProperty in an ontology.

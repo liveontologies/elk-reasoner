@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.semanticweb.elk.syntax.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 
 /**
  * Represents a complex ElkSubObjectPropertyOfAxiom. The chain consists of

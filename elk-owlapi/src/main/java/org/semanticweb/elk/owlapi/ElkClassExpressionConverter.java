@@ -25,20 +25,20 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import org.semanticweb.elk.syntax.interfaces.ElkClass;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectAllValuesFrom;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectExactCardinality;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectHasSelf;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectHasValue;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectMaxCardinality;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectMinCardinality;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectOneOf;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.syntax.interfaces.ElkObjectUnionOf;
-import org.semanticweb.elk.syntax.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
+import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;

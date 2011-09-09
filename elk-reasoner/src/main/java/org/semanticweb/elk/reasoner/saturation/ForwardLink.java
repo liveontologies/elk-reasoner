@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
-import org.semanticweb.elk.util.Pair;
+import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * @author Frantisek Simancik
