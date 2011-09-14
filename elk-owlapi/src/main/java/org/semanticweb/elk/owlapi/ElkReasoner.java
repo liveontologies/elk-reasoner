@@ -227,6 +227,7 @@ public class ElkReasoner implements OWLReasoner {
 		owlOntology.getOWLOntologyManager().removeOntologyChangeListener(
 				ontologyChangeListener);
 		pendingChanges.clear();
+		reasoner.shutdown();
 	}
 
 	public void flush() {
