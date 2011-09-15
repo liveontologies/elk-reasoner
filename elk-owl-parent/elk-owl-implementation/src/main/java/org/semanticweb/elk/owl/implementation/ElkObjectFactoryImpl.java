@@ -179,21 +179,22 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 								otherObjectPropertyExpressions)));
 	}
 
-	public ElkDisjointUnionAxiom getDisjointUnionAxiom(
+	public ElkDisjointUnionAxiom getDisjointUnionAxiom(ElkClass definedClass,
 			List<? extends ElkClassExpression> disjointClassExpressions) {
 		return (ElkDisjointUnionAxiom) objectManager
 				.getCanonicalElkObject(new ElkDisjointUnionAxiomImpl(
-						disjointClassExpressions));
+						definedClass, disjointClassExpressions));
 	}
 
-	public ElkDisjointUnionAxiom getDisjointUnionAxiom(
+	public ElkDisjointUnionAxiom getDisjointUnionAxiom(ElkClass definedClass,
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions) {
 		return (ElkDisjointUnionAxiom) objectManager
 				.getCanonicalElkObject(new ElkDisjointUnionAxiomImpl(
-						ElkObjectListObject.varArgsToList(firstClassExpression,
-								secondClassExpression, otherClassExpressions)));
+						definedClass, ElkObjectListObject.varArgsToList(
+								firstClassExpression, secondClassExpression,
+								otherClassExpressions)));
 	}
 
 	public ElkEquivalentClassesAxiom getEquivalentClassesAxiom(

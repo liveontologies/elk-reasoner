@@ -24,6 +24,7 @@ package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
@@ -40,14 +41,21 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDisjointUnionAxiomImpl extends ElkClassExpressionListObject
 		implements ElkDisjointUnionAxiom {
 
+	protected final ElkClass definedClass;
+
 	private static final int constructorHash_ = "ElkDisjointUnionAxiom"
 			.hashCode();
 
-	/* package-private */ElkDisjointUnionAxiomImpl(
+	/* package-private */ElkDisjointUnionAxiomImpl(ElkClass definedClass,
 			List<? extends ElkClassExpression> disjointClassExpressions) {
 		super(disjointClassExpressions);
+		this.definedClass = definedClass;
 		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
 				constructorHash_, disjointClassExpressions);
+	}
+
+	public ElkClass getDefinedClass() {
+		return definedClass;
 	}
 
 	@Override

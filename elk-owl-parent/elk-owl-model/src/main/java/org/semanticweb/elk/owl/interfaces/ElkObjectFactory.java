@@ -149,6 +149,7 @@ public interface ElkObjectFactory {
 	 * @return
 	 */
 	public abstract ElkDisjointUnionAxiom getDisjointUnionAxiom(
+			ElkClass definedClass,
 			List<? extends ElkClassExpression> disjointClassExpressions);
 
 	/**
@@ -160,7 +161,7 @@ public interface ElkObjectFactory {
 	 * @return
 	 */
 	public abstract ElkDisjointUnionAxiom getDisjointUnionAxiom(
-			ElkClassExpression firstClassExpression,
+			ElkClass definedClass, ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
 
@@ -456,7 +457,7 @@ public interface ElkObjectFactory {
 	public abstract ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
-	
+
 	/**
 	 * Create an ElkObjectUnionOf.
 	 * 
@@ -515,7 +516,7 @@ public interface ElkObjectFactory {
 	 */
 	public abstract ElkReflexiveObjectPropertyAxiom getReflexiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
-	
+
 	/**
 	 * Create an ElkSameIndividualAxiom.
 	 * 
@@ -524,7 +525,7 @@ public interface ElkObjectFactory {
 	 */
 	public abstract ElkSameIndividualAxiom getSameIndividualAxiom(
 			List<? extends ElkIndividual> individuals);
-	
+
 	/**
 	 * Create an ElkSameIndividualAxiom.
 	 * 

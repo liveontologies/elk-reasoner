@@ -37,6 +37,13 @@ import java.util.List;
 public interface ElkDisjointUnionAxiom extends ElkClassAxiom {
 
 	/**
+	 * Get the class that is defined to be a disjoint union.
+	 * 
+	 * @return class
+	 */
+	public ElkClass getDefinedClass();
+
+	/**
 	 * Get the list of disjoint class expressions that this axiom refers to. The
 	 * order of class expressions does not affect the semantics but it is
 	 * relevant to the syntax of OWL.
