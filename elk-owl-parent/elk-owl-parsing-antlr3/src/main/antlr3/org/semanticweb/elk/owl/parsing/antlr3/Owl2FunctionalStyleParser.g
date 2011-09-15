@@ -28,6 +28,7 @@
  * http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#sparqlGrammar
  * 
  * @author Yevgeny Kazakov, Apr 19, 2011
+ * @author Markus Kroetzsch
  */
 
 parser grammar Owl2FunctionalStyleParser;
@@ -42,9 +43,7 @@ options {
 package org.semanticweb.elk.owl.parsing.antlr3;
   
 import java.util.Vector;
-import java.util.concurrent.Future;
 
-import org.semanticweb.elk.owl.parsing.FutureElkAxiomConsumer;    
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;  
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
@@ -61,17 +60,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.FutureElkObjectFactory;
-import org.semanticweb.elk.owl.implementation.FutureElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.ElkDummyObjectManager;
 }
 
 
 @members {
-    private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-    private final static FutureElkObjectFactory constructor =
-        new FutureElkObjectFactoryImpl(objectFactory);
+    private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(new ElkDummyObjectManager());
 
   // Make sure that exception is thrown on parsing error
   @Override
@@ -110,6 +107,7 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
  *------------------------------------------------------------------*/
 
 /* 2 Preliminary Definitions */
+
 /* 2.3 Integers, Characters, Strings, Language Tags, and Node IDs */
 /* @ (U+40) followed a nonempty sequence of characters matching the 
 * langtag production from [BCP 47] 
@@ -123,7 +121,8 @@ languageTag
 */
 nodeId 
     :  BLANK_NODE_LABEL
-    ;    
+    ;
+
 /* 2.3 IRIs */
 /* an iri as defined in [RFC3987], enclosed in a pair of < (U+3C) and > 
 * (U+3E) characters
@@ -136,50 +135,64 @@ iri returns [String value]
     : x = fullIri          { $value = $x.value; }
     | y = abbreviatedIri   { $value = $y.value; }
     ;
+
 /* a finite sequence of characters matching the PNAME_LN production of 
 * [SPARQL] 
 */
 abbreviatedIri returns [String value]
     : x = PNAME_LN         { $value = $x.text; }
     ;
+
 /* a finite sequence of characters matching the as PNAME_NS production of 
 * [SPARQL] 
 */
 prefixName 
     : PNAME_NS
     ;
+
 /* 3 Ontologies */
+
 /* 3.5 Ontology Annotations */
 ontologyAnnotations 
     : annotation*
     ;
+
 /* 3.7 Functional-Style Syntax */    
-ontologyDocument[FutureElkAxiomConsumer consumer] 
-    : prefixDeclaration* ontology[$consumer]
+ontologyDocument[ElkAxiomProcessor processor] 
+    : prefixDeclaration* ontology[$processor]
     ;
+
 prefixDeclaration 
     : PREFIX OPEN_BRACE prefixName EQUALS fullIri CLOSE_BRACE
     ;
-ontology[FutureElkAxiomConsumer consumer] 
+
+ontology[ElkAxiomProcessor processor] 
     : ONTOLOGY OPEN_BRACE ( ontologyIri versionIri? )?
        directlyImportsDocuments
        ontologyAnnotations
-       axioms[$consumer]
+       axioms[$processor]
       CLOSE_BRACE
     ;
+
 ontologyIri 
     : iri
     ;
+
 versionIri 
     : iri
     ;
+
 directlyImportsDocuments 
     : ( IMPORT OPEN_BRACE iri CLOSE_BRACE )*
     ;
-axioms[FutureElkAxiomConsumer consumer]
-	: (x = axiom { $consumer.submit($x.value); })*  
+
+axioms[ElkAxiomProcessor processor]
+	: (x = axiom { $processor.process($x.value); })*  
     ;
+
+
 /* 4 Datatype Maps */
+
 /* 4.1 Real Numbers, Decimal Numbers, and Integers */ 
 dtRealsDecimalsIntegers
     : OWL_REAL
@@ -199,11 +212,13 @@ dtRealsDecimalsIntegers
     | XSD_UNSIGNED_SHORT
     | XSD_UNSIGNED_BYTE
     ;
+
 /* 4.2 Floating-Point Numbers */
 dtFloats
     : XSD_DOUBLE
     | XSD_FLOAT
     ;
+
 /* 4.3 Strings */
 dtStrings
     : RDF_PLAIN_LITERAL
@@ -215,34 +230,43 @@ dtStrings
     | XSD_NC_NAME
     | XSD_NMTOKEN
     ;
+
 /* 4.4 Boolean Values */
 dtBooleans
     : XSD_BOOLEAN
     ;
+
 /* 4.5 Binary Data */
 dtBinaryData
     : XSD_HEX_BINARY
     | XSD_BASE_64_BINARY
     ;
+
 /* 4.6 IRIs */
 dtIris
     : XSD_ANY_URI
     ;
+
 /* 4.7 Time Instants */
 dtTimeInstants
     : XSD_DATE_TIME_STAMP
     ;
+
 /* 4.8 XML Literals */
 dtXmlLiterals
     : RDF_XML_LITERAL
     ;
+
+
 /* 5 Entities and Literals */
+
 /* 5.1 Classes */
-clazz returns [Future<? extends ElkClass> value]
-    : x = iri         { $value = constructor.getFutureElkClass($x.value); }
-    | OWL_THING       { $value = constructor.getFuture(objectFactory.getOwlThing()); }
-    | OWL_NOTHING     { $value = constructor.getFuture(objectFactory.getOwlNothing()); }
+clazz returns [ElkClass value]
+    : x = iri         { $value = objectFactory.getClass($x.value); }
+    | OWL_THING       { $value = objectFactory.getOwlThing(); }
+    | OWL_NOTHING     { $value = objectFactory.getOwlNothing(); }
     ;
+
 /* 5.2 Datatypes */    
 datatype 
     : iri
@@ -256,22 +280,25 @@ datatype
     | dtTimeInstants
     | dtXmlLiterals
     ;
+
 /* 5.3 Object Properties */       
-objectProperty returns [Future<? extends ElkObjectProperty> value]
-    : x = iri	{ $value = constructor.getFutureElkObjectProperty($x.value); }
+objectProperty returns [ElkObjectProperty value]
+    : x = iri	{ $value = objectFactory.getObjectProperty($x.value); }
     | OWL_TOP_OBJECT_PROPERTY { 
-        $value = constructor.getFuture(objectFactory.getOwlTopObjectProperty()); 
+        $value = objectFactory.getOwlTopObjectProperty(); 
       }
     | OWL_BOTTOM_OBJECT_PROPERTY { 
-        $value = constructor.getFuture(objectFactory.getOwlBottomObjectProperty()); 
+        $value = objectFactory.getOwlBottomObjectProperty(); 
       }
     ;
+
 /* 5.4 Data Properties */    
 dataProperty 
     : iri
     | OWL_TOP_DATA_PROPERTY
     | OWL_BOTTOM_DATA_PROPERTY
     ;
+
 /* 5.5 Annotation Properties */    
 annotationProperty 
     : iri
@@ -285,32 +312,38 @@ annotationProperty
     | OWL_BACKWARD_COMPATIBLE_WITH
     | OWL_INCOMPATIBLE_WITH
     ;
+
 /* 5.6 Individuals */
 individual 
     : namedIndividual 
     | anonymousIndividual
     ;
+
 /* 5.6.1 Named Individuals */
 namedIndividual 
     : iri
     ;
+
 /* 5.6.2 Anonymous Individuals */    
 anonymousIndividual 
     : nodeId
     ;
+
 /* 5.7 Literals */
 literal
     : QUOTED_STRING      
         ( REFERENCE datatype
         | languageTag?
         )
-    ; 
-/* 5.8 Entity Declarations and Typing */    
-declaration returns [Future<? extends ElkDeclarationAxiom> value]
-    : DECLARATION OPEN_BRACE axiomAnnotations x = entity CLOSE_BRACE
-      { $value = constructor.getFutureElkDeclarationAxiom($x.value); }
     ;
-entity returns [Future<? extends ElkEntity> value]
+
+/* 5.8 Entity Declarations and Typing */    
+declaration returns [ElkDeclarationAxiom value]
+    : DECLARATION OPEN_BRACE axiomAnnotations x = entity CLOSE_BRACE
+      { $value = objectFactory.getDeclarationAxiom($x.value); }
+    ;
+
+entity returns [ElkEntity value]
     : CLASS OPEN_BRACE x = clazz CLOSE_BRACE 
       { $value = $x.value; }
     | DATATYPE OPEN_BRACE datatype CLOSE_BRACE
@@ -320,19 +353,23 @@ entity returns [Future<? extends ElkEntity> value]
     | ANNOTATION_PROPERTY OPEN_BRACE annotationProperty CLOSE_BRACE
     | NAMED_INDIVIDUAL OPEN_BRACE namedIndividual CLOSE_BRACE
     ;
+
 /* 6 Property Expressions */    
-objectPropertyExpression returns [Future<? extends ElkObjectPropertyExpression> value]
+objectPropertyExpression returns [ElkObjectPropertyExpression value]
     : x = objectProperty		{ $value = $x.value; } 
     | inverseObjectProperty
     ;
+
 /* 6.1.1 Inverse Object Properties */    
 inverseObjectProperty 
     : OBJECT_INVERSE_OF OPEN_BRACE objectProperty CLOSE_BRACE
     ;
+
 /* 6.2 Data Property Expressions */    
 dataPropertyExpression 
     : dataProperty
     ;
+
 /* 7 Data Ranges */    
 dataRange 
     : datatype 
@@ -342,22 +379,27 @@ dataRange
     | dataOneOf 
     | datatypeRestriction
     ;
+
 /* 7.1 Intersection of Data Ranges */    
 dataIntersectionOf 
     : DATA_INTERSECTION_OF OPEN_BRACE dataRange dataRange+ CLOSE_BRACE
     ;
+
 /* 7.2 Union of Data Ranges */
 dataUnionOf
     : DATA_UNION_OF OPEN_BRACE dataRange dataRange+ CLOSE_BRACE
     ;
+
 /* 7.3 Complement of Data Ranges */    
 dataComplementOf 
     : DATA_COMPLEMENT_OF OPEN_BRACE dataRange CLOSE_BRACE
     ;
+
 /* 7.4 Enumeration of Literals */
 dataOneOf 
     : DATA_ONE_OF OPEN_BRACE literal+ CLOSE_BRACE
     ;
+
 /* 7.5 Datatype Restrictions */
 datatypeRestriction 
     : DATATYPE_RESTRICTION OPEN_BRACE 
@@ -365,6 +407,7 @@ datatypeRestriction
         ( constrainingFacet restrictionValue )+ 
       CLOSE_BRACE
     ;
+
 constrainingFacet 
     : iri
     | XSD_MIN_INCLUSIVE
@@ -377,11 +420,13 @@ constrainingFacet
     | XSD_PATTERN
     | RDF_LANG_RANGE
     ;
+
 restrictionValue 
     : literal
     ;
+
 /* 8 Class Expressions */
-classExpression returns [Future<? extends ElkClassExpression> value]
+classExpression returns [ElkClassExpression value]
     : x = clazz 				        { $value = $x.value; } 
     | y = objectIntersectionOf  { $value = $y.value; } 
     | objectUnionOf 
@@ -401,39 +446,49 @@ classExpression returns [Future<? extends ElkClassExpression> value]
     | dataMaxCardinality 
     | dataExactCardinality
     ;
+
+
 /* 8.1 Propositional Connectives and Enumeration of Individuals */
+
 /* 8.1.1 Intersection of Class Expressions */
-objectIntersectionOf returns [Future<? extends ElkObjectIntersectionOf> value]  
+objectIntersectionOf returns [ElkObjectIntersectionOf value]  
     : OBJECT_INTERSECTION_OF OPEN_BRACE {
-          Vector<Future<? extends ElkClassExpression>> v = 
-              new Vector<Future<? extends ElkClassExpression>> ();
+          Vector<ElkClassExpression> v = 
+              new Vector<ElkClassExpression> ();
         }
     	    x = classExpression   { v.add($x.value); }
     	  ( x = classExpression   { v.add($x.value); } )+ 
-    	  { $value = constructor.getFutureElkObjectIntersectionOf(v); }
+    	  { $value = objectFactory.getObjectIntersectionOf(v); }
     	CLOSE_BRACE	
     ;
+
 /* 8.1.2 Union of Class Expressions */
 objectUnionOf 
     : OBJECT_UNION_OF OPEN_BRACE classExpression classExpression+ CLOSE_BRACE
     ;
+
 /* 8.1.3 Complement of Class Expressions */
 objectComplementOf 
     : OBJECT_COMPLEMENT_OF OPEN_BRACE classExpression CLOSE_BRACE
     ;
+
 /* 8.1.4 Enumeration of Individuals */    
 objectOneOf 
     : OBJECT_ONE_OF OPEN_BRACE individual+ CLOSE_BRACE
     ;
+
+
 /* 8.2 Object Property Restrictions */
+
 /* 8.2.1 Existential Quantification */    
-objectSomeValuesFrom returns [Future<? extends ElkObjectSomeValuesFrom> value]
+objectSomeValuesFrom returns [ElkObjectSomeValuesFrom value]
     : OBJECT_SOME_VALUES_FROM OPEN_BRACE 
          x = objectPropertyExpression 
          y = classExpression 
       CLOSE_BRACE
-    	{ $value = constructor.getFutureElkObjectSomeValuesFrom($x.value, $y.value); }
+    	{ $value = objectFactory.getObjectSomeValuesFrom($x.value, $y.value); }
     ;
+
 /* 8.2.2 Universal Quantification */
 objectAllValuesFrom 
     : OBJECT_ALL_VALUES_FROM OPEN_BRACE 
@@ -441,6 +496,7 @@ objectAllValuesFrom
         classExpression 
       CLOSE_BRACE
     ;
+
 /* 8.2.3 Individual Value Restriction */
 objectHasValue 
     : OBJECT_HAS_VALUE OPEN_BRACE 
@@ -448,13 +504,17 @@ objectHasValue
         individual 
       CLOSE_BRACE
     ;
+
 /* 8.2.4 Self-Restriction */
 objectHasSelf 
     : OBJECT_HAS_SELF OPEN_BRACE 
         objectPropertyExpression 
       CLOSE_BRACE
     ;
+
+
 /* 8.3 Object Property Cardinality Restrictions */
+
 /* 8.3.1 Minimum Cardinality */
 objectMinCardinality 
     : OBJECT_MIN_CARDINALITY OPEN_BRACE 
@@ -463,6 +523,7 @@ objectMinCardinality
         classExpression? 
       CLOSE_BRACE
     ;
+
 /* 8.3.2 Maximum Cardinality */
 objectMaxCardinality 
     : OBJECT_MAX_CARDINALITY OPEN_BRACE 
@@ -471,6 +532,7 @@ objectMaxCardinality
         classExpression? 
       CLOSE_BRACE
     ;
+
 /* 8.3.3 Exact Cardinality */    
 objectExactCardinality 
     : OBJECT_EXACT_CARDINALITY OPEN_BRACE 
@@ -479,7 +541,10 @@ objectExactCardinality
         classExpression? 
       CLOSE_BRACE
     ;
+
+
 /* 8.4 Data Property Restrictions */
+
 /* 8.4.1 Existential Quantification */
 dataSomeValuesFrom 
     : DATA_SOME_VALUES_FROM OPEN_BRACE 
@@ -487,6 +552,7 @@ dataSomeValuesFrom
         dataRange 
       CLOSE_BRACE
     ;
+
 /* 8.4.2 Universal Quantification */
 dataAllValuesFrom 
     : DATA_ALL_VALUES_FROM OPEN_BRACE 
@@ -494,6 +560,7 @@ dataAllValuesFrom
         dataRange 
       CLOSE_BRACE
     ;
+
 /* 8.4.3 Literal Value Restriction */
 dataHasValue 
     : DATA_HAS_VALUE OPEN_BRACE 
@@ -501,7 +568,10 @@ dataHasValue
         literal 
       CLOSE_BRACE
     ;
+
+
 /* 8.5 Data Property Cardinality Restrictions */
+
 /* 8.5.1 Minimum Cardinality */
 dataMinCardinality 
     : DATA_MIN_CARDINALITY OPEN_BRACE 
@@ -510,6 +580,7 @@ dataMinCardinality
         dataRange? 
       CLOSE_BRACE
     ;
+
 /* 8.5.2 Maximum Cardinality */
 dataMaxCardinality 
     : DATA_MAX_CARDINALITY OPEN_BRACE 
@@ -518,6 +589,7 @@ dataMaxCardinality
         dataRange? 
       CLOSE_BRACE
     ;
+
 /* 8.5.3 Exact Cardinality */
 dataExactCardinality 
     : DATA_EXACT_CARDINALITY OPEN_BRACE 
@@ -526,8 +598,9 @@ dataExactCardinality
         dataRange? 
       CLOSE_BRACE
     ;
+
 /* 9 Axioms */
-axiom returns [Future<? extends ElkAxiom> value]
+axiom returns [ElkAxiom value]
 	  : declaration 
     | x = classAxiom 			      { $value = $x.value; } 
     | y = objectPropertyAxiom 	{ $value = $y.value; }
@@ -537,43 +610,50 @@ axiom returns [Future<? extends ElkAxiom> value]
     | assertion 
     | annotationAxiom
     ;
+
 axiomAnnotations 
     : annotation*
-    ;    
+    ;
+ 
 /* 9.1 Class Expression Axioms */    
-classAxiom returns [Future<? extends ElkClassAxiom> value]
+classAxiom returns [ElkClassAxiom value]
     : x = subClassOf		        { $value = $x.value; }
     | y = equivalentClasses	    { $value = $y.value; } 
     | disjointClasses 
     | disjointUnion
     ;
+
 /* 9.1.1 Subclass Axioms */
-subClassOf returns [Future<? extends ElkSubClassOfAxiom> value] 
+subClassOf returns [ElkSubClassOfAxiom value] 
     : SUB_CLASS_OF OPEN_BRACE 
         axiomAnnotations 
         x = subClassExpression 
         y = superClassExpression 
       CLOSE_BRACE
-		{ $value = constructor.getFutureElkSubClassOfAxiom($x.value, $y.value); }
+		{ $value = objectFactory.getSubClassOfAxiom($x.value, $y.value); }
     ;
-subClassExpression returns [Future<? extends ElkClassExpression> value]
+
+subClassExpression returns [ElkClassExpression value]
     : x = classExpression	      { $value = $x.value; }
     ;
-superClassExpression returns [Future<? extends ElkClassExpression> value]
+
+superClassExpression returns [ElkClassExpression value]
     : x = classExpression	      { $value = $x.value; }
     ;
+
 /* 9.1.2 Equivalent Classes */
-equivalentClasses returns [Future<? extends ElkEquivalentClassesAxiom> value] 
+equivalentClasses returns [ElkEquivalentClassesAxiom value] 
     : EQUIVALENT_CLASSES OPEN_BRACE 
         axiomAnnotations { 
-           Vector<Future<? extends ElkClassExpression>> v = 
-               new Vector<Future<? extends ElkClassExpression>> (); 
+           Vector<ElkClassExpression> v = 
+               new Vector<ElkClassExpression> (); 
          }          
           x = classExpression    { v.add($x.value); } 
         ( x = classExpression    { v.add($x.value); } )+ 
       CLOSE_BRACE
-		{ $value = constructor.getFutureElkEquivalentClassesAxiom(v); }      
+		{ $value = objectFactory.getEquivalentClassesAxiom(v); }      
     ;
+
 /* 9.1.3 Disjoint Classes */
 disjointClasses
     : DISJOINT_CLASSES OPEN_BRACE 
@@ -582,6 +662,7 @@ disjointClasses
         classExpression+ 
       CLOSE_BRACE
     ;
+
 /* 9.1.4 Disjoint Union of Class Expressions */
 disjointUnion 
     : DISJOINT_UNION OPEN_BRACE 
@@ -590,11 +671,13 @@ disjointUnion
         disjointClassExpressions 
       CLOSE_BRACE
     ;
+
 disjointClassExpressions 
     : classExpression classExpression+
     ;
+
 /* 9.2 Object Property Axioms */    
-objectPropertyAxiom returns [Future<? extends ElkObjectPropertyAxiom> value]
+objectPropertyAxiom returns [ElkObjectPropertyAxiom value]
     : x = subObjectPropertyOf 			  { $value = $x.value; }
     | equivalentObjectProperties 
     | disjointObjectProperties 
@@ -609,31 +692,34 @@ objectPropertyAxiom returns [Future<? extends ElkObjectPropertyAxiom> value]
     | asymmetricObjectProperty 
     | y = transitiveObjectProperty		{ $value = $y.value; }
     ;
+
 /* 9.2.1 Object Subproperties */
-subObjectPropertyOf returns [Future<? extends ElkSubObjectPropertyOfAxiom> value]
+subObjectPropertyOf returns [ElkSubObjectPropertyOfAxiom value]
     : SUB_OBJECT_PROPERTY_OF OPEN_BRACE {
           boolean isChain = false;
         }
         axiomAnnotations 
         ( x = objectPropertyExpression { isChain = false; } 
-        | y = propertyExpressionChain  {isChain = true;} 
+        | y = propertyExpressionChain  { isChain = true; } 
         ) z = objectPropertyExpression 
       CLOSE_BRACE { 
         if (isChain)
-          $value = constructor.getFutureElkSubObjectPropertyOfAxiom($y.value, $z.value);
+          $value = objectFactory.getSubObjectPropertyOfAxiom($y.value, $z.value);
         else          
-      	  $value = constructor.getFutureElkSubObjectPropertyOfAxiom($x.value, $z.value); 
+      	  $value = objectFactory.getSubObjectPropertyOfAxiom($x.value, $z.value); 
       }	  
     ;
-propertyExpressionChain returns [Future<? extends ElkObjectPropertyChain> value] 
+
+propertyExpressionChain returns [ElkObjectPropertyChain value] 
     : OBJECT_PROPERTY_CHAIN OPEN_BRACE {
-          Vector<Future<? extends ElkObjectPropertyExpression>> v = 
-             new Vector<Future<? extends ElkObjectPropertyExpression>> (2); 
+          Vector<ElkObjectPropertyExpression> v = 
+             new Vector<ElkObjectPropertyExpression> (2); 
         } 
           x = objectPropertyExpression { v.add($x.value); } 
         ( x = objectPropertyExpression { v.add($x.value); } )+
-      CLOSE_BRACE { $value = constructor.getFutureElkObjectPropertyChain(v); }
+      CLOSE_BRACE { $value = objectFactory.getObjectPropertyChain(v); }
     ;
+
 /* 9.2.2 Equivalent Object Properties */    
 equivalentObjectProperties 
     : EQUIVALENT_OBJECT_PROPERTIES OPEN_BRACE 
@@ -642,6 +728,7 @@ equivalentObjectProperties
         objectPropertyExpression+ 
       CLOSE_BRACE
     ;
+
 /* 9.2.3 Disjoint Object Properties */
 disjointObjectProperties 
     : DISJOINT_OBJECT_PROPERTIES OPEN_BRACE 
@@ -650,6 +737,7 @@ disjointObjectProperties
         objectPropertyExpression+ 
       CLOSE_BRACE
     ;
+
 /* 9.2.4 Inverse Object Properties */
 inverseObjectProperties 
     : INVERSE_OBJECT_PROPERTIES OPEN_BRACE 
@@ -658,6 +746,7 @@ inverseObjectProperties
         objectPropertyExpression 
       CLOSE_BRACE
     ;
+
 /* 9.2.5 Object Property Domain */
 objectPropertyDomain 
     : OBJECT_PROPERTY_DOMAIN OPEN_BRACE 
@@ -666,6 +755,7 @@ objectPropertyDomain
         classExpression 
        CLOSE_BRACE
     ;
+
 /* 9.2.6 Object Property Range */        
 objectPropertyRange 
     : OBJECT_PROPERTY_RANGE OPEN_BRACE 
@@ -674,6 +764,7 @@ objectPropertyRange
         classExpression 
       CLOSE_BRACE
     ;
+
 /* 9.2.7 Functional Object Properties */
 functionalObjectProperty 
     : FUNCTIONAL_OBJECT_PROPERTY OPEN_BRACE 
@@ -681,6 +772,7 @@ functionalObjectProperty
         objectPropertyExpression 
       CLOSE_BRACE
     ;
+
 /* 9.2.8 Inverse-Functional Object Properties */    
 inverseFunctionalObjectProperty 
     : INVERSE_FUNCTIONAL_OBJECT_PROPERTY OPEN_BRACE 
@@ -688,6 +780,7 @@ inverseFunctionalObjectProperty
         objectPropertyExpression 
       CLOSE_BRACE
     ;
+
 /* 9.2.9 Reflexive Object Properties */
 reflexiveObjectProperty 
     : REFLEXIVE_OBJECT_PROPERTY OPEN_BRACE 
@@ -695,6 +788,7 @@ reflexiveObjectProperty
         objectPropertyExpression 
       CLOSE_BRACE
     ;
+
 /* 9.2.10 Irreflexive Object Properties */
 irreflexiveObjectProperty 
     : IRREFLEXIVE_OBJECT_PROPERTY OPEN_BRACE 
@@ -702,6 +796,7 @@ irreflexiveObjectProperty
         objectPropertyExpression 
       CLOSE_BRACE
     ;
+
 /* 9.2.11 Symmetric Object Properties */
 symmetricObjectProperty 
     : SYMMETRIC_OBJECT_PROPERTY OPEN_BRACE 
@@ -709,6 +804,7 @@ symmetricObjectProperty
         objectPropertyExpression 
       CLOSE_BRACE
     ;
+
 /* 9.2.12 Asymmetric Object Properties */
 asymmetricObjectProperty 
     : ASYMMETRIC_OBJECT_PROPERTY OPEN_BRACE 
@@ -716,15 +812,17 @@ asymmetricObjectProperty
         objectPropertyExpression 
        CLOSE_BRACE
     ;
+
 /* 9.2.13 Transitive Object Properties */
-transitiveObjectProperty returns [Future<? extends ElkTransitiveObjectPropertyAxiom> value] 
+transitiveObjectProperty returns [ElkTransitiveObjectPropertyAxiom value] 
     : TRANSITIVE_OBJECT_PROPERTY OPEN_BRACE 
         axiomAnnotations 
         x = objectPropertyExpression { 
-          $value = constructor.getFutureElkTransitiveObjectPropertyAxiom($x.value); 
+          $value = objectFactory.getTransitiveObjectPropertyAxiom($x.value); 
         } 
       CLOSE_BRACE
     ;
+
 /* 9.3 Data Property Axioms */    
 dataPropertyAxiom 
     : subDataPropertyOf 
@@ -734,6 +832,7 @@ dataPropertyAxiom
     | dataPropertyRange 
     | functionalDataProperty
     ;
+
 /* 9.3.1 Data Subproperties */
 subDataPropertyOf 
     : SUB_DATA_PROPERTY_OF OPEN_BRACE 
@@ -741,13 +840,15 @@ subDataPropertyOf
         subDataPropertyExpression 
         superDataPropertyExpression 
       CLOSE_BRACE
-    ;    
+    ;
+  
 subDataPropertyExpression 
     : dataPropertyExpression
     ;
 superDataPropertyExpression 
     : dataPropertyExpression
     ;
+
 /* 9.3.2 Equivalent Data Properties */
 equivalentDataProperties 
     : EQUIVALENT_DATA_PROPERTIES OPEN_BRACE 
@@ -756,6 +857,7 @@ equivalentDataProperties
         dataPropertyExpression+ 
       CLOSE_BRACE
     ;
+
 /* 9.3.3 Disjoint Data Properties */
 disjointDataProperties 
     : DISJOINT_DATA_PROPERTIES OPEN_BRACE 
@@ -764,6 +866,7 @@ disjointDataProperties
         dataPropertyExpression+ 
       CLOSE_BRACE
     ;
+
 /* 9.3.4 Data Property Domain */
 dataPropertyDomain 
     : DATA_PROPERTY_DOMAIN OPEN_BRACE 
@@ -772,6 +875,7 @@ dataPropertyDomain
         classExpression 
       CLOSE_BRACE
     ;
+
 /* 9.3.5 Data Property Range */
 dataPropertyRange 
     : DATA_PROPERTY_RANGE OPEN_BRACE 
@@ -780,6 +884,7 @@ dataPropertyRange
         dataRange 
       CLOSE_BRACE
     ;
+
 /* 9.3.6 Functional Data Properties */
 functionalDataProperty 
     : FUNCTIONAL_DATA_PROPERTY OPEN_BRACE 
@@ -787,6 +892,7 @@ functionalDataProperty
         dataPropertyExpression 
       CLOSE_BRACE
     ;
+
 /* 9.4 Datatype Definitions */
 datatypeDefinition 
     : DATATYPE_DEFINITION OPEN_BRACE 
@@ -795,6 +901,7 @@ datatypeDefinition
         dataRange 
       CLOSE_BRACE
     ;
+
 /* 9.5 Keys */
 hasKey 
     : HAS_KEY OPEN_BRACE 
@@ -804,6 +911,7 @@ hasKey
         OPEN_BRACE dataPropertyExpression* CLOSE_BRACE 
       CLOSE_BRACE
     ;
+
 /* 9.6 Assertions */    
 assertion 
     : sameIndividual 
@@ -814,6 +922,7 @@ assertion
     | dataPropertyAssertion 
     | negativeDataPropertyAssertion
     ;
+
 sourceIndividual 
     : individual
     ;
@@ -823,6 +932,7 @@ targetIndividual
 targetValue 
     : literal
     ;
+
 /* 9.6.1 Individual Equality */
 sameIndividual 
     : SAME_INDIVIDUAL OPEN_BRACE 
@@ -831,6 +941,7 @@ sameIndividual
         individual+ 
       CLOSE_BRACE
     ;
+
 /* 9.6.2 Individual Inequality */
 differentIndividuals 
     : DIFFERENT_INDIVIDUALS OPEN_BRACE 
@@ -839,6 +950,7 @@ differentIndividuals
         individual+ 
       CLOSE_BRACE
     ;
+
 /* 9.6.3 Class Assertions */
 classAssertion 
     : CLASS_ASSERTION OPEN_BRACE 
@@ -847,6 +959,7 @@ classAssertion
         individual 
       CLOSE_BRACE
     ;
+
 /* 9.6.4 Positive Object Property Assertions */
 objectPropertyAssertion 
     : OBJECT_PROPERTY_ASSERTION OPEN_BRACE 
@@ -856,6 +969,7 @@ objectPropertyAssertion
         targetIndividual 
       CLOSE_BRACE
     ;
+
 /* 9.6.5 Negative Object Property Assertions */
 negativeObjectPropertyAssertion 
     : NEGATIVE_OBJECT_PROPERTY_ASSERTION OPEN_BRACE 
@@ -865,6 +979,7 @@ negativeObjectPropertyAssertion
         targetIndividual 
       CLOSE_BRACE
     ;
+
 /* 9.6.6 Positive Data Property Assertions */
 dataPropertyAssertion 
     : DATA_PROPERTY_ASSERTION OPEN_BRACE 
@@ -874,6 +989,7 @@ dataPropertyAssertion
         targetValue 
       CLOSE_BRACE
     ;
+
 /* 9.6.7 Negative Data Property Assertions */
 negativeDataPropertyAssertion 
     : NEGATIVE_DATA_PROPERTY_ASSERTION OPEN_BRACE 
@@ -883,7 +999,10 @@ negativeDataPropertyAssertion
         targetValue 
       CLOSE_BRACE
     ;
+
+
 /* 10 Annotations */
+
 /* 10.1 Annotations of Ontologies, Axioms, and other Annotations */
 annotation 
     : ANNOTATION OPEN_BRACE 
@@ -892,12 +1011,15 @@ annotation
         annotationValue 
       CLOSE_BRACE
     ;
+
 annotationAnnotations  
     : annotation*
     ;
+
 annotationValue 
     : anonymousIndividual | iri | literal
     ;
+
 /* 10.2 Annotation Axioms */    
 annotationAxiom 
     : annotationAssertion 
@@ -905,6 +1027,7 @@ annotationAxiom
     | annotationPropertyDomain 
     | annotationPropertyRange
     ;
+
 /* 10.2.1 Annotation Assertion */
 annotationAssertion 
     : ANNOTATION_ASSERTION OPEN_BRACE 
@@ -914,9 +1037,11 @@ annotationAssertion
         annotationValue 
       CLOSE_BRACE
     ;
+
 annotationSubject 
     : iri | anonymousIndividual
     ;
+
 /* 10.2.2 Annotation Subproperties */
 subAnnotationPropertyOf 
     : SUB_ANNOTATION_PROPERTY_OF OPEN_BRACE 
@@ -925,12 +1050,15 @@ subAnnotationPropertyOf
         superAnnotationProperty 
       CLOSE_BRACE
     ;
+
 subAnnotationProperty 
     : annotationProperty
     ;
+
 superAnnotationProperty 
     : annotationProperty
     ;
+
 /* 10.2.3 Annotation Property Domain */
 annotationPropertyDomain 
     : ANNOTATION_PROPERTY_DOMAIN OPEN_BRACE 
@@ -939,6 +1067,7 @@ annotationPropertyDomain
         iri 
       CLOSE_BRACE
     ;
+
 /* 10.2.4 Annotation Property Range */
 annotationPropertyRange 
     : ANNOTATION_PROPERTY_RANGE OPEN_BRACE 
@@ -947,14 +1076,3 @@ annotationPropertyRange
         iri 
       CLOSE_BRACE
     ;
-
-
-
-
-
-
-
-
-
-
-

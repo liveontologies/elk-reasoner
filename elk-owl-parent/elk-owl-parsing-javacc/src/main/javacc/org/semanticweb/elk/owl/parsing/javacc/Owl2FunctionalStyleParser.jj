@@ -28,6 +28,7 @@
  * http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#sparqlGrammar
  * 
  * @author Yevgeny Kazakov, Apr 19, 2011
+ * @author Markus Kroetzsch
  */
 
 options
@@ -42,9 +43,7 @@ PARSER_BEGIN(Owl2FunctionalStyleParser)
 package org.semanticweb.elk.owl.parsing.javacc;
 
 import java.util.Vector;
-import java.util.concurrent.Future;
 
-import org.semanticweb.elk.owl.parsing.FutureElkAxiomConsumer;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
@@ -63,17 +62,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.FutureElkObjectFactory;
-import org.semanticweb.elk.owl.implementation.FutureElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.ElkDummyObjectManager;
 
 public class Owl2FunctionalStyleParser {
     boolean initialized = false;
     
-    private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-    private final static FutureElkObjectFactory constructor =
-        new FutureElkObjectFactoryImpl(objectFactory);
+    private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(new ElkDummyObjectManager());
 
     public void Init(java.io.InputStream stream, String encoding) {
         if (initialized) {
@@ -314,6 +311,7 @@ TOKEN :
  *------------------------------------------------------------------*/
 
 /* 2 Preliminary Definitions */
+
 /* 2.3 Integers, Characters, Strings, Language Tags, and Node IDs */
 /* @ (U+40) followed a nonempty sequence of characters matching the 
 * langtag production from [BCP 47] 
@@ -322,14 +320,18 @@ void languageTag():
 {}
 {
     <LANGTAG>
-} /* See LANGTAG in [SPARQL] */ 
+}
+
+/* See LANGTAG in [SPARQL] */ 
 /* a finite sequence of characters matching the BLANK_NODE_LABEL 
 * production of [SPARQL]
 */
 void nodeId():
 {}{
     <BLANK_NODE_LABEL>
-}    
+}
+
+
 /* 2.3 IRIs */
 /* an iri as defined in [RFC3987], enclosed in a pair of < (U+3C) and > 
 * (U+3E) characters
@@ -341,8 +343,9 @@ String fullIri():
     t = <IRI_REF> {
       return t.image;
     }
-} 
-    /* See IRI_REF in [SPARQL] */
+}
+
+/* See IRI_REF in [SPARQL] */
 String iri():
 {
   String x;
@@ -351,6 +354,7 @@ String iri():
 |   x = abbreviatedIri()  
    ) { return x; }
 }
+
 /* a finite sequence of characters matching the PNAME_LN production of 
 * [SPARQL] 
 */
@@ -360,6 +364,7 @@ String abbreviatedIri():
 }{
     t = <PNAME_LN>   { return t.image; }
 }
+
 /* a finite sequence of characters matching the as PNAME_NS production of 
 * [SPARQL] 
 */
@@ -367,17 +372,22 @@ void prefixName():
 {}{
     <PNAME_NS>
 }
+
+
 /* 3 Ontologies */
+
 /* 3.5 Ontology Annotations */
 void ontologyAnnotations():
 {}{
     ( annotation() )*
 }
+
 /* 3.7 Functional-Style Syntax */    
-void ontologyDocument(FutureElkAxiomConsumer consumer):
+void ontologyDocument(ElkAxiomProcessor processor):
 {}{
-    ( prefixDeclaration() )* ontology(consumer)
+    ( prefixDeclaration() )* ontology(processor)
 }
+
 void prefixDeclaration():
 {}{
     <PREFIX> <OPEN_BRACE>
@@ -386,33 +396,41 @@ void prefixDeclaration():
       fullIri()
     <CLOSE_BRACE>
 }
-void ontology(FutureElkAxiomConsumer consumer):
+
+void ontology(ElkAxiomProcessor processor):
 {}{
     <ONTOLOGY> <OPEN_BRACE> ( ontologyIri() ( versionIri() )? )?
        directlyImportsDocuments()
        ontologyAnnotations()
-       axioms(consumer)       
+       axioms(processor)       
     <CLOSE_BRACE>
 }
+
 void ontologyIri():
 {}{
     iri()
 }
+
 void versionIri():
 {}{
     iri()
 }
+
 void directlyImportsDocuments():
 {}{
     ( <IMPORT> <OPEN_BRACE> iri() <CLOSE_BRACE> )*
 }
-void axioms(FutureElkAxiomConsumer consumer):
+
+void axioms(ElkAxiomProcessor processor):
 {
-    Future<? extends ElkAxiom> x;
+    ElkAxiom x;
 }{
-    ( x = axiom() { consumer.submit(x); } )*
+    ( x = axiom() { processor.process(x); } )*
 }
+
+
 /* 4 Datatype Maps */
+
 /* 4.1 Real Numbers, Decimal Numbers, and Integers */ 
 void dtRealsDecimalsIntegers():
 {}{
@@ -433,6 +451,7 @@ void dtRealsDecimalsIntegers():
 |   <XSD_UNSIGNED_SHORT>
 |   <XSD_UNSIGNED_BYTE>
 }
+
 /* 4.2 Floating-Point Numbers */
 void dtFloats():
 {}{
@@ -451,42 +470,51 @@ void dtStrings():
 |   <XSD_NC_NAME>
 |   <XSD_NMTOKEN>
 }
+
 /* 4.4 Boolean Values */
 void dtBooleans():
 {}{
     <XSD_BOOLEAN>
 }
+
 /* 4.5 Binary Data */
 void dtBinaryData():
 {}{
     <XSD_HEX_BINARY>
 |   <XSD_BASE_64_BINARY>
 }
+
 /* 4.6 IRIs */
 void dtIris():
 {}{
     <XSD_ANY_URI>
 }
+
 /* 4.7 Time Instants */
 void dtTimeInstants():
 {}{
     <XSD_DATE_TIME_STAMP>
 }
+
 /* 4.8 XML Literals */
 void dtXmlLiterals():
 {}{
     <RDF_XML_LITERAL>
 }
+
+
 /* 5 Entities and Literals */
+
 /* 5.1 Classes */
-Future<? extends ElkClass> clazz():
+ElkClass clazz():
 {
   String x;
 }{
-    x = iri()     { return constructor.getFutureElkClass(x); }  
-|   <OWL_THING>   { return constructor.getFuture(objectFactory.getOwlThing()); }
-|   <OWL_NOTHING> { return constructor.getFuture(objectFactory.getOwlNothing()); }
+    x = iri()     { return objectFactory.getClass(x); }  
+|   <OWL_THING>   { return objectFactory.getOwlThing(); }
+|   <OWL_NOTHING> { return objectFactory.getOwlNothing(); }
 }
+
 /* 5.2 Datatypes */    
 void datatype():
 {}{
@@ -501,24 +529,23 @@ void datatype():
 |   dtTimeInstants()
 |   dtXmlLiterals()
 }
+
 /* 5.3 Object Properties */       
-Future<? extends ElkObjectProperty> objectProperty():
+ElkObjectProperty objectProperty():
 {
   String x;
 }{
     x = iri() {
-      return constructor.getFutureElkObjectProperty(x);
+      return objectFactory.getObjectProperty(x);
     }     
 |   <OWL_TOP_OBJECT_PROPERTY> {
-      return constructor.getFuture(
-        objectFactory.getOwlTopObjectProperty());
+      return objectFactory.getOwlTopObjectProperty();
     }
 |   <OWL_BOTTOM_OBJECT_PROPERTY> {
-      return constructor.getFuture(
-        objectFactory.getOwlBottomObjectProperty());
+      return objectFactory.getOwlBottomObjectProperty();
     }
-  
 }
+
 /* 5.4 Data Properties */    
 void dataProperty():
 {}{
@@ -526,6 +553,7 @@ void dataProperty():
 |   <OWL_TOP_DATA_PROPERTY>
 |   <OWL_BOTTOM_DATA_PROPERTY>
 }
+
 /* 5.5 Annotation Properties */    
 void annotationProperty():
 {}{
@@ -540,22 +568,26 @@ void annotationProperty():
 |   <OWL_BACKWARD_COMPATIBLE_WITH>
 |   <OWL_INCOMPATIBLE_WITH>
 }
+
 /* 5.6 Individuals */
 void individual():
 {}{
     namedIndividual() 
 |   anonymousIndividual()
 }
+
 /* 5.6.1 Named Individuals */
 void namedIndividual():
 {}{
     iri()
 }
+
 /* 5.6.2 Anonymous Individuals */    
 void anonymousIndividual():
 {}{
     nodeId()
 }
+
 /* 5.7 Literals */    
 void literal():
 {}{
@@ -567,19 +599,20 @@ void literal():
 }    
 
 /* 5.8 Entity Declarations and Typing */
-Future<? extends ElkDeclarationAxiom> declaration():
+ElkDeclarationAxiom declaration():
 {
-  Future<? extends ElkEntity> x;  
+  ElkEntity x;  
 }{
     <DECLARATION> <OPEN_BRACE> axiomAnnotations()
     x = entity()
     <CLOSE_BRACE> {      
-      return constructor.getFutureElkDeclarationAxiom(x);
+      return objectFactory.getDeclarationAxiom(x);
     } 
 }
-Future<? extends ElkEntity> entity():
+
+ElkEntity entity():
 {
-  Future<? extends ElkEntity> x = null;
+  ElkEntity x = null;
 }{ (
     <CLASS> <OPEN_BRACE> x = clazz() <CLOSE_BRACE> 
 |   <DATATYPE> <OPEN_BRACE> datatype() <CLOSE_BRACE>
@@ -589,17 +622,19 @@ Future<? extends ElkEntity> entity():
 |   <NAMED_INDIVIDUAL> <OPEN_BRACE> namedIndividual() <CLOSE_BRACE>
    ) { return x; }
 }
+
 /* 6 Property Expressions */    
-Future<? extends ElkObjectPropertyExpression> objectPropertyExpression():
+ElkObjectPropertyExpression objectPropertyExpression():
 {
-  Future<? extends ElkObjectPropertyExpression> x;
+  ElkObjectPropertyExpression x;
 }{ (
     x = objectProperty()
 |   x = inverseObjectProperty()
    ) { return x; }
 }
+
 /* 6.1.1 Inverse Object Properties */    
-Future<? extends ElkObjectInverseOf> inverseObjectProperty():
+ElkObjectInverseOf inverseObjectProperty():
 {}{
     <OBJECT_INVERSE_OF> <OPEN_BRACE>
       objectProperty()
@@ -607,6 +642,7 @@ Future<? extends ElkObjectInverseOf> inverseObjectProperty():
       return null;
     } 
 }
+
 /* 6.2 Data Property Expressions */    
 void dataPropertyExpression():
 {}{
@@ -622,6 +658,7 @@ void dataRange():
 |   dataOneOf() 
 |   datatypeRestriction()
 }
+
 /* 7.1 Intersection of Data Ranges */    
 void dataIntersectionOf():
 {}{
@@ -630,6 +667,7 @@ void dataIntersectionOf():
       ( dataRange() )+
     <CLOSE_BRACE>
 }
+
 /* 7.2 Union of Data Ranges */
 void dataUnionOf():
 {}{
@@ -638,6 +676,7 @@ void dataUnionOf():
       ( dataRange() )+
     <CLOSE_BRACE>
 }
+
 /* 7.3 Complement of Data Ranges */    
 void dataComplementOf():
 {}{
@@ -645,6 +684,7 @@ void dataComplementOf():
       dataRange()
     <CLOSE_BRACE>
 }
+
 /* 7.4 Enumeration of Literals */
 void dataOneOf():
 {}{
@@ -652,6 +692,7 @@ void dataOneOf():
       ( literal() )+
     <CLOSE_BRACE>
 }
+
 /* 7.5 Datatype Restrictions */
 void datatypeRestriction():
 {}{
@@ -660,6 +701,7 @@ void datatypeRestriction():
         ( constrainingFacet() restrictionValue() )+ 
     <CLOSE_BRACE>
 }
+
 void constrainingFacet():
 {}{
     iri()
@@ -673,14 +715,16 @@ void constrainingFacet():
 |   <XSD_PATTERN>
 |   <RDF_LANG_RANGE>
 }
+
 void restrictionValue():
 {}{
     literal()
 }
+
 /* 8 Class Expressions */
-Future<? extends ElkClassExpression> classExpression():
+ElkClassExpression classExpression():
 {
-  Future<? extends ElkClassExpression> x = null;
+  ElkClassExpression x = null;
 }{ (
     x = clazz()      
 |   x = objectIntersectionOf()
@@ -702,21 +746,25 @@ Future<? extends ElkClassExpression> classExpression():
 |   dataExactCardinality()
    ) { return x; }
 }
+
+
 /* 8.1 Propositional Connectives and Enumeration of Individuals */
+
 /* 8.1.1 Intersection of Class Expressions */
-Future<? extends ElkObjectIntersectionOf> objectIntersectionOf():
+ElkObjectIntersectionOf objectIntersectionOf():
 {
-  Future<? extends ElkClassExpression> x;
-  Vector<Future<? extends ElkClassExpression>> v =
-      new Vector<Future<? extends ElkClassExpression>> ();  
+  ElkClassExpression x;
+  Vector<ElkClassExpression> v =
+      new Vector<ElkClassExpression> ();  
 }{
     <OBJECT_INTERSECTION_OF> <OPEN_BRACE> 
         x = classExpression() { v.add(x); }  
       ( x = classExpression() { v.add(x); } )+   
     <CLOSE_BRACE> {
-        return constructor.getFutureElkObjectIntersectionOf(v);
+        return objectFactory.getObjectIntersectionOf(v);
     }
 }
+
 /* 8.1.2 Union of Class Expressions */
 void objectUnionOf():
 {}{
@@ -725,6 +773,7 @@ void objectUnionOf():
       ( classExpression() )+
     <CLOSE_BRACE>
 }
+
 /* 8.1.3 Complement of Class Expressions */
 void objectComplementOf():
 {}{
@@ -732,6 +781,7 @@ void objectComplementOf():
       classExpression()
     <CLOSE_BRACE>
 }
+
 /* 8.1.4 Enumeration of Individuals */    
 void objectOneOf():
 {}{
@@ -739,20 +789,24 @@ void objectOneOf():
       ( individual() )+
     <CLOSE_BRACE>
 }
+
+
 /* 8.2 Object Property Restrictions */
+
 /* 8.2.1 Existential Quantification */    
-Future<? extends ElkObjectSomeValuesFrom> objectSomeValuesFrom():
+ElkObjectSomeValuesFrom objectSomeValuesFrom():
 {
-  Future<? extends ElkObjectPropertyExpression> x;
-  Future<? extends ElkClassExpression> y;
+  ElkObjectPropertyExpression x;
+  ElkClassExpression y;
 }{
     <OBJECT_SOME_VALUES_FROM> <OPEN_BRACE>
       x = objectPropertyExpression()
       y = classExpression()
     <CLOSE_BRACE> {
-      return constructor.getFutureElkObjectSomeValuesFrom(x, y);
+      return objectFactory.getObjectSomeValuesFrom(x, y);
     }
 }
+
 /* 8.2.2 Universal Quantification */
 void objectAllValuesFrom():
 {}{
@@ -761,6 +815,7 @@ void objectAllValuesFrom():
       classExpression()
     <CLOSE_BRACE>
 }
+
 /* 8.2.3 Individual Value Restriction */
 void objectHasValue():
 {}{
@@ -769,6 +824,7 @@ void objectHasValue():
       individual()
     <CLOSE_BRACE>
 }
+
 /* 8.2.4 Self-Restriction */
 void objectHasSelf():
 {}{
@@ -776,7 +832,10 @@ void objectHasSelf():
       objectPropertyExpression()
     <CLOSE_BRACE>
 }
+
+
 /* 8.3 Object Property Cardinality Restrictions */
+
 /* 8.3.1 Minimum Cardinality */
 void objectMinCardinality():
 {}{
@@ -786,6 +845,7 @@ void objectMinCardinality():
         ( classExpression() )? 
     <CLOSE_BRACE>
 }
+
 /* 8.3.2 Maximum Cardinality */
 void objectMaxCardinality():
 {}{
@@ -795,6 +855,7 @@ void objectMaxCardinality():
         ( classExpression() )? 
     <CLOSE_BRACE>
 }
+
 /* 8.3.3 Exact Cardinality */    
 void objectExactCardinality():
 {}{
@@ -804,7 +865,10 @@ void objectExactCardinality():
         ( classExpression() )? 
     <CLOSE_BRACE>
 }
+
+
 /* 8.4 Data Property Restrictions */
+
 /* 8.4.1 Existential Quantification */
 void dataSomeValuesFrom():
 {}{    
@@ -813,6 +877,7 @@ void dataSomeValuesFrom():
       dataRange()
     <CLOSE_BRACE>
 }
+
 /* 8.4.2 Universal Quantification */
 void dataAllValuesFrom():
 {}{    
@@ -821,6 +886,7 @@ void dataAllValuesFrom():
       dataRange()
     <CLOSE_BRACE>
 }
+
 /* 8.4.3 Literal Value Restriction */
 void dataHasValue():
 {}{
@@ -829,7 +895,10 @@ void dataHasValue():
       literal()
     <CLOSE_BRACE>
 }
+
+
 /* 8.5 Data Property Cardinality Restrictions */
+
 /* 8.5.1 Minimum Cardinality */
 void dataMinCardinality():
 {}{
@@ -839,6 +908,7 @@ void dataMinCardinality():
         ( dataRange() )? 
     <CLOSE_BRACE>
 }
+
 /* 8.5.2 Maximum Cardinality */
 void dataMaxCardinality():
 {}{
@@ -848,6 +918,7 @@ void dataMaxCardinality():
         ( dataRange() )? 
     <CLOSE_BRACE>
 }
+
 /* 8.5.3 Exact Cardinality */
 void dataExactCardinality():
 {}{
@@ -857,10 +928,12 @@ void dataExactCardinality():
         ( dataRange() )? 
     <CLOSE_BRACE>
 }
+
+
 /* 9 Axioms */
-Future<? extends ElkAxiom> axiom():
+ElkAxiom axiom():
 {
-  Future<? extends ElkAxiom> x = null;
+  ElkAxiom x = null;
 }{ (
     declaration()
 |   x = classAxiom()   
@@ -875,11 +948,12 @@ Future<? extends ElkAxiom> axiom():
 void axiomAnnotations():
 {}{
     ( annotation() )*
-}    
+}
+
 /* 9.1 Class Expression Axioms */    
-Future<? extends ElkClassAxiom> classAxiom():
+ElkClassAxiom classAxiom():
 {
-  Future<? extends ElkClassAxiom> x = null;
+  ElkClassAxiom x = null;
 }{ (
     x = subClassOf() 
 |   x = equivalentClasses() 
@@ -887,34 +961,37 @@ Future<? extends ElkClassAxiom> classAxiom():
 |   disjointUnion()
    ) { return x; }
 }
+
 /* 9.1.1 Subclass Axioms */
-Future<? extends ElkSubClassOfAxiom> subClassOf():
+ElkSubClassOfAxiom subClassOf():
 {
-  Future<? extends ElkClassExpression> x, y;
+  ElkClassExpression x, y;
 }{
     <SUB_CLASS_OF> <OPEN_BRACE> 
         axiomAnnotations() 
         x = classExpression() 
         y = classExpression() 
     <CLOSE_BRACE> {
-      return constructor.getFutureElkSubClassOfAxiom(x, y);
+      return objectFactory.getSubClassOfAxiom(x, y);
     }    
 }
+
 /* 9.1.2 Equivalent Classes */
-Future<? extends ElkEquivalentClassesAxiom> equivalentClasses():
+ElkEquivalentClassesAxiom equivalentClasses():
 {
-  Future<? extends ElkClassExpression> x;
-  Vector<Future<? extends ElkClassExpression>> v =
-      new Vector<Future<? extends ElkClassExpression>> ();
+  ElkClassExpression x;
+  Vector<ElkClassExpression> v =
+      new Vector<ElkClassExpression> ();
 }{
     <EQUIVALENT_CLASSES> <OPEN_BRACE> 
         axiomAnnotations() 
           x = classExpression() { v.add(x); }
         ( x = classExpression() { v.add(x); } )+ 
     <CLOSE_BRACE> {
-      return constructor.getFutureElkEquivalentClassesAxiom(v);
+      return objectFactory.getEquivalentClassesAxiom(v);
     }    
 }
+
 /* 9.1.3 Disjoint Classes */
 void disjointClasses():
 {}{
@@ -924,6 +1001,7 @@ void disjointClasses():
         ( classExpression() )+ 
     <CLOSE_BRACE>
 }
+
 /* 9.1.4 Disjoint Union of Class Expressions */
 void disjointUnion():
 {}{
@@ -933,14 +1011,16 @@ void disjointUnion():
       disjointClassExpressions()
     <CLOSE_BRACE>
 }
+
 void disjointClassExpressions():
 {}{
     classExpression() ( classExpression() )+
 }
+
 /* 9.2 Object Property Axioms */    
-Future<? extends ElkObjectPropertyAxiom> objectPropertyAxiom():
+ElkObjectPropertyAxiom objectPropertyAxiom():
 {
-    Future<? extends ElkObjectPropertyAxiom> x = null;
+    ElkObjectPropertyAxiom x = null;
 }{ (
     x = subObjectPropertyOf() 
 |   equivalentObjectProperties()
@@ -957,11 +1037,12 @@ Future<? extends ElkObjectPropertyAxiom> objectPropertyAxiom():
 |   x = transitiveObjectProperty()
    ) { return x; }
 }
+
 /* 9.2.1 Object Subproperties */
-Future<? extends ElkSubObjectPropertyOfAxiom> subObjectPropertyOf():
+ElkSubObjectPropertyOfAxiom subObjectPropertyOf():
 {
-  Future<? extends ElkSubObjectPropertyExpression> x = null;
-  Future<? extends ElkObjectPropertyExpression> z;
+  ElkSubObjectPropertyExpression x = null;
+  ElkObjectPropertyExpression z;
 }{
     <SUB_OBJECT_PROPERTY_OF> <OPEN_BRACE> 
         axiomAnnotations() 
@@ -971,22 +1052,24 @@ Future<? extends ElkSubObjectPropertyOfAxiom> subObjectPropertyOf():
         ) 
         z = objectPropertyExpression() 
     <CLOSE_BRACE> {
-        return constructor.getFutureElkSubObjectPropertyOfAxiom(x, z);
+        return objectFactory.getSubObjectPropertyOfAxiom(x, z);
     }
 }
-Future<? extends ElkObjectPropertyChain> propertyExpressionChain():
+
+ElkObjectPropertyChain propertyExpressionChain():
 {
-  Future<? extends ElkObjectPropertyExpression> x;
-  Vector<Future<? extends ElkObjectPropertyExpression>> v = 
-             new Vector<Future<? extends ElkObjectPropertyExpression>> (2);
+  ElkObjectPropertyExpression x;
+  Vector<ElkObjectPropertyExpression> v = 
+             new Vector<ElkObjectPropertyExpression> (2);
 }{
     <OBJECT_PROPERTY_CHAIN> <OPEN_BRACE> 
           x = objectPropertyExpression() { v.add(x); }        
         ( x = objectPropertyExpression() { v.add(x); } )+ 
     <CLOSE_BRACE> {
-      return constructor.getFutureElkObjectPropertyChain(v);  
+      return objectFactory.getObjectPropertyChain(v);  
     }
 }
+
 /* 9.2.2 Equivalent Object Properties */    
 void equivalentObjectProperties():
 {}{
@@ -996,6 +1079,7 @@ void equivalentObjectProperties():
         ( objectPropertyExpression() )+ 
     <CLOSE_BRACE>
 }
+
 /* 9.2.3 Disjoint Object Properties */
 void disjointObjectProperties():
 {}{
@@ -1005,6 +1089,7 @@ void disjointObjectProperties():
         ( objectPropertyExpression() )+ 
     <CLOSE_BRACE>
 }
+
 /* 9.2.4 Inverse Object Properties */
 void inverseObjectProperties():
 {}{
@@ -1014,6 +1099,7 @@ void inverseObjectProperties():
         objectPropertyExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.2.5 Object Property Domain */
 void objectPropertyDomain():
 {}{
@@ -1023,6 +1109,7 @@ void objectPropertyDomain():
         classExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.2.6 Object Property Range */        
 void objectPropertyRange():
 {}{
@@ -1032,6 +1119,7 @@ void objectPropertyRange():
         classExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.2.7 Functional Object Properties */
 void functionalObjectProperty():
 {}{
@@ -1040,6 +1128,7 @@ void functionalObjectProperty():
         objectPropertyExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.2.8 Inverse-Functional Object Properties */    
 void inverseFunctionalObjectProperty():
 {}{
@@ -1048,6 +1137,7 @@ void inverseFunctionalObjectProperty():
         objectPropertyExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.2.9 Reflexive Object Properties */
 void reflexiveObjectProperty():
 {}{
@@ -1056,6 +1146,7 @@ void reflexiveObjectProperty():
         objectPropertyExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.2.10 Irreflexive Object Properties */
 void irreflexiveObjectProperty():
 {}{
@@ -1064,6 +1155,7 @@ void irreflexiveObjectProperty():
         objectPropertyExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.2.11 Symmetric Object Properties */
 void symmetricObjectProperty():
 {}{
@@ -1072,6 +1164,7 @@ void symmetricObjectProperty():
         objectPropertyExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.2.12 Asymmetric Object Properties */
 void asymmetricObjectProperty():
 {}{
@@ -1080,18 +1173,20 @@ void asymmetricObjectProperty():
         objectPropertyExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.2.13 Transitive Object Properties */
-Future<? extends ElkTransitiveObjectPropertyAxiom> transitiveObjectProperty():
+ElkTransitiveObjectPropertyAxiom transitiveObjectProperty():
 {
-    Future<? extends ElkObjectPropertyExpression> x; 
+    ElkObjectPropertyExpression x; 
 }{  
     <TRANSITIVE_OBJECT_PROPERTY> <OPEN_BRACE> 
         axiomAnnotations() 
         x = objectPropertyExpression() 
     <CLOSE_BRACE>{
-        return constructor.getFutureElkTransitiveObjectPropertyAxiom(x);
+        return objectFactory.getTransitiveObjectPropertyAxiom(x);
     } 
 }
+
 /* 9.3 Data Property Axioms */    
 void dataPropertyAxiom():
 {}{
@@ -1102,6 +1197,7 @@ void dataPropertyAxiom():
 |   dataPropertyRange() 
 |   functionalDataProperty()
 }
+
 /* 9.3.1 Data Subproperties */
 void subDataPropertyOf():
 {}{
@@ -1110,15 +1206,18 @@ void subDataPropertyOf():
         subDataPropertyExpression() 
         superDataPropertyExpression() 
     <CLOSE_BRACE>
-}    
+}
+
 void subDataPropertyExpression():
 {}{
     dataPropertyExpression()
 }
+
 void superDataPropertyExpression():
 {}{
     dataPropertyExpression()
 }
+
 /* 9.3.2 Equivalent Data Properties */
 void equivalentDataProperties():
 {}{
@@ -1128,6 +1227,7 @@ void equivalentDataProperties():
         ( dataPropertyExpression() )+ 
     <CLOSE_BRACE>
 }
+
 /* 9.3.3 Disjoint Data Properties */
 void disjointDataProperties():
 {}{
@@ -1137,6 +1237,7 @@ void disjointDataProperties():
         ( dataPropertyExpression() )+ 
     <CLOSE_BRACE>
 }
+
 /* 9.3.4 Data Property Domain */
 void dataPropertyDomain():
 {}{
@@ -1146,6 +1247,7 @@ void dataPropertyDomain():
         classExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.3.5 Data Property Range */
 void dataPropertyRange():
 {}{
@@ -1155,6 +1257,7 @@ void dataPropertyRange():
         dataRange() 
     <CLOSE_BRACE>
 }
+
 /* 9.3.6 Functional Data Properties */
 void functionalDataProperty():
 {}{
@@ -1163,6 +1266,7 @@ void functionalDataProperty():
         dataPropertyExpression() 
     <CLOSE_BRACE>
 }
+
 /* 9.4 Datatype Definitions */
 void datatypeDefinition():
 {}{
@@ -1172,6 +1276,7 @@ void datatypeDefinition():
       dataRange()
     <CLOSE_BRACE>
 }
+
 /* 9.5 Keys */
 void hasKey():
 {}{
@@ -1182,6 +1287,7 @@ void hasKey():
         <OPEN_BRACE> ( dataPropertyExpression() )* <CLOSE_BRACE> 
     <CLOSE_BRACE>
 }
+
 /* 9.6 Assertions */    
 void assertion():
 {}{
@@ -1193,18 +1299,22 @@ void assertion():
 |   dataPropertyAssertion() 
 |   negativeDataPropertyAssertion()
 }
+
 void sourceIndividual():
 {}{
     individual()
 }
+
 void targetIndividual():
 {}{
     individual()
 }
+
 void targetValue():
 {}{
     literal()
 }
+
 /* 9.6.1 Individual Equality */
 void sameIndividual():
 {}{
@@ -1214,6 +1324,7 @@ void sameIndividual():
       ( individual() )+
     <CLOSE_BRACE>
 }
+
 /* 9.6.2 Individual Inequality */
 void differentIndividuals():
 {}{
@@ -1223,6 +1334,7 @@ void differentIndividuals():
       ( individual() )+
     <CLOSE_BRACE>
 }
+
 /* 9.6.3 Class Assertions */
 void classAssertion():
 {}{
@@ -1232,6 +1344,7 @@ void classAssertion():
       individual()
     <CLOSE_BRACE>
 }
+
 /* 9.6.4 Positive Object Property Assertions */
 void objectPropertyAssertion():
 {}{
@@ -1242,6 +1355,7 @@ void objectPropertyAssertion():
         targetIndividual() 
     <CLOSE_BRACE>
 }
+
 /* 9.6.5 Negative Object Property Assertions */
 void negativeObjectPropertyAssertion():
 {}{
@@ -1252,6 +1366,7 @@ void negativeObjectPropertyAssertion():
         targetIndividual() 
     <CLOSE_BRACE>
 }
+
 /* 9.6.6 Positive Data Property Assertions */
 void dataPropertyAssertion():
 {}{
@@ -1262,6 +1377,7 @@ void dataPropertyAssertion():
         targetValue() 
     <CLOSE_BRACE>
 }
+
 /* 9.6.7 Negative Data Property Assertions */
 void negativeDataPropertyAssertion():
 {}{
@@ -1272,7 +1388,10 @@ void negativeDataPropertyAssertion():
         targetValue() 
     <CLOSE_BRACE>
 }
+
+
 /* 10 Annotations */
+
 /* 10.1 Annotations of Ontologies, Axioms, and other Annotations */
 void annotation():
 {}{
@@ -1282,14 +1401,17 @@ void annotation():
         annotationValue() 
     <CLOSE_BRACE>
 }
+
 void annotationAnnotations():
 {}{
     ( annotation() )*
 }
+
 void annotationValue():
 {}{
     anonymousIndividual() | iri() | literal()
 }
+
 /* 10.2 Annotation Axioms */    
 void annotationAxiom():
 {}{
@@ -1298,6 +1420,7 @@ void annotationAxiom():
 |   annotationPropertyDomain() 
 |   annotationPropertyRange()
 }
+
 /* 10.2.1 Annotation Assertion */
 void annotationAssertion():
 {}{
@@ -1308,10 +1431,12 @@ void annotationAssertion():
         annotationValue() 
     <CLOSE_BRACE>
 }
+
 void annotationSubject():
 {}{
     iri() | anonymousIndividual()
 }
+
 /* 10.2.2 Annotation Subproperties */
 void subAnnotationPropertyOf():
 {}{
@@ -1321,14 +1446,17 @@ void subAnnotationPropertyOf():
         superAnnotationProperty() 
     <CLOSE_BRACE>
 }
+
 void subAnnotationProperty():
 {}{
     annotationProperty()
 }
+
 void superAnnotationProperty():
 {}{
     annotationProperty()
 }
+
 /* 10.2.3 Annotation Property Domain */
 void annotationPropertyDomain():
 {}{
@@ -1338,6 +1466,7 @@ void annotationPropertyDomain():
       iri()
     <CLOSE_BRACE>
 }
+
 /* 10.2.4 Annotation Property Range */
 void annotationPropertyRange():
 {}{

@@ -95,8 +95,36 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	protected final ElkObjectManager objectManager;
 
+	/**
+	 * Construct an ElkObjectFactoryImpl that avoids duplicates of objects and
+	 * rather reuses previously generated objects when possible.
+	 */
 	public ElkObjectFactoryImpl() {
 		this.objectManager = new WeakCanonicalSet();
+	}
+
+	/**
+	 * Construct an ElkObjectFactoryImpl that uses the given object manager for
+	 * handling objects. The object manager can be used to manage global object
+	 * references, especially to avoid duplicates. Multiple factories can share
+	 * one manager if desired. An instance of ElkDummyObjectManager can be used
+	 * to ignore duplicates.
+	 * 
+	 * @param objectManager
+	 *            object manager to be used
+	 */
+	public ElkObjectFactoryImpl(ElkObjectManager objectManager) {
+		this.objectManager = objectManager;
+	}
+
+	/**
+	 * Obtain access to the classes object manager. Can be used to share the
+	 * same object manager among multiple factories.
+	 * 
+	 * @return
+	 */
+	public ElkObjectManager getObjectManager() {
+		return objectManager;
 	}
 
 	public ElkClass getClass(String iri) {

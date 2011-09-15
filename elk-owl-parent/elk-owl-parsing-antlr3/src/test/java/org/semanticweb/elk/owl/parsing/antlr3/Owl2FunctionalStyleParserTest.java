@@ -26,30 +26,29 @@
 package org.semanticweb.elk.owl.parsing.antlr3;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.UnbufferedTokenStream;
+import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.parsing.FutureElkAxiomConsumer;
 
 /**
  * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public class Owl2FunctionalStyleParserTest extends TestCase {
 	public Owl2FunctionalStyleParserTest(String testName) {
 		super(testName);
 	}
 
-	class DummyFutureElkAxiomConsumer implements FutureElkAxiomConsumer {
-		public void submit(Future<? extends ElkAxiom> futureAxiom) {
+	class DummyElkAxiomProcessor implements ElkAxiomProcessor {
+		public void process(ElkAxiom axiom) {
 		}
 	}
 
@@ -59,7 +58,7 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 				new ANTLRStringStream(testString));
 		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
-		parser.ontologyDocument(new DummyFutureElkAxiomConsumer());
+		parser.ontologyDocument(new DummyElkAxiomProcessor());
 	}
 
 	public void testOntologyDocument() {
@@ -92,7 +91,7 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 				new ANTLRStringStream(testString));
 		UnbufferedTokenStream tokens = new UnbufferedTokenStream(lex);
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(tokens);
-		return parser.clazz().get();
+		return parser.clazz();
 	}
 
 	public void testClazz() throws InterruptedException, ExecutionException {
