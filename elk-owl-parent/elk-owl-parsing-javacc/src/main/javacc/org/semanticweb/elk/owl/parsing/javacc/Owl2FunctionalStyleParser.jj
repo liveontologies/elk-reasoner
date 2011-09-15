@@ -1225,12 +1225,10 @@ Vector<ElkObjectPropertyExpression> objectPropertyExpressionList():
 	ElkObjectPropertyExpression x;
 	Vector<ElkObjectPropertyExpression> v = 
 		new Vector<ElkObjectPropertyExpression> ();
-}{ 
-		x = objectPropertyExpression() { v.add(x); }        
-		( x = objectPropertyExpression() { v.add(x); } )+ 
-	{
-		return v;  
-	}
+}{
+	x = objectPropertyExpression() { v.add(x); }
+	( x = objectPropertyExpression() { v.add(x); } )+ 
+	{ return v;	}
 }
 
 /* 9.2.4 Inverse Object Properties */
@@ -1539,12 +1537,9 @@ Vector<ElkIndividual> individualList():
 	Vector<ElkIndividual> v = 
 		new Vector<ElkIndividual> ();
 }{
-	<OBJECT_PROPERTY_CHAIN> <OPEN_BRACE> 
-		x = individual() { v.add(x); }        
-		( x = individual() { v.add(x); } )+ 
-	<CLOSE_BRACE> {
-		return v;  
-	}
+	x = individual() { v.add(x); }
+	( x = individual() { v.add(x); } )+ 
+	{ return v;	}
 }
 
 /* 9.6.3 Class Assertions */
