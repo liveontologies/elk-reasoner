@@ -25,17 +25,14 @@ package org.semanticweb.elk.reasoner.saturation;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
+import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.implementation.FutureElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.FutureElkObjectFactory;
-import org.semanticweb.elk.owl.parsing.ConcurrentFutureElkAxiomLoader;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
@@ -43,7 +40,6 @@ import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
 public class ConcurrentSaturatorTest extends TestCase {
 
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-	final FutureElkObjectFactory constructor = new FutureElkObjectFactoryImpl(objectFactory);
 
 	public ConcurrentSaturatorTest(String testName) {
 		super(testName);
@@ -51,34 +47,26 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 	public void testExistentials() throws InterruptedException,
 			ExecutionException {
-		Future<ElkClass> a = constructor.getFutureElkClass("A");
-		Future<ElkClass> b = constructor.getFutureElkClass("B");
-		Future<ElkClass> c = constructor.getFutureElkClass("C");
-		Future<ElkClass> d = constructor.getFutureElkClass("D");
-		Future<ElkObjectProperty> r = constructor
-				.getFutureElkObjectProperty("R");
-		Future<ElkObjectProperty> s = constructor
-				.getFutureElkObjectProperty("S");
+		ElkClass a = objectFactory.getClass(":A");
+		ElkClass b = objectFactory.getClass(":B");
+		ElkClass c = objectFactory.getClass(":C");
+		ElkClass d = objectFactory.getClass(":D");
+		ElkObjectProperty r = objectFactory.getObjectProperty("R");
+		ElkObjectProperty s = objectFactory.getObjectProperty("S");
 
 		OntologyIndex ontologyIndex = new SerialOntologyIndex();
 
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		final ConcurrentFutureElkAxiomLoader indexComputation = new ConcurrentFutureElkAxiomLoader(
-				executor, 8, ontologyIndex.getAxiomInserter());
-		indexComputation.submit(constructor.getFutureElkEquivalentClassesAxiom(
-				b, c));
-		indexComputation.submit(constructor.getFutureElkSubClassOfAxiom(a,
-				constructor.getFutureElkObjectSomeValuesFrom(r, b)));
-		indexComputation.submit(constructor.getFutureElkSubClassOfAxiom(
-				constructor.getFutureElkObjectSomeValuesFrom(s, c), d));
-		indexComputation.submit(constructor
-				.getFutureElkSubObjectPropertyOfAxiom(r, s));
-		indexComputation.waitCompletion();
+		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
+		inserter.process(objectFactory.getEquivalentClassesAxiom(b, c));
+		inserter.process(objectFactory.getSubClassOfAxiom(a,
+				objectFactory.getObjectSomeValuesFrom(r, b)));
+		inserter.process(objectFactory.getSubClassOfAxiom(
+				objectFactory.getObjectSomeValuesFrom(s, c), d));
+		inserter.process(objectFactory.getSubObjectPropertyOfAxiom(r, s));
 
-		IndexedClassExpression A = ontologyIndex.getIndexedClassExpression(a
-				.get());
-		IndexedClassExpression D = ontologyIndex.getIndexedClassExpression(d
-				.get());
+		IndexedClassExpression A = ontologyIndex.getIndexedClassExpression(a);
+		IndexedClassExpression D = ontologyIndex.getIndexedClassExpression(d);
 
 		final ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
 				executor, 16, ontologyIndex);
@@ -99,33 +87,27 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 	public void testConjunctions() throws InterruptedException,
 			ExecutionException {
-		Future<ElkClass> a = constructor.getFutureElkClass("A");
-		Future<ElkClass> b = constructor.getFutureElkClass("B");
-		Future<ElkClass> c = constructor.getFutureElkClass("C");
-		Future<ElkClass> d = constructor.getFutureElkClass("D");
+		ElkClass a = objectFactory.getClass(":A");
+		ElkClass b = objectFactory.getClass(":B");
+		ElkClass c = objectFactory.getClass(":C");
+		ElkClass d = objectFactory.getClass(":D");
 
 		final OntologyIndex ontologyIndex = new SerialOntologyIndex();
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		final ConcurrentFutureElkAxiomLoader indexingManager = new ConcurrentFutureElkAxiomLoader(
-				executor, 8, ontologyIndex.getAxiomInserter());
+		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 
-		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(a, b));
-		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(a, c));
-		indexingManager.submit(constructor.getFutureElkSubClassOfAxiom(
-				constructor.getFutureElkObjectIntersectionOf(b, c), d));
-		indexingManager.waitCompletion();
+		inserter.process(objectFactory.getSubClassOfAxiom(a, b));
+		inserter.process(objectFactory.getSubClassOfAxiom(a, c));
+		inserter.process(objectFactory.getSubClassOfAxiom(
+				objectFactory.getObjectIntersectionOf(b, c), d));
 
-		IndexedClassExpression A = ontologyIndex.getIndexedClassExpression(a
-				.get());
-		IndexedClassExpression B = ontologyIndex.getIndexedClassExpression(b
-				.get());
-		IndexedClassExpression C = ontologyIndex.getIndexedClassExpression(c
-				.get());
-		IndexedClassExpression D = ontologyIndex.getIndexedClassExpression(d
-				.get());
+		IndexedClassExpression A = ontologyIndex.getIndexedClassExpression(a);
+		IndexedClassExpression B = ontologyIndex.getIndexedClassExpression(b);
+		IndexedClassExpression C = ontologyIndex.getIndexedClassExpression(c);
+		IndexedClassExpression D = ontologyIndex.getIndexedClassExpression(d);
 		IndexedClassExpression I = ontologyIndex
-				.getIndexedClassExpression(constructor
-						.getFutureElkObjectIntersectionOf(b, c).get());
+				.getIndexedClassExpression(objectFactory
+						.getObjectIntersectionOf(b, c));
 
 		assertTrue("A SubClassOf B",
 				A.getToldSuperClassExpressions().contains(B));

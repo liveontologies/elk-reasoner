@@ -24,20 +24,16 @@ package org.semanticweb.elk.reasoner;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.implementation.FutureElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.FutureElkObjectFactory;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassNode;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
-import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -45,7 +41,6 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 public class ReasonerTest extends TestCase {
 
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-	final FutureElkObjectFactory constructor = new FutureElkObjectFactoryImpl(objectFactory);
 
 	public ReasonerTest(String testName) {
 		super(testName);
@@ -64,12 +59,10 @@ public class ReasonerTest extends TestCase {
 				+ ")"//
 		);
 
-		ElkClass a = constructor.getFutureElkClass(":A").get();
-		ElkClass d = constructor.getFutureElkClass(":D").get();
-		ElkObjectProperty r = constructor.getFutureElkObjectProperty(":R")
-				.get();
-		ElkObjectProperty s = constructor.getFutureElkObjectProperty(":S")
-				.get();
+		ElkClass a = objectFactory.getClass(":A");
+		ElkClass d = objectFactory.getClass(":D");
+		ElkObjectProperty r = objectFactory.getObjectProperty(":R");
+		ElkObjectProperty s = objectFactory.getObjectProperty(":S");
 
 		reasoner.classify();
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
@@ -93,19 +86,19 @@ public class ReasonerTest extends TestCase {
 				+ "SubClassOf(:A :C)" + "SubClassOf(:A :D)"
 				+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)" + ")");
 
-		Future<ElkClass> a = constructor.getFutureElkClass(":A");
-		Future<ElkClass> b = constructor.getFutureElkClass(":B");
-		Future<ElkClass> c = constructor.getFutureElkClass(":C");
-		Future<ElkClass> d = constructor.getFutureElkClass(":D");
-		Future<ElkClass> e = constructor.getFutureElkClass(":E");
+		ElkClass a = objectFactory.getClass(":A");
+		ElkClass b = objectFactory.getClass(":B");
+		ElkClass c = objectFactory.getClass(":C");
+		ElkClass d = objectFactory.getClass(":D");
+		ElkClass e = objectFactory.getClass(":E");
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
-		IndexedClassExpression A = index.getIndexedClassExpression(a.get());
-		IndexedClassExpression B = index.getIndexedClassExpression(b.get());
-		IndexedClassExpression C = index.getIndexedClassExpression(c.get());
-		IndexedClassExpression D = index.getIndexedClassExpression(d.get());
-		IndexedClassExpression E = index.getIndexedClassExpression(e.get());
+		IndexedClassExpression A = index.getIndexedClassExpression(a);
+		IndexedClassExpression B = index.getIndexedClassExpression(b);
+		IndexedClassExpression C = index.getIndexedClassExpression(c);
+		IndexedClassExpression D = index.getIndexedClassExpression(d);
+		IndexedClassExpression E = index.getIndexedClassExpression(e);
 
 		assertTrue("A SubClassOf B",
 				A.getToldSuperClassExpressions().contains(B));
@@ -119,17 +112,17 @@ public class ReasonerTest extends TestCase {
 		reasoner.classify();
 
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
-		ClassNode aNode = taxonomy.getNode(a.get());
+		ClassNode aNode = taxonomy.getNode(a);
 
-		assertTrue("A contains A", aNode.getMembers().contains(a.get()));
+		assertTrue("A contains A", aNode.getMembers().contains(a));
 		assertTrue("A contains B",
-				aNode.getDirectSuperNodes().contains(taxonomy.getNode(b.get())));
+				aNode.getDirectSuperNodes().contains(taxonomy.getNode(b)));
 		assertTrue("A contains C",
-				aNode.getDirectSuperNodes().contains(taxonomy.getNode(c.get())));
+				aNode.getDirectSuperNodes().contains(taxonomy.getNode(c)));
 		assertTrue("A contains D",
-				aNode.getDirectSuperNodes().contains(taxonomy.getNode(d.get())));
+				aNode.getDirectSuperNodes().contains(taxonomy.getNode(d)));
 		assertTrue("A contains E",
-				aNode.getDirectSuperNodes().contains(taxonomy.getNode(e.get())));
+				aNode.getDirectSuperNodes().contains(taxonomy.getNode(e)));
 	}
 	
 	public void testPropertyChains() throws ParseException, IOException {
@@ -163,17 +156,17 @@ public class ReasonerTest extends TestCase {
 				+ "SubClassOf(:A :C)" + "SubClassOf(:B :D)"
 				+ "SubClassOf(:C :D))");
 
-		Future<ElkClass> a = constructor.getFutureElkClass(":A");
-		Future<ElkClass> b = constructor.getFutureElkClass(":B");
-		Future<ElkClass> c = constructor.getFutureElkClass(":C");
-		Future<ElkClass> d = constructor.getFutureElkClass(":D");
+		ElkClass a = objectFactory.getClass(":A");
+		ElkClass b = objectFactory.getClass(":B");
+		ElkClass c = objectFactory.getClass(":C");
+		ElkClass d = objectFactory.getClass(":D");
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
-		IndexedClassExpression A = index.getIndexedClassExpression(a.get());
-		IndexedClassExpression B = index.getIndexedClassExpression(b.get());
-		IndexedClassExpression C = index.getIndexedClassExpression(c.get());
-		IndexedClassExpression D = index.getIndexedClassExpression(d.get());
+		IndexedClassExpression A = index.getIndexedClassExpression(a);
+		IndexedClassExpression B = index.getIndexedClassExpression(b);
+		IndexedClassExpression C = index.getIndexedClassExpression(c);
+		IndexedClassExpression D = index.getIndexedClassExpression(d);
 
 		assertTrue("A SubClassOf B",
 				A.getToldSuperClassExpressions().contains(B));
@@ -187,22 +180,22 @@ public class ReasonerTest extends TestCase {
 		reasoner.classify();
 
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
-		ClassNode aNode = taxonomy.getNode(a.get());
-		ClassNode bNode = taxonomy.getNode(b.get());
+		ClassNode aNode = taxonomy.getNode(a);
+		ClassNode bNode = taxonomy.getNode(b);
 
-		assertTrue("A contains A", aNode.getMembers().contains(a.get()));
+		assertTrue("A contains A", aNode.getMembers().contains(a));
 		assertTrue("A direct subclass of B", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(b.get())));
+				.contains(taxonomy.getNode(b)));
 		assertTrue("A direct subclass of C", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(c.get())));
+				.contains(taxonomy.getNode(c)));
 		assertFalse("A not direct subclass of D", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(d.get())));
+				.contains(taxonomy.getNode(d)));
 		assertTrue("B direct subclass of D", bNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(d.get())));
+				.contains(taxonomy.getNode(d)));
 		assertTrue("A indirect subclass of B", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(b.get())));
+				.contains(taxonomy.getNode(b)));
 		assertTrue("A indirect subclass of D", aNode.getAllSuperNodes()
-				.contains(taxonomy.getNode(d.get())));
+				.contains(taxonomy.getNode(d)));
 		assertEquals("A has exactly two direct super-classes", 2, aNode
 				.getDirectSuperNodes().size());
 		assertEquals("A has exactly four super-classes: B, C, D and owl:Thing",
