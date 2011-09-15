@@ -35,12 +35,6 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<artifactSet>
-								<excludes>
-									<exclude>org.antlr:*</exclude>
-									<exclude>antlr:*</exclude>
-								</excludes>
-							</artifactSet>
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
