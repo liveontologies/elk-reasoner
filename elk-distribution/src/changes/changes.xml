@@ -16,6 +16,9 @@ will appear in the produced result.
 	</properties>
 	<body>
 		<release version="${release.version}" date="${buildDate}" description="Subsequent release">
+			<action dev="markus" type="add">
+				Support for object property domain axioms.
+			</action>
 			<action dev="frantisek" type="add">
 				Support for object property chain inclusion axioms.
 			</action>
