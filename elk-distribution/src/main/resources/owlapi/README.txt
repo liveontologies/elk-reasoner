@@ -1,7 +1,7 @@
 ELK is an ontology reasoner that aims to support the OWL 2 EL profile.
 See ${project.parent.url} for further information.
 
-ELK plug-in for Protege is Copyright (c) ${project.inceptionYear} 
+ELK Reasoner is Copyright (c) ${project.inceptionYear} 
 ${project.organization.name}
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,16 +16,20 @@ ${project.organization.name}
    See the License for the specific language governing permissions and
    limitations under the License.
 
+ABOUT:
+
+This package contains a Java library for accessing ELK Reasoner through 
+OWL API plus all third party libraries used by ELK, except for the 
+OWL API itself. The OWL API library can be obtained here:
+
+    http://owlapi.sourceforge.net/
+
 REQUIREMENTS:
 
-ELK plug-in is tested to work with Protege v.4.1. It may work with other 
-versions of Protege.
+ELK OWL API bindings are tested to work with OWL API v.3.2.4. It may work 
+with other versions of OWL API.
 
 INSTALLATION:
 
-To install, place the file ${project.groupId}.jar to the plugins folder
-of the Protege installation. The plug-in supports Protege 4 Auto Update 
-feature which can be used for upgrading to newer versions according to the 
-instructions here:
-
-    http://protegewiki.stanford.edu/wiki/EnablePluginAutoUpdate
+To use the library make sure that Java finds ${project.groupId}.jar, and
+the third party libraries in the class path.

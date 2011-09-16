@@ -26,6 +26,26 @@
 			<version>0.2.0-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-owlapi-standalone</artifactId>
+			<version>0.2.0-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-owlapi-standalone</artifactId>
+			<version>0.2.0-SNAPSHOT</version>
+			<type>jar</type>
+			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-owlapi-standalone</artifactId>
+			<version>0.2.0-SNAPSHOT</version>
+			<type>jar</type>
+			<classifier>lib</classifier>
+		</dependency>
 	</dependencies>
 
 	<properties>
@@ -37,6 +57,10 @@
 		<protege-zip.name>
 			elk-protege-${project.version}
 		</protege-zip.name>
+		<!-- the base name of the zip file for elk-owlapi-standalone distribution -->
+		<owlapi-zip.name>
+			elk-owlapi-${project.version}
+		</owlapi-zip.name>
 		<!-- the following timestamp and release.version properties are used for 
 			the current release information changes.xml file -->
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
@@ -198,6 +222,22 @@
 							</descriptors>
 						</configuration>
 					</execution>
+					<execution>
+						<!-- creating the distribution archive for elk-owlapi-standalone -->
+						<id>create-owlapi-zip</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>${owlapi-zip.name}</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<!-- configuration file describing how to create the archive -->
+								<descriptor>${basedir}/src/main/assembly/owlapi-zip.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -233,6 +273,16 @@
 						<upload>
 							<file>${project.build.directory}/${protege-zip.name}.zip</file>
 							<summary>ELK reasoner Protege plugin version ${project.version}</summary>
+							<labels>
+								<label>Featured</label>
+								<label>OpSys-All</label>
+								<label>Type-Archive</label>
+							</labels>
+						</upload>
+						<upload>
+							<file>${project.build.directory}/${owlapi-zip.name}.zip</file>
+							<summary>ELK reasoner library for OWL API version
+								${project.version}</summary>
 							<labels>
 								<label>Featured</label>
 								<label>OpSys-All</label>

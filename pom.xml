@@ -15,6 +15,7 @@
 		<module>elk-cli</module>
 		<module>elk-standalone</module>
 		<module>elk-distribution</module>
+		<module>elk-owlapi-standalone</module>
 	</modules>
 
 	<name>ELK</name>
