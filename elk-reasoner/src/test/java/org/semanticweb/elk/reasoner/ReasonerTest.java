@@ -56,11 +56,13 @@ public class ReasonerTest extends TestCase {
 				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 				+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"//
 				+ "SubObjectPropertyOf(:R :S)"//
+				+ "ObjectPropertyDomain(:S :E)"//
 				+ ")"//
 		);
 
 		ElkClass a = objectFactory.getClass(":A");
 		ElkClass d = objectFactory.getClass(":D");
+		ElkClass e = objectFactory.getClass(":E");
 		ElkObjectProperty r = objectFactory.getObjectProperty(":R");
 		ElkObjectProperty s = objectFactory.getObjectProperty(":S");
 
@@ -76,6 +78,8 @@ public class ReasonerTest extends TestCase {
 		assertTrue("S superrole R", S.getToldSubObjectProperties().contains(R));
 		assertTrue("A contains D", taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(d)));
+		assertTrue("A contains E", taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(e)));
 	}
 
 	public void testConjunctions() throws InterruptedException,

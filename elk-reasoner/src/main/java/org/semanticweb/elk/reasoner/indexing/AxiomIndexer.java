@@ -343,7 +343,12 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	}
 
 	public Void visit(ElkObjectPropertyDomainAxiom elkObjectPropertyDomainAxiom) {
-		// TODO Auto-generated method stub
+		ElkObjectPropertyExpression ope = elkObjectPropertyDomainAxiom
+				.getObjectPropertyExpression();
+		indexSubClassOfAxiom(
+				objectFactory.getObjectSomeValuesFrom(ope,
+						objectFactory.getOwlThing()),
+				elkObjectPropertyDomainAxiom.getClassExpression());
 		return null;
 	}
 
