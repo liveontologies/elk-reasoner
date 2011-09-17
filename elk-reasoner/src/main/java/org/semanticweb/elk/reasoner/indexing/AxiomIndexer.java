@@ -33,20 +33,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
-import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
@@ -416,61 +405,6 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	}
 
 	public Void visit(ElkDataPropertyAssertionAxiom elkObjectDataAssertionAxiom) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDatatype elkDatatype) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataAllValuesFrom elkDataAllValuesFrom) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataComplementOf elkDataComplementOf) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataExactCardinality elkDataExactCardinality) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataHasValue elkDataHasValue) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataIntersectionOf elkDataIntersectionOf) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataMaxCardinality elkDataMaxCardinality) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataMinCardinality elkDataMaxCardinality) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataOneOf elkDataOneOf) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Void visit(ElkDataUnionOf elkDataUnionOf) {
 		// TODO Auto-generated method stub
 		return null;
 	}

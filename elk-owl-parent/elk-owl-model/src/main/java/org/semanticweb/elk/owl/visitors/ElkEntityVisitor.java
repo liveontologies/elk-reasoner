@@ -26,6 +26,8 @@
 package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -39,8 +41,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 public interface ElkEntityVisitor<O> {
 	
 	O visit(ElkClass elkClass);
+	
+	O visit(ElkDatatype elkDatatype);
 
 	O visit(ElkObjectProperty elkObjectProperty);
+	
+	O visit(ElkDataProperty elkDataProperty);
 	
 	O visit(ElkNamedIndividual elkNamedIndividual);
 

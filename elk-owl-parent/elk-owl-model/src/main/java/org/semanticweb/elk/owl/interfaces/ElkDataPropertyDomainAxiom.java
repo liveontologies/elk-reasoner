@@ -27,7 +27,7 @@ package org.semanticweb.elk.owl.interfaces;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Data_Property_Domain">Object Property
+ * "http://www.w3.org/TR/owl2-syntax/#Data_Property_Domain">Data Property
  * Domain<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch

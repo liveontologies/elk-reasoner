@@ -23,15 +23,9 @@
 package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 
 /**
@@ -43,24 +37,12 @@ import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 public interface ElkDataRangeVisitor<O> {
 
 	O visit(ElkDatatype elkDatatype);
-
-	O visit(ElkDataAllValuesFrom elkDataAllValuesFrom);
 	
 	O visit(ElkDataComplementOf elkDataComplementOf);
 
-	O visit(ElkDataExactCardinality elkDataExactCardinality);
-
-	O visit(ElkDataHasValue elkDataHasValue);
-
-	O visit(ElkDataIntersectionOf elkDataIntersectionOf);
-
-	O visit(ElkDataMaxCardinality elkDataMaxCardinality);
-
-	O visit(ElkDataMinCardinality elkDataMaxCardinality);
-
 	O visit(ElkDataOneOf elkDataOneOf);
-
-	O visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom);
+	
+	O visit(ElkDataIntersectionOf elkDataIntersectionOf);
 
 	O visit(ElkDataUnionOf elkDataUnionOf);
 

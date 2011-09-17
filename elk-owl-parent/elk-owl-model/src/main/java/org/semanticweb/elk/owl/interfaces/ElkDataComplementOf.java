@@ -24,7 +24,7 @@ package org.semanticweb.elk.owl.interfaces;
 
 /**
  * Corresponds to the <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Complement_of_Class_Expressions"
+ * "http://www.w3.org/TR/owl2-syntax/#Complement_of_Data_Ranges"
  * >complement of a data range<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch

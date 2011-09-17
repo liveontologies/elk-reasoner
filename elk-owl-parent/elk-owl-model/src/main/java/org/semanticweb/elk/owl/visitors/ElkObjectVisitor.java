@@ -31,9 +31,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * Visitor pattern interface for instances of {@link ElkObject}.
  * 
  * @author Yevgeny Kazakov
- * 
+ * @author Markus Kroetzsch
  */
 public interface ElkObjectVisitor<O> extends ElkAxiomVisitor<O>,
-		ElkClassExpressionVisitor<O>, ElkSubObjectPropertyExpressionVisitor<O>, ElkIndividualVisitor<O> {
-	
+		ElkClassExpressionVisitor<O>, ElkDataRangeVisitor<O>,
+		ElkSubObjectPropertyExpressionVisitor<O>,
+		ElkDataPropertyExpressionVisitor<O>, ElkIndividualVisitor<O>,
+		ElkLiteralVisitor<O> {
+
 }

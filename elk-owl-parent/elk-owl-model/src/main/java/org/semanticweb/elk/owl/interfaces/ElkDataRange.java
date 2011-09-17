@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDataRange extends ElkEntity {
+public interface ElkDataRange extends ElkObject {
 	
 	/**
 	 * Accept an ElkDataRangeVisitor. 

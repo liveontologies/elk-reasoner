@@ -31,8 +31,8 @@ import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
  * @param <O>
  */
 public interface ElkAxiomVisitor<O> extends ElkClassAxiomVisitor<O>,
-		ElkObjectPropertyAxiomVisitor<O>, ElkDataRangeVisitor<O>,
-		ElkDataPropertyAxiomVisitor<O>, ElkAssertionAxiomVisitor<O> {
+		ElkObjectPropertyAxiomVisitor<O>, ElkDataPropertyAxiomVisitor<O>,
+		ElkAssertionAxiomVisitor<O> {
 
 	O visit(ElkDeclarationAxiom elkDeclarationAxiom);
 

@@ -27,11 +27,10 @@ package org.semanticweb.elk.owl.interfaces;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Data_Properties">Object Property<a> in
- * the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Data_Properties">Data Property<a> in the
+ * OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDataProperty extends ElkDataPropertyExpression,
-		ElkEntity {
+public interface ElkDataProperty extends ElkDataPropertyExpression, ElkEntity {
 }

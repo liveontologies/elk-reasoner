@@ -27,12 +27,12 @@ package org.semanticweb.elk.owl.interfaces;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Existential_Quantification">Existential
+ * "http://www.w3.org/TR/owl2-syntax/#Existential_Quantification_2">Existential
  * Quantification Data Property Restriction<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDataSomeValuesFrom extends ElkDataRange {
+public interface ElkDataSomeValuesFrom extends ElkClassExpression {
 
 	/**
 	 * Get the data property expression that this expression refers to.

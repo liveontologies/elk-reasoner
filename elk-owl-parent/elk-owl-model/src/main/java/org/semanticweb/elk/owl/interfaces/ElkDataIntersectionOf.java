@@ -29,17 +29,17 @@ import java.util.List;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
- * >Intersection of Class Expressions<a> in the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Data_Ranges" >Intersection
+ * of Data Ranges<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
 public interface ElkDataIntersectionOf extends ElkDataRange {
 
 	/**
-	 * Get the list of data ranges that this expression refers to. The
-	 * order of data ranges does not affect the semantics but it is
-	 * relevant to the syntax of OWL.
+	 * Get the list of data ranges that this expression refers to. The order of
+	 * data ranges does not affect the semantics but it is relevant to the
+	 * syntax of OWL.
 	 * 
 	 * @return list of data ranges
 	 */

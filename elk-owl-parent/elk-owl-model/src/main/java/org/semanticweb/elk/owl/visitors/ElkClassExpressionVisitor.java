@@ -27,6 +27,12 @@ package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
@@ -64,12 +70,24 @@ public interface ElkClassExpressionVisitor<O> {
 
 	O visit(ElkObjectMaxCardinality elkObjectMaxCardinality);
 
-	O visit(ElkObjectMinCardinality elkObjectMaxCardinality);
+	O visit(ElkObjectMinCardinality elkObjectMinCardinality);
 
 	O visit(ElkObjectOneOf elkObjectOneOf);
 
 	O visit(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom);
 
 	O visit(ElkObjectUnionOf elkObjectUnionOf);
+	
+	O visit(ElkDataHasValue elkDataHasValue);
+
+	O visit(ElkDataMaxCardinality elkDataMaxCardinality);
+
+	O visit(ElkDataMinCardinality elkDataMinCardinality);
+	
+	O visit(ElkDataExactCardinality elkDataExactCardinality);
+	
+	O visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom);
+	
+	O visit(ElkDataAllValuesFrom elkDataAllValuesFrom);
 
 }

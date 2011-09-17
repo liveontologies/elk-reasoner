@@ -27,12 +27,12 @@ package org.semanticweb.elk.owl.interfaces;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Exact_Cardinality">exact cardinality
+ * "http://www.w3.org/TR/owl2-syntax/#Exact_Cardinality_2">exact cardinality
  * restriction<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDataExactCardinality extends ElkDataRange {
+public interface ElkDataExactCardinality extends ElkClassExpression {
 
 	/**
 	 * Get the cardinality that this expression refers to.
@@ -49,9 +49,8 @@ public interface ElkDataExactCardinality extends ElkDataRange {
 	public ElkDataPropertyExpression getDataPropertyExpression();
 
 	/**
-	 * Get the data range that this expression refers to. If the
-	 * cardinality restriction is not qualified, this data range might be
-	 * null.
+	 * Get the data range that this expression refers to. If the cardinality
+	 * restriction is not qualified, this data range might be null.
 	 * 
 	 * @return data range
 	 */

@@ -26,6 +26,12 @@
 package org.semanticweb.elk.owlapi;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
@@ -129,6 +135,37 @@ public final class ElkClassExpressionConverter implements
 	}
 
 	public OWLClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkDataHasValue elkDataHasValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkDataMaxCardinality elkDataMaxCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkDataMinCardinality elkDataMinCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(
+			ElkDataExactCardinality elkDataExactCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkDataAllValuesFrom elkDataAllValuesFrom) {
 		// TODO Auto-generated method stub
 		return null;
 	}

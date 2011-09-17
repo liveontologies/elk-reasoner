@@ -33,6 +33,14 @@ import java.util.Map;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
+import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
@@ -241,6 +249,16 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 			return null;
 		}
 
+		public IndexedEntity visit(ElkDatatype elkDatatype) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedEntity visit(ElkDataProperty elkDataProperty) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	private IndexedEntityGetter indexedEntityGetter = new IndexedEntityGetter();
@@ -263,6 +281,16 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 		}
 
 		public IndexedEntity visit(ElkNamedIndividual elkNamedIndividual) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedEntity visit(ElkDatatype elkDatatype) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedEntity visit(ElkDataProperty elkDataProperty) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -390,6 +418,41 @@ public class SerialOntologyIndex extends OntologyIndexModifier {
 
 		public IndexedClassExpression visit(
 				ElkObjectComplementOf elkObjectComplementOf) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkDataMaxCardinality elkDataMaxCardinality) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkDataMinCardinality elkDataMinCardinality) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkDataExactCardinality elkDataExactCardinality) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public IndexedClassExpression visit(
+				ElkDataAllValuesFrom elkDataAllValuesFrom) {
 			// TODO Auto-generated method stub
 			return null;
 		}

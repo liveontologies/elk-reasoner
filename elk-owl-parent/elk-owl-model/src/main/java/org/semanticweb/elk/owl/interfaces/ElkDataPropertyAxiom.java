@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Data_Property_Axioms">Object Property
+ * "http://www.w3.org/TR/owl2-syntax/#Data_Property_Axioms">Data Property
  * Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
