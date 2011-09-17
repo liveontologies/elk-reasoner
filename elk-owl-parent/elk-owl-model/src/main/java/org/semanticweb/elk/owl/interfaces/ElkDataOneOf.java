@@ -29,20 +29,20 @@ import java.util.List;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Individuals">Enumeration of
- * Individuals<a> in the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Literals">Enumeration of
+ * Literals<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
 public interface ElkDataOneOf extends ElkDataRange {
 
 	/**
-	 * Get the list of individuals that this expression refers to. The order of
-	 * individuals does not affect the semantics but it is relevant to the
+	 * Get the list of literals that this expression refers to. The order of
+	 * literals does not affect the semantics but it is relevant to the
 	 * syntax of OWL.
 	 * 
-	 * @return list of individuals
+	 * @return list of literals
 	 */
-	public List<? extends ElkIndividual> getIndividuals();
+	public List<? extends ElkLiteral> getLiteral();
 
 }

@@ -24,7 +24,9 @@ package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
@@ -45,5 +47,9 @@ public interface ElkAssertionAxiomVisitor<O> {
 	O visit(ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom);
 	
 	O visit(ElkSameIndividualAxiom elkSameIndividualAxiom);
+	
+	O visit(ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion);
+	
+	O visit(ElkDataPropertyAssertionAxiom elkObjectDataAssertionAxiom);
 
 }

@@ -27,8 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Individual_Value_Restriction">Individual
- * Value Restriction for Data Properties<a> in the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Literal_Value_Restriction">Literal Value
+ * Restriction for Data Properties<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -42,10 +42,10 @@ public interface ElkDataHasValue extends ElkDataRange {
 	public ElkDataPropertyExpression getDataPropertyExpression();
 
 	/**
-	 * Get the individual that this expression refers to.
+	 * Get the literal that this expression refers to.
 	 * 
-	 * @return individual
+	 * @return literal
 	 */
-	public ElkIndividual getIndividual();
+	public ElkLiteral getLiteral();
 
 }

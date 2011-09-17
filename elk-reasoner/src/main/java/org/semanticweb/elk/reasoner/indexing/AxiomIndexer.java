@@ -33,17 +33,35 @@ import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
@@ -56,6 +74,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
@@ -386,6 +405,105 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	}
 
 	public Void visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataPropertyAssertionAxiom elkObjectDataAssertionAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDatatype elkDatatype) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataAllValuesFrom elkDataAllValuesFrom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataComplementOf elkDataComplementOf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataExactCardinality elkDataExactCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataHasValue elkDataHasValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataIntersectionOf elkDataIntersectionOf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataMaxCardinality elkDataMaxCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataMinCardinality elkDataMaxCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataOneOf elkDataOneOf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataUnionOf elkDataUnionOf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkDisjointDataPropertiesAxiom elkDisjointDataPropertiesAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(
+			ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Void visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}

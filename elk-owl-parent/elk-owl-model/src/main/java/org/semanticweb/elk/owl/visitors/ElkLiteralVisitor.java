@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,15 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 
 /**
- * Super interface of all visitors for ElkAxioms.
+ * Visitor interface for ELKLiteral. 
  * 
  * @author Markus Kroetzsch
- * @param <O>
  */
-public interface ElkAxiomVisitor<O> extends ElkClassAxiomVisitor<O>,
-		ElkObjectPropertyAxiomVisitor<O>, ElkDataRangeVisitor<O>,
-		ElkDataPropertyAxiomVisitor<O>, ElkAssertionAxiomVisitor<O> {
+public interface ElkLiteralVisitor<O> {
 
-	O visit(ElkDeclarationAxiom elkDeclarationAxiom);
+	O visit(ElkLiteral elkLiteral);
 
 }

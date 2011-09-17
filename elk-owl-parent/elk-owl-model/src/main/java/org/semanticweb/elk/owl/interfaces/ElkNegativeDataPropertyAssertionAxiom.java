@@ -35,18 +35,18 @@ package org.semanticweb.elk.owl.interfaces;
 public interface ElkNegativeDataPropertyAssertionAxiom extends ElkAssertionAxiom {
 
 	/**
-	 * Get the first individual that this axiom refers to.
+	 * Get the first literal that this axiom refers to.
 	 * 
-	 * @return data property expression
+	 * @return literal
 	 */
-	public ElkIndividual getFirstIndividual();
+	public ElkLiteral getFirstLiteral();
 
 	/**
-	 * Get the second individual that this axiom refers to.
+	 * Get the second literal that this axiom refers to.
 	 * 
-	 * @return data property expression
+	 * @return literal
 	 */
-	public ElkIndividual getSecondIndividual();
+	public ElkLiteral getSecondLiteral();
 
 	/**
 	 * Get the data property expression that this axiom refers to.

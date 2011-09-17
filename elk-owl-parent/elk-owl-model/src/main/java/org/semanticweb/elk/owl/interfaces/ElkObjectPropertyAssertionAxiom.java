@@ -37,14 +37,14 @@ public interface ElkObjectPropertyAssertionAxiom extends ElkAssertionAxiom {
 	/**
 	 * Get the first individual that this axiom refers to.
 	 * 
-	 * @return object property expression
+	 * @return individual
 	 */
 	public ElkIndividual getFirstIndividual();
 
 	/**
 	 * Get the second individual that this axiom refers to.
 	 * 
-	 * @return object property expression
+	 * @return individual
 	 */
 	public ElkIndividual getSecondIndividual();
 
