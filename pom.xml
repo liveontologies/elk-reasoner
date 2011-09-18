@@ -47,14 +47,14 @@
 		<developer>
 			<id>yevgeny</id>
 			<name>Yevgeny Kazakov</name>
-			<email>yevgeny.kazakov@cs.ox.ac.uk</email>
-			<organization>Department of Computer Science, University of Oxford
+			<email>yevgeny.kazakov@uni-ulm.de</email>
+			<organization>Institute of Artificial Intelligence, University of Ulm
             </organization>
-			<organizationUrl>http://www.cs.ox.ac.uk</organizationUrl>
+			<organizationUrl>http://www.uni-ulm.de/en/in/ki.html</organizationUrl>
 			<roles>
 				<role>developer</role>
 			</roles>
-			<timezone>0</timezone>
+			<timezone>1</timezone>
 		</developer>
 		<developer>
 			<id>markus</id>
@@ -230,6 +230,21 @@
 					<tagBase>https://elk-reasoner.googlecode.com/svn/tags</tagBase>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 				</configuration>
+			</plugin>
+			<!-- making sure that the sources are always istalled -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
