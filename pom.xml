@@ -133,6 +133,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<owlapi.version>3.2.4</owlapi.version>
+		<protege.version>4.1.0</protege.version>
 	</properties>
 
 	<repositories>

@@ -26,7 +26,7 @@ OWL API itself. The OWL API library can be obtained here:
 
 REQUIREMENTS:
 
-ELK OWL API bindings are tested to work with OWL API v.3.2.4. It may work 
+ELK OWL API bindings are tested to work with OWL API ${owlapi.version}. It may work 
 with other versions of OWL API.
 
 INSTALLATION:

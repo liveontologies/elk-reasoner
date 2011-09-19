@@ -18,7 +18,7 @@ ${project.organization.name}
 
 REQUIREMENTS:
 
-ELK plug-in is tested to work with Protege v.4.1. It may work with other 
+ELK plug-in is tested to work with Protege ${protege.version}. It may work with other 
 versions of Protege.
 
 INSTALLATION:

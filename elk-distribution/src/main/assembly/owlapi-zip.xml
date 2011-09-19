@@ -19,7 +19,7 @@
 		</file>
 		<file>
 			<source>${basedir}/src/main/resources/owlapi/README.txt</source>
-			<filtered>false</filtered>
+			<filtered>true</filtered>
 		</file>
 	</files>
 	<dependencySets>

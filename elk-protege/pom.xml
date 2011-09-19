@@ -18,17 +18,17 @@
 		<dependency>
 			<groupId>org.protege</groupId>
 			<artifactId>protege-editor-core-application</artifactId>
-			<version>4.1.0</version>
+			<version>${protege.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.protege</groupId>
 			<artifactId>protege-editor-owl</artifactId>
-			<version>4.1.0</version>
+			<version>${protege.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-all</artifactId>
-			<version>3.2.4</version>			
+			<version>${owlapi.version}</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
