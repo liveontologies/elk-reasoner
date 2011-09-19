@@ -31,14 +31,18 @@
 			</includes>
 			<!-- we omit the version numbers in the included artifact names -->
 			<outputFileNameMapping>elk-owlapi.${artifact.extension}</outputFileNameMapping>
+			<!-- don't include the artifact for this project -->
+			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
 		<dependencySet>
 			<!-- including the sources -->
 			<includes>
-				<include>*:elk-owlapi-standalone:jar:sources</include>
+				<include>*:elk-owlapi-standalone:jar:src</include>
 			</includes>
 			<!-- we omit the version numbers in the included artifact names -->
 			<outputFileNameMapping>elk-owlapi-sources.${artifact.extension}</outputFileNameMapping>
+			<!-- don't include the artifact for this project -->
+			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
 		<dependencySet>
 			<!-- including the third-party libaries -->
@@ -52,6 +56,8 @@
 				</excludes>
 			</unpackOptions>
 			<outputDirectory>lib</outputDirectory>
+			<!-- don't include the artifact for this project -->
+			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
 	</dependencySets>
 

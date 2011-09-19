@@ -106,7 +106,7 @@
 						</goals>
 						<configuration>
 							<classesDirectory>${project.build.directory}/sources</classesDirectory>
-							<classifier>sources</classifier>
+							<classifier>src</classifier>
 						</configuration>
 					</execution>
 					<execution>
@@ -116,7 +116,7 @@
 						</goals>
 						<configuration>
 							<classesDirectory>${project.build.directory}/lib</classesDirectory>
-							<classifier>libraries</classifier>
+							<classifier>lib</classifier>
 						</configuration>
 					</execution>
 				</executions>

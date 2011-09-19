@@ -37,14 +37,14 @@
 			<artifactId>elk-owlapi-standalone</artifactId>
 			<version>0.2.0-SNAPSHOT</version>
 			<type>jar</type>
-			<classifier>sources</classifier>
+			<classifier>src</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owlapi-standalone</artifactId>
 			<version>0.2.0-SNAPSHOT</version>
 			<type>jar</type>
-			<classifier>libraries</classifier>
+			<classifier>lib</classifier>
 		</dependency>
 	</dependencies>
 
