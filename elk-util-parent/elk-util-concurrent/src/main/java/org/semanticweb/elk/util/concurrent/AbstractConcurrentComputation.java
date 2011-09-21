@@ -42,7 +42,12 @@ public abstract class AbstractConcurrentComputation<Input> {
 	// minimal size of the buffer before running jobs
 	protected final int bufferThreshold;
 
-
+	
+	/*
+	 * If this object hasBoundedCapacity and the size of the buffer exceeds
+	 * overfullLimit, then submission of further jobs waits until the size
+	 * of the buffer decreases to underfullLimit.  
+	 */
 	protected final boolean hasBoundedCapacity;
 	protected final int underfullLimit;
 	protected final int overfullLimit;
@@ -65,7 +70,7 @@ public abstract class AbstractConcurrentComputation<Input> {
 		this.bufferThreshold = bufferThreshold;
 		
 		hasBoundedCapacity = (bufferCapacity != 0);
-		int overfullLowerBound = Math.max(bufferThreshold + 16, 128);
+		int overfullLowerBound = Math.max(bufferThreshold + 16, 64);
 		overfullLimit = Math.max(bufferCapacity, overfullLowerBound);
 		underfullLimit = overfullLimit / 2;
 		
@@ -95,6 +100,29 @@ public abstract class AbstractConcurrentComputation<Input> {
 		// assert bufferSize == 0 && workerCount == 0;
 	}
 	
+	protected void waitCapacity() {
+		if (hasBoundedCapacity && bufferSize.get() > overfullLimit)
+			synchronized (bufferSize) {
+				while (bufferSize.get() > underfullLimit) {
+					addWorker();
+					try {
+						bufferSize.wait();
+					}
+					catch (InterruptedException e) {
+					}
+				}
+				// assert bufferSize <= underfullLimit
+			}
+	}
+
+	
+	protected void addJob(Input input) {
+		buffer.add(input);
+		if (bufferSize.incrementAndGet() > bufferThreshold)
+			addWorker();
+	}
+
+	
 	
 	// class for concurrent indexing jobs
 	protected class Worker implements Runnable {
@@ -102,7 +130,7 @@ public abstract class AbstractConcurrentComputation<Input> {
 			for (;;) {
 				Input nextInput = buffer.poll();
 				if (nextInput != null) {
-					if (bufferSize.getAndDecrement() == underfullLimit)
+					if (bufferSize.decrementAndGet() == underfullLimit)
 						synchronized (bufferSize) {
 							bufferSize.notify();
 						}
@@ -130,24 +158,4 @@ public abstract class AbstractConcurrentComputation<Input> {
 				executor.execute(worker);
 	}
 	
-	
-	protected void waitCapacity() {
-		if (hasBoundedCapacity && bufferSize.get() > overfullLimit)
-			synchronized (bufferSize) {
-				while (bufferSize.get() > underfullLimit)
-					try {
-						bufferSize.wait();
-					}
-					catch (InterruptedException e) {
-					}
-			}
-	}
-
-	
-	protected void addJob(Input input) {
-		buffer.add(input);
-		if (bufferSize.incrementAndGet() > bufferThreshold)
-			addWorker();
-	}
-
 }
