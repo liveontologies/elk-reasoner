@@ -42,10 +42,10 @@ public interface ElkDataPropertyDomainAxiom extends ElkDataPropertyAxiom {
 	public ElkDataPropertyExpression getDataPropertyExpression();
 
 	/**
-	 * Get the data range that this axiom refers to.
+	 * Get the class expression that this axiom refers to.
 	 * 
-	 * @return data range
+	 * @return class expression
 	 */
-	public ElkDataRange getDataRange();
+	public ElkClassExpression getClassExpression();
 
 }

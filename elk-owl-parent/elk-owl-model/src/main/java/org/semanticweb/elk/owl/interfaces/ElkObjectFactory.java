@@ -578,4 +578,284 @@ public interface ElkObjectFactory {
 	public abstract ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
+	/**
+	 * Create an ElkDatatype.
+	 * 
+	 * @param iri
+	 * @return
+	 */
+	public abstract ElkDatatype getDatatype(String iri);
+
+	/**
+	 * Create an ElkDisjointDataPropertiesAxiom.
+	 * 
+	 * @param disjointDataPropertyExpressions
+	 * @return
+	 */
+	public abstract ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
+			List<? extends ElkDataPropertyExpression> disjointDataPropertyExpressions);
+
+	/**
+	 * Create an ElkDisjointDataPropertiesAxiom.
+	 * 
+	 * @param firstDataPropertyExpression
+	 * @param secondDataPropertyExpression
+	 * @param otherDataPropertyExpressions
+	 * @return
+	 */
+	public abstract ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
+			ElkDataPropertyExpression firstDataPropertyExpression,
+			ElkDataPropertyExpression secondDataPropertyExpression,
+			ElkDataPropertyExpression... otherDataPropertyExpressions);
+
+	/**
+	 * Create an ElkEquivalentDataPropertiesAxiom.
+	 * 
+	 * @param equivalentDataPropertyExpressions
+	 * @return
+	 */
+	public abstract ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+			List<? extends ElkDataPropertyExpression> equivalentDataPropertyExpressions);
+
+	/**
+	 * Create an ElkEquivalentDataPropertiesAxiom.
+	 * 
+	 * @param firstDataPropertyExpression
+	 * @param secondDataPropertyExpression
+	 * @param otherDataPropertyExpressions
+	 * @return
+	 */
+	public abstract ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+			ElkDataPropertyExpression firstDataPropertyExpression,
+			ElkDataPropertyExpression secondDataPropertyExpression,
+			ElkDataPropertyExpression... otherDataPropertyExpressions);
+
+	/**
+	 * Create an ElkFunctionalDataPropertyAxiom.
+	 * 
+	 * @param dataPropertyExpression
+	 * @return
+	 */
+	public abstract ElkFunctionalDataPropertyAxiom getFunctionalDataPropertyAxiom(
+			ElkDataPropertyExpression dataPropertyExpression);
+
+	/**
+	 * Create an ElkNegativeDataPropertyAssertionAxiom.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param firstIndividual
+	 * @param secondIndividual
+	 * @return
+	 */
+	public abstract ElkNegativeDataPropertyAssertionAxiom getNegativeDataPropertyAssertionAxiom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkIndividual individual, ElkLiteral literal);
+
+	/**
+	 * Create an ElkDataAllValuesFrom.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param dataRange
+	 * @return
+	 */
+	public abstract ElkDataAllValuesFrom getDataAllValuesFrom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkDataRange dataRange);
+
+	/**
+	 * Create an ElkDataComplementOf.
+	 * 
+	 * @param dataRange
+	 * @return
+	 */
+	public abstract ElkDataComplementOf getDataComplementOf(
+			ElkDataRange dataRange);
+
+	/**
+	 * Create an ElkDataExactCardinality.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param cardinality
+	 * @param dataRange
+	 *            can be null for unqualified cardinality restrictions
+	 * @return
+	 */
+	public abstract ElkDataExactCardinality getDataExactCardinality(
+			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
+			ElkDataRange dataRange);
+
+	/**
+	 * Create an ElkDataHasValue.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param literal
+	 * @return
+	 */
+	public abstract ElkDataHasValue getDataHasValue(
+			ElkDataPropertyExpression dataPropertyExpression, ElkLiteral literal);
+
+	/**
+	 * Create an ElkDataIntersectionOf.
+	 * 
+	 * @param dataRanges
+	 * @return
+	 */
+	public abstract ElkDataIntersectionOf getDataIntersectionOf(
+			List<? extends ElkDataRange> dataRanges);
+
+	/**
+	 * Create an ElkDataIntersectionOf.
+	 * 
+	 * @param firstDataRange
+	 * @param secondDataRange
+	 * @param otherDataRanges
+	 * @return
+	 */
+	public abstract ElkDataIntersectionOf getDataIntersectionOf(
+			ElkDataRange firstDataRange, ElkDataRange secondDataRange,
+			ElkDataRange... otherDataRanges);
+
+	/**
+	 * Create an ElkDataOneOf.
+	 * 
+	 * @param literals
+	 * @return
+	 */
+	public abstract ElkDataOneOf getDataOneOf(
+			List<? extends ElkLiteral> literals);
+
+	/**
+	 * Create an ElkDataOneOf.
+	 * 
+	 * @param firstIndividual
+	 * @param otherIndividuals
+	 * @return
+	 */
+	public abstract ElkDataOneOf getDataOneOf(ElkLiteral firstLiteral,
+			ElkLiteral... otherLiterals);
+
+	/**
+	 * Create an ElkDataMaxCardinality.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param cardinality
+	 * @param dataRange
+	 *            can be null for unqualified cardinality restrictions
+	 * @return
+	 */
+	public abstract ElkDataMaxCardinality getDataMaxCardinality(
+			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
+			ElkDataRange dataRange);
+
+	/**
+	 * Create an ElkDataMinCardinality.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param cardinality
+	 * @param dataRange
+	 *            can be null for unqualified cardinality restrictions
+	 * @return
+	 */
+	public abstract ElkDataMinCardinality getDataMinCardinality(
+			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
+			ElkDataRange dataRange);
+
+	/**
+	 * Create an ElkDataProperty.
+	 * 
+	 * @param dataPropertyIri
+	 * @return
+	 */
+	public abstract ElkDataProperty getDataProperty(String dataPropertyIri);
+
+	/**
+	 * Create an ElkDataPropertyAssertionAxiom.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param firstIndividual
+	 * @param secondIndividual
+	 * @return
+	 */
+	public abstract ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkIndividual individual, ElkLiteral literal);
+
+	/**
+	 * Create an ElkDataPropertyDomainAxiom.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param classExpression
+	 * @return
+	 */
+	public abstract ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkClassExpression classExpression);
+
+	/**
+	 * Create an ElkDataPropertyRangeAxiom.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param dataRange
+	 * @return
+	 */
+	public abstract ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkDataRange dataRange);
+
+	/**
+	 * Create an ElkDataSomeValuesFrom.
+	 * 
+	 * @param dataPropertyExpression
+	 * @param dataRange
+	 * @return
+	 */
+	public abstract ElkDataSomeValuesFrom getDataSomeValuesFrom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkDataRange dataRange);
+
+	/**
+	 * Create an ElkDataUnionOf.
+	 * 
+	 * @param dataRanges
+	 * @return
+	 */
+	public abstract ElkDataUnionOf getDataUnionOf(
+			List<? extends ElkDataRange> dataRanges);
+
+	/**
+	 * Create an ElkDataUnionOf.
+	 * 
+	 * @param firstDataRange
+	 * @param secondDataRange
+	 * @param otherDataRanges
+	 * @return
+	 */
+	public abstract ElkDataUnionOf getDataUnionOf(ElkDataRange firstDataRange,
+			ElkDataRange secondDataRange, ElkDataRange... otherDataRanges);
+
+	/**
+	 * Create the ElkDataProperty representing owl:BottomDataProperty.
+	 * 
+	 * @return
+	 */
+	public abstract ElkDataProperty getOwlBottomDataProperty();
+
+	/**
+	 * Create the ElkDataProperty representing owl:TopDataProperty.
+	 * 
+	 * @return
+	 */
+	public abstract ElkDataProperty getOwlTopDataProperty();
+
+	/**
+	 * Create an ElkSubDataPropertyOfAxiom.
+	 * 
+	 * @param subDataPropertyExpression
+	 * @param superDataPropertyExpression
+	 * @return
+	 */
+	public abstract ElkSubDataPropertyOfAxiom getSubDataPropertyOfAxiom(
+			ElkDataPropertyExpression subDataPropertyExpression,
+			ElkDataPropertyExpression superDataPropertyExpression);
+
 }

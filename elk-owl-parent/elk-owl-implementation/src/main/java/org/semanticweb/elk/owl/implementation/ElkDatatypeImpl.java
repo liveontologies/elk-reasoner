@@ -1,9 +1,9 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK OWL Model Implementation
  * 
- * $Id: ElkClass.java 131 2011-07-04 00:28:11Z ykazakovgo@gmail.com $
- * $HeadURL: https://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner/src/main/java/org/semanticweb/elk/syntax/ElkClass.java $
+ * $Id$
+ * $HeadURL$
  * %%
  * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
@@ -20,26 +20,24 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, Apr 8, 2011
- */
 package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkClass.
+ * ELK implementation of ElkDatatype.
  * 
- * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class ElkClassImpl extends ElkIriObject implements ElkEntity, ElkClass {
+public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
+		ElkDatatype {
 
-	/* package-private */ElkClassImpl(String iri) {
+	/* package-private */ElkDatatypeImpl(String iri) {
 		super(iri);
 		this.structuralHashCode = iri.hashCode();
 	}
@@ -54,7 +52,7 @@ public class ElkClassImpl extends ElkIriObject implements ElkEntity, ElkClass {
 		}
 	}
 
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
@@ -36,20 +36,25 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  */
 public class ElkDataPropertyDomainAxiomImpl extends
-		ElkDataPropertyExpressionDataRangeObject implements
-		ElkDataPropertyDomainAxiom {
+		ElkDataPropertyExpressionObject implements ElkDataPropertyDomainAxiom {
+
+	protected final ElkClassExpression classExpression;
 
 	private static final int constructorHash_ = "ElkDataPropertyDomainAxiom"
 			.hashCode();
 
 	ElkDataPropertyDomainAxiomImpl(
 			ElkDataPropertyExpression dataPropertyExpression,
-			ElkDataRange dataRange) {
-		super(dataPropertyExpression, dataRange);
+			ElkClassExpression classExpression) {
+		super(dataPropertyExpression);
+		this.classExpression = classExpression;
 		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				dataPropertyExpression.structuralHashCode(),
-				dataRange.structuralHashCode());
+				constructorHash_, dataPropertyExpression.structuralHashCode(),
+				classExpression.structuralHashCode());
+	}
+
+	public ElkClassExpression getClassExpression() {
+		return classExpression;
 	}
 
 	@Override
@@ -64,9 +69,9 @@ public class ElkDataPropertyDomainAxiomImpl extends
 			return dataPropertyExpression
 					.equals(((ElkDataPropertyDomainAxiom) object)
 							.getDataPropertyExpression())
-					&& dataRange
+					&& classExpression
 							.equals(((ElkDataPropertyDomainAxiom) object)
-									.getDataRange());
+									.getClassExpression());
 		} else {
 			return false;
 		}

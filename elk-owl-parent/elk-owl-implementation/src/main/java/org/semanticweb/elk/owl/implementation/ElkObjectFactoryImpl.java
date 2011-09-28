@@ -31,20 +31,42 @@ import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
@@ -68,6 +90,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
@@ -88,10 +111,16 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			"owl:Nothing");
 
 	protected static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			"owl:TobObjectProperty");
+			"owl:TopObjectProperty");
 
 	protected static final ElkObjectProperty ELK_OWL_BOTTOM_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
 			"owl:BottomObjectProperty");
+
+	protected static final ElkDataProperty ELK_OWL_TOP_DATA_PROPERTY = new ElkDataPropertyImpl(
+			"owl:TopDataProperty");
+
+	protected static final ElkDataProperty ELK_OWL_BOTTOM_DATA_PROPERTY = new ElkDataPropertyImpl(
+			"owl:BottomDataProperty");
 
 	protected final ElkObjectManager objectManager;
 
@@ -531,4 +560,200 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 				.getCanonicalElkObject(new ElkSymmetricObjectPropertyAxiomImpl(
 						objectPropertyExpression));
 	}
+
+	public ElkDatatype getDatatype(String iri) {
+		return (ElkDatatype) objectManager
+				.getCanonicalElkObject(new ElkDatatypeImpl(iri));
+	}
+
+	public ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
+			List<? extends ElkDataPropertyExpression> disjointDataPropertyExpressions) {
+		return (ElkDisjointDataPropertiesAxiom) objectManager
+				.getCanonicalElkObject(new ElkDisjointDataPropertiesAxiomImpl(
+						disjointDataPropertyExpressions));
+	}
+
+	public ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
+			ElkDataPropertyExpression firstDataPropertyExpression,
+			ElkDataPropertyExpression secondDataPropertyExpression,
+			ElkDataPropertyExpression... otherDataPropertyExpressions) {
+		return (ElkDisjointDataPropertiesAxiom) objectManager
+				.getCanonicalElkObject(new ElkDisjointDataPropertiesAxiomImpl(
+						ElkObjectListObject.varArgsToList(
+								firstDataPropertyExpression,
+								secondDataPropertyExpression,
+								otherDataPropertyExpressions)));
+	}
+
+	public ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+			List<? extends ElkDataPropertyExpression> equivalentDataPropertyExpressions) {
+		return (ElkEquivalentDataPropertiesAxiom) objectManager
+				.getCanonicalElkObject(new ElkEquivalentDataPropertiesAxiomImpl(
+						equivalentDataPropertyExpressions));
+	}
+
+	public ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+			ElkDataPropertyExpression firstDataPropertyExpression,
+			ElkDataPropertyExpression secondDataPropertyExpression,
+			ElkDataPropertyExpression... otherDataPropertyExpressions) {
+		return (ElkEquivalentDataPropertiesAxiom) objectManager
+				.getCanonicalElkObject(new ElkEquivalentDataPropertiesAxiomImpl(
+						ElkObjectListObject.varArgsToList(
+								firstDataPropertyExpression,
+								secondDataPropertyExpression,
+								otherDataPropertyExpressions)));
+	}
+
+	public ElkFunctionalDataPropertyAxiom getFunctionalDataPropertyAxiom(
+			ElkDataPropertyExpression dataPropertyExpression) {
+		return (ElkFunctionalDataPropertyAxiom) objectManager
+				.getCanonicalElkObject(new ElkFunctionalDataPropertyAxiomImpl(
+						dataPropertyExpression));
+	}
+
+	public ElkDataHasValue getDataHasValue(
+			ElkDataPropertyExpression dataPropertyExpression, ElkLiteral literal) {
+		return (ElkDataHasValue) objectManager
+				.getCanonicalElkObject(new ElkDataHasValueImpl(
+						dataPropertyExpression, literal));
+	}
+
+	public ElkDataIntersectionOf getDataIntersectionOf(
+			List<? extends ElkDataRange> dataRanges) {
+		return (ElkDataIntersectionOf) objectManager
+				.getCanonicalElkObject(new ElkDataIntersectionOfImpl(dataRanges));
+	}
+
+	public ElkDataIntersectionOf getDataIntersectionOf(
+			ElkDataRange firstDataRange, ElkDataRange secondDataRange,
+			ElkDataRange... otherDataRanges) {
+		return (ElkDataIntersectionOf) objectManager
+				.getCanonicalElkObject(new ElkDataIntersectionOfImpl(
+						ElkObjectListObject.varArgsToList(firstDataRange,
+								secondDataRange, otherDataRanges)));
+	}
+
+	public ElkDataOneOf getDataOneOf(List<? extends ElkLiteral> literals) {
+		return (ElkDataOneOf) objectManager
+				.getCanonicalElkObject(new ElkDataOneOfImpl(literals));
+	}
+
+	public ElkDataOneOf getDataOneOf(ElkLiteral firstLiteral,
+			ElkLiteral... otherLiterals) {
+		return (ElkDataOneOf) objectManager
+				.getCanonicalElkObject(new ElkDataOneOfImpl(ElkObjectListObject
+						.varArgsToList(firstLiteral, otherLiterals)));
+	}
+
+	public ElkDataProperty getDataProperty(String dataPropertyIri) {
+		return (ElkDataProperty) objectManager
+				.getCanonicalElkObject(new ElkDataPropertyImpl(dataPropertyIri));
+	}
+
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkDataRange dataRange) {
+		return (ElkDataSomeValuesFrom) objectManager
+				.getCanonicalElkObject(new ElkDataSomeValuesFromImpl(
+						dataPropertyExpression, dataRange));
+	}
+
+	public ElkDataProperty getOwlBottomDataProperty() {
+		return ElkObjectFactoryImpl.ELK_OWL_BOTTOM_DATA_PROPERTY;
+	}
+
+	public ElkDataProperty getOwlTopDataProperty() {
+		return ElkObjectFactoryImpl.ELK_OWL_TOP_DATA_PROPERTY;
+	}
+
+	public ElkSubDataPropertyOfAxiom getSubDataPropertyOfAxiom(
+			ElkDataPropertyExpression subDataPropertyExpression,
+			ElkDataPropertyExpression superDataPropertyExpression) {
+		return (ElkSubDataPropertyOfAxiom) objectManager
+				.getCanonicalElkObject(new ElkSubDataPropertyOfAxiomImpl(
+						subDataPropertyExpression, superDataPropertyExpression));
+	}
+
+	public ElkNegativeDataPropertyAssertionAxiom getNegativeDataPropertyAssertionAxiom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkIndividual individual, ElkLiteral literal) {
+		return (ElkNegativeDataPropertyAssertionAxiom) objectManager
+				.getCanonicalElkObject(new ElkNegativeDataPropertyAssertionAxiomImpl(
+						dataPropertyExpression, individual, literal));
+	}
+
+	public ElkDataAllValuesFrom getDataAllValuesFrom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkDataRange dataRange) {
+		return (ElkDataAllValuesFrom) objectManager
+				.getCanonicalElkObject(new ElkDataAllValuesFromImpl(
+						dataPropertyExpression, dataRange));
+	}
+
+	public ElkDataComplementOf getDataComplementOf(ElkDataRange dataRange) {
+		return (ElkDataComplementOf) objectManager
+				.getCanonicalElkObject(new ElkDataComplementOfImpl(dataRange));
+	}
+
+	public ElkDataExactCardinality getDataExactCardinality(
+			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
+			ElkDataRange dataRange) {
+		return (ElkDataExactCardinality) objectManager
+				.getCanonicalElkObject(new ElkDataExactCardinalityImpl(
+						dataPropertyExpression, cardinality, dataRange));
+	}
+
+	public ElkDataMaxCardinality getDataMaxCardinality(
+			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
+			ElkDataRange dataRange) {
+		return (ElkDataMaxCardinality) objectManager
+				.getCanonicalElkObject(new ElkDataMaxCardinalityImpl(
+						dataPropertyExpression, cardinality, dataRange));
+	}
+
+	public ElkDataMinCardinality getDataMinCardinality(
+			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
+			ElkDataRange dataRange) {
+		return (ElkDataMinCardinality) objectManager
+				.getCanonicalElkObject(new ElkDataMinCardinalityImpl(
+						dataPropertyExpression, cardinality, dataRange));
+	}
+
+	public ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkIndividual individual, ElkLiteral literal) {
+		return (ElkDataPropertyAssertionAxiom) objectManager
+				.getCanonicalElkObject(new ElkDataPropertyAssertionAxiomImpl(
+						dataPropertyExpression, individual, literal));
+	}
+
+	public ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkClassExpression classExpression) {
+		return (ElkDataPropertyDomainAxiom) objectManager
+				.getCanonicalElkObject(new ElkDataPropertyDomainAxiomImpl(
+						dataPropertyExpression, classExpression));
+	}
+
+	public ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
+			ElkDataPropertyExpression dataPropertyExpression,
+			ElkDataRange dataRange) {
+		return (ElkDataPropertyRangeAxiom) objectManager
+				.getCanonicalElkObject(new ElkDataPropertyRangeAxiomImpl(
+						dataPropertyExpression, dataRange));
+	}
+
+	public ElkDataUnionOf getDataUnionOf(List<? extends ElkDataRange> dataRanges) {
+		return (ElkDataUnionOf) objectManager
+				.getCanonicalElkObject(new ElkDataUnionOfImpl(dataRanges));
+	}
+
+	public ElkDataUnionOf getDataUnionOf(ElkDataRange firstDataRange,
+			ElkDataRange secondDataRange, ElkDataRange... otherDataRanges) {
+		return (ElkDataUnionOf) objectManager
+				.getCanonicalElkObject(new ElkDataUnionOfImpl(
+						ElkObjectListObject.varArgsToList(firstDataRange,
+								secondDataRange, otherDataRanges)));
+	}
+
 }
