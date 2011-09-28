@@ -43,6 +43,6 @@ public interface ElkDataIntersectionOf extends ElkDataRange {
 	 * 
 	 * @return list of data ranges
 	 */
-	public List<? extends ElkDataRange> getClassExpressions();
+	public List<? extends ElkDataRange> getDataRanges();
 
 }

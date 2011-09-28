@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
@@ -20,29 +20,28 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Markus Kroetzsch, Aug 8, 2011
- */
 package org.semanticweb.elk.owl.interfaces;
 
-import java.util.List;
-
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Literals">Enumeration of
- * Literals<a> in the OWL 2 specification.
+ * Corresponds to a pair of constraining facet and restriction value as used in
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Datatype_Restrictions">OWL 2
+ * Datatype Restrictions<a>.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDataOneOf extends ElkDataRange {
+public interface ElkFacetRestriction {
 
 	/**
-	 * Get the list of literals that this expression refers to. The order of
-	 * literals does not affect the semantics but it is relevant to the
-	 * syntax of OWL.
+	 * Get the IRI of the constraining facet.
 	 * 
-	 * @return list of literals
+	 * @return IRI of the facet
 	 */
-	public List<? extends ElkLiteral> getLiterals();
+	public String getConstrainingFacet();
 
+	/**
+	 * Get the literal used as a restriction value.
+	 * 
+	 * @return the literal used as restriction value
+	 */
+	public ElkLiteral getRestrictionValue();
 }

@@ -20,29 +20,27 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Markus Kroetzsch, Aug 8, 2011
- */
-package org.semanticweb.elk.owl.interfaces;
+package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Literals">Enumeration of
- * Literals<a> in the OWL 2 specification.
+ * Implementation for ElkObjects that maintain a list of object property
+ * expressions.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDataOneOf extends ElkDataRange {
+public abstract class ElkDataPropertyExpressionListObject extends
+		ElkObjectListObject<ElkDataPropertyExpression> {
 
-	/**
-	 * Get the list of literals that this expression refers to. The order of
-	 * literals does not affect the semantics but it is relevant to the
-	 * syntax of OWL.
-	 * 
-	 * @return list of literals
-	 */
-	public List<? extends ElkLiteral> getLiterals();
+	/* package-private */ElkDataPropertyExpressionListObject(
+			List<? extends ElkDataPropertyExpression> dataPropertyExpressions) {
+		super(dataPropertyExpressions);
+	}
 
+	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions() {
+		return elkObjects;
+	}
 }

@@ -27,6 +27,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 
 /**
  * Visitor pattern interface for instances of {@link ElkDataRange}.
@@ -45,5 +46,7 @@ public interface ElkDataRangeVisitor<O> {
 	O visit(ElkDataIntersectionOf elkDataIntersectionOf);
 
 	O visit(ElkDataUnionOf elkDataUnionOf);
+
+	O visit(ElkDatatypeRestriction elkDatatypeRestriction);
 
 }
