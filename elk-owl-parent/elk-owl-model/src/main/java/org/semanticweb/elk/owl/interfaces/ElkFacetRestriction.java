@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.util.hashing.StructuralHashObject;
+
 /**
  * Corresponds to a pair of constraining facet and restriction value as used in
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Datatype_Restrictions">OWL 2
@@ -29,7 +31,7 @@ package org.semanticweb.elk.owl.interfaces;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkFacetRestriction {
+public interface ElkFacetRestriction extends StructuralHashObject {
 
 	/**
 	 * Get the IRI of the constraining facet.

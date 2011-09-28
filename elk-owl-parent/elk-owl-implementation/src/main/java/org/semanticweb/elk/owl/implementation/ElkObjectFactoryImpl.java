@@ -48,6 +48,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
@@ -58,6 +59,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
@@ -756,4 +758,17 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 								secondDataRange, otherDataRanges)));
 	}
 
+	public ElkDatatypeRestriction getDatatypeRestriction(ElkDatatype datatype,
+			List<ElkFacetRestriction> facetRestrictions) {
+		return (ElkDatatypeRestriction) objectManager
+				.getCanonicalElkObject(new ElkDatatypeRestrictionImpl(datatype,
+						facetRestrictions));
+	}
+
+	public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype,
+			String languageTag) {
+		return (ElkLiteral) objectManager
+				.getCanonicalElkObject(new ElkLiteralImpl(lexicalForm,
+						datatype, languageTag));
+	}
 }
