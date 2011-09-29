@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkEntity {
+public interface ElkEntity extends ElkObject {
 
 	/**
 	 * Get the IRI of this entity.

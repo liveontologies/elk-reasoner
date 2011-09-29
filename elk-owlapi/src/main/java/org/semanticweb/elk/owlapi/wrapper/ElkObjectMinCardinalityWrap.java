@@ -24,6 +24,7 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
@@ -38,7 +39,7 @@ import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
  * 
  */
 public class ElkObjectMinCardinalityWrap<T extends OWLObjectMinCardinality>
-		extends ElkClassExpressionWrap<T> implements ElkObjectMaxCardinality {
+		extends ElkClassExpressionWrap<T> implements ElkObjectMinCardinality {
 
 	ElkObjectMinCardinalityWrap(T owlObjectMinCardinality) {
 		super(owlObjectMinCardinality);

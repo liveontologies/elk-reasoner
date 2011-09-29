@@ -175,6 +175,64 @@ public class HashGenerator {
 	}
 
 	/**
+	 * Compute the combined hash code of several objects using their {@link
+	 * hashCode()} functions. The combined hash code depends on the order in
+	 * which the objects are listed.
+	 * 
+	 * The current implementation is based on the Jenkins One-at-a-Time hash,
+	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
+	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
+	 * 
+	 * @param objects
+	 *            the list of objects for which to compute the combined hash
+	 *            code
+	 * @return the combined hash code
+	 */
+	public static int combinedHashCode(Object... objects) {
+		int result = 0;
+		for (Object obj : objects) {
+			int h = obj.hashCode();
+			result += h;
+			result += (h << 10);
+			result ^= (h >> 6);
+		}
+		result += (result << 3);
+		result ^= (result >> 11);
+		result += (result << 15);
+
+		return result;
+	}
+
+	/**
+	 * Compute the combined hash code of several objects using their {@link
+	 * hashCode()} functions. The combined hash code depends on the order in
+	 * which the objects are listed.
+	 * 
+	 * The current implementation is based on the Jenkins One-at-a-Time hash,
+	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
+	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
+	 * 
+	 * @param objects
+	 *            the list of objects for which to compute the combined hash
+	 *            code
+	 * @return the combined hash code
+	 */
+	public static int combinedHashCode(Iterable<Object> objects) {
+		int result = 0;
+		for (Object obj : objects) {
+			int h = obj.hashCode();
+			result += h;
+			result += (h << 10);
+			result ^= (h >> 6);
+		}
+		result += (result << 3);
+		result ^= (result >> 11);
+		result += (result << 15);
+
+		return result;
+	}
+
+	/**
 	 * Combine the hash codes of a collection of structural hash objects into
 	 * one in a way that depends on their order.
 	 * 

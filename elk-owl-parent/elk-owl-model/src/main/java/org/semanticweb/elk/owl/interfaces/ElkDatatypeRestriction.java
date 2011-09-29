@@ -45,6 +45,6 @@ public interface ElkDatatypeRestriction extends ElkDataRange {
 	 * 
 	 * @return The facet restrictions of this datatype restriction.
 	 */
-	public List<ElkFacetRestriction> getFacetRestrictions();
+	public List<? extends ElkFacetRestriction> getFacetRestrictions();
 
 }

@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
+import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
@@ -37,6 +38,8 @@ public interface ElkObjectVisitor<O> extends ElkAxiomVisitor<O>,
 		ElkClassExpressionVisitor<O>, ElkDataRangeVisitor<O>,
 		ElkSubObjectPropertyExpressionVisitor<O>,
 		ElkDataPropertyExpressionVisitor<O>, ElkIndividualVisitor<O>,
-		ElkLiteralVisitor<O> {
+		ElkLiteralVisitor<O>, ElkEntityVisitor<O> {
+
+	O visit(ElkFacetRestriction elkFacetRestriction);
 
 }

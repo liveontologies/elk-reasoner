@@ -33,4 +33,19 @@ package org.semanticweb.elk.owl.interfaces;
  * @author Markus Kroetzsch
  */
 public interface ElkInverseObjectPropertiesAxiom extends ElkObjectPropertyAxiom {
+
+	/**
+	 * Get the first object property that this axiom refers to.
+	 * 
+	 * @return the first object property
+	 */
+	public ElkObjectPropertyExpression getFirstObjectPropertyExpression();
+
+	/**
+	 * Get the second object property that this axiom refers to.
+	 * 
+	 * @return the second object property
+	 */
+	public ElkObjectPropertyExpression getSecondObjectPropertyExpression();
+
 }

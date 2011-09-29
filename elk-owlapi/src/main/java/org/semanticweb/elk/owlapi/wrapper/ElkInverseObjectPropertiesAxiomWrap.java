@@ -23,12 +23,14 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
+import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLInverseObjectPropertiesAxiom;
 
 /**
- * Implements the {@link ElkInverseObjectPropertiesAxiom} interface by wrapping instances of
- * {@link OWLInverseObjectPropertiesAxiom}
+ * Implements the {@link ElkInverseObjectPropertiesAxiom} interface by wrapping
+ * instances of {@link OWLInverseObjectPropertiesAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -39,6 +41,18 @@ public class ElkInverseObjectPropertiesAxiomWrap<T extends OWLInverseObjectPrope
 
 	public ElkInverseObjectPropertiesAxiomWrap(T owlInverseObjectPropertiesAxiom) {
 		super(owlInverseObjectPropertiesAxiom);
+	}
+
+	public ElkObjectPropertyExpression getFirstObjectPropertyExpression() {
+		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
+				.getInstance();
+		return this.owlObject.getFirstProperty().accept(converter);
+	}
+
+	public ElkObjectPropertyExpression getSecondObjectPropertyExpression() {
+		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
+				.getInstance();
+		return this.owlObject.getSecondProperty().accept(converter);
 	}
 
 	@Override
