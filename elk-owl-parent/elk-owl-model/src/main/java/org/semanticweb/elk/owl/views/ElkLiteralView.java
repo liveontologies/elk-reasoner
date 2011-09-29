@@ -62,13 +62,8 @@ public class ElkLiteralView<T extends ElkLiteral> extends ElkObjectView<T>
 		return subObjectViewer.getView(this.elkObject.getDatatype());
 	}
 
-	public String getLanguageTag() {
-		return this.elkObject.getLanguageTag();
-	}
-
 	public int generateHashCode() {
-		return combinedHashCode(getClass(), getLexicalForm(), getDatatype(),
-				getLanguageTag());
+		return combinedHashCode(getClass(), getLexicalForm(), getDatatype());
 	}
 
 	@Override
@@ -81,8 +76,7 @@ public class ElkLiteralView<T extends ElkLiteral> extends ElkObjectView<T>
 			return (getClass() == other.getClass())
 					&& (this.subObjectViewer == otherView.subObjectViewer)
 					&& getLexicalForm().equals(otherView.getLexicalForm())
-					&& getDatatype().equals(otherView.getDatatype())
-					&& getLanguageTag().equals(otherView.getLanguageTag());
+					&& getDatatype().equals(otherView.getDatatype());
 		}
 		return false;
 	}

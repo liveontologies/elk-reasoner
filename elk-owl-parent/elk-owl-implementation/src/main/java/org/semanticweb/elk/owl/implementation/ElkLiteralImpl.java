@@ -37,16 +37,12 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 
 	protected final String lexicalForm;
 	protected final ElkDatatype datatype;
-	protected final String languageTag;
 
-	/* package-private */ElkLiteralImpl(String lexicalForm,
-			ElkDatatype datatype, String languageTag) {
+	/* package-private */ElkLiteralImpl(String lexicalForm, ElkDatatype datatype) {
 		this.lexicalForm = lexicalForm;
 		this.datatype = datatype;
-		this.languageTag = languageTag;
 		this.structuralHashCode = HashGenerator.combineListHash(
-				datatype.structuralHashCode(), lexicalForm.hashCode(),
-				languageTag.hashCode());
+				datatype.structuralHashCode(), lexicalForm.hashCode());
 	}
 
 	public boolean structuralEquals(Object object) {
@@ -54,9 +50,7 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 			return true;
 		} else if (object instanceof ElkLiteral) {
 			return lexicalForm.equals(((ElkLiteral) object).getLexicalForm())
-					&& datatype.equals(((ElkLiteral) object).getDatatype())
-					&& languageTag.equals(((ElkLiteral) object)
-							.getLanguageTag());
+					&& datatype.equals(((ElkLiteral) object).getDatatype());
 		} else {
 			return false;
 		}
@@ -68,10 +62,6 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 
 	public ElkDatatype getDatatype() {
 		return datatype;
-	}
-
-	public String getLanguageTag() {
-		return languageTag;
 	}
 
 	public <O> O accept(ElkLiteralVisitor<O> visitor) {

@@ -30,14 +30,15 @@ import org.semanticweb.elk.owl.visitors.ElkLiteralVisitor;
  * 
  * The OWL specification distinguishes three specific kinds of literals: typed
  * literals, plain literals without language tag, and plain literals with
- * language tag. However, plain literals without language tag are the same as
- * typed literals of type "rdf:PlainLiteral" i.e. they are considered
- * structurally identical. Thus, we really have two kinds of literals: typed
- * ones with and without language tag. The relevant constraint is: every literal
- * is either of type "rdf:PlainLiteral" or has an empty language tag. This
- * cannot be captured in an interface declaration, hence we only have one
- * interface for literals and leave it to the implementation to enforce the
- * restriction on language tag usage.
+ * language tag. However, plain literals are identified with typed literals of
+ * type "rdf:PlainLiteral" where the language tag is represented as part of the
+ * lexical form. For example, "Some text"@de is represented as
+ * "Some text@de"^^rdf:PlainLiteral and "Another text" is represented as
+ * "Another text@"^^rdf:PlainLiteral. These forms are considered structurally
+ * identical.
+ * 
+ * Therefore, all literals can be considered as consisting of a lexical form and
+ * a datatype.
  * 
  * Also note that the semantic interpretation of literals is not part of the
  * structural model of OWL. For example, the literals "1"^^xsd:integer,
@@ -61,14 +62,6 @@ public interface ElkLiteral extends ElkObject {
 	 * @return The datatype of this literal.
 	 */
 	public ElkDatatype getDatatype();
-
-	/**
-	 * Get the language tag of this literal or an empty string if no such tag is
-	 * given. See the interface documentation for further information.
-	 * 
-	 * @return The language tag of this literal, if any.
-	 */
-	public String getLanguageTag();
 
 	/**
 	 * Accept an ElkLiteralVisitor.

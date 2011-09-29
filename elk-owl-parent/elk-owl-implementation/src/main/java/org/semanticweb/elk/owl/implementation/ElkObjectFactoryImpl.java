@@ -107,22 +107,25 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	protected static final ElkClass ELK_OWL_THING = new ElkClassImpl(
-			"owl:Thing");
+			"http://www.w3.org/2002/07/owl#Thing");
 
 	protected static final ElkClass ELK_OWL_NOTHING = new ElkClassImpl(
-			"owl:Nothing");
+			"http://www.w3.org/2002/07/owl#Nothing");
 
 	protected static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			"owl:TopObjectProperty");
+			"http://www.w3.org/2002/07/owl#TopObjectProperty");
 
 	protected static final ElkObjectProperty ELK_OWL_BOTTOM_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			"owl:BottomObjectProperty");
+			"http://www.w3.org/2002/07/owl#BottomObjectProperty");
 
 	protected static final ElkDataProperty ELK_OWL_TOP_DATA_PROPERTY = new ElkDataPropertyImpl(
-			"owl:TopDataProperty");
+			"http://www.w3.org/2002/07/owl#TopDataProperty");
 
 	protected static final ElkDataProperty ELK_OWL_BOTTOM_DATA_PROPERTY = new ElkDataPropertyImpl(
-			"owl:BottomDataProperty");
+			"http://www.w3.org/2002/07/owl#BottomDataProperty");
+
+	protected static final ElkDatatype ELK_RDF_PLAIN_LITERAL = new ElkDatatypeImpl(
+			"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 
 	protected final ElkObjectManager objectManager;
 
@@ -568,6 +571,10 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 				.getCanonicalElkObject(new ElkDatatypeImpl(iri));
 	}
 
+	public ElkDatatype getDatatypeRdfPlainLiteral() {
+		return ELK_RDF_PLAIN_LITERAL;
+	}
+
 	public ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
 			List<? extends ElkDataPropertyExpression> disjointDataPropertyExpressions) {
 		return (ElkDisjointDataPropertiesAxiom) objectManager
@@ -765,10 +772,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						facetRestrictions));
 	}
 
-	public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype,
-			String languageTag) {
+	public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype) {
 		return (ElkLiteral) objectManager
-				.getCanonicalElkObject(new ElkLiteralImpl(lexicalForm,
-						datatype, languageTag));
+				.getCanonicalElkObject(new ElkLiteralImpl(lexicalForm, datatype));
 	}
 }

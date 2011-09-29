@@ -51,6 +51,7 @@ public class ReasonerTest extends TestCase {
 
 		Reasoner reasoner = new Reasoner();
 		reasoner.loadOntologyFromString(""//
+				+ "Prefix( : = <http://example.org/> )"
 				+ "Ontology("//
 				+ "EquivalentClasses(:B :C)"//
 				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
@@ -60,11 +61,11 @@ public class ReasonerTest extends TestCase {
 				+ ")"//
 		);
 
-		ElkClass a = objectFactory.getClass(":A");
-		ElkClass d = objectFactory.getClass(":D");
-		ElkClass e = objectFactory.getClass(":E");
-		ElkObjectProperty r = objectFactory.getObjectProperty(":R");
-		ElkObjectProperty s = objectFactory.getObjectProperty(":S");
+		ElkClass a = objectFactory.getClass("http://example.org/A");
+		ElkClass d = objectFactory.getClass("http://example.org/D");
+		ElkClass e = objectFactory.getClass("http://example.org/E");
+		ElkObjectProperty r = objectFactory.getObjectProperty("http://example.org/R");
+		ElkObjectProperty s = objectFactory.getObjectProperty("http://example.org/S");
 
 		reasoner.classify();
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
@@ -86,15 +87,17 @@ public class ReasonerTest extends TestCase {
 			ExecutionException, ParseException, IOException {
 
 		final Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString("Ontology(" + "SubClassOf(:A :B)"
+		reasoner.loadOntologyFromString(
+				  "Prefix( : = <http://example.org/> )"
+				+ "Ontology(" + "SubClassOf(:A :B)"
 				+ "SubClassOf(:A :C)" + "SubClassOf(:A :D)"
 				+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)" + ")");
 
-		ElkClass a = objectFactory.getClass(":A");
-		ElkClass b = objectFactory.getClass(":B");
-		ElkClass c = objectFactory.getClass(":C");
-		ElkClass d = objectFactory.getClass(":D");
-		ElkClass e = objectFactory.getClass(":E");
+		ElkClass a = objectFactory.getClass("http://example.org/A");
+		ElkClass b = objectFactory.getClass("http://example.org/B");
+		ElkClass c = objectFactory.getClass("http://example.org/C");
+		ElkClass d = objectFactory.getClass("http://example.org/D");
+		ElkClass e = objectFactory.getClass("http://example.org/E");
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
@@ -132,6 +135,8 @@ public class ReasonerTest extends TestCase {
 	public void testPropertyChains() throws ParseException, IOException {
 		Reasoner reasoner = new Reasoner();
 		reasoner.loadOntologyFromString(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
 				+ "Ontology("//
 				+ "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
 				+ "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
@@ -146,9 +151,9 @@ public class ReasonerTest extends TestCase {
 		reasoner.classify();
 
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
-		ClassNode aNode = taxonomy.getNode(objectFactory.getClass(":A"));
+		ClassNode aNode = taxonomy.getNode(objectFactory.getClass("http://example.org/A"));
 		assertTrue("A SubClassOf X", aNode.getDirectSuperNodes().contains(
-				taxonomy.getNode(objectFactory.getClass(":X"))));
+				taxonomy.getNode(objectFactory.getClass("http://example.org/X"))));
 	}
 
 
@@ -156,14 +161,16 @@ public class ReasonerTest extends TestCase {
 			ExecutionException, ParseException, IOException {
 
 		final Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString("Ontology(" + "SubClassOf(:A :B)"
+		reasoner.loadOntologyFromString(
+				  "Prefix( : = <http://example.org/> )"
+				+ "Ontology(" + "SubClassOf(:A :B)"
 				+ "SubClassOf(:A :C)" + "SubClassOf(:B :D)"
 				+ "SubClassOf(:C :D))");
 
-		ElkClass a = objectFactory.getClass(":A");
-		ElkClass b = objectFactory.getClass(":B");
-		ElkClass c = objectFactory.getClass(":C");
-		ElkClass d = objectFactory.getClass(":D");
+		ElkClass a = objectFactory.getClass("http://example.org/A");
+		ElkClass b = objectFactory.getClass("http://example.org/B");
+		ElkClass c = objectFactory.getClass("http://example.org/C");
+		ElkClass d = objectFactory.getClass("http://example.org/D");
 
 		OntologyIndex index = reasoner.ontologyIndex;
 

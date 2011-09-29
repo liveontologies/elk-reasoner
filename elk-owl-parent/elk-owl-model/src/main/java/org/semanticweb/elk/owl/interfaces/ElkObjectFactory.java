@@ -240,6 +240,13 @@ public interface ElkObjectFactory {
 	public abstract ElkDatatype getDatatype(String iri);
 
 	/**
+	 * Create the ElkDatatype for rdf:PlainLiteral.
+	 * 
+	 * @return
+	 */
+	public abstract ElkDatatype getDatatypeRdfPlainLiteral();
+
+	/**
 	 * Create an ElkDatatypeRestriction.
 	 * 
 	 * @param datatype
@@ -505,11 +512,10 @@ public interface ElkObjectFactory {
 	 * 
 	 * @param lexicalForm
 	 * @param datatype
-	 * @param languageTag
 	 * @return
 	 */
 	public abstract ElkLiteral getLiteral(String lexicalForm,
-			ElkDatatype datatype, String languageTag);
+			ElkDatatype datatype);
 
 	/**
 	 * Create an ElkNamedIndividual.
