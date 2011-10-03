@@ -1,4 +1,4 @@
-package org.semanticweb.elk.owl;
+package org.semanticweb.elk.owl.managers;
 /*
  * #%L
  * elk-reasoner

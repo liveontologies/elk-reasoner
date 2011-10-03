@@ -1,4 +1,4 @@
-package org.semanticweb.elk.owl;
+package org.semanticweb.elk.owl.managers;
 /*
  * #%L
  * ELK Reasoner
@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * 
  * @author Markus Kroetzsch
  */
-public class ElkDummyObjectManager implements ElkObjectManager {
+public class DummyObjectManager implements ElkObjectManager {
 
 	public ElkObject getCanonicalElkObject(ElkObject object) {
 		return object;

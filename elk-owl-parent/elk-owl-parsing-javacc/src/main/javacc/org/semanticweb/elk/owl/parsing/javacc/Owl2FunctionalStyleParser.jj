@@ -123,13 +123,13 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
-import org.semanticweb.elk.owl.ElkDummyObjectManager;
+import org.semanticweb.elk.owl.managers.DummyObjectManager;
 import java.util.Map;
 import java.util.HashMap;
 
 public class Owl2FunctionalStyleParser {
 
-	private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(new ElkDummyObjectManager());
+	private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(new DummyObjectManager());
 
 	/**
 	 * Prefix declarations as found in the parsed document.

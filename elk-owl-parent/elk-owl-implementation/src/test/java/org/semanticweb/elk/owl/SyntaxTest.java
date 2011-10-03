@@ -47,42 +47,5 @@ public class SyntaxTest extends TestCase {
 		assertSame("heart == heart2", heart, heart2);
 		assertNotSame("heart != organ", organ);
 
-		ElkClassExpression human = objectFactory.getClass("Human");
-		ElkObjectPropertyExpression has = objectFactory
-				.getObjectProperty("has");
-
-		ElkClassExpression hasHeart = objectFactory.getObjectSomeValuesFrom(
-				has, heart);
-		ElkClassExpression hasOrgan = objectFactory.getObjectSomeValuesFrom(
-				has, organ);
-		ElkClassExpression hasHeart2 = objectFactory.getObjectSomeValuesFrom(
-				has, heart2);
-
-		assertSame("hasHeart == hasHeart2", hasHeart, hasHeart2);
-		assertNotSame("hasHeart != hasOrgan", hasHeart, hasOrgan);
-
-		ElkClassExpression heartAndOrgan = objectFactory
-				.getObjectIntersectionOf(Arrays.asList(heart, organ));
-		ElkClassExpression organAndHeart = objectFactory
-				.getObjectIntersectionOf(Arrays.asList(organ, heart));
-		ElkClassExpression heart2AndOrgan = objectFactory
-				.getObjectIntersectionOf(Arrays.asList(heart2, organ));
-
-		assertSame("heartAndOrgan == heart2AndOrgan", heartAndOrgan,
-				heart2AndOrgan);
-		assertNotSame("heartAndOrgan == organAndHeart", heartAndOrgan,
-				organAndHeart);
-
-		ElkClassAxiom humanHasHeart = objectFactory.getSubClassOfAxiom(human,
-				hasHeart);
-		ElkClassAxiom humanHasOrgan = objectFactory.getSubClassOfAxiom(human,
-				hasOrgan);
-		ElkClassAxiom humanHasHeart2 = objectFactory.getSubClassOfAxiom(human,
-				hasHeart2);
-
-		assertSame("humanHasHeart == humanHasHeart2", humanHasHeart,
-				humanHasHeart2);
-		assertNotSame("humanHasHeart != humanHasOrgan", humanHasHeart,
-				humanHasOrgan);
 	}
 }

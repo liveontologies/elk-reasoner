@@ -1,4 +1,4 @@
-package org.semanticweb.elk.owl;
+package org.semanticweb.elk.owl.managers;
 /*
  * #%L
  * elk-reasoner
@@ -44,7 +44,6 @@ package org.semanticweb.elk.owl;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;

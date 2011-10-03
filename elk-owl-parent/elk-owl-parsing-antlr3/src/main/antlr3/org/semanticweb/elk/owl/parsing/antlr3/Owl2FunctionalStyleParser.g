@@ -63,12 +63,12 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
-import org.semanticweb.elk.owl.ElkDummyObjectManager;
+import org.semanticweb.elk.owl.managers.DummyObjectManager;
 }
 
 
 @members {
-    private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(new ElkDummyObjectManager());
+    private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(new DummyObjectManager());
 
   // Make sure that exception is thrown on parsing error
   @Override

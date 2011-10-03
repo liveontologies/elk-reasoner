@@ -24,8 +24,6 @@ package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.ElkObjectManager;
-import org.semanticweb.elk.owl.WeakCanonicalSet;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -97,6 +95,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.managers.ElkObjectManager;
+import org.semanticweb.elk.owl.managers.WeakCanonicalSet;
 
 /**
  * A factory for creating ElkObjects based on the implementations in the
