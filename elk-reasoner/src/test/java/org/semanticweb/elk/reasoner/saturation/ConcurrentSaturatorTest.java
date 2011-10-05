@@ -46,7 +46,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 	}
 
 	public void testExistentials() throws InterruptedException,
-			ExecutionException {
+			ExecutionException {		
 		ElkClass a = objectFactory.getClass(":A");
 		ElkClass b = objectFactory.getClass(":B");
 		ElkClass c = objectFactory.getClass(":C");
@@ -71,11 +71,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 		final ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
 				executor, 16, ontologyIndex);
 
-		objectPropertySaturation.compute();
+		objectPropertySaturation.compute();		
 
 		final ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
 				executor, 16, ontologyIndex);
 
+		classExpressionSaturation.start();
 		classExpressionSaturation.submit(A);
 		classExpressionSaturation.waitCompletion();
 
@@ -121,6 +122,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		final ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
 				executor, 16, ontologyIndex);
 
+		classExpressionSaturation.start();
 		classExpressionSaturation.submit(A);
 		classExpressionSaturation.waitCompletion();
 		SaturatedClassExpression context = A.getSaturated();

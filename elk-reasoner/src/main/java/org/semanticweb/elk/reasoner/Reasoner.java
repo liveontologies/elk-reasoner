@@ -160,14 +160,24 @@ public class Reasoner {
 		Statistics.logOperationStart("Saturation", LOGGER_);
 		progressMonitor.start("Saturation");
 
-		objectPropertySaturation.compute();
-		
+		try {
+			objectPropertySaturation.compute();
+		} catch (InterruptedException e1) {
+		}
+
 		progress = 0;
+		classExpressionSaturation.start();
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
-			classExpressionSaturation.submit(ic);
+			try {
+				classExpressionSaturation.submit(ic);
+			} catch (InterruptedException e) {
+			}
 			progressMonitor.report(++progress, maxIndexedClassCount);
 		}
-		classExpressionSaturation.waitCompletion();
+		try {
+			classExpressionSaturation.waitCompletion();
+		} catch (InterruptedException e) {
+		}
 
 		progressMonitor.finish();
 		Statistics.logOperationFinish("Saturation", LOGGER_);
@@ -182,12 +192,20 @@ public class Reasoner {
 		ClassTaxonomyComputation classification = new ClassTaxonomyComputation(
 				executor, workerNo);
 		progress = 0;
+		classification.start();
+
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
-			classification.submit(ic);
+			try {
+				classification.submit(ic);
+			} catch (InterruptedException e) {
+			}
 			progressMonitor.report(++progress, maxIndexedClassCount);
 		}
 
-		classTaxonomy = classification.computeTaxonomy();
+		try {
+			classTaxonomy = classification.computeTaxonomy();
+		} catch (InterruptedException e) {
+		}
 
 		progressMonitor.finish();
 		Statistics.logOperationFinish("Transitive reduction", LOGGER_);

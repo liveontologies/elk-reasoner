@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.log4j.Logger;
@@ -35,7 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
-import org.semanticweb.elk.util.concurrent.AbstractConcurrentComputation;
+import org.semanticweb.elk.util.concurrent.computation.AbstractConcurrentComputation;
 
 public class ClassTaxonomyComputation extends
 		AbstractConcurrentComputation<IndexedClass> {
@@ -53,14 +55,20 @@ public class ClassTaxonomyComputation extends
 	// Factory used to get owl:Thing and owl:Nothing.
 	protected final ElkObjectFactory objectFactory;
 
+	/**
+	 * Queue for nodes with assigned parents
+	 */
+	protected final Queue<ClassNode> assignedParentsNodes;
+
 	public ClassTaxonomyComputation(ExecutorService executor, int maxWorkers) {
-		super(executor, maxWorkers, 256, 512);
+		super(executor, maxWorkers, 2 * maxWorkers, 1024);
 		this.classTaxonomy = new ConcurrentClassTaxonomy();
-		this.linker = new Linker();
+		this.linker = new Linker(executor, 2 * maxWorkers, 16, 1024);
 		this.objectFactory = new ElkObjectFactoryImpl();
+		this.assignedParentsNodes = new ConcurrentLinkedQueue<ClassNode>();
 	}
 
-	public ClassTaxonomy computeTaxonomy() {
+	public ClassTaxonomy computeTaxonomy() throws InterruptedException {
 		waitCompletion();
 
 		topNode = classTaxonomy.getNode(objectFactory.getOwlThing());
@@ -77,7 +85,17 @@ public class ClassTaxonomyComputation extends
 					bottomNode);
 		}
 
+		// processing the nodes with assigned parents
 		linker.start();
+
+		for (;;) {
+			ClassNode node = assignedParentsNodes.poll();
+			if (node == null) {
+				break;
+			}
+			linker.submit(node);
+		}
+
 		linker.waitCompletion();
 
 		for (ClassNode node : classTaxonomy.getNodes())
@@ -91,6 +109,12 @@ public class ClassTaxonomyComputation extends
 
 	protected ClassNode getNode(IndexedClass indexedClass) {
 		return classTaxonomy.getNode(indexedClass.getElkClass());
+	}
+
+	protected void process(Iterable<IndexedClass> rootBatch) {
+		for (IndexedClass root : rootBatch) {
+			process(root);
+		}
 	}
 
 	protected void process(IndexedClass root) {
@@ -135,7 +159,7 @@ public class ClassTaxonomyComputation extends
 		ClassNode node = new ClassNode(equivalent);
 		node.parentIndexClasses = parents;
 
-		linker.submit(node);
+		assignedParentsNodes.add(node);
 
 		for (ElkClass ec : equivalent)
 			classTaxonomy.nodeLookup.put(ec, node);
@@ -143,19 +167,9 @@ public class ClassTaxonomyComputation extends
 
 	private class Linker extends AbstractConcurrentComputation<ClassNode> {
 
-		public Linker() {
-			super(ClassTaxonomyComputation.this.executor,
-					ClassTaxonomyComputation.this.maxWorkers, 0, 0);
-		}
-
-		@Override
-		public void submit(ClassNode node) {
-			buffer.add(node);
-		}
-
-		public void start() {
-			for (int i = 0; i < maxWorkers; i++)
-				addWorker();
+		public Linker(ExecutorService executor, int maxWorkers,
+				int bufferCapacity, int batchSize) {
+			super(executor, maxWorkers, bufferCapacity, batchSize);
 		}
 
 		@Override

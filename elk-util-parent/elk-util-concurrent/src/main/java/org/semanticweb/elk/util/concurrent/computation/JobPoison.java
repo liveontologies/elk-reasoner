@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK Utilities for Concurrency
  * 
  * $Id$
  * $HeadURL$
@@ -20,14 +20,21 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
+package org.semanticweb.elk.util.concurrent.computation;
 
-public interface IndexedObjectFilter {
+/**
+ * A dummy class for "poison" elements, typically used to terminate the workers
+ * in the producer-consumer framework.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <I>
+ *            the type of the input elements
+ */
+public final class JobPoison<I> implements Job<I> {
 
-	IndexedClassExpression filter(IndexedClassExpression ice);
-
-	IndexedObjectProperty filter(IndexedObjectProperty iop);
-
-	IndexedPropertyComposition filter(IndexedPropertyComposition ipc);
+	public <O> O accept(JobProcessor<I, O> processor) {
+		return processor.process(this);
+	}
 
 }

@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK Utilities for Concurrency
  * 
  * $Id$
  * $HeadURL$
@@ -20,14 +20,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
+package org.semanticweb.elk.util.concurrent.computation;
 
-public interface IndexedObjectFilter {
+/**
+ * A general interface for jobs processed by workers.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <I>
+ *            the type of the input to be processed
+ */
+public interface Job<I> {
 
-	IndexedClassExpression filter(IndexedClassExpression ice);
-
-	IndexedObjectProperty filter(IndexedObjectProperty iop);
-
-	IndexedPropertyComposition filter(IndexedPropertyComposition ipc);
+	/**
+	 * processing of the job using a job processor
+	 * 
+	 * @param processor
+	 *            the job processor with the input type {@link I} and output
+	 *            type {@link O}
+	 * @return
+	 */
+	public <O> O accept(JobProcessor<I, O> processor);
 
 }

@@ -121,7 +121,9 @@ class AxiomIndexer implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 	 * Index the given axiom.
 	 */
 	public void process(ElkAxiom elkAxiom) {
-		elkAxiom.accept(this);
+		if (elkAxiom != null) {
+			elkAxiom.accept(this);
+		}
 	}
 
 	public Void visit(ElkSubClassOfAxiom axiom) {

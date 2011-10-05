@@ -23,6 +23,8 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Collection;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,7 +40,7 @@ import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
-import org.semanticweb.elk.util.concurrent.AbstractConcurrentComputation;
+import org.semanticweb.elk.util.concurrent.computation.AbstractConcurrentComputation;
 
 /**
  * Experimental version of Saturation Manager.
@@ -47,7 +49,7 @@ import org.semanticweb.elk.util.concurrent.AbstractConcurrentComputation;
  * 
  */
 public class ClassExpressionSaturation extends
-		AbstractConcurrentComputation<SaturatedClassExpression> {
+		AbstractConcurrentComputation<IndexedClassExpression> {
 
 	AtomicInteger derivedNo = new AtomicInteger(0);
 	AtomicInteger backLinkNo = new AtomicInteger(0);
@@ -61,11 +63,19 @@ public class ClassExpressionSaturation extends
 
 	protected final IndexedClassExpression owlThing;
 
-	public ClassExpressionSaturation(ExecutorService executor, int workerNo,
-			OntologyIndex ontologyIndex) {
-		super(executor, workerNo, 256, 512);
-		this.ontologyIndex = ontologyIndex;
+	/**
+	 * The queue containing all activated contexts. Every activated context
+	 * occurs exactly once.
+	 */
+	protected final Queue<SaturatedClassExpression> activeContexts;
 
+	public ClassExpressionSaturation(ExecutorService executor, int maxWorkers,
+			OntologyIndex ontologyIndex) {
+		super(executor, maxWorkers, 8 * maxWorkers, 32);
+		this.ontologyIndex = ontologyIndex;
+		this.activeContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
+
+		// reset saturation in case of re-saturation after changes
 		for (IndexedClassExpression ice : ontologyIndex
 				.getIndexedClassExpressions())
 			ice.resetSaturated();
@@ -73,11 +83,6 @@ public class ClassExpressionSaturation extends
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 		owlThing = ontologyIndex.getIndexedClassExpression(objectFactory
 				.getOwlThing());
-	}
-
-	public void submit(IndexedClassExpression root) {
-		waitCapacity();
-		getCreateContext(root);
 	}
 
 	/**
@@ -112,7 +117,7 @@ public class ClassExpressionSaturation extends
 
 	protected void activateContext(SaturatedClassExpression context) {
 		if (context.tryActivate()) {
-			addJob(context);
+			activeContexts.add(context);
 		}
 	}
 
@@ -134,8 +139,22 @@ public class ClassExpressionSaturation extends
 		}
 	}
 
-	@Override
+	protected void process(IndexedClassExpression ice) {
+		getCreateContext(ice);
+		processActiveContexts();
+	}
+
+	protected void processActiveContexts() {
+		for (;;) {
+			SaturatedClassExpression nextContext = activeContexts.poll();
+			if (nextContext == null)
+				break;
+			process(nextContext);
+		}
+	}
+
 	protected void process(SaturatedClassExpression context) {
+
 		final QueueProcessor queueProcessor = new QueueProcessor(context);
 
 		for (;;) {
@@ -204,15 +223,16 @@ public class ClassExpressionSaturation extends
 									.keySet(),
 							context.forwardLinksByObjectProperty.keySet())) {
 
-						Collection<IndexedPropertyExpression> compositions = 
-							linkRelation.getSaturated().propertyCompositionsByRightSubProperty.get(forwardRelation);
-						Collection<Linkable> forwardTargets = 
-							context.forwardLinksByObjectProperty.get(forwardRelation);
-						
+						Collection<IndexedPropertyExpression> compositions = linkRelation
+								.getSaturated().propertyCompositionsByRightSubProperty
+								.get(forwardRelation);
+						Collection<Linkable> forwardTargets = context.forwardLinksByObjectProperty
+								.get(forwardRelation);
+
 						for (IndexedPropertyExpression composition : compositions)
 							for (Linkable forwardTarget : forwardTargets)
-								enqueue(forwardTarget,
-									new BackwardLink(composition, target));
+								enqueue(forwardTarget, new BackwardLink(
+										composition, target));
 					}
 				}
 
@@ -244,14 +264,16 @@ public class ClassExpressionSaturation extends
 									.keySet(),
 							context.backwardLinksByObjectProperty.keySet())) {
 
-						Collection<IndexedPropertyExpression> compositions =
-							linkRelation.getSaturated().propertyCompositionsByLeftSubProperty.get(backwardRelation);
-						Collection<Linkable> backwardTargets =
-							context.backwardLinksByObjectProperty.get(backwardRelation);
-						
+						Collection<IndexedPropertyExpression> compositions = linkRelation
+								.getSaturated().propertyCompositionsByLeftSubProperty
+								.get(backwardRelation);
+						Collection<Linkable> backwardTargets = context.backwardLinksByObjectProperty
+								.get(backwardRelation);
+
 						for (IndexedPropertyExpression composition : compositions)
 							for (Linkable backwardTarget : backwardTargets)
-								enqueue(target,	new BackwardLink(composition, backwardTarget));
+								enqueue(target, new BackwardLink(composition,
+										backwardTarget));
 					}
 				}
 
@@ -338,8 +360,7 @@ public class ClassExpressionSaturation extends
 
 		}
 
-		private ClassExpressionDecomposer classExpressionDecomposer =
-			new ClassExpressionDecomposer();
+		private ClassExpressionDecomposer classExpressionDecomposer = new ClassExpressionDecomposer();
 
 		private class ClassExpressionDecomposer implements
 				IndexedClassExpressionVisitor<Void> {
@@ -388,13 +409,13 @@ public class ClassExpressionSaturation extends
 
 	}
 
-//	@Override
-//	public void waitCompletion() {
-//		super.waitCompletion();
-//		System.err.println("derived: " + derivedNo);
-//		System.err.println("backLnk: " + backLinkNo);
-//		System.err.println("  props: " + propNo);
-//		System.err.println("forwLnk: " + forwLinkNo);
-//	}
+	// @Override
+	// public void waitCompletion() {
+	// super.waitCompletion();
+	// System.err.println("derived: " + derivedNo);
+	// System.err.println("backLnk: " + backLinkNo);
+	// System.err.println("  props: " + propNo);
+	// System.err.println("forwLnk: " + forwLinkNo);
+	// }
 
 }

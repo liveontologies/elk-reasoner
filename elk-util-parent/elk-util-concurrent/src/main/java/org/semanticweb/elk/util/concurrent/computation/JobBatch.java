@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK Utilities for Concurrency
  * 
  * $Id$
  * $HeadURL$
@@ -20,14 +20,32 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
+package org.semanticweb.elk.util.concurrent.computation;
 
-public interface IndexedObjectFilter {
+import java.util.ArrayList;
 
-	IndexedClassExpression filter(IndexedClassExpression ice);
+/**
+ * The class holding a collection of the input elements (a batch) to be
+ * processed.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <I>
+ *            the type of the input elements
+ */
+public final class JobBatch<I> extends ArrayList<I> implements Job<I> {
 
-	IndexedObjectProperty filter(IndexedObjectProperty iop);
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8035078348556495610L;
 
-	IndexedPropertyComposition filter(IndexedPropertyComposition ipc);
+	JobBatch(int size) {
+		super(size);
+	}
+
+	public <O> O accept(JobProcessor<I, O> processor) {
+		return processor.process(this);
+	}
 
 }
