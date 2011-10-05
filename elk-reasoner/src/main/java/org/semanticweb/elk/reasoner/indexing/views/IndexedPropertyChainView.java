@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.views;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -34,14 +34,14 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @param <T>
  *            the typed of the wrapped indexed object property expression
  */
-public abstract class IndexedSubPropertyExpressionView<T extends IndexedSubPropertyExpression> {
+public abstract class IndexedPropertyChainView<T extends IndexedPropertyChain> {
 
 	/**
 	 * The wrapped indexed class expression
 	 */
 	protected final T representative;
 
-	IndexedSubPropertyExpressionView(T representative) {
+	IndexedPropertyChainView(T representative) {
 		this.representative = representative;
 	}
 

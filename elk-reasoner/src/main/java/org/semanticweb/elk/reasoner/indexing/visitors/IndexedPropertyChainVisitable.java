@@ -24,12 +24,12 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 
 /**
  * Interface for things that can be visited by
- * {@link IndexedPropertyCompositionVisitor}.
+ * {@link IndexedPropertyChainVisitor}.
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedPropertyCompositionVisitable {
+public interface IndexedPropertyChainVisitable {
 
-	public <O> O accept(IndexedPropertyCompositionVisitor<O> visitor);
+	<O> O accept(IndexedPropertyChainVisitor<O> visitor);
 
 }

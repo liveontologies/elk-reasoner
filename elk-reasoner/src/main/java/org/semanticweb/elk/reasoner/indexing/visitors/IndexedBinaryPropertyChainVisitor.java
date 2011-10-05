@@ -22,14 +22,16 @@
  */
 package org.semanticweb.elk.reasoner.indexing.visitors;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+
 /**
- * Interface for things that can be visited by
- * {@link IndexedSubPropertyExpressionVisitor}.
+ * Visitor pattern interface for instances of {@link IndexedBinaryPropertyChain}
+ * .
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedSubPropertyExpressionVisitable {
+public interface IndexedBinaryPropertyChainVisitor<O> {
 
-	public <O> O accept(IndexedSubPropertyExpressionVisitor<O> visitor);
+	O visit(IndexedBinaryPropertyChain element);
 
 }

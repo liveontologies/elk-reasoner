@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitable;
 import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -50,11 +49,6 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 abstract public class IndexedClassExpression implements
 		IndexedClassExpressionVisitable {
-	/**
-	 * list of ElkClassExpressions that are represented by this object, possibly
-	 * empty
-	 */
-	protected final List<ElkClassExpression> representatives;
 
 	protected List<IndexedClassExpression> toldSuperClassExpressions;
 	protected Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
@@ -81,10 +75,6 @@ abstract public class IndexedClassExpression implements
 	 */
 	protected int negativeOccurrenceNo = 0;
 
-	protected IndexedClassExpression(List<ElkClassExpression> representatives) {
-		this.representatives = representatives;
-	}
-
 	public boolean occurs() {
 		return occurrenceNo > 0;
 	}
@@ -98,7 +88,9 @@ abstract public class IndexedClassExpression implements
 	}
 
 	protected abstract void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement);
+			int positiveIncrement, int negativeIncrement,
+			IndexedObjectCanonizer canonizer);
+	
 
 	/**
 	 * @return All told super class expressions of this class expression,
@@ -122,14 +114,6 @@ abstract public class IndexedClassExpression implements
 	 */
 	public List<IndexedObjectSomeValuesFrom> getNegExistentials() {
 		return negExistentials;
-	}
-
-	protected void addRepresentative(ElkClassExpression classExpression) {
-		representatives.add(classExpression);
-	}
-
-	protected List<ElkClassExpression> getRepresentantatives() {
-		return representatives;
 	}
 
 	protected void addToldSuperClassExpression(

@@ -29,6 +29,6 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  */
 public interface IndexedClassVisitable {
 
-	public <O> O accept(IndexedClassVisitor<O> visitor);
+	<O> O accept(IndexedClassVisitor<O> visitor);
 
 }

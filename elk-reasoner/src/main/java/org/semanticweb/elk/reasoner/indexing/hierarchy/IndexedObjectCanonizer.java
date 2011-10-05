@@ -26,18 +26,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.views.IndexedClassExpressionView;
-import org.semanticweb.elk.reasoner.indexing.views.IndexedSubPropertyExpressionView;
+import org.semanticweb.elk.reasoner.indexing.views.IndexedPropertyChainView;
 import org.semanticweb.elk.reasoner.indexing.views.IndexedViewConverter;
 
 class IndexedObjectCanonizer {
 
-	private final Map<IndexedClassExpressionView<? extends IndexedClassExpression>, IndexedClassExpression> indexedClassExpressionLookup;
-	private final Map<IndexedSubPropertyExpressionView<? extends IndexedSubPropertyExpression>, IndexedSubPropertyExpression> indexedSubPropertyExpressionLookup;
-
+	protected final Map<IndexedClassExpressionView<? extends IndexedClassExpression>, IndexedClassExpression> indexedClassExpressionLookup;
+	protected final Map<IndexedPropertyChainView<? extends IndexedPropertyChain>, IndexedPropertyChain> indexedPropertyChainLookup;
+	protected int indexedClassCount = 0;
+	protected int indexedObjectPropertyCount = 0;
+	
 	IndexedObjectCanonizer() {
-		indexedClassExpressionLookup = new HashMap<IndexedClassExpressionView<? extends IndexedClassExpression>, IndexedClassExpression>(
+		indexedClassExpressionLookup = 
+			new HashMap<IndexedClassExpressionView<? extends IndexedClassExpression>, IndexedClassExpression>(
 				1023);
-		indexedSubPropertyExpressionLookup = new HashMap<IndexedSubPropertyExpressionView<? extends IndexedSubPropertyExpression>, IndexedSubPropertyExpression>(
+		indexedPropertyChainLookup = 
+			new HashMap<IndexedPropertyChainView<? extends IndexedPropertyChain>, IndexedPropertyChain>(
 				127);
 	}
 
@@ -49,11 +53,11 @@ class IndexedObjectCanonizer {
 		return result;
 	}
 
-	IndexedSubPropertyExpression get(IndexedSubPropertyExpression ipe) {
-		IndexedSubPropertyExpressionView<? extends IndexedSubPropertyExpression> ipeView = ipe
+	IndexedPropertyChain get(IndexedPropertyChain ipc) {
+		IndexedPropertyChainView<? extends IndexedPropertyChain> ipcView = ipc
 				.accept(IndexedViewConverter.getInstance());
-		IndexedSubPropertyExpression result = indexedSubPropertyExpressionLookup
-				.get(ipeView);
+		IndexedPropertyChain result = indexedPropertyChainLookup
+				.get(ipcView);
 		return result;
 	}
 
@@ -65,32 +69,41 @@ class IndexedObjectCanonizer {
 		if (result == null) {
 			result = ice;
 			indexedClassExpressionLookup.put(iceView, result);
+			if (ice instanceof IndexedClass)
+				indexedClassCount++;
 		}
 		return result;
 	}
 
-	IndexedSubPropertyExpression getCreate(IndexedSubPropertyExpression ipe) {
-		IndexedSubPropertyExpressionView<? extends IndexedSubPropertyExpression> ipeView = ipe
+	IndexedPropertyChain getCreate(IndexedPropertyChain ipc) {
+		IndexedPropertyChainView<? extends IndexedPropertyChain> ipcView = ipc
 				.accept(IndexedViewConverter.getInstance());
-		IndexedSubPropertyExpression result = indexedSubPropertyExpressionLookup
-				.get(ipeView);
+		IndexedPropertyChain result = indexedPropertyChainLookup
+				.get(ipcView);
 		if (result == null) {
-			result = ipe;
-			indexedSubPropertyExpressionLookup.put(ipeView, result);
+			result = ipc;
+			indexedPropertyChainLookup.put(ipcView, result);
+			if (ipc instanceof IndexedObjectProperty)
+				indexedObjectPropertyCount++;
 		}
 		return result;
 	}
 
-	void remove(IndexedClassExpression ice) {
+	boolean remove(IndexedClassExpression ice) {
 		IndexedClassExpressionView<? extends IndexedClassExpression> iceView = ice
 				.accept(IndexedViewConverter.getInstance());
-		indexedClassExpressionLookup.remove(iceView);
+		boolean success = indexedClassExpressionLookup.remove(iceView) != null;
+		if (success && ice instanceof IndexedClass)
+			indexedClassCount--;
+		return success;
 	}
 
-	void remove(IndexedSubPropertyExpression ipe) {
-		IndexedSubPropertyExpressionView<? extends IndexedSubPropertyExpression> ipeView = ipe
+	boolean remove(IndexedPropertyChain ipc) {
+		IndexedPropertyChainView<? extends IndexedPropertyChain> ipcView = ipc
 				.accept(IndexedViewConverter.getInstance());
-		indexedSubPropertyExpressionLookup.remove(ipeView);
+		boolean success = indexedPropertyChainLookup.remove(ipcView) != null;
+		if (success && ipc instanceof IndexedObjectProperty)
+			indexedObjectPropertyCount--;
+		return success;
 	}
-
 }

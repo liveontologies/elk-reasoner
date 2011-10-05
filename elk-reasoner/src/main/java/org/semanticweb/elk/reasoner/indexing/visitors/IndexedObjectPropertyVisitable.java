@@ -30,6 +30,6 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  */
 public interface IndexedObjectPropertyVisitable {
 
-	public <O> O accept(IndexedObjectPropertyVisitor<O> visitor);
+	<O> O accept(IndexedObjectPropertyVisitor<O> visitor);
 
 }

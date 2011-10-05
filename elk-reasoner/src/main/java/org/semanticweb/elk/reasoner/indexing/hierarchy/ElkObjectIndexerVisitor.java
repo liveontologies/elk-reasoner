@@ -22,7 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.ListIterator;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
@@ -40,23 +43,25 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 
 public class ElkObjectIndexerVisitor implements
 		ElkClassExpressionVisitor<IndexedClassExpression>,
-		ElkObjectPropertyExpressionVisitor<IndexedObjectProperty> {
+		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain> {
 
-	private IndexedObjectFilter subObjectFilter;
+	private IndexedObjectFilter objectFilter;
 
 	ElkObjectIndexerVisitor(IndexedObjectFilter subObjectFilter) {
-		this.subObjectFilter = subObjectFilter;
+		this.objectFilter = subObjectFilter;
 	}
 
 	public IndexedClassExpression visit(ElkClass elkClass) {
-		return subObjectFilter.filter(new IndexedClass(elkClass));
+		return objectFilter.filter(new IndexedClass(elkClass));
 	}
 
 	public IndexedClassExpression visit(
@@ -89,8 +94,31 @@ public class ElkObjectIndexerVisitor implements
 
 	public IndexedClassExpression visit(
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		IndexedClassExpression result = null;
+		for (ElkClassExpression c : elkObjectIntersectionOf
+				.getClassExpressions()) {
+			IndexedClassExpression ice = c.accept(this);
+
+			if (result == null) {
+				result = ice;
+				continue;
+			}
+
+			// TODO comparison shouldn't be on hash code
+			IndexedClassExpression firstConjunct, secondConjunct;
+			if (result.hashCode() < ice.hashCode()) {
+				firstConjunct = result;
+				secondConjunct = ice;
+			} else {
+				firstConjunct = ice;
+				secondConjunct = result;
+			}
+
+			result = objectFilter.filter(new IndexedObjectIntersectionOf(firstConjunct, secondConjunct));
+		}
+
+		return result;
 	}
 
 	public IndexedClassExpression visit(
@@ -112,10 +140,10 @@ public class ElkObjectIndexerVisitor implements
 
 	public IndexedClassExpression visit(
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-		return subObjectFilter.filter(new IndexedObjectSomeValuesFrom(
-				elkObjectSomeValuesFrom.getObjectPropertyExpression().accept(
-						this), elkObjectSomeValuesFrom.getClassExpression()
-						.accept(this)));
+		IndexedObjectProperty iop = (IndexedObjectProperty)
+			elkObjectSomeValuesFrom.getObjectPropertyExpression().accept(this); 
+		return objectFilter.filter(new IndexedObjectSomeValuesFrom(iop,
+			elkObjectSomeValuesFrom.getClassExpression().accept(this)));
 	}
 
 	public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
@@ -164,8 +192,29 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	public IndexedObjectProperty visit(ElkObjectProperty elkObjectProperty) {
-		// TODO Auto-generated method stub
-		return null;
+		return (IndexedObjectProperty) objectFilter.filter(new IndexedObjectProperty(elkObjectProperty));
+	}
+
+	public IndexedBinaryPropertyChain visit(
+			ElkObjectPropertyChain elkObjectPropertyChain) {
+	
+		IndexedPropertyChain result = null;
+		ListIterator<? extends ElkObjectPropertyExpression> iterator = 
+			elkObjectPropertyChain.getObjectPropertyExpressions().listIterator(
+					elkObjectPropertyChain.getObjectPropertyExpressions().size());
+		
+		while (iterator.hasPrevious()) {
+			IndexedObjectProperty iop = (IndexedObjectProperty) iterator.previous().accept(this);
+
+			if (result == null) {
+				result = iop;
+				continue;
+			}
+
+			result = objectFilter.filter(new IndexedBinaryPropertyChain(iop, result));
+		}
+
+		return (IndexedBinaryPropertyChain) result;
 	}
 
 }

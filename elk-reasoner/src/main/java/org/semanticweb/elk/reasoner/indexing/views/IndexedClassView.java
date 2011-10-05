@@ -52,8 +52,8 @@ public class IndexedClassView<T extends IndexedClass> extends
 		}
 		if (other instanceof IndexedClassView<?>) {
 			IndexedClassView<?> otherView = (IndexedClassView<?>) other;
-			return this.representative.getIri().equals(
-					otherView.representative.getIri());
+			return this.representative.getElkClass().getIri().equals(
+					otherView.representative.getElkClass().getIri());
 		}
 		return false;
 	}

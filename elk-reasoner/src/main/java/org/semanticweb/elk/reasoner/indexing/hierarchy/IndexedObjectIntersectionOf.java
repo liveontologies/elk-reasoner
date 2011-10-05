@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
-
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitable;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
@@ -39,14 +36,13 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression
 		implements IndexedObjectIntersectionOfVisitable {
 	/**
 	 * There are only two conjuncts. This reflects the fact that conjunctions
-	 * are binarized during indexing construction. The conjuncts may not
+	 * are binarized during index construction. The conjuncts may not
 	 * correspond to any ElkClassExpression in the ontology.
 	 */
 	protected final IndexedClassExpression firstConjunct, secondConjunct;
 
 	protected IndexedObjectIntersectionOf(IndexedClassExpression firstConjunct,
 			IndexedClassExpression secondConjunct) {
-		super(new ArrayList<ElkClassExpression>(1));
 		this.firstConjunct = firstConjunct;
 		this.secondConjunct = secondConjunct;
 	}
@@ -69,32 +65,30 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression
 
 	@Override
 	protected void updateOccurrenceNumbers(int increment, int positiveIncrement,
-			int negativeIncrement) {
+			int negativeIncrement, IndexedObjectCanonizer canonizer) {
 
-		if (this.negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this conjunction
-			this.firstConjunct.addNegConjunctionByConjunct(this,
-					this.secondConjunct);
-			this.secondConjunct.addNegConjunctionByConjunct(this,
-					this.firstConjunct);
+			firstConjunct.addNegConjunctionByConjunct(this,	secondConjunct);
+			secondConjunct.addNegConjunctionByConjunct(this, firstConjunct);
 		}
 
-		this.occurrenceNo += increment;
-		this.positiveOccurrenceNo += positiveIncrement;
-		this.negativeOccurrenceNo += negativeIncrement;
+		occurrenceNo += increment;
+		positiveOccurrenceNo += positiveIncrement;
+		negativeOccurrenceNo += negativeIncrement;
+		if (occurrenceNo == 0)
+			canonizer.remove(this);
 
-		if (this.negativeOccurrenceNo == 0 && negativeIncrement < 0) {
+		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
-			this.firstConjunct.removeNegConjunctionByConjunct(this,
-					this.secondConjunct);
-			this.secondConjunct.removeNegConjunctionByConjunct(this,
-					this.firstConjunct);
+			firstConjunct.removeNegConjunctionByConjunct(this, secondConjunct);
+			secondConjunct.removeNegConjunctionByConjunct(this, firstConjunct);
 		}
 
-		this.firstConjunct.updateOccurrenceNumbers(increment, positiveIncrement,
-				negativeIncrement);
-		this.secondConjunct.updateOccurrenceNumbers(increment,
-				positiveIncrement, negativeIncrement);
+		firstConjunct.updateOccurrenceNumbers(increment, positiveIncrement,
+				negativeIncrement, canonizer);
+		secondConjunct.updateOccurrenceNumbers(increment,
+				positiveIncrement, negativeIncrement, canonizer);
 	}
 
 }

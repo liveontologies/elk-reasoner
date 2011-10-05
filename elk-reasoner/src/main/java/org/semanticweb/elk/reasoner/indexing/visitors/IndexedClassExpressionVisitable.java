@@ -29,6 +29,6 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  */
 public interface IndexedClassExpressionVisitable {
 
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor);
+	<O> O accept(IndexedClassExpressionVisitor<O> visitor);
 
 }

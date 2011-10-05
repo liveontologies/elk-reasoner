@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
-
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitable;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
@@ -44,7 +41,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression
 
 	IndexedObjectSomeValuesFrom(IndexedObjectProperty indexedObjectProperty,
 			IndexedClassExpression filler) {
-		super(new ArrayList<ElkClassExpression>(1));
 		this.relation = indexedObjectProperty;
 		this.filler = filler;
 	}
@@ -74,24 +70,27 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression
 
 	@Override
 	protected void updateOccurrenceNumbers(int increment, int positiveIncrement,
-			int negativeIncrement) {
+			int negativeIncrement, IndexedObjectCanonizer canonizer) {
 
-		if (this.negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this conjunction
-			this.filler.addNegExistential(this);
+			filler.addNegExistential(this);
 		}
 
-		this.occurrenceNo += increment;
-		this.positiveOccurrenceNo += positiveIncrement;
-		this.negativeOccurrenceNo += negativeIncrement;
+		occurrenceNo += increment;
+		positiveOccurrenceNo += positiveIncrement;
+		negativeOccurrenceNo += negativeIncrement;
+		if (occurrenceNo == 0)
+			canonizer.remove(this);
 
-		if (this.negativeOccurrenceNo == 0 && negativeIncrement < 0) {
+		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			this.filler.removeNegExistential(this);
+			filler.removeNegExistential(this);
 		}
 
-		this.filler.updateOccurrenceNumbers(increment, positiveIncrement,
-				negativeIncrement);
+		relation.updateOccurrenceNumber(increment, canonizer);
+		filler.updateOccurrenceNumbers(increment, positiveIncrement,
+				negativeIncrement, canonizer);
 	}
 
 }

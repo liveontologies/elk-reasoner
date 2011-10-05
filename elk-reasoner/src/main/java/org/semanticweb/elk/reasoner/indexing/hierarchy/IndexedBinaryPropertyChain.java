@@ -1,0 +1,95 @@
+/*
+ * #%L
+ * ELK Reasoner
+ * 
+ * $Id$
+ * $HeadURL$
+ * %%
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitable;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+
+/**
+ * Represents a complex ElkSubObjectPropertyOfAxiom. The chain consists of
+ * two components: an IndexedObjectProperty on the left and an
+ * IndexedPropertyExpression on the right. This reflects the fact that property
+ * inclusions are binarized during index constructions. The auxiliary 
+ * inclusions may not represent any ElkObject in the ontology. 
+ * 
+ * @author Frantisek Simancik
+ *
+ */
+
+public class IndexedBinaryPropertyChain extends IndexedPropertyChain
+		implements IndexedBinaryPropertyChainVisitable {
+
+	protected final IndexedObjectProperty leftProperty;
+	protected final IndexedPropertyChain rightProperty;
+
+	/**
+	 * Used for creating auxiliary inclusions during binarization.
+	 * 
+	 * @param leftProperty
+	 * @param rightProperty
+	 */
+	protected IndexedBinaryPropertyChain(IndexedObjectProperty leftProperty,
+			IndexedPropertyChain rightProperty) {
+
+		this.leftProperty = leftProperty;
+		this.rightProperty = rightProperty;
+	}
+
+	/**
+	 * @return The left component of this (binary) complex property inclusion
+	 *         axiom.
+	 */
+	public IndexedObjectProperty getLeftProperty() {
+		return leftProperty;
+	}
+
+	/**
+	 * @return The right component of this (binary) complex property inclusion
+	 *         axiom.
+	 */
+	public IndexedPropertyChain getRightProperty() {
+		return rightProperty;
+	}
+
+	@Override
+	public <O> O accept(IndexedPropertyChainVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	public <O> O accept(IndexedBinaryPropertyChainVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	protected void updateOccurrenceNumber(int increment,
+			IndexedObjectCanonizer canonizer) {
+		occurrenceNo += increment;
+		if (occurrenceNo == 0)
+			canonizer.remove(this);
+		
+		leftProperty.updateOccurrenceNumber(increment, canonizer);
+		rightProperty.updateOccurrenceNumber(increment, canonizer);
+	}
+
+}

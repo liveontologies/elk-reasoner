@@ -22,16 +22,14 @@
  */
 package org.semanticweb.elk.reasoner.indexing.visitors;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyComposition;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
- * Visitor pattern interface for instances of {@link IndexedPropertyComposition}
- * .
+ * Visitor pattern interface for instances of {@link IndexedClassExpression}.
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedPropertyCompositionVisitor<O> {
-
-	O visit(IndexedPropertyComposition element);
+public interface IndexedPropertyChainVisitor<O> extends
+		IndexedObjectPropertyVisitor<O>, IndexedBinaryPropertyChainVisitor<O> {
 
 }

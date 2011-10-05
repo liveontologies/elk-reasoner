@@ -27,15 +27,15 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyComposition;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedSubPropertyExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 
 public class IndexedViewConverter
 		implements
 		IndexedClassExpressionVisitor<IndexedClassExpressionView<? extends IndexedClassExpression>>,
-		IndexedSubPropertyExpressionVisitor<IndexedSubPropertyExpressionView<? extends IndexedSubPropertyExpression>> {
+		IndexedPropertyChainVisitor<IndexedPropertyChainView<? extends IndexedPropertyChain>> {
 
 	private IndexedViewConverter() {
 	}
@@ -62,15 +62,15 @@ public class IndexedViewConverter
 				element);
 	}
 
-	public IndexedSubPropertyExpressionView<? extends IndexedSubPropertyExpression> visit(
+	public IndexedPropertyChainView<? extends IndexedPropertyChain> visit(
 			IndexedObjectProperty element) {
 		return new IndexedObjectPropertyView<IndexedObjectProperty>(element) {
 		};
 	}
 
-	public IndexedSubPropertyExpressionView<? extends IndexedSubPropertyExpression> visit(
-			IndexedPropertyComposition element) {
-		return new IndexedPropertyCompositionView<IndexedPropertyComposition>(
+	public IndexedPropertyChainView<? extends IndexedPropertyChain> visit(
+			IndexedBinaryPropertyChain element) {
+		return new IndexedBinaryPropertyChainView<IndexedBinaryPropertyChain>(
 				element);
 	}
 }

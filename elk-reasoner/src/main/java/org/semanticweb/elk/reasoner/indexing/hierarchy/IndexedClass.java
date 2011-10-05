@@ -22,10 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Collections;
-
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitable;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
@@ -40,33 +37,22 @@ public class IndexedClass extends IndexedClassExpression implements
 		IndexedClassVisitable {
 
 	/**
-	 * The iri of this indexed class
+	 * The indexed ElkClass
 	 */
-	protected final String iri;
+	protected final ElkClass elkClass;
 
 	/**
 	 * Creates an object representing the given ElkClass.
 	 */
 	protected IndexedClass(ElkClass elkClass) {
-		super(Collections.singletonList((ElkClassExpression) elkClass));
-		this.iri = elkClass.getIri();
-	}
-
-	/**
-	 * Get iri of this indexed class. It is equal to iri of the elk class from
-	 * which it was constructed.
-	 * 
-	 * @return the iri of this indexed class.
-	 */
-	public String getIri() {
-		return this.iri;
+		this.elkClass = elkClass;
 	}
 
 	/**
 	 * @return The represented ElkClass.
 	 */
 	public ElkClass getElkClass() {
-		return (ElkClass) representatives.get(0);
+		return elkClass;
 	}
 
 	/**
@@ -90,10 +76,13 @@ public class IndexedClass extends IndexedClassExpression implements
 
 	@Override
 	protected void updateOccurrenceNumbers(int increment, int positiveIncrement,
-			int negativeIncrement) {
-		this.occurrenceNo += increment;
-		this.positiveOccurrenceNo += positiveIncrement;
-		this.negativeOccurrenceNo += negativeIncrement;
+			int negativeIncrement, IndexedObjectCanonizer canonizer) {
+		
+		occurrenceNo += increment;
+		positiveOccurrenceNo += positiveIncrement;
+		negativeOccurrenceNo += negativeIncrement;
+		if (occurrenceNo == 0)
+			canonizer.remove(this);
 	}
 
 }

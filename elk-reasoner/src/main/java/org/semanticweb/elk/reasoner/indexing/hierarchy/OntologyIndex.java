@@ -27,11 +27,10 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /**
- * Interface for public and protected methods of the index of the ontology.
+ * Interface for public methods of the index of the ontology.
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
@@ -39,37 +38,20 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  */
 public interface OntologyIndex {
 
-	IndexedClassExpression getIndexedClassExpression(
-			ElkClassExpression representative);
+	IndexedClassExpression getIndexed(
+			ElkClassExpression elkClassExpression);
 
-	IndexedObjectProperty getIndexedObjectProperty(
-			ElkObjectPropertyExpression representative);
+	IndexedPropertyChain getIndexed(
+			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression);
 
-	IndexedPropertyComposition getIndexedPropertyChain(
-			ElkSubObjectPropertyOfAxiom representative);
 
-	/**
-	 * @return All IndexedClasses occurring in the ontology without repetitions.
-	 */
+	Iterable<IndexedClassExpression> getIndexedClassExpressions();
 	Iterable<IndexedClass> getIndexedClasses();
-
 	int getIndexedClassCount();
 
-	/**
-	 * @return All IndexedClassExpressions with possible repetitions.
-	 */
-	Iterable<IndexedClassExpression> getIndexedClassExpressions();
-
-	/**
-	 * @return All IndexedObjectProperties occurring in the ontology without
-	 *         repetitions.
-	 */
+	Iterable<IndexedPropertyChain> getIndexedPropertyChains();
 	Iterable<IndexedObjectProperty> getIndexedObjectProperties();
-
-	/**
-	 * @return All IndexedPropertyCompositions without repetitions.
-	 */
-	Iterable<IndexedPropertyComposition> getIndexedPropertyChains();
+	int getIndexedObjectPropertyCount();
 
 	ElkAxiomProcessor getAxiomInserter();
 

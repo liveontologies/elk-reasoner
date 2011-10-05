@@ -29,7 +29,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectPropertyVisitable;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectPropertyVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedSubPropertyExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 
 /**
  * Represents all occurrences of an ElkObjectProperty in an ontology.
@@ -38,75 +38,49 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedSubPropertyExpressi
  * @author Markus Kroetzsch
  */
 
-public class IndexedObjectProperty extends IndexedSubPropertyExpression implements
+public class IndexedObjectProperty extends IndexedPropertyChain implements
 		IndexedObjectPropertyVisitable {
-	protected final ElkObjectProperty representative;
+	protected final ElkObjectProperty elkObjectProperty;
 
-	protected List<IndexedObjectProperty> toldSubObjectProperties;
-	protected List<IndexedObjectProperty> toldSuperObjectProperties;
-
+	protected List<IndexedPropertyChain> toldSubObjectProperties;
+	
 	/**
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
 	protected IndexedObjectProperty(ElkObjectProperty elkObjectProperty) {
-		representative = elkObjectProperty;
+		this.elkObjectProperty = elkObjectProperty;
 	}
 
 	/**
 	 * @return The represented object property expression.
 	 */
 	public ElkObjectProperty getElkObjectProperty() {
-		return representative;
+		return elkObjectProperty;
 	}
 
 	/**
 	 * @return All told sub object properties of this object property, possibly
 	 *         null.
 	 */
-	public List<IndexedObjectProperty> getToldSubObjectProperties() {
+	public List<IndexedPropertyChain> getToldSubObjectProperties() {
 		return toldSubObjectProperties;
 	}
-
-	/**
-	 * @return All told super object properties of this object property,
-	 *         possibly null.
-	 */
-	public List<IndexedObjectProperty> getToldSuperObjectProperties() {
-		return toldSuperObjectProperties;
-	}
+	
 
 	protected void addToldSubObjectProperty(
-			IndexedObjectProperty subObjectProperty) {
+			IndexedPropertyChain subObjectProperty) {
 		if (toldSubObjectProperties == null)
-			toldSubObjectProperties = new ArrayList<IndexedObjectProperty>(1);
+			toldSubObjectProperties = new ArrayList<IndexedPropertyChain>(1);
 		toldSubObjectProperties.add(subObjectProperty);
 	}
 
 	protected boolean removeToldSubObjectProperty(
-			IndexedObjectProperty subObjectProperty) {
+			IndexedPropertyChain subObjectProperty) {
 		boolean success = false;
 		if (toldSubObjectProperties != null) {
 			success = toldSubObjectProperties.remove(subObjectProperty);
 			if (toldSubObjectProperties.isEmpty())
 				toldSubObjectProperties = null;
-		}
-		return success;
-	}
-
-	protected void addToldSuperObjectProperty(
-			IndexedObjectProperty superObjectProperty) {
-		if (toldSuperObjectProperties == null)
-			toldSuperObjectProperties = new ArrayList<IndexedObjectProperty>(1);
-		toldSuperObjectProperties.add(superObjectProperty);
-	}
-
-	protected boolean removeToldSuperObjectProperty(
-			IndexedObjectProperty superObjectProperty) {
-		boolean success = false;
-		if (toldSuperObjectProperties != null) {
-			success = toldSuperObjectProperties.remove(superObjectProperty);
-			if (toldSuperObjectProperties.isEmpty())
-				toldSuperObjectProperties = null;
 		}
 		return success;
 	}
@@ -128,8 +102,16 @@ public class IndexedObjectProperty extends IndexedSubPropertyExpression implemen
 	}
 
 	@Override
-	public <O> O accept(IndexedSubPropertyExpressionVisitor<O> visitor) {
+	public <O> O accept(IndexedPropertyChainVisitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	protected void updateOccurrenceNumber(int increment,
+			IndexedObjectCanonizer canonizer) {
+		occurrenceNo += increment;
+		if (occurrenceNo == 0)
+			canonizer.remove(this);
 	}
 
 }

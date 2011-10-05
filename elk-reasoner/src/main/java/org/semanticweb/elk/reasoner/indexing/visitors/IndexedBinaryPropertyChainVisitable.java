@@ -20,10 +20,16 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
+package org.semanticweb.elk.reasoner.indexing.visitors;
 
-public interface Filter<T> {
+/**
+ * Interface for things that can be visited by
+ * {@link IndexedBinaryPropertyChainVisitor}.
+ * 
+ * @author "Yevgeny Kazakov"
+ */
+public interface IndexedBinaryPropertyChainVisitable {
 
-	T filter(T object);
+	<O> O accept(IndexedBinaryPropertyChainVisitor<O> visitor);
 
 }

@@ -53,6 +53,7 @@ public class Reasoner {
 
 	protected final OntologyIndex ontologyIndex;
 
+	// TODO use directly from ontologyIndex
 	protected final ElkAxiomProcessor axiomInserter, axiomDeleter;
 
 	protected ClassTaxonomy classTaxonomy;

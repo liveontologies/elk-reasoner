@@ -23,10 +23,12 @@
 
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedSubPropertyExpressionVisitable;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedSubPropertyExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitable;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturatedPropertyExpression;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -44,14 +46,47 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  */
 
-public abstract class IndexedSubPropertyExpression implements
-		IndexedSubPropertyExpressionVisitable {
+public abstract class IndexedPropertyChain implements
+		IndexedPropertyChainVisitable {
+	
+	protected List<IndexedObjectProperty> toldSuperObjectProperties;
+	
+
+	/**
+	 * @return All told super object properties of this object property,
+	 *         possibly null.
+	 */
+	public List<IndexedObjectProperty> getToldSuperObjectProperties() {
+		return toldSuperObjectProperties;
+	}
+
+
+	protected void addToldSuperObjectProperty(
+			IndexedObjectProperty superObjectProperty) {
+		if (toldSuperObjectProperties == null)
+			toldSuperObjectProperties = new ArrayList<IndexedObjectProperty>(1);
+		toldSuperObjectProperties.add(superObjectProperty);
+	}
+
+	protected boolean removeToldSuperObjectProperty(
+			IndexedObjectProperty superObjectProperty) {
+		boolean success = false;
+		if (toldSuperObjectProperties != null) {
+			success = toldSuperObjectProperties.remove(superObjectProperty);
+			if (toldSuperObjectProperties.isEmpty())
+				toldSuperObjectProperties = null;
+		}
+		return success;
+	}
+	
 	/**
 	 * This counts how often this object occurred in the ontology.
 	 */
 	protected int occurrenceNo = 0;
-
+	
 	protected final AtomicReference<SaturatedPropertyExpression> saturated = new AtomicReference<SaturatedPropertyExpression>();
+	
+	protected abstract void updateOccurrenceNumber(int increment, IndexedObjectCanonizer canonizer);
 
 	/**
 	 * @return The corresponding SaturatedObjecProperty, null if none was
@@ -91,6 +126,6 @@ public abstract class IndexedSubPropertyExpression implements
 		return hashCode_;
 	}
 
-	public abstract <O> O accept(IndexedSubPropertyExpressionVisitor<O> visitor);
+	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);
 
 }

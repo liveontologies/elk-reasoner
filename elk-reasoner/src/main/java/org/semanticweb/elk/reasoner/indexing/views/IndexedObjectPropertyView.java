@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
  *            the type of the wrapped indexed object property
  */
 public abstract class IndexedObjectPropertyView<T extends IndexedObjectProperty>
-		extends IndexedSubPropertyExpressionView<T> {
+		extends IndexedPropertyChainView<T> {
 
 	public IndexedObjectPropertyView(T representative) {
 		super(representative);

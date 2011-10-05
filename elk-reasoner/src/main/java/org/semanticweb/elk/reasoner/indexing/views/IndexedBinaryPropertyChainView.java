@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.views;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyComposition;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 
 /**
  * Implements a view for instances of {@link IndexedObjectProperty}
@@ -33,29 +33,26 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyCompositio
  * @param <T>
  *            the type of the wrapped indexed object property composition
  */
-public class IndexedPropertyCompositionView<T extends IndexedPropertyComposition>
-		extends IndexedSubPropertyExpressionView<T> {
+public class IndexedBinaryPropertyChainView<T extends IndexedBinaryPropertyChain>
+		extends IndexedPropertyChainView<T> {
 
-	IndexedPropertyCompositionView(T representative) {
+	IndexedBinaryPropertyChainView(T representative) {
 		super(representative);
 	}
 
 	@Override
 	public int hashCode() {
-		return combinedHashCode(IndexedPropertyCompositionView.class,
+		return combinedHashCode(IndexedBinaryPropertyChainView.class,
 				this.representative.getLeftProperty(),
-				this.representative.getRightProperty(),
-				this.representative.getSuperProperty());
+				this.representative.getRightProperty());
 	}
 
 	@Override
 	public boolean equals(Object other) {
-		IndexedPropertyCompositionView<?> otherView = (IndexedPropertyCompositionView<?>) other;
+		IndexedBinaryPropertyChainView<?> otherView = (IndexedBinaryPropertyChainView<?>) other;
 		return this.representative.getLeftProperty().equals(
 				otherView.representative.getLeftProperty())
 				&& this.representative.getRightProperty().equals(
-						otherView.representative.getRightProperty())
-				&& this.representative.getSuperProperty().equals(
-						otherView.representative.getSuperProperty());
+						otherView.representative.getRightProperty());
 	}
 }
