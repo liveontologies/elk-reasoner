@@ -28,13 +28,12 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkIndividualConverterVisitor;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
 
 /**
- * Implements the {@link ElkSameIndividualAxiom} interface by wrapping instances of
- * {@link OWLSameIndividualAxiom}
+ * Implements the {@link ElkSameIndividualAxiom} interface by wrapping instances
+ * of {@link OWLSameIndividualAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -47,13 +46,11 @@ public class ElkSameIndividualAxiomWrap<T extends OWLSameIndividualAxiom>
 	}
 
 	public List<? extends ElkIndividual> getIndividuals() {
-		ElkIndividualConverterVisitor converter = ElkIndividualConverterVisitor
-				.getInstance();
 		List<ElkIndividual> result = new ArrayList<ElkIndividual>();
 		for (OWLIndividual ind : this.owlObject.getIndividuals()) {
-			result.add(ind.accept(converter));
+			result.add(converter.convert(ind));
 		}
-		return result;		
+		return result;
 	}
 
 	@Override

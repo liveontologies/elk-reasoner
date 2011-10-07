@@ -37,16 +37,16 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
  */
 public interface ElkDataRangeVisitor<O> {
 
-	O visit(ElkDatatype elkDatatype);
-	
 	O visit(ElkDataComplementOf elkDataComplementOf);
-
-	O visit(ElkDataOneOf elkDataOneOf);
 	
 	O visit(ElkDataIntersectionOf elkDataIntersectionOf);
 
-	O visit(ElkDataUnionOf elkDataUnionOf);
+	O visit(ElkDataOneOf elkDataOneOf);
+	
+	O visit(ElkDatatype elkDatatype);
 
 	O visit(ElkDatatypeRestriction elkDatatypeRestriction);
+
+	O visit(ElkDataUnionOf elkDataUnionOf);
 
 }

@@ -26,13 +26,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
 
 /**
- * Implements the {@link ElkObjectExactCardinality} interface by wrapping instances of
- * {@link OWLObjectExactCardinality}
+ * Implements the {@link ElkObjectExactCardinality} interface by wrapping
+ * instances of {@link OWLObjectExactCardinality}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -49,15 +47,11 @@ public class ElkObjectExactCardinalityWrap<T extends OWLObjectExactCardinality>
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
 
 	public ElkClassExpression getClassExpression() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getFiller().accept(converter);		
+		return converter.convert(this.owlObject.getFiller());
 	}
 
 	@Override

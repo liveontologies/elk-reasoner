@@ -29,7 +29,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDisjointUnionAxiom;
@@ -49,11 +48,9 @@ public class ElkDisjointUnionAxiomWrap<T extends OWLDisjointUnionAxiom> extends
 	}
 
 	public List<? extends ElkClassExpression> getClassExpressions() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
 		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
 		for (OWLClassExpression ce : this.owlObject.getClassExpressions()) {
-			result.add(ce.accept(converter));
+			result.add(converter.convert(ce));
 		}
 		return result;
 	}

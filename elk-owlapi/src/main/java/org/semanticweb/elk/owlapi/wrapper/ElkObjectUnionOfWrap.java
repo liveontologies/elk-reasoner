@@ -28,7 +28,6 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 
@@ -47,13 +46,11 @@ public class ElkObjectUnionOfWrap<T extends OWLObjectUnionOf> extends
 	}
 
 	public List<? extends ElkClassExpression> getClassExpressions() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
 		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
 		for (OWLClassExpression ce : this.owlObject.getOperands()) {
-			result.add(ce.accept(converter));
+			result.add(converter.convert(ce));
 		}
-		return result;		
+		return result;
 	}
 
 	@Override

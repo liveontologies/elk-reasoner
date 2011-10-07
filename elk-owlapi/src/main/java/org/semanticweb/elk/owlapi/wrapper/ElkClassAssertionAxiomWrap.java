@@ -26,14 +26,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkIndividualConverterVisitor;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 
-
 /**
- * Implements the {@link ElkClassAssertionAxiom} interface by wrapping instances of
- * {@link OWLClassAssertionAxiom}
+ * Implements the {@link ElkClassAssertionAxiom} interface by wrapping instances
+ * of {@link OWLClassAssertionAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -46,15 +43,11 @@ public class ElkClassAssertionAxiomWrap<T extends OWLClassAssertionAxiom>
 	}
 
 	public ElkIndividual getIndividual() {
-		ElkIndividualConverterVisitor converter = ElkIndividualConverterVisitor
-				.getInstance();
-		return this.owlObject.getIndividual().accept(converter);		
+		return converter.convert(this.owlObject.getIndividual());
 	}
 
 	public ElkClassExpression getClassExpression() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getClassExpression().accept(converter);		
+		return converter.convert(this.owlObject.getClassExpression());
 	}
 
 	@Override

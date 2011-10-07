@@ -42,12 +42,12 @@ public interface ElkEntityVisitor<O> {
 	
 	O visit(ElkClass elkClass);
 	
-	O visit(ElkDatatype elkDatatype);
-
-	O visit(ElkObjectProperty elkObjectProperty);
-	
 	O visit(ElkDataProperty elkDataProperty);
+
+	O visit(ElkDatatype elkDatatype);
 	
 	O visit(ElkNamedIndividual elkNamedIndividual);
+	
+	O visit(ElkObjectProperty elkObjectProperty);
 
 }

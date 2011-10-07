@@ -25,12 +25,11 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
 
 /**
- * Implements the {@link ElkTransitiveObjectPropertyAxiom} interface by wrapping instances of
- * {@link OWLTransitiveObjectPropertyAxiom}
+ * Implements the {@link ElkTransitiveObjectPropertyAxiom} interface by wrapping
+ * instances of {@link OWLTransitiveObjectPropertyAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -45,9 +44,7 @@ public class ElkTransitiveObjectPropertyAxiomWrap<T extends OWLTransitiveObjectP
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
 
 	@Override

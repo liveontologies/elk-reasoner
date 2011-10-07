@@ -56,8 +56,20 @@ public interface ElkClassExpressionVisitor<O> {
 
 	O visit(ElkClass elkClass);
 
-	O visit(ElkObjectAllValuesFrom elkObjectAllValuesFrom);
+	O visit(ElkDataAllValuesFrom elkDataAllValuesFrom);
 	
+	O visit(ElkDataExactCardinality elkDataExactCardinality);
+
+	O visit(ElkDataHasValue elkDataHasValue);
+
+	O visit(ElkDataMaxCardinality elkDataMaxCardinality);
+
+	O visit(ElkDataMinCardinality elkDataMinCardinality);
+
+	O visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom);
+
+	O visit(ElkObjectAllValuesFrom elkObjectAllValuesFrom);
+
 	O visit(ElkObjectComplementOf elkObjectComplementOf);
 
 	O visit(ElkObjectExactCardinality elkObjectExactCardinality);
@@ -65,29 +77,17 @@ public interface ElkClassExpressionVisitor<O> {
 	O visit(ElkObjectHasSelf elkObjectHasSelf);
 
 	O visit(ElkObjectHasValue elkObjectHasValue);
-
+	
 	O visit(ElkObjectIntersectionOf elkObjectIntersectionOf);
 
 	O visit(ElkObjectMaxCardinality elkObjectMaxCardinality);
 
 	O visit(ElkObjectMinCardinality elkObjectMinCardinality);
-
+	
 	O visit(ElkObjectOneOf elkObjectOneOf);
-
+	
 	O visit(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom);
-
+	
 	O visit(ElkObjectUnionOf elkObjectUnionOf);
-	
-	O visit(ElkDataHasValue elkDataHasValue);
-
-	O visit(ElkDataMaxCardinality elkDataMaxCardinality);
-
-	O visit(ElkDataMinCardinality elkDataMinCardinality);
-	
-	O visit(ElkDataExactCardinality elkDataExactCardinality);
-	
-	O visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom);
-	
-	O visit(ElkDataAllValuesFrom elkDataAllValuesFrom);
 
 }

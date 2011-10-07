@@ -28,7 +28,6 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDisjointClassesAxiom;
 
@@ -46,12 +45,10 @@ public class ElkDisjointClassesAxiomWrap<T extends OWLDisjointClassesAxiom>
 		super(owlDisjointClassesAxiom);
 	}
 
-	public List<? extends ElkClassExpression> getClassExpressions() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
+	public List<? extends ElkClassExpression> getClassExpressions() {		
 		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
 		for (OWLClassExpression ce : this.owlObject.getClassExpressions()) {
-			result.add(ce.accept(converter));
+			result.add(converter.convert(ce));
 		}
 		return result;
 	}

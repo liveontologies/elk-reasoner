@@ -28,7 +28,6 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLEquivalentObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
@@ -49,11 +48,9 @@ public class ElkEquivalentObjectPropertiesAxiomWrap<T extends OWLEquivalentObjec
 	}
 
 	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
 		List<ElkObjectPropertyExpression> result = new ArrayList<ElkObjectPropertyExpression>();
 		for (OWLObjectPropertyExpression ope : this.owlObject.getProperties()) {
-			result.add(ope.accept(converter));
+			result.add(converter.convert(ope));
 		}
 		return result;
 	}

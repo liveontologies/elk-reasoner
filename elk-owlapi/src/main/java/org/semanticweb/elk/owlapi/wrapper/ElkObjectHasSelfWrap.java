@@ -25,7 +25,6 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLObjectHasSelf;
 
 /**
@@ -43,14 +42,12 @@ public class ElkObjectHasSelfWrap<T extends OWLObjectHasSelf> extends
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 }

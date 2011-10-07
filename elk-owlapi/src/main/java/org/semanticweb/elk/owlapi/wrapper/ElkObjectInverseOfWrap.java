@@ -24,18 +24,23 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 
 /**
  * Implements the {@link ElkObjectInverseOf} interface by wrapping instances of
- * {@link OWLObjectInverseOf}
+ * {@link OWLObjectProperty}. We cannot wrap {@link OWLObjectInverseOf} because
+ * it can be nested. For example, object property expressions such as
+ * {@code ObjectInverseOf(ObjectInverseOf r)} are allowed in OWL API, but are
+ * not valid in OWL 2 and for this reason are not allowed to be constructed for
+ * {@link ElkObjectPropertyExpression}.
  * 
  * @author Yevgeny Kazakov
  * 
  */
-public class ElkObjectInverseOfWrap<T extends OWLObjectInverseOf> extends
+public class ElkObjectInverseOfWrap<T extends OWLObjectProperty> extends
 		ElkObjectPropertyExpressionWrap<T> implements ElkObjectInverseOf {
 
 	public ElkObjectInverseOfWrap(T owlObjectInverseOf) {
@@ -43,9 +48,7 @@ public class ElkObjectInverseOfWrap<T extends OWLObjectInverseOf> extends
 	}
 
 	public ElkObjectProperty getObjectProperty() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getInverse().accept(converter);
+		return new ElkObjectPropertyWrap<OWLObjectProperty>(this.owlObject);
 	}
 
 	@Override

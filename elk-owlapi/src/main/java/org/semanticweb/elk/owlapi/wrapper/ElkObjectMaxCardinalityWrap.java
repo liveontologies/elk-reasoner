@@ -26,13 +26,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLObjectMaxCardinality;
 
 /**
- * Implements the {@link ElkObjectMaxCardinality} interface by wrapping instances of
- * {@link OWLObjectMaxCardinality}
+ * Implements the {@link ElkObjectMaxCardinality} interface by wrapping
+ * instances of {@link OWLObjectMaxCardinality}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -49,15 +47,11 @@ public class ElkObjectMaxCardinalityWrap<T extends OWLObjectMaxCardinality>
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
 
 	public ElkClassExpression getClassExpression() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getFiller().accept(converter);		
+		return converter.convert(this.owlObject.getFiller());
 	}
 
 	@Override

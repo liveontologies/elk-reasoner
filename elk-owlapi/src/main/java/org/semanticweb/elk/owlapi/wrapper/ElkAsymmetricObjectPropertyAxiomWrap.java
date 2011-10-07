@@ -25,12 +25,11 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLAsymmetricObjectPropertyAxiom;
 
 /**
- * Implements the {@link ElkAsymmetricObjectPropertyAxiom} interface by wrapping instances of
- * {@link OWLAsymmetricObjectPropertyAxiom}
+ * Implements the {@link ElkAsymmetricObjectPropertyAxiom} interface by wrapping
+ * instances of {@link OWLAsymmetricObjectPropertyAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -39,14 +38,13 @@ public class ElkAsymmetricObjectPropertyAxiomWrap<T extends OWLAsymmetricObjectP
 		extends ElkObjectPropertyAxiomWrap<T> implements
 		ElkAsymmetricObjectPropertyAxiom {
 
-	public ElkAsymmetricObjectPropertyAxiomWrap(T owlAsymmetricObjectPropertyAxiom) {
+	public ElkAsymmetricObjectPropertyAxiomWrap(
+			T owlAsymmetricObjectPropertyAxiom) {
 		super(owlAsymmetricObjectPropertyAxiom);
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
 
 	@Override

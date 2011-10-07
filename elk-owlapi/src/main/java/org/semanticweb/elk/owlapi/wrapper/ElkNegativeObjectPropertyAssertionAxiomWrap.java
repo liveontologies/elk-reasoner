@@ -26,13 +26,11 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkIndividualConverterVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLNegativeObjectPropertyAssertionAxiom;
 
 /**
- * Implements the {@link ElkNegativeObjectPropertyAssertionAxiom} interface by wrapping instances of
- * {@link OWLNegativeObjectPropertyAssertionAxiom}
+ * Implements the {@link ElkNegativeObjectPropertyAssertionAxiom} interface by
+ * wrapping instances of {@link OWLNegativeObjectPropertyAssertionAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -47,21 +45,15 @@ public class ElkNegativeObjectPropertyAssertionAxiomWrap<T extends OWLNegativeOb
 	}
 
 	public ElkIndividual getFirstIndividual() {
-		ElkIndividualConverterVisitor converter = ElkIndividualConverterVisitor
-				.getInstance();
-		return this.owlObject.getSubject().accept(converter);
+		return converter.convert(this.owlObject.getSubject());
 	}
 
 	public ElkIndividual getSecondIndividual() {
-		ElkIndividualConverterVisitor converter = ElkIndividualConverterVisitor
-				.getInstance();
-		return this.owlObject.getObject().accept(converter);
+		return converter.convert(this.owlObject.getObject());
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
 
 	@Override

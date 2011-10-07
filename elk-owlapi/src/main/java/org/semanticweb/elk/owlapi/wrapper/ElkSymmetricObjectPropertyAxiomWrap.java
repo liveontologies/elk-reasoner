@@ -25,12 +25,11 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 
 /**
- * Implements the {@link ElkSymmetricObjectPropertyAxiom} interface by wrapping instances of
- * {@link OWLSymmetricObjectPropertyAxiom}
+ * Implements the {@link ElkSymmetricObjectPropertyAxiom} interface by wrapping
+ * instances of {@link OWLSymmetricObjectPropertyAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -44,9 +43,7 @@ public class ElkSymmetricObjectPropertyAxiomWrap<T extends OWLSymmetricObjectPro
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
 
 	@Override

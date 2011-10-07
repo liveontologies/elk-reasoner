@@ -25,12 +25,11 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 
 /**
- * Implements the {@link ElkObjectComplementOf} interface by wrapping instances of
- * {@link OWLObjectComplementOf}
+ * Implements the {@link ElkObjectComplementOf} interface by wrapping instances
+ * of {@link OWLObjectComplementOf}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -43,9 +42,7 @@ public class ElkObjectComplementOfWrap<T extends OWLObjectComplementOf> extends
 	}
 
 	public ElkClassExpression getClassExpression() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getOperand().accept(converter);
+		return converter.convert(this.owlObject.getOperand());
 	}
 
 	@Override

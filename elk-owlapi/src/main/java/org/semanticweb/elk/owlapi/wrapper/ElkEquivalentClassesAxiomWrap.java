@@ -28,13 +28,12 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 
 /**
- * Implements the {@link ElkEquivalentClassesAxiom} interface by wrapping instances
- * of {@link OWLEquivalentClassesAxiom}
+ * Implements the {@link ElkEquivalentClassesAxiom} interface by wrapping
+ * instances of {@link OWLEquivalentClassesAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -47,11 +46,9 @@ public class ElkEquivalentClassesAxiomWrap<T extends OWLEquivalentClassesAxiom>
 	}
 
 	public List<? extends ElkClassExpression> getClassExpressions() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
 		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
 		for (OWLClassExpression ce : this.owlObject.getClassExpressions()) {
-			result.add(ce.accept(converter));
+			result.add(converter.convert(ce));
 		}
 		return result;
 	}

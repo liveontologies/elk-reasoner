@@ -26,12 +26,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 
 /**
- * Implements the {@link ElkSubObjectPropertyOfAxiom} interface by wrapping instances of
- * {@link OWLSubPropertyChainOfAxiom}
+ * Implements the {@link ElkSubObjectPropertyOfAxiom} interface by wrapping
+ * instances of {@link OWLSubPropertyChainOfAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -45,18 +44,17 @@ public class ElkSubObjectPropertyChainOfAxiomWrap<T extends OWLSubPropertyChainO
 	}
 
 	public ElkSubObjectPropertyExpression getSubObjectPropertyExpression() {
-		return new ElkObjectPropertyChainWrap<OWLSubPropertyChainOfAxiom>(this.owlObject);
+		return new ElkObjectPropertyChainWrap<OWLSubPropertyChainOfAxiom>(
+				this.owlObject);
 	}
 
 	public ElkObjectPropertyExpression getSuperObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getSuperProperty().accept(converter);
+		return converter.convert(this.owlObject.getSuperProperty());
 	}
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 }

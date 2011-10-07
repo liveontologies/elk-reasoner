@@ -26,8 +26,6 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkIndividualConverterVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLObjectHasValue;
 
 /**
@@ -45,15 +43,11 @@ public class ElkObjectHasValueWrap<T extends OWLObjectHasValue> extends
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
 
 	public ElkIndividual getIndividual() {
-		ElkIndividualConverterVisitor converter = ElkIndividualConverterVisitor
-				.getInstance();
-		return this.owlObject.getValue().accept(converter);		
+		return converter.convert(this.owlObject.getValue());
 	}
 
 	@Override

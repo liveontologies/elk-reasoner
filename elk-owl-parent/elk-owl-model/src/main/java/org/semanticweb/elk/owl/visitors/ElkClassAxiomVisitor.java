@@ -39,12 +39,12 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public interface ElkClassAxiomVisitor<O> {
 
-	O visit(ElkEquivalentClassesAxiom elkEquivalentClassesAxiom);
-
-	O visit(ElkSubClassOfAxiom elkSubClassOfAxiom);
-
 	O visit(ElkDisjointClassesAxiom elkDisjointClasses);
 
 	O visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom);
+
+	O visit(ElkEquivalentClassesAxiom elkEquivalentClassesAxiom);
+
+	O visit(ElkSubClassOfAxiom elkSubClassOfAxiom);
 
 }

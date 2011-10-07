@@ -28,7 +28,6 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkIndividualConverterVisitor;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectOneOf;
 
@@ -47,11 +46,9 @@ public class ElkObjectOneOfWrap<T extends OWLObjectOneOf> extends
 	}
 
 	public List<? extends ElkIndividual> getIndividuals() {
-		ElkIndividualConverterVisitor converter = ElkIndividualConverterVisitor
-				.getInstance();
 		List<ElkIndividual> result = new ArrayList<ElkIndividual>();
 		for (OWLIndividual ce : this.owlObject.getIndividuals()) {
-			result.add(ce.accept(converter));
+			result.add(converter.convert(ce));
 		}
 		return result;
 	}

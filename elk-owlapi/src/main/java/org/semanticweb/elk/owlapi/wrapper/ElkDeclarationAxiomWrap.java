@@ -25,7 +25,6 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkEntityConverterVisitor;
 import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
 
 /**
@@ -43,9 +42,7 @@ public class ElkDeclarationAxiomWrap<T extends OWLDeclarationAxiom> extends
 	}
 
 	public ElkEntity getEntity() {
-		ElkEntityConverterVisitor converter = ElkEntityConverterVisitor
-				.getInstance();
-		return this.owlObject.getEntity().accept(converter);
+		return converter.convert(this.owlObject.getEntity());
 	}
 
 	@Override

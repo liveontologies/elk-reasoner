@@ -25,7 +25,6 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 /**
@@ -43,22 +42,16 @@ public class ElkSubClassOfAxiomWrap<T extends OWLSubClassOfAxiom> extends
 	}
 
 	public ElkClassExpression getSubClassExpression() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getSubClass().accept(converter);		
+		return converter.convert(this.owlObject.getSubClass());
 	}
 
 	public ElkClassExpression getSuperClassExpression() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getSuperClass().accept(converter);
+		return converter.convert(this.owlObject.getSuperClass());
 	}
 
 	@Override
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
-	
 
 }

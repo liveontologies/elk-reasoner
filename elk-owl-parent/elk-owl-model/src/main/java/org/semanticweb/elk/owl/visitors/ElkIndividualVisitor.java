@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
  */
 public interface ElkIndividualVisitor<O> {
 
-	O visit(ElkNamedIndividual elkNamedIndividual);
-
 	O visit(ElkAnonymousIndividual elkAnonymousIndividual);
+
+	O visit(ElkNamedIndividual elkNamedIndividual);
 }

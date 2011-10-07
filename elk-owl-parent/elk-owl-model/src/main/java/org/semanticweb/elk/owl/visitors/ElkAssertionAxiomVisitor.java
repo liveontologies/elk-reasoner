@@ -40,16 +40,16 @@ public interface ElkAssertionAxiomVisitor<O> {
 
 	O visit(ElkClassAssertionAxiom elkClassAssertionAxiom);
 	
+	O visit(ElkDataPropertyAssertionAxiom elkDataPropertyAssertionAxiom);
+	
 	O visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom);
+	
+	O visit(ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion);
 	
 	O visit(ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion);
 	
 	O visit(ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom);
 	
 	O visit(ElkSameIndividualAxiom elkSameIndividualAxiom);
-	
-	O visit(ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion);
-	
-	O visit(ElkDataPropertyAssertionAxiom elkObjectDataAssertionAxiom);
 
 }

@@ -36,15 +36,15 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
  */
 public interface ElkDataPropertyAxiomVisitor<O> {
 
+	O visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom);
+
+	O visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom);
+
 	O visit(ElkDisjointDataPropertiesAxiom elkDisjointDataPropertiesAxiom);
 
 	O visit(ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties);
 
 	O visit(ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom);
-
-	O visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom);
-
-	O visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom);
 
 	O visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom);
 

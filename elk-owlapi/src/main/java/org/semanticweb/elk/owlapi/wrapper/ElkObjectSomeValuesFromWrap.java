@@ -26,13 +26,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkClassExpressionConverterVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 
 /**
- * Implements the {@link ElkObjectSomeValuesFrom} interface by wrapping instances of
- * {@link OWLObjectSomeValuesFrom}
+ * Implements the {@link ElkObjectSomeValuesFrom} interface by wrapping
+ * instances of {@link OWLObjectSomeValuesFrom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -46,19 +44,15 @@ public class ElkObjectSomeValuesFromWrap<T extends OWLObjectSomeValuesFrom>
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
 
 	public ElkClassExpression getClassExpression() {
-		ElkClassExpressionConverterVisitor converter = ElkClassExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getFiller().accept(converter);		
+		return converter.convert(this.owlObject.getFiller());
 	}
 
 	@Override
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {		
+	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

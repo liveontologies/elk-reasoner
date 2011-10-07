@@ -25,12 +25,11 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owlapi.converter.ElkObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.OWLIrreflexiveObjectPropertyAxiom;
 
 /**
- * Implements the {@link ElkIrreflexiveObjectPropertyAxiom} interface by wrapping instances of
- * {@link OWLIrreflexiveObjectPropertyAxiom}
+ * Implements the {@link ElkIrreflexiveObjectPropertyAxiom} interface by
+ * wrapping instances of {@link OWLIrreflexiveObjectPropertyAxiom}
  * 
  * @author Yevgeny Kazakov
  * 
@@ -39,20 +38,18 @@ public class ElkIrreflexiveObjectPropertyAxiomWrap<T extends OWLIrreflexiveObjec
 		extends ElkObjectPropertyAxiomWrap<T> implements
 		ElkIrreflexiveObjectPropertyAxiom {
 
-	public ElkIrreflexiveObjectPropertyAxiomWrap(T owlIrreflexiveObjectPropertyAxiom) {
+	public ElkIrreflexiveObjectPropertyAxiomWrap(
+			T owlIrreflexiveObjectPropertyAxiom) {
 		super(owlIrreflexiveObjectPropertyAxiom);
 	}
 
 	public ElkObjectPropertyExpression getObjectPropertyExpression() {
-		ElkObjectPropertyExpressionConverterVisitor converter = ElkObjectPropertyExpressionConverterVisitor
-				.getInstance();
-		return this.owlObject.getProperty().accept(converter);
+		return converter.convert(this.owlObject.getProperty());
 	}
-	
+
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
 
 }
