@@ -96,7 +96,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.managers.ElkObjectManager;
-import org.semanticweb.elk.owl.managers.WeakCanonicalSet;
+import org.semanticweb.elk.owl.managers.WeakCanonicalEntityObjectManager;
 
 /**
  * A factory for creating ElkObjects based on the implementations in the
@@ -134,7 +134,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	 * rather reuses previously generated objects when possible.
 	 */
 	public ElkObjectFactoryImpl() {
-		this.objectManager = new WeakCanonicalSet();
+		this.objectManager = new WeakCanonicalEntityObjectManager();
 	}
 
 	/**
