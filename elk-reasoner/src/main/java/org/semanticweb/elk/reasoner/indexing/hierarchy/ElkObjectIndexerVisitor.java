@@ -152,8 +152,7 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
-		// TODO Auto-generated method stub
-		return null;
+		return objectFilter.filter(new IndexedDataHasValue(elkDataHasValue));
 	}
 
 	public IndexedClassExpression visit(

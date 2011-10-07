@@ -22,27 +22,28 @@
  */
 package org.semanticweb.elk.reasoner.indexing.views;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 
 /**
- * Implements a view for instances of {@link IndexedObjectSomeValuesFrom}
+ * Implements a view for instances of {@link IndexedClass}
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the type of the wrapped indexed class expression
+ *            the type of the wrapped indexed object
  */
-public class IndexedObjectSomeValuesFromView<T extends IndexedObjectSomeValuesFrom>
-		extends IndexedClassExpressionView<T> {
+public class IndexedDataHasValueView<T extends IndexedDataHasValue> extends
+		IndexedClassExpressionView<T> {
 
-	IndexedObjectSomeValuesFromView(T representative) {
+	public IndexedDataHasValueView(T representative) {
 		super(representative);
 	}
 
 	@Override
 	public int hashCode() {
-		return combinedHashCode(IndexedObjectSomeValuesFromView.class,
-				this.representative.getRelation(), this.representative.getFiller());
+		return combinedHashCode(IndexedDataHasValueView.class, this.representative
+				.getRelation().getIri(), this.representative.getFiller().getLexicalForm());
 	}
 
 	@Override
@@ -50,12 +51,12 @@ public class IndexedObjectSomeValuesFromView<T extends IndexedObjectSomeValuesFr
 		if (this == other) {
 			return true;
 		}
-		if (other instanceof IndexedObjectSomeValuesFromView<?>) {
-			IndexedObjectSomeValuesFromView<?> otherView = (IndexedObjectSomeValuesFromView<?>) other;
-			return this.representative.getRelation().equals(
-					otherView.representative.getRelation())
-				&& this.representative.getFiller().equals(
-					otherView.representative.getFiller());
+		if (other instanceof IndexedDataHasValueView<?>) {
+			IndexedDataHasValueView<?> otherView = (IndexedDataHasValueView<?>) other;
+			return this.representative.getRelation().getIri().equals(
+					otherView.representative.getRelation().getIri())
+				&& this.representative.getFiller().getLexicalForm().equals(
+					otherView.representative.getFiller().getLexicalForm());
 		}
 		return false;
 	}

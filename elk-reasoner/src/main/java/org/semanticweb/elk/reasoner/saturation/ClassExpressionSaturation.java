@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -373,13 +374,16 @@ public class ClassExpressionSaturation extends
 			public Void visit(IndexedObjectIntersectionOf ice) {
 				enqueue(context, ice.getFirstConjunct());
 				enqueue(context, ice.getSecondConjunct());
-
 				return null;
 			}
 
 			public Void visit(IndexedObjectSomeValuesFrom ice) {
 				enqueue(getCreateContext(ice.getFiller()),
 						new BackwardLink(ice.getRelation(), context));
+				return null;
+			}
+
+			public Void visit(IndexedDataHasValue element) {
 				return null;
 			}
 		}

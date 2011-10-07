@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.views;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -55,6 +56,12 @@ public class IndexedViewConverter
 		return new IndexedObjectIntersectionOfView<IndexedObjectIntersectionOf>(
 				element);
 	}
+	
+	public IndexedClassExpressionView<? extends IndexedDataHasValue> visit(
+			IndexedDataHasValue element) {
+		return new IndexedDataHasValueView<IndexedDataHasValue>(element) {
+		};
+	}
 
 	public IndexedClassExpressionView<IndexedObjectSomeValuesFrom> visit(
 			IndexedObjectSomeValuesFrom element) {
@@ -73,4 +80,5 @@ public class IndexedViewConverter
 		return new IndexedBinaryPropertyChainView<IndexedBinaryPropertyChain>(
 				element);
 	}
+
 }
