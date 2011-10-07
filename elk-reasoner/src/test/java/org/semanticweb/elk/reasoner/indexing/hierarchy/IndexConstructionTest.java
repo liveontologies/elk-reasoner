@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing;
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import junit.framework.TestCase;
 
@@ -46,7 +46,7 @@ public class IndexConstructionTest extends TestCase {
 		ElkClass d = objectFactory.getClass("D");
 		ElkObjectProperty r = objectFactory.getObjectProperty("R");
 
-		OntologyIndex index = new SerialOntologyIndex();
+		OntologyIndex index = new OntologyIndexImpl();
 		ElkAxiomProcessor inserter = index.getAxiomInserter();
 		ElkAxiomProcessor deleter = index.getAxiomDeleter();
 
@@ -55,10 +55,10 @@ public class IndexConstructionTest extends TestCase {
 		inserter.process(objectFactory.getEquivalentClassesAxiom(
 				objectFactory.getObjectSomeValuesFrom(r, c), a));
 
-		IndexedClassExpression A = index.getIndexedClassExpression(a);
-		IndexedClassExpression B = index.getIndexedClassExpression(b);
-		IndexedClassExpression C = index.getIndexedClassExpression(c);
-		IndexedObjectProperty R = index.getIndexedObjectProperty(r);
+		IndexedClassExpression A = index.getIndexed(a);
+		IndexedClassExpression B = index.getIndexed(b);
+		IndexedClassExpression C = index.getIndexed(c);
+		IndexedPropertyChain R = index.getIndexed(r);
 		assertEquals(2, A.negativeOccurrenceNo);
 		assertEquals(1, A.positiveOccurrenceNo);
 		assertEquals(1, B.negativeOccurrenceNo);
@@ -76,14 +76,14 @@ public class IndexConstructionTest extends TestCase {
 		assertEquals(0, A.positiveOccurrenceNo);
 		assertEquals(0, R.occurrenceNo);
 		assertNull(C.getNegExistentials());
-		assertNull(index.getIndexedEntity(c));
-		assertNull(index.getIndexedEntity(r));
+		assertNull(index.getIndexed(c));
+		assertNull(index.getIndexed(r));
 
 		deleter.process(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectIntersectionOf(a, b), d));
 		assertEquals(0, A.negativeOccurrenceNo);
 		assertNull(A.getNegConjunctionsByConjunct());
-		assertNull(index.getIndexedEntity(a));
+		assertNull(index.getIndexed(a));
 	}
 
 	public void testConjunctionSharing() {
@@ -96,15 +96,15 @@ public class IndexConstructionTest extends TestCase {
 		ElkClassExpression y = objectFactory.getObjectIntersectionOf(
 				objectFactory.getObjectIntersectionOf(b, a), c);
 
-		OntologyIndex index = new SerialOntologyIndex();
+		OntologyIndex index = new OntologyIndexImpl();
 		ElkAxiomProcessor inserter = index.getAxiomInserter();
 
 		inserter.process(objectFactory.getSubClassOfAxiom(x, d));
 		inserter.process(objectFactory.getSubClassOfAxiom(y, d));
 
-		assertSame(index.getIndexedClassExpression(x),
-				index.getIndexedClassExpression(y));
-		assertEquals(2, index.getIndexedClassExpression(x)
+		assertSame(index.getIndexed(x),
+				index.getIndexed(y));
+		assertEquals(2, index.getIndexed(x)
 				.getToldSuperClassExpressions().size());
 	}
 

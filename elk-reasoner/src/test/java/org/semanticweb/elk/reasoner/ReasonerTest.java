@@ -34,9 +34,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassNode;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
-import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 
 public class ReasonerTest extends TestCase {
 
@@ -72,11 +72,11 @@ public class ReasonerTest extends TestCase {
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
-		IndexedObjectProperty R = index.getIndexedObjectProperty(r);
-		IndexedObjectProperty S = index.getIndexedObjectProperty(s);
+		IndexedPropertyChain R = index.getIndexed(r);
+		IndexedPropertyChain S = index.getIndexed(s);
 
-		assertTrue("R subrole S", R.getToldSuperObjectProperties().contains(S));
-		assertTrue("S superrole R", S.getToldSubObjectProperties().contains(R));
+		assertTrue("R subrole S", R.getToldSuperProperties().contains(S));
+		assertTrue("S superrole R", S.getToldSubProperties().contains(R));
 		assertTrue("A contains D", taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(d)));
 		assertTrue("A contains E", taxonomy.getNode(a).getDirectSuperNodes()
@@ -101,11 +101,11 @@ public class ReasonerTest extends TestCase {
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
-		IndexedClassExpression A = index.getIndexedClassExpression(a);
-		IndexedClassExpression B = index.getIndexedClassExpression(b);
-		IndexedClassExpression C = index.getIndexedClassExpression(c);
-		IndexedClassExpression D = index.getIndexedClassExpression(d);
-		IndexedClassExpression E = index.getIndexedClassExpression(e);
+		IndexedClassExpression A = index.getIndexed(a);
+		IndexedClassExpression B = index.getIndexed(b);
+		IndexedClassExpression C = index.getIndexed(c);
+		IndexedClassExpression D = index.getIndexed(d);
+		IndexedClassExpression E = index.getIndexed(e);
 
 		assertTrue("A SubClassOf B",
 				A.getToldSuperClassExpressions().contains(B));
@@ -174,10 +174,10 @@ public class ReasonerTest extends TestCase {
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
-		IndexedClassExpression A = index.getIndexedClassExpression(a);
-		IndexedClassExpression B = index.getIndexedClassExpression(b);
-		IndexedClassExpression C = index.getIndexedClassExpression(c);
-		IndexedClassExpression D = index.getIndexedClassExpression(d);
+		IndexedClassExpression A = index.getIndexed(a);
+		IndexedClassExpression B = index.getIndexed(b);
+		IndexedClassExpression C = index.getIndexed(c);
+		IndexedClassExpression D = index.getIndexed(d);
 
 		assertTrue("A SubClassOf B",
 				A.getToldSuperClassExpressions().contains(B));

@@ -23,19 +23,13 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import org.semanticweb.elk.reasoner.indexing.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.IndexedPropertyComposition;
-import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.util.collections.HashListMultimap;
-import org.semanticweb.elk.util.collections.Pair;
+import org.semanticweb.elk.util.collections.Iterables;
 import org.semanticweb.elk.util.concurrent.computation.AbstractConcurrentComputation;
 
 /**
@@ -55,23 +49,11 @@ public class ObjectPropertySaturation {
 	protected final int maxWorkers;
 	protected final OntologyIndex ontologyIndex;
 
-	// Safety for left-linear composition is not used in the current
-	// implementation.
-	/*
-	 * protected final Multimap<IndexedPropertyExpression,
-	 * IndexedPropertyComposition> subChains; final AtomicInteger safeRiaNo =
-	 * new AtomicInteger(0); final AtomicInteger unsafeRiaNo = new
-	 * AtomicInteger(0);
-	 */
-
 	public ObjectPropertySaturation(ExecutorService executor, int maxWorkers,
 			OntologyIndex ontologyIndex) {
 		this.executor = executor;
 		this.maxWorkers = maxWorkers;
 		this.ontologyIndex = ontologyIndex;
-
-		// this.subChains = new HashListMultimap<IndexedPropertyExpression,
-		// IndexedPropertyComposition> ();
 	}
 
 	/**
@@ -85,68 +67,69 @@ public class ObjectPropertySaturation {
 
 		roleHierarchyComputation.start();
 
-		for (IndexedObjectProperty iop : ontologyIndex
-				.getIndexedObjectProperties()) {
-			iop.resetSaturated();
-			roleHierarchyComputation.submit(iop);
-		}
-
-		for (IndexedPropertyComposition ipc : ontologyIndex
+		for (IndexedPropertyChain ipc : ontologyIndex
 				.getIndexedPropertyChains()) {
 			ipc.resetSaturated();
-			if (ipc.isAuxiliary()) {
-				SaturatedPropertyExpression saturated = new SaturatedPropertyExpression(
-						ipc);
-				ipc.setSaturated(saturated);
-				saturated.derivedSubObjectProperties.add(ipc);
-				saturated.derivedSuperObjectProperties.add(ipc);
-			}
+			roleHierarchyComputation.submit(ipc);
 		}
 
 		roleHierarchyComputation.waitCompletion();
 
 		// set up property composition
-		HashMap<Pair<IndexedPropertyExpression, IndexedPropertyExpression>, ArrayList<IndexedPropertyExpression>> m = new HashMap<Pair<IndexedPropertyExpression, IndexedPropertyExpression>, ArrayList<IndexedPropertyExpression>>();
+//		HashMap<Pair<IndexedPropertyChain, IndexedPropertyChain>, ArrayList<IndexedPropertyChain>> m = new HashMap<Pair<IndexedPropertyChain, IndexedPropertyChain>, ArrayList<IndexedPropertyChain>>();
 
-		for (IndexedPropertyComposition ria : ontologyIndex
-				.getIndexedPropertyChains())
-			for (IndexedPropertyExpression rightProperty : ria
-					.getRightProperty().getSaturated().getSubObjectProperties())
-				for (IndexedPropertyExpression leftProperty : ria
-						.getLeftProperty().getSaturated()
-						.getSubObjectProperties()) {
-
-					Pair<IndexedPropertyExpression, IndexedPropertyExpression> body = new Pair<IndexedPropertyExpression, IndexedPropertyExpression>(
-							leftProperty, rightProperty);
-					ArrayList<IndexedPropertyExpression> list = m.get(body);
+		for (IndexedBinaryPropertyChain chain : Iterables.filter(ontologyIndex
+				.getIndexedPropertyChains(), IndexedBinaryPropertyChain.class))
+			for (IndexedPropertyChain rightSubProperty : chain
+					.getRightProperty().getSaturated().getSubProperties())
+				for (IndexedPropertyChain leftSubProperty : chain
+						.getLeftProperty().getSaturated().getSubProperties()) {
+					
+					SaturatedPropertyChain right = rightSubProperty.getSaturated();
+					if (right.propertyCompositionsByLeftSubProperty == null)
+						right.propertyCompositionsByLeftSubProperty = 
+							new	HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain>();
+					right.propertyCompositionsByLeftSubProperty.add(leftSubProperty, chain);
+					
+					SaturatedPropertyChain left = leftSubProperty.getSaturated();
+					if (left.propertyCompositionsByRightSubProperty == null)
+						left.propertyCompositionsByRightSubProperty = 
+							new HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain>();
+					left.propertyCompositionsByRightSubProperty.add(rightSubProperty, chain);
+				
+/*
+					Pair<IndexedPropertyChain, IndexedPropertyChain> body = new Pair<IndexedPropertyChain, IndexedPropertyChain>(
+							leftsubProperty, rightsubProperty);
+					ArrayList<IndexedPropertyChain> list = m.get(body);
 
 					if (list == null) {
-						list = new ArrayList<IndexedPropertyExpression>();
+						list = new ArrayList<IndexedPropertyChain>();
 						m.put(body, list);
 					}
 
 					list.add(ria.getSuperProperty());
+*/					
 				}
-
+/*
 		RedundantCompositionsElimination elimination = new RedundantCompositionsElimination(
 				executor, maxWorkers);
 
 		elimination.start();
 		
-		for (Map.Entry<Pair<IndexedPropertyExpression, IndexedPropertyExpression>, ArrayList<IndexedPropertyExpression>> e : m
+		for (Map.Entry<Pair<IndexedPropertyChain, IndexedPropertyChain>, ArrayList<IndexedPropertyChain>> e : m
 				.entrySet()) {
 
-			SaturatedPropertyExpression firstSat = e.getKey().getFirst()
+			SaturatedPropertyChain firstSat = e.getKey().getFirst()
 					.getSaturated();
 			if (firstSat.propertyCompositionsByRightSubProperty == null)
-				firstSat.propertyCompositionsByRightSubProperty = new HashListMultimap<IndexedPropertyExpression, IndexedPropertyExpression>();
+				firstSat.propertyCompositionsByRightSubProperty = new HashListMultimap<IndexedPropertyChain, IndexedPropertyChain>();
 			firstSat.propertyCompositionsByRightSubProperty.put(e.getKey()
 					.getSecond(), e.getValue());
 
-			SaturatedPropertyExpression secondSat = e.getKey().getSecond()
+			SaturatedPropertyChain secondSat = e.getKey().getSecond()
 					.getSaturated();
 			if (secondSat.propertyCompositionsByLeftSubProperty == null)
-				secondSat.propertyCompositionsByLeftSubProperty = new HashListMultimap<IndexedPropertyExpression, IndexedPropertyExpression>();
+				secondSat.propertyCompositionsByLeftSubProperty = new HashListMultimap<IndexedPropertyChain, IndexedPropertyChain>();
 			secondSat.propertyCompositionsByLeftSubProperty.put(e.getKey()
 					.getFirst(), e.getValue());
 
@@ -154,56 +137,57 @@ public class ObjectPropertySaturation {
 		}
 		m = null;
 		elimination.waitCompletion();
+*/		
 	}
 
 	class RoleHierarchyComputation extends
-			AbstractConcurrentComputation<IndexedObjectProperty> {
+			AbstractConcurrentComputation<IndexedPropertyChain> {
 		RoleHierarchyComputation(ExecutorService executor, int maxWorkers) {
 			super(executor, maxWorkers, 2 * maxWorkers, 128);
 		}
 
 		@Override
-		protected void process(IndexedObjectProperty iop) {
-			
-			SaturatedPropertyExpression saturated = new SaturatedPropertyExpression(
-					iop);
-			iop.setSaturated(saturated);
+		protected void process(IndexedPropertyChain ipc) {
+			SaturatedPropertyChain saturated = new SaturatedPropertyChain(ipc);
+			ipc.setSaturated(saturated);
 
 			// compute all subproperties
-			ArrayDeque<IndexedObjectProperty> queue = new ArrayDeque<IndexedObjectProperty>();
-			saturated.derivedSubObjectProperties.add(iop);
-			queue.addLast(iop);
+			ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
+			saturated.derivedSubProperties.add(ipc);
+			queue.addLast(ipc);
 			while (!queue.isEmpty()) {
-				IndexedObjectProperty r = queue.removeLast();
-				if (r.getToldSubObjectProperties() != null)
-					for (IndexedObjectProperty s : r
-							.getToldSubObjectProperties())
-						if (saturated.derivedSubObjectProperties.add(s))
+				IndexedPropertyChain r = queue.removeLast();
+				if (r.getToldSubProperties() != null)
+					for (IndexedPropertyChain s : r
+							.getToldSubProperties())
+						if (saturated.derivedSubProperties.add(s))
 							queue.addLast(s);
 			}
 
 			// compute all superproperties
 			queue.clear();
-			saturated.derivedSuperObjectProperties.add(iop);
-			queue.addLast(iop);
+			saturated.derivedSuperProperties.add(ipc);
+			queue.addLast(ipc);
 			while (!queue.isEmpty()) {
-				IndexedObjectProperty r = queue.removeLast();
-				if (r.getToldSuperObjectProperties() != null)
-					for (IndexedObjectProperty s : r
-							.getToldSuperObjectProperties())
-						if (saturated.derivedSuperObjectProperties.add(s))
+				IndexedPropertyChain r = queue.removeLast();
+				if (r.getToldSuperProperties() != null)
+					for (IndexedPropertyChain s : r
+							.getToldSuperProperties())
+						if (saturated.derivedSuperProperties.add(s))
 							queue.addLast(s);
 			}
 
 		}
 	}
 
+	
 	/*
 	 * if R1.R2 -> S1 and R1.R2 -> S2 with S1 -> S2, then the latter composition
 	 * is redundant and is removed
 	 */
+/*	
 	class RedundantCompositionsElimination extends
-			AbstractConcurrentComputation<ArrayList<IndexedPropertyExpression>> {
+			AbstractConcurrentComputation<ArrayList<IndexedPropertyChain>> {
 
 		public RedundantCompositionsElimination(ExecutorService executor,
 				int maxWorkers) {
@@ -211,11 +195,11 @@ public class ObjectPropertySaturation {
 		}
 
 		@Override
-		protected void process(ArrayList<IndexedPropertyExpression> list) {
+		protected void process(ArrayList<IndexedPropertyChain> list) {
 			for (int i = 0; i < list.size(); i++)
 				if (list.get(i) != null) {
-					Set<IndexedPropertyExpression> superProperties = list
-							.get(i).getSaturated().getSuperObjectProperties();
+					Set<IndexedPropertyChain> superProperties = list
+							.get(i).getSaturated().getSuperProperties();
 
 					for (int j = 0; j < list.size(); j++)
 						if (j != i && list.get(j) != null
@@ -223,7 +207,7 @@ public class ObjectPropertySaturation {
 							list.set(j, null);
 				}
 
-			Iterator<IndexedPropertyExpression> iter = list.iterator();
+			Iterator<IndexedPropertyChain> iter = list.iterator();
 			while (iter.hasNext()) {
 				if (iter.next() == null) {
 					iter.remove();
@@ -234,5 +218,5 @@ public class ObjectPropertySaturation {
 		}
 
 	}
-
+*/
 }

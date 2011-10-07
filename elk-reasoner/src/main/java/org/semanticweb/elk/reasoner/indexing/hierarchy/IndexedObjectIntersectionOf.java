@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitable;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 
 /**
@@ -32,8 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionO
  * @author Frantisek Simancik
  * 
  */
-public class IndexedObjectIntersectionOf extends IndexedClassExpression
-		implements IndexedObjectIntersectionOfVisitable {
+public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	/**
 	 * There are only two conjuncts. This reflects the fact that conjunctions
 	 * are binarized during index construction. The conjuncts may not

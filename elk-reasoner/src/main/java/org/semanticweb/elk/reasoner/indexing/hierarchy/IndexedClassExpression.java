@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitable;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.saturation.Derivable;
+import org.semanticweb.elk.reasoner.saturation.QueueableVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -47,8 +49,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression implements
-		IndexedClassExpressionVisitable {
+abstract public class IndexedClassExpression implements Derivable {
 
 	protected List<IndexedClassExpression> toldSuperClassExpressions;
 	protected Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
@@ -216,4 +217,9 @@ abstract public class IndexedClassExpression implements
 		return hashCode_;
 	}
 
+	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
+	
+	public <O> O accept(QueueableVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 }

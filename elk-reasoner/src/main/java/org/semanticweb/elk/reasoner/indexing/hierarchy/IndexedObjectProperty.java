@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectPropertyVisitable;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 
@@ -38,11 +37,10 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
  * @author Markus Kroetzsch
  */
 
-public class IndexedObjectProperty extends IndexedPropertyChain implements
-		IndexedObjectPropertyVisitable {
+public class IndexedObjectProperty extends IndexedPropertyChain {
 	protected final ElkObjectProperty elkObjectProperty;
 
-	protected List<IndexedPropertyChain> toldSubObjectProperties;
+	protected List<IndexedPropertyChain> toldSubProperties;
 	
 	/**
 	 * Creates an object representing the given ElkObjectProperty.
@@ -62,25 +60,26 @@ public class IndexedObjectProperty extends IndexedPropertyChain implements
 	 * @return All told sub object properties of this object property, possibly
 	 *         null.
 	 */
-	public List<IndexedPropertyChain> getToldSubObjectProperties() {
-		return toldSubObjectProperties;
+	@Override
+	public List<IndexedPropertyChain> getToldSubProperties() {
+		return toldSubProperties;
 	}
 	
 
 	protected void addToldSubObjectProperty(
 			IndexedPropertyChain subObjectProperty) {
-		if (toldSubObjectProperties == null)
-			toldSubObjectProperties = new ArrayList<IndexedPropertyChain>(1);
-		toldSubObjectProperties.add(subObjectProperty);
+		if (toldSubProperties == null)
+			toldSubProperties = new ArrayList<IndexedPropertyChain>(1);
+		toldSubProperties.add(subObjectProperty);
 	}
 
 	protected boolean removeToldSubObjectProperty(
 			IndexedPropertyChain subObjectProperty) {
 		boolean success = false;
-		if (toldSubObjectProperties != null) {
-			success = toldSubObjectProperties.remove(subObjectProperty);
-			if (toldSubObjectProperties.isEmpty())
-				toldSubObjectProperties = null;
+		if (toldSubProperties != null) {
+			success = toldSubProperties.remove(subObjectProperty);
+			if (toldSubProperties.isEmpty())
+				toldSubProperties = null;
 		}
 		return success;
 	}

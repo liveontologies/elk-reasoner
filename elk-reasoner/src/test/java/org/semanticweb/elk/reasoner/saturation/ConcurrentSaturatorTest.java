@@ -33,9 +33,9 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 
 public class ConcurrentSaturatorTest extends TestCase {
 
@@ -54,7 +54,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkObjectProperty r = objectFactory.getObjectProperty("R");
 		ElkObjectProperty s = objectFactory.getObjectProperty("S");
 
-		OntologyIndex ontologyIndex = new SerialOntologyIndex();
+		OntologyIndex ontologyIndex = new OntologyIndexImpl();
 
 		final ExecutorService executor = Executors.newCachedThreadPool();
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
@@ -65,8 +65,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 				objectFactory.getObjectSomeValuesFrom(s, c), d));
 		inserter.process(objectFactory.getSubObjectPropertyOfAxiom(r, s));
 
-		IndexedClassExpression A = ontologyIndex.getIndexedClassExpression(a);
-		IndexedClassExpression D = ontologyIndex.getIndexedClassExpression(d);
+		IndexedClassExpression A = ontologyIndex.getIndexed(a);
+		IndexedClassExpression D = ontologyIndex.getIndexed(d);
 
 		final ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
 				executor, 16, ontologyIndex);
@@ -93,7 +93,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkClass c = objectFactory.getClass(":C");
 		ElkClass d = objectFactory.getClass(":D");
 
-		final OntologyIndex ontologyIndex = new SerialOntologyIndex();
+		final OntologyIndex ontologyIndex = new OntologyIndexImpl();
 		final ExecutorService executor = Executors.newCachedThreadPool();
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 
@@ -102,12 +102,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 		inserter.process(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectIntersectionOf(b, c), d));
 
-		IndexedClassExpression A = ontologyIndex.getIndexedClassExpression(a);
-		IndexedClassExpression B = ontologyIndex.getIndexedClassExpression(b);
-		IndexedClassExpression C = ontologyIndex.getIndexedClassExpression(c);
-		IndexedClassExpression D = ontologyIndex.getIndexedClassExpression(d);
+		IndexedClassExpression A = ontologyIndex.getIndexed(a);
+		IndexedClassExpression B = ontologyIndex.getIndexed(b);
+		IndexedClassExpression C = ontologyIndex.getIndexed(c);
+		IndexedClassExpression D = ontologyIndex.getIndexed(d);
 		IndexedClassExpression I = ontologyIndex
-				.getIndexedClassExpression(objectFactory
+				.getIndexed(objectFactory
 						.getObjectIntersectionOf(b, c));
 
 		assertTrue("A SubClassOf B",

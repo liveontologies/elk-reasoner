@@ -73,7 +73,7 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor, ElkAxiomVisi
 			ElkClassExpression superClass);
 	
 	protected abstract void indexSubObjectPropertyOfAxiom(
-			ElkSubObjectPropertyExpression subPropertyExpression,
+			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
 	
 	protected abstract void indexDeclarationAxiom(ElkEntity entity);
@@ -88,7 +88,8 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor, ElkAxiomVisi
 		new ElkObjectFactoryImpl(new DummyObjectManager());
 	
 	public void process(ElkAxiom elkAxiom) {
-		elkAxiom.accept(this);
+		if (elkAxiom != null)
+			elkAxiom.accept(this);
 	}
 
 	public Void visit(

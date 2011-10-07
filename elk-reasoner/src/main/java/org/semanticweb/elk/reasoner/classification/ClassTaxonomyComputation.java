@@ -35,8 +35,8 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.reasoner.indexing.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.AbstractConcurrentComputation;
 
 public class ClassTaxonomyComputation extends

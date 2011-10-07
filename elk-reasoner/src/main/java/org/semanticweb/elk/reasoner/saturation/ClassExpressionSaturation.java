@@ -31,13 +31,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.reasoner.indexing.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.concurrent.computation.AbstractConcurrentComputation;
@@ -81,7 +82,7 @@ public class ClassExpressionSaturation extends
 			ice.resetSaturated();
 
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-		owlThing = ontologyIndex.getIndexedClassExpression(objectFactory
+		owlThing = ontologyIndex.getIndexed(objectFactory
 				.getOwlThing());
 	}
 
@@ -175,11 +176,11 @@ public class ClassExpressionSaturation extends
 		}
 
 		public Void visit(BackwardLink backwardLink) {
-			IndexedPropertyExpression linkRelation = backwardLink.getRelation();
+			IndexedPropertyChain linkRelation = backwardLink.getRelation();
 			Linkable target = backwardLink.getTarget();
 
 			if (context.backwardLinksByObjectProperty == null) {
-				context.backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyExpression, Linkable>();
+				context.backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Linkable>();
 
 				// start deriving propagations
 				for (IndexedClassExpression ice : context.derived)
@@ -197,9 +198,9 @@ public class ClassExpressionSaturation extends
 				// apply all propagations over the link
 				if (context.propagationsByObjectProperty != null) {
 
-					for (IndexedPropertyExpression propRelation : new LazySetIntersection<IndexedPropertyExpression>(
+					for (IndexedPropertyChain propRelation : new LazySetIntersection<IndexedPropertyChain>(
 							linkRelation.getSaturated()
-									.getSuperObjectProperties(),
+									.getSuperProperties(),
 							context.propagationsByObjectProperty.keySet()))
 
 						for (Queueable carry : context.propagationsByObjectProperty
@@ -218,18 +219,18 @@ public class ClassExpressionSaturation extends
 				if (linkRelation.getSaturated().propertyCompositionsByRightSubProperty != null
 						&& context.forwardLinksByObjectProperty != null) {
 
-					for (IndexedPropertyExpression forwardRelation : new LazySetIntersection<IndexedPropertyExpression>(
+					for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 							linkRelation.getSaturated().propertyCompositionsByRightSubProperty
 									.keySet(),
 							context.forwardLinksByObjectProperty.keySet())) {
 
-						Collection<IndexedPropertyExpression> compositions = linkRelation
+						Collection<IndexedBinaryPropertyChain> compositions = linkRelation
 								.getSaturated().propertyCompositionsByRightSubProperty
 								.get(forwardRelation);
 						Collection<Linkable> forwardTargets = context.forwardLinksByObjectProperty
 								.get(forwardRelation);
 
-						for (IndexedPropertyExpression composition : compositions)
+						for (IndexedPropertyChain composition : compositions)
 							for (Linkable forwardTarget : forwardTargets)
 								enqueue(forwardTarget, new BackwardLink(
 										composition, target));
@@ -242,11 +243,11 @@ public class ClassExpressionSaturation extends
 		}
 
 		public Void visit(ForwardLink forwardLink) {
-			IndexedPropertyExpression linkRelation = forwardLink.getRelation();
+			IndexedPropertyChain linkRelation = forwardLink.getRelation();
 			Linkable target = forwardLink.getTarget();
 
 			if (context.forwardLinksByObjectProperty == null) {
-				context.forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyExpression, Linkable>();
+				context.forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Linkable>();
 				initializeDerivationOfBackwardLinks();
 			}
 
@@ -259,18 +260,18 @@ public class ClassExpressionSaturation extends
 				// != null
 				if (context.backwardLinksByObjectProperty != null) {
 
-					for (IndexedPropertyExpression backwardRelation : new LazySetIntersection<IndexedPropertyExpression>(
+					for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 							linkRelation.getSaturated().propertyCompositionsByLeftSubProperty
 									.keySet(),
 							context.backwardLinksByObjectProperty.keySet())) {
 
-						Collection<IndexedPropertyExpression> compositions = linkRelation
+						Collection<IndexedBinaryPropertyChain> compositions = linkRelation
 								.getSaturated().propertyCompositionsByLeftSubProperty
 								.get(backwardRelation);
 						Collection<Linkable> backwardTargets = context.backwardLinksByObjectProperty
 								.get(backwardRelation);
 
-						for (IndexedPropertyExpression composition : compositions)
+						for (IndexedPropertyChain composition : compositions)
 							for (Linkable backwardTarget : backwardTargets)
 								enqueue(target, new BackwardLink(composition,
 										backwardTarget));
@@ -283,11 +284,11 @@ public class ClassExpressionSaturation extends
 		}
 
 		public Void visit(Propagation propagation) {
-			IndexedPropertyExpression propRelation = propagation.getRelation();
+			IndexedPropertyChain propRelation = propagation.getRelation();
 			Queueable carry = propagation.getCarry();
 
 			if (context.propagationsByObjectProperty == null) {
-				context.propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyExpression, Queueable>();
+				context.propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Queueable>();
 				initializeDerivationOfBackwardLinks();
 			}
 
@@ -297,9 +298,9 @@ public class ClassExpressionSaturation extends
 				// propagate over all backward links
 				if (context.backwardLinksByObjectProperty != null) {
 
-					for (IndexedPropertyExpression linkRelation : new LazySetIntersection<IndexedPropertyExpression>(
+					for (IndexedPropertyChain linkRelation : new LazySetIntersection<IndexedPropertyChain>(
 							propRelation.getSaturated()
-									.getSubObjectProperties(),
+									.getSubProperties(),
 							context.backwardLinksByObjectProperty.keySet()))
 
 						for (Linkable target : context.backwardLinksByObjectProperty
@@ -395,7 +396,7 @@ public class ClassExpressionSaturation extends
 
 			if (context.backwardLinksByObjectProperty != null)
 
-				for (IndexedPropertyExpression linkRelation : context.backwardLinksByObjectProperty
+				for (IndexedPropertyChain linkRelation : context.backwardLinksByObjectProperty
 						.keySet())
 
 					if (linkRelation.getSaturated().propertyCompositionsByLeftSubProperty != null)

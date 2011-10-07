@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 
@@ -37,42 +38,42 @@ import org.semanticweb.elk.util.collections.HashListMultimap;
  * @author Frantisek Simancik
  *
  */
-public class SaturatedPropertyExpression {
-	protected final IndexedPropertyExpression root;
+public class SaturatedPropertyChain {
+	protected final IndexedPropertyChain root;
 	
-	protected final Set<IndexedPropertyExpression>
-		derivedSubObjectProperties;
+	protected final Set<IndexedPropertyChain>
+		derivedSubProperties;
 	
-	protected final Set<IndexedPropertyExpression>
-		derivedSuperObjectProperties;
+	protected final Set<IndexedPropertyChain>
+		derivedSuperProperties;
 	
-	protected HashListMultimap<IndexedPropertyExpression,
-			IndexedPropertyExpression>
+	protected HashListMultimap<IndexedPropertyChain,
+			IndexedBinaryPropertyChain>
 		propertyCompositionsByLeftSubProperty;
 	
-	protected HashListMultimap<IndexedPropertyExpression,
-			IndexedPropertyExpression>
+	protected HashListMultimap<IndexedPropertyChain,
+			IndexedBinaryPropertyChain>
 		propertyCompositionsByRightSubProperty;
 
 	
-	public SaturatedPropertyExpression(IndexedPropertyExpression iop) {
+	public SaturatedPropertyChain(IndexedPropertyChain iop) {
 		this.root = iop;
-		this.derivedSuperObjectProperties =
-			new ArrayHashSet<IndexedPropertyExpression>();
-		this.derivedSubObjectProperties =
-			new ArrayHashSet<IndexedPropertyExpression>();
+		this.derivedSuperProperties =
+			new ArrayHashSet<IndexedPropertyChain>();
+		this.derivedSubProperties =
+			new ArrayHashSet<IndexedPropertyChain>();
 	}
 	
-	public IndexedPropertyExpression getRoot() {
+	public IndexedPropertyChain getRoot() {
 		return root;
 	}
 
-	public Set<IndexedPropertyExpression> getSubObjectProperties() {
-		return derivedSubObjectProperties;
+	public Set<IndexedPropertyChain> getSubProperties() {
+		return derivedSubProperties;
 	}
 
-	public Set<IndexedPropertyExpression> getSuperObjectProperties() {
-		return derivedSuperObjectProperties;
+	public Set<IndexedPropertyChain> getSuperProperties() {
+		return derivedSuperProperties;
 	}
 
 }

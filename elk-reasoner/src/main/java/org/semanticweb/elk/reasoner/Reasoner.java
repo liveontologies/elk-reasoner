@@ -38,9 +38,9 @@ import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomyComputation;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomyPrinter;
-import org.semanticweb.elk.reasoner.indexing.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.SerialOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -53,9 +53,6 @@ public class Reasoner {
 
 	protected final OntologyIndex ontologyIndex;
 
-	// TODO use directly from ontologyIndex
-	protected final ElkAxiomProcessor axiomInserter, axiomDeleter;
-
 	protected ClassTaxonomy classTaxonomy;
 
 	// logger for events
@@ -64,9 +61,7 @@ public class Reasoner {
 	public Reasoner(ExecutorService executor, int workerNo) {
 		this.executor = executor;
 		this.workerNo = workerNo;
-		this.ontologyIndex = new SerialOntologyIndex();
-		axiomInserter = ontologyIndex.getAxiomInserter();
-		axiomDeleter = ontologyIndex.getAxiomDeleter();
+		this.ontologyIndex = new OntologyIndexImpl();
 	}
 
 	public OntologyIndex getOntologyIndex() {
@@ -92,7 +87,7 @@ public class Reasoner {
 
 	public void loadOntologyFromStream(InputStream stream)
 			throws ParseException, IOException {
-		loadOntologyFromStream(stream, axiomInserter);
+		loadOntologyFromStream(stream, ontologyIndex.getAxiomInserter());
 	}
 
 	public void loadOntologyFromFile(File file,
@@ -112,7 +107,7 @@ public class Reasoner {
 
 	public void loadOntologyFromFile(File file) throws ParseException,
 			IOException {
-		loadOntologyFromFile(file, axiomInserter);
+		loadOntologyFromFile(file, ontologyIndex.getAxiomInserter());
 	}
 
 	public void loadOntologyFromFile(String fileName) throws ParseException,
@@ -132,15 +127,15 @@ public class Reasoner {
 
 	public void loadOntologyFromString(String text) throws ParseException,
 			IOException {
-		loadOntologyFromString(text, axiomInserter);
+		loadOntologyFromString(text, ontologyIndex.getAxiomInserter());
 	}
 
 	public void addAxiom(ElkAxiom axiom) {
-		axiomInserter.process(axiom);
+		ontologyIndex.getAxiomInserter().process(axiom);
 	}
 
 	public void removeAxiom(ElkAxiom axiom) {
-		axiomDeleter.process(axiom);
+		ontologyIndex.getAxiomDeleter().process(axiom);
 	}
 
 	public void classify(ProgressMonitor progressMonitor) {
@@ -165,6 +160,7 @@ public class Reasoner {
 			objectPropertySaturation.compute();
 		} catch (InterruptedException e1) {
 		}
+		
 
 		progress = 0;
 		classExpressionSaturation.start();

@@ -191,11 +191,11 @@ public class ElkObjectIndexerVisitor implements
 		return null;
 	}
 
-	public IndexedObjectProperty visit(ElkObjectProperty elkObjectProperty) {
-		return (IndexedObjectProperty) objectFilter.filter(new IndexedObjectProperty(elkObjectProperty));
+	public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
+		return objectFilter.filter(new IndexedObjectProperty(elkObjectProperty));
 	}
 
-	public IndexedBinaryPropertyChain visit(
+	public IndexedPropertyChain visit(
 			ElkObjectPropertyChain elkObjectPropertyChain) {
 	
 		IndexedPropertyChain result = null;
@@ -214,7 +214,7 @@ public class ElkObjectIndexerVisitor implements
 			result = objectFilter.filter(new IndexedBinaryPropertyChain(iop, result));
 		}
 
-		return (IndexedBinaryPropertyChain) result;
+		return result;
 	}
 
 }

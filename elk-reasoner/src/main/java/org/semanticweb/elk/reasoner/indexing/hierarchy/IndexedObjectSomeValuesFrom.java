@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitable;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 
 /**
@@ -32,8 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFro
  * @author Frantisek Simancik
  * 
  */
-public class IndexedObjectSomeValuesFrom extends IndexedClassExpression
-		implements IndexedObjectSomeValuesFromVisitable {
+public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	protected final IndexedObjectProperty relation;
 

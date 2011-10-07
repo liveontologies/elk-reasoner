@@ -29,14 +29,14 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.util.collections.Iterables;
 
-class OntologyIndexImpl extends IndexedObjectCanonizer 
+public class OntologyIndexImpl extends IndexedObjectCanonizer 
 		implements OntologyIndex {
 	
 	private final ElkObjectIndexerVisitor failingIndexer;
 	private final ElkAxiomProcessor axiomInserter;
 	private final ElkAxiomProcessor axiomDeleter;
 	
-	OntologyIndexImpl() {
+	public OntologyIndexImpl() {
 		this.failingIndexer = new ElkObjectIndexerVisitor(
 				new FailingIndexedObjectFilter(this));
 		this.axiomInserter = new ElkAxiomInserterVisitor(this);

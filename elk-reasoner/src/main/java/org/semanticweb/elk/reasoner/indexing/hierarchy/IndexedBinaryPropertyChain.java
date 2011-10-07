@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitable;
+import java.util.List;
+
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 
@@ -37,8 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
  *
  */
 
-public class IndexedBinaryPropertyChain extends IndexedPropertyChain
-		implements IndexedBinaryPropertyChainVisitable {
+public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 
 	protected final IndexedObjectProperty leftProperty;
 	protected final IndexedPropertyChain rightProperty;
@@ -90,6 +90,11 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain
 		
 		leftProperty.updateOccurrenceNumber(increment, canonizer);
 		rightProperty.updateOccurrenceNumber(increment, canonizer);
+	}
+
+	@Override
+	public List<IndexedPropertyChain> getToldSubProperties() {
+		return null;
 	}
 
 }

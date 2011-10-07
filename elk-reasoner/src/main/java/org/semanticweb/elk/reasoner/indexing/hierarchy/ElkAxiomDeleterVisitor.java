@@ -76,7 +76,7 @@ class ElkAxiomDeleterVisitor extends ElkAxiomIndexerVisitor  {
 		subIndexedProperty.updateOccurrenceNumber(-1, canonizer);
 		superIndexedProperty.updateOccurrenceNumber(-1, canonizer);
 		subIndexedProperty.removeToldSuperObjectProperty(superIndexedProperty);
-		superIndexedProperty.addToldSubObjectProperty(subIndexedProperty);
+		superIndexedProperty.removeToldSubObjectProperty(subIndexedProperty);
 	}
 
 	@Override

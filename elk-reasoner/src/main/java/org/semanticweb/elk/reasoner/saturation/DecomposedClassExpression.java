@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
-import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
  * Wrapper used for indicating that this IndexedClassExpression has been

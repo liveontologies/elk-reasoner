@@ -30,7 +30,7 @@ class ConstructingIndexedObjectFilter implements IndexedObjectFilter {
 	
 	protected final IndexedObjectCanonizer canonizer;
 
-	public ConstructingIndexedObjectFilter(IndexedObjectCanonizer canonizer) {
+	protected ConstructingIndexedObjectFilter(IndexedObjectCanonizer canonizer) {
 		this.canonizer = canonizer;
 	}
 

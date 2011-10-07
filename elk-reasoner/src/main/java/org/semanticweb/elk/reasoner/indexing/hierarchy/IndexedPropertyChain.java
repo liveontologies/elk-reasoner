@@ -27,9 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitable;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturatedPropertyExpression;
+import org.semanticweb.elk.reasoner.saturation.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -46,35 +45,39 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  */
 
-public abstract class IndexedPropertyChain implements
-		IndexedPropertyChainVisitable {
+public abstract class IndexedPropertyChain {
 	
-	protected List<IndexedObjectProperty> toldSuperObjectProperties;
+	protected List<IndexedObjectProperty> toldSuperProperties;
 	
 
 	/**
 	 * @return All told super object properties of this object property,
 	 *         possibly null.
 	 */
-	public List<IndexedObjectProperty> getToldSuperObjectProperties() {
-		return toldSuperObjectProperties;
+	public List<IndexedObjectProperty> getToldSuperProperties() {
+		return toldSuperProperties;
 	}
 
+	/**
+	 * @return All told sub object properties of this object property,
+	 *         possibly null.
+	 */
+	public abstract List<IndexedPropertyChain> getToldSubProperties();
 
 	protected void addToldSuperObjectProperty(
 			IndexedObjectProperty superObjectProperty) {
-		if (toldSuperObjectProperties == null)
-			toldSuperObjectProperties = new ArrayList<IndexedObjectProperty>(1);
-		toldSuperObjectProperties.add(superObjectProperty);
+		if (toldSuperProperties == null)
+			toldSuperProperties = new ArrayList<IndexedObjectProperty>(1);
+		toldSuperProperties.add(superObjectProperty);
 	}
 
 	protected boolean removeToldSuperObjectProperty(
 			IndexedObjectProperty superObjectProperty) {
 		boolean success = false;
-		if (toldSuperObjectProperties != null) {
-			success = toldSuperObjectProperties.remove(superObjectProperty);
-			if (toldSuperObjectProperties.isEmpty())
-				toldSuperObjectProperties = null;
+		if (toldSuperProperties != null) {
+			success = toldSuperProperties.remove(superObjectProperty);
+			if (toldSuperProperties.isEmpty())
+				toldSuperProperties = null;
 		}
 		return success;
 	}
@@ -84,7 +87,7 @@ public abstract class IndexedPropertyChain implements
 	 */
 	protected int occurrenceNo = 0;
 	
-	protected final AtomicReference<SaturatedPropertyExpression> saturated = new AtomicReference<SaturatedPropertyExpression>();
+	protected final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
 	
 	protected abstract void updateOccurrenceNumber(int increment, IndexedObjectCanonizer canonizer);
 
@@ -92,7 +95,7 @@ public abstract class IndexedPropertyChain implements
 	 * @return The corresponding SaturatedObjecProperty, null if none was
 	 *         assigned.
 	 */
-	public SaturatedPropertyExpression getSaturated() {
+	public SaturatedPropertyChain getSaturated() {
 		return saturated.get();
 	}
 
@@ -102,7 +105,7 @@ public abstract class IndexedPropertyChain implements
 	 * @return True if the operation succeeded.
 	 */
 	public boolean setSaturated(
-			SaturatedPropertyExpression saturatedObjectProperty) {
+			SaturatedPropertyChain saturatedObjectProperty) {
 		return saturated.compareAndSet(null, saturatedObjectProperty);
 	}
 

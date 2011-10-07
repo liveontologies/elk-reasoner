@@ -27,8 +27,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.semanticweb.elk.reasoner.indexing.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -49,13 +49,13 @@ public class SaturatedClassExpression implements Linkable {
 	// TODO use Derivable instead of IndexedClassExpression here
 	protected final Set<IndexedClassExpression> derived;
 	
-	protected Multimap<IndexedPropertyExpression, Linkable>
+	protected Multimap<IndexedPropertyChain, Linkable>
 		backwardLinksByObjectProperty;
 	
-	protected Multimap<IndexedPropertyExpression, Linkable>
+	protected Multimap<IndexedPropertyChain, Linkable>
 		forwardLinksByObjectProperty;
 	
-	protected Multimap<IndexedPropertyExpression, Queueable>
+	protected Multimap<IndexedPropertyChain, Queueable>
 		propagationsByObjectProperty;
 	
 	/**

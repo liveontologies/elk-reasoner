@@ -42,7 +42,7 @@ public class IndexedObjectSomeValuesFromView<T extends IndexedObjectSomeValuesFr
 	@Override
 	public int hashCode() {
 		return combinedHashCode(IndexedObjectSomeValuesFromView.class,
-				this.representative.getFiller(), this.representative.getClass());
+				this.representative.getRelation(), this.representative.getFiller());
 	}
 
 	@Override
@@ -52,10 +52,10 @@ public class IndexedObjectSomeValuesFromView<T extends IndexedObjectSomeValuesFr
 		}
 		if (other instanceof IndexedObjectSomeValuesFromView<?>) {
 			IndexedObjectSomeValuesFromView<?> otherView = (IndexedObjectSomeValuesFromView<?>) other;
-			return this.representative.getFiller().equals(
-					otherView.representative.getFiller())
-					&& this.representative.getClass().equals(
-							otherView.representative.getClass());
+			return this.representative.getRelation().equals(
+					otherView.representative.getRelation())
+					&& this.representative.getFiller().equals(
+							otherView.representative.getFiller());
 		}
 		return false;
 	}

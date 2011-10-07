@@ -22,20 +22,20 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
-import org.semanticweb.elk.reasoner.indexing.IndexedPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * @author Frantisek Simancik
  *
  */
-public class ForwardLink extends Pair<IndexedPropertyExpression, Linkable> implements Queueable {
+public class ForwardLink extends Pair<IndexedPropertyChain, Linkable> implements Queueable {
 	
-	public ForwardLink(IndexedPropertyExpression relation, Linkable target) {
+	public ForwardLink(IndexedPropertyChain relation, Linkable target) {
 		super(relation, target);
 	}
 	
-	public IndexedPropertyExpression getRelation() {
+	public IndexedPropertyChain getRelation() {
 		return first;
 	}
 	

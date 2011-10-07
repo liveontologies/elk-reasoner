@@ -32,7 +32,7 @@ class FailingIndexedObjectFilter implements IndexedObjectFilter {
 	
 	protected final IndexedObjectCanonizer canonizer;
 
-	public FailingIndexedObjectFilter(IndexedObjectCanonizer canonizer) {
+	protected FailingIndexedObjectFilter(IndexedObjectCanonizer canonizer) {
 		this.canonizer = canonizer;
 	}
 

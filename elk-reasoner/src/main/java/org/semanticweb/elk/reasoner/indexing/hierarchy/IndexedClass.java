@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitable;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 
 /**
@@ -33,8 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
  * @author Frantisek Simancik
  * 
  */
-public class IndexedClass extends IndexedClassExpression implements
-		IndexedClassVisitable {
+public class IndexedClass extends IndexedClassExpression {
 
 	/**
 	 * The indexed ElkClass
