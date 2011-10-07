@@ -26,39 +26,43 @@ import java.util.NoSuchElementException;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.owl.predefined.PredefinedElkDeclarationAxiom;
 import org.semanticweb.elk.util.collections.Iterables;
 
-public class OntologyIndexImpl extends IndexedObjectCanonizer 
-		implements OntologyIndex {
-	
+public class OntologyIndexImpl extends IndexedObjectCanonizer implements
+		OntologyIndex {
+
 	private final ElkObjectIndexerVisitor failingIndexer;
 	private final ElkAxiomProcessor axiomInserter;
 	private final ElkAxiomProcessor axiomDeleter;
-	
+
 	public OntologyIndexImpl() {
 		this.failingIndexer = new ElkObjectIndexerVisitor(
 				new FailingIndexedObjectFilter(this));
 		this.axiomInserter = new ElkAxiomInserterVisitor(this);
 		this.axiomDeleter = new ElkAxiomDeleterVisitor(this);
+		// index predefined axioms
+		// TODO: what to do if someone tries to delete them?
+		for (ElkDeclarationAxiom builtInDeclaration : PredefinedElkDeclarationAxiom.DECLARATIONS) {
+			this.axiomInserter.process(builtInDeclaration);
+		}
 	}
-	
-	public IndexedClassExpression getIndexed(
-			ElkClassExpression representative) {
+
+	public IndexedClassExpression getIndexed(ElkClassExpression representative) {
 		try {
 			return representative.accept(failingIndexer);
-		}
-		catch (NoSuchElementException e) {
+		} catch (NoSuchElementException e) {
 			return null;
 		}
 	}
-	
+
 	public IndexedPropertyChain getIndexed(
 			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression) {
 		try {
 			return elkSubObjectPropertyExpression.accept(failingIndexer);
-		}
-		catch (NoSuchElementException e) {
+		} catch (NoSuchElementException e) {
 			return null;
 		}
 	}
@@ -66,11 +70,12 @@ public class OntologyIndexImpl extends IndexedObjectCanonizer
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
 		return indexedClassExpressionLookup.values();
 	}
-	
+
 	public Iterable<IndexedClass> getIndexedClasses() {
-		return Iterables.filter(getIndexedClassExpressions(), IndexedClass.class);
+		return Iterables.filter(getIndexedClassExpressions(),
+				IndexedClass.class);
 	}
-	
+
 	public int getIndexedClassCount() {
 		return indexedClassCount;
 	}
@@ -78,9 +83,10 @@ public class OntologyIndexImpl extends IndexedObjectCanonizer
 	public Iterable<IndexedPropertyChain> getIndexedPropertyChains() {
 		return indexedPropertyChainLookup.values();
 	}
-	
+
 	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
-		return Iterables.filter(getIndexedPropertyChains(), IndexedObjectProperty.class);
+		return Iterables.filter(getIndexedPropertyChains(),
+				IndexedObjectProperty.class);
 	}
 
 	public int getIndexedObjectPropertyCount() {

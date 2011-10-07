@@ -64,29 +64,30 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.managers.DummyObjectManager;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 
-abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor, ElkAxiomVisitor<Void> {
-	
-	protected abstract void indexSubClassOfAxiom(
-			ElkClassExpression subClass,
+abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
+		ElkAxiomVisitor<Void> {
+
+	protected abstract void indexSubClassOfAxiom(ElkClassExpression subClass,
 			ElkClassExpression superClass);
-	
+
 	protected abstract void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
-	
+
 	protected abstract void indexDeclarationAxiom(ElkEntity entity);
-	
+
 	/**
 	 * Object factory that is used internally to replace some syntactic
 	 * constructs with other logically equivalent constructs. ElkObjects created
 	 * in this class are only used for this purpose (temporarily), hence we can
 	 * use any factory implementation here.
 	 */
-	private final ElkObjectFactory objectFactory =
-		new ElkObjectFactoryImpl(new DummyObjectManager());
-	
+	private final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(
+			new DummyObjectManager());
+
 	public void process(ElkAxiom elkAxiom) {
 		if (elkAxiom != null)
 			elkAxiom.accept(this);
@@ -97,43 +98,52 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor, ElkAxiomVisi
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	public Void visit(
-			ElkEquivalentObjectPropertiesAxiom axiom) {
+
+	public Void visit(ElkEquivalentObjectPropertiesAxiom axiom) {
 		ElkObjectPropertyExpression first = null;
-		for (ElkObjectPropertyExpression p : axiom.getObjectPropertyExpressions()) {
-			// implement EquivalentObjectPropertyExpressionAxiom as two SubObjectPropertyOfAxioms
+		for (ElkObjectPropertyExpression p : axiom
+				.getObjectPropertyExpressions()) {
+			// implement EquivalentObjectPropertyExpressionAxiom as two
+			// SubObjectPropertyOfAxioms
 
 			if (first == null)
 				first = p;
@@ -144,59 +154,69 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor, ElkAxiomVisi
 		}
 		return null;
 	}
+
 	public Void visit(
 			ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkInverseFunctionalObjectPropertyAxiom elkInverseFunctionalObjectPropertyAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkInverseObjectPropertiesAxiom elkInverseObjectPropertiesAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkIrreflexiveObjectPropertyAxiom elkIrreflexiveObjectPropertyAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkObjectPropertyDomainAxiom axiom) {
-		indexSubClassOfAxiom(
-				objectFactory.getObjectSomeValuesFrom(
-						axiom.getObjectPropertyExpression(),
-						objectFactory.getOwlThing()),
-				axiom.getClassExpression());
+		indexSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(
+				axiom.getObjectPropertyExpression(),
+				PredefinedElkClass.OWL_THING), axiom.getClassExpression());
 		return null;
 	}
+
 	public Void visit(ElkObjectPropertyRangeAxiom elkObjectPropertyRangeAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
-		indexSubObjectPropertyOfAxiom(axiom.getSubObjectPropertyExpression(), axiom.getSuperObjectPropertyExpression());
+		indexSubObjectPropertyOfAxiom(axiom.getSubObjectPropertyExpression(),
+				axiom.getSuperObjectPropertyExpression());
 		return null;
 	}
+
 	public Void visit(
 			ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	public Void visit(
-			ElkTransitiveObjectPropertyAxiom axiom) {
+
+	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
 		ElkObjectPropertyExpression ope = axiom.getObjectPropertyExpression();
-		indexSubObjectPropertyOfAxiom(objectFactory.getObjectPropertyChain(
-				Arrays.asList(ope, ope)), ope);
+		indexSubObjectPropertyOfAxiom(
+				objectFactory.getObjectPropertyChain(Arrays.asList(ope, ope)),
+				ope);
 		return null;
 	}
+
 	public Void visit(ElkEquivalentClassesAxiom axiom) {
 		ElkClassExpression first = null;
 		for (ElkClassExpression c : axiom.getClassExpressions()) {
@@ -211,50 +231,61 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor, ElkAxiomVisi
 		}
 		return null;
 	}
+
 	public Void visit(ElkSubClassOfAxiom axiom) {
 		indexSubClassOfAxiom(axiom.getSubClassExpression(),
 				axiom.getSuperClassExpression());
 		return null;
 	}
+
 	public Void visit(ElkDisjointClassesAxiom elkDisjointClasses) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(
 			ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkDataPropertyAssertionAxiom elkObjectDataAssertionAxiom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Void visit(ElkDeclarationAxiom axiom) {
 		indexDeclarationAxiom(axiom.getEntity());
 		return null;

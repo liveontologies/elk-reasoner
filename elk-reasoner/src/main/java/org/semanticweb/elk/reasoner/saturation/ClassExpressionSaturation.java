@@ -29,8 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -82,9 +81,7 @@ public class ClassExpressionSaturation extends
 				.getIndexedClassExpressions())
 			ice.resetSaturated();
 
-		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-		owlThing = ontologyIndex.getIndexed(objectFactory
-				.getOwlThing());
+		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 	}
 
 	/**
@@ -200,8 +197,7 @@ public class ClassExpressionSaturation extends
 				if (context.propagationsByObjectProperty != null) {
 
 					for (IndexedPropertyChain propRelation : new LazySetIntersection<IndexedPropertyChain>(
-							linkRelation.getSaturated()
-									.getSuperProperties(),
+							linkRelation.getSaturated().getSuperProperties(),
 							context.propagationsByObjectProperty.keySet()))
 
 						for (Queueable carry : context.propagationsByObjectProperty
@@ -300,8 +296,7 @@ public class ClassExpressionSaturation extends
 				if (context.backwardLinksByObjectProperty != null) {
 
 					for (IndexedPropertyChain linkRelation : new LazySetIntersection<IndexedPropertyChain>(
-							propRelation.getSaturated()
-									.getSubProperties(),
+							propRelation.getSaturated().getSubProperties(),
 							context.backwardLinksByObjectProperty.keySet()))
 
 						for (Linkable target : context.backwardLinksByObjectProperty

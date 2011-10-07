@@ -32,9 +32,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.AbstractConcurrentComputation;
@@ -52,9 +51,6 @@ public class ClassTaxonomyComputation extends
 
 	protected final Linker linker;
 
-	// Factory used to get owl:Thing and owl:Nothing.
-	protected final ElkObjectFactory objectFactory;
-
 	/**
 	 * Queue for nodes with assigned parents
 	 */
@@ -64,24 +60,25 @@ public class ClassTaxonomyComputation extends
 		super(executor, maxWorkers, 2 * maxWorkers, 1024);
 		this.classTaxonomy = new ConcurrentClassTaxonomy();
 		this.linker = new Linker(executor, 2 * maxWorkers, 16, 1024);
-		this.objectFactory = new ElkObjectFactoryImpl();
 		this.assignedParentsNodes = new ConcurrentLinkedQueue<ClassNode>();
 	}
 
 	public ClassTaxonomy computeTaxonomy() throws InterruptedException {
 		waitCompletion();
 
-		topNode = classTaxonomy.getNode(objectFactory.getOwlThing());
+		topNode = classTaxonomy.getNode(PredefinedElkClass.OWL_THING);
 		if (topNode == null) {
-			topNode = new ClassNode(Collections.singletonList(objectFactory
-					.getOwlThing()));
-			classTaxonomy.nodeLookup.put(objectFactory.getOwlThing(), topNode);
+			topNode = new ClassNode(
+					Collections
+							.singletonList((ElkClass) PredefinedElkClass.OWL_THING));
+			classTaxonomy.nodeLookup.put(PredefinedElkClass.OWL_THING, topNode);
 		}
-		bottomNode = classTaxonomy.getNode(objectFactory.getOwlNothing());
+		bottomNode = classTaxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
 		if (bottomNode == null) {
-			bottomNode = new ClassNode(Collections.singletonList(objectFactory
-					.getOwlNothing()));
-			classTaxonomy.nodeLookup.put(objectFactory.getOwlNothing(),
+			bottomNode = new ClassNode(
+					Collections
+							.singletonList((ElkClass) PredefinedElkClass.OWL_NOTHING));
+			classTaxonomy.nodeLookup.put(PredefinedElkClass.OWL_NOTHING,
 					bottomNode);
 		}
 

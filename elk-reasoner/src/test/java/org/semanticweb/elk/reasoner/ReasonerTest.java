@@ -51,8 +51,7 @@ public class ReasonerTest extends TestCase {
 
 		Reasoner reasoner = new Reasoner();
 		reasoner.loadOntologyFromString(""//
-				+ "Prefix( : = <http://example.org/> )"
-				+ "Ontology("//
+				+ "Prefix( : = <http://example.org/> )" + "Ontology("//
 				+ "EquivalentClasses(:B :C)"//
 				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 				+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"//
@@ -64,8 +63,10 @@ public class ReasonerTest extends TestCase {
 		ElkClass a = objectFactory.getClass("http://example.org/A");
 		ElkClass d = objectFactory.getClass("http://example.org/D");
 		ElkClass e = objectFactory.getClass("http://example.org/E");
-		ElkObjectProperty r = objectFactory.getObjectProperty("http://example.org/R");
-		ElkObjectProperty s = objectFactory.getObjectProperty("http://example.org/S");
+		ElkObjectProperty r = objectFactory
+				.getObjectProperty("http://example.org/R");
+		ElkObjectProperty s = objectFactory
+				.getObjectProperty("http://example.org/S");
 
 		reasoner.classify();
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
@@ -87,10 +88,9 @@ public class ReasonerTest extends TestCase {
 			ExecutionException, ParseException, IOException {
 
 		final Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString(
-				  "Prefix( : = <http://example.org/> )"
-				+ "Ontology(" + "SubClassOf(:A :B)"
-				+ "SubClassOf(:A :C)" + "SubClassOf(:A :D)"
+		reasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
+				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
+				+ "SubClassOf(:A :D)"
 				+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)" + ")");
 
 		ElkClass a = objectFactory.getClass("http://example.org/A");
@@ -131,7 +131,7 @@ public class ReasonerTest extends TestCase {
 		assertTrue("A contains E",
 				aNode.getDirectSuperNodes().contains(taxonomy.getNode(e)));
 	}
-	
+
 	public void testPropertyChains() throws ParseException, IOException {
 		Reasoner reasoner = new Reasoner();
 		reasoner.loadOntologyFromString(""//
@@ -147,25 +147,26 @@ public class ReasonerTest extends TestCase {
 				+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
 				+ ")"//
 		);
-		
+
 		reasoner.classify();
 
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
-		ClassNode aNode = taxonomy.getNode(objectFactory.getClass("http://example.org/A"));
-		assertTrue("A SubClassOf X", aNode.getDirectSuperNodes().contains(
-				taxonomy.getNode(objectFactory.getClass("http://example.org/X"))));
+		ClassNode aNode = taxonomy.getNode(objectFactory
+				.getClass("http://example.org/A"));
+		assertTrue(
+				"A SubClassOf X",
+				aNode.getDirectSuperNodes().contains(
+						taxonomy.getNode(objectFactory
+								.getClass("http://example.org/X"))));
 	}
-
 
 	public void testAncestors() throws InterruptedException,
 			ExecutionException, ParseException, IOException {
 
 		final Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString(
-				  "Prefix( : = <http://example.org/> )"
-				+ "Ontology(" + "SubClassOf(:A :B)"
-				+ "SubClassOf(:A :C)" + "SubClassOf(:B :D)"
-				+ "SubClassOf(:C :D))");
+		reasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
+				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
+				+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))");
 
 		ElkClass a = objectFactory.getClass("http://example.org/A");
 		ElkClass b = objectFactory.getClass("http://example.org/B");

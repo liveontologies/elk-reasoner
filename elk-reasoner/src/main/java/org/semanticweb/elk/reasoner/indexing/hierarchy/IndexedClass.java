@@ -73,14 +73,13 @@ public class IndexedClass extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment, int positiveIncrement,
-			int negativeIncrement, IndexedObjectCanonizer canonizer) {
-		
+	protected void updateOccurrenceNumbers(int increment,
+			int positiveIncrement, int negativeIncrement,
+			IndexedObjectCanonizer canonizer) {
 		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 		if (occurrenceNo == 0)
 			canonizer.remove(this);
 	}
-
 }

@@ -35,7 +35,6 @@ import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
@@ -62,20 +61,18 @@ public final class ElkClassExpressionConverter implements
 
 	final OWLDataFactory owlDataFactory = OWLManager.getOWLDataFactory();
 
-	protected final ElkObjectFactory objectFactory;
+	private static ElkClassExpressionConverter INSTANCE_ = new ElkClassExpressionConverter();
 
-	public ElkClassExpressionConverter(ElkObjectFactory objectFactory) {
-		this.objectFactory = objectFactory;
+	private ElkClassExpressionConverter() {
+	}
+
+	public static ElkClassExpressionConverter getInstance() {
+		return INSTANCE_;
 	}
 
 	public OWLClass visit(ElkClass elkClass) {
 		String iri = elkClass.getIri();
-		if (elkClass.equals(objectFactory.getOwlThing()))
-			return owlDataFactory.getOWLThing();
-		else if (elkClass.equals(objectFactory.getOwlNothing()))
-			return owlDataFactory.getOWLNothing();
-		else
-			return owlDataFactory.getOWLClass(IRI.create(iri));
+		return owlDataFactory.getOWLClass(IRI.create(iri));
 	}
 
 	public OWLObjectIntersectionOf visit(
