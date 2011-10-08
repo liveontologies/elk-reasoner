@@ -190,8 +190,8 @@ public abstract class AbstractConcurrentComputation<I> {
 		}
 		// wait until the buffer becomes empty; it will mean that all the
 		// workers are dead
-		while (!buffer.isEmpty()) {
-			synchronized (buffer) {
+		synchronized (buffer) {
+			while (!buffer.isEmpty()) {
 				buffer.wait();
 			}
 		}
