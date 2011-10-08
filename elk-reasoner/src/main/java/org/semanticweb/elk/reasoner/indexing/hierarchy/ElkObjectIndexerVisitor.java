@@ -24,6 +24,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ListIterator;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
@@ -54,6 +56,10 @@ public class ElkObjectIndexerVisitor implements
 		ElkClassExpressionVisitor<IndexedClassExpression>,
 		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain> {
 
+	// logger for events
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ElkObjectIndexerVisitor.class);
+
 	private IndexedObjectFilter objectFilter;
 
 	ElkObjectIndexerVisitor(IndexedObjectFilter subObjectFilter) {
@@ -66,35 +72,36 @@ public class ElkObjectIndexerVisitor implements
 
 	public IndexedClassExpression visit(
 			ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkObjectAllValuesFrom.class.getSimpleName() + " not supported");
 	}
 
 	public IndexedClassExpression visit(
 			ElkObjectComplementOf elkObjectComplementOf) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkObjectComplementOf.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(
 			ElkObjectExactCardinality elkObjectExactCardinality) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkObjectExactCardinality.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public IndexedClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkObjectHasSelf.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkObjectHasValue.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
-		
+
 		IndexedClassExpression result = null;
 		for (ElkClassExpression c : elkObjectIntersectionOf
 				.getClassExpressions()) {
@@ -115,7 +122,8 @@ public class ElkObjectIndexerVisitor implements
 				secondConjunct = result;
 			}
 
-			result = objectFilter.filter(new IndexedObjectIntersectionOf(firstConjunct, secondConjunct));
+			result = objectFilter.filter(new IndexedObjectIntersectionOf(
+					firstConjunct, secondConjunct));
 		}
 
 		return result;
@@ -123,94 +131,103 @@ public class ElkObjectIndexerVisitor implements
 
 	public IndexedClassExpression visit(
 			ElkObjectMaxCardinality elkObjectMaxCardinality) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkObjectMaxCardinality.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public IndexedClassExpression visit(
 			ElkObjectMinCardinality elkObjectMinCardinality) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkObjectMinCardinality.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public IndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkObjectOneOf.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-		IndexedObjectProperty iop = (IndexedObjectProperty)
-			elkObjectSomeValuesFrom.getObjectPropertyExpression().accept(this); 
+		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectSomeValuesFrom
+				.getObjectPropertyExpression().accept(this);
 		return objectFilter.filter(new IndexedObjectSomeValuesFrom(iop,
-			elkObjectSomeValuesFrom.getClassExpression().accept(this)));
+				elkObjectSomeValuesFrom.getClassExpression().accept(this)));
 	}
 
 	public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkObjectUnionOf.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
+		if (LOGGER_.isEnabledFor(Level.WARN))
+			LOGGER_.warn(ElkDataHasValue.class.getSimpleName()
+					+ " is supported only partially.");
 		return objectFilter.filter(new IndexedDataHasValue(elkDataHasValue));
 	}
 
 	public IndexedClassExpression visit(
 			ElkDataMaxCardinality elkDataMaxCardinality) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkDataMaxCardinality.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(
 			ElkDataMinCardinality elkDataMinCardinality) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkDataMinCardinality.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(
 			ElkDataExactCardinality elkDataExactCardinality) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkDataMinCardinality.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(
 			ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkDataSomeValuesFrom.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(
 			ElkDataAllValuesFrom elkDataAllValuesFrom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkDataAllValuesFrom.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkObjectInverseOf.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
-		return objectFilter.filter(new IndexedObjectProperty(elkObjectProperty));
+		return objectFilter
+				.filter(new IndexedObjectProperty(elkObjectProperty));
 	}
 
 	public IndexedPropertyChain visit(
 			ElkObjectPropertyChain elkObjectPropertyChain) {
-	
+
 		IndexedPropertyChain result = null;
-		ListIterator<? extends ElkObjectPropertyExpression> iterator = 
-			elkObjectPropertyChain.getObjectPropertyExpressions().listIterator(
-					elkObjectPropertyChain.getObjectPropertyExpressions().size());
-		
+		ListIterator<? extends ElkObjectPropertyExpression> iterator = elkObjectPropertyChain
+				.getObjectPropertyExpressions().listIterator(
+						elkObjectPropertyChain.getObjectPropertyExpressions()
+								.size());
+
 		while (iterator.hasPrevious()) {
-			IndexedObjectProperty iop = (IndexedObjectProperty) iterator.previous().accept(this);
+			IndexedObjectProperty iop = (IndexedObjectProperty) iterator
+					.previous().accept(this);
 
 			if (result == null) {
 				result = iop;
 				continue;
 			}
 
-			result = objectFilter.filter(new IndexedBinaryPropertyChain(iop, result));
+			result = objectFilter.filter(new IndexedBinaryPropertyChain(iop,
+					result));
 		}
 
 		return result;

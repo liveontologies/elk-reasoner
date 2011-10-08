@@ -63,8 +63,9 @@ public class OwlObjectInverseOfConverterVisitor implements
 	}
 
 	public ElkObjectPropertyExpression visit(OWLDataProperty property) {
-		throw new IllegalArgumentException(property.getClass()
-				+ " cannot be converted to " + ElkObjectProperty.class);
+		throw new IllegalArgumentException(property.getClass().getSimpleName()
+				+ " cannot be converted to "
+				+ ElkObjectProperty.class.getSimpleName());
 	}
 
 }

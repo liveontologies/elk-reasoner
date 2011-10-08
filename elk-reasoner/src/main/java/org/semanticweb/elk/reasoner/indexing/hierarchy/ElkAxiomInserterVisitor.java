@@ -90,8 +90,8 @@ class ElkAxiomInserterVisitor extends ElkAxiomIndexerVisitor {
 		}
 
 		public Void visit(ElkDatatype elkDatatype) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new IndexingException(ElkDatatype.class.getSimpleName()
+					+ " not supported");
 		}
 
 		public Void visit(ElkObjectProperty elkObjectProperty) {
@@ -102,13 +102,13 @@ class ElkAxiomInserterVisitor extends ElkAxiomIndexerVisitor {
 		}
 
 		public Void visit(ElkDataProperty elkDataProperty) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new IndexingException(ElkDataProperty.class.getSimpleName()
+					+ " not supported");
 		}
 
 		public Void visit(ElkNamedIndividual elkNamedIndividual) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new IndexingException(
+					ElkNamedIndividual.class.getSimpleName() + " not supported");
 		}
 	};
 

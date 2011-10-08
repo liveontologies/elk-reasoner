@@ -20,27 +20,28 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.implementation;
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-/**
- * Implementation for ElkObjects that maintain an IRI.
- * 
- * @author Markus Kroetzsch
- */
-public abstract class ElkIriObject extends ElkObjectImpl {
+public class IndexingException extends RuntimeException {
 
-	protected final String iri;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8678875783274619601L;
 
-	/* package-private */ElkIriObject(String iri) {
-		this.iri = iri;
+	protected IndexingException() {
 	}
 
-	public String getIri() {
-		return iri;
+	public IndexingException(String message) {
+		super(message);
 	}
 
-	@Override
-	public String toString() {
-		return '<' + iri + '>';
+	public IndexingException(String message, Throwable cause) {
+		super(message, cause);
 	}
+
+	public IndexingException(Throwable cause) {
+		super(cause);
+	}
+
 }

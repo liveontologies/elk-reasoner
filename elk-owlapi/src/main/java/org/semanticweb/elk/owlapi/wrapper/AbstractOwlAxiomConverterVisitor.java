@@ -83,214 +83,271 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 
 	public T visit(OWLSubAnnotationPropertyOfAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLSubAnnotationPropertyOfAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLSubAnnotationPropertyOfAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLAnnotationPropertyDomainAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLAnnotationPropertyDomainAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLAnnotationPropertyDomainAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLAnnotationPropertyRangeAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLAnnotationPropertyRangeAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLAnnotationPropertyRangeAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLSubClassOfAxiom axiom) {
-		throw new IllegalArgumentException(OWLSubClassOfAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLSubClassOfAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLNegativeObjectPropertyAssertionAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLNegativeObjectPropertyAssertionAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLAsymmetricObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLAsymmetricObjectPropertyAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLAsymmetricObjectPropertyAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLReflexiveObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLReflexiveObjectPropertyAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLReflexiveObjectPropertyAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDisjointClassesAxiom axiom) {
-		throw new IllegalArgumentException(OWLDisjointClassesAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLDisjointClassesAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDataPropertyDomainAxiom axiom) {
-		throw new IllegalArgumentException(OWLDataPropertyDomainAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLDataPropertyDomainAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLObjectPropertyDomainAxiom axiom) {
-		throw new IllegalArgumentException(OWLObjectPropertyDomainAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLObjectPropertyDomainAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLEquivalentObjectPropertiesAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLEquivalentObjectPropertiesAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLEquivalentObjectPropertiesAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLNegativeDataPropertyAssertionAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLNegativeDataPropertyAssertionAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDifferentIndividualsAxiom axiom) {
-		throw new IllegalArgumentException(OWLDifferentIndividualsAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLDifferentIndividualsAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDisjointDataPropertiesAxiom axiom) {
-		throw new IllegalArgumentException(OWLDisjointDataPropertiesAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLDisjointDataPropertiesAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDisjointObjectPropertiesAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLDisjointObjectPropertiesAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLDisjointObjectPropertiesAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLObjectPropertyRangeAxiom axiom) {
-		throw new IllegalArgumentException(OWLObjectPropertyRangeAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLObjectPropertyRangeAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLObjectPropertyAssertionAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLObjectPropertyAssertionAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLObjectPropertyAssertionAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLFunctionalObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLFunctionalObjectPropertyAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLFunctionalObjectPropertyAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLSubObjectPropertyOfAxiom axiom) {
-		throw new IllegalArgumentException(OWLSubObjectPropertyOfAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLSubObjectPropertyOfAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDisjointUnionAxiom axiom) {
-		throw new IllegalArgumentException(OWLDisjointUnionAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLDisjointUnionAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDeclarationAxiom axiom) {
-		throw new IllegalArgumentException(OWLDeclarationAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLDeclarationAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLAnnotationAssertionAxiom axiom) {
-		throw new IllegalArgumentException(OWLAnnotationAssertionAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLAnnotationAssertionAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLSymmetricObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLSymmetricObjectPropertyAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLSymmetricObjectPropertyAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDataPropertyRangeAxiom axiom) {
-		throw new IllegalArgumentException(OWLDataPropertyRangeAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLDataPropertyRangeAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLFunctionalDataPropertyAxiom axiom) {
-		throw new IllegalArgumentException(OWLFunctionalDataPropertyAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLFunctionalDataPropertyAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLEquivalentDataPropertiesAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLEquivalentDataPropertiesAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLEquivalentDataPropertiesAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLClassAssertionAxiom axiom) {
-		throw new IllegalArgumentException(OWLClassAssertionAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLClassAssertionAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLEquivalentClassesAxiom axiom) {
-		throw new IllegalArgumentException(OWLEquivalentClassesAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLEquivalentClassesAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDataPropertyAssertionAxiom axiom) {
-		throw new IllegalArgumentException(OWLDataPropertyAssertionAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLDataPropertyAssertionAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLTransitiveObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLTransitiveObjectPropertyAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLTransitiveObjectPropertyAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLIrreflexiveObjectPropertyAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLIrreflexiveObjectPropertyAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLSubDataPropertyOfAxiom axiom) {
-		throw new IllegalArgumentException(OWLSubDataPropertyOfAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLSubDataPropertyOfAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLInverseFunctionalObjectPropertyAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLInverseFunctionalObjectPropertyAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLSameIndividualAxiom axiom) {
-		throw new IllegalArgumentException(OWLSameIndividualAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLSameIndividualAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLSubPropertyChainOfAxiom axiom) {
-		throw new IllegalArgumentException(OWLSubPropertyChainOfAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLSubPropertyChainOfAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLInverseObjectPropertiesAxiom axiom) {
 		throw new IllegalArgumentException(
-				OWLInverseObjectPropertiesAxiom.class
-						+ " cannot be converted to " + getTargetClass());
+				OWLInverseObjectPropertiesAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLHasKeyAxiom axiom) {
-		throw new IllegalArgumentException(OWLHasKeyAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(OWLHasKeyAxiom.class.getSimpleName()
+				+ " cannot be converted to " + getTargetClass().getSimpleName());
 	}
 
 	public T visit(OWLDatatypeDefinitionAxiom axiom) {
-		throw new IllegalArgumentException(OWLDatatypeDefinitionAxiom.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(
+				OWLDatatypeDefinitionAxiom.class.getSimpleName()
+						+ " cannot be converted to "
+						+ getTargetClass().getSimpleName());
 	}
 
 	public T visit(SWRLRule rule) {
-		throw new IllegalArgumentException(SWRLRule.class
-				+ " cannot be converted to " + getTargetClass());
+		throw new IllegalArgumentException(SWRLRule.class.getSimpleName()
+				+ " cannot be converted to " + getTargetClass().getSimpleName());
 	}
 
 }

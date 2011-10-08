@@ -199,8 +199,10 @@ public class OwlCorrespondingObjectConverterVisitor implements
 	}
 
 	public ElkEntity visit(OWLAnnotationProperty property) {
-		throw new IllegalArgumentException(OWLAnnotationProperty.class
-				+ " cannot be converted to " + ElkEntity.class);
+		throw new IllegalArgumentException(
+				OWLAnnotationProperty.class.getSimpleName()
+						+ " cannot be converted to "
+						+ ElkEntity.class.getSimpleName());
 	}
 
 	public ElkAnonymousIndividual visit(

@@ -24,6 +24,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Arrays;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
@@ -70,6 +72,10 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 		ElkAxiomVisitor<Void> {
 
+	// logger for events
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ElkAxiomIndexerVisitor.class);
+
 	protected abstract void indexSubClassOfAxiom(ElkClassExpression subClass,
 			ElkClassExpression superClass);
 
@@ -90,52 +96,65 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 
 	public void process(ElkAxiom elkAxiom) {
 		if (elkAxiom != null)
-			elkAxiom.accept(this);
+			try {
+				elkAxiom.accept(this);
+			} catch (RuntimeException e) {
+				if (LOGGER_.isEnabledFor(Level.WARN))
+					LOGGER_.warn("Axiom ignored: " + e.getMessage());
+			}
 	}
 
 	public Void visit(
 			ElkDisjointDataPropertiesAxiom elkDisjointDataPropertiesAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkDisjointDataPropertiesAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkEquivalentDataPropertiesAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkFunctionalDataPropertyAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkDataPropertyDomainAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkDataPropertyRangeAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkSubDataPropertyOfAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkAsymmetricObjectPropertyAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkDisjointObjectPropertiesAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkEquivalentObjectPropertiesAxiom axiom) {
@@ -157,26 +176,30 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 
 	public Void visit(
 			ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkFunctionalObjectPropertyAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkInverseFunctionalObjectPropertyAxiom elkInverseFunctionalObjectPropertyAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkInverseFunctionalObjectPropertyAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkInverseObjectPropertiesAxiom elkInverseObjectPropertiesAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkInverseObjectPropertiesAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkIrreflexiveObjectPropertyAxiom elkIrreflexiveObjectPropertyAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkIrreflexiveObjectPropertyAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkObjectPropertyDomainAxiom axiom) {
@@ -187,14 +210,16 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 	}
 
 	public Void visit(ElkObjectPropertyRangeAxiom elkObjectPropertyRangeAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkObjectPropertyRangeAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkReflexiveObjectPropertyAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
@@ -205,8 +230,9 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 
 	public Void visit(
 			ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkSymmetricObjectPropertyAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
@@ -239,51 +265,57 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 	}
 
 	public Void visit(ElkDisjointClassesAxiom elkDisjointClasses) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkDisjointClassesAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(ElkDisjointUnionAxiom.class.getSimpleName()
+				+ " not supported");
 	}
 
 	public Void visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkClassAssertionAxiom.class.getSimpleName() + " not supported");
 	}
 
 	public Void visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkDifferentIndividualsAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkNegativeObjectPropertyAssertionAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(
 			ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkObjectPropertyAssertionAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkSameIndividualAxiom.class.getSimpleName() + " not supported");
 	}
 
 	public Void visit(
 			ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkNegativeDataPropertyAssertionAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkDataPropertyAssertionAxiom elkObjectDataAssertionAxiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IndexingException(
+				ElkDataPropertyAssertionAxiom.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public Void visit(ElkDeclarationAxiom axiom) {

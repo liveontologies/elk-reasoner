@@ -139,21 +139,11 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	protected void addAxiom(OWLAxiom ax) {
-		try {
-			reasoner.addAxiom(owlConverter.convert(ax));
-		} catch (RuntimeException e) {
-			LOGGER_.warn("Axiom ignored: " + ax.toString() + ": "
-					+ e.getMessage());
-		}
+		reasoner.addAxiom(owlConverter.convert(ax));
 	}
 
 	protected void removeAxiom(OWLAxiom ax) {
-		try {
-			reasoner.removeAxiom(owlConverter.convert(ax));
-		} catch (RuntimeException e) {
-			LOGGER_.warn("Axiom ignored: " + ax.toString() + ": "
-					+ e.getMessage());
-		}
+		reasoner.removeAxiom(owlConverter.convert(ax));
 	}
 
 	protected void syncOntology() {

@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -39,21 +40,26 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
- *
+ * 
  */
 class ConcurrentClassTaxonomy extends ClassTaxonomy {
 
-	protected final ConcurrentMap<ElkClass, ClassNode> nodeLookup;
+	// logger for events
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ConcurrentClassTaxonomy.class);
+
+	// map from class IRIs to class nodes
+	protected final ConcurrentMap<String, ClassNode> nodeLookup;
 
 	ConcurrentClassTaxonomy() {
-		this.nodeLookup = new ConcurrentHashMap<ElkClass, ClassNode>();
+		this.nodeLookup = new ConcurrentHashMap<String, ClassNode>();
 	}
 
 	public Set<ClassNode> getNodes() {
 		return Collections.unmodifiableSet(new HashSet<ClassNode>(nodeLookup
 				.values()));
 	}
-	
+
 	/**
 	 * Obtain a ClassNode object for a given ElkClass, null if none assigned
 	 * 
@@ -61,10 +67,12 @@ class ConcurrentClassTaxonomy extends ClassTaxonomy {
 	 * @return ClassNode object for elkClass, possibly still incomplete
 	 */
 	public ClassNode getNode(ElkClass elkClass) {
-		return nodeLookup.get(elkClass);
+		ClassNode result = nodeLookup.get(elkClass.getIri());
+		if (result == null)
+			LOGGER_.error("No taxonomy node for class " + elkClass.getIri());
+		return result;
 	}
-	
-	
+
 	public int structuralHashCode() {
 		return HashGenerator.combineMultisetHash(true, getNodes());
 	}

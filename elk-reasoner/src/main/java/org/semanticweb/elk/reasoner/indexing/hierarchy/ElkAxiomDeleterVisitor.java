@@ -33,16 +33,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
-
 /**
  * @author Frantisek Simancik
- *
+ * 
  */
-class ElkAxiomDeleterVisitor extends ElkAxiomIndexerVisitor  {
-	
+class ElkAxiomDeleterVisitor extends ElkAxiomIndexerVisitor {
+
 	private final IndexedObjectCanonizer canonizer;
 	private final ElkObjectIndexerVisitor elkObjectIndexer;
-	
+
 	public ElkAxiomDeleterVisitor(IndexedObjectCanonizer canonizer) {
 		this.canonizer = canonizer;
 		this.elkObjectIndexer = new ElkObjectIndexerVisitor(
@@ -52,11 +51,11 @@ class ElkAxiomDeleterVisitor extends ElkAxiomIndexerVisitor  {
 	@Override
 	protected void indexSubClassOfAxiom(ElkClassExpression subElkClass,
 			ElkClassExpression superElkClass) {
-		IndexedClassExpression subIndexedClass = 
-			subElkClass.accept(elkObjectIndexer);
-		IndexedClassExpression superIndexedClass = 
-			superElkClass.accept(elkObjectIndexer);
-		
+		IndexedClassExpression subIndexedClass = subElkClass
+				.accept(elkObjectIndexer);
+		IndexedClassExpression superIndexedClass = superElkClass
+				.accept(elkObjectIndexer);
+
 		if (subIndexedClass != null && superIndexedClass != null) {
 			subIndexedClass.updateOccurrenceNumbers(-1, 0, -1, canonizer);
 			superIndexedClass.updateOccurrenceNumbers(-1, -1, 0, canonizer);
@@ -68,11 +67,11 @@ class ElkAxiomDeleterVisitor extends ElkAxiomIndexerVisitor  {
 	protected void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subElkProperty,
 			ElkObjectPropertyExpression superElkProperty) {
-		IndexedPropertyChain subIndexedProperty = 
-			subElkProperty.accept(elkObjectIndexer);
-		IndexedObjectProperty superIndexedProperty = 
-			(IndexedObjectProperty) superElkProperty.accept(elkObjectIndexer);
-		
+		IndexedPropertyChain subIndexedProperty = subElkProperty
+				.accept(elkObjectIndexer);
+		IndexedObjectProperty superIndexedProperty = (IndexedObjectProperty) superElkProperty
+				.accept(elkObjectIndexer);
+
 		subIndexedProperty.updateOccurrenceNumber(-1, canonizer);
 		superIndexedProperty.updateOccurrenceNumber(-1, canonizer);
 		subIndexedProperty.removeToldSuperObjectProperty(superIndexedProperty);
@@ -83,37 +82,38 @@ class ElkAxiomDeleterVisitor extends ElkAxiomIndexerVisitor  {
 	protected void indexDeclarationAxiom(ElkEntity entity) {
 		entity.accept(entityDeleter);
 	}
-	
+
 	private final ElkEntityVisitor<Void> entityDeleter = new ElkEntityVisitor<Void>() {
 
-			public Void visit(ElkClass elkClass) {
-				IndexedClassExpression ice = elkClass.accept(elkObjectIndexer);
-				if (ice != null)
-					ice.updateOccurrenceNumbers(-1, 0, 0, canonizer);
-				return null;
-			}
+		public Void visit(ElkClass elkClass) {
+			IndexedClassExpression ice = elkClass.accept(elkObjectIndexer);
+			if (ice != null)
+				ice.updateOccurrenceNumbers(-1, 0, 0, canonizer);
+			return null;
+		}
 
-			public Void visit(ElkDatatype elkDatatype) {
-				// TODO Auto-generated method stub
-				return null;
-			}
+		public Void visit(ElkDatatype elkDatatype) {
+			throw new IndexingException(ElkDatatype.class.getSimpleName()
+					+ " not supported");
+		}
 
-			public Void visit(ElkObjectProperty elkObjectProperty) {
-				IndexedPropertyChain ipc = elkObjectProperty.accept(elkObjectIndexer);
-				if (ipc != null)
-					ipc.updateOccurrenceNumber(-1, canonizer);
-				return null;
-			}
+		public Void visit(ElkObjectProperty elkObjectProperty) {
+			IndexedPropertyChain ipc = elkObjectProperty
+					.accept(elkObjectIndexer);
+			if (ipc != null)
+				ipc.updateOccurrenceNumber(-1, canonizer);
+			return null;
+		}
 
-			public Void visit(ElkDataProperty elkDataProperty) {
-				// TODO Auto-generated method stub
-				return null;
-			}
+		public Void visit(ElkDataProperty elkDataProperty) {
+			throw new IndexingException(ElkDataProperty.class.getSimpleName()
+					+ " not supported");
+		}
 
-			public Void visit(ElkNamedIndividual elkNamedIndividual) {
-				// TODO Auto-generated method stub
-				return null;
-			}
+		public Void visit(ElkNamedIndividual elkNamedIndividual) {
+			throw new IndexingException(
+					ElkNamedIndividual.class.getSimpleName() + " not supported");
+		}
 	};
 
 }
