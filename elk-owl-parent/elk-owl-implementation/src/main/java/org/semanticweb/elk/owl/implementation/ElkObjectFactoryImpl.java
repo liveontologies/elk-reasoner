@@ -24,6 +24,7 @@ package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -127,6 +128,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	protected static final ElkDatatype ELK_RDF_PLAIN_LITERAL = new ElkDatatypeImpl(
 			"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 
+	protected static final ElkAnnotationAxiom ELK_ANNOTATION_AXIOM = new ElkAnnotationAxiomImpl();
+
 	protected final ElkObjectManager objectManager;
 
 	/**
@@ -159,6 +162,10 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	 */
 	public ElkObjectManager getObjectManager() {
 		return objectManager;
+	}
+
+	public ElkAnnotationAxiom getAnnotationAxiom() {
+		return ELK_ANNOTATION_AXIOM;
 	}
 
 	public ElkClass getClass(String iri) {
@@ -776,4 +783,5 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 		return (ElkLiteral) objectManager
 				.getCanonicalElkObject(new ElkLiteralImpl(lexicalForm, datatype));
 	}
+
 }

@@ -51,6 +51,7 @@ import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubDataPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
+import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
 
@@ -236,6 +237,12 @@ public class OwlAxiomConverterVisitor extends
 	};
 
 	@Override
+	public ElkAxiom visit(OWLSubPropertyChainOfAxiom owlSubPropertyChainOfAxiom) {
+		return new ElkSubObjectPropertyChainOfAxiomWrap<OWLSubPropertyChainOfAxiom>(
+				owlSubPropertyChainOfAxiom);
+	};
+
+	@Override
 	public ElkAxiom visit(
 			OWLSymmetricObjectPropertyAxiom owlSymmetricObjectPropertyAxiom) {
 		return CONVERTER.convert(owlSymmetricObjectPropertyAxiom);
@@ -246,5 +253,4 @@ public class OwlAxiomConverterVisitor extends
 			OWLTransitiveObjectPropertyAxiom owlTransitiveObjectPropertyAxiom) {
 		return CONVERTER.convert(owlTransitiveObjectPropertyAxiom);
 	};
-
 }

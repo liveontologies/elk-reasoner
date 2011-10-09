@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,23 +20,19 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.visitors;
-
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
+package org.semanticweb.elk.owl.interfaces;
 
 /**
- * Super interface of all visitors for ElkAxioms.
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Annotation_Axioms">Annotation Axiom<a> in
+ * the OWL 2 specification. Annotation axioms do not have any logical meaning
+ * and can be safely ignored during reasoning. A (dummy) implementation of
+ * annotation axioms is required to handle them more gracefully during loading
+ * of OWL 2 ontologies.
  * 
- * @author Markus Kroetzsch
- * @param <O>
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public interface ElkAxiomVisitor<O> extends ElkClassAxiomVisitor<O>,
-		ElkObjectPropertyAxiomVisitor<O>, ElkDataPropertyAxiomVisitor<O>,
-		ElkAssertionAxiomVisitor<O> {
-
-	O visit(ElkDeclarationAxiom elkDeclarationAxiom);
-
-	O visit(ElkAnnotationAxiom elkAnnotationAxiom);
+public interface ElkAnnotationAxiom extends ElkAxiom {
 
 }

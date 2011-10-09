@@ -34,6 +34,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
+import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
 
@@ -50,14 +51,14 @@ public class OwlObjectPropertyAxiomConverterVisitor extends
 
 	private static OwlObjectPropertyAxiomConverterVisitor INSTANCE_ = new OwlObjectPropertyAxiomConverterVisitor();
 
-	private OwlObjectPropertyAxiomConverterVisitor() {
-	}
+	protected static OwlConverter CONVERTER = OwlConverter.getInstance();
 
 	public static OwlObjectPropertyAxiomConverterVisitor getInstance() {
 		return INSTANCE_;
 	}
 
-	protected static OwlConverter CONVERTER = OwlConverter.getInstance();
+	private OwlObjectPropertyAxiomConverterVisitor() {
+	}
 
 	@Override
 	protected Class<ElkObjectPropertyAxiom> getTargetClass() {
@@ -128,6 +129,13 @@ public class OwlObjectPropertyAxiomConverterVisitor extends
 	public ElkObjectPropertyAxiom visit(
 			OWLSubObjectPropertyOfAxiom owlSubObjectPropertyOfAxiom) {
 		return CONVERTER.convert(owlSubObjectPropertyOfAxiom);
+	};
+
+	@Override
+	public ElkObjectPropertyAxiom visit(
+			OWLSubPropertyChainOfAxiom owlSubPropertyChainOfAxiom) {
+		return new ElkSubObjectPropertyChainOfAxiomWrap<OWLSubPropertyChainOfAxiom>(
+				owlSubPropertyChainOfAxiom);
 	};
 
 	@Override

@@ -44,6 +44,7 @@ package org.semanticweb.elk.owl.parsing.javacc;
 
 import java.util.Vector;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
@@ -1251,7 +1252,7 @@ ElkAxiom axiom():
 	| datatypeDefinition()
 	| hasKey()
 	| x = assertion()
-	| annotationAxiom()
+	| x = annotationAxiom()
 	) { return x; }
 }
 
@@ -1849,12 +1850,15 @@ void annotationValue():
 }
 
 /* 10.2 Annotation Axioms */
-void annotationAxiom():
+ElkAnnotationAxiom annotationAxiom():
 {}{
-	annotationAssertion()
+	( annotationAssertion()
 	| subAnnotationPropertyOf()
 	| annotationPropertyDomain()
 	| annotationPropertyRange()
+	) { 
+		return objectFactory.getAnnotationAxiom(); 
+	}
 }
 
 /* 10.2.1 Annotation Assertion */

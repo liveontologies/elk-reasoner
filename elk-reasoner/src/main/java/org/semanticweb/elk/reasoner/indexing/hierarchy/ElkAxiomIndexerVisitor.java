@@ -28,6 +28,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
@@ -95,13 +96,16 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 			new DummyObjectManager());
 
 	public void process(ElkAxiom elkAxiom) {
-		if (elkAxiom != null)
-			try {
-				elkAxiom.accept(this);
-			} catch (RuntimeException e) {
-				if (LOGGER_.isEnabledFor(Level.WARN))
-					LOGGER_.warn("Axiom ignored: " + e.getMessage());
-			}
+		try {
+			elkAxiom.accept(this);
+		} catch (RuntimeException e) {
+			if (LOGGER_.isEnabledFor(Level.WARN))
+				LOGGER_.warn("Axiom ignored: " + e.getMessage());
+		}
+	}
+
+	public Void visit(ElkAnnotationAxiom elkAnnotationAxiom) {
+		return null;
 	}
 
 	public Void visit(
