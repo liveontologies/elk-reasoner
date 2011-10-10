@@ -41,6 +41,14 @@ public interface ElkObjectFactory {
 	 * @return
 	 */
 	public abstract ElkAnnotationAxiom getAnnotationAxiom();
+	
+	/**
+	 * Create an {@link ElkAnnotationProperty}.
+	 * 
+	 * @param iri
+	 * @return
+	 */
+	public abstract ElkAnnotationProperty getAnnotationProperty(String iri);
 
 	/**
 	 * Create an {@link ElkAnonymousIndividual}.

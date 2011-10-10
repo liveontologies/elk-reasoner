@@ -25,6 +25,7 @@ package org.semanticweb.elk.owl.implementation;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -168,6 +169,11 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 		return ELK_ANNOTATION_AXIOM;
 	}
 
+	public ElkAnnotationProperty getAnnotationProperty(String iri) {
+		return (ElkAnnotationProperty) objectManager.
+			getCanonicalElkObject(new ElkAnnotationPropertyImpl(iri));
+	}
+	
 	public ElkClass getClass(String iri) {
 		return (ElkClass) objectManager.getCanonicalElkObject(new ElkClassImpl(
 				iri));

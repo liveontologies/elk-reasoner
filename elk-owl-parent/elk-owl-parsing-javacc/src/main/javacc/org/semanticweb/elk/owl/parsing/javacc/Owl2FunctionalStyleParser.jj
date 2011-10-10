@@ -45,6 +45,7 @@ package org.semanticweb.elk.owl.parsing.javacc;
 import java.util.Vector;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
@@ -706,9 +707,13 @@ ElkDataProperty dataProperty():
 }
 
 /* 5.5 Annotation Properties */
-void annotationProperty():
-{}{
-	iri()
+ElkAnnotationProperty annotationProperty():
+{
+	String x;
+}{
+	x = iri() {
+		return objectFactory.getAnnotationProperty(x);
+	}
 // 	| <RDFS_LABEL>
 // 	| <RDFS_COMMENT>
 // 	| <RDFS_SEE_ALSO>
@@ -809,7 +814,7 @@ ElkEntity entity():
 	| <DATATYPE> <OPEN_BRACE> x = datatype() <CLOSE_BRACE>
 	| <OBJECT_PROPERTY> <OPEN_BRACE> x = objectProperty() <CLOSE_BRACE>
 	| <DATA_PROPERTY> <OPEN_BRACE> x = dataProperty() <CLOSE_BRACE>
-	| <ANNOTATION_PROPERTY> <OPEN_BRACE> annotationProperty() <CLOSE_BRACE>
+	| <ANNOTATION_PROPERTY> <OPEN_BRACE> x = annotationProperty() <CLOSE_BRACE>
 	| <NAMED_INDIVIDUAL> <OPEN_BRACE> x = namedIndividual() <CLOSE_BRACE>
    ) { return x; }
 }

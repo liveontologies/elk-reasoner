@@ -25,6 +25,7 @@ package org.semanticweb.elk.owl.managers;
 import java.lang.ref.ReferenceQueue;
 import java.util.HashMap;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
@@ -67,6 +68,11 @@ public class WeakCanonicalEntityObjectManager implements ElkObjectManager {
 			public WeakWrapper<? extends ElkEntity> visit(
 					ElkNamedIndividual elkNamedIndividual) {
 				return new WeakElkNamedIndividualWrapper(elkNamedIndividual, referenceQueue);
+			}
+
+			public WeakWrapper<? extends ElkEntity> visit(
+					ElkAnnotationProperty elkAnnotationProperty) {
+				return new WeakElkAnnotationPropertyWrapper(elkAnnotationProperty, referenceQueue);
 			}
 		
 	};

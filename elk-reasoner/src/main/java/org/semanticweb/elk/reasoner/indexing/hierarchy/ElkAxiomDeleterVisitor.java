@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
@@ -113,6 +114,11 @@ class ElkAxiomDeleterVisitor extends ElkAxiomIndexerVisitor {
 		public Void visit(ElkNamedIndividual elkNamedIndividual) {
 			throw new IndexingException(
 					ElkNamedIndividual.class.getSimpleName() + " not supported");
+		}
+
+		public Void visit(ElkAnnotationProperty elkAnnotationProperty) {
+			// annotations are ignored during indexing
+			return null;
 		}
 	};
 

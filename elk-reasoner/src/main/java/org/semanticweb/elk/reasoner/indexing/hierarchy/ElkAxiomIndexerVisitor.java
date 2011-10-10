@@ -105,6 +105,7 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 	}
 
 	public Void visit(ElkAnnotationAxiom elkAnnotationAxiom) {
+		// annotations are ignored during indexing
 		return null;
 	}
 
