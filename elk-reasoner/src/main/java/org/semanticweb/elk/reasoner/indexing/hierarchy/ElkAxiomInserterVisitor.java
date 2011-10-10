@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -39,6 +40,10 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
  * 
  */
 class ElkAxiomInserterVisitor extends ElkAxiomIndexerVisitor {
+
+	// logger for events
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ElkAxiomInserterVisitor.class);
 
 	private final IndexedObjectCanonizer canonizer;
 	private final ElkObjectIndexerVisitor elkObjectIndexer;
@@ -91,8 +96,9 @@ class ElkAxiomInserterVisitor extends ElkAxiomIndexerVisitor {
 		}
 
 		public Void visit(ElkDatatype elkDatatype) {
-			throw new IndexingException(ElkDatatype.class.getSimpleName()
-					+ " not supported");
+			LOGGER_.warn(ElkDatatype.class.getSimpleName()
+					+ " is supported only partially.");
+			return null;
 		}
 
 		public Void visit(ElkObjectProperty elkObjectProperty) {
@@ -103,8 +109,9 @@ class ElkAxiomInserterVisitor extends ElkAxiomIndexerVisitor {
 		}
 
 		public Void visit(ElkDataProperty elkDataProperty) {
-			throw new IndexingException(ElkDataProperty.class.getSimpleName()
-					+ " not supported");
+			LOGGER_.warn(ElkDataProperty.class.getSimpleName()
+					+ " is supported only partially.");
+			return null;
 		}
 
 		public Void visit(ElkNamedIndividual elkNamedIndividual) {

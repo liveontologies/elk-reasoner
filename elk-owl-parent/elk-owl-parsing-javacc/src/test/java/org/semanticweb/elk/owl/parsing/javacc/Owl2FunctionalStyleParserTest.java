@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.managers.DummyObjectManager;
 
 /**
  * @author Yevgeny Kazakov
@@ -62,6 +63,8 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 			boolean defaultPrefixes) {
 		InputStream stream = new ByteArrayInputStream(testString.getBytes());
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
+		parser.setObjectFactory(new ElkObjectFactoryImpl(
+				new DummyObjectManager()));
 		if (defaultPrefixes) {
 			parser.enableOwlDefaultPrefixDeclarations();
 		}
@@ -125,8 +128,8 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		return getParserForString(testString, true).literal();
 	}
 
-	public void testPlainLiterals() throws InterruptedException, ExecutionException,
-	ParseException {
+	public void testPlainLiterals() throws InterruptedException,
+			ExecutionException, ParseException {
 		ElkLiteral literal1 = parseElkLiteral("\"Test\"@en");
 		assertNotNull(literal1);
 		ElkLiteral literal2 = parseElkLiteral("\"Test@en\"^^rdf:PlainLiteral");
@@ -134,11 +137,14 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		assertEquals(literal1.getLexicalForm(), "Test@en");
 		assertEquals(literal2.getLexicalForm(), "Test@en");
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-		assertEquals(literal1.getDatatype(), objectFactory.getDatatypeRdfPlainLiteral());
-		assertEquals(literal1.getDatatype().getIri(), "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
-		assertEquals(literal2.getDatatype().getIri(), "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
+		assertEquals(literal1.getDatatype(),
+				objectFactory.getDatatypeRdfPlainLiteral());
+		assertEquals(literal1.getDatatype().getIri(),
+				"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
+		assertEquals(literal2.getDatatype().getIri(),
+				"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 		assertTrue(literal1.getDatatype().equals(literal2.getDatatype()));
-		//assertEquals(literal1, literal2);
+		// assertEquals(literal1, literal2);
 	}
 
 }

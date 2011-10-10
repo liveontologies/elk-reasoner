@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK OWL API
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
@@ -20,34 +20,27 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, Jul 1, 2011
- */
-package org.semanticweb.elk.owlapi;
+package org.semanticweb.elk.owl.printers;
 
-/**
- * @author Yevgeny Kazakov
- * 
- */
-public class ConverterException extends RuntimeException {
+public class PrintingException extends RuntimeException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4527538954666532031L;
+	private static final long serialVersionUID = -1816369750840306252L;
 
-	protected ConverterException() {
+	protected PrintingException() {
 	}
 
-	public ConverterException(String message) {
+	public PrintingException(String message) {
 		super(message);
 	}
 
-	public ConverterException(String message, Throwable cause) {
+	public PrintingException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ConverterException(Throwable cause) {
+	public PrintingException(Throwable cause) {
 		super(cause);
 	}
 

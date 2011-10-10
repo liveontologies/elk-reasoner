@@ -68,6 +68,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.managers.DummyObjectManager;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 
 abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
@@ -100,7 +101,9 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 			elkAxiom.accept(this);
 		} catch (RuntimeException e) {
 			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn("Axiom ignored: " + e.getMessage());
+				LOGGER_.warn("Axiom ignored: "
+						+ OwlFunctionalStylePrinter.toString(elkAxiom) + " : "
+						+ e.getMessage());
 		}
 	}
 

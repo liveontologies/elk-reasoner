@@ -35,6 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
@@ -164,13 +165,14 @@ public class ClassTaxonomyPrinter {
 		for (ElkClass elkClassMember : orderedEquivalentClasses.values()) {
 			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = objectFactory
 					.getEquivalentClassesAxiom(elkClass, elkClassMember);
-			writer.write(elkEquivalentClassesAxiom.toString() + "\n");
+			OwlFunctionalStylePrinter.append(writer, elkEquivalentClassesAxiom);
+			writer.append('\n');
 		}
 		for (ElkClass elkSubClass : orderedSubClasses.values()) {
 			ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
 					.getSubClassOfAxiom(elkSubClass, elkClass);
-			writer.write(elkSubClassAxiom.toString() + "\n");
+			OwlFunctionalStylePrinter.append(writer, elkSubClassAxiom);
+			writer.append('\n');
 		}
 	}
-
 }

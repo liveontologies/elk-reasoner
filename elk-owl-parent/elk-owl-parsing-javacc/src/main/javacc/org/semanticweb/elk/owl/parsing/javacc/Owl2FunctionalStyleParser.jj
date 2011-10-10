@@ -24,7 +24,7 @@
  *
  * Follows the official OWL 2 specifications:
  * http://www.w3.org/TR/owl2-syntax/#Appendix:_Complete_Grammar_.28Normative.29
- * Some lexing definitions use terminals from SPQRQL specification:
+ * Some lexing definitions use terminals from SPARQL specification:
  * http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#sparqlGrammar
  *
  * @author Yevgeny Kazakov, Apr 19, 2011
@@ -44,6 +44,8 @@ package org.semanticweb.elk.owl.parsing.javacc;
 
 import java.util.Vector;
 
+import org.semanticweb.elk.owl.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
@@ -122,16 +124,24 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
-import org.semanticweb.elk.owl.managers.DummyObjectManager;
+import org.semanticweb.elk.owl.managers.WeakCanonicalEntityObjectManager;
 import java.util.Map;
 import java.util.HashMap;
 
 public class Owl2FunctionalStyleParser {
 
-	private final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(new DummyObjectManager());
+	/**
+	 * Default object factory used for creation of ELK Objects.
+	 */
+	protected ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(
+			new WeakCanonicalEntityObjectManager());
+
+	/**
+	 * Setting an object factory to be used for creation of ELK Objects.
+	 */
+	public void setObjectFactory(ElkObjectFactory objectFactory) {
+		this.objectFactory = objectFactory;
+	}
 
 	/**
 	 * Prefix declarations as found in the parsed document.
