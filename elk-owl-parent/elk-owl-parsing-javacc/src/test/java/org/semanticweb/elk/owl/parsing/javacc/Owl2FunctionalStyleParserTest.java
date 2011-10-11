@@ -109,6 +109,23 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 
 		parseOntologyDocument(testString);
 	}
+	
+	public void testEmptyPrefix() throws ParseException {
+		String testString = "Prefix(:=<>)" +
+		"Ontology("
+		+ "Declaration(Class(:A))"
+		+ ")";
+		parseOntologyDocument(testString);
+	}
+	
+	public void testQualifiedNamesInIris() throws ParseException {
+		String testString = "Prefix(p: = <>)" +
+				"Ontology("
+				+ "SubClassOf(p:Class p:Ontology)"
+				+ ")";
+
+		parseOntologyDocument(testString);
+	}
 
 	protected ElkClass parseElkClass(String testString) throws ParseException,
 			InterruptedException, ExecutionException {

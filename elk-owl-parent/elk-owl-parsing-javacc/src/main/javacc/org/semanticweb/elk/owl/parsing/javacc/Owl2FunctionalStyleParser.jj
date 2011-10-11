@@ -232,10 +232,10 @@ SKIP :
 
 TOKEN :
 {
-  < OPEN_BRACE: "(" >
-| < CLOSE_BRACE: ")" >
-| < EQUALS: "=" >
+  < OPEN_BRACKET: "(" >
+| < CLOSE_BRACKET: ")" >
 | < REFERENCE: "^^" >
+
 
 /* Reserved Keywords */
 // | < OWL_BACKWARD_COMPATIBLE_WITH: "owl:backwardCompatibleWith" >
@@ -394,22 +394,17 @@ TOKEN :
 | < ANNOTATION_PROPERTY_DOMAIN: "AnnotationPropertyDomain" >
 | < ANNOTATION_PROPERTY_RANGE: "AnnotationPropertyRange" >
 
-| < NON_NEGATIVE_INTEGER: ["1"-"9"] (<DIGIT>)* >
-| < #DIGIT: ["0"-"9"] >
-| < QUOTED_STRING:
-       "\"" (
-               ~["\\","\""]
-            |  ("\\" ("\""|"\'"|"\\"))
-            )*
-       "\""
-  >
-| < IRI_REF:
-       "<" ( ~["<",">","\"","{","}","|","^","`","\\","\u0000"-"\u0020"] )* ">"
-  > /* based on IRI_REF of [SPARQL] */
-| < PNAME_NS: (<PN_PREFIX>)? ":" >
-// | < PNAME_LN: <PNAME_NS> <PN_LOCAL> >
-| < BLANK_NODE_LABEL: "_:" <PN_LOCAL> >
+| < NON_NEGATIVE_INTEGER: (<DIGIT>)+ >
 | < LANGTAG: "@" ( ["a"-"z","A"-"Z"])+ ("-" (["a"-"z","A"-"Z"]|<DIGIT>)+ )* >
+
+| < PNAME_NS: (<PN_PREFIX>)? ":" > : AfterPrefix
+| < #PN_PREFIX: <PN_CHARS_BASE> ( ( <PN_CHARS> | "." )* <PN_CHARS> )? >
+| < BLANK_NODE_PREFIX: "_:" > : AfterPrefix
+// | < PNAME_LN: <PNAME_NS> <PN_LOCAL> >
+// | < BLANK_NODE_LABEL: "_:" <PN_LOCAL> >
+
+/* Auxiliary character tokens */
+| < #DIGIT: ["0"-"9"] >
 | < #PN_CHARS_U: <PN_CHARS_BASE> | "_" >
 | < #PN_CHARS:
       <PN_CHARS_U>
@@ -419,8 +414,6 @@ TOKEN :
     | ["\u0300"-"\u036F"]
     | ["\u203F"-"\u2040"]
   >
-| < #PN_PREFIX: <PN_CHARS_BASE> ( ( <PN_CHARS> | "." )* <PN_CHARS> )? >
-| < PN_LOCAL: ( <PN_CHARS_U> | <DIGIT> ) ( ( <PN_CHARS> | "." )* <PN_CHARS>)? >
 | < #PN_CHARS_BASE:
       ["a"-"z"]
     | ["A"-"Z"]
@@ -436,6 +429,39 @@ TOKEN :
     | ["\uF900"-"\uFDCF"]
     | ["\uFDF0"-"\uFFFD"]
   >
+}
+
+SKIP : 
+{ 
+  "<" : FullIri
+| "\"" : QuotedString 
+}
+
+<FullIri> TOKEN : 
+{ 
+  /* based on IRI_REF of [SPARQL] */
+  < FULL_IRI: ( ~["<",">","\"","{","}","|","^","`","\\","\u0000"-"\u0020"] )* > : FullIriEnd
+}
+
+<FullIriEnd> SKIP :
+{
+  ">" : DEFAULT
+}
+
+<AfterPrefix> TOKEN :
+{
+  < EQUALS: ([" ", "\t", "\n", "\r"])* "=" > : DEFAULT
+| < PN_LOCAL: ( <PN_CHARS_U> | <DIGIT> ) ( ( <PN_CHARS> | "." )* <PN_CHARS>)? > : DEFAULT
+}
+
+<QuotedString> TOKEN :
+{
+  < QUOTED_STRING: ( ~["\\","\""]  |  ("\\" ["\"","\'","\\"]) )* > : QuotedStringEnd
+}            
+
+<QuotedStringEnd> SKIP :
+{
+  "\"" : DEFAULT
 }
 
 /*------------------------------------------------------------------
@@ -465,7 +491,7 @@ String nodeId():
 {
 	Token t;
 }{
-	t = <BLANK_NODE_LABEL> {
+	t = <BLANK_NODE_PREFIX> <PN_LOCAL> {
 		return t.image;
 	}
 }
@@ -480,11 +506,9 @@ String nodeId():
 String fullIri():
 {
 	Token t;
-	String x;
 }{
-	t = <IRI_REF> {
-		x = t.image;
-		return x.substring(1,x.length()-1);
+	t = <FULL_IRI> {
+		return t.image;
 	}
 }
 
@@ -553,11 +577,11 @@ void prefixDeclaration():
 {
 	String name,iri;
 }{
-	<PREFIX> <OPEN_BRACE>
+	<PREFIX> <OPEN_BRACKET>
 		name = prefixName()
 		<EQUALS>
 		iri = fullIri()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		if ( prefixDeclarations.containsKey(name) ) {
 			throw new ParseException("Duplicate declaration of prefix " + name + ".");
 		} else {
@@ -568,11 +592,11 @@ void prefixDeclaration():
 
 void ontology(ElkAxiomProcessor processor):
 {}{
-	<ONTOLOGY> <OPEN_BRACE> ( ontologyIri() ( versionIri() )? )?
+	<ONTOLOGY> <OPEN_BRACKET> ( ontologyIri() ( versionIri() )? )?
 		directlyImportsDocuments()
 		ontologyAnnotations()
 		axioms(processor)
-	<CLOSE_BRACE>
+	<CLOSE_BRACKET>
 }
 
 String ontologyIri():
@@ -591,7 +615,7 @@ String versionIri():
 
 void directlyImportsDocuments():
 {}{
-	( <IMPORT> <OPEN_BRACE> iri() <CLOSE_BRACE> )*
+	( <IMPORT> <OPEN_BRACKET> iri() <CLOSE_BRACKET> )*
 }
 
 void axioms(ElkAxiomProcessor processor):
@@ -689,10 +713,10 @@ ElkClass clazz():
 /* 5.2 Datatypes */
 ElkDatatype datatype():
 {
-	String iri;
+	String x;
 }{
-	iri = iri() {
-		return objectFactory.getDatatype(iri);
+	x = iri() {
+		return objectFactory.getDatatype(x);
 	}
 }
 
@@ -796,11 +820,9 @@ ElkLiteral literal():
 String quotedString():
 {
 	Token t;
-	String x;
 }{
 	t = <QUOTED_STRING> {
-		x = t.image;
-		return x.substring(1,x.length()-1);
+		return t.image;
 	}
 }
 
@@ -809,9 +831,9 @@ ElkDeclarationAxiom declaration():
 {
 	ElkEntity x;
 }{
-	<DECLARATION> <OPEN_BRACE> axiomAnnotations()
+	<DECLARATION> <OPEN_BRACKET> axiomAnnotations()
 	x = entity()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDeclarationAxiom(x);
 	}
 }
@@ -820,12 +842,12 @@ ElkEntity entity():
 {
   ElkEntity x = null; //TODO
 }{ (
-    <CLASS> <OPEN_BRACE> x = clazz() <CLOSE_BRACE>
-	| <DATATYPE> <OPEN_BRACE> x = datatype() <CLOSE_BRACE>
-	| <OBJECT_PROPERTY> <OPEN_BRACE> x = objectProperty() <CLOSE_BRACE>
-	| <DATA_PROPERTY> <OPEN_BRACE> x = dataProperty() <CLOSE_BRACE>
-	| <ANNOTATION_PROPERTY> <OPEN_BRACE> x = annotationProperty() <CLOSE_BRACE>
-	| <NAMED_INDIVIDUAL> <OPEN_BRACE> x = namedIndividual() <CLOSE_BRACE>
+    <CLASS> <OPEN_BRACKET> x = clazz() <CLOSE_BRACKET>
+	| <DATATYPE> <OPEN_BRACKET> x = datatype() <CLOSE_BRACKET>
+	| <OBJECT_PROPERTY> <OPEN_BRACKET> x = objectProperty() <CLOSE_BRACKET>
+	| <DATA_PROPERTY> <OPEN_BRACKET> x = dataProperty() <CLOSE_BRACKET>
+	| <ANNOTATION_PROPERTY> <OPEN_BRACKET> x = annotationProperty() <CLOSE_BRACKET>
+	| <NAMED_INDIVIDUAL> <OPEN_BRACKET> x = namedIndividual() <CLOSE_BRACKET>
    ) { return x; }
 }
 
@@ -845,9 +867,9 @@ ElkObjectInverseOf inverseObjectProperty():
 {
 	ElkObjectProperty x;
 }{
-	<OBJECT_INVERSE_OF> <OPEN_BRACE>
+	<OBJECT_INVERSE_OF> <OPEN_BRACKET>
 		x = objectProperty()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectInverseOf(x);
 	}
 }
@@ -893,9 +915,9 @@ ElkDataIntersectionOf dataIntersectionOf():
 {
 	Vector<ElkDataRange> v;
 }{
-	<DATA_INTERSECTION_OF> <OPEN_BRACE>
+	<DATA_INTERSECTION_OF> <OPEN_BRACKET>
 		v = dataRangeList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataIntersectionOf(v);
 	}
 }
@@ -905,9 +927,9 @@ ElkDataUnionOf dataUnionOf():
 {
 	Vector<ElkDataRange> v;
 }{
-	<DATA_UNION_OF> <OPEN_BRACE>
+	<DATA_UNION_OF> <OPEN_BRACKET>
 		v = dataRangeList()
-	<CLOSE_BRACE>{
+	<CLOSE_BRACKET>{
 		return objectFactory.getDataUnionOf(v);
 	}
 }
@@ -917,9 +939,9 @@ ElkDataComplementOf dataComplementOf():
 {
 	ElkDataRange x;
 }{
-	<DATA_COMPLEMENT_OF> <OPEN_BRACE>
+	<DATA_COMPLEMENT_OF> <OPEN_BRACKET>
 		x = dataRange()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataComplementOf(x);
 	}
 }
@@ -931,10 +953,10 @@ ElkDataOneOf dataOneOf():
 	Vector<ElkLiteral> v =
 		new Vector<ElkLiteral> ();
 }{
-	<DATA_ONE_OF> <OPEN_BRACE>
+	<DATA_ONE_OF> <OPEN_BRACKET>
 		x = literal() { v.add(x); }
 		( x = literal() { v.add(x); } )+
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataOneOf(v);
 	}
 }
@@ -946,10 +968,10 @@ ElkDatatypeRestriction datatypeRestriction():
 	Vector<ElkFacetRestriction> v =
 		new Vector<ElkFacetRestriction> ();
 }{
-	<DATATYPE_RESTRICTION> <OPEN_BRACE>
+	<DATATYPE_RESTRICTION> <OPEN_BRACKET>
 		x = datatype()
 		( constrainingFacet() literal() )+ //TODO
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDatatypeRestriction(x,v);
 	}
 }
@@ -1002,9 +1024,9 @@ ElkObjectIntersectionOf objectIntersectionOf():
 {
 	Vector<ElkClassExpression> v;
 }{
-	<OBJECT_INTERSECTION_OF> <OPEN_BRACE>
+	<OBJECT_INTERSECTION_OF> <OPEN_BRACKET>
 		v = classExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectIntersectionOf(v);
 	}
 }
@@ -1014,9 +1036,9 @@ ElkObjectUnionOf objectUnionOf():
 {
 	Vector<ElkClassExpression> v;
 }{
-	<OBJECT_UNION_OF> <OPEN_BRACE>
+	<OBJECT_UNION_OF> <OPEN_BRACKET>
 		v = classExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectUnionOf(v);
 	}
 }
@@ -1026,9 +1048,9 @@ ElkObjectComplementOf objectComplementOf():
 {
 	ElkClassExpression x;
 }{
-	<OBJECT_COMPLEMENT_OF> <OPEN_BRACE>
+	<OBJECT_COMPLEMENT_OF> <OPEN_BRACKET>
 		x = classExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectComplementOf(x);
 	}
 }
@@ -1040,10 +1062,10 @@ ElkObjectOneOf objectOneOf():
 	Vector<ElkIndividual> v =
 		new Vector<ElkIndividual> ();
 }{
-	<OBJECT_ONE_OF> <OPEN_BRACE>
+	<OBJECT_ONE_OF> <OPEN_BRACKET>
 		x = individual() { v.add(x); }
 		( x = individual() { v.add(x); } )+
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectOneOf(v);
 	}
 }
@@ -1057,10 +1079,10 @@ ElkObjectSomeValuesFrom objectSomeValuesFrom():
 	ElkObjectPropertyExpression x;
 	ElkClassExpression y;
 }{
-	<OBJECT_SOME_VALUES_FROM> <OPEN_BRACE>
+	<OBJECT_SOME_VALUES_FROM> <OPEN_BRACKET>
 		x = objectPropertyExpression()
 		y = classExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectSomeValuesFrom(x, y);
 	}
 }
@@ -1071,10 +1093,10 @@ ElkObjectAllValuesFrom objectAllValuesFrom():
 	ElkObjectPropertyExpression x;
 	ElkClassExpression y;
 }{
-	<OBJECT_ALL_VALUES_FROM> <OPEN_BRACE>
+	<OBJECT_ALL_VALUES_FROM> <OPEN_BRACKET>
 		x = objectPropertyExpression()
 		y = classExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectAllValuesFrom(x, y);
 	}
 }
@@ -1085,10 +1107,10 @@ ElkObjectHasValue objectHasValue():
 	ElkObjectPropertyExpression x;
 	ElkIndividual y;
 }{
-	<OBJECT_HAS_VALUE> <OPEN_BRACE>
+	<OBJECT_HAS_VALUE> <OPEN_BRACKET>
 		x = objectPropertyExpression()
 		y = individual()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectHasValue(x, y);
 	}
 }
@@ -1098,9 +1120,9 @@ ElkObjectHasSelf objectHasSelf():
 {
 	ElkObjectPropertyExpression x;
 }{
-	<OBJECT_HAS_SELF> <OPEN_BRACE>
+	<OBJECT_HAS_SELF> <OPEN_BRACKET>
 		x = objectPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectHasSelf(x);
 	}
 }
@@ -1115,11 +1137,11 @@ ElkObjectMinCardinality objectMinCardinality():
 	ElkObjectPropertyExpression x;
 	ElkClassExpression y = null;
 }{
-	<OBJECT_MIN_CARDINALITY> <OPEN_BRACE>
+	<OBJECT_MIN_CARDINALITY> <OPEN_BRACKET>
 		n = <NON_NEGATIVE_INTEGER>
 		x = objectPropertyExpression()
 		( y = classExpression() )?
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectMinCardinality(x, Integer.parseInt( n.image ), y);
 	}
 }
@@ -1131,11 +1153,11 @@ ElkObjectMaxCardinality objectMaxCardinality():
 	ElkObjectPropertyExpression x;
 	ElkClassExpression y = null;
 }{
-	<OBJECT_MAX_CARDINALITY> <OPEN_BRACE>
+	<OBJECT_MAX_CARDINALITY> <OPEN_BRACKET>
 		n = <NON_NEGATIVE_INTEGER>
 		x = objectPropertyExpression()
 		( y = classExpression() )?
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectMaxCardinality(x, Integer.parseInt( n.image ), y);
 	}
 }
@@ -1147,11 +1169,11 @@ ElkObjectExactCardinality objectExactCardinality():
 	ElkObjectPropertyExpression x;
 	ElkClassExpression y = null;
 }{
-	<OBJECT_EXACT_CARDINALITY> <OPEN_BRACE>
+	<OBJECT_EXACT_CARDINALITY> <OPEN_BRACKET>
 		n = <NON_NEGATIVE_INTEGER>
 		x = objectPropertyExpression()
 		( y = classExpression() )?
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectExactCardinality(x, Integer.parseInt( n.image ), y);
 	}
 }
@@ -1164,11 +1186,11 @@ ElkDataSomeValuesFrom dataSomeValuesFrom():
 	ElkDataPropertyExpression x;
 	ElkDataRange y;
 }{
-	<DATA_SOME_VALUES_FROM> <OPEN_BRACE>
+	<DATA_SOME_VALUES_FROM> <OPEN_BRACKET>
 		x = dataPropertyExpression()
 		//(LOOKAHEAD( 2 ) dataPropertyExpression() )+ // TODO: nary data ranges not supported in ELK so far
 		y = dataRange()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataSomeValuesFrom(x, y);
 	}
 }
@@ -1179,11 +1201,11 @@ ElkDataAllValuesFrom dataAllValuesFrom():
 	ElkDataPropertyExpression x;
 	ElkDataRange y;
 }{
-	<DATA_ALL_VALUES_FROM> <OPEN_BRACE>
+	<DATA_ALL_VALUES_FROM> <OPEN_BRACKET>
 		x = dataPropertyExpression()
 		//(LOOKAHEAD( 2 ) dataPropertyExpression() )+ // TODO: nary data ranges not supported in ELK so far
 		y = dataRange()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataAllValuesFrom(x, y);
 	}
 }
@@ -1194,10 +1216,10 @@ ElkDataHasValue dataHasValue():
 	ElkDataPropertyExpression x;
 	ElkLiteral y;
 }{
-	<DATA_HAS_VALUE> <OPEN_BRACE>
+	<DATA_HAS_VALUE> <OPEN_BRACKET>
 		x = dataPropertyExpression()
 		y = literal()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataHasValue(x, y);
 	}
 }
@@ -1212,11 +1234,11 @@ ElkDataMinCardinality dataMinCardinality():
 	ElkDataPropertyExpression x;
 	ElkDataRange y = null;
 }{
-	<DATA_MIN_CARDINALITY> <OPEN_BRACE>
+	<DATA_MIN_CARDINALITY> <OPEN_BRACKET>
 		n = <NON_NEGATIVE_INTEGER>
 		x = dataPropertyExpression()
 		( y = dataRange() )?
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataMinCardinality(x, Integer.parseInt( n.image ), y);
 	}
 }
@@ -1228,11 +1250,11 @@ ElkDataMaxCardinality dataMaxCardinality():
 	ElkDataPropertyExpression x;
 	ElkDataRange y = null;
 }{
-	<DATA_MAX_CARDINALITY> <OPEN_BRACE>
+	<DATA_MAX_CARDINALITY> <OPEN_BRACKET>
 		n = <NON_NEGATIVE_INTEGER>
 		x = dataPropertyExpression()
 		( y = dataRange() )?
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataMaxCardinality(x, Integer.parseInt( n.image ), y);
 	}
 }
@@ -1244,11 +1266,11 @@ ElkDataExactCardinality dataExactCardinality():
 	ElkDataPropertyExpression x;
 	ElkDataRange y = null;
 }{
-	<DATA_EXACT_CARDINALITY> <OPEN_BRACE>
+	<DATA_EXACT_CARDINALITY> <OPEN_BRACKET>
 		n = <NON_NEGATIVE_INTEGER>
 		x = dataPropertyExpression()
 		( y = dataRange() )?
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataExactCardinality(x, Integer.parseInt( n.image ), y);
 	}
 }
@@ -1293,11 +1315,11 @@ ElkSubClassOfAxiom subClassOf():
 {
 	ElkClassExpression x, y;
 }{
-	<SUB_CLASS_OF> <OPEN_BRACE>
+	<SUB_CLASS_OF> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = classExpression()
 		y = classExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getSubClassOfAxiom(x, y);
 	}
 }
@@ -1307,10 +1329,10 @@ ElkEquivalentClassesAxiom equivalentClasses():
 {
 	Vector<ElkClassExpression> v;
 }{
-	<EQUIVALENT_CLASSES> <OPEN_BRACE>
+	<EQUIVALENT_CLASSES> <OPEN_BRACKET>
 		axiomAnnotations()
 		v = classExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getEquivalentClassesAxiom(v);
 	}
 }
@@ -1320,10 +1342,10 @@ ElkDisjointClassesAxiom disjointClasses():
 {
 	Vector<ElkClassExpression> v;
 }{
-	<DISJOINT_CLASSES> <OPEN_BRACE>
+	<DISJOINT_CLASSES> <OPEN_BRACKET>
 		axiomAnnotations()
 		v = classExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDisjointClassesAxiom(v);
 	}
 }
@@ -1334,11 +1356,11 @@ ElkDisjointUnionAxiom disjointUnion():
 	ElkClass x;
 	Vector<ElkClassExpression> v;
 }{
-	<DISJOINT_UNION> <OPEN_BRACE>
+	<DISJOINT_UNION> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = clazz()
 		v = classExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDisjointUnionAxiom(x, v);
 	}
 }
@@ -1382,14 +1404,14 @@ ElkSubObjectPropertyOfAxiom subObjectPropertyOf():
 	ElkSubObjectPropertyExpression x = null;
 	ElkObjectPropertyExpression z;
 }{
-	<SUB_OBJECT_PROPERTY_OF> <OPEN_BRACE>
+	<SUB_OBJECT_PROPERTY_OF> <OPEN_BRACKET>
 		axiomAnnotations()
 		(
 		  x = objectPropertyExpression()
 		| x = propertyExpressionChain()
 		)
 		z = objectPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getSubObjectPropertyOfAxiom(x, z);
 	}
 }
@@ -1398,9 +1420,9 @@ ElkObjectPropertyChain propertyExpressionChain():
 {
 	Vector<ElkObjectPropertyExpression> v;
 }{
-	<OBJECT_PROPERTY_CHAIN> <OPEN_BRACE>
+	<OBJECT_PROPERTY_CHAIN> <OPEN_BRACKET>
 		v = objectPropertyExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectPropertyChain(v);
 	}
 }
@@ -1410,10 +1432,10 @@ ElkEquivalentObjectPropertiesAxiom equivalentObjectProperties():
 {
 	Vector<ElkObjectPropertyExpression> v;
 }{
-	<EQUIVALENT_OBJECT_PROPERTIES> <OPEN_BRACE>
+	<EQUIVALENT_OBJECT_PROPERTIES> <OPEN_BRACKET>
 		axiomAnnotations()
 		v = objectPropertyExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getEquivalentObjectPropertiesAxiom(v);
 	}
 }
@@ -1423,10 +1445,10 @@ ElkDisjointObjectPropertiesAxiom disjointObjectProperties():
 {
 	Vector<ElkObjectPropertyExpression> v;
 }{
-	<DISJOINT_OBJECT_PROPERTIES> <OPEN_BRACE>
+	<DISJOINT_OBJECT_PROPERTIES> <OPEN_BRACKET>
 		axiomAnnotations()
 		v = objectPropertyExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDisjointObjectPropertiesAxiom(v);
 	}
 }
@@ -1447,11 +1469,11 @@ ElkInverseObjectPropertiesAxiom inverseObjectProperties():
 {
 	ElkObjectPropertyExpression x, y;
 }{
-	<INVERSE_OBJECT_PROPERTIES> <OPEN_BRACE>
+	<INVERSE_OBJECT_PROPERTIES> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
 		y = objectPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getInverseObjectPropertiesAxiom(x, y);
 	}
 }
@@ -1462,11 +1484,11 @@ ElkObjectPropertyDomainAxiom objectPropertyDomain():
 	ElkObjectPropertyExpression x;
 	ElkClassExpression y;
 }{
-	<OBJECT_PROPERTY_DOMAIN> <OPEN_BRACE>
+	<OBJECT_PROPERTY_DOMAIN> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
 		y = classExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectPropertyDomainAxiom(x, y);
 	}
 }
@@ -1477,11 +1499,11 @@ ElkObjectPropertyRangeAxiom objectPropertyRange():
 	ElkObjectPropertyExpression x;
 	ElkClassExpression y;
 }{
-	<OBJECT_PROPERTY_RANGE> <OPEN_BRACE>
+	<OBJECT_PROPERTY_RANGE> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
 		y = classExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectPropertyRangeAxiom(x, y);
 	}
 }
@@ -1491,10 +1513,10 @@ ElkFunctionalObjectPropertyAxiom functionalObjectProperty():
 {
 	ElkObjectPropertyExpression x;
 }{
-	<FUNCTIONAL_OBJECT_PROPERTY> <OPEN_BRACE>
+	<FUNCTIONAL_OBJECT_PROPERTY> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getFunctionalObjectPropertyAxiom(x);
 	}
 }
@@ -1504,10 +1526,10 @@ ElkInverseFunctionalObjectPropertyAxiom inverseFunctionalObjectProperty():
 {
 	ElkObjectPropertyExpression x;
 }{
-	<INVERSE_FUNCTIONAL_OBJECT_PROPERTY> <OPEN_BRACE>
+	<INVERSE_FUNCTIONAL_OBJECT_PROPERTY> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getInverseFunctionalObjectPropertyAxiom(x);
 	}
 }
@@ -1517,10 +1539,10 @@ ElkReflexiveObjectPropertyAxiom reflexiveObjectProperty():
 {
 	ElkObjectPropertyExpression x;
 }{
-	<REFLEXIVE_OBJECT_PROPERTY> <OPEN_BRACE>
+	<REFLEXIVE_OBJECT_PROPERTY> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getReflexiveObjectPropertyAxiom(x);
 	}
 }
@@ -1530,10 +1552,10 @@ ElkIrreflexiveObjectPropertyAxiom irreflexiveObjectProperty():
 {
 	ElkObjectPropertyExpression x;
 }{
-	<IRREFLEXIVE_OBJECT_PROPERTY> <OPEN_BRACE>
+	<IRREFLEXIVE_OBJECT_PROPERTY> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getIrreflexiveObjectPropertyAxiom(x);
 	}
 }
@@ -1543,10 +1565,10 @@ ElkSymmetricObjectPropertyAxiom symmetricObjectProperty():
 {
 	ElkObjectPropertyExpression x;
 }{
-	<SYMMETRIC_OBJECT_PROPERTY> <OPEN_BRACE>
+	<SYMMETRIC_OBJECT_PROPERTY> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getSymmetricObjectPropertyAxiom(x);
 	}
 }
@@ -1556,10 +1578,10 @@ ElkAsymmetricObjectPropertyAxiom asymmetricObjectProperty():
 {
 	ElkObjectPropertyExpression x;
 }{
-	<ASYMMETRIC_OBJECT_PROPERTY> <OPEN_BRACE>
+	<ASYMMETRIC_OBJECT_PROPERTY> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getAsymmetricObjectPropertyAxiom(x);
 	}
 }
@@ -1569,10 +1591,10 @@ ElkTransitiveObjectPropertyAxiom transitiveObjectProperty():
 {
 	ElkObjectPropertyExpression x;
 }{
-	<TRANSITIVE_OBJECT_PROPERTY> <OPEN_BRACE>
+	<TRANSITIVE_OBJECT_PROPERTY> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
-	<CLOSE_BRACE>{
+	<CLOSE_BRACKET>{
 		return objectFactory.getTransitiveObjectPropertyAxiom(x);
 	}
 }
@@ -1597,11 +1619,11 @@ ElkSubDataPropertyOfAxiom subDataPropertyOf():
 {
 	ElkDataPropertyExpression sub,sup;
 }{
-	<SUB_DATA_PROPERTY_OF> <OPEN_BRACE>
+	<SUB_DATA_PROPERTY_OF> <OPEN_BRACKET>
 		axiomAnnotations()
 		sub = dataPropertyExpression()
 		sup = dataPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getSubDataPropertyOfAxiom(sub, sup);
 	}
 }
@@ -1611,10 +1633,10 @@ ElkEquivalentDataPropertiesAxiom equivalentDataProperties():
 {
 	Vector<ElkDataPropertyExpression> v;
 }{
-	<EQUIVALENT_DATA_PROPERTIES> <OPEN_BRACE>
+	<EQUIVALENT_DATA_PROPERTIES> <OPEN_BRACKET>
 		axiomAnnotations()
 		v = dataPropertyExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getEquivalentDataPropertiesAxiom(v);
 	}
 }
@@ -1624,10 +1646,10 @@ ElkDisjointDataPropertiesAxiom disjointDataProperties():
 {
 	Vector<ElkDataPropertyExpression> v;
 }{
-	<DISJOINT_DATA_PROPERTIES> <OPEN_BRACE>
+	<DISJOINT_DATA_PROPERTIES> <OPEN_BRACKET>
 		axiomAnnotations()
 		v = dataPropertyExpressionList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDisjointDataPropertiesAxiom(v);
 	}
 }
@@ -1649,11 +1671,11 @@ ElkDataPropertyDomainAxiom dataPropertyDomain():
 	ElkDataPropertyExpression x;
 	ElkClassExpression y;
 }{
-	<DATA_PROPERTY_DOMAIN> <OPEN_BRACE>
+	<DATA_PROPERTY_DOMAIN> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = dataPropertyExpression()
 		y = classExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataPropertyDomainAxiom(x, y);
 	}
 }
@@ -1664,11 +1686,11 @@ ElkDataPropertyRangeAxiom dataPropertyRange():
 	ElkDataPropertyExpression x;
 	ElkDataRange y;
 }{
-	<DATA_PROPERTY_RANGE> <OPEN_BRACE>
+	<DATA_PROPERTY_RANGE> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = dataPropertyExpression()
 		y = dataRange()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataPropertyRangeAxiom(x, y);
 	}
 }
@@ -1678,10 +1700,10 @@ ElkFunctionalDataPropertyAxiom functionalDataProperty():
 {
 	ElkDataPropertyExpression x;
 }{
-	<FUNCTIONAL_DATA_PROPERTY> <OPEN_BRACE>
+	<FUNCTIONAL_DATA_PROPERTY> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = dataPropertyExpression()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getFunctionalDataPropertyAxiom(x);
 	}
 }
@@ -1689,22 +1711,22 @@ ElkFunctionalDataPropertyAxiom functionalDataProperty():
 /* 9.4 Datatype Definitions */
 void datatypeDefinition():
 {}{
-	<DATATYPE_DEFINITION> <OPEN_BRACE>
+	<DATATYPE_DEFINITION> <OPEN_BRACKET>
 		axiomAnnotations()
 		datatype()
 		dataRange()
-	<CLOSE_BRACE>
+	<CLOSE_BRACKET>
 }
 
 /* 9.5 Keys */
 void hasKey():
 {}{
-	<HAS_KEY> <OPEN_BRACE>
+	<HAS_KEY> <OPEN_BRACKET>
 		axiomAnnotations()
 		classExpression()
-		<OPEN_BRACE> ( objectPropertyExpression() )* <CLOSE_BRACE>
-		<OPEN_BRACE> ( dataPropertyExpression() )* <CLOSE_BRACE>
-	<CLOSE_BRACE>
+		<OPEN_BRACKET> ( objectPropertyExpression() )* <CLOSE_BRACKET>
+		<OPEN_BRACKET> ( dataPropertyExpression() )* <CLOSE_BRACKET>
+	<CLOSE_BRACKET>
 }
 
 /* 9.6 Assertions */
@@ -1728,10 +1750,10 @@ ElkSameIndividualAxiom sameIndividual():
 {
 	Vector<ElkIndividual> v;
 }{
-	<SAME_INDIVIDUAL> <OPEN_BRACE>
+	<SAME_INDIVIDUAL> <OPEN_BRACKET>
 		axiomAnnotations()
 		v = individualList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getSameIndividualAxiom(v);
 	}
 }
@@ -1741,10 +1763,10 @@ ElkDifferentIndividualsAxiom differentIndividuals():
 {
 	Vector<ElkIndividual> v;
 }{
-	<DIFFERENT_INDIVIDUALS> <OPEN_BRACE>
+	<DIFFERENT_INDIVIDUALS> <OPEN_BRACKET>
 		axiomAnnotations()
 		v = individualList()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDifferentIndividualsAxiom(v);
 	}
 }
@@ -1766,11 +1788,11 @@ ElkClassAssertionAxiom classAssertion():
 	ElkClassExpression x;
 	ElkIndividual y;
 }{
-	<CLASS_ASSERTION> <OPEN_BRACE>
+	<CLASS_ASSERTION> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = classExpression()
 		y = individual()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getClassAssertionAxiom(x, y);
 	}
 }
@@ -1781,12 +1803,12 @@ ElkObjectPropertyAssertionAxiom objectPropertyAssertion():
 	ElkObjectPropertyExpression x;
 	ElkIndividual sourceIndividual, targetIndividual;
 }{
-	<OBJECT_PROPERTY_ASSERTION> <OPEN_BRACE>
+	<OBJECT_PROPERTY_ASSERTION> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
 		sourceIndividual = individual()
 		targetIndividual = individual()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getObjectPropertyAssertionAxiom(x, sourceIndividual, targetIndividual);
 	}
 }
@@ -1797,12 +1819,12 @@ ElkNegativeObjectPropertyAssertionAxiom negativeObjectPropertyAssertion():
 	ElkObjectPropertyExpression x;
 	ElkIndividual sourceIndividual, targetIndividual;
 }{
-	<NEGATIVE_OBJECT_PROPERTY_ASSERTION> <OPEN_BRACE>
+	<NEGATIVE_OBJECT_PROPERTY_ASSERTION> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = objectPropertyExpression()
 		sourceIndividual = individual()
 		targetIndividual = individual()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getNegativeObjectPropertyAssertionAxiom(x, sourceIndividual, targetIndividual);
 	}
 }
@@ -1814,12 +1836,12 @@ ElkDataPropertyAssertionAxiom dataPropertyAssertion():
 	ElkIndividual sourceIndividual;
 	ElkLiteral targetLiteral;
 }{
-	<DATA_PROPERTY_ASSERTION> <OPEN_BRACE>
+	<DATA_PROPERTY_ASSERTION> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = dataPropertyExpression()
 		sourceIndividual = individual()
 		targetLiteral = literal()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getDataPropertyAssertionAxiom(x, sourceIndividual, targetLiteral);
 	}
 }
@@ -1831,12 +1853,12 @@ ElkNegativeDataPropertyAssertionAxiom negativeDataPropertyAssertion():
 	ElkIndividual sourceIndividual;
 	ElkLiteral targetLiteral;
 }{
-	<NEGATIVE_DATA_PROPERTY_ASSERTION> <OPEN_BRACE>
+	<NEGATIVE_DATA_PROPERTY_ASSERTION> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = dataPropertyExpression()
 		sourceIndividual = individual()
 		targetLiteral = literal()
-	<CLOSE_BRACE> {
+	<CLOSE_BRACKET> {
 		return objectFactory.getNegativeDataPropertyAssertionAxiom(x, sourceIndividual, targetLiteral);
 	}
 }
@@ -1847,11 +1869,11 @@ ElkNegativeDataPropertyAssertionAxiom negativeDataPropertyAssertion():
 /* 10.1 Annotations of Ontologies, Axioms, and other Annotations */
 void annotation():
 {}{
-	<ANNOTATION> <OPEN_BRACE>
+	<ANNOTATION> <OPEN_BRACKET>
 		annotationAnnotations()
 		annotationProperty()
 		annotationValue()
-	<CLOSE_BRACE>
+	<CLOSE_BRACKET>
 }
 
 void annotationAnnotations():
@@ -1879,12 +1901,12 @@ ElkAnnotationAxiom annotationAxiom():
 /* 10.2.1 Annotation Assertion */
 void annotationAssertion():
 {}{
-	<ANNOTATION_ASSERTION> <OPEN_BRACE>
+	<ANNOTATION_ASSERTION> <OPEN_BRACKET>
 		axiomAnnotations()
 		annotationProperty()
 		annotationSubject()
 		annotationValue()
-	<CLOSE_BRACE>
+	<CLOSE_BRACKET>
 }
 
 void annotationSubject():
@@ -1895,11 +1917,11 @@ void annotationSubject():
 /* 10.2.2 Annotation Subproperties */
 void subAnnotationPropertyOf():
 {}{
-	<SUB_ANNOTATION_PROPERTY_OF> <OPEN_BRACE>
+	<SUB_ANNOTATION_PROPERTY_OF> <OPEN_BRACKET>
 		axiomAnnotations()
 		subAnnotationProperty()
 		superAnnotationProperty()
-	<CLOSE_BRACE>
+	<CLOSE_BRACKET>
 }
 
 void subAnnotationProperty():
@@ -1915,19 +1937,19 @@ void superAnnotationProperty():
 /* 10.2.3 Annotation Property Domain */
 void annotationPropertyDomain():
 {}{
-	<ANNOTATION_PROPERTY_DOMAIN> <OPEN_BRACE>
+	<ANNOTATION_PROPERTY_DOMAIN> <OPEN_BRACKET>
 		axiomAnnotations()
 		annotationProperty()
 		iri()
-	<CLOSE_BRACE>
+	<CLOSE_BRACKET>
 }
 
 /* 10.2.4 Annotation Property Range */
 void annotationPropertyRange():
 {}{
-	<ANNOTATION_PROPERTY_RANGE> <OPEN_BRACE>
+	<ANNOTATION_PROPERTY_RANGE> <OPEN_BRACKET>
 		axiomAnnotations()
 		annotationProperty()
 		iri()
-	<CLOSE_BRACE>
+	<CLOSE_BRACKET>
 }
