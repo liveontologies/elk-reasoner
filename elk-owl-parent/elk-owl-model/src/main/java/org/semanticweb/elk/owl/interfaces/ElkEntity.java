@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 /**
@@ -35,13 +36,19 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
  * @author Markus Kroetzsch
  */
 public interface ElkEntity extends ElkObject {
-
+	
 	/**
-	 * Get the IRI of this entity.
-	 * 
 	 * @return The IRI of this entity.
 	 */
-	public String getIri();
+	public ElkIri getIri();
+
+	/**
+	 * Get the IRI of this entity as a string. This 
+	 * is a convenience method for the equivalent getIri().toString()
+	 * 
+	 * @return The IRI of this entity as a string.
+	 */
+	public String getFullIri();
 
 	/**
 	 * Accept an ElkEntityVisitor.

@@ -42,7 +42,7 @@ public abstract class IndexedObjectPropertyView<T extends IndexedObjectProperty>
 	@Override
 	public int hashCode() {
 		return combinedHashCode(IndexedClassView.class, this.representative
-				.getElkObjectProperty().getIri());
+				.getElkObjectProperty().getFullIri());
 	}
 
 	@Override
@@ -54,9 +54,9 @@ public abstract class IndexedObjectPropertyView<T extends IndexedObjectProperty>
 			IndexedObjectPropertyView<?> otherView = (IndexedObjectPropertyView<?>) other;
 			return this.representative
 					.getElkObjectProperty()
-					.getIri()
+					.getFullIri()
 					.equals(otherView.representative.getElkObjectProperty()
-							.getIri());
+							.getFullIri());
 		}
 		return false;
 	}

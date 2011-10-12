@@ -22,15 +22,12 @@
  */
 package org.semanticweb.elk.owl;
 
-import java.util.Arrays;
+import junit.framework.TestCase;
 
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-
-import junit.framework.TestCase;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
 
 public class SyntaxTest extends TestCase {
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
@@ -40,9 +37,9 @@ public class SyntaxTest extends TestCase {
 	}
 
 	public void testFactory() {
-		ElkClassExpression heart = objectFactory.getClass("Heart");
-		ElkClassExpression organ = objectFactory.getClass("Organ");
-		ElkClassExpression heart2 = objectFactory.getClass("Heart");
+		ElkClassExpression heart = objectFactory.getClass(new ElkFullIri("Heart"));
+		ElkClassExpression organ = objectFactory.getClass(new ElkFullIri("Organ"));
+		ElkClassExpression heart2 = objectFactory.getClass(new ElkFullIri("Heart"));
 
 		assertSame("heart == heart2", heart, heart2);
 		assertNotSame("heart != organ", organ);

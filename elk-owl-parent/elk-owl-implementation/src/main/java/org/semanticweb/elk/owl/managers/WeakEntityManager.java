@@ -36,7 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 
-public class WeakCanonicalEntityObjectManager implements ElkObjectManager {
+public class WeakEntityManager implements ElkObjectManager {
 	
 	private HashMap<WeakWrapper<? extends ElkEntity>, WeakWrapper<? extends ElkEntity>> cache = 
 		new HashMap<WeakWrapper<? extends ElkEntity>, WeakWrapper<? extends ElkEntity>>();

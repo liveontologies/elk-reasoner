@@ -23,12 +23,13 @@
 package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 public class ElkAnnotationPropertyImpl extends ElkIriObject implements ElkAnnotationProperty {
 
-	ElkAnnotationPropertyImpl(String iri) {
+	ElkAnnotationPropertyImpl(ElkIri iri) {
 		super(iri);
 	}
 

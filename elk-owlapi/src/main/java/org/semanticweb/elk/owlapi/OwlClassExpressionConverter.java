@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLClassExpressionVisitorEx;
@@ -79,7 +80,7 @@ public class OwlClassExpressionConverter implements
 		else if (ce.isOWLNothing())
 			return objectFactory.getOwlThing();
 		else
-			return objectFactory.getClass(ce.getIRI().toString());
+			return objectFactory.getClass(new ElkFullIri(ce.getIRI().toString()));
 	}
 
 	public ElkObjectIntersectionOf visit(OWLObjectIntersectionOf ce) {

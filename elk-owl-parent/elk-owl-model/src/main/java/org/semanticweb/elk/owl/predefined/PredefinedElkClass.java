@@ -23,6 +23,8 @@
 package org.semanticweb.elk.owl.predefined;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
@@ -37,11 +39,11 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  */
 public final class PredefinedElkClass implements ElkClass {
 
-	protected final String iri;
+	protected final ElkIri iri;
 
 	// do not allow construction of other instances of this class
 	private PredefinedElkClass(String iri) {
-		this.iri = iri;
+		this.iri = new ElkFullIri(iri);
 	}
 
 	public static final PredefinedElkClass OWL_THING = new PredefinedElkClass(
@@ -50,7 +52,11 @@ public final class PredefinedElkClass implements ElkClass {
 	public static final PredefinedElkClass OWL_NOTHING = new PredefinedElkClass(
 			"http://www.w3.org/2002/07/owl#Nothing");
 
-	public String getIri() {
+	public String getFullIri() {
+		return iri.toString();
+	}
+	
+	public ElkIri getIri() {
 		return iri;
 	}
 

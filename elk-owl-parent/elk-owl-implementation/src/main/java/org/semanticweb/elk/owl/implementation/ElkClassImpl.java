@@ -27,6 +27,7 @@ package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
@@ -39,7 +40,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  */
 public class ElkClassImpl extends ElkIriObject implements ElkEntity, ElkClass {
 
-	/* package-private */ElkClassImpl(String iri) {
+	ElkClassImpl(ElkIri iri) {
 		super(iri);
 		this.structuralHashCode = iri.hashCode();
 	}

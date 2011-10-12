@@ -43,7 +43,7 @@ public class IndexedDataHasValueView<T extends IndexedDataHasValue> extends
 	@Override
 	public int hashCode() {
 		return combinedHashCode(IndexedDataHasValueView.class, this.representative
-				.getRelation().getIri(), this.representative.getFiller().getLexicalForm());
+				.getRelation().getFullIri(), this.representative.getFiller().getLexicalForm());
 	}
 
 	@Override
@@ -53,8 +53,8 @@ public class IndexedDataHasValueView<T extends IndexedDataHasValue> extends
 		}
 		if (other instanceof IndexedDataHasValueView<?>) {
 			IndexedDataHasValueView<?> otherView = (IndexedDataHasValueView<?>) other;
-			return this.representative.getRelation().getIri().equals(
-					otherView.representative.getRelation().getIri())
+			return this.representative.getRelation().getFullIri().equals(
+					otherView.representative.getRelation().getFullIri())
 				&& this.representative.getFiller().getLexicalForm().equals(
 					otherView.representative.getFiller().getLexicalForm());
 		}

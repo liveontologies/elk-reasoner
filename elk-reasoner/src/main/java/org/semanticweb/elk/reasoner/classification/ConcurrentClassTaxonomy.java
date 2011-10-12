@@ -67,9 +67,9 @@ class ConcurrentClassTaxonomy extends ClassTaxonomy {
 	 * @return ClassNode object for elkClass, possibly still incomplete
 	 */
 	public ClassNode getNode(ElkClass elkClass) {
-		ClassNode result = nodeLookup.get(elkClass.getIri());
+		ClassNode result = nodeLookup.get(elkClass.getFullIri());
 		if (result == null)
-			LOGGER_.error("No taxonomy node for class " + elkClass.getIri());
+			LOGGER_.error("No taxonomy node for class " + elkClass.getFullIri());
 		return result;
 	}
 

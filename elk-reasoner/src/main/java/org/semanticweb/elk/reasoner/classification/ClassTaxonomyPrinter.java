@@ -113,13 +113,13 @@ public class ClassTaxonomyPrinter {
 		for (ClassNode classNode : classTaxonomy.getNodes()) {
 			orderedEquivalentClasses.clear();
 			for (ElkClass elkClass : classNode.getMembers()) {
-				orderedEquivalentClasses.put(elkClass.getIri(), elkClass);
+				orderedEquivalentClasses.put(elkClass.getFullIri(), elkClass);
 			}
 
 			ElkClass firstClass = orderedEquivalentClasses.firstEntry()
 					.getValue();
 			firstElkClasses.put(classNode.getCanonicalMember(), firstClass);
-			orderedElkClasses.put(firstClass.getIri(), firstClass);
+			orderedElkClasses.put(firstClass.getFullIri(), firstClass);
 		}
 
 		TreeMap<String, ElkClass> orderedSubClasses = new TreeMap<String, ElkClass>();
@@ -130,14 +130,14 @@ public class ClassTaxonomyPrinter {
 
 			for (ElkClass elkClassMember : classNode.getMembers()) {
 				if (!elkClassMember.structuralEquals(elkClass)) {
-					orderedEquivalentClasses.put(elkClassMember.getIri(),
+					orderedEquivalentClasses.put(elkClassMember.getFullIri(),
 							elkClassMember);
 				}
 			}
 			for (ClassNode classNodeChild : classNode.getDirectSubNodes()) {
 				ElkClass firstClass = firstElkClasses.get(classNodeChild
 						.getCanonicalMember());
-				orderedSubClasses.put(firstClass.getIri(), firstClass);
+				orderedSubClasses.put(firstClass.getFullIri(), firstClass);
 			}
 
 			processClassAxioms(elkClass, orderedEquivalentClasses,

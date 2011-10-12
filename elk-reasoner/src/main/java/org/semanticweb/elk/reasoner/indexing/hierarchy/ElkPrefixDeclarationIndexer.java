@@ -20,33 +20,8 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.implementation;
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.owl.iris.ElkIri;
+public class ElkPrefixDeclarationIndexer {
 
-/**
- * Implementation for ElkObjects that maintain an IRI.
- * 
- * @author Markus Kroetzsch
- */
-public abstract class ElkIriObject extends ElkObjectImpl {
-
-	protected final ElkIri iri;
-
-	ElkIriObject(ElkIri iri) {
-		this.iri = iri;
-	}
-
-	public ElkIri getIri() {
-		return iri;
-	}
-	
-	public String getFullIri() {
-		return iri.toString();
-	}
-
-	@Override
-	public String toString() {
-		return '<' + getFullIri() + '>';
-	}
 }

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.owl.views;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -53,12 +54,16 @@ public abstract class ElkEntityView<T extends ElkEntity> extends
 		super(refElkEntity, subObjectViewer);
 	}
 
-	public String getIri() {
-		return this.elkObject.getIri();
+	public ElkIri getIri() {
+		return elkObject.getIri();
+	}
+	
+	public String getFullIri() {
+		return elkObject.getFullIri();
 	}
 
 	public int generateHashCode() {
-		return combinedHashCode(getClass(), getIri());
+		return combinedHashCode(getClass(), getFullIri());
 	}
 
 	@Override
@@ -70,7 +75,7 @@ public abstract class ElkEntityView<T extends ElkEntity> extends
 			ElkEntityView<?> otherView = (ElkEntityView<?>) other;
 			return (getClass() == other.getClass())
 					&& (this.subObjectViewer == otherView.subObjectViewer)
-					&& getIri().equals(otherView.getIri());
+					&& getFullIri().equals(otherView.getFullIri());
 		}
 		return false;
 	}

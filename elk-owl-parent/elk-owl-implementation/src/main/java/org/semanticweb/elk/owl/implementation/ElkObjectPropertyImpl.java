@@ -27,6 +27,7 @@ package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
@@ -43,7 +44,7 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 public class ElkObjectPropertyImpl extends ElkIriObject implements ElkEntity,
 		ElkObjectProperty {
 
-	/* package-private */ElkObjectPropertyImpl(String iri) {
+	ElkObjectPropertyImpl(ElkIri iri) {
 		super(iri);
 		this.structuralHashCode = iri.hashCode();
 	}
@@ -52,7 +53,7 @@ public class ElkObjectPropertyImpl extends ElkIriObject implements ElkEntity,
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkObjectProperty) {
-			return iri.equals(((ElkObjectProperty) object).getIri());
+			return iri.equals(((ElkObjectProperty) object).getFullIri());
 		} else {
 			return false;
 		}

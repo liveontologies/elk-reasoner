@@ -27,13 +27,15 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.iris.ElkIri;
+
 /**
  * Interface that provides methods for creating instances of ElkObjects.
  * 
  * @author Markus Kroetzsch
  */
 public interface ElkObjectFactory {
-
+	
 	/**
 	 * Create an {@link ElkAnnotationAxiom}.
 	 * 
@@ -48,7 +50,7 @@ public interface ElkObjectFactory {
 	 * @param iri
 	 * @return
 	 */
-	public abstract ElkAnnotationProperty getAnnotationProperty(String iri);
+	public abstract ElkAnnotationProperty getAnnotationProperty(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkAnonymousIndividual}.
@@ -73,7 +75,7 @@ public interface ElkObjectFactory {
 	 * @param iri
 	 * @return
 	 */
-	public abstract ElkClass getClass(String iri);
+	public abstract ElkClass getClass(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkClassAssertionAxiom}.
@@ -200,7 +202,7 @@ public interface ElkObjectFactory {
 	 * @param dataPropertyIri
 	 * @return
 	 */
-	public abstract ElkDataProperty getDataProperty(String dataPropertyIri);
+	public abstract ElkDataProperty getDataProperty(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkDataPropertyAssertionAxiom}.
@@ -253,7 +255,7 @@ public interface ElkObjectFactory {
 	 * @param iri
 	 * @return
 	 */
-	public abstract ElkDatatype getDatatype(String iri);
+	public abstract ElkDatatype getDatatype(ElkIri iri);
 
 	/**
 	 * Create the ElkDatatype for rdf:PlainLiteral}.
@@ -539,7 +541,7 @@ public interface ElkObjectFactory {
 	 * @param iri
 	 * @return
 	 */
-	public abstract ElkNamedIndividual getNamedIndividual(String iri);
+	public abstract ElkNamedIndividual getNamedIndividual(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkNegativeDataPropertyAssertionAxiom}.
@@ -700,7 +702,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyIri
 	 * @return
 	 */
-	public abstract ElkObjectProperty getObjectProperty(String objectPropertyIri);
+	public abstract ElkObjectProperty getObjectProperty(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkObjectPropertyAssertionAxiom}.

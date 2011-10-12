@@ -142,7 +142,7 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		ElkClass clazz = parseElkClass("owl:Thing");
 		assertNotNull(clazz);
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-		assertEquals(objectFactory.getOwlThing(), clazz);
+		assertEquals(objectFactory.getOwlThing().getIri(), clazz.getIri());
 	}
 
 	protected ElkLiteral parseElkLiteral(String testString)
@@ -161,11 +161,11 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 		assertEquals(literal1.getDatatype(),
 				objectFactory.getDatatypeRdfPlainLiteral());
-		assertEquals(literal1.getDatatype().getIri(),
+		assertEquals(literal1.getDatatype().getIri().toString(),
 				"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
-		assertEquals(literal2.getDatatype().getIri(),
+		assertEquals(literal2.getDatatype().getIri().toString(),
 				"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
-		assertTrue(literal1.getDatatype().equals(literal2.getDatatype()));
+		assertEquals(literal1.getDatatype().getIri(), literal2.getDatatype().getIri());
 		// assertEquals(literal1, literal2);
 	}
 

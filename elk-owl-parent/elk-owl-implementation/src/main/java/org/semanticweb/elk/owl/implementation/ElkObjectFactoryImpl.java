@@ -97,8 +97,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.managers.ElkObjectManager;
-import org.semanticweb.elk.owl.managers.WeakCanonicalEntityObjectManager;
+import org.semanticweb.elk.owl.managers.WeakEntityManager;
 
 /**
  * A factory for creating ElkObjects based on the implementations in the
@@ -109,25 +111,25 @@ import org.semanticweb.elk.owl.managers.WeakCanonicalEntityObjectManager;
 public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	protected static final ElkClass ELK_OWL_THING = new ElkClassImpl(
-			"http://www.w3.org/2002/07/owl#Thing");
+			new ElkFullIri("http://www.w3.org/2002/07/owl#Thing"));
 
 	protected static final ElkClass ELK_OWL_NOTHING = new ElkClassImpl(
-			"http://www.w3.org/2002/07/owl#Nothing");
+			new ElkFullIri("http://www.w3.org/2002/07/owl#Nothing"));
 
 	protected static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			"http://www.w3.org/2002/07/owl#TopObjectProperty");
+			new ElkFullIri("http://www.w3.org/2002/07/owl#TopObjectProperty"));
 
 	protected static final ElkObjectProperty ELK_OWL_BOTTOM_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			"http://www.w3.org/2002/07/owl#BottomObjectProperty");
+			new ElkFullIri("http://www.w3.org/2002/07/owl#BottomObjectProperty"));
 
 	protected static final ElkDataProperty ELK_OWL_TOP_DATA_PROPERTY = new ElkDataPropertyImpl(
-			"http://www.w3.org/2002/07/owl#TopDataProperty");
+			new ElkFullIri("http://www.w3.org/2002/07/owl#TopDataProperty"));
 
 	protected static final ElkDataProperty ELK_OWL_BOTTOM_DATA_PROPERTY = new ElkDataPropertyImpl(
-			"http://www.w3.org/2002/07/owl#BottomDataProperty");
+			new ElkFullIri("http://www.w3.org/2002/07/owl#BottomDataProperty"));
 
 	protected static final ElkDatatype ELK_RDF_PLAIN_LITERAL = new ElkDatatypeImpl(
-			"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
+			new ElkFullIri("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral"));
 
 	protected static final ElkAnnotationAxiom ELK_ANNOTATION_AXIOM = new ElkAnnotationAxiomImpl();
 
@@ -138,7 +140,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	 * rather reuses previously generated objects when possible.
 	 */
 	public ElkObjectFactoryImpl() {
-		this.objectManager = new WeakCanonicalEntityObjectManager();
+		this.objectManager = new WeakEntityManager();
 	}
 
 	/**
@@ -169,14 +171,14 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 		return ELK_ANNOTATION_AXIOM;
 	}
 
-	public ElkAnnotationProperty getAnnotationProperty(String iri) {
+	public ElkAnnotationProperty getAnnotationProperty(ElkIri iri) {
 		return (ElkAnnotationProperty) objectManager.
 			getCanonicalElkObject(new ElkAnnotationPropertyImpl(iri));
 	}
 	
-	public ElkClass getClass(String iri) {
-		return (ElkClass) objectManager.getCanonicalElkObject(new ElkClassImpl(
-				iri));
+	public ElkClass getClass(ElkIri iri) {
+		return (ElkClass) objectManager.
+		getCanonicalElkObject(new ElkClassImpl(iri));
 	}
 
 	public ElkAnonymousIndividual getAnonymousIndividual(String nodeId) {
@@ -303,7 +305,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						secondObjectPropertyExpression));
 	}
 
-	public ElkNamedIndividual getNamedIndividual(String iri) {
+	public ElkNamedIndividual getNamedIndividual(ElkIri iri) {
 		return (ElkNamedIndividual) objectManager
 				.getCanonicalElkObject(new ElkNamedIndividualImpl(iri));
 	}
@@ -368,10 +370,9 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						objectPropertyExpressions));
 	}
 
-	public ElkObjectProperty getObjectProperty(String objectPropertyIri) {
+	public ElkObjectProperty getObjectProperty(ElkIri iri) {
 		return (ElkObjectProperty) objectManager
-				.getCanonicalElkObject(new ElkObjectPropertyImpl(
-						objectPropertyIri));
+				.getCanonicalElkObject(new ElkObjectPropertyImpl(iri));
 	}
 
 	public ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
@@ -579,7 +580,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						objectPropertyExpression));
 	}
 
-	public ElkDatatype getDatatype(String iri) {
+	public ElkDatatype getDatatype(ElkIri iri) {
 		return (ElkDatatype) objectManager
 				.getCanonicalElkObject(new ElkDatatypeImpl(iri));
 	}
@@ -667,9 +668,9 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						.varArgsToList(firstLiteral, otherLiterals)));
 	}
 
-	public ElkDataProperty getDataProperty(String dataPropertyIri) {
+	public ElkDataProperty getDataProperty(ElkIri iri) {
 		return (ElkDataProperty) objectManager
-				.getCanonicalElkObject(new ElkDataPropertyImpl(dataPropertyIri));
+				.getCanonicalElkObject(new ElkDataPropertyImpl(iri));
 	}
 
 	public ElkDataSomeValuesFrom getDataSomeValuesFrom(

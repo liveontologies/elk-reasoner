@@ -36,13 +36,13 @@ public class WeakElkAnnotationPropertyWrapper extends WeakWrapper<ElkAnnotationP
 
 	@Override
 	protected int hashCode(ElkAnnotationProperty referent) {
-		return HashGenerator.combinedHashCode("ElkAnnotationProperty", referent.getIri());
+		return HashGenerator.combinedHashCode("ElkAnnotationProperty", referent.getFullIri());
 	}
 
 	@Override
 	protected boolean equal(ElkAnnotationProperty referent, Object obj) {
 		if (obj instanceof ElkAnnotationProperty)
-			return referent.getIri().equals(((ElkAnnotationProperty) obj).getIri());
+			return referent.getFullIri().equals(((ElkAnnotationProperty) obj).getFullIri());
 		return false;
 	}
 

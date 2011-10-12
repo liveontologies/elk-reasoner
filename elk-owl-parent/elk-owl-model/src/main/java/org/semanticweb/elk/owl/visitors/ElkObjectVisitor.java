@@ -34,11 +34,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public interface ElkObjectVisitor<O> extends ElkAxiomVisitor<O>,
-		ElkClassExpressionVisitor<O>, ElkDataRangeVisitor<O>,
+public interface ElkObjectVisitor<O> extends 
+		ElkAxiomVisitor<O>,
+		ElkClassExpressionVisitor<O>,
+		ElkDataRangeVisitor<O>,
 		ElkSubObjectPropertyExpressionVisitor<O>,
-		ElkDataPropertyExpressionVisitor<O>, ElkIndividualVisitor<O>,
-		ElkLiteralVisitor<O>, ElkEntityVisitor<O> {
+		ElkDataPropertyExpressionVisitor<O>,
+		ElkIndividualVisitor<O>,
+		ElkLiteralVisitor<O>,
+		ElkEntityVisitor<O> {
 
 	O visit(ElkFacetRestriction elkFacetRestriction);
 

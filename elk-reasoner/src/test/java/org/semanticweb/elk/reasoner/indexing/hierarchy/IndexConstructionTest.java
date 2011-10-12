@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
 
 public class IndexConstructionTest extends TestCase {
 	
@@ -40,11 +41,11 @@ public class IndexConstructionTest extends TestCase {
 	}
 
 	public void testIndexer() {
-		ElkClass a = objectFactory.getClass("A");
-		ElkClass b = objectFactory.getClass("B");
-		ElkClass c = objectFactory.getClass("C");
-		ElkClass d = objectFactory.getClass("D");
-		ElkObjectProperty r = objectFactory.getObjectProperty("R");
+		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri("C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri("D"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri("R"));
 
 		OntologyIndex index = new OntologyIndexImpl();
 		ElkAxiomProcessor inserter = index.getAxiomInserter();
@@ -87,10 +88,10 @@ public class IndexConstructionTest extends TestCase {
 	}
 
 	public void testConjunctionSharing() {
-		ElkClass a = objectFactory.getClass("A");
-		ElkClass b = objectFactory.getClass("B");
-		ElkClass c = objectFactory.getClass("C");
-		ElkClass d = objectFactory.getClass("D");
+		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri("C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri("D"));
 
 		ElkClassExpression x = objectFactory.getObjectIntersectionOf(a, b, c);
 		ElkClassExpression y = objectFactory.getObjectIntersectionOf(

@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Model Implementation
  * 
  * $Id$
  * $HeadURL$
@@ -20,33 +20,28 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.implementation;
+package org.semanticweb.elk.owl.iris;
 
-import org.semanticweb.elk.owl.iris.ElkIri;
 
 /**
- * Implementation for ElkObjects that maintain an IRI.
- * 
- * @author Markus Kroetzsch
+ * @author Frantisek Simancik
+ *
  */
-public abstract class ElkIriObject extends ElkObjectImpl {
+public class ElkPrefix {
+	
+	protected final String name;
+	protected final ElkFullIri iri;
 
-	protected final ElkIri iri;
-
-	ElkIriObject(ElkIri iri) {
+	public ElkPrefix(String prefixName, ElkFullIri iri) {
+		this.name = prefixName;
 		this.iri = iri;
 	}
 
-	public ElkIri getIri() {
-		return iri;
+	public String getName() {
+		return name;
 	}
 	
-	public String getFullIri() {
-		return iri.toString();
-	}
-
-	@Override
-	public String toString() {
-		return '<' + getFullIri() + '>';
+	public ElkFullIri getIri() {
+		return iri;
 	}
 }

@@ -42,6 +42,8 @@ PARSER_BEGIN(Owl2FunctionalStyleParser)
 
 package org.semanticweb.elk.owl.parsing.javacc;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
@@ -124,9 +126,13 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.managers.WeakCanonicalEntityObjectManager;
-import java.util.Map;
-import java.util.HashMap;
+import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.iris.ElkPrefix;
+import org.semanticweb.elk.owl.iris.ElkPrefixManager;
+import org.semanticweb.elk.owl.iris.ElkPrefixManagerImpl;
+import org.semanticweb.elk.owl.managers.WeakEntityManager;
 
 public class Owl2FunctionalStyleParser {
 
@@ -134,14 +140,16 @@ public class Owl2FunctionalStyleParser {
 	 * Default object factory used for creation of ELK Objects.
 	 */
 	protected ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(
-			new WeakCanonicalEntityObjectManager());
-
+			new WeakEntityManager());
+			
 	/**
 	 * Setting an object factory to be used for creation of ELK Objects.
 	 */
 	public void setObjectFactory(ElkObjectFactory objectFactory) {
 		this.objectFactory = objectFactory;
 	}
+
+	protected final ElkPrefixManager prefixManager = new ElkPrefixManagerImpl();
 
 	/**
 	 * Prefix declarations as found in the parsed document.
@@ -166,7 +174,8 @@ public class Owl2FunctionalStyleParser {
 	 * @param iri the IRI string to be used as a prefix
 	 */
 	public void setDefaultPrefixDeclaration(String prefixName, String iri) {
-		defaultPrefixDeclarations.put(prefixName, iri);
+		prefixManager.addPrefix(new ElkPrefix(prefixName, new ElkFullIri(iri)));
+//		defaultPrefixDeclarations.put(prefixName, iri);
 	}
 
 	/**
@@ -176,10 +185,10 @@ public class Owl2FunctionalStyleParser {
 	 * must always declare all prefixes explicitly.
 	 */
 	public void enableOwlDefaultPrefixDeclarations() {
-		defaultPrefixDeclarations.put("owl:","http://www.w3.org/2002/07/owl#");
-		defaultPrefixDeclarations.put("rdf:","http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-		defaultPrefixDeclarations.put("rdfs:","http://www.w3.org/2000/01/rdf-schema#");
-		defaultPrefixDeclarations.put("xsd:","http://www.w3.org/2001/XMLSchema#");
+		setDefaultPrefixDeclaration("owl:","http://www.w3.org/2002/07/owl#");
+		setDefaultPrefixDeclaration("rdf:","http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+		setDefaultPrefixDeclaration("rdfs:","http://www.w3.org/2000/01/rdf-schema#");
+		setDefaultPrefixDeclaration("xsd:","http://www.w3.org/2001/XMLSchema#");
 	}
 
 	/**
@@ -508,19 +517,19 @@ String nodeId():
 * The function returns only the IRI part of the string without the
 * enclosing < >.
 */
-String fullIri():
+ElkFullIri fullIri():
 {
 	Token t;
 }{
 	t = <FULL_IRI> {
-		return t.image;
+		return new ElkFullIri(t.image);
 	}
 }
 
 /* Extract the actual IRI from a full IRI or abbreviated IRI */
-String iri():
+ElkIri iri():
 {
-	String x;
+	ElkIri x;
 }{
 	(
 	  x = fullIri()
@@ -533,16 +542,17 @@ String iri():
 * [SPARQL]. The function returns the IRI that the abbreviation encodes
 * based on the known prefix declarations.
 */
-String abbreviatedIri():
+ElkAbbreviatedIri abbreviatedIri():
 {
-	String prefixName, prefixIri;
+	String prefixName;
+	ElkPrefix prefix;
 	Token t;
 }{
 	prefixName = prefixName()
 	t = <PN_LOCAL> {
-		prefixIri = getIriForPrefix(prefixName);
-		if ( prefixIri != null ) {
-			return prefixIri + t.image;
+		prefix = prefixManager.getPrefix(prefixName);
+		if ( prefix != null ) {
+			return new ElkAbbreviatedIri(prefix, t.image);
 		} else {
 			throw new ParseException("Unknown prefix " + prefixName + ".");
 		}
@@ -580,17 +590,16 @@ void ontologyDocument(ElkAxiomProcessor processor):
 
 void prefixDeclaration():
 {
-	String name,iri;
+	String name;
+	ElkFullIri iri;
 }{
 	<PREFIX> <OPEN_BRACKET>
 		name = prefixName()
 		<EQUALS>
 		iri = fullIri()
 	<CLOSE_BRACKET> {
-		if ( prefixDeclarations.containsKey(name) ) {
+		if ( !prefixManager.addPrefix( new ElkPrefix(name, iri)) ) {
 			throw new ParseException("Duplicate declaration of prefix " + name + ".");
-		} else {
-			prefixDeclarations.put(name,iri);
 		}
 	}
 }
@@ -604,16 +613,16 @@ void ontology(ElkAxiomProcessor processor):
 	<CLOSE_BRACKET>
 }
 
-String ontologyIri():
+ElkIri ontologyIri():
 {
-	String x;
+	ElkIri x;
 }{
 	x = iri() { return x; }
 }
 
-String versionIri():
+ElkIri versionIri():
 {
-	String x;
+	ElkIri x;
 }{
 	x = iri() { return x; }
 }
@@ -710,7 +719,7 @@ void axioms(ElkAxiomProcessor processor):
 /* 5.1 Classes */
 ElkClass clazz():
 {
-	String x;
+	ElkIri x;
 }{
 	x = iri() { return objectFactory.getClass(x); }
 }
@@ -718,7 +727,7 @@ ElkClass clazz():
 /* 5.2 Datatypes */
 ElkDatatype datatype():
 {
-	String x;
+	ElkIri x;
 }{
 	x = iri() {
 		return objectFactory.getDatatype(x);
@@ -728,7 +737,7 @@ ElkDatatype datatype():
 /* 5.3 Object Properties */
 ElkObjectProperty objectProperty():
 {
-	String x;
+	ElkIri x;
 }{
 	x = iri() {
 		return objectFactory.getObjectProperty(x);
@@ -738,7 +747,7 @@ ElkObjectProperty objectProperty():
 /* 5.4 Data Properties */
 ElkDataProperty dataProperty():
 {
-	String x;
+	ElkIri x;
 }{
 	x = iri() {
 		return objectFactory.getDataProperty(x);
@@ -748,7 +757,7 @@ ElkDataProperty dataProperty():
 /* 5.5 Annotation Properties */
 ElkAnnotationProperty annotationProperty():
 {
-	String x;
+	ElkIri x;
 }{
 	x = iri() {
 		return objectFactory.getAnnotationProperty(x);
@@ -778,7 +787,7 @@ ElkIndividual individual():
 /* 5.6.1 Named Individuals */
 ElkNamedIndividual namedIndividual():
 {
-	String x;
+	ElkIri x;
 }{
 	x = iri() {
 		return objectFactory.getNamedIndividual(x);

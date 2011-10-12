@@ -71,7 +71,7 @@ public final class ElkClassExpressionConverter implements
 	}
 
 	public OWLClass visit(ElkClass elkClass) {
-		String iri = elkClass.getIri();
+		String iri = elkClass.getFullIri();
 		return owlDataFactory.getOWLClass(IRI.create(iri));
 	}
 

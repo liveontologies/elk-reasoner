@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
@@ -20,33 +20,25 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.implementation;
-
-import org.semanticweb.elk.owl.iris.ElkIri;
+package org.semanticweb.elk.owl.iris;
 
 /**
- * Implementation for ElkObjects that maintain an IRI.
- * 
- * @author Markus Kroetzsch
+ * @author Frantisek Simancik
+ *
  */
-public abstract class ElkIriObject extends ElkObjectImpl {
-
-	protected final ElkIri iri;
-
-	ElkIriObject(ElkIri iri) {
-		this.iri = iri;
-	}
-
-	public ElkIri getIri() {
-		return iri;
-	}
+public interface ElkPrefixManager {
+	/**
+	 * Prefix declaration. Rejects if a prefix with the same prefixName
+	 * has already been declared.  
+	 * 
+	 * @param prefix
+	 * @return true is successful
+	 */
+	public boolean addPrefix(ElkPrefix prefix);
 	
-	public String getFullIri() {
-		return iri.toString();
-	}
-
-	@Override
-	public String toString() {
-		return '<' + getFullIri() + '>';
-	}
+	/**
+	 * @param prefixName
+	 * @return The ElkPrefix associated the prefixName, null if none.
+	 */
+	public ElkPrefix getPrefix(String prefixName);
 }

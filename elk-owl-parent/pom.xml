@@ -18,7 +18,6 @@
 		<module>elk-owl-model</module>
 		<module>elk-owl-implementation</module>
 		<module>elk-owl-parsing-javacc</module>
-		<module>elk-owl-parsing-antlr3</module>
 	</modules>
 	
 </project>

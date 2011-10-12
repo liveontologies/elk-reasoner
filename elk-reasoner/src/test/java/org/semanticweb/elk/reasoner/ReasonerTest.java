@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassNode;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
@@ -60,13 +61,16 @@ public class ReasonerTest extends TestCase {
 				+ ")"//
 		);
 
-		ElkClass a = objectFactory.getClass("http://example.org/A");
-		ElkClass d = objectFactory.getClass("http://example.org/D");
-		ElkClass e = objectFactory.getClass("http://example.org/E");
-		ElkObjectProperty r = objectFactory
-				.getObjectProperty("http://example.org/R");
-		ElkObjectProperty s = objectFactory
-				.getObjectProperty("http://example.org/S");
+		ElkClass a = objectFactory.getClass(
+				new ElkFullIri("http://example.org/A"));
+		ElkClass d = objectFactory.getClass(
+				new ElkFullIri("http://example.org/D"));
+		ElkClass e = objectFactory.getClass(
+				new ElkFullIri("http://example.org/E"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(
+				new ElkFullIri("http://example.org/R"));
+		ElkObjectProperty s = objectFactory.getObjectProperty(
+				new ElkFullIri("http://example.org/S"));
 
 		reasoner.classify();
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
@@ -93,11 +97,16 @@ public class ReasonerTest extends TestCase {
 				+ "SubClassOf(:A :D)"
 				+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)" + ")");
 
-		ElkClass a = objectFactory.getClass("http://example.org/A");
-		ElkClass b = objectFactory.getClass("http://example.org/B");
-		ElkClass c = objectFactory.getClass("http://example.org/C");
-		ElkClass d = objectFactory.getClass("http://example.org/D");
-		ElkClass e = objectFactory.getClass("http://example.org/E");
+		ElkClass a = objectFactory.getClass(
+				new ElkFullIri("http://example.org/A"));
+		ElkClass b = objectFactory.getClass(
+				new ElkFullIri("http://example.org/B"));
+		ElkClass c = objectFactory.getClass(
+				new ElkFullIri("http://example.org/C"));
+		ElkClass d = objectFactory.getClass(
+				new ElkFullIri("http://example.org/D"));
+		ElkClass e = objectFactory.getClass(
+				new ElkFullIri("http://example.org/E"));
 
 		OntologyIndex index = reasoner.ontologyIndex;
 
@@ -151,13 +160,13 @@ public class ReasonerTest extends TestCase {
 		reasoner.classify();
 
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
-		ClassNode aNode = taxonomy.getNode(objectFactory
-				.getClass("http://example.org/A"));
+		ClassNode aNode = taxonomy.getNode(objectFactory.getClass(
+				new ElkFullIri("http://example.org/A")));
 		assertTrue(
 				"A SubClassOf X",
 				aNode.getDirectSuperNodes().contains(
-						taxonomy.getNode(objectFactory
-								.getClass("http://example.org/X"))));
+						taxonomy.getNode(objectFactory.getClass(
+						new ElkFullIri("http://example.org/X")))));
 	}
 
 	public void testAncestors() throws InterruptedException,
@@ -168,10 +177,14 @@ public class ReasonerTest extends TestCase {
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))");
 
-		ElkClass a = objectFactory.getClass("http://example.org/A");
-		ElkClass b = objectFactory.getClass("http://example.org/B");
-		ElkClass c = objectFactory.getClass("http://example.org/C");
-		ElkClass d = objectFactory.getClass("http://example.org/D");
+		ElkClass a = objectFactory.getClass(
+				new ElkFullIri("http://example.org/A"));
+		ElkClass b = objectFactory.getClass(
+				new ElkFullIri("http://example.org/B"));
+		ElkClass c = objectFactory.getClass(
+				new ElkFullIri("http://example.org/C"));
+		ElkClass d = objectFactory.getClass(
+				new ElkFullIri("http://example.org/D"));
 
 		OntologyIndex index = reasoner.ontologyIndex;
 

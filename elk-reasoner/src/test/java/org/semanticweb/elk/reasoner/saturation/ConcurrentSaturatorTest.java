@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
@@ -47,12 +48,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 	public void testExistentials() throws InterruptedException,
 			ExecutionException {		
-		ElkClass a = objectFactory.getClass(":A");
-		ElkClass b = objectFactory.getClass(":B");
-		ElkClass c = objectFactory.getClass(":C");
-		ElkClass d = objectFactory.getClass(":D");
-		ElkObjectProperty r = objectFactory.getObjectProperty("R");
-		ElkObjectProperty s = objectFactory.getObjectProperty("S");
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri("R"));
+		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri("S"));
 
 		OntologyIndex ontologyIndex = new OntologyIndexImpl();
 
@@ -88,10 +89,10 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 	public void testConjunctions() throws InterruptedException,
 			ExecutionException {
-		ElkClass a = objectFactory.getClass(":A");
-		ElkClass b = objectFactory.getClass(":B");
-		ElkClass c = objectFactory.getClass(":C");
-		ElkClass d = objectFactory.getClass(":D");
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 
 		final OntologyIndex ontologyIndex = new OntologyIndexImpl();
 		final ExecutorService executor = Executors.newCachedThreadPool();

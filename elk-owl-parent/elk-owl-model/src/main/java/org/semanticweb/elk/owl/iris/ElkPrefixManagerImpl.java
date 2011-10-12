@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
@@ -20,33 +20,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.implementation;
+package org.semanticweb.elk.owl.iris;
 
-import org.semanticweb.elk.owl.iris.ElkIri;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Implementation for ElkObjects that maintain an IRI.
- * 
- * @author Markus Kroetzsch
- */
-public abstract class ElkIriObject extends ElkObjectImpl {
-
-	protected final ElkIri iri;
-
-	ElkIriObject(ElkIri iri) {
-		this.iri = iri;
-	}
-
-	public ElkIri getIri() {
-		return iri;
-	}
+public class ElkPrefixManagerImpl implements ElkPrefixManager {
 	
-	public String getFullIri() {
-		return iri.toString();
+	protected final Map<String, ElkPrefix> prefixLookup =
+		new HashMap<String, ElkPrefix> ();
+
+	public boolean addPrefix(ElkPrefix prefix) {
+		if (prefixLookup.containsKey(prefix.getName()))
+			return false;
+		
+		prefixLookup.put(prefix.getName(), prefix);
+		return true;
 	}
 
-	@Override
-	public String toString() {
-		return '<' + getFullIri() + '>';
+	public ElkPrefix getPrefix(String prefixName) {
+		return prefixLookup.get(prefixName);
 	}
+
 }

@@ -36,13 +36,13 @@ public class WeakElkDatatypeWrapper extends WeakWrapper<ElkDatatype> {
 
 	@Override
 	protected int hashCode(ElkDatatype referent) {
-		return HashGenerator.combinedHashCode("ElkDatatype", referent.getIri());
+		return HashGenerator.combinedHashCode("ElkDatatype", referent.getFullIri());
 	}
 
 	@Override
 	protected boolean equal(ElkDatatype referent, Object obj) {
 		if (obj instanceof ElkDatatype)
-			return referent.getIri().equals(((ElkDatatype) obj).getIri());
+			return referent.getFullIri().equals(((ElkDatatype) obj).getFullIri());
 		return false;
 	}
 
