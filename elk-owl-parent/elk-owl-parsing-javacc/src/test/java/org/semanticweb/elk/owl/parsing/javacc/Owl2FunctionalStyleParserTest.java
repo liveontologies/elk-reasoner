@@ -89,6 +89,11 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 			// expected behaviour
 		}
 	}
+	
+	public void testObjectOneOf() throws ParseException {
+		String testString = "Ontology(SubClassOf( <A> ObjectOneOf(<i>)))";
+		parseOntologyDocument(testString);
+	}
 
 	public void testOntologyDocument() throws ParseException {
 		String testString = "Prefix ( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )"

@@ -234,6 +234,7 @@ TOKEN :
 {
   < OPEN_BRACKET: "(" >
 | < CLOSE_BRACKET: ")" >
+| < EQUALS: "=" > 
 | < REFERENCE: "^^" >
 
 
@@ -450,8 +451,12 @@ SKIP :
 
 <AfterPrefix> TOKEN :
 {
-  < EQUALS: ([" ", "\t", "\n", "\r"])* "=" > : DEFAULT
-| < PN_LOCAL: ( <PN_CHARS_U> | <DIGIT> ) ( ( <PN_CHARS> | "." )* <PN_CHARS>)? > : DEFAULT
+  < PN_LOCAL: ( <PN_CHARS_U> | <DIGIT> ) ( ( <PN_CHARS> | "." )* <PN_CHARS>)? > : DEFAULT
+}
+
+<AfterPrefix> SKIP :
+{
+  "" : DEFAULT
 }
 
 <QuotedString> TOKEN :
@@ -1063,7 +1068,6 @@ ElkObjectOneOf objectOneOf():
 		new Vector<ElkIndividual> ();
 }{
 	<OBJECT_ONE_OF> <OPEN_BRACKET>
-		x = individual() { v.add(x); }
 		( x = individual() { v.add(x); } )+
 	<CLOSE_BRACKET> {
 		return objectFactory.getObjectOneOf(v);
