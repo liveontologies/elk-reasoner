@@ -42,13 +42,6 @@ public interface ElkEntity extends ElkObject {
 	 */
 	public ElkIri getIri();
 
-	/**
-	 * Get the IRI of this entity as a string. This 
-	 * is a convenience method for the equivalent getIri().toString()
-	 * 
-	 * @return The IRI of this entity as a string.
-	 */
-	public String getFullIri();
 
 	/**
 	 * Accept an ElkEntityVisitor.

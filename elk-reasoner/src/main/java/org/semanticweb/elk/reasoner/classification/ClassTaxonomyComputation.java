@@ -71,7 +71,7 @@ public class ClassTaxonomyComputation extends
 			topNode = new ClassNode(
 					Collections
 							.singletonList((ElkClass) PredefinedElkClass.OWL_THING));
-			classTaxonomy.nodeLookup.put(PredefinedElkClass.OWL_THING.getFullIri(),
+			classTaxonomy.nodeLookup.put(PredefinedElkClass.OWL_THING.getIri(),
 					topNode);
 		}
 		bottomNode = classTaxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
@@ -80,7 +80,7 @@ public class ClassTaxonomyComputation extends
 					Collections
 							.singletonList((ElkClass) PredefinedElkClass.OWL_NOTHING));
 			classTaxonomy.nodeLookup.put(
-					PredefinedElkClass.OWL_NOTHING.getFullIri(), bottomNode);
+					PredefinedElkClass.OWL_NOTHING.getIri(), bottomNode);
 		}
 
 		// processing the nodes with assigned parents
@@ -160,7 +160,7 @@ public class ClassTaxonomyComputation extends
 		assignedParentsNodes.add(node);
 
 		for (ElkClass ec : equivalent)
-			classTaxonomy.nodeLookup.put(ec.getFullIri(), node);
+			classTaxonomy.nodeLookup.put(ec.getIri(), node);
 	}
 
 	private class Linker extends AbstractConcurrentComputation<ClassNode> {

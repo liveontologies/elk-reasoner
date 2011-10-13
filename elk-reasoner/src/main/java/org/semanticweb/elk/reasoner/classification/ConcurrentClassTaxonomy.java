@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -49,10 +50,10 @@ class ConcurrentClassTaxonomy extends ClassTaxonomy {
 			.getLogger(ConcurrentClassTaxonomy.class);
 
 	// map from class IRIs to class nodes
-	protected final ConcurrentMap<String, ClassNode> nodeLookup;
+	protected final ConcurrentMap<ElkIri, ClassNode> nodeLookup;
 
 	ConcurrentClassTaxonomy() {
-		this.nodeLookup = new ConcurrentHashMap<String, ClassNode>();
+		this.nodeLookup = new ConcurrentHashMap<ElkIri, ClassNode>();
 	}
 
 	public Set<ClassNode> getNodes() {
@@ -67,9 +68,9 @@ class ConcurrentClassTaxonomy extends ClassTaxonomy {
 	 * @return ClassNode object for elkClass, possibly still incomplete
 	 */
 	public ClassNode getNode(ElkClass elkClass) {
-		ClassNode result = nodeLookup.get(elkClass.getFullIri());
+		ClassNode result = nodeLookup.get(elkClass.getIri());
 		if (result == null)
-			LOGGER_.error("No taxonomy node for class " + elkClass.getFullIri());
+			LOGGER_.error("No taxonomy node for class " + elkClass.getIri());
 		return result;
 	}
 

@@ -36,13 +36,13 @@ public class WeakElkNamedIndividualWrapper extends WeakWrapper<ElkNamedIndividua
 
 	@Override
 	protected int hashCode(ElkNamedIndividual referent) {
-		return HashGenerator.combinedHashCode("ElkNamedIndividual", referent.getFullIri());
+		return HashGenerator.combinedHashCode("ElkNamedIndividual", referent.getIri());
 	}
 
 	@Override
 	protected boolean equal(ElkNamedIndividual referent, Object obj) {
 		if (obj instanceof ElkNamedIndividual)
-			return referent.getFullIri().equals(((ElkNamedIndividual) obj).getFullIri());
+			return referent.getIri().equals(((ElkNamedIndividual) obj).getIri());
 		return false;
 	}
 

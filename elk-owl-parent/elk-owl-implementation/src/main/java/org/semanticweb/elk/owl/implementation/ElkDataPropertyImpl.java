@@ -49,7 +49,7 @@ public class ElkDataPropertyImpl extends ElkIriObject implements ElkEntity,
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkDataProperty) {
-			return iri.equals(((ElkDataProperty) object).getFullIri());
+			return iri.equals(((ElkDataProperty) object).getIri());
 		} else {
 			return false;
 		}

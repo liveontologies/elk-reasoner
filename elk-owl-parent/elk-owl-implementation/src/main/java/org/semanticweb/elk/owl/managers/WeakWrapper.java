@@ -25,16 +25,12 @@ package org.semanticweb.elk.owl.managers;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
-public class WeakWrapper<T> extends WeakReference<T> {
+public abstract class WeakWrapper<T> extends WeakReference<T> {
 	private final int hash_;
 	
-	protected int hashCode(T referent) {
-		return referent.hashCode();
-	}
+	protected abstract int hashCode(T referent);
 	
-	protected boolean equal(T referent, Object obj) {
-		return referent.equals(obj);
-	}
+	protected abstract boolean equal(T referent, Object obj);
 		
 	public WeakWrapper(T referent, ReferenceQueue<? super T> q) {
 		super(referent, q);

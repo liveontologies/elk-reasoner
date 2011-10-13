@@ -58,12 +58,8 @@ public abstract class ElkEntityView<T extends ElkEntity> extends
 		return elkObject.getIri();
 	}
 	
-	public String getFullIri() {
-		return elkObject.getFullIri();
-	}
-
 	public int generateHashCode() {
-		return combinedHashCode(getClass(), getFullIri());
+		return combinedHashCode(getClass(), getIri());
 	}
 
 	@Override
@@ -75,7 +71,7 @@ public abstract class ElkEntityView<T extends ElkEntity> extends
 			ElkEntityView<?> otherView = (ElkEntityView<?>) other;
 			return (getClass() == other.getClass())
 					&& (this.subObjectViewer == otherView.subObjectViewer)
-					&& getFullIri().equals(otherView.getFullIri());
+					&& getIri().equals(otherView.getIri());
 		}
 		return false;
 	}

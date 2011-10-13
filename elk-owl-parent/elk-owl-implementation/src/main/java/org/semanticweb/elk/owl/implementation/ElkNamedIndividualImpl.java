@@ -48,7 +48,7 @@ public class ElkNamedIndividualImpl extends ElkIriObject implements
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkNamedIndividual) {
-			return iri.equals(((ElkNamedIndividual) object).getFullIri());
+			return iri.equals(((ElkNamedIndividual) object).getIri());
 		} else {
 			return false;
 		}

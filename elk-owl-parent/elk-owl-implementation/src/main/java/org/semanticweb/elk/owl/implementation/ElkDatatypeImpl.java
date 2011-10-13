@@ -46,7 +46,7 @@ public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
 		if (this == object) {
 			return true;
 		} else if (object instanceof ElkDatatype) {
-			return iri.equals(((ElkDatatype) object).getFullIri());
+			return iri.equals(((ElkDatatype) object).getIri());
 		} else {
 			return false;
 		}

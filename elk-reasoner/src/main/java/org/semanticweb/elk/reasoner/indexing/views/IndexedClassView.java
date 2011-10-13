@@ -42,7 +42,7 @@ public class IndexedClassView<T extends IndexedClass> extends
 	@Override
 	public int hashCode() {
 		return combinedHashCode(IndexedClassView.class, this.representative
-				.getElkClass().getFullIri());
+				.getElkClass().getIri());
 	}
 
 	@Override
@@ -52,8 +52,8 @@ public class IndexedClassView<T extends IndexedClass> extends
 		}
 		if (other instanceof IndexedClassView<?>) {
 			IndexedClassView<?> otherView = (IndexedClassView<?>) other;
-			return this.representative.getElkClass().getFullIri().equals(
-					otherView.representative.getElkClass().getFullIri());
+			return this.representative.getElkClass().getIri().equals(
+					otherView.representative.getElkClass().getIri());
 		}
 		return false;
 	}
