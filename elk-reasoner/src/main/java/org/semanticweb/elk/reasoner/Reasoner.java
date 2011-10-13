@@ -31,9 +31,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.managers.DummyObjectManager;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
@@ -53,7 +53,7 @@ public class Reasoner {
 	// number of workers for concurrent jobs
 	protected final int workerNo;
 
-	protected final OntologyIndex ontologyIndex;
+	protected OntologyIndex ontologyIndex;
 
 	protected ClassTaxonomy classTaxonomy;
 
@@ -75,43 +75,26 @@ public class Reasoner {
 				.availableProcessors());
 	}
 
-	public void loadOntologyFromStream(InputStream stream,
-			ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
+	public void loadOntologyFromStream(InputStream stream) throws ParseException,
 			IOException {
 		Statistics.logOperationStart("Loading", LOGGER_);
 
+		ontologyIndex = new OntologyIndexImpl();
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
-		parser.setObjectFactory(new ElkObjectFactoryImpl(
-				new DummyObjectManager()));
-		parser.ontologyDocument(elkAxiomProcessor);
+		parser.setObjectFactory(new ElkObjectFactoryImpl(new DummyObjectManager()));
+		parser.setPrefixDeclarations(new ElkPrefixDeclarationsImpl());
+		parser.ontologyDocument(ontologyIndex.getAxiomInserter());
 		stream.close();
 		Statistics.logOperationFinish("Loading", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 	}
 
-	public void loadOntologyFromStream(InputStream stream)
-			throws ParseException, IOException {
-		loadOntologyFromStream(stream, ontologyIndex.getAxiomInserter());
-	}
-
-	public void loadOntologyFromFile(File file,
-			ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
+	public void loadOntologyFromFile(File file) throws ParseException,
 			IOException {
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Loading ontology from " + file);
 		}
-		loadOntologyFromStream(new FileInputStream(file), elkAxiomProcessor);
-	}
-
-	public void loadOntologyFromFile(String fileName,
-			ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
-			IOException {
-		loadOntologyFromFile(new File(fileName), elkAxiomProcessor);
-	}
-
-	public void loadOntologyFromFile(File file) throws ParseException,
-			IOException {
-		loadOntologyFromFile(file, ontologyIndex.getAxiomInserter());
+		loadOntologyFromStream(new FileInputStream(file));
 	}
 
 	public void loadOntologyFromFile(String fileName) throws ParseException,
@@ -119,19 +102,12 @@ public class Reasoner {
 		loadOntologyFromFile(new File(fileName));
 	}
 
-	public void loadOntologyFromString(String text,
-			ElkAxiomProcessor elkAxiomProcessor) throws ParseException,
+	public void loadOntologyFromString(String text) throws ParseException,
 			IOException {
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Loading ontology from string");
 		}
-		loadOntologyFromStream(new ByteArrayInputStream(text.getBytes()),
-				elkAxiomProcessor);
-	}
-
-	public void loadOntologyFromString(String text) throws ParseException,
-			IOException {
-		loadOntologyFromString(text, ontologyIndex.getAxiomInserter());
+		loadOntologyFromStream(new ByteArrayInputStream(text.getBytes()));
 	}
 
 	public void addAxiom(ElkAxiom axiom) {

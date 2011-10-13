@@ -39,6 +39,8 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
+import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.managers.DummyObjectManager;
 
 /**
@@ -66,7 +68,9 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		parser.setObjectFactory(new ElkObjectFactoryImpl(
 				new DummyObjectManager()));
 		if (defaultPrefixes) {
-			parser.enableOwlDefaultPrefixDeclarations();
+			ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
+			prefixDeclarations.addOwlDefaultPrefixes();
+			parser.setPrefixDeclarations(prefixDeclarations);
 		}
 		return parser;
 	}

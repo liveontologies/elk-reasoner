@@ -130,17 +130,17 @@ import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
-import org.semanticweb.elk.owl.iris.ElkPrefixManager;
-import org.semanticweb.elk.owl.iris.ElkPrefixManagerImpl;
+import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
+import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.managers.WeakEntityManager;
 
 public class Owl2FunctionalStyleParser {
 
 	/**
-	 * Default object factory used for creation of ELK Objects.
+	 * Object factory used for creation of ELK Objects.
 	 */
-	protected ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(
-			new WeakEntityManager());
+	protected ElkObjectFactory objectFactory = 
+		new ElkObjectFactoryImpl(new WeakEntityManager());
 			
 	/**
 	 * Setting an object factory to be used for creation of ELK Objects.
@@ -148,82 +148,19 @@ public class Owl2FunctionalStyleParser {
 	public void setObjectFactory(ElkObjectFactory objectFactory) {
 		this.objectFactory = objectFactory;
 	}
-
-	protected final ElkPrefixManager prefixManager = new ElkPrefixManagerImpl();
-
-	/**
-	 * Prefix declarations as found in the parsed document.
-	 * This is an internal field to collect a state during parsing.
-	 * It will be reset when starting to parse ontology documents.
-	 */
-	protected final static Map<String,String> prefixDeclarations = new HashMap<String,String>();
-
-	/**
-	 * Default prefixes to use when a prefix has not been declared.
-	 * This can be used to declare prefixes when parsing incomplete
-	 * ontology documents or syntax parts. If the parsed document
-	 * includes prefix declarations, they take precedence over the default
-	 * without causing error messages.
-	 */
-	protected final static Map<String,String> defaultPrefixDeclarations = new HashMap<String,String>();
-
-	/**
-	 * Add a default prefix declaration to use during parsing.
-	 *
-	 * @param prefixName a prefix name, including the final ":"
-	 * @param iri the IRI string to be used as a prefix
-	 */
-	public void setDefaultPrefixDeclaration(String prefixName, String iri) {
-		prefixManager.addPrefix(new ElkPrefix(prefixName, new ElkFullIri(iri)));
-//		defaultPrefixDeclarations.put(prefixName, iri);
-	}
-
-	/**
-	 * Convenience method to use the default prefix declarations that are
-	 * used in the OWL specification. This is mainly useful when parsing
-	 * syntactic fragments of OWL ontologies. Complete ontology documents
-	 * must always declare all prefixes explicitly.
-	 */
-	public void enableOwlDefaultPrefixDeclarations() {
-		setDefaultPrefixDeclaration("owl:","http://www.w3.org/2002/07/owl#");
-		setDefaultPrefixDeclaration("rdf:","http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-		setDefaultPrefixDeclaration("rdfs:","http://www.w3.org/2000/01/rdf-schema#");
-		setDefaultPrefixDeclaration("xsd:","http://www.w3.org/2001/XMLSchema#");
-	}
-
-	/**
-	 * Clear default prefix declarations.
-	 */
-	public void clearDefaultPrefixDeclarations() {
-		defaultPrefixDeclarations.clear();
-	}
-
-	/**
-	 * Get the IRI that a prefix name abbreviates. Based on the prefix
-	 * declarations that have been found during parsing, and the default
-	 * declarations that were specified. If the prefix is unknown, null
-	 * is returned.
-	 *
-	 * @param prefixName a prefix name, including the final ":"
-	 */
-	public String getIriForPrefix(String prefixName) {
-		if ( prefixDeclarations.containsKey(prefixName) ) {
-			return prefixDeclarations.get(prefixName);
-		} else if ( defaultPrefixDeclarations.containsKey(prefixName) ) {
-			return defaultPrefixDeclarations.get(prefixName);
-		} else {
-			return null;
-		}
-	}
 	
 	/**
-	 * Reset the internal state of the parser and forget any information
-	 * that was collected during earlier parsing. For example, all prefix
-	 * declarations are cleared. This reset happens automatically when
+	 * Prefix declarations as found in the parsed document. 
+	 */
+	protected ElkPrefixDeclarations prefixDeclarations =
+		 new ElkPrefixDeclarationsImpl();
+
+	/**
+	 * This method should be used to reset prefixDeclarations before
 	 * parsing a new ontology document.
 	 */
-	public void reset() {
-		prefixDeclarations.clear();
+	public void setPrefixDeclarations(ElkPrefixDeclarations prefixDeclarations) {
+		this.prefixDeclarations = prefixDeclarations;
 	}
 
 }
@@ -550,7 +487,7 @@ ElkAbbreviatedIri abbreviatedIri():
 }{
 	prefixName = prefixName()
 	t = <PN_LOCAL> {
-		prefix = prefixManager.getPrefix(prefixName);
+		prefix = prefixDeclarations.getPrefix(prefixName);
 		if ( prefix != null ) {
 			return new ElkAbbreviatedIri(prefix, t.image);
 		} else {
@@ -582,9 +519,7 @@ void ontologyAnnotations():
 
 /* 3.7 Functional-Style Syntax */
 void ontologyDocument(ElkAxiomProcessor processor):
-{
-	reset();
-}{
+{}{
 	( prefixDeclaration() )* ontology(processor)
 }
 
@@ -598,7 +533,7 @@ void prefixDeclaration():
 		<EQUALS>
 		iri = fullIri()
 	<CLOSE_BRACKET> {
-		if ( !prefixManager.addPrefix( new ElkPrefix(name, iri)) ) {
+		if ( !prefixDeclarations.addPrefix( new ElkPrefix(name, iri)) ) {
 			throw new ParseException("Duplicate declaration of prefix " + name + ".");
 		}
 	}

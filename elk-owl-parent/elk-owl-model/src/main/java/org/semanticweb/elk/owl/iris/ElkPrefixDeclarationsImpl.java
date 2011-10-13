@@ -25,7 +25,11 @@ package org.semanticweb.elk.owl.iris;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ElkPrefixManagerImpl implements ElkPrefixManager {
+/**
+ * @author Frantisek Simancik
+ *
+ */
+public class ElkPrefixDeclarationsImpl implements ElkPrefixDeclarations {
 	
 	protected final Map<String, ElkPrefix> prefixLookup =
 		new HashMap<String, ElkPrefix> ();
@@ -40,6 +44,17 @@ public class ElkPrefixManagerImpl implements ElkPrefixManager {
 
 	public ElkPrefix getPrefix(String prefixName) {
 		return prefixLookup.get(prefixName);
+	}
+	
+	public void addOwlDefaultPrefixes() {
+         addPrefix(new ElkPrefix("owl:", 
+        		 new ElkFullIri("http://www.w3.org/2002/07/owl#")));
+         addPrefix(new ElkPrefix("rdf:", 
+        		 new ElkFullIri("http://www.w3.org/1999/02/22-rdf-syntax-ns#")));
+         addPrefix(new ElkPrefix("rdfs:", 
+        		 new ElkFullIri("http://www.w3.org/2000/01/rdf-schema#")));
+         addPrefix(new ElkPrefix("xsd:",
+        		 new ElkFullIri("http://www.w3.org/2001/XMLSchema#")));
 	}
 
 }
