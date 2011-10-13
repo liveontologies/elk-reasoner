@@ -41,7 +41,6 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
-import org.semanticweb.elk.owl.managers.DummyObjectManager;
 
 /**
  * @author Yevgeny Kazakov
@@ -65,8 +64,6 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 			boolean defaultPrefixes) {
 		InputStream stream = new ByteArrayInputStream(testString.getBytes());
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
-		parser.setObjectFactory(new ElkObjectFactoryImpl(
-				new DummyObjectManager()));
 		if (defaultPrefixes) {
 			ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
 			prefixDeclarations.addOwlDefaultPrefixes();

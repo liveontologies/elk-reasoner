@@ -31,10 +31,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
-import org.semanticweb.elk.owl.managers.DummyObjectManager;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
@@ -81,7 +79,6 @@ public class Reasoner {
 
 		ontologyIndex = new OntologyIndexImpl();
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
-		parser.setObjectFactory(new ElkObjectFactoryImpl(new DummyObjectManager()));
 		parser.setPrefixDeclarations(new ElkPrefixDeclarationsImpl());
 		parser.ontologyDocument(ontologyIndex.getAxiomInserter());
 		stream.close();

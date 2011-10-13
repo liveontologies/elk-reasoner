@@ -132,7 +132,7 @@ import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
-import org.semanticweb.elk.owl.managers.WeakEntityManager;
+import org.semanticweb.elk.owl.managers.DummyObjectManager;
 
 public class Owl2FunctionalStyleParser {
 
@@ -140,7 +140,7 @@ public class Owl2FunctionalStyleParser {
 	 * Object factory used for creation of ELK Objects.
 	 */
 	protected ElkObjectFactory objectFactory = 
-		new ElkObjectFactoryImpl(new WeakEntityManager());
+		new ElkObjectFactoryImpl(new DummyObjectManager());
 			
 	/**
 	 * Setting an object factory to be used for creation of ELK Objects.
