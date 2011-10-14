@@ -55,13 +55,6 @@ abstract public class IndexedClassExpression implements Derivable {
 	protected Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
 	protected List<IndexedObjectSomeValuesFrom> negExistentials;
 
-	// TODO: some of the occurrence counters are relevant only for subclasses
-
-	/**
-	 * This counts how often this object occurred in the ontology.
-	 */
-	protected int occurrenceNo = 0;
-
 	/**
 	 * This counts how often this object occurred positively. Some indexing
 	 * operations are only needed when encountering objects positively for the
@@ -77,7 +70,7 @@ abstract public class IndexedClassExpression implements Derivable {
 	protected int negativeOccurrenceNo = 0;
 
 	public boolean occurs() {
-		return occurrenceNo > 0;
+		return positiveOccurrenceNo > 0 || negativeOccurrenceNo > 0;
 	}
 
 	public boolean occursNegatively() {
@@ -88,9 +81,11 @@ abstract public class IndexedClassExpression implements Derivable {
 		return positiveOccurrenceNo > 0;
 	}
 
+	/**
+	 * Non-recursively. 
+	 */
 	protected abstract void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement,
-			IndexedObjectCanonizer canonizer);
+			int positiveIncrement, int negativeIncrement);
 	
 
 	/**

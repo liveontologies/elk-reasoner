@@ -20,27 +20,32 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
-
-import java.util.NoSuchElementException;
+package org.semanticweb.elk.reasoner.indexing;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomDeleterVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomInserterVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectIndexerVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.Iterables;
 
-public class OntologyIndexImpl extends IndexedObjectCanonizer implements
+public class OntologyIndexImpl extends IndexedObjectCache implements
 		OntologyIndex {
 
-	private final ElkObjectIndexerVisitor failingIndexer;
+	private final ElkObjectIndexerVisitor elkObjectIndexer;
 	private final ElkAxiomProcessor axiomInserter;
 	private final ElkAxiomProcessor axiomDeleter;
 
 	public OntologyIndexImpl() {
-		this.failingIndexer = new ElkObjectIndexerVisitor(
-				new FailingIndexedObjectFilter(this));
+		this.elkObjectIndexer = new ElkObjectIndexerVisitor(this);
 		this.axiomInserter = new ElkAxiomInserterVisitor(this);
 		this.axiomDeleter = new ElkAxiomDeleterVisitor(this);
 		// index predefined axioms
@@ -51,20 +56,20 @@ public class OntologyIndexImpl extends IndexedObjectCanonizer implements
 	}
 
 	public IndexedClassExpression getIndexed(ElkClassExpression representative) {
-		try {
-			return representative.accept(failingIndexer);
-		} catch (NoSuchElementException e) {
+		IndexedClassExpression result = representative.accept(elkObjectIndexer);
+		if (result.occurs())
+			return result;
+		else
 			return null;
-		}
 	}
 
 	public IndexedPropertyChain getIndexed(
 			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression) {
-		try {
-			return elkSubObjectPropertyExpression.accept(failingIndexer);
-		} catch (NoSuchElementException e) {
+		IndexedPropertyChain result = elkSubObjectPropertyExpression.accept(elkObjectIndexer);
+		if (result.occurs())
+			return result;
+		else
 			return null;
-		}
 	}
 
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {

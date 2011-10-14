@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation;
 import java.util.ArrayDeque;
 import java.util.concurrent.ExecutorService;
 
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Iterables;
 import org.semanticweb.elk.util.concurrent.computation.AbstractConcurrentComputation;

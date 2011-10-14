@@ -62,8 +62,8 @@ public class ElkObjectIndexerVisitor implements
 
 	private IndexedObjectFilter objectFilter;
 
-	ElkObjectIndexerVisitor(IndexedObjectFilter subObjectFilter) {
-		this.objectFilter = subObjectFilter;
+	public ElkObjectIndexerVisitor(IndexedObjectFilter objectFilter) {
+		this.objectFilter = objectFilter;
 	}
 
 	public IndexedClassExpression visit(ElkClass elkClass) {

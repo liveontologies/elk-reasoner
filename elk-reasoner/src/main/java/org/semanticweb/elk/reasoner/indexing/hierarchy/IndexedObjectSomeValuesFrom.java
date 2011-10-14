@@ -68,27 +68,20 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	@Override
 	protected void updateOccurrenceNumbers(int increment, int positiveIncrement,
-			int negativeIncrement, IndexedObjectCanonizer canonizer) {
+			int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this conjunction
 			filler.addNegExistential(this);
 		}
 
-		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
-		if (occurrenceNo == 0)
-			canonizer.remove(this);
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
 			filler.removeNegExistential(this);
 		}
-
-		relation.updateOccurrenceNumber(increment, canonizer);
-		filler.updateOccurrenceNumbers(increment, positiveIncrement,
-				negativeIncrement, canonizer);
 	}
 
 }

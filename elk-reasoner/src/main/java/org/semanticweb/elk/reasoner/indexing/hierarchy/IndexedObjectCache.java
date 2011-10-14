@@ -29,14 +29,14 @@ import org.semanticweb.elk.reasoner.indexing.views.IndexedClassExpressionView;
 import org.semanticweb.elk.reasoner.indexing.views.IndexedPropertyChainView;
 import org.semanticweb.elk.reasoner.indexing.views.IndexedViewConverter;
 
-class IndexedObjectCanonizer {
+public class IndexedObjectCache implements IndexedObjectFilter {
 
 	protected final Map<IndexedClassExpressionView<? extends IndexedClassExpression>, IndexedClassExpression> indexedClassExpressionLookup;
 	protected final Map<IndexedPropertyChainView<? extends IndexedPropertyChain>, IndexedPropertyChain> indexedPropertyChainLookup;
 	protected int indexedClassCount = 0;
 	protected int indexedObjectPropertyCount = 0;
 	
-	IndexedObjectCanonizer() {
+	protected IndexedObjectCache() {
 		indexedClassExpressionLookup = 
 			new HashMap<IndexedClassExpressionView<? extends IndexedClassExpression>, IndexedClassExpression>(
 				1023);
@@ -45,65 +45,57 @@ class IndexedObjectCanonizer {
 				127);
 	}
 
-	IndexedClassExpression get(IndexedClassExpression ice) {
+	public IndexedClassExpression filter(IndexedClassExpression ice) {
 		IndexedClassExpressionView<? extends IndexedClassExpression> iceView = ice
 				.accept(IndexedViewConverter.getInstance());
 		IndexedClassExpression result = indexedClassExpressionLookup
 				.get(iceView);
-		return result;
+		if (result == null)
+			return ice;
+		else
+			return result;
 	}
 
-	IndexedPropertyChain get(IndexedPropertyChain ipc) {
+	public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
 		IndexedPropertyChainView<? extends IndexedPropertyChain> ipcView = ipc
 				.accept(IndexedViewConverter.getInstance());
 		IndexedPropertyChain result = indexedPropertyChainLookup
 				.get(ipcView);
-		return result;
+		if (result == null)
+			return ipc;
+		else
+			return result;
 	}
 
-	IndexedClassExpression getCreate(IndexedClassExpression ice) {
+	protected void add(IndexedClassExpression ice) {
 		IndexedClassExpressionView<? extends IndexedClassExpression> iceView = ice
 				.accept(IndexedViewConverter.getInstance());
-		IndexedClassExpression result = indexedClassExpressionLookup
-				.get(iceView);
-		if (result == null) {
-			result = ice;
-			indexedClassExpressionLookup.put(iceView, result);
-			if (ice instanceof IndexedClass)
-				indexedClassCount++;
-		}
-		return result;
+		indexedClassExpressionLookup.put(iceView, ice);
+		if (ice instanceof IndexedClass)
+			indexedClassCount++;
 	}
 
-	IndexedPropertyChain getCreate(IndexedPropertyChain ipc) {
+	protected void add(IndexedPropertyChain ipc) {
 		IndexedPropertyChainView<? extends IndexedPropertyChain> ipcView = ipc
 				.accept(IndexedViewConverter.getInstance());
-		IndexedPropertyChain result = indexedPropertyChainLookup
-				.get(ipcView);
-		if (result == null) {
-			result = ipc;
-			indexedPropertyChainLookup.put(ipcView, result);
-			if (ipc instanceof IndexedObjectProperty)
-				indexedObjectPropertyCount++;
-		}
-		return result;
+		indexedPropertyChainLookup.put(ipcView, ipc);
+		if (ipc instanceof IndexedObjectProperty)
+			indexedObjectPropertyCount++;
 	}
 
-	boolean remove(IndexedClassExpression ice) {
+	protected void remove(IndexedClassExpression ice) {
 		IndexedClassExpressionView<? extends IndexedClassExpression> iceView = ice
 				.accept(IndexedViewConverter.getInstance());
-		boolean success = indexedClassExpressionLookup.remove(iceView) != null;
-		if (success && ice instanceof IndexedClass)
+		indexedClassExpressionLookup.remove(iceView);
+		if (ice instanceof IndexedClass)
 			indexedClassCount--;
-		return success;
 	}
 
-	boolean remove(IndexedPropertyChain ipc) {
+	protected void remove(IndexedPropertyChain ipc) {
 		IndexedPropertyChainView<? extends IndexedPropertyChain> ipcView = ipc
 				.accept(IndexedViewConverter.getInstance());
-		boolean success = indexedPropertyChainLookup.remove(ipcView) != null;
-		if (success && ipc instanceof IndexedObjectProperty)
+		indexedPropertyChainLookup.remove(ipcView);
+		if (ipc instanceof IndexedObjectProperty)
 			indexedObjectPropertyCount--;
-		return success;
 	}
 }

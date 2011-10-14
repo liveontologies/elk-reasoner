@@ -49,14 +49,9 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 
 	@Override
 	protected void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement,
-			IndexedObjectCanonizer canonizer) {
-		
-		occurrenceNo += increment;
+			int positiveIncrement, int negativeIncrement) {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
-		if (occurrenceNo == 0)
-			canonizer.remove(this);
 	}
 
 	public <O> O accept(IndexedDataHasValueVisitor<O> visitor) { 

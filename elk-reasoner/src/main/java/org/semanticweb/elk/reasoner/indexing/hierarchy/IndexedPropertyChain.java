@@ -89,7 +89,14 @@ public abstract class IndexedPropertyChain {
 	
 	protected final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
 	
-	protected abstract void updateOccurrenceNumber(int increment, IndexedObjectCanonizer canonizer);
+	/**
+	 * Non-recursively.
+	 */
+	protected abstract void updateOccurrenceNumber(int increment);
+	
+	public boolean occurs() {
+		return occurrenceNo > 0;
+	}
 
 	/**
 	 * @return The corresponding SaturatedObjecProperty, null if none was

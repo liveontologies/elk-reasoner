@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+
 interface IndexedObjectFilter {
 
 	IndexedClassExpression filter(IndexedClassExpression ice);

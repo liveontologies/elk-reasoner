@@ -106,11 +106,8 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	}
 
 	@Override
-	protected void updateOccurrenceNumber(int increment,
-			IndexedObjectCanonizer canonizer) {
+	protected void updateOccurrenceNumber(int increment) {
 		occurrenceNo += increment;
-		if (occurrenceNo == 0)
-			canonizer.remove(this);
 	}
 
 }

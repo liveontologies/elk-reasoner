@@ -38,6 +38,9 @@ public class IndexedClass extends IndexedClassExpression {
 	 * The indexed ElkClass
 	 */
 	protected final ElkClass elkClass;
+	
+	// TODO: Indexed Class perhaps doesn't need to keep track of positive and negative occurrences
+	protected int occurrenceNo = 0;
 
 	/**
 	 * Creates an object representing the given ElkClass.
@@ -74,12 +77,14 @@ public class IndexedClass extends IndexedClassExpression {
 
 	@Override
 	protected void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement,
-			IndexedObjectCanonizer canonizer) {
+			int positiveIncrement, int negativeIncrement) {
 		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
-		if (occurrenceNo == 0)
-			canonizer.remove(this);
+	}
+	
+	@Override
+	public boolean occurs() {
+		return occurrenceNo > 0;
 	}
 }

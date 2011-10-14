@@ -22,48 +22,39 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 /**
  * @author Frantisek Simancik
  * 
  */
-class ElkAxiomInserterVisitor extends ElkAxiomIndexerVisitor {
+public class ElkAxiomInserterVisitor extends ElkAxiomIndexerVisitor {
 
-	// logger for events
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ElkAxiomInserterVisitor.class);
-
-	private final IndexedObjectCanonizer canonizer;
+	private final UpdateCacheFilter filter;
 	private final ElkObjectIndexerVisitor elkObjectIndexer;
+	
 
-	public ElkAxiomInserterVisitor(IndexedObjectCanonizer indexedObjectCanonizer) {
-		this.canonizer = indexedObjectCanonizer;
-		this.elkObjectIndexer = new ElkObjectIndexerVisitor(
-				new ConstructingIndexedObjectFilter(indexedObjectCanonizer));
+	public ElkAxiomInserterVisitor(IndexedObjectCache objectCache) {
+		this.filter = new UpdateCacheFilter(objectCache);
+		this.elkObjectIndexer = new ElkObjectIndexerVisitor(filter);
 	}
 
 	@Override
 	protected void indexSubClassOfAxiom(ElkClassExpression subElkClass,
 			ElkClassExpression superElkClass) {
+		
+		filter.setIncrements(1, 0, 1);
 		IndexedClassExpression subIndexedClass = subElkClass
 				.accept(elkObjectIndexer);
+
+		filter.setIncrements(1, 1, 0);
 		IndexedClassExpression superIndexedClass = superElkClass
 				.accept(elkObjectIndexer);
 
-		subIndexedClass.updateOccurrenceNumbers(1, 0, 1, canonizer);
-		superIndexedClass.updateOccurrenceNumbers(1, 1, 0, canonizer);
 		subIndexedClass.addToldSuperClassExpression(superIndexedClass);
 	}
 
@@ -71,58 +62,29 @@ class ElkAxiomInserterVisitor extends ElkAxiomIndexerVisitor {
 	protected void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subElkProperty,
 			ElkObjectPropertyExpression superElkProperty) {
+		
+		filter.setIncrements(1, 0, 1);
 		IndexedPropertyChain subIndexedProperty = subElkProperty
 				.accept(elkObjectIndexer);
+		
+		filter.setIncrements(1, 1, 0);
 		IndexedObjectProperty superIndexedProperty = (IndexedObjectProperty) superElkProperty
 				.accept(elkObjectIndexer);
 
-		subIndexedProperty.updateOccurrenceNumber(1, canonizer);
-		superIndexedProperty.updateOccurrenceNumber(1, canonizer);
 		subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
 		superIndexedProperty.addToldSubObjectProperty(subIndexedProperty);
 	}
 
 	@Override
-	protected void indexDeclarationAxiom(ElkEntity entity) {
-		entity.accept(entityAdder);
-	};
+	protected void indexClassDeclaration(ElkClass ec) {
+		filter.setIncrements(1, 0, 0);
+		ec.accept(elkObjectIndexer);
+	}
 
-	private final ElkEntityVisitor<Void> entityAdder = new ElkEntityVisitor<Void>() {
-
-		public Void visit(ElkClass elkClass) {
-			IndexedClassExpression ice = elkClass.accept(elkObjectIndexer);
-			ice.updateOccurrenceNumbers(1, 0, 0, canonizer);
-			return null;
-		}
-
-		public Void visit(ElkDatatype elkDatatype) {
-			LOGGER_.warn(ElkDatatype.class.getSimpleName()
-					+ " is supported only partially.");
-			return null;
-		}
-
-		public Void visit(ElkObjectProperty elkObjectProperty) {
-			IndexedPropertyChain ipc = elkObjectProperty
-					.accept(elkObjectIndexer);
-			ipc.updateOccurrenceNumber(1, canonizer);
-			return null;
-		}
-
-		public Void visit(ElkDataProperty elkDataProperty) {
-			LOGGER_.warn(ElkDataProperty.class.getSimpleName()
-					+ " is supported only partially.");
-			return null;
-		}
-
-		public Void visit(ElkNamedIndividual elkNamedIndividual) {
-			throw new IndexingException(
-					ElkNamedIndividual.class.getSimpleName() + " not supported");
-		}
-
-		public Void visit(ElkAnnotationProperty elkAnnotationProperty) {
-			// annotations are ignored during indexing
-			return null;
-		}
-	};
+	@Override
+	protected void indexObjectPropertyDeclaration(ElkObjectProperty ep) {
+		filter.setIncrements(1, 0, 0);
+		ep.accept(elkObjectIndexer);
+	}
 
 }

@@ -29,20 +29,23 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
@@ -51,9 +54,11 @@ import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
@@ -70,6 +75,7 @@ import org.semanticweb.elk.owl.managers.DummyObjectManager;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 		ElkAxiomVisitor<Void> {
@@ -85,7 +91,8 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
 
-	protected abstract void indexDeclarationAxiom(ElkEntity entity);
+	protected abstract void indexClassDeclaration(ElkClass ec);
+	protected abstract void indexObjectPropertyDeclaration(ElkObjectProperty eop);
 
 	/**
 	 * Object factory that is used internally to replace some syntactic
@@ -327,7 +334,41 @@ abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
 	}
 
 	public Void visit(ElkDeclarationAxiom axiom) {
-		indexDeclarationAxiom(axiom.getEntity());
-		return null;
+		return axiom.getEntity().accept(entityDeclarator);
 	}
+	
+	private final ElkEntityVisitor<Void> entityDeclarator = new ElkEntityVisitor<Void>() {
+
+		public Void visit(ElkClass elkClass) {
+			indexClassDeclaration(elkClass);
+			return null;
+		}
+
+		public Void visit(ElkDatatype elkDatatype) {
+			LOGGER_.warn(ElkDatatype.class.getSimpleName()
+					+ " is supported only partially.");
+			return null;
+		}
+
+		public Void visit(ElkObjectProperty elkObjectProperty) {
+			indexObjectPropertyDeclaration(elkObjectProperty);
+			return null;
+		}
+
+		public Void visit(ElkDataProperty elkDataProperty) {
+			LOGGER_.warn(ElkDataProperty.class.getSimpleName()
+					+ " is supported only partially.");
+			return null;
+		}
+
+		public Void visit(ElkNamedIndividual elkNamedIndividual) {
+			throw new IndexingException(
+					ElkNamedIndividual.class.getSimpleName() + " not supported");
+		}
+
+		public Void visit(ElkAnnotationProperty elkAnnotationProperty) {
+			// annotations are ignored during indexing
+			return null;
+		}
+	};
 }

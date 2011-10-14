@@ -82,14 +82,8 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	}
 
 	@Override
-	protected void updateOccurrenceNumber(int increment,
-			IndexedObjectCanonizer canonizer) {
+	protected void updateOccurrenceNumber(int increment) {
 		occurrenceNo += increment;
-		if (occurrenceNo == 0)
-			canonizer.remove(this);
-		
-		leftProperty.updateOccurrenceNumber(increment, canonizer);
-		rightProperty.updateOccurrenceNumber(increment, canonizer);
 	}
 
 	@Override

@@ -63,7 +63,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 	@Override
 	protected void updateOccurrenceNumbers(int increment, int positiveIncrement,
-			int negativeIncrement, IndexedObjectCanonizer canonizer) {
+			int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this conjunction
@@ -71,11 +71,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			secondConjunct.addNegConjunctionByConjunct(this, firstConjunct);
 		}
 
-		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
-		if (occurrenceNo == 0)
-			canonizer.remove(this);
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
@@ -83,10 +80,6 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			secondConjunct.removeNegConjunctionByConjunct(this, firstConjunct);
 		}
 
-		firstConjunct.updateOccurrenceNumbers(increment, positiveIncrement,
-				negativeIncrement, canonizer);
-		secondConjunct.updateOccurrenceNumbers(increment,
-				positiveIncrement, negativeIncrement, canonizer);
 	}
 
 }
