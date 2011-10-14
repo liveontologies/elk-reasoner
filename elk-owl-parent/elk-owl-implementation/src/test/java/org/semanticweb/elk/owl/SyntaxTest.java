@@ -28,9 +28,10 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.managers.WeakEntityManager;
 
 public class SyntaxTest extends TestCase {
-	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(new WeakEntityManager());
 
 	public SyntaxTest(String testName) {
 		super(testName);

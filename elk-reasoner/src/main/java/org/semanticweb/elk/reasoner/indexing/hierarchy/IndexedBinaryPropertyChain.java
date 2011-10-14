@@ -82,11 +82,6 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	}
 
 	@Override
-	protected void updateOccurrenceNumber(int increment) {
-		occurrenceNo += increment;
-	}
-
-	@Override
 	public List<IndexedPropertyChain> getToldSubProperties() {
 		return null;
 	}

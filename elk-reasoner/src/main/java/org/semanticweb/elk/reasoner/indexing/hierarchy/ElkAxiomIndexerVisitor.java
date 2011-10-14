@@ -22,353 +22,131 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Arrays;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
-import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDisjointObjectPropertiesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.managers.DummyObjectManager;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
-abstract class ElkAxiomIndexerVisitor implements ElkAxiomProcessor,
-		ElkAxiomVisitor<Void> {
+/**
+ * @author Frantisek Simancik
+ * 
+ */
+public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
-	// logger for events
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ElkAxiomIndexerVisitor.class);
-
-	protected abstract void indexSubClassOfAxiom(ElkClassExpression subClass,
-			ElkClassExpression superClass);
-
-	protected abstract void indexSubObjectPropertyOfAxiom(
-			ElkSubObjectPropertyExpression subProperty,
-			ElkObjectPropertyExpression superProperty);
-
-	protected abstract void indexClassDeclaration(ElkClass ec);
-	protected abstract void indexObjectPropertyDeclaration(ElkObjectProperty eop);
+	private final IndexedObjectCache objectCache;
+	private final int multiplicity;
+	private final ElkObjectIndexerVisitor neutralIndexer,
+		positiveIndexer, negativeIndexer;
+	
 
 	/**
-	 * Object factory that is used internally to replace some syntactic
-	 * constructs with other logically equivalent constructs. ElkObjects created
-	 * in this class are only used for this purpose (temporarily), hence we can
-	 * use any factory implementation here.
+	 * @param objectCache
+	 * @param insert specifies whether this objects inserts or deletes axioms
 	 */
-	private final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(
-			new DummyObjectManager());
+	public ElkAxiomIndexerVisitor(IndexedObjectCache objectCache, boolean insert) {
+		this.objectCache = objectCache; 
+		this.multiplicity = insert ? 1 : -1;
+		this.neutralIndexer = new ElkObjectIndexerVisitor(
+			new UpdateCacheFilter(multiplicity, 0, 0));
+		this.positiveIndexer = new ElkObjectIndexerVisitor( 
+			new UpdateCacheFilter(multiplicity, multiplicity, 0));
+		this.negativeIndexer = new ElkObjectIndexerVisitor(
+			new UpdateCacheFilter(multiplicity, 0, multiplicity));
+	}
 
-	public void process(ElkAxiom elkAxiom) {
-		try {
-			elkAxiom.accept(this);
-		} catch (RuntimeException e) {
-			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn("Axiom ignored: "
-						+ OwlFunctionalStylePrinter.toString(elkAxiom) + " : "
-						+ e.getMessage());
+	@Override
+	protected void indexSubClassOfAxiom(ElkClassExpression subElkClass,
+			ElkClassExpression superElkClass) {
+		
+		IndexedClassExpression subIndexedClass = subElkClass
+				.accept(negativeIndexer);
+
+		IndexedClassExpression superIndexedClass = superElkClass
+				.accept(positiveIndexer);
+
+		if (multiplicity == 1) {
+			subIndexedClass.addToldSuperClassExpression(superIndexedClass);
+		}
+		else {
+			subIndexedClass.removeToldSuperClassExpression(superIndexedClass);
 		}
 	}
 
-	public Void visit(ElkAnnotationAxiom elkAnnotationAxiom) {
-		// annotations are ignored during indexing
-		return null;
-	}
+	@Override
+	protected void indexSubObjectPropertyOfAxiom(
+			ElkSubObjectPropertyExpression subElkProperty,
+			ElkObjectPropertyExpression superElkProperty) {
+		
+		IndexedPropertyChain subIndexedProperty = subElkProperty
+				.accept(negativeIndexer);
+		
+		IndexedObjectProperty superIndexedProperty = (IndexedObjectProperty) superElkProperty
+				.accept(positiveIndexer);
 
-	public Void visit(
-			ElkDisjointDataPropertiesAxiom elkDisjointDataPropertiesAxiom) {
-		throw new IndexingException(
-				ElkDisjointDataPropertiesAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties) {
-		throw new IndexingException(
-				ElkEquivalentDataPropertiesAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom) {
-		throw new IndexingException(
-				ElkFunctionalDataPropertyAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom) {
-		throw new IndexingException(
-				ElkDataPropertyDomainAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom) {
-		throw new IndexingException(
-				ElkDataPropertyRangeAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom) {
-		throw new IndexingException(
-				ElkSubDataPropertyOfAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom) {
-		throw new IndexingException(
-				ElkAsymmetricObjectPropertyAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
-		throw new IndexingException(
-				ElkDisjointObjectPropertiesAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkEquivalentObjectPropertiesAxiom axiom) {
-		ElkObjectPropertyExpression first = null;
-		for (ElkObjectPropertyExpression p : axiom
-				.getObjectPropertyExpressions()) {
-			// implement EquivalentObjectPropertyExpressionAxiom as two
-			// SubObjectPropertyOfAxioms
-
-			if (first == null)
-				first = p;
-			else {
-				indexSubObjectPropertyOfAxiom(first, p);
-				indexSubObjectPropertyOfAxiom(p, first);
-			}
+		if (multiplicity == 1) {
+			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
+			superIndexedProperty.addToldSubObjectProperty(subIndexedProperty);
 		}
-		return null;
-	}
-
-	public Void visit(
-			ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom) {
-		throw new IndexingException(
-				ElkFunctionalObjectPropertyAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkInverseFunctionalObjectPropertyAxiom elkInverseFunctionalObjectPropertyAxiom) {
-		throw new IndexingException(
-				ElkInverseFunctionalObjectPropertyAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkInverseObjectPropertiesAxiom elkInverseObjectPropertiesAxiom) {
-		throw new IndexingException(
-				ElkInverseObjectPropertiesAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkIrreflexiveObjectPropertyAxiom elkIrreflexiveObjectPropertyAxiom) {
-		throw new IndexingException(
-				ElkIrreflexiveObjectPropertyAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkObjectPropertyDomainAxiom axiom) {
-		indexSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(
-				axiom.getObjectPropertyExpression(),
-				PredefinedElkClass.OWL_THING), axiom.getClassExpression());
-		return null;
-	}
-
-	public Void visit(ElkObjectPropertyRangeAxiom elkObjectPropertyRangeAxiom) {
-		throw new IndexingException(
-				ElkObjectPropertyRangeAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
-		throw new IndexingException(
-				ElkReflexiveObjectPropertyAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
-		indexSubObjectPropertyOfAxiom(axiom.getSubObjectPropertyExpression(),
-				axiom.getSuperObjectPropertyExpression());
-		return null;
-	}
-
-	public Void visit(
-			ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom) {
-		throw new IndexingException(
-				ElkSymmetricObjectPropertyAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-		ElkObjectPropertyExpression ope = axiom.getObjectPropertyExpression();
-		indexSubObjectPropertyOfAxiom(
-				objectFactory.getObjectPropertyChain(Arrays.asList(ope, ope)),
-				ope);
-		return null;
-	}
-
-	public Void visit(ElkEquivalentClassesAxiom axiom) {
-		ElkClassExpression first = null;
-		for (ElkClassExpression c : axiom.getClassExpressions()) {
-			// implement EquivalentClassesAxiom as two SubClassOfAxioms
-
-			if (first == null)
-				first = c;
-			else {
-				indexSubClassOfAxiom(first, c);
-				indexSubClassOfAxiom(c, first);
-			}
+		else {
+			subIndexedProperty.removeToldSuperObjectProperty(superIndexedProperty);
+			superIndexedProperty.removeToldSubObjectProperty(subIndexedProperty);
 		}
-		return null;
 	}
 
-	public Void visit(ElkSubClassOfAxiom axiom) {
-		indexSubClassOfAxiom(axiom.getSubClassExpression(),
-				axiom.getSuperClassExpression());
-		return null;
+	@Override
+	protected void indexClassDeclaration(ElkClass ec) {
+		ec.accept(neutralIndexer);
 	}
 
-	public Void visit(ElkDisjointClassesAxiom elkDisjointClasses) {
-		throw new IndexingException(
-				ElkDisjointClassesAxiom.class.getSimpleName()
-						+ " not supported");
+	@Override
+	protected void indexObjectPropertyDeclaration(ElkObjectProperty ep) {
+		ep.accept(neutralIndexer);
 	}
 
-	public Void visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
-		throw new IndexingException(ElkDisjointUnionAxiom.class.getSimpleName()
-				+ " not supported");
-	}
-
-	public Void visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
-		throw new IndexingException(
-				ElkClassAssertionAxiom.class.getSimpleName() + " not supported");
-	}
-
-	public Void visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom) {
-		throw new IndexingException(
-				ElkDifferentIndividualsAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion) {
-		throw new IndexingException(
-				ElkNegativeObjectPropertyAssertionAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(
-			ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom) {
-		throw new IndexingException(
-				ElkObjectPropertyAssertionAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
-		throw new IndexingException(
-				ElkSameIndividualAxiom.class.getSimpleName() + " not supported");
-	}
-
-	public Void visit(
-			ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion) {
-		throw new IndexingException(
-				ElkNegativeDataPropertyAssertionAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkDataPropertyAssertionAxiom elkObjectDataAssertionAxiom) {
-		throw new IndexingException(
-				ElkDataPropertyAssertionAxiom.class.getSimpleName()
-						+ " not supported");
-	}
-
-	public Void visit(ElkDeclarationAxiom axiom) {
-		return axiom.getEntity().accept(entityDeclarator);
-	}
 	
-	private final ElkEntityVisitor<Void> entityDeclarator = new ElkEntityVisitor<Void>() {
+	
+	
+	
+	private class UpdateCacheFilter implements IndexedObjectFilter {
 
-		public Void visit(ElkClass elkClass) {
-			indexClassDeclaration(elkClass);
-			return null;
+		protected final int increment, positiveIncrement, negativeIncrement;
+
+		UpdateCacheFilter(int increment, int positiveIncrement,
+				int negativeIncrement) {
+			this.increment = increment;
+			this.positiveIncrement = positiveIncrement;
+			this.negativeIncrement = negativeIncrement;
 		}
 
-		public Void visit(ElkDatatype elkDatatype) {
-			LOGGER_.warn(ElkDatatype.class.getSimpleName()
-					+ " is supported only partially.");
-			return null;
+		public IndexedClassExpression filter(IndexedClassExpression ice) {
+			IndexedClassExpression result = objectCache.filter(ice);
+
+			if (!result.occurs() && increment > 0)
+				objectCache.add(result);
+
+			result.updateOccurrenceNumbers(increment,
+					positiveIncrement, negativeIncrement);
+
+			if (!result.occurs() && increment < 0)
+				objectCache.remove(result);
+
+			return result;
 		}
 
-		public Void visit(ElkObjectProperty elkObjectProperty) {
-			indexObjectPropertyDeclaration(elkObjectProperty);
-			return null;
-		}
+		public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
+			IndexedPropertyChain result = objectCache.filter(ipc);
 
-		public Void visit(ElkDataProperty elkDataProperty) {
-			LOGGER_.warn(ElkDataProperty.class.getSimpleName()
-					+ " is supported only partially.");
-			return null;
-		}
+			if (!result.occurs() && increment > 0)
+				objectCache.add(result);
 
-		public Void visit(ElkNamedIndividual elkNamedIndividual) {
-			throw new IndexingException(
-					ElkNamedIndividual.class.getSimpleName() + " not supported");
-		}
+			result.updateOccurrenceNumber(increment);
 
-		public Void visit(ElkAnnotationProperty elkAnnotationProperty) {
-			// annotations are ignored during indexing
-			return null;
+			if (!result.occurs() && increment < 0)
+				objectCache.remove(result);
+
+			return result;
 		}
-	};
+	}
+
 }

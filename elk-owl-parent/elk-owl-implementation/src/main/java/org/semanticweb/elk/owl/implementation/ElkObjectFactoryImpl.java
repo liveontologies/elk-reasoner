@@ -99,8 +99,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.managers.DummyElkObjectManager;
 import org.semanticweb.elk.owl.managers.ElkObjectManager;
-import org.semanticweb.elk.owl.managers.WeakEntityManager;
 
 /**
  * A factory for creating ElkObjects based on the implementations in the
@@ -136,11 +136,10 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	protected final ElkObjectManager objectManager;
 
 	/**
-	 * Construct an ElkObjectFactoryImpl that avoids duplicates of objects and
-	 * rather reuses previously generated objects when possible.
+	 * Construct an ElkObjectFactoryImpl that uses the DummyElkObjectManager.
 	 */
 	public ElkObjectFactoryImpl() {
-		this.objectManager = new WeakEntityManager();
+		this(new DummyElkObjectManager());
 	}
 
 	/**

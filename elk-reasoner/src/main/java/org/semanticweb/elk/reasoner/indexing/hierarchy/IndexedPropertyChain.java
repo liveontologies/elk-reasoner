@@ -47,6 +47,10 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 
 public abstract class IndexedPropertyChain {
 	
+	/**
+	 * Correctness of axioms deletions requires that toldSuperProperties
+	 * is a List.
+	 */
 	protected List<IndexedObjectProperty> toldSuperProperties;
 	
 
@@ -92,7 +96,9 @@ public abstract class IndexedPropertyChain {
 	/**
 	 * Non-recursively.
 	 */
-	protected abstract void updateOccurrenceNumber(int increment);
+	protected void updateOccurrenceNumber(int increment) {
+		occurrenceNo += increment;
+	}
 	
 	public boolean occurs() {
 		return occurrenceNo > 0;

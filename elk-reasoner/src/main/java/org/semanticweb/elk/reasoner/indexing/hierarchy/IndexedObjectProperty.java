@@ -40,6 +40,10 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
 public class IndexedObjectProperty extends IndexedPropertyChain {
 	protected final ElkObjectProperty elkObjectProperty;
 
+	/**
+	 * Correctness of axioms deletions requires that toldSubProperties
+	 * is a List.
+	 */
 	protected List<IndexedPropertyChain> toldSubProperties;
 	
 	/**
@@ -103,11 +107,6 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	@Override
 	public <O> O accept(IndexedPropertyChainVisitor<O> visitor) {
 		return visitor.visit(this);
-	}
-
-	@Override
-	protected void updateOccurrenceNumber(int increment) {
-		occurrenceNo += increment;
 	}
 
 }

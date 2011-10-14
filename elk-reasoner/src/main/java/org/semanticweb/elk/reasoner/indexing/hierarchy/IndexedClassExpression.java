@@ -51,6 +51,10 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 abstract public class IndexedClassExpression implements Derivable {
 
+	/**
+	 * Correctness of axioms deletions requires that toldSuperClassExpressions
+	 * is a List.
+	 */
 	protected List<IndexedClassExpression> toldSuperClassExpressions;
 	protected Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
 	protected List<IndexedObjectSomeValuesFrom> negExistentials;

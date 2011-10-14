@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * 
  * @author Markus Kroetzsch
  */
-public class DummyObjectManager implements ElkObjectManager {
+public class DummyElkObjectManager implements ElkObjectManager {
 
 	public ElkObject getCanonicalElkObject(ElkObject object) {
 		return object;
