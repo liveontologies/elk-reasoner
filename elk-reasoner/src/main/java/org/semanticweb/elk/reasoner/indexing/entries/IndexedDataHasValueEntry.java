@@ -20,9 +20,10 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.views;
+package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 
 /**
  * Implements a view for instances of {@link IndexedClass}
@@ -30,19 +31,23 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the type of the wrapped indexed object
+ *            The type of the elements in the set where this entry is used
+ * 
+ * @param <K>
+ *            the type of the wrapped indexed object used as the key of the
+ *            entry
  */
-public class IndexedClassView<T extends IndexedClass> extends
-		IndexedClassExpressionView<T> {
+public class IndexedDataHasValueEntry<T, K extends IndexedDataHasValue> extends
+		IndexedClassExpressionEntry<T, K> {
 
-	public IndexedClassView(T representative) {
+	public IndexedDataHasValueEntry(K representative) {
 		super(representative);
 	}
 
 	@Override
-	public int hashCode() {
-		return combinedHashCode(IndexedClassView.class, this.representative
-				.getElkClass().getIri());
+	public int computeHashCode() {
+		return combinedHashCode(IndexedDataHasValueEntry.class, this.key
+				.getRelation().getIri(), this.key.getFiller().getLexicalForm());
 	}
 
 	@Override
@@ -50,10 +55,12 @@ public class IndexedClassView<T extends IndexedClass> extends
 		if (this == other) {
 			return true;
 		}
-		if (other instanceof IndexedClassView<?>) {
-			IndexedClassView<?> otherView = (IndexedClassView<?>) other;
-			return this.representative.getElkClass().getIri().equals(
-					otherView.representative.getElkClass().getIri());
+		if (other instanceof IndexedDataHasValueEntry<?, ?>) {
+			IndexedDataHasValueEntry<?, ?> otherEntry = (IndexedDataHasValueEntry<?, ?>) other;
+			return this.key.getRelation().getIri()
+					.equals(otherEntry.key.getRelation().getIri())
+					&& this.key.getFiller().getLexicalForm()
+							.equals(otherEntry.key.getFiller().getLexicalForm());
 		}
 		return false;
 	}

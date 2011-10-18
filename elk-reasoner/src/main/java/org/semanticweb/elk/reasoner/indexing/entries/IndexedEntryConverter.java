@@ -20,64 +20,57 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.views;
+package org.semanticweb.elk.reasoner.indexing.entries;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 
-public class IndexedViewConverter
+public class IndexedEntryConverter<T>
 		implements
-		IndexedClassExpressionVisitor<IndexedClassExpressionView<? extends IndexedClassExpression>>,
-		IndexedPropertyChainVisitor<IndexedPropertyChainView<? extends IndexedPropertyChain>> {
+		IndexedClassExpressionVisitor<KeyEntry<T, ? extends IndexedClassExpression>>,
+		IndexedPropertyChainVisitor<IndexedPropertyChainEntry<T, ? extends IndexedPropertyChain>> {
 
-	private IndexedViewConverter() {
+	public IndexedClassExpressionEntry<T, IndexedClass> visit(
+			IndexedClass element) {
+		return new IndexedClassEntry<T, IndexedClass>(element);
 	}
 
-	private static IndexedViewConverter instance_ = new IndexedViewConverter();
-
-	public static IndexedViewConverter getInstance() {
-		return instance_;
-	}
-
-	public IndexedClassExpressionView<IndexedClass> visit(IndexedClass element) {
-		return new IndexedClassView<IndexedClass>(element);
-	}
-
-	public IndexedClassExpressionView<IndexedObjectIntersectionOf> visit(
+	public IndexedClassExpressionEntry<T, IndexedObjectIntersectionOf> visit(
 			IndexedObjectIntersectionOf element) {
-		return new IndexedObjectIntersectionOfView<IndexedObjectIntersectionOf>(
+		return new IndexedObjectIntersectionOfEntry<T, IndexedObjectIntersectionOf>(
 				element);
 	}
-	
-	public IndexedClassExpressionView<? extends IndexedDataHasValue> visit(
+
+	public IndexedClassExpressionEntry<T, IndexedDataHasValue> visit(
 			IndexedDataHasValue element) {
-		return new IndexedDataHasValueView<IndexedDataHasValue>(element) {
+		return new IndexedDataHasValueEntry<T, IndexedDataHasValue>(element) {
 		};
 	}
 
-	public IndexedClassExpressionView<IndexedObjectSomeValuesFrom> visit(
+	public IndexedClassExpressionEntry<T, IndexedObjectSomeValuesFrom> visit(
 			IndexedObjectSomeValuesFrom element) {
-		return new IndexedObjectSomeValuesFromView<IndexedObjectSomeValuesFrom>(
+		return new IndexedObjectSomeValuesFromEntry<T, IndexedObjectSomeValuesFrom>(
 				element);
 	}
 
-	public IndexedPropertyChainView<? extends IndexedPropertyChain> visit(
+	public IndexedPropertyChainEntry<T, IndexedObjectProperty> visit(
 			IndexedObjectProperty element) {
-		return new IndexedObjectPropertyView<IndexedObjectProperty>(element) {
+		return new IndexedObjectPropertyEntry<T, IndexedObjectProperty>(element) {
 		};
 	}
 
-	public IndexedPropertyChainView<? extends IndexedPropertyChain> visit(
+	public IndexedPropertyChainEntry<T, IndexedBinaryPropertyChain> visit(
 			IndexedBinaryPropertyChain element) {
-		return new IndexedBinaryPropertyChainView<IndexedBinaryPropertyChain>(
+		return new IndexedBinaryPropertyChainEntry<T, IndexedBinaryPropertyChain>(
 				element);
 	}
 

@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.views;
+package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 
@@ -30,20 +30,23 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the type of the wrapped indexed class expression
+ *            The type of the elements in the set where this entry is used
+ * 
+ * @param <K>
+ *            the type of the wrapped indexed object used as the key of the
+ *            entry
  */
-public class IndexedObjectIntersectionOfView<T extends IndexedObjectIntersectionOf>
-		extends IndexedClassExpressionView<T> {
+public class IndexedObjectIntersectionOfEntry<T, K extends IndexedObjectIntersectionOf>
+		extends IndexedClassExpressionEntry<T, K> {
 
-	IndexedObjectIntersectionOfView(T representative) {
+	IndexedObjectIntersectionOfEntry(K representative) {
 		super(representative);
 	}
 
 	@Override
-	public int hashCode() {
-		return combinedHashCode(IndexedObjectIntersectionOfView.class,
-				this.representative.getFirstConjunct(),
-				this.representative.getSecondConjunct());
+	public int computeHashCode() {
+		return combinedHashCode(IndexedObjectIntersectionOfEntry.class,
+				this.key.getFirstConjunct(), this.key.getSecondConjunct());
 	}
 
 	@Override
@@ -51,12 +54,12 @@ public class IndexedObjectIntersectionOfView<T extends IndexedObjectIntersection
 		if (this == other) {
 			return true;
 		}
-		if (other instanceof IndexedObjectIntersectionOfView<?>) {
-			IndexedObjectIntersectionOfView<?> otherView = (IndexedObjectIntersectionOfView<?>) other;
-			return this.representative.getFirstConjunct().equals(
-					otherView.representative.getFirstConjunct())
-					&& this.representative.getSecondConjunct().equals(
-							otherView.representative.getSecondConjunct());
+		if (other instanceof IndexedObjectIntersectionOfEntry<?, ?>) {
+			IndexedObjectIntersectionOfEntry<?, ?> otherView = (IndexedObjectIntersectionOfEntry<?, ?>) other;
+			return this.key.getFirstConjunct().equals(
+					otherView.key.getFirstConjunct())
+					&& this.key.getSecondConjunct().equals(
+							otherView.key.getSecondConjunct());
 		}
 		return false;
 	}

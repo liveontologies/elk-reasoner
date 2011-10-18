@@ -64,7 +64,8 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 
 	public IndexedPropertyChain getIndexed(
 			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression) {
-		IndexedPropertyChain result = elkSubObjectPropertyExpression.accept(elkObjectIndexer);
+		IndexedPropertyChain result = elkSubObjectPropertyExpression
+				.accept(elkObjectIndexer);
 		if (result.occurs())
 			return result;
 		else
@@ -72,7 +73,7 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	}
 
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
-		return indexedClassExpressionLookup.values();
+		return indexedClassExpressionLookup;
 	}
 
 	public Iterable<IndexedClass> getIndexedClasses() {
@@ -85,7 +86,7 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	}
 
 	public Iterable<IndexedPropertyChain> getIndexedPropertyChains() {
-		return indexedPropertyChainLookup.values();
+		return indexedPropertyChainLookup;
 	}
 
 	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
@@ -104,4 +105,5 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	public ElkAxiomProcessor getAxiomDeleter() {
 		return axiomDeleter;
 	}
+
 }

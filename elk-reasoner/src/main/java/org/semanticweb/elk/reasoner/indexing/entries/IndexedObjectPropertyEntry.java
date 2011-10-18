@@ -20,10 +20,9 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.views;
+package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 
 /**
  * Implements a view for instances of {@link IndexedObjectProperty}
@@ -31,28 +30,35 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the type of the wrapped indexed object property composition
+ *            The type of the elements in the set where this entry is used
+ * 
+ * @param <K>
+ *            the type of the wrapped indexed object used as the key of the
+ *            entry
  */
-public class IndexedBinaryPropertyChainView<T extends IndexedBinaryPropertyChain>
-		extends IndexedPropertyChainView<T> {
+public class IndexedObjectPropertyEntry<T, K extends IndexedObjectProperty>
+		extends IndexedPropertyChainEntry<T, K> {
 
-	IndexedBinaryPropertyChainView(T representative) {
+	public IndexedObjectPropertyEntry(K representative) {
 		super(representative);
 	}
 
 	@Override
-	public int hashCode() {
-		return combinedHashCode(IndexedBinaryPropertyChainView.class,
-				this.representative.getLeftProperty(),
-				this.representative.getRightProperty());
+	public int computeHashCode() {
+		return combinedHashCode(IndexedClassEntry.class, this.key
+				.getElkObjectProperty().getIri());
 	}
 
 	@Override
 	public boolean equals(Object other) {
-		IndexedBinaryPropertyChainView<?> otherView = (IndexedBinaryPropertyChainView<?>) other;
-		return this.representative.getLeftProperty().equals(
-				otherView.representative.getLeftProperty())
-				&& this.representative.getRightProperty().equals(
-						otherView.representative.getRightProperty());
+		if (this == other) {
+			return true;
+		}
+		if (other instanceof IndexedObjectPropertyEntry<?, ?>) {
+			IndexedObjectPropertyEntry<?, ?> otherEntry = (IndexedObjectPropertyEntry<?, ?>) other;
+			return this.key.getElkObjectProperty().getIri()
+					.equals(otherEntry.key.getElkObjectProperty().getIri());
+		}
+		return false;
 	}
 }

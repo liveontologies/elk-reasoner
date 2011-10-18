@@ -20,37 +20,35 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.views;
+package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * The wrapper class to define custom equality and hash functions for indexed
- * class expressions.
+ * class expressions to be used in {@link KeyEntryHashSet}. It is based on the
+ * extension of the {@link StrongKeyEntry} class.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the typed of the wrapped indexed class expression
+ *            The type of the elements in the set where this entry is used
+ * 
+ * @param <K>
+ *            the type of the wrapped indexed object used as the key of the
+ *            entry
  */
-public abstract class IndexedClassExpressionView<T extends IndexedClassExpression> {
+public abstract class IndexedClassExpressionEntry<T, K extends IndexedClassExpression>
+		extends StrongKeyEntry<T, K> {
 
-	/**
-	 * The wrapped indexed class expression
-	 */
-	protected final T representative;
-
-	IndexedClassExpressionView(T representative) {
-		this.representative = representative;
+	IndexedClassExpressionEntry(K representative) {
+		super(representative);
 	}
 
 	static int combinedHashCode(Object... objects) {
 		return HashGenerator.combinedHashCode(objects);
 	}
-
-	public abstract int hashCode();
-
-	public abstract boolean equals(Object other);
 
 }

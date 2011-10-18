@@ -20,9 +20,10 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.views;
+package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -32,25 +33,21 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the typed of the wrapped indexed object property expression
+ *            The type of the elements in the set where this entry is used
+ * 
+ * @param <K>
+ *            the type of the wrapped indexed object used as the key of the
+ *            entry
  */
-public abstract class IndexedPropertyChainView<T extends IndexedPropertyChain> {
+public abstract class IndexedPropertyChainEntry<T, K extends IndexedPropertyChain>
+		extends StrongKeyEntry<T, K> {
 
-	/**
-	 * The wrapped indexed class expression
-	 */
-	protected final T representative;
-
-	IndexedPropertyChainView(T representative) {
-		this.representative = representative;
+	IndexedPropertyChainEntry(K representative) {
+		super(representative);
 	}
 
 	static int combinedHashCode(Object... objects) {
 		return HashGenerator.combinedHashCode(objects);
 	}
-
-	public abstract int hashCode();
-
-	public abstract boolean equals(Object other);
 
 }

@@ -22,34 +22,27 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.semanticweb.elk.reasoner.indexing.views.IndexedClassExpressionView;
-import org.semanticweb.elk.reasoner.indexing.views.IndexedPropertyChainView;
-import org.semanticweb.elk.reasoner.indexing.views.IndexedViewConverter;
+import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
+import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
+import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
+import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 
 public class IndexedObjectCache implements IndexedObjectFilter {
 
-	protected final Map<IndexedClassExpressionView<? extends IndexedClassExpression>, IndexedClassExpression> indexedClassExpressionLookup;
-	protected final Map<IndexedPropertyChainView<? extends IndexedPropertyChain>, IndexedPropertyChain> indexedPropertyChainLookup;
+	protected final KeyEntryHashSet<IndexedClassExpression> indexedClassExpressionLookup;
+	protected final KeyEntryHashSet<IndexedPropertyChain> indexedPropertyChainLookup;
 	protected int indexedClassCount = 0;
 	protected int indexedObjectPropertyCount = 0;
-	
+
 	protected IndexedObjectCache() {
-		indexedClassExpressionLookup = 
-			new HashMap<IndexedClassExpressionView<? extends IndexedClassExpression>, IndexedClassExpression>(
-				1023);
-		indexedPropertyChainLookup = 
-			new HashMap<IndexedPropertyChainView<? extends IndexedPropertyChain>, IndexedPropertyChain>(
-				127);
+		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
+				indexedClassExpressionViewFactory, 1024);
+		indexedPropertyChainLookup = new KeyEntryHashSet<IndexedPropertyChain>(
+				indexedPropertyChainViewFactory, 128);
 	}
 
 	public IndexedClassExpression filter(IndexedClassExpression ice) {
-		IndexedClassExpressionView<? extends IndexedClassExpression> iceView = ice
-				.accept(IndexedViewConverter.getInstance());
-		IndexedClassExpression result = indexedClassExpressionLookup
-				.get(iceView);
+		IndexedClassExpression result = indexedClassExpressionLookup.get(ice);
 		if (result == null)
 			return ice;
 		else
@@ -57,10 +50,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
-		IndexedPropertyChainView<? extends IndexedPropertyChain> ipcView = ipc
-				.accept(IndexedViewConverter.getInstance());
-		IndexedPropertyChain result = indexedPropertyChainLookup
-				.get(ipcView);
+		IndexedPropertyChain result = indexedPropertyChainLookup.get(ipc);
 		if (result == null)
 			return ipc;
 		else
@@ -68,34 +58,55 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	protected void add(IndexedClassExpression ice) {
-		IndexedClassExpressionView<? extends IndexedClassExpression> iceView = ice
-				.accept(IndexedViewConverter.getInstance());
-		indexedClassExpressionLookup.put(iceView, ice);
+		indexedClassExpressionLookup.merge(ice);
 		if (ice instanceof IndexedClass)
 			indexedClassCount++;
 	}
 
 	protected void add(IndexedPropertyChain ipc) {
-		IndexedPropertyChainView<? extends IndexedPropertyChain> ipcView = ipc
-				.accept(IndexedViewConverter.getInstance());
-		indexedPropertyChainLookup.put(ipcView, ipc);
+		indexedPropertyChainLookup.merge(ipc);
 		if (ipc instanceof IndexedObjectProperty)
 			indexedObjectPropertyCount++;
 	}
 
 	protected void remove(IndexedClassExpression ice) {
-		IndexedClassExpressionView<? extends IndexedClassExpression> iceView = ice
-				.accept(IndexedViewConverter.getInstance());
-		indexedClassExpressionLookup.remove(iceView);
+		indexedClassExpressionLookup.remove(ice);
 		if (ice instanceof IndexedClass)
 			indexedClassCount--;
 	}
 
 	protected void remove(IndexedPropertyChain ipc) {
-		IndexedPropertyChainView<? extends IndexedPropertyChain> ipcView = ipc
-				.accept(IndexedViewConverter.getInstance());
-		indexedPropertyChainLookup.remove(ipcView);
+		indexedPropertyChainLookup.remove(ipc);
 		if (ipc instanceof IndexedObjectProperty)
 			indexedObjectPropertyCount--;
 	}
+
+	class IndexedClassExpressionViewFactory implements
+			KeyEntryFactory<IndexedClassExpression> {
+
+		final IndexedEntryConverter<IndexedClassExpression> converter = new IndexedEntryConverter<IndexedClassExpression>();
+
+		public KeyEntry<IndexedClassExpression, ? extends IndexedClassExpression> createEntry(
+				IndexedClassExpression key) {
+			return key.accept(converter);
+		}
+
+	}
+
+	IndexedClassExpressionViewFactory indexedClassExpressionViewFactory = new IndexedClassExpressionViewFactory();
+
+	class IndexedPropertyChainViewFactory implements
+			KeyEntryFactory<IndexedPropertyChain> {
+
+		final IndexedEntryConverter<IndexedPropertyChain> converter = new IndexedEntryConverter<IndexedPropertyChain>();
+
+		public KeyEntry<IndexedPropertyChain, ? extends IndexedPropertyChain> createEntry(
+				IndexedPropertyChain key) {
+			return key.accept(converter);
+		}
+
+	}
+
+	IndexedPropertyChainViewFactory indexedPropertyChainViewFactory = new IndexedPropertyChainViewFactory();
+
 }

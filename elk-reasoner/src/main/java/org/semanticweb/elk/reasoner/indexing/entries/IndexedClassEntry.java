@@ -20,29 +20,33 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.views;
+package org.semanticweb.elk.reasoner.indexing.entries;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 
 /**
- * Implements a view for instances of {@link IndexedObjectProperty}
+ * Implements a view for instances of {@link IndexedClass}
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the type of the wrapped indexed object property
+ *            The type of the elements in the set where this entry is used
+ * 
+ * @param <K>
+ *            the type of the wrapped indexed object used as the key of the
+ *            entry
  */
-public abstract class IndexedObjectPropertyView<T extends IndexedObjectProperty>
-		extends IndexedPropertyChainView<T> {
+public class IndexedClassEntry<T, K extends IndexedClass> extends
+		IndexedClassExpressionEntry<T, K> {
 
-	public IndexedObjectPropertyView(T representative) {
+	public IndexedClassEntry(K representative) {
 		super(representative);
 	}
 
 	@Override
-	public int hashCode() {
-		return combinedHashCode(IndexedClassView.class, this.representative
-				.getElkObjectProperty().getIri());
+	public int computeHashCode() {
+		return combinedHashCode(IndexedClassEntry.class, this.key.getElkClass()
+				.getIri());
 	}
 
 	@Override
@@ -50,12 +54,12 @@ public abstract class IndexedObjectPropertyView<T extends IndexedObjectProperty>
 		if (this == other) {
 			return true;
 		}
-		if (other instanceof IndexedObjectPropertyView<?>) {
-			IndexedObjectPropertyView<?> otherView = 
-				(IndexedObjectPropertyView<?>) other;
-			return this.representative.getElkObjectProperty().getIri().equals(
-					otherView.representative.getElkObjectProperty().getIri());
+		if (other instanceof IndexedClassEntry<?, ?>) {
+			IndexedClassEntry<?, ?> otherEntry = (IndexedClassEntry<?, ?>) other;
+			return this.key.getElkClass().getIri()
+					.equals(otherEntry.key.getElkClass().getIri());
 		}
 		return false;
 	}
+
 }

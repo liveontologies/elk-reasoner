@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.views;
+package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
@@ -30,19 +30,23 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the type of the wrapped indexed class expression
+ *            The type of the elements in the set where this entry is used
+ * 
+ * @param <K>
+ *            the type of the wrapped indexed object used as the key of the
+ *            entry
  */
-public class IndexedObjectSomeValuesFromView<T extends IndexedObjectSomeValuesFrom>
-		extends IndexedClassExpressionView<T> {
+public class IndexedObjectSomeValuesFromEntry<T, K extends IndexedObjectSomeValuesFrom>
+		extends IndexedClassExpressionEntry<T, K> {
 
-	IndexedObjectSomeValuesFromView(T representative) {
+	IndexedObjectSomeValuesFromEntry(K representative) {
 		super(representative);
 	}
 
 	@Override
-	public int hashCode() {
-		return combinedHashCode(IndexedObjectSomeValuesFromView.class,
-				this.representative.getRelation(), this.representative.getFiller());
+	public int computeHashCode() {
+		return combinedHashCode(IndexedObjectSomeValuesFromEntry.class,
+				this.key.getRelation(), this.key.getFiller());
 	}
 
 	@Override
@@ -50,12 +54,10 @@ public class IndexedObjectSomeValuesFromView<T extends IndexedObjectSomeValuesFr
 		if (this == other) {
 			return true;
 		}
-		if (other instanceof IndexedObjectSomeValuesFromView<?>) {
-			IndexedObjectSomeValuesFromView<?> otherView = (IndexedObjectSomeValuesFromView<?>) other;
-			return this.representative.getRelation().equals(
-					otherView.representative.getRelation())
-				&& this.representative.getFiller().equals(
-					otherView.representative.getFiller());
+		if (other instanceof IndexedObjectSomeValuesFromEntry<?, ?>) {
+			IndexedObjectSomeValuesFromEntry<?, ?> otherView = (IndexedObjectSomeValuesFromEntry<?, ?>) other;
+			return this.key.getRelation().equals(otherView.key.getRelation())
+					&& this.key.getFiller().equals(otherView.key.getFiller());
 		}
 		return false;
 	}
