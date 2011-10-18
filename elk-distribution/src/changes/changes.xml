@@ -16,6 +16,15 @@ will appear in the produced result.
 	</properties>
 	<body>
 		<release version="${release.version}" date="${buildDate}" description="Subsequent release">
+			<action dev="frantisek" type="fix" issue="5">
+				Fixed tokenization of IRIs containing reserved words built-in parse.
+			</action>
+			<action dev="frantisek" type="fix" issue="4">
+				Fixed grammar for non-negative integers in the built-in parser.
+			</action>
+			<action dev="frantisek" type="fix" issue="3">
+				Fixed grammar for ObjectOneOf in the built-in  parser.
+			</action>
 			<action dev="markus" type="add">
 				Support for object property domain axioms.
 			</action>

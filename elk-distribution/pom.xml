@@ -49,18 +49,21 @@
 	</dependencies>
 
 	<properties>
+		<elk-standalone.base>elk-standalone</elk-standalone.base>
+		<elk-protege.base>elk-protege</elk-protege.base>
+		<elk-owlapi.base>elk-owlapi</elk-owlapi.base>
 		<!-- the base name of the zip file for elk-standalone distribution -->
-		<standalone-zip.name>
-			elk-standalone-${project.version}
-		</standalone-zip.name>
+		<elk-standalone-zip.base>
+			${elk-standalone.base}-${project.version}
+		</elk-standalone-zip.base>
 		<!-- the base name of the zip file for elk-protege distribution -->
-		<protege-zip.name>
-			elk-protege-${project.version}
-		</protege-zip.name>
-		<!-- the base name of the zip file for elk-owlapi-standalone distribution -->
-		<owlapi-zip.name>
-			elk-owlapi-${project.version}
-		</owlapi-zip.name>
+		<elk-protege-zip.base>
+			${elk-protege.base}-${project.version}
+		</elk-protege-zip.base>
+		<!-- the base name of the zip file for elk-owlapi distribution -->
+		<elk-owlapi-zip.base>
+			${elk-owlapi.base}-${project.version}
+		</elk-owlapi-zip.base>
 		<!-- the following timestamp and release.version properties are used for 
 			the current release information changes.xml file -->
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
@@ -198,7 +201,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>${standalone-zip.name}</finalName>
+							<finalName>${elk-standalone-zip.base}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
 								<!-- configuration file describing how to create the archive -->
@@ -214,7 +217,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>${protege-zip.name}</finalName>
+							<finalName>${elk-protege-zip.base}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
 								<!-- configuration file describing how to create the archive -->
@@ -230,7 +233,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>${owlapi-zip.name}</finalName>
+							<finalName>${elk-owlapi-zip.base}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
 								<!-- configuration file describing how to create the archive -->
@@ -261,7 +264,7 @@
 					<projectName>elk-reasoner</projectName>
 					<uploads>
 						<upload>
-							<file>${project.build.directory}/${standalone-zip.name}.zip</file>
+							<file>${project.build.directory}/${elk-standalone-zip.base}.zip</file>
 							<summary>ELK reasoner standalone executable version
 								${project.version}</summary>
 							<labels>
@@ -271,7 +274,7 @@
 							</labels>
 						</upload>
 						<upload>
-							<file>${project.build.directory}/${protege-zip.name}.zip</file>
+							<file>${project.build.directory}/${elk-protege-zip.base}.zip</file>
 							<summary>ELK reasoner Protege plugin version ${project.version}</summary>
 							<labels>
 								<label>Featured</label>
@@ -280,7 +283,7 @@
 							</labels>
 						</upload>
 						<upload>
-							<file>${project.build.directory}/${owlapi-zip.name}.zip</file>
+							<file>${project.build.directory}/${elk-owlapi-zip.base}.zip</file>
 							<summary>ELK reasoner library for OWL API version
 								${project.version}</summary>
 							<labels>

@@ -29,7 +29,7 @@
 				<include>*:elk-protege:*</include>
 			</includes>
 			<!-- we omit the version numbers in the included artifact names -->
-			<outputFileNameMapping>${artifact.groupId}.${artifact.extension}</outputFileNameMapping>
+			<outputFileNameMapping>${elk-protege.base}.jar</outputFileNameMapping>
 			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>

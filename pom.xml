@@ -110,12 +110,17 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>2.7</version>
 			</plugin>
+			<plugin>
+        		<groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-project-info-reports-plugin</artifactId>
+        		<version>2.4</version>
+      		</plugin>
 		</plugins>
 	</reporting>
 
 	<issueManagement>
-		<system>Google Code</system>
-		<url>http://code.google.com/p/elk-reasoner/issues/list</url>
+		<system>GoogleCode</system>
+		<url>http://code.google.com/p/elk-reasoner/issues/</url>
 	</issueManagement>
 
 	<mailingLists>
@@ -233,7 +238,7 @@
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 				</configuration>
 			</plugin>
-			<!-- making sure that the sources are always istalled -->
+			<!-- making sure that the sources are always installed -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>

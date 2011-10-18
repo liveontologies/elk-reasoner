@@ -16,6 +16,10 @@ ${project.organization.name}
    See the License for the specific language governing permissions and
    limitations under the License.
 
+ABOUT:
+
+This package contains a plugin for using ELK in Protege.
+
 REQUIREMENTS:
 
 ELK plug-in is tested to work with Protege ${protege.version}. It may work with other 
@@ -23,7 +27,7 @@ versions of Protege.
 
 INSTALLATION:
 
-To install, place the file ${project.groupId}.jar to the plugins folder
+To install, place the file ${elk-protege.base}.jar to the plugins folder
 of the Protege installation. The plug-in supports Protege 4 Auto Update 
 feature which can be used for upgrading to newer versions according to the 
 instructions here:

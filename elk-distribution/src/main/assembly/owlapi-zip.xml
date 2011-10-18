@@ -30,7 +30,7 @@
 				<include>*:elk-owlapi-standalone:jar</include>
 			</includes>
 			<!-- we omit the version numbers in the included artifact names -->
-			<outputFileNameMapping>elk-owlapi.${artifact.extension}</outputFileNameMapping>
+			<outputFileNameMapping>${elk-owlapi.base}.jar</outputFileNameMapping>
 			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
@@ -40,7 +40,7 @@
 				<include>*:elk-owlapi-standalone:jar:src</include>
 			</includes>
 			<!-- we omit the version numbers in the included artifact names -->
-			<outputFileNameMapping>elk-owlapi-sources.${artifact.extension}</outputFileNameMapping>
+			<outputFileNameMapping>${elk-owlapi.base}-sources.jar</outputFileNameMapping>
 			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>

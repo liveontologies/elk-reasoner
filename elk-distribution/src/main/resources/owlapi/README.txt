@@ -18,7 +18,7 @@ ${project.organization.name}
 
 ABOUT:
 
-This package contains a Java library for accessing ELK Reasoner through 
+This package contains a Java library for accessing ELK through 
 OWL API plus all third party libraries used by ELK, except for the 
 OWL API itself. The OWL API library can be obtained here:
 
@@ -31,5 +31,12 @@ with other versions of OWL API.
 
 INSTALLATION:
 
-To use the library make sure that Java finds ${project.groupId}.jar, and
-the third party libraries in the class path.
+To use the library make sure that Java finds ${elk-owlapi.base}.jar, and
+the third party libraries from the lib directory in the class path.
+
+USAGE:
+
+Usage instructions, including an example program demonstrating how to use ELK
+through OWL API for ontology classification, can be found here:
+
+    ${project.parent.url}wiki/ELK_from_OWL_API  
