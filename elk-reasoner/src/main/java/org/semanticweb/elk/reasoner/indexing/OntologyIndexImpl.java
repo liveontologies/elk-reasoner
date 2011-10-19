@@ -24,9 +24,8 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.owl.predefined.PredefinedElkDeclarationAxiom;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -40,18 +39,17 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 		OntologyIndex {
 
 	private final ElkObjectIndexerVisitor elkObjectIndexer;
-	private final ElkAxiomProcessor axiomInserter;
-	private final ElkAxiomProcessor axiomDeleter;
+	private final ElkAxiomIndexerVisitor axiomInserter;
+	private final ElkAxiomIndexerVisitor axiomDeleter;
 
 	public OntologyIndexImpl() {
 		this.elkObjectIndexer = new ElkObjectIndexerVisitor(this);
 		this.axiomInserter = new ElkAxiomIndexerVisitor(this, true);
 		this.axiomDeleter = new ElkAxiomIndexerVisitor(this, false);
-		// index predefined axioms
+		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
-		for (ElkDeclarationAxiom builtInDeclaration : PredefinedElkDeclarationAxiom.DECLARATIONS) {
-			this.axiomInserter.process(builtInDeclaration);
-		}
+		axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_THING);
+		axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	public IndexedClassExpression getIndexed(ElkClassExpression representative) {

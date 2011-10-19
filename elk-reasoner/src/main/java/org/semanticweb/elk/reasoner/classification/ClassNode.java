@@ -33,7 +33,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.StructuralHashObject;
@@ -51,6 +51,8 @@ public class ClassNode implements StructuralHashObject {
 	// TODO: return members, sub-nodes and super-nodes in the methods as sets
 	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
+	 * The first element is the least according to the ordering defined by 
+	 * PredefinedElkIri.compare().
 	 */
 	final List<ElkClass> members;
 	/**
@@ -64,8 +66,6 @@ public class ClassNode implements StructuralHashObject {
 	 */
 	final List<ClassNode> directSubNodes;
 
-	List<IndexedClass> parentIndexClasses;
-
 	/**
 	 * Constructor.
 	 * 
@@ -76,6 +76,20 @@ public class ClassNode implements StructuralHashObject {
 		this.members = equivalent;
 		this.directSubNodes = new ArrayList<ClassNode>();
 		this.directSuperNodes = new ArrayList<ClassNode>();
+
+		// find the class with the least IRI
+		int least = 0;
+		for (int i = 1; i < members.size(); i++)
+			if (PredefinedElkIri.compare( members.get(least).getIri(),
+					members.get(i).getIri()) > 0)
+				least = i;
+	
+		// move the class to the first position
+		if (least != 0) {
+			ElkClass leastClass = members.get(least);
+			members.set(least, members.get(0));
+			members.set(0, leastClass);
+		}
 	}
 
 	/**
@@ -89,12 +103,12 @@ public class ClassNode implements StructuralHashObject {
 	}
 
 	/**
-	 * Add a direct sub-class node. This method is thread safe.
+	 * Add a direct sub-class node. This method is not thread safe.
 	 * 
 	 * @param subNode
 	 *            node to add
 	 */
-	synchronized void addDirectSubNode(ClassNode subNode) {
+	void addDirectSubNode(ClassNode subNode) {
 		directSubNodes.add(subNode);
 	}
 

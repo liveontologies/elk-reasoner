@@ -37,10 +37,6 @@ import org.semanticweb.elk.util.concurrent.computation.AbstractConcurrentComputa
  * multimaps for fast retrieval of property compositions. 
  * 
  * @author Frantisek Simancik
- *
- */
-/**
- * @author Frantisek Simancik
  * 
  */
 public class ObjectPropertySaturation {

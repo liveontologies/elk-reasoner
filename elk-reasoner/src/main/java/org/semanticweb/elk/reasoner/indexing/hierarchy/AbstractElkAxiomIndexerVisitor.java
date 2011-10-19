@@ -83,16 +83,16 @@ public abstract class AbstractElkAxiomIndexerVisitor implements ElkAxiomProcesso
 	private static final Logger LOGGER_ = Logger
 			.getLogger(AbstractElkAxiomIndexerVisitor.class);
 
-	protected abstract void indexSubClassOfAxiom(ElkClassExpression subClass,
+	public abstract void indexSubClassOfAxiom(ElkClassExpression subClass,
 			ElkClassExpression superClass);
 
-	protected abstract void indexSubObjectPropertyOfAxiom(
+	public abstract void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
 
-	protected abstract void indexClassDeclaration(ElkClass ec);
+	public abstract void indexClassDeclaration(ElkClass ec);
 	
-	protected abstract void indexObjectPropertyDeclaration(ElkObjectProperty eop);
+	public abstract void indexObjectPropertyDeclaration(ElkObjectProperty eop);
 
 	/**
 	 * Object factory that is used internally to replace some syntactic

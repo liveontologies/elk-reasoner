@@ -26,8 +26,8 @@
 package org.semanticweb.elk.reasoner.classification;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -51,14 +51,15 @@ class ConcurrentClassTaxonomy extends ClassTaxonomy {
 
 	// map from class IRIs to class nodes
 	protected final ConcurrentMap<ElkIri, ClassNode> nodeLookup;
+	protected final List<ClassNode> allNodes;
 
 	ConcurrentClassTaxonomy() {
 		this.nodeLookup = new ConcurrentHashMap<ElkIri, ClassNode>();
+		this.allNodes = new LinkedList<ClassNode> ();
 	}
 
-	public Set<ClassNode> getNodes() {
-		return Collections.unmodifiableSet(new HashSet<ClassNode>(nodeLookup
-				.values()));
+	public List<ClassNode> getNodes() {
+		return Collections.unmodifiableList(allNodes);
 	}
 
 	/**

@@ -56,7 +56,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	}
 
 	@Override
-	protected void indexSubClassOfAxiom(ElkClassExpression subElkClass,
+	public void indexSubClassOfAxiom(ElkClassExpression subElkClass,
 			ElkClassExpression superElkClass) {
 		
 		IndexedClassExpression subIndexedClass = subElkClass
@@ -74,7 +74,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	}
 
 	@Override
-	protected void indexSubObjectPropertyOfAxiom(
+	public void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subElkProperty,
 			ElkObjectPropertyExpression superElkProperty) {
 		
@@ -95,12 +95,12 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	}
 
 	@Override
-	protected void indexClassDeclaration(ElkClass ec) {
+	public void indexClassDeclaration(ElkClass ec) {
 		ec.accept(neutralIndexer);
 	}
 
 	@Override
-	protected void indexObjectPropertyDeclaration(ElkObjectProperty ep) {
+	public void indexObjectPropertyDeclaration(ElkObjectProperty ep) {
 		ep.accept(neutralIndexer);
 	}
 

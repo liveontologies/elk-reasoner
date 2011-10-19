@@ -23,7 +23,6 @@
 package org.semanticweb.elk.owl.predefined;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
@@ -42,15 +41,15 @@ public final class PredefinedElkClass implements ElkClass {
 	protected final ElkIri iri;
 
 	// do not allow construction of other instances of this class
-	private PredefinedElkClass(String iri) {
-		this.iri = new ElkFullIri(iri);
+	private PredefinedElkClass(ElkIri iri) {
+		this.iri = iri;
 	}
 
 	public static final PredefinedElkClass OWL_THING = new PredefinedElkClass(
-			"http://www.w3.org/2002/07/owl#Thing");
+			PredefinedElkIri.OWL_THING);
 
 	public static final PredefinedElkClass OWL_NOTHING = new PredefinedElkClass(
-			"http://www.w3.org/2002/07/owl#Nothing");
+			PredefinedElkIri.OWL_NOTHING);
 
 	public String getFullIri() {
 		return iri.toString();
@@ -72,7 +71,7 @@ public final class PredefinedElkClass implements ElkClass {
 		return visitor.visit(this);
 	}
 
-	// TODO: delete when removed from the interface
+	// TODO: delete when removed from the interfaces
 	public boolean structuralEquals(Object object) {
 		// TODO Auto-generated method stub
 		return false;
@@ -82,5 +81,4 @@ public final class PredefinedElkClass implements ElkClass {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
 }

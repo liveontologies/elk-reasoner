@@ -26,16 +26,17 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.TreeSet;
 
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
 /**
@@ -45,6 +46,12 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
  * @author Markus Kroetzsch
  */
 public class ClassTaxonomyPrinter {
+	
+	protected static Comparator<ElkClass> comparator = new Comparator<ElkClass>() {
+
+		public int compare(ElkClass o1, ElkClass o2) {
+			return PredefinedElkIri.compare(o1.getIri(), o2.getIri());		}
+	};
 
 	/**
 	 * Convenience method for printing a ClassTaxonomy to a file at the given
@@ -108,43 +115,31 @@ public class ClassTaxonomyPrinter {
 	 */
 	protected static void processClassTaxomomy(ClassTaxonomy classTaxonomy,
 			Writer writer) throws IOException {
-		TreeMap<ElkIri, ElkClass> orderedElkClasses = new TreeMap<ElkIri, ElkClass>();
-		HashMap<ElkClass, ElkClass> firstElkClasses = new HashMap<ElkClass, ElkClass>();
-		TreeMap<ElkIri, ElkClass> orderedEquivalentClasses = new TreeMap<ElkIri, ElkClass>();
-		for (ClassNode classNode : classTaxonomy.getNodes()) {
-			orderedEquivalentClasses.clear();
-			for (ElkClass elkClass : classNode.getMembers()) {
-				orderedEquivalentClasses.put(elkClass.getIri(), elkClass);
-			}
+		
+		writer.write("Ontology(\n");
+		
+		TreeSet<ElkClass> canonicalElkClasses = new TreeSet<ElkClass> (comparator);
+		for (ClassNode classNode : classTaxonomy.getNodes())
+			canonicalElkClasses.add(classNode.getCanonicalMember());
 
-			ElkClass firstClass = orderedEquivalentClasses.firstEntry()
-					.getValue();
-			firstElkClasses.put(classNode.getCanonicalMember(), firstClass);
-			orderedElkClasses.put(firstClass.getIri(), firstClass);
-		}
-
-		TreeMap<ElkIri, ElkClass> orderedSubClasses = new TreeMap<ElkIri, ElkClass>();
-		for (ElkClass elkClass : orderedElkClasses.values()) {
-			orderedEquivalentClasses.clear();
-			orderedSubClasses.clear();
+		
+		for (ElkClass elkClass : canonicalElkClasses) {
 			ClassNode classNode = classTaxonomy.getNode(elkClass);
-
-			for (ElkClass elkClassMember : classNode.getMembers()) {
-				if (!elkClassMember.structuralEquals(elkClass)) {
-					orderedEquivalentClasses.put(elkClassMember.getIri(),
-							elkClassMember);
-				}
-			}
-			for (ClassNode classNodeChild : classNode.getDirectSubNodes()) {
-				ElkClass firstClass = firstElkClasses.get(classNodeChild
-						.getCanonicalMember());
-				orderedSubClasses.put(firstClass.getIri(), firstClass);
+			
+			ArrayList<ElkClass> orderedEquivalentClasses = 
+				new ArrayList<ElkClass> (classNode.getMembers());
+			Collections.sort(orderedEquivalentClasses, comparator);
+			
+			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass> (comparator);
+			for (ClassNode childNode : classNode.getDirectSubNodes()) {
+				orderedSubClasses.add(childNode.getCanonicalMember());
 			}
 
 			processClassAxioms(elkClass, orderedEquivalentClasses,
 					orderedSubClasses, writer);
 		}
-
+		
+		writer.write(")");
 	}
 
 	/**
@@ -159,21 +154,26 @@ public class ClassTaxonomyPrinter {
 	 * @throws IOException
 	 */
 	protected static void processClassAxioms(ElkClass elkClass,
-			SortedMap<ElkIri, ElkClass> orderedEquivalentClasses,
-			SortedMap<ElkIri, ElkClass> orderedSubClasses, Writer writer)
+			ArrayList<ElkClass> orderedEquivalentClasses,
+			TreeSet<ElkClass> orderedSubClasses, Writer writer)
 			throws IOException {
+		
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-		for (ElkClass elkClassMember : orderedEquivalentClasses.values()) {
+		
+		if (orderedEquivalentClasses.size() > 1) {
 			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = objectFactory
-					.getEquivalentClassesAxiom(elkClass, elkClassMember);
+					.getEquivalentClassesAxiom(orderedEquivalentClasses);
 			OwlFunctionalStylePrinter.append(writer, elkEquivalentClassesAxiom);
 			writer.append('\n');
 		}
-		for (ElkClass elkSubClass : orderedSubClasses.values()) {
-			ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
-					.getSubClassOfAxiom(elkSubClass, elkClass);
-			OwlFunctionalStylePrinter.append(writer, elkSubClassAxiom);
-			writer.append('\n');
-		}
+		
+		if (elkClass.getIri() != PredefinedElkIri.OWL_THING)
+			for (ElkClass elkSubClass : orderedSubClasses)
+				if (elkSubClass.getIri() != PredefinedElkIri.OWL_NOTHING) {
+					ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
+							.getSubClassOfAxiom(elkSubClass, elkClass);
+					OwlFunctionalStylePrinter.append(writer, elkSubClassAxiom);
+					writer.append('\n');
+				}
 	}
 }

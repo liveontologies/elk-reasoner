@@ -32,6 +32,8 @@ public class TestReasoner {
 	public static void main(String[] args) throws ParseException, IOException {
 		IOReasoner reasoner = new IOReasoner(Executors.newCachedThreadPool(), 8);
 		reasoner.loadOntologyFromFile("e:/krr/ontologies/snomed.owl");
+//		reasoner.loadOntologyFromFile("e:/krr/ontologies/el-galen.owl");
+//		reasoner.loadOntologyFromFile("e:/krr/ontologies/galen8_simplified.owl");
 		reasoner.classify();
 		System.err.println(ClassTaxonomyPrinter.getHashString(reasoner.getTaxonomy()));
 		reasoner.shutdown();

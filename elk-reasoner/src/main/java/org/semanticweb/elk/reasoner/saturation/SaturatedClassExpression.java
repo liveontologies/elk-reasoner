@@ -58,6 +58,8 @@ public class SaturatedClassExpression implements Linkable {
 	protected Multimap<IndexedPropertyChain, Queueable>
 		propagationsByObjectProperty;
 	
+	protected boolean satisfiable = true;
+	
 	/**
 	 * If set to true, then composition rules will be applied
 	 * to derive all incoming links. This is usually needed only when
@@ -81,6 +83,10 @@ public class SaturatedClassExpression implements Linkable {
 	
 	public IndexedClassExpression getRoot() {
 		return root;
+	}
+	
+	public boolean isSatisfiable() {
+		return satisfiable;
 	}
 
 	

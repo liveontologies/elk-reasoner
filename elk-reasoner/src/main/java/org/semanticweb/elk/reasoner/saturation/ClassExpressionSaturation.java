@@ -62,8 +62,8 @@ public class ClassExpressionSaturation extends
 
 	protected final OntologyIndex ontologyIndex;
 
-	protected final IndexedClassExpression owlThing;
-
+	protected final IndexedClassExpression owlThing, owlNothing;
+	
 	/**
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
@@ -82,6 +82,7 @@ public class ClassExpressionSaturation extends
 			ice.resetSaturated();
 
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
+		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	/**
@@ -107,7 +108,7 @@ public class ClassExpressionSaturation extends
 				}
 				enqueue(sce, root);
 
-				if (owlThing != null && owlThing.occursNegatively())
+				if (owlThing.occursNegatively())
 					enqueue(sce, owlThing);
 			}
 		}
@@ -329,6 +330,11 @@ public class ClassExpressionSaturation extends
 		}
 
 		void processClass(IndexedClassExpression ice) {
+			//TODO propagate bottom backwards
+			if (ice == owlNothing) {
+				context.satisfiable = false;
+				return;
+			}
 
 			// process subsumptions
 			if (ice.getToldSuperClassExpressions() != null) {

@@ -34,8 +34,10 @@ import java.util.concurrent.ExecutorService;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.collections.Pair;
 import org.semanticweb.elk.util.concurrent.computation.AbstractConcurrentComputation;
 
 public class ClassTaxonomyComputation extends
@@ -49,64 +51,63 @@ public class ClassTaxonomyComputation extends
 
 	protected ClassNode topNode, bottomNode;
 
-	protected final Linker linker;
-
 	/**
 	 * Queue for nodes with assigned parents
 	 */
-	protected final Queue<ClassNode> assignedParentsNodes;
+	protected final Queue<Pair<ClassNode, List<IndexedClass>>> nodesWithParents;
+	
+	/**
+	 * Synchronized list that collects all unsatisfiable classes 
+	 */
+	protected final List<ElkClass> unsatClasses;
 
 	public ClassTaxonomyComputation(ExecutorService executor, int maxWorkers) {
 		super(executor, maxWorkers, 2 * maxWorkers, 1024);
 		this.classTaxonomy = new ConcurrentClassTaxonomy();
-		this.linker = new Linker(executor, 2 * maxWorkers, 16, 1024);
-		this.assignedParentsNodes = new ConcurrentLinkedQueue<ClassNode>();
+		this.nodesWithParents = new ConcurrentLinkedQueue<
+			Pair<ClassNode, List<IndexedClass>>>();
+		this.unsatClasses = Collections.synchronizedList(new ArrayList<ElkClass>());
 	}
 
 	public ClassTaxonomy computeTaxonomy() throws InterruptedException {
 		waitCompletion();
-
+		
+		bottomNode = new ClassNode(unsatClasses);
+		classTaxonomy.allNodes.add(bottomNode);
+		for (ElkClass unsatClass : unsatClasses)
+			classTaxonomy.nodeLookup.put(unsatClass.getIri(), bottomNode);
+		
 		topNode = classTaxonomy.getNode(PredefinedElkClass.OWL_THING);
-		if (topNode == null) {
-			topNode = new ClassNode(
-					Collections
-							.singletonList((ElkClass) PredefinedElkClass.OWL_THING));
-			classTaxonomy.nodeLookup.put(PredefinedElkClass.OWL_THING.getIri(),
-					topNode);
-		}
-		bottomNode = classTaxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
-		if (bottomNode == null) {
-			bottomNode = new ClassNode(
-					Collections
-							.singletonList((ElkClass) PredefinedElkClass.OWL_NOTHING));
-			classTaxonomy.nodeLookup.put(
-					PredefinedElkClass.OWL_NOTHING.getIri(), bottomNode);
-		}
-
+		
 		// processing the nodes with assigned parents
-		linker.start();
-
 		for (;;) {
-			ClassNode node = assignedParentsNodes.poll();
-			if (node == null) {
+			Pair<ClassNode, List<IndexedClass>> p = nodesWithParents.poll();
+			if (p == null) {
 				break;
 			}
-			linker.submit(node);
+			
+			ClassNode node = p.getFirst();
+			classTaxonomy.allNodes.add(node);
+			for (IndexedClass ic : p.getSecond()) {
+				ClassNode parent = classTaxonomy.getNode(ic.getElkClass());
+				node.addDirectSuperNode(parent);
+				parent.addDirectSubNode(node);
+			}
 		}
 
-		linker.waitCompletion();
-
-		for (ClassNode node : classTaxonomy.getNodes())
+		// connect to topNode and bottomNode
+		for (ClassNode node : classTaxonomy.getNodes()) {
+			if (node.getDirectSuperNodes().isEmpty() && node != topNode) {
+				node.addDirectSuperNode(topNode);
+				topNode.addDirectSubNode(node);
+			}
 			if (node.getDirectSubNodes().isEmpty() && node != bottomNode) {
 				node.addDirectSubNode(bottomNode);
 				bottomNode.addDirectSuperNode(node);
 			}
+		}
 
 		return classTaxonomy;
-	}
-
-	protected ClassNode getNode(IndexedClass indexedClass) {
-		return classTaxonomy.getNode(indexedClass.getElkClass());
 	}
 
 	protected void process(Iterable<IndexedClass> rootBatch) {
@@ -116,17 +117,30 @@ public class ClassTaxonomyComputation extends
 	}
 
 	protected void process(IndexedClass root) {
-		List<ElkClass> equivalent = new ArrayList<ElkClass>();
+		
+		if (!root.getSaturated().isSatisfiable()) {
+			unsatClasses.add(root.getElkClass());
+			return;
+		}
+		
+		List<ElkClass> equivalent = new ArrayList<ElkClass>(1);
 		List<IndexedClass> parents = new LinkedList<IndexedClass>();
 
+		equivalent.add(root.getElkClass());
+		
 		for (IndexedClassExpression superClassExpression : root.getSaturated()
 				.getSuperClassExpressions())
-			if (superClassExpression instanceof IndexedClass) {
+			if (superClassExpression != root &&
+					superClassExpression instanceof IndexedClass) {
 				IndexedClass superClass = (IndexedClass) superClassExpression;
 
 				if (superClass.getSaturated().getSuperClassExpressions()
-						.contains(root))
+						.contains(root)) {
+					if (PredefinedElkIri.compare(root.getElkClass().getIri(), 
+							superClass.getElkClass().getIri()) > 0)
+						return;
 					equivalent.add(superClass.getElkClass());
+				}
 				else {
 					boolean addThis = true;
 					Iterator<IndexedClass> i = parents.iterator();
@@ -148,43 +162,10 @@ public class ClassTaxonomyComputation extends
 				}
 			}
 
-		ElkClass rootElkClass = root.getElkClass();
-		for (ElkClass ec : equivalent)
-			// TODO comparison shouldn't be on hash code
-			if (ec.hashCode() < rootElkClass.hashCode())
-				return;
-
 		ClassNode node = new ClassNode(equivalent);
-		node.parentIndexClasses = parents;
-
-		assignedParentsNodes.add(node);
-
 		for (ElkClass ec : equivalent)
 			classTaxonomy.nodeLookup.put(ec.getIri(), node);
-	}
-
-	private class Linker extends AbstractConcurrentComputation<ClassNode> {
-
-		public Linker(ExecutorService executor, int maxWorkers,
-				int bufferCapacity, int batchSize) {
-			super(executor, maxWorkers, bufferCapacity, batchSize);
-		}
-
-		@Override
-		protected void process(ClassNode node) {
-			if (node.parentIndexClasses.isEmpty() && node != topNode) {
-				node.addDirectSuperNode(topNode);
-				topNode.addDirectSubNode(node);
-			}
-
-			for (IndexedClass ic : node.parentIndexClasses) {
-				ClassNode parent = getNode(ic);
-				node.addDirectSuperNode(parent);
-				parent.addDirectSubNode(node);
-			}
-
-			node.parentIndexClasses = null;
-		}
-
+		
+		nodesWithParents.add(new Pair<ClassNode, List<IndexedClass>> (node, parents));
 	}
 }

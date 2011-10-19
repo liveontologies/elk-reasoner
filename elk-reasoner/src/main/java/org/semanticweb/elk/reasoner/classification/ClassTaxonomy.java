@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.reasoner.classification;
 
-import java.util.Set;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -44,11 +44,11 @@ public abstract class ClassTaxonomy implements StructuralHashObject {
 	public abstract ClassNode getNode(ElkClass elkClass);
 
 	/**
-	 * Obtain an unmodifiable Set of all nodes in this ClassTaxonomy.
+	 * Obtain an unmodifiable List of all nodes in this ClassTaxonomy.
 	 * 
 	 * @return an unmodifiable Collection
 	 */
-	public abstract Set<ClassNode> getNodes();
+	public abstract List<ClassNode> getNodes();
 
 	/**
 	 * Compute a hash code based on all subclass relationships that are

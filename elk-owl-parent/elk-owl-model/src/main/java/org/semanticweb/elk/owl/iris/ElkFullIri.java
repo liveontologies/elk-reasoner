@@ -35,6 +35,10 @@ public class ElkFullIri extends ElkIri {
 		this.iri = iri;
 	}
 	
+	public ElkFullIri(ElkPrefix prefix, String localName) {
+		this.iri = prefix.getIri()+localName;
+	}
+	
 	@Override
 	public String toString() {
 		return iri;
