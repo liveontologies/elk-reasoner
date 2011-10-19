@@ -25,6 +25,9 @@ will appear in the produced result.
 			<action dev="frantisek" type="fix" issue="3">
 				Fixed grammar for ObjectOneOf in the built-in  parser.
 			</action>
+			<action dev="markus" type="fix" issue="2">
+				Close all threads immediately when OWLReasoner.dispose() is called.
+			</action>
 			<action dev="markus" type="add">
 				Support for object property domain axioms.
 			</action>

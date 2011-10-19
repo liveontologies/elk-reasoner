@@ -1,6 +1,6 @@
 /*
  * #%L
- * elk-reasoner
+ * elk-IOReasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.cli;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -50,8 +50,8 @@ public class ReasonerTest extends TestCase {
 	public void testExistentials() throws InterruptedException,
 			ExecutionException, ParseException, IOException {
 
-		Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString(""//
+		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )" + "Ontology("//
 				+ "EquivalentClasses(:B :C)"//
 				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
@@ -72,10 +72,10 @@ public class ReasonerTest extends TestCase {
 		ElkObjectProperty s = objectFactory.getObjectProperty(
 				new ElkFullIri("http://example.org/S"));
 
-		reasoner.classify();
-		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+		IOReasoner.classify();
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 
-		OntologyIndex index = reasoner.ontologyIndex;
+		OntologyIndex index = IOReasoner.getOntologyIndex();
 
 		IndexedPropertyChain R = index.getIndexed(r);
 		IndexedPropertyChain S = index.getIndexed(s);
@@ -91,8 +91,8 @@ public class ReasonerTest extends TestCase {
 	public void testConjunctions() throws InterruptedException,
 			ExecutionException, ParseException, IOException {
 
-		final Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
+		final IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:A :D)"
 				+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)" + ")");
@@ -108,7 +108,7 @@ public class ReasonerTest extends TestCase {
 		ElkClass e = objectFactory.getClass(
 				new ElkFullIri("http://example.org/E"));
 
-		OntologyIndex index = reasoner.ontologyIndex;
+		OntologyIndex index = IOReasoner.getOntologyIndex();
 
 		IndexedClassExpression A = index.getIndexed(a);
 		IndexedClassExpression B = index.getIndexed(b);
@@ -125,9 +125,9 @@ public class ReasonerTest extends TestCase {
 		assertFalse("A SubClassOf E", A.getToldSuperClassExpressions()
 				.contains(E));
 
-		reasoner.classify();
+		IOReasoner.classify();
 
-		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(a);
 
 		assertTrue("A contains A", aNode.getMembers().contains(a));
@@ -142,8 +142,8 @@ public class ReasonerTest extends TestCase {
 	}
 
 	public void testPropertyChains() throws ParseException, IOException {
-		Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString(""//
+		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
 				+ "Ontology("//
@@ -157,9 +157,9 @@ public class ReasonerTest extends TestCase {
 				+ ")"//
 		);
 
-		reasoner.classify();
+		IOReasoner.classify();
 
-		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(objectFactory.getClass(
 				new ElkFullIri("http://example.org/A")));
 		assertTrue(
@@ -172,8 +172,8 @@ public class ReasonerTest extends TestCase {
 	public void testAncestors() throws InterruptedException,
 			ExecutionException, ParseException, IOException {
 
-		final Reasoner reasoner = new Reasoner();
-		reasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
+		final IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))");
 
@@ -186,7 +186,7 @@ public class ReasonerTest extends TestCase {
 		ElkClass d = objectFactory.getClass(
 				new ElkFullIri("http://example.org/D"));
 
-		OntologyIndex index = reasoner.ontologyIndex;
+		OntologyIndex index = IOReasoner.getOntologyIndex();
 
 		IndexedClassExpression A = index.getIndexed(a);
 		IndexedClassExpression B = index.getIndexed(b);
@@ -202,9 +202,9 @@ public class ReasonerTest extends TestCase {
 		assertTrue("B SubClassOf D",
 				B.getToldSuperClassExpressions().contains(D));
 
-		reasoner.classify();
+		IOReasoner.classify();
 
-		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(a);
 		ClassNode bNode = taxonomy.getNode(b);
 
