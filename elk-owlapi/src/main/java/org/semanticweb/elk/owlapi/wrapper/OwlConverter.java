@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
@@ -95,6 +96,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAsymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -201,6 +203,12 @@ public class OwlConverter {
 	protected static OwlObjectPropertyExpressionConverterVisitor OWL_OBJECT_PROPERTY_EXPRESSION_CONVERTER = OwlObjectPropertyExpressionConverterVisitor
 			.getInstance();
 
+	public ElkAnnotationProperty convert(
+			OWLAnnotationProperty owlAnnotationProperty) {
+		return new ElkAnnotationPropertyWrap<OWLAnnotationProperty> (
+				owlAnnotationProperty);
+	}
+	
 	public ElkAnonymousIndividual convert(
 			OWLAnonymousIndividual owlAnonymousIndividual) {
 		return new ElkAnonymousIndividualWrap<OWLAnonymousIndividual>(

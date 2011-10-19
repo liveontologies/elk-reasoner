@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -198,11 +199,8 @@ public class OwlCorrespondingObjectConverterVisitor implements
 		return CONVERTER.convert(owlDatatype);
 	}
 
-	public ElkEntity visit(OWLAnnotationProperty property) {
-		throw new IllegalArgumentException(
-				OWLAnnotationProperty.class.getSimpleName()
-						+ " cannot be converted to "
-						+ ElkEntity.class.getSimpleName());
+	public ElkAnnotationProperty visit(OWLAnnotationProperty owlAnnotationproperty) {
+		return CONVERTER.convert(owlAnnotationproperty);
 	}
 
 	public ElkAnonymousIndividual visit(
