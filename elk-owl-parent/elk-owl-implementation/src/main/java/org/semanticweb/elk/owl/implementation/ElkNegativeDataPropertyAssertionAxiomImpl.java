@@ -22,14 +22,13 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkNegativeDataPropertyAssertion.
@@ -44,18 +43,12 @@ public class ElkNegativeDataPropertyAssertionAxiomImpl extends
 	protected final ElkIndividual individual;
 	protected final ElkLiteral literal;
 
-	private static final int constructorHash_ = "ElkNegativeDataPropertyAssertionAxiom"
-			.hashCode();
-
 	/* package-private */ElkNegativeDataPropertyAssertionAxiomImpl(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkIndividual individual, ElkLiteral literal) {
 		super(dataPropertyExpression);
 		this.individual = individual;
 		this.literal = literal;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_, dataPropertyExpression.structuralHashCode(),
-				individual.structuralHashCode(), literal.structuralHashCode());
 	}
 
 	public ElkIndividual getIndividual() {
@@ -77,24 +70,6 @@ public class ElkNegativeDataPropertyAssertionAxiomImpl extends
 		result.append(literal.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkNegativeDataPropertyAssertionAxiom) {
-			return dataPropertyExpression
-					.equals(((ElkNegativeDataPropertyAssertionAxiom) object)
-							.getDataPropertyExpression())
-					&& individual
-							.equals(((ElkNegativeDataPropertyAssertionAxiom) object)
-									.getIndividual())
-					&& literal
-							.equals(((ElkNegativeDataPropertyAssertionAxiom) object)
-									.getLiteral());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {

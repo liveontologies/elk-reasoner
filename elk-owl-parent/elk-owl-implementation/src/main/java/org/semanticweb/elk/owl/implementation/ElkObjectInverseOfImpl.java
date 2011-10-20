@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Corresponds to an <a href=
@@ -45,27 +44,12 @@ public class ElkObjectInverseOfImpl extends ElkObjectImpl implements
 
 	protected final ElkObjectProperty objectProperty;
 
-	private static final int constructorHash_ = "ElkObjectInverseOf".hashCode();
-
 	/* package-private */ElkObjectInverseOfImpl(ElkObjectProperty objectProperty) {
 		this.objectProperty = objectProperty;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_, objectProperty.structuralHashCode());
 	}
 
 	public ElkObjectProperty getObjectProperty() {
 		return objectProperty;
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectInverseOf) {
-			return objectProperty.equals(((ElkObjectInverseOf) object)
-					.getObjectProperty());
-		} else {
-			return false;
-		}
 	}
 
 	@Override

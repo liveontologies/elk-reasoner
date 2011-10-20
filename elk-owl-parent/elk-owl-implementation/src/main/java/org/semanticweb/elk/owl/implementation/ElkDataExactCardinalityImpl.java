@@ -22,12 +22,11 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkDataExactCardinality.
@@ -37,39 +36,15 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class ElkDataExactCardinalityImpl extends
 		ElkDataCardinalityRestriction implements ElkDataExactCardinality {
 
-	private static final int constructorHash_ = "ElkDataExactCardinality"
-			.hashCode();
-
 	ElkDataExactCardinalityImpl(
 			ElkDataPropertyExpression dataPropertyExpression,
 			int cardinality, ElkDataRange dataRange) {
 		super(dataPropertyExpression, cardinality, dataRange);
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				dataPropertyExpression.structuralHashCode(),
-				dataRange.structuralHashCode(), cardinality);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("DataExactCardinality");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataExactCardinality) {
-			return (cardinality == ((ElkDataExactCardinality) object)
-					.getCardinality())
-					&& dataPropertyExpression
-							.equals(((ElkDataExactCardinality) object)
-									.getDataPropertyExpression())
-					&& dataRange
-							.equals(((ElkDataExactCardinality) object)
-									.getDataRange());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

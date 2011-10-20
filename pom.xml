@@ -19,7 +19,7 @@
 	</modules>
 
 	<name>ELK</name>
-	<description>An Java-based OWL EL reasoner.</description>
+	<description>A Java-based OWL EL reasoner.</description>
 	<url>http://code.google.com/p/elk-reasoner/</url>
 
 	<scm>

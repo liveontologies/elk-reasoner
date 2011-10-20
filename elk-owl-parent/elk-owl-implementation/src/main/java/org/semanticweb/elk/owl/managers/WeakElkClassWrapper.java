@@ -27,9 +27,9 @@ import java.lang.ref.ReferenceQueue;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
-public class WeakElkClassWrapper extends WeakWrapper<ElkClass> {
+class WeakElkClassWrapper extends WeakWrapper<ElkClass> {
 
-	public WeakElkClassWrapper(ElkClass referent,
+	WeakElkClassWrapper(ElkClass referent,
 			ReferenceQueue<? super ElkClass> q) {
 		super(referent, q);
 	}

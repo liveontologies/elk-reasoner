@@ -103,7 +103,7 @@ public class ClassTaxonomyPrinter {
 	 * @return hash string
 	 */
 	public static String getHashString(ClassTaxonomy classTaxonomy) {
-		return Integer.toHexString(classTaxonomy.structuralHashCode());
+		return Integer.toHexString(ClassTaxonomyHasher.hash(classTaxonomy));
 	}
 
 	/**

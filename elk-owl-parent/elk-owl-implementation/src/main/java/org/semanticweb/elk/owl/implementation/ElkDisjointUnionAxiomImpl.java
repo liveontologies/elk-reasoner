@@ -43,15 +43,10 @@ public class ElkDisjointUnionAxiomImpl extends ElkClassExpressionListObject
 
 	protected final ElkClass definedClass;
 
-	private static final int constructorHash_ = "ElkDisjointUnionAxiom"
-			.hashCode();
-
 	/* package-private */ElkDisjointUnionAxiomImpl(ElkClass definedClass,
 			List<? extends ElkClassExpression> disjointClassExpressions) {
 		super(disjointClassExpressions);
 		this.definedClass = definedClass;
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, disjointClassExpressions);
 	}
 
 	public ElkClass getDefinedClass() {
@@ -61,17 +56,6 @@ public class ElkDisjointUnionAxiomImpl extends ElkClassExpressionListObject
 	@Override
 	public String toString() {
 		return buildFssString("DisjointUnion");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDisjointUnionAxiom) {
-			return elkObjects.equals(((ElkDisjointUnionAxiom) object)
-					.getClassExpressions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {

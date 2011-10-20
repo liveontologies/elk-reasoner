@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkTransitiveObjectPropertyAxiom.
@@ -43,32 +42,14 @@ public class ElkTransitiveObjectPropertyAxiomImpl extends
 		ElkObjectPropertyExpressionObject implements
 		ElkTransitiveObjectPropertyAxiom {
 
-	private static final int constructorHash_ = "ElkTransitiveObjectPropertyAxiom"
-			.hashCode();
-
 	/* package-private */ElkTransitiveObjectPropertyAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
-		this.structuralHashCode = HashGenerator
-				.combineListHash(constructorHash_,
-						objectPropertyExpression.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("TransitiveObjectProperty");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkTransitiveObjectPropertyAxiom) {
-			return objectPropertyExpression
-					.equals(((ElkTransitiveObjectPropertyAxiom) object)
-							.getObjectPropertyExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {

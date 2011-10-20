@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Corresponds to an <a href=
@@ -44,37 +43,15 @@ public class ElkObjectSomeValuesFromImpl extends
 		ElkObjectPropertyExpressionClassExpressionObject implements
 		ElkObjectSomeValuesFrom {
 
-	private static final int constructorHash_ = "ElkObjectSomeValuesFrom"
-			.hashCode();
-
 	/* package-private */ElkObjectSomeValuesFromImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
 		super(objectPropertyExpression, classExpression);
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				objectPropertyExpression.structuralHashCode(),
-				classExpression.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("ObjectSomeValuesFrom");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectSomeValuesFrom) {
-			return objectPropertyExpression
-					.equals(((ElkObjectSomeValuesFrom) object)
-							.getObjectPropertyExpression())
-					&& classExpression
-							.equals(((ElkObjectSomeValuesFrom) object)
-									.getClassExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

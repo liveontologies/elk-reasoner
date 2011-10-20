@@ -97,10 +97,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.managers.DummyElkObjectManager;
 import org.semanticweb.elk.owl.managers.ElkObjectManager;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 
 /**
  * A factory for creating ElkObjects based on the implementations in the
@@ -111,25 +111,25 @@ import org.semanticweb.elk.owl.managers.ElkObjectManager;
 public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	protected static final ElkClass ELK_OWL_THING = new ElkClassImpl(
-			new ElkFullIri("http://www.w3.org/2002/07/owl#Thing"));
+			PredefinedElkIri.OWL_THING);
 
 	protected static final ElkClass ELK_OWL_NOTHING = new ElkClassImpl(
-			new ElkFullIri("http://www.w3.org/2002/07/owl#Nothing"));
+			PredefinedElkIri.OWL_NOTHING);
 
 	protected static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			new ElkFullIri("http://www.w3.org/2002/07/owl#TopObjectProperty"));
+			PredefinedElkIri.OWL_TOP_OBJECT_PROPERTY);
 
 	protected static final ElkObjectProperty ELK_OWL_BOTTOM_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			new ElkFullIri("http://www.w3.org/2002/07/owl#BottomObjectProperty"));
+			PredefinedElkIri.OWL_BOTTOM_OBJECT_PROPERTY);
 
 	protected static final ElkDataProperty ELK_OWL_TOP_DATA_PROPERTY = new ElkDataPropertyImpl(
-			new ElkFullIri("http://www.w3.org/2002/07/owl#TopDataProperty"));
+			PredefinedElkIri.OWL_TOP_DATA_PROPERTY);
 
 	protected static final ElkDataProperty ELK_OWL_BOTTOM_DATA_PROPERTY = new ElkDataPropertyImpl(
-			new ElkFullIri("http://www.w3.org/2002/07/owl#BottomDataProperty"));
+			PredefinedElkIri.OWL_BOTTOM_DATA_PROPERTY);
 
 	protected static final ElkDatatype ELK_RDF_PLAIN_LITERAL = new ElkDatatypeImpl(
-			new ElkFullIri("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral"));
+			PredefinedElkIri.RDF_PLAIN_LITERAL);
 
 	protected static final ElkAnnotationAxiom ELK_ANNOTATION_AXIOM = new ElkAnnotationAxiomImpl();
 

@@ -41,6 +41,8 @@ public abstract class ElkObjectPropertyExpressionClassExpressionObject extends
 		return classExpression;
 	}
 
+	// TODO: this method will throw null pointer exception on unqualified
+	// cardinality restrictions
 	public String buildFssString(String operatorName) {
 		StringBuilder result = new StringBuilder(operatorName);
 		result.append("(");

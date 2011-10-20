@@ -41,31 +41,14 @@ public class ElkDisjointObjectPropertiesAxiomImpl extends
 		ElkObjectPropertyExpressionListObject implements
 		ElkDisjointObjectPropertiesAxiom {
 
-	private static final int constructorHash_ = "ElkDisjointObjectPropertiesAxiom"
-			.hashCode();
-
 	/* package-private */ElkDisjointObjectPropertiesAxiomImpl(
 			List<? extends ElkObjectPropertyExpression> disjointObjectPropertyExpressions) {
 		super(disjointObjectPropertyExpressions);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, disjointObjectPropertyExpressions);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("DisjointObjectProperties");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDisjointObjectPropertiesAxiom) {
-			return elkObjects
-					.equals(((ElkDisjointObjectPropertiesAxiom) object)
-							.getObjectPropertyExpressions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {

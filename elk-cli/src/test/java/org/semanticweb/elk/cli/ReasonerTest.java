@@ -130,7 +130,6 @@ public class ReasonerTest extends TestCase {
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(a);
 
-		assertTrue("A contains A", aNode.getMembers().contains(a));
 		assertTrue("A contains B",
 				aNode.getDirectSuperNodes().contains(taxonomy.getNode(b)));
 		assertTrue("A contains C",
@@ -208,7 +207,6 @@ public class ReasonerTest extends TestCase {
 		ClassNode aNode = taxonomy.getNode(a);
 		ClassNode bNode = taxonomy.getNode(b);
 
-		assertTrue("A contains A", aNode.getMembers().contains(a));
 		assertTrue("A direct subclass of B", aNode.getDirectSuperNodes()
 				.contains(taxonomy.getNode(b)));
 		assertTrue("A direct subclass of C", aNode.getDirectSuperNodes()

@@ -27,7 +27,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkObjectMinCardinality.
@@ -37,39 +36,15 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class ElkObjectMaxCardinalityImpl extends
 		ElkObjectCardinalityRestriction implements ElkObjectMaxCardinality {
 
-	private static final int constructorHash_ = "ElkObjectMaxCardinality"
-			.hashCode();
-
 	ElkObjectMaxCardinalityImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression) {
 		super(objectPropertyExpression, cardinality, classExpression);
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				objectPropertyExpression.structuralHashCode(),
-				classExpression.structuralHashCode(), cardinality);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("ObjectMaxCardinality");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectMaxCardinality) {
-			return (cardinality == ((ElkObjectMaxCardinality) object)
-					.getCardinality())
-					&& objectPropertyExpression
-							.equals(((ElkObjectMaxCardinality) object)
-									.getObjectPropertyExpression())
-					&& classExpression
-							.equals(((ElkObjectMaxCardinality) object)
-									.getClassExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

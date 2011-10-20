@@ -32,6 +32,22 @@ public class PredefinedElkIri {
 	
 	public static final ElkIri OWL_NOTHING = new ElkFullIri(
 			PredefinedElkPrefix.OWL, "Nothing");
+	
+	public static final ElkIri OWL_TOP_OBJECT_PROPERTY = new ElkFullIri(
+			PredefinedElkPrefix.OWL, "TopObjectProperty");
+
+	public static final ElkIri OWL_BOTTOM_OBJECT_PROPERTY = new ElkFullIri(
+			PredefinedElkPrefix.OWL, "BottomObjectProperty");
+
+	public static final ElkIri OWL_TOP_DATA_PROPERTY = new ElkFullIri(
+			PredefinedElkPrefix.OWL, "TopDataProperty");
+
+	public static final ElkIri OWL_BOTTOM_DATA_PROPERTY = new ElkFullIri(
+			PredefinedElkPrefix.OWL, "BottomDataProperty");
+
+	public static final ElkIri RDF_PLAIN_LITERAL = new ElkFullIri(
+			PredefinedElkPrefix.RDF, "PlainLiteral");
+
 
 	/**
 	 * Defines an ordering on IRIs starting with OWL_NOTHING, OWL_THING,

@@ -22,11 +22,10 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkDataComplementOf.
@@ -39,15 +38,10 @@ public class ElkDataComplementOfImpl extends ElkObjectImpl implements
 
 	protected final ElkDataRange dataRange;
 
-	private static final int constructorHash_ = "ElkDataComplementOf"
-			.hashCode();
-
 	/* package-private */ElkDataComplementOfImpl(
 			ElkDataRange dataRange) {
 
 		this.dataRange = dataRange;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_, dataRange.structuralHashCode());
 	}
 
 	public ElkDataRange getDataRange() {
@@ -60,17 +54,6 @@ public class ElkDataComplementOfImpl extends ElkObjectImpl implements
 		result.append(dataRange.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataComplementOf) {
-			return dataRange.equals(((ElkDataComplementOf) object)
-					.getDataRange());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectVisitor<O> visitor) {

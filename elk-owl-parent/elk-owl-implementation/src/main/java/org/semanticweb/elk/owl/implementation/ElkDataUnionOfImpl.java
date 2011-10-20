@@ -38,28 +38,13 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDataUnionOfImpl extends ElkDataRangeListObject
 		implements ElkDataUnionOf {
 
-	private static final int constructorHash_ = "ElkDataUnionOf".hashCode();
-
 	ElkDataUnionOfImpl(List<? extends ElkDataRange> dataRanges) {
 		super(dataRanges);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, dataRanges);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("DataUnionOf");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataUnionOf) {
-			return elkObjects.equals(((ElkDataUnionOf) object)
-					.getDataRanges());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {

@@ -22,12 +22,11 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkDataMinCardinality.
@@ -37,39 +36,15 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class ElkDataMinCardinalityImpl extends
 		ElkDataCardinalityRestriction implements ElkDataMinCardinality {
 
-	private static final int constructorHash_ = "ElkDataMinCardinality"
-			.hashCode();
-
 	ElkDataMinCardinalityImpl(
 			ElkDataPropertyExpression dataPropertyExpression,
 			int cardinality, ElkDataRange dataRange) {
 		super(dataPropertyExpression, cardinality, dataRange);
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				dataPropertyExpression.structuralHashCode(),
-				dataRange.structuralHashCode(), cardinality);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("DataMinCardinality");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataMinCardinality) {
-			return (cardinality == ((ElkDataMinCardinality) object)
-					.getCardinality())
-					&& dataPropertyExpression
-							.equals(((ElkDataMinCardinality) object)
-									.getDataPropertyExpression())
-					&& dataRange
-							.equals(((ElkDataMinCardinality) object)
-									.getDataRange());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

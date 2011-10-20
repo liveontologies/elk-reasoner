@@ -39,13 +39,9 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkObjectOneOfImpl extends ElkObjectListObject<ElkIndividual>
 		implements ElkObjectOneOf {
 
-	private static final int constructorHash_ = "ElkObjectOneOf".hashCode();
-
 	/* package-private */ElkObjectOneOfImpl(
 			List<? extends ElkIndividual> individuals) {
 		super(individuals);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, individuals);
 	}
 
 	public List<? extends ElkIndividual> getIndividuals() {
@@ -55,17 +51,6 @@ public class ElkObjectOneOfImpl extends ElkObjectListObject<ElkIndividual>
 	@Override
 	public String toString() {
 		return buildFssString("ObjectOneOf");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectOneOf) {
-			return elkObjects
-					.equals(((ElkObjectOneOf) object).getIndividuals());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

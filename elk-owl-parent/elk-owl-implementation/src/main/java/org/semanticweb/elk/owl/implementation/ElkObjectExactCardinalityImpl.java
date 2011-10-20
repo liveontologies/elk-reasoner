@@ -27,7 +27,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkObjectExactCardinality.
@@ -37,39 +36,15 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class ElkObjectExactCardinalityImpl extends
 		ElkObjectCardinalityRestriction implements ElkObjectExactCardinality {
 
-	private static final int constructorHash_ = "ElkObjectExactCardinality"
-			.hashCode();
-
 	ElkObjectExactCardinalityImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression) {
 		super(objectPropertyExpression, cardinality, classExpression);
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				objectPropertyExpression.structuralHashCode(),
-				classExpression.structuralHashCode(), cardinality);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("ObjectExactCardinality");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectExactCardinality) {
-			return (cardinality == ((ElkObjectExactCardinality) object)
-					.getCardinality())
-					&& objectPropertyExpression
-							.equals(((ElkObjectExactCardinality) object)
-									.getObjectPropertyExpression())
-					&& classExpression
-							.equals(((ElkObjectExactCardinality) object)
-									.getClassExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

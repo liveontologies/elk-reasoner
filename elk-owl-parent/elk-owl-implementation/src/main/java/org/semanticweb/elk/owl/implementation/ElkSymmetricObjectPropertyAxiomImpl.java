@@ -27,7 +27,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkSymmetricObjectPropertyAxiom.
@@ -39,32 +38,14 @@ public class ElkSymmetricObjectPropertyAxiomImpl extends
 		ElkObjectPropertyExpressionObject implements
 		ElkSymmetricObjectPropertyAxiom {
 
-	private static final int constructorHash_ = "ElkSymmetricObjectPropertyAxiom"
-			.hashCode();
-
 	/* package-private */ElkSymmetricObjectPropertyAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
-		this.structuralHashCode = HashGenerator
-				.combineListHash(constructorHash_,
-						objectPropertyExpression.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("SymmetricObjectProperty");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkSymmetricObjectPropertyAxiom) {
-			return objectPropertyExpression
-					.equals(((ElkSymmetricObjectPropertyAxiom) object)
-							.getObjectPropertyExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {

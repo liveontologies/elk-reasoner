@@ -26,7 +26,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Corresponds to a <a href=
@@ -38,25 +37,9 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class ElkObjectHasSelfImpl extends ElkObjectPropertyExpressionObject
 		implements ElkObjectHasSelf {
 
-	private static final int constructorHash_ = "ElkObjectHasSelf".hashCode();
-
 	/* package-private */ElkObjectHasSelfImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
-		this.structuralHashCode = HashGenerator
-				.combineListHash(constructorHash_,
-						objectPropertyExpression.structuralHashCode());
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectHasSelf) {
-			return objectPropertyExpression.equals(((ElkObjectHasSelf) object)
-					.getObjectPropertyExpression());
-		} else {
-			return false;
-		}
 	}
 
 	@Override

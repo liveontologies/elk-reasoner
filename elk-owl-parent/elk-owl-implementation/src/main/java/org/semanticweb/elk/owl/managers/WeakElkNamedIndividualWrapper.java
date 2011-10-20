@@ -27,9 +27,9 @@ import java.lang.ref.ReferenceQueue;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
-public class WeakElkNamedIndividualWrapper extends WeakWrapper<ElkNamedIndividual> {
+class WeakElkNamedIndividualWrapper extends WeakWrapper<ElkNamedIndividual> {
 
-	public WeakElkNamedIndividualWrapper(ElkNamedIndividual referent,
+	WeakElkNamedIndividualWrapper(ElkNamedIndividual referent,
 			ReferenceQueue<? super ElkNamedIndividual> q) {
 		super(referent, q);
 	}

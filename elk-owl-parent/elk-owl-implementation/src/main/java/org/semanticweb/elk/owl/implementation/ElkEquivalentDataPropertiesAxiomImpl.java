@@ -41,31 +41,14 @@ public class ElkEquivalentDataPropertiesAxiomImpl extends
 		ElkDataPropertyExpressionListObject implements
 		ElkEquivalentDataPropertiesAxiom {
 
-	private static final int constructorHash_ = "ElkEquivalentDataPropertiesAxiom"
-			.hashCode();
-
 	/* package-private */ElkEquivalentDataPropertiesAxiomImpl(
 			List<? extends ElkDataPropertyExpression> equivalentDataPropertyExpressions) {
 		super(equivalentDataPropertyExpressions);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, equivalentDataPropertyExpressions);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("EquivalentDataProperties");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkEquivalentDataPropertiesAxiom) {
-			return elkObjects
-					.equals(((ElkEquivalentDataPropertiesAxiom) object)
-							.getDataPropertyExpressions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {

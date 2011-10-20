@@ -38,28 +38,13 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkObjectUnionOfImpl extends ElkClassExpressionListObject
 		implements ElkObjectUnionOf {
 
-	private static final int constructorHash_ = "ElkObjectUnionOf".hashCode();
-
 	ElkObjectUnionOfImpl(List<? extends ElkClassExpression> classExpressions) {
 		super(classExpressions);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, classExpressions);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("ObjectUnionOf");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectUnionOf) {
-			return elkObjects.equals(((ElkObjectUnionOf) object)
-					.getClassExpressions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

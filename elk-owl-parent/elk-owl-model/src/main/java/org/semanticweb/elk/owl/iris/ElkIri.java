@@ -23,8 +23,10 @@
 package org.semanticweb.elk.owl.iris;
 
 /**
+ * This class represents an IRI. It redefines hash and equality so that two
+ * IRIs are considered equal iff their string representations are equal.  
+ * 
  * @author Frantisek Simancik
- *
  */
 public abstract class ElkIri {
 	
@@ -32,20 +34,19 @@ public abstract class ElkIri {
 	/**
 	 * Returns the full IRI as a string;
 	 */
-	@Override
-	public abstract String toString();
+	public abstract String asString();
 	
 	@Override
-	public int hashCode() {
-		return toString().hashCode();
+	public final int hashCode() {
+		return asString().hashCode();
 	}
 	
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj instanceof ElkIri) {
-			return this.toString().equals(((ElkIri) obj).toString());
+			return this.asString().equals(((ElkIri) obj).asString());
 		}
 		return false;	
 	}

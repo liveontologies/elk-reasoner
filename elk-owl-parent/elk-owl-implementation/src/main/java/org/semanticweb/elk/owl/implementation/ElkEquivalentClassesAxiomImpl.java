@@ -45,30 +45,14 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkEquivalentClassesAxiomImpl extends ElkClassExpressionListObject
 		implements ElkEquivalentClassesAxiom {
 
-	private static final int constructorHash_ = "ElkEquivalentClassesAxiom"
-			.hashCode();
-
 	/* package-private */ElkEquivalentClassesAxiomImpl(
 			List<? extends ElkClassExpression> equivalentClassExpressions) {
 		super(equivalentClassExpressions);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, equivalentClassExpressions);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("EquivalentClasses");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkEquivalentClassesAxiom) {
-			return elkObjects.equals(((ElkEquivalentClassesAxiom) object)
-					.getClassExpressions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {

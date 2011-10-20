@@ -32,30 +32,15 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 public class ElkObjectPropertyChainImpl extends
 		ElkObjectPropertyExpressionListObject implements ElkObjectPropertyChain {
 
-	private static final int constructorHash_ = "ElkObjectPropertyChain"
-			.hashCode();
 
 	/* package-private */ElkObjectPropertyChainImpl(
 			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
 		super(objectPropertyExpressions);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, objectPropertyExpressions);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("ObjectPropertyChain");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectPropertyChain) {
-			return elkObjects.equals(((ElkObjectPropertyChain) object)
-					.getObjectPropertyExpressions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {

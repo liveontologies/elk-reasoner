@@ -23,20 +23,13 @@
 package org.semanticweb.elk.util.hashing;
 
 /**
- * General interface for any object that can be hashed. Used to avoid building
- * lists of has codes when invoking HashGenerator functions on lists of objects.
+ * An interface for defining custom hash codes,
  * 
- * @author Markus Kroetzsch
- * 
+ * @author Frantisek Simancik
+ *
  */
-public interface StructuralHashObject {
+public interface Hasher<T> {
 
-	/**
-	 * Get a structural hash code, i.e. a hash code that faithfully represents
-	 * the relevant internal structure of an object.
-	 * 
-	 * @return structural hash code
-	 */
-	public int structuralHashCode();
+	public int hash(T object);
 
 }

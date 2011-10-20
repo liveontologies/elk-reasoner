@@ -22,12 +22,11 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkDataHasValue. 
@@ -40,17 +39,11 @@ public class ElkDataHasValueImpl extends ElkDataPropertyExpressionObject
 
 	protected final ElkLiteral literal;
 
-	private static final int constructorHash_ = "ElkDataHasValue".hashCode();
-
 	/* package-private */ElkDataHasValueImpl(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkLiteral literal) {
 		super(dataPropertyExpression);
 		this.literal = literal;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				dataPropertyExpression.structuralHashCode(),
-				literal.structuralHashCode());
 	}
 
 	public ElkLiteral getLiteral() {
@@ -65,19 +58,6 @@ public class ElkDataHasValueImpl extends ElkDataPropertyExpressionObject
 		result.append(literal.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataHasValue) {
-			return dataPropertyExpression.equals(((ElkDataHasValue) object)
-					.getDataPropertyExpression())
-					&& literal.equals(((ElkDataHasValue) object)
-							.getLiteral());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

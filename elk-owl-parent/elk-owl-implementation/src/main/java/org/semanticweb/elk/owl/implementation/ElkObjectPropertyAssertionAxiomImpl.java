@@ -28,7 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkObjectPropertyAssertion.
@@ -43,20 +42,12 @@ public class ElkObjectPropertyAssertionAxiomImpl extends
 	protected final ElkIndividual firstIndividual;
 	protected final ElkIndividual secondIndividual;
 
-	private static final int constructorHash_ = "ElkObjectPropertyAssertionAxiom"
-			.hashCode();
-
 	/* package-private */ElkObjectPropertyAssertionAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
 		super(objectPropertyExpression);
 		this.firstIndividual = firstIndividual;
 		this.secondIndividual = secondIndividual;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				objectPropertyExpression.structuralHashCode(),
-				firstIndividual.structuralHashCode(),
-				secondIndividual.structuralHashCode());
 	}
 
 	public ElkIndividual getFirstIndividual() {
@@ -77,24 +68,6 @@ public class ElkObjectPropertyAssertionAxiomImpl extends
 		result.append(secondIndividual.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectPropertyAssertionAxiom) {
-			return objectPropertyExpression
-					.equals(((ElkObjectPropertyAssertionAxiom) object)
-							.getObjectPropertyExpression())
-					&& firstIndividual
-							.equals(((ElkObjectPropertyAssertionAxiom) object)
-									.getFirstIndividual())
-					&& secondIndividual
-							.equals(((ElkObjectPropertyAssertionAxiom) object)
-									.getSecondIndividual());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {

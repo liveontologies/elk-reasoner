@@ -700,7 +700,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 
 	protected final void write(ElkEntity elkEntity) {
 		write('<');
-		write(elkEntity.getIri().toString());
+		write(elkEntity.getIri().asString());
 		write('>');
 	}
 

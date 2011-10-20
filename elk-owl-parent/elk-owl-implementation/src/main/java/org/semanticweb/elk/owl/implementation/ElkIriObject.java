@@ -41,12 +41,8 @@ public abstract class ElkIriObject extends ElkObjectImpl {
 		return iri;
 	}
 	
-	public String getFullIri() {
-		return iri.toString();
-	}
-
 	@Override
 	public String toString() {
-		return '<' + getFullIri() + '>';
+		return '<' + iri.asString() + '>';
 	}
 }

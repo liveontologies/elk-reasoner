@@ -28,7 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkNegativeObjectPropertyAssertion.
@@ -43,20 +42,12 @@ public class ElkNegativeObjectPropertyAssertionAxiomImpl extends
 	protected final ElkIndividual firstIndividual;
 	protected final ElkIndividual secondIndividual;
 
-	private static final int constructorHash_ = "ElkNegativeObjectPropertyAssertionAxiom"
-			.hashCode();
-
 	/* package-private */ElkNegativeObjectPropertyAssertionAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
 		super(objectPropertyExpression);
 		this.firstIndividual = firstIndividual;
 		this.secondIndividual = secondIndividual;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				objectPropertyExpression.structuralHashCode(),
-				firstIndividual.structuralHashCode(),
-				secondIndividual.structuralHashCode());
 	}
 
 	public ElkIndividual getFirstIndividual() {
@@ -78,24 +69,6 @@ public class ElkNegativeObjectPropertyAssertionAxiomImpl extends
 		result.append(secondIndividual.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkNegativeObjectPropertyAssertionAxiom) {
-			return objectPropertyExpression
-					.equals(((ElkNegativeObjectPropertyAssertionAxiom) object)
-							.getObjectPropertyExpression())
-					&& firstIndividual
-							.equals(((ElkNegativeObjectPropertyAssertionAxiom) object)
-									.getFirstIndividual())
-					&& secondIndividual
-							.equals(((ElkNegativeObjectPropertyAssertionAxiom) object)
-									.getSecondIndividual());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {

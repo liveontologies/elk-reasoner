@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Corresponds to an <a href=
@@ -44,32 +43,14 @@ public class ElkInverseFunctionalObjectPropertyAxiomImpl extends
 		ElkObjectPropertyExpressionObject implements
 		ElkInverseFunctionalObjectPropertyAxiom {
 
-	private static final int constructorHash_ = "ElkFunctionalObjectPropertyAxiom"
-			.hashCode();
-
 	/* package-private */ElkInverseFunctionalObjectPropertyAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
-		this.structuralHashCode = HashGenerator
-				.combineListHash(constructorHash_,
-						objectPropertyExpression.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("InverseFunctionalObjectProperty");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkInverseFunctionalObjectPropertyAxiomImpl) {
-			return objectPropertyExpression
-					.equals(((ElkInverseFunctionalObjectPropertyAxiomImpl) object)
-							.getObjectPropertyExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {

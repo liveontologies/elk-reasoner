@@ -42,17 +42,6 @@ public class ElkDataPropertyImpl extends ElkIriObject implements ElkEntity,
 
 	ElkDataPropertyImpl(ElkIri iri) {
 		super(iri);
-		this.structuralHashCode = iri.hashCode();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataProperty) {
-			return iri.equals(((ElkDataProperty) object).getIri());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkDataPropertyExpressionVisitor<O> visitor) {

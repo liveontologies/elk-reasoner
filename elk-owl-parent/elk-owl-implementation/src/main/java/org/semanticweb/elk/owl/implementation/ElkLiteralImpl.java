@@ -26,7 +26,6 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkLiteralVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkLiteral.
@@ -41,19 +40,6 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 	/* package-private */ElkLiteralImpl(String lexicalForm, ElkDatatype datatype) {
 		this.lexicalForm = lexicalForm;
 		this.datatype = datatype;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				datatype.structuralHashCode(), lexicalForm.hashCode());
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkLiteral) {
-			return lexicalForm.equals(((ElkLiteral) object).getLexicalForm())
-					&& datatype.equals(((ElkLiteral) object).getDatatype());
-		} else {
-			return false;
-		}
 	}
 
 	public String getLexicalForm() {

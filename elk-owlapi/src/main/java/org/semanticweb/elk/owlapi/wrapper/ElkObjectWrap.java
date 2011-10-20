@@ -57,22 +57,4 @@ public abstract class ElkObjectWrap<T extends OWLObject> implements ElkObject {
 		return owlObject.hashCode();
 	}
 
-	/*
-	 * We compute the structural hash code by taking hash code of the underlying
-	 * owl object.
-	 */
-	public int structuralHashCode() {
-		return owlObject.hashCode();
-	}
-
-	/*
-	 * We implement structural equality by testing the underlying owl objects
-	 */
-	public final boolean structuralEquals(Object obj) {
-		if (obj instanceof ElkObjectWrap<?>)
-			return this.owlObject.equals(((ElkObjectWrap<?>) obj).owlObject);
-		else
-			return false;
-	}
-
 }

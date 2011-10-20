@@ -26,7 +26,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkObjectComplementOf.
@@ -39,15 +38,10 @@ public class ElkObjectComplementOfImpl extends ElkObjectImpl implements
 
 	protected final ElkClassExpression classExpression;
 
-	private static final int constructorHash_ = "ElkObjectComplementOf"
-			.hashCode();
-
 	/* package-private */ElkObjectComplementOfImpl(
 			ElkClassExpression classExpression) {
 
 		this.classExpression = classExpression;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_, classExpression.structuralHashCode());
 	}
 
 	public ElkClassExpression getClassExpression() {
@@ -60,17 +54,6 @@ public class ElkObjectComplementOfImpl extends ElkObjectImpl implements
 		result.append(classExpression.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectComplementOf) {
-			return classExpression.equals(((ElkObjectComplementOf) object)
-					.getClassExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectVisitor<O> visitor) {

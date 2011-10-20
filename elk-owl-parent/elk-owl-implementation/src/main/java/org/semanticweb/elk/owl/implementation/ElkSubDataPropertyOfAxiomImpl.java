@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkSubDataPropertyOfAxiom.
@@ -43,18 +42,11 @@ public class ElkSubDataPropertyOfAxiomImpl extends ElkObjectImpl implements
 	protected final ElkDataPropertyExpression subDataPropertyExpression;
 	protected final ElkDataPropertyExpression superDataPropertyExpression;
 
-	private static final int constructorHash_ = "ElkSubDataPropertyOfAxiom"
-			.hashCode();
-
 	/* package-private */ElkSubDataPropertyOfAxiomImpl(
 			ElkDataPropertyExpression subDataPropertyExpression,
 			ElkDataPropertyExpression superDataPropertyExpression) {
 		this.subDataPropertyExpression = subDataPropertyExpression;
 		this.superDataPropertyExpression = superDataPropertyExpression;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				subDataPropertyExpression.structuralHashCode(),
-				superDataPropertyExpression.structuralHashCode());
 	}
 
 	public ElkDataPropertyExpression getSubDataPropertyExpression() {
@@ -73,21 +65,6 @@ public class ElkSubDataPropertyOfAxiomImpl extends ElkObjectImpl implements
 		result.append(superDataPropertyExpression.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkSubDataPropertyOfAxiom) {
-			return subDataPropertyExpression
-					.equals(((ElkSubDataPropertyOfAxiom) object)
-							.getSubDataPropertyExpression())
-					&& superDataPropertyExpression
-							.equals(((ElkSubDataPropertyOfAxiom) object)
-									.getSuperDataPropertyExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {

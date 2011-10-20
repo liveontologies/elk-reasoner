@@ -26,34 +26,14 @@
 package org.semanticweb.elk.owl.interfaces;
 
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.StructuralHashObject;
 
 /**
- * Basic implementation of hashable objects in ELK, typically syntactic
- * structures like axioms or class expressions. In addition to a structural hash
- * code that reflects the content of an ELKObject, this class also provides a
- * basic hash code that acts as an ID for the actual Java object and which is
- * used in managing such objects.
  * 
- * @author Markus Kroetzsch
+ * @author Frantisek Simancik
+ *
  */
-public interface ElkObject extends StructuralHashObject {
+public interface ElkObject {
 
-	/**
-	 * Compare the structure of two ELKObjects and return true if they are
-	 * structurally equivalent.
-	 * 
-	 * @param object
-	 * @return True if objects are structurally equal
-	 */
-	public abstract boolean structuralEquals(Object object);
-
-	/**
-	 * Accept an ElkObjectVisitor.
-	 * 
-	 * @param visitor
-	 * @return
-	 */
-	public abstract <O> O accept(ElkObjectVisitor<O> visitor);
+	public <O> O accept(ElkObjectVisitor<O> visitor);
 
 }

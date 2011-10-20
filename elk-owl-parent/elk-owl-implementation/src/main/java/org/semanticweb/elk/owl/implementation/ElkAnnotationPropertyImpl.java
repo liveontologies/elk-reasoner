@@ -33,11 +33,6 @@ public class ElkAnnotationPropertyImpl extends ElkIriObject implements ElkAnnota
 		super(iri);
 	}
 
-	public boolean structuralEquals(Object object) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
 	public <O> O accept(ElkEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

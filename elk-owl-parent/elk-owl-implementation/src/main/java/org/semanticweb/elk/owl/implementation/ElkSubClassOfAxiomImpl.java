@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Corresponds to a <a href=
@@ -46,16 +45,11 @@ public class ElkSubClassOfAxiomImpl extends ElkObjectImpl implements
 	protected final ElkClassExpression subClassExpression,
 			superClassExpression;
 
-	private static final int constructorHash_ = "ElkSubClassOfAxiom".hashCode();
-
 	/* package-private */ElkSubClassOfAxiomImpl(
 			ElkClassExpression subClassExpression,
 			ElkClassExpression superClassExpression) {
 		this.subClassExpression = subClassExpression;
 		this.superClassExpression = superClassExpression;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_, subClassExpression.structuralHashCode(),
-				superClassExpression.structuralHashCode());
 	}
 
 	public ElkClassExpression getSubClassExpression() {
@@ -74,20 +68,6 @@ public class ElkSubClassOfAxiomImpl extends ElkObjectImpl implements
 		result.append(superClassExpression.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkSubClassOfAxiom) {
-			return subClassExpression.equals(((ElkSubClassOfAxiom) object)
-					.getSubClassExpression())
-					&& superClassExpression
-							.equals(((ElkSubClassOfAxiom) object)
-									.getSuperClassExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {

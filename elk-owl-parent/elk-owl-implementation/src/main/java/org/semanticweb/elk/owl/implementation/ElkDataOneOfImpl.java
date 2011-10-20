@@ -24,8 +24,8 @@ package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -37,13 +37,9 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDataOneOfImpl extends ElkObjectListObject<ElkLiteral>
 		implements ElkDataOneOf {
 
-	private static final int constructorHash_ = "ElkDataOneOf".hashCode();
-
 	/* package-private */ElkDataOneOfImpl(
 			List<? extends ElkLiteral> literals) {
 		super(literals);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, literals);
 	}
 
 	public List<? extends ElkLiteral> getLiterals() {
@@ -53,17 +49,6 @@ public class ElkDataOneOfImpl extends ElkObjectListObject<ElkLiteral>
 	@Override
 	public String toString() {
 		return buildFssString("DataOneOf");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataOneOf) {
-			return elkObjects
-					.equals(((ElkDataOneOf) object).getLiterals());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {

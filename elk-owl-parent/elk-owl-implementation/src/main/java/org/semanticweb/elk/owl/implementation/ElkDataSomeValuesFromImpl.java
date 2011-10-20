@@ -25,12 +25,11 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkDataSomeValuesFrom.
@@ -41,37 +40,15 @@ public class ElkDataSomeValuesFromImpl extends
 		ElkDataPropertyExpressionDataRangeObject implements
 		ElkDataSomeValuesFrom {
 
-	private static final int constructorHash_ = "ElkDataSomeValuesFrom"
-			.hashCode();
-
 	/* package-private */ElkDataSomeValuesFromImpl(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkDataRange dataRange) {
 		super(dataPropertyExpression, dataRange);
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				dataPropertyExpression.structuralHashCode(),
-				dataRange.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("DataSomeValuesFrom");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataSomeValuesFrom) {
-			return dataPropertyExpression
-					.equals(((ElkDataSomeValuesFrom) object)
-							.getDataPropertyExpression())
-					&& dataRange
-							.equals(((ElkDataSomeValuesFrom) object)
-									.getDataRange());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

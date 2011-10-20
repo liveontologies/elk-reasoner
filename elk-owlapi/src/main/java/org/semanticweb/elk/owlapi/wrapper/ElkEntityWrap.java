@@ -40,10 +40,6 @@ public abstract class ElkEntityWrap<T extends OWLEntity> extends
 		super(owlEntity);
 	}
 
-	public String getFullIri() {
-		return this.owlObject.getIRI().toString();
-	}
-	
 	public ElkIri getIri() {
 		return new ElkFullIri(this.owlObject.getIRI().toString());
 	}

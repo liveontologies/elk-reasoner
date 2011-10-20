@@ -35,11 +35,6 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkAnnotationAxiomImpl extends ElkObjectImpl implements
 		ElkAnnotationAxiom {
 
-	public boolean structuralEquals(Object object) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -46,21 +46,10 @@ public class ElkDeclarationAxiomImpl extends ElkObjectImpl implements
 
 	/* package-private */ElkDeclarationAxiomImpl(ElkEntity entity) {
 		this.entity = entity;
-		this.structuralHashCode = entity.hashCode();
 	}
 
 	public ElkEntity getEntity() {
 		return entity;
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDeclarationAxiom) {
-			return entity.equals(((ElkDeclarationAxiom) object).getEntity());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {

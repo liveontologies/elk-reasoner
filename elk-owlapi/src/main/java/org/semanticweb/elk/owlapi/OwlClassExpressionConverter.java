@@ -74,11 +74,11 @@ public class OwlClassExpressionConverter implements
 	}
 
 	public ElkClass visit(OWLClass ce) {
-		// TODO use visitors?
+		// TODO is this needed?
 		if (ce.isOWLThing())
 			return objectFactory.getOwlThing();
 		else if (ce.isOWLNothing())
-			return objectFactory.getOwlThing();
+			return objectFactory.getOwlNothing();
 		else
 			return objectFactory.getClass(new ElkFullIri(ce.getIRI().toString()));
 	}

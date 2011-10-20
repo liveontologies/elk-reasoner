@@ -36,7 +36,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
-import org.semanticweb.elk.util.hashing.StructuralHashObject;
 
 /**
  * Class for storing information about a class in the context of classification.
@@ -47,11 +46,11 @@ import org.semanticweb.elk.util.hashing.StructuralHashObject;
  * 
  * @author Yevgeny Kazakov
  */
-public class ClassNode implements StructuralHashObject {
+public class ClassNode {
 	// TODO: return members, sub-nodes and super-nodes in the methods as sets
 	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
-	 * The first element is the least according to the ordering defined by 
+	 * The first element is the least one according to the ordering defined by 
 	 * PredefinedElkIri.compare().
 	 */
 	final List<ElkClass> members;
@@ -72,7 +71,7 @@ public class ClassNode implements StructuralHashObject {
 	 * @param equivalent
 	 *            non-empty list of equivalent ElkClass objects
 	 */
-	public ClassNode(final List<ElkClass> equivalent) {
+	protected ClassNode(List<ElkClass> equivalent) {
 		this.members = equivalent;
 		this.directSubNodes = new ArrayList<ClassNode>();
 		this.directSuperNodes = new ArrayList<ClassNode>();
@@ -124,7 +123,8 @@ public class ClassNode implements StructuralHashObject {
 
 	/**
 	 * Get one ElkClass object to canonically represent the classes in this
-	 * ClassNode.
+	 * ClassNode. It is guaranteed that the least object is the least one 
+	 * according to the ordering defined by PredefinedElkIri.compare().
 	 * 
 	 * @return canonical ElkClass object
 	 */
@@ -198,29 +198,6 @@ public class ClassNode implements StructuralHashObject {
 			}
 		}
 		return Collections.unmodifiableSet(result);
-	}
-
-	public int structuralHashCode() {
-		int memberHash = HashGenerator.combineMultisetHash(true, members);
-
-		int subClassHash = "subClassOf".hashCode();
-		for (ClassNode o : directSubNodes) {
-			int subMemberHash = HashGenerator.combineMultisetHash(true,
-					o.getMembers());
-			subClassHash = HashGenerator.combineMultisetHash(false,
-					subClassHash, subMemberHash);
-		}
-
-		int superClassHash = "superClassOf".hashCode();
-		for (ClassNode o : directSuperNodes) {
-			int superMemberHash = HashGenerator.combineMultisetHash(true,
-					o.getMembers());
-			superClassHash = HashGenerator.combineMultisetHash(false,
-					superClassHash, superMemberHash);
-		}
-
-		return HashGenerator.combineListHash(memberHash, subClassHash,
-				superClassHash);
 	}
 
 	private final int hashCode_ = HashGenerator.generateNextHashCode();

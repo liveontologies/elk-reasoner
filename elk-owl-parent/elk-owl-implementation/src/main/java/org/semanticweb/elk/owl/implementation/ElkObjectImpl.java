@@ -25,55 +25,14 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import java.util.List;
-
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.util.hashing.HashGenerator;
-import org.semanticweb.elk.util.hashing.StructuralHashObject;
 
 /**
  * Basic implementation of hashable objects in ELK, typically syntactic
- * structures like axioms or class expressions. ElkObjects are immutable and
- * their equality is based on their actual structural content.
+ * structures like axioms or class expressions. ElkObjects are immutable.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
 public abstract class ElkObjectImpl implements ElkObject {
-
-	/**
-	 * Structural hash code for this object. Must be initialized on
-	 * construction.
-	 */
-	protected int structuralHashCode;
-
-	public final int structuralHashCode() {
-		return structuralHashCode;
-	}
-
-	public final int hashCode() {
-		return structuralHashCode;
-	}
-
-	public final boolean equals(Object obj) {
-		return structuralEquals(obj);
-	}
-
-	/**
-	 * Helper method to compute a composite hash from a constructor hash and a
-	 * list of objects. The constructor hash seeds the hash generation and can
-	 * be, e.g., the hash code of a string name that identifies the kind of
-	 * hash. The list of hash objects represents the components of the structure
-	 * that is represented by the hash. Their order is taken into account when
-	 * computing the hash.
-	 * 
-	 * @param constructorHash
-	 * @param subObjects
-	 * @return hash code
-	 */
-	public static int computeCompositeHash(int constructorHash,
-			List<? extends StructuralHashObject> subObjects) {
-		return HashGenerator.combineListHash(constructorHash,
-				HashGenerator.combineListHash(subObjects));
-	}
 }

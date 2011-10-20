@@ -26,9 +26,7 @@ package org.semanticweb.elk.owl.managers;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * Interface for classes that implement ElkObject management. The main task of
- * such classes is to ensure that structurally equivalent ElkObjects are
- * represented by only one object in memory.
+ * Interface for classes that implement ElkObject management.
  * 
  * @author Markus Kroetzsch
  */
@@ -40,13 +38,10 @@ public interface ElkObjectManager {
 	 * The method always returns an ElkObject that is structurally equivalent to
 	 * the one that was given. However, it might return another Java object in
 	 * cases where it already knows about an ElkObject that is structurally
-	 * equivalent to the given one. This reduces the memory consumption by
-	 * ensuring that only one copy of each (immutable) ElkObject is kept for
-	 * each structure.
+	 * equivalent to the given one.
 	 * 
-	 * @param object
-	 *            the object to get a canonical reference for
-	 * @return canonical object representing the input data
+	 * @param the object to get a substitute for
+	 * @return an object that is structurally equivalent to the given one
 	 */
 	public ElkObject getCanonicalElkObject(ElkObject object);
 

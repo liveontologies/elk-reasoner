@@ -22,13 +22,12 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkDataPropertyRangeAxiom.
@@ -39,37 +38,15 @@ public class ElkDataPropertyRangeAxiomImpl extends
 		ElkDataPropertyExpressionDataRangeObject implements
 		ElkDataPropertyRangeAxiom {
 
-	private static final int constructorHash_ = "ElkDataPropertyRangeAxiom"
-			.hashCode();
-
 	ElkDataPropertyRangeAxiomImpl(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkDataRange dataRange) {
 		super(dataPropertyExpression, dataRange);
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				dataPropertyExpression.structuralHashCode(),
-				dataRange.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("DataPropertyRange");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataPropertyRangeAxiom) {
-			return dataPropertyExpression
-					.equals(((ElkDataPropertyRangeAxiom) object)
-							.getDataPropertyExpression())
-					&& dataRange
-							.equals(((ElkDataPropertyRangeAxiom) object)
-									.getDataRange());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {

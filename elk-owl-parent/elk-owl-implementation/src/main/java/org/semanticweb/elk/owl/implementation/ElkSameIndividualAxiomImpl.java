@@ -38,30 +38,14 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkSameIndividualAxiomImpl extends ElkIndividualListObject
 		implements ElkSameIndividualAxiom {
 
-	private static final int constructorHash_ = "ElkSameIndividualAxiom"
-			.hashCode();
-
 	/* package-private */ElkSameIndividualAxiomImpl(
 			List<? extends ElkIndividual> individuals) {
 		super(individuals);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, individuals);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("SameIndividual");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkSameIndividualAxiom) {
-			return elkObjects.equals(((ElkSameIndividualAxiom) object)
-					.getIndividuals());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {

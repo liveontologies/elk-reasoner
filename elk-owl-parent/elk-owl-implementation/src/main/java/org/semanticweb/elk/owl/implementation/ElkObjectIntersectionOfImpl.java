@@ -41,30 +41,14 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkObjectIntersectionOfImpl extends ElkClassExpressionListObject
 		implements ElkObjectIntersectionOf {
 
-	private static final int constructorHash_ = "ElkObjectIntersectionOf"
-			.hashCode();
-
 	/* package-private */ElkObjectIntersectionOfImpl(
 			List<? extends ElkClassExpression> classExpressions) {
 		super(classExpressions);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, classExpressions);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("ObjectIntersectionOf");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectIntersectionOf) {
-			return elkObjects.equals(((ElkObjectIntersectionOf) object)
-					.getClassExpressions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

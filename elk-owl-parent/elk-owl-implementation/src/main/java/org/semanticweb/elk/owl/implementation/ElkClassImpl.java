@@ -42,17 +42,6 @@ public class ElkClassImpl extends ElkIriObject implements ElkEntity, ElkClass {
 
 	ElkClassImpl(ElkIri iri) {
 		super(iri);
-		this.structuralHashCode = iri.hashCode();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkClass) {
-			return iri.equals(((ElkClass) object).getIri());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

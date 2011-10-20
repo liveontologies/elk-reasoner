@@ -28,7 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkObjectPropertyRangeAxiom.
@@ -39,37 +38,15 @@ public class ElkObjectPropertyRangeAxiomImpl extends
 		ElkObjectPropertyExpressionClassExpressionObject implements
 		ElkObjectPropertyRangeAxiom {
 
-	private static final int constructorHash_ = "ElkObjectPropertyRangeAxiom"
-			.hashCode();
-
 	ElkObjectPropertyRangeAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
 		super(objectPropertyExpression, classExpression);
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				objectPropertyExpression.structuralHashCode(),
-				classExpression.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("ObjectPropertyRange");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectPropertyRangeAxiom) {
-			return objectPropertyExpression
-					.equals(((ElkObjectPropertyRangeAxiom) object)
-							.getObjectPropertyExpression())
-					&& classExpression
-							.equals(((ElkObjectPropertyRangeAxiom) object)
-									.getClassExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {

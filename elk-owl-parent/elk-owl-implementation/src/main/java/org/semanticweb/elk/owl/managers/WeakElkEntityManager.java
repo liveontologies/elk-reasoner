@@ -36,7 +36,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 
-public class WeakEntityManager implements ElkObjectManager {
+/**
+ * An implementation of the ElkObjectManager interface that keeps track of and
+ * reuses existing ElkEntity objects. The entities are maintained using weak
+ * references.  
+ * 
+ * @author Frantisek Simancik
+ *
+ */
+public class WeakElkEntityManager implements ElkObjectManager {
 	
 	private HashMap<WeakWrapper<? extends ElkEntity>, WeakWrapper<? extends ElkEntity>> cache = 
 		new HashMap<WeakWrapper<? extends ElkEntity>, WeakWrapper<? extends ElkEntity>>();

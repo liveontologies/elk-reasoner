@@ -27,8 +27,8 @@ package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -41,30 +41,14 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDataIntersectionOfImpl extends ElkDataRangeListObject
 		implements ElkDataIntersectionOf {
 
-	private static final int constructorHash_ = "ElkDataIntersectionOf"
-			.hashCode();
-
 	/* package-private */ElkDataIntersectionOfImpl(
 			List<? extends ElkDataRange> dataRanges) {
 		super(dataRanges);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, dataRanges);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("DataIntersectionOf");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDataIntersectionOf) {
-			return elkObjects.equals(((ElkDataIntersectionOf) object)
-					.getDataRanges());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {

@@ -51,10 +51,6 @@ public final class PredefinedElkClass implements ElkClass {
 	public static final PredefinedElkClass OWL_NOTHING = new PredefinedElkClass(
 			PredefinedElkIri.OWL_NOTHING);
 
-	public String getFullIri() {
-		return iri.toString();
-	}
-	
 	public ElkIri getIri() {
 		return iri;
 	}
@@ -71,14 +67,4 @@ public final class PredefinedElkClass implements ElkClass {
 		return visitor.visit(this);
 	}
 
-	// TODO: delete when removed from the interfaces
-	public boolean structuralEquals(Object object) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public int structuralHashCode() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }

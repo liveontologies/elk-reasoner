@@ -29,7 +29,6 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 public class ElkDatatypeRestrictionImpl extends ElkObjectImpl implements
 		ElkDatatypeRestriction {
@@ -41,23 +40,6 @@ public class ElkDatatypeRestrictionImpl extends ElkObjectImpl implements
 			List<ElkFacetRestriction> facetRestrictions) {
 		this.datatype = datatype;
 		this.facetRestrictions = facetRestrictions;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				datatype.structuralHashCode(),
-				HashGenerator.combineListHash(facetRestrictions));
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDatatypeRestriction) {
-			return datatype.equals(((ElkDatatypeRestriction) object)
-					.getDatatype())
-					&& facetRestrictions
-							.equals(((ElkDatatypeRestriction) object)
-									.getFacetRestrictions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectVisitor<O> visitor) {

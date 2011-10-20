@@ -31,7 +31,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Corresponds to an <a href=
@@ -48,18 +47,11 @@ public class ElkSubObjectPropertyOfAxiomImpl extends ElkObjectImpl implements
 	protected final ElkSubObjectPropertyExpression subObjectPropertyExpression;
 	protected final ElkObjectPropertyExpression superObjectPropertyExpression;
 
-	private static final int constructorHash_ = "ElkSubObjectPropertyOfAxiom"
-			.hashCode();
-
 	/* package-private */ElkSubObjectPropertyOfAxiomImpl(
 			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression) {
 		this.subObjectPropertyExpression = subObjectPropertyExpression;
 		this.superObjectPropertyExpression = superObjectPropertyExpression;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				subObjectPropertyExpression.structuralHashCode(),
-				superObjectPropertyExpression.structuralHashCode());
 	}
 
 	public ElkSubObjectPropertyExpression getSubObjectPropertyExpression() {
@@ -78,21 +70,6 @@ public class ElkSubObjectPropertyOfAxiomImpl extends ElkObjectImpl implements
 		result.append(superObjectPropertyExpression.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkSubObjectPropertyOfAxiom) {
-			return subObjectPropertyExpression
-					.equals(((ElkSubObjectPropertyOfAxiom) object)
-							.getSubObjectPropertyExpression())
-					&& superObjectPropertyExpression
-							.equals(((ElkSubObjectPropertyOfAxiom) object)
-									.getSuperObjectPropertyExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {

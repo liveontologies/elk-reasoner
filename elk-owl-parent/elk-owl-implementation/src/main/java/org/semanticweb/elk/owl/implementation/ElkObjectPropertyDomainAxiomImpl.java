@@ -28,7 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkObjectPropertyDomainAxiom.
@@ -39,37 +38,15 @@ public class ElkObjectPropertyDomainAxiomImpl extends
 		ElkObjectPropertyExpressionClassExpressionObject implements
 		ElkObjectPropertyDomainAxiom {
 
-	private static final int constructorHash_ = "ElkObjectPropertyDomainAxiom"
-			.hashCode();
-
 	ElkObjectPropertyDomainAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
 		super(objectPropertyExpression, classExpression);
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				objectPropertyExpression.structuralHashCode(),
-				classExpression.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("ObjectPropertyDomain");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkObjectPropertyDomainAxiom) {
-			return objectPropertyExpression
-					.equals(((ElkObjectPropertyDomainAxiom) object)
-							.getObjectPropertyExpression())
-					&& classExpression
-							.equals(((ElkObjectPropertyDomainAxiom) object)
-									.getClassExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {

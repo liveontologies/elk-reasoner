@@ -24,8 +24,8 @@ package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
@@ -41,31 +41,14 @@ public class ElkDisjointDataPropertiesAxiomImpl extends
 		ElkDataPropertyExpressionListObject implements
 		ElkDisjointDataPropertiesAxiom {
 
-	private static final int constructorHash_ = "ElkDisjointDataPropertiesAxiom"
-			.hashCode();
-
 	/* package-private */ElkDisjointDataPropertiesAxiomImpl(
 			List<? extends ElkDataPropertyExpression> disjointDataPropertyExpressions) {
 		super(disjointDataPropertyExpressions);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, disjointDataPropertyExpressions);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("DisjointDataProperties");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDisjointDataPropertiesAxiom) {
-			return elkObjects
-					.equals(((ElkDisjointDataPropertiesAxiom) object)
-							.getDataPropertyExpressions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {

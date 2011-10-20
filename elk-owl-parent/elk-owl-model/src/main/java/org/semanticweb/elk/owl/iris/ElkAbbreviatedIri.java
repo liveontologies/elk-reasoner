@@ -24,6 +24,9 @@ package org.semanticweb.elk.owl.iris;
 
 
 /**
+ * Represents an abbreaviated IRI. This class holds enough information to
+ * be able to get the IRI both in the full and the abbreviated form.
+ * 
  * @author Frantisek Simancik
  *
  */
@@ -46,8 +49,8 @@ public class ElkAbbreviatedIri extends ElkIri {
 	}
 	
 	@Override
-	public String toString() {
-		return prefix.getIri() + localName;
+	public String asString() {
+		return prefix.getIri().asString() + localName;
 	}
 
 }

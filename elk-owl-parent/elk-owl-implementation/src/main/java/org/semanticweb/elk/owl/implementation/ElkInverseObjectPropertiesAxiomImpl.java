@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Corresponds to an <a href=
@@ -46,18 +45,11 @@ public class ElkInverseObjectPropertiesAxiomImpl extends ElkObjectImpl
 	protected final ElkObjectPropertyExpression firstObjectPropertyExpression;
 	protected final ElkObjectPropertyExpression secondObjectPropertyExpression;
 
-	private static final int constructorHash_ = "ElkSubObjectPropertyOfAxiom"
-			.hashCode();
-
 	/* package-private */ElkInverseObjectPropertiesAxiomImpl(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression) {
 		this.firstObjectPropertyExpression = firstObjectPropertyExpression;
 		this.secondObjectPropertyExpression = secondObjectPropertyExpression;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_,
-				firstObjectPropertyExpression.structuralHashCode(),
-				secondObjectPropertyExpression.structuralHashCode());
 	}
 
 	public ElkObjectPropertyExpression getFirstObjectPropertyExpression() {
@@ -76,21 +68,6 @@ public class ElkInverseObjectPropertiesAxiomImpl extends ElkObjectImpl
 		result.append(secondObjectPropertyExpression.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkInverseObjectPropertiesAxiomImpl) {
-			return firstObjectPropertyExpression
-					.equals(((ElkInverseObjectPropertiesAxiomImpl) object)
-							.getFirstObjectPropertyExpression())
-					&& secondObjectPropertyExpression
-							.equals(((ElkInverseObjectPropertiesAxiomImpl) object)
-									.getSecondObjectPropertyExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {

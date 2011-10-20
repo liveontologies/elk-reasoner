@@ -25,12 +25,11 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Corresponds to a <a href=
@@ -44,32 +43,14 @@ public class ElkFunctionalDataPropertyAxiomImpl extends
 		ElkDataPropertyExpressionObject implements
 		ElkFunctionalDataPropertyAxiom {
 
-	private static final int constructorHash_ = "ElkFunctionalDataPropertyAxiom"
-			.hashCode();
-
 	/* package-private */ElkFunctionalDataPropertyAxiomImpl(
 			ElkDataPropertyExpression dataPropertyExpression) {
 		super(dataPropertyExpression);
-		this.structuralHashCode = HashGenerator
-				.combineListHash(constructorHash_,
-						dataPropertyExpression.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("FunctionalDataProperty");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkFunctionalDataPropertyAxiomImpl) {
-			return dataPropertyExpression
-					.equals(((ElkFunctionalDataPropertyAxiomImpl) object)
-							.getDataPropertyExpression());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {

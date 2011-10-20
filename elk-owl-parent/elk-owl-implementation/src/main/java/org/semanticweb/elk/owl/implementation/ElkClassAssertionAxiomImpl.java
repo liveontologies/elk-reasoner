@@ -28,7 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkClassAssertionAxiom.
@@ -42,17 +41,11 @@ public class ElkClassAssertionAxiomImpl extends ElkObjectImpl implements
 	protected final ElkIndividual individual;
 	protected final ElkClassExpression classExpression;
 
-	private static final int constructorHash_ = "ElkClassAssertionAxiom"
-			.hashCode();
-
 	/* package-private */ElkClassAssertionAxiomImpl(
 			ElkClassExpression classExpression, ElkIndividual individual) {
 
 		this.individual = individual;
 		this.classExpression = classExpression;
-		this.structuralHashCode = HashGenerator.combineListHash(
-				constructorHash_, classExpression.structuralHashCode(),
-				individual.structuralHashCode());
 	}
 
 	public ElkClassExpression getClassExpression() {
@@ -71,19 +64,6 @@ public class ElkClassAssertionAxiomImpl extends ElkObjectImpl implements
 		result.append(individual.toString());
 		result.append(")");
 		return result.toString();
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkClassAssertionAxiom) {
-			return classExpression.equals(((ElkClassAssertionAxiom) object)
-					.getClassExpression())
-					&& individual.equals(((ElkClassAssertionAxiom) object)
-							.getIndividual());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {

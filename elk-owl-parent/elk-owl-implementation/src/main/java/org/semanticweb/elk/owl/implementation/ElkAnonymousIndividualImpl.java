@@ -40,7 +40,6 @@ public class ElkAnonymousIndividualImpl extends ElkObjectImpl implements
 
 	/* package-private */ElkAnonymousIndividualImpl(String nodeId) {
 		this.nodeId = nodeId;
-		this.structuralHashCode = nodeId.hashCode();
 	}
 
 	public String getNodeId() {
@@ -50,16 +49,6 @@ public class ElkAnonymousIndividualImpl extends ElkObjectImpl implements
 	@Override
 	public String toString() {
 		return nodeId;
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkAnonymousIndividual) {
-			return nodeId.equals(((ElkAnonymousIndividual) object).getNodeId());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkIndividualVisitor<O> visitor) {

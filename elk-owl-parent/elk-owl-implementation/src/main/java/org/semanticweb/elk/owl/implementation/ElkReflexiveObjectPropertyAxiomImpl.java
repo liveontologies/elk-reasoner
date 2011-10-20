@@ -27,7 +27,6 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ELK implementation of ElkReflexiveObjectPropertyAxiom.
@@ -39,31 +38,15 @@ public class ElkReflexiveObjectPropertyAxiomImpl extends
 		ElkObjectPropertyExpressionObject implements
 		ElkReflexiveObjectPropertyAxiom {
 
-	private static final int constructorHash_ = "ElkReflexiveObjectPropertyAxiom"
-			.hashCode();
 
 	/* package-private */ElkReflexiveObjectPropertyAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
-		this.structuralHashCode = HashGenerator
-				.combineListHash(constructorHash_,
-						objectPropertyExpression.structuralHashCode());
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("ReflexiveObjectProperty");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkReflexiveObjectPropertyAxiom) {
-			return objectPropertyExpression
-					.equals(((ElkReflexiveObjectPropertyAxiomImpl) object).objectPropertyExpression);
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {

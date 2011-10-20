@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Class taxonomy that is suitable for concurrent processing.
@@ -43,7 +42,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Frantisek Simancik
  * 
  */
-class ConcurrentClassTaxonomy extends ClassTaxonomy {
+class ConcurrentClassTaxonomy implements ClassTaxonomy {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -75,7 +74,4 @@ class ConcurrentClassTaxonomy extends ClassTaxonomy {
 		return result;
 	}
 
-	public int structuralHashCode() {
-		return HashGenerator.combineMultisetHash(true, getNodes());
-	}
 }

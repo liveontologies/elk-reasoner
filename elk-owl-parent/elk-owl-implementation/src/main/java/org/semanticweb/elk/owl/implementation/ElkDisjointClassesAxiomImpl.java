@@ -40,30 +40,14 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDisjointClassesAxiomImpl extends ElkClassExpressionListObject
 		implements ElkDisjointClassesAxiom {
 
-	private static final int constructorHash_ = "ElkDisjointClassesAxiom"
-			.hashCode();
-
 	/* package-private */ElkDisjointClassesAxiomImpl(
 			List<? extends ElkClassExpression> disjointClassExpressions) {
 		super(disjointClassExpressions);
-		this.structuralHashCode = ElkObjectImpl.computeCompositeHash(
-				constructorHash_, disjointClassExpressions);
 	}
 
 	@Override
 	public String toString() {
 		return buildFssString("DisjointClasses");
-	}
-
-	public boolean structuralEquals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (object instanceof ElkDisjointClassesAxiom) {
-			return elkObjects.equals(((ElkDisjointClassesAxiom) object)
-					.getClassExpressions());
-		} else {
-			return false;
-		}
 	}
 
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
