@@ -52,28 +52,38 @@ public class Reasoner {
 	public Reasoner(ExecutorService executor, int workerNo) {
 		this.executor = executor;
 		this.workerNo = workerNo;
-		this.ontologyIndex = new OntologyIndexImpl();
+		reset();
 	}
 	
 	public Reasoner() {
 		this(Executors.newCachedThreadPool(), 2 * Runtime.getRuntime()
 				.availableProcessors());
 	}
+	
+	public void reset() {
+		ontologyIndex = new OntologyIndexImpl();
+		classTaxonomy = null;
+	}
 
 	public OntologyIndex getOntologyIndex() {
 		return ontologyIndex;
 	}
 	
+	/**
+	 * Returns null if the current state of the index is not classified.
+	 */
 	public ClassTaxonomy getTaxonomy() {
 		return classTaxonomy;
 	}
-
+	
 	public void addAxiom(ElkAxiom axiom) {
 		ontologyIndex.getAxiomInserter().process(axiom);
+		classTaxonomy = null;
 	}
 
 	public void removeAxiom(ElkAxiom axiom) {
 		ontologyIndex.getAxiomDeleter().process(axiom);
+		classTaxonomy = null;
 	}
 
 	public void classify(ProgressMonitor progressMonitor) {

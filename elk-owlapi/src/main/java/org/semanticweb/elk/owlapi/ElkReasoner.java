@@ -95,11 +95,9 @@ public class ElkReasoner implements OWLReasoner {
 	protected final OWLOntologyManager manager;
 	protected final OWLDataFactory owlDataFactory;
 	// the ELK reasoner instance used for reasoning
-	protected Reasoner reasoner; // TODO use only one reasoner object
+	protected final Reasoner reasoner;
 	// ELK progress monitor implementation to display progress
 	protected final ProgressMonitor elkProgressMonitor;
-	// isClassified == true iff ontology is classified
-	protected boolean isClassified = false;
 	// isBufferingMode == true iff the buffering mode for reasoner is {@link
 	// BufferingMode.BUFFERING}
 	protected final boolean isBufferingMode;
@@ -148,7 +146,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	protected void syncOntology() {
 		if (!isSynced) {
-			this.reasoner = new Reasoner();
+			reasoner.reset();
 			try {
 				Set<OWLOntology> importsClosure = owlOntology
 						.getImportsClosure();
@@ -179,7 +177,6 @@ public class ElkReasoner implements OWLReasoner {
 				}
 			} catch (ReasonerInterruptedException e) {
 			}
-			isClassified = false;
 			isSynced = true;
 			pendingChanges.clear();
 		}
@@ -209,11 +206,15 @@ public class ElkReasoner implements OWLReasoner {
 
 	protected void classifyOntology() {
 		reasoner.classify(elkProgressMonitor);
-		isClassified = true;
 	}
 
-	ClassNode getElkClassNode(ElkClass cls) {
-		return reasoner.getTaxonomy().getNode(cls);
+	protected ClassNode getElkClassNode(ElkClass cls) throws FreshEntitiesException {
+		if (reasoner.getTaxonomy() == null)
+			classifyOntology();
+		ClassNode node = reasoner.getTaxonomy().getNode(cls);
+		if (node == null)
+			throw new FreshEntitiesException(elkConverter.convert(cls));
+		return node;
 	}
 
 	/* Methods required by the OWLReasoner interface */
@@ -326,7 +327,7 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	public FreshEntityPolicy getFreshEntityPolicy() {
-		return FreshEntityPolicy.ALLOW;
+		return FreshEntityPolicy.DISALLOW;
 	}
 
 	public IndividualNodeSetPolicy getIndividualNodeSetPolicy() {
@@ -535,8 +536,8 @@ public class ElkReasoner implements OWLReasoner {
 
 	public boolean isConsistent() throws ReasonerInterruptedException,
 			TimeOutException {
-		// TODO implement for inconsistent ontologies
-		return true;
+		return getElkClassNode(PredefinedElkClass.OWL_NOTHING) !=
+			getElkClassNode(PredefinedElkClass.OWL_THING);
 	}
 
 	public boolean isEntailed(OWLAxiom arg0)
@@ -564,7 +565,7 @@ public class ElkReasoner implements OWLReasoner {
 	public boolean isPrecomputed(InferenceType inferenceType) {
 		// TODO Auto-generated method stub
 		if (inferenceType.equals(InferenceType.CLASS_HIERARCHY))
-			return isClassified;
+			return reasoner.getTaxonomy() != null;
 		else
 			return false;
 	}

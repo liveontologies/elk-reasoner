@@ -53,7 +53,7 @@ protected final OWLReasonerFactory factory=new ElkReasonerFactory();
     }
         
     public OWLReasonerConfiguration getConfiguration(ReasonerProgressMonitor monitor) {
-    	return new SimpleConfiguration(monitor, FreshEntityPolicy.ALLOW, 0, IndividualNodeSetPolicy.BY_NAME);
+    	return new SimpleConfiguration(monitor, FreshEntityPolicy.DISALLOW, 0, IndividualNodeSetPolicy.BY_NAME);
     }
     
     public void initialise() throws Exception {

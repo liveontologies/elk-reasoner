@@ -34,7 +34,6 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.classification.ClassTaxonomyPrinter;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndexImpl;
 import org.semanticweb.elk.util.logging.Statistics;
 
 public class IOReasoner extends Reasoner {
@@ -51,7 +50,7 @@ public class IOReasoner extends Reasoner {
 	IOException {
 		Statistics.logOperationStart("Loading", LOGGER_);
 
-		ontologyIndex = new OntologyIndexImpl();
+		reset();
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
 		parser.setPrefixDeclarations(new ElkPrefixDeclarationsImpl());
 		parser.ontologyDocument(ontologyIndex.getAxiomInserter());
