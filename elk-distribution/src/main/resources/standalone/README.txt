@@ -39,11 +39,13 @@ and store the result in classification.fss, run ELK as follows:
 You may want to specify further Java parameters for increasing available
 memory for classifying larger ontologies, e.g. by setting
 
-    java -XX:+AggressiveHeap -jar ${elk-standalone.base}.jar
+    java -Xms256M -Xmx1G -jar ${elk-standalone.base}.jar
+    
+or    
 
-or by providing a increased maximum heap size such as -Xmx3000m.	
+    java -XX:+AggressiveHeap -jar ${elk-standalone.base}.jar	
 
 Currently ELK can only read ontologies in OWL 2 Functional-Style Syntax.
 OWL ontologies in other formats can be converted into Functional-Style Syntax
-using Protégé version 4.1 or higher. To convert a file, open it in Protege
+using Protege version 4.1 or higher. To convert a file, open it in Protege
 and save using the menu: File > Save as... > OWL Functional Syntax

@@ -18,7 +18,7 @@ ${project.organization.name}
 
 ABOUT:
 
-This package contains a plugin for using ELK in Protege.
+This package contains a plug-in for using ELK in Protege.
 
 REQUIREMENTS:
 

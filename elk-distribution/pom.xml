@@ -50,7 +50,7 @@
 
 	<properties>
 		<elk-standalone.base>elk-standalone</elk-standalone.base>
-		<elk-protege.base>elk-protege</elk-protege.base>
+		<elk-protege.base>org.semanticweb.elk</elk-protege.base>
 		<elk-owlapi.base>elk-owlapi</elk-owlapi.base>
 		<!-- the base name of the zip file for elk-standalone distribution -->
 		<elk-standalone-zip.base>
@@ -58,7 +58,7 @@
 		</elk-standalone-zip.base>
 		<!-- the base name of the zip file for elk-protege distribution -->
 		<elk-protege-zip.base>
-			${elk-protege.base}-${project.version}
+			elk-protege-${project.version}
 		</elk-protege-zip.base>
 		<!-- the base name of the zip file for elk-owlapi distribution -->
 		<elk-owlapi-zip.base>
