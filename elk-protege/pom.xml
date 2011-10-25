@@ -75,7 +75,7 @@
 						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
-						<Update-Url>http://elk-reasoner.googlecode.com/svn/resources/update.properties</Update-Url>
+						<Update-Url>http://elk-reasoner.googlecode.com/svn/resources/elk-reasoner/update.properties</Update-Url>
 						<Import-Package>*</Import-Package>
 					</instructions>
 				</configuration>
