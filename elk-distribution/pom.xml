@@ -324,7 +324,7 @@
 							<includes>update.properties,version-info.txt</includes>
 							<!-- uploading the update.properties and version-info.txt files to 
 								the resources folder of the googlecode svn -->
-							<url>svn:https://elk-reasoner.googlecode.com/svn/resources</url>
+							<url>svn:https://elk-reasoner.googlecode.com/svn/resources/elk-reasoner</url>
 						</configuration>
 					</execution>
 				</executions>
