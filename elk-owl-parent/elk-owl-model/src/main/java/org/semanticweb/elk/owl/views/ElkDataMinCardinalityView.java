@@ -22,14 +22,14 @@
  */
 package org.semanticweb.elk.owl.views;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Implements a view for instances of {@link ElkDataMinCardinality}
+ * Implements a view for instances of {@link ElkDataMinCardinalityQualified}
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -37,13 +37,13 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  *            the type of the wrapped elk object
  */
 
-public class ElkDataMinCardinalityView<T extends ElkDataMinCardinality> extends
+public class ElkDataMinCardinalityView<T extends ElkDataMinCardinalityQualified> extends
 		ElkCardinalityObjectView<T, ElkDataPropertyExpression, ElkDataRange>
-		implements ElkDataMinCardinality {
+		implements ElkDataMinCardinalityQualified {
 
 	/**
 	 * Constructing {@link ElkDataMinCardinalityView} from
-	 * {@link ElkDataMinCardinality} using a sub-object viewer
+	 * {@link ElkDataMinCardinalityQualified} using a sub-object viewer
 	 * 
 	 * @param refElkDataMinCardinality
 	 *            the reference elk object for which the view object is
@@ -57,22 +57,22 @@ public class ElkDataMinCardinalityView<T extends ElkDataMinCardinality> extends
 		super(refElkDataMinCardinality, subObjectViewer);
 	}
 
-	public ElkDataPropertyExpression getDataPropertyExpression() {
+	public ElkDataPropertyExpression getProperty() {
 		return getFirstElkSubObjectView();
 	}
 
-	public ElkDataRange getDataRange() {
+	public ElkDataRange getFiller() {
 		return getSecondElkSubObjectView();
 	}
 
 	@Override
 	ElkDataPropertyExpression getFirstElkSubObject() {
-		return this.elkObject.getDataPropertyExpression();
+		return this.elkObject.getProperty();
 	}
 
 	@Override
 	ElkDataRange getSecondElkSubObject() {
-		return this.elkObject.getDataRange();
+		return this.elkObject.getFiller();
 	}
 
 	@Override

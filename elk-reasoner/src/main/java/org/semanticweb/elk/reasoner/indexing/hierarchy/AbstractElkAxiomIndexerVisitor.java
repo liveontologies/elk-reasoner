@@ -76,8 +76,8 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
-public abstract class AbstractElkAxiomIndexerVisitor implements ElkAxiomProcessor,
-		ElkAxiomVisitor<Void> {
+public abstract class AbstractElkAxiomIndexerVisitor implements
+		ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -91,7 +91,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements ElkAxiomProcesso
 			ElkObjectPropertyExpression superProperty);
 
 	public abstract void indexClassDeclaration(ElkClass ec);
-	
+
 	public abstract void indexObjectPropertyDeclaration(ElkObjectProperty eop);
 
 	/**
@@ -335,7 +335,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements ElkAxiomProcesso
 	public Void visit(ElkDeclarationAxiom axiom) {
 		return axiom.getEntity().accept(entityDeclarator);
 	}
-	
+
 	private final ElkEntityVisitor<Void> entityDeclarator = new ElkEntityVisitor<Void>() {
 
 		public Void visit(ElkClass elkClass) {

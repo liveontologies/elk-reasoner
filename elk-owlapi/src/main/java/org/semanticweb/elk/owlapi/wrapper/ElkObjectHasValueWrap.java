@@ -42,11 +42,11 @@ public class ElkObjectHasValueWrap<T extends OWLObjectHasValue> extends
 		super(owlObjectHasValue);
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 
-	public ElkIndividual getIndividual() {
+	public ElkIndividual getFiller() {
 		return converter.convert(this.owlObject.getValue());
 	}
 

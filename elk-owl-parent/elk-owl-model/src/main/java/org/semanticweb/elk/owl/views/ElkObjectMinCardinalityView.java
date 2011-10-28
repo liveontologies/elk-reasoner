@@ -23,13 +23,13 @@
 package org.semanticweb.elk.owl.views;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Implements a view for instances of {@link ElkObjectMinCardinality}
+ * Implements a view for instances of {@link ElkObjectMinCardinalityQualified}
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -37,14 +37,14 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  *            the type of the wrapped elk object
  */
 
-public class ElkObjectMinCardinalityView<T extends ElkObjectMinCardinality>
+public class ElkObjectMinCardinalityView<T extends ElkObjectMinCardinalityQualified>
 		extends
 		ElkCardinalityObjectView<T, ElkObjectPropertyExpression, ElkClassExpression>
-		implements ElkObjectMinCardinality {
+		implements ElkObjectMinCardinalityQualified {
 
 	/**
 	 * Constructing {@link ElkObjectMinCardinalityView} from
-	 * {@link ElkObjectMinCardinality} using a sub-object viewer
+	 * {@link ElkObjectMinCardinalityQualified} using a sub-object viewer
 	 * 
 	 * @param refElkObjectMinCardinality
 	 *            the reference elk object for which the view object is
@@ -58,22 +58,22 @@ public class ElkObjectMinCardinalityView<T extends ElkObjectMinCardinality>
 		super(refElkObjectMinCardinality, subObjectViewer);
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return getFirstElkSubObjectView();
 	}
 
-	public ElkClassExpression getClassExpression() {
+	public ElkClassExpression getFiller() {
 		return getSecondElkSubObjectView();
 	}
 
 	@Override
 	ElkObjectPropertyExpression getFirstElkSubObject() {
-		return this.elkObject.getObjectPropertyExpression();
+		return this.elkObject.getProperty();
 	}
 
 	@Override
 	ElkClassExpression getSecondElkSubObject() {
-		return this.elkObject.getClassExpression();
+		return this.elkObject.getFiller();
 	}
 
 	@Override

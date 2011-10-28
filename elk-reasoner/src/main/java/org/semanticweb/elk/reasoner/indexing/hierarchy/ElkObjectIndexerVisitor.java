@@ -30,19 +30,25 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
@@ -86,6 +92,13 @@ public class ElkObjectIndexerVisitor implements
 			ElkObjectExactCardinality elkObjectExactCardinality) {
 		throw new IndexingException(
 				ElkObjectExactCardinality.class.getSimpleName()
+						+ " not supported");
+	}
+
+	public IndexedClassExpression visit(
+			ElkObjectExactCardinalityQualified elkObjectExactCardinalityQualified) {
+		throw new IndexingException(
+				ElkObjectExactCardinalityQualified.class.getSimpleName()
 						+ " not supported");
 	}
 
@@ -137,9 +150,23 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	public IndexedClassExpression visit(
+			ElkObjectMaxCardinalityQualified elkObjectMaxCardinalityQualified) {
+		throw new IndexingException(
+				ElkObjectMaxCardinalityQualified.class.getSimpleName()
+						+ " not supported");
+	}
+
+	public IndexedClassExpression visit(
 			ElkObjectMinCardinality elkObjectMinCardinality) {
 		throw new IndexingException(
 				ElkObjectMinCardinality.class.getSimpleName()
+						+ " not supported");
+	}
+
+	public IndexedClassExpression visit(
+			ElkObjectMinCardinalityQualified elkObjectMinCardinalityQualified) {
+		throw new IndexingException(
+				ElkObjectMinCardinalityQualified.class.getSimpleName()
 						+ " not supported");
 	}
 
@@ -151,9 +178,9 @@ public class ElkObjectIndexerVisitor implements
 	public IndexedClassExpression visit(
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
 		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectSomeValuesFrom
-				.getObjectPropertyExpression().accept(this);
+				.getProperty().accept(this);
 		return objectFilter.filter(new IndexedObjectSomeValuesFrom(iop,
-				elkObjectSomeValuesFrom.getClassExpression().accept(this)));
+				elkObjectSomeValuesFrom.getFiller().accept(this)));
 	}
 
 	public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
@@ -175,15 +202,36 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	public IndexedClassExpression visit(
+			ElkDataMaxCardinalityQualified elkDataMaxCardinalityQualified) {
+		throw new IndexingException(
+				ElkDataMaxCardinalityQualified.class.getSimpleName()
+						+ " not supported");
+	}
+
+	public IndexedClassExpression visit(
 			ElkDataMinCardinality elkDataMinCardinality) {
 		throw new IndexingException(ElkDataMinCardinality.class.getSimpleName()
 				+ " not supported");
 	}
 
 	public IndexedClassExpression visit(
+			ElkDataMinCardinalityQualified elkDataMinCardinalityQualified) {
+		throw new IndexingException(
+				ElkDataMinCardinalityQualified.class.getSimpleName()
+						+ " not supported");
+	}
+
+	public IndexedClassExpression visit(
 			ElkDataExactCardinality elkDataExactCardinality) {
 		throw new IndexingException(ElkDataMinCardinality.class.getSimpleName()
 				+ " not supported");
+	}
+
+	public IndexedClassExpression visit(
+			ElkDataExactCardinalityQualified elkDataExactCardinalityQualified) {
+		throw new IndexingException(
+				ElkDataMinCardinalityQualified.class.getSimpleName()
+						+ " not supported");
 	}
 
 	public IndexedClassExpression visit(

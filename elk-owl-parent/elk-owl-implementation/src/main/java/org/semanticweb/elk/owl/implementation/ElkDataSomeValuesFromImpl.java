@@ -29,16 +29,18 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkDataSomeValuesFrom.
- *
+ * Implementation of {@link ElkDataSomeValuesFrom}.
+ * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public class ElkDataSomeValuesFromImpl extends
-		ElkDataPropertyExpressionDataRangeObject implements
-		ElkDataSomeValuesFrom {
+public class ElkDataSomeValuesFromImpl
+		extends
+		ElkPropertyRestrictionQualifiedImpl<ElkDataPropertyExpression, ElkDataRange>
+		implements ElkDataSomeValuesFrom {
 
 	/* package-private */ElkDataSomeValuesFromImpl(
 			ElkDataPropertyExpression dataPropertyExpression,
@@ -47,15 +49,7 @@ public class ElkDataSomeValuesFromImpl extends
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("DataSomeValuesFrom");
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

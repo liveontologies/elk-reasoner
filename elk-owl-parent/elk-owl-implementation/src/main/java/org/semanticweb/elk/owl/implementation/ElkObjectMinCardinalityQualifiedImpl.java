@@ -23,36 +23,30 @@
 package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 
-public abstract class ElkObjectCardinalityRestriction extends
-		ElkObjectPropertyExpressionClassExpressionObject {
+/**
+ * Implementation of {@link ElkObjectMinCardinalityQualified}.
+ * 
+ * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public class ElkObjectMinCardinalityQualifiedImpl
+		extends
+		ElkCardinalityRestrictionQualifiedImpl<ElkObjectPropertyExpression, ElkClassExpression>
+		implements ElkObjectMinCardinalityQualified {
 
-	protected final int cardinality;
-
-	ElkObjectCardinalityRestriction(
+	ElkObjectMinCardinalityQualifiedImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression) {
-		super(objectPropertyExpression, classExpression);
-		this.cardinality = cardinality;
+		super(objectPropertyExpression, cardinality, classExpression);
 	}
 
-	public int getCardinality() {
-		return cardinality;
+	@Override
+	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
-
-	public String buildFssString(String operatorName) {
-		StringBuilder result = new StringBuilder(operatorName);
-		result.append("(");
-		result.append(cardinality);
-		result.append(" ");
-		result.append(objectPropertyExpression.toString());
-		if (classExpression != null) {
-			result.append(" ");
-			result.append(classExpression.toString());
-		}
-		result.append(")");
-		return result.toString();
-	}
-
 }

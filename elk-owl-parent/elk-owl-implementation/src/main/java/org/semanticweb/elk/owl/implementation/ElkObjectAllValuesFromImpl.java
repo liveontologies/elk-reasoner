@@ -26,16 +26,18 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkObjectAllValuesFrom.
+ * Implementation of {@link ElkObjectAllValuesFrom}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public class ElkObjectAllValuesFromImpl extends
-		ElkObjectPropertyExpressionClassExpressionObject implements
-		ElkObjectAllValuesFrom {
+public class ElkObjectAllValuesFromImpl
+		extends
+		ElkPropertyRestrictionQualifiedImpl<ElkObjectPropertyExpression, ElkClassExpression>
+		implements ElkObjectAllValuesFrom {
 
 	/* package-private */ElkObjectAllValuesFromImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
@@ -44,15 +46,7 @@ public class ElkObjectAllValuesFromImpl extends
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("ObjectAllValuesFrom");
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

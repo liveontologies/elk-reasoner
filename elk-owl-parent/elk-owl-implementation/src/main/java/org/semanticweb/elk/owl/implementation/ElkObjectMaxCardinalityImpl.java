@@ -22,36 +22,29 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkObjectMinCardinality.
+ * Implementation of {@link ElkObjectMaxCardinality}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
  */
 public class ElkObjectMaxCardinalityImpl extends
-		ElkObjectCardinalityRestriction implements ElkObjectMaxCardinality {
+		ElkCardinalityRestrictionImpl<ElkObjectPropertyExpression> implements
+		ElkObjectMaxCardinality {
 
 	ElkObjectMaxCardinalityImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
-		super(objectPropertyExpression, cardinality, classExpression);
+			int cardinality) {
+		super(objectPropertyExpression, cardinality);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("ObjectMaxCardinality");
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

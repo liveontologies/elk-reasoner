@@ -57,22 +57,22 @@ public class ElkDataHasValueView<T extends ElkDataHasValue> extends
 		super(refElkDataHasValue, subObjectViewer);
 	}
 
-	public ElkDataPropertyExpression getDataPropertyExpression() {
+	public ElkDataPropertyExpression getProperty() {
 		return getFirstElkSubObjectView();
 	}
 
-	public ElkLiteral getLiteral() {
+	public ElkLiteral getFiller() {
 		return getSecondElkSubObjectView();
 	}
 
 	@Override
 	ElkDataPropertyExpression getFirstElkSubObject() {
-		return this.elkObject.getDataPropertyExpression();
+		return this.elkObject.getProperty();
 	}
 
 	@Override
 	ElkLiteral getSecondElkSubObject() {
-		return this.elkObject.getLiteral();
+		return this.elkObject.getFiller();
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

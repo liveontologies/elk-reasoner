@@ -56,13 +56,13 @@ public class ElkObjectHasSelfView<T extends ElkObjectHasSelf> extends
 		super(refElkObjectHasSelf, subObjectViewer);
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return getElkSubObjectView();
 	}
 
 	@Override
 	ElkObjectPropertyExpression getElkSubObject() {
-		return this.elkObject.getObjectPropertyExpression();
+		return this.elkObject.getProperty();
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

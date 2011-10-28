@@ -34,8 +34,8 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 	protected final ElkLiteral filler;
 	
 	protected IndexedDataHasValue(ElkDataHasValue elkDataHasValue) {
-		this.relation = (ElkDataProperty) elkDataHasValue.getDataPropertyExpression();
-		this.filler = elkDataHasValue.getLiteral();
+		this.relation = (ElkDataProperty) elkDataHasValue.getProperty();
+		this.filler = elkDataHasValue.getFiller();
 	}
 	
 	

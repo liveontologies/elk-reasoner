@@ -23,14 +23,14 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.owlapi.model.OWLDataMinCardinality;
 
 /**
- * Implements the {@link ElkDataMinCardinality} interface by wrapping instances
- * of {@link OWLDataMinCardinality}
+ * Implements the {@link ElkDataMinCardinalityQualified} interface by wrapping
+ * instances of {@link OWLDataMinCardinality}
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -46,12 +46,8 @@ public class ElkDataMinCardinalityWrap<T extends OWLDataMinCardinality> extends
 		return this.owlObject.getCardinality();
 	}
 
-	public ElkDataPropertyExpression getDataPropertyExpression() {
+	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
-	}
-
-	public ElkDataRange getDataRange() {
-		return converter.convert(this.owlObject.getFiller());
 	}
 
 	@Override

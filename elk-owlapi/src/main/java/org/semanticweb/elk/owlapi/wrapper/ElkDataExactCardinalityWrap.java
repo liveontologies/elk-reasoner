@@ -24,7 +24,6 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.owlapi.model.OWLDataExactCardinality;
 
@@ -46,12 +45,8 @@ public class ElkDataExactCardinalityWrap<T extends OWLDataExactCardinality>
 		return this.owlObject.getCardinality();
 	}
 
-	public ElkDataPropertyExpression getDataPropertyExpression() {
+	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
-	}
-
-	public ElkDataRange getDataRange() {
-		return converter.convert(this.owlObject.getFiller());
 	}
 
 	@Override

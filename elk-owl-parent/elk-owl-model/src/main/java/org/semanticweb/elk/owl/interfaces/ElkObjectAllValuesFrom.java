@@ -32,20 +32,8 @@ package org.semanticweb.elk.owl.interfaces;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkObjectAllValuesFrom extends ElkClassExpression {
-
-	/**
-	 * Get the object property expression that this expression refers to.
-	 * 
-	 * @return object property expression
-	 */
-	public ElkObjectPropertyExpression getObjectPropertyExpression();
-
-	/**
-	 * Get the class expression that this expression refers to.
-	 * 
-	 * @return class expression
-	 */
-	public ElkClassExpression getClassExpression();
+public interface ElkObjectAllValuesFrom
+		extends
+		ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression> {
 
 }

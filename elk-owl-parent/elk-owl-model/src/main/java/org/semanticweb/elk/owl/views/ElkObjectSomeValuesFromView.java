@@ -58,22 +58,22 @@ public class ElkObjectSomeValuesFromView<T extends ElkObjectSomeValuesFrom>
 		super(refElkObjectSomeValuesFrom, subObjectViewer);
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return getFirstElkSubObjectView();
 	}
 
-	public ElkClassExpression getClassExpression() {
+	public ElkClassExpression getFiller() {
 		return getSecondElkSubObjectView();
 	}
 
 	@Override
 	ElkObjectPropertyExpression getFirstElkSubObject() {
-		return this.elkObject.getObjectPropertyExpression();
+		return this.elkObject.getProperty();
 	}
 
 	@Override
 	ElkClassExpression getSecondElkSubObject() {
-		return this.elkObject.getClassExpression();
+		return this.elkObject.getFiller();
 	}
 
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {

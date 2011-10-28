@@ -199,7 +199,8 @@ public class OwlCorrespondingObjectConverterVisitor implements
 		return CONVERTER.convert(owlDatatype);
 	}
 
-	public ElkAnnotationProperty visit(OWLAnnotationProperty owlAnnotationproperty) {
+	public ElkAnnotationProperty visit(
+			OWLAnnotationProperty owlAnnotationproperty) {
 		return CONVERTER.convert(owlAnnotationproperty);
 	}
 

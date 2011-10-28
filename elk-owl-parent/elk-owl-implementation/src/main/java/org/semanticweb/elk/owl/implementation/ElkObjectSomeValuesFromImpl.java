@@ -29,19 +29,17 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Existential_Quantification">Existential
- * Quantification Object Property Restriction<a> in the OWL 2 specification.
+ * Implementation of {@link ElkObjectSomeValuesFrom}
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class ElkObjectSomeValuesFromImpl extends
-		ElkObjectPropertyExpressionClassExpressionObject implements
-		ElkObjectSomeValuesFrom {
+public class ElkObjectSomeValuesFromImpl
+		extends
+		ElkPropertyRestrictionQualifiedImpl<ElkObjectPropertyExpression, ElkClassExpression>
+		implements ElkObjectSomeValuesFrom {
 
 	/* package-private */ElkObjectSomeValuesFromImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
@@ -50,15 +48,7 @@ public class ElkObjectSomeValuesFromImpl extends
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("ObjectSomeValuesFrom");
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

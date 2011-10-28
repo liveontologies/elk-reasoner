@@ -205,10 +205,10 @@ public class OwlConverter {
 
 	public ElkAnnotationProperty convert(
 			OWLAnnotationProperty owlAnnotationProperty) {
-		return new ElkAnnotationPropertyWrap<OWLAnnotationProperty> (
+		return new ElkAnnotationPropertyWrap<OWLAnnotationProperty>(
 				owlAnnotationProperty);
 	}
-	
+
 	public ElkAnonymousIndividual convert(
 			OWLAnonymousIndividual owlAnonymousIndividual) {
 		return new ElkAnonymousIndividualWrap<OWLAnonymousIndividual>(
@@ -260,8 +260,12 @@ public class OwlConverter {
 
 	public ElkDataExactCardinality convert(
 			OWLDataExactCardinality owlDataExactCardinality) {
-		return new ElkDataExactCardinalityWrap<OWLDataExactCardinality>(
-				owlDataExactCardinality);
+		if (owlDataExactCardinality.isQualified())
+			return new ElkDataExactCardinalityQualifiedWrap<OWLDataExactCardinality>(
+					owlDataExactCardinality);
+		else
+			return new ElkDataExactCardinalityWrap<OWLDataExactCardinality>(
+					owlDataExactCardinality);
 	}
 
 	public ElkDataHasValue convert(OWLDataHasValue owlDataHasValue) {
@@ -276,14 +280,22 @@ public class OwlConverter {
 
 	public ElkDataMaxCardinality convert(
 			OWLDataMaxCardinality owlDataMaxCardinality) {
-		return new ElkDataMaxCardinalityWrap<OWLDataMaxCardinality>(
-				owlDataMaxCardinality);
+		if (owlDataMaxCardinality.isQualified())
+			return new ElkDataMaxCardinalityQualifiedWrap<OWLDataMaxCardinality>(
+					owlDataMaxCardinality);
+		else
+			return new ElkDataMaxCardinalityWrap<OWLDataMaxCardinality>(
+					owlDataMaxCardinality);
 	}
 
 	public ElkDataMinCardinality convert(
 			OWLDataMinCardinality owlDataMinCardinality) {
-		return new ElkDataMinCardinalityWrap<OWLDataMinCardinality>(
-				owlDataMinCardinality);
+		if (owlDataMinCardinality.isQualified())
+			return new ElkDataMinCardinalityQualifiedWrap<OWLDataMinCardinality>(
+					owlDataMinCardinality);
+		else
+			return new ElkDataMinCardinalityWrap<OWLDataMinCardinality>(
+					owlDataMinCardinality);
 	}
 
 	public ElkDataOneOf convert(OWLDataOneOf owlDataOneOf) {
@@ -477,8 +489,12 @@ public class OwlConverter {
 
 	public ElkObjectExactCardinality convert(
 			OWLObjectExactCardinality owlObjectExactCardinality) {
-		return new ElkObjectExactCardinalityWrap<OWLObjectExactCardinality>(
-				owlObjectExactCardinality);
+		if (owlObjectExactCardinality.isQualified())
+			return new ElkObjectExactCardinalityQualifiedWrap<OWLObjectExactCardinality>(
+					owlObjectExactCardinality);
+		else
+			return new ElkObjectExactCardinalityWrap<OWLObjectExactCardinality>(
+					owlObjectExactCardinality);
 	}
 
 	public ElkObjectHasSelf convert(OWLObjectHasSelf owlObjectHasSelf) {
@@ -497,14 +513,22 @@ public class OwlConverter {
 
 	public ElkObjectMaxCardinality convert(
 			OWLObjectMaxCardinality owlObjectMaxCardinality) {
-		return new ElkObjectMaxCardinalityWrap<OWLObjectMaxCardinality>(
-				owlObjectMaxCardinality);
+		if (owlObjectMaxCardinality.isQualified())
+			return new ElkObjectMaxCardinalityQualifiedWrap<OWLObjectMaxCardinality>(
+					owlObjectMaxCardinality);
+		else
+			return new ElkObjectMaxCardinalityWrap<OWLObjectMaxCardinality>(
+					owlObjectMaxCardinality);
 	}
 
 	public ElkObjectMinCardinality convert(
 			OWLObjectMinCardinality owlObjectMaxCardinality) {
-		return new ElkObjectMinCardinalityWrap<OWLObjectMinCardinality>(
-				owlObjectMaxCardinality);
+		if (owlObjectMaxCardinality.isQualified())
+			return new ElkObjectMinCardinalityQualifiedWrap<OWLObjectMinCardinality>(
+					owlObjectMaxCardinality);
+		else
+			return new ElkObjectMinCardinalityWrap<OWLObjectMinCardinality>(
+					owlObjectMaxCardinality);
 	}
 
 	public ElkObjectOneOf convert(OWLObjectOneOf owlObjectOneOf) {

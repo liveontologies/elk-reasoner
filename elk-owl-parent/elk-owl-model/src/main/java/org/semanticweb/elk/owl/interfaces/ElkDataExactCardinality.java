@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK OWL Object Interfaces
  * 
- * $Id: ElkDataSomeValuesFrom.java 295 2011-08-10 11:43:29Z mak@aifb.uni-karlsruhe.de $
- * $HeadURL: https://elk-reasoner.googlecode.com/svn/trunk/elk-reasoner/src/main/java/org/semanticweb/elk/syntax/interfaces/ElkDataSomeValuesFrom.java $
+ * $Id$
+ * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,40 +20,18 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Markus Kroetzsch, Aug 8, 2011
- */
 package org.semanticweb.elk.owl.interfaces;
 
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Exact_Cardinality_2">exact cardinality
- * restriction<a> in the OWL 2 specification.
+ * restriction<a> in the OWL 2 specification in the case the qualified data
+ * range is empty.
  * 
- * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public interface ElkDataExactCardinality extends ElkClassExpression {
-
-	/**
-	 * Get the cardinality that this expression refers to.
-	 * 
-	 * @return cardinality
-	 */
-	public int getCardinality();
-
-	/**
-	 * Get the data property expression that this expression refers to.
-	 * 
-	 * @return data property expression
-	 */
-	public ElkDataPropertyExpression getDataPropertyExpression();
-
-	/**
-	 * Get the data range that this expression refers to. If the cardinality
-	 * restriction is not qualified, this data range might be null.
-	 * 
-	 * @return data range
-	 */
-	public ElkDataRange getDataRange();
+public interface ElkDataExactCardinality extends
+		ElkCardinalityRestriction<ElkDataPropertyExpression> {
 
 }

@@ -32,20 +32,7 @@ package org.semanticweb.elk.owl.interfaces;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDataHasValue extends ElkClassExpression {
-
-	/**
-	 * Get the data property expression that this expression refers to.
-	 * 
-	 * @return data property expression
-	 */
-	public ElkDataPropertyExpression getDataPropertyExpression();
-
-	/**
-	 * Get the literal that this expression refers to.
-	 * 
-	 * @return literal
-	 */
-	public ElkLiteral getLiteral();
+public interface ElkDataHasValue extends
+		ElkPropertyRestrictionQualified<ElkDataPropertyExpression, ElkLiteral> {
 
 }

@@ -41,7 +41,7 @@ public class ElkObjectHasSelfWrap<T extends OWLObjectHasSelf> extends
 		super(owlObjectHashSelf);
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 

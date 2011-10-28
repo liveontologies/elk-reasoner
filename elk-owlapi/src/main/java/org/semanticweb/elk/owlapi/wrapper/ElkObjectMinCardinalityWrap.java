@@ -22,15 +22,14 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
 
 /**
- * Implements the {@link ElkObjectMaxCardinality} interface by wrapping
+ * Implements the {@link ElkObjectMaxCardinalityQualified} interface by wrapping
  * instances of {@link OWLObjectMinCardinality}
  * 
  * @author Yevgeny Kazakov
@@ -47,12 +46,8 @@ public class ElkObjectMinCardinalityWrap<T extends OWLObjectMinCardinality>
 		return this.owlObject.getCardinality();
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
-	}
-
-	public ElkClassExpression getClassExpression() {
-		return converter.convert(this.owlObject.getFiller());
 	}
 
 	@Override

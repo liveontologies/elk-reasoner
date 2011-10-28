@@ -26,48 +26,27 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Individual_Value_Restriction">Individual
- * Value Restriction for Object Properties<a> in the OWL 2 specification.
+ * Implementation of {@link ElkObjectHasValue}
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  */
-public class ElkObjectHasValueImpl extends ElkObjectPropertyExpressionObject
+public class ElkObjectHasValueImpl
+		extends
+		ElkPropertyRestrictionQualifiedImpl<ElkObjectPropertyExpression, ElkIndividual>
 		implements ElkObjectHasValue {
-
-	protected final ElkIndividual individual;
 
 	/* package-private */ElkObjectHasValueImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual individual) {
-		super(objectPropertyExpression);
-		this.individual = individual;
-	}
-
-	public ElkIndividual getIndividual() {
-		return individual;
+		super(objectPropertyExpression, individual);
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("ObjectHasValue(");
-		result.append(objectPropertyExpression.toString());
-		result.append(" ");
-		result.append(individual.toString());
-		result.append(")");
-		return result.toString();
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 }

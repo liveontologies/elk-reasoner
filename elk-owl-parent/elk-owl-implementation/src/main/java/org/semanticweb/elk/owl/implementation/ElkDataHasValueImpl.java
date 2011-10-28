@@ -26,45 +26,26 @@ import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkDataHasValue. 
+ * ELK implementation of {@link ElkDataHasValue}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  */
-public class ElkDataHasValueImpl extends ElkDataPropertyExpressionObject
+public class ElkDataHasValueImpl
+		extends
+		ElkPropertyRestrictionQualifiedImpl<ElkDataPropertyExpression, ElkLiteral>
 		implements ElkDataHasValue {
 
-	protected final ElkLiteral literal;
-
 	/* package-private */ElkDataHasValueImpl(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkLiteral literal) {
-		super(dataPropertyExpression);
-		this.literal = literal;
-	}
-
-	public ElkLiteral getLiteral() {
-		return literal;
+			ElkDataPropertyExpression dataPropertyExpression, ElkLiteral literal) {
+		super(dataPropertyExpression, literal);
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("DataHasValue(");
-		result.append(dataPropertyExpression.toString());
-		result.append(" ");
-		result.append(literal.toString());
-		result.append(")");
-		return result.toString();
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

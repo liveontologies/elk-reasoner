@@ -32,20 +32,8 @@ package org.semanticweb.elk.owl.interfaces;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkObjectHasValue extends ElkClassExpression {
-
-	/**
-	 * Get the object property expression that this expression refers to.
-	 * 
-	 * @return object property expression
-	 */
-	public ElkObjectPropertyExpression getObjectPropertyExpression();
-
-	/**
-	 * Get the individual that this expression refers to.
-	 * 
-	 * @return individual
-	 */
-	public ElkIndividual getIndividual();
+public interface ElkObjectHasValue
+		extends
+		ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ElkIndividual> {
 
 }

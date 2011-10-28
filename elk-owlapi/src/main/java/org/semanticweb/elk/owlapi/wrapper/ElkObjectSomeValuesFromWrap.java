@@ -43,11 +43,11 @@ public class ElkObjectSomeValuesFromWrap<T extends OWLObjectSomeValuesFrom>
 
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 
-	public ElkClassExpression getClassExpression() {
+	public ElkClassExpression getFiller() {
 		return converter.convert(this.owlObject.getFiller());
 	}
 

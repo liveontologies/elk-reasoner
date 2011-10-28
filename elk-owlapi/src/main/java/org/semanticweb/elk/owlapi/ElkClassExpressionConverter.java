@@ -28,18 +28,24 @@ package org.semanticweb.elk.owlapi;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
@@ -59,6 +65,10 @@ import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 public final class ElkClassExpressionConverter implements
 		ElkClassExpressionVisitor<OWLClassExpression> {
 
+	public static ElkClassExpressionConverter getInstance() {
+		return INSTANCE_;
+	}
+
 	final OWLDataFactory owlDataFactory = OWLManager.getOWLDataFactory();
 
 	private static ElkClassExpressionConverter INSTANCE_ = new ElkClassExpressionConverter();
@@ -66,38 +76,56 @@ public final class ElkClassExpressionConverter implements
 	private ElkClassExpressionConverter() {
 	}
 
-	public static ElkClassExpressionConverter getInstance() {
-		return INSTANCE_;
-	}
-
 	public OWLClass visit(ElkClass elkClass) {
 		String iri = elkClass.getIri().asString();
 		return owlDataFactory.getOWLClass(IRI.create(iri));
 	}
 
-	public OWLObjectIntersectionOf visit(
-			ElkObjectIntersectionOf elkObjectIntersectionOf) {
-		// TODO Support this constructor
-		throw new ConverterException("Not yet implemented.");
-	}
-
-	public OWLObjectSomeValuesFrom visit(
-			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-		// TODO Support this constructor
-		throw new ConverterException("Not yet implemented.");
-	}
-
-	public OWLClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
+	public OWLClassExpression visit(ElkDataAllValuesFrom elkDataAllValuesFrom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public OWLClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
+	public OWLClassExpression visit(
+			ElkDataExactCardinality elkDataExactCardinality) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public OWLClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
+	public OWLClassExpression visit(
+			ElkDataExactCardinalityQualified elkDataExactCardinalityQualified) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkDataHasValue elkDataHasValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkDataMaxCardinality elkDataMaxCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(
+			ElkDataMaxCardinalityQualified elkDataMaxCardinalityQualified) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkDataMinCardinality elkDataMinCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(
+			ElkDataMinCardinalityQualified elkDataMinCardinalityQualified) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -120,7 +148,35 @@ public final class ElkClassExpressionConverter implements
 	}
 
 	public OWLClassExpression visit(
+			ElkObjectExactCardinalityQualified elkObjectExactCardinalityQualified) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLObjectIntersectionOf visit(
+			ElkObjectIntersectionOf elkObjectIntersectionOf) {
+		// TODO Support this constructor
+		throw new ConverterException("Not yet implemented.");
+	}
+
+	public OWLClassExpression visit(
 			ElkObjectMaxCardinality elkObjectMaxCardinality) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OWLClassExpression visit(
+			ElkObjectMaxCardinalityQualified elkObjectMaxCardinalityQualified) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -131,38 +187,24 @@ public final class ElkClassExpressionConverter implements
 		return null;
 	}
 
-	public OWLClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public OWLClassExpression visit(ElkDataHasValue elkDataHasValue) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public OWLClassExpression visit(ElkDataMaxCardinality elkDataMaxCardinality) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public OWLClassExpression visit(ElkDataMinCardinality elkDataMinCardinality) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public OWLClassExpression visit(
-			ElkDataExactCardinality elkDataExactCardinality) {
+			ElkObjectMinCardinalityQualified elkObjectMinCardinalityQualified) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public OWLClassExpression visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
+	public OWLClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public OWLClassExpression visit(ElkDataAllValuesFrom elkDataAllValuesFrom) {
+	public OWLObjectSomeValuesFrom visit(
+			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
+		// TODO Support this constructor
+		throw new ConverterException("Not yet implemented.");
+	}
+
+	public OWLClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
 		// TODO Auto-generated method stub
 		return null;
 	}

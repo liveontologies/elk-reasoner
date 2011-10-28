@@ -22,43 +22,31 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 
 /**
- * Abstract base class for all implementations of cardinality restrictions for
- * data properties.
+ * Implementation of {@link ElkDataExactCardinalityQualified}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public abstract class ElkDataCardinalityRestriction extends
-		ElkDataPropertyExpressionDataRangeObject {
+public class ElkDataExactCardinalityQualifiedImpl
+		extends
+		ElkCardinalityRestrictionQualifiedImpl<ElkDataPropertyExpression, ElkDataRange>
+		implements ElkDataExactCardinalityQualified {
 
-	protected final int cardinality;
-
-	ElkDataCardinalityRestriction(
+	ElkDataExactCardinalityQualifiedImpl(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange) {
-		super(dataPropertyExpression, dataRange);
-		this.cardinality = cardinality;
+		super(dataPropertyExpression, cardinality, dataRange);
 	}
 
-	public int getCardinality() {
-		return cardinality;
+	@Override
+	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
-
-	public String buildFssString(String operatorName) {
-		StringBuilder result = new StringBuilder(operatorName);
-		result.append("(");
-		result.append(cardinality);
-		result.append(" ");
-		result.append(dataPropertyExpression.toString());
-		if (dataRange != null) {
-			result.append(" ");
-			result.append(dataRange.toString());
-		}
-		result.append(")");
-		return result.toString();
-	}
-
 }

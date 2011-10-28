@@ -42,11 +42,11 @@ public class ElkDataHasValueWrap<T extends OWLDataHasValue> extends
 		super(owlDataHasValue);
 	}
 
-	public ElkDataPropertyExpression getDataPropertyExpression() {
+	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 
-	public ElkLiteral getLiteral() {
+	public ElkLiteral getFiller() {
 		return converter.convert(this.owlObject.getValue());
 	}
 

@@ -25,17 +25,17 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Corresponds to a <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Self-Restriction">Self-Restriction<a> in
- * the OWL 2 specification.
+ * Implementation of {@link ObjectHasSelf}
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public class ElkObjectHasSelfImpl extends ElkObjectPropertyExpressionObject
-		implements ElkObjectHasSelf {
+public class ElkObjectHasSelfImpl extends
+		ElkPropertyRestrictionImpl<ElkObjectPropertyExpression> implements
+		ElkObjectHasSelf {
 
 	/* package-private */ElkObjectHasSelfImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
@@ -43,16 +43,7 @@ public class ElkObjectHasSelfImpl extends ElkObjectPropertyExpressionObject
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("ObjectHasSelf");
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 }

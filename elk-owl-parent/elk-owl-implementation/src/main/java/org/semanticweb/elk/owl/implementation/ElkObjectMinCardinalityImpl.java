@@ -22,36 +22,29 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkObjectMinCardinality.
+ * Implementation of {@link ElkObjectMinCardinality}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
  */
 public class ElkObjectMinCardinalityImpl extends
-		ElkObjectCardinalityRestriction implements ElkObjectMinCardinality {
+		ElkCardinalityRestrictionImpl<ElkObjectPropertyExpression> implements
+		ElkObjectMinCardinality {
 
 	ElkObjectMinCardinalityImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
-		super(objectPropertyExpression, cardinality, classExpression);
+			int cardinality) {
+		super(objectPropertyExpression, cardinality);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("ObjectMinCardinality");
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }
