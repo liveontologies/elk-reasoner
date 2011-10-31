@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectIntersectionOfWrap<T extends OWLObjectIntersectionOf>
 		extends ElkClassExpressionWrap<T> implements ElkObjectIntersectionOf {

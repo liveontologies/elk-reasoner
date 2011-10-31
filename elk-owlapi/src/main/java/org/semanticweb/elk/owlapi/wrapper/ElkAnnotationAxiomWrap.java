@@ -31,6 +31,9 @@ import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
  * {@link OWLAnnotationAxiom}
  * 
  * @author Yevgeny Kazakov
+ * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkAnnotationAxiomWrap<T extends OWLAnnotationAxiom> extends
 		ElkAxiomWrap<T> implements ElkAnnotationAxiom {

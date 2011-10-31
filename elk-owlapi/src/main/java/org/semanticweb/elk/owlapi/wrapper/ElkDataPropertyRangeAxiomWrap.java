@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataPropertyRangeAxiomWrap<T extends OWLDataPropertyRangeAxiom>
 		extends ElkDataPropertyAxiomWrap<T> implements
@@ -43,11 +45,11 @@ public class ElkDataPropertyRangeAxiomWrap<T extends OWLDataPropertyRangeAxiom>
 		super(owlDataPropertyRangeAxiom);
 	}
 
-	public ElkDataPropertyExpression getDataPropertyExpression() {
+	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 
-	public ElkDataRange getDataRange() {
+	public ElkDataRange getRange() {
 		return converter.convert(this.owlObject.getRange());
 	}
 

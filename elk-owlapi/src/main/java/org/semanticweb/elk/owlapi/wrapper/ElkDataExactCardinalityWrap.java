@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLDataExactCardinality;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataExactCardinalityWrap<T extends OWLDataExactCardinality>
 		extends ElkClassExpressionWrap<T> implements ElkDataExactCardinality {

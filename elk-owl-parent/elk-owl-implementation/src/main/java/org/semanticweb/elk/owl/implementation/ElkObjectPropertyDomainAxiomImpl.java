@@ -27,37 +27,29 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkObjectPropertyDomainAxiom.
+ * Implementation of {@link ElkObjectPropertyDomainAxiom}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public class ElkObjectPropertyDomainAxiomImpl extends
-		ElkObjectPropertyExpressionClassExpressionObject implements
-		ElkObjectPropertyDomainAxiom {
+public class ElkObjectPropertyDomainAxiomImpl
+		extends
+		ElkPropertyDomainAxiomImpl<ElkObjectPropertyExpression, ElkClassExpression>
+		implements ElkObjectPropertyDomainAxiom {
 
-	ElkObjectPropertyDomainAxiomImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
-		super(objectPropertyExpression, classExpression);
+	ElkObjectPropertyDomainAxiomImpl(ElkObjectPropertyExpression property,
+			ElkClassExpression domain) {
+		super(property, domain);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("ObjectPropertyDomain");
-	}
-
-	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

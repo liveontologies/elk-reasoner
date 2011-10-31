@@ -30,45 +30,21 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkNegativeObjectPropertyAssertion.
+ * Implementation of {@link ElkNegativeObjectPropertyAssertion}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  */
-public class ElkNegativeObjectPropertyAssertionAxiomImpl extends
-		ElkObjectPropertyExpressionObject implements
-		ElkNegativeObjectPropertyAssertionAxiom {
+public class ElkNegativeObjectPropertyAssertionAxiomImpl
+		extends
+		ElkPropertyAssertionAxiomImpl<ElkObjectPropertyExpression, ElkIndividual, ElkIndividual>
+		implements ElkNegativeObjectPropertyAssertionAxiom {
 
-	protected final ElkIndividual firstIndividual;
-	protected final ElkIndividual secondIndividual;
-
-	/* package-private */ElkNegativeObjectPropertyAssertionAxiomImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
-		super(objectPropertyExpression);
-		this.firstIndividual = firstIndividual;
-		this.secondIndividual = secondIndividual;
-	}
-
-	public ElkIndividual getFirstIndividual() {
-		return firstIndividual;
-	}
-
-	public ElkIndividual getSecondIndividual() {
-		return secondIndividual;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder(
-				"NegativeObjectPropertyAssertion(");
-		result.append(objectPropertyExpression.toString());
-		result.append(" ");
-		result.append(firstIndividual.toString());
-		result.append(" ");
-		result.append(secondIndividual.toString());
-		result.append(")");
-		return result.toString();
+	ElkNegativeObjectPropertyAssertionAxiomImpl(
+			ElkObjectPropertyExpression property,
+			ElkIndividual subject, ElkIndividual object) {
+		super(property, subject, object);
 	}
 
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {

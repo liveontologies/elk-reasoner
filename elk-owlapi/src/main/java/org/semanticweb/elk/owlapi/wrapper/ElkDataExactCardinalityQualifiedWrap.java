@@ -28,11 +28,12 @@ import org.semanticweb.owlapi.model.OWLDataExactCardinality;
 
 /**
  * Implements the {@link ElkDataExactCardinalityQualified} interface by wrapping
- * qualified instances of {@link OWLDataExactCardinality}, which have a
- * non-empty filler
+ * qualified instances of {@link OWLDataExactCardinality}.
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataExactCardinalityQualifiedWrap<T extends OWLDataExactCardinality>
 		extends ElkDataExactCardinalityWrap<T> implements

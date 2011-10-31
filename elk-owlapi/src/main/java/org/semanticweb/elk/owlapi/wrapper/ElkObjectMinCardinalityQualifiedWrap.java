@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectMinCardinalityQualifiedWrap<T extends OWLObjectMinCardinality>
 		extends ElkObjectMinCardinalityWrap<T> implements

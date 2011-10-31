@@ -30,10 +30,12 @@ import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 
 /**
  * Implements the {@link ElkSubObjectPropertyOfAxiom} interface by wrapping
- * instances of {@link OWLSubPropertyChainOfAxiom}
+ * instances of {@link OWLSubPropertyChainOfAxiom}.
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkSubObjectPropertyChainOfAxiomWrap<T extends OWLSubPropertyChainOfAxiom>
 		extends ElkObjectPropertyAxiomWrap<T> implements

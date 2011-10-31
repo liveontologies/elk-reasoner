@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLDisjointDataPropertiesAxiom;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDisjointDataPropertiesAxiomWrap<T extends OWLDisjointDataPropertiesAxiom>
 		extends ElkDataPropertyAxiomWrap<T> implements

@@ -32,7 +32,9 @@ import org.semanticweb.owlapi.model.OWLDataRange;
  * {@link OWLDataRange}
  * 
  * @author "Yevgeny Kazakov"
- * 
+ *
+ * @param <T>
+ *            the type of the wrapped object
  */
 public abstract class ElkDataRangeWrap<T extends OWLDataRange> extends
 		ElkObjectWrap<T> implements ElkDataRange {

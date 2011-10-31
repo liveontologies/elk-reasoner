@@ -125,7 +125,7 @@ public interface ElkObjectFactory {
 	 * @param dataRange
 	 * @return
 	 */
-	public abstract ElkDataExactCardinalityQualified getDataExactCardinality(
+	public abstract ElkDataExactCardinalityQualified getDataExactCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange);
 
@@ -178,7 +178,7 @@ public interface ElkObjectFactory {
 	 * @param dataRange
 	 * @return
 	 */
-	public abstract ElkDataMaxCardinalityQualified getDataMaxCardinality(
+	public abstract ElkDataMaxCardinalityQualified getDataMaxCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange);
 
@@ -200,7 +200,7 @@ public interface ElkObjectFactory {
 	 * @param dataRange
 	 * @return
 	 */
-	public abstract ElkDataMinCardinalityQualified getDataMinCardinality(
+	public abstract ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange);
 
@@ -633,7 +633,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectExactCardinalityQualified getObjectExactCardinality(
+	public abstract ElkObjectExactCardinalityQualified getObjectExactCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression);
 
@@ -707,7 +707,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectMaxCardinalityQualified getObjectMaxCardinality(
+	public abstract ElkObjectMaxCardinalityQualified getObjectMaxCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression);
 
@@ -730,7 +730,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectMinCardinalityQualified getObjectMinCardinality(
+	public abstract ElkObjectMinCardinalityQualified getObjectMinCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression);
 

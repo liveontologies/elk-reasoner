@@ -15,7 +15,9 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-		<release version="${release.version}" date="${buildDate}" description="Subsequent release">
+		<release version="${release.version}" date="${buildDate}" description="Current version">		
+		</release>
+		<release version="0.2.0" date="2011-10-25" description="Second public release">
 			<action dev="frantisek" type="fix" issue="5">
 				Fixed tokenization of IRIs containing reserved words built-in parse.
 			</action>

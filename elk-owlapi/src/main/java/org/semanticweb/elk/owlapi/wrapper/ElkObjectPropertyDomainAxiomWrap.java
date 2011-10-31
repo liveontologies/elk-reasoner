@@ -28,6 +28,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 
+/**
+ * Implements the {@link ElkObjectPropertyDomainAxiom} interface by wrapping
+ * instances of {@link OWLObjectPropertyDomainAxiom}.
+ * 
+ * @author Yevgeny Kazakov
+ * 
+ * @param <T>
+ *            the type of the wrapped object
+ */
 public class ElkObjectPropertyDomainAxiomWrap<T extends OWLObjectPropertyDomainAxiom>
 		extends ElkObjectPropertyAxiomWrap<T> implements
 		ElkObjectPropertyDomainAxiom {
@@ -36,11 +45,11 @@ public class ElkObjectPropertyDomainAxiomWrap<T extends OWLObjectPropertyDomainA
 		super(owlObjectPropertyDomainAxiom);
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 
-	public ElkClassExpression getClassExpression() {
+	public ElkClassExpression getDomain() {
 		return converter.convert(this.owlObject.getDomain());
 	}
 

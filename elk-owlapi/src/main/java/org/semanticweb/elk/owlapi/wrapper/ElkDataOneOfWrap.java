@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLLiteral;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataOneOfWrap<T extends OWLDataOneOf> extends
 		ElkDataRangeWrap<T> implements ElkDataOneOf {

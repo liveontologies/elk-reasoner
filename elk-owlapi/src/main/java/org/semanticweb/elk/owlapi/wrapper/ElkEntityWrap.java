@@ -25,6 +25,8 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.owlapi.model.OWLEntity;
 
 /**
@@ -32,6 +34,9 @@ import org.semanticweb.owlapi.model.OWLEntity;
  * {@link OWLEntity}
  * 
  * @author Yevgeny Kazakov
+ * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public abstract class ElkEntityWrap<T extends OWLEntity> extends
 		ElkObjectWrap<T> implements ElkEntity {
@@ -42,6 +47,12 @@ public abstract class ElkEntityWrap<T extends OWLEntity> extends
 
 	public ElkIri getIri() {
 		return new ElkFullIri(this.owlObject.getIRI().toString());
+	}
+
+	public abstract <O> O accept(ElkEntityVisitor<O> visitor);
+
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkEntityVisitor<O>) visitor);
 	}
 
 }

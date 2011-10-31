@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLDataRange;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataIntersectionOfWrap<T extends OWLDataIntersectionOf> extends
 		ElkDataRangeWrap<T> implements ElkDataIntersectionOf {

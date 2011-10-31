@@ -38,6 +38,8 @@ import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectPropertyChainWrap<T extends OWLSubPropertyChainOfAxiom>
 		extends ElkSubObjectPropertyExpressionWrap<T> implements

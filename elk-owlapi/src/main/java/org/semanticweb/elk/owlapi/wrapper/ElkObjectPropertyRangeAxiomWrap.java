@@ -30,11 +30,12 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 
 /**
  * Implements the {@link ElkObjectPropertyRangeAxiom} interface by wrapping
- * instances of {@link OWLObjectPropertyRangeAxiom}. The object corresponds to
- * subchain expression of the axiom.
+ * instances of {@link OWLObjectPropertyRangeAxiom}.
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectPropertyRangeAxiomWrap<T extends OWLObjectPropertyRangeAxiom>
 		extends ElkObjectPropertyAxiomWrap<T> implements
@@ -44,11 +45,11 @@ public class ElkObjectPropertyRangeAxiomWrap<T extends OWLObjectPropertyRangeAxi
 		super(owlObjectPropertyRangeAxiom);
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 
-	public ElkClassExpression getClassExpression() {
+	public ElkClassExpression getRange() {
 		return converter.convert(this.owlObject.getRange());
 	}
 

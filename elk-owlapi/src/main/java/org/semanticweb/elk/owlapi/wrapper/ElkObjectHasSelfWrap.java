@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLObjectHasSelf;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectHasSelfWrap<T extends OWLObjectHasSelf> extends
 		ElkClassExpressionWrap<T> implements ElkObjectHasSelf {

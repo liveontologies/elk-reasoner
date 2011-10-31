@@ -31,28 +31,10 @@ package org.semanticweb.elk.owl.interfaces;
  * >positive data property assertion axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public interface ElkDataPropertyAssertionAxiom extends ElkAssertionAxiom {
-
-	/**
-	 * Get the individual (subject) that this axiom refers to.
-	 * 
-	 * @return individual
-	 */
-	public ElkIndividual getIndividual();
-
-	/**
-	 * Get the literal (object) that this axiom refers to.
-	 * 
-	 * @return literal
-	 */
-	public ElkLiteral getLiteral();
-
-	/**
-	 * Get the data property expression that this axiom refers to.
-	 * 
-	 * @return data property expression
-	 */
-	public ElkDataPropertyExpression getDataPropertyExpression();
+public interface ElkDataPropertyAssertionAxiom
+		extends
+		ElkPropertyAssertionAxiom<ElkDataPropertyExpression, ElkIndividual, ElkLiteral> {
 
 }

@@ -31,21 +31,8 @@ package org.semanticweb.elk.owl.interfaces;
  * Range<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public interface ElkDataPropertyRangeAxiom extends ElkDataPropertyAxiom {
-
-	/**
-	 * Get the data property expression that this axiom refers to.
-	 * 
-	 * @return data property expression
-	 */
-	public ElkDataPropertyExpression getDataPropertyExpression();
-
-	/**
-	 * Get the data range that this axiom refers to.
-	 * 
-	 * @return data range
-	 */
-	public ElkDataRange getDataRange();
-
+public interface ElkDataPropertyRangeAxiom extends ElkDataPropertyAxiom,
+		ElkPropertyRangeAxiom<ElkDataPropertyExpression, ElkDataRange> {
 }

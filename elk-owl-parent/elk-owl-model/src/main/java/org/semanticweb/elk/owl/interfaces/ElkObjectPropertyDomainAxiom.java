@@ -31,21 +31,8 @@ package org.semanticweb.elk.owl.interfaces;
  * Domain<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public interface ElkObjectPropertyDomainAxiom extends ElkObjectPropertyAxiom {
-
-	/**
-	 * Get the object property expression that this axiom refers to.
-	 * 
-	 * @return object property expression
-	 */
-	public ElkObjectPropertyExpression getObjectPropertyExpression();
-
-	/**
-	 * Get the class expression that this axiom refers to.
-	 * 
-	 * @return class expression
-	 */
-	public ElkClassExpression getClassExpression();
-
+public interface ElkObjectPropertyDomainAxiom extends ElkObjectPropertyAxiom,
+		ElkPropertyDomainAxiom<ElkObjectPropertyExpression, ElkClassExpression> {
 }

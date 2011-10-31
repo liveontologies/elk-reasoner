@@ -38,6 +38,8 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDisjointObjectPropertiesAxiomWrap<T extends OWLDisjointObjectPropertiesAxiom>
 		extends ElkObjectPropertyAxiomWrap<T> implements

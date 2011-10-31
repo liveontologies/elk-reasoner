@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLObjectComplementOf;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectComplementOfWrap<T extends OWLObjectComplementOf> extends
 		ElkClassExpressionWrap<T> implements ElkObjectComplementOf {

@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLClassAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public abstract class ElkClassAxiomWrap<T extends OWLClassAxiom> extends
 		ElkAxiomWrap<T> implements ElkClassAxiom {

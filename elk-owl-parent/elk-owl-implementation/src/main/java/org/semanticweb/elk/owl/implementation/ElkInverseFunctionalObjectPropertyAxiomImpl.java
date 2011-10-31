@@ -29,39 +29,29 @@ import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxio
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Inverse-Functional_Object_Properties"
- * >Inverse Functional Object Property Axiom<a> in the OWL 2 specification.
+ * Implements {@link ElkInverseFunctionalObjectPropertyAxiom}
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class ElkInverseFunctionalObjectPropertyAxiomImpl extends
-		ElkObjectPropertyExpressionObject implements
+		ElkPropertyAxiomImpl<ElkObjectPropertyExpression> implements
 		ElkInverseFunctionalObjectPropertyAxiom {
 
-	/* package-private */ElkInverseFunctionalObjectPropertyAxiomImpl(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		super(objectPropertyExpression);
+	ElkInverseFunctionalObjectPropertyAxiomImpl(
+			ElkObjectPropertyExpression property) {
+		super(property);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("InverseFunctionalObjectProperty");
-	}
-
-	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

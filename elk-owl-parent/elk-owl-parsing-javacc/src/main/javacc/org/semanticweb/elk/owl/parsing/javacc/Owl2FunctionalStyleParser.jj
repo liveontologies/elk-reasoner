@@ -1089,7 +1089,7 @@ ElkObjectMinCardinality objectMinCardinality():
 		if (y == null)
 			return objectFactory.getObjectMinCardinality(x, Integer.parseInt( n.image ));
 		else
-			return objectFactory.getObjectMinCardinality(x, Integer.parseInt( n.image ), y);
+			return objectFactory.getObjectMinCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
 }
 
@@ -1108,7 +1108,7 @@ ElkObjectMaxCardinality objectMaxCardinality():
 		if (y == null)
 			return objectFactory.getObjectMaxCardinality(x, Integer.parseInt( n.image ));
 		else
-			return objectFactory.getObjectMaxCardinality(x, Integer.parseInt( n.image ), y);
+			return objectFactory.getObjectMaxCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
 }
 
@@ -1127,7 +1127,7 @@ ElkObjectExactCardinality objectExactCardinality():
 		if (y == null)
 			return objectFactory.getObjectExactCardinality(x, Integer.parseInt( n.image ));
 		else
-			return objectFactory.getObjectExactCardinality(x, Integer.parseInt( n.image ), y);
+			return objectFactory.getObjectExactCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
 }
 
@@ -1195,7 +1195,7 @@ ElkDataMinCardinality dataMinCardinality():
 		if (y == null)
 			return objectFactory.getDataMinCardinality(x, Integer.parseInt( n.image ));
 		else
-			return objectFactory.getDataMinCardinality(x, Integer.parseInt( n.image ), y);
+			return objectFactory.getDataMinCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
 }
 
@@ -1214,7 +1214,7 @@ ElkDataMaxCardinality dataMaxCardinality():
 		if (y == null)
 			return objectFactory.getDataMaxCardinality(x, Integer.parseInt( n.image ));
 		else
-			return objectFactory.getDataMaxCardinality(x, Integer.parseInt( n.image ), y);
+			return objectFactory.getDataMaxCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
 }
 
@@ -1233,7 +1233,7 @@ ElkDataExactCardinality dataExactCardinality():
 		if (y == null)
 			return objectFactory.getDataExactCardinality(x, Integer.parseInt( n.image ));
 		else
-			return objectFactory.getDataExactCardinality(x, Integer.parseInt( n.image ), y);
+			return objectFactory.getDataExactCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
 }
 

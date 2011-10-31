@@ -26,37 +26,28 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkSymmetricObjectPropertyAxiom.
+ * Implementation of {@link ElkSymmetricObjectPropertyAxiom}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class ElkSymmetricObjectPropertyAxiomImpl extends
-		ElkObjectPropertyExpressionObject implements
+		ElkPropertyAxiomImpl<ElkObjectPropertyExpression> implements
 		ElkSymmetricObjectPropertyAxiom {
 
-	/* package-private */ElkSymmetricObjectPropertyAxiomImpl(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		super(objectPropertyExpression);
+	ElkSymmetricObjectPropertyAxiomImpl(ElkObjectPropertyExpression property) {
+		super(property);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("SymmetricObjectProperty");
-	}
-
-	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

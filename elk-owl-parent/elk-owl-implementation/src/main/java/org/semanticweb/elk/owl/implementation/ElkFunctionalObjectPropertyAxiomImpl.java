@@ -29,39 +29,29 @@ import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Corresponds to a <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Functional_Object_Properties">Functional
- * Object Property Axiom<a> in the OWL 2 specification.
+ * Implements {@link ElkFunctionalObjectPropertyAxiom}
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class ElkFunctionalObjectPropertyAxiomImpl extends
-		ElkObjectPropertyExpressionObject implements
+		ElkPropertyAxiomImpl<ElkObjectPropertyExpression> implements
 		ElkFunctionalObjectPropertyAxiom {
 
-	/* package-private */ElkFunctionalObjectPropertyAxiomImpl(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		super(objectPropertyExpression);
+	ElkFunctionalObjectPropertyAxiomImpl(
+			ElkObjectPropertyExpression property) {
+		super(property);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("FunctionalObjectProperty");
-	}
-
-	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

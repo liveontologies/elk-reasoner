@@ -215,7 +215,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						dataPropertyExpression, cardinality));
 	}
 
-	public ElkDataExactCardinalityQualified getDataExactCardinality(
+	public ElkDataExactCardinalityQualified getDataExactCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange) {
 		return (ElkDataExactCardinalityQualified) objectManager
@@ -252,7 +252,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						dataPropertyExpression, cardinality));
 	}
 
-	public ElkDataMaxCardinalityQualified getDataMaxCardinality(
+	public ElkDataMaxCardinalityQualified getDataMaxCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange) {
 		return (ElkDataMaxCardinalityQualified) objectManager
@@ -267,7 +267,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						dataPropertyExpression, cardinality));
 	}
 
-	public ElkDataMinCardinalityQualified getDataMinCardinality(
+	public ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange) {
 		return (ElkDataMinCardinalityQualified) objectManager
@@ -590,7 +590,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						objectPropertyExpression, cardinality));
 	}
 
-	public ElkObjectExactCardinalityQualified getObjectExactCardinality(
+	public ElkObjectExactCardinalityQualified getObjectExactCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression) {
 		return (ElkObjectExactCardinalityQualified) objectManager
@@ -655,7 +655,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						objectPropertyExpression, cardinality));
 	}
 
-	public ElkObjectMaxCardinalityQualified getObjectMaxCardinality(
+	public ElkObjectMaxCardinalityQualified getObjectMaxCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression) {
 		return (ElkObjectMaxCardinalityQualified) objectManager
@@ -671,7 +671,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						objectPropertyExpression, cardinality));
 	}
 
-	public ElkObjectMinCardinalityQualified getObjectMinCardinality(
+	public ElkObjectMinCardinalityQualified getObjectMinCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression) {
 		return (ElkObjectMinCardinalityQualified) objectManager

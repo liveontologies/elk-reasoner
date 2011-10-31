@@ -23,12 +23,13 @@
 package org.semanticweb.elk.owl.interfaces;
 
 /**
- * A generic for restrictions on properties.
+ * A generic interface for class expressions with data properties or object
+ * properties.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <P>
- *            the type of the property
+ *            the type of the property of this expression
  */
 public interface ElkPropertyRestriction<P> extends ElkClassExpression {
 

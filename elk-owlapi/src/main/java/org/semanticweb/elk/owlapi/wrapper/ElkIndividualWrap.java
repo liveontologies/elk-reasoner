@@ -32,6 +32,9 @@ import org.semanticweb.owlapi.model.OWLIndividual;
  * {@link OWLIndividual}
  * 
  * @author Yevgeny Kazakov
+ * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public abstract class ElkIndividualWrap<T extends OWLIndividual> extends
 		ElkObjectWrap<T> implements ElkIndividual {

@@ -34,14 +34,8 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
  * Object Property Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public interface ElkReflexiveObjectPropertyAxiom extends ElkObjectPropertyAxiom {
-
-	/**
-	 * Get the object property expression that this axiom refers to.
-	 * 
-	 * @return object property expression
-	 */
-	public ElkObjectPropertyExpression getObjectPropertyExpression();
-
+public interface ElkReflexiveObjectPropertyAxiom extends
+		ElkObjectPropertyAxiom, ElkPropertyAxiom<ElkObjectPropertyExpression> {
 }

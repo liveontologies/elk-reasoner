@@ -27,37 +27,29 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkObjectPropertyRangeAxiom.
+ * Implementation of {@link ElkObjectPropertyRangeAxiom}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public class ElkObjectPropertyRangeAxiomImpl extends
-		ElkObjectPropertyExpressionClassExpressionObject implements
-		ElkObjectPropertyRangeAxiom {
+public class ElkObjectPropertyRangeAxiomImpl
+		extends
+		ElkPropertyRangeAxiomImpl<ElkObjectPropertyExpression, ElkClassExpression>
+		implements ElkObjectPropertyRangeAxiom {
 
-	ElkObjectPropertyRangeAxiomImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
-		super(objectPropertyExpression, classExpression);
+	ElkObjectPropertyRangeAxiomImpl(ElkObjectPropertyExpression property,
+			ElkClassExpression range) {
+		super(property, range);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("ObjectPropertyRange");
-	}
-
-	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

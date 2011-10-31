@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkEquivalentObjectPropertiesAxiomWrap<T extends OWLEquivalentObjectPropertiesAxiom>
 		extends ElkObjectPropertyAxiomWrap<T> implements

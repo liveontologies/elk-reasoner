@@ -39,6 +39,8 @@ import org.semanticweb.owlapi.model.OWLObjectProperty;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectInverseOfWrap<T extends OWLObjectProperty> extends
 		ElkObjectPropertyExpressionWrap<T> implements ElkObjectInverseOf {

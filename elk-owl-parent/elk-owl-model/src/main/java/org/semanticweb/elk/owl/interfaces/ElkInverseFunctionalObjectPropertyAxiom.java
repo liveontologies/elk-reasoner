@@ -31,15 +31,8 @@ package org.semanticweb.elk.owl.interfaces;
  * >Inverse Functional Object Property Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
 public interface ElkInverseFunctionalObjectPropertyAxiom extends
-		ElkObjectPropertyAxiom {
-
-	/**
-	 * Get the object property expression that this axiom refers to.
-	 * 
-	 * @return object property expression
-	 */
-	public ElkObjectPropertyExpression getObjectPropertyExpression();
-
+		ElkObjectPropertyAxiom, ElkPropertyAxiom<ElkObjectPropertyExpression> {
 }

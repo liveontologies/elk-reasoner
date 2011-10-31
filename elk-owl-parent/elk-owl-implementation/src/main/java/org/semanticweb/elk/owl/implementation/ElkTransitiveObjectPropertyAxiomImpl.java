@@ -29,38 +29,29 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkTransitiveObjectPropertyAxiom.
+ * Implementation of {@link ElkTransitiveObjectPropertyAxiom}.
  * 
- * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class ElkTransitiveObjectPropertyAxiomImpl extends
-		ElkObjectPropertyExpressionObject implements
+		ElkPropertyAxiomImpl<ElkObjectPropertyExpression> implements
 		ElkTransitiveObjectPropertyAxiom {
 
-	/* package-private */ElkTransitiveObjectPropertyAxiomImpl(
+	ElkTransitiveObjectPropertyAxiomImpl(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("TransitiveObjectProperty");
-	}
-
-	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

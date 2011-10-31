@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLDataAllValuesFrom;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataAllValuesFromWrap<T extends OWLDataAllValuesFrom> extends
 		ElkClassExpressionWrap<T> implements ElkDataAllValuesFrom {

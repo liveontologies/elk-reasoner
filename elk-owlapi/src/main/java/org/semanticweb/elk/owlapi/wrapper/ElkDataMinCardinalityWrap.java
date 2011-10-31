@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLDataMinCardinality;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataMinCardinalityWrap<T extends OWLDataMinCardinality> extends
 		ElkClassExpressionWrap<T> implements ElkDataMinCardinality {

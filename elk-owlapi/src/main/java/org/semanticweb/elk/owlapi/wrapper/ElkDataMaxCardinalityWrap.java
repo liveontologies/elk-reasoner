@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataMaxCardinalityWrap<T extends OWLDataMaxCardinality> extends
 		ElkClassExpressionWrap<T> implements ElkDataMaxCardinality {

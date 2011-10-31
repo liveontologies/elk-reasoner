@@ -29,12 +29,13 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
 /**
- * Implements the {@link ElkObjectPropertyExpression} interface by wrapping instances
- * of {@link OWLObjectPropertyExpression}. The object corresponds to subchain
- * expression of the axiom.
+ * Implements the {@link ElkObjectPropertyExpression} interface by wrapping
+ * instances of {@link OWLObjectPropertyExpression}.
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public abstract class ElkObjectPropertyExpressionWrap<T extends OWLObjectPropertyExpression>
 		extends ElkObjectWrap<T> implements ElkObjectPropertyExpression {
@@ -42,7 +43,7 @@ public abstract class ElkObjectPropertyExpressionWrap<T extends OWLObjectPropert
 	public ElkObjectPropertyExpressionWrap(T owlObjectPropertyExpression) {
 		super(owlObjectPropertyExpression);
 	}
-	
+
 	public abstract <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor);
 
 	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {
@@ -50,7 +51,7 @@ public abstract class ElkObjectPropertyExpressionWrap<T extends OWLObjectPropert
 	}
 
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return accept((ElkObjectPropertyExpressionVisitor<O>) visitor);		
+		return accept((ElkObjectPropertyExpressionVisitor<O>) visitor);
 	}
-	
+
 }

@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLObjectUnionOf;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectUnionOfWrap<T extends OWLObjectUnionOf> extends
 		ElkClassExpressionWrap<T> implements ElkObjectUnionOf {

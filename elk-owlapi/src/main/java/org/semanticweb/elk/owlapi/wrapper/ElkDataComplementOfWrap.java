@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLDataComplementOf;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataComplementOfWrap<T extends OWLDataComplementOf> extends
 		ElkDataRangeWrap<T> implements ElkDataComplementOf {

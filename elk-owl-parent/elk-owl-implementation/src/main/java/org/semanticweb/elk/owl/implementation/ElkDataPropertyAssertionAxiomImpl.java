@@ -27,59 +27,27 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkDataPropertyAssertion.
+ * Implementation of {@link ElkDataPropertyAssertion}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  */
-public class ElkDataPropertyAssertionAxiomImpl extends
-		ElkDataPropertyExpressionObject implements
-		ElkDataPropertyAssertionAxiom {
+public class ElkDataPropertyAssertionAxiomImpl
+		extends
+		ElkPropertyAssertionAxiomImpl<ElkDataPropertyExpression, ElkIndividual, ElkLiteral>
+		implements ElkDataPropertyAssertionAxiom {
 
-	protected final ElkIndividual individual;
-	protected final ElkLiteral literal;
-
-	/* package-private */ElkDataPropertyAssertionAxiomImpl(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkIndividual individual, ElkLiteral literal) {
-		super(dataPropertyExpression);
-		this.individual = individual;
-		this.literal = literal;
-	}
-
-	public ElkIndividual getIndividual() {
-		return individual;
-	}
-
-	public ElkLiteral getLiteral() {
-		return literal;
+	ElkDataPropertyAssertionAxiomImpl(
+			ElkDataPropertyExpression property,
+			ElkIndividual subject, ElkLiteral object) {
+		super(property, subject, object);
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("DataPropertyAssertion(");
-		result.append(dataPropertyExpression.toString());
-		result.append(" ");
-		result.append(individual.toString());
-		result.append(" ");
-		result.append(literal.toString());
-		result.append(")");
-		return result.toString();
-	}
-
-	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <T> T accept(ElkAssertionAxiomVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 

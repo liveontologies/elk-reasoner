@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLInverseFunctionalObjectPropertyAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkInverseFunctionalObjectPropertyAxiomWrap<T extends OWLInverseFunctionalObjectPropertyAxiom>
 		extends ElkObjectPropertyAxiomWrap<T> implements
@@ -43,7 +45,7 @@ public class ElkInverseFunctionalObjectPropertyAxiomWrap<T extends OWLInverseFun
 		super(owlInverseFunctionalObjectPropertyAxiom);
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 

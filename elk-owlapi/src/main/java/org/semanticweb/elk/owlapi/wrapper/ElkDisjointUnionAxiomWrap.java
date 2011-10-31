@@ -39,6 +39,8 @@ import org.semanticweb.owlapi.model.OWLDisjointUnionAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDisjointUnionAxiomWrap<T extends OWLDisjointUnionAxiom> extends
 		ElkClassAxiomWrap<T> implements ElkDisjointUnionAxiom {

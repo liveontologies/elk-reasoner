@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkReflexiveObjectPropertyAxiomWrap<T extends OWLReflexiveObjectPropertyAxiom>
 		extends ElkObjectPropertyAxiomWrap<T> implements
@@ -42,7 +44,7 @@ public class ElkReflexiveObjectPropertyAxiomWrap<T extends OWLReflexiveObjectPro
 		super(owlReflexiveObjectPropertyAxiom);
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 

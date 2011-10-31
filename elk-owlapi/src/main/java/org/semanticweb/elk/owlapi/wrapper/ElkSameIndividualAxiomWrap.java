@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkSameIndividualAxiomWrap<T extends OWLSameIndividualAxiom>
 		extends ElkAssertionAxiomWrap<T> implements ElkSameIndividualAxiom {

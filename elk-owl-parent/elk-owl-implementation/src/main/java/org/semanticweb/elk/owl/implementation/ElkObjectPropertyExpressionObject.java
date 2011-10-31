@@ -38,7 +38,7 @@ public abstract class ElkObjectPropertyExpressionObject extends ElkObjectImpl {
 		this.objectPropertyExpression = objectPropertyExpression;
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return objectPropertyExpression;
 	}
 

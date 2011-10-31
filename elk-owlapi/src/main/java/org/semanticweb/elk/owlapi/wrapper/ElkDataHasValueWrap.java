@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLDataHasValue;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDataHasValueWrap<T extends OWLDataHasValue> extends
 		ElkClassExpressionWrap<T> implements ElkDataHasValue {

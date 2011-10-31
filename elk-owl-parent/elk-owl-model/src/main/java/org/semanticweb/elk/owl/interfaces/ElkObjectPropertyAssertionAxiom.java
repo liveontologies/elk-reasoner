@@ -31,28 +31,9 @@ package org.semanticweb.elk.owl.interfaces;
  * >positive object property assertion axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public interface ElkObjectPropertyAssertionAxiom extends ElkAssertionAxiom {
-
-	/**
-	 * Get the first individual that this axiom refers to.
-	 * 
-	 * @return individual
-	 */
-	public ElkIndividual getFirstIndividual();
-
-	/**
-	 * Get the second individual that this axiom refers to.
-	 * 
-	 * @return individual
-	 */
-	public ElkIndividual getSecondIndividual();
-
-	/**
-	 * Get the object property expression that this axiom refers to.
-	 * 
-	 * @return object property expression
-	 */
-	public ElkObjectPropertyExpression getObjectPropertyExpression();
-
+public interface ElkObjectPropertyAssertionAxiom
+		extends
+		ElkPropertyAssertionAxiom<ElkObjectPropertyExpression, ElkIndividual, ElkIndividual> {
 }

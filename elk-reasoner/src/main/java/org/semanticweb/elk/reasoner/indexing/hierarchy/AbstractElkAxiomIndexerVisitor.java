@@ -218,8 +218,8 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 
 	public Void visit(ElkObjectPropertyDomainAxiom axiom) {
 		indexSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(
-				axiom.getObjectPropertyExpression(),
-				PredefinedElkClass.OWL_THING), axiom.getClassExpression());
+				axiom.getProperty(), PredefinedElkClass.OWL_THING),
+				axiom.getDomain());
 		return null;
 	}
 
@@ -250,7 +250,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	}
 
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-		ElkObjectPropertyExpression ope = axiom.getObjectPropertyExpression();
+		ElkObjectPropertyExpression ope = axiom.getProperty();
 		indexSubObjectPropertyOfAxiom(
 				objectFactory.getObjectPropertyChain(Arrays.asList(ope, ope)),
 				ope);

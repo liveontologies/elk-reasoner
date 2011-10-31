@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectExactCardinalityWrap<T extends OWLObjectExactCardinality>
 		extends ElkClassExpressionWrap<T> implements ElkObjectExactCardinality {

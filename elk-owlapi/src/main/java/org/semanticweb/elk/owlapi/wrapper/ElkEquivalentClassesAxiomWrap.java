@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkEquivalentClassesAxiomWrap<T extends OWLEquivalentClassesAxiom>
 		extends ElkClassAxiomWrap<T> implements ElkEquivalentClassesAxiom {

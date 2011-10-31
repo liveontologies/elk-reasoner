@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkClassAssertionAxiomWrap<T extends OWLClassAssertionAxiom>
 		extends ElkAssertionAxiomWrap<T> implements ElkClassAssertionAxiom {

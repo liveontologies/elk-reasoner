@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public abstract class ElkDataPropertyExpressionWrap<T extends OWLDataPropertyExpression>
 		extends ElkObjectWrap<T> implements ElkDataPropertyExpression {

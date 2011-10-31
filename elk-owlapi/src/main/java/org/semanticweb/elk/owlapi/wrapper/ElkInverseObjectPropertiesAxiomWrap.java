@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLInverseObjectPropertiesAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkInverseObjectPropertiesAxiomWrap<T extends OWLInverseObjectPropertiesAxiom>
 		extends ElkObjectPropertyAxiomWrap<T> implements

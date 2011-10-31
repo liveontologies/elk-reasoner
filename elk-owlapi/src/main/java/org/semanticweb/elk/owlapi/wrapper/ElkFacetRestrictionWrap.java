@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLFacetRestriction;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkFacetRestrictionWrap<T extends OWLFacetRestriction> extends
 		ElkObjectWrap<T> implements ElkFacetRestriction {

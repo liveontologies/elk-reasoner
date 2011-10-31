@@ -31,15 +31,9 @@ package org.semanticweb.elk.owl.interfaces;
  * Object Property Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
 public interface ElkAsymmetricObjectPropertyAxiom extends
-		ElkObjectPropertyAxiom {
-
-	/**
-	 * Get the object property expression that this axiom refers to.
-	 * 
-	 * @return object property expression
-	 */
-	public ElkObjectPropertyExpression getObjectPropertyExpression();
+		ElkObjectPropertyAxiom, ElkPropertyAxiom<ElkObjectPropertyExpression> {
 
 }

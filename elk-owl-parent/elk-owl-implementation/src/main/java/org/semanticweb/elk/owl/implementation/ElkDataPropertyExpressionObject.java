@@ -38,7 +38,7 @@ public abstract class ElkDataPropertyExpressionObject extends ElkObjectImpl {
 		this.dataPropertyExpression = dataPropertyExpression;
 	}
 
-	public ElkDataPropertyExpression getDataPropertyExpression() {
+	public ElkDataPropertyExpression getProperty() {
 		return dataPropertyExpression;
 	}
 

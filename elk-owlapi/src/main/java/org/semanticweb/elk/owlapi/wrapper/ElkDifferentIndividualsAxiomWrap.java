@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLIndividual;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDifferentIndividualsAxiomWrap<T extends OWLDifferentIndividualsAxiom>
 		extends ElkAssertionAxiomWrap<T> implements

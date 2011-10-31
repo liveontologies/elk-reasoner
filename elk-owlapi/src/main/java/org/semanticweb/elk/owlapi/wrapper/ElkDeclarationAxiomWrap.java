@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDeclarationAxiomWrap<T extends OWLDeclarationAxiom> extends
 		ElkAxiomWrap<T> implements ElkDeclarationAxiom {

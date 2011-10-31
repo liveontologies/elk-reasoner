@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkSubObjectPropertyOfAxiomWrap<T extends OWLSubObjectPropertyOfAxiom>
 		extends ElkObjectPropertyAxiomWrap<T> implements

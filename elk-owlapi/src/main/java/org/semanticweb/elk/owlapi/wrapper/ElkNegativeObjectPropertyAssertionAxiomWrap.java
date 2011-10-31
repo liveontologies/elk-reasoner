@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLNegativeObjectPropertyAssertionAxiom;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkNegativeObjectPropertyAssertionAxiomWrap<T extends OWLNegativeObjectPropertyAssertionAxiom>
 		extends ElkAssertionAxiomWrap<T> implements
@@ -44,15 +46,15 @@ public class ElkNegativeObjectPropertyAssertionAxiomWrap<T extends OWLNegativeOb
 		super(owlNegativeObjectPropertyAssertionAxiom);
 	}
 
-	public ElkIndividual getFirstIndividual() {
+	public ElkIndividual getObject() {
 		return converter.convert(this.owlObject.getSubject());
 	}
 
-	public ElkIndividual getSecondIndividual() {
+	public ElkIndividual getSubject() {
 		return converter.convert(this.owlObject.getObject());
 	}
 
-	public ElkObjectPropertyExpression getObjectPropertyExpression() {
+	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 

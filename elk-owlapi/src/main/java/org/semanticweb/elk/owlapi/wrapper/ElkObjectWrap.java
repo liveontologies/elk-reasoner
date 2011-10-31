@@ -34,14 +34,15 @@ import org.semanticweb.owlapi.model.OWLObject;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public abstract class ElkObjectWrap<T extends OWLObject> implements ElkObject {
 
 	/**
 	 * The converter for converting sub-objects.
 	 */
-	protected static OwlConverter converter = OwlConverter
-			.getInstance();
+	protected static OwlConverter converter = OwlConverter.getInstance();
 
 	/**
 	 * The {@link OWLObject} for which {@link ElkObjectWrap} is created. Must be

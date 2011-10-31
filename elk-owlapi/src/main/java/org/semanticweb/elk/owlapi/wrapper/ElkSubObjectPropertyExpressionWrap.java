@@ -27,13 +27,14 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.owlapi.model.OWLObject;
 
-
 /**
- * Implements the {@link ElkSubObjectPropertyExpression} interface by wrapping instances of
- * {@link OWLObject}
+ * Implements the {@link ElkSubObjectPropertyExpression} interface by wrapping
+ * instances of {@link OWLObject}
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public abstract class ElkSubObjectPropertyExpressionWrap<T extends OWLObject>
 		extends ElkObjectWrap<T> implements ElkSubObjectPropertyExpression {
@@ -42,10 +43,11 @@ public abstract class ElkSubObjectPropertyExpressionWrap<T extends OWLObject>
 		super(owlObject);
 	}
 
-	public abstract <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor);
-	
+	public abstract <O> O accept(
+			ElkSubObjectPropertyExpressionVisitor<O> visitor);
+
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return accept((ElkSubObjectPropertyExpressionVisitor<O>) visitor);
 	}
-	
+
 }

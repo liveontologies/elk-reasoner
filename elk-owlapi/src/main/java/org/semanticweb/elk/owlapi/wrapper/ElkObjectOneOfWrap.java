@@ -37,6 +37,8 @@ import org.semanticweb.owlapi.model.OWLObjectOneOf;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkObjectOneOfWrap<T extends OWLObjectOneOf> extends
 		ElkClassExpressionWrap<T> implements ElkObjectOneOf {

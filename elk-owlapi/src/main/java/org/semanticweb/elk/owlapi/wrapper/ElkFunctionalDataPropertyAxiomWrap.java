@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLFunctionalDataPropertyAxiom;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkFunctionalDataPropertyAxiomWrap<T extends OWLFunctionalDataPropertyAxiom>
 		extends ElkDataPropertyAxiomWrap<T> implements
@@ -42,7 +44,7 @@ public class ElkFunctionalDataPropertyAxiomWrap<T extends OWLFunctionalDataPrope
 		super(owlFunctionalDataPropertyAxiom);
 	}
 
-	public ElkDataPropertyExpression getDataPropertyExpression() {
+	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 

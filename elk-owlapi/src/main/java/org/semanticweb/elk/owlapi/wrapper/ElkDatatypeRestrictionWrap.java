@@ -38,6 +38,8 @@ import org.semanticweb.owlapi.model.OWLFacetRestriction;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDatatypeRestrictionWrap<T extends OWLDatatypeRestriction>
 		extends ElkDataRangeWrap<T> implements ElkDatatypeRestriction {

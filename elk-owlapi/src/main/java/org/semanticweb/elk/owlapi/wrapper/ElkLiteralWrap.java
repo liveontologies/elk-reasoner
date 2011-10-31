@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLLiteral;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkLiteralWrap<T extends OWLLiteral> extends ElkObjectWrap<T>
 		implements ElkLiteral {

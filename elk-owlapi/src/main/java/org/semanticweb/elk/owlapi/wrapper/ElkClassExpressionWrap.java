@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public abstract class ElkClassExpressionWrap<T extends OWLClassExpression>
 		extends ElkObjectWrap<T> implements ElkClassExpression {

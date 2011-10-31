@@ -31,15 +31,9 @@ package org.semanticweb.elk.owl.interfaces;
  * Data Property Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public interface ElkFunctionalDataPropertyAxiom extends
-		ElkDataPropertyAxiom {
-
-	/**
-	 * Get the data property expression that this axiom refers to.
-	 * 
-	 * @return data property expression
-	 */
-	public ElkDataPropertyExpression getDataPropertyExpression();
+public interface ElkFunctionalDataPropertyAxiom extends ElkDataPropertyAxiom,
+		ElkPropertyAxiom<ElkDataPropertyExpression> {
 
 }

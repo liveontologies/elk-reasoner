@@ -25,7 +25,6 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.owlapi.model.OWLDatatype;
 
 /**
@@ -34,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLDatatype;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkDatatypeWrap<T extends OWLDatatype> extends ElkEntityWrap<T>
 		implements ElkDatatype {
@@ -42,15 +43,13 @@ public class ElkDatatypeWrap<T extends OWLDatatype> extends ElkEntityWrap<T>
 		super(owlDatatype);
 	}
 
+	@Override
+	public <O> O accept(ElkEntityVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(ElkEntityVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
 }

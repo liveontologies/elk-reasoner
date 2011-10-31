@@ -25,7 +25,6 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 
 /**
@@ -34,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
  * 
  * @author Yevgeny Kazakov
  * 
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkNamedIndividualWrap<T extends OWLNamedIndividual> extends
 		ElkEntityWrap<T> implements ElkNamedIndividual {
@@ -42,7 +43,8 @@ public class ElkNamedIndividualWrap<T extends OWLNamedIndividual> extends
 		super(owlNamedIndividual);
 	}
 
-	public <O> O accept(ElkEntityVisitor<O> visitor) {		
+	@Override
+	public <O> O accept(ElkEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -50,9 +52,4 @@ public class ElkNamedIndividualWrap<T extends OWLNamedIndividual> extends
 		return visitor.visit(this);
 	}
 
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	
 }

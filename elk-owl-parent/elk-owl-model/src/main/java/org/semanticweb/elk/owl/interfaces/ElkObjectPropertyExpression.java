@@ -35,7 +35,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
  * @author Markus Kroetzsch
  */
 public interface ElkObjectPropertyExpression extends
-		ElkSubObjectPropertyExpression {
+		ElkSubObjectPropertyExpression, ElkObject {
 
 	/**
 	 * Accept an ElkObjectPropertyExpressionVisitor.
