@@ -42,61 +42,57 @@ import org.semanticweb.elk.util.collections.Multimap;
  * @author Frantisek Simancik
  */
 public class SaturatedClassExpression implements Linkable {
+
 	protected final IndexedClassExpression root;
-	
+
 	protected final Queue<Queueable> queue;
 
 	// TODO use Derivable instead of IndexedClassExpression here
 	protected final Set<IndexedClassExpression> derived;
-	
-	protected Multimap<IndexedPropertyChain, Linkable>
-		backwardLinksByObjectProperty;
-	
-	protected Multimap<IndexedPropertyChain, Linkable>
-		forwardLinksByObjectProperty;
-	
-	protected Multimap<IndexedPropertyChain, Queueable>
-		propagationsByObjectProperty;
-	
+
+	protected Multimap<IndexedPropertyChain, Linkable> backwardLinksByObjectProperty;
+
+	protected Multimap<IndexedPropertyChain, Linkable> forwardLinksByObjectProperty;
+
+	protected Multimap<IndexedPropertyChain, Queueable> propagationsByObjectProperty;
+
 	protected boolean satisfiable = true;
-	
+
+	protected boolean saturated = false;
+
 	/**
-	 * If set to true, then composition rules will be applied
-	 * to derive all incoming links. This is usually needed only when
-	 * at least one propagation has been derived at this object.
+	 * If set to true, then composition rules will be applied to derive all
+	 * incoming links. This is usually needed only when at least one propagation
+	 * has been derived at this object.
 	 */
 	protected boolean deriveBackwardLinks = false;
-	
+
 	/**
-	 * A context is active iff its queue is not empty or it is being
-	 * processed.
+	 * A context is active iff its queue is not empty or it is being processed.
 	 */
 	private AtomicBoolean isActive;
 
 	public SaturatedClassExpression(IndexedClassExpression root) {
 		this.root = root;
-		this.queue = new ConcurrentLinkedQueue<Queueable> ();
-		this.derived = new ArrayHashSet<IndexedClassExpression> (13);
+		this.queue = new ConcurrentLinkedQueue<Queueable>();
+		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
 		this.isActive = new AtomicBoolean(false);
 	}
 
-	
 	public IndexedClassExpression getRoot() {
 		return root;
 	}
-	
+
 	public boolean isSatisfiable() {
 		return satisfiable;
 	}
 
-	
 	/**
 	 * @return the set of derived indexed class expressions
 	 */
 	public Set<IndexedClassExpression> getSuperClassExpressions() {
 		return derived;
 	}
-
 
 	/**
 	 * Sets the context as active if it was false. This method is thread safe:
@@ -110,7 +106,6 @@ public class SaturatedClassExpression implements Linkable {
 		return isActive.compareAndSet(false, true);
 	}
 
-	
 	/**
 	 * Sets the context as not active if it was active. This method is thread
 	 * safe: for two concurrent executions only one succeeds.
@@ -121,6 +116,24 @@ public class SaturatedClassExpression implements Linkable {
 		if (!isActive.get())
 			return false;
 		return isActive.compareAndSet(true, false);
+	}
+
+	/**
+	 * Marks this context as saturated. The derivable set should not change from
+	 * this point.
+	 */
+	public void setSaturated() {
+		this.saturated = true;
+	}
+
+	/**
+	 * Tests if this context is saturated
+	 * 
+	 * @return <tt>true</tt> if this context is saturated and <tt>false</tt>
+	 *         otherwise
+	 */
+	public boolean isSaturated() {
+		return this.saturated;
 	}
 
 }

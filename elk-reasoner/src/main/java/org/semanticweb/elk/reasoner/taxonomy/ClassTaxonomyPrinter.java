@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.classification;
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -46,18 +46,19 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
  * @author Markus Kroetzsch
  */
 public class ClassTaxonomyPrinter {
-	
+
 	protected static Comparator<ElkClass> comparator = new Comparator<ElkClass>() {
 
 		public int compare(ElkClass o1, ElkClass o2) {
-			return PredefinedElkIri.compare(o1.getIri(), o2.getIri());		}
+			return PredefinedElkIri.compare(o1.getIri(), o2.getIri());
+		}
 	};
 
 	/**
 	 * Convenience method for printing a ClassTaxonomy to a file at the given
 	 * location.
 	 * 
-	 * @see org.semanticweb.elk.reasoner.classification.ClassTaxonomyPrinter#dumpClassTaxomomy
+	 * @see org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter#dumpClassTaxomomy
 	 * 
 	 * @param classTaxonomy
 	 * @param fileName
@@ -115,22 +116,23 @@ public class ClassTaxonomyPrinter {
 	 */
 	protected static void processClassTaxomomy(ClassTaxonomy classTaxonomy,
 			Writer writer) throws IOException {
-		
+
 		writer.write("Ontology(\n");
-		
-		TreeSet<ElkClass> canonicalElkClasses = new TreeSet<ElkClass> (comparator);
+
+		TreeSet<ElkClass> canonicalElkClasses = new TreeSet<ElkClass>(
+				comparator);
 		for (ClassNode classNode : classTaxonomy.getNodes())
 			canonicalElkClasses.add(classNode.getCanonicalMember());
 
-		
 		for (ElkClass elkClass : canonicalElkClasses) {
 			ClassNode classNode = classTaxonomy.getNode(elkClass);
-			
-			ArrayList<ElkClass> orderedEquivalentClasses = 
-				new ArrayList<ElkClass> (classNode.getMembers());
+
+			ArrayList<ElkClass> orderedEquivalentClasses = new ArrayList<ElkClass>(
+					classNode.getMembers());
 			Collections.sort(orderedEquivalentClasses, comparator);
-			
-			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass> (comparator);
+
+			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass>(
+					comparator);
 			for (ClassNode childNode : classNode.getDirectSubNodes()) {
 				orderedSubClasses.add(childNode.getCanonicalMember());
 			}
@@ -138,7 +140,7 @@ public class ClassTaxonomyPrinter {
 			processClassAxioms(elkClass, orderedEquivalentClasses,
 					orderedSubClasses, writer);
 		}
-		
+
 		writer.write(")");
 	}
 
@@ -157,16 +159,16 @@ public class ClassTaxonomyPrinter {
 			ArrayList<ElkClass> orderedEquivalentClasses,
 			TreeSet<ElkClass> orderedSubClasses, Writer writer)
 			throws IOException {
-		
+
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-		
+
 		if (orderedEquivalentClasses.size() > 1) {
 			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = objectFactory
 					.getEquivalentClassesAxiom(orderedEquivalentClasses);
 			OwlFunctionalStylePrinter.append(writer, elkEquivalentClassesAxiom);
 			writer.append('\n');
 		}
-		
+
 		if (elkClass.getIri() != PredefinedElkIri.OWL_THING)
 			for (ElkClass elkSubClass : orderedSubClasses)
 				if (elkSubClass.getIri() != PredefinedElkIri.OWL_NOTHING) {

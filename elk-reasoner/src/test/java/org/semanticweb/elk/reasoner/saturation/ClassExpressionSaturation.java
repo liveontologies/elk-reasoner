@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Utilities for Concurrency
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,32 +20,20 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util.concurrent.computation;
+package org.semanticweb.elk.reasoner.saturation;
 
-import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
 
-/**
- * The class holding a collection of the input elements (a batch) to be
- * processed.
- * 
- * @author "Yevgeny Kazakov"
- * 
- * @param <I>
- *            the type of the input elements
- */
-public final class JobBatch<I> extends ArrayList<I> implements Job<I> {
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8035078348556495610L;
+public class ClassExpressionSaturation<J extends SaturationJob<? extends IndexedClassExpression>>
+		extends ConcurrentComputation<J> {
 
-	JobBatch(int size) {
-		super(size);
+	public ClassExpressionSaturation(ExecutorService executor, int maxWorkers,
+			OntologyIndex ontologyIndex) {
+		super(new ClassExpressionSaturationEngine<J>(ontologyIndex), executor,
+				maxWorkers, 8 * maxWorkers, 32);
 	}
-
-	public <O> O accept(JobProcessor<I, O> processor) throws InterruptedException {
-		return processor.process(this);
-	}
-
 }

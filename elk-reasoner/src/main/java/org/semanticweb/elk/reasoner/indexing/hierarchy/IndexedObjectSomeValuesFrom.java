@@ -33,13 +33,13 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFro
  */
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
-	protected final IndexedObjectProperty relation;
+	protected final IndexedObjectProperty property;
 
 	protected final IndexedClassExpression filler;
 
 	IndexedObjectSomeValuesFrom(IndexedObjectProperty indexedObjectProperty,
 			IndexedClassExpression filler) {
-		this.relation = indexedObjectProperty;
+		this.property = indexedObjectProperty;
 		this.filler = filler;
 	}
 
@@ -47,7 +47,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 * @return The indexed object property comprising this ObjectSomeValuesFrom.
 	 */
 	public IndexedObjectProperty getRelation() {
-		return relation;
+		return property;
 	}
 
 	/**
@@ -67,8 +67,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment, int positiveIncrement,
-			int negativeIncrement) {
+	protected void updateOccurrenceNumbers(int increment,
+			int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this conjunction
@@ -82,6 +82,12 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			// no negative occurrences of this expression left
 			filler.removeNegExistential(this);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "ObjectSomeValuesFrom(" + this.property + ' ' + this.filler
+				+ ')';
 	}
 
 }

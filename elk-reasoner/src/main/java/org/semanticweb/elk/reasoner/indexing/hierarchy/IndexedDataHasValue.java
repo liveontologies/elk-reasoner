@@ -29,18 +29,17 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
 
 public class IndexedDataHasValue extends IndexedClassExpression {
-	
-	protected final ElkDataProperty relation;
+
+	protected final ElkDataProperty property;
 	protected final ElkLiteral filler;
-	
+
 	protected IndexedDataHasValue(ElkDataHasValue elkDataHasValue) {
-		this.relation = (ElkDataProperty) elkDataHasValue.getProperty();
+		this.property = (ElkDataProperty) elkDataHasValue.getProperty();
 		this.filler = elkDataHasValue.getFiller();
 	}
-	
-	
+
 	public ElkDataProperty getRelation() {
-		return relation;
+		return property;
 	}
 
 	public ElkLiteral getFiller() {
@@ -54,13 +53,19 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 		negativeOccurrenceNo += negativeIncrement;
 	}
 
-	public <O> O accept(IndexedDataHasValueVisitor<O> visitor) { 
+	public <O> O accept(IndexedDataHasValueVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return accept((IndexedDataHasValueVisitor<O>) visitor);
 	}
 
+	@Override
+	public String toString() {
+		return "DataHasValue(" + '<' + this.property.getIri().asString()
+				+ "> \"" + this.filler.getLexicalForm() + "\"^^<"
+				+ this.filler.getDatatype().getIri().asString() + ">)";
+	}
 }

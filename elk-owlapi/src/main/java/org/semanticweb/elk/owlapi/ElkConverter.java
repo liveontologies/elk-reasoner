@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.classification.ClassNode;
+import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;

@@ -22,30 +22,26 @@
  */
 package org.semanticweb.elk.util.concurrent.computation;
 
-import java.util.ArrayList;
-
 /**
- * The class holding a collection of the input elements (a batch) to be
- * processed.
+ * An abstract interface for computations processing an input of a certain type.
+ * It has just one method {@link process} for processing the jobs. This method
+ * is typically executed repeatedly from concurrently running workers.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <I>
- *            the type of the input elements
+ *            the type of the input
  */
-public final class JobBatch<I> extends ArrayList<I> implements Job<I> {
+public interface InputProcessor<I> {
 
 	/**
+	 * Processing of the input.
 	 * 
+	 * @param input
+	 *            the input to be processed
+	 * @throws InterruptedException
+	 *             if interrupted during processing
 	 */
-	private static final long serialVersionUID = -8035078348556495610L;
-
-	JobBatch(int size) {
-		super(size);
-	}
-
-	public <O> O accept(JobProcessor<I, O> processor) throws InterruptedException {
-		return processor.process(this);
-	}
+	public void process(I input) throws InterruptedException;
 
 }

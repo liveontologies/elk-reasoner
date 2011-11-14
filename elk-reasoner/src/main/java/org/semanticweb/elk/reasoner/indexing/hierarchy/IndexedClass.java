@@ -38,8 +38,9 @@ public class IndexedClass extends IndexedClassExpression {
 	 * The indexed ElkClass
 	 */
 	protected final ElkClass elkClass;
-	
-	// TODO: Indexed Class perhaps doesn't need to keep track of positive and negative occurrences
+
+	// TODO: Indexed Class perhaps doesn't need to keep track of positive and
+	// negative occurrences
 	protected int occurrenceNo = 0;
 
 	/**
@@ -54,17 +55,6 @@ public class IndexedClass extends IndexedClassExpression {
 	 */
 	public ElkClass getElkClass() {
 		return elkClass;
-	}
-
-	/**
-	 * Represent the object's ElkClass as a string. This implementation reflects
-	 * the fact that we generally consider only one IndexedClass for each
-	 * ElkClass.
-	 * 
-	 * @return String representation.
-	 */
-	public String toString() {
-		return "[" + getElkClass().toString() + "]";
 	}
 
 	public <O> O accept(IndexedClassVisitor<O> visitor) {
@@ -82,9 +72,20 @@ public class IndexedClass extends IndexedClassExpression {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 	}
-	
+
 	@Override
 	public boolean occurs() {
 		return occurrenceNo > 0;
+	}
+
+	/**
+	 * Represent the object's ElkClass as a string. This implementation reflects
+	 * the fact that we generally consider only one IndexedClass for each
+	 * ElkClass.
+	 * 
+	 * @return String representation.
+	 */
+	public String toString() {
+		return '<' + getElkClass().getIri().asString() + '>';
 	}
 }

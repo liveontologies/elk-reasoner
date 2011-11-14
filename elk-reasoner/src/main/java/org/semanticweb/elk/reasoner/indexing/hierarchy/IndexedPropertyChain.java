@@ -46,13 +46,12 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 
 public abstract class IndexedPropertyChain {
-	
+
 	/**
-	 * Correctness of axioms deletions requires that toldSuperProperties
-	 * is a List.
+	 * Correctness of axioms deletions requires that toldSuperProperties is a
+	 * List.
 	 */
 	protected List<IndexedObjectProperty> toldSuperProperties;
-	
 
 	/**
 	 * @return All told super object properties of this object property,
@@ -63,8 +62,8 @@ public abstract class IndexedPropertyChain {
 	}
 
 	/**
-	 * @return All told sub object properties of this object property,
-	 *         possibly null.
+	 * @return All told sub object properties of this object property, possibly
+	 *         null.
 	 */
 	public abstract List<IndexedPropertyChain> getToldSubProperties();
 
@@ -85,21 +84,21 @@ public abstract class IndexedPropertyChain {
 		}
 		return success;
 	}
-	
+
 	/**
 	 * This counts how often this object occurred in the ontology.
 	 */
 	protected int occurrenceNo = 0;
-	
+
 	protected final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
-	
+
 	/**
 	 * Non-recursively.
 	 */
 	protected void updateOccurrenceNumber(int increment) {
 		occurrenceNo += increment;
 	}
-	
+
 	public boolean occurs() {
 		return occurrenceNo > 0;
 	}
@@ -117,8 +116,7 @@ public abstract class IndexedPropertyChain {
 	 * 
 	 * @return True if the operation succeeded.
 	 */
-	public boolean setSaturated(
-			SaturatedPropertyChain saturatedObjectProperty) {
+	public boolean setSaturated(SaturatedPropertyChain saturatedObjectProperty) {
 		return saturated.compareAndSet(null, saturatedObjectProperty);
 	}
 
@@ -143,5 +141,8 @@ public abstract class IndexedPropertyChain {
 	}
 
 	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);
+
+	@Override
+	public abstract String toString();
 
 }

@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Utilities for Concurrency
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,32 +20,20 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util.concurrent.computation;
+package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 
-/**
- * The class holding a collection of the input elements (a batch) to be
- * processed.
- * 
- * @author "Yevgeny Kazakov"
- * 
- * @param <I>
- *            the type of the input elements
- */
-public final class JobBatch<I> extends ArrayList<I> implements Job<I> {
+class TransitiveReductionJobRoot extends TransitiveReductionJobClassTaxonomy {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8035078348556495610L;
-
-	JobBatch(int size) {
-		super(size);
+	public TransitiveReductionJobRoot(IndexedClass root) {
+		super(root);
 	}
 
-	public <O> O accept(JobProcessor<I, O> processor) throws InterruptedException {
-		return processor.process(this);
+	@Override
+	void accept(TransitiveReductionJobVisitor jobVisitor)
+			throws InterruptedException {
+		jobVisitor.visit(this);
 	}
 
 }

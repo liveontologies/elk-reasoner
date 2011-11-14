@@ -195,7 +195,12 @@ public class ArrayHashSet<E> implements Set<E> {
 	}
 
 	public Object[] toArray() {
-		throw new UnsupportedOperationException();
+		Object[] result = new Object[size];
+		int i = 0;
+		for (E element : this) {
+			result[i++] = element;
+		}
+		return result;
 	}
 
 	public <T> T[] toArray(T[] a) {

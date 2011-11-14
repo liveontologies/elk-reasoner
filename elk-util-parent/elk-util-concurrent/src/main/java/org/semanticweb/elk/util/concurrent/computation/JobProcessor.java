@@ -34,7 +34,7 @@ package org.semanticweb.elk.util.concurrent.computation;
  */
 public interface JobProcessor<I, O> {
 
-	public O process(JobBatch<I> job);
+	public O process(JobBatch<I> job) throws InterruptedException;
 
 	public O process(JobPoison<I> job);
 

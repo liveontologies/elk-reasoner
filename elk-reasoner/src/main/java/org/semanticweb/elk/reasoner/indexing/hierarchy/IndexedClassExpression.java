@@ -86,11 +86,10 @@ abstract public class IndexedClassExpression implements Derivable {
 	}
 
 	/**
-	 * Non-recursively. 
+	 * Non-recursively.
 	 */
 	protected abstract void updateOccurrenceNumbers(int increment,
 			int positiveIncrement, int negativeIncrement);
-	
 
 	/**
 	 * @return All told super class expressions of this class expression,
@@ -217,8 +216,11 @@ abstract public class IndexedClassExpression implements Derivable {
 	}
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
-	
+
 	public <O> O accept(QueueableVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
+	@Override
+	public abstract String toString();
 }

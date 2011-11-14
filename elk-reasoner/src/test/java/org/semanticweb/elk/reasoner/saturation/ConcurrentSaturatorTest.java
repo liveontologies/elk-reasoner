@@ -47,13 +47,15 @@ public class ConcurrentSaturatorTest extends TestCase {
 	}
 
 	public void testExistentials() throws InterruptedException,
-			ExecutionException {		
+			ExecutionException {
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
-		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri("R"));
-		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri("S"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
+				"R"));
+		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(
+				"S"));
 
 		OntologyIndex ontologyIndex = new OntologyIndexImpl();
 
@@ -72,13 +74,14 @@ public class ConcurrentSaturatorTest extends TestCase {
 		final ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
 				executor, 16, ontologyIndex);
 
-		objectPropertySaturation.compute();		
+		objectPropertySaturation.compute();
 
-		final ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
+		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
-		classExpressionSaturation.submit(A);
+		classExpressionSaturation
+				.submit(new SaturationJob<IndexedClassExpression>(A));
 		classExpressionSaturation.waitCompletion();
 
 		assertTrue("A contains D", A.getSaturated().getSuperClassExpressions()
@@ -107,9 +110,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression B = ontologyIndex.getIndexed(b);
 		IndexedClassExpression C = ontologyIndex.getIndexed(c);
 		IndexedClassExpression D = ontologyIndex.getIndexed(d);
-		IndexedClassExpression I = ontologyIndex
-				.getIndexed(objectFactory
-						.getObjectIntersectionOf(b, c));
+		IndexedClassExpression I = ontologyIndex.getIndexed(objectFactory
+				.getObjectIntersectionOf(b, c));
 
 		assertTrue("A SubClassOf B",
 				A.getToldSuperClassExpressions().contains(B));
@@ -120,11 +122,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 		assertTrue("I SubClassOf D",
 				I.getToldSuperClassExpressions().contains(D));
 
-		final ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
+		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
-		classExpressionSaturation.submit(A);
+		classExpressionSaturation
+				.submit(new SaturationJob<IndexedClassExpression>(A));
 		classExpressionSaturation.waitCompletion();
 		SaturatedClassExpression context = A.getSaturated();
 

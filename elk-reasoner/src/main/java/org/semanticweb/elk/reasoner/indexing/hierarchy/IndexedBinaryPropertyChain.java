@@ -28,14 +28,14 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChain
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 
 /**
- * Represents a complex ElkSubObjectPropertyOfAxiom. The chain consists of
- * two components: an IndexedObjectProperty on the left and an
+ * Represents a complex ElkSubObjectPropertyOfAxiom. The chain consists of two
+ * components: an IndexedObjectProperty on the left and an
  * IndexedPropertyExpression on the right. This reflects the fact that property
- * inclusions are binarized during index constructions. The auxiliary 
- * inclusions may not represent any ElkObject in the ontology. 
+ * inclusions are binarized during index constructions. The auxiliary inclusions
+ * may not represent any ElkObject in the ontology.
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
 
 public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
@@ -86,4 +86,9 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return "ObjectPropertyChain(" + this.leftProperty + ' '
+				+ this.rightProperty + ')';
+	}
 }

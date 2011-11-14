@@ -41,11 +41,11 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	protected final ElkObjectProperty elkObjectProperty;
 
 	/**
-	 * Correctness of axioms deletions requires that toldSubProperties
-	 * is a List.
+	 * Correctness of axioms deletions requires that toldSubProperties is a
+	 * List.
 	 */
 	protected List<IndexedPropertyChain> toldSubProperties;
-	
+
 	/**
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
@@ -68,7 +68,6 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	public List<IndexedPropertyChain> getToldSubProperties() {
 		return toldSubProperties;
 	}
-	
 
 	protected void addToldSubObjectProperty(
 			IndexedPropertyChain subObjectProperty) {
@@ -88,6 +87,15 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		return success;
 	}
 
+	public <O> O accept(IndexedObjectPropertyVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(IndexedPropertyChainVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
 	/**
 	 * Represent the object's ElkObjectProperty as a string. This implementation
 	 * reflects the fact that we generally consider only one
@@ -97,16 +105,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 */
 	@Override
 	public String toString() {
-		return "[" + getElkObjectProperty().toString() + "]";
-	}
-
-	public <O> O accept(IndexedObjectPropertyVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(IndexedPropertyChainVisitor<O> visitor) {
-		return visitor.visit(this);
+		return '<' + getElkObjectProperty().getIri().asString() + '>';
 	}
 
 }

@@ -40,7 +40,7 @@ import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.classification.ClassNode;
+import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.elk.util.logging.Statistics;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;

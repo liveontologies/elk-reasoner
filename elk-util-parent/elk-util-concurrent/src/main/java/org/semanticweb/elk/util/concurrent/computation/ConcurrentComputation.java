@@ -27,17 +27,21 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 /**
- * An abstract class for concurrent processing of a number of tasks. The input
- * for the tasks are submitted, buffered, and processed in batches by concurrent
- * workers. The implementation is loosely based on a produce-consumer framework
- * with one producer and many consumers.
+ * An class for concurrent processing of a number of tasks. The input for the
+ * tasks are submitted, buffered, and processed in batches by concurrent workers
+ * using an {@link InputProcessor} . The implementation is loosely based on a
+ * produce-consumer framework with one producer and many consumers.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <I>
  *            the type of the input to be processed.
  */
-public abstract class AbstractConcurrentComputation<I> {
+public class ConcurrentComputation<I> {
+	/**
+	 * processor for the input
+	 */
+	protected final InputProcessor<I> inputProcessor;
 	/**
 	 * executor used to run the jobs
 	 */
@@ -74,6 +78,8 @@ public abstract class AbstractConcurrentComputation<I> {
 	/**
 	 * Creating a computation instance.
 	 * 
+	 * @param inputProcessor
+	 *            the processor for the input to be executed by workers
 	 * @param executor
 	 *            the executor used to execute the concurrent jobs
 	 * @param maxWorkers
@@ -83,8 +89,10 @@ public abstract class AbstractConcurrentComputation<I> {
 	 *            full, submitting new jobs will block until new space is
 	 *            available
 	 */
-	public AbstractConcurrentComputation(ExecutorService executor,
-			int maxWorkers, int bufferCapacity, int batchSize) {
+	public ConcurrentComputation(InputProcessor<I> inputProcesor,
+			ExecutorService executor, int maxWorkers, int bufferCapacity,
+			int batchSize) {
+		this.inputProcessor = inputProcesor;
 		this.executor = executor;
 		this.maxWorkers = maxWorkers;
 		this.buffer = new ArrayBlockingQueue<Job<I>>(bufferCapacity);
@@ -124,14 +132,6 @@ public abstract class AbstractConcurrentComputation<I> {
 	}
 
 	/**
-	 * An abstract method for processing of the input. This method is repeatedly
-	 * executed over the input from concurrently running workers.
-	 * 
-	 * @param input
-	 */
-	protected abstract void process(I input);
-
-	/**
 	 * The class that is used to process and run the input jobs.
 	 * 
 	 * @author "Yevgeny Kazakov"
@@ -139,10 +139,10 @@ public abstract class AbstractConcurrentComputation<I> {
 	 */
 	protected final class Worker implements JobProcessor<I, Boolean>, Runnable {
 
-		public final Boolean process(JobBatch<I> batch) {
+		public final Boolean process(JobBatch<I> batch) throws InterruptedException {
 			for (I input : batch) {
-				// processing the input using the abstract method defined above
-				AbstractConcurrentComputation.this.process(input);
+				// processing the input using the input processor
+				inputProcessor.process(input);
 			}
 			return true;
 		}

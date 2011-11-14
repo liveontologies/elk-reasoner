@@ -27,13 +27,13 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
-import org.semanticweb.elk.reasoner.classification.ClassTaxonomyComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyEngine;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.logging.Statistics;
 
 public class Reasoner {
@@ -54,12 +54,12 @@ public class Reasoner {
 		this.workerNo = workerNo;
 		reset();
 	}
-	
+
 	public Reasoner() {
 		this(Executors.newCachedThreadPool(), 2 * Runtime.getRuntime()
 				.availableProcessors());
 	}
-	
+
 	public void reset() {
 		ontologyIndex = new OntologyIndexImpl();
 		classTaxonomy = null;
@@ -68,14 +68,14 @@ public class Reasoner {
 	public OntologyIndex getOntologyIndex() {
 		return ontologyIndex;
 	}
-	
+
 	/**
 	 * Returns null if the current state of the index is not classified.
 	 */
 	public ClassTaxonomy getTaxonomy() {
 		return classTaxonomy;
 	}
-	
+
 	public void addAxiom(ElkAxiom axiom) {
 		ontologyIndex.getAxiomInserter().process(axiom);
 		classTaxonomy = null;
@@ -96,13 +96,13 @@ public class Reasoner {
 		ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
 				executor, workerNo, ontologyIndex);
 
-		ClassExpressionSaturation classExpressionSaturation = new ClassExpressionSaturation(
+		TaxonomyComputation taxonomyComputation = new TaxonomyComputation(
 				executor, workerNo, ontologyIndex);
 
 		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Saturation using " + workerNo + " workers");
-		Statistics.logOperationStart("Saturation", LOGGER_);
-		progressMonitor.start("Saturation");
+			LOGGER_.info("Classification using " + workerNo + " workers");
+		Statistics.logOperationStart("Classification", LOGGER_);
+		progressMonitor.start("Classification");
 
 		try {
 			objectPropertySaturation.compute();
@@ -110,49 +110,21 @@ public class Reasoner {
 		}
 
 		progress = 0;
-		classExpressionSaturation.start();
+		taxonomyComputation.start();
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
 			try {
-				classExpressionSaturation.submit(ic);
+				taxonomyComputation.submit(ic);
 			} catch (InterruptedException e) {
 			}
 			progressMonitor.report(++progress, maxIndexedClassCount);
 		}
 		try {
-			classExpressionSaturation.waitCompletion();
+			taxonomyComputation.waitCompletion();
 		} catch (InterruptedException e) {
 		}
-
+		classTaxonomy = taxonomyComputation.getClassTaxonomy();
 		progressMonitor.finish();
-		Statistics.logOperationFinish("Saturation", LOGGER_);
-		Statistics.logMemoryUsage(LOGGER_);
-
-		// Transitive reduction stage
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Transitive reduction using " + workerNo + " workers");
-		Statistics.logOperationStart("Transitive reduction", LOGGER_);
-		progressMonitor.start("Transitive reduction");
-
-		ClassTaxonomyComputation classification = new ClassTaxonomyComputation(
-				executor, workerNo);
-		progress = 0;
-		classification.start();
-
-		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
-			try {
-				classification.submit(ic);
-			} catch (InterruptedException e) {
-			}
-			progressMonitor.report(++progress, maxIndexedClassCount);
-		}
-
-		try {
-			classTaxonomy = classification.computeTaxonomy();
-		} catch (InterruptedException e) {
-		}
-
-		progressMonitor.finish();
-		Statistics.logOperationFinish("Transitive reduction", LOGGER_);
+		Statistics.logOperationFinish("Classification", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 	}
 
@@ -162,5 +134,26 @@ public class Reasoner {
 
 	public void shutdown() {
 		executor.shutdownNow();
+	}
+
+	public class TaxonomyComputation extends
+			ConcurrentComputation<IndexedClass> {
+
+		final ClassTaxonomyEngine classTaxonomyEngine;
+
+		public TaxonomyComputation(ExecutorService executor, int maxWorkers,
+				ClassTaxonomyEngine classTaxonomyEngine) {
+			super(classTaxonomyEngine, executor, maxWorkers, 8 * maxWorkers, 32);
+			this.classTaxonomyEngine = classTaxonomyEngine;
+		}
+
+		public TaxonomyComputation(ExecutorService executor, int maxWorkers,
+				OntologyIndex ontologyIndex) {
+			this(executor, maxWorkers, new ClassTaxonomyEngine(ontologyIndex));
+		}
+
+		public ClassTaxonomy getClassTaxonomy() {
+			return classTaxonomyEngine.getClassTaxonomy();
+		}
 	}
 }

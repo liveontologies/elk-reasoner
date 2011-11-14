@@ -34,8 +34,8 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionO
 public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	/**
 	 * There are only two conjuncts. This reflects the fact that conjunctions
-	 * are binarized during index construction. The conjuncts may not
-	 * correspond to any ElkClassExpression in the ontology.
+	 * are binarized during index construction. The conjuncts may not correspond
+	 * to any ElkClassExpression in the ontology.
 	 */
 	protected final IndexedClassExpression firstConjunct, secondConjunct;
 
@@ -62,12 +62,12 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment, int positiveIncrement,
-			int negativeIncrement) {
+	protected void updateOccurrenceNumbers(int increment,
+			int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this conjunction
-			firstConjunct.addNegConjunctionByConjunct(this,	secondConjunct);
+			firstConjunct.addNegConjunctionByConjunct(this, secondConjunct);
 			secondConjunct.addNegConjunctionByConjunct(this, firstConjunct);
 		}
 
@@ -80,6 +80,12 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			secondConjunct.removeNegConjunctionByConjunct(this, firstConjunct);
 		}
 
+	}
+
+	@Override
+	public String toString() {
+		return "ObjectIntersectionOf(" + this.firstConjunct + ' '
+				+ this.secondConjunct + ')';
 	}
 
 }

@@ -23,9 +23,9 @@
 /**
  * @author Yevgeny Kazakov, May 15, 2011
  */
-package org.semanticweb.elk.reasoner.classification;
+package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.List;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 
@@ -48,10 +48,10 @@ public interface ClassTaxonomy {
 	public ClassNode getNode(ElkClass elkClass);
 
 	/**
-	 * Obtain an unmodifiable List of all nodes in this ClassTaxonomy.
+	 * Obtain an unmodifiable Set of all nodes in this ClassTaxonomy.
 	 * 
 	 * @return an unmodifiable Collection
 	 */
-	public List<ClassNode> getNodes();
+	public Set<ClassNode> getNodes();
 
 }

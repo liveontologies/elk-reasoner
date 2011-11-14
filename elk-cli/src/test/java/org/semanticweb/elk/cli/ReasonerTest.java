@@ -33,11 +33,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
-import org.semanticweb.elk.reasoner.classification.ClassNode;
-import org.semanticweb.elk.reasoner.classification.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
 
 public class ReasonerTest extends TestCase {
 

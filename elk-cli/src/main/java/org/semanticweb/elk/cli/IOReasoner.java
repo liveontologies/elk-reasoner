@@ -33,7 +33,7 @@ import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.classification.ClassTaxonomyPrinter;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
 import org.semanticweb.elk.util.logging.Statistics;
 
 public class IOReasoner extends Reasoner {

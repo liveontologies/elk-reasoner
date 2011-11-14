@@ -39,7 +39,8 @@ public interface Job<I> {
 	 *            the job processor with the input type {@link I} and output
 	 *            type {@link O}
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public <O> O accept(JobProcessor<I, O> processor);
+	public <O> O accept(JobProcessor<I, O> processor) throws InterruptedException;
 
 }

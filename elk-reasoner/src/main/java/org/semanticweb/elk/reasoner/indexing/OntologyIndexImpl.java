@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.util.collections.Iterables;
+import org.semanticweb.elk.util.collections.Operations;
 
 public class OntologyIndexImpl extends IndexedObjectCache implements
 		OntologyIndex {
@@ -75,7 +75,7 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	}
 
 	public Iterable<IndexedClass> getIndexedClasses() {
-		return Iterables.filter(getIndexedClassExpressions(),
+		return Operations.filter(getIndexedClassExpressions(),
 				IndexedClass.class);
 	}
 
@@ -88,7 +88,7 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	}
 
 	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
-		return Iterables.filter(getIndexedPropertyChains(),
+		return Operations.filter(getIndexedPropertyChains(),
 				IndexedObjectProperty.class);
 	}
 

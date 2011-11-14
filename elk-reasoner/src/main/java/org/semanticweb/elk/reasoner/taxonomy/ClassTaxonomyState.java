@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Utilities for Concurrency
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,32 +20,29 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util.concurrent.computation;
+package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
-/**
- * The class holding a collection of the input elements (a batch) to be
- * processed.
- * 
- * @author "Yevgeny Kazakov"
- * 
- * @param <I>
- *            the type of the input elements
- */
-public final class JobBatch<I> extends ArrayList<I> implements Job<I> {
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8035078348556495610L;
+class ClassTaxonomyState {
 
-	JobBatch(int size) {
-		super(size);
+	protected final NonBottomNode rootNode;
+	protected final Iterator<IndexedClass> iteratorDirectSuperClasses;
+
+	ClassTaxonomyState(NonBottomNode rootNode,
+			Iterator<IndexedClass> iteratorDirectSuperClasses) {
+		this.rootNode = rootNode;
+		this.iteratorDirectSuperClasses = iteratorDirectSuperClasses;
 	}
 
-	public <O> O accept(JobProcessor<I, O> processor) throws InterruptedException {
-		return processor.process(this);
+	NonBottomNode getRootNode() {
+		return rootNode;
+	}
+
+	Iterator<IndexedClass> getIteratorDirectSuperClasses() {
+		return iteratorDirectSuperClasses;
 	}
 
 }
