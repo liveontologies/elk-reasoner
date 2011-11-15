@@ -188,7 +188,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * the same job object several times. It is not guaranteed that
 	 * {@link #processOutput(ReasonerJob)} will be called from the same thread
 	 * in which the job was submitted; it can be processed by any of the
-	 * concurrently running running workers since the job pool is shared. It is
+	 * concurrently running workers since the job pool is shared. It is
 	 * guaranteed that all submitted jobs will be processed when no instances of
 	 * {@link #process(ReasonerJob)} of the same engine object are running.
 	 * 
@@ -211,7 +211,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		} else {
 			getCreateContext(root);
 			/*
-			 * invariant: for every buffered job, the context is created
+			 * invariant: for every buffered job, the context is created and
 			 * scheduled for processing
 			 */
 			while (!this.buffer.offer(job)) {
@@ -573,11 +573,15 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 
 		public Void visit(DecomposedClassExpression compositeClassExpression) {
 			if (context.isSaturated())
-				LOGGER_.error(context.root + ": adding "
+				LOGGER_.warn(context.root + ": adding "
 						+ compositeClassExpression.getClassExpression()
 						+ " to a saturated context!");
 			if (context.derived.add(compositeClassExpression
 					.getClassExpression())) {
+				if (context.isSaturated())
+					LOGGER_.error(context.root + ": new "
+							+ compositeClassExpression.getClassExpression()
+							+ " in a saturated context!");
 				derivedNo.incrementAndGet();
 				processClass(compositeClassExpression.getClassExpression());
 			}
@@ -586,9 +590,13 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 
 		public Void visit(IndexedClassExpression indexedClassExpression) {
 			if (context.isSaturated())
-				LOGGER_.error(context.root + ": adding "
+				LOGGER_.warn(context.root + ": adding "
 						+ indexedClassExpression + " to a saturated context!");
 			if (context.derived.add(indexedClassExpression)) {
+				if (context.isSaturated())
+					LOGGER_.error(context.root + ": new "
+							+ indexedClassExpression
+							+ " in a saturated context!");
 				derivedNo.incrementAndGet();
 				processClass(indexedClassExpression);
 				indexedClassExpression.accept(classExpressionDecomposer);

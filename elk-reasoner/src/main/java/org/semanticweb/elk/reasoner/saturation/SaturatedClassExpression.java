@@ -58,7 +58,7 @@ public class SaturatedClassExpression implements Linkable {
 
 	protected boolean satisfiable = true;
 
-	protected boolean saturated = false;
+	protected final AtomicBoolean saturated;
 
 	/**
 	 * If set to true, then composition rules will be applied to derive all
@@ -77,6 +77,7 @@ public class SaturatedClassExpression implements Linkable {
 		this.queue = new ConcurrentLinkedQueue<Queueable>();
 		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
 		this.isActive = new AtomicBoolean(false);
+		this.saturated = new AtomicBoolean(false);
 	}
 
 	public IndexedClassExpression getRoot() {
@@ -123,7 +124,7 @@ public class SaturatedClassExpression implements Linkable {
 	 * this point.
 	 */
 	public void setSaturated() {
-		this.saturated = true;
+		this.saturated.set(true);
 	}
 
 	/**
@@ -133,7 +134,7 @@ public class SaturatedClassExpression implements Linkable {
 	 *         otherwise
 	 */
 	public boolean isSaturated() {
-		return this.saturated;
+		return saturated.get();
 	}
 
 }
