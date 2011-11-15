@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * 
  */
 class SaturationJobRoot<I extends IndexedClassExpression, J extends TransitiveReductionJob<I>>
-		extends SaturationJobTransitiveReduction<I, I, J> {
+		extends SaturationJobForTransitiveReduction<I, I, J> {
 
 	/**
 	 * The link to the transitive reduction job that has initiated this job

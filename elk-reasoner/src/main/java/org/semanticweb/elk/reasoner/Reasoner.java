@@ -56,7 +56,7 @@ public class Reasoner {
 	}
 
 	public Reasoner() {
-		this(Executors.newCachedThreadPool(), 2 * Runtime.getRuntime()
+		this(Executors.newCachedThreadPool(), Runtime.getRuntime()
 				.availableProcessors());
 	}
 
@@ -143,7 +143,7 @@ public class Reasoner {
 
 		public TaxonomyComputation(ExecutorService executor, int maxWorkers,
 				ClassTaxonomyEngine classTaxonomyEngine) {
-			super(classTaxonomyEngine, executor, maxWorkers, 8 * maxWorkers, 32);
+			super(classTaxonomyEngine, executor, maxWorkers, 8 * maxWorkers, 16);
 			this.classTaxonomyEngine = classTaxonomyEngine;
 		}
 

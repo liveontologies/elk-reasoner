@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
@@ -20,15 +20,19 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.owl.util;
 
-public interface TransitiveReductionJobVisitor {
+import java.util.Comparator;
 
-	void visit(TransitiveReductionJobRoot job) throws InterruptedException;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 
-	void visit(TransitiveReductionJobDirectSuperClass job)
-			throws InterruptedException;
+public class Comparators {
 
-	void visit(TransitiveReductionJobTopSuperClass job)
-			throws InterruptedException;;
+	public static Comparator<ElkClass> ELK_CLASS_COMPARATOR = new Comparator<ElkClass>() {
+		public int compare(ElkClass o1, ElkClass o2) {
+			return PredefinedElkIri.compare(o1.getIri(), o2.getIri());
+		}
+	};
+
 }

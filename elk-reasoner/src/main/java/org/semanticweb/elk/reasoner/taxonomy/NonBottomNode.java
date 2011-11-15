@@ -33,6 +33,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -59,11 +60,7 @@ public class NonBottomNode implements ClassNode {
 	 * first element is the least one according to the ordering defined by
 	 * PredefinedElkIri.compare().
 	 */
-	final Set<ElkClass> members;
-	/**
-	 * The element from the members set with the least iri representation.
-	 */
-	final ElkClass canonical;
+	private ArraySet<ElkClass> members;
 	/**
 	 * ElkClass nodes whose members are direct super-classes of the members of
 	 * this node.
@@ -76,30 +73,47 @@ public class NonBottomNode implements ClassNode {
 	private final Set<ClassNode> directSubNodes;
 
 	/**
-	 * Constructor.
+	 * Constructing a new class node for a given taxonomy
+	 * 
+	 * @param members
+	 *            non-empty set of equivalent ElkClass objects
+	 */
+	protected NonBottomNode(ConcurrentClassTaxonomy taxonomy) {
+		this.taxonomy = taxonomy;
+		this.directSubNodes = new ArrayHashSet<ClassNode>();
+		this.directSuperNodes = new ArrayHashSet<ClassNode>();
+	}
+
+	/**
+	 * Constructing the class node for a given taxonomy and the set of
+	 * equivalent classes.
 	 * 
 	 * @param members
 	 *            non-empty set of equivalent ElkClass objects
 	 */
 	protected NonBottomNode(ConcurrentClassTaxonomy taxonomy,
-			Set<ElkClass> members) {
-		this.taxonomy = taxonomy;
+			ArraySet<ElkClass> members) {
+		this(taxonomy);
+		setMembers(members);
+	}
+
+	/**
+	 * Testing if the members have been set
+	 * 
+	 * @return <tt>true</tt> if the members are set, otherwise <tt>false</tt>
+	 */
+	protected boolean membersSet() {
+		return members != null;
+	}
+
+	/**
+	 * Setting the members of this class node.
+	 * 
+	 * @param members
+	 *            the set of members to be set for this class node
+	 */
+	protected void setMembers(ArraySet<ElkClass> members) {
 		this.members = members;
-		this.directSubNodes = new ArrayHashSet<ClassNode>();
-		this.directSuperNodes = new ArrayHashSet<ClassNode>();
-		/*
-		 * finding a canonical member with the least Iri
-		 */
-		ElkClass canonical = null;
-		String canonicalIri = "";
-		for (ElkClass member : members) {
-			String memberIri = member.getIri().asString();
-			if (canonical == null || memberIri.compareTo(canonicalIri) < 0) {
-				canonical = member;
-				canonicalIri = memberIri;
-			}
-		}
-		this.canonical = canonical;
 	}
 
 	/**
@@ -134,7 +148,7 @@ public class NonBottomNode implements ClassNode {
 	}
 
 	public ElkClass getCanonicalMember() {
-		return canonical;
+		return members.get(0);
 	}
 
 	public Set<ClassNode> getDirectSuperNodes() {
@@ -201,6 +215,6 @@ public class NonBottomNode implements ClassNode {
 	}
 
 	public String toString() {
-		return this.canonical.getIri().asString();
+		return getCanonicalMember().getIri().asString();
 	}
 }

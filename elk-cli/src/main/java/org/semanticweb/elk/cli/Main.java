@@ -68,7 +68,8 @@ public class Main {
 		OptionSpec<Integer> nWorkers = parser
 				.acceptsAll(asList("w", "concurrent-workers"),
 						"number of concurrent classification workers")
-				.withOptionalArg().ofType(Integer.class).defaultsTo(4);
+				.withOptionalArg().ofType(Integer.class)
+				.defaultsTo(Runtime.getRuntime().availableProcessors());
 		OptionSpec<Void> version = parser.acceptsAll(asList("version", "v"),
 				"print version information");
 		OptionSpec<Void> help = parser.acceptsAll(asList("h", "help", "?"),
@@ -84,8 +85,8 @@ public class Main {
 		else if (!options.has(inputOntologyFile))
 			parser.printHelpOn(System.out);
 		else {
-			IOReasoner reasoner = new IOReasoner(Executors.newCachedThreadPool(),
-					nWorkers.value(options));
+			IOReasoner reasoner = new IOReasoner(
+					Executors.newCachedThreadPool(), nWorkers.value(options));
 			reasoner.loadOntologyFromFile(inputOntologyFile.value(options));
 			if (options.has(classify))
 				reasoner.classify();

@@ -22,147 +22,78 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionEngine;
+import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputSatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 
 public class TransitiveReductionEngineForClassTaxonomy
 		extends
-		TransitiveReductionEngine<IndexedClass, TransitiveReductionJobClassTaxonomy> {
+		TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>> {
 
 	protected final OntologyIndex ontologyIndex;
 
 	protected final ConcurrentClassTaxonomy taxonomy;
 
-	protected final TransitiveReductionJobOutputProcessor outputJobProcessor;
-
 	protected final TransitiveReductionOutputProcessor outputProcessor;
-
-	protected final Queue<TransitiveReductionJobClassTaxonomy> jobQueue;
 
 	public TransitiveReductionEngineForClassTaxonomy(
 			OntologyIndex ontologyIndex, ConcurrentClassTaxonomy taxonomy) {
 		super(ontologyIndex);
 		this.ontologyIndex = ontologyIndex;
 		this.taxonomy = taxonomy;
-		this.outputJobProcessor = new TransitiveReductionJobOutputProcessor();
 		this.outputProcessor = new TransitiveReductionOutputProcessor();
-		jobQueue = new ConcurrentLinkedQueue<TransitiveReductionJobClassTaxonomy>();
 	}
 
 	@Override
-	public void process(TransitiveReductionJobClassTaxonomy job)
+	public void process(TransitiveReductionJob<IndexedClass> job)
 			throws InterruptedException {
 		super.process(job);
-		for (;;) {
-			TransitiveReductionJobClassTaxonomy subJob = jobQueue.poll();
-			if (subJob == null)
-				break;
-			super.process(subJob);
-		}
+		taxonomy.processNewNodes();
 	}
 
 	@Override
-	public void processOutput(TransitiveReductionJobClassTaxonomy job)
+	public void processOutput(TransitiveReductionJob<IndexedClass> job)
 			throws InterruptedException {
 		super.processOutput(job);
-		job.accept(outputJobProcessor);
-	}
-
-	class TransitiveReductionJobOutputProcessor implements
-			TransitiveReductionJobVisitor {
-
-		public void visit(TransitiveReductionJobRoot job)
-				throws InterruptedException {
-			job.getOutput().accept(outputProcessor);
-		}
-
-		public void visit(TransitiveReductionJobDirectSuperClass job)
-				throws InterruptedException {
-			ClassTaxonomyState state = job.getClassTaxonomyState();
-			NonBottomNode superClassNode = job.getOutput().accept(
-					outputProcessor);
-			assignDirectSuperClassNode(state.getRootNode(), superClassNode);
-			processState(state);
-		}
-
-		public void visit(TransitiveReductionJobTopSuperClass job)
-				throws InterruptedException {
-			NonBottomNode topNode = job.getOutput().accept(outputProcessor);
-			assignDirectSuperClassNode(job.getRootNode(), topNode);
-		}
+		job.getOutput().accept(outputProcessor);
 	}
 
 	class TransitiveReductionOutputProcessor implements
-			TransitiveReductionOutputVisitor<IndexedClass, NonBottomNode> {
-		public NonBottomNode visit(
+			TransitiveReductionOutputVisitor<IndexedClass> {
+		public void visit(
 				TransitiveReductionOutputSatisfiable<IndexedClass> output) {
-			return getCreateClassNode(output);
+			NonBottomNode node = taxonomy.getCreate(output.getEquivalent());
+			processDirectSuperClasses(node, output.getDirectSuperClasses());
 		}
 
-		public NonBottomNode visit(
+		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 			taxonomy.unsatisfiableClasses.add(output.getRoot().getElkClass());
-			return null;
 		}
 	}
 
-	NonBottomNode getCreateClassNode(
-			TransitiveReductionOutputSatisfiable<IndexedClass> transitiveReductionOutputSatisfiable) {
-		Set<ElkClass> equivalentClasses = transitiveReductionOutputSatisfiable
-				.getEquivalent();
-		NonBottomNode node = new NonBottomNode(taxonomy, equivalentClasses);
-		NonBottomNode previous = taxonomy.putIfAbsent(node);
-		if (previous == null) {
-			/* processing the new node */
-			Iterator<IndexedClass> directSuperClassesIterator = transitiveReductionOutputSatisfiable
-					.getDirectSuperClasses().iterator();
-			ClassTaxonomyState state = new ClassTaxonomyState(node,
-					directSuperClassesIterator);
-			processState(state);
-			return node;
-		} else {
-			return previous;
-		}
-	}
-
-	void processState(ClassTaxonomyState state) {
-		NonBottomNode rootNode = state.getRootNode();
-		Iterator<IndexedClass> iteratorDirectSuperClasses = state
-				.getIteratorDirectSuperClasses();
-		while (iteratorDirectSuperClasses.hasNext()) {
-			IndexedClass superClass = iteratorDirectSuperClasses.next();
-			NonBottomNode superClassNode = taxonomy.getNonBottomNode(superClass
+	void processDirectSuperClasses(NonBottomNode node,
+			Iterable<IndexedClass> directSuperClasses) {
+		for (IndexedClass directSuperClass : directSuperClasses) {
+			NonBottomNode superNode = taxonomy.getCreate(directSuperClass
 					.getElkClass());
-			if (superClassNode == null) {
-				jobQueue.add(new TransitiveReductionJobDirectSuperClass(
-						superClass, state));
-				return;
-			}
-			assignDirectSuperClassNode(rootNode, superClassNode);
+			assignDirectSuperClassNode(node, superNode);
 		}
-		if (rootNode.getDirectSuperNodes().isEmpty()) {
+		// Top Node:
+		if (node.getDirectSuperNodes().isEmpty()) {
+			/*
+			 * we use that OWL_THING is minimal in the ordering among
+			 * satisfiable classes
+			 */
 			NonBottomNode topNode = taxonomy
-					.getNonBottomNode(PredefinedElkClass.OWL_THING);
-			if (topNode == null) {
-				/* in particular, rootNode != topNode */
-				jobQueue.add(new TransitiveReductionJobTopSuperClass(
-						this.ontologyIndex, rootNode));
-				return;
-			}
-			if (rootNode != topNode) {
-				assignDirectSuperClassNode(rootNode, topNode);
-			}
+					.getCreate(PredefinedElkClass.OWL_THING);
+			if (node != topNode)
+				assignDirectSuperClassNode(node, topNode);
 		}
 	}
 

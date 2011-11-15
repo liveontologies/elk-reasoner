@@ -50,7 +50,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * results for further post-processing. The jobs initialized with input class
  * expressions are submitted using the method {@link #process(ReasonerJob)}. A
  * hook for post-processing the result when it is ready, is specified by the
- * {@link #processSatisfiable(ReasonerJob)} method which should be implemented
+ * {@link #processOutput(ReasonerJob)} method which should be implemented
  * accordingly.
  * 
  * The implementation relies heavily on Java's concurrency package and contains
@@ -93,7 +93,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 
 	/**
 	 * The buffer for jobs in progress, i.e., for those jobs for which the
-	 * method {@link #processSatisfiable(ReasonerJob)} is not yet executed.
+	 * method {@link #processOutput(ReasonerJob)} is not yet executed.
 	 */
 	protected final BlockingQueue<J> buffer;
 
@@ -176,17 +176,17 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 *            the index used for executing the rules
 	 */
 	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex) {
-		this(ontologyIndex, 1024);
+		this(ontologyIndex, 64);
 	}
 
 	/**
 	 * Submits a job initialized with an indexed class expression for computing
 	 * the saturation. Once the job is processed, a method
-	 * {@link #processSatisfiable(ReasonerJob)} will be called to post-process this
+	 * {@link #processOutput(ReasonerJob)} will be called to post-process this
 	 * job. This method is thread safe and different jobs can be executed
 	 * concurrently from different threads, however, it is not safe to submit
 	 * the same job object several times. It is not guaranteed that
-	 * {@link #processSatisfiable(ReasonerJob)} will be called from the same thread
+	 * {@link #processOutput(ReasonerJob)} will be called from the same thread
 	 * in which the job was submitted; it can be processed by any of the
 	 * concurrently running running workers since the job pool is shared. It is
 	 * guaranteed that all submitted jobs will be processed when no instances of
@@ -206,7 +206,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		SaturatedClassExpression rootSaturation = root.getSaturated();
 		if (rootSaturation != null && rootSaturation.isSaturated()) {
 			job.setOutput(rootSaturation);
-			processSatisfiable(job);
+			processOutput(job);
 			activeWorkers.incrementAndGet();
 		} else {
 			getCreateContext(root);
@@ -328,7 +328,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 						.getSaturated();
 				output.setSaturated();
 				nextJob.setOutput(output);
-				processSatisfiable(nextJob);
+				processOutput(nextJob);
 			}
 		}
 	}
@@ -340,7 +340,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 *            the processed job
 	 * @throws InterruptedException
 	 */
-	protected void processSatisfiable(J job) throws InterruptedException {
+	protected void processOutput(J job) throws InterruptedException {
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace(job.getInput() + ": saturation finished");
 		}

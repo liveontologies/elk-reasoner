@@ -31,9 +31,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface TransitiveReductionOutputVisitor<R extends IndexedClassExpression, O> {
+public interface TransitiveReductionOutputVisitor<R extends IndexedClassExpression> {
 
-	public O visit(TransitiveReductionOutputSatisfiable<R> output);
+	public void visit(TransitiveReductionOutputSatisfiable<R> output);
 
-	public O visit(TransitiveReductionOutputUnsatisfiable<R> output);
+	public void visit(TransitiveReductionOutputUnsatisfiable<R> output);
 }

@@ -31,14 +31,14 @@ import org.semanticweb.elk.reasoner.saturation.SaturationJob;
  * @author "Yevgeny Kazakov"
  * 
  */
-abstract class SaturationJobTransitiveReduction<I extends IndexedClassExpression, R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
+abstract class SaturationJobForTransitiveReduction<I extends IndexedClassExpression, R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
 		extends SaturationJob<I> {
 
 	/**
 	 * @param input
 	 * @param initiatingJob
 	 */
-	public SaturationJobTransitiveReduction(I input) {
+	public SaturationJobForTransitiveReduction(I input) {
 		super(input);
 	}
 

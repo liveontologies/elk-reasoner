@@ -22,9 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -52,24 +52,22 @@ class TransitiveReductionState<J extends TransitiveReductionJob<?>> {
 	protected final Iterator<IndexedClassExpression> superClassIterator;
 
 	/**
-	 * The set accumulating all super classes that are found up to the current
-	 * state of the iterator.
+	 * The list containing all equivalent classes that are found up to the
+	 * current state of the iterator.
 	 */
-	protected final Set<ElkClass> equivalent;
+	protected final List<ElkClass> equivalent;
 
 	/**
-	 * The current transitively reduced set of super classes of root found up to
-	 * the current state of the iterator. For each of these indexed super
-	 * classes, the saturation has already been computed.
+	 * The list consisting of equivalent classes of direct super-classes
+	 * together with their saturation.
 	 */
-	protected final List<IndexedClass> reducedSuperClasses;
+	protected final List<IndexedClass> directSuperClasses;
 
-	TransitiveReductionState(J initiatorJob, Set<ElkClass> equivalent,
-			List<IndexedClass> superSuperClasses,
+	TransitiveReductionState(J initiatorJob,
 			Iterator<IndexedClassExpression> superClassIterator) {
 		this.initiatorJob = initiatorJob;
-		this.equivalent = equivalent;
-		this.reducedSuperClasses = superSuperClasses;
+		this.equivalent = new ArrayList<ElkClass>(1);
+		this.directSuperClasses = new ArrayList<IndexedClass>(1);
 		this.superClassIterator = superClassIterator;
 	}
 
@@ -81,12 +79,12 @@ class TransitiveReductionState<J extends TransitiveReductionJob<?>> {
 		return this.superClassIterator;
 	}
 
-	Set<ElkClass> getEquivalent() {
+	List<ElkClass> getEquivalent() {
 		return equivalent;
 	}
 
-	List<IndexedClass> getReducedSuperClasses() {
-		return reducedSuperClasses;
+	List<IndexedClass> getDirectSuperClasses() {
+		return directSuperClasses;
 	}
 
 }

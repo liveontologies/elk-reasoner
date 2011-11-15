@@ -39,8 +39,8 @@ public class TransitiveReductionOutputUnsatisfiable<R extends IndexedClassExpres
 	}
 
 	@Override
-	public <O> O accept(TransitiveReductionOutputVisitor<R, O> visitor) {
-		return visitor.visit(this);
+	public void accept(TransitiveReductionOutputVisitor<R> visitor) {
+		visitor.visit(this);
 	}
 
 }

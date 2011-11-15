@@ -190,7 +190,7 @@ public class Operations {
 				Object[] result = new Object[size];
 				int i = 0;
 				for (Object o : filter(input, condition)) {
-					result[++i] = o;
+					result[i++] = o;
 				}
 				return result;
 			}

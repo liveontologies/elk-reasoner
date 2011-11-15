@@ -23,9 +23,9 @@
 package org.semanticweb.elk.reasoner.reduction;
 
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
@@ -40,38 +40,39 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 public class TransitiveReductionOutputSatisfiable<R extends IndexedClassExpression>
 		extends TransitiveReductionOutput<R> {
 
-	protected final Set<ElkClass> equivalent;
+	protected final List<ElkClass> equivalent;
 	protected final List<IndexedClass> directSuperClasses;
 
 	public TransitiveReductionOutputSatisfiable(R root,
-			Set<ElkClass> equivalent, List<IndexedClass> superClasses) {
+			List<ElkClass> equivalent, List<IndexedClass> superClasses) {
 		super(root);
 		this.equivalent = equivalent;
 		this.directSuperClasses = superClasses;
 	}
 
 	/**
-	 * Returns the set of classes that are equivalent to the root of this node.
+	 * Returns the list of classes that are equivalent to the root of this node.
 	 * 
-	 * @return the set of classes that are equivalent to the root of this node
+	 * @return the list of classes that are equivalent to the root of this node
 	 */
-	public Set<ElkClass> getEquivalent() {
+	public List<ElkClass> getEquivalent() {
 		return equivalent;
 	}
 
 	/**
-	 * Returns the direct, i.e., transitively reduced list of indexed super
-	 * classes of this node.
+	 * Returns the list of direct, i.e., transitively reduced, super classes of
+	 * this node. Every direct super class is minimal in its equivalence class
+	 * according to the comparator {@link Comparators#ELK_CLASS_COMPARATOR}.
 	 * 
-	 * @return the list of direct indexed super classes of this node
+	 * @return the list consisting of direct super classes of this node
 	 */
-	public Iterable<IndexedClass> getDirectSuperClasses() {
+	public List<IndexedClass> getDirectSuperClasses() {
 		return directSuperClasses;
 	}
 
 	@Override
-	public <O> O accept(TransitiveReductionOutputVisitor<R, O> visitor) {
-		return visitor.visit(this);
+	public void accept(TransitiveReductionOutputVisitor<R> visitor) {
+		visitor.visit(this);
 	}
 
 }

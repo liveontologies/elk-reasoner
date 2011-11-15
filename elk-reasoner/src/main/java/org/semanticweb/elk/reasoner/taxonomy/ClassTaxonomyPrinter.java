@@ -38,6 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.owl.util.Comparators;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
@@ -47,12 +48,7 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
  */
 public class ClassTaxonomyPrinter {
 
-	protected static Comparator<ElkClass> comparator = new Comparator<ElkClass>() {
-
-		public int compare(ElkClass o1, ElkClass o2) {
-			return PredefinedElkIri.compare(o1.getIri(), o2.getIri());
-		}
-	};
+	protected static Comparator<ElkClass> comparator = Comparators.ELK_CLASS_COMPARATOR;
 
 	/**
 	 * Convenience method for printing a ClassTaxonomy to a file at the given

@@ -30,6 +30,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <R>
+ *            the type of the input for the transitive reduction task
  */
 public abstract class TransitiveReductionOutput<R extends IndexedClassExpression> {
 
@@ -52,6 +54,6 @@ public abstract class TransitiveReductionOutput<R extends IndexedClassExpression
 		return root;
 	}
 
-	public abstract <O> O accept(TransitiveReductionOutputVisitor<R, O> visitor);
+	public abstract void accept(TransitiveReductionOutputVisitor<R> visitor);
 
 }

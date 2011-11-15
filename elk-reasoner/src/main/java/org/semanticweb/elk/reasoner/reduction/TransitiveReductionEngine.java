@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.reduction;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -31,12 +30,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
@@ -66,6 +65,14 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 	 */
 	protected final SaturationEngineForTransitiveReduction saturationEngineForTransitiveReduction;
 
+	/**
+	 * The processed jobs can create new jobs to be submitted to this engine. In
+	 * order to avoid stack overflow due to the potentially unbounded recursion,
+	 * we will use a queue to buffer such created jobs. This queue will be
+	 * emptied after processing of every input.
+	 */
+	protected final Queue<SaturationJobForTransitiveReduction<?, I, J>> jobQueue = new ConcurrentLinkedQueue<SaturationJobForTransitiveReduction<?, I, J>>();
+
 	public TransitiveReductionEngine(OntologyIndex ontologyIndex) {
 		this.saturationEngineForTransitiveReduction = new SaturationEngineForTransitiveReduction(
 				ontologyIndex);
@@ -93,7 +100,7 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 
 	/**
 	 * The saturation engine for transitive reduction that can only process
-	 * instances of {@link SaturationJobTransitiveReduction}. There are two
+	 * instances of {@link SaturationJobForTransitiveReduction}. There are two
 	 * types of the jobs. The instances of {@link SaturationJobRoot} are
 	 * saturation jobs for the indexed class expression, for which a transitive
 	 * reduction needs to be computed. The transitive reduction is computed by
@@ -107,22 +114,13 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 	 */
 	class SaturationEngineForTransitiveReduction
 			extends
-			ClassExpressionSaturationEngine<SaturationJobTransitiveReduction<?, I, J>> {
-
-		/**
-		 * The processed jobs can create new jobs to be submitted to this
-		 * engine. In order to avoid stack overflow due to the potentially
-		 * unbounded recursion, we will use a queue to buffer such created jobs.
-		 * This queue will be emptied after processing of every input.
-		 */
-		protected final Queue<SaturationJobTransitiveReduction<?, I, J>> jobQueue = new ConcurrentLinkedQueue<SaturationJobTransitiveReduction<?, I, J>>();
+			ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<?, I, J>> {
 
 		/**
 		 * The object to which we delegate post-processing of saturation jobs
 		 * and inserting possible new jobs into the job queue.
 		 */
-		protected final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor(
-				jobQueue);
+		protected final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor();
 
 		/**
 		 * Creates a new transitive reduction saturation engine using a given
@@ -138,7 +136,7 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 		/**
 		 * Processing of saturation jobs required for transitive reduction. Once
 		 * the job is processed, it is submitted to the method
-		 * {@link #processSatisfiable(SaturationJobTransitiveReduction)}.
+		 * {@link #processOutput(SaturationJobForTransitiveReduction)}.
 		 * 
 		 * @param input
 		 *            the saturation job required to be processed
@@ -146,11 +144,11 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 		 *             if interrupted when the thread was idle
 		 */
 		@Override
-		public void process(SaturationJobTransitiveReduction<?, I, J> input)
+		public void process(SaturationJobForTransitiveReduction<?, I, J> input)
 				throws InterruptedException {
 			super.process(input);
 			for (;;) {
-				SaturationJobTransitiveReduction<?, I, J> nextJob = jobQueue
+				SaturationJobForTransitiveReduction<?, I, J> nextJob = jobQueue
 						.poll();
 				if (nextJob == null)
 					break;
@@ -171,10 +169,10 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 		 *             if interrupted when the thread was idle
 		 */
 		@Override
-		public void processSatisfiable(
-				SaturationJobTransitiveReduction<?, I, J> output)
+		public void processOutput(
+				SaturationJobForTransitiveReduction<?, I, J> output)
 				throws InterruptedException {
-			super.processSatisfiable(output);
+			super.processOutput(output);
 			output.accept(saturationOutputProcessor);
 		}
 	}
@@ -182,32 +180,12 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 	/**
 	 * The class for processing the output of the finished saturation jobs. It
 	 * implements the visitor pattern for
-	 * {@link SaturationJobTransitiveReduction}.
+	 * {@link SaturationJobForTransitiveReduction}.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
 	class SaturationOutputProcessor implements SaturationJobVisitor<I, J> {
-
-		/**
-		 * The job queue into which the newly created saturation jobs are
-		 * submitted. This queue is supposed to be shared with
-		 * {@link SaturationEngineForTransitiveReduction}.
-		 */
-		protected final Queue<SaturationJobTransitiveReduction<?, I, J>> jobQueue;
-
-		/**
-		 * Creating a new saturation output processor that uses the given
-		 * saturation job queue.
-		 * 
-		 * @param jobQueue
-		 *            the queue used for submitting the newly created saturation
-		 *            jobs
-		 */
-		SaturationOutputProcessor(
-				Queue<SaturationJobTransitiveReduction<?, I, J>> jobQueue) {
-			this.jobQueue = jobQueue;
-		}
 
 		public void visit(
 				SaturationJobRoot<I, J> saturationJobTransitiveReductionRoot)
@@ -254,12 +232,8 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 			 * need to save the states we are currently in until the computation
 			 * is over.
 			 */
-			Set<ElkClass> equivalent = new ArrayHashSet<ElkClass>(1);
-			List<IndexedClass> directSuperClasses = new LinkedList<IndexedClass>();
 			TransitiveReductionState<J> trState = new TransitiveReductionState<J>(
-					initiatorJob, equivalent, directSuperClasses,
-					superClassIterator);
-
+					initiatorJob, superClassIterator);
 			/* the iteration over the super classes using the state is done here */
 			processSuperClasses(trState);
 		}
@@ -289,9 +263,9 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 		}
 
 		/**
-		 * Update the current equivalent and reduced super classes of the
-		 * current transitive reduction state using the saturation for one of
-		 * the super classes
+		 * Update the current equivalent and direct super classes of the current
+		 * transitive reduction state using the saturation for one of the super
+		 * classes
 		 * 
 		 * @param superClass
 		 *            the next super class for which the saturation is computed
@@ -313,38 +287,62 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 			 * to the root.
 			 */
 			IndexedClassExpression root = trState.getInitiatorJob().getInput();
-			Set<ElkClass> equivalent = trState.getEquivalent();
-			if (superClassSaturation.getSuperClassExpressions().contains(root)) {
+			Set<IndexedClassExpression> superClassDerived = superClassSaturation
+					.getSuperClassExpressions();
+			List<ElkClass> equivalent = trState.getEquivalent();
+			if (superClassDerived.contains(root)) {
 				equivalent.add(superClass.getElkClass());
 				return;
 			}
 			/*
 			 * Next, we iterate over the transitively reduced set of super
-			 * classes of the root computed so far. If the (already computed)
-			 * saturation for such reduced super class contains the given super
-			 * class, it cannot be direct. Similarly, if one of the reduced
-			 * super classes occurs in the computed saturation, it should be
-			 * removed.
+			 * classes of the root computed so far.
 			 */
-			List<IndexedClass> reducedSuperClasses = trState
-					.getReducedSuperClasses();
-			Iterator<IndexedClass> iteratorDirectSuperClasses = reducedSuperClasses
+			List<IndexedClass> directSuperClasses = trState
+					.getDirectSuperClasses();
+			Iterator<IndexedClass> iteratorDirectSuperClasses = directSuperClasses
 					.iterator();
 			boolean addThis = true;
 			while (iteratorDirectSuperClasses.hasNext()) {
-				IndexedClass next = iteratorDirectSuperClasses.next();
-				if (next.getSaturated().getSuperClassExpressions()
+				IndexedClass directSuperClass = iteratorDirectSuperClasses
+						.next();
+				/*
+				 * If the (already computed) saturation for such reduced super
+				 * class contains the given super class, it cannot be direct.
+				 */
+				if (directSuperClass.getSaturated().getSuperClassExpressions()
 						.contains(superClass)) {
-					addThis = false;
-					break;
+					/*
+					 * if this super class is equivalent to the direct super
+					 * class, but smaller in the ordering, the direct super
+					 * class should be replace
+					 */
+					if (superClassDerived.contains(directSuperClass)
+							&& Comparators.ELK_CLASS_COMPARATOR.compare(
+									superClass.getElkClass(),
+									directSuperClass.getElkClass()) < 0) {
+						iteratorDirectSuperClasses.remove();
+						/*
+						 * no other direct super-classes can subsume or be
+						 * equivalent to this class
+						 */
+						break;
+					} else {
+						addThis = false;
+						break;
+					}
 				}
-				if (superClassSaturation.getSuperClassExpressions().contains(
-						next)) {
+				/*
+				 * Otherwise, if the direct super class representative occurs in
+				 * the set of the derived classes, it a strict sub-class of the
+				 * direct class, and so, should be removed.
+				 */
+				else if (superClassDerived.contains(directSuperClass)) {
 					iteratorDirectSuperClasses.remove();
 				}
 			}
 			if (addThis) {
-				reducedSuperClasses.add(superClass);
+				directSuperClasses.add(superClass);
 			}
 		}
 
@@ -362,9 +360,11 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 
 			J initiatorJob = trState.getInitiatorJob();
 			I root = initiatorJob.getInput();
-			Set<ElkClass> equivalent = trState.equivalent;
-			final List<IndexedClass> reducedSuperClasses = trState.reducedSuperClasses;
-			Iterator<IndexedClassExpression> superClassIterator = trState.superClassIterator;
+			List<ElkClass> equivalent = trState.equivalent;
+			final List<IndexedClass> directSuperClasses = trState
+					.getDirectSuperClasses();
+			Iterator<IndexedClassExpression> superClassIterator = trState
+					.getSuperClassIterator();
 
 			/* finding the next super class */
 			while (superClassIterator.hasNext()) {
@@ -390,10 +390,11 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 				}
 			}
 			/*
-			 * when we reached this point, the transitive reduction is computed
+			 * when we have reached this point, the transitive reduction is
+			 * computed
 			 */
 			TransitiveReductionOutputSatisfiable<I> satisfiable = new TransitiveReductionOutputSatisfiable<I>(
-					root, equivalent, reducedSuperClasses);
+					root, equivalent, directSuperClasses);
 			initiatorJob.setOutput(satisfiable);
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace(root + ": transitive reduction finished");
@@ -401,4 +402,5 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 			processOutput(initiatorJob);
 		}
 	}
+
 }
