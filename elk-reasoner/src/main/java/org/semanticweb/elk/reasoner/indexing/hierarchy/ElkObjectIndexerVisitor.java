@@ -26,6 +26,7 @@ import java.util.ListIterator;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
@@ -37,6 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
@@ -56,11 +58,13 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 
 public class ElkObjectIndexerVisitor implements
 		ElkClassExpressionVisitor<IndexedClassExpression>,
-		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain> {
+		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain>,
+		ElkIndividualVisitor<IndexedNominal> {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -108,8 +112,10 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	public IndexedClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
-		throw new IndexingException(ElkObjectHasValue.class.getSimpleName()
-				+ " not supported");
+		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectHasValue
+			.getProperty().accept(this);
+		return objectFilter.filter(new IndexedObjectSomeValuesFrom(iop,
+				elkObjectHasValue.getFiller().accept(this)));
 	}
 
 	public IndexedClassExpression visit(
@@ -171,8 +177,10 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	public IndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
-		throw new IndexingException(ElkObjectOneOf.class.getSimpleName()
-				+ " not supported");
+		if (elkObjectOneOf.getIndividuals().size() != 1)
+			throw new IndexingException(ElkObjectOneOf.class.getSimpleName()
+				+ "is supported only for singletons");
+		return elkObjectOneOf.getIndividuals().get(0).accept(this);
 	}
 
 	public IndexedClassExpression visit(
@@ -281,4 +289,13 @@ public class ElkObjectIndexerVisitor implements
 		return result;
 	}
 
+	public IndexedNominal visit(ElkAnonymousIndividual elkAnonymousIndividual) {
+		throw new IndexingException(ElkAnonymousIndividual.class.getSimpleName()
+				+ " not supported");
+	}
+
+	public IndexedNominal visit(ElkNamedIndividual elkNamedIndividual) {
+		return (IndexedNominal) objectFilter.filter(
+				new IndexedNominal(elkNamedIndividual));
+	}
 }

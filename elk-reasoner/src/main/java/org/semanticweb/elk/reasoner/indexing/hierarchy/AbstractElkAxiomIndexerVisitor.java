@@ -89,10 +89,12 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	public abstract void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
-
+	
 	public abstract void indexClassDeclaration(ElkClass ec);
 
 	public abstract void indexObjectPropertyDeclaration(ElkObjectProperty eop);
+	
+	public abstract void indexNamedIndividualDeclaration(ElkNamedIndividual eni);
 
 	/**
 	 * Object factory that is used internally to replace some syntactic
@@ -289,9 +291,10 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 				+ " not supported");
 	}
 
-	public Void visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
-		throw new IndexingException(
-				ElkClassAssertionAxiom.class.getSimpleName() + " not supported");
+	public Void visit(ElkClassAssertionAxiom axiom) {
+		indexSubClassOfAxiom(objectFactory.getObjectOneOf(axiom.getIndividual()),
+				axiom.getClassExpression());
+		return null;
 	}
 
 	public Void visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom) {
@@ -300,11 +303,11 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
-	public Void visit(
-			ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion) {
-		throw new IndexingException(
-				ElkNegativeObjectPropertyAssertionAxiom.class.getSimpleName()
-						+ " not supported");
+	public Void visit(ElkNegativeObjectPropertyAssertionAxiom axiom) {
+		indexSubClassOfAxiom(objectFactory.getObjectOneOf(axiom.getSubject()),
+				objectFactory.getObjectSomeValuesFrom(axiom.getProperty(),
+						objectFactory.getObjectOneOf(axiom.getObject())));
+		return null;
 	}
 
 	public Void visit(
@@ -361,8 +364,8 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 		}
 
 		public Void visit(ElkNamedIndividual elkNamedIndividual) {
-			throw new IndexingException(
-					ElkNamedIndividual.class.getSimpleName() + " not supported");
+			indexNamedIndividualDeclaration(elkNamedIndividual);
+			return null;
 		}
 
 		public Void visit(ElkAnnotationProperty elkAnnotationProperty) {

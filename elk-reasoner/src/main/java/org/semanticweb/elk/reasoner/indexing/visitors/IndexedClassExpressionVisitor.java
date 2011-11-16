@@ -32,7 +32,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  *
  */
 public interface IndexedClassExpressionVisitor<O> extends
-		IndexedClassVisitor<O>, IndexedObjectIntersectionOfVisitor<O>,
-		IndexedObjectSomeValuesFromVisitor<O>, IndexedDataHasValueVisitor<O> {
-
+		IndexedClassVisitor<O>, 
+		IndexedObjectIntersectionOfVisitor<O>,
+		IndexedObjectSomeValuesFromVisitor<O>, 
+		IndexedDataHasValueVisitor<O>, 
+		IndexedNominalVisitor<O> {
 }
