@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -52,8 +53,7 @@ public class IndexedEntryConverter<T>
 
 	public IndexedClassExpressionEntry<T, IndexedDataHasValue> visit(
 			IndexedDataHasValue element) {
-		return new IndexedDataHasValueEntry<T, IndexedDataHasValue>(element) {
-		};
+		return new IndexedDataHasValueEntry<T, IndexedDataHasValue>(element);
 	}
 
 	public IndexedClassExpressionEntry<T, IndexedObjectSomeValuesFrom> visit(
@@ -64,14 +64,18 @@ public class IndexedEntryConverter<T>
 
 	public IndexedPropertyChainEntry<T, IndexedObjectProperty> visit(
 			IndexedObjectProperty element) {
-		return new IndexedObjectPropertyEntry<T, IndexedObjectProperty>(element) {
-		};
+		return new IndexedObjectPropertyEntry<T, IndexedObjectProperty>(element);
 	}
 
 	public IndexedPropertyChainEntry<T, IndexedBinaryPropertyChain> visit(
 			IndexedBinaryPropertyChain element) {
 		return new IndexedBinaryPropertyChainEntry<T, IndexedBinaryPropertyChain>(
 				element);
+	}
+
+	public IndexedNominalEntry<T, IndexedNominal> visit(
+			IndexedNominal element) {
+		return new IndexedNominalEntry<T, IndexedNominal> (element);
 	}
 
 }

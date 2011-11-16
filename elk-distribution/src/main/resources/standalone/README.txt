@@ -34,7 +34,7 @@ Invoking the client without any parameters displays the supported options:
 To load the ontology from the file ontology.fss, compute its classification
 and store the result in classification.fss, run ELK as follows: 
 
-    java -jar ${elk-standalone.base}.jar -i ontology.fss -c -o classificaiton.fss
+    java -jar ${elk-standalone.base}.jar -i ontology.fss -c -o classification.fss
 	
 You may want to specify further Java parameters for increasing available
 memory for classifying larger ontologies, e.g. by setting

@@ -62,7 +62,7 @@ public class IndexedClass extends IndexedClassExpression {
 	}
 
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedClassVisitor<O>) visitor);
+		return visitor.visit(this);
 	}
 
 	@Override
