@@ -352,7 +352,7 @@ public class RuleApplicationEngine {
 		void processClass(IndexedClassExpression ice) {
 			// TODO propagate bottom backwards
 			if (ice == owlNothing) {
-				context.satisfiable = false;
+				context.isSatisfiable = false;
 				return;
 			}
 

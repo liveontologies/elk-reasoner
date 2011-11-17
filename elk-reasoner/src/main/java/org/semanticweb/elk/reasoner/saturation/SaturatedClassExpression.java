@@ -56,9 +56,9 @@ public class SaturatedClassExpression implements Linkable {
 
 	protected Multimap<IndexedPropertyChain, Queueable> propagationsByObjectProperty;
 
-	protected boolean satisfiable = true;
+	protected volatile boolean isSatisfiable = true;
 
-	protected final AtomicBoolean saturated;
+	protected volatile boolean isSaturated = false;
 
 	/**
 	 * If set to true, then composition rules will be applied to derive all
@@ -70,14 +70,13 @@ public class SaturatedClassExpression implements Linkable {
 	/**
 	 * A context is active iff its queue is not empty or it is being processed.
 	 */
-	private AtomicBoolean isActive;
+	private final AtomicBoolean isActive;
 
 	public SaturatedClassExpression(IndexedClassExpression root) {
 		this.root = root;
 		this.queue = new ConcurrentLinkedQueue<Queueable>();
 		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
 		this.isActive = new AtomicBoolean(false);
-		this.saturated = new AtomicBoolean(false);
 	}
 
 	public IndexedClassExpression getRoot() {
@@ -85,7 +84,7 @@ public class SaturatedClassExpression implements Linkable {
 	}
 
 	public boolean isSatisfiable() {
-		return satisfiable;
+		return isSatisfiable;
 	}
 
 	/**
@@ -124,7 +123,7 @@ public class SaturatedClassExpression implements Linkable {
 	 * this point.
 	 */
 	public void setSaturated() {
-		this.saturated.set(true);
+		isSaturated = true;
 	}
 
 	/**
@@ -134,7 +133,7 @@ public class SaturatedClassExpression implements Linkable {
 	 *         otherwise
 	 */
 	public boolean isSaturated() {
-		return saturated.get();
+		return isSaturated;
 	}
 
 }
