@@ -22,17 +22,26 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-
+import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 
 /**
+ * In context {a} the SubNominal (A:C) represents the axiom $A: C \sqsubseteq {a}$.
+ * 
  * @author Frantisek Simancik
  *
  */
-public interface DerivableVisitor<O> {
-	O visit(SuperClassExpression superClassExpression);
-	O visit(ComposedSuperClassExpression composedSuperClassExpression);
-	O visit(BackwardLink backwardLink);
-	O visit(ForwardLink forwardLink);
-	O visit(SubNominal subNominal);
-	O visit(NonEmptyAxiom nonEmptyAxiom);
+public class SubNominal implements Derivable {
+	protected final Marked<SaturatedClassExpression> markedClassExpression;
+
+	public SubNominal(Marked<SaturatedClassExpression> markedClassExpression) {
+		this.markedClassExpression = markedClassExpression;
+	}
+	
+	public Marked<SaturatedClassExpression> getClassExpression() {
+		return markedClassExpression;
+	}
+
+	public <O> O accept(DerivableVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 }

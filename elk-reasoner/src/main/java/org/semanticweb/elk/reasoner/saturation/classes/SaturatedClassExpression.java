@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 import org.semanticweb.elk.reasoner.saturation.markers.MarkedHashSet;
 import org.semanticweb.elk.reasoner.saturation.markers.MarkedMultimap;
 import org.semanticweb.elk.reasoner.saturation.markers.Marker;
-import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.reasoner.saturation.markers.NonEmpty;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -54,17 +54,19 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 
 	protected final Queue<Derivable> queue;
 
-	protected final MarkedHashSet<IndexedClassExpression> derived;
+	protected final MarkedHashSet<IndexedClassExpression> superClassExpressions;
 
 	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> backwardLinksByObjectProperty;
 
 	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> forwardLinksByObjectProperty;
 
+	protected Marked<NonEmpty> nonEmpty;
+	
+	// this field is only required for nominals
+	protected MarkedHashSet<SaturatedClassExpression> subNominals;
+
 	protected MarkedMultimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty;
 	
-	// if this is a nominal {a}, then the subNominals keeps track of axioms C \sqsubseteq {a}
-	protected Multimap<IndexedClassExpression, Marker> subNominals;
-
 	protected boolean isSatisfiable = true;
 
 	protected final AtomicBoolean saturated;
@@ -84,7 +86,7 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 	public SaturatedClassExpression(IndexedClassExpression root) {
 		this.root = root;
 		this.queue = new ConcurrentLinkedQueue<Derivable>();
-		this.derived = new MarkedHashSet<IndexedClassExpression> (13);
+		this.superClassExpressions = new MarkedHashSet<IndexedClassExpression> (13);
 		this.isActive = new AtomicBoolean(false);
 		this.saturated = new AtomicBoolean(false);
 	}
@@ -166,12 +168,12 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 
 		@Override
 		public boolean contains(Object obj) {
-			return derived.contains(obj);
+			return superClassExpressions.contains(obj);
 		}
 		
 		@Override
 		public Iterator<IndexedClass> iterator() {
-			return Operations.filter(derived, IndexedClass.class).iterator();
+			return Operations.filter(superClassExpressions, IndexedClass.class).iterator();
 		}
 
 		@Override

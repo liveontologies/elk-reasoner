@@ -22,29 +22,34 @@
  */
 package org.semanticweb.elk.reasoner.saturation.markers;
 
+import java.util.Collections;
 import java.util.Set;
 
 
 /**
- * An interface for objects marked with a set of Markers. The intended use it 
- * have the parameter class T also implement Marked<T> and the naked objects of
- * type T then represent definite (unmarked) objects. Elements of Marked<T> are
- * unmutable, that is their key and markers will not change after creation. 
- * 
+ * This is a dummy class that can be marked by markers. Used in NonEmptyAxiom.
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
-public interface Marked<T> extends Entry<T> {
-	/**
-	 * @return true if this is an instance of the underlying type T
-	 */
-	boolean isDefinite();
-	
-	/**
-	 * getMarkers() is only required when not isDefinite()
-	 * 
-	 * @return unmodifiable non-empty set of markers 
-	 */
-	Set<? extends Marker> getMarkers();
+public class NonEmpty implements Marked<NonEmpty> {
+
+	public static NonEmpty INSTANCE = new NonEmpty();
+	public static Marked<NonEmpty> POSSIBLE_INSTANCE = new ExplicitlyMarked<NonEmpty>(
+			INSTANCE, Collections.singleton(QuestionMarker.INSTANCE));
+
+	private NonEmpty() {
+	}
+
+	public NonEmpty getKey() {
+		return this;
+	}
+
+	public boolean isDefinite() {
+		return true;
+	}
+
+	public Set<? extends Marker> getMarkers() {
+		throw new UnsupportedOperationException();
+	}
 }

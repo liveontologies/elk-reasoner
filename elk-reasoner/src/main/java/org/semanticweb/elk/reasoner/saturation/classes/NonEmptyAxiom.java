@@ -22,17 +22,28 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-
+import org.semanticweb.elk.reasoner.saturation.markers.NonEmpty;
+import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 
 /**
+ * In context C the NonEmptyAxiom A:_ represents $A: C \neq \emptyset$. 
+ * 
  * @author Frantisek Simancik
  *
  */
-public interface DerivableVisitor<O> {
-	O visit(SuperClassExpression superClassExpression);
-	O visit(ComposedSuperClassExpression composedSuperClassExpression);
-	O visit(BackwardLink backwardLink);
-	O visit(ForwardLink forwardLink);
-	O visit(SubNominal subNominal);
-	O visit(NonEmptyAxiom nonEmptyAxiom);
+public class NonEmptyAxiom implements Derivable {
+	
+	protected final Marked<NonEmpty> nonEmpty;
+	
+	public NonEmptyAxiom(Marked<NonEmpty> markedVoid) {
+		this.nonEmpty = markedVoid;
+	}
+
+	public Marked<NonEmpty> getNonEmpty() {
+		return nonEmpty;
+	}
+
+	public <O> O accept(DerivableVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 }

@@ -36,6 +36,8 @@ import org.semanticweb.elk.util.collections.ArraySet;
 public class ExplicitlyMarked<T> implements Marked<T> {
 
 	/**
+	 * This method is used to compute the Markers of a result of a unary rule.
+	 * 
 	 * @return Marked<T> object that represents the key marked with the same
 	 *         markers as markerSource.
 	 */
@@ -47,38 +49,83 @@ public class ExplicitlyMarked<T> implements Marked<T> {
 	}
 
 	/**
+	 * This method is used to compute the Markers of a result of a binary rule.
+	 * 
 	 * @return Marked<T> object that represent the key marked with the
 	 *         intersection of markers from markerSource1 and markerSource2.
-	 *         Returns null if the intersection if empty.
+	 *         Returns null if the intersection is empty.
 	 * 
 	 */
-	public static <T extends Marked<T>> Marked<T> mark(T key,
+	public static <T extends Marked<T>> Marked<T> markIntersection(T key,
 			Marked<?> markerSource1, Marked<?> markerSource2) {
 		if (markerSource1.isDefinite() && markerSource2.isDefinite())
 			return key;
-		
+
 		if (markerSource1.isDefinite())
-			return new ExplicitlyMarked<T> (key, markerSource2.getMarkers());
-		
+			return new ExplicitlyMarked<T>(key, markerSource2.getMarkers());
+
 		if (markerSource2.isDefinite())
-			return new ExplicitlyMarked<T> (key, markerSource1.getMarkers());
-		
-		ArraySet<Marker> markers = new ArraySet<Marker> (markerSource1.getMarkers().size());
+			return new ExplicitlyMarked<T>(key, markerSource1.getMarkers());
+
+		// this is just an optimisation
+		if (markerSource1.getMarkers() == markerSource2.getMarkers())
+			return new ExplicitlyMarked<T>(key, markerSource1.getMarkers());
+
+		ArraySet<Marker> markers = new ArraySet<Marker>(markerSource1
+				.getMarkers().size());
 		for (Marker m : markerSource1.getMarkers())
 			if (markerSource2.getMarkers().contains(m))
 				markers.add(m);
-		
+
 		if (markers.isEmpty())
 			return null;
-		
+
 		markers.trimToSize();
-		return new ExplicitlyMarked<T> (key, markers);
+		return new ExplicitlyMarked<T>(key, markers);
 	}
 
-	protected final Set<Marker> markers;
+	/**
+	 * This method is used to decide if a newly derived axiom is stronger then
+	 * an existing axiom, and if it is, then compute the resulting markers.
+	 * 
+	 * @return null if the oldMarked.getMarkers() is stronger than
+	 *         newMarked.getMarkers(). Otherwise return newMarked.getKey()
+	 *         marked by the union of the marks of oldMarked and newMarked.
+	 */
+	public static <T> Marked<T> markUnion(Marked<T> oldMarked,
+			Marked<T> newMarked) {
+		assert oldMarked.getKey() == newMarked.getKey();
+
+		if (oldMarked.isDefinite()) {
+			return null;
+		}
+
+		if (newMarked.isDefinite()) {
+			return newMarked;
+		}
+
+		// this is just an optimisation
+		if (oldMarked.getMarkers() == newMarked.getMarkers()) {
+			return null;
+		}
+
+		ArraySet<Marker> markers = new ArraySet<Marker>(oldMarked.getMarkers());
+		boolean newMarker = false;
+		for (Marker m : newMarked.getMarkers()) {
+			newMarker = newMarker || markers.add(m);
+		}
+
+		if (!newMarker)
+			return null;
+
+		markers.trimToSize();
+		return new ExplicitlyMarked<T>(newMarked.getKey(), markers);
+	}
+
+	protected final Set<? extends Marker> markers;
 	protected final T key;
 
-	public ExplicitlyMarked(T key, Set<Marker> markers) {
+	public ExplicitlyMarked(T key, Set<? extends Marker> markers) {
 		this.markers = markers;
 		this.key = key;
 	}
@@ -91,7 +138,7 @@ public class ExplicitlyMarked<T> implements Marked<T> {
 		return false;
 	}
 
-	public Set<Marker> getMarkers() {
+	public Set<? extends Marker> getMarkers() {
 		return Collections.unmodifiableSet(markers);
 	}
 }

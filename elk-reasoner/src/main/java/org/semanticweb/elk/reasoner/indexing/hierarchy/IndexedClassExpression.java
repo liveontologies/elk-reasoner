@@ -230,7 +230,7 @@ abstract public class IndexedClassExpression implements Marked<IndexedClassExpre
 		return true;
 	}
 
-	public Set<Marker> getMarkers() {
+	public Set<? extends Marker> getMarkers() {
 		throw new UnsupportedOperationException();
 	}
 

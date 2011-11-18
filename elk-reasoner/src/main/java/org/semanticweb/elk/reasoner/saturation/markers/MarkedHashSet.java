@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.markers;
 
-import org.semanticweb.elk.util.collections.ArraySet;
 
 /**
  * A set of Marked<T> that takes into account relationships between markers to
@@ -44,32 +43,18 @@ public class MarkedHashSet<T> extends EntryHashSet<T, Marked<T>> {
 	}
 
 	@Override
-	public boolean add(Marked<T> element) {
-		Marked<T> old = get(element.getKey());
+	public boolean add(Marked<T> newMarked) {
+		Marked<T> oldMarked = get(newMarked.getKey());
 
-		if (old == null) {
-			return super.add(element);
+		if (oldMarked == null) {
+			return super.add(newMarked);
 		}
-
-		if (old.isDefinite()) {
+		
+		Marked<T> union = ExplicitlyMarked.markUnion(oldMarked, newMarked);
+		
+		if (union == null)
 			return false;
-		}
-
-		if (element.isDefinite()) {
-			return replace(element);
-		}
-
-		ArraySet<Marker> markers = new ArraySet<Marker>(old.getMarkers());
-		boolean newMarker = false;
-		for (Marker m : element.getMarkers()) {
-			newMarker = newMarker || markers.add(m);
-		}
-
-		if (!newMarker)
-			return false;
-
-		markers.trimToSize();
-		return replace(new ExplicitlyMarked<T>(element.getKey(), markers));
-
+		else
+			return replace(union); 
 	}
 }

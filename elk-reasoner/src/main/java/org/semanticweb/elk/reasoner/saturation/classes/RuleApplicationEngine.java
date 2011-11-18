@@ -22,6 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
+import static org.semanticweb.elk.reasoner.saturation.markers.ExplicitlyMarked.mark;
+import static org.semanticweb.elk.reasoner.saturation.markers.ExplicitlyMarked.markIntersection;
+import static org.semanticweb.elk.reasoner.saturation.markers.ExplicitlyMarked.markUnion;
+
 import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -41,10 +45,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.markers.Marked;
+import org.semanticweb.elk.reasoner.saturation.markers.MarkedHashSet;
 import org.semanticweb.elk.reasoner.saturation.markers.MarkedMultimap;
+import org.semanticweb.elk.reasoner.saturation.markers.NonEmpty;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
-
-import static org.semanticweb.elk.reasoner.saturation.markers.ExplicitlyMarked.mark;
 
 /**
  * The engine for computing the saturation of class expressions. This is the
@@ -55,6 +59,8 @@ import static org.semanticweb.elk.reasoner.saturation.markers.ExplicitlyMarked.m
  */
 public class RuleApplicationEngine {
 
+	// TODO catch nulls produced by the method ExplicitlyMarked.mark() !
+
 	// Statistical information
 	AtomicInteger derivedNo = new AtomicInteger(0);
 	AtomicInteger backLinkNo = new AtomicInteger(0);
@@ -62,7 +68,7 @@ public class RuleApplicationEngine {
 	AtomicInteger forwLinkNo = new AtomicInteger(0);
 
 	protected final static Logger LOGGER_ = Logger
-	.getLogger(ClassExpressionSaturationEngine.class);
+			.getLogger(ClassExpressionSaturationEngine.class);
 
 	// TODO: try to get rid of the ontology index, if possible
 	/**
@@ -99,8 +105,8 @@ public class RuleApplicationEngine {
 	 * Return a context which has the input indexed class expression as a root.
 	 * In case no such context exists, a new one is markd with the given root
 	 * and is returned. It is ensured that no two different contexts are markd
-	 * with the same root. In case a new context is markd, it is scheduled to
-	 * be processed.
+	 * with the same root. In case a new context is markd, it is scheduled to be
+	 * processed.
 	 * 
 	 * @param root
 	 *            the input indexed class expression for which to return the
@@ -108,14 +114,19 @@ public class RuleApplicationEngine {
 	 * @return context which root is the input indexed class expression.
 	 * 
 	 */
-	public SaturatedClassExpression getCreateContext(
-			IndexedClassExpression root) {
+	public SaturatedClassExpression getCreateContext(IndexedClassExpression root) {
 		if (root.getSaturated() == null) {
 			SaturatedClassExpression sce = new SaturatedClassExpression(root);
 			if (root.setSaturated(sce)) {
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": context markd");
 				}
+
+				if (root instanceof IndexedNominal)
+					sce.nonEmpty = NonEmpty.INSTANCE;
+				else
+					sce.nonEmpty = NonEmpty.POSSIBLE_INSTANCE;
+
 				enqueue(sce, new SuperClassExpression(root));
 
 				if (owlThing.occursNegatively())
@@ -142,15 +153,20 @@ public class RuleApplicationEngine {
 		activateContext(context);
 	}
 
-	protected void link(IndexedPropertyChain relation, Marked<SaturatedClassExpression> source,
+	protected void link(IndexedPropertyChain relation,
+			Marked<SaturatedClassExpression> source,
 			Marked<SaturatedClassExpression> target) {
-		enqueue(target.getKey(), new BackwardLink(relation, mark(source.getKey(), target, source))); 
+		enqueue(target.getKey(),
+				new BackwardLink(relation, markIntersection(source.getKey(),
+						target, source)));
 	}
-	
-	protected void propagate(Marked<SaturatedClassExpression> target, Marked<IndexedClassExpression> mice) {
-		enqueue(target.getKey(), new ComposedSuperClassExpression(mark(mice.getKey(), target, mice)));
+
+	protected void propagate(Marked<SaturatedClassExpression> target,
+			Marked<IndexedClassExpression> mice) {
+		enqueue(target.getKey(), new ComposedSuperClassExpression(
+				markIntersection(mice.getKey(), target, mice)));
 	}
-	
+
 	public void processActiveContexts() throws InterruptedException {
 		for (;;) {
 			SaturatedClassExpression nextContext = activeContexts.poll();
@@ -174,7 +190,6 @@ public class RuleApplicationEngine {
 		deactivateContext(context);
 	}
 
-
 	private class QueueProcessor implements DerivableVisitor<Void> {
 		final SaturatedClassExpression context;
 
@@ -184,28 +199,31 @@ public class RuleApplicationEngine {
 
 		public Void visit(BackwardLink backwardLink) {
 			IndexedPropertyChain backwardRelation = backwardLink.getRelation();
-			Marked<SaturatedClassExpression> backwardTarget = backwardLink.getTarget();
+			Marked<SaturatedClassExpression> backwardTarget = backwardLink
+					.getTarget();
 
 			if (context.backwardLinksByObjectProperty == null) {
-				context.backwardLinksByObjectProperty = 
-					new MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression>();
+				context.backwardLinksByObjectProperty = new MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression>();
 
 				// start deriving propagations
-				for (Marked<IndexedClassExpression> mce : context.derived)
+				for (Marked<IndexedClassExpression> mce : context.superClassExpressions)
 					if (mce.getKey().getNegExistentials() != null)
-							for (IndexedObjectSomeValuesFrom e : mce.getKey()
-									.getNegExistentials())
-								addPropagation(e.getRelation(), mark((IndexedClassExpression) e, mce));
+						for (IndexedObjectSomeValuesFrom e : mce.getKey()
+								.getNegExistentials())
+							addPropagation(e.getRelation(),
+									mark((IndexedClassExpression) e, mce));
 			}
 
-			if (context.backwardLinksByObjectProperty.add(backwardRelation, backwardTarget)) {
+			if (context.backwardLinksByObjectProperty.add(backwardRelation,
+					backwardTarget)) {
 				backLinkNo.incrementAndGet();
 
 				// apply all propagations over the link
 				if (context.propagationsByObjectProperty != null) {
 
 					for (IndexedPropertyChain propRelation : new LazySetIntersection<IndexedPropertyChain>(
-							backwardRelation.getSaturated().getSuperProperties(),
+							backwardRelation.getSaturated()
+									.getSuperProperties(),
 							context.propagationsByObjectProperty.keySet()))
 
 						for (Marked<IndexedClassExpression> carry : context.propagationsByObjectProperty
@@ -219,23 +237,29 @@ public class RuleApplicationEngine {
 				 * to consider the link in property compositions
 				 */
 				if (context.deriveBackwardLinks
-						&& backwardRelation.getSaturated().getPropertyCompositionsByLeftSubProperty() != null)
-					enqueue(backwardTarget.getKey(), new ForwardLink(backwardRelation, mark(context, backwardTarget)));
+						&& backwardRelation.getSaturated()
+								.getPropertyCompositionsByLeftSubProperty() != null)
+					enqueue(backwardTarget.getKey(), new ForwardLink(
+							backwardRelation, mark(context, backwardTarget)));
 
 				/* compose the link with all forward links */
-				if (backwardRelation.getSaturated().getPropertyCompositionsByRightSubProperty() != null
+				if (backwardRelation.getSaturated()
+						.getPropertyCompositionsByRightSubProperty() != null
 						&& context.forwardLinksByObjectProperty != null) {
 
 					for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-							backwardRelation.getSaturated().getPropertyCompositionsByRightSubProperty()
-							.keySet(),
+							backwardRelation
+									.getSaturated()
+									.getPropertyCompositionsByRightSubProperty()
+									.keySet(),
 							context.forwardLinksByObjectProperty.keySet())) {
 
 						Collection<IndexedBinaryPropertyChain> compositions = backwardRelation
-						.getSaturated().getPropertyCompositionsByRightSubProperty()
-						.get(forwardRelation);
+								.getSaturated()
+								.getPropertyCompositionsByRightSubProperty()
+								.get(forwardRelation);
 						Collection<Marked<SaturatedClassExpression>> forwardTargets = context.forwardLinksByObjectProperty
-						.get(forwardRelation);
+								.get(forwardRelation);
 
 						for (IndexedPropertyChain composition : compositions)
 							for (Marked<SaturatedClassExpression> forwardTarget : forwardTargets)
@@ -250,15 +274,16 @@ public class RuleApplicationEngine {
 
 		public Void visit(ForwardLink forwardLink) {
 			IndexedPropertyChain forwardRelation = forwardLink.getRelation();
-			Marked<SaturatedClassExpression> forwardTarget = forwardLink.getTarget();
+			Marked<SaturatedClassExpression> forwardTarget = forwardLink
+					.getTarget();
 
 			if (context.forwardLinksByObjectProperty == null) {
-				context.forwardLinksByObjectProperty = 
-					new MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression>();
+				context.forwardLinksByObjectProperty = new MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression>();
 				initializeDerivationOfBackwardLinks();
 			}
 
-			if (context.forwardLinksByObjectProperty.add(forwardRelation, forwardTarget)) {
+			if (context.forwardLinksByObjectProperty.add(forwardRelation,
+					forwardTarget)) {
 				forwLinkNo.incrementAndGet();
 
 				/* compose the link with all backward links */
@@ -268,15 +293,17 @@ public class RuleApplicationEngine {
 				if (context.backwardLinksByObjectProperty != null) {
 
 					for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-							forwardRelation.getSaturated().getPropertyCompositionsByLeftSubProperty()
-							.keySet(),
+							forwardRelation.getSaturated()
+									.getPropertyCompositionsByLeftSubProperty()
+									.keySet(),
 							context.backwardLinksByObjectProperty.keySet())) {
 
 						Collection<IndexedBinaryPropertyChain> compositions = forwardRelation
-						.getSaturated().getPropertyCompositionsByLeftSubProperty()
-						.get(backwardRelation);
+								.getSaturated()
+								.getPropertyCompositionsByLeftSubProperty()
+								.get(backwardRelation);
 						Collection<Marked<SaturatedClassExpression>> backwardTargets = context.backwardLinksByObjectProperty
-						.get(backwardRelation);
+								.get(backwardRelation);
 
 						for (IndexedPropertyChain composition : compositions)
 							for (Marked<SaturatedClassExpression> backwardTarget : backwardTargets)
@@ -289,14 +316,15 @@ public class RuleApplicationEngine {
 			return null;
 		}
 
-		public Void addPropagation(IndexedPropertyChain propRelation, Marked<IndexedClassExpression> carry) {
+		private Void addPropagation(IndexedPropertyChain propRelation,
+				Marked<IndexedClassExpression> carry) {
 
 			if (context.propagationsByObjectProperty == null) {
-				context.propagationsByObjectProperty = 
-					new MarkedMultimap<IndexedPropertyChain, IndexedClassExpression> ();
+				context.propagationsByObjectProperty = new MarkedMultimap<IndexedPropertyChain, IndexedClassExpression>();
 				initializeDerivationOfBackwardLinks();
 			}
 
+			// addPropagations is never called twice with the same argument
 			if (context.propagationsByObjectProperty.add(propRelation, carry)) {
 				propNo.incrementAndGet();
 
@@ -312,19 +340,21 @@ public class RuleApplicationEngine {
 
 							propagate(backwardTarget, carry);
 				}
-
 			}
 
 			return null;
 		}
 
-		public Void visit(ComposedSuperClassExpression composedSuperClassExpression) {
-			processClassExpression(composedSuperClassExpression.getClassExpression());
+		public Void visit(
+				ComposedSuperClassExpression composedSuperClassExpression) {
+			processClassExpression(composedSuperClassExpression
+					.getClassExpression());
 			return null;
 		}
 
 		public Void visit(SuperClassExpression superClassExpression) {
-			Marked<IndexedClassExpression> mce = superClassExpression.getClassExpression();
+			Marked<IndexedClassExpression> mce = superClassExpression
+					.getClassExpression();
 			if (processClassExpression(mce)) {
 				mce.getKey().accept(new ClassExpressionDecomposer(mce));
 			}
@@ -335,17 +365,16 @@ public class RuleApplicationEngine {
 		boolean processClassExpression(Marked<IndexedClassExpression> mce) {
 
 			if (context.isSaturated())
-				LOGGER_.warn(context.root + ": adding "
-						+ mce.getKey() + " to a saturated context!");
+				LOGGER_.warn(context.root + ": adding " + mce.getKey()
+						+ " to a saturated context!");
 
-			if (context.derived.add(mce)) {
+			if (context.superClassExpressions.add(mce)) {
 				if (context.isSaturated())
-					LOGGER_.error(context.root + ": new "
-							+ mce.getKey()
+					LOGGER_.error(context.root + ": new " + mce.getKey()
 							+ " in a saturated context!");
-				
+
 				IndexedClassExpression ice = mce.getKey();
-				
+
 				// TODO propagate bottom backwards
 				if (ice == owlNothing && mce.isDefinite()) {
 					context.isSatisfiable = false;
@@ -356,36 +385,44 @@ public class RuleApplicationEngine {
 				if (ice.getToldSuperClassExpressions() != null) {
 					for (IndexedClassExpression implied : ice
 							.getToldSuperClassExpressions())
-						enqueue(context, new SuperClassExpression(mark(implied, mce)));
+						enqueue(context,
+								new SuperClassExpression(mark(implied, mce)));
 				}
 
 				/* process negative conjunctions */
 				if (ice.getNegConjunctionsByConjunct() != null) {
-					for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression> (
+					for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 							ice.getNegConjunctionsByConjunct().keySet(),
-							context.derived.keySet()))
-						enqueue(context, new ComposedSuperClassExpression(mark(
-								(IndexedClassExpression) ice.getNegConjunctionsByConjunct().get(common),
-								mce, context.derived.get(common))));
+							context.superClassExpressions.keySet()))
+						enqueue(context,
+								new ComposedSuperClassExpression(
+										markIntersection(
+												(IndexedClassExpression) ice
+														.getNegConjunctionsByConjunct()
+														.get(common), mce,
+												context.superClassExpressions
+														.get(common))));
 				}
 
 				/*
-				 * process negative existentials only needed when there is at least
-				 * one backward link
+				 * process negative existentials only needed when there is at
+				 * least one backward link
 				 */
 				if (context.backwardLinksByObjectProperty != null
 						&& ice.getNegExistentials() != null) {
-					for (IndexedObjectSomeValuesFrom e : ice.getNegExistentials())
-						addPropagation(e.getRelation(), mark((IndexedClassExpression) e, mce));
+					for (IndexedObjectSomeValuesFrom e : ice
+							.getNegExistentials())
+						addPropagation(e.getRelation(),
+								mark((IndexedClassExpression) e, mce));
 				}
 
 				return true;
 			}
 			return false;
 		}
-		
+
 		private class ClassExpressionDecomposer implements
-		IndexedClassExpressionVisitor<Void> {
+				IndexedClassExpressionVisitor<Void> {
 
 			private final Marked<?> markers;
 
@@ -398,14 +435,26 @@ public class RuleApplicationEngine {
 			}
 
 			public Void visit(IndexedObjectIntersectionOf ice) {
-				enqueue(context, new SuperClassExpression(mark(ice.getFirstConjunct(), markers)));
-				enqueue(context, new SuperClassExpression(mark(ice.getSecondConjunct(), markers)));
+				enqueue(context,
+						new SuperClassExpression(mark(ice.getFirstConjunct(),
+								markers)));
+				enqueue(context,
+						new SuperClassExpression(mark(ice.getSecondConjunct(),
+								markers)));
 				return null;
 			}
 
 			public Void visit(IndexedObjectSomeValuesFrom ice) {
-				enqueue(getCreateContext(ice.getFiller()), new BackwardLink(ice.getRelation(),
-						mark(context, markers)));
+				SaturatedClassExpression target = getCreateContext(ice
+						.getFiller());
+				enqueue(target,
+						new BackwardLink(ice.getRelation(), mark(context,
+								markers)));
+				if (context.nonEmpty != NonEmpty.POSSIBLE_INSTANCE)
+					enqueue(target,
+							new NonEmptyAxiom(markIntersection(
+									NonEmpty.INSTANCE, context.nonEmpty,
+									markers)));
 				return null;
 			}
 
@@ -414,6 +463,8 @@ public class RuleApplicationEngine {
 			}
 
 			public Void visit(IndexedNominal element) {
+				enqueue(getCreateContext(element), new SubNominal(
+						markIntersection(context, context.nonEmpty, markers)));
 				return null;
 			}
 		}
@@ -433,16 +484,70 @@ public class RuleApplicationEngine {
 				for (IndexedPropertyChain backwardRelation : context.backwardLinksByObjectProperty
 						.keySet())
 
-					if (backwardRelation.getSaturated().getPropertyCompositionsByLeftSubProperty() != null)
+					if (backwardRelation.getSaturated()
+							.getPropertyCompositionsByLeftSubProperty() != null)
 
 						for (Marked<SaturatedClassExpression> backwardTarget : context.backwardLinksByObjectProperty
 								.get(backwardRelation))
 
-							enqueue(backwardTarget.getKey(), new ForwardLink(backwardRelation,
-									mark(context, backwardTarget)));
+							enqueue(backwardTarget.getKey(),
+									new ForwardLink(backwardRelation, mark(
+											context, backwardTarget)));
+		}
+
+		public Void visit(SubNominal subNominal) {
+			if (context.subNominals == null) {
+				context.subNominals = new MarkedHashSet<SaturatedClassExpression>();
+			}
+
+			Marked<SaturatedClassExpression> mce1 = subNominal
+					.getClassExpression();
+			if (context.subNominals.add(mce1)) {
+				for (Marked<SaturatedClassExpression> mce2 : context.subNominals)
+					if (mce1.getKey() != mce2.getKey()) {
+						enqueue(mce1.getKey(),
+								new SuperClassExpression(markIntersection(
+										mce2.getKey().root, mce1, mce2)));
+						enqueue(mce2.getKey(),
+								new SuperClassExpression(markIntersection(
+										mce1.getKey().root, mce1, mce2)));
+					}
+			}
+
+			return null;
+		}
+
+		public Void visit(NonEmptyAxiom nonEmptyAxiom) {
+			Marked<NonEmpty> newNonEmpty = nonEmptyAxiom.getNonEmpty();
+
+			Marked<NonEmpty> union = markUnion(context.nonEmpty, newNonEmpty);
+			if (union == null)
+				return null;
+			
+			context.nonEmpty = union;
+
+			/*
+			 * The following iteration can be optimised by keeping all forward
+			 * links and all super nominals.
+			 */
+			for (Marked<IndexedClassExpression> mce : context.superClassExpressions) {
+				IndexedClassExpression ice = mce.getKey();
+
+				// TODO use a visitor here
+				if (ice instanceof IndexedObjectSomeValuesFrom) {
+					enqueue(getCreateContext(((IndexedObjectSomeValuesFrom) ice)
+							.getFiller()),
+							new NonEmptyAxiom(markIntersection(
+									NonEmpty.INSTANCE, newNonEmpty, mce)));
+				}
+				if (ice instanceof IndexedNominal) {
+					enqueue(getCreateContext(ice), new SubNominal(
+							markIntersection(context, newNonEmpty, mce)));
+				}
+			}
+
+			return null;
 		}
 
 	}
-
-
 }
