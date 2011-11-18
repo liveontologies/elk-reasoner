@@ -26,8 +26,23 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 
 /**
+ * In context C the SuperClassExpression (A:D) represents the axiom $A: C \sqsubseteq D$.
+ * 
  * @author Frantisek Simancik
  *
  */
-public interface SuperClassExpression extends Marked<IndexedClassExpression>, Queueable {
+public class SuperClassExpression implements Derivable {
+	protected final Marked<IndexedClassExpression> markedClassExpression;
+
+	public SuperClassExpression(Marked<IndexedClassExpression> markedClassExpression) {
+		this.markedClassExpression = markedClassExpression;
+	}
+	
+	public Marked<IndexedClassExpression> getClassExpression() {
+		return markedClassExpression;
+	}
+
+	public <O> O accept(DerivableVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 }

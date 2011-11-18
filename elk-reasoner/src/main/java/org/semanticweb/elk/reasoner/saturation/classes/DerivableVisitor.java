@@ -22,29 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.markers.Marked;
-import org.semanticweb.elk.util.collections.Pair;
+
 
 /**
  * @author Frantisek Simancik
  *
  */
-public class Propagation extends Pair<IndexedPropertyChain, Marked<IndexedClassExpression>> implements Queueable {
-	public Propagation(IndexedPropertyChain relation, Marked<IndexedClassExpression> carry) {
-		super(relation, carry);
-	}
-	
-	public IndexedPropertyChain getRelation() {
-		return first;
-	}
-	
-	public Marked<IndexedClassExpression> getCarry() {
-		return second;
-	}
-
-	public <O> O accept(QueueableVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
+public interface DerivableVisitor<O> {
+	O visit(SuperClassExpression superClassExpression);
+	O visit(ComposedSuperClassExpression composedSuperClassExpression);
+	O visit(BackwardLink backwardLink);
+	O visit(ForwardLink forwardLink);
 }

@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
+import java.util.AbstractSet;
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -34,8 +36,8 @@ import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 import org.semanticweb.elk.reasoner.saturation.markers.MarkedHashSet;
 import org.semanticweb.elk.reasoner.saturation.markers.MarkedMultimap;
 import org.semanticweb.elk.reasoner.saturation.markers.Marker;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * Objects of this class are used to manage subsumption relations between class
@@ -50,10 +52,8 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 
 	protected final IndexedClassExpression root;
 
-	protected final Queue<Queueable> queue;
+	protected final Queue<Derivable> queue;
 
-	protected final Set<IndexedClass> superClasses;
-	
 	protected final MarkedHashSet<IndexedClassExpression> derived;
 
 	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> backwardLinksByObjectProperty;
@@ -83,8 +83,7 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 
 	public SaturatedClassExpression(IndexedClassExpression root) {
 		this.root = root;
-		this.queue = new ConcurrentLinkedQueue<Queueable>();
-		this.superClasses = new ArrayHashSet<IndexedClass> ();
+		this.queue = new ConcurrentLinkedQueue<Derivable>();
 		this.derived = new MarkedHashSet<IndexedClassExpression> (13);
 		this.isActive = new AtomicBoolean(false);
 		this.saturated = new AtomicBoolean(false);
@@ -102,7 +101,7 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 	 * @return the set of derived indexed class expressions
 	 */
 	public Set<IndexedClass> getSuperClasses() {
-		return superClasses;
+		return new IndexedClassSetView();
 	}
 
 	/**
@@ -161,6 +160,24 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 
 	public Set<Marker> getMarkers() {
 		throw new UnsupportedOperationException();
+	}
+	
+	private class IndexedClassSetView extends AbstractSet<IndexedClass> {
+
+		@Override
+		public boolean contains(Object obj) {
+			return derived.contains(obj);
+		}
+		
+		@Override
+		public Iterator<IndexedClass> iterator() {
+			return Operations.filter(derived, IndexedClass.class).iterator();
+		}
+
+		@Override
+		public int size() {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 }

@@ -24,10 +24,27 @@ package org.semanticweb.elk.reasoner.saturation.markers;
 
 import java.util.Set;
 
-public interface Marked<T> extends Entry<T>{
+
+/**
+ * An interface for objects marked with a set of Markers. The intended use it 
+ * have the parameter class T also implement Marked<T> and the naked objects of
+ * type T then represent definite (unmarked) objects. Elements of Marked<T> are
+ * unmutable, that is their key and markers will not change after creation. 
+ * 
+ * 
+ * @author Frantisek Simancik
+ *
+ */
+public interface Marked<T> extends Entry<T> {
+	/**
+	 * @return true if this is an instance of the underlying type T
+	 */
 	boolean isDefinite();
+	
 	/**
 	 * getMarkers() is only required when not isDefinite()
+	 * 
+	 * @return unmodifiable non-empty set of markers 
 	 */
 	Set<Marker> getMarkers();
 }

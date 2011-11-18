@@ -30,9 +30,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.classes.QueueableVisitor;
 import org.semanticweb.elk.reasoner.saturation.classes.SaturatedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.classes.SuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 import org.semanticweb.elk.reasoner.saturation.markers.Marker;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -51,7 +50,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression implements SuperClassExpression {
+abstract public class IndexedClassExpression implements Marked<IndexedClassExpression>, Marker {
 
 	/**
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
@@ -227,7 +226,6 @@ abstract public class IndexedClassExpression implements SuperClassExpression {
 	/**
 	 * IndexedClassExpression is a definite Marked<IndexedClassExpression>
 	 */
-	
 	public boolean isDefinite() {
 		return true;
 	}
@@ -240,8 +238,4 @@ abstract public class IndexedClassExpression implements SuperClassExpression {
 		return this;
 	}
 	
-	public <O> O accept(QueueableVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 }

@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.markers;
 
 /**
- * Marks an axiom with a question mark.
+ * Used to mark an axiom with a question mark representing a possible axiom.
  * 
  * @author Frantisek Simancik
  *

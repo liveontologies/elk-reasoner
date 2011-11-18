@@ -27,10 +27,12 @@ import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
+ * In context C the ForwardLink (R, A:D) represents the axiom $A: C \sqsubseteq \exists R.D$.
+ * 
  * @author Frantisek Simancik
  *
  */
-public class ForwardLink extends Pair<IndexedPropertyChain, Marked<SaturatedClassExpression>> implements Queueable {
+public class ForwardLink extends Pair<IndexedPropertyChain, Marked<SaturatedClassExpression>> implements Derivable {
 	
 	public ForwardLink(IndexedPropertyChain relation, Marked<SaturatedClassExpression> target) {
 		super(relation, target);
@@ -44,7 +46,7 @@ public class ForwardLink extends Pair<IndexedPropertyChain, Marked<SaturatedClas
 		return second;
 	}
 
-	public <O> O accept(QueueableVisitor<O> visitor) {
+	public <O> O accept(DerivableVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

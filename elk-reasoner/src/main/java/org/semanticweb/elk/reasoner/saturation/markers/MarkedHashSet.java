@@ -22,39 +22,54 @@
  */
 package org.semanticweb.elk.reasoner.saturation.markers;
 
+import org.semanticweb.elk.util.collections.ArraySet;
 
+/**
+ * A set of Marked<T> that takes into account relationships between markers to
+ * remove redundancy. It overrides add(Marked<T> element) so that it if an
+ * element with stronger markers than element.getMarkers() is already present,
+ * then the element is not inserted.
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
 public class MarkedHashSet<T> extends EntryHashSet<T, Marked<T>> {
-	
+
 	public MarkedHashSet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public MarkedHashSet(int initialCapacity) {
 		super(initialCapacity);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public boolean add(Marked<T> element) {
 		Marked<T> old = get(element.getKey());
-		
+
 		if (old == null) {
 			return super.add(element);
 		}
-		
+
 		if (old.isDefinite()) {
 			return false;
 		}
-		
+
 		if (element.isDefinite()) {
 			return replace(element);
 		}
-		
-		boolean change = false;
-		for (Marker marker : element.getMarkers()) {
-			change = change || old.getMarkers().add(marker);
+
+		ArraySet<Marker> markers = new ArraySet<Marker>(old.getMarkers());
+		boolean newMarker = false;
+		for (Marker m : element.getMarkers()) {
+			newMarker = newMarker || markers.add(m);
 		}
-		return change;
+
+		if (!newMarker)
+			return false;
+
+		markers.trimToSize();
+		return replace(new ExplicitlyMarked<T>(element.getKey(), markers));
+
 	}
 }

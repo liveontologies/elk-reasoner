@@ -22,6 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.saturation.markers;
 
+/**
+ * An interface for elements of EntryHashSet. Entries are unmodifiable.
+ * 
+ * @author Frantisek Simancik
+ *
+ */
 public interface Entry<K> {
 	K getKey();
 }

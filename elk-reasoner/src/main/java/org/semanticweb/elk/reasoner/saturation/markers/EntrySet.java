@@ -32,8 +32,29 @@ import java.util.Set;
  * 
  */
 public interface EntrySet<K, E extends Entry<K>> extends Set<E> {
+	/**
+	 * @param key
+	 * @return the unique Entry with this key, or null if none
+	 */
 	E get(K key);
+
+	/**
+	 * @return a set view of all keys
+	 */
 	Set<K> keySet();
-	boolean containsKey(Object o);
+
+	/**
+	 * @param obj
+	 * @return true if an entry with this key occurs in the set
+	 */
+	boolean containsKey(Object obj);
+
+	/**
+	 * if the set already contains an element with key equal to
+	 * entry.getEqual(), then that element is replaced by entry. Nothing happens
+	 * when there is no such element.
+	 * 
+	 * @return true if successful
+	 */
 	boolean replace(E entry);
 }

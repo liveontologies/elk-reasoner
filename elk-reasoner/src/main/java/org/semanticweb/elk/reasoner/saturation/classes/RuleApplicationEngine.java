@@ -41,9 +41,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.markers.Marked;
-import org.semanticweb.elk.reasoner.saturation.markers.MarkedImpl;
 import org.semanticweb.elk.reasoner.saturation.markers.MarkedMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
+
+import static org.semanticweb.elk.reasoner.saturation.markers.ExplicitlyMarked.mark;
 
 /**
  * The engine for computing the saturation of class expressions. This is the
@@ -96,9 +97,9 @@ public class RuleApplicationEngine {
 
 	/**
 	 * Return a context which has the input indexed class expression as a root.
-	 * In case no such context exists, a new one is created with the given root
-	 * and is returned. It is ensured that no two different contexts are created
-	 * with the same root. In case a new context is created, it is scheduled to
+	 * In case no such context exists, a new one is markd with the given root
+	 * and is returned. It is ensured that no two different contexts are markd
+	 * with the same root. In case a new context is markd, it is scheduled to
 	 * be processed.
 	 * 
 	 * @param root
@@ -113,12 +114,12 @@ public class RuleApplicationEngine {
 			SaturatedClassExpression sce = new SaturatedClassExpression(root);
 			if (root.setSaturated(sce)) {
 				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(root + ": context created");
+					LOGGER_.trace(root + ": context markd");
 				}
-				enqueue(sce, root);
+				enqueue(sce, new SuperClassExpression(root));
 
 				if (owlThing.occursNegatively())
-					enqueue(sce, owlThing);
+					enqueue(sce, new SuperClassExpression(owlThing));
 			}
 		}
 		return root.getSaturated();
@@ -136,18 +137,18 @@ public class RuleApplicationEngine {
 				activateContext(context);
 	}
 
-	protected void enqueue(SaturatedClassExpression context, Queueable item) {
+	protected void enqueue(SaturatedClassExpression context, Derivable item) {
 		context.queue.add(item);
 		activateContext(context);
 	}
 
 	protected void link(IndexedPropertyChain relation, Marked<SaturatedClassExpression> source,
 			Marked<SaturatedClassExpression> target) {
-		enqueue(target.getKey(), new BackwardLink(relation, MarkedImpl.create(source.getKey(), target, source))); 
+		enqueue(target.getKey(), new BackwardLink(relation, mark(source.getKey(), target, source))); 
 	}
 	
 	protected void propagate(Marked<SaturatedClassExpression> target, Marked<IndexedClassExpression> mice) {
-		enqueue(target.getKey(), new ComposedSuperClassExpression(MarkedImpl.create(mice.getKey(), target, mice)));
+		enqueue(target.getKey(), new ComposedSuperClassExpression(mark(mice.getKey(), target, mice)));
 	}
 	
 	public void processActiveContexts() throws InterruptedException {
@@ -164,7 +165,7 @@ public class RuleApplicationEngine {
 		final QueueProcessor queueProcessor = new QueueProcessor(context);
 
 		for (;;) {
-			Queueable item = context.queue.poll();
+			Derivable item = context.queue.poll();
 			if (item == null)
 				break;
 			item.accept(queueProcessor);
@@ -174,7 +175,7 @@ public class RuleApplicationEngine {
 	}
 
 
-	private class QueueProcessor implements QueueableVisitor<Void> {
+	private class QueueProcessor implements DerivableVisitor<Void> {
 		final SaturatedClassExpression context;
 
 		QueueProcessor(SaturatedClassExpression context) {
@@ -194,7 +195,7 @@ public class RuleApplicationEngine {
 					if (mce.getKey().getNegExistentials() != null)
 							for (IndexedObjectSomeValuesFrom e : mce.getKey()
 									.getNegExistentials())
-								new Propagation(e.getRelation(), MarkedImpl.create((IndexedClassExpression) e, mce)).accept(this);
+								addPropagation(e.getRelation(), mark((IndexedClassExpression) e, mce));
 			}
 
 			if (context.backwardLinksByObjectProperty.add(backwardRelation, backwardTarget)) {
@@ -219,7 +220,7 @@ public class RuleApplicationEngine {
 				 */
 				if (context.deriveBackwardLinks
 						&& backwardRelation.getSaturated().getPropertyCompositionsByLeftSubProperty() != null)
-					enqueue(backwardTarget.getKey(), new ForwardLink(backwardRelation, MarkedImpl.create(context, backwardTarget)));
+					enqueue(backwardTarget.getKey(), new ForwardLink(backwardRelation, mark(context, backwardTarget)));
 
 				/* compose the link with all forward links */
 				if (backwardRelation.getSaturated().getPropertyCompositionsByRightSubProperty() != null
@@ -288,9 +289,7 @@ public class RuleApplicationEngine {
 			return null;
 		}
 
-		public Void visit(Propagation propagation) {
-			IndexedPropertyChain propRelation = propagation.getRelation();
-			Marked<IndexedClassExpression> carry = propagation.getCarry();
+		public Void addPropagation(IndexedPropertyChain propRelation, Marked<IndexedClassExpression> carry) {
 
 			if (context.propagationsByObjectProperty == null) {
 				context.propagationsByObjectProperty = 
@@ -324,7 +323,8 @@ public class RuleApplicationEngine {
 			return null;
 		}
 
-		public Void visit(SuperClassExpression mce) {
+		public Void visit(SuperClassExpression superClassExpression) {
+			Marked<IndexedClassExpression> mce = superClassExpression.getClassExpression();
 			if (processClassExpression(mce)) {
 				mce.getKey().accept(new ClassExpressionDecomposer(mce));
 			}
@@ -346,10 +346,6 @@ public class RuleApplicationEngine {
 				
 				IndexedClassExpression ice = mce.getKey();
 				
-				// TODO moved this to post processing
-				if (ice instanceof IndexedClass && mce.isDefinite())
-					context.superClasses.add((IndexedClass) ice);
-
 				// TODO propagate bottom backwards
 				if (ice == owlNothing && mce.isDefinite()) {
 					context.isSatisfiable = false;
@@ -360,7 +356,7 @@ public class RuleApplicationEngine {
 				if (ice.getToldSuperClassExpressions() != null) {
 					for (IndexedClassExpression implied : ice
 							.getToldSuperClassExpressions())
-						enqueue(context, (SuperClassExpression) MarkedImpl.create(implied, mce));
+						enqueue(context, new SuperClassExpression(mark(implied, mce)));
 				}
 
 				/* process negative conjunctions */
@@ -368,7 +364,7 @@ public class RuleApplicationEngine {
 					for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression> (
 							ice.getNegConjunctionsByConjunct().keySet(),
 							context.derived.keySet()))
-						enqueue(context, new ComposedSuperClassExpression(MarkedImpl.create(
+						enqueue(context, new ComposedSuperClassExpression(mark(
 								(IndexedClassExpression) ice.getNegConjunctionsByConjunct().get(common),
 								mce, context.derived.get(common))));
 				}
@@ -380,7 +376,7 @@ public class RuleApplicationEngine {
 				if (context.backwardLinksByObjectProperty != null
 						&& ice.getNegExistentials() != null) {
 					for (IndexedObjectSomeValuesFrom e : ice.getNegExistentials())
-						new Propagation(e.getRelation(), MarkedImpl.create((IndexedClassExpression) e)).accept(this);
+						addPropagation(e.getRelation(), mark((IndexedClassExpression) e, mce));
 				}
 
 				return true;
@@ -402,14 +398,14 @@ public class RuleApplicationEngine {
 			}
 
 			public Void visit(IndexedObjectIntersectionOf ice) {
-				enqueue(context, (SuperClassExpression) MarkedImpl.create(ice.getFirstConjunct(), markers));
-				enqueue(context, (SuperClassExpression) MarkedImpl.create(ice.getSecondConjunct(), markers));
+				enqueue(context, new SuperClassExpression(mark(ice.getFirstConjunct(), markers)));
+				enqueue(context, new SuperClassExpression(mark(ice.getSecondConjunct(), markers)));
 				return null;
 			}
 
 			public Void visit(IndexedObjectSomeValuesFrom ice) {
 				enqueue(getCreateContext(ice.getFiller()), new BackwardLink(ice.getRelation(),
-						MarkedImpl.create(context, markers)));
+						mark(context, markers)));
 				return null;
 			}
 
@@ -443,7 +439,7 @@ public class RuleApplicationEngine {
 								.get(backwardRelation))
 
 							enqueue(backwardTarget.getKey(), new ForwardLink(backwardRelation,
-									MarkedImpl.create(context, backwardTarget)));
+									mark(context, backwardTarget)));
 		}
 
 	}

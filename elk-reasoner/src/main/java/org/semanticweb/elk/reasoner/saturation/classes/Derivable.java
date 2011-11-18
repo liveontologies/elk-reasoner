@@ -22,11 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import org.semanticweb.elk.reasoner.saturation.markers.Marker;
 
-public final class NonEmptyMarker implements Marker {
-	
-	public final static NonEmptyMarker INSTANCE = new NonEmptyMarker();
-	
-	private NonEmptyMarker() {}
+/**
+ * Common interface for axioms that can be derived during saturation.
+ * 
+ * @author Frantisek Simancik
+ */
+public interface Derivable {
+	<O> O accept(DerivableVisitor<O> visitor);
 }

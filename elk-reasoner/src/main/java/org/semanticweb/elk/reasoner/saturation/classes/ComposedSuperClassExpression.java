@@ -25,29 +25,28 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 
-
-
 /**
- * Wrapper used for indicating that this IndexedClassExpression has been
- * derived by a composition rule. Decomposition rules need not be applied
- * to such expression.
- *  
+ * This is a special type of SuperClassExpression indicated that the wrapped
+ * class has been obtained by a composition rule and therefore the reverse
+ * decomposition rule doesn't have to applied.
+ * 
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
-public class ComposedSuperClassExpression implements Queueable {
+public class ComposedSuperClassExpression implements Derivable {
 	protected final Marked<IndexedClassExpression> markedClassExpression;
 
-	public ComposedSuperClassExpression(Marked<IndexedClassExpression> markedClassExpression) {
+	public ComposedSuperClassExpression(
+			Marked<IndexedClassExpression> markedClassExpression) {
 		this.markedClassExpression = markedClassExpression;
 	}
-	
+
 	public Marked<IndexedClassExpression> getClassExpression() {
 		return markedClassExpression;
 	}
 
-	public <O> O accept(QueueableVisitor<O> visitor) {
+	public <O> O accept(DerivableVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

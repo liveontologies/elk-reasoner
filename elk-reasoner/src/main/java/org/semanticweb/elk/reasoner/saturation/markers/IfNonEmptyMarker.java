@@ -25,13 +25,15 @@ package org.semanticweb.elk.reasoner.saturation.markers;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
- * Marks that an axiom holds when the precondition is non-empty. 
+ * Marks that an axiom holds when the precondition is non-empty. This class is
+ * currently not used in the implementation, instead IndexedClassExpressions are
+ * used directly as markers.
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
 public final class IfNonEmptyMarker implements Marker {
-	
+
 	protected final IndexedClassExpression precondition;
 
 	public IfNonEmptyMarker(IndexedClassExpression precondition) {
@@ -41,12 +43,12 @@ public final class IfNonEmptyMarker implements Marker {
 	public IndexedClassExpression getPrecondition() {
 		return precondition;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return precondition.hashCode();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

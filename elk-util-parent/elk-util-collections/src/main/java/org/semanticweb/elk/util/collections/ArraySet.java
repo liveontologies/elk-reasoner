@@ -37,6 +37,13 @@ public class ArraySet<T> extends ArrayList<T> implements Set<T> {
 		super(initialCapacity);
 	}
 	
+	public ArraySet(Set<T> set) {
+		super(set.size());
+		for (T element : set) {
+			super.add(element);
+		}
+	}
+	
 	@Override
 	public boolean add(T element) {
 		if (!contains(element)) 

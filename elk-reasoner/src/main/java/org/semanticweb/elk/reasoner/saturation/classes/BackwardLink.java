@@ -27,10 +27,12 @@ import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
+ * In context C the BackwardLink (R, A:D) represents the axiom $A: D \sqsubseteq \exists R.C$.
+ * 
  * @author Frantisek Simancik
  *
  */
-public class BackwardLink extends Pair<IndexedPropertyChain, Marked<SaturatedClassExpression>> implements Queueable {
+public class BackwardLink extends Pair<IndexedPropertyChain, Marked<SaturatedClassExpression>> implements Derivable {
 	
 	public BackwardLink(IndexedPropertyChain relation, Marked<SaturatedClassExpression> target) {
 		super(relation, target);
@@ -44,7 +46,7 @@ public class BackwardLink extends Pair<IndexedPropertyChain, Marked<SaturatedCla
 		return second;
 	}
 
-	public <O> O accept(QueueableVisitor<O> visitor) {
+	public <O> O accept(DerivableVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
