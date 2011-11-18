@@ -225,8 +225,8 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 			 * We construct equivalent classes and direct super classes by
 			 * iterating over the derived super classes using an iterator.
 			 */
-			Iterator<IndexedClassExpression> superClassIterator = saturation
-					.getSuperClassExpressions().iterator();
+			Iterator<IndexedClass> superClassIterator = saturation
+					.getSuperClasses().iterator();
 			/*
 			 * For some super-classes we will need to compute saturation, so we
 			 * need to save the states we are currently in until the computation
@@ -287,8 +287,8 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 			 * to the root.
 			 */
 			IndexedClassExpression root = trState.getInitiatorJob().getInput();
-			Set<IndexedClassExpression> superClassDerived = superClassSaturation
-					.getSuperClassExpressions();
+			Set<IndexedClass> superClassDerived = superClassSaturation
+					.getSuperClasses();
 			List<ElkClass> equivalent = trState.getEquivalent();
 			if (superClassDerived.contains(root)) {
 				equivalent.add(superClass.getElkClass());
@@ -310,7 +310,7 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 				 * If the (already computed) saturation for such reduced super
 				 * class contains the given super class, it cannot be direct.
 				 */
-				if (directSuperClass.getSaturated().getSuperClassExpressions()
+				if (directSuperClass.getSaturated().getSuperClasses()
 						.contains(superClass)) {
 					/*
 					 * if this super class is equivalent to the direct super
@@ -363,29 +363,25 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 			List<ElkClass> equivalent = trState.equivalent;
 			final List<IndexedClass> directSuperClasses = trState
 					.getDirectSuperClasses();
-			Iterator<IndexedClassExpression> superClassIterator = trState
+			Iterator<IndexedClass> superClassIterator = trState
 					.getSuperClassIterator();
 
 			/* finding the next super class */
 			while (superClassIterator.hasNext()) {
-				IndexedClassExpression superClassExpression = superClassIterator
-						.next();
-				if (superClassExpression instanceof IndexedClass) {
-					IndexedClass superClass = (IndexedClass) superClassExpression;
-					if (superClass == root)
-						equivalent.add(superClass.getElkClass());
-					else {
-						SaturatedClassExpression superClassSaturation = superClass
-								.getSaturated();
-						if (superClassSaturation != null
-								&& superClassSaturation.isSaturated()) {
-							updateTransitiveReductionState(superClass,
-									superClassSaturation, trState);
-						} else {
-							jobQueue.add(new SaturationJobSuperClass<I, J>(
-									superClass, trState));
-							return;
-						}
+				IndexedClass superClass = superClassIterator.next();
+				if (superClass == root)
+					equivalent.add(superClass.getElkClass());
+				else {
+					SaturatedClassExpression superClassSaturation = superClass
+					.getSaturated();
+					if (superClassSaturation != null
+							&& superClassSaturation.isSaturated()) {
+						updateTransitiveReductionState(superClass,
+								superClassSaturation, trState);
+					} else {
+						jobQueue.add(new SaturationJobSuperClass<I, J>(
+								superClass, trState));
+						return;
 					}
 				}
 			}

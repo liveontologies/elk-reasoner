@@ -345,6 +345,10 @@ public class RuleApplicationEngine {
 							+ " in a saturated context!");
 				
 				IndexedClassExpression ice = mce.getKey();
+				
+				// TODO moved this to post processing
+				if (ice instanceof IndexedClass && mce.isDefinite())
+					context.superClasses.add((IndexedClass) ice);
 
 				// TODO propagate bottom backwards
 				if (ice == owlNothing && mce.isDefinite()) {

@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.markers.Marked;
@@ -51,6 +52,8 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 
 	protected final Queue<Queueable> queue;
 
+	protected final Set<IndexedClass> superClasses;
+	
 	protected final MarkedHashSet<IndexedClassExpression> derived;
 
 	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> backwardLinksByObjectProperty;
@@ -81,6 +84,7 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 	public SaturatedClassExpression(IndexedClassExpression root) {
 		this.root = root;
 		this.queue = new ConcurrentLinkedQueue<Queueable>();
+		this.superClasses = new ArrayHashSet<IndexedClass> ();
 		this.derived = new MarkedHashSet<IndexedClassExpression> (13);
 		this.isActive = new AtomicBoolean(false);
 		this.saturated = new AtomicBoolean(false);
@@ -97,15 +101,8 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 	/**
 	 * @return the set of derived indexed class expressions
 	 */
-	public Set<IndexedClassExpression> getSuperClassExpressions() {
-		Set<IndexedClassExpression> result = 
-			new ArrayHashSet<IndexedClassExpression> ();
-		
-		for (Marked<IndexedClassExpression> marked : derived)
-			if (marked.isDefinite())
-				result.add(marked.getKey());
-		
-		return result;
+	public Set<IndexedClass> getSuperClasses() {
+		return superClasses;
 	}
 
 	/**

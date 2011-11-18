@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
  * An intermediate state of transitive reduction for an intexted class
@@ -49,7 +48,7 @@ class TransitiveReductionState<J extends TransitiveReductionJob<?>> {
 	 * saturation for the root. Each iterator object can be used only in one
 	 * state object.
 	 */
-	protected final Iterator<IndexedClassExpression> superClassIterator;
+	protected final Iterator<IndexedClass> superClassIterator;
 
 	/**
 	 * The list containing all equivalent classes that are found up to the
@@ -64,18 +63,18 @@ class TransitiveReductionState<J extends TransitiveReductionJob<?>> {
 	protected final List<IndexedClass> directSuperClasses;
 
 	TransitiveReductionState(J initiatorJob,
-			Iterator<IndexedClassExpression> superClassIterator) {
+			Iterator<IndexedClass> superClassIterator2) {
 		this.initiatorJob = initiatorJob;
 		this.equivalent = new ArrayList<ElkClass>(1);
 		this.directSuperClasses = new ArrayList<IndexedClass>(1);
-		this.superClassIterator = superClassIterator;
+		this.superClassIterator = superClassIterator2;
 	}
 
 	J getInitiatorJob() {
 		return this.initiatorJob;
 	}
 
-	Iterator<IndexedClassExpression> getSuperClassIterator() {
+	Iterator<IndexedClass> getSuperClassIterator() {
 		return this.superClassIterator;
 	}
 
