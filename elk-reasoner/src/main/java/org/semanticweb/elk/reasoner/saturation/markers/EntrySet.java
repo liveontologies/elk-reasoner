@@ -20,22 +20,20 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.markers;
 
-import org.semanticweb.elk.reasoner.ReasonerJob;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.classes.SaturatedClassExpression;
+import java.util.Set;
 
-public class SaturationJob<I extends IndexedClassExpression> extends
-		ReasonerJob<I, SaturatedClassExpression> {
-
-	public SaturationJob(I input) {
-		super(input);
-	}
-
-	@Override
-	protected void setOutput(SaturatedClassExpression output) {
-		super.setOutput(output);
-	}
-
+/**
+ * Set of Entry<K> with the property that there can be at most one entry for
+ * each key.
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
+public interface EntrySet<K, E extends Entry<K>> extends Set<E> {
+	E get(K key);
+	Set<K> keySet();
+	boolean containsKey(Object o);
+	boolean replace(E entry);
 }

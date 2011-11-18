@@ -20,22 +20,14 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.markers;
 
-import org.semanticweb.elk.reasoner.ReasonerJob;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.classes.SaturatedClassExpression;
-
-public class SaturationJob<I extends IndexedClassExpression> extends
-		ReasonerJob<I, SaturatedClassExpression> {
-
-	public SaturationJob(I input) {
-		super(input);
-	}
-
-	@Override
-	protected void setOutput(SaturatedClassExpression output) {
-		super.setOutput(output);
-	}
+/**
+ * Markers are used for marking the status of an axiom. 
+ * 
+ * @author Frantisek Simancik
+ *
+ */
+public interface Marker {
 
 }

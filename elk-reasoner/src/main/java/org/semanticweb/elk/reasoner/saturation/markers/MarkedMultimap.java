@@ -20,16 +20,25 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.markers;
 
-/**
- * Common interface for object that can be linked to during
- * ClassExpressionSaturation. SaturatedClassExpression is the
- * only Linkable class in the current implementation.
- * 
- * @author Frantisek Simancik
- *
- */
-public interface Linkable {
+import java.util.Collection;
+
+import org.semanticweb.elk.util.collections.AbstractHashMultimap;
+
+public class MarkedMultimap<K, T> extends AbstractHashMultimap<K, Marked<T>> {
+
+	public MarkedMultimap() {
+		super();
+	}
+
+	public MarkedMultimap(int i) {
+		super(i);
+	}
+	
+	@Override
+	protected Collection<Marked<T>> newRecord() {
+		return new MarkedHashSet<T> ();
+	}
 
 }

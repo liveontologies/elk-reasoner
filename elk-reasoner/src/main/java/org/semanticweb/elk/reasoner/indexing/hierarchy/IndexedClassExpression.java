@@ -26,12 +26,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.Derivable;
-import org.semanticweb.elk.reasoner.saturation.QueueableVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.QueueableVisitor;
+import org.semanticweb.elk.reasoner.saturation.classes.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.SuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.markers.Marker;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -49,7 +51,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression implements Derivable {
+abstract public class IndexedClassExpression implements SuperClassExpression {
 
 	/**
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
@@ -217,10 +219,29 @@ abstract public class IndexedClassExpression implements Derivable {
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
 
+	@Override
+	public abstract String toString();
+	
+
+	
+	/**
+	 * IndexedClassExpression is a definite Marked<IndexedClassExpression>
+	 */
+	
+	public boolean isDefinite() {
+		return true;
+	}
+
+	public Set<Marker> getMarkers() {
+		throw new UnsupportedOperationException();
+	}
+
+	public IndexedClassExpression getKey() {
+		return this;
+	}
+	
 	public <O> O accept(QueueableVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
-	@Override
-	public abstract String toString();
 }

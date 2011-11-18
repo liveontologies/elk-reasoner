@@ -20,9 +20,12 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.markers.Marked;
+
+
 
 /**
  * Wrapper used for indicating that this IndexedClassExpression has been
@@ -33,32 +36,15 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * @author Frantisek Simancik
  *
  */
-public class DecomposedClassExpression implements Queueable {
-	protected final IndexedClassExpression classExpression;
+public class ComposedSuperClassExpression implements Queueable {
+	protected final Marked<IndexedClassExpression> markedClassExpression;
 
-	public DecomposedClassExpression(IndexedClassExpression classExpression) {
-		assert classExpression != null;
-		this.classExpression = classExpression;
+	public ComposedSuperClassExpression(Marked<IndexedClassExpression> markedClassExpression) {
+		this.markedClassExpression = markedClassExpression;
 	}
 	
-	public IndexedClassExpression getClassExpression() {
-		return classExpression;
-	}
-
-	@Override
-	public int hashCode() {
-		return 19123433 + classExpression.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		
-		if (obj != null && obj instanceof DecomposedClassExpression)
-			return (classExpression == ((DecomposedClassExpression) obj).classExpression);
-		
-		return false;
+	public Marked<IndexedClassExpression> getClassExpression() {
+		return markedClassExpression;
 	}
 
 	public <O> O accept(QueueableVisitor<O> visitor) {

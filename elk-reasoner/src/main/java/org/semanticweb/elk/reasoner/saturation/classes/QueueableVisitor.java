@@ -20,17 +20,17 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+
 
 /**
  * @author Frantisek Simancik
  *
  */
 public interface QueueableVisitor<O> {
-	O visit(IndexedClassExpression indexedClassExpression);
-	O visit(DecomposedClassExpression compositeClassExpression);
+	O visit(SuperClassExpression superClassExpression);
+	O visit(ComposedSuperClassExpression composedSuperClassExpression);
 	O visit(BackwardLink backwardLink);
 	O visit(ForwardLink forwardLink);
 	O visit(Propagation propagation);

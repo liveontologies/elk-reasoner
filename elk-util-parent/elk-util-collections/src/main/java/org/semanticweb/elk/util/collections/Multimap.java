@@ -23,7 +23,7 @@
 package org.semanticweb.elk.util.collections;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.Map;
 
 
 /**
@@ -35,12 +35,7 @@ import java.util.Set;
  * @param <Value>
  */
 
-// TODO use Multimap from google.common instead
-
-public interface Multimap<Key, Value> {
+public interface Multimap<Key, Value> extends Map<Key, Collection<Value>> {
 	boolean add(Key key, Value value);
 	boolean contains(Key key, Value value);
-	Collection<Value> get(Key key);
-	boolean isEmpty();
-	Set<Key> keySet();
 }

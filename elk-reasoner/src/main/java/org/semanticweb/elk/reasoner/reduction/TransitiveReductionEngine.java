@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
-import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.SaturatedClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**

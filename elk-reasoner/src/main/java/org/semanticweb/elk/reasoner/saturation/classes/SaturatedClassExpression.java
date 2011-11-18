@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.Queue;
 import java.util.Set;
@@ -29,6 +29,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.markers.Marked;
+import org.semanticweb.elk.reasoner.saturation.markers.MarkedHashSet;
+import org.semanticweb.elk.reasoner.saturation.markers.MarkedMultimap;
+import org.semanticweb.elk.reasoner.saturation.markers.Marker;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -41,24 +45,26 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 
  * @author Frantisek Simancik
  */
-public class SaturatedClassExpression implements Linkable {
+public class SaturatedClassExpression implements Marked<SaturatedClassExpression> {
 
 	protected final IndexedClassExpression root;
 
 	protected final Queue<Queueable> queue;
 
-	// TODO use Derivable instead of IndexedClassExpression here
-	protected final Set<IndexedClassExpression> derived;
+	protected final MarkedHashSet<IndexedClassExpression> derived;
 
-	protected Multimap<IndexedPropertyChain, Linkable> backwardLinksByObjectProperty;
+	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> backwardLinksByObjectProperty;
 
-	protected Multimap<IndexedPropertyChain, Linkable> forwardLinksByObjectProperty;
+	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> forwardLinksByObjectProperty;
 
-	protected Multimap<IndexedPropertyChain, Queueable> propagationsByObjectProperty;
+	protected MarkedMultimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty;
+	
+	// if this is a nominal {a}, then the subNominals keeps track of axioms C \sqsubseteq {a}
+	protected Multimap<IndexedClassExpression, Marker> subNominals;
 
-	protected volatile boolean isSatisfiable = true;
+	protected boolean isSatisfiable = true;
 
-	protected volatile boolean isSaturated = false;
+	protected final AtomicBoolean saturated;
 
 	/**
 	 * If set to true, then composition rules will be applied to derive all
@@ -70,13 +76,14 @@ public class SaturatedClassExpression implements Linkable {
 	/**
 	 * A context is active iff its queue is not empty or it is being processed.
 	 */
-	private final AtomicBoolean isActive;
+	private AtomicBoolean isActive;
 
 	public SaturatedClassExpression(IndexedClassExpression root) {
 		this.root = root;
 		this.queue = new ConcurrentLinkedQueue<Queueable>();
-		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
+		this.derived = new MarkedHashSet<IndexedClassExpression> (13);
 		this.isActive = new AtomicBoolean(false);
+		this.saturated = new AtomicBoolean(false);
 	}
 
 	public IndexedClassExpression getRoot() {
@@ -91,7 +98,14 @@ public class SaturatedClassExpression implements Linkable {
 	 * @return the set of derived indexed class expressions
 	 */
 	public Set<IndexedClassExpression> getSuperClassExpressions() {
-		return derived;
+		Set<IndexedClassExpression> result = 
+			new ArrayHashSet<IndexedClassExpression> ();
+		
+		for (Marked<IndexedClassExpression> marked : derived)
+			if (marked.isDefinite())
+				result.add(marked.getKey());
+		
+		return result;
 	}
 
 	/**
@@ -123,7 +137,7 @@ public class SaturatedClassExpression implements Linkable {
 	 * this point.
 	 */
 	public void setSaturated() {
-		isSaturated = true;
+		this.saturated.set(true);
 	}
 
 	/**
@@ -133,7 +147,23 @@ public class SaturatedClassExpression implements Linkable {
 	 *         otherwise
 	 */
 	public boolean isSaturated() {
-		return isSaturated;
+		return saturated.get();
+	}
+
+	/*
+	 * 
+	 * Implementation of the Marked<SaturationPropertyExpression>
+	 */
+	public SaturatedClassExpression getKey() {
+		return this;
+	}
+
+	public boolean isDefinite() {
+		return true;
+	}
+
+	public Set<Marker> getMarkers() {
+		throw new UnsupportedOperationException();
 	}
 
 }

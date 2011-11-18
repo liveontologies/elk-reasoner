@@ -30,6 +30,8 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ReasonerJob;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.classes.SaturatedClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**

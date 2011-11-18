@@ -76,4 +76,13 @@ public class SaturatedPropertyChain {
 		return derivedSuperProperties;
 	}
 
+	public HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getPropertyCompositionsByLeftSubProperty() {
+		return propertyCompositionsByLeftSubProperty;
+	}
+
+	public HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getPropertyCompositionsByRightSubProperty() {
+		return propertyCompositionsByRightSubProperty;
+	}
+	
+
 }

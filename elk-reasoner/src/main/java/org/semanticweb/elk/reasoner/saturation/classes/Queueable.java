@@ -20,12 +20,15 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.classes;
+
 
 /**
+ * Common interface for objects that can be queued during
+ * ClassExpressionSaturation.
+ * 
  * @author Frantisek Simancik
- *
  */
-public interface Derivable extends Queueable {
-
+public interface Queueable {
+	<O> O accept(QueueableVisitor<O> visitor);
 }

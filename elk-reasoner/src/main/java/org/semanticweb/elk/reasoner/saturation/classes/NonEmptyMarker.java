@@ -20,14 +20,13 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
-/**
- * Common interface for objects that can be queued during
- * ClassExpressionSaturation.
- * 
- * @author Frantisek Simancik
- */
-public interface Queueable {
-	<O> O accept(QueueableVisitor<O> visitor);
+import org.semanticweb.elk.reasoner.saturation.markers.Marker;
+
+public final class NonEmptyMarker implements Marker {
+	
+	public final static NonEmptyMarker INSTANCE = new NonEmptyMarker();
+	
+	private NonEmptyMarker() {}
 }
