@@ -399,7 +399,7 @@ public class RuleApplicationEngine {
 
 			public Void visit(IndexedObjectIntersectionOf ice) {
 				enqueue(context, (SuperClassExpression) MarkedImpl.create(ice.getFirstConjunct(), markers));
-				enqueue(context, (SuperClassExpression) MarkedImpl.create(ice.getFirstConjunct(), markers));
+				enqueue(context, (SuperClassExpression) MarkedImpl.create(ice.getSecondConjunct(), markers));
 				return null;
 			}
 

@@ -71,8 +71,10 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	final int bufferSize;
 
 	/**
-	 * A counter for the number of worker instances processing the active
-	 * contexts queue
+	 * An upper bound on the the number of workers modifying the active
+	 * saturations queue the saturations themselves; if the value of this
+	 * counter is zero, this should guarantee that all saturated class
+	 * expressions created thus far are processed.
 	 */
 	final AtomicInteger activeWorkers = new AtomicInteger(0);
 
@@ -94,17 +96,6 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * and should reach that in the limit when all computations are over
 	 */
 	protected final AtomicInteger countOutputJobs = new AtomicInteger(0);
-
-	/**
-	 * Indicates that some workers are waiting for new processed jobs
-	 */
-	protected volatile boolean waitingForNewProcessedJobs = false;
-
-	/**
-	 * Indicates that there are new processed jobs that are not yet submitted
-	 * for post-processing
-	 */
-	protected volatile boolean newProcessedJobsAvailable = false;
 
 	/**
 	 * Creates a saturation engine using a given ontology index for executing
@@ -162,125 +153,88 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace(root + ": saturation started");
 		}
-		SaturatedClassExpression rootSaturation = root.getSaturated();
-		if (rootSaturation != null && rootSaturation.isSaturated()) {
-			job.setOutput(rootSaturation);
-			processOutput(job);
-			activeWorkers.incrementAndGet();
-		} else {
-			ruleApplicationEngine.getCreateContext(root);
-			/*
-			 * invariant: for every buffered job, the context is created and
-			 * scheduled for processing
-			 */
-			while (!this.buffer.offer(job)) {
-				/* wait until there are new processed jobs */
-				if (!newProcessedJobsAvailable) {
-					synchronized (buffer) {
-						if (!newProcessedJobsAvailable) {
-							waitingForNewProcessedJobs = true;
-							buffer.wait();
-						}
-					}
-				}
-				outputNewProcessedJobs();
-			}
-			activeWorkers.incrementAndGet();
-			/*
-			 * it is important to increment the counter for the buffered jobs
-			 * only when the number of active workers is positive
-			 */
-			countJobs.incrementAndGet();
-		}
+		/*
+		 * invariant: if the counter for active workers = 0, then for every job
+		 * in the buffer, a saturated class expression has been initialized and
+		 * processed (together with all dependent saturations). Note that it is
+		 * possible that a job has been inserted into the buffer, and the
+		 * assigned saturation is being initialized by another worker and not
+		 * yet finished or processed. It is guaranteed in this case, however,
+		 * that the counter for active workers remains positive until the
+		 * initialization and processing will be over.
+		 */
+		activeWorkers.incrementAndGet();
+		ruleApplicationEngine.getCreateContext(root);
 		ruleApplicationEngine.processActiveContexts();
-		if (activeWorkers.decrementAndGet() == 0) {
-			int snapshotCountJobs = countJobs.get();
-			if (activeWorkers.get() == 0) {
-				/*
-				 * We increment the counter for the jobs only after a context
-				 * for a job was created and it has been added to the buffer,
-				 * and only when some worker is active, i.e., the counter for
-				 * active workers is greater than zero. At the moment when the
-				 * counter for active workers becomes zero, no worker is
-				 * processing the active contexts, thus at the time the last
-				 * worker finishing processing active contexts, all context
-				 * created before become saturated. So at that very time, the
-				 * value for the counter for the jobs is equal to the number of
-				 * finished jobs. We take a snapshot of the counter between two
-				 * such moments, which means that 1) now the value of the
-				 * snapshot does not exceed the number of processed jobs and 2)
-				 * after every time the last active worker is finished, we will
-				 * have a snapshot value (perhaps taken in a different thread)
-				 * which will represent at least the number of processed jobs at
-				 * that time.
-				 * 
-				 * Now we update the counter for processed jobs to this
-				 * snapshot, provided it is greater. It may happen that the
-				 * snapshot value is not greater because several threads can
-				 * simultaneously enter this block for different snapshot
-				 * values. It is guaranteed, however, that the counter will be
-				 * updated to the largest of these values.
-				 */
-				for (;;) {
-					int snapshotCountProcessedJobs = countProcessedJobs.get();
-					if (snapshotCountJobs <= snapshotCountProcessedJobs)
-						break;
-					if (countProcessedJobs.compareAndSet(
-							snapshotCountProcessedJobs, snapshotCountJobs)) {
-						notifyAboutNewProcessedJobs();
-						outputNewProcessedJobs();
-						break;
-					}
+		activeWorkers.decrementAndGet();
+		/*
+		 * this check is to make sure we do not stuck inserting things into the
+		 * buffer when there are processed jobs available that can be removed
+		 */
+		checkProcessedJobs();
+		buffer.put(job);
+		/*
+		 * we increment the counter only after the job is inserted to the buffer
+		 */
+		countJobs.incrementAndGet();
+		/* check that all jobs are processed before we finish */
+		checkProcessedJobs();
+	}
+
+	void checkProcessedJobs() throws InterruptedException {
+		int snapshotCountJobs = countJobs.get();
+		/*
+		 * At the time the counter of active workers becomes zero, we know that
+		 * for every job in the buffer, a saturation was assigned, initialized
+		 * and processed, together with all the dependent saturations.
+		 * Therefore, at that time, every job in the buffer is finished. Since
+		 * the counter for the jobs never exceeds the number of jobs ever
+		 * inserted into the buffer, the snapshot value, taken before the active
+		 * worker counter becomes zero, is at most the number of finished jobs
+		 * in the buffer coming consecutively from the head + the number of jobs
+		 * that were taken from the buffer before.
+		 */
+		if (activeWorkers.get() == 0) {
+			/*
+			 * Now we update the counter for processed jobs to the taken
+			 * snapshot, provided it is greater. It may happen that the snapshot
+			 * value is not greater because several threads can simultaneously
+			 * enter this block for different snapshot values. It is guaranteed,
+			 * however, that the counter will be updated to the largest of them.
+			 */
+			for (;;) {
+				int snapshotCountProcessedJobs = countProcessedJobs.get();
+				if (snapshotCountJobs <= snapshotCountProcessedJobs)
+					break;
+				if (countProcessedJobs.compareAndSet(
+						snapshotCountProcessedJobs, snapshotCountJobs)) {
+					break;
 				}
 			}
 		}
-	}
-
-	/**
-	 * Notifies, if necessary, that new processed jobs are available for the
-	 * output
-	 */
-	void notifyAboutNewProcessedJobs() {
-		newProcessedJobsAvailable = true;
-		if (waitingForNewProcessedJobs) {
-			synchronized (buffer) {
-				waitingForNewProcessedJobs = false;
-				buffer.notifyAll();
-			}
-		}
-	}
-
-	/**
-	 * Post-processing the newly processed jobs
-	 * 
-	 * @throws InterruptedException
-	 */
-	void outputNewProcessedJobs() throws InterruptedException {
+		/*
+		 * now we check if the counter for output jobs can be increased and new
+		 * jobs can be taken from the buffer; this is independent from whether
+		 * the counter for the processed jobs has been updated or not in the
+		 * previous step since this can happen in another thread.
+		 */
 		for (;;) {
 			int shapshotOutputJobs = countOutputJobs.get();
 			if (shapshotOutputJobs == countProcessedJobs.get()) {
-				newProcessedJobsAvailable = false;
-				/*
-				 * before exiting, check to make sure that no new processed jobs
-				 * have appeared after the last test and before the variable was
-				 * set
-				 */
-				if (shapshotOutputJobs == countProcessedJobs.get())
-					break;
-				else
-					notifyAboutNewProcessedJobs();
+				break;
 			}
 			/*
 			 * at this place we know that the number of output jobs is smaller
-			 * than the number of processed jobs, if this counter has not been
+			 * than the number of processed jobs if this counter has not been
 			 * changed.
 			 */
 			if (countOutputJobs.compareAndSet(shapshotOutputJobs,
 					shapshotOutputJobs + 1)) {
 				/*
-				 * Since the contexts are created and therefore saturated in the
-				 * order they appear in the buffer, it is safe to assume that
-				 * the next job in the buffer is processed.
+				 * We have updated the counter for processed jobs only when we
+				 * know how many *consecutive* jobs in the buffer are processed.
+				 * Therefore, it is safe to assume that the next job in the
+				 * buffer is processed.
 				 */
 				J nextJob = buffer.poll();
 				SaturatedClassExpression output = nextJob.getInput()
@@ -304,5 +258,4 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 			LOGGER_.trace(job.getInput() + ": saturation finished");
 		}
 	}
-
 }
