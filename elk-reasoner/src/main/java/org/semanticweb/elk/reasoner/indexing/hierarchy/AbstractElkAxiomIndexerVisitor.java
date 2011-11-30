@@ -304,17 +304,16 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	}
 
 	public Void visit(ElkNegativeObjectPropertyAssertionAxiom axiom) {
+		throw new IndexingException(
+				ElkObjectPropertyAssertionAxiom.class.getSimpleName()
+						+ " not supported");
+	}
+
+	public Void visit(ElkObjectPropertyAssertionAxiom axiom) {
 		indexSubClassOfAxiom(objectFactory.getObjectOneOf(axiom.getSubject()),
 				objectFactory.getObjectSomeValuesFrom(axiom.getProperty(),
 						objectFactory.getObjectOneOf(axiom.getObject())));
 		return null;
-	}
-
-	public Void visit(
-			ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom) {
-		throw new IndexingException(
-				ElkObjectPropertyAssertionAxiom.class.getSimpleName()
-						+ " not supported");
 	}
 
 	public Void visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {

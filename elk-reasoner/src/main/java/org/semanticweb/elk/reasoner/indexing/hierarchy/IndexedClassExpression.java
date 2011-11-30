@@ -26,13 +26,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.classes.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.markers.DefiniteMarkers;
 import org.semanticweb.elk.reasoner.saturation.markers.Marked;
-import org.semanticweb.elk.reasoner.saturation.markers.Marker;
+import org.semanticweb.elk.reasoner.saturation.markers.Markers;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -50,7 +50,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression implements Marked<IndexedClassExpression>, Marker {
+abstract public class IndexedClassExpression implements Marked<IndexedClassExpression> {
 
 	/**
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
@@ -226,12 +226,9 @@ abstract public class IndexedClassExpression implements Marked<IndexedClassExpre
 	/**
 	 * IndexedClassExpression is a definite Marked<IndexedClassExpression>
 	 */
-	public boolean isDefinite() {
-		return true;
-	}
 
-	public Set<? extends Marker> getMarkers() {
-		throw new UnsupportedOperationException();
+	public Markers getMarkers() {
+		return DefiniteMarkers.INSTANCE;
 	}
 
 	public IndexedClassExpression getKey() {

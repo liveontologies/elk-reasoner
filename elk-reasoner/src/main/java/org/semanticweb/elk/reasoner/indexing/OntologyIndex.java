@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
@@ -51,6 +52,7 @@ public interface OntologyIndex {
 
 	Iterable<IndexedClassExpression> getIndexedClassExpressions();
 	Iterable<IndexedClass> getIndexedClasses();
+	Iterable<IndexedNominal> getIndexedNominals();
 	int getIndexedClassCount();
 
 	Iterable<IndexedPropertyChain> getIndexedPropertyChains();
