@@ -702,7 +702,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 
 	public Void visit(
 			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
-		write("SymmetricObjectProperty(");
+		write("TransitiveObjectProperty(");
 		write((ElkPropertyAxiom<ElkObjectPropertyExpression>) elkTransitiveObjectPropertyAxiom);
 		write(')');
 		return null;
