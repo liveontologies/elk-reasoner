@@ -22,29 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.saturation.markers;
 
+import java.util.Set;
 
-
-/**
- * Represents a non-definite element marked by at least one marker.
- * 
- * @author Frantisek Simancik
- * 
- */
-public class ExplicitlyMarked<T> implements Marked<T> {
-	
-	protected final Markers markers;
-	protected final T key;
-
-	public ExplicitlyMarked(T key, Markers markers) {
-		this.markers = markers;
-		this.key = key;
-	}
-	
-	public T getKey() {
-		return key;
-	}
-
-	public Markers getMarkers() {
-		return markers;
-	}
+public interface Markers {
+	boolean isDefinite();
+	Set<Marker> getMarkers();
 }

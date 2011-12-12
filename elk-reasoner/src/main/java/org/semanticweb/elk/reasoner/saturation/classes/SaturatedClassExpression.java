@@ -28,15 +28,19 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.markers.DefiniteMarkers;
 import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 import org.semanticweb.elk.reasoner.saturation.markers.MarkedHashSet;
 import org.semanticweb.elk.reasoner.saturation.markers.MarkedMultimap;
 import org.semanticweb.elk.reasoner.saturation.markers.Marker;
-import org.semanticweb.elk.reasoner.saturation.markers.NonEmpty;
+import org.semanticweb.elk.reasoner.saturation.markers.Markers;
+import org.semanticweb.elk.reasoner.saturation.markers.NonDefiniteMarkers;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -48,19 +52,19 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  * @author Frantisek Simancik
  */
-public class SaturatedClassExpression implements Marked<SaturatedClassExpression> {
+public class SaturatedClassExpression implements Marked<SaturatedClassExpression>, Marker {
 
 	protected final IndexedClassExpression root;
 
 	protected final Queue<Derivable> queue;
 
-	protected final MarkedHashSet<IndexedClassExpression> superClassExpressions;
+	public final MarkedHashSet<IndexedClassExpression> superClassExpressions;
 
 	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> backwardLinksByObjectProperty;
 
 	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> forwardLinksByObjectProperty;
 
-	protected Marked<NonEmpty> nonEmpty;
+	public Markers reachable;
 	
 	// this field is only required for nominals
 	protected MarkedHashSet<SaturatedClassExpression> subNominals;
@@ -70,7 +74,15 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 	protected boolean isSatisfiable = true;
 
 	protected final AtomicBoolean saturated;
+	
+	
+	// used for keeping statistics
+	protected boolean newSubsumption = false;
+	protected boolean newSuperClass = false;
+	protected boolean secondPhase = false;
+	public static final AtomicInteger nonEmptyNo = new AtomicInteger(0);
 
+	
 	/**
 	 * If set to true, then composition rules will be applied to derive all
 	 * incoming links. This is usually needed only when at least one propagation
@@ -89,6 +101,11 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 		this.superClassExpressions = new MarkedHashSet<IndexedClassExpression> (13);
 		this.isActive = new AtomicBoolean(false);
 		this.saturated = new AtomicBoolean(false);
+		
+		if (root instanceof IndexedNominal)
+			reachable = DefiniteMarkers.INSTANCE;
+		else 
+			reachable = NonDefiniteMarkers.QUESTION_MARKERS;
 	}
 
 	public IndexedClassExpression getRoot() {
@@ -134,8 +151,22 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 	 * Marks this context as saturated. The derivable set should not change from
 	 * this point.
 	 */
-	public void setSaturated() {
-		this.saturated.set(true);
+	public int setSaturated() {
+		if (this.saturated.compareAndSet(false, true)) {
+			if (reachable.isDefinite()) {
+				nonEmptyNo.incrementAndGet();
+				return 0;
+			}
+
+			int c = 0;
+			for (Marked<IndexedClassExpression> mce : superClassExpressions)
+				if (!mce.getMarkers().isDefinite() && mce.getKey() instanceof IndexedClass)
+					c++;
+
+			secondPhase = c > 0;
+			return c;
+		}
+		return 0;
 	}
 
 	/**
@@ -156,12 +187,8 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 		return this;
 	}
 
-	public boolean isDefinite() {
-		return true;
-	}
-
-	public Set<Marker> getMarkers() {
-		throw new UnsupportedOperationException();
+	public Markers getMarkers() {
+		return DefiniteMarkers.INSTANCE;
 	}
 	
 	private class IndexedClassSetView extends AbstractSet<IndexedClass> {
@@ -181,5 +208,9 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 			throw new UnsupportedOperationException();
 		}
 	}
-
+	
+	@Override
+	public String toString() {
+		return root.toString();
+	}
 }

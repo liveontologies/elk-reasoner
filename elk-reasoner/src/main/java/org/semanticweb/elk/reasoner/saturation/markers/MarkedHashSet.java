@@ -32,7 +32,8 @@ package org.semanticweb.elk.reasoner.saturation.markers;
  * @author Frantisek Simancik
  * 
  */
-public class MarkedHashSet<T> extends EntryHashSet<T, Marked<T>> {
+ 
+public class MarkedHashSet<T extends Marked<T>> extends EntryHashSet<T, Marked<T>> {
 
 	public MarkedHashSet() {
 		super();
@@ -50,11 +51,12 @@ public class MarkedHashSet<T> extends EntryHashSet<T, Marked<T>> {
 			return super.add(newMarked);
 		}
 		
-		Marked<T> union = ExplicitlyMarked.markUnion(oldMarked, newMarked);
+		Markers union = MarkerOperations.markersUnion(oldMarked.getMarkers(), newMarked.getMarkers());
 		
 		if (union == null)
 			return false;
-		else
-			return replace(union); 
+		else {
+			return replace(MarkerOperations.mark(newMarked.getKey(), union));
+		}
 	}
 }

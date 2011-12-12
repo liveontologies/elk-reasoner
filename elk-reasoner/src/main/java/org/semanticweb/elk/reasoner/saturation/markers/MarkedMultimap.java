@@ -26,7 +26,7 @@ import java.util.Collection;
 
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 
-public class MarkedMultimap<K, T> extends AbstractHashMultimap<K, Marked<T>> {
+public class MarkedMultimap<K, T extends Marked<T>> extends AbstractHashMultimap<K, Marked<T>> {
 
 	public MarkedMultimap() {
 		super();

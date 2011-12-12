@@ -22,8 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import org.semanticweb.elk.reasoner.saturation.markers.NonEmpty;
-import org.semanticweb.elk.reasoner.saturation.markers.Marked;
+import org.semanticweb.elk.reasoner.saturation.markers.Markers;
 
 /**
  * In context C the NonEmptyAxiom A:_ represents $A: C \neq \emptyset$. 
@@ -31,16 +30,16 @@ import org.semanticweb.elk.reasoner.saturation.markers.Marked;
  * @author Frantisek Simancik
  *
  */
-public class NonEmptyAxiom implements Derivable {
+public class Reachability implements Derivable {
 	
-	protected final Marked<NonEmpty> nonEmpty;
+	protected final Markers markers;
 	
-	public NonEmptyAxiom(Marked<NonEmpty> markedVoid) {
-		this.nonEmpty = markedVoid;
+	public Reachability(Markers markers) {
+		this.markers = markers;
 	}
 
-	public Marked<NonEmpty> getNonEmpty() {
-		return nonEmpty;
+	public Markers getMarkers() {
+		return markers;
 	}
 
 	public <O> O accept(DerivableVisitor<O> visitor) {

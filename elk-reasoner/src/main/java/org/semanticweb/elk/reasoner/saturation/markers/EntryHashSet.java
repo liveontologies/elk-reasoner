@@ -32,7 +32,8 @@ import java.util.Set;
 /**
  * An implementation of EntrySet<K, E> based on our implementation of
  * ArrayHashSet. Only the method contains is thread safe, other methods might
- * corrupt the state when used concurrently.
+ * corrupt the state when used concurrently. For performance reasons the current
+ * implementation uses pointer equality of keys.
  * 
  * @author Frantisek Simancik
  * 
@@ -120,13 +121,14 @@ public class EntryHashSet<K, E extends Entry<K>> implements EntrySet<K, E> {
 	}
 
 	private boolean addElement(E[] data, E e) {
-		int i = getIndex(e.getKey(), data.length);
+		K key = e.getKey();
+		int i = getIndex(key, data.length);
 		for (;;) {
 			E probe = data[i];
 			if (probe == null) {
 				data[i] = e;
 				return true;
-			} else if (e.getKey().equals(probe.getKey()))
+			} else if (key == probe.getKey()) // (e.getKey().equals(probe.getKey()))
 				return false;
 			if (i == 0)
 				i = data.length - 1;
@@ -145,7 +147,7 @@ public class EntryHashSet<K, E extends Entry<K>> implements EntrySet<K, E> {
 			E probe = data[i];
 			if (probe == null)
 				return -1;
-			else if (key.equals(probe.getKey()))
+			else if (key == probe.getKey()) // (key.equals(probe.getKey()))
 				return i;
 			if (i == 0)
 				i = data.length - 1;
@@ -176,7 +178,7 @@ public class EntryHashSet<K, E extends Entry<K>> implements EntrySet<K, E> {
 		if (e == null)
 			throw new NullPointerException();
 		E[] data = this.data;
-		int i = getPosition(data, e);
+		int i = getPosition(data, e.getKey());
 		if (i == -1)
 			return false;
 		data[i] = e;

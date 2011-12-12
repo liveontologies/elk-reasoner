@@ -82,7 +82,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		classExpressionSaturation.start();
 		classExpressionSaturation
-				.submit(new SaturationJob<IndexedClassExpression>(A));
+				.submit(new SaturationJob<IndexedClassExpression>(A, false));
 		classExpressionSaturation.waitCompletion();
 
 		assertTrue("A contains D", A.getSaturated().getSuperClasses()
@@ -128,7 +128,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		classExpressionSaturation.start();
 		classExpressionSaturation
-				.submit(new SaturationJob<IndexedClassExpression>(A));
+				.submit(new SaturationJob<IndexedClassExpression>(A, false));
 		classExpressionSaturation.waitCompletion();
 		SaturatedClassExpression context = A.getSaturated();
 

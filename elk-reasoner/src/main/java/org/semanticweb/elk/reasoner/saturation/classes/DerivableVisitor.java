@@ -30,9 +30,8 @@ package org.semanticweb.elk.reasoner.saturation.classes;
  */
 public interface DerivableVisitor<O> {
 	O visit(SuperClassExpression superClassExpression);
-	O visit(ComposedSuperClassExpression composedSuperClassExpression);
 	O visit(BackwardLink backwardLink);
 	O visit(ForwardLink forwardLink);
 	O visit(SubNominal subNominal);
-	O visit(NonEmptyAxiom nonEmptyAxiom);
+	O visit(Reachability reachability);
 }

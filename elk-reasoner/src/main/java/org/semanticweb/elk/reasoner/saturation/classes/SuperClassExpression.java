@@ -33,13 +33,24 @@ import org.semanticweb.elk.reasoner.saturation.markers.Marked;
  */
 public class SuperClassExpression implements Derivable {
 	protected final Marked<IndexedClassExpression> markedClassExpression;
+	protected final boolean needsDecomposition;
 
 	public SuperClassExpression(Marked<IndexedClassExpression> markedClassExpression) {
 		this.markedClassExpression = markedClassExpression;
+		this.needsDecomposition = true;
+	}
+	
+	public SuperClassExpression(Marked<IndexedClassExpression> markedClassExpression, boolean needsDecomposition) {
+		this.markedClassExpression = markedClassExpression;
+		this.needsDecomposition = needsDecomposition;
 	}
 	
 	public Marked<IndexedClassExpression> getClassExpression() {
 		return markedClassExpression;
+	}
+	
+	public boolean needsDecomposition() {
+		return needsDecomposition;
 	}
 
 	public <O> O accept(DerivableVisitor<O> visitor) {

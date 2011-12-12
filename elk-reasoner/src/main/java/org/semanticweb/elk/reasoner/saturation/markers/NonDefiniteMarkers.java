@@ -25,31 +25,33 @@ package org.semanticweb.elk.reasoner.saturation.markers;
 import java.util.Collections;
 import java.util.Set;
 
+import org.semanticweb.elk.util.collections.ArraySet;
 
-/**
- * This is a dummy class that can be marked by markers. Used in NonEmptyAxiom.
- * 
- * @author Frantisek Simancik
- * 
- */
-public class NonEmpty implements Marked<NonEmpty> {
+public class NonDefiniteMarkers implements Markers {
 
-	public static NonEmpty INSTANCE = new NonEmpty();
-	public static Marked<NonEmpty> POSSIBLE_INSTANCE = new ExplicitlyMarked<NonEmpty>(
-			INSTANCE, Collections.singleton(QuestionMarker.INSTANCE));
-
-	private NonEmpty() {
+	public final static Markers QUESTION_MARKERS = 
+		new NonDefiniteMarkers(QuestionMarker.INSTANCE);
+	
+	protected final Set<Marker> markers;
+	
+	public NonDefiniteMarkers(ArraySet<Marker> markers) {
+		if (markers.size() == 1)
+			this.markers = Collections.singleton(markers.get(0));
+		else {
+			markers.trimToSize();
+			this.markers = Collections.unmodifiableSet(markers);
+		}
 	}
-
-	public NonEmpty getKey() {
-		return this;
+	
+	public NonDefiniteMarkers(Marker marker) {
+		this.markers =  Collections.singleton(marker);
 	}
-
+	
 	public boolean isDefinite() {
-		return true;
+		return false;
 	}
 
-	public Set<? extends Marker> getMarkers() {
-		throw new UnsupportedOperationException();
+	public Set<Marker> getMarkers() {
+		return markers;
 	}
 }

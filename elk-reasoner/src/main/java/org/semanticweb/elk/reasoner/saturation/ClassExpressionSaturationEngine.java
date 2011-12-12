@@ -30,8 +30,10 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ReasonerJob;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.Reachability;
 import org.semanticweb.elk.reasoner.saturation.classes.RuleApplicationEngine;
 import org.semanticweb.elk.reasoner.saturation.classes.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.markers.NonDefiniteMarkers;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
@@ -164,7 +166,11 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		 * initialization and processing will be over.
 		 */
 		activeWorkers.incrementAndGet();
-		ruleApplicationEngine.getCreateContext(root);
+		SaturatedClassExpression context = ruleApplicationEngine.getCreateContext(root);
+		if (job.reachabilityMarker != null) {
+			ruleApplicationEngine.enqueue(context, new Reachability(
+					new NonDefiniteMarkers(job.reachabilityMarker)));
+		}
 		ruleApplicationEngine.processActiveContexts();
 		activeWorkers.decrementAndGet();
 		/*
@@ -239,7 +245,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				J nextJob = buffer.poll();
 				SaturatedClassExpression output = nextJob.getInput()
 						.getSaturated();
-				output.setSaturated();
+//				output.setSaturated();
 				nextJob.setOutput(output);
 				processOutput(nextJob);
 			}

@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.markers;
 
-import java.util.Set;
 
 
 /**
@@ -37,14 +36,8 @@ import java.util.Set;
  */
 public interface Marked<T> extends Entry<T> {
 	/**
-	 * @return true if this is an instance of the underlying type T
-	 */
-	boolean isDefinite();
-	
-	/**
-	 * getMarkers() is only required when not isDefinite()
 	 * 
 	 * @return unmodifiable non-empty set of markers 
 	 */
-	Set<? extends Marker> getMarkers();
+	Markers getMarkers();
 }

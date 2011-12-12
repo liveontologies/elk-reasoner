@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.markers;
 
+
 /**
  * Used to mark an axiom with a question mark representing a possible axiom.
  * 
@@ -30,7 +31,12 @@ package org.semanticweb.elk.reasoner.saturation.markers;
  */
 public final class QuestionMarker implements Marker {
 	
-	public final static QuestionMarker INSTANCE = new QuestionMarker();
-	
+	public final static Marker INSTANCE = new QuestionMarker();
+		
 	private QuestionMarker() {}
+	
+	@Override
+	public String toString() {
+		return "?";
+	}
 }
