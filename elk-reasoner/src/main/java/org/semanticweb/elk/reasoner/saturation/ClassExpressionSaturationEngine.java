@@ -22,8 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -61,35 +61,43 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * The buffer for jobs in progress, i.e., for those jobs for which the
 	 * method {@link #processOutput(ReasonerJob)} is not yet executed.
 	 */
-	protected final BlockingQueue<J> buffer;
+	protected final Queue<J> buffer;
 
 	/**
-	 * The size of the job buffer.
+	 * The threshold on the number of saturation task before we wait for there
+	 * completion
 	 */
-	final int bufferSize;
+	final int threshold;
+
+	/**
+	 * The number of saturation currently active
+	 */
+	final AtomicInteger activeSaturations = new AtomicInteger(0);
+
+	volatile boolean workersWaiting = false;
 
 	/**
 	 * An upper bound on the the number of workers modifying the active
-	 * saturations queue the saturations themselves; if the value of this
-	 * counter is zero, this should guarantee that all saturated class
-	 * expressions created thus far are processed.
+	 * saturation queue the saturations themselves; if the value of this counter
+	 * is zero, this should guarantee that all saturated class expressions
+	 * created thus far are processed.
 	 */
 	final AtomicInteger activeWorkers = new AtomicInteger(0);
 
 	/**
-	 * The counter incremented with every inserted job to the buffer
+	 * This counter is incremented with every inserted job to the buffer
 	 */
 	protected final AtomicInteger countJobs = new AtomicInteger(0);
 
 	/**
-	 * The counter incremented whenever a job is processed, i.e., the input is
-	 * saturated; it should never exceed the counter for the number of the
-	 * inserted jobs and should reach that when all computations are over
+	 * This counter is incremented whenever a job is processed, i.e., the input
+	 * is saturated; it should never exceed the counter for the number of the
+	 * inserted jobs and should reach that value when all computations are over
 	 */
 	protected final AtomicInteger countProcessedJobs = new AtomicInteger(0);
 
 	/**
-	 * The counter incremented whenever the processed job is submitted for
+	 * This counter is incremented whenever the processed job is submitted for
 	 * post-processing; it should never exceed the counter for processed jobs
 	 * and should reach that in the limit when all computations are over
 	 */
@@ -101,18 +109,19 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * has an effect on the size of batches in which the input is processed and
 	 * has an effect on throughput and latency of the processing: in general,
 	 * the larger the limit is, the faster it takes to perform the overall
-	 * processing of jobs, but it might take longer to process an individual
-	 * individual job because the jobs are processed in batches.
+	 * processing of jobs, but it might take longer to process an individual job
+	 * because we can detect that the job is processed only when the whole batch
+	 * is processed.
 	 * 
 	 * @param ontologyIndex
 	 *            the index used for executing the rules
-	 * @param maxUnprocessed
+	 * @param threshold
 	 *            the maximum number of unprocessed jobs at any given time
 	 */
 	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex,
-			int maxUnprocessed) {
-		this.bufferSize = maxUnprocessed;
-		this.buffer = new ArrayBlockingQueue<J>(maxUnprocessed);
+			int threshold) {
+		this.threshold = threshold;
+		this.buffer = new ConcurrentLinkedQueue<J>();
 		this.ruleApplicationEngine = new RuleApplicationEngine(ontologyIndex);
 	}
 
@@ -137,8 +146,8 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * {@link #processOutput(ReasonerJob)} will be called from the same thread
 	 * in which the job was submitted; it can be processed by any of the
 	 * concurrently running workers since the job pool is shared. It is
-	 * guaranteed that all submitted jobs will be processed when no instances of
-	 * {@link #process(ReasonerJob)} of the same engine object are running.
+	 * guaranteed that all submitted jobs will be processed when no instance of
+	 * {@link #process(ReasonerJob)} of the same engine object is running.
 	 * 
 	 * @param job
 	 *            the job initialized with the the indexed class expression for
@@ -152,33 +161,51 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 			LOGGER_.trace(root + ": saturation started");
 		}
 		/*
+		 * incrementing active saturations counter if it does not exceed the
+		 * threshold
+		 */
+		for (;;) {
+			int snapshotActiveSaturations = activeSaturations.get();
+			if (snapshotActiveSaturations == threshold)
+				synchronized (activeSaturations) {
+					if (activeSaturations.get() == threshold) {
+						workersWaiting = true;
+						activeSaturations.wait();
+					}
+				}
+			else if (activeSaturations.compareAndSet(snapshotActiveSaturations,
+					snapshotActiveSaturations + 1))
+				break;
+		}
+		/*
 		 * invariant: if the counter for active workers = 0, then for every job
 		 * in the buffer, a saturated class expression has been initialized and
 		 * processed (together with all dependent saturations). Note that it is
-		 * possible that a job has been inserted into the buffer, and the
-		 * assigned saturation is being initialized by another worker and not
-		 * yet finished or processed. It is guaranteed in this case, however,
-		 * that the counter for active workers remains positive until the
+		 * possible for a job to be inserted into the buffer when the assigned
+		 * saturation is being initialized by another worker and not yet
+		 * finished or processed. It is guaranteed in this case, however, that
+		 * the counter for active workers remains positive until the
 		 * initialization and processing will be over.
 		 */
 		activeWorkers.incrementAndGet();
 		ruleApplicationEngine.getCreateContext(root);
 		ruleApplicationEngine.processActiveContexts();
 		activeWorkers.decrementAndGet();
-		/*
-		 * this check is to make sure we do not stuck inserting things into the
-		 * buffer when there are processed jobs available that can be removed
-		 */
-		checkProcessedJobs();
-		buffer.put(job);
+		buffer.add(job);
 		/*
 		 * we increment the counter only after the job is inserted to the buffer
 		 */
 		countJobs.incrementAndGet();
-		/* check that all jobs are processed before we finish */
+		/* check new processed jobs */
 		checkProcessedJobs();
+
 	}
 
+	/**
+	 * Detect processed jobs in the buffer, take them, and submit to the output.
+	 * 
+	 * @throws InterruptedException
+	 */
 	void checkProcessedJobs() throws InterruptedException {
 		int snapshotCountJobs = countJobs.get();
 		/*
@@ -188,9 +215,9 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		 * Therefore, at that time, every job in the buffer is finished. Since
 		 * the counter for the jobs never exceeds the number of jobs ever
 		 * inserted into the buffer, the snapshot value, taken before the active
-		 * worker counter becomes zero, is at most the number of finished jobs
-		 * in the buffer coming consecutively from the head + the number of jobs
-		 * that were taken from the buffer before.
+		 * worker counter becomes zero, cannot exceed the number of finished
+		 * jobs in the buffer coming consecutively from the head + the number of
+		 * jobs that were taken from the buffer before.
 		 */
 		if (activeWorkers.get() == 0) {
 			/*
@@ -229,12 +256,18 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 			if (countOutputJobs.compareAndSet(shapshotOutputJobs,
 					shapshotOutputJobs + 1)) {
 				/*
-				 * We have updated the counter for processed jobs only when we
+				 * we have updated the counter for processed jobs only when we
 				 * know how many *consecutive* jobs in the buffer are processed.
 				 * Therefore, it is safe to assume that the next job in the
 				 * buffer is processed.
 				 */
 				J nextJob = buffer.poll();
+				activeSaturations.decrementAndGet();
+				if (workersWaiting)
+					synchronized (activeSaturations) {
+						workersWaiting = false;
+						activeSaturations.notifyAll();
+					}
 				SaturatedClassExpression output = nextJob.getInput()
 						.getSaturated();
 				output.setSaturated();
