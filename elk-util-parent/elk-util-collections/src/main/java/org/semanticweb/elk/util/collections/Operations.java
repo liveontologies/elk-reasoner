@@ -36,6 +36,29 @@ public class Operations {
 		return concat(Arrays.asList(a, b));
 	}
 
+	public static <T> Iterable<T> singleton(final T element) {
+		return new Iterable<T>() {
+			public Iterator<T> iterator() {
+				return new Iterator<T>() {
+					boolean hasNext = true;
+
+					public boolean hasNext() {
+						return hasNext;
+					}
+
+					public T next() {
+						hasNext = false;
+						return element;
+					}
+
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+				};
+			}
+		};
+	}
+
 	public static <T> Iterable<T> concat(
 			final Iterable<? extends Iterable<? extends T>> input) {
 		assert input != null;
@@ -126,7 +149,7 @@ public class Operations {
 					}
 
 					public void remove() {
-						throw new UnsupportedOperationException();
+						i.remove();
 					}
 
 					boolean advance() {
