@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.reduction;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 
 /**
  * Instances of saturation jobs for computing super-classes
@@ -32,17 +31,20 @@ import org.semanticweb.elk.reasoner.saturation.SaturationJob;
  * 
  */
 abstract class SaturationJobForTransitiveReduction<I extends IndexedClassExpression, R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
-		extends SaturationJob<I> {
+		implements Iterable<I> {
 
 	/**
-	 * @param input
-	 * @param initiatingJob
+	 * The link to the transitive reduction job that has initiated this job
 	 */
-	public SaturationJobForTransitiveReduction(I input) {
-		super(input);
+	protected final J initiatorJob;
+
+	SaturationJobForTransitiveReduction(J initiatorJob) {
+		this.initiatorJob = initiatorJob;
 	}
 
-	public abstract J getInitiatorJob();
+	public J getInitiatorJob() {
+		return initiatorJob;
+	}
 
 	abstract void accept(SaturationJobVisitor<R, J> visitor)
 			throws InterruptedException;

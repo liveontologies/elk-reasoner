@@ -53,13 +53,12 @@ public class TransitiveReductionEngineForClassTaxonomy
 	public void process(TransitiveReductionJob<IndexedClass> job)
 			throws InterruptedException {
 		super.process(job);
-		taxonomy.processNewNodes();
 	}
 
 	@Override
-	public void processOutput(TransitiveReductionJob<IndexedClass> job)
+	public void postProcess(TransitiveReductionJob<IndexedClass> job)
 			throws InterruptedException {
-		super.processOutput(job);
+		super.postProcess(job);
 		job.getOutput().accept(outputProcessor);
 	}
 
@@ -100,7 +99,7 @@ public class TransitiveReductionEngineForClassTaxonomy
 	void assignDirectSuperClassNode(NonBottomNode rootNode,
 			NonBottomNode superClassNode) {
 		rootNode.addDirectSuperNode(superClassNode);
-		/* be careful: sub nodes can be added from different threads */
+		/* be careful: sub-nodes can be added from different threads */
 		synchronized (superClassNode) {
 			superClassNode.addDirectSubNode(rootNode);
 		}

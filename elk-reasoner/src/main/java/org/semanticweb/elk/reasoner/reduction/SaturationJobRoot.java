@@ -22,7 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
+import java.util.Iterator;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * A job for computing direct super-classes for the input indexed class
@@ -34,14 +37,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 class SaturationJobRoot<I extends IndexedClassExpression, J extends TransitiveReductionJob<I>>
 		extends SaturationJobForTransitiveReduction<I, I, J> {
 
-	/**
-	 * The link to the transitive reduction job that has initiated this job
-	 */
-	protected final J initiatorJob;
-
 	SaturationJobRoot(J initiatorJob) {
-		super(initiatorJob.getInput());
-		this.initiatorJob = initiatorJob;
+		super(initiatorJob);
 	}
 
 	@Override
@@ -54,4 +51,7 @@ class SaturationJobRoot<I extends IndexedClassExpression, J extends TransitiveRe
 		return this.initiatorJob;
 	}
 
+	public Iterator<I> iterator() {
+		return Operations.singleton(initiatorJob.getInput()).iterator();
+	}
 }

@@ -39,7 +39,7 @@ interface SaturationJobVisitor<R extends IndexedClassExpression, J extends Trans
 			throws InterruptedException;
 
 	void visit(
-			SaturationJobSuperClass<R, J> saturationJobSuperTransitiveReductionClass)
+			SaturationJobSuperClasses<R, J> saturationJobSuperTransitiveReductionClass)
 			throws InterruptedException;
 
 }

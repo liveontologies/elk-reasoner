@@ -37,6 +37,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.collections.Operations;
 
 public class ConcurrentSaturatorTest extends TestCase {
 
@@ -76,12 +77,11 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		objectPropertySaturation.compute();
 
-		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
+		final ClassExpressionSaturation<Iterable<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<Iterable<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
-		classExpressionSaturation
-				.submit(new SaturationJob<IndexedClassExpression>(A));
+		classExpressionSaturation.submit(Operations.singleton(A));
 		classExpressionSaturation.waitCompletion();
 
 		assertTrue("A contains D", A.getSaturated().getSuperClassExpressions()
@@ -122,12 +122,11 @@ public class ConcurrentSaturatorTest extends TestCase {
 		assertTrue("I SubClassOf D",
 				I.getToldSuperClassExpressions().contains(D));
 
-		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
+		final ClassExpressionSaturation<Iterable<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<Iterable<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
-		classExpressionSaturation
-				.submit(new SaturationJob<IndexedClassExpression>(A));
+		classExpressionSaturation.submit(Operations.singleton(A));
 		classExpressionSaturation.waitCompletion();
 		SaturatedClassExpression context = A.getSaturated();
 

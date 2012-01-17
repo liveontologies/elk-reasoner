@@ -27,10 +27,8 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,7 +37,6 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
@@ -60,23 +57,19 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 
 	/* thread safe map from class IRIs to class nodes */
 	protected final ConcurrentMap<String, NonBottomNode> nodeLookup;
-	/* non thread safe set of all nodes */
+	/* thread safe set of all nodes */
 	protected final Set<ClassNode> allNodes;
-	/* the queue for new nodes */
-	protected final Queue<ClassNode> newNodes;
 	/* boolean to guard access to the set of all nodes */
 	protected final AtomicBoolean processingNewNodes;
 	/* counts the number of nodes which have non-bottom sub-classes */
 	protected final AtomicInteger countNodesWithSubClasses;
-	/* thread safe list of unsatisfiable classes */
+	/* thread safe set of unsatisfiable classes */
 	protected final Set<ElkClass> unsatisfiableClasses;
 
 	ConcurrentClassTaxonomy() {
 		this.nodeLookup = new ConcurrentHashMap<String, NonBottomNode>();
-		// this.allNodes = Collections
-		// .newSetFromMap(new ConcurrentHashMap<ClassNode, Boolean>());
-		this.allNodes = new ArrayHashSet<ClassNode>();
-		this.newNodes = new ConcurrentLinkedQueue<ClassNode>();
+		this.allNodes = Collections
+				.newSetFromMap(new ConcurrentHashMap<ClassNode, Boolean>());
 		this.processingNewNodes = new AtomicBoolean(false);
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 		this.unsatisfiableClasses = Collections
@@ -145,7 +138,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 			} else
 				return previous;
 		} else {
-			newNodes.add(node);
+			allNodes.add(node);
 		}
 		for (ElkClass member : members) {
 			if (member != canonical)
@@ -160,38 +153,12 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 		if (previous != null) {
 			node = previous;
 		} else {
-			newNodes.add(node);
+			allNodes.add(node);
 		}
 		return node;
 	}
 
-	/**
-	 * Adding the new nodes from the queue to the set. We use the atomic boolean
-	 * to make sure we access the set of all nodes from a single thread, and run
-	 * in a loop to ensure that the last worker running this method will process
-	 * all elements in the queue.
-	 */
-	protected void processNewNodes() {
-		for (;;) {
-			if (processingNewNodes.get() || newNodes.isEmpty())
-				break;
-			if (processingNewNodes.compareAndSet(false, true)) {
-				try {
-					for (;;) {
-						ClassNode node = newNodes.poll();
-						if (node == null)
-							break;
-						allNodes.add(node);
-					}
-				} finally {
-					processingNewNodes.set(false);
-				}
-			} else
-				break;
-		}
-	}
-
-	/* {@link ClassNode} method implementing the bottom class */
+	/* functions required by the {@link ClassNode} representing the bottom node */
 
 	public Set<ElkClass> getMembers() {
 		return unsatisfiableClasses;

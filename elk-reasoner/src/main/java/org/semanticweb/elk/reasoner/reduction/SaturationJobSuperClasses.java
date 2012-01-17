@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
@@ -32,23 +35,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * @author "Yevgeny Kazakov"
  * 
  */
-class SaturationJobSuperClass<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
+class SaturationJobSuperClasses<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
 		extends SaturationJobForTransitiveReduction<IndexedClass, R, J> {
 
-	/**
-	 * The current state of the transitive reduction. It should be used only in
-	 * one unprocessed job at a time.
-	 */
-	protected final TransitiveReductionState<J> transitiveReductionState;
-
-	SaturationJobSuperClass(IndexedClass superClass,
-			TransitiveReductionState<J> transitiveReductionState) {
-		super(superClass);
-		this.transitiveReductionState = transitiveReductionState;
-	}
-
-	TransitiveReductionState<J> getTransitiveReductionState() {
-		return this.transitiveReductionState;
+	SaturationJobSuperClasses(J initiatorJob) {
+		super(initiatorJob);
 	}
 
 	@Override
@@ -56,9 +47,45 @@ class SaturationJobSuperClass<R extends IndexedClassExpression, J extends Transi
 		visitor.visit(this);
 	}
 
-	@Override
-	public J getInitiatorJob() {
-		return this.transitiveReductionState.getInitiatorJob();
+	public Iterator<IndexedClass> iterator() {
+		// return Operations.filter(
+		// /* the saturation for the root concept should be already computed */
+		// this.initiatorJob.getInput().getSaturated().getSuperClassExpressions(),
+		// IndexedClass.class).iterator();
+		return new Iterator<IndexedClass>() {
+			Iterator<IndexedClassExpression> i = initiatorJob.getInput()
+					.getSaturated().getSuperClassExpressions().iterator();
+			IndexedClass next;
+			boolean hasNext = advance();
+
+			public boolean hasNext() {
+				return hasNext;
+			}
+
+			public IndexedClass next() {
+				if (hasNext) {
+					IndexedClass result = next;
+					hasNext = advance();
+					return result;
+				}
+				throw new NoSuchElementException();
+			}
+
+			public void remove() {
+				i.remove();
+			}
+
+			boolean advance() {
+				while (i.hasNext()) {
+					IndexedClassExpression nextClassExpression = i.next();
+					if (nextClassExpression instanceof IndexedClass) {
+						next = (IndexedClass) nextClassExpression;
+						return true;
+					}
+				}
+				return false;
+			}
+		};
 	}
 
 }
