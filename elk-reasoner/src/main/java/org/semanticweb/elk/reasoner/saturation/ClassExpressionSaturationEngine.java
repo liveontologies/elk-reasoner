@@ -106,13 +106,14 @@ public class ClassExpressionSaturationEngine<J extends Iterable<? extends Indexe
 	final AtomicInteger activeWorkers = new AtomicInteger(0);
 
 	/**
-	 * Creates a saturation engine using a given rule application engine and the
-	 * maximum number of concurrent saturation tasks. The limit has an effect on
-	 * the size of batches in which the input is processed and has an effect on
-	 * throughput and latency of the processing: in general, the larger the
-	 * limit is, the faster it takes to perform the overall processing of jobs,
-	 * but it might take longer to process an individual job because we can
-	 * detect that the job is processed only when the whole batch is processed.
+	 * Creates a saturation engine using the given rule application engine and
+	 * the maximum number of concurrent saturation tasks. The limit has an
+	 * effect on the size of batches in which the input is processed and has an
+	 * effect on throughput and latency of the processing: in general, the
+	 * larger the limit is, the faster it takes to perform the overall
+	 * processing of jobs, but it might take longer to process an individual job
+	 * because we can detect that the job is processed only when the whole batch
+	 * is processed.
 	 * 
 	 * @param ruleApplicationEngine
 	 *            the engine used to perform saturation
@@ -171,8 +172,11 @@ public class ClassExpressionSaturationEngine<J extends Iterable<? extends Indexe
 		while (moreTasks) {
 			if (roots.hasNext()) {
 				IndexedClassExpression root = roots.next();
-				SaturatedClassExpression saturation = root.getSaturated();
-				if (saturation != null && saturation.isSaturated())
+				/*
+				 * if saturation is already assigned, this task is already
+				 * started or finished
+				 */
+				if (root.getSaturated() != null)
 					continue;
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": saturation started");

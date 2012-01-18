@@ -23,13 +23,14 @@
 package org.semanticweb.elk.reasoner.reduction;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
- * A job for computing saturation for the input atomic super-class of the root
+ * A job for computing saturation for the input atomic super-classes of the root
  * that is required for transitive reduction of the root.
  * 
  * @author "Yevgeny Kazakov"
@@ -38,8 +39,24 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 class SaturationJobSuperClasses<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
 		extends SaturationJobForTransitiveReduction<IndexedClass, R, J> {
 
+	/**
+	 * The list containing implied super classes of the root.
+	 */
+	protected final List<IndexedClass> superClasses;
+
 	SaturationJobSuperClasses(J initiatorJob) {
 		super(initiatorJob);
+		superClasses = new LinkedList<IndexedClass>();
+		/*
+		 * it is required that the saturation for the initiator job is already
+		 * computed
+		 */
+		for (IndexedClassExpression superClassExpression : initiatorJob
+				.getInput().getSaturated().getSuperClassExpressions()) {
+			if (superClassExpression instanceof IndexedClass) {
+				superClasses.add((IndexedClass) superClassExpression);
+			}
+		}
 	}
 
 	@Override
@@ -48,44 +65,6 @@ class SaturationJobSuperClasses<R extends IndexedClassExpression, J extends Tran
 	}
 
 	public Iterator<IndexedClass> iterator() {
-		// return Operations.filter(
-		// /* the saturation for the root concept should be already computed */
-		// this.initiatorJob.getInput().getSaturated().getSuperClassExpressions(),
-		// IndexedClass.class).iterator();
-		return new Iterator<IndexedClass>() {
-			Iterator<IndexedClassExpression> i = initiatorJob.getInput()
-					.getSaturated().getSuperClassExpressions().iterator();
-			IndexedClass next;
-			boolean hasNext = advance();
-
-			public boolean hasNext() {
-				return hasNext;
-			}
-
-			public IndexedClass next() {
-				if (hasNext) {
-					IndexedClass result = next;
-					hasNext = advance();
-					return result;
-				}
-				throw new NoSuchElementException();
-			}
-
-			public void remove() {
-				i.remove();
-			}
-
-			boolean advance() {
-				while (i.hasNext()) {
-					IndexedClassExpression nextClassExpression = i.next();
-					if (nextClassExpression instanceof IndexedClass) {
-						next = (IndexedClass) nextClassExpression;
-						return true;
-					}
-				}
-				return false;
-			}
-		};
+		return superClasses.iterator();
 	}
-
 }

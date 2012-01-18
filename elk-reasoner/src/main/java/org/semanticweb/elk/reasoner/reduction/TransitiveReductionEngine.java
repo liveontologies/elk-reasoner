@@ -249,81 +249,78 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 			 */
 			final List<IndexedClass> directSuperClasses = new LinkedList<IndexedClass>();
 			for (IndexedClass candidate : saturationJob) {
-				if (candidate == root)
+				if (candidate == root) {
 					equivalent.add(candidate.getElkClass());
-				else {
-					Set<IndexedClassExpression> candidateDerived = candidate
-							.getSaturated().getSuperClassExpressions();
+					continue;
+				}
+				Set<IndexedClassExpression> candidateDerived = candidate
+						.getSaturated().getSuperClassExpressions();
+				/*
+				 * If the saturation for the candidate contains the root, it is
+				 * equivalent to the root
+				 */
+				if (candidateDerived.contains(root)) {
+					equivalent.add(candidate.getElkClass());
+					continue;
+				}
+				/*
+				 * To check if the candidate should be added to the list of
+				 * direct super-classes, we iterate over the transitively
+				 * reduced set of super classes of the root computed so far.
+				 */
+				Iterator<IndexedClass> iteratorDirectSuperClasses = directSuperClasses
+						.iterator();
+				/*
+				 * If the value of this flag is true after the iteration, the
+				 * candidate should be added to the list
+				 */
+				boolean addCandidate = true;
+				while (iteratorDirectSuperClasses.hasNext()) {
+					IndexedClass directSuperClass = iteratorDirectSuperClasses
+							.next();
 					/*
-					 * If the saturation for the candidate contains the root, it
-					 * is equivalent to the root
+					 * If the (already computed) saturation for direct
+					 * super-class contains the candidate, it cannot be direct.
 					 */
-					if (candidateDerived.contains(root)) {
-						equivalent.add(candidate.getElkClass());
-						continue;
-					}
-					/*
-					 * To check if the candidate should be added to the list of
-					 * direct super-classes, we iterate over the transitively
-					 * reduced set of super classes of the root computed so far.
-					 */
-					Iterator<IndexedClass> iteratorDirectSuperClasses = directSuperClasses
-							.iterator();
-					/*
-					 * If the value of this flag is true after the iteration,
-					 * the candidate should be added to the list
-					 */
-					boolean addCandidate = true;
-					while (iteratorDirectSuperClasses.hasNext()) {
-						IndexedClass directSuperClass = iteratorDirectSuperClasses
-								.next();
+					if (directSuperClass.getSaturated()
+							.getSuperClassExpressions().contains(candidate)) {
 						/*
-						 * If the (already computed) saturation for direct
-						 * super-class contains the candidate, it cannot be
-						 * direct.
+						 * If, conversely, the saturation for the candidate
+						 * contains the direct super class, they are equivalent.
+						 * In this case, if the candidate is smaller
+						 * lexicographically, we remove the super-class from the
+						 * list and add the candidate instead.
 						 */
-						if (directSuperClass.getSaturated()
-								.getSuperClassExpressions().contains(candidate)) {
-							/*
-							 * If, conversely, the saturation for the candidate
-							 * contains the direct super class, they are
-							 * equivalent. In this case, if the candidate is
-							 * smaller lexicographically, we remove the
-							 * super-class from the list and add the candidate
-							 * instead.
-							 */
-							if (candidateDerived.contains(directSuperClass)
-									&& Comparators.ELK_CLASS_COMPARATOR
-											.compare(candidate.getElkClass(),
-													directSuperClass
-															.getElkClass()) < 0) {
-								iteratorDirectSuperClasses.remove();
-								/*
-								 * no other direct super-classes computed so far
-								 * can subsume or be equivalent to the candidate
-								 * because this was the case for the super-class
-								 * that we have removed.
-								 */
-								break;
-							} else {
-								addCandidate = false;
-								break;
-							}
-						}
-						/*
-						 * The candidate is not contained in the saturation of
-						 * the super-class. We check, if conversely, the
-						 * saturation of the candidate contains the super-class.
-						 * In this case the super-class is not direct and should
-						 * be removed from the list.
-						 */
-						else if (candidateDerived.contains(directSuperClass)) {
+						if (candidateDerived.contains(directSuperClass)
+								&& Comparators.ELK_CLASS_COMPARATOR.compare(
+										candidate.getElkClass(),
+										directSuperClass.getElkClass()) < 0) {
 							iteratorDirectSuperClasses.remove();
+							/*
+							 * no other direct super-classes computed so far can
+							 * subsume or be equivalent to the candidate because
+							 * this was the case for the super-class that we
+							 * have removed.
+							 */
+							break;
+						} else {
+							addCandidate = false;
+							break;
 						}
 					}
-					if (addCandidate) {
-						directSuperClasses.add(candidate);
+					/*
+					 * The candidate is not contained in the saturation of the
+					 * super-class. We check, if conversely, the saturation of
+					 * the candidate contains the super-class. In this case the
+					 * super-class is not direct and should be removed from the
+					 * list.
+					 */
+					else if (candidateDerived.contains(directSuperClass)) {
+						iteratorDirectSuperClasses.remove();
 					}
+				}
+				if (addCandidate) {
+					directSuperClasses.add(candidate);
 				}
 			}
 			/* Set the output of the initiator job and prost-process it */
