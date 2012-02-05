@@ -123,8 +123,9 @@ public class NonBottomNode implements ClassNode {
 	 *            node to add
 	 */
 	void addDirectSuperNode(NonBottomNode superNode) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": new direct super-node " + superNode);
+		// TODO: members of superNode might not be assigned, so will not print
+		// if (LOGGER_.isTraceEnabled())
+		// LOGGER_.trace(this + ": new direct super-node " + superNode);
 		directSuperNodes.add(superNode);
 	}
 
@@ -135,8 +136,9 @@ public class NonBottomNode implements ClassNode {
 	 *            node to add
 	 */
 	void addDirectSubNode(NonBottomNode subNode) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": new direct sub-node " + subNode);
+		// TODO: members of subNode might not be assigned, so will not print
+		// if (LOGGER_.isTraceEnabled())
+		// LOGGER_.trace(this + ": new direct sub-node " + subNode);
 		if (directSubNodes.isEmpty()) {
 			this.taxonomy.countNodesWithSubClasses.incrementAndGet();
 		}

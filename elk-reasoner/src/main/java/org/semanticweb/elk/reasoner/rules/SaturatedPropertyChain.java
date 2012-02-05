@@ -21,7 +21,7 @@
  * #L%
  */
 
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.rules;
 
 import java.util.Set;
 

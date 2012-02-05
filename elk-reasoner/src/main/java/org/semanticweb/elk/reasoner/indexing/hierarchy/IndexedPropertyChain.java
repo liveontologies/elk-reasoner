@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.rules.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**

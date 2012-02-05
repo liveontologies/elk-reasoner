@@ -20,29 +20,32 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * @author Frantisek Simancik
- *
+ * 
  */
-public class Propagation extends Pair<IndexedPropertyChain, Queueable> implements Queueable {
-	public Propagation(IndexedPropertyChain relation, Queueable carry) {
-		super(relation, carry);
+class BackwardLink extends Pair<IndexedPropertyChain, Linkable> implements
+		Queueable {
+
+	public BackwardLink(IndexedPropertyChain relation, Linkable target) {
+		super(relation, target);
 	}
-	
+
 	public IndexedPropertyChain getRelation() {
 		return first;
 	}
-	
-	public Queueable getCarry() {
+
+	public Linkable getTarget() {
 		return second;
 	}
 
 	public <O> O accept(QueueableVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
 }

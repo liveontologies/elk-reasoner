@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.rules;
 
 import java.util.ArrayDeque;
 import java.util.concurrent.ExecutorService;
@@ -144,7 +144,7 @@ public class ObjectPropertySaturation {
 	class RoleHierarchyComputation implements
 			InputProcessor<IndexedPropertyChain> {
 
-		public void process(IndexedPropertyChain ipc) {
+		public void submit(IndexedPropertyChain ipc) {
 			SaturatedPropertyChain saturated = new SaturatedPropertyChain(ipc);
 			ipc.setSaturated(saturated);
 
@@ -172,6 +172,11 @@ public class ObjectPropertySaturation {
 							queue.addLast(s);
 			}
 
+		}
+
+		public void process() throws InterruptedException {
+			// nothing to do here, everything should be processed during the
+			// submission
 		}
 	}
 

@@ -212,7 +212,7 @@ public class ReasonerTest extends TestCase {
 		assertTrue("A direct subclass of C", aNode.getDirectSuperNodes()
 				.contains(taxonomy.getNode(c)));
 		assertFalse("A not direct subclass of D", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(d)));
+				.contains(taxonomy.getNode(d)));		
 		assertTrue("B direct subclass of D", bNode.getDirectSuperNodes()
 				.contains(taxonomy.getNode(d)));
 		assertTrue("A indirect subclass of B", aNode.getDirectSuperNodes()

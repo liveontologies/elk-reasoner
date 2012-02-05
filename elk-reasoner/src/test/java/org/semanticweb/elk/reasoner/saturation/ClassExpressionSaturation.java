@@ -33,7 +33,7 @@ public class ClassExpressionSaturation<J extends Iterable<? extends IndexedClass
 
 	public ClassExpressionSaturation(ExecutorService executor, int maxWorkers,
 			OntologyIndex ontologyIndex) {
-		super(new ClassExpressionSaturationEngine<J>(new RuleApplicationEngine(
-				ontologyIndex)), executor, maxWorkers, 8 * maxWorkers, 32);
+		super(new ClassExpressionSaturationEngine<J>(ontologyIndex), executor,
+				maxWorkers, 8 * maxWorkers, 32);
 	}
 }

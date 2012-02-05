@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.Derivable;
-import org.semanticweb.elk.reasoner.saturation.QueueableVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.rules.Derivable;
+import org.semanticweb.elk.reasoner.rules.QueueableVisitor;
+import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**

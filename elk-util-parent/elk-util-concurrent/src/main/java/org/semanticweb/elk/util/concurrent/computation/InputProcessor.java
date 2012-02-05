@@ -23,25 +23,35 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * An abstract interface for computations processing an input of a certain type.
- * It has just one method {@link process} for processing the jobs. This method
- * is typically executed repeatedly from concurrently running workers.
+ * An abstract interface for submitting and processing jobs of a certain type.
+ * It has a method for submitting jobs and processing of the submitted jobs,
+ * which are typically executed from concurrently running workers.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I>
- *            the type of the input
+ * @param <J>
+ *            the type of the jobs to be submitted and processed
  */
-public interface InputProcessor<I> {
+public interface InputProcessor<J> {
 
 	/**
-	 * Processing of the input.
+	 * Submit a job to be processed by this manager.
 	 * 
-	 * @param input
-	 *            the input to be processed
+	 * @param job
+	 *            the job to be submitted
+	 * @throws InterruptedException
+	 *             if interrupted during submitting the job
+	 */
+	public void submit(J job) throws InterruptedException;
+
+	/**
+	 * Process all currently submitted jobs. This method is intended to be
+	 * executed from several threads, therefore it is not guaranteed that all
+	 * jobs will be processed when the method terminates.
+	 * 
 	 * @throws InterruptedException
 	 *             if interrupted during processing
 	 */
-	public void process(I input) throws InterruptedException;
+	public void process() throws InterruptedException;
 
 }

@@ -50,15 +50,9 @@ public class TransitiveReductionEngineForClassTaxonomy
 	}
 
 	@Override
-	public void process(TransitiveReductionJob<IndexedClass> job)
+	public void notifyProcessed(TransitiveReductionJob<IndexedClass> job)
 			throws InterruptedException {
-		super.process(job);
-	}
-
-	@Override
-	public void postProcess(TransitiveReductionJob<IndexedClass> job)
-			throws InterruptedException {
-		super.postProcess(job);
+		super.notifyProcessed(job);
 		job.getOutput().accept(outputProcessor);
 	}
 

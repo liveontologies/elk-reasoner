@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
-public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
+public class ClassTaxonomyEngine extends AbstractJobManager<IndexedClass> {
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
@@ -44,12 +44,22 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 				ontologyIndex, this.taxonomy);
 	}
 
-	public void process(IndexedClass input) throws InterruptedException {
+	public final void submit(IndexedClass job) throws InterruptedException {
 		transitiveReductionEngine
-				.process(new TransitiveReductionJob<IndexedClass>(input));
+				.submit(new TransitiveReductionJob<IndexedClass>(job));
+	}
+
+	public final void process() throws InterruptedException {
+		transitiveReductionEngine.process();
+	}
+
+	@Override
+	public boolean canProcess() {
+		return transitiveReductionEngine.canProcess();
 	}
 
 	public ClassTaxonomy getClassTaxonomy() {
 		return this.taxonomy;
 	}
+
 }
