@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,35 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
+import java.util.Set;
+
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * The result of the transitive reduction for satisfiable indexed class
- * expression. No further information is computed here.
+ * expression; it contains information about equivalent classes.
  * 
- * @author "Yevgeny Kazakov"
- * 
+ * @param <I>
+ *            the type of the indexed class expression representing this class
  */
-public class TransitiveReductionOutputUnsatisfiable<I extends IndexedClassExpression>
+public class TransitiveReductionOutputEquivalent<I extends IndexedClassExpression>
 		extends TransitiveReductionOutput<I> {
 
-	TransitiveReductionOutputUnsatisfiable(I root) {
+	final Set<ElkClass> equivalent;
+
+	TransitiveReductionOutputEquivalent(I root) {
 		super(root);
+		this.equivalent = new ArrayHashSet<ElkClass>(1);
+	}
+
+	public Set<ElkClass> getEquivalent() {
+		return equivalent;
 	}
 
 	@Override
 	public void accept(TransitiveReductionOutputVisitor<I> visitor) {
 		visitor.visit(this);
 	}
-
 }

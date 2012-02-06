@@ -26,7 +26,6 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -36,8 +35,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 
@@ -120,40 +117,19 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 		return null;
 	}
 
-	public NonBottomNode getCreate(List<ElkClass> elkClasses) {
-
-		ArraySet<ElkClass> members = new ArraySet<ElkClass>(elkClasses.size());
-		for (ElkClass elkClass : elkClasses) {
-			members.add(elkClass);
-		}
-		Collections.sort(members, Comparators.ELK_CLASS_COMPARATOR);
+	public NonBottomNode getCreate(Set<ElkClass> members) {
 		NonBottomNode node = new NonBottomNode(this, members);
+		// we assign first for the node to the canonical member to avoid
+		// concurrency problems
 		ElkClass canonical = node.getCanonicalMember();
 		NonBottomNode previous = nodeLookup
 				.putIfAbsent(getKey(canonical), node);
-		if (previous != null) {
-			node = previous;
-			if (!node.membersSet()) {
-				node.setMembers(members);
-			} else
-				return previous;
-		} else {
-			allNodes.add(node);
-		}
+		if (previous != null)
+			return previous;
+		allNodes.add(node);
 		for (ElkClass member : members) {
 			if (member != canonical)
 				nodeLookup.put(getKey(member), node);
-		}
-		return node;
-	}
-
-	protected NonBottomNode getCreate(ElkClass elkClass) {
-		NonBottomNode node = new NonBottomNode(this);
-		NonBottomNode previous = nodeLookup.putIfAbsent(getKey(elkClass), node);
-		if (previous != null) {
-			node = previous;
-		} else {
-			allNodes.add(node);
 		}
 		return node;
 	}

@@ -22,18 +22,13 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -251,19 +246,13 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 			 */
 			final I root = saturationJob.getInitiatorJob().getInput();
 			/**
-			 * The list containing all equivalent classes of the root.
+			 * Initializing the output for the root.
 			 */
-			final List<ElkClass> equivalent = new ArrayList<ElkClass>(1);
-			/**
-			 * The list consisting direct super-classes of the root. If some of
-			 * the direct super-classes are equivalent, the list contains only
-			 * the smallest in the ordering according to
-			 * {@link Comparators.ELK_CLASS_COMPARATOR}
-			 */
-			final List<IndexedClass> directSuperClasses = new LinkedList<IndexedClass>();
+			final TransitiveReductionOutputEquivalentDirect<I> output = new TransitiveReductionOutputEquivalentDirect<I>(
+					root);
 			for (IndexedClass candidate : saturationJob) {
 				if (candidate == root) {
-					equivalent.add(candidate.getElkClass());
+					output.equivalent.add(candidate.getElkClass());
 					continue;
 				}
 				Set<IndexedClassExpression> candidateDerived = candidate
@@ -273,15 +262,15 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 				 * equivalent to the root
 				 */
 				if (candidateDerived.contains(root)) {
-					equivalent.add(candidate.getElkClass());
+					output.equivalent.add(candidate.getElkClass());
 					continue;
 				}
 				/*
 				 * To check if the candidate should be added to the list of
-				 * direct super-classes, we iterate over the transitively
-				 * reduced set of super classes of the root computed so far.
+				 * direct super-classes, we iterate over the direct super
+				 * classes computed so far.
 				 */
-				Iterator<IndexedClass> iteratorDirectSuperClasses = directSuperClasses
+				Iterator<TransitiveReductionOutputEquivalent<IndexedClass>> iteratorDirectSuperClasses = output.directSuperClasses
 						.iterator();
 				/*
 				 * If the value of this flag is true after the iteration, the
@@ -289,62 +278,53 @@ public class TransitiveReductionEngine<I extends IndexedClassExpression, J exten
 				 */
 				boolean addCandidate = true;
 				while (iteratorDirectSuperClasses.hasNext()) {
-					IndexedClass directSuperClass = iteratorDirectSuperClasses
+					TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = iteratorDirectSuperClasses
 							.next();
+					IndexedClass directSuperClass = directSuperClassEquivalent
+							.getRoot();
 					/*
 					 * If the (already computed) saturation for direct
 					 * super-class contains the candidate, it cannot be direct.
 					 */
 					if (directSuperClass.getSaturated()
 							.getSuperClassExpressions().contains(candidate)) {
+						addCandidate = false;
 						/*
-						 * If, conversely, the saturation for the candidate
-						 * contains the direct super class, they are equivalent.
-						 * In this case, if the candidate is smaller
-						 * lexicographically, we remove the super-class from the
-						 * list and add the candidate instead.
+						 * If, in addition, the saturation for the candidate
+						 * contains the direct super class, they are equivalent,
+						 * so it is added to the equivalence class.
 						 */
-						if (candidateDerived.contains(directSuperClass)
-								&& Comparators.ELK_CLASS_COMPARATOR.compare(
-										candidate.getElkClass(),
-										directSuperClass.getElkClass()) < 0) {
-							iteratorDirectSuperClasses.remove();
-							/*
-							 * no other direct super-classes computed so far can
-							 * subsume or be equivalent to the candidate because
-							 * this was the case for the super-class that we
-							 * have removed.
-							 */
-							break;
-						} else {
-							addCandidate = false;
-							break;
-						}
+						if (candidateDerived.contains(directSuperClass))
+							directSuperClassEquivalent.equivalent.add(candidate
+									.getElkClass());
+						break;
 					}
 					/*
-					 * The candidate is not contained in the saturation of the
-					 * super-class. We check, if conversely, the saturation of
-					 * the candidate contains the super-class. In this case the
-					 * super-class is not direct and should be removed from the
-					 * list.
+					 * At this point we know that the candidate is not contained
+					 * in the saturation of the super-class. We check, if
+					 * conversely, the saturation of the candidate contains the
+					 * super-class. In this case the super-class is not direct
+					 * and should be removed from the list.
 					 */
-					else if (candidateDerived.contains(directSuperClass)) {
+					if (candidateDerived.contains(directSuperClass)) {
 						iteratorDirectSuperClasses.remove();
 					}
 				}
 				if (addCandidate) {
-					directSuperClasses.add(candidate);
+					TransitiveReductionOutputEquivalent<IndexedClass> candidateOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
+							candidate);
+					candidateOutput.equivalent.add(candidate.getElkClass());
+					output.directSuperClasses.add(candidateOutput);
 				}
 			}
 			/* Set the output of the initiator job and prost-process it */
-			TransitiveReductionOutputSatisfiable<I> satisfiable = new TransitiveReductionOutputSatisfiable<I>(
-					root, equivalent, directSuperClasses);
 			J initiatorJob = saturationJob.getInitiatorJob();
-			initiatorJob.setOutput(satisfiable);
+			initiatorJob.setOutput(output);
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace(root + ": transitive reduction finished");
-				for (IndexedClassExpression direct : directSuperClasses) {
-					LOGGER_.trace(root + ": direct super class " + direct);
+				for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.directSuperClasses) {
+					LOGGER_.trace(root + ": direct super class "
+							+ direct.getRoot());
 				}
 			}
 			notifyProcessed(initiatorJob);
