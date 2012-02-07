@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -100,10 +101,11 @@ public class TransitiveReductionEngineForClassTaxonomy
 				// ElkClass implementation!
 				if (node.getMembers().contains(PredefinedElkClass.OWL_THING))
 					topNode = node;
-				else
-					topNode = taxonomy
-							.getCreate(Collections
-									.singleton((ElkClass) PredefinedElkClass.OWL_THING));
+				else {
+					List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
+					topMembers.add(PredefinedElkClass.OWL_THING);
+					topNode = taxonomy.getCreate(topMembers);
+				}
 				topNodeRef.set(topNode);
 			}
 			if (node != topNode)

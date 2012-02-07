@@ -25,8 +25,12 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -58,7 +62,7 @@ public class NonBottomNode implements ClassNode {
 	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
 	 */
-	private final Set<ElkClass> members;
+	private final List<ElkClass> members;
 	/**
 	 * ElkClass nodes whose members are direct super-classes of the members of
 	 * this node.
@@ -77,14 +81,15 @@ public class NonBottomNode implements ClassNode {
 	 * @param taxonomy
 	 *            the taxonomy to which this node belongs
 	 * @param members
-	 *            non-empty set of equivalent ElkClass objects
+	 *            non-empty list of equivalent ElkClass objects
 	 */
 	protected NonBottomNode(ConcurrentClassTaxonomy taxonomy,
-			Set<ElkClass> members) {
+			Collection<ElkClass> members) {
 		this.taxonomy = taxonomy;
-		this.members = members;
+		this.members = new ArrayList<ElkClass>(members);
 		this.directSubNodes = new ArrayHashSet<ClassNode>();
 		this.directSuperNodes = new ArrayHashSet<ClassNode>();
+		Collections.sort(this.members, Comparators.ELK_CLASS_COMPARATOR);
 	}
 
 	/**
@@ -115,11 +120,74 @@ public class NonBottomNode implements ClassNode {
 	}
 
 	public Set<ElkClass> getMembers() {
-		return Collections.unmodifiableSet(members);
+		// create an unmodifiable set view of the members; alternatively, one
+		// could have created a TreeSet, but it consumes more memory
+		return new Set<ElkClass>() {
+
+			public boolean add(ElkClass arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public boolean addAll(Collection<? extends ElkClass> arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public void clear() {
+				throw new UnsupportedOperationException();
+			}
+
+			public boolean contains(Object arg0) {
+				if (arg0 instanceof ElkClass)
+					return (Collections.binarySearch(members, (ElkClass) arg0,
+							Comparators.ELK_CLASS_COMPARATOR) >= 0);
+				else
+					return false;
+			}
+
+			public boolean containsAll(Collection<?> arg0) {
+				for (Object element : arg0) {
+					if (!this.contains(element))
+						return false;
+				}
+				return true;
+			}
+
+			public boolean isEmpty() {
+				return members.isEmpty();
+			}
+
+			public Iterator<ElkClass> iterator() {
+				return members.iterator();
+			}
+
+			public boolean remove(Object arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public boolean removeAll(Collection<?> arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public boolean retainAll(Collection<?> arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public int size() {
+				return members.size();
+			}
+
+			public Object[] toArray() {
+				return members.toArray();
+			}
+
+			public <T> T[] toArray(T[] arg0) {
+				return members.toArray(arg0);
+			}
+		};
 	}
 
 	public ElkClass getCanonicalMember() {
-		return Collections.min(members, Comparators.ELK_CLASS_COMPARATOR);
+		return members.get(0);
 	}
 
 	public Set<ClassNode> getDirectSuperNodes() {

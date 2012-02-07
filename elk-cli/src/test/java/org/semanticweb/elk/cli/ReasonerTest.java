@@ -23,6 +23,8 @@
 package org.semanticweb.elk.cli;
 
 import java.io.IOException;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 import junit.framework.TestCase;
@@ -32,7 +34,12 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
+import org.semanticweb.elk.owl.util.Comparators;
+import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -61,16 +68,16 @@ public class ReasonerTest extends TestCase {
 				+ ")"//
 		);
 
-		ElkClass a = objectFactory.getClass(
-				new ElkFullIri("http://example.org/A"));
-		ElkClass d = objectFactory.getClass(
-				new ElkFullIri("http://example.org/D"));
-		ElkClass e = objectFactory.getClass(
-				new ElkFullIri("http://example.org/E"));
-		ElkObjectProperty r = objectFactory.getObjectProperty(
-				new ElkFullIri("http://example.org/R"));
-		ElkObjectProperty s = objectFactory.getObjectProperty(
-				new ElkFullIri("http://example.org/S"));
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/A"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/D"));
+		ElkClass e = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/E"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
+				"http://example.org/R"));
+		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(
+				"http://example.org/S"));
 
 		IOReasoner.classify();
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
@@ -97,16 +104,16 @@ public class ReasonerTest extends TestCase {
 				+ "SubClassOf(:A :D)"
 				+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)" + ")");
 
-		ElkClass a = objectFactory.getClass(
-				new ElkFullIri("http://example.org/A"));
-		ElkClass b = objectFactory.getClass(
-				new ElkFullIri("http://example.org/B"));
-		ElkClass c = objectFactory.getClass(
-				new ElkFullIri("http://example.org/C"));
-		ElkClass d = objectFactory.getClass(
-				new ElkFullIri("http://example.org/D"));
-		ElkClass e = objectFactory.getClass(
-				new ElkFullIri("http://example.org/E"));
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/D"));
+		ElkClass e = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/E"));
 
 		OntologyIndex index = IOReasoner.getOntologyIndex();
 
@@ -142,30 +149,31 @@ public class ReasonerTest extends TestCase {
 
 	public void testPropertyChains() throws ParseException, IOException {
 		IOReasoner IOReasoner = new IOReasoner();
-		IOReasoner.loadOntologyFromString(""//
-				+ "Prefix( : = <http://example.org/> )"//
-				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-				+ "Ontology("//
-				+ "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
-				+ "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
-				+ "SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))"//
-				+ "SubClassOf(:D ObjectSomeValuesFrom(:R4 :E))"//
-				+ "SubClassOf(ObjectIntersectionOf(owl:Thing ObjectSomeValuesFrom(:T owl:Thing)) :X)"//
-				+ "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
-				+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
-				+ ")"//
-		);
+		IOReasoner
+				.loadOntologyFromString(""//
+						+ "Prefix( : = <http://example.org/> )"//
+						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
+						+ "SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))"//
+						+ "SubClassOf(:D ObjectSomeValuesFrom(:R4 :E))"//
+						+ "SubClassOf(ObjectIntersectionOf(owl:Thing ObjectSomeValuesFrom(:T owl:Thing)) :X)"//
+						+ "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
+						+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
+						+ ")"//
+				);
 
 		IOReasoner.classify();
 
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
-		ClassNode aNode = taxonomy.getNode(objectFactory.getClass(
-				new ElkFullIri("http://example.org/A")));
+		ClassNode aNode = taxonomy.getNode(objectFactory
+				.getClass(new ElkFullIri("http://example.org/A")));
 		assertTrue(
 				"A SubClassOf X",
 				aNode.getDirectSuperNodes().contains(
-						taxonomy.getNode(objectFactory.getClass(
-						new ElkFullIri("http://example.org/X")))));
+						taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
+								"http://example.org/X")))));
 	}
 
 	public void testAncestors() throws InterruptedException,
@@ -176,14 +184,14 @@ public class ReasonerTest extends TestCase {
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))");
 
-		ElkClass a = objectFactory.getClass(
-				new ElkFullIri("http://example.org/A"));
-		ElkClass b = objectFactory.getClass(
-				new ElkFullIri("http://example.org/B"));
-		ElkClass c = objectFactory.getClass(
-				new ElkFullIri("http://example.org/C"));
-		ElkClass d = objectFactory.getClass(
-				new ElkFullIri("http://example.org/D"));
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/D"));
 
 		OntologyIndex index = IOReasoner.getOntologyIndex();
 
@@ -212,7 +220,7 @@ public class ReasonerTest extends TestCase {
 		assertTrue("A direct subclass of C", aNode.getDirectSuperNodes()
 				.contains(taxonomy.getNode(c)));
 		assertFalse("A not direct subclass of D", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(d)));		
+				.contains(taxonomy.getNode(d)));
 		assertTrue("B direct subclass of D", bNode.getDirectSuperNodes()
 				.contains(taxonomy.getNode(d)));
 		assertTrue("A indirect subclass of B", aNode.getDirectSuperNodes()
@@ -224,4 +232,120 @@ public class ReasonerTest extends TestCase {
 		assertEquals("A has exactly four super-classes: B, C, D and owl:Thing",
 				4, aNode.getAllSuperNodes().size());
 	}
+
+	public void testTop() throws InterruptedException, ExecutionException,
+			ParseException, IOException {
+
+		final IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner.loadOntologyFromString(""//
+				+ "Prefix( owl:= <http://www.w3.org/2002/07/owl#> )"//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Ontology("//
+				+ "SubClassOf(:A :B)"//
+				+ "SubClassOf(owl:Thing :C)"//
+				+ ")");
+
+		ElkClass top = new TestElkClass(new ElkFullIri(
+				"http://www.w3.org/2002/07/owl#Thing"));
+		ElkClass bot = new TestElkClass(new ElkFullIri(
+				"http://www.w3.org/2002/07/owl#Nothing"));
+		ElkClass a = new TestElkClass(new ElkFullIri("http://example.org/A"));
+		ElkClass b = new TestElkClass(new ElkFullIri("http://example.org/B"));
+		ElkClass c = new TestElkClass(new ElkFullIri("http://example.org/C"));
+
+		IOReasoner.classify();
+
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		ClassNode botNode = taxonomy.getNode(bot);
+		ClassNode aNode = taxonomy.getNode(a);
+		ClassNode bNode = taxonomy.getNode(b);
+		ClassNode cNode = taxonomy.getNode(c);
+		ClassNode topNode = taxonomy.getNode(top);
+
+		assertEquals("C and owl:Ting belong to the same node", cNode, topNode);
+
+		assertEquals("Nodes: [bot], [A], [B], [top,C]", taxonomy.getNodes()
+				.size(), 4);
+
+		assertTrue("[owl:Nothing] is a node in the taxonomy", taxonomy
+				.getNodes().contains(botNode));
+		assertEquals("[owl:Nothing] has 1 elemenent", botNode.getMembers()
+				.size(), 1);
+		assertTrue("[owl:Nothing] node contains owl:Nothing", botNode
+				.getMembers().contains(bot));
+
+		assertTrue("[A] is a node in the taxonomy", taxonomy.getNodes()
+				.contains(aNode));
+		assertEquals("[A] has 1 elemenent", aNode.getMembers().size(), 1);
+		assertTrue("[A] contains A", aNode.getMembers().contains(a));
+
+		assertTrue("[B] is a node in the taxonomy", taxonomy.getNodes()
+				.contains(bNode));
+		assertEquals("[B] has 1 elemenent", bNode.getMembers().size(), 1);
+		assertTrue("[B] contains B", bNode.getMembers().contains(b));
+
+		assertTrue("[C] is a node in the taxonomy", taxonomy.getNodes()
+				.contains(cNode));
+		assertEquals("[C] has 2 elemenent", cNode.getMembers().size(), 2);
+		assertTrue("[C] contains C", cNode.getMembers().contains(c));
+		assertTrue("[C] contains owl:Thing", cNode.getMembers().contains(top));
+
+		assertTrue("[owl:Thing] is a node in the taxonomy", taxonomy.getNodes()
+				.contains(topNode));
+		assertEquals("[owl:Thing] has 2 elemenent",
+				topNode.getMembers().size(), 2);
+		assertTrue("[owl:Thing] contains C", topNode.getMembers().contains(c));
+		assertTrue("[owl:Thing] contains owl:Thing", topNode.getMembers()
+				.contains(top));
+
+		assertEquals("[owl:Nothing] -> [A]", botNode.getDirectSuperNodes()
+				.size(), 1);
+		assertTrue("[owl:Nothing] -> [A]", botNode.getDirectSuperNodes()
+				.contains(aNode));
+		assertEquals("[owl:Nothing] -> [A]", aNode.getDirectSubNodes().size(),
+				1);
+		assertTrue("[owl:Nothing] -> [A]",
+				aNode.getDirectSubNodes().contains(botNode));
+
+		assertEquals("[A] -> [B]", aNode.getDirectSuperNodes().size(), 1);
+		assertTrue("[A] -> [B]", aNode.getDirectSuperNodes().contains(bNode));
+		assertEquals("[A] -> [B]", bNode.getDirectSubNodes().size(), 1);
+		assertTrue("[A] -> [B]", bNode.getDirectSubNodes().contains(aNode));
+
+		assertEquals("[B] -> [owl:Thing, C]", bNode.getDirectSuperNodes()
+				.size(), 1);
+		assertTrue("[B] -> [owl:Thing, C]", bNode.getDirectSuperNodes()
+				.contains(cNode));
+		assertEquals("[B] -> [owl:Thing, C]", cNode.getDirectSubNodes().size(),
+				1);
+		assertTrue("[B] -> [owl:Thing, C]",
+				cNode.getDirectSubNodes().contains(bNode));
+
+	}
+
+	class TestElkClass implements ElkClass {
+		protected final ElkIri iri;
+
+		// do not allow construction of other instances of this class
+		TestElkClass(ElkIri iri) {
+			this.iri = iri;
+		}
+
+		public ElkIri getIri() {
+			return iri;
+		}
+
+		public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+			return visitor.visit(this);
+		}
+
+		public <O> O accept(ElkObjectVisitor<O> visitor) {
+			return visitor.visit(this);
+		}
+
+		public <O> O accept(ElkEntityVisitor<O> visitor) {
+			return visitor.visit(this);
+		}
+	}
+
 }

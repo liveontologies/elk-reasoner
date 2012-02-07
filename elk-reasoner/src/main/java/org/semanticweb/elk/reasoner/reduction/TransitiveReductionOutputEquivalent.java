@@ -22,11 +22,11 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * The result of the transitive reduction for satisfiable indexed class
@@ -38,14 +38,14 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 public class TransitiveReductionOutputEquivalent<I extends IndexedClassExpression>
 		extends TransitiveReductionOutput<I> {
 
-	final Set<ElkClass> equivalent;
+	final List<ElkClass> equivalent;
 
 	TransitiveReductionOutputEquivalent(I root) {
 		super(root);
-		this.equivalent = new ArrayHashSet<ElkClass>(1);
+		this.equivalent = new ArrayList<ElkClass>(1);
 	}
 
-	public Set<ElkClass> getEquivalent() {
+	public List<ElkClass> getEquivalent() {
 		return equivalent;
 	}
 
