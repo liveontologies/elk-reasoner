@@ -20,18 +20,16 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
-
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+package org.semanticweb.elk.reasoner.rules;
 
 /**
+ * Common interface for object that can be linked to during
+ * ClassExpressionSaturation. SaturatedClassExpression is the
+ * only Linkable class in the current implementation.
+ * 
  * @author Frantisek Simancik
  *
  */
-public interface QueueableVisitor<O> {
-	O visit(IndexedClassExpression indexedClassExpression);
-	O visit(DecomposedClassExpression compositeClassExpression);
-	O visit(BackwardLink backwardLink);
-	O visit(ForwardLink forwardLink);
-	O visit(Propagation propagation);
+public interface Linkable {
+
 }

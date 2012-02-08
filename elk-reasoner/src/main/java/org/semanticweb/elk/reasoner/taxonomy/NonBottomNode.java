@@ -25,15 +25,19 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -56,11 +60,9 @@ public class NonBottomNode implements ClassNode {
 	final ConcurrentClassTaxonomy taxonomy;
 
 	/**
-	 * Equivalent ElkClass objects that are representatives of this node. The
-	 * first element is the least one according to the ordering defined by
-	 * PredefinedElkIri.compare().
+	 * Equivalent ElkClass objects that are representatives of this node.
 	 */
-	private ArraySet<ElkClass> members;
+	private final List<ElkClass> members;
 	/**
 	 * ElkClass nodes whose members are direct super-classes of the members of
 	 * this node.
@@ -73,47 +75,21 @@ public class NonBottomNode implements ClassNode {
 	private final Set<ClassNode> directSubNodes;
 
 	/**
-	 * Constructing a new class node for a given taxonomy
-	 * 
-	 * @param members
-	 *            non-empty set of equivalent ElkClass objects
-	 */
-	protected NonBottomNode(ConcurrentClassTaxonomy taxonomy) {
-		this.taxonomy = taxonomy;
-		this.directSubNodes = new ArrayHashSet<ClassNode>();
-		this.directSuperNodes = new ArrayHashSet<ClassNode>();
-	}
-
-	/**
 	 * Constructing the class node for a given taxonomy and the set of
 	 * equivalent classes.
 	 * 
+	 * @param taxonomy
+	 *            the taxonomy to which this node belongs
 	 * @param members
-	 *            non-empty set of equivalent ElkClass objects
+	 *            non-empty list of equivalent ElkClass objects
 	 */
 	protected NonBottomNode(ConcurrentClassTaxonomy taxonomy,
-			ArraySet<ElkClass> members) {
-		this(taxonomy);
-		setMembers(members);
-	}
-
-	/**
-	 * Testing if the members have been set
-	 * 
-	 * @return <tt>true</tt> if the members are set, otherwise <tt>false</tt>
-	 */
-	protected boolean membersSet() {
-		return members != null;
-	}
-
-	/**
-	 * Setting the members of this class node.
-	 * 
-	 * @param members
-	 *            the set of members to be set for this class node
-	 */
-	protected void setMembers(ArraySet<ElkClass> members) {
-		this.members = members;
+			Collection<ElkClass> members) {
+		this.taxonomy = taxonomy;
+		this.members = new ArrayList<ElkClass>(members);
+		this.directSubNodes = new ArrayHashSet<ClassNode>();
+		this.directSuperNodes = new ArrayHashSet<ClassNode>();
+		Collections.sort(this.members, Comparators.ELK_CLASS_COMPARATOR);
 	}
 
 	/**
@@ -144,7 +120,70 @@ public class NonBottomNode implements ClassNode {
 	}
 
 	public Set<ElkClass> getMembers() {
-		return Collections.unmodifiableSet(members);
+		// create an unmodifiable set view of the members; alternatively, one
+		// could have created a TreeSet, but it consumes more memory
+		return new Set<ElkClass>() {
+
+			public boolean add(ElkClass arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public boolean addAll(Collection<? extends ElkClass> arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public void clear() {
+				throw new UnsupportedOperationException();
+			}
+
+			public boolean contains(Object arg0) {
+				if (arg0 instanceof ElkClass)
+					return (Collections.binarySearch(members, (ElkClass) arg0,
+							Comparators.ELK_CLASS_COMPARATOR) >= 0);
+				else
+					return false;
+			}
+
+			public boolean containsAll(Collection<?> arg0) {
+				for (Object element : arg0) {
+					if (!this.contains(element))
+						return false;
+				}
+				return true;
+			}
+
+			public boolean isEmpty() {
+				return members.isEmpty();
+			}
+
+			public Iterator<ElkClass> iterator() {
+				return members.iterator();
+			}
+
+			public boolean remove(Object arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public boolean removeAll(Collection<?> arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public boolean retainAll(Collection<?> arg0) {
+				throw new UnsupportedOperationException();
+			}
+
+			public int size() {
+				return members.size();
+			}
+
+			public Object[] toArray() {
+				return members.toArray();
+			}
+
+			public <T> T[] toArray(T[] arg0) {
+				return members.toArray(arg0);
+			}
+		};
 	}
 
 	public ElkClass getCanonicalMember() {

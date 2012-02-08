@@ -22,10 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
@@ -36,42 +35,34 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <I>
+ *            the type of the input for which the output equivalent and direct
+ *            super classes are computed
  */
-public class TransitiveReductionOutputSatisfiable<R extends IndexedClassExpression>
-		extends TransitiveReductionOutput<R> {
+public class TransitiveReductionOutputEquivalentDirect<I extends IndexedClassExpression>
+		extends TransitiveReductionOutputEquivalent<I> {
 
-	protected final List<ElkClass> equivalent;
-	protected final List<IndexedClass> directSuperClasses;
+	final List<TransitiveReductionOutputEquivalent<IndexedClass>> directSuperClasses;
 
-	public TransitiveReductionOutputSatisfiable(R root,
-			List<ElkClass> equivalent, List<IndexedClass> superClasses) {
+	public TransitiveReductionOutputEquivalentDirect(I root) {
 		super(root);
-		this.equivalent = equivalent;
-		this.directSuperClasses = superClasses;
+		this.directSuperClasses = new LinkedList<TransitiveReductionOutputEquivalent<IndexedClass>>();
 	}
 
 	/**
-	 * Returns the list of classes that are equivalent to the root of this node.
+	 * Returns the list of partial outputs of transitive reduction (only
+	 * equivalent classes) for direct, i.e., transitively reduced, super classes
+	 * of the root.
 	 * 
-	 * @return the list of classes that are equivalent to the root of this node
+	 * @return the list consisting of partial output of transitive reduction for
+	 *         direct super classes of the root
 	 */
-	public List<ElkClass> getEquivalent() {
-		return equivalent;
-	}
-
-	/**
-	 * Returns the list of direct, i.e., transitively reduced, super classes of
-	 * this node. Every direct super class is minimal in its equivalence class
-	 * according to the comparator {@link Comparators#ELK_CLASS_COMPARATOR}.
-	 * 
-	 * @return the list consisting of direct super classes of this node
-	 */
-	public List<IndexedClass> getDirectSuperClasses() {
+	public List<TransitiveReductionOutputEquivalent<IndexedClass>> getDirectSuperClasses() {
 		return directSuperClasses;
 	}
 
 	@Override
-	public void accept(TransitiveReductionOutputVisitor<R> visitor) {
+	public void accept(TransitiveReductionOutputVisitor<I> visitor) {
 		visitor.visit(this);
 	}
 

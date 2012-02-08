@@ -22,12 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionEngine;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
-import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputSatisfiable;
+import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalent;
+import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalentDirect;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 
@@ -50,22 +56,16 @@ public class TransitiveReductionEngineForClassTaxonomy
 	}
 
 	@Override
-	public void process(TransitiveReductionJob<IndexedClass> job)
+	public void notifyProcessed(TransitiveReductionJob<IndexedClass> job)
 			throws InterruptedException {
-		super.process(job);
-	}
-
-	@Override
-	public void postProcess(TransitiveReductionJob<IndexedClass> job)
-			throws InterruptedException {
-		super.postProcess(job);
+		super.notifyProcessed(job);
 		job.getOutput().accept(outputProcessor);
 	}
 
 	class TransitiveReductionOutputProcessor implements
 			TransitiveReductionOutputVisitor<IndexedClass> {
 		public void visit(
-				TransitiveReductionOutputSatisfiable<IndexedClass> output) {
+				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 			NonBottomNode node = taxonomy.getCreate(output.getEquivalent());
 			processDirectSuperClasses(node, output.getDirectSuperClasses());
 		}
@@ -74,23 +74,40 @@ public class TransitiveReductionEngineForClassTaxonomy
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 			taxonomy.unsatisfiableClasses.add(output.getRoot().getElkClass());
 		}
+
+		public void visit(
+				TransitiveReductionOutputEquivalent<IndexedClass> output) {
+			throw new IllegalArgumentException();
+		}
 	}
 
-	void processDirectSuperClasses(NonBottomNode node,
-			Iterable<IndexedClass> directSuperClasses) {
-		for (IndexedClass directSuperClass : directSuperClasses) {
-			NonBottomNode superNode = taxonomy.getCreate(directSuperClass
-					.getElkClass());
+	/**
+	 * We cache top node
+	 */
+	final AtomicReference<NonBottomNode> topNodeRef = new AtomicReference<NonBottomNode>();
+
+	void processDirectSuperClasses(
+			NonBottomNode node,
+			Iterable<TransitiveReductionOutputEquivalent<IndexedClass>> directSuperClasses) {
+		for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : directSuperClasses) {
+			NonBottomNode superNode = taxonomy.getCreate(directSuperEquivalent
+					.getEquivalent());
 			assignDirectSuperClassNode(node, superNode);
 		}
-		// Top Node:
 		if (node.getDirectSuperNodes().isEmpty()) {
-			/*
-			 * we use that OWL_THING is minimal in the ordering among
-			 * satisfiable classes
-			 */
-			NonBottomNode topNode = taxonomy
-					.getCreate(PredefinedElkClass.OWL_THING);
+			NonBottomNode topNode = topNodeRef.get();
+			if (topNode == null) {
+				// TODO: make sure the membership checking works for any
+				// ElkClass implementation!
+				if (node.getMembers().contains(PredefinedElkClass.OWL_THING))
+					topNode = node;
+				else {
+					List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
+					topMembers.add(PredefinedElkClass.OWL_THING);
+					topNode = taxonomy.getCreate(topMembers);
+				}
+				topNodeRef.set(topNode);
+			}
 			if (node != topNode)
 				assignDirectSuperClassNode(node, topNode);
 		}

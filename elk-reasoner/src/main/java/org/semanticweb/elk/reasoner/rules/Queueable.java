@@ -20,16 +20,14 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.rules;
 
 /**
- * Common interface for object that can be linked to during
- * ClassExpressionSaturation. SaturatedClassExpression is the
- * only Linkable class in the current implementation.
+ * Common interface for objects that can be queued during
+ * ClassExpressionSaturation.
  * 
  * @author Frantisek Simancik
- *
  */
-public interface Linkable {
-
+public interface Queueable {
+	<O> O accept(QueueableVisitor<O> visitor);
 }

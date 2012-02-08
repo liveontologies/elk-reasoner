@@ -20,14 +20,30 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.rules;
+
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.util.collections.Pair;
 
 /**
- * Common interface for objects that can be queued during
- * ClassExpressionSaturation.
- * 
  * @author Frantisek Simancik
+ * 
  */
-public interface Queueable {
-	<O> O accept(QueueableVisitor<O> visitor);
+class Propagation extends Pair<IndexedPropertyChain, Queueable> implements
+		Queueable {
+	public Propagation(IndexedPropertyChain relation, Queueable carry) {
+		super(relation, carry);
+	}
+
+	public IndexedPropertyChain getRelation() {
+		return first;
+	}
+
+	public Queueable getCarry() {
+		return second;
+	}
+
+	public <O> O accept(QueueableVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 }

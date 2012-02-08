@@ -30,18 +30,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <R>
+ * @param <I>
  *            the type of the input for the transitive reduction task
  */
-public abstract class TransitiveReductionOutput<R extends IndexedClassExpression> {
+public abstract class TransitiveReductionOutput<I extends IndexedClassExpression> {
 
 	/**
 	 * The indexed class expression for which the transitive reduction was
 	 * initiated.
 	 */
-	protected final R root;
+	protected final I root;
 
-	TransitiveReductionOutput(R root) {
+	TransitiveReductionOutput(I root) {
 		this.root = root;
 	}
 
@@ -50,10 +50,10 @@ public abstract class TransitiveReductionOutput<R extends IndexedClassExpression
 	 * 
 	 * @return the indexed class expression for which this output was computed
 	 */
-	public R getRoot() {
+	public I getRoot() {
 		return root;
 	}
 
-	public abstract void accept(TransitiveReductionOutputVisitor<R> visitor);
+	public abstract void accept(TransitiveReductionOutputVisitor<I> visitor);
 
 }

@@ -139,10 +139,12 @@ public class ConcurrentComputation<I> {
 	 */
 	protected final class Worker implements JobProcessor<I, Boolean>, Runnable {
 
-		public final Boolean process(JobBatch<I> batch) throws InterruptedException {
+		public final Boolean process(JobBatch<I> batch)
+				throws InterruptedException {
 			for (I input : batch) {
 				// processing the input using the input processor
-				inputProcessor.process(input);
+				inputProcessor.submit(input);
+				inputProcessor.process();
 			}
 			return true;
 		}

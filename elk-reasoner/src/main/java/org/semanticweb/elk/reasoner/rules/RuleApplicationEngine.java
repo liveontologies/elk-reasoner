@@ -20,11 +20,12 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.rules;
 
 import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -39,17 +40,21 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
 /**
  * The engine for computing the saturation of class expressions. This is the
  * class that implements the application of inference rules.
  * 
  * @author Frantisek Simancik
+ * @author Yevgeny Kazakov
  * 
  */
-public class RuleApplicationEngine {
+public class RuleApplicationEngine extends
+		AbstractJobManager<IndexedClassExpression> {
 
 	// Statistical information
 	AtomicInteger derivedNo = new AtomicInteger(0);
@@ -77,9 +82,15 @@ public class RuleApplicationEngine {
 	 */
 	protected final Queue<SaturatedClassExpression> activeContexts;
 
+	/**
+	 * <tt>true</tt> if the {@link #activeContexts} queue is not empty
+	 */
+	protected final AtomicBoolean activeContextsNonEmpty;
+
 	public RuleApplicationEngine(OntologyIndex ontologyIndex) {
 		this.ontologyIndex = ontologyIndex;
 		this.activeContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
+		this.activeContextsNonEmpty = new AtomicBoolean(false);
 
 		// reset saturation in case of re-saturation after changes
 		for (IndexedClassExpression ice : ontologyIndex
@@ -89,6 +100,29 @@ public class RuleApplicationEngine {
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 
+	}
+
+	public final void submit(IndexedClassExpression job) {
+		getCreateContext(job);
+	}
+
+	public final void process() throws InterruptedException {
+		processActiveContexts();
+	}
+
+	@Override
+	public boolean canProcess() {
+		return !activeContextsNonEmpty.get();
+	}
+
+	/**
+	 * calls {@link #notifyCanProcess()} the {@link #activeContextsNonEmpty}
+	 * flag was <tt>false</tt>
+	 */
+	protected void tryNotifyCanProcess() {
+		if (!activeContextsNonEmpty.get()
+				&& activeContextsNonEmpty.compareAndSet(false, true))
+			notifyCanProcess();
 	}
 
 	/**
@@ -124,6 +158,7 @@ public class RuleApplicationEngine {
 	protected void activateContext(SaturatedClassExpression context) {
 		if (context.tryActivate()) {
 			activeContexts.add(context);
+			tryNotifyCanProcess();
 		}
 	}
 
@@ -141,7 +176,6 @@ public class RuleApplicationEngine {
 		 */
 		if (target instanceof SaturatedClassExpression) {
 			SaturatedClassExpression context = (SaturatedClassExpression) target;
-
 			context.queue.add(item);
 			activateContext(context);
 		}
@@ -150,8 +184,18 @@ public class RuleApplicationEngine {
 	protected void processActiveContexts() throws InterruptedException {
 		for (;;) {
 			SaturatedClassExpression nextContext = activeContexts.poll();
-			if (nextContext == null)
-				break;
+			if (nextContext == null) {
+				if (activeContextsNonEmpty.get()
+						&& activeContextsNonEmpty.compareAndSet(true, false)) {
+					nextContext = activeContexts.poll();
+					if (nextContext == null)
+						break;
+					else
+						tryNotifyCanProcess();
+				} else
+					break;
+			}
+
 			process(nextContext);
 		}
 	}

@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import org.semanticweb.elk.reasoner.ReasonerJob;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 
 public class SaturationJob<I extends IndexedClassExpression> extends
 		ReasonerJob<I, SaturatedClassExpression> {

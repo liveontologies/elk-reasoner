@@ -25,19 +25,21 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 
@@ -70,10 +72,12 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 		this.nodeLookup = new ConcurrentHashMap<String, NonBottomNode>();
 		this.allNodes = Collections
 				.newSetFromMap(new ConcurrentHashMap<ClassNode, Boolean>());
+		allNodes.add(this);
 		this.processingNewNodes = new AtomicBoolean(false);
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 		this.unsatisfiableClasses = Collections
-				.newSetFromMap(new ConcurrentHashMap<ElkClass, Boolean>());
+				.synchronizedSet(new TreeSet<ElkClass>(
+						Comparators.ELK_CLASS_COMPARATOR));
 		this.unsatisfiableClasses.add(PredefinedElkClass.OWL_NOTHING);
 	}
 
@@ -98,9 +102,11 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	 *            the class for which to find the node non-bottom
 	 * @return the non-bottom node for the given {@link ElkClass}
 	 */
-	NonBottomNode getNonBottomNode(ElkClass elkClass) {
+	protected NonBottomNode getNonBottomNode(ElkClass elkClass) {
 		return nodeLookup.get(getKey(elkClass));
 	}
+
+	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
 	/**
 	 * Obtain a ClassNode object for a given {@link ElkClass}, <tt>null</tt> if
@@ -120,40 +126,19 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 		return null;
 	}
 
-	public NonBottomNode getCreate(List<ElkClass> elkClasses) {
-
-		ArraySet<ElkClass> members = new ArraySet<ElkClass>(elkClasses.size());
-		for (ElkClass elkClass : elkClasses) {
-			members.add(elkClass);
-		}
-		Collections.sort(members, Comparators.ELK_CLASS_COMPARATOR);
+	NonBottomNode getCreate(Collection<ElkClass> members) {
 		NonBottomNode node = new NonBottomNode(this, members);
+		// we assign first for the node to the canonical member to avoid
+		// concurrency problems
 		ElkClass canonical = node.getCanonicalMember();
 		NonBottomNode previous = nodeLookup
 				.putIfAbsent(getKey(canonical), node);
-		if (previous != null) {
-			node = previous;
-			if (!node.membersSet()) {
-				node.setMembers(members);
-			} else
-				return previous;
-		} else {
-			allNodes.add(node);
-		}
+		if (previous != null)
+			return previous;
+		allNodes.add(node);
 		for (ElkClass member : members) {
 			if (member != canonical)
 				nodeLookup.put(getKey(member), node);
-		}
-		return node;
-	}
-
-	protected NonBottomNode getCreate(ElkClass elkClass) {
-		NonBottomNode node = new NonBottomNode(this);
-		NonBottomNode previous = nodeLookup.putIfAbsent(getKey(elkClass), node);
-		if (previous != null) {
-			node = previous;
-		} else {
-			allNodes.add(node);
 		}
 		return node;
 	}
@@ -173,7 +158,8 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 			public boolean holds(Object element) {
 				if (element instanceof ClassNode) {
 					ClassNode node = (ClassNode) element;
-					return (node.getDirectSubNodes().contains(this));
+					return (node.getDirectSubNodes()
+							.contains(ConcurrentClassTaxonomy.this));
 				}
 				return false;
 			}
