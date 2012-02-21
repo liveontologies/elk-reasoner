@@ -25,21 +25,24 @@ package org.semanticweb.elk.reasoner.reduction;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
- * The visitor pattern class to distinguish the types of the output of the
- * saturation according to the tags.
+ * The visitor pattern class to distinguish the saturation jobs.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <O>
+ * @param <R>
+ *            the type of the root indexed class expression for which transitive
+ *            reduction needs to be computed
+ * 
+ * @param <J>
+ *            the type of the transitive reduction job
  */
 interface SaturationJobVisitor<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>> {
 
-	void visit(
-			SaturationJobRoot<R, J> saturationJobTransitiveReductionRoot)
+	void visit(SaturationJobRoot<R, J> saturationJobTransitiveReductionRoot)
 			throws InterruptedException;
 
 	void visit(
-			SaturationJobSuperClasses<R, J> saturationJobSuperTransitiveReductionClass)
+			SaturationJobSuperClass<R, J> saturationJobSuperTransitiveReductionClass)
 			throws InterruptedException;
 
 }

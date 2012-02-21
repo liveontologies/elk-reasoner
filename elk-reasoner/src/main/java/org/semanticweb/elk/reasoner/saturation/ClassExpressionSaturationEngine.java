@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,6 +31,7 @@ import org.semanticweb.elk.reasoner.ReasonerJob;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.rules.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
 /**
@@ -53,7 +53,7 @@ import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
  *            the type of the saturation jobs that can be processed in this
  *            saturation engine
  */
-public class ClassExpressionSaturationEngine<J extends Iterable<? extends IndexedClassExpression>>
+public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends IndexedClassExpression>>
 		extends AbstractJobManager<J> {
 
 	protected final static Logger LOGGER_ = Logger
@@ -156,70 +156,63 @@ public class ClassExpressionSaturationEngine<J extends Iterable<? extends Indexe
 	 *            the engine used to perform saturation
 	 */
 	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex) {
-		this(ontologyIndex, 64);
+		this(ontologyIndex, 128);
 	}
 
 	public final void submit(J job) throws InterruptedException {
 
+		IndexedClassExpression root = job.getInput();
 		/*
-		 * the iterator over the root indexed class expressions for which
-		 * saturations are required to be computed as a part of this job
+		 * if saturation is already assigned, this task is already started or
+		 * finished
 		 */
-		Iterator<? extends IndexedClassExpression> roots = job.iterator();
-		/* if there are more task of the job to be submitted */
-		boolean moreTasks = true;
-		while (moreTasks) {
-			if (roots.hasNext()) {
-				IndexedClassExpression root = roots.next();
-				/*
-				 * if saturation is already assigned, this task is already
-				 * started or finished
-				 */
-				if (root.getSaturated() != null)
-					continue;
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(root + ": saturation started");
-				}
-				/*
-				 * incrementing the number of submitted tasks unless it reaches
-				 * the number of processed tasks plus the threshold
-				 */
-				for (;;) {
-					process();
-					int snapshotCountTasksSubmitted = countTasksSubmitted.get();
-					if (snapshotCountTasksSubmitted - countTasksProcessed.get() == threshold)
-						synchronized (countTasksSubmitted) {
-							if (countTasksSubmitted.get()
-									- countTasksProcessed.get() == threshold
-									&& !canProcess()) {
-								workersWaiting = true;
-								countTasksSubmitted.wait();
-							}
-						}
-					else if (countTasksSubmitted.compareAndSet(
-							snapshotCountTasksSubmitted,
-							snapshotCountTasksSubmitted + 1))
-						break;
-				}
-				/*
-				 * process the submitted tasks; the counter of active workers
-				 * overestimates the number of workers processing the tasks
-				 * using the rule engine
-				 */
-				activeWorkers.incrementAndGet();
-				ruleApplicationEngine.submit(root);
-				ruleApplicationEngine.process();
-				activeWorkers.decrementAndGet();
-			} else {
-				/*
-				 * all tasks of this job have been submitted; we can add the job
-				 * to the buffer to wait for completion
-				 */
-				moreTasks = false;
-				buffer.add(job);
-				countJobsSubmitted.incrementAndGet();
-			}
+		SaturatedClassExpression rootSaturation = root.getSaturated();
+		if (rootSaturation != null && rootSaturation.isSaturated()) {
+			notifyProcessed(job);
+			return;
 		}
+		if (rootSaturation == null) {
+
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(root + ": saturation started");
+			}
+			/*
+			 * incrementing the number of submitted tasks unless it reaches the
+			 * number of processed tasks plus the threshold
+			 */
+			for (;;) {
+				process();
+				int snapshotCountTasksSubmitted = countTasksSubmitted.get();
+				if (snapshotCountTasksSubmitted - countTasksProcessed.get() == threshold)
+					synchronized (countTasksSubmitted) {
+						if (countTasksSubmitted.get()
+								- countTasksProcessed.get() == threshold
+								&& !canProcess()) {
+							workersWaiting = true;
+							countTasksSubmitted.wait();
+						}
+					}
+				else if (countTasksSubmitted.compareAndSet(
+						snapshotCountTasksSubmitted,
+						snapshotCountTasksSubmitted + 1))
+					break;
+			}
+			/*
+			 * process the submitted tasks; the counter of active workers
+			 * overestimates the number of workers processing the tasks using
+			 * the rule engine
+			 */
+			activeWorkers.incrementAndGet();
+			ruleApplicationEngine.submit(root);
+			ruleApplicationEngine.process();
+			activeWorkers.decrementAndGet();
+		}
+		/*
+		 * if job is already processed then notify about it, otherwise add the
+		 * job to the buffer and wait until all of its tasks are saturated
+		 */
+		buffer.add(job);
+		countJobsSubmitted.incrementAndGet();
 	}
 
 	public final void process() throws InterruptedException {
@@ -234,6 +227,13 @@ public class ClassExpressionSaturationEngine<J extends Iterable<? extends Indexe
 	@Override
 	public boolean canProcess() {
 		return ruleApplicationEngine.canProcess();
+	}
+
+	/**
+	 * Print statistics about the saturation
+	 */
+	public void printStatistics() {
+		ruleApplicationEngine.printStatistics();
 	}
 
 	/**
@@ -294,8 +294,8 @@ public class ClassExpressionSaturationEngine<J extends Iterable<? extends Indexe
 		 * thread.
 		 */
 		for (;;) {
-			int shapshotOutputJobs = countJobsFinished.get();
-			if (shapshotOutputJobs == countJobsProcessed.get()) {
+			int shapshotJobsFinished = countJobsFinished.get();
+			if (shapshotJobsFinished == countJobsProcessed.get()) {
 				break;
 			}
 			/*
@@ -303,8 +303,8 @@ public class ClassExpressionSaturationEngine<J extends Iterable<? extends Indexe
 			 * than the number of processed jobs if this counter has not been
 			 * changed.
 			 */
-			if (countJobsFinished.compareAndSet(shapshotOutputJobs,
-					shapshotOutputJobs + 1)) {
+			if (countJobsFinished.compareAndSet(shapshotJobsFinished,
+					shapshotJobsFinished + 1)) {
 				/*
 				 * It is safe to assume that the next job in the buffer is
 				 * processed since a job is inserted in the buffer only after
@@ -312,11 +312,12 @@ public class ClassExpressionSaturationEngine<J extends Iterable<? extends Indexe
 				 */
 				J nextJob = buffer.poll();
 				/* mark all saturations as completed */
-				for (IndexedClassExpression root : nextJob) {
-					root.getSaturated().setSaturated();
-					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace(root + ": saturation finished");
-					}
+				IndexedClassExpression root = nextJob.getInput();
+				SaturatedClassExpression rootSaturation = root.getSaturated();
+				rootSaturation.setSaturated();
+				nextJob.setOutput(rootSaturation);
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace(root + ": saturation finished");
 				}
 				notifyProcessed(nextJob);
 			}

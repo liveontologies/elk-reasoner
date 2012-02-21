@@ -58,6 +58,13 @@ public class ClassTaxonomyEngine extends AbstractJobManager<IndexedClass> {
 		return transitiveReductionEngine.canProcess();
 	}
 
+	/**
+	 * Print statistics about class taxonomy
+	 */
+	public void printStatistics() {
+		transitiveReductionEngine.printStatistics();
+	}
+
 	public ClassTaxonomy getClassTaxonomy() {
 		return this.taxonomy;
 	}

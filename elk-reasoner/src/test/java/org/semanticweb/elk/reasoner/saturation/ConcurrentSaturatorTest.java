@@ -39,7 +39,6 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.rules.ObjectPropertySaturation;
 import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
-import org.semanticweb.elk.util.collections.Operations;
 
 public class ConcurrentSaturatorTest extends TestCase {
 
@@ -79,11 +78,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		objectPropertySaturation.compute();
 
-		final ClassExpressionSaturation<Iterable<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<Iterable<IndexedClassExpression>>(
+		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
-		classExpressionSaturation.submit(Operations.singleton(A));
+		classExpressionSaturation
+				.submit(new SaturationJob<IndexedClassExpression>(A));
 		classExpressionSaturation.waitCompletion();
 
 		assertTrue("A contains D", A.getSaturated().getSuperClassExpressions()
@@ -124,11 +124,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 		assertTrue("I SubClassOf D",
 				I.getToldSuperClassExpressions().contains(D));
 
-		final ClassExpressionSaturation<Iterable<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<Iterable<IndexedClassExpression>>(
+		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
-		classExpressionSaturation.submit(Operations.singleton(A));
+		classExpressionSaturation
+				.submit(new SaturationJob<IndexedClassExpression>(A));
 		classExpressionSaturation.waitCompletion();
 		SaturatedClassExpression context = A.getSaturated();
 

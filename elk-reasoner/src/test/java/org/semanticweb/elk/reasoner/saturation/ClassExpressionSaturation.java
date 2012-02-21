@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 
-public class ClassExpressionSaturation<J extends Iterable<? extends IndexedClassExpression>>
+public class ClassExpressionSaturation<J extends SaturationJob<? extends IndexedClassExpression>>
 		extends ConcurrentComputation<J> {
 
 	public ClassExpressionSaturation(ExecutorService executor, int maxWorkers,
