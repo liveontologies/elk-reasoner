@@ -85,16 +85,15 @@ public class RuleApplicationEngine extends
 	 * occurs exactly once.
 	 */
 	protected final Queue<SaturatedClassExpression> activeContexts;
+	/**
+	 * The number of contexts ever created by this engine
+	 */
+	protected final AtomicInteger contextNo = new AtomicInteger(0);
 
 	/**
 	 * <tt>true</tt> if the {@link #activeContexts} queue is empty
 	 */
 	protected final AtomicBoolean activeContextsEmpty;
-	/**
-	 * The maximal number of created active contexts before blocking
-	 * submissions.
-	 */
-	final int threshold = 256;
 
 	public RuleApplicationEngine(OntologyIndex ontologyIndex) {
 		this.ontologyIndex = ontologyIndex;
@@ -126,10 +125,20 @@ public class RuleApplicationEngine extends
 	}
 
 	/**
+	 * Returns the total number of contexts created
+	 * 
+	 * @return number of created contexts
+	 */
+	public int getContextNo() {
+		return contextNo.get();
+	}
+
+	/**
 	 * Prints statistic of rule applications
 	 */
 	public void printStatistics() {
 		if (LOGGER_.isDebugEnabled()) {
+			LOGGER_.debug("Contexts created:" + contextNo.get());
 			LOGGER_.debug("Derived Produced/Unique:" + derivedInfNo.get() + "/"
 					+ derivedNo.get());
 			LOGGER_.debug("Backward Links Produced/Unique:"
@@ -147,11 +156,11 @@ public class RuleApplicationEngine extends
 	}
 
 	/**
-	 * Return a context which has the input indexed class expression as a root.
-	 * In case no such context exists, a new one is created with the given root
-	 * and is returned. It is ensured that no two different contexts are created
-	 * with the same root. In case a new context is created, it is scheduled to
-	 * be processed.
+	 * Return the context which has the input indexed class expression as a
+	 * root. In case no such context exists, a new one is created with the given
+	 * root and is returned. It is ensured that no two different contexts are
+	 * created with the same root. In case a new context is created, it is
+	 * scheduled to be processed.
 	 * 
 	 * @param root
 	 *            the input indexed class expression for which to return the
@@ -167,6 +176,7 @@ public class RuleApplicationEngine extends
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": context created");
 				}
+				contextNo.incrementAndGet();
 				enqueue(sce, root);
 
 				if (owlThing.occursNegatively())
