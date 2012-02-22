@@ -58,9 +58,13 @@ public class RuleApplicationEngine extends
 
 	// Statistical information
 	AtomicInteger derivedNo = new AtomicInteger(0);
+	AtomicInteger derivedInfNo = new AtomicInteger(0);
 	AtomicInteger backLinkNo = new AtomicInteger(0);
+	AtomicInteger backLinkInfNo = new AtomicInteger(0);
 	AtomicInteger propNo = new AtomicInteger(0);
+	AtomicInteger propInfNo = new AtomicInteger(0);
 	AtomicInteger forwLinkNo = new AtomicInteger(0);
+	AtomicInteger forwLinkInfNo = new AtomicInteger(0);
 
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
@@ -81,18 +85,23 @@ public class RuleApplicationEngine extends
 	 * occurs exactly once.
 	 */
 	protected final Queue<SaturatedClassExpression> activeContexts;
+	/**
+	 * The number of contexts ever created by this engine
+	 */
+	protected final AtomicInteger contextNo = new AtomicInteger(0);
 
 	/**
-	 * <tt>true</tt> if the {@link #activeContexts} queue is not empty
+	 * <tt>true</tt> if the {@link #activeContexts} queue is empty
 	 */
-	protected final AtomicBoolean activeContextsNonEmpty;
+	protected final AtomicBoolean activeContextsEmpty;
 
 	public RuleApplicationEngine(OntologyIndex ontologyIndex) {
 		this.ontologyIndex = ontologyIndex;
 		this.activeContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
-		this.activeContextsNonEmpty = new AtomicBoolean(false);
+		this.activeContextsEmpty = new AtomicBoolean(true);
 
 		// reset saturation in case of re-saturation after changes
+		// TODO: introduce a separate method for this
 		for (IndexedClassExpression ice : ontologyIndex
 				.getIndexedClassExpressions())
 			ice.resetSaturated();
@@ -112,25 +121,46 @@ public class RuleApplicationEngine extends
 
 	@Override
 	public boolean canProcess() {
-		return !activeContextsNonEmpty.get();
+		return !activeContextsEmpty.get();
 	}
 
 	/**
-	 * calls {@link #notifyCanProcess()} the {@link #activeContextsNonEmpty}
-	 * flag was <tt>false</tt>
+	 * Returns the total number of contexts created
+	 * 
+	 * @return number of created contexts
 	 */
+	public int getContextNo() {
+		return contextNo.get();
+	}
+
+	/**
+	 * Prints statistic of rule applications
+	 */
+	public void printStatistics() {
+		if (LOGGER_.isDebugEnabled()) {
+			LOGGER_.debug("Contexts created:" + contextNo.get());
+			LOGGER_.debug("Derived Produced/Unique:" + derivedInfNo.get() + "/"
+					+ derivedNo.get());
+			LOGGER_.debug("Backward Links Produced/Unique:"
+					+ backLinkInfNo.get() + "/" + backLinkNo.get());
+			LOGGER_.debug("Propagations Produced/Unique:" + propInfNo.get()
+					+ "/" + propNo.get());
+			LOGGER_.debug("Forward Links Produced/Unique:"
+					+ forwLinkInfNo.get() + "/" + forwLinkNo.get());
+		}
+	}
+
 	protected void tryNotifyCanProcess() {
-		if (!activeContextsNonEmpty.get()
-				&& activeContextsNonEmpty.compareAndSet(false, true))
+		if (activeContextsEmpty.compareAndSet(true, false))
 			notifyCanProcess();
 	}
 
 	/**
-	 * Return a context which has the input indexed class expression as a root.
-	 * In case no such context exists, a new one is created with the given root
-	 * and is returned. It is ensured that no two different contexts are created
-	 * with the same root. In case a new context is created, it is scheduled to
-	 * be processed.
+	 * Return the context which has the input indexed class expression as a
+	 * root. In case no such context exists, a new one is created with the given
+	 * root and is returned. It is ensured that no two different contexts are
+	 * created with the same root. In case a new context is created, it is
+	 * scheduled to be processed.
 	 * 
 	 * @param root
 	 *            the input indexed class expression for which to return the
@@ -146,6 +176,7 @@ public class RuleApplicationEngine extends
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": context created");
 				}
+				contextNo.incrementAndGet();
 				enqueue(sce, root);
 
 				if (owlThing.occursNegatively())
@@ -185,17 +216,13 @@ public class RuleApplicationEngine extends
 		for (;;) {
 			SaturatedClassExpression nextContext = activeContexts.poll();
 			if (nextContext == null) {
-				if (activeContextsNonEmpty.get()
-						&& activeContextsNonEmpty.compareAndSet(true, false)) {
-					nextContext = activeContexts.poll();
-					if (nextContext == null)
-						break;
-					else
-						tryNotifyCanProcess();
-				} else
-					break;
+				if (!activeContextsEmpty.compareAndSet(false, true))
+					return;
+				nextContext = activeContexts.poll();
+				if (nextContext == null)
+					return;
+				tryNotifyCanProcess();
 			}
-
 			process(nextContext);
 		}
 	}
@@ -222,6 +249,7 @@ public class RuleApplicationEngine extends
 		}
 
 		public Void visit(BackwardLink backwardLink) {
+			backLinkInfNo.incrementAndGet();
 			IndexedPropertyChain linkRelation = backwardLink.getRelation();
 			Linkable target = backwardLink.getTarget();
 
@@ -290,6 +318,7 @@ public class RuleApplicationEngine extends
 		}
 
 		public Void visit(ForwardLink forwardLink) {
+			forwLinkInfNo.incrementAndGet();
 			IndexedPropertyChain linkRelation = forwardLink.getRelation();
 			Linkable target = forwardLink.getTarget();
 
@@ -331,6 +360,7 @@ public class RuleApplicationEngine extends
 		}
 
 		public Void visit(Propagation propagation) {
+			propInfNo.incrementAndGet();
 			IndexedPropertyChain propRelation = propagation.getRelation();
 			Queueable carry = propagation.getCarry();
 
@@ -361,6 +391,7 @@ public class RuleApplicationEngine extends
 		}
 
 		public Void visit(DecomposedClassExpression compositeClassExpression) {
+			derivedInfNo.incrementAndGet();
 			if (context.isSaturated())
 				LOGGER_.warn(context.root + ": adding "
 						+ compositeClassExpression.getClassExpression()
@@ -378,6 +409,7 @@ public class RuleApplicationEngine extends
 		}
 
 		public Void visit(IndexedClassExpression indexedClassExpression) {
+			derivedInfNo.incrementAndGet();
 			if (context.isSaturated())
 				LOGGER_.warn(context.root + ": adding "
 						+ indexedClassExpression + " to a saturated context!");

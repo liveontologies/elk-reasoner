@@ -23,8 +23,6 @@
 package org.semanticweb.elk.cli;
 
 import java.io.IOException;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 import junit.framework.TestCase;
@@ -36,7 +34,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
-import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;

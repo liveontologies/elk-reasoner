@@ -126,6 +126,7 @@ public class Reasoner {
 		progressMonitor.finish();
 		Statistics.logOperationFinish("Classification", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
+		taxonomyComputation.printStatistics();
 	}
 
 	public void classify() {
@@ -154,6 +155,10 @@ public class Reasoner {
 
 		public ClassTaxonomy getClassTaxonomy() {
 			return classTaxonomyEngine.getClassTaxonomy();
+		}
+
+		public void printStatistics() {
+			classTaxonomyEngine.printStatistics();
 		}
 	}
 }
