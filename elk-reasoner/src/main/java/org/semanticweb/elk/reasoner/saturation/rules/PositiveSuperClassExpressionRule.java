@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,13 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
-/**
- * Common interface for objects that can be queued during
- * ClassExpressionSaturation.
- * 
- * @author Frantisek Simancik
- */
-public interface Queueable {
-	<O> O accept(QueueableVisitor<O> visitor);
+import org.semanticweb.elk.reasoner.saturation.expressions.PositiveSuperClassExpression;
+
+public abstract class PositiveSuperClassExpressionRule implements UnaryRule<PositiveSuperClassExpression>, RegistrableRule {
+
+	public void register(InferenceSystem inferenceSystem) {
+		inferenceSystem.visit(this);
+	}
 }

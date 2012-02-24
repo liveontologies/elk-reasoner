@@ -20,32 +20,16 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.expressions;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * @author Frantisek Simancik
- * 
+ *
  */
-class ForwardLink extends Pair<IndexedPropertyChain, Linkable> implements
-		Queueable {
-
-	public ForwardLink(IndexedPropertyChain relation, Linkable target) {
-		super(relation, target);
-	}
-
-	public IndexedPropertyChain getRelation() {
-		return first;
-	}
-
-	public Linkable getTarget() {
-		return second;
-	}
-
-	public <O> O accept(QueueableVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
+public interface QueueableVisitor<O> {
+	O visit(NegativeSuperClassExpression negSuperClassExpression);
+	O visit(PositiveSuperClassExpression posSuperClassExpression);
+	O visit(BackwardLink backwardLink);
+	O visit(ForwardLink forwardLink);
 }

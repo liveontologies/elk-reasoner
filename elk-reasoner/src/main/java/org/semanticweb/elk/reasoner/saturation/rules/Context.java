@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
 import java.util.Queue;
 import java.util.Set;
@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.expressions.Queueable;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -41,18 +42,17 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 
  * @author Frantisek Simancik
  */
-public class SaturatedClassExpression implements Linkable {
+public class Context {
 
 	protected final IndexedClassExpression root;
 
 	protected final Queue<Queueable> queue;
 
-	// TODO use Derivable instead of IndexedClassExpression here
-	protected final Set<IndexedClassExpression> derived;
+	protected final Set<IndexedClassExpression> superClassExpressions;
 
-	protected Multimap<IndexedPropertyChain, Linkable> backwardLinksByObjectProperty;
+	protected Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty;
 
-	protected Multimap<IndexedPropertyChain, Linkable> forwardLinksByObjectProperty;
+	protected Multimap<IndexedPropertyChain, Context> forwardLinksByObjectProperty;
 
 	protected Multimap<IndexedPropertyChain, Queueable> propagationsByObjectProperty;
 
@@ -66,16 +66,22 @@ public class SaturatedClassExpression implements Linkable {
 	 * has been derived at this object.
 	 */
 	protected boolean deriveBackwardLinks = false;
+	
+	/**
+	 * If set to true, then propagations will be derived in this context. This
+	 * is needed only when there is at least one backward link.
+	 */
+	protected boolean derivePropagations = false;
 
 	/**
 	 * A context is active iff its queue is not empty or it is being processed.
 	 */
 	private final AtomicBoolean isActive;
 
-	public SaturatedClassExpression(IndexedClassExpression root) {
+	public Context(IndexedClassExpression root) {
 		this.root = root;
 		this.queue = new ConcurrentLinkedQueue<Queueable>();
-		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
+		this.superClassExpressions = new ArrayHashSet<IndexedClassExpression>(13);
 		this.isActive = new AtomicBoolean(false);
 	}
 
@@ -91,7 +97,7 @@ public class SaturatedClassExpression implements Linkable {
 	 * @return the set of derived indexed class expressions
 	 */
 	public Set<IndexedClassExpression> getSuperClassExpressions() {
-		return derived;
+		return superClassExpressions;
 	}
 
 	/**

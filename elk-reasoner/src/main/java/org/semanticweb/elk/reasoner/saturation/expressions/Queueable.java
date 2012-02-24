@@ -20,22 +20,14 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.expressions;
 
-import org.semanticweb.elk.reasoner.ReasonerJob;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rules.Context;
-
-public class SaturationJob<I extends IndexedClassExpression> extends
-		ReasonerJob<I, Context> {
-
-	public SaturationJob(I input) {
-		super(input);
-	}
-
-	@Override
-	protected void setOutput(Context output) {
-		super.setOutput(output);
-	}
-
+/**
+ * Common interface for objects that can be queued during
+ * ClassExpressionSaturation.
+ * 
+ * @author Frantisek Simancik
+ */
+public interface Queueable {
+	<O> O accept(QueueableVisitor<O> visitor);
 }

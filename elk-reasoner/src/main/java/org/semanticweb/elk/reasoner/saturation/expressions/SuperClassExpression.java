@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,19 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.expressions;
 
-/**
- * Common interface for object that can be linked to during
- * ClassExpressionSaturation. SaturatedClassExpression is the
- * only Linkable class in the current implementation.
- * 
- * @author Frantisek Simancik
- *
- */
-public interface Linkable {
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
+public abstract class SuperClassExpression implements Queueable {
+	
+	protected final IndexedClassExpression expression;
+	
+	public SuperClassExpression(IndexedClassExpression expression) {
+		this.expression = expression;
+	}
+	
+	public IndexedClassExpression getExpression() {
+		return expression;
+	}
 }

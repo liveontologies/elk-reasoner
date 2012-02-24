@@ -62,7 +62,7 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 		this.initiatorJob = initiatorJob;
 		R root = initiatorJob.getInput();
 		this.output = new TransitiveReductionOutputEquivalentDirect<R>(root);
-		this.superClassExpressionsIterator = root.getSaturated()
+		this.superClassExpressionsIterator = root.getContext()
 				.getSuperClassExpressions().iterator();
 	}
 }

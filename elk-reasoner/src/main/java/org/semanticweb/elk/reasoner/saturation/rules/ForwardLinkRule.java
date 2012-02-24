@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,13 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.ReasonerJob;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rules.Context;
+import org.semanticweb.elk.reasoner.saturation.expressions.ForwardLink;
 
-public class SaturationJob<I extends IndexedClassExpression> extends
-		ReasonerJob<I, Context> {
+public abstract class ForwardLinkRule implements UnaryRule<ForwardLink>, RegistrableRule {
 
-	public SaturationJob(I input) {
-		super(input);
+	public void register(InferenceSystem inferenceSystem) {
+		inferenceSystem.visit(this);
 	}
-
-	@Override
-	protected void setOutput(Context output) {
-		super.setOutput(output);
-	}
-
 }

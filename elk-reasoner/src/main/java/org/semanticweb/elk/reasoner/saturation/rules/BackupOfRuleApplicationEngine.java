@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
 import java.util.Collection;
 import java.util.Queue;
@@ -41,6 +41,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
+import org.semanticweb.elk.reasoner.saturation.expressions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.expressions.DecomposedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.expressions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.expressions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.expressions.Queueable;
+import org.semanticweb.elk.reasoner.saturation.expressions.QueueableVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
@@ -53,7 +59,7 @@ import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
  * @author Yevgeny Kazakov
  * 
  */
-public class RuleApplicationEngine extends
+public class BackupOfRuleApplicationEngine extends
 		AbstractJobManager<IndexedClassExpression> {
 
 	// Statistical information
@@ -84,7 +90,7 @@ public class RuleApplicationEngine extends
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
-	protected final Queue<SaturatedClassExpression> activeContexts;
+	protected final Queue<Context> activeContexts;
 	/**
 	 * The number of contexts ever created by this engine
 	 */
@@ -95,16 +101,16 @@ public class RuleApplicationEngine extends
 	 */
 	protected final AtomicBoolean activeContextsEmpty;
 
-	public RuleApplicationEngine(OntologyIndex ontologyIndex) {
+	public BackupOfRuleApplicationEngine(OntologyIndex ontologyIndex) {
 		this.ontologyIndex = ontologyIndex;
-		this.activeContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
+		this.activeContexts = new ConcurrentLinkedQueue<Context>();
 		this.activeContextsEmpty = new AtomicBoolean(true);
 
 		// reset saturation in case of re-saturation after changes
 		// TODO: introduce a separate method for this
 		for (IndexedClassExpression ice : ontologyIndex
 				.getIndexedClassExpressions())
-			ice.resetSaturated();
+			ice.resetContext();
 
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
@@ -168,11 +174,11 @@ public class RuleApplicationEngine extends
 	 * @return context which root is the input indexed class expression.
 	 * 
 	 */
-	protected SaturatedClassExpression getCreateContext(
+	protected Context getCreateContext(
 			IndexedClassExpression root) {
-		if (root.getSaturated() == null) {
-			SaturatedClassExpression sce = new SaturatedClassExpression(root);
-			if (root.setSaturated(sce)) {
+		if (root.getContext() == null) {
+			Context sce = new Context(root);
+			if (root.setContext(sce)) {
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": context created");
 				}
@@ -183,30 +189,30 @@ public class RuleApplicationEngine extends
 					enqueue(sce, owlThing);
 			}
 		}
-		return root.getSaturated();
+		return root.getContext();
 	}
 
-	protected void activateContext(SaturatedClassExpression context) {
+	protected void activateContext(Context context) {
 		if (context.tryActivate()) {
 			activeContexts.add(context);
 			tryNotifyCanProcess();
 		}
 	}
 
-	protected void deactivateContext(SaturatedClassExpression context) {
+	protected void deactivateContext(Context context) {
 		if (context.tryDeactivate())
 			if (!context.queue.isEmpty())
 				activateContext(context);
 	}
 
-	protected void enqueue(Linkable target, Queueable item) {
+	protected void enqueue(Context target, Queueable item) {
 
 		/*
 		 * so far SaturatedClassExpression is the only implementation of
 		 * Linkable
 		 */
-		if (target instanceof SaturatedClassExpression) {
-			SaturatedClassExpression context = (SaturatedClassExpression) target;
+		if (target instanceof Context) {
+			Context context = (Context) target;
 			context.queue.add(item);
 			activateContext(context);
 		}
@@ -214,7 +220,7 @@ public class RuleApplicationEngine extends
 
 	protected void processActiveContexts() throws InterruptedException {
 		for (;;) {
-			SaturatedClassExpression nextContext = activeContexts.poll();
+			Context nextContext = activeContexts.poll();
 			if (nextContext == null) {
 				if (!activeContextsEmpty.compareAndSet(false, true))
 					return;
@@ -227,7 +233,7 @@ public class RuleApplicationEngine extends
 		}
 	}
 
-	protected void process(SaturatedClassExpression context) {
+	protected void process(Context context) {
 
 		final QueueProcessor queueProcessor = new QueueProcessor(context);
 
@@ -242,22 +248,22 @@ public class RuleApplicationEngine extends
 	}
 
 	private class QueueProcessor implements QueueableVisitor<Void> {
-		final SaturatedClassExpression context;
+		final Context context;
 
-		QueueProcessor(SaturatedClassExpression context) {
+		QueueProcessor(Context context) {
 			this.context = context;
 		}
 
 		public Void visit(BackwardLink backwardLink) {
 			backLinkInfNo.incrementAndGet();
 			IndexedPropertyChain linkRelation = backwardLink.getRelation();
-			Linkable target = backwardLink.getTarget();
+			Context target = backwardLink.getTarget();
 
 			if (context.backwardLinksByObjectProperty == null) {
-				context.backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Linkable>();
+				context.backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Context>();
 
 				// start deriving propagations
-				for (IndexedClassExpression ice : context.derived)
+				for (IndexedClassExpression ice : context.superClassExpressions)
 					if (ice.getNegExistentials() != null)
 						for (IndexedObjectSomeValuesFrom e : ice
 								.getNegExistentials())
@@ -302,11 +308,11 @@ public class RuleApplicationEngine extends
 						Collection<IndexedBinaryPropertyChain> compositions = linkRelation
 								.getSaturated().propertyCompositionsByRightSubProperty
 								.get(forwardRelation);
-						Collection<Linkable> forwardTargets = context.forwardLinksByObjectProperty
+						Collection<Context> forwardTargets = context.forwardLinksByObjectProperty
 								.get(forwardRelation);
 
 						for (IndexedPropertyChain composition : compositions)
-							for (Linkable forwardTarget : forwardTargets)
+							for (Context forwardTarget : forwardTargets)
 								enqueue(forwardTarget, new BackwardLink(
 										composition, target));
 					}
@@ -320,10 +326,10 @@ public class RuleApplicationEngine extends
 		public Void visit(ForwardLink forwardLink) {
 			forwLinkInfNo.incrementAndGet();
 			IndexedPropertyChain linkRelation = forwardLink.getRelation();
-			Linkable target = forwardLink.getTarget();
+			Context target = forwardLink.getTarget();
 
 			if (context.forwardLinksByObjectProperty == null) {
-				context.forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Linkable>();
+				context.forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Context>();
 				initializeDerivationOfBackwardLinks();
 			}
 
@@ -344,11 +350,11 @@ public class RuleApplicationEngine extends
 						Collection<IndexedBinaryPropertyChain> compositions = linkRelation
 								.getSaturated().propertyCompositionsByLeftSubProperty
 								.get(backwardRelation);
-						Collection<Linkable> backwardTargets = context.backwardLinksByObjectProperty
+						Collection<Context> backwardTargets = context.backwardLinksByObjectProperty
 								.get(backwardRelation);
 
 						for (IndexedPropertyChain composition : compositions)
-							for (Linkable backwardTarget : backwardTargets)
+							for (Context backwardTarget : backwardTargets)
 								enqueue(target, new BackwardLink(composition,
 										backwardTarget));
 					}
@@ -379,7 +385,7 @@ public class RuleApplicationEngine extends
 							propRelation.getSaturated().getSubProperties(),
 							context.backwardLinksByObjectProperty.keySet()))
 
-						for (Linkable target : context.backwardLinksByObjectProperty
+						for (Context target : context.backwardLinksByObjectProperty
 								.get(linkRelation))
 
 							enqueue(target, carry);
@@ -396,7 +402,7 @@ public class RuleApplicationEngine extends
 				LOGGER_.warn(context.root + ": adding "
 						+ compositeClassExpression.getClassExpression()
 						+ " to a saturated context!");
-			if (context.derived.add(compositeClassExpression
+			if (context.superClassExpressions.add(compositeClassExpression
 					.getClassExpression())) {
 				if (context.isSaturated())
 					LOGGER_.error(context.root + ": new "
@@ -413,7 +419,7 @@ public class RuleApplicationEngine extends
 			if (context.isSaturated())
 				LOGGER_.warn(context.root + ": adding "
 						+ indexedClassExpression + " to a saturated context!");
-			if (context.derived.add(indexedClassExpression)) {
+			if (context.superClassExpressions.add(indexedClassExpression)) {
 				if (context.isSaturated())
 					LOGGER_.error(context.root + ": new "
 							+ indexedClassExpression
@@ -443,7 +449,7 @@ public class RuleApplicationEngine extends
 			if (ice.getNegConjunctionsByConjunct() != null) {
 				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 						ice.getNegConjunctionsByConjunct().keySet(),
-						context.derived))
+						context.superClassExpressions))
 					enqueue(context, new DecomposedClassExpression(ice
 							.getNegConjunctionsByConjunct().get(common)));
 			}
@@ -508,7 +514,7 @@ public class RuleApplicationEngine extends
 
 					if (linkRelation.getSaturated().propertyCompositionsByLeftSubProperty != null)
 
-						for (Linkable target : context.backwardLinksByObjectProperty
+						for (Context target : context.backwardLinksByObjectProperty
 								.get(linkRelation))
 
 							enqueue(target, new ForwardLink(linkRelation,
