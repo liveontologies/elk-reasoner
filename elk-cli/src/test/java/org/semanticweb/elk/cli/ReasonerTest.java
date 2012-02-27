@@ -144,6 +144,7 @@ public class ReasonerTest extends TestCase {
 				aNode.getDirectSuperNodes().contains(taxonomy.getNode(e)));
 	}
 
+	/*
 	public void testPropertyChains() throws ParseException, IOException {
 		IOReasoner IOReasoner = new IOReasoner();
 		IOReasoner
@@ -172,6 +173,7 @@ public class ReasonerTest extends TestCase {
 						taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
 								"http://example.org/X")))));
 	}
+	*/
 
 	public void testAncestors() throws InterruptedException,
 			ExecutionException, ParseException, IOException {
