@@ -37,7 +37,7 @@ import org.semanticweb.elk.util.collections.Multimap;
 
 public class RuleExistentialPlus implements InferenceRule {
 
-	public static class RuleExistentialPlus1 extends BackwardLinkRule {
+	public static class RuleExistentialPlus1 extends UnaryRule<BackwardLink> {
 
 		public RuleExistentialPlus1(RuleApplicationEngine engine) {
 			super(engine);
@@ -75,7 +75,8 @@ public class RuleExistentialPlus implements InferenceRule {
 
 	};
 
-	public static class RuleExistentialPlus2 extends SuperClassExpressionRule {
+	public static class RuleExistentialPlus2 extends
+			UnaryRule<SuperClassExpression> {
 
 		public RuleExistentialPlus2(RuleApplicationEngine engine) {
 			super(engine);

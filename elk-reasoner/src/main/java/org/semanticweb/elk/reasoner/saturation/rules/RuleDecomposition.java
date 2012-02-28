@@ -75,7 +75,7 @@ public class RuleDecomposition implements InferenceRule {
 	};
 
 	public static class RuleDecomposition1 extends
-			PositiveSuperClassExpressionRule {
+			UnaryRule<PositiveSuperClassExpression> {
 
 		public RuleDecomposition1(RuleApplicationEngine engine) {
 			super(engine);

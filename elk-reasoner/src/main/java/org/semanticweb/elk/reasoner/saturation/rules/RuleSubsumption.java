@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.expressions.SuperClassExpression;
 
 public class RuleSubsumption implements InferenceRule {
 
-	public static class RuleSubsumption1 extends SuperClassExpressionRule {
+	public static class RuleSubsumption1 extends UnaryRule<SuperClassExpression> {
 
 		public RuleSubsumption1(RuleApplicationEngine engine) {
 			super(engine);

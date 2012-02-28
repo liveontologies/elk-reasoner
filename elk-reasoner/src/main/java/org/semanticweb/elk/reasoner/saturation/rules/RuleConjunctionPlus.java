@@ -33,8 +33,8 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
 public class RuleConjunctionPlus implements InferenceRule {
 
 	public static class RuleConjunctionPlusRule1 extends
-			SuperClassExpressionRule {
-		
+			UnaryRule<SuperClassExpression> {
+
 		public RuleConjunctionPlusRule1(RuleApplicationEngine engine) {
 			super(engine);
 		}
@@ -52,7 +52,7 @@ public class RuleConjunctionPlus implements InferenceRule {
 				engine.enqueue(context,
 						new NegativeSuperClassExpression(conjs.get(common)));
 		}
-		
+
 	}
 
 }
