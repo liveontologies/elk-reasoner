@@ -149,7 +149,7 @@ public class InferenceRuleManager {
 	protected void registerUnaryRuleForClass(
 			UnaryRule<? extends Queueable> unaryRule, Class<?> clazz) {
 		for (Class<?> keyclass : unaryRules.keySet()) {
-			if (clazz.isAssignableFrom(keyclass)) {
+			if (clazz.isAssignableFrom(keyclass) && !clazz.equals(keyclass)) {
 				addUnaryRuleForClass(unaryRule, keyclass);
 			}
 		}
@@ -166,8 +166,8 @@ public class InferenceRuleManager {
 	 */
 	protected void addUnaryRuleForClass(
 			UnaryRule<? extends Queueable> unaryRule, Class<?> clazz) {
-		// System.out.println( "Adding rule " + unaryRule.getClass().getName() +
-		// " under " + clazz.getSimpleName());
+//		System.out.println( "Adding rule " + unaryRule.getClass().getName() +
+//		 " under " + clazz.getSimpleName());
 		LinkedListOfRules listedRule = new LinkedListOfRules(unaryRule,
 				unaryRules.get(clazz));
 		unaryRules.put(clazz, listedRule);
