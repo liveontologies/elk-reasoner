@@ -23,6 +23,4 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
 public interface InferenceRule {
-	
-	RegistrableRule[] getComponentRules();
 }

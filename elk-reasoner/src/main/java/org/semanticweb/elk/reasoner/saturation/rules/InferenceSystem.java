@@ -22,89 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.saturation.expressions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.expressions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.expressions.NegativeSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.expressions.PositiveSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.expressions.QueueableVisitor;
+import java.util.ArrayList;
+import java.util.List;
 
-abstract class InferenceSystem  {
+abstract class InferenceSystem {
 	
-	UnaryRule<? super NegativeSuperClassExpression> negSuperClassExpressionRule = null;
-	UnaryRule<? super PositiveSuperClassExpression> posSuperClassExpressionRule = null; 
-	UnaryRule<BackwardLink> backwardLinkRule = null;
-	UnaryRule<ForwardLink> forwardLinkRule = null;
+	List<InferenceRule> inferenceRules = new ArrayList<InferenceRule>();
 
-	void add(InferenceRule inferenceRule) {
-		for (RegistrableRule componentRule : inferenceRule.getComponentRules())
-			componentRule.register(this);
-	}
-	
-	void visit(SuperClassExpressionRule rule) {
-		if (negSuperClassExpressionRule == null)
-			negSuperClassExpressionRule = rule;
-		else
-			negSuperClassExpressionRule = new ComposedRule<NegativeSuperClassExpression>(negSuperClassExpressionRule, rule);
-		
-		if (posSuperClassExpressionRule == null)
-			posSuperClassExpressionRule = rule;
-		else
-			posSuperClassExpressionRule = new ComposedRule<PositiveSuperClassExpression>(posSuperClassExpressionRule, rule);
-	}
-	
-	void visit(PositiveSuperClassExpressionRule rule) {
-		if (posSuperClassExpressionRule == null)
-			posSuperClassExpressionRule = rule;
-		else
-			posSuperClassExpressionRule = new ComposedRule<PositiveSuperClassExpression>(posSuperClassExpressionRule, rule);
+	public void add(InferenceRule inferenceRule) {
+		inferenceRules.add(inferenceRule);
 	}
 
-	void visit(BackwardLinkRule rule) {
-		if (backwardLinkRule == null)
-			backwardLinkRule = rule;
-		else
-			backwardLinkRule = new ComposedRule<BackwardLink>(backwardLinkRule, rule);
-	}
-
-	void visit(ForwardLinkRule rule) {
-		if (forwardLinkRule == null)
-			forwardLinkRule = rule;
-		else
-			forwardLinkRule = new ComposedRule<ForwardLink>(forwardLinkRule, rule);
-	}
-	
-	RuleApplicatorInContext getRuleApplicatorInContext(Context context, RuleApplicationEngine engine) {
-		return new RuleApplicatorInContext(context, engine);
-	}
-	
-	class RuleApplicatorInContext implements QueueableVisitor<Void> {
-
-		final Context context;
-		final RuleApplicationEngine engine;
-
-		protected RuleApplicatorInContext(Context context, RuleApplicationEngine engine) {
-			this.context = context;
-			this.engine = engine;
-		}
-
-		public Void visit(BackwardLink backwardLink) {
-			backwardLinkRule.apply(backwardLink, context, engine);
-			return null;
-		}
-
-		public Void visit(ForwardLink forwardLink) {
-			forwardLinkRule.apply(forwardLink, context, engine);
-			return null;
-		}
-
-		public Void visit(NegativeSuperClassExpression negSuperClassExpression) {
-			negSuperClassExpressionRule.apply(negSuperClassExpression, context, engine);
-			return null;
-		}
-
-		public Void visit(PositiveSuperClassExpression posSuperClassExpression) {
-			posSuperClassExpressionRule.apply(posSuperClassExpression, context, engine);
-			return null;
-		}
+	public List<InferenceRule> getInferenceRules() {
+		return inferenceRules;
 	}
 }

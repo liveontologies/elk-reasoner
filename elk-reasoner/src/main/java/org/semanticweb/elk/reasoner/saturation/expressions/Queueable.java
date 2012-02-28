@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.expressions;
 
+import org.semanticweb.elk.reasoner.saturation.rules.Context;
+
 /**
  * Common interface for objects that can be queued during
  * ClassExpressionSaturation.
@@ -30,4 +32,5 @@ package org.semanticweb.elk.reasoner.saturation.expressions;
  */
 public interface Queueable {
 	<O> O accept(QueueableVisitor<O> visitor);
+
 }

@@ -24,9 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.expressions.ForwardLink;
 
-public abstract class ForwardLinkRule implements UnaryRule<ForwardLink>, RegistrableRule {
+public abstract class ForwardLinkRule extends UnaryRule<ForwardLink> {
 
-	public void register(InferenceSystem inferenceSystem) {
-		inferenceSystem.visit(this);
+	public ForwardLinkRule(RuleApplicationEngine engine) {
+		super(engine);
 	}
+
 }

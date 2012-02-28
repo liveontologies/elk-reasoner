@@ -34,7 +34,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.expressions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.expressions.Queueable;
-import org.semanticweb.elk.reasoner.saturation.expressions.QueueableVisitor;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
 /**
@@ -53,6 +52,8 @@ public class RuleApplicationEngine extends
 
 	protected final InferenceSystem inferenceSystem =
 		new InferenceSystemEL();
+	
+	protected final InferenceRuleManager inferenceRuleIndex; 
 	
 	
 	// TODO: try to get rid of the ontology index, if possible
@@ -95,6 +96,8 @@ public class RuleApplicationEngine extends
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 
+		inferenceRuleIndex = new InferenceRuleManager(this);
+		inferenceRuleIndex.addInferenceSystem(inferenceSystem);
 	}
 
 	public final void submit(IndexedClassExpression job) {
@@ -134,6 +137,10 @@ public class RuleApplicationEngine extends
 			LOGGER_.debug("Forward Links Produced/Unique:" + 
 					QueueableStore.forwLinkInfNo + "/" + 
 					QueueableStore.forwLinkNo.get());
+			LOGGER_.debug("Processed queueables:" + 
+					InferenceRuleManager.debugProcessedQueueables);
+			LOGGER_.debug("Rule applications:" + 
+					InferenceRuleManager.debugRuleApplications);
 		}
 	}
 
@@ -208,7 +215,6 @@ public class RuleApplicationEngine extends
 
 	protected void process(Context context) {
 
-		QueueableVisitor<Void> ruleApplicator = inferenceSystem.getRuleApplicatorInContext(context, this);
 		QueueableStore store = new QueueableStore(context);
 		
 		for (;;) {
@@ -217,7 +223,7 @@ public class RuleApplicationEngine extends
 				break;
 			
 			if (item.accept(store))
-				item.accept(ruleApplicator);
+				inferenceRuleIndex.applyRuleInContext(item, context);
 		}
 
 		deactivateContext(context);

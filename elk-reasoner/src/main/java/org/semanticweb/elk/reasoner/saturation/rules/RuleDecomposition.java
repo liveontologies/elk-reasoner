@@ -31,18 +31,20 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.saturation.expressions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.expressions.PositiveSuperClassExpression;
 
-public class RuleDecomposition extends PositiveSuperClassExpressionRule implements InferenceRule {
-	
-	private class ClassExpressionDecomposer implements IndexedClassExpressionVisitor<Void> {
-		
+public class RuleDecomposition implements InferenceRule {
+
+	private static class ClassExpressionDecomposer implements
+			IndexedClassExpressionVisitor<Void> {
+
 		private final Context context;
 		private final RuleApplicationEngine engine;
 
-		public ClassExpressionDecomposer(Context context, RuleApplicationEngine engine) {
+		public ClassExpressionDecomposer(Context context,
+				RuleApplicationEngine engine) {
 			this.context = context;
 			this.engine = engine;
 		}
-		
+
 		public Void visit(IndexedClass ice) {
 			if (ice == engine.owlNothing)
 				context.isSatisfiable = false;
@@ -50,8 +52,10 @@ public class RuleDecomposition extends PositiveSuperClassExpressionRule implemen
 		}
 
 		public Void visit(IndexedObjectIntersectionOf ice) {
-			engine.enqueue(context, new PositiveSuperClassExpression(ice.getFirstConjunct()));
-			engine.enqueue(context, new PositiveSuperClassExpression(ice.getSecondConjunct()));
+			engine.enqueue(context,
+					new PositiveSuperClassExpression(ice.getFirstConjunct()));
+			engine.enqueue(context,
+					new PositiveSuperClassExpression(ice.getSecondConjunct()));
 			return null;
 		}
 
@@ -69,13 +73,19 @@ public class RuleDecomposition extends PositiveSuperClassExpressionRule implemen
 			return null;
 		}
 	};
-	
-	public void apply(PositiveSuperClassExpression argument, Context context, RuleApplicationEngine engine) {
-		ClassExpressionDecomposer decomposer = new ClassExpressionDecomposer(context, engine);
-		argument.getExpression().accept(decomposer);
+
+	public static class RuleDecomposition1 extends
+			PositiveSuperClassExpressionRule {
+
+		public RuleDecomposition1(RuleApplicationEngine engine) {
+			super(engine);
+		}
+
+		public void apply(PositiveSuperClassExpression argument, Context context) {
+			ClassExpressionDecomposer decomposer = new ClassExpressionDecomposer(
+					context, engine);
+			argument.getExpression().accept(decomposer);
+		}
 	}
-	
-	public RegistrableRule[] getComponentRules() {
-		return new RegistrableRule[] { this };
-	}
+
 }

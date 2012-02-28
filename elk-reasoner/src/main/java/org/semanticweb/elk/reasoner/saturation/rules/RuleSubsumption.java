@@ -28,22 +28,26 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.expressions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.expressions.SuperClassExpression;
 
-public class RuleSubsumption extends SuperClassExpressionRule implements InferenceRule {
+public class RuleSubsumption implements InferenceRule {
 
-	public void apply(SuperClassExpression argument, Context context, RuleApplicationEngine engine) {
+	public static class RuleSubsumption1 extends SuperClassExpressionRule {
 
-		List<IndexedClassExpression> implied = argument.getExpression().getToldSuperClassExpressions();
+		public RuleSubsumption1(RuleApplicationEngine engine) {
+			super(engine);
+		}
 
-		if (implied == null)
-			return;
+		public void apply(SuperClassExpression argument, Context context) {
 
-		for (IndexedClassExpression ice : implied)
-			engine.enqueue(context, new PositiveSuperClassExpression(ice));
+			List<IndexedClassExpression> implied = argument.getExpression()
+					.getToldSuperClassExpressions();
 
-	}
+			if (implied == null)
+				return;
 
-	public RegistrableRule[] getComponentRules() {
-		return new RegistrableRule[] { this };
+			for (IndexedClassExpression ice : implied)
+				engine.enqueue(context, new PositiveSuperClassExpression(ice));
+
+		}
 	}
 
 }

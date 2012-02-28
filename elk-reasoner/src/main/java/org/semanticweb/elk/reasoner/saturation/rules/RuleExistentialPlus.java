@@ -37,12 +37,16 @@ import org.semanticweb.elk.util.collections.Multimap;
 
 public class RuleExistentialPlus implements InferenceRule {
 
-	BackwardLinkRule comp1 = new BackwardLinkRule() {
+	public static class RuleExistentialPlus1 extends BackwardLinkRule {
 
-		public void apply(BackwardLink argument, Context context, RuleApplicationEngine engine) {
+		public RuleExistentialPlus1(RuleApplicationEngine engine) {
+			super(engine);
+		}
+
+		public void apply(BackwardLink argument, Context context) {
 			IndexedPropertyChain linkRelation = argument.getRelation();
 			Context target = argument.getTarget();
-			
+
 			// start deriving propagations
 			if (!context.derivePropagations) {
 				context.derivePropagations = true;
@@ -51,7 +55,9 @@ public class RuleExistentialPlus implements InferenceRule {
 					if (ice.getNegExistentials() != null)
 						for (IndexedObjectSomeValuesFrom e : ice
 								.getNegExistentials())
-							addPropagation(e.getRelation(), new NegativeSuperClassExpression(e), context, engine);
+							addPropagation(e.getRelation(),
+									new NegativeSuperClassExpression(e),
+									context, engine);
 			}
 
 			// apply all propagations over the link
@@ -60,52 +66,57 @@ public class RuleExistentialPlus implements InferenceRule {
 				return;
 
 			for (IndexedPropertyChain propRelation : new LazySetIntersection<IndexedPropertyChain>(
-					linkRelation.getSaturated().getSuperProperties(), props.keySet()))
+					linkRelation.getSaturated().getSuperProperties(),
+					props.keySet()))
 
 				for (Queueable carry : props.get(propRelation))
 					engine.enqueue(target, carry);
 		}
-		
+
 	};
 
-	SuperClassExpressionRule comp2 = new SuperClassExpressionRule() {
+	public static class RuleExistentialPlus2 extends SuperClassExpressionRule {
 
-		public void apply(SuperClassExpression argument, Context context, RuleApplicationEngine engine) {
-			List<IndexedObjectSomeValuesFrom> exists = argument.getExpression().getNegExistentials();
-			
+		public RuleExistentialPlus2(RuleApplicationEngine engine) {
+			super(engine);
+		}
+
+		public void apply(SuperClassExpression argument, Context context) {
+			List<IndexedObjectSomeValuesFrom> exists = argument.getExpression()
+					.getNegExistentials();
+
 			if (!context.derivePropagations || exists == null)
 				return;
 
 			for (IndexedObjectSomeValuesFrom e : exists)
-				addPropagation(e.getRelation(), new NegativeSuperClassExpression(e), context, engine);
+				addPropagation(e.getRelation(),
+						new NegativeSuperClassExpression(e), context, engine);
 		}
 
 	};
-	
-	
-	private void addPropagation(IndexedPropertyChain propRelation, Queueable carry, Context context, RuleApplicationEngine engine) {
+
+	private static void addPropagation(IndexedPropertyChain propRelation,
+			Queueable carry, Context context, RuleApplicationEngine engine) {
 
 		if (context.propagationsByObjectProperty == null) {
 			context.propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Queueable>();
-// 			TODO initializeDerivationOfBackwardLinks();
+			// TODO initializeDerivationOfBackwardLinks();
 		}
 
 		if (context.propagationsByObjectProperty.add(propRelation, carry)) {
-			
+
 			// propagate over all backward links
 			Multimap<IndexedPropertyChain, Context> backLinks = context.backwardLinksByObjectProperty;
 			if (context.backwardLinksByObjectProperty == null)
-				return; 	// this should never happen
+				return; // this should never happen
 
 			for (IndexedPropertyChain linkRelation : new LazySetIntersection<IndexedPropertyChain>(
-					propRelation.getSaturated().getSubProperties(), backLinks.keySet()))
+					propRelation.getSaturated().getSubProperties(),
+					backLinks.keySet()))
 
 				for (Context target : backLinks.get(linkRelation))
 					engine.enqueue(target, carry);
 		}
 	}
 
-	public RegistrableRule[] getComponentRules() {
-		return new RegistrableRule[] { comp1, comp2 };
-	}
 }

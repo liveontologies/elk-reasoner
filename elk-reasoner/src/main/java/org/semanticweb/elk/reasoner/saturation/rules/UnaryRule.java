@@ -24,6 +24,17 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.expressions.Queueable;
 
-public interface UnaryRule<T extends Queueable> {
-	void apply(T argument, Context context, RuleApplicationEngine engine);
+public abstract class UnaryRule<T extends Queueable> {
+	
+	final RuleApplicationEngine engine;
+	
+	public UnaryRule(RuleApplicationEngine engine) {
+		this.engine = engine;
+	}
+
+	void applyToQueuable(Queueable argument, Context context) {
+		apply((T) argument, context);
+	}
+
+	abstract void apply(T argument, Context context);
 }

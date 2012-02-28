@@ -30,23 +30,29 @@ import org.semanticweb.elk.reasoner.saturation.expressions.NegativeSuperClassExp
 import org.semanticweb.elk.reasoner.saturation.expressions.SuperClassExpression;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
-public class RuleConjunctionPlus extends SuperClassExpressionRule implements InferenceRule {
+public class RuleConjunctionPlus implements InferenceRule {
 
-	public void apply(SuperClassExpression argument, Context context, RuleApplicationEngine engine) {
+	public static class RuleConjunctionPlusRule1 extends
+			SuperClassExpressionRule {
+		
+		public RuleConjunctionPlusRule1(RuleApplicationEngine engine) {
+			super(engine);
+		}
 
-		Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjs = 
-			argument.getExpression().getNegConjunctionsByConjunct();
+		public void apply(SuperClassExpression argument, Context context) {
 
-		if (conjs == null)
-			return;
+			Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjs = argument
+					.getExpression().getNegConjunctionsByConjunct();
 
-		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-				conjs.keySet(), context.superClassExpressions))
-			engine.enqueue(context, new NegativeSuperClassExpression(conjs.get(common)));
-	}
+			if (conjs == null)
+				return;
 
-	public RegistrableRule[] getComponentRules() {
-		return new RegistrableRule[] { this };
+			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+					conjs.keySet(), context.superClassExpressions))
+				engine.enqueue(context,
+						new NegativeSuperClassExpression(conjs.get(common)));
+		}
+		
 	}
 
 }

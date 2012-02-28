@@ -24,9 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.expressions.SuperClassExpression;
 
-public abstract class SuperClassExpressionRule implements UnaryRule<SuperClassExpression>, RegistrableRule {
+public abstract class SuperClassExpressionRule extends UnaryRule<SuperClassExpression> {
 
-	public void register(InferenceSystem inferenceSystem) {
-		inferenceSystem.visit(this);
+	public SuperClassExpressionRule(RuleApplicationEngine engine) {
+		super(engine);
 	}
+
 }

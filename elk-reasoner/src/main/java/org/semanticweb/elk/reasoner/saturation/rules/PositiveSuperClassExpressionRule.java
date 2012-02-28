@@ -24,9 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.expressions.PositiveSuperClassExpression;
 
-public abstract class PositiveSuperClassExpressionRule implements UnaryRule<PositiveSuperClassExpression>, RegistrableRule {
+public abstract class PositiveSuperClassExpressionRule extends UnaryRule<PositiveSuperClassExpression> {
 
-	public void register(InferenceSystem inferenceSystem) {
-		inferenceSystem.visit(this);
+	public PositiveSuperClassExpressionRule(RuleApplicationEngine engine) {
+		super(engine);
 	}
+	
 }

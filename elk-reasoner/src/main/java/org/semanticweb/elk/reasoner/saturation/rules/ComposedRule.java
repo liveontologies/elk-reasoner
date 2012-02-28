@@ -24,18 +24,19 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.expressions.Queueable;
 
-public class ComposedRule<T extends Queueable> implements UnaryRule<T> {
+public class ComposedRule<T extends Queueable> extends UnaryRule<T> {
 	final protected UnaryRule<? super T> rule1;
 	final protected UnaryRule<? super T> rule2;
 	
 	public ComposedRule(UnaryRule<? super T> rule1, UnaryRule<? super T> rule2) {
+		super(null);
 		this.rule1 = rule1;
 		this.rule2 = rule2;
 	}
 
-	public void apply(T argument, Context context, RuleApplicationEngine engine) {
-		rule1.apply(argument, context, engine);
-		rule2.apply(argument, context, engine);
+	public void apply(T argument, Context context) {
+		rule1.apply(argument, context);
+		rule2.apply(argument, context);
 	}
 
 }
