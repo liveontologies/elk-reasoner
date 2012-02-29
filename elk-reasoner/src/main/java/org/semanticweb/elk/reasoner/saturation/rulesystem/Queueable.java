@@ -20,33 +20,16 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.expressions;
-
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.Context;
-import org.semanticweb.elk.util.collections.Pair;
+package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
 /**
- * @author Frantisek Simancik
+ * Common interface for objects that can be queued during
+ * ClassExpressionSaturation.
  * 
+ * @author Frantisek Simancik
  */
-public class ForwardLink extends Pair<IndexedPropertyChain, Context> implements
-		Queueable {
-
-	public ForwardLink(IndexedPropertyChain relation, Context target) {
-		super(relation, target);
-	}
-
-	public IndexedPropertyChain getRelation() {
-		return first;
-	}
-
-	public Context getTarget() {
-		return second;
-	}
-
-	public <O> O accept(QueueableVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
+public interface Queueable<C extends Context> {
+	
+	public boolean storeInContext(C context); 
 
 }

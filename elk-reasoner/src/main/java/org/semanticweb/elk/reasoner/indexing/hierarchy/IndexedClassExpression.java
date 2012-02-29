@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.Context;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**

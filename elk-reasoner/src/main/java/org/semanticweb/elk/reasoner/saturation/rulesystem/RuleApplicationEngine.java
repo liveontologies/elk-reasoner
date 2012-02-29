@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -32,8 +32,9 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
-import org.semanticweb.elk.reasoner.saturation.expressions.PositiveSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.expressions.Queueable;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.InferenceSystemEL;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.SuperClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
 /**
@@ -50,12 +51,10 @@ public class RuleApplicationEngine extends
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
 
-	protected final InferenceSystem inferenceSystem =
-		new InferenceSystemEL();
-	
-	protected final InferenceRuleManager inferenceRuleIndex; 
-	
-	
+	protected final InferenceSystem<? extends Context> inferenceSystem = new InferenceSystemEL();
+
+	protected final InferenceRuleManager inferenceRuleManager;
+
 	// TODO: try to get rid of the ontology index, if possible
 	/**
 	 * The index used for executing the rules
@@ -65,7 +64,7 @@ public class RuleApplicationEngine extends
 	/**
 	 * Cached constants
 	 */
-	protected final IndexedClassExpression owlThing, owlNothing;
+	public final IndexedClassExpression owlThing, owlNothing;
 
 	/**
 	 * The queue containing all activated contexts. Every activated context
@@ -96,8 +95,13 @@ public class RuleApplicationEngine extends
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 
-		inferenceRuleIndex = new InferenceRuleManager(this);
-		inferenceRuleIndex.addInferenceSystem(inferenceSystem);
+		inferenceRuleManager = new InferenceRuleManager(this);
+		try {
+			inferenceRuleManager.addInferenceSystem(inferenceSystem);
+		} catch (IllegalRuleMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public final void submit(IndexedClassExpression job) {
@@ -127,20 +131,20 @@ public class RuleApplicationEngine extends
 	 */
 	public void printStatistics() {
 		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Contexts created:" + contextNo);
-			LOGGER_.debug("Derived Produced/Unique:" + 
-					QueueableStore.superClassExpressionInfNo + "/" +
-					QueueableStore.superClassExpressionNo);
-			LOGGER_.debug("Backward Links Produced/Unique:" + 
-					QueueableStore.backLinkInfNo + "/" + 
-					QueueableStore.backLinkNo);
-			LOGGER_.debug("Forward Links Produced/Unique:" + 
-					QueueableStore.forwLinkInfNo + "/" + 
-					QueueableStore.forwLinkNo.get());
-			LOGGER_.debug("Processed queueables:" + 
-					InferenceRuleManager.debugProcessedQueueables);
-			LOGGER_.debug("Rule applications:" + 
-					InferenceRuleManager.debugRuleApplications);
+			 LOGGER_.debug("Contexts created:" + InferenceSystemEL.contextNo);
+			 LOGGER_.debug("Derived Produced/Unique:" +
+			 SuperClassExpression.superClassExpressionInfNo + "/" +
+			 SuperClassExpression.superClassExpressionNo);
+			 LOGGER_.debug("Backward Links Produced/Unique:" +
+			 BackwardLink.backLinkInfNo + "/" +
+			 BackwardLink.backLinkNo);
+			// LOGGER_.debug("Forward Links Produced/Unique:" +
+			// QueueableStore.forwLinkInfNo + "/" +
+			// QueueableStore.forwLinkNo.get());
+			// LOGGER_.debug("Processed queueables:" +
+			// InferenceRuleManager.debugProcessedQueueables);
+//			 LOGGER_.debug("Rule applications:" +
+//			 InferenceRuleManager.debugRuleApplications);
 		}
 	}
 
@@ -162,20 +166,9 @@ public class RuleApplicationEngine extends
 	 * @return context which root is the input indexed class expression.
 	 * 
 	 */
-	protected Context getCreateContext(
-			IndexedClassExpression root) {
+	public Context getCreateContext(IndexedClassExpression root) {
 		if (root.getContext() == null) {
-			Context sce = new Context(root);
-			if (root.setContext(sce)) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(root + ": context created");
-				}
-				contextNo.incrementAndGet();
-				enqueue(sce, new PositiveSuperClassExpression(root));
-
-				if (owlThing.occursNegatively())
-					enqueue(sce, new PositiveSuperClassExpression(owlThing));
-			}
+			inferenceSystem.createAndInitializeContext(root, this);
 		}
 		return root.getContext();
 	}
@@ -193,9 +186,9 @@ public class RuleApplicationEngine extends
 				activateContext(context);
 	}
 
-	protected void enqueue(Context context, Queueable item) {
-			context.queue.add(item);
-			activateContext(context);
+	public void enqueue(Context context, Queueable<?> item) {
+		context.queue.add(item);
+		activateContext(context);
 	}
 
 	protected void processActiveContexts() throws InterruptedException {
@@ -214,16 +207,15 @@ public class RuleApplicationEngine extends
 	}
 
 	protected void process(Context context) {
-
-		QueueableStore store = new QueueableStore(context);
-		
 		for (;;) {
-			Queueable item = context.queue.poll();
+			Queueable<?> item = context.queue.poll();
 			if (item == null)
 				break;
-			
-			if (item.accept(store))
-				inferenceRuleIndex.applyRuleInContext(item, context);
+
+//			if (inferenceRuleManager.storeInContext(item, context))
+//			if (((Queueable<ContextEl>)item).storeInContext((ContextEl)context))
+//				inferenceRuleManager.applyRuleInContext(item, context);
+			inferenceRuleManager.processItemInContext(item, context);
 		}
 
 		deactivateContext(context);

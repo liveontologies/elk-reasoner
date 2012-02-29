@@ -20,39 +20,31 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.expressions.NegativeSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.expressions.SuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
-public class RuleConjunctionPlus implements InferenceRule {
+public class RuleConjunctionPlus<C extends ContextEl> implements InferenceRule<C> {
 
-	public static class RuleConjunctionPlusRule1 extends
-			UnaryRule<SuperClassExpression> {
+	public void apply(SuperClassExpression<C> argument, C context,
+			RuleApplicationEngine engine) {
 
-		public RuleConjunctionPlusRule1(RuleApplicationEngine engine) {
-			super(engine);
-		}
+		Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjs = argument
+				.getExpression().getNegConjunctionsByConjunct();
 
-		public void apply(SuperClassExpression argument, Context context) {
+		if (conjs == null)
+			return;
 
-			Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjs = argument
-					.getExpression().getNegConjunctionsByConjunct();
-
-			if (conjs == null)
-				return;
-
-			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-					conjs.keySet(), context.superClassExpressions))
-				engine.enqueue(context,
-						new NegativeSuperClassExpression(conjs.get(common)));
-		}
-
+		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+				conjs.keySet(), context.getSuperClassExpressions()))
+			engine.enqueue(context,
+					new NegativeSuperClassExpression<C>(conjs.get(common)));
 	}
 
 }

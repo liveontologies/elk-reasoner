@@ -20,18 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.expressions;
+package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-
-public class NegativeSuperClassExpression extends SuperClassExpression  {
-	
-	public NegativeSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
-		super(superClassExpression);
-	}
-
-	public <O> O accept(QueueableVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
+public interface InferenceRule<C extends Context> {
 }

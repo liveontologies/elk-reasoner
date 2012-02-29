@@ -20,18 +20,13 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.expressions.Queueable;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * Objects of this class are used to manage subsumption relations between class
@@ -46,32 +41,9 @@ public class Context {
 
 	protected final IndexedClassExpression root;
 
-	protected final Queue<Queueable> queue;
-
-	protected final Set<IndexedClassExpression> superClassExpressions;
-
-	protected Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty;
-
-	protected Multimap<IndexedPropertyChain, Context> forwardLinksByObjectProperty;
-
-	protected Multimap<IndexedPropertyChain, Queueable> propagationsByObjectProperty;
-
-	protected volatile boolean isSatisfiable = true;
+	protected final Queue<Queueable<?>> queue;
 
 	protected volatile boolean isSaturated = false;
-
-	/**
-	 * If set to true, then composition rules will be applied to derive all
-	 * incoming links. This is usually needed only when at least one propagation
-	 * has been derived at this object.
-	 */
-	protected boolean deriveBackwardLinks = false;
-	
-	/**
-	 * If set to true, then propagations will be derived in this context. This
-	 * is needed only when there is at least one backward link.
-	 */
-	protected boolean derivePropagations = false;
 
 	/**
 	 * A context is active iff its queue is not empty or it is being processed.
@@ -80,24 +52,12 @@ public class Context {
 
 	public Context(IndexedClassExpression root) {
 		this.root = root;
-		this.queue = new ConcurrentLinkedQueue<Queueable>();
-		this.superClassExpressions = new ArrayHashSet<IndexedClassExpression>(13);
+		this.queue = new ConcurrentLinkedQueue<Queueable<?>>();
 		this.isActive = new AtomicBoolean(false);
 	}
 
 	public IndexedClassExpression getRoot() {
 		return root;
-	}
-
-	public boolean isSatisfiable() {
-		return isSatisfiable;
-	}
-
-	/**
-	 * @return the set of derived indexed class expressions
-	 */
-	public Set<IndexedClassExpression> getSuperClassExpressions() {
-		return superClassExpressions;
 	}
 
 	/**

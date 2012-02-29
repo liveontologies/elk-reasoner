@@ -20,20 +20,28 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 
-import java.util.ArrayList;
 import java.util.List;
 
-abstract class InferenceSystem {
-	
-	List<InferenceRule> inferenceRules = new ArrayList<InferenceRule>();
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
-	public void add(InferenceRule inferenceRule) {
-		inferenceRules.add(inferenceRule);
+public class RuleSubsumption<C extends ContextEl> implements InferenceRule<C> {
+
+	public void apply(SuperClassExpression<C> argument, C context,
+			RuleApplicationEngine engine) {
+
+		List<IndexedClassExpression> implied = argument.getExpression()
+				.getToldSuperClassExpressions();
+
+		if (implied == null)
+			return;
+
+		for (IndexedClassExpression ice : implied)
+			engine.enqueue(context, new PositiveSuperClassExpression<C>(ice));
+
 	}
 
-	public List<InferenceRule> getInferenceRules() {
-		return inferenceRules;
-	}
 }

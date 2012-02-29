@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,15 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.expressions;
+package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
-/**
- * @author Frantisek Simancik
- *
- */
-public interface QueueableVisitor<O> {
-	O visit(NegativeSuperClassExpression negSuperClassExpression);
-	O visit(PositiveSuperClassExpression posSuperClassExpression);
-	O visit(BackwardLink backwardLink);
-	O visit(ForwardLink forwardLink);
+public class NegativeSuperClassExpression<C extends ContextEl> extends SuperClassExpression<C>  {
+	
+	public NegativeSuperClassExpression(
+			IndexedClassExpression superClassExpression) {
+		super(superClassExpression);
+	}
+
 }

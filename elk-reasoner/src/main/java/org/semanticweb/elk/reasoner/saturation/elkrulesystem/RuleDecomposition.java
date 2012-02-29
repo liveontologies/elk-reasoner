@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
@@ -28,18 +28,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.expressions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.expressions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
-public class RuleDecomposition implements InferenceRule {
+public class RuleDecomposition<C extends ContextEl> implements InferenceRule<C> {
 
-	private static class ClassExpressionDecomposer implements
+	private class ClassExpressionDecomposer implements
 			IndexedClassExpressionVisitor<Void> {
 
-		private final Context context;
+		private final C context;
 		private final RuleApplicationEngine engine;
 
-		public ClassExpressionDecomposer(Context context,
+		public ClassExpressionDecomposer(C context,
 				RuleApplicationEngine engine) {
 			this.context = context;
 			this.engine = engine;
@@ -47,21 +47,21 @@ public class RuleDecomposition implements InferenceRule {
 
 		public Void visit(IndexedClass ice) {
 			if (ice == engine.owlNothing)
-				context.isSatisfiable = false;
+				context.setSatisfiable(false);
 			return null;
 		}
 
 		public Void visit(IndexedObjectIntersectionOf ice) {
 			engine.enqueue(context,
-					new PositiveSuperClassExpression(ice.getFirstConjunct()));
+					new PositiveSuperClassExpression<C>(ice.getFirstConjunct()));
 			engine.enqueue(context,
-					new PositiveSuperClassExpression(ice.getSecondConjunct()));
+					new PositiveSuperClassExpression<C>(ice.getSecondConjunct()));
 			return null;
 		}
 
 		public Void visit(IndexedObjectSomeValuesFrom ice) {
 			engine.enqueue(engine.getCreateContext(ice.getFiller()),
-					new BackwardLink(ice.getRelation(), context));
+					new BackwardLink<C>(ice.getRelation(), context));
 			return null;
 		}
 
@@ -74,18 +74,11 @@ public class RuleDecomposition implements InferenceRule {
 		}
 	};
 
-	public static class RuleDecomposition1 extends
-			UnaryRule<PositiveSuperClassExpression> {
-
-		public RuleDecomposition1(RuleApplicationEngine engine) {
-			super(engine);
-		}
-
-		public void apply(PositiveSuperClassExpression argument, Context context) {
-			ClassExpressionDecomposer decomposer = new ClassExpressionDecomposer(
-					context, engine);
-			argument.getExpression().accept(decomposer);
-		}
+	public void apply(PositiveSuperClassExpression<C> argument,
+			C context, RuleApplicationEngine engine) {
+		ClassExpressionDecomposer decomposer = new ClassExpressionDecomposer(
+				context, engine);
+		argument.getExpression().accept(decomposer);
 	}
 
 }

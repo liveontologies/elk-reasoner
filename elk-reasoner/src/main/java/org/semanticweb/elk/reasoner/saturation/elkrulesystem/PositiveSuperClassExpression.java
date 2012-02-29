@@ -20,19 +20,15 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.expressions;
+package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
-public abstract class SuperClassExpression implements Queueable {
+public class PositiveSuperClassExpression<C extends ContextEl> extends SuperClassExpression<C>  {
 	
-	protected final IndexedClassExpression expression;
-	
-	public SuperClassExpression(IndexedClassExpression expression) {
-		this.expression = expression;
+	public PositiveSuperClassExpression(
+			IndexedClassExpression superClassExpression) {
+		super(superClassExpression);
 	}
 	
-	public IndexedClassExpression getExpression() {
-		return expression;
-	}
 }

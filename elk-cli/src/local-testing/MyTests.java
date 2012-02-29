@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,8 +47,9 @@ import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.saturation.rules.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleDecomposition;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.RuleDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
 import org.semanticweb.elk.util.logging.Statistics;
 
@@ -102,7 +104,21 @@ public class MyTests {
 		Statistics.logOperationFinish("Testing", LOGGER_);
 	}
 	
+	public static boolean testMethod(Integer i) {
+		return true;
+	}
+	
 	public static void doReflectionTests() throws NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
+		Class<?> partypes[] = new Class<?>[1];
+        partypes[0] = Integer.class;
+		Method method = MyTests.class.getMethod("testMethod", partypes);
+		Integer num = 42;
+		String str = "Test";
+		Object obj = num;
+		if (method.invoke(null, obj).equals(null)) 
+			return;
+		System.out.println("Test done.");
+		
 		List<Integer> list = new ArrayList<Integer>();
 		
 		GenericProcessor<Integer> intProcessor = new GenericProcessor<Integer>();

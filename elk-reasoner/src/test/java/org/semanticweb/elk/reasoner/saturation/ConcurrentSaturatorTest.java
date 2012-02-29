@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
-import org.semanticweb.elk.reasoner.saturation.rules.Context;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 
 public class ConcurrentSaturatorTest extends TestCase {
 
