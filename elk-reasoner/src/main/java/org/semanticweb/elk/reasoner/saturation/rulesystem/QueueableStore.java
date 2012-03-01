@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.elkrulesystem.PositiveSuperClassE
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.SuperClassExpression;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 
-public class QueueableStore { //implements QueueableVisitor<Boolean> {
+public class QueueableStore {
 	
 	// Statistical information
 	static AtomicInteger superClassExpressionNo = new AtomicInteger(0);

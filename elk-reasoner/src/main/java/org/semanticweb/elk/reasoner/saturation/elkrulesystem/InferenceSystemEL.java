@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystem;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
-public class InferenceSystemEL extends InferenceSystem<ContextEl> {
+public final class InferenceSystemEL extends InferenceSystem<ContextEl> {
 	
 	public static AtomicInteger contextNo = new AtomicInteger(0);
 
@@ -39,7 +39,7 @@ public class InferenceSystemEL extends InferenceSystem<ContextEl> {
 		add(new RuleDecomposition<ContextEl>());
 	}
 
-	public void createAndInitializeContext(IndexedClassExpression root, RuleApplicationEngine engine) {
+	public final boolean createAndInitializeContext(IndexedClassExpression root, RuleApplicationEngine engine) {
 		ContextEl sce = new ContextEl(root);
 		if (root.setContext(sce)) {
 //			if (LOGGER_.isTraceEnabled()) {
@@ -50,7 +50,10 @@ public class InferenceSystemEL extends InferenceSystem<ContextEl> {
 
 			if (engine.owlThing.occursNegatively())
 				engine.enqueue(sce, new PositiveSuperClassExpression<ContextEl>(engine.owlThing));
+			
+			return true;
 		}
+		return false;
 	}
 	
 }

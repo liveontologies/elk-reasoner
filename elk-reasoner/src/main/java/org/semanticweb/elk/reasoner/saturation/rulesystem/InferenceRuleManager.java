@@ -1,3 +1,25 @@
+/*
+ * #%L
+ * ELK Reasoner
+ * 
+ * $Id$
+ * $HeadURL$
+ * %%
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
 import java.lang.reflect.InvocationTargetException;
@@ -8,6 +30,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.NegativeSuperClassExpression;
 
+/**
+ * Class for managing the application of inference rules and related methods
+ * that are specific to a particular inference system. Java Reflection is used
+ * to find and manage methods that are provided by input objects.
+ * 
+ * @author Markus Kroetzsch
+ * 
+ */
 public class InferenceRuleManager {
 
 	protected final static Logger LOGGER_ = Logger
@@ -31,21 +61,11 @@ public class InferenceRuleManager {
 			this.rest = rest;
 		}
 
-		public void applyToQueueable(Queueable<?> argument, Context context) {
+		public void applyToQueueable(Queueable<?> argument, Context context)
+				throws IllegalArgumentException, IllegalAccessException,
+				InvocationTargetException {
 			// debugRuleApplications.incrementAndGet();
-			try {
-				firstMethod.invoke(firstInferenceRule, argument, context,
-						engine);
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			firstMethod.invoke(firstInferenceRule, argument, context, engine);
 			if (rest != null) {
 				rest.applyToQueueable(argument, context);
 			}
@@ -200,7 +220,7 @@ public class InferenceRuleManager {
 		Method storeMethod = storeMethods.get(clazz);
 		if (storeMethod != null) {
 			try {
-				if (storeMethod.invoke(queueable, context).equals(Boolean.TRUE)) {
+				if (Boolean.TRUE.equals(storeMethod.invoke(queueable, context))) {
 					LinkedListOfMethods ruleMethodList = ruleMethods.get(clazz);
 					if (ruleMethodList == null) {
 						// synchronized (unaryRules) {
@@ -262,7 +282,18 @@ public class InferenceRuleManager {
 			return;
 			// System.out.println("Initialized for " + clazz.toString());
 		}
-		ruleMethodList.applyToQueueable(queueable, context);
+		try {
+			ruleMethodList.applyToQueueable(queueable, context);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

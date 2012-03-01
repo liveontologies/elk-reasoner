@@ -53,7 +53,7 @@ public class RuleApplicationEngine extends
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
 
-	protected final InferenceSystem<? extends Context> inferenceSystem = new InferenceSystemEL();
+	protected InferenceSystem<? extends Context> inferenceSystem = new InferenceSystemEL();
 
 	protected final InferenceRuleManager inferenceRuleManager;
 
@@ -170,18 +170,19 @@ public class RuleApplicationEngine extends
 	 */
 	public Context getCreateContext(IndexedClassExpression root) {
 		if (root.getContext() == null) {
-			ContextEl sce = new ContextEl(root);
-			if (root.setContext(sce)) {
-//				if (LOGGER_.isTraceEnabled()) {
-//					LOGGER_.trace(root + ": context created");
-//				}
+//			ContextEl sce = new ContextEl(root);
+//			if (root.setContext(sce)) {
+////				if (LOGGER_.isTraceEnabled()) {
+////					LOGGER_.trace(root + ": context created");
+////				}
+//				contextNo.incrementAndGet();
+//				enqueue(sce, new PositiveSuperClassExpression<ContextEl>(root));
+//
+//				if (owlThing.occursNegatively())
+//					enqueue(sce, new PositiveSuperClassExpression<ContextEl>(owlThing));
+//			}
+			if (inferenceSystem.createAndInitializeContext(root, this))
 				contextNo.incrementAndGet();
-				enqueue(sce, new PositiveSuperClassExpression<ContextEl>(root));
-
-				if (owlThing.occursNegatively())
-					enqueue(sce, new PositiveSuperClassExpression<ContextEl>(owlThing));
-			}
-			//inferenceSystem.createAndInitializeContext(root, this);
 		}
 		return root.getContext();
 	}
@@ -220,21 +221,12 @@ public class RuleApplicationEngine extends
 	}
 
 	protected void process(Context context) {
-		
-		QueueableStore qs = new QueueableStore((ContextEl)context);
-		
 		for (;;) {
 			Queueable<?> item = context.queue.poll();
 			if (item == null)
 				break;
 
-//			if (inferenceRuleManager.storeItemInContext(item, context))
-//			if (((Queueable<ContextEl>)item).storeItemInContext((ContextEl)context))
-//				inferenceRuleManager.applyRuleToItemInContext(item, context);
-			//inferenceRuleManager.processItemInContext(item, context);
-			
-			if (item.accept(qs)) 
-				inferenceRuleManager.applyRuleToItemInContext(item, context);
+			inferenceRuleManager.processItemInContext(item, context);
 		}
 
 		deactivateContext(context);

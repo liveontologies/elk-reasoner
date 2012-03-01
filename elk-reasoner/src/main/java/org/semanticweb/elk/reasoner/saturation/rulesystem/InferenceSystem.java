@@ -39,5 +39,5 @@ public abstract class InferenceSystem<C extends Context> {
 		return inferenceRules;
 	}
 	
-	public abstract void createAndInitializeContext(IndexedClassExpression root, RuleApplicationEngine engine);
+	public abstract boolean createAndInitializeContext(IndexedClassExpression root, RuleApplicationEngine engine);
 }

@@ -26,12 +26,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.QueueableStore;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * @author Frantisek Simancik
- * 
+ *
  */
 public class BackwardLink<C extends ContextEl> extends
 		Pair<IndexedPropertyChain, C> implements Queueable<C> {
@@ -62,10 +61,6 @@ public class BackwardLink<C extends ContextEl> extends
 			return true;
 		}
 		return false;
-	}
-	
-	public boolean accept(QueueableStore store) {
-		return store.visit(this);
 	}
 
 }

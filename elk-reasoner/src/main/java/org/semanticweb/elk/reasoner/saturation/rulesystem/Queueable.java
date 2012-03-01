@@ -31,7 +31,5 @@ package org.semanticweb.elk.reasoner.saturation.rulesystem;
 public interface Queueable<C extends Context> {
 	
 	public boolean storeInContext(C context);
-	
-	public boolean accept(QueueableStore store);
 
 }
