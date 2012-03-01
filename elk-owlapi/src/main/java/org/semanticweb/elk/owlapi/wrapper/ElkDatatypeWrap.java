@@ -52,4 +52,16 @@ public class ElkDatatypeWrap<T extends OWLDatatype> extends ElkEntityWrap<T>
 		return visitor.visit(this);
 	}
 
+	@Override
+	public String toString() {
+		return this.owlObject.toString();
+	}
+
+	public String getDatatypeShortname() {
+		return this.owlObject.getIRI().getFragment();
+	}
+
+	public String getDatatypeIRI() {
+		return this.owlObject.getIRI().toString();
+	}
 }

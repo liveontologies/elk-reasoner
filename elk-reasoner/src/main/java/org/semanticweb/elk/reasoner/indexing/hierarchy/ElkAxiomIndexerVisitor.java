@@ -153,6 +153,22 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 			return result;
 		}
+
+		public IndexedDataProperty filter(IndexedDataProperty idp) {
+			IndexedDataProperty result = objectCache.filter(idp);
+
+			if (!result.occurs() && increment > 0) {
+				objectCache.add(result);
+			}
+
+			result.updateOccurrenceNumber(increment);
+
+			if (!result.occurs() && increment < 0) {
+				objectCache.remove(result);
+			}
+
+			return result;
+		}
 	}
 
 }

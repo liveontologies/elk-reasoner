@@ -40,6 +40,13 @@ public interface ElkFacetRestriction extends ElkObject {
 	public String getConstrainingFacet();
 
 	/**
+	 * Get the short name of the constraining facet.
+	 *
+	 * @return short name of the facet
+	 */
+	public String getConstrainingFacetShortName();
+
+	/**
 	 * Get the literal used as a restriction value.
 	 * 
 	 * @return the literal used as restriction value

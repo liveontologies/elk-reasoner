@@ -35,6 +35,7 @@ public interface IndexedClassExpressionVisitor<O> extends
 		IndexedClassVisitor<O>, 
 		IndexedObjectIntersectionOfVisitor<O>,
 		IndexedObjectSomeValuesFromVisitor<O>, 
-		IndexedDataHasValueVisitor<O>, 
+		IndexedDataHasValueVisitor<O>,
+		IndexedDataSomeValuesFromVisitor<O>,
 		IndexedNominalVisitor<O> {
 }

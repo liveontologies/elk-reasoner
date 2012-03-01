@@ -23,47 +23,18 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ListIterator;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
-import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
+import org.semanticweb.elk.owl.interfaces.*;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataPropertyExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 
 public class ElkObjectIndexerVisitor implements
 		ElkClassExpressionVisitor<IndexedClassExpression>,
 		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain>,
+		ElkDataPropertyExpressionVisitor<IndexedDataProperty>,
 		ElkIndividualVisitor<IndexedNominal> {
 
 	// logger for events
@@ -197,10 +168,12 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
-		if (LOGGER_.isEnabledFor(Level.WARN))
+		if (LOGGER_.isEnabledFor(Level.WARN)) {
 			LOGGER_.warn(ElkDataHasValue.class.getSimpleName()
 					+ " is supported only partially.");
-		return objectFilter.filter(new IndexedDataHasValue(elkDataHasValue));
+		}
+		IndexedDataProperty idp = (IndexedDataProperty) elkDataHasValue.getProperty().accept(this);
+		return objectFilter.filter(new IndexedDataHasValue(idp, elkDataHasValue.getFiller()));
 	}
 
 	public IndexedClassExpression visit(
@@ -244,8 +217,11 @@ public class ElkObjectIndexerVisitor implements
 
 	public IndexedClassExpression visit(
 			ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
-		throw new IndexingException(ElkDataSomeValuesFrom.class.getSimpleName()
-				+ " not supported");
+		if (LOGGER_.isEnabledFor(Level.WARN)) {
+			LOGGER_.warn(ElkDataSomeValuesFrom.class.getSimpleName() + " is supported only partially.");
+		}
+		IndexedDataProperty idp = (IndexedDataProperty) elkDataSomeValuesFrom.getProperty().accept(this);
+		return objectFilter.filter(new IndexedDataSomeValuesFrom(idp, elkDataSomeValuesFrom.getFiller()));
 	}
 
 	public IndexedClassExpression visit(
@@ -262,6 +238,10 @@ public class ElkObjectIndexerVisitor implements
 	public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
 		return objectFilter
 				.filter(new IndexedObjectProperty(elkObjectProperty));
+	}
+        
+	public IndexedDataProperty visit(ElkDataProperty elkDataProperty) {
+		return objectFilter.filter(new IndexedDataProperty(elkDataProperty));
 	}
 
 	public IndexedPropertyChain visit(

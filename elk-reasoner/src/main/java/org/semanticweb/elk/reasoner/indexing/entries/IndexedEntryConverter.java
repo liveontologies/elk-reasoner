@@ -22,23 +22,17 @@
  */
 package org.semanticweb.elk.reasoner.indexing.entries;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.*;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 
 public class IndexedEntryConverter<T>
 		implements
 		IndexedClassExpressionVisitor<KeyEntry<T, ? extends IndexedClassExpression>>,
-		IndexedPropertyChainVisitor<IndexedPropertyChainEntry<T, ? extends IndexedPropertyChain>> {
+		IndexedPropertyChainVisitor<IndexedPropertyChainEntry<T, ? extends IndexedPropertyChain>>,
+		IndexedDataPropertyVisitor<KeyEntry<T, ? extends IndexedDataProperty>> {
 
 	public IndexedClassExpressionEntry<T, IndexedClass> visit(
 			IndexedClass element) {
@@ -54,6 +48,15 @@ public class IndexedEntryConverter<T>
 	public IndexedClassExpressionEntry<T, IndexedDataHasValue> visit(
 			IndexedDataHasValue element) {
 		return new IndexedDataHasValueEntry<T, IndexedDataHasValue>(element);
+	}
+
+	public IndexedClassExpressionEntry<T, IndexedDataSomeValuesFrom> visit(
+			IndexedDataSomeValuesFrom element) {
+		return new IndexedDataSomeValuesFromEntry<T, IndexedDataSomeValuesFrom>(element);
+	}
+
+	public KeyEntry<T, ? extends IndexedDataProperty> visit(IndexedDataProperty element) {
+		return new IndexedDataPropertyEntry<T, IndexedDataProperty>(element);
 	}
 
 	public IndexedClassExpressionEntry<T, IndexedObjectSomeValuesFrom> visit(
@@ -75,7 +78,6 @@ public class IndexedEntryConverter<T>
 
 	public IndexedNominalEntry<T, IndexedNominal> visit(
 			IndexedNominal element) {
-		return new IndexedNominalEntry<T, IndexedNominal> (element);
+		return new IndexedNominalEntry<T, IndexedNominal>(element);
 	}
-
 }
