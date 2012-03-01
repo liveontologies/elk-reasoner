@@ -25,11 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.rulesystem;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.NegativeSuperClassExpression;
 
 /**
  * Class for managing the application of inference rules and related methods
@@ -45,21 +44,50 @@ public class InferenceSystemInvocationManager {
 			.getLogger(InferenceSystemInvocationManager.class);
 
 	/**
-	 * Name of the method for applying an inference rule to an incoming
-	 * queueable.
+	 * Name of the method(s) that InferenceRule objects use for applying an
+	 * inference rule to an incoming queueable.
 	 */
 	protected final static String nameRuleMethod = "apply";
+	/**
+	 * Required parameter types of the rule method in InferenceRule objects.
+	 * Note that generic type information is irrelevant here (it will not be
+	 * checked, but the use of compatible generic types is ensured by the
+	 * InferenceSystem that stores the rules).
+	 */
 	protected final static Class<?>[] parameterTypesRuleMethod = {
 			Queueable.class, Context.class, RuleApplicationEngine.class };
+	/**
+	 * Name of the method that InferenceRule objects use for initializing a
+	 * context. These methods implement inference rules without premises.
+	 */
 	protected final static String nameInitMethod = "init";
+	/**
+	 * Required parameter types of the init method in InferenceRule objects.
+	 * Note that generic type information is irrelevant here (it will not be
+	 * checked, but the use of compatible generic types is ensured by the
+	 * InferenceSystem that stores the rules).
+	 */
 	protected final static Class<?>[] parameterTypesInitMethod = {
 			Context.class, RuleApplicationEngine.class };
+	/**
+	 * Name of the method that Queueable objects use for storing their date in a
+	 * given context. This is also part of the required interface of Queueable,
+	 * since storing is not optional (as opposed to applying rules of any kind).
+	 */
 	protected final static String nameStoreMethod = "storeInContext";
+	/**
+	 * Required parameter types of the store method in Queueable objects. A
+	 * generic type used for Context can be more specific than this.
+	 */
 	protected final static Class<?>[] parameterTypesStoreMethod = { Context.class };
 
 	static AtomicInteger debugProcessedQueueables = new AtomicInteger(0);
 	static AtomicInteger debugRuleApplications = new AtomicInteger(0);
 
+	/**
+	 * RuleApplicationEngine that owns this object. Rule applications need to
+	 * know this for enqueueing new derivations.
+	 */
 	protected final RuleApplicationEngine engine;
 
 	/**
@@ -133,7 +161,8 @@ public class InferenceSystemInvocationManager {
 	 * Map from types of queueable objects to containers with all relevant
 	 * inference methods.
 	 */
-	HashMap<Class<?>, InferenceMethods> methodsForQueueable = new HashMap<Class<?>, InferenceMethods>();
+	ConcurrentHashMap<Class<?>, InferenceMethods> methodsForQueueable = new ConcurrentHashMap<Class<?>, InferenceMethods>(
+			10, (float) 0.50, 4);
 
 	/**
 	 * List of methods that should be called to initialize new contexts.
@@ -169,12 +198,6 @@ public class InferenceSystemInvocationManager {
 				.getInferenceRules()) {
 			addInferenceRule(inferenceRule);
 		}
-		// TODO a better solution is needed for doing the following:
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Registering additional rules "
-					+ NegativeSuperClassExpression.class.toString());
-		}
-		initializeMethodsForClass(NegativeSuperClassExpression.class);
 	}
 
 	/**
@@ -288,13 +311,20 @@ public class InferenceSystemInvocationManager {
 	 */
 	protected void initializeMethodsForClass(Class<?> clazz)
 			throws NoSuchMethodException, IllegalInferenceMethodException {
-		if (!methodsForQueueable.containsKey(clazz)) {
-			methodsForQueueable.put(clazz, new InferenceMethods());
+		methodsForQueueable.put(clazz, getInitialMethodsForClass(clazz));
+	}
+
+	protected InferenceMethods getInitialMethodsForClass(Class<?> clazz)
+			throws NoSuchMethodException, IllegalInferenceMethodException {
+		InferenceMethods result;
+		if (methodsForQueueable.containsKey(clazz)) {
+			result = methodsForQueueable.get(clazz);
+		} else {
+			result = new InferenceMethods();
 		}
-		InferenceMethods classMethods = methodsForQueueable.get(clazz);
 
 		try {
-			classMethods.storeMethod = clazz.getMethod(nameStoreMethod,
+			result.storeMethod = clazz.getMethod(nameStoreMethod,
 					parameterTypesStoreMethod);
 		} catch (NoSuchMethodException e) {
 			throw new NoSuchMethodException("The queueable item "
@@ -309,13 +339,15 @@ public class InferenceSystemInvocationManager {
 				InferenceMethods keymethods = methodsForQueueable.get(keyclass);
 				RuleMethodList keyrules = keymethods.ruleMethods;
 				while (keyrules != null) {
-					classMethods.ruleMethods = addRuleMethod(
+					result.ruleMethods = addRuleMethod(
 							keyrules.firstInferenceRule, keyrules.firstMethod,
-							classMethods.ruleMethods);
+							result.ruleMethods);
 					keyrules = keyrules.rest;
 				}
 			}
 		}
+
+		return result;
 	}
 
 	/**
@@ -341,8 +373,8 @@ public class InferenceSystemInvocationManager {
 						ruleMethod, inferenceMethods.ruleMethods);
 			}
 		}
-		inferenceMethods.ruleMethods = addRuleMethod(inferenceRule,
-				ruleMethod, inferenceMethods.ruleMethods);
+		inferenceMethods.ruleMethods = addRuleMethod(inferenceRule, ruleMethod,
+				inferenceMethods.ruleMethods);
 	}
 
 	/**
@@ -377,24 +409,66 @@ public class InferenceSystemInvocationManager {
 		initMethods = new InitMethodList(inferenceRule, initMethod, initMethods);
 	}
 
+	/**
+	 * Complete information for a class of queueables that was only encoutered
+	 * during reasoning. This needs to be synchronized since the data that is
+	 * added in principle also depends on the current registration information.
+	 * So not only the actual update (write) but also the computation of the
+	 * value that is written must be sychronized.
+	 * 
+	 * @param clazz
+	 * @throws RuntimeException
+	 *             whenever the initialization failed
+	 */
+	synchronized protected void lateInitializeMethodsForClass(Class<?> clazz) {
+		if (methodsForQueueable.containsKey(clazz))
+			return; // someone else did it while we waited for the
+					// synchronization
+		if (LOGGER_.isDebugEnabled()) {
+			LOGGER_.debug("Late initialization of methods for class: "
+					+ clazz.toString());
+		}
+		try {
+			methodsForQueueable.put(clazz, getInitialMethodsForClass(clazz));
+		} catch (NoSuchMethodException e) {
+			// Re-throw as runtime exception
+			throw new RuntimeException(e.getMessage(), e);
+		} catch (IllegalInferenceMethodException e) {
+			// Re-throw as runtime exception
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Execute all known initialization rules for the given context.
+	 * Initialization rules are rules that do not require premises that are
+	 * derived first. There should always be initialization rules (otherwise
+	 * nothing would ever be derived): a RuntimeException will be thrown if no
+	 * rules are given to alert the user of this problem.
+	 * 
+	 * @param context
+	 * @throws IllegalArgumentException
+	 */
 	public void initContext(Context context) throws IllegalArgumentException {
-		if (initMethods != null) {
-			try {
-				initMethods.invoke(context);
-			} catch (IllegalAccessException e) {
-				// Happens if VM security configuration prevents method call.
-				// Wrap and throw as unchecked exception:
+		if (initMethods == null) {
+			throw new RuntimeException(
+					"Incomplete inference system: no initialization rules have been provided; nothing will ever be derived.");
+		}
+		try {
+			initMethods.invoke(context);
+		} catch (IllegalAccessException e) {
+			// Happens if VM security configuration prevents method call.
+			// Wrap and throw as unchecked exception:
+			throw new RuntimeException(e.getMessage(), e);
+		} catch (InvocationTargetException e) {
+			// This happens if one of the inference methods called through
+			// reflection has thrown an exception. Throw it but don't
+			// require
+			// others to check it (wrap into RuntimeException).
+			if (e.getCause() instanceof RuntimeException) {
+				throw (RuntimeException) e.getCause();
+			} else {
 				throw new RuntimeException(e.getMessage(), e);
-			} catch (InvocationTargetException e) {
-				// This happens if one of the inference methods called through
-				// reflection has thrown an exception. Throw it but don't
-				// require
-				// others to check it (wrap into RuntimeException).
-				if (e.getCause() instanceof RuntimeException) {
-					throw (RuntimeException) e.getCause();
-				} else {
-					throw new RuntimeException(e.getMessage(), e);
-				}
 			}
 		}
 	}
@@ -405,6 +479,10 @@ public class InferenceSystemInvocationManager {
 	 * queueable item. Only if this was necessary (i.e., if it was not known
 	 * before), then all inference rule methods registered for this queueable
 	 * are called.
+	 * 
+	 * If the class of queueable has not been encountered yet, a late
+	 * registration is performed. This can cause runtime exceptions if the
+	 * queueable does not provide a suitable method for storing it.
 	 * 
 	 * @param queueable
 	 * @param context
@@ -422,36 +500,31 @@ public class InferenceSystemInvocationManager {
 			throws IllegalArgumentException {
 		Class<?> clazz = queueable.getClass();
 		InferenceMethods inferenceMethods = methodsForQueueable.get(clazz);
-		if (inferenceMethods != null) {
-			try {
-				if (Boolean.TRUE.equals(inferenceMethods.storeMethod.invoke(
-						queueable, context))) {
-					if (inferenceMethods.ruleMethods == null) {
-						// synchronized (unaryRules) {
-						// initializeUnaryRulesForClass(clazz);
-						// }
-						// ruleList = unaryRules.get(clazz);
-						// if (ruleList == null) // give up
-						return;
-						// System.out.println("Initialized for " +
-						// clazz.toString());
-					}
+		if (inferenceMethods == null) {
+			lateInitializeMethodsForClass(clazz);
+			inferenceMethods = methodsForQueueable.get(clazz);
+			assert (inferenceMethods != null); // exception thrown otherwise
+		}
+
+		try {
+			if (Boolean.TRUE.equals(inferenceMethods.storeMethod.invoke(
+					queueable, context))) {
+				if (inferenceMethods.ruleMethods != null) {
 					inferenceMethods.ruleMethods.invoke(queueable, context);
 				}
-			} catch (IllegalAccessException e) {
-				// Happens if VM security configuration prevents method call.
-				// Wrap and throw as unchecked exception:
+			}
+		} catch (IllegalAccessException e) {
+			// Happens if VM security configuration prevents method call.
+			// Wrap and throw as unchecked exception:
+			throw new RuntimeException(e.getMessage(), e);
+		} catch (InvocationTargetException e) {
+			// This happens if one of the inference methods called through
+			// reflection has thrown an exception. Throw it but don't
+			// require others to check it (wrap into RuntimeException).
+			if (e.getCause() instanceof RuntimeException) {
+				throw (RuntimeException) e.getCause();
+			} else {
 				throw new RuntimeException(e.getMessage(), e);
-			} catch (InvocationTargetException e) {
-				// This happens if one of the inference methods called through
-				// reflection has thrown an exception. Throw it but don't
-				// require
-				// others to check it (wrap into RuntimeException).
-				if (e.getCause() instanceof RuntimeException) {
-					throw (RuntimeException) e.getCause();
-				} else {
-					throw new RuntimeException(e.getMessage(), e);
-				}
 			}
 		}
 	}
