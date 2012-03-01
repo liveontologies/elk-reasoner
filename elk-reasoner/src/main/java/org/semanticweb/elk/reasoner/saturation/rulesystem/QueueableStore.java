@@ -26,72 +26,73 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ContextEl;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.SuperClassExpression;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 
-class QueueableStore { //implements QueueableVisitor<Boolean> {
+public class QueueableStore { //implements QueueableVisitor<Boolean> {
 	
-//	// Statistical information
-//	static AtomicInteger superClassExpressionNo = new AtomicInteger(0);
-//	static AtomicInteger superClassExpressionInfNo = new AtomicInteger(0);
-//	static AtomicInteger backLinkNo = new AtomicInteger(0);
-//	static AtomicInteger backLinkInfNo = new AtomicInteger(0);
-//	static AtomicInteger forwLinkNo = new AtomicInteger(0);
-//	static AtomicInteger forwLinkInfNo = new AtomicInteger(0);
-//	
-//	protected final Context context;
-//
-//	public QueueableStore(Context context) {
-//		this.context = context;
-//	}
-//	
-//	protected Boolean add(SuperClassExpression superClassExpression) {
-//		superClassExpressionInfNo.incrementAndGet();
-//		if (context.superClassExpressions.add(
-//				superClassExpression.getExpression())) {
-//			superClassExpressionNo.incrementAndGet();
-//			return true;
-//		}
-//		return false;
-//	}
-//
-//	public Boolean visit(NegativeSuperClassExpression negSuperClassExpression) {
-//		return add(negSuperClassExpression);	
-//	}
-//
-//	public Boolean visit(PositiveSuperClassExpression posSuperClassExpression) {
-//		return add(posSuperClassExpression);
-//	}
-//
-//	public Boolean visit(BackwardLink backwardLink) {
-//		backLinkInfNo.incrementAndGet();
-//
-//		if (context.backwardLinksByObjectProperty == null)
-//			context.backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Context>();
-//		
-//		if (context.backwardLinksByObjectProperty.add(
-//				backwardLink.getRelation(), backwardLink.getTarget())) {
-//			backLinkNo.incrementAndGet();
-//			return true;
-//		}
-//		return false;
-//	}
-//
-//	public Boolean visit(ForwardLink forwardLink) {
-//		forwLinkInfNo.incrementAndGet();
-//
-//		if (context.forwardLinksByObjectProperty == null)
-//			context.forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Context>();
-//
-//		if (context.forwardLinksByObjectProperty.add(
-//				forwardLink.getRelation(), forwardLink.getTarget())) {
-//			forwLinkNo.incrementAndGet();
-//			return true;
-//		}
-//		return false;
-//	}
+	// Statistical information
+	static AtomicInteger superClassExpressionNo = new AtomicInteger(0);
+	static AtomicInteger superClassExpressionInfNo = new AtomicInteger(0);
+	static AtomicInteger backLinkNo = new AtomicInteger(0);
+	static AtomicInteger backLinkInfNo = new AtomicInteger(0);
+	static AtomicInteger forwLinkNo = new AtomicInteger(0);
+	static AtomicInteger forwLinkInfNo = new AtomicInteger(0);
+	
+	public final ContextEl context;
+
+	public QueueableStore(ContextEl context) {
+		this.context = context;
+	}
+	
+	protected Boolean add(SuperClassExpression<? extends ContextEl> superClassExpression) {
+		superClassExpressionInfNo.incrementAndGet();
+		if (context.superClassExpressions.add(
+				superClassExpression.getExpression())) {
+			superClassExpressionNo.incrementAndGet();
+			return true;
+		}
+		return false;
+	}
+
+	public Boolean visit(NegativeSuperClassExpression<? extends ContextEl> negSuperClassExpression) {
+		return add(negSuperClassExpression);	
+	}
+
+	public Boolean visit(PositiveSuperClassExpression<? extends ContextEl> posSuperClassExpression) {
+		return add(posSuperClassExpression);
+	}
+
+	public Boolean visit(BackwardLink<? extends ContextEl> backwardLink) {
+		backLinkInfNo.incrementAndGet();
+
+		if (context.backwardLinksByObjectProperty == null)
+			context.backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, ContextEl>();
+		
+		if (context.backwardLinksByObjectProperty.add(
+				backwardLink.getRelation(), backwardLink.getTarget())) {
+			backLinkNo.incrementAndGet();
+			return true;
+		}
+		return false;
+	}
+
+	public Boolean visit(ForwardLink<? extends ContextEl> forwardLink) {
+		forwLinkInfNo.incrementAndGet();
+
+		if (context.forwardLinksByObjectProperty == null)
+			context.forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, ContextEl>();
+
+		if (context.forwardLinksByObjectProperty.add(
+				forwardLink.getRelation(), forwardLink.getTarget())) {
+			forwLinkNo.incrementAndGet();
+			return true;
+		}
+		return false;
+	}
 
 }

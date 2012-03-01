@@ -33,7 +33,9 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ContextEl;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.InferenceSystemEL;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.SuperClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
@@ -168,7 +170,18 @@ public class RuleApplicationEngine extends
 	 */
 	public Context getCreateContext(IndexedClassExpression root) {
 		if (root.getContext() == null) {
-			inferenceSystem.createAndInitializeContext(root, this);
+			ContextEl sce = new ContextEl(root);
+			if (root.setContext(sce)) {
+//				if (LOGGER_.isTraceEnabled()) {
+//					LOGGER_.trace(root + ": context created");
+//				}
+				contextNo.incrementAndGet();
+				enqueue(sce, new PositiveSuperClassExpression<ContextEl>(root));
+
+				if (owlThing.occursNegatively())
+					enqueue(sce, new PositiveSuperClassExpression<ContextEl>(owlThing));
+			}
+			//inferenceSystem.createAndInitializeContext(root, this);
 		}
 		return root.getContext();
 	}
@@ -207,15 +220,21 @@ public class RuleApplicationEngine extends
 	}
 
 	protected void process(Context context) {
+		
+		QueueableStore qs = new QueueableStore((ContextEl)context);
+		
 		for (;;) {
 			Queueable<?> item = context.queue.poll();
 			if (item == null)
 				break;
 
-//			if (inferenceRuleManager.storeInContext(item, context))
-//			if (((Queueable<ContextEl>)item).storeInContext((ContextEl)context))
-//				inferenceRuleManager.applyRuleInContext(item, context);
-			inferenceRuleManager.processItemInContext(item, context);
+//			if (inferenceRuleManager.storeItemInContext(item, context))
+//			if (((Queueable<ContextEl>)item).storeItemInContext((ContextEl)context))
+//				inferenceRuleManager.applyRuleToItemInContext(item, context);
+			//inferenceRuleManager.processItemInContext(item, context);
+			
+			if (item.accept(qs)) 
+				inferenceRuleManager.applyRuleToItemInContext(item, context);
 		}
 
 		deactivateContext(context);

@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.QueueableStore;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
@@ -47,7 +47,7 @@ public class BackwardLink<C extends ContextEl> extends
 		return first;
 	}
 
-	public Context getTarget() {
+	public C getTarget() {
 		return second;
 	}
 
@@ -62,6 +62,10 @@ public class BackwardLink<C extends ContextEl> extends
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean accept(QueueableStore store) {
+		return store.visit(this);
 	}
 
 }

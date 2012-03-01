@@ -12,11 +12,11 @@ import org.semanticweb.elk.util.collections.Multimap;
 
 public class ContextEl extends Context {
 	
-	protected final Set<IndexedClassExpression> superClassExpressions;
+	public final Set<IndexedClassExpression> superClassExpressions;
 	
-	protected Multimap<IndexedPropertyChain, ContextEl> backwardLinksByObjectProperty;
+	public Multimap<IndexedPropertyChain, ContextEl> backwardLinksByObjectProperty;
 	
-	protected Multimap<IndexedPropertyChain, ContextEl> forwardLinksByObjectProperty;
+	public Multimap<IndexedPropertyChain, ContextEl> forwardLinksByObjectProperty;
 	
 	protected Multimap<IndexedPropertyChain, Queueable<? extends ContextEl>> propagationsByObjectProperty;
 	

@@ -23,12 +23,17 @@
 package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.QueueableStore;
 
 public class PositiveSuperClassExpression<C extends ContextEl> extends SuperClassExpression<C>  {
 	
 	public PositiveSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
+	}
+	
+	public boolean accept(QueueableStore store) {
+		return store.visit(this);
 	}
 	
 }
