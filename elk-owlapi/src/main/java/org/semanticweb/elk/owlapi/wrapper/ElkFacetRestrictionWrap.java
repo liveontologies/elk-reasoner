@@ -46,10 +46,6 @@ public class ElkFacetRestrictionWrap<T extends OWLFacetRestriction> extends
 	public String getConstrainingFacet() {
 		return this.owlObject.getFacet().getIRI().toString();
 	}
-        
-	public String getConstrainingFacetShortName() {
-		return this.owlObject.getFacet().getShortName();
-	}
 
 	public ElkLiteral getRestrictionValue() {
 		return converter.convert(this.owlObject.getFacetValue());

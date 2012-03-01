@@ -27,17 +27,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 
 /**
  * Implements a view for instances of {@link IndexedClass}
- *
+ * 
  * @author "Yevgeny Kazakov"
- *
+ * 
  * @param <T>
  *            The type of the elements in the set where this entry is used
- *
+ * 
  * @param <K>
  *            the type of the wrapped indexed object used as the key of the
  *            entry
  */
-public class IndexedDataHasValueEntry<T, K extends IndexedDataHasValue> extends IndexedClassExpressionEntry<T, K> {
+public class IndexedDataHasValueEntry<T, K extends IndexedDataHasValue> extends
+		IndexedClassExpressionEntry<T, K> {
 
 	public IndexedDataHasValueEntry(K representative) {
 		super(representative);
@@ -45,7 +46,8 @@ public class IndexedDataHasValueEntry<T, K extends IndexedDataHasValue> extends 
 
 	@Override
 	public int computeHashCode() {
-		return combinedHashCode(IndexedDataHasValueEntry.class, this.key.getProperty().getIri(), this.key.getFiller().getLexicalForm());
+		return combinedHashCode(IndexedDataHasValueEntry.class, this.key
+				.getRelation().getIri(), this.key.getFiller().getLexicalForm());
 	}
 
 	@Override
@@ -55,8 +57,10 @@ public class IndexedDataHasValueEntry<T, K extends IndexedDataHasValue> extends 
 		}
 		if (other instanceof IndexedDataHasValueEntry<?, ?>) {
 			IndexedDataHasValueEntry<?, ?> otherEntry = (IndexedDataHasValueEntry<?, ?>) other;
-			return this.key.getProperty().getIri().equals(otherEntry.key.getProperty().getIri())
-					&& this.key.getFiller().getLexicalForm().equals(otherEntry.key.getFiller().getLexicalForm());
+			return this.key.getRelation().getIri()
+					.equals(otherEntry.key.getRelation().getIri())
+					&& this.key.getFiller().getLexicalForm()
+							.equals(otherEntry.key.getFiller().getLexicalForm());
 		}
 		return false;
 	}

@@ -29,5 +29,4 @@ interface IndexedObjectFilter {
 
 	IndexedPropertyChain filter(IndexedPropertyChain ipc);
 
-	IndexedDataProperty filter(IndexedDataProperty idp);
 }

@@ -61,11 +61,6 @@ public class ElkDatatypeRestrictionWrap<T extends OWLDatatypeRestriction>
 	}
 
 	@Override
-	public String toString() {
-		return this.owlObject.toString();
-	}
-
-	@Override
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

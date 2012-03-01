@@ -22,61 +22,50 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Collections;
-import java.util.List;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
-import org.semanticweb.elk.reasoner.rules.DatatypeResolutionEngine;
-import org.semanticweb.elk.reasoner.rules.DatatypeRestriction;
 
-public class IndexedDataHasValue extends IndexedDatatypeExpression {
+public class IndexedDataHasValue extends IndexedClassExpression {
 
-    protected final ElkLiteral filler;
+	protected final ElkDataProperty property;
+	protected final ElkLiteral filler;
 
-	protected IndexedDataHasValue(IndexedDataProperty dataProperty, ElkLiteral elkLiteral) {
-		super(dataProperty);
-		this.filler = elkLiteral;
+	protected IndexedDataHasValue(ElkDataHasValue elkDataHasValue) {
+		this.property = (ElkDataProperty) elkDataHasValue.getProperty();
+		this.filler = elkDataHasValue.getFiller();
 	}
 
-    public ElkLiteral getFiller() {
-        return filler;
-    }
+	public ElkDataProperty getRelation() {
+		return property;
+	}
 
-    @Override
-    protected void updateOccurrenceNumbers(int increment,
-            int positiveIncrement, int negativeIncrement) {
-        positiveOccurrenceNo += positiveIncrement;
-        negativeOccurrenceNo += negativeIncrement;
-    }
-
-    public <O> O accept(IndexedDataHasValueVisitor<O> visitor) {
-        return visitor.visit(this);
-    }
-
-    @Override
-    public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-        return accept((IndexedDataHasValueVisitor<O>) visitor);
-    }
-
-    @Override
-    public String toString() {
-        return "DataHasValue(" + '<' + this.property.getIri().asString()
-                + "> \"" + this.filler.getLexicalForm() + "\"^^<"
-                + this.filler.getDatatype().getIri().asString() + ">)";
+	public ElkLiteral getFiller() {
+		return filler;
 	}
 
 	@Override
-	public List<DatatypeRestriction> getRestrictions() {
-		DatatypeRestriction restriction = new DatatypeRestriction(
-				filler.getDatatype(),
-				DatatypeResolutionEngine.Relation.EQUAL,
-				filler.getLexicalForm());
-		return Collections.singletonList(restriction);
+	protected void updateOccurrenceNumbers(int increment,
+			int positiveIncrement, int negativeIncrement) {
+		positiveOccurrenceNo += positiveIncrement;
+		negativeOccurrenceNo += negativeIncrement;
+	}
+
+	public <O> O accept(IndexedDataHasValueVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public int getRestrictionCount() {
-		return 1;
+	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+		return accept((IndexedDataHasValueVisitor<O>) visitor);
+	}
+
+	@Override
+	public String toString() {
+		return "DataHasValue(" + '<' + this.property.getIri().asString()
+				+ "> \"" + this.filler.getLexicalForm() + "\"^^<"
+				+ this.filler.getDatatype().getIri().asString() + ">)";
 	}
 }

@@ -23,26 +23,22 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
-import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
+import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 
 public class IndexedObjectCache implements IndexedObjectFilter {
 
 	protected final KeyEntryHashSet<IndexedClassExpression> indexedClassExpressionLookup;
 	protected final KeyEntryHashSet<IndexedPropertyChain> indexedPropertyChainLookup;
-	protected final KeyEntryHashSet<IndexedDataProperty> indexedDataPropertiesLookup;
 	protected int indexedClassCount = 0;
 	protected int indexedObjectPropertyCount = 0;
-	protected int indexedDataPropertyCount = 0;
 
 	protected IndexedObjectCache() {
 		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
 				indexedClassExpressionViewFactory, 1024);
 		indexedPropertyChainLookup = new KeyEntryHashSet<IndexedPropertyChain>(
 				indexedPropertyChainViewFactory, 128);
-		indexedDataPropertiesLookup = new KeyEntryHashSet<IndexedDataProperty>(
-				indexedDataPropertyViewFactory, 128);
 	}
 
 	public IndexedClassExpression filter(IndexedClassExpression ice) {
@@ -60,15 +56,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		else
 			return result;
 	}
-    
-	public IndexedDataProperty filter(IndexedDataProperty idp) {
-		IndexedDataProperty result = indexedDataPropertiesLookup.get(idp);
-		if (result == null) {
-			return idp;
-		} else {
-			return result;
-		}
-	}
 
 	protected void add(IndexedClassExpression ice) {
 		indexedClassExpressionLookup.merge(ice);
@@ -81,13 +68,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		if (ipc instanceof IndexedObjectProperty)
 			indexedObjectPropertyCount++;
 	}
-        
-	protected void add(IndexedDataProperty idp) {
-		indexedDataPropertiesLookup.merge(idp);
-		if (idp instanceof IndexedDataProperty) {
-			indexedDataPropertyCount++;
-		}
-	}
 
 	protected void remove(IndexedClassExpression ice) {
 		indexedClassExpressionLookup.remove(ice);
@@ -99,13 +79,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		indexedPropertyChainLookup.remove(ipc);
 		if (ipc instanceof IndexedObjectProperty)
 			indexedObjectPropertyCount--;
-	}
-        
-	protected void remove(IndexedDataProperty idp) {
-		indexedDataPropertiesLookup.remove(idp);
-		if (idp instanceof IndexedDataProperty) {
-			indexedDataPropertyCount--;
-		}
 	}
 
 	class IndexedClassExpressionViewFactory implements
@@ -136,15 +109,4 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 	IndexedPropertyChainViewFactory indexedPropertyChainViewFactory = new IndexedPropertyChainViewFactory();
 
-	class IndexedDataPropertyViewFactory implements
-			KeyEntryFactory<IndexedDataProperty> {
-
-		final IndexedEntryConverter<IndexedDataProperty> converter = new IndexedEntryConverter<IndexedDataProperty>();
-
-		public KeyEntry<IndexedDataProperty, ? extends IndexedDataProperty> createEntry(
-				IndexedDataProperty key) {
-			return key.accept(converter);
-		}
-	}
-	IndexedDataPropertyViewFactory indexedDataPropertyViewFactory = new IndexedDataPropertyViewFactory();
 }

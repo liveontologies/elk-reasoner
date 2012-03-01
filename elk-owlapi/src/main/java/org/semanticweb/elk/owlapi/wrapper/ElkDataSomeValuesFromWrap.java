@@ -53,11 +53,6 @@ public class ElkDataSomeValuesFromWrap<T extends OWLDataSomeValuesFrom> extends
 	}
 
 	@Override
-	public String toString() {
-		return this.owlObject.toString();
-	}
-
-	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
