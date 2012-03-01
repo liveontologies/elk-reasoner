@@ -27,17 +27,62 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
+/**
+ * Abstract base class for inference systems. An inference system defines the
+ * rules and data structures that form the basis of saturation-based reasoning.
+ * It is parameterized by a generic Context type that its rules are based on. It
+ * maintains a list of inference rules that implement a saturation calculus. The
+ * generic context parameter is used to check the compatibility of the set of
+ * rules with the context at compile time.
+ * 
+ * @author Markus Kroetzsch
+ * 
+ * @param <C>
+ */
 public abstract class InferenceSystem<C extends Context> {
-	
-	List<InferenceRule<C>> inferenceRules = new ArrayList<InferenceRule<C>>();
 
+	protected List<InferenceRule<C>> inferenceRules = new ArrayList<InferenceRule<C>>();
+
+	/**
+	 * Add an inference rule to this inference system. This is typically done in
+	 * the constructor of concrete inference systems.
+	 * 
+	 * @param inferenceRule
+	 */
 	public void add(InferenceRule<C> inferenceRule) {
 		inferenceRules.add(inferenceRule);
 	}
 
+	/**
+	 * Get the list of inference rules of this inference system.
+	 * 
+	 * @return
+	 */
 	public List<InferenceRule<C>> getInferenceRules() {
 		return inferenceRules;
 	}
-	
-	public abstract boolean createAndInitializeContext(IndexedClassExpression root, RuleApplicationEngine engine);
+
+	/**
+	 * Create a new context for the given root expression.
+	 * 
+	 * @param root
+	 * @return
+	 */
+	public abstract C createContext(IndexedClassExpression root);
+
+	/**
+	 * Temporary method to cast contexts that have been stored without
+	 * specifying C back to C. This is mainly needed for indexed objects, since
+	 * they do not depend on C but currently store contexts; this will be fixed
+	 * by storing contexts elsewhere.
+	 * 
+	 * @note This method will vanish soon. Do not use it unless you really,
+	 *       really must.
+	 * @param context
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public C castContext(Context context) {
+		return (C) context;
+	}
 }

@@ -33,9 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ContextEl;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.InferenceSystemEL;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.SuperClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
@@ -45,6 +43,7 @@ import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
  * 
  * @author Frantisek Simancik
  * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  * 
  */
 public class RuleApplicationEngine extends
@@ -55,7 +54,7 @@ public class RuleApplicationEngine extends
 
 	protected InferenceSystem<? extends Context> inferenceSystem = new InferenceSystemEL();
 
-	protected final InferenceRuleManager inferenceRuleManager;
+	protected final InferenceSystemInvocationManager inferenceSystemInvocationManager;
 
 	// TODO: try to get rid of the ontology index, if possible
 	/**
@@ -97,10 +96,13 @@ public class RuleApplicationEngine extends
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 
-		inferenceRuleManager = new InferenceRuleManager(this);
+		inferenceSystemInvocationManager = new InferenceSystemInvocationManager(this);
 		try {
-			inferenceRuleManager.addInferenceSystem(inferenceSystem);
-		} catch (IllegalRuleMethodException e) {
+			inferenceSystemInvocationManager.addInferenceSystem(inferenceSystem);
+		} catch (IllegalInferenceMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -133,7 +135,7 @@ public class RuleApplicationEngine extends
 	 */
 	public void printStatistics() {
 		if (LOGGER_.isDebugEnabled()) {
-			 LOGGER_.debug("Contexts created:" + InferenceSystemEL.contextNo);
+			 LOGGER_.debug("Contexts created:" + contextNo);
 			 LOGGER_.debug("Derived Produced/Unique:" +
 			 SuperClassExpression.superClassExpressionInfNo + "/" +
 			 SuperClassExpression.superClassExpressionNo);
@@ -170,19 +172,14 @@ public class RuleApplicationEngine extends
 	 */
 	public Context getCreateContext(IndexedClassExpression root) {
 		if (root.getContext() == null) {
-//			ContextEl sce = new ContextEl(root);
-//			if (root.setContext(sce)) {
-////				if (LOGGER_.isTraceEnabled()) {
-////					LOGGER_.trace(root + ": context created");
-////				}
-//				contextNo.incrementAndGet();
-//				enqueue(sce, new PositiveSuperClassExpression<ContextEl>(root));
-//
-//				if (owlThing.occursNegatively())
-//					enqueue(sce, new PositiveSuperClassExpression<ContextEl>(owlThing));
-//			}
-			if (inferenceSystem.createAndInitializeContext(root, this))
+			Context context = inferenceSystem.createContext(root);
+			if (root.setContext(context)) {
 				contextNo.incrementAndGet();
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace(root + ": context created");
+				}
+				inferenceSystemInvocationManager.initContext(context);
+			}
 		}
 		return root.getContext();
 	}
@@ -226,7 +223,7 @@ public class RuleApplicationEngine extends
 			if (item == null)
 				break;
 
-			inferenceRuleManager.processItemInContext(item, context);
+			inferenceSystemInvocationManager.processItemInContext(item, context);
 		}
 
 		deactivateContext(context);

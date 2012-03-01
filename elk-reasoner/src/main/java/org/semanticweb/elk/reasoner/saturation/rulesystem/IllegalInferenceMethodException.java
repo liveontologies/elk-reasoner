@@ -25,13 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.rulesystem;
 import java.lang.reflect.Method;
 
 /**
- * A simple exception to report problems when registering inference rules in
+ * A simple exception to report problems when registering inference methods in
  * InferenceRuleManager.
  * 
  * @author Markus Kroetzsch
  * 
  */
-public class IllegalRuleMethodException extends Exception {
+public class IllegalInferenceMethodException extends Exception {
 
 	/**
 	 * The version identifier for this Serializable class. Increment only if the
@@ -39,8 +39,12 @@ public class IllegalRuleMethodException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public IllegalRuleMethodException(Method ruleMethod, String message) {
-		super("Cannot use the rule method '" + ruleMethod + "'.\n" + message);
+	public IllegalInferenceMethodException(String methodName, String message) {
+		super("Cannot use the rule method '" + methodName + "'.\n" + message);
+	}
+	
+	public IllegalInferenceMethodException(Method inferenceMethod, String message) {
+		super("Cannot use the inference method '" + inferenceMethod + "'.\n" + message);
 	}
 	
 }

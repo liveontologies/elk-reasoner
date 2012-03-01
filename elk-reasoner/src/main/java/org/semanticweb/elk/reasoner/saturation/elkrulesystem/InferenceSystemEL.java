@@ -22,38 +22,21 @@
  */
 package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystem;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
 public final class InferenceSystemEL extends InferenceSystem<ContextEl> {
-	
-	public static AtomicInteger contextNo = new AtomicInteger(0);
 
 	public InferenceSystemEL() {
+		add(new RuleInitialization<ContextEl>());
 		add(new RuleSubsumption<ContextEl>());
 		add(new RuleConjunctionPlus<ContextEl>());
 		add(new RuleExistentialPlus<ContextEl>());
 		add(new RuleDecomposition<ContextEl>());
 	}
 
-	public final boolean createAndInitializeContext(IndexedClassExpression root, RuleApplicationEngine engine) {
-		ContextEl sce = new ContextEl(root);
-		if (root.setContext(sce)) {
-//			if (LOGGER_.isTraceEnabled()) {
-//				LOGGER_.trace(root + ": context created");
-//			}
-			contextNo.incrementAndGet();
-			engine.enqueue(sce, new PositiveSuperClassExpression<ContextEl>(root));
-
-			if (engine.owlThing.occursNegatively())
-				engine.enqueue(sce, new PositiveSuperClassExpression<ContextEl>(engine.owlThing));
-			
-			return true;
-		}
-		return false;
+	public final ContextEl createContext(IndexedClassExpression root) {
+		return new ContextEl(root);
 	}
 	
 }
