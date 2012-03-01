@@ -27,18 +27,10 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.*;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -458,9 +450,32 @@ public class RuleApplicationEngine extends
 					new Propagation(e.getRelation(),
 							new DecomposedClassExpression(e)).accept(this);
 			}
-
+			
+			if (ice instanceof IndexedDatatypeExpression) {
+				IndexedDatatypeExpression datatypeExpression = (IndexedDatatypeExpression) ice;
+				for (IndexedDataSomeValuesFrom someValueFrom :
+						datatypeExpression.getProperty().getNegExistential()) {
+					if (datatypeExpression != someValueFrom
+							&& isSubsumed(datatypeExpression, someValueFrom)) {
+						enqueue(context, someValueFrom);
+					}
+				}
+			}
 		}
 
+		private boolean isSubsumed(IndexedDatatypeExpression datatypeExp1, IndexedDatatypeExpression datatypeExp2) {
+			boolean ret;
+			for (DatatypeRestriction r_n : datatypeExp1.getRestrictions()) {
+				for (DatatypeRestriction r_m : datatypeExp2.getRestrictions()) {
+					ret = DatatypeResolutionEngine.computeCorollary(r_n, r_m);
+					if (!ret) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		
 		private ClassExpressionDecomposer classExpressionDecomposer = new ClassExpressionDecomposer();
 
 		private class ClassExpressionDecomposer implements
@@ -483,6 +498,10 @@ public class RuleApplicationEngine extends
 			}
 
 			public Void visit(IndexedDataHasValue element) {
+				return null;
+			}
+
+			public Void visit(IndexedDataSomeValuesFrom element) {
 				return null;
 			}
 

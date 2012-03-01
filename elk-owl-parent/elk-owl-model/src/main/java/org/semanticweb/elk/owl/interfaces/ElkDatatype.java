@@ -31,4 +31,7 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkDatatype extends ElkDataRange, ElkEntity {
 
+	public String getDatatypeShortname();
+
+	public String getDatatypeIRI();
 }
