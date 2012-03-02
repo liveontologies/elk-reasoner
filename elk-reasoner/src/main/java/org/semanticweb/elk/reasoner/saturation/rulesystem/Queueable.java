@@ -23,13 +23,32 @@
 package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
 /**
- * Common interface for objects that can be queued during
- * ClassExpressionSaturation.
+ * Common interface for derivations that can be queued when computing a
+ * saturation. Objects of this class contain partial information about a
+ * derivation, so they should be lightweight data containers. Queueables are
+ * affiliated with a {@link Context} during processing, and together with the
+ * information in the context the derivation is uniquely determined. For
+ * example, if it is derived that class A is a subclass of class B, then a
+ * Queueable that is related to the context of A only needs to store B. When a
+ * queued item is processed, it is stored in its context. Therefore, it may
+ * require certain context implementations to be used. The generic type C
+ * specifies which type of context is used with this queueable, and
+ * implementations define constraints on C so that the suitability of the
+ * context type can be checked at compile time.
  * 
  * @author Frantisek Simancik
+ * @author Markus Kroetzsch
  */
 public interface Queueable<C extends Context> {
-	
+
+	/**
+	 * Ensure that the object is stored in the given context. If it was not
+	 * stored in the context yet, it will be added and true will be returned.
+	 * Otherwise false will be returned.
+	 * 
+	 * @param context
+	 * @return if context has been modified
+	 */
 	public boolean storeInContext(C context);
 
 }

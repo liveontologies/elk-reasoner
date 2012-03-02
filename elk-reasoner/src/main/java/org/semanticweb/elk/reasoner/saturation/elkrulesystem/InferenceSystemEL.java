@@ -25,6 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystem;
 
+/**
+ * Inference system for EL reasoning.
+ * 
+ * @author Markus Kroetzsch
+ * 
+ */
 public final class InferenceSystemEL extends InferenceSystem<ContextEl> {
 
 	public InferenceSystemEL() {
@@ -38,5 +44,5 @@ public final class InferenceSystemEL extends InferenceSystem<ContextEl> {
 	public final ContextEl createContext(IndexedClassExpression root) {
 		return new ContextEl(root);
 	}
-	
+
 }

@@ -33,8 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ContextEl;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ClassSaturationContext;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
 /**
@@ -213,7 +212,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 			 */
 			J initiatorJob = saturationJob.initiatorJob;
 			R root = initiatorJob.getInput();
-			ContextEl saturation = (ContextEl)root.getContext();
+			ClassSaturationContext saturation = (ClassSaturationContext)root.getContext();
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
@@ -254,7 +253,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 			IndexedClass candidate = saturationJob.getInput();
 			TransitiveReductionState<R, J> state = saturationJob.state;
 			updateTransitiveReductionOutput(state.output, candidate,
-					(ContextEl)candidate.getContext());
+					(ClassSaturationContext)candidate.getContext());
 			processTransitiveReductionState(state);
 		}
 
@@ -282,7 +281,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 				if (!(next instanceof IndexedClass))
 					continue;
 				IndexedClass candidate = (IndexedClass) next;
-				ContextEl candidateSaturation = (ContextEl)candidate
+				ClassSaturationContext candidateSaturation = (ClassSaturationContext)candidate
 						.getContext();
 				/*
 				 * If the saturation for the candidate is not yet computed,
@@ -332,7 +331,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		private void updateTransitiveReductionOutput(
 				TransitiveReductionOutputEquivalentDirect<R> output,
 				IndexedClass candidate,
-				ContextEl candidateSaturation) {
+				ClassSaturationContext candidateSaturation) {
 			R root = output.root;
 			if (candidate == root) {
 				output.equivalent.add(candidate.getElkClass());
@@ -364,7 +363,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 				 * If the (already computed) saturation for direct super-class
 				 * contains the candidate, it cannot be direct.
 				 */
-				if (((ContextEl)directSuperClass.getContext()).getSuperClassExpressions()
+				if (((ClassSaturationContext)directSuperClass.getContext()).getSuperClassExpressions()
 						.contains(candidate)) {
 					/*
 					 * If, in addition, the saturation for the candidate

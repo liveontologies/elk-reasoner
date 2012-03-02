@@ -176,8 +176,7 @@ abstract public class IndexedClassExpression {
 	protected final AtomicReference<Context> context = new AtomicReference<Context>();
 
 	/**
-	 * @return The corresponding context, null if none was
-	 *         assigned.
+	 * @return The corresponding context, null if none was assigned.
 	 */
 	public Context getContext() {
 		return context.get();
@@ -188,8 +187,7 @@ abstract public class IndexedClassExpression {
 	 * 
 	 * @return True if the operation succeeded.
 	 */
-	public boolean setContext(
-			Context context) {
+	public boolean setContext(Context context) {
 		return this.context.compareAndSet(null, context);
 	}
 

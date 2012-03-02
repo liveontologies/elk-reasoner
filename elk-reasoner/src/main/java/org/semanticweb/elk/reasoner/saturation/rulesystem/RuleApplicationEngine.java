@@ -72,10 +72,14 @@ public class RuleApplicationEngine extends
 	 * occurs exactly once.
 	 */
 	protected final Queue<Context> activeContexts;
+
 	/**
-	 * The number of contexts ever created by this engine
+	 * The number of contexts ever created by this engine. This number is used
+	 * not only for statistical purposes, but also by some callers to control
+	 * the number of parallel workers (if the number of new contexts is too
+	 * small, it does not make sense to run independent workers).
 	 */
-	protected final AtomicInteger contextNo = new AtomicInteger(0);
+	protected final AtomicInteger contextNumber = new AtomicInteger(0);
 
 	/**
 	 * <tt>true</tt> if the {@link #activeContexts} queue is empty
@@ -96,9 +100,11 @@ public class RuleApplicationEngine extends
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 
-		inferenceSystemInvocationManager = new InferenceSystemInvocationManager(this);
+		inferenceSystemInvocationManager = new InferenceSystemInvocationManager(
+				this);
 		try {
-			inferenceSystemInvocationManager.addInferenceSystem(inferenceSystem);
+			inferenceSystemInvocationManager
+					.addInferenceSystem(inferenceSystem);
 		} catch (IllegalInferenceMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -126,8 +132,8 @@ public class RuleApplicationEngine extends
 	 * 
 	 * @return number of created contexts
 	 */
-	public int getContextNo() {
-		return contextNo.get();
+	public int getContextNumber() {
+		return contextNumber.get();
 	}
 
 	/**
@@ -135,20 +141,20 @@ public class RuleApplicationEngine extends
 	 */
 	public void printStatistics() {
 		if (LOGGER_.isDebugEnabled()) {
-			 LOGGER_.debug("Contexts created:" + contextNo);
-			 LOGGER_.debug("Derived Produced/Unique:" +
-			 SuperClassExpression.superClassExpressionInfNo + "/" +
-			 SuperClassExpression.superClassExpressionNo);
-			 LOGGER_.debug("Backward Links Produced/Unique:" +
-			 BackwardLink.backLinkInfNo + "/" +
-			 BackwardLink.backLinkNo);
+			LOGGER_.debug("Contexts created:" + contextNumber);
+			LOGGER_.debug("Derived Produced/Unique:"
+					+ SuperClassExpression.superClassExpressionInfNo + "/"
+					+ SuperClassExpression.superClassExpressionNo);
+			LOGGER_.debug("Backward Links Produced/Unique:"
+					+ BackwardLink.backLinkInfNo + "/"
+					+ BackwardLink.backLinkNo);
 			// LOGGER_.debug("Forward Links Produced/Unique:" +
 			// QueueableStore.forwLinkInfNo + "/" +
 			// QueueableStore.forwLinkNo.get());
 			// LOGGER_.debug("Processed queueables:" +
 			// InferenceRuleManager.debugProcessedQueueables);
-//			 LOGGER_.debug("Rule applications:" +
-//			 InferenceRuleManager.debugRuleApplications);
+			// LOGGER_.debug("Rule applications:" +
+			// InferenceRuleManager.debugRuleApplications);
 		}
 	}
 
@@ -174,7 +180,7 @@ public class RuleApplicationEngine extends
 		if (root.getContext() == null) {
 			Context context = inferenceSystem.createContext(root);
 			if (root.setContext(context)) {
-				contextNo.incrementAndGet();
+				contextNumber.incrementAndGet();
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": context created");
 				}
@@ -193,12 +199,12 @@ public class RuleApplicationEngine extends
 
 	protected void deactivateContext(Context context) {
 		if (context.tryDeactivate())
-			if (!context.queue.isEmpty())
+			if (!context.getQueue().isEmpty())
 				activateContext(context);
 	}
 
 	public void enqueue(Context context, Queueable<?> item) {
-		context.queue.add(item);
+		context.getQueue().add(item);
 		activateContext(context);
 	}
 
@@ -219,11 +225,12 @@ public class RuleApplicationEngine extends
 
 	protected void process(Context context) {
 		for (;;) {
-			Queueable<?> item = context.queue.poll();
+			Queueable<?> item = context.getQueue().poll();
 			if (item == null)
 				break;
 
-			inferenceSystemInvocationManager.processItemInContext(item, context);
+			inferenceSystemInvocationManager
+					.processItemInContext(item, context);
 		}
 
 		deactivateContext(context);
