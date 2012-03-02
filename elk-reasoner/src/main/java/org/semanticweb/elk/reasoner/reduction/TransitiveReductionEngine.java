@@ -32,8 +32,9 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ContextClassSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
 /**
@@ -59,9 +60,13 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 			.getLogger(TransitiveReductionEngine.class);
 
 	/**
-	 * The saturation engine that is specific for transitive reduction
+	 * The listener for transitive reduction callbacks
 	 */
-	protected final SaturationEngineForTransitiveReduction saturationEngineForTransitiveReduction;
+	protected final TransitiveReductionListener<J> listener;
+	/**
+	 * The saturation engine used for computing saturations of class expressions
+	 */
+	protected final ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>> saturationEngine;
 
 	/**
 	 * The processed jobs can create new saturation jobs for super classes to be
@@ -84,10 +89,13 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
 	 */
-	public TransitiveReductionEngine(OntologyIndex ontologyIndex) {
+	public TransitiveReductionEngine(OntologyIndex ontologyIndex,
+			TransitiveReductionListener<J> listener) {
 
-		this.saturationEngineForTransitiveReduction = new SaturationEngineForTransitiveReduction(
-				ontologyIndex);
+		this.listener = listener;
+		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>(
+				ontologyIndex,
+				new ClassExpressionSaturationListenerForTransitiveReduction());
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.jobQueueEmpty = new AtomicBoolean(true);
 	}
@@ -97,13 +105,12 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace(root + ": transitive reduction started");
 		}
-		saturationEngineForTransitiveReduction
-				.submit(new SaturationJobRoot<R, J>(job));
+		saturationEngine.submit(new SaturationJobRoot<R, J>(job));
 	}
 
 	public final void process() throws InterruptedException {
 		for (;;) {
-			saturationEngineForTransitiveReduction.process();
+			saturationEngine.process();
 			SaturationJobForTransitiveReduction<R, ?, J> nextJob = auxJobQueue
 					.poll();
 			if (nextJob == null) {
@@ -114,21 +121,19 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 					break;
 				tryNotifyCanProcess();
 			}
-			saturationEngineForTransitiveReduction.submit(nextJob);
+			saturationEngine.submit(nextJob);
 		}
 	}
 
-	@Override
 	public boolean canProcess() {
-		return !auxJobQueue.isEmpty()
-				|| saturationEngineForTransitiveReduction.canProcess();
+		return !auxJobQueue.isEmpty() || saturationEngine.canProcess();
 	}
 
 	/**
 	 * Print statistics about transitive reduction
 	 */
 	public void printStatistics() {
-		saturationEngineForTransitiveReduction.printStatistics();
+		saturationEngine.printStatistics();
 	}
 
 	private void tryNotifyCanProcess() {
@@ -150,9 +155,9 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	class SaturationEngineForTransitiveReduction
-			extends
-			ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>> {
+	class ClassExpressionSaturationListenerForTransitiveReduction
+			implements
+			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>> {
 
 		/**
 		 * The object to which we delegate post-processing of saturation jobs
@@ -160,20 +165,8 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		 */
 		protected final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor();
 
-		/**
-		 * Creates a new transitive reduction saturation engine using the given
-		 * ontology index.
-		 * 
-		 * @param ontologyIndex
-		 */
-		public SaturationEngineForTransitiveReduction(
-				OntologyIndex ontologyIndex) {
-			super(ontologyIndex);
-		}
-
-		@Override
 		public void notifyCanProcess() {
-			TransitiveReductionEngine.this.notifyCanProcess();
+			listener.notifyCanProcess();
 		}
 
 		/**
@@ -185,11 +178,9 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		 * @throws InterruptedException
 		 *             if interrupted during post-processing
 		 */
-		@Override
 		public void notifyProcessed(
 				SaturationJobForTransitiveReduction<R, ?, J> output)
 				throws InterruptedException {
-			super.notifyProcessed(output);
 			output.accept(saturationOutputProcessor);
 		}
 	}
@@ -208,11 +199,11 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 				throws InterruptedException {
 			/*
 			 * We know that the saturation for the root indexed class expression
-			 * of the initiator job should be already computed
+			 * of the initiator job should already be computed
 			 */
 			J initiatorJob = saturationJob.initiatorJob;
 			R root = initiatorJob.getInput();
-			ContextClassSaturation saturation = (ContextClassSaturation)root.getContext();
+			SaturatedClassExpression saturation = root.getSaturated();
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
@@ -224,7 +215,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 				TransitiveReductionOutput<R> output = new TransitiveReductionOutputUnsatisfiable<R>(
 						root);
 				initiatorJob.setOutput(output);
-				notifyProcessed(initiatorJob);
+				listener.notifyProcessed(initiatorJob);
 				return;
 			}
 			/*
@@ -253,7 +244,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 			IndexedClass candidate = saturationJob.getInput();
 			TransitiveReductionState<R, J> state = saturationJob.state;
 			updateTransitiveReductionOutput(state.output, candidate,
-					(ContextClassSaturation)candidate.getContext());
+					candidate.getSaturated());
 			processTransitiveReductionState(state);
 		}
 
@@ -281,8 +272,8 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 				if (!(next instanceof IndexedClass))
 					continue;
 				IndexedClass candidate = (IndexedClass) next;
-				ContextClassSaturation candidateSaturation = (ContextClassSaturation)candidate
-						.getContext();
+				SaturatedClassExpression candidateSaturation = candidate
+						.getSaturated();
 				/*
 				 * If the saturation for the candidate is not yet computed,
 				 * create a corresponding saturation job and suspend processing
@@ -313,7 +304,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 							+ direct.getRoot());
 				}
 			}
-			notifyProcessed(state.initiatorJob);
+			listener.notifyProcessed(state.initiatorJob);
 		}
 
 		/**
@@ -331,7 +322,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		private void updateTransitiveReductionOutput(
 				TransitiveReductionOutputEquivalentDirect<R> output,
 				IndexedClass candidate,
-				ContextClassSaturation candidateSaturation) {
+				SaturatedClassExpression candidateSaturation) {
 			R root = output.root;
 			if (candidate == root) {
 				output.equivalent.add(candidate.getElkClass());
@@ -363,7 +354,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 				 * If the (already computed) saturation for direct super-class
 				 * contains the candidate, it cannot be direct.
 				 */
-				if (((ContextClassSaturation)directSuperClass.getContext()).getSuperClassExpressions()
+				if (directSuperClass.getSaturated().getSuperClassExpressions()
 						.contains(candidate)) {
 					/*
 					 * If, in addition, the saturation for the candidate

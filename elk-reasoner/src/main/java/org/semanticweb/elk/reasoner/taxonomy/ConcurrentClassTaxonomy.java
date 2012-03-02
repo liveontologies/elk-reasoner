@@ -134,8 +134,11 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 		NonBottomNode previous = nodeLookup
 				.putIfAbsent(getKey(canonical), node);
 		if (previous != null)
-			return previous;
+			return previous;		
 		allNodes.add(node);
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace(canonical + ": node created");
+		}
 		for (ElkClass member : members) {
 			if (member != canonical)
 				nodeLookup.put(getKey(member), node);

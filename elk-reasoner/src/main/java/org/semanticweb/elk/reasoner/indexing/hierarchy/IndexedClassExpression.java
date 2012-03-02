@@ -29,7 +29,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
+import org.semanticweb.elk.reasoner.rules.Derivable;
+import org.semanticweb.elk.reasoner.rules.QueueableVisitor;
+import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -47,7 +49,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression {
+abstract public class IndexedClassExpression implements Derivable {
 
 	/**
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
@@ -173,29 +175,31 @@ abstract public class IndexedClassExpression {
 	/**
 	 * 
 	 */
-	protected final AtomicReference<Context> context = new AtomicReference<Context>();
+	protected final AtomicReference<SaturatedClassExpression> saturated = new AtomicReference<SaturatedClassExpression>();
 
 	/**
-	 * @return The corresponding context, null if none was assigned.
+	 * @return The corresponding SaturatedClassExpression, null if none was
+	 *         assigned.
 	 */
-	public Context getContext() {
-		return context.get();
+	public SaturatedClassExpression getSaturated() {
+		return saturated.get();
 	}
 
 	/**
-	 * Sets the corresponding context if none was yet assigned.
+	 * Sets the corresponding SaturatedClassExpression if none was yet assigned.
 	 * 
 	 * @return True if the operation succeeded.
 	 */
-	public boolean setContext(Context context) {
-		return this.context.compareAndSet(null, context);
+	public boolean setSaturated(
+			SaturatedClassExpression saturatedClassExpression) {
+		return saturated.compareAndSet(null, saturatedClassExpression);
 	}
 
 	/**
-	 * Resets the corresponding context to null.
+	 * Resets the corresponding SaturatedClassExpression to null.
 	 */
-	public void resetContext() {
-		context.set(null);
+	public void resetSaturated() {
+		saturated.set(null);
 	}
 
 	/** Hash code for this object. */
@@ -212,6 +216,10 @@ abstract public class IndexedClassExpression {
 	}
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
+
+	public <O> O accept(QueueableVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 
 	@Override
 	public abstract String toString();

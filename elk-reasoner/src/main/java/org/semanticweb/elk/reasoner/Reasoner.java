@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
+import org.semanticweb.elk.reasoner.rules.ObjectPropertySaturation;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyEngine;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;

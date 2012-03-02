@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Utilities for Concurrency
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,19 +20,9 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util.concurrent.computation;
+package org.semanticweb.elk.reasoner.saturation;
 
-/**
- * A prototype class for processing jobs and monitoring their activity. This
- * class is useful when jobs are processed concurrently from several threads and
- * balanced loading is required, as well as notification about finished jobs.
- * 
- * @author "Yevgeny Kazakov"
- * 
- * @param <J>
- *            the type of the job that can be submitted to this manager
- */
-public abstract class AbstractJobManager<J> implements InputProcessor<J> {
+public interface ClassExpressionSaturationListener<J> {
 
 	/**
 	 * An callback hook to the method using which one can signal that the
@@ -48,9 +38,7 @@ public abstract class AbstractJobManager<J> implements InputProcessor<J> {
 	 * all sleeping threads, so the threads will resume the computation (execute
 	 * {@link #process()}) when new computational power can be required.
 	 */
-	public void notifyCanProcess() {
-
-	}
+	public void notifyCanProcess();
 
 	/**
 	 * An callback hook to the method using which one can receive notifications
@@ -65,8 +53,6 @@ public abstract class AbstractJobManager<J> implements InputProcessor<J> {
 	 * @throws InterruptedException
 	 *             if interrupted during the notification
 	 */
-	public void notifyProcessed(J job) throws InterruptedException {
-
-	}
-
+	public void notifyProcessed(J job) throws InterruptedException;
+	
 }
