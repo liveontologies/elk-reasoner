@@ -111,7 +111,7 @@ public class InferenceSystemInvocationManager {
 		public void invoke(Queueable<?> argument, Context context)
 				throws IllegalArgumentException, IllegalAccessException,
 				InvocationTargetException {
-			// debugRuleApplications.incrementAndGet();
+			debugRuleApplications.incrementAndGet();
 			firstMethod.invoke(firstInferenceRule, argument, context, engine);
 			if (rest != null) {
 				rest.invoke(argument, context);
@@ -183,8 +183,9 @@ public class InferenceSystemInvocationManager {
 
 	/**
 	 * Register a new inference system. Each inference rule of the system is
-	 * processed to extract methods relevant for reasoning.
+	 * processed to extract methods relevant for reasoning.</p>
 	 * 
+	 * <p>
 	 * An IllegalRuleMethodException is thrown if a method that is relevant for
 	 * applying rules (based on the name of the method) does not have the
 	 * correct declaration to be used as intended.
@@ -211,8 +212,9 @@ public class InferenceSystemInvocationManager {
 	 * that are relevant in reasoning (which are found based on their names),
 	 * and pointers to these methods are stored in internal data structures
 	 * according to their signature (so that they can be called without further
-	 * type checks to process inputs).
+	 * type checks to process inputs).</p>
 	 * 
+	 * <p>
 	 * An IllegalRuleMethodException is thrown if a method that is relevant for
 	 * applying rules (based on the name of the method) does not have the
 	 * correct declaration to be used as intended.
@@ -493,8 +495,9 @@ public class InferenceSystemInvocationManager {
 	 * information if necessary. The method first tries to store the given
 	 * queueable item. Only if this was necessary (i.e., if it was not known
 	 * before), then all inference rule methods registered for this queueable
-	 * are called.
+	 * are called.</p>
 	 * 
+	 * <p>
 	 * If the class of queueable has not been encountered yet, a late
 	 * registration is performed. This can cause runtime exceptions if the
 	 * queueable does not provide a suitable method for storing it.
@@ -513,6 +516,7 @@ public class InferenceSystemInvocationManager {
 	 */
 	public void processItemInContext(Queueable<?> queueable, Context context)
 			throws IllegalArgumentException {
+		debugRuleApplications.incrementAndGet();
 		Class<?> clazz = queueable.getClass();
 		InferenceMethods inferenceMethods = methodsForQueueable.get(clazz);
 		if (inferenceMethods == null) {
