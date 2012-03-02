@@ -30,9 +30,10 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ReasonerJob;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.rules.RuleApplicationEngine;
-import org.semanticweb.elk.reasoner.rules.RuleApplicationListener;
-import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ContextClassSaturation;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationListener;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
@@ -173,8 +174,8 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 		 * if saturation is already assigned, this task is already started or
 		 * finished
 		 */
-		SaturatedClassExpression rootSaturation = root.getSaturated();
-		if (rootSaturation != null && rootSaturation.isSaturated()) {
+		Context rootSaturation = root.getContext();
+		if (rootSaturation != null && ((ContextClassSaturation) rootSaturation).isSaturated()) {
 			listener.notifyProcessed(job);
 			return;
 		}
@@ -187,13 +188,13 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 		 */
 		for (;;) {
 			process();
-			if (ruleApplicationEngine.getContextNo()
+			if (ruleApplicationEngine.getContextNumber()
 					- countContextsProcessed.get() <= threshold)
 				break;
 			synchronized (countContextsProcessed) {
 				if (canProcess())
 					continue;
-				if (ruleApplicationEngine.getContextNo()
+				if (ruleApplicationEngine.getContextNumber()
 						- countContextsProcessed.get() <= threshold)
 					break;
 				workersWaiting = true;
@@ -246,7 +247,7 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 		/*
 		 * cache the current snapshot for submitted jobs
 		 */
-		int snapshotContextNo = ruleApplicationEngine.getContextNo();
+		int snapshotContextNo = ruleApplicationEngine.getContextNumber();
 		int snapshotCountJobsSubmitted = countJobsSubmitted.get();
 		if (activeWorkers.get() > 0)
 			return;
@@ -316,8 +317,8 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 				 */
 				J nextJob = buffer.poll();
 				IndexedClassExpression root = nextJob.getInput();
-				SaturatedClassExpression rootSaturation = root.getSaturated();
-				rootSaturation.setSaturated();
+				Context rootSaturation = root.getContext();
+				((ContextClassSaturation) rootSaturation).setSaturated();
 				nextJob.setOutput(rootSaturation);
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": saturation finished");

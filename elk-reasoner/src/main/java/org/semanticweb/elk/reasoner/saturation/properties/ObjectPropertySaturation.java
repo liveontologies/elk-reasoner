@@ -178,6 +178,11 @@ public class ObjectPropertySaturation {
 			// nothing to do here, everything should be processed during the
 			// submission
 		}
+
+		public boolean canProcess() {
+			// TODO Auto-generated method stub
+			return false;
+		}
 	}
 
 	/*

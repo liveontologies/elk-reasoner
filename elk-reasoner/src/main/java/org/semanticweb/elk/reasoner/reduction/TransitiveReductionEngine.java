@@ -32,9 +32,10 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ContextClassSaturation;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
 /**
@@ -203,11 +204,11 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 			 */
 			J initiatorJob = saturationJob.initiatorJob;
 			R root = initiatorJob.getInput();
-			SaturatedClassExpression saturation = root.getSaturated();
+			Context saturation = root.getContext();
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
-			if (!saturation.isSatisfiable()) {
+			if (!((ContextClassSaturation) saturation).isSatisfiable()) {
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root
 							+ ": transitive reduction finished: unsatisfiable");
@@ -244,7 +245,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 			IndexedClass candidate = saturationJob.getInput();
 			TransitiveReductionState<R, J> state = saturationJob.state;
 			updateTransitiveReductionOutput(state.output, candidate,
-					candidate.getSaturated());
+					candidate.getContext());
 			processTransitiveReductionState(state);
 		}
 
@@ -272,15 +273,15 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 				if (!(next instanceof IndexedClass))
 					continue;
 				IndexedClass candidate = (IndexedClass) next;
-				SaturatedClassExpression candidateSaturation = candidate
-						.getSaturated();
+				Context candidateSaturation = candidate
+						.getContext();
 				/*
 				 * If the saturation for the candidate is not yet computed,
 				 * create a corresponding saturation job and suspend processing
 				 * of the state until the job will be finished.
 				 */
 				if (candidateSaturation == null
-						|| !candidateSaturation.isSaturated()) {
+						|| !((ContextClassSaturation) candidateSaturation).isSaturated()) {
 					auxJobQueue.add(new SaturationJobSuperClass<R, J>(
 							candidate, state));
 					tryNotifyCanProcess();
@@ -322,13 +323,13 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		private void updateTransitiveReductionOutput(
 				TransitiveReductionOutputEquivalentDirect<R> output,
 				IndexedClass candidate,
-				SaturatedClassExpression candidateSaturation) {
+				Context candidateSaturation) {
 			R root = output.root;
 			if (candidate == root) {
 				output.equivalent.add(candidate.getElkClass());
 				return;
 			}
-			Set<IndexedClassExpression> candidateDerived = candidateSaturation
+			Set<IndexedClassExpression> candidateDerived = ((ContextClassSaturation) candidateSaturation)
 					.getSuperClassExpressions();
 			/*
 			 * If the saturation for the candidate contains the root, the
@@ -354,7 +355,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 				 * If the (already computed) saturation for direct super-class
 				 * contains the candidate, it cannot be direct.
 				 */
-				if (directSuperClass.getSaturated().getSuperClassExpressions()
+				if (((ContextClassSaturation) directSuperClass.getContext()).getSuperClassExpressions()
 						.contains(candidate)) {
 					/*
 					 * If, in addition, the saturation for the candidate
