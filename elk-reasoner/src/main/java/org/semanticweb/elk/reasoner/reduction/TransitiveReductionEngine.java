@@ -155,7 +155,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 * @throws InterruptedException
 	 *             if interrupted during post-processing
 	 */
-	public void notifyProcessed(
+	public void notifyFinished(
 			SaturationJobForTransitiveReduction<R, ?, J> output)
 			throws InterruptedException {
 		output.accept(saturationOutputProcessor);

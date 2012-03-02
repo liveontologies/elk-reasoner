@@ -22,6 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+/**
+ * The interface for listeners which can be used with
+ * {@link ClassExpressionSaturationEngine}, which can implement method hooks for
+ * triggering some actions
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <J>
+ */
 public interface ClassExpressionSaturationListener<J> {
 
 	/**
@@ -44,15 +53,14 @@ public interface ClassExpressionSaturationListener<J> {
 	 * An callback hook to the method using which one can receive notifications
 	 * about processed jobs to perform further actions, e.g., post-processing.
 	 * If {@link #submit(job)} is called followed with {@link #process()}, it is
-	 * guaranteed that {@link #notifyProcessed(job)} will be called (perhaps
-	 * from some other thread) before no instance of {@link #process()} is
-	 * running.
+	 * guaranteed that {@link #notifyFinished(job)} will be called (perhaps from
+	 * some other thread) before no instance of {@link #process()} is running.
 	 * 
 	 * @param job
 	 *            the job that has been processed
 	 * @throws InterruptedException
 	 *             if interrupted during the notification
 	 */
-	public void notifyProcessed(J job) throws InterruptedException;
-	
+	public void notifyFinished(J job) throws InterruptedException;
+
 }
