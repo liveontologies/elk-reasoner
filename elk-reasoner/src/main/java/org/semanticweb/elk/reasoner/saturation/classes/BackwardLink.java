@@ -20,7 +20,9 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
+package org.semanticweb.elk.reasoner.saturation.classes;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
@@ -28,12 +30,15 @@ import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * @author Frantisek Simancik
- * 
+ *
  */
-public class ForwardLink<C extends ContextElClassSaturation> extends
+public class BackwardLink<C extends ContextElClassSaturation> extends
 		Pair<IndexedPropertyChain, C> implements Queueable<C> {
+	
+	public static AtomicInteger backLinkNo = new AtomicInteger(0);
+	public static AtomicInteger backLinkInfNo = new AtomicInteger(0);
 
-	public ForwardLink(IndexedPropertyChain relation, C target) {
+	public BackwardLink(IndexedPropertyChain relation, C target) {
 		super(relation, target);
 	}
 
@@ -46,13 +51,13 @@ public class ForwardLink<C extends ContextElClassSaturation> extends
 	}
 
 	public boolean storeInContext(C context) {
-		// forwLinkInfNo.incrementAndGet();
+		backLinkInfNo.incrementAndGet();
 
-		if (context.forwardLinksByObjectProperty == null)
-			context.initForwardLinksByProperty();
+		if (context.backwardLinksByObjectProperty == null)
+			context.initBackwardLinksByProperty();
 
-		if (context.forwardLinksByObjectProperty.add(first, second)) {
-			// forwLinkNo.incrementAndGet();
+		if (context.backwardLinksByObjectProperty.add(first, second)) {
+			backLinkNo.incrementAndGet();
 			return true;
 		}
 		return false;

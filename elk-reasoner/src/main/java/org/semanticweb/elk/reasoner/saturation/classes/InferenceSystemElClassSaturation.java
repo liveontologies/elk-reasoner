@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystem;
@@ -39,6 +39,7 @@ public final class InferenceSystemElClassSaturation extends InferenceSystem<Cont
 		add(new RuleConjunctionPlus<ContextElClassSaturation>());
 		add(new RuleExistentialPlus<ContextElClassSaturation>());
 		add(new RuleDecomposition<ContextElClassSaturation>());
+		add(new RuleRoleComposition<ContextElClassSaturation>());
 	}
 
 	public final ContextElClassSaturation createContext(IndexedClassExpression root) {

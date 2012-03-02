@@ -32,9 +32,9 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.InferenceSystemElClassSaturation;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.SuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemElClassSaturation;
+import org.semanticweb.elk.reasoner.saturation.classes.SuperClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**

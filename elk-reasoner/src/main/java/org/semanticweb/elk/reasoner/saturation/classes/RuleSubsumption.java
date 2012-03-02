@@ -20,31 +20,28 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
-import java.util.Map;
+import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
 
-public class RuleConjunctionPlus<C extends ContextElClassSaturation> implements InferenceRule<C> {
+public class RuleSubsumption<C extends ContextElClassSaturation> implements InferenceRule<C> {
 
 	public void apply(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
 
-		Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjs = argument
-				.getExpression().getNegConjunctionsByConjunct();
+		final List<IndexedClassExpression> implied = argument.getExpression()
+				.getToldSuperClassExpressions();
 
-		if (conjs == null)
+		if (implied == null)
 			return;
 
-		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-				conjs.keySet(), context.getSuperClassExpressions()))
-			engine.enqueue(context,
-					new NegativeSuperClassExpression<C>(conjs.get(common)));
+		for (IndexedClassExpression ice : implied)
+			engine.enqueue(context, new PositiveSuperClassExpression<C>(ice));
+
 	}
 
 }

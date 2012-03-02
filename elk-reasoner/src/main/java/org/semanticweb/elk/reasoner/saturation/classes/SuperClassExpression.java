@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

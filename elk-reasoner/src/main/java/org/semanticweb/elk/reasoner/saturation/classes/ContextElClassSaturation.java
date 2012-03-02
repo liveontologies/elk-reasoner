@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * incoming links. This is usually needed only when at least one propagation
 	 * has been derived at this object.
 	 */
-	protected boolean deriveBackwardLinks = false;
+	protected boolean composeBackwardLinks = false;
 
 	/**
 	 * If set to true, then propagations will be derived in this context. This
@@ -118,11 +118,11 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * has been derived at this object.
 	 */
 	public boolean getDeriveBackwardLinks() {
-		return deriveBackwardLinks;
+		return composeBackwardLinks;
 	}
 
 	public void setDeriveBackwardLinks(boolean deriveBackwardLinks) {
-		this.deriveBackwardLinks = deriveBackwardLinks;
+		this.composeBackwardLinks = deriveBackwardLinks;
 	}
 
 	public Multimap<IndexedPropertyChain, ContextElClassSaturation> getBackwardLinksByObjectProperty() {

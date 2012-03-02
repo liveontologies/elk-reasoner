@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ContextClassSaturation;
+import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 

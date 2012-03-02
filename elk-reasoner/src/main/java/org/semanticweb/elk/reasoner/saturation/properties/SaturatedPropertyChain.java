@@ -49,11 +49,11 @@ public class SaturatedPropertyChain {
 	
 	protected HashListMultimap<IndexedPropertyChain,
 			IndexedBinaryPropertyChain>
-		propertyCompositionsByLeftSubProperty;
+		compositionsByLeftSubProperty;
 	
 	protected HashListMultimap<IndexedPropertyChain,
 			IndexedBinaryPropertyChain>
-		propertyCompositionsByRightSubProperty;
+		compositionsByRightSubProperty;
 
 	
 	public SaturatedPropertyChain(IndexedPropertyChain iop) {
@@ -74,6 +74,14 @@ public class SaturatedPropertyChain {
 
 	public Set<IndexedPropertyChain> getSuperProperties() {
 		return derivedSuperProperties;
+	}
+
+	public HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getCompositionsByLeftSubProperty() {
+		return compositionsByLeftSubProperty;
+	}
+
+	public HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getCompositionsByRightSubProperty() {
+		return compositionsByRightSubProperty;
 	}
 
 }

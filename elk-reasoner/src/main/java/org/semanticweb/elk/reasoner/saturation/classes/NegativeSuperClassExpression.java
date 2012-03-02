@@ -20,15 +20,15 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
-public class PositiveSuperClassExpression<C extends ContextElClassSaturation> extends SuperClassExpression<C>  {
+public class NegativeSuperClassExpression<C extends ContextElClassSaturation> extends SuperClassExpression<C>  {
 	
-	public PositiveSuperClassExpression(
+	public NegativeSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
 	}
-	
+
 }
