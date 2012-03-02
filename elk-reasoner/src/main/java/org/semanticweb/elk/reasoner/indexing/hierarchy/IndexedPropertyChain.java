@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.rules.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -68,7 +68,7 @@ public abstract class IndexedPropertyChain {
 	public abstract List<IndexedPropertyChain> getToldSubProperties();
 
 	protected void addToldSuperObjectProperty(
-			IndexedObjectProperty superObjectProperty) {
+			IndexedObjectProperty superObjectProperty) { 
 		if (toldSuperProperties == null)
 			toldSuperProperties = new ArrayList<IndexedObjectProperty>(1);
 		toldSuperProperties.add(superObjectProperty);

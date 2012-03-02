@@ -29,9 +29,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.rules.Derivable;
-import org.semanticweb.elk.reasoner.rules.QueueableVisitor;
-import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -49,7 +47,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression implements Derivable {
+abstract public class IndexedClassExpression {
 
 	/**
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
@@ -115,7 +113,7 @@ abstract public class IndexedClassExpression implements Derivable {
 		return negExistentials;
 	}
 
-	protected void addToldSuperClassExpression(
+	protected void addToldSuperClassExpression( 
 			IndexedClassExpression superClassExpression) {
 		if (toldSuperClassExpressions == null)
 			toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(1);
@@ -175,31 +173,31 @@ abstract public class IndexedClassExpression implements Derivable {
 	/**
 	 * 
 	 */
-	protected final AtomicReference<SaturatedClassExpression> saturated = new AtomicReference<SaturatedClassExpression>();
+	protected final AtomicReference<Context> context = new AtomicReference<Context>();
 
 	/**
-	 * @return The corresponding SaturatedClassExpression, null if none was
+	 * @return The corresponding context, null if none was
 	 *         assigned.
 	 */
-	public SaturatedClassExpression getSaturated() {
-		return saturated.get();
+	public Context getContext() {
+		return context.get();
 	}
 
 	/**
-	 * Sets the corresponding SaturatedClassExpression if none was yet assigned.
+	 * Sets the corresponding context if none was yet assigned.
 	 * 
 	 * @return True if the operation succeeded.
 	 */
-	public boolean setSaturated(
-			SaturatedClassExpression saturatedClassExpression) {
-		return saturated.compareAndSet(null, saturatedClassExpression);
+	public boolean setContext(
+			Context context) {
+		return this.context.compareAndSet(null, context);
 	}
 
 	/**
-	 * Resets the corresponding SaturatedClassExpression to null.
+	 * Resets the corresponding context to null.
 	 */
-	public void resetSaturated() {
-		saturated.set(null);
+	public void resetContext() {
+		context.set(null);
 	}
 
 	/** Hash code for this object. */
@@ -216,10 +214,6 @@ abstract public class IndexedClassExpression implements Derivable {
 	}
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
-
-	public <O> O accept(QueueableVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
 
 	@Override
 	public abstract String toString();
