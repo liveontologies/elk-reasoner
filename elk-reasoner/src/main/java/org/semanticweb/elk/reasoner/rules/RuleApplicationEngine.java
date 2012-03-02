@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
-import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * The engine for computing the saturation of class expressions. This is the
@@ -53,8 +53,8 @@ import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
  * @author Yevgeny Kazakov
  * 
  */
-public class RuleApplicationEngine extends
-		AbstractJobManager<IndexedClassExpression> {
+public final class RuleApplicationEngine implements
+		InputProcessor<IndexedClassExpression> {
 
 	// Statistical information
 	AtomicInteger derivedNo = new AtomicInteger(0);
@@ -68,6 +68,11 @@ public class RuleApplicationEngine extends
 
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
+
+	/**
+	 * The listener for rule application callbacks
+	 */
+	protected final RuleApplicationListener listener;
 
 	// TODO: try to get rid of the ontology index, if possible
 	/**
@@ -95,8 +100,10 @@ public class RuleApplicationEngine extends
 	 */
 	protected final AtomicBoolean activeContextsEmpty;
 
-	public RuleApplicationEngine(OntologyIndex ontologyIndex) {
+	public RuleApplicationEngine(OntologyIndex ontologyIndex,
+			RuleApplicationListener listener) {
 		this.ontologyIndex = ontologyIndex;
+		this.listener = listener;
 		this.activeContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
 		this.activeContextsEmpty = new AtomicBoolean(true);
 
@@ -111,15 +118,14 @@ public class RuleApplicationEngine extends
 
 	}
 
-	public final void submit(IndexedClassExpression job) {
+	public void submit(IndexedClassExpression job) {
 		getCreateContext(job);
 	}
 
-	public final void process() throws InterruptedException {
+	public void process() throws InterruptedException {
 		processActiveContexts();
 	}
 
-	@Override
 	public boolean canProcess() {
 		return !activeContextsEmpty.get();
 	}
@@ -152,7 +158,7 @@ public class RuleApplicationEngine extends
 
 	protected void tryNotifyCanProcess() {
 		if (activeContextsEmpty.compareAndSet(true, false))
-			notifyCanProcess();
+			listener.notifyCanProcess();
 	}
 
 	/**
