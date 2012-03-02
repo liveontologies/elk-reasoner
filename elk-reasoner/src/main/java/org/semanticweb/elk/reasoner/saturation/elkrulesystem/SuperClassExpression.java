@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 
-public abstract class SuperClassExpression<C extends ContextEl> implements
+public abstract class SuperClassExpression<C extends ContextElClassSaturation> implements
 		Queueable<C> {
 	
 	public static AtomicInteger superClassExpressionNo = new AtomicInteger(0);

@@ -26,23 +26,23 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystem;
 
 /**
- * Inference system for EL reasoning.
+ * Inference system for EL class saturation.
  * 
  * @author Markus Kroetzsch
  * 
  */
-public final class InferenceSystemEL extends InferenceSystem<ContextEl> {
+public final class InferenceSystemElClassSaturation extends InferenceSystem<ContextElClassSaturation> {
 
-	public InferenceSystemEL() {
-		add(new RuleInitialization<ContextEl>());
-		add(new RuleSubsumption<ContextEl>());
-		add(new RuleConjunctionPlus<ContextEl>());
-		add(new RuleExistentialPlus<ContextEl>());
-		add(new RuleDecomposition<ContextEl>());
+	public InferenceSystemElClassSaturation() {
+		add(new RuleInitialization<ContextElClassSaturation>());
+		add(new RuleSubsumption<ContextElClassSaturation>());
+		add(new RuleConjunctionPlus<ContextElClassSaturation>());
+		add(new RuleExistentialPlus<ContextElClassSaturation>());
+		add(new RuleDecomposition<ContextElClassSaturation>());
 	}
 
-	public final ContextEl createContext(IndexedClassExpression root) {
-		return new ContextEl(root);
+	public final ContextElClassSaturation createContext(IndexedClassExpression root) {
+		return new ContextElClassSaturation(root);
 	}
 
 }

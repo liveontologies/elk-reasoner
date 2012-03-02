@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
-public class PositiveSuperClassExpression<C extends ContextEl> extends SuperClassExpression<C>  {
+public class PositiveSuperClassExpression<C extends ContextElClassSaturation> extends SuperClassExpression<C>  {
 	
 	public PositiveSuperClassExpression(
 			IndexedClassExpression superClassExpression) {

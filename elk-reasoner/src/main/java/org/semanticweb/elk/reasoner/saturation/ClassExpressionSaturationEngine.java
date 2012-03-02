@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ReasonerJob;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ClassSaturationContext;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.ContextClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.AbstractContext;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
@@ -165,7 +165,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		 * if saturation is already assigned, this task is already started or
 		 * finished
 		 */
-		ClassSaturationContext rootSaturation = (ClassSaturationContext) root
+		ContextClassSaturation rootSaturation = (ContextClassSaturation) root
 				.getContext();
 		if (rootSaturation != null && rootSaturation.isSaturated()) {
 			notifyProcessed(job);
@@ -310,7 +310,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				 */
 				J nextJob = buffer.poll();
 				IndexedClassExpression root = nextJob.getInput();
-				ClassSaturationContext rootSaturation = (ClassSaturationContext) root
+				ContextClassSaturation rootSaturation = (ContextClassSaturation) root
 						.getContext();
 				rootSaturation.setSaturated();
 				nextJob.setOutput(rootSaturation);

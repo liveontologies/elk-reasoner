@@ -32,7 +32,7 @@ import org.semanticweb.elk.util.collections.Pair;
  * @author Frantisek Simancik
  *
  */
-public class BackwardLink<C extends ContextEl> extends
+public class BackwardLink<C extends ContextElClassSaturation> extends
 		Pair<IndexedPropertyChain, C> implements Queueable<C> {
 	
 	public static AtomicInteger backLinkNo = new AtomicInteger(0);

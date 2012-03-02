@@ -41,16 +41,16 @@ import org.semanticweb.elk.util.collections.Multimap;
  * @author Frantisek Simancik
  * 
  */
-public class ContextEl extends AbstractContext implements
-		ClassSaturationContext {
+public class ContextElClassSaturation extends AbstractContext implements
+		ContextClassSaturation {
 
 	public final Set<IndexedClassExpression> superClassExpressions;
 
-	public Multimap<IndexedPropertyChain, ContextEl> backwardLinksByObjectProperty;
+	public Multimap<IndexedPropertyChain, ContextElClassSaturation> backwardLinksByObjectProperty;
 
-	public Multimap<IndexedPropertyChain, ContextEl> forwardLinksByObjectProperty;
+	public Multimap<IndexedPropertyChain, ContextElClassSaturation> forwardLinksByObjectProperty;
 
-	protected Multimap<IndexedPropertyChain, Queueable<? extends ContextEl>> propagationsByObjectProperty;
+	protected Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> propagationsByObjectProperty;
 
 	/**
 	 * A context is saturated if all superclass expressions of the root
@@ -76,7 +76,7 @@ public class ContextEl extends AbstractContext implements
 	 */
 	protected boolean derivePropagations = false;
 
-	public ContextEl(IndexedClassExpression root) {
+	public ContextElClassSaturation(IndexedClassExpression root) {
 		super(root);
 		this.superClassExpressions = new ArrayHashSet<IndexedClassExpression>(
 				13);
@@ -125,7 +125,7 @@ public class ContextEl extends AbstractContext implements
 		this.deriveBackwardLinks = deriveBackwardLinks;
 	}
 
-	public Multimap<IndexedPropertyChain, ContextEl> getBackwardLinksByObjectProperty() {
+	public Multimap<IndexedPropertyChain, ContextElClassSaturation> getBackwardLinksByObjectProperty() {
 		return backwardLinksByObjectProperty;
 	}
 
@@ -133,15 +133,15 @@ public class ContextEl extends AbstractContext implements
 	 * Initialize the set of propagations with the empty set
 	 */
 	public void initBackwardLinksByProperty() {
-		backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, ContextEl>();
+		backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, ContextElClassSaturation>();
 	}
 
-	public Multimap<IndexedPropertyChain, ContextEl> getForwardLinksByObjectProperty() {
+	public Multimap<IndexedPropertyChain, ContextElClassSaturation> getForwardLinksByObjectProperty() {
 		return forwardLinksByObjectProperty;
 	}
 
 	public void initForwardLinksByProperty() {
-		forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, ContextEl>();
+		forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, ContextElClassSaturation>();
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class ContextEl extends AbstractContext implements
 		this.derivePropagations = derivePropagations;
 	}
 
-	public Multimap<IndexedPropertyChain, Queueable<? extends ContextEl>> getPropagationsByObjectProperty() {
+	public Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> getPropagationsByObjectProperty() {
 		return propagationsByObjectProperty;
 	}
 
@@ -164,7 +164,7 @@ public class ContextEl extends AbstractContext implements
 	 * Initialize the set of propagations with the empty set
 	 */
 	public void initPropagationsByProperty() {
-		propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Queueable<? extends ContextEl>>();
+		propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>>();
 	}
 
 	/**

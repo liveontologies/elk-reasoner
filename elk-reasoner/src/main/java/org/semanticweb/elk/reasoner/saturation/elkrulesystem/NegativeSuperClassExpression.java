@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.elkrulesystem;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
-public class NegativeSuperClassExpression<C extends ContextEl> extends SuperClassExpression<C>  {
+public class NegativeSuperClassExpression<C extends ContextElClassSaturation> extends SuperClassExpression<C>  {
 	
 	public NegativeSuperClassExpression(
 			IndexedClassExpression superClassExpression) {

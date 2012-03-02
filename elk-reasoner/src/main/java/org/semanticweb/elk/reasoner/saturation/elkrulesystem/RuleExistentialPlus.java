@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
-public class RuleExistentialPlus<C extends ContextEl> implements
+public class RuleExistentialPlus<C extends ContextElClassSaturation> implements
 		InferenceRule<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
@@ -56,7 +56,7 @@ public class RuleExistentialPlus<C extends ContextEl> implements
 		}
 
 		// apply all propagations over the link
-		Multimap<IndexedPropertyChain, Queueable<? extends ContextEl>> props = context.propagationsByObjectProperty;
+		Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> props = context.propagationsByObjectProperty;
 		if (props == null)
 			return;
 
@@ -92,7 +92,7 @@ public class RuleExistentialPlus<C extends ContextEl> implements
 		if (context.propagationsByObjectProperty.add(propRelation, carry)) {
 
 			// propagate over all backward links
-			Multimap<IndexedPropertyChain, ContextEl> backLinks = context.backwardLinksByObjectProperty;
+			Multimap<IndexedPropertyChain, ContextElClassSaturation> backLinks = context.backwardLinksByObjectProperty;
 			if (context.backwardLinksByObjectProperty == null)
 				return; // this should never happen
 

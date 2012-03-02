@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.elkrulesystem.InferenceSystemEL;
+import org.semanticweb.elk.reasoner.saturation.elkrulesystem.InferenceSystemElClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.elkrulesystem.SuperClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
 
@@ -52,11 +52,11 @@ public class RuleApplicationEngine extends
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
 
-	protected InferenceSystem<? extends Context> inferenceSystem = new InferenceSystemEL();
+	protected InferenceSystem<? extends Context> inferenceSystem = new InferenceSystemElClassSaturation();
 
 	protected final InferenceSystemInvocationManager inferenceSystemInvocationManager;
 
-	// TODO: try to get rid of the ontology index, if possible
+	// TODO Try to get rid of the ontology index, if possible.
 	/**
 	 * The index used for executing the rules
 	 */

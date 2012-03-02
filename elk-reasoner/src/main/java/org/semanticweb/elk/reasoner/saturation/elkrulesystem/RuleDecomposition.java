@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
-public class RuleDecomposition<C extends ContextEl> implements InferenceRule<C> {
+public class RuleDecomposition<C extends ContextElClassSaturation> implements InferenceRule<C> {
 
 	private class ClassExpressionDecomposer implements
 			IndexedClassExpressionVisitor<Void> {

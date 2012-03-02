@@ -30,7 +30,7 @@ import org.semanticweb.elk.util.collections.Pair;
  * @author Frantisek Simancik
  * 
  */
-public class ForwardLink<C extends ContextEl> extends
+public class ForwardLink<C extends ContextElClassSaturation> extends
 		Pair<IndexedPropertyChain, C> implements Queueable<C> {
 
 	public ForwardLink(IndexedPropertyChain relation, C target) {

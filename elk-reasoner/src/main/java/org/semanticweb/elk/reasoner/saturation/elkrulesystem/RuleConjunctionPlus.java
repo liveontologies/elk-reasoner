@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
-public class RuleConjunctionPlus<C extends ContextEl> implements InferenceRule<C> {
+public class RuleConjunctionPlus<C extends ContextElClassSaturation> implements InferenceRule<C> {
 
 	public void apply(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {

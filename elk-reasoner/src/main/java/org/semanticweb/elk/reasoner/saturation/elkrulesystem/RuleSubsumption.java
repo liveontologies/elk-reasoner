@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
-public class RuleSubsumption<C extends ContextEl> implements InferenceRule<C> {
+public class RuleSubsumption<C extends ContextElClassSaturation> implements InferenceRule<C> {
 
 	public void apply(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {

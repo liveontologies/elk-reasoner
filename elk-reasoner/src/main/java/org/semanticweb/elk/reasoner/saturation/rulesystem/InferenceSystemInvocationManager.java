@@ -161,13 +161,14 @@ public class InferenceSystemInvocationManager {
 	 * Map from types of queueable objects to containers with all relevant
 	 * inference methods.
 	 */
-	ConcurrentHashMap<Class<?>, InferenceMethods> methodsForQueueable = new ConcurrentHashMap<Class<?>, InferenceMethods>(
-			10, (float) 0.50, 4);
+	protected ConcurrentHashMap<Class<?>, InferenceMethods> methodsForQueueable = new ConcurrentHashMap<Class<?>, InferenceMethods>(
+			10, (float) 0.50, 4); // parameters are rough guesses, no major
+									// impact on performance observed so far
 
 	/**
 	 * List of methods that should be called to initialize new contexts.
 	 */
-	InitMethodList initMethods;
+	protected InitMethodList initMethods;
 
 	/**
 	 * Constructor. The object keeps a RuleApplicationEngine since this is
@@ -187,6 +188,11 @@ public class InferenceSystemInvocationManager {
 	 * An IllegalRuleMethodException is thrown if a method that is relevant for
 	 * applying rules (based on the name of the method) does not have the
 	 * correct declaration to be used as intended.
+	 * 
+	 * @note There is only one public method for registering rules to ensure
+	 *       that all rules use a compatible generic type of context, without
+	 *       requiring this class to check it. Note that method invocation via
+	 *       Java Reflexion does not need to know the type of context either.
 	 * 
 	 * @param inferenceSystem
 	 * @throws IllegalInferenceMethodException
@@ -215,7 +221,7 @@ public class InferenceSystemInvocationManager {
 	 * @throws IllegalInferenceMethodException
 	 * @throws NoSuchMethodException
 	 */
-	public void addInferenceRule(InferenceRule<?> inferenceRule)
+	protected void addInferenceRule(InferenceRule<?> inferenceRule)
 			throws IllegalInferenceMethodException, NoSuchMethodException {
 		Class<?> ruleClass = inferenceRule.getClass();
 
@@ -245,7 +251,7 @@ public class InferenceSystemInvocationManager {
 	 * @throws IllegalInferenceMethodException
 	 * @throws NoSuchMethodException
 	 */
-	public void registerRuleMethod(InferenceRule<?> inferenceRule,
+	protected void registerRuleMethod(InferenceRule<?> inferenceRule,
 			Method ruleMethod, Class<?> queueableClass)
 			throws IllegalInferenceMethodException, NoSuchMethodException {
 
@@ -258,7 +264,16 @@ public class InferenceSystemInvocationManager {
 		registerRuleMethodForClass(inferenceRule, ruleMethod, queueableClass);
 	}
 
-	public void registerInitMethod(InferenceRule<?> inferenceRule,
+	/**
+	 * Register an init method. It is first checked whether the method is of
+	 * correct format and modifiers, and an exception is thrown if this check
+	 * fails.
+	 * 
+	 * @param inferenceRule
+	 * @param initMethod
+	 * @throws IllegalInferenceMethodException
+	 */
+	protected void registerInitMethod(InferenceRule<?> inferenceRule,
 			Method initMethod) throws IllegalInferenceMethodException {
 		checkMethodSignature(initMethod, nameInitMethod,
 				parameterTypesInitMethod);
@@ -490,11 +505,11 @@ public class InferenceSystemInvocationManager {
 	 * @throws IllegalArgumentException
 	 *             Can potentially happen since the use of reflection implicitly
 	 *             casts the arguments to the required input types; this could
-	 *             fail. This would happen the context is not of the type that
-	 *             is required by some inference rule. Since both context type
-	 *             and inference rule type is controlled by the same generic in
-	 *             InferenceSystem, this is extremely unlikely to ever happen.
-	 *             Nevertheless, we declare it here for clarity.
+	 *             fail. This would happen if the context is not of the type
+	 *             that is required by some inference rule. Since both context
+	 *             type and inference rule type is controlled by the same
+	 *             generic in InferenceSystem, this is extremely unlikely to
+	 *             ever happen. Nevertheless, we declare it here for clarity.
 	 */
 	public void processItemInContext(Queueable<?> queueable, Context context)
 			throws IllegalArgumentException {
