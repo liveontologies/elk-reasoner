@@ -31,8 +31,9 @@ import org.semanticweb.elk.reasoner.ReasonerJob;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.rules.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.rules.RuleApplicationListener;
 import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
-import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * The engine for scheduling saturation jobs, detecting when results are ready,
@@ -53,34 +54,20 @@ import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
  *            the type of the saturation jobs that can be processed in this
  *            saturation engine
  */
-public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends IndexedClassExpression>>
-		extends AbstractJobManager<J> {
+public final class ClassExpressionSaturationEngine<J extends SaturationJob<? extends IndexedClassExpression>>
+		implements InputProcessor<J> {
 
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
 
-	class RuleApplicationEngineForSaturation extends RuleApplicationEngine {
-
-		public RuleApplicationEngineForSaturation(OntologyIndex ontologyIndex) {
-			super(ontologyIndex);
-		}
-
-		@Override
-		public void notifyCanProcess() {
-			/* wake up all sleeping workers whenever new jobs are available */
-			if (workersWaiting)
-				synchronized (countContextsProcessed) {
-					workersWaiting = false;
-					countContextsProcessed.notifyAll();
-				}
-			ClassExpressionSaturationEngine.this.notifyCanProcess();
-		}
-	}
-
 	/**
-	 * The engine used for execution of rules.
+	 * The listener for saturation callbacks
 	 */
-	protected final RuleApplicationEngineForSaturation ruleApplicationEngine;
+	protected final ClassExpressionSaturationListener<J> listener;
+	/**
+	 * The rule application engine used for execution of the rules.
+	 */
+	protected final RuleApplicationEngine ruleApplicationEngine;
 	/**
 	 * The buffer for jobs in progress, i.e., those jobs for which the method
 	 * {@link #process(ReasonerJob)} was executed but not
@@ -102,7 +89,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 */
 	protected final AtomicInteger countJobsFinished = new AtomicInteger(0);
 	/**
-	 * The number of processed contexts
+	 * The number of processed contexts; used to control batches of jobs
 	 */
 	final AtomicInteger countContextsProcessed = new AtomicInteger(0);
 	/**
@@ -135,16 +122,31 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * 
 	 * @param ruleApplicationEngine
 	 *            the engine used to perform saturation
+	 * @param listener
+	 *            the listener for saturation callbacks
 	 * @param threshold
 	 *            the maximal difference between unprocessed and processed
 	 *            contexts under which new jobs can be submitted.
 	 */
 	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex,
-			int threshold) {
+			ClassExpressionSaturationListener<J> listener, int threshold) {
 		this.threshold = threshold;
+		this.listener = listener;
 		this.buffer = new ConcurrentLinkedQueue<J>();
-		this.ruleApplicationEngine = new RuleApplicationEngineForSaturation(
-				ontologyIndex);
+		this.ruleApplicationEngine = new RuleApplicationEngine(ontologyIndex,
+				new RuleApplicationListenerForSaturation());
+	}
+
+	/**
+	 * Creates a saturation engine using a given ontology index and the
+	 * listener.
+	 * 
+	 * @param ruleApplicationEngine
+	 *            the engine used to perform saturation
+	 */
+	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex,
+			ClassExpressionSaturationListener<J> listener) {
+		this(ontologyIndex, listener, 256);
 	}
 
 	/**
@@ -154,10 +156,17 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 *            the engine used to perform saturation
 	 */
 	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex) {
-		this(ontologyIndex, 256);
+		this(ontologyIndex, new ClassExpressionSaturationListener<J>() {
+
+			public void notifyCanProcess() {
+			}
+
+			public void notifyProcessed(J job) throws InterruptedException {
+			}
+		});
 	}
 
-	public final void submit(J job) throws InterruptedException {
+	public void submit(J job) throws InterruptedException {
 
 		IndexedClassExpression root = job.getInput();
 		/*
@@ -166,7 +175,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		 */
 		SaturatedClassExpression rootSaturation = root.getSaturated();
 		if (rootSaturation != null && rootSaturation.isSaturated()) {
-			notifyProcessed(job);
+			listener.notifyProcessed(job);
 			return;
 		}
 		if (LOGGER_.isTraceEnabled()) {
@@ -207,7 +216,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		processFinishedJobs();
 	}
 
-	public final void process() throws InterruptedException {
+	public void process() throws InterruptedException {
 		if (ruleApplicationEngine.canProcess()) {
 			activeWorkers.incrementAndGet();
 			ruleApplicationEngine.process();
@@ -217,7 +226,6 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		processFinishedJobs();
 	}
 
-	@Override
 	public boolean canProcess() {
 		return ruleApplicationEngine.canProcess()
 				|| countJobsFinished.get() > countJobsProcessed.get();
@@ -277,7 +285,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				workersWaiting = false;
 				countContextsProcessed.notifyAll();
 			}
-			notifyCanProcess();
+			listener.notifyCanProcess();
 		}
 
 	}
@@ -314,8 +322,22 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": saturation finished");
 				}
-				notifyProcessed(nextJob);
+				listener.notifyProcessed(nextJob);
 			}
+		}
+	}
+
+	class RuleApplicationListenerForSaturation implements
+			RuleApplicationListener {
+
+		public void notifyCanProcess() {
+			/* wake up all sleeping workers whenever new jobs are available */
+			if (workersWaiting)
+				synchronized (countContextsProcessed) {
+					workersWaiting = false;
+					countContextsProcessed.notifyAll();
+				}
+			listener.notifyCanProcess();
 		}
 	}
 
