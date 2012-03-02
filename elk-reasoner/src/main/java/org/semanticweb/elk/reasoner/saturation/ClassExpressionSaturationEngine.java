@@ -55,7 +55,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  *            saturation engine
  */
 public final class ClassExpressionSaturationEngine<J extends SaturationJob<? extends IndexedClassExpression>>
-		implements InputProcessor<J> {
+		implements InputProcessor<J>, RuleApplicationListener {
 
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
@@ -134,7 +134,7 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 		this.listener = listener;
 		this.buffer = new ConcurrentLinkedQueue<J>();
 		this.ruleApplicationEngine = new RuleApplicationEngine(ontologyIndex,
-				new RuleApplicationListenerForSaturation());
+				this);
 	}
 
 	/**
@@ -231,6 +231,16 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 				|| countJobsFinished.get() > countJobsProcessed.get();
 	}
 
+	public void notifyCanProcess() {
+		/* wake up all sleeping workers whenever new jobs are available */
+		if (workersWaiting)
+			synchronized (countContextsProcessed) {
+				workersWaiting = false;
+				countContextsProcessed.notifyAll();
+			}
+		listener.notifyCanProcess();
+	}
+
 	/**
 	 * Print statistics about the saturation
 	 */
@@ -324,20 +334,6 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 				}
 				listener.notifyProcessed(nextJob);
 			}
-		}
-	}
-
-	class RuleApplicationListenerForSaturation implements
-			RuleApplicationListener {
-
-		public void notifyCanProcess() {
-			/* wake up all sleeping workers whenever new jobs are available */
-			if (workersWaiting)
-				synchronized (countContextsProcessed) {
-					workersWaiting = false;
-					countContextsProcessed.notifyAll();
-				}
-			listener.notifyCanProcess();
 		}
 	}
 

@@ -37,9 +37,10 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalen
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalentDirect;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
-import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
-public class ClassTaxonomyEngine extends AbstractJobManager<IndexedClass> {
+public class ClassTaxonomyEngine implements InputProcessor<IndexedClass>,
+		TransitiveReductionListener<TransitiveReductionJob<IndexedClass>> {
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
@@ -55,13 +56,19 @@ public class ClassTaxonomyEngine extends AbstractJobManager<IndexedClass> {
 	 */
 	protected final TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>> transitiveReductionEngine;
 
+	protected final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
+
+	/**
+	 * We cache top node
+	 */
+	protected final AtomicReference<NonBottomNode> topNodeRef = new AtomicReference<NonBottomNode>();
+
 	public ClassTaxonomyEngine(OntologyIndex ontologyIndex,
 			ClassTaxonomyListener<IndexedClass> listener) {
 		this.listener = listener;
 		this.taxonomy = new ConcurrentClassTaxonomy();
 		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>(
-				ontologyIndex,
-				new TransitiveReductionListenerForClassTaxonomy());
+				ontologyIndex, this);
 	}
 
 	public ClassTaxonomyEngine(OntologyIndex ontologyIndex) {
@@ -87,6 +94,14 @@ public class ClassTaxonomyEngine extends AbstractJobManager<IndexedClass> {
 		return transitiveReductionEngine.canProcess();
 	}
 
+	public void notifyProcessed(TransitiveReductionJob<IndexedClass> job)
+			throws InterruptedException {
+		job.getOutput().accept(outputProcessor);
+	}
+
+	public void notifyCanProcess() {
+	}
+
 	/**
 	 * Print statistics about class taxonomy
 	 */
@@ -98,81 +113,59 @@ public class ClassTaxonomyEngine extends AbstractJobManager<IndexedClass> {
 		return this.taxonomy;
 	}
 
-	class TransitiveReductionListenerForClassTaxonomy implements
-			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>> {
-
-		protected final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();;
-
-		public void notifyProcessed(TransitiveReductionJob<IndexedClass> job)
-				throws InterruptedException {
-			job.getOutput().accept(outputProcessor);
+	class TransitiveReductionOutputProcessor implements
+			TransitiveReductionOutputVisitor<IndexedClass> {
+		public void visit(
+				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
+			NonBottomNode node = taxonomy.getCreate(output.getEquivalent());
+			processDirectSuperClasses(node, output.getDirectSuperClasses());
 		}
 
-		public void notifyCanProcess() {
+		public void visit(
+				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
+			taxonomy.unsatisfiableClasses.add(output.getRoot().getElkClass());
 		}
 
-		class TransitiveReductionOutputProcessor implements
-				TransitiveReductionOutputVisitor<IndexedClass> {
-			public void visit(
-					TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
-				NonBottomNode node = taxonomy.getCreate(output.getEquivalent());
-				processDirectSuperClasses(node, output.getDirectSuperClasses());
-			}
-
-			public void visit(
-					TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
-				taxonomy.unsatisfiableClasses.add(output.getRoot()
-						.getElkClass());
-			}
-
-			public void visit(
-					TransitiveReductionOutputEquivalent<IndexedClass> output) {
-				throw new IllegalArgumentException();
-			}
+		public void visit(
+				TransitiveReductionOutputEquivalent<IndexedClass> output) {
+			throw new IllegalArgumentException();
 		}
+	}
 
-		/**
-		 * We cache top node
-		 */
-		final AtomicReference<NonBottomNode> topNodeRef = new AtomicReference<NonBottomNode>();
-
-		void processDirectSuperClasses(
-				NonBottomNode node,
-				Iterable<TransitiveReductionOutputEquivalent<IndexedClass>> directSuperClasses) {
-			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : directSuperClasses) {
-				NonBottomNode superNode = taxonomy
-						.getCreate(directSuperEquivalent.getEquivalent());
-				assignDirectSuperClassNode(node, superNode);
-			}
-			if (node.getDirectSuperNodes().isEmpty()) {
-				NonBottomNode topNode = topNodeRef.get();
-				if (topNode == null) {
-					// TODO: make sure the membership checking works for any
-					// ElkClass implementation!
-					if (node.getMembers()
-							.contains(PredefinedElkClass.OWL_THING))
-						topNode = node;
-					else {
-						List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
-						topMembers.add(PredefinedElkClass.OWL_THING);
-						topNode = taxonomy.getCreate(topMembers);
-					}
-					topNodeRef.set(topNode);
+	void processDirectSuperClasses(
+			NonBottomNode node,
+			Iterable<TransitiveReductionOutputEquivalent<IndexedClass>> directSuperClasses) {
+		for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : directSuperClasses) {
+			NonBottomNode superNode = taxonomy.getCreate(directSuperEquivalent
+					.getEquivalent());
+			assignDirectSuperClassNode(node, superNode);
+		}
+		if (node.getDirectSuperNodes().isEmpty()) {
+			NonBottomNode topNode = topNodeRef.get();
+			if (topNode == null) {
+				// TODO: make sure the membership checking works for any
+				// ElkClass implementation!
+				if (node.getMembers().contains(PredefinedElkClass.OWL_THING))
+					topNode = node;
+				else {
+					List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
+					topMembers.add(PredefinedElkClass.OWL_THING);
+					topNode = taxonomy.getCreate(topMembers);
 				}
-				if (node != topNode)
-					assignDirectSuperClassNode(node, topNode);
+				topNodeRef.set(topNode);
 			}
+			if (node != topNode)
+				assignDirectSuperClassNode(node, topNode);
 		}
+	}
 
-		void assignDirectSuperClassNode(NonBottomNode rootNode,
-				NonBottomNode superClassNode) {
-			rootNode.addDirectSuperNode(superClassNode);
-			/* be careful: sub-nodes can be added from different threads */
-			synchronized (superClassNode) {
-				superClassNode.addDirectSubNode(rootNode);
-			}
+	void assignDirectSuperClassNode(NonBottomNode rootNode,
+			NonBottomNode superClassNode) {
+		rootNode.addDirectSuperNode(superClassNode);
+		/* be careful: sub-nodes can be added from different threads */
+		synchronized (superClassNode) {
+			superClassNode.addDirectSubNode(rootNode);
 		}
-
 	}
 
 }

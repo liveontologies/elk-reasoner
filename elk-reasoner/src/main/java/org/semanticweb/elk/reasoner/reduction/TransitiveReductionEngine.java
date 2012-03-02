@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
-import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * The engine for computing equivalent classes and direct super classes of the
@@ -53,7 +53,9 @@ import org.semanticweb.elk.util.concurrent.computation.AbstractJobManager;
  *            result
  */
 public class TransitiveReductionEngine<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
-		extends AbstractJobManager<J> {
+		implements
+		InputProcessor<J>,
+		ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>> {
 
 	// logger for events
 	protected final static Logger LOGGER_ = Logger
@@ -64,9 +66,21 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 */
 	protected final TransitiveReductionListener<J> listener;
 	/**
-	 * The saturation engine used for computing saturations of class expressions
+	 * The saturation engine for transitive reduction that can only process
+	 * instances of {@link SaturationJobForTransitiveReduction}. There are two
+	 * types of the jobs. The instances of {@link SaturationJobRoot} are
+	 * saturation jobs for the indexed class expression, for which a transitive
+	 * reduction needs to be computed. The transitive reduction is computed by
+	 * iterating over the derived super classes, and computing saturation for
+	 * them in order to filter out non-direct super classes. For this purpose,
+	 * the second kind of jobs, which are instances of
+	 * {@link SaturationJobSuperClass} are used.
 	 */
 	protected final ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>> saturationEngine;
+	/**
+	 * Processor for the saturation jobs that are finished
+	 */
+	protected final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor();
 
 	/**
 	 * The processed jobs can create new saturation jobs for super classes to be
@@ -94,8 +108,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 
 		this.listener = listener;
 		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>(
-				ontologyIndex,
-				new ClassExpressionSaturationListenerForTransitiveReduction());
+				ontologyIndex, this);
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.jobQueueEmpty = new AtomicBoolean(true);
 	}
@@ -129,6 +142,25 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		return !auxJobQueue.isEmpty() || saturationEngine.canProcess();
 	}
 
+	public void notifyCanProcess() {
+		listener.notifyCanProcess();
+	}
+
+	/**
+	 * Post-processing the finished saturation jobs using the
+	 * {@link SaturationOutputProcessor}.
+	 * 
+	 * @param output
+	 *            the processed saturation job
+	 * @throws InterruptedException
+	 *             if interrupted during post-processing
+	 */
+	public void notifyProcessed(
+			SaturationJobForTransitiveReduction<R, ?, J> output)
+			throws InterruptedException {
+		output.accept(saturationOutputProcessor);
+	}
+
 	/**
 	 * Print statistics about transitive reduction
 	 */
@@ -142,48 +174,9 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	}
 
 	/**
-	 * The saturation engine for transitive reduction that can only process
-	 * instances of {@link SaturationJobForTransitiveReduction}. There are two
-	 * types of the jobs. The instances of {@link SaturationJobRoot} are
-	 * saturation jobs for the indexed class expression, for which a transitive
-	 * reduction needs to be computed. The transitive reduction is computed by
-	 * iterating over the derived super classes, and computing saturation for
-	 * them in order to filter out non-direct super classes. For this purpose,
-	 * the second kind of jobs, which are instances of
-	 * {@link SaturationJobSuperClass} are used.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
+	 * The object to which we delegate post-processing of saturation jobs and
+	 * inserting possible new jobs into the job queue.
 	 */
-	class ClassExpressionSaturationListenerForTransitiveReduction
-			implements
-			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>> {
-
-		/**
-		 * The object to which we delegate post-processing of saturation jobs
-		 * and inserting possible new jobs into the job queue.
-		 */
-		protected final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor();
-
-		public void notifyCanProcess() {
-			listener.notifyCanProcess();
-		}
-
-		/**
-		 * Post-processing the finished saturation jobs using the
-		 * {@link SaturationOutputProcessor}.
-		 * 
-		 * @param output
-		 *            the processed saturation job
-		 * @throws InterruptedException
-		 *             if interrupted during post-processing
-		 */
-		public void notifyProcessed(
-				SaturationJobForTransitiveReduction<R, ?, J> output)
-				throws InterruptedException {
-			output.accept(saturationOutputProcessor);
-		}
-	}
 
 	/**
 	 * The class for processing the output of the finished saturation jobs. It
