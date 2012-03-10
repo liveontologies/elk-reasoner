@@ -25,58 +25,69 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Collections;
 import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeRestriction;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit.Domain;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit.Relation;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
-import org.semanticweb.elk.reasoner.rules.DatatypeResolutionEngine;
-import org.semanticweb.elk.reasoner.rules.DatatypeRestriction;
 
 public class IndexedDataHasValue extends IndexedDatatypeExpression {
 
-    protected final ElkLiteral filler;
+	protected final ElkLiteral filler;
+	protected List<DatatypeRestriction> dtRestrictions;
+	protected Domain dtDomain;
 
 	protected IndexedDataHasValue(IndexedDataProperty dataProperty, ElkLiteral elkLiteral) {
 		super(dataProperty);
 		this.filler = elkLiteral;
+		dtDomain = DatatypeToolkit.clarifyDomain(filler.getDatatype());
+		DatatypeRestriction restriction = new DatatypeRestriction(
+				Relation.EQUAL,
+				filler.getLexicalForm(),
+				dtDomain);
+		dtRestrictions = Collections.singletonList(restriction);
 	}
 
-    public ElkLiteral getFiller() {
-        return filler;
-    }
+	public ElkLiteral getFiller() {
+		return filler;
+	}
 
-    @Override
-    protected void updateOccurrenceNumbers(int increment,
-            int positiveIncrement, int negativeIncrement) {
-        positiveOccurrenceNo += positiveIncrement;
-        negativeOccurrenceNo += negativeIncrement;
-    }
+	@Override
+	protected void updateOccurrenceNumbers(int increment,
+			int positiveIncrement, int negativeIncrement) {
+		positiveOccurrenceNo += positiveIncrement;
+		negativeOccurrenceNo += negativeIncrement;
+	}
 
-    public <O> O accept(IndexedDataHasValueVisitor<O> visitor) {
-        return visitor.visit(this);
-    }
+	public <O> O accept(IndexedDataHasValueVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 
-    @Override
-    public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-        return accept((IndexedDataHasValueVisitor<O>) visitor);
-    }
+	@Override
+	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+		return accept((IndexedDataHasValueVisitor<O>) visitor);
+	}
 
-    @Override
-    public String toString() {
-        return "DataHasValue(" + '<' + this.property.getIri().asString()
-                + "> \"" + this.filler.getLexicalForm() + "\"^^<"
-                + this.filler.getDatatype().getIri().asString() + ">)";
+	@Override
+	public String toString() {
+		return "DataHasValue(" + '<' + this.property.getIri().asString()
+				+ "> \"" + this.filler.getLexicalForm() + "\"^^<"
+				+ this.filler.getDatatype().getIri().asString() + ">)";
 	}
 
 	@Override
 	public List<DatatypeRestriction> getRestrictions() {
-		DatatypeRestriction restriction = new DatatypeRestriction(
-				filler.getDatatype(),
-				DatatypeResolutionEngine.Relation.EQUAL,
-				filler.getLexicalForm());
-		return Collections.singletonList(restriction);
+		return dtRestrictions;
 	}
 
 	@Override
 	public int getRestrictionCount() {
 		return 1;
+	}
+
+	@Override
+	public Domain getRestrictionDomain() {
+		return dtDomain;
 	}
 }

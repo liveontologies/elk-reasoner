@@ -454,28 +454,14 @@ public class RuleApplicationEngine extends
 			if (ice instanceof IndexedDatatypeExpression) {
 				IndexedDatatypeExpression datatypeExpression = (IndexedDatatypeExpression) ice;
 				for (IndexedDataSomeValuesFrom someValueFrom :
-						datatypeExpression.getProperty().getNegExistential()) {
-					if (datatypeExpression != someValueFrom
-							&& isSubsumed(datatypeExpression, someValueFrom)) {
+						datatypeExpression.getProperty().getSatisfyingNegExistentials(datatypeExpression)) {
+					if (datatypeExpression != someValueFrom) {
 						enqueue(context, someValueFrom);
 					}
 				}
 			}
 		}
 
-		private boolean isSubsumed(IndexedDatatypeExpression datatypeExp1, IndexedDatatypeExpression datatypeExp2) {
-			boolean ret;
-			for (DatatypeRestriction r_n : datatypeExp1.getRestrictions()) {
-				for (DatatypeRestriction r_m : datatypeExp2.getRestrictions()) {
-					ret = DatatypeResolutionEngine.computeCorollary(r_n, r_m);
-					if (!ret) {
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-		
 		private ClassExpressionDecomposer classExpressionDecomposer = new ClassExpressionDecomposer();
 
 		private class ClassExpressionDecomposer implements
