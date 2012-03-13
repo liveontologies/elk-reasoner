@@ -71,21 +71,32 @@ abstract public class IndexedClassExpression {
 	 */
 	protected int negativeOccurrenceNo = 0;
 
+	/**
+	 * This method should always return true apart from intermediate steps during the indexing.
+	 * 
+	 * @return true if the represented class expression occurs in the ontology
+	 */
 	public boolean occurs() {
 		return positiveOccurrenceNo > 0 || negativeOccurrenceNo > 0;
 	}
 
+	/**
+	 * @return true if the represented class expression occurs negatively in the ontology
+	 */
 	public boolean occursNegatively() {
 		return negativeOccurrenceNo > 0;
 	}
 
+	/**
+	 * @return true if the represented class expression occurs positively in the ontologu
+	 */
 	public boolean occursPositively() {
 		return positiveOccurrenceNo > 0;
 	}
 
 	/**
-	 * Non-recursively.
-	 */
+	 * Non-recursively. The recursion is implemented in indexing visitors.
+	 */ 
 	protected abstract void updateOccurrenceNumbers(int increment,
 			int positiveIncrement, int negativeIncrement);
 
@@ -120,6 +131,10 @@ abstract public class IndexedClassExpression {
 		toldSuperClassExpressions.add(superClassExpression);
 	}
 
+	/**
+	 * @param superClassExpression
+	 * @return true if successfully removed
+	 */
 	protected boolean removeToldSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		boolean success = false;
@@ -141,6 +156,11 @@ abstract public class IndexedClassExpression {
 		negConjunctionsByConjunct.put(conjunct, conjunction);
 	}
 
+	/**
+	 * @param conjunction
+	 * @param conjunct
+	 * @return true if successfully removed
+	 */
 	protected boolean removeNegConjunctionByConjunct(
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
@@ -159,6 +179,10 @@ abstract public class IndexedClassExpression {
 		negExistentials.add(existential);
 	}
 
+	/**
+	 * @param existential
+	 * @return true if successfully removed
+	 */
 	protected boolean removeNegExistential(
 			IndexedObjectSomeValuesFrom existential) {
 		boolean success = false;
@@ -170,8 +194,11 @@ abstract public class IndexedClassExpression {
 		return success;
 	}
 
+	
+	// TODO: replace pointers to contexts by a mapping
+	
 	/**
-	 * 
+	 * Used for efficient retrieval of the Context corresponding to this class expression.  
 	 */
 	protected final AtomicReference<Context> context = new AtomicReference<Context>();
 

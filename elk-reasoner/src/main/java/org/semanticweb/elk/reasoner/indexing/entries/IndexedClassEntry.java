@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.entries;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 
 /**
- * Implements a view for instances of {@link IndexedClass}
+ * Implements an equality view for instances of {@link IndexedClass}
  * 
  * @author "Yevgeny Kazakov"
  * 

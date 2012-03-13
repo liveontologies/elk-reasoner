@@ -39,8 +39,11 @@ public class IndexedClass extends IndexedClassExpression {
 	 */
 	protected final ElkClass elkClass;
 
-	// TODO: Indexed Class perhaps doesn't need to keep track of positive and
-	// negative occurrences
+	/**
+	 * This counts how many times this object occurred in the ontology. Because
+	 * of declaration axioms, this number might differ from the sum of the
+	 * negative and the positive occurrences counts
+	 */
 	protected int occurrenceNo = 0;
 
 	/**
