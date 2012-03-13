@@ -32,14 +32,6 @@ public class Interval {
 	private Number lowEndpoint;
 	private Number highEndpoint;
 
-	/**
-	 * It is required that the low endpoint be less than or equal to the high
-	 * endpoint according to the Comparator which will be passed into the
-	 * overlaps() routines.
-	 *
-	 * @param lowEndpoint
-	 * @param highEndpoint
-	 */
 	public Interval(Number lowEndpoint, Number highEndpoint) {
 		this.lowEndpoint = lowEndpoint;
 		this.highEndpoint = highEndpoint;
@@ -53,33 +45,9 @@ public class Interval {
 		return highEndpoint;
 	}
 
-	/**
-	 * This takes the Interval to compare against as well as a Comparator which
-	 * will be applied to the low and high endpoints of the given intervals.
-	 *
-	 * @param arg
-	 * @param endpointComparator
-	 * @return
-	 */
-	public boolean overlaps(Interval arg, Comparator endpointComparator) {
-		return overlaps(arg.getLowEndpoint(), arg.getHighEndpoint(), endpointComparator);
-	}
-
-	/**
-	 * Routine which can be used instead of the one taking an interval, for the
-	 * situation where the endpoints are being retrieved from different data
-	 * structures
-	 *
-	 * @param otherLowEndpoint
-	 * @param otherHighEndpoint
-	 * @param endpointComparator
-	 * @return
-	 */
-	public boolean overlaps(Number otherLowEndpoint,
-			Number otherHighEndpoint,
-			Comparator endpointComparator) {
-		return endpointComparator.compare(highEndpoint, otherHighEndpoint) >= 0
-				&& endpointComparator.compare(lowEndpoint, otherLowEndpoint) <= 0;
+	public boolean overlays(Interval i, Comparator comparator) {
+		return comparator.compare(highEndpoint, i.getHighEndpoint()) >= 0
+				&& comparator.compare(lowEndpoint, i.getLowEndpoint()) <= 0;
 	}
 
 	public String toString() {

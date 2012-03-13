@@ -73,31 +73,32 @@ public class IntervalTree extends RBTree {
 	}
 
 	private void searchForIntersectingNodesFrom(IntervalNode node,
-			Interval interval,
+			Interval searchInterval,
 			List resultList) {
+
 		if (node == null) {
 			return;
 		}
 
-		// Check to see whether we have to traverse the left subtree
-		IntervalNode left = (IntervalNode) node.getLeft();
-		if ((left != null)
-				&& (endpointComparator.compare(left.getMaxEndpoint(),
-				interval.getLowEndpoint()) >= 0)) {
-			searchForIntersectingNodesFrom(left, interval, resultList);
-		}
-
-		// Check for intersection with current node
-		if (node.getInterval().overlaps(interval, endpointComparator)) {
+		// Check current node
+		if (node.getInterval().overlays(searchInterval, endpointComparator)) {
 			resultList.add(node);
 		}
 
 		// Check to see whether we have to traverse the left subtree
+		IntervalNode left = (IntervalNode) node.getLeft();
+		if (left != null
+				&& endpointComparator.compare(left.getMinEndpoint(), searchInterval.getLowEndpoint()) <= 0
+				&& endpointComparator.compare(left.getMaxEndpoint(), searchInterval.getHighEndpoint()) >= 0) {
+			searchForIntersectingNodesFrom(left, searchInterval, resultList);
+		}
+
+		// Check to see whether we have to traverse the right subtree
 		IntervalNode right = (IntervalNode) node.getRight();
-		if ((right != null)
-				&& (endpointComparator.compare(interval.getHighEndpoint(),
-				right.getMinEndpoint()) >= 0)) {
-			searchForIntersectingNodesFrom(right, interval, resultList);
+		if (right != null
+				&& endpointComparator.compare(right.getMinEndpoint(), searchInterval.getLowEndpoint()) <= 0
+				&& endpointComparator.compare(right.getMaxEndpoint(), searchInterval.getHighEndpoint()) >= 0) {
+			searchForIntersectingNodesFrom(right, searchInterval, resultList);
 		}
 	}
 }
