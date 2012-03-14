@@ -39,8 +39,21 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfi
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
-public class ClassTaxonomyEngine implements InputProcessor<IndexedClass>,
-		TransitiveReductionListener<TransitiveReductionJob<IndexedClass>> {
+/**
+ * The engine for constructing of the {@link ClassTaxonomy}. The jobs are
+ * submitted using the method {@link #submit(IndexedClass)}, which require the
+ * computation of the {@link ClassNode} for the input {@link IndexedClass}. To
+ * every class taxonomy engine it is possible to attach a
+ * {@link ClassTaxonomyListener}, which can implement hook methods that perform
+ * certain actions during the processing, e.g., notifying when the jobs are
+ * finished.
+ * 
+ * @author "Yevgeny Kazakov"
+ */
+public class ClassTaxonomyEngine
+		implements
+		InputProcessor<IndexedClass>,
+		TransitiveReductionListener<TransitiveReductionJob<IndexedClass>, TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>> {
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
@@ -48,35 +61,50 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass>,
 	/**
 	 * The listener for the taxonomy computation callbacks
 	 */
-	protected final ClassTaxonomyListener<IndexedClass> listener;
-
+	protected final ClassTaxonomyListener<ClassTaxonomyEngine> listener;
 	/**
-	 * The engine to compute equivalent classes and direct super classes of a
-	 * class
+	 * The transitive reduction engine used in the taxonomy construction
 	 */
 	protected final TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>> transitiveReductionEngine;
-
-	protected final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
-
 	/**
-	 * We cache top node
+	 * The object creating or update the nodes from the result of the transitive
+	 * reduction
+	 */
+	protected final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
+	/**
+	 * The reference to cache the value of the top node for frequent use
 	 */
 	protected final AtomicReference<NonBottomNode> topNodeRef = new AtomicReference<NonBottomNode>();
 
+	/**
+	 * Creates a new class taxonomy engine for the input ontology index and a
+	 * listener for executing callback functions.
+	 * 
+	 * @param ontologyIndex
+	 *            the ontology index for which the engine is created
+	 * @param listener
+	 *            the listener object implementing callback functions
+	 */
 	public ClassTaxonomyEngine(OntologyIndex ontologyIndex,
-			ClassTaxonomyListener<IndexedClass> listener) {
+			ClassTaxonomyListener<ClassTaxonomyEngine> listener) {
 		this.listener = listener;
 		this.taxonomy = new ConcurrentClassTaxonomy();
 		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>(
 				ontologyIndex, this);
 	}
 
+	/**
+	 * Creates a new class taxonomy engine for the input ontology index.
+	 * 
+	 * @param ontologyIndex
+	 *            the ontology index for which the engine is created
+	 */
 	public ClassTaxonomyEngine(OntologyIndex ontologyIndex) {
-		this(ontologyIndex, new ClassTaxonomyListener<IndexedClass>() {
+		this(ontologyIndex, new ClassTaxonomyListener<ClassTaxonomyEngine>() {
 			public void notifyCanProcess() {
 			}
 
-			public void notifyProcessed(IndexedClass job) {
+			public void notifyFinished(IndexedClass job) {
 			}
 		});
 	}
@@ -94,7 +122,7 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass>,
 		return transitiveReductionEngine.canProcess();
 	}
 
-	public void notifyProcessed(TransitiveReductionJob<IndexedClass> job)
+	public void notifyFinished(TransitiveReductionJob<IndexedClass> job)
 			throws InterruptedException {
 		job.getOutput().accept(outputProcessor);
 	}
@@ -103,22 +131,58 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass>,
 	}
 
 	/**
-	 * Print statistics about class taxonomy
+	 * Print statistics about class taxonomy construction
 	 */
 	public void printStatistics() {
 		transitiveReductionEngine.printStatistics();
 	}
 
+	/**
+	 * Returns the class taxonomy constructed by this engine
+	 * 
+	 * @return the class taxonomy constructed by this engine
+	 */
 	public ClassTaxonomy getClassTaxonomy() {
 		return this.taxonomy;
 	}
 
+	/**
+	 * The class for processing the finished transitive reduction jobs. It
+	 * implements the visitor pattern for
+	 * {@link TransitiveReductionOutputVisitor<IndexedClass>}.
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
 	class TransitiveReductionOutputProcessor implements
 			TransitiveReductionOutputVisitor<IndexedClass> {
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 			NonBottomNode node = taxonomy.getCreate(output.getEquivalent());
-			processDirectSuperClasses(node, output.getDirectSuperClasses());
+			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
+					.getDirectSuperClasses()) {
+				NonBottomNode superNode = taxonomy
+						.getCreate(directSuperEquivalent.getEquivalent());
+				assignDirectSuperClassNode(node, superNode);
+			}
+			// if there are no direct super nodes, then the top node is the only
+			// direct super node
+			if (node.getDirectSuperNodes().isEmpty()) {
+				NonBottomNode topNode = topNodeRef.get();
+				if (topNode == null) {
+					if (node.getMembers()
+							.contains(PredefinedElkClass.OWL_THING))
+						topNode = node;
+					else {
+						List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
+						topMembers.add(PredefinedElkClass.OWL_THING);
+						topNode = taxonomy.getCreate(topMembers);
+					}
+					topNodeRef.set(topNode);
+				}
+				if (node != topNode)
+					assignDirectSuperClassNode(node, topNode);
+			}
 		}
 
 		public void visit(
@@ -132,39 +196,25 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass>,
 		}
 	}
 
-	void processDirectSuperClasses(
-			NonBottomNode node,
-			Iterable<TransitiveReductionOutputEquivalent<IndexedClass>> directSuperClasses) {
-		for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : directSuperClasses) {
-			NonBottomNode superNode = taxonomy.getCreate(directSuperEquivalent
-					.getEquivalent());
-			assignDirectSuperClassNode(node, superNode);
-		}
-		if (node.getDirectSuperNodes().isEmpty()) {
-			NonBottomNode topNode = topNodeRef.get();
-			if (topNode == null) {
-				// TODO: make sure the membership checking works for any
-				// ElkClass implementation!
-				if (node.getMembers().contains(PredefinedElkClass.OWL_THING))
-					topNode = node;
-				else {
-					List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
-					topMembers.add(PredefinedElkClass.OWL_THING);
-					topNode = taxonomy.getCreate(topMembers);
-				}
-				topNodeRef.set(topNode);
-			}
-			if (node != topNode)
-				assignDirectSuperClassNode(node, topNode);
-		}
-	}
-
-	void assignDirectSuperClassNode(NonBottomNode rootNode,
-			NonBottomNode superClassNode) {
-		rootNode.addDirectSuperNode(superClassNode);
-		/* be careful: sub-nodes can be added from different threads */
-		synchronized (superClassNode) {
-			superClassNode.addDirectSubNode(rootNode);
+	/**
+	 * Connecting the given pair of nodes in sub/super-node relation. The method
+	 * should not be called concurrently for the same first argument.
+	 * 
+	 * @param subNode
+	 *            the node that should be the sub-node of the second node
+	 * 
+	 * @param superNode
+	 *            the node that should be the super-node of the first node
+	 */
+	void assignDirectSuperClassNode(NonBottomNode subNode,
+			NonBottomNode superNode) {
+		subNode.addDirectSuperNode(superNode);
+		/*
+		 * since super-nodes can be added from different nodes, this call should
+		 * be synchronized
+		 */
+		synchronized (superNode) {
+			superNode.addDirectSubNode(subNode);
 		}
 	}
 

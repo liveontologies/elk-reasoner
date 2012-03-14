@@ -22,10 +22,19 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
-public interface TransitiveReductionListener<J> {
-		
-	public void notifyCanProcess();
-	
-	public void notifyProcessed(J job) throws InterruptedException;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyCanProcess;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyFinishedJob;
 
+/**
+ * A listener to be used with {@link TransitiveReductionEngine}. The listener
+ * defines functions that are triggered during transitive reduction.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <J>
+ *            the type of the jobs of {@link TransitiveReductionEngine}
+ */
+public interface TransitiveReductionListener<J extends TransitiveReductionJob<?>, P extends TransitiveReductionEngine<?, J>>
+		extends InputProcessorListenerNotifyCanProcess<P>,
+		InputProcessorListenerNotifyFinishedJob<J, P> {
 }

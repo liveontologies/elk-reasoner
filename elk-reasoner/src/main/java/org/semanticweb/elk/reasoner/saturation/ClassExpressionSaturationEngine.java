@@ -51,19 +51,19 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @author "Yevgeny Kazakov"
  * 
  * @param <J>
- *            the type of the saturation jobs that can be processed in this
+ *            the type of the saturation jobs that can be processed by this
  *            saturation engine
  */
-public final class ClassExpressionSaturationEngine<J extends SaturationJob<? extends IndexedClassExpression>>
+public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends IndexedClassExpression>>
 		implements InputProcessor<J>, RuleApplicationListener {
 
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
 
 	/**
-	 * The listener object implementing callback functions
+	 * The listener object implementing callback functions for this engine
 	 */
-	protected final ClassExpressionSaturationListener<J> listener;
+	protected final ClassExpressionSaturationListener<J, ClassExpressionSaturationEngine<J>> listener;
 	/**
 	 * The rule application engine used internally for execution of the
 	 * saturation rules.
@@ -112,26 +112,28 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 	final AtomicInteger activeWorkers = new AtomicInteger(0);
 
 	/**
-	 * Creates a saturation engine using the given ontology index, listener for
-	 * callback functions, and threshold for the number of unprocessed contexts.
-	 * The threshold has influence on the size of the batches of the input jobs
-	 * that are processed simultaneously, which, in turn, has an effect on
-	 * throughput and latency of the saturation: in general, the larger the
-	 * threshold is, the faster it takes (in theory) to perform the overall
-	 * processing of jobs, but it might take longer to process an individual job
-	 * because it is possible to detect that the job is processed only when the
-	 * whole batch of jobs is processed.
+	 * Creates a new saturation engine using the given ontology index, listener
+	 * for callback functions, and threshold for the number of unprocessed
+	 * contexts. The threshold has influence on the size of the batches of the
+	 * input jobs that are processed simultaneously, which, in turn, has an
+	 * effect on throughput and latency of the saturation: in general, the
+	 * larger the threshold is, the faster it takes (in theory) to perform the
+	 * overall processing of jobs, but it might take longer to process an
+	 * individual job because it is possible to detect that the job is processed
+	 * only when the whole batch of jobs is processed.
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index used to apply the rules
 	 * @param listener
-	 *            The listener object implementing callback functions
+	 *            the listener object implementing callback functions
 	 * @param threshold
 	 *            the maximal difference between unprocessed and processed
 	 *            contexts under which new jobs can be submitted.
 	 */
-	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex,
-			ClassExpressionSaturationListener<J> listener, int threshold) {
+	public ClassExpressionSaturationEngine(
+			OntologyIndex ontologyIndex,
+			ClassExpressionSaturationListener<J, ClassExpressionSaturationEngine<J>> listener,
+			int threshold) {
 		this.threshold = threshold;
 		this.listener = listener;
 		this.buffer = new ConcurrentLinkedQueue<J>();
@@ -140,7 +142,7 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 	}
 
 	/**
-	 * Creates a saturation engine using the given ontology index and the
+	 * Creates a new saturation engine using the given ontology index and the
 	 * listener for callback functions.
 	 * 
 	 * @param ontologyIndex
@@ -148,27 +150,31 @@ public final class ClassExpressionSaturationEngine<J extends SaturationJob<? ext
 	 * @param listener
 	 *            The listener object implementing callback functions
 	 */
-	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex,
-			ClassExpressionSaturationListener<J> listener) {
+	public ClassExpressionSaturationEngine(
+			OntologyIndex ontologyIndex,
+			ClassExpressionSaturationListener<J, ClassExpressionSaturationEngine<J>> listener) {
 		this(ontologyIndex, listener, 256);
 	}
 
 	/**
-	 * Creates a saturation engine using the given ontology index.
+	 * Creates a new saturation engine using the given ontology index.
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index used to apply the rules
 	 */
 	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex) {
 		/* we use a dummy listener */
-		this(ontologyIndex, new ClassExpressionSaturationListener<J>() {
+		this(
+				ontologyIndex,
+				new ClassExpressionSaturationListener<J, ClassExpressionSaturationEngine<J>>() {
 
-			public void notifyCanProcess() {
-			}
+					public void notifyCanProcess() {
+					}
 
-			public void notifyFinished(J job) throws InterruptedException {
-			}
-		});
+					public void notifyFinished(J job)
+							throws InterruptedException {
+					}
+				});
 	}
 
 	public void submit(J job) throws InterruptedException {

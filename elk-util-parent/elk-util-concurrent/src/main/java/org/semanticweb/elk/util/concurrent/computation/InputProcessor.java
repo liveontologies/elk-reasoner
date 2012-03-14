@@ -56,7 +56,7 @@ public interface InputProcessor<J> {
 
 	/**
 	 * Returns <tt>true</tt> if new computational power can be used for
-	 * processing qjobs. This means that running the {@link #process()} method
+	 * processing jobs. This means that running the {@link #process()} method
 	 * can perform some computations. The method typically returns <tt>true</tt>
 	 * after a job has been submitted but not started to be processed from some
 	 * thread, but it can also return <tt>true</tt> when the job that is being

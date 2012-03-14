@@ -22,10 +22,17 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-public interface ClassTaxonomyListener<J> {
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyCanProcess;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyFinishedJob;
 
-	public void notifyCanProcess();
-
-	public void notifyProcessed(J job) throws InterruptedException;
-
+/**
+ * A listener to be used with {@link ClassTaxonomyEngine}. The listener defines
+ * functions that are triggered during the construction of the taxonomy.
+ * 
+ * @author "Yevgeny Kazakov"
+ */
+public interface ClassTaxonomyListener<P extends ClassTaxonomyEngine> extends
+		InputProcessorListenerNotifyCanProcess<P>,
+		InputProcessorListenerNotifyFinishedJob<IndexedClass, P> {
 }
