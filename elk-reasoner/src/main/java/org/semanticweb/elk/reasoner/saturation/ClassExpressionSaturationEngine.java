@@ -55,7 +55,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  *            saturation engine
  */
 public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends IndexedClassExpression>>
-		implements InputProcessor<J>, RuleApplicationListener {
+		implements InputProcessor<J> {
 
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
@@ -138,7 +138,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		this.listener = listener;
 		this.buffer = new ConcurrentLinkedQueue<J>();
 		this.ruleApplicationEngine = new RuleApplicationEngine(ontologyIndex,
-				this);
+				new ThisRuleApplicationListener());
 	}
 
 	/**
@@ -241,19 +241,6 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				|| countJobsFinished.get() > countJobsProcessed.get();
 	}
 
-	public void notifyCanProcess() {
-		/*
-		 * the rule application engine can process; wake up all sleeping workers
-		 */
-		if (workersWaiting)
-			synchronized (countContextsProcessed) {
-				workersWaiting = false;
-				countContextsProcessed.notifyAll();
-			}
-		/* tell also that the saturation engine can process */
-		listener.notifyCanProcess();
-	}
-
 	/**
 	 * Print statistics about the saturation
 	 */
@@ -350,6 +337,30 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				}
 				listener.notifyFinished(nextJob);
 			}
+		}
+	}
+
+	/**
+	 * The listener class used for the rule application engine, which is used
+	 * within this saturation engine
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	class ThisRuleApplicationListener implements RuleApplicationListener {
+
+		public void notifyCanProcess() {
+			/*
+			 * the rule application engine can process; wake up all sleeping
+			 * workers
+			 */
+			if (workersWaiting)
+				synchronized (countContextsProcessed) {
+					workersWaiting = false;
+					countContextsProcessed.notifyAll();
+				}
+			/* tell also that the saturation engine can process */
+			listener.notifyCanProcess();
 		}
 	}
 

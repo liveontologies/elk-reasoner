@@ -58,9 +58,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  *            reduction engine
  */
 public class TransitiveReductionEngine<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
-		implements
-		InputProcessor<J>,
-		ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>, ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>> {
+		implements InputProcessor<J> {
 
 	// logger for events
 	protected final static Logger LOGGER_ = Logger
@@ -116,7 +114,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 
 		this.listener = listener;
 		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>(
-				ontologyIndex, this);
+				ontologyIndex, new ThisClassExpressionSaturationListener());
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.jobQueueEmpty = new AtomicBoolean(true);
 	}
@@ -150,10 +148,6 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		return !auxJobQueue.isEmpty() || saturationEngine.canProcess();
 	}
 
-	public void notifyCanProcess() {
-		listener.notifyCanProcess();
-	}
-
 	/**
 	 * executes the notification function of the listenerq the first time the
 	 * job queue becomes non-empty
@@ -164,25 +158,32 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	}
 
 	/**
-	 * Post-processing of the finished saturation jobs using the
-	 * {@link SaturationOutputProcessor}.
-	 * 
-	 * @param output
-	 *            the processed saturation job
-	 * @throws InterruptedException
-	 *             if interrupted during post-processing
-	 */
-	public void notifyFinished(
-			SaturationJobForTransitiveReduction<R, ?, J> output)
-			throws InterruptedException {
-		output.accept(saturationOutputProcessor);
-	}
-
-	/**
 	 * Print statistics about the transitive reduction stage
 	 */
 	public void printStatistics() {
 		saturationEngine.printStatistics();
+	}
+
+	/**
+	 * The listener class used for the class expression saturation engine, which
+	 * is used within this transitive reduction engine
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	class ThisClassExpressionSaturationListener
+			implements
+			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>, ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>> {
+
+		public void notifyCanProcess() {
+			listener.notifyCanProcess();
+		}
+
+		public void notifyFinished(
+				SaturationJobForTransitiveReduction<R, ?, J> output)
+				throws InterruptedException {
+			output.accept(saturationOutputProcessor);
+		}
 	}
 
 	/**

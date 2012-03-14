@@ -50,10 +50,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ClassTaxonomyEngine
-		implements
-		InputProcessor<IndexedClass>,
-		TransitiveReductionListener<TransitiveReductionJob<IndexedClass>, TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>> {
+public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
@@ -90,7 +87,7 @@ public class ClassTaxonomyEngine
 		this.listener = listener;
 		this.taxonomy = new ConcurrentClassTaxonomy();
 		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>(
-				ontologyIndex, this);
+				ontologyIndex, new ThisTransitiveReductionListener());
 	}
 
 	/**
@@ -122,14 +119,6 @@ public class ClassTaxonomyEngine
 		return transitiveReductionEngine.canProcess();
 	}
 
-	public void notifyFinished(TransitiveReductionJob<IndexedClass> job)
-			throws InterruptedException {
-		job.getOutput().accept(outputProcessor);
-	}
-
-	public void notifyCanProcess() {
-	}
-
 	/**
 	 * Print statistics about class taxonomy construction
 	 */
@@ -144,6 +133,26 @@ public class ClassTaxonomyEngine
 	 */
 	public ClassTaxonomy getClassTaxonomy() {
 		return this.taxonomy;
+	}
+
+	/**
+	 * The listener class used for the transitive reduction engine, which is
+	 * used within this class taxonomy computation engine
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 */
+	class ThisTransitiveReductionListener
+			implements
+			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>, TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>> {
+
+		public void notifyCanProcess() {
+		}
+
+		public void notifyFinished(TransitiveReductionJob<IndexedClass> job)
+				throws InterruptedException {
+			job.getOutput().accept(outputProcessor);
+		}
+
 	}
 
 	/**
