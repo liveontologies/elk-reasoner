@@ -28,6 +28,10 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.Multimap;
 
+/**
+ * @author Frantisek Simancik
+ *
+ */
 public class RuleBottom<C extends ContextElClassSaturation> implements InferenceRule<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
@@ -40,14 +44,16 @@ public class RuleBottom<C extends ContextElClassSaturation> implements Inference
 
 	public void apply(PositiveSuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
+
+		if (argument.getExpression() != engine.owlNothing)
+			return;
 		
-		if (argument.getExpression() == engine.owlNothing)
-			context.setSatisfiable(false);
-		
+		context.setSatisfiable(false);
+
 		// propagate over all backward links
 		final Multimap<IndexedPropertyChain, ContextElClassSaturation> backLinks = 
 			context.getBackwardLinksByObjectProperty();
-		
+
 		if (backLinks != null) {
 			for (IndexedPropertyChain relation : backLinks.keySet())
 				for (Context target : backLinks.get(relation))

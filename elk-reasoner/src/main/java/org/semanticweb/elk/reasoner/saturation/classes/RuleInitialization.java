@@ -25,6 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
+/**
+ * @author Frantisek Simancik
+ *
+ */
 public class RuleInitialization<C extends ContextElClassSaturation> implements InferenceRule<C> {
 
 	public void init(C context, RuleApplicationEngine engine) {

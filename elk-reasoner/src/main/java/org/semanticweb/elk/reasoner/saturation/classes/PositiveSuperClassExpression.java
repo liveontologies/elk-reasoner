@@ -24,11 +24,18 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
-public class PositiveSuperClassExpression<C extends ContextElClassSaturation> extends SuperClassExpression<C>  {
-	
+/**
+ * Kind of SuperClassExpression to which decomposition rules need to be applied.
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
+public class PositiveSuperClassExpression<C extends ContextElClassSaturation>
+		extends SuperClassExpression<C> {
+
 	public PositiveSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
 	}
-	
+
 }

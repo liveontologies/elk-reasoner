@@ -34,13 +34,15 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystem;
 public final class InferenceSystemElClassSaturation extends InferenceSystem<ContextElClassSaturation> {
 
 	public InferenceSystemElClassSaturation() {
+		
 		add(new RuleInitialization<ContextElClassSaturation>());
 		add(new RuleSubsumption<ContextElClassSaturation>());
+		add(new RuleDecomposition<ContextElClassSaturation>());
+		add(new RuleBottom<ContextElClassSaturation>());
 		add(new RuleConjunctionPlus<ContextElClassSaturation>());
 		add(new RuleExistentialPlus<ContextElClassSaturation>());
-		add(new RuleDecomposition<ContextElClassSaturation>());
 		add(new RuleRoleComposition<ContextElClassSaturation>());
-		add(new RuleBottom<ContextElClassSaturation>());
+		
 	}
 
 	public final ContextElClassSaturation createContext(IndexedClassExpression root) {

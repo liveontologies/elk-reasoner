@@ -24,6 +24,13 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
+/**
+ * King of SuperClassExpression that was obtained by composition rules. 
+ * Decomposition rules do not need to by applied to this.
+ * 
+ * @author Frantisek Simancik
+ *
+ */
 public class NegativeSuperClassExpression<C extends ContextElClassSaturation> extends SuperClassExpression<C>  {
 	
 	public NegativeSuperClassExpression(

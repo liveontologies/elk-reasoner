@@ -382,16 +382,14 @@ public class InferenceSystemInvocationManager {
 	 */
 	protected void registerRuleMethodForClass(InferenceRule<?> inferenceRule,
 			Method ruleMethod, Class<?> clazz) {
-		InferenceMethods inferenceMethods = methodsForQueueable.get(clazz);
-		assert (inferenceMethods != null);
+		
 		for (Class<?> keyclass : methodsForQueueable.keySet()) {
-			if (clazz.isAssignableFrom(keyclass) && !clazz.equals(keyclass)) {
+			if (clazz.isAssignableFrom(keyclass)) {
+				InferenceMethods inferenceMethods = methodsForQueueable.get(keyclass);
 				inferenceMethods.ruleMethods = addRuleMethod(inferenceRule,
 						ruleMethod, inferenceMethods.ruleMethods);
 			}
 		}
-		inferenceMethods.ruleMethods = addRuleMethod(inferenceRule, ruleMethod,
-				inferenceMethods.ruleMethods);
 	}
 
 	/**

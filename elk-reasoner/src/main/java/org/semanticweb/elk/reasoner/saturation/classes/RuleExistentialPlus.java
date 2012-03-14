@@ -34,6 +34,10 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
+/**
+ * @author Frantisek Simancik
+ *
+ */
 public class RuleExistentialPlus<C extends ContextElClassSaturation> extends RuleWithBackwardLinks<C>
 		implements InferenceRule<C> {
 

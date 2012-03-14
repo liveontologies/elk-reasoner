@@ -27,6 +27,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 
+/**
+ * @author Frantisek Simancik
+ *
+ */
 public abstract class SuperClassExpression<C extends ContextElClassSaturation> implements
 		Queueable<C> {
 	

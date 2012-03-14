@@ -26,9 +26,22 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.Multimap;
 
+/**
+ * Abstract super class of all rules that require that BackwardLinks are fully
+ * derived. 
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
 public abstract class RuleWithBackwardLinks<C extends ContextElClassSaturation> {
-	
-	protected void initializeCompositionOfBackwardLinks(C context, RuleApplicationEngine engine) {
+
+	/**
+	 * Triggers composition rules for the backward links in the given context,
+	 * which are otherwise ommitted for efficiency.
+	 * 
+	 */
+	protected void initializeCompositionOfBackwardLinks(C context,
+			RuleApplicationEngine engine) {
 		if (context.composeBackwardLinks)
 			return;
 
@@ -36,15 +49,17 @@ public abstract class RuleWithBackwardLinks<C extends ContextElClassSaturation> 
 
 		if (context.backwardLinksByObjectProperty != null) {
 
-			Multimap<IndexedPropertyChain, ? extends ContextElClassSaturation> backLinks =
-				context.backwardLinksByObjectProperty;
-			
+			Multimap<IndexedPropertyChain, ? extends ContextElClassSaturation> backLinks = context.backwardLinksByObjectProperty;
+
 			for (IndexedPropertyChain linkRelation : backLinks.keySet())
-				if (linkRelation.getSaturated().getCompositionsByLeftSubProperty() != null)
-					for (ContextElClassSaturation target : backLinks.get(linkRelation))
-						engine.enqueue(target, new ForwardLink<ContextElClassSaturation> (linkRelation, context));
+				if (linkRelation.getSaturated()
+						.getCompositionsByLeftSubProperty() != null)
+					for (ContextElClassSaturation target : backLinks
+							.get(linkRelation))
+						engine.enqueue(target,
+								new ForwardLink<ContextElClassSaturation>(
+										linkRelation, context));
 		}
 	}
-
 
 }
