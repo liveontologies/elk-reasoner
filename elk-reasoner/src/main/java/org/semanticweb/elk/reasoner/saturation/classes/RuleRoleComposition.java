@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
-public class RuleRoleComposition<C extends ContextElClassSaturation>  extends RuleWithBackwardLink<C> 
+public class RuleRoleComposition<C extends ContextElClassSaturation>  extends RuleWithBackwardLinks<C> 
 		implements InferenceRule<C> {
 
 	public void apply(BackwardLink<C> argument, C context,

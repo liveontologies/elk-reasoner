@@ -40,6 +40,7 @@ public final class InferenceSystemElClassSaturation extends InferenceSystem<Cont
 		add(new RuleExistentialPlus<ContextElClassSaturation>());
 		add(new RuleDecomposition<ContextElClassSaturation>());
 		add(new RuleRoleComposition<ContextElClassSaturation>());
+		add(new RuleBottom<ContextElClassSaturation>());
 	}
 
 	public final ContextElClassSaturation createContext(IndexedClassExpression root) {

@@ -59,7 +59,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	protected volatile boolean isSaturated = false;
 
 	/**
-	 * True if owl:Nothing is stored as a superclass in this context.
+	 * False if owl:Nothing is stored as a superclass in this context.
 	 */
 	protected volatile boolean isSatisfiable = true;
 

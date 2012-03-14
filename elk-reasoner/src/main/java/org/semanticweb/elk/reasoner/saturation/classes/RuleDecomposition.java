@@ -46,8 +46,6 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements In
 		}
 
 		public Void visit(IndexedClass ice) {
-			if (ice == engine.owlNothing)
-				context.setSatisfiable(false);
 			return null;
 		}
 

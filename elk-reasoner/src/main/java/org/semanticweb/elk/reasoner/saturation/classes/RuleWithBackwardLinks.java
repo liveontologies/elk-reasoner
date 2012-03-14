@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.Multimap;
 
-public abstract class RuleWithBackwardLink<C extends ContextElClassSaturation> {
+public abstract class RuleWithBackwardLinks<C extends ContextElClassSaturation> {
 	
 	protected void initializeCompositionOfBackwardLinks(C context, RuleApplicationEngine engine) {
 		if (context.composeBackwardLinks)

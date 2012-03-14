@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
-public class RuleExistentialPlus<C extends ContextElClassSaturation> extends RuleWithBackwardLink<C>
+public class RuleExistentialPlus<C extends ContextElClassSaturation> extends RuleWithBackwardLinks<C>
 		implements InferenceRule<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
@@ -50,7 +50,8 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends Rul
 		}
 
 		// apply all propagations over the link
-		final Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> props = context.propagationsByObjectProperty;
+		final Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> props = 
+			context.getPropagationsByObjectProperty();
 		if (props == null)
 			return;
 
@@ -98,9 +99,11 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends Rul
 		if (context.propagationsByObjectProperty.add(propRelation, carry)) {
 
 			// propagate over all backward links
-			final Multimap<IndexedPropertyChain, ContextElClassSaturation> backLinks = context.backwardLinksByObjectProperty;
-			if (context.backwardLinksByObjectProperty == null)
-				return; // this should never happen
+			final Multimap<IndexedPropertyChain, ContextElClassSaturation> backLinks = 
+				context.getBackwardLinksByObjectProperty();
+			
+			if (backLinks == null) // this should never happen
+				return; 
 
 			for (IndexedPropertyChain linkRelation : new LazySetIntersection<IndexedPropertyChain>(
 					propRelation.getSaturated().getSubProperties(),
