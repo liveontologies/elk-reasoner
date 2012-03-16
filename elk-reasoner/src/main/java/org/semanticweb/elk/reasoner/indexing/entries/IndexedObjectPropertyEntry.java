@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.entries;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 
 /**
- * Implements a view for instances of {@link IndexedObjectProperty}
+ * Implements an equality view for instances of {@link IndexedObjectProperty}
  * 
  * @author "Yevgeny Kazakov"
  * 

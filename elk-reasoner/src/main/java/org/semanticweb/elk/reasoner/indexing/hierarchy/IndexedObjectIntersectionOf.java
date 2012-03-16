@@ -66,7 +66,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
-			// first negative occurrence of this conjunction
+			// first negative occurrence of this expression
 			firstConjunct.addNegConjunctionByConjunct(this, secondConjunct);
 			secondConjunct.addNegConjunctionByConjunct(this, firstConjunct);
 		}

@@ -74,6 +74,10 @@ public abstract class IndexedPropertyChain {
 		toldSuperProperties.add(superObjectProperty);
 	}
 
+	/**
+	 * @param superObjectProperty
+	 * @return true if successfully removed
+	 */
 	protected boolean removeToldSuperObjectProperty(
 			IndexedObjectProperty superObjectProperty) {
 		boolean success = false;
@@ -93,7 +97,7 @@ public abstract class IndexedPropertyChain {
 	protected final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
 
 	/**
-	 * Non-recursively.
+	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
 	protected void updateOccurrenceNumber(int increment) {
 		occurrenceNo += increment;

@@ -76,6 +76,10 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		toldSubProperties.add(subObjectProperty);
 	}
 
+	/**
+	 * @param subObjectProperty
+	 * @return true if succesfully removed
+	 */
 	protected boolean removeToldSubObjectProperty(
 			IndexedPropertyChain subObjectProperty) {
 		boolean success = false;
