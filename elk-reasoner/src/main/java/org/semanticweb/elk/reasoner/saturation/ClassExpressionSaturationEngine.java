@@ -25,6 +25,9 @@ package org.semanticweb.elk.reasoner.saturation;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -110,6 +113,16 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * If the number of workers is zero, all rules must have been applied.
 	 */
 	final AtomicInteger activeWorkers = new AtomicInteger(0);
+	/**
+	 * The lock used to suspend workers until a sufficient number of jobs are
+	 * processed
+	 */
+	final Lock suspendLock = new ReentrantLock();
+	/**
+	 * The lock condition using which one signal when jobs can be processed or
+	 * submitted
+	 */
+	final Condition canProcessOrSubmit = suspendLock.newCondition();
 
 	/**
 	 * Creates a new saturation engine using the given ontology index, listener
@@ -193,23 +206,10 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 			LOGGER_.trace(root + ": saturation started");
 		}
 		/*
-		 * if the number of unprocessed contexts exceeds the threshold, suspend
-		 * the computation; whenever workers wake up, try to process the jobs
+		 * checking if the number of unprocessed jobs does not exceed the
+		 * threshold
 		 */
-		for (;; process()) {
-			if (ruleApplicationEngine.getContextNo()
-					- countContextsProcessed.get() <= threshold)
-				break;
-			synchronized (countContextsProcessed) {
-				if (canProcess())
-					continue;
-				if (ruleApplicationEngine.getContextNo()
-						- countContextsProcessed.get() <= threshold)
-					break;
-				workersWaiting = true;
-				countContextsProcessed.wait();
-			}
-		}
+		checkThreshold();
 		/*
 		 * submit the job to the rule engine and start processing it; the
 		 * counter of active workers overestimates the number of workers
@@ -217,13 +217,49 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		 * active workers, we know that all submitted jobs are processed
 		 */
 		activeWorkers.incrementAndGet();
+		// activeWorkers.incrementAndGet();
 		buffer.add(job);
 		countJobsSubmitted.incrementAndGet();
 		ruleApplicationEngine.submit(root);
 		ruleApplicationEngine.process();
+		// activeWorkers.decrementAndGet();
 		if (activeWorkers.decrementAndGet() == 0)
 			updateProcessedCounters();
 		processFinishedJobs();
+	}
+
+	/**
+	 * Check whether the number of unprocessed jobs exceeds the threshold. If it
+	 * does, then suspend the computation until the jobs are processed or other
+	 * jobs can be processed
+	 * 
+	 * @throws InterruptedException
+	 */
+	void checkThreshold() throws InterruptedException {
+		/*
+		 * if the number of unprocessed contexts exceeds the threshold, suspend
+		 * the computation; whenever workers wake up, try to process the jobs
+		 */
+		for (;;) {
+			if (ruleApplicationEngine.getContextNo()
+					- countContextsProcessed.get() <= threshold)
+				return;
+			suspendLock.lock();
+			try {
+				for (;;) {
+					if (canProcess())
+						break;
+					if (ruleApplicationEngine.getContextNo()
+							- countContextsProcessed.get() <= threshold)
+						return;
+					workersWaiting = true;
+					canProcessOrSubmit.await();
+				}
+			} finally {
+				suspendLock.unlock();
+			}
+			process();
+		}
 	}
 
 	public void process() throws InterruptedException {
@@ -294,9 +330,12 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 			/*
 			 * waking up all workers waiting to submit the jobs
 			 */
-			synchronized (countContextsProcessed) {
+			suspendLock.lock();
+			try {
 				workersWaiting = false;
-				countContextsProcessed.notifyAll();
+				canProcessOrSubmit.signalAll();
+			} finally {
+				suspendLock.unlock();
 			}
 			listener.notifyCanProcess();
 		}
@@ -354,11 +393,15 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 			 * the rule application engine can process; wake up all sleeping
 			 * workers
 			 */
-			if (workersWaiting)
-				synchronized (countContextsProcessed) {
+			if (workersWaiting) {
+				suspendLock.lock();
+				try {
 					workersWaiting = false;
-					countContextsProcessed.notifyAll();
+					canProcessOrSubmit.signalAll();
+				} finally {
+					suspendLock.unlock();
 				}
+			}
 			/* tell also that the saturation engine can process */
 			listener.notifyCanProcess();
 		}
