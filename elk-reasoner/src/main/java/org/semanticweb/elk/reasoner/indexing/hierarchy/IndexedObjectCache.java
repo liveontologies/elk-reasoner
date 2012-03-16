@@ -27,6 +27,16 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 
+/**
+ * A cache of all indexed objects in the ontology backed by a KeyEntryHashSet.
+ * It uses indexed Entries to compare object with respect to structural
+ * equality. Supports (non-recursive) addition, removal, and retrieval of single
+ * indexed objects. The recursion for indexing subobjects is in the 
+ * ElkObjectIndexerVisitor.
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
 public class IndexedObjectCache implements IndexedObjectFilter {
 
 	protected final KeyEntryHashSet<IndexedClassExpression> indexedClassExpressionLookup;
@@ -41,6 +51,15 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				indexedPropertyChainViewFactory, 128);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFilter#filter
+	 * (org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression)
+	 * 
+	 * Returns the indexed canonical representative of the argument.
+	 */
 	public IndexedClassExpression filter(IndexedClassExpression ice) {
 		IndexedClassExpression result = indexedClassExpressionLookup.get(ice);
 		if (result == null)
@@ -49,6 +68,15 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFilter#filter
+	 * (org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain)
+	 * 
+	 * Returns the indexed canonical representative of the argument.
+	 */
 	public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
 		IndexedPropertyChain result = indexedPropertyChainLookup.get(ipc);
 		if (result == null)
@@ -81,6 +109,11 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			indexedObjectPropertyCount--;
 	}
 
+	/**
+	 * The factory used in indexedClassExpressionLookup for wrapping indexed
+	 * class expressions in the corresponding entries to use structural
+	 * equality.
+	 */
 	class IndexedClassExpressionViewFactory implements
 			KeyEntryFactory<IndexedClassExpression> {
 
@@ -95,6 +128,10 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 	IndexedClassExpressionViewFactory indexedClassExpressionViewFactory = new IndexedClassExpressionViewFactory();
 
+	/**
+	 * The factory used in indexedPropertyChainLookup for wrapping indexed class
+	 * expressions in the corresponding entries to use structural equality.
+	 */
 	class IndexedPropertyChainViewFactory implements
 			KeyEntryFactory<IndexedPropertyChain> {
 

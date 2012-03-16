@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.entries;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
 /**
- * Implements a view for instances of {@link IndexedObjectSomeValuesFrom}
+ * Implements equality for instances of {@link IndexedObjectSomeValuesFrom}
  * 
  * @author "Yevgeny Kazakov"
  * 

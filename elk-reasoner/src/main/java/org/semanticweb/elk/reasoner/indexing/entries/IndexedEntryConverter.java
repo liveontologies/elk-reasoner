@@ -35,6 +35,13 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 
+/**
+ * A visitor for IndexedClassExpression and IndexedPropertyChains that wraps 
+ * the visited objects in the corresponding Entry wrapper to redefine equality.  
+ * 
+ * @author Frantisek Simancik
+ *
+ */
 public class IndexedEntryConverter<T>
 		implements
 		IndexedClassExpressionVisitor<KeyEntry<T, ? extends IndexedClassExpression>>,
