@@ -47,22 +47,22 @@ public class ArrayHashSetTest extends TestCase {
 	/**
 	 * Checking if two sets are equal
 	 * 
-	 * @param firstSet
-	 * @param secondSet
+	 * @param referenceSet
+	 * @param testSet
 	 */
-	<E> void testSetEquality(Set<E> firstSet, Set<E> secondSet) {
+	<E> void testSetEquality(Set<E> referenceSet, Set<E> testSet) {
 		int i = 0;
-		for (E e : firstSet) {
-			assertTrue(secondSet.contains(e));
+		for (E e : referenceSet) {
+			assertTrue(testSet.contains(e));
 			i++;
 		}
-		assertEquals(i, secondSet.size());
+		assertEquals(i, testSet.size());
 		i = 0;
-		for (E e : secondSet) {
-			assertTrue(firstSet.contains(e));
+		for (E e : testSet) {
+			assertTrue(referenceSet.contains(e));
 			i++;
 		}
-		assertEquals(i, secondSet.size());
+		assertEquals(referenceSet.size(), i);
 	}
 
 	public void testAddRemoveContains() {
@@ -85,47 +85,51 @@ public class ArrayHashSetTest extends TestCase {
 
 			int initialSize = generator.nextInt(noElements);
 
-			Set<Integer> set = new ArrayHashSet<Integer>(initialSize);
+			Set<Integer> testSet = new ArrayHashSet<Integer>(initialSize);
 			Set<Integer> referenceSet = new HashSet<Integer>(noElements);
 
 			// adding random elements
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
 				expected = referenceSet.add(element);
-				actual = set.add(element);
+				assertEquals(expected, !testSet.contains(element));
+				actual = testSet.add(element);
 				assertEquals(expected, actual);
-				assertEquals(set.size(), referenceSet.size());
+				assertEquals(referenceSet.size(), testSet.size());
 			}
-			testSetEquality(set, referenceSet);
+			testSetEquality(referenceSet, testSet);
 
 			// removing random elements
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
 				expected = referenceSet.remove(element);
-				actual = set.remove(element);
+				assertEquals(expected, testSet.contains(element));
+				actual = testSet.remove(element);
 				assertEquals(expected, actual);
-				assertEquals(set.size(), referenceSet.size());
+				assertEquals(referenceSet.size(), testSet.size());
 			}
-			testSetEquality(set, referenceSet);
+			testSetEquality(referenceSet, testSet);
 
 			// randomly adding and removing
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
 				if (generator.nextBoolean()) {
 					expected = referenceSet.add(element);
-					actual = set.add(element);
+					assertEquals(expected, !testSet.contains(element));
+					actual = testSet.add(element);
 				} else {
 					expected = referenceSet.remove(element);
-					actual = set.remove(element);
+					assertEquals(expected, testSet.contains(element));
+					actual = testSet.remove(element);
 				}
 				assertEquals(expected, actual);
-				assertEquals(set.size(), referenceSet.size());
+				assertEquals(referenceSet.size(), testSet.size());
 			}
-			testSetEquality(set, referenceSet);
+			testSetEquality(referenceSet, testSet);
 
-			set.clear();
+			testSet.clear();
 			referenceSet.clear();
-			testSetEquality(set, referenceSet);
+			testSetEquality(referenceSet, testSet);
 		}
 
 	}
