@@ -35,17 +35,17 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class IndexedDataProperty {
 
 	protected ElkDataProperty property;
-	protected Set<IndexedDataSomeValuesFrom> negExistential;
+	protected Set<IndexedDatatypeExpression> negExistential;
 	protected IntervalTree numericIntervalTree;
 	protected IntervalTree temporalIntervalTree;
-	protected Map<String, IndexedDataSomeValuesFrom> stringCache;
+	protected Map<String, IndexedDatatypeExpression> stringCache;
 
 	public IndexedDataProperty(ElkDataProperty property) {
 		this.property = property;
-		negExistential = new HashSet<IndexedDataSomeValuesFrom>(5);
+		negExistential = new HashSet<IndexedDatatypeExpression>(5);
 		numericIntervalTree = DatatypeToolkit.makeNewIntervalTree();
 		temporalIntervalTree = DatatypeToolkit.makeNewIntervalTree();
-		stringCache = new HashMap<String, IndexedDataSomeValuesFrom>();
+		stringCache = new HashMap<String, IndexedDatatypeExpression>();
 	}
 
 	public ElkIri getIri() {
@@ -60,49 +60,49 @@ public class IndexedDataProperty {
 		return visitor.visit(this);
 	}
 
-	void addNegExistential(IndexedDataSomeValuesFrom dataSomeValuesFrom) {
-		negExistential.add(dataSomeValuesFrom);
-		Domain restrictionDomain = dataSomeValuesFrom.getRestrictionDomain();
+	void addNegExistential(IndexedDatatypeExpression datatypeExpression) {
+		negExistential.add(datatypeExpression);
+		Domain restrictionDomain = datatypeExpression.getRestrictionDomain();
 		switch (restrictionDomain) {
 			case N:
 			case Z:
 			case R:
 				numericIntervalTree.insert(
-						DatatypeToolkit.convertRestrictionToInterval(dataSomeValuesFrom.getRestrictions(), restrictionDomain)
-						,dataSomeValuesFrom);
+						DatatypeToolkit.convertRestrictionToInterval(datatypeExpression.getRestrictions(), restrictionDomain)
+						,datatypeExpression);
 				break;
 			case TIME:
 			case DATE:
 			case DATETIME:
 				temporalIntervalTree.insert(
-						DatatypeToolkit.convertRestrictionToInterval(dataSomeValuesFrom.getRestrictions(), restrictionDomain)
-						,dataSomeValuesFrom);
+						DatatypeToolkit.convertRestrictionToInterval(datatypeExpression.getRestrictions(), restrictionDomain)
+						,datatypeExpression);
 				break;
 			case TEXT:
-				for (DatatypeRestriction dr : dataSomeValuesFrom.getRestrictions()) {
-					stringCache.put(dr.getValueAsString(), dataSomeValuesFrom);
+				for (DatatypeRestriction dr : datatypeExpression.getRestrictions()) {
+					stringCache.put(dr.getValueAsString(), datatypeExpression);
 				}
 				break;
 		}
 	}
 
-	void removeNegExistential(IndexedDataSomeValuesFrom dataSomeValuesFrom) {
+	void removeNegExistential(IndexedDatatypeExpression dataSomeValuesFrom) {
 		negExistential.remove(dataSomeValuesFrom);
 		//TODO: remove this ugly code - make proper corrections to data stuctures
 		numericIntervalTree = DatatypeToolkit.makeNewIntervalTree();
 		temporalIntervalTree = DatatypeToolkit.makeNewIntervalTree();
 		stringCache.clear();
-		for (IndexedDataSomeValuesFrom negExt : negExistential) {
+		for (IndexedDatatypeExpression negExt : negExistential) {
 			addNegExistential(negExt);
 		}
 		//TODO: no realy, remove it. ASAP.
 	}
 
-	public Set<IndexedDataSomeValuesFrom> getAllNegExistentials() {
+	public Set<IndexedDatatypeExpression> getAllNegExistentials() {
 		return negExistential;
 	}
 
-	public Set<IndexedDataSomeValuesFrom> getSatisfyingNegExistentials(IndexedDatatypeExpression ide) {
+	public Set<IndexedDatatypeExpression> getSatisfyingNegExistentials(IndexedDatatypeExpression ide) {
 		switch (ide.getRestrictionDomain()) {
 			case N:
 			case Z:

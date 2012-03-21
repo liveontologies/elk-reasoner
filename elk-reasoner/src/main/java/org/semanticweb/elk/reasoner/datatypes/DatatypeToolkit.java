@@ -23,7 +23,6 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.intervals.Interval;
 import org.semanticweb.elk.reasoner.datatypes.intervals.IntervalNode;
 import org.semanticweb.elk.reasoner.datatypes.intervals.IntervalTree;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
@@ -191,21 +190,21 @@ public class DatatypeToolkit {
 		});
 	}
 
-	public static Set<IndexedDataSomeValuesFrom> findSatisfyingExpressions(IndexedDatatypeExpression ide, IntervalTree tree) {
+	public static Set<IndexedDatatypeExpression> findSatisfyingExpressions(IndexedDatatypeExpression ide, IntervalTree tree) {
 		Interval interval = convertRestrictionToInterval(ide.getRestrictions(), ide.getRestrictionDomain());
-		Set<IndexedDataSomeValuesFrom> retSet = new HashSet<IndexedDataSomeValuesFrom>(5);
+		Set<IndexedDatatypeExpression> retSet = new HashSet<IndexedDatatypeExpression>(5);
 		if (interval != null) {
 			List<IntervalNode> nodes = tree.findAllNodesContaining(interval);
 			for (IntervalNode intervalNode : nodes) {
-				retSet.add((IndexedDataSomeValuesFrom) intervalNode.getData());
+				retSet.add((IndexedDatatypeExpression) intervalNode.getData());
 			}
 		}
 		return retSet;
 	}
 
-	public static Set<IndexedDataSomeValuesFrom> findSatisfyingExpressions(IndexedDatatypeExpression ide, Map<String, IndexedDataSomeValuesFrom> stringCache) {
-		Set<IndexedDataSomeValuesFrom> retSet = new HashSet<IndexedDataSomeValuesFrom>(5);
-		for (Entry<String, IndexedDataSomeValuesFrom> entry : stringCache.entrySet()) {
+	public static Set<IndexedDatatypeExpression> findSatisfyingExpressions(IndexedDatatypeExpression ide, Map<String, IndexedDatatypeExpression> stringCache) {
+		Set<IndexedDatatypeExpression> retSet = new HashSet<IndexedDatatypeExpression>(5);
+		for (Entry<String, IndexedDatatypeExpression> entry : stringCache.entrySet()) {
 			for (DatatypeRestriction dr : ide.getRestrictions()) {
 				if (computeCorollary(dr.getValueAsString(), entry.getKey())) {
 					retSet.add(entry.getValue());

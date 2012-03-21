@@ -56,8 +56,18 @@ public class IndexedDataHasValue extends IndexedDatatypeExpression {
 	@Override
 	protected void updateOccurrenceNumbers(int increment,
 			int positiveIncrement, int negativeIncrement) {
+		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+			// first negative occurrence of this expression
+			property.addNegExistential(this);
+		}
+
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
+
+		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
+			// no negative occurrences of this expression left
+			property.removeNegExistential(this);
+		}
 	}
 
 	public <O> O accept(IndexedDataHasValueVisitor<O> visitor) {

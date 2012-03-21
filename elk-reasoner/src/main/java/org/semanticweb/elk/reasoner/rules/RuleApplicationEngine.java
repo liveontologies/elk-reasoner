@@ -453,10 +453,10 @@ public class RuleApplicationEngine extends
 			
 			if (ice instanceof IndexedDatatypeExpression) {
 				IndexedDatatypeExpression datatypeExpression = (IndexedDatatypeExpression) ice;
-				for (IndexedDataSomeValuesFrom someValueFrom :
+				for (IndexedDatatypeExpression negDatatypeExpr :
 						datatypeExpression.getProperty().getSatisfyingNegExistentials(datatypeExpression)) {
-					if (datatypeExpression != someValueFrom) {
-						enqueue(context, someValueFrom);
+					if (datatypeExpression != negDatatypeExpr) {
+						enqueue(context, negDatatypeExpr);
 					}
 				}
 			}
