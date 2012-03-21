@@ -40,13 +40,6 @@ public class IntervalTree extends RBTree {
 		insertNode(node);
 	}
 
-	public void insertAll(List<Interval> intervals, Object data) {
-		for (Interval i : intervals) {
-			IntervalNode node = new IntervalNode(i, endpointComparator, data);
-			insertNode(node);
-		}
-	}
-
 	public List<IntervalNode> findAllNodesContaining(Interval interval) {
 		List retList = new ArrayList();
 		searchForIntersectingNodesFrom((IntervalNode) getRoot(), interval, retList);

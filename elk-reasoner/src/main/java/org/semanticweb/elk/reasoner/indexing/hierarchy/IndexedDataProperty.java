@@ -23,6 +23,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.reasoner.datatypes.DatatypeRestriction;
 import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit.Domain;
 import org.semanticweb.elk.reasoner.datatypes.intervals.IntervalTree;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -61,18 +62,21 @@ public class IndexedDataProperty {
 
 	void addNegExistential(IndexedDataSomeValuesFrom dataSomeValuesFrom) {
 		negExistential.add(dataSomeValuesFrom);
-		switch (dataSomeValuesFrom.getRestrictionDomain()) {
+		Domain restrictionDomain = dataSomeValuesFrom.getRestrictionDomain();
+		switch (restrictionDomain) {
 			case N:
 			case Z:
 			case R:
-				numericIntervalTree.insertAll(
-						DatatypeToolkit.convertRestrictionToIntervals(dataSomeValuesFrom.getRestrictions()), dataSomeValuesFrom);
+				numericIntervalTree.insert(
+						DatatypeToolkit.convertRestrictionToInterval(dataSomeValuesFrom.getRestrictions(), restrictionDomain)
+						,dataSomeValuesFrom);
 				break;
 			case TIME:
 			case DATE:
 			case DATETIME:
-				temporalIntervalTree.insertAll(
-						DatatypeToolkit.convertRestrictionToIntervals(dataSomeValuesFrom.getRestrictions()), dataSomeValuesFrom);
+				temporalIntervalTree.insert(
+						DatatypeToolkit.convertRestrictionToInterval(dataSomeValuesFrom.getRestrictions(), restrictionDomain)
+						,dataSomeValuesFrom);
 				break;
 			case TEXT:
 				for (DatatypeRestriction dr : dataSomeValuesFrom.getRestrictions()) {

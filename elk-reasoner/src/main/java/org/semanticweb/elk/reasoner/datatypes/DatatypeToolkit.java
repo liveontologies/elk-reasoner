@@ -85,7 +85,8 @@ public class DatatypeToolkit {
 				|| "unsignedLong".equals(dt) || "unsignedInt".equals(dt)
 				|| "unsignedShort".equals(dt) || "unsignedByte".equals(dt)) {
 			return Domain.N;
-		} else if ("double".equals(dt) || "float".equals(dt) || "decimal".equals(dt)) {
+		} else if ("double".equals(dt) || "float".equals(dt) 
+				|| "decimal".equals(dt) || "real".equals(dt)) {
 			return Domain.R;
 		} else if ("date".equals(dt)) {
 			return Domain.DATE;
@@ -125,30 +126,26 @@ public class DatatypeToolkit {
 		}
 	}
 
-	public static List<Interval> convertRestrictionToIntervals(List<DatatypeRestriction> restrictions) {
-		List<Interval> result = new ArrayList<Interval>(2);
-
+	public static Interval convertRestrictionToInterval(List<DatatypeRestriction> restrictions, Domain domain) {
 		Number leftEnd = Double.NEGATIVE_INFINITY;
 		Number rightEnd = Double.POSITIVE_INFINITY;
 
-		boolean isN = false;
+		Number temp;
 
 		for (DatatypeRestriction r : restrictions) {
 			if (r.value != null) {
 				Number value = r.getValueAsNumber();
 				switch (r.relation) {
 					case LESS:
-						rightEnd = getNextValueDown(value, r.domain);
-						if (r.domain == Domain.N) {
-							leftEnd = 0;
-							isN = true;
+						temp = getNextValueDown(value, r.domain);
+						if (temp.doubleValue() < rightEnd.doubleValue()) {
+							rightEnd = temp;
 						}
 						break;
 					case LESS_OR_EQUAL:
-						rightEnd = value;
-						if (r.domain == Domain.N) {
-							leftEnd = 0;
-							isN = true;
+						temp = value;
+						if (temp.doubleValue() < rightEnd.doubleValue()) {
+							rightEnd = temp;
 						}
 						break;
 					case EQUAL:
@@ -156,26 +153,30 @@ public class DatatypeToolkit {
 						leftEnd = value;
 						break;
 					case MORE_OR_EQUAL:
-						leftEnd = value;
+						temp = value;
+						if (temp.doubleValue() > leftEnd.doubleValue()) {
+							leftEnd = temp;
+						}
 						break;
 					case MORE:
-						leftEnd = getNextValueUp(value, r.domain);
+						temp = getNextValueUp(value, r.domain);
+						if (temp.doubleValue() > leftEnd.doubleValue()) {
+							leftEnd = temp;
+						}
 						break;
 				}
 			}
 		}
 
-		if (leftEnd.doubleValue() <= rightEnd.doubleValue()) {
-			result.add(new Interval(leftEnd, rightEnd));
-		} else {
-			if (isN) {
-				result.add(new Interval(0, rightEnd));
-			} else {
-				result.add(new Interval(Double.NEGATIVE_INFINITY, rightEnd));
-			}
-			result.add(new Interval(leftEnd, Double.POSITIVE_INFINITY));
+		if (domain == domain.N) {
+			leftEnd = 0;
 		}
-		return result;
+
+		if (leftEnd.doubleValue() <= rightEnd.doubleValue()) {
+			return new Interval(leftEnd, rightEnd);
+		} else {
+			return null;
+		}
 	}
 
 	public static IntervalTree makeNewIntervalTree() {
@@ -191,20 +192,12 @@ public class DatatypeToolkit {
 	}
 
 	public static Set<IndexedDataSomeValuesFrom> findSatisfyingExpressions(IndexedDatatypeExpression ide, IntervalTree tree) {
-		List<Interval> intervals = convertRestrictionToIntervals(ide.getRestrictions());
+		Interval interval = convertRestrictionToInterval(ide.getRestrictions(), ide.getRestrictionDomain());
 		Set<IndexedDataSomeValuesFrom> retSet = new HashSet<IndexedDataSomeValuesFrom>(5);
-		boolean first = true;
-		for (Interval interval : intervals) {
+		if (interval != null) {
 			List<IntervalNode> nodes = tree.findAllNodesContaining(interval);
-			Set<IndexedDataSomeValuesFrom> dtExps = new HashSet<IndexedDataSomeValuesFrom>(nodes.size());
 			for (IntervalNode intervalNode : nodes) {
-				dtExps.add((IndexedDataSomeValuesFrom) intervalNode.getData());
-			}
-			if (first) {
-				retSet.addAll(dtExps);
-				first = false;
-			} else {
-				retSet.retainAll(dtExps);
+				retSet.add((IndexedDataSomeValuesFrom) intervalNode.getData());
 			}
 		}
 		return retSet;
