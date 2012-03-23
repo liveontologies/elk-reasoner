@@ -50,8 +50,8 @@ public class IndexConstructionTest extends TestCase {
 		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri("R"));
 
 		OntologyIndex index = new OntologyIndexImpl();
-		ElkAxiomProcessor inserter = index.getAxiomInserter();
-		ElkAxiomProcessor deleter = index.getAxiomDeleter();
+		ElkAxiomProcessor inserter = index.getDirectAxiomInserter();
+		ElkAxiomProcessor deleter = index.getDirectAxiomDeleter();
 
 		inserter.process(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectIntersectionOf(a, b), d));
@@ -100,7 +100,7 @@ public class IndexConstructionTest extends TestCase {
 				objectFactory.getObjectIntersectionOf(b, a), c);
 
 		OntologyIndex index = new OntologyIndexImpl();
-		ElkAxiomProcessor inserter = index.getAxiomInserter();
+		ElkAxiomProcessor inserter = index.getDirectAxiomInserter();
 
 		inserter.process(objectFactory.getSubClassOfAxiom(x, d));
 		inserter.process(objectFactory.getSubClassOfAxiom(y, d));

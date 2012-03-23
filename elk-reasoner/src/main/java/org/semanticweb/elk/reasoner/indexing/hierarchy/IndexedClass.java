@@ -69,8 +69,8 @@ public class IndexedClass extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement) {
+	protected void updateOccurrenceNumbers(IndexUpdater indexUpdater,
+			int increment, int positiveIncrement, int negativeIncrement) {
 		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;

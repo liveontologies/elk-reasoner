@@ -23,7 +23,6 @@
 
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -67,28 +66,6 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	@Override
 	public List<IndexedPropertyChain> getToldSubProperties() {
 		return toldSubProperties;
-	}
-
-	protected void addToldSubObjectProperty(
-			IndexedPropertyChain subObjectProperty) {
-		if (toldSubProperties == null)
-			toldSubProperties = new ArrayList<IndexedPropertyChain>(1);
-		toldSubProperties.add(subObjectProperty);
-	}
-
-	/**
-	 * @param subObjectProperty
-	 * @return true if succesfully removed
-	 */
-	protected boolean removeToldSubObjectProperty(
-			IndexedPropertyChain subObjectProperty) {
-		boolean success = false;
-		if (toldSubProperties != null) {
-			success = toldSubProperties.remove(subObjectProperty);
-			if (toldSubProperties.isEmpty())
-				toldSubProperties = null;
-		}
-		return success;
 	}
 
 	public <O> O accept(IndexedObjectPropertyVisitor<O> visitor) {

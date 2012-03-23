@@ -50,6 +50,8 @@ public class SaturatedClassExpression implements Linkable {
 	// TODO use Derivable instead of IndexedClassExpression here
 	protected final Set<IndexedClassExpression> derived;
 
+	protected final AtomicBoolean isSaturated;
+
 	protected Multimap<IndexedPropertyChain, Linkable> backwardLinksByObjectProperty;
 
 	protected Multimap<IndexedPropertyChain, Linkable> forwardLinksByObjectProperty;
@@ -57,8 +59,6 @@ public class SaturatedClassExpression implements Linkable {
 	protected Multimap<IndexedPropertyChain, Queueable> propagationsByObjectProperty;
 
 	protected volatile boolean isSatisfiable = true;
-
-	protected volatile boolean isSaturated = false;
 
 	/**
 	 * If set to true, then composition rules will be applied to derive all
@@ -76,6 +76,7 @@ public class SaturatedClassExpression implements Linkable {
 		this.root = root;
 		this.queue = new ConcurrentLinkedQueue<Queueable>();
 		this.derived = new ArrayHashSet<IndexedClassExpression>(13);
+		this.isSaturated = new AtomicBoolean(false);
 		this.isActive = new AtomicBoolean(false);
 	}
 
@@ -121,9 +122,23 @@ public class SaturatedClassExpression implements Linkable {
 	/**
 	 * Marks this context as saturated. The derivable set should not change from
 	 * this point.
+	 * 
+	 * @return <tt>true</tt> if the saturation status has changed from
+	 *         <tt>false</tt> to <tt>true</tt>
 	 */
-	public void setSaturated() {
-		isSaturated = true;
+	public boolean setSaturated() {
+		return isSaturated.compareAndSet(false, true);
+	}
+
+	/**
+	 * Marks this context as not saturated.
+	 */
+	/**
+	 * @return <tt>true</tt> if the saturation status has changed from
+	 *         <tt>true</tt> to <tt>false</tt>
+	 */
+	public boolean setNotSaturated() {
+		return isSaturated.compareAndSet(true, false);
 	}
 
 	/**
@@ -133,7 +148,19 @@ public class SaturatedClassExpression implements Linkable {
 	 *         otherwise
 	 */
 	public boolean isSaturated() {
-		return isSaturated;
+		return isSaturated.get();
+	}
+
+	/**
+	 * Clears the saturation information that is derivable from the root of this
+	 * context
+	 */
+	public void clear() {
+		derived.clear();
+		forwardLinksByObjectProperty = null;
+		propagationsByObjectProperty = null;
+		isSatisfiable = true;
+		setNotSaturated();
 	}
 
 }

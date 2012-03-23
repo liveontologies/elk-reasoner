@@ -35,8 +35,8 @@ import java.util.Collection;
  * @param <Value>
  */
 
-
-public class HashListMultimap<Key, Value> extends AbstractHashMultimap<Key, Value> {
+public class HashListMultimap<Key, Value> extends
+		AbstractHashMultimap<Key, Value> {
 
 	public HashListMultimap() {
 		super();
@@ -48,6 +48,7 @@ public class HashListMultimap<Key, Value> extends AbstractHashMultimap<Key, Valu
 
 	@Override
 	protected Collection<Value> newRecord() {
-		return new ArrayList<Value> ();
+		return new ArrayList<Value>();
 	}
+
 }

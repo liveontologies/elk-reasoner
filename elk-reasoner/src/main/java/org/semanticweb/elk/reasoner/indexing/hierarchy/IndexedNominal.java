@@ -31,7 +31,7 @@ public class IndexedNominal extends IndexedClassExpression {
 	 * The ElkNamedIndividual that is the sole instance of this nominal
 	 */
 	protected final ElkNamedIndividual elkNamedIndividual;
-	
+
 	protected int occurrenceNo = 0;
 
 	protected IndexedNominal(ElkNamedIndividual elkNamedIndividual) {
@@ -54,13 +54,13 @@ public class IndexedNominal extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement) {
+	protected void updateOccurrenceNumbers(IndexUpdater indexUpdater,
+			int increment, int positiveIncrement, int negativeIncrement) {
 		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 	}
-	
+
 	@Override
 	public boolean occurs() {
 		return occurrenceNo > 0;
@@ -68,7 +68,7 @@ public class IndexedNominal extends IndexedClassExpression {
 
 	@Override
 	public String toString() {
-		return "ObjectOneOf(<"+elkNamedIndividual.getIri().asString()+">)";
+		return "ObjectOneOf(<" + elkNamedIndividual.getIri().asString() + ">)";
 	}
 
 }

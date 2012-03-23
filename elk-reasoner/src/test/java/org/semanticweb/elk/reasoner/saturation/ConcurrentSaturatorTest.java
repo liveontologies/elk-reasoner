@@ -62,7 +62,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		OntologyIndex ontologyIndex = new OntologyIndexImpl();
 
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
+		final ElkAxiomProcessor inserter = ontologyIndex.getDirectAxiomInserter();
 		inserter.process(objectFactory.getEquivalentClassesAxiom(b, c));
 		inserter.process(objectFactory.getSubClassOfAxiom(a,
 				objectFactory.getObjectSomeValuesFrom(r, b)));
@@ -101,7 +101,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		final OntologyIndex ontologyIndex = new OntologyIndexImpl();
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
+		final ElkAxiomProcessor inserter = ontologyIndex.getDirectAxiomInserter();
 
 		inserter.process(objectFactory.getSubClassOfAxiom(a, b));
 		inserter.process(objectFactory.getSubClassOfAxiom(a, c));

@@ -41,7 +41,12 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
 	 */
-	private final IndexedObjectCache objectCache;
+	private final IndexedObjectLookup objectLookup;
+
+	/**
+	 * The object through which the changes in the index are recordered
+	 */
+	private final IndexUpdater indexUpdater;
 
 	/**
 	 * 1 if adding axioms, -1 if removing axioms
@@ -56,19 +61,43 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			negativeIndexer;
 
 	/**
-	 * @param objectCache
+	 * @param objectLookup
 	 * @param insert
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
-	public ElkAxiomIndexerVisitor(IndexedObjectCache objectCache, boolean insert) {
-		this.objectCache = objectCache;
+	public ElkAxiomIndexerVisitor(IndexedObjectLookup objectLookup,
+			IndexUpdater indexUpdater, boolean insert) {
+		this.objectLookup = objectLookup;
+		this.indexUpdater = indexUpdater;
 		this.multiplicity = insert ? 1 : -1;
 		this.neutralIndexer = new ElkObjectIndexerVisitor(
-				new UpdateCacheFilter(multiplicity, 0, 0));
+				new ObjectLookupUpdater(multiplicity, 0, 0));
 		this.positiveIndexer = new ElkObjectIndexerVisitor(
-				new UpdateCacheFilter(multiplicity, multiplicity, 0));
+				new ObjectLookupUpdater(multiplicity, multiplicity, 0));
 		this.negativeIndexer = new ElkObjectIndexerVisitor(
-				new UpdateCacheFilter(multiplicity, 0, multiplicity));
+				new ObjectLookupUpdater(multiplicity, 0, multiplicity));
+	}
+
+	/**
+	 * Create the axiom indexer which applies the index changes immediately to
+	 * the indexed objects.
+	 * 
+	 * @param objectLookup
+	 *            lookup for indexed objects
+	 * @param insert
+	 * @return
+	 */
+	public static ElkAxiomIndexerVisitor getDirectAxiomIndexer(
+			IndexedObjectLookup objectLookup, boolean insert) {
+		return new ElkAxiomIndexerVisitor(objectLookup,
+				new DirectIndexUpdater(), insert);
+	}
+
+	public static ElkAxiomIndexerVisitor getIncrementalAxiomIndexer(
+			IndexedObjectLookup objectLookup, IndexChange indexChange,
+			boolean insert) {
+		return new ElkAxiomIndexerVisitor(objectLookup,
+				new IncrementalIndexUpdater(indexChange), insert);
 	}
 
 	@Override
@@ -82,9 +111,11 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 				.accept(positiveIndexer);
 
 		if (multiplicity == 1) {
-			subIndexedClass.addToldSuperClassExpression(superIndexedClass);
+			indexUpdater.addToldSuperClassExpression(subIndexedClass,
+					superIndexedClass);
 		} else {
-			subIndexedClass.removeToldSuperClassExpression(superIndexedClass);
+			indexUpdater.removeToldSuperClassExpression(subIndexedClass,
+					superIndexedClass);
 		}
 	}
 
@@ -100,13 +131,15 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 				.accept(positiveIndexer);
 
 		if (multiplicity == 1) {
-			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
-			superIndexedProperty.addToldSubObjectProperty(subIndexedProperty);
+			indexUpdater.addToldSuperObjectProperty(subIndexedProperty,
+					superIndexedProperty);
+			indexUpdater.addToldSubObjectProperty(superIndexedProperty,
+					subIndexedProperty);
 		} else {
-			subIndexedProperty
-					.removeToldSuperObjectProperty(superIndexedProperty);
-			superIndexedProperty
-					.removeToldSubObjectProperty(subIndexedProperty);
+			indexUpdater.removeToldSuperObjectProperty(subIndexedProperty,
+					superIndexedProperty);
+			indexUpdater.removeToldSubObjectProperty(superIndexedProperty,
+					subIndexedProperty);
 		}
 	}
 
@@ -135,11 +168,11 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 * @author Frantisek Simancik
 	 * 
 	 */
-	private class UpdateCacheFilter implements IndexedObjectFilter {
+	private class ObjectLookupUpdater implements IndexedObjectFilter {
 
 		protected final int increment, positiveIncrement, negativeIncrement;
 
-		UpdateCacheFilter(int increment, int positiveIncrement,
+		ObjectLookupUpdater(int increment, int positiveIncrement,
 				int negativeIncrement) {
 			this.increment = increment;
 			this.positiveIncrement = positiveIncrement;
@@ -147,30 +180,30 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		}
 
 		public IndexedClassExpression filter(IndexedClassExpression ice) {
-			IndexedClassExpression result = objectCache.filter(ice);
+			IndexedClassExpression result = objectLookup.filter(ice);
 
 			if (!result.occurs() && increment > 0)
-				objectCache.add(result);
+				objectLookup.add(result);
 
-			result.updateOccurrenceNumbers(increment, positiveIncrement,
-					negativeIncrement);
+			result.updateOccurrenceNumbers(indexUpdater, increment,
+					positiveIncrement, negativeIncrement);
 
 			if (!result.occurs() && increment < 0)
-				objectCache.remove(result);
+				objectLookup.remove(result);
 
 			return result;
 		}
 
 		public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
-			IndexedPropertyChain result = objectCache.filter(ipc);
+			IndexedPropertyChain result = objectLookup.filter(ipc);
 
 			if (!result.occurs() && increment > 0)
-				objectCache.add(result);
+				objectLookup.add(result);
 
 			result.updateOccurrenceNumber(increment);
 
 			if (!result.occurs() && increment < 0)
-				objectCache.remove(result);
+				objectLookup.remove(result);
 
 			return result;
 		}

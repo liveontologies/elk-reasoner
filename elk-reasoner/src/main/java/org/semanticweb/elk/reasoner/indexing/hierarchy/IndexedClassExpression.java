@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -74,7 +72,8 @@ abstract public class IndexedClassExpression implements Derivable {
 	protected int negativeOccurrenceNo = 0;
 
 	/**
-	 * This method should always return true apart from intermediate steps during the indexing.
+	 * This method should always return true apart from intermediate steps
+	 * during the indexing.
 	 * 
 	 * @return true if the represented class expression occurs in the ontology
 	 */
@@ -83,14 +82,16 @@ abstract public class IndexedClassExpression implements Derivable {
 	}
 
 	/**
-	 * @return true if the represented class expression occurs negatively in the ontology
+	 * @return true if the represented class expression occurs negatively in the
+	 *         ontology
 	 */
 	public boolean occursNegatively() {
 		return negativeOccurrenceNo > 0;
 	}
 
 	/**
-	 * @return true if the represented class expression occurs positively in the ontologu
+	 * @return true if the represented class expression occurs positively in the
+	 *         ontologu
 	 */
 	public boolean occursPositively() {
 		return positiveOccurrenceNo > 0;
@@ -98,9 +99,9 @@ abstract public class IndexedClassExpression implements Derivable {
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
-	 */ 
-	protected abstract void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement);
+	 */
+	protected abstract void updateOccurrenceNumbers(IndexUpdater indexUpdater,
+			int increment, int positiveIncrement, int negativeIncrement);
 
 	/**
 	 * @return All told super class expressions of this class expression,
@@ -126,81 +127,11 @@ abstract public class IndexedClassExpression implements Derivable {
 		return negExistentials;
 	}
 
-	protected void addToldSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
-		if (toldSuperClassExpressions == null)
-			toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(1);
-		toldSuperClassExpressions.add(superClassExpression);
-	}
-
-	/**
-	 * @param superClassExpression
-	 * @return true if successfully removed
-	 */
-	protected boolean removeToldSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
-		boolean success = false;
-		if (toldSuperClassExpressions != null) {
-			success = toldSuperClassExpressions.remove(superClassExpression);
-			if (toldSuperClassExpressions.isEmpty())
-				toldSuperClassExpressions = null;
-		}
-		return success;
-	}
-
-	protected void addNegConjunctionByConjunct(
-			IndexedObjectIntersectionOf conjunction,
-			IndexedClassExpression conjunct) {
-		if (negConjunctionsByConjunct == null)
-			// TODO possibly replace by ArrayHashMap when it supports removal
-			negConjunctionsByConjunct = new HashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
-					4);
-		negConjunctionsByConjunct.put(conjunct, conjunction);
-	}
-
-	/**
-	 * @param conjunction
-	 * @param conjunct
-	 * @return true if successfully removed
-	 */
-	protected boolean removeNegConjunctionByConjunct(
-			IndexedObjectIntersectionOf conjunction,
-			IndexedClassExpression conjunct) {
-		boolean success = false;
-		if (negConjunctionsByConjunct != null) {
-			success = (negConjunctionsByConjunct.remove(conjunct) != null);
-			if (negConjunctionsByConjunct.isEmpty())
-				negConjunctionsByConjunct = null;
-		}
-		return success;
-	}
-
-	protected void addNegExistential(IndexedObjectSomeValuesFrom existential) {
-		if (negExistentials == null)
-			negExistentials = new ArrayList<IndexedObjectSomeValuesFrom>(1);
-		negExistentials.add(existential);
-	}
-
-	/**
-	 * @param existential
-	 * @return true if successfully removed
-	 */
-	protected boolean removeNegExistential(
-			IndexedObjectSomeValuesFrom existential) {
-		boolean success = false;
-		if (negExistentials != null) {
-			success = negExistentials.remove(existential);
-			if (negExistentials.isEmpty())
-				negExistentials = null;
-		}
-		return success;
-	}
-
-	
 	// TODO: replace pointers to contexts by a mapping
-	
+
 	/**
-	 * Used for efficient retrieval of the Context corresponding to this class expression.  
+	 * Used for efficient retrieval of the Context corresponding to this class
+	 * expression.
 	 */
 	protected final AtomicReference<SaturatedClassExpression> saturated = new AtomicReference<SaturatedClassExpression>();
 

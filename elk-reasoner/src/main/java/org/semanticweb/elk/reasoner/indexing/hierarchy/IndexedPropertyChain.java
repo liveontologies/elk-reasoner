@@ -23,7 +23,6 @@
 
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -66,28 +65,6 @@ public abstract class IndexedPropertyChain {
 	 *         null.
 	 */
 	public abstract List<IndexedPropertyChain> getToldSubProperties();
-
-	protected void addToldSuperObjectProperty(
-			IndexedObjectProperty superObjectProperty) {
-		if (toldSuperProperties == null)
-			toldSuperProperties = new ArrayList<IndexedObjectProperty>(1);
-		toldSuperProperties.add(superObjectProperty);
-	}
-
-	/**
-	 * @param superObjectProperty
-	 * @return true if successfully removed
-	 */
-	protected boolean removeToldSuperObjectProperty(
-			IndexedObjectProperty superObjectProperty) {
-		boolean success = false;
-		if (toldSuperProperties != null) {
-			success = toldSuperProperties.remove(superObjectProperty);
-			if (toldSuperProperties.isEmpty())
-				toldSuperProperties = null;
-		}
-		return success;
-	}
 
 	/**
 	 * This counts how often this object occurred in the ontology.

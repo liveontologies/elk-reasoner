@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.semanticweb.elk.util.collections.ArrayHashMap;
-
 import junit.framework.TestCase;
 
 /**
@@ -44,62 +42,99 @@ public class ArrayHashMapTest extends TestCase {
 		super(testName);
 	}
 
+	/**
+	 * Checking if two maps are equal
+	 * 
+	 * @param referenceMap
+	 * @param testMap
+	 */
+	<K, V> void testMapEquality(Map<K, V> referenceMap, Map<K, V> testMap) {
+		int i = 0;
+		for (Entry<K, V> entry : referenceMap.entrySet()) {
+			assertEquals(entry.getValue(), testMap.get(entry.getKey()));
+			assertTrue(testMap.keySet().contains(entry.getKey()));
+			i++;
+		}
+		assertEquals(i, testMap.size());
+		i = 0;
+		for (Entry<K, V> entry : testMap.entrySet()) {
+			assertEquals(referenceMap.get(entry.getKey()), entry.getValue());
+			i++;
+		}
+		assertEquals(referenceMap.size(), i);
+	}
+
 	public void testPutGet() {
 		// random number generator for elements
 		Random generator = new Random(123);
 		// number of iterations of filling in elements
-		final int noIterations = 100;
-		// number of entries to generate in each iteration
-		final int noEntries = 10000;		
-		
+		final int noIterations = 55;
+		// number of entries to generate in each iteration; will vary
+		int noEntries = 10;
+
 		int i;
 
 		for (int j = 0; j < noIterations; j++) {
+			// doubling the number of entries every 4 iteration
+			if ((j & 3) == 3)
+				noEntries <<= 1;
 
 			int initialSize = generator.nextInt(noEntries);
-			Map<Integer, Integer> map = new ArrayHashMap<Integer, Integer>(initialSize);
-			Map<Integer, Integer> referenceMap = new HashMap<Integer, Integer>(noEntries);
+			Map<Integer, Integer> testMap = new ArrayHashMap<Integer, Integer>(
+					initialSize);
+			Map<Integer, Integer> referenceMap = new HashMap<Integer, Integer>(
+					noEntries);
 
+			// adding random additions
 			for (i = 0; i < noEntries; i++) {
 				int key = generator.nextInt(noEntries / 2);
 				int value = i;
 				Integer previousReference = referenceMap.put(key, value);
-				if (previousReference == null)
-					assertFalse(map.containsKey(key));
-				else
-					assertTrue(map.containsKey(key));
-				Integer previous = map.put(key, value);
-				assertEquals(previous, previousReference);
-				assertEquals(map.size(), referenceMap.size());
+				assertEquals(previousReference == null,
+						!testMap.containsKey(key));
+				Integer previous = testMap.put(key, value);
+				assertEquals(previousReference, previous);
+				assertEquals(referenceMap.size(), testMap.size());
 			}
+			testMapEquality(referenceMap, testMap);
 
-			i = 0;
-			for (Integer key : map.keySet()) {
-				assertTrue(referenceMap.containsKey(key));
-				i++;
+			// adding random deletions
+			for (i = 0; i < noEntries; i++) {
+				int key = generator.nextInt(noEntries / 2);
+				Integer previousReference = referenceMap.remove(key);
+				assertEquals(previousReference == null,
+						!testMap.containsKey(key));
+				Integer previous = testMap.remove(key);
+				assertEquals(previousReference, previous);
+				assertEquals(referenceMap.size(), testMap.size());
 			}
-			assertEquals(i, referenceMap.size());
+			testMapEquality(referenceMap, testMap);
 
-			i = 0;
-			for (Entry<Integer, Integer> entry : map.entrySet()) {
-				assertEquals(referenceMap.get(entry.getKey()), entry.getValue());
-				i++;
+			// randomly adding and removing
+			for (i = 0; i < noEntries; i++) {
+				int key = generator.nextInt(noEntries / 2);
+				Integer previousReference, previous;
+				if (generator.nextBoolean()) {
+					int value = i;
+					previousReference = referenceMap.put(key, value);
+					assertEquals(previousReference == null,
+							!testMap.containsKey(key));
+					previous = testMap.put(key, value);
+				} else {
+					previousReference = referenceMap.remove(key);
+					assertEquals(previousReference == null,
+							!testMap.containsKey(key));
+					previous = testMap.remove(key);
+				}
+				assertEquals(previousReference, previous);
+				assertEquals(referenceMap.size(), testMap.size());
 			}
-			assertEquals(i, referenceMap.size());
+			testMapEquality(referenceMap, testMap);
 
-			i = 0;
-			for (Entry<Integer, Integer> entry : referenceMap.entrySet()) {
-				assertEquals(map.get(entry.getKey()), entry.getValue());
-				assertTrue(map.keySet().contains(entry.getKey()));
-				i++;
-			}
-			assertEquals(i, map.size());
-			
-			map.clear();
+			testMap.clear();
 			referenceMap.clear();
-			assertEquals(map.size(), referenceMap.size());
+			testMapEquality(referenceMap, testMap);
 
 		}
 	}
-
 }

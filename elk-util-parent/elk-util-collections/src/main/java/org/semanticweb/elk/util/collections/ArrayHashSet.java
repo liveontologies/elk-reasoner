@@ -58,19 +58,26 @@ public class ArrayHashSet<E> implements Set<E> {
 	/**
 	 * The table for the elements; the length MUST always be a power of two.
 	 */
-	protected transient E[] data;
+	transient E[] data;
 
 	/**
 	 * The number of elements contained in this set.
 	 */
-	protected transient int size;
+	transient int size;
 
 	/**
-	 * The next size value at which to resize the table.
+	 * The next upper size value at which to stretch the table.
 	 * 
 	 * @serial
 	 */
-	int threshold;
+	int upperSize;
+
+	/**
+	 * The next lower size value at which to shrink the table.
+	 * 
+	 * @serial
+	 */
+	int lowerSize;
 
 	@SuppressWarnings("unchecked")
 	public ArrayHashSet(int initialCapacity) {
@@ -85,7 +92,8 @@ public class ArrayHashSet<E> implements Set<E> {
 			capacity <<= 1;
 		this.data = (E[]) new Object[capacity];
 		this.size = 0;
-		this.threshold = computeThreshold(capacity);
+		this.upperSize = computeUpperSize(capacity);
+		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,7 +101,8 @@ public class ArrayHashSet<E> implements Set<E> {
 		int capacity = DEFAULT_INITIAL_CAPACITY;
 		this.data = (E[]) new Object[capacity];
 		this.size = 0;
-		this.threshold = computeThreshold(capacity);
+		this.upperSize = computeUpperSize(capacity);
+		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	public int size() {
@@ -105,21 +114,35 @@ public class ArrayHashSet<E> implements Set<E> {
 	}
 
 	/**
-	 * Computes a maximum number of elements for a given capacity after which to
-	 * resize the table.
+	 * Computes a maximum size of the table for a given capacity after which to
+	 * stretch the table.
 	 * 
 	 * @param capacity
 	 *            the capacity of the table.
-	 * @return the threshold for the given capacity.
+	 * @return maximum size of the table for a given capacity after which to
+	 *         stretch the table.
 	 */
-	static int computeThreshold(int capacity) {
+	static private int computeUpperSize(int capacity) {
 		if (capacity > 128)
 			return (3 * capacity) / 4; // max 75% filled
 		else
 			return capacity;
 	}
 
-	static int getIndex(Object o, int length) {
+	/**
+	 * Computes a minimum size of the table for a given capacity after which to
+	 * shrink the table.
+	 * 
+	 * @param capacity
+	 *            the capacity of the table.
+	 * @return minimum size of the table for a given capacity after which to
+	 *         shrink the table
+	 */
+	static private int computeLowerSize(int capacity) {
+		return capacity / 4;
+	}
+
+	static private int getIndex(Object o, int length) {
 		return o.hashCode() & (length - 1);
 	}
 
@@ -139,11 +162,22 @@ public class ArrayHashSet<E> implements Set<E> {
 				i = data.length - 1;
 			else
 				i--;
-			if (i == j)
+			if (i == j) // full cycle
 				return false;
 		}
 	}
 
+	/**
+	 * Adds the element to the set represented by given data array, if it did
+	 * not contain there already.
+	 * 
+	 * @param data
+	 *            the elements of the set
+	 * @param e
+	 *            the element to be added to the set
+	 * @return <tt>true</tt> if the set has changed (the element is added),
+	 *         <tt>false</tt> otherwise
+	 */
 	private boolean addElement(E[] data, E e) {
 		int i = getIndex(e, data.length);
 		for (;;) {
@@ -160,33 +194,137 @@ public class ArrayHashSet<E> implements Set<E> {
 		}
 	}
 
-	public void resize() {
+	/**
+	 * Removes an element at position <tt>i</tt> of <tt>data</tt> shifting, if
+	 * necessary, other elements so that all elements can be found by linear
+	 * probing.
+	 * 
+	 * @param data
+	 *            the array of the elements
+	 * @param i
+	 *            the position of data at which to delete the element
+	 */
+	private void shift(E[] data, int i) {
+		int del = i; // the position at which the element is about to be deleted
+		int j = i; // testing if the element at this position can still be
+					// found by linear probing
+		for (;;) {
+			if (j == 0)
+				j = data.length - 1;
+			else
+				j--;
+			// invariant: interval [j, del[ contains non-null elements whose
+			// index is in [j, del[
+			if (j == del) {
+				// we made a full cycle; no elements have to be shifted
+				data[del] = null;
+				return;
+			}
+			E test = data[j];
+			if (test == null) {
+				// no further elements to the left need to be shifted
+				data[del] = null;
+				return;
+			}
+			int k = getIndex(test, data.length);
+			// check if k is in [j, del[
+			if ((j < del) ? (j <= k) && (k < del) : (j <= k) || (k < del))
+				// the index is in [j, del[, so the test element should not be
+				// shifted
+				continue;
+			else {
+				// copy the element to the position of deleted element and
+				// start deleting its previous location
+				data[del] = test;
+				del = j;
+				continue;
+			}
+		}
+	}
+
+	private boolean removeElement(E[] data, Object o) {
+		int i = getIndex(o, data.length);
+		int j = i; // for cycle detection
+		for (;;) {
+			Object probe = data[i];
+			if (probe == null) {
+				return false;
+			} else if (o.equals(probe)) {
+				shift(data, i);
+				return true;
+			}
+			if (i == 0)
+				i = data.length - 1;
+			else
+				i--;
+			if (i == j) // full cycle
+				return false;
+		}
+	}
+
+	/**
+	 * Increasing the capacity of the table
+	 */
+	private void stretch() {
 		int oldCapacity = data.length;
 		if (oldCapacity == MAXIMUM_CAPACITY)
 			throw new IllegalArgumentException(
 					"The set cannot grow beyond the capacity: "
 							+ MAXIMUM_CAPACITY);
-		E oldData[] = data;
+		E[] oldData = data;
 		int newCapacity = oldCapacity << 1;
 		@SuppressWarnings("unchecked")
-		E newData[] = (E[]) new Object[newCapacity];
+		E[] newData = (E[]) new Object[newCapacity];
 		for (int i = 0; i < oldCapacity; i++) {
 			E e = oldData[i];
 			if (e != null)
 				addElement(newData, e);
 		}
 		this.data = newData;
-		this.threshold = computeThreshold(newCapacity);
+		this.upperSize = computeUpperSize(newCapacity);
+		this.lowerSize = computeLowerSize(newCapacity);
+	}
+
+	/**
+	 * Decreasing the capacity of the table
+	 */
+	private void shrink() {
+		int oldCapacity = data.length;
+		if (oldCapacity == 1)
+			return;
+		E[] oldData = data;
+		int newCapacity = oldCapacity >> 1;
+		@SuppressWarnings("unchecked")
+		E[] newData = (E[]) new Object[newCapacity];
+		for (int i = 0; i < oldCapacity; i++) {
+			E e = oldData[i];
+			if (e != null)
+				addElement(newData, e);
+		}
+		this.data = newData;
+		this.upperSize = computeUpperSize(newCapacity);
+		this.lowerSize = computeLowerSize(newCapacity);
 	}
 
 	public boolean add(E e) {
 		if (e == null)
 			throw new NullPointerException();
-		if (size == threshold)
-			resize();
+		if (size == upperSize)
+			stretch();
 		boolean result = addElement(data, e);
 		if (result)
 			size++;
+		return result;
+	}
+
+	public boolean remove(Object o) {
+		if (o == null)
+			throw new NullPointerException();
+		boolean result = removeElement(data, o);
+		if (result)
+			size--;
+		if (size == lowerSize)
+			shrink();
 		return result;
 	}
 
@@ -207,16 +345,19 @@ public class ArrayHashSet<E> implements Set<E> {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean remove(Object o) {
-		throw new UnsupportedOperationException();
-	}
-
 	public boolean containsAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
+		for (Object o : c) {
+			if (!contains(o))
+				return false;
+		}
+		return true;
 	}
 
 	public boolean addAll(Collection<? extends E> c) {
-		throw new UnsupportedOperationException();
+		boolean changed = false;
+		for (E e : c)
+			changed = changed || add(e);
+		return changed;
 	}
 
 	public boolean retainAll(Collection<?> c) {
@@ -224,7 +365,10 @@ public class ArrayHashSet<E> implements Set<E> {
 	}
 
 	public boolean removeAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
+		boolean changed = false;
+		for (Object o : c)
+			changed = changed || remove(o);
+		return changed;
 	}
 
 	public void clear() {
@@ -248,6 +392,7 @@ public class ArrayHashSet<E> implements Set<E> {
 			this.expectedSize = size;
 			this.dataSnapshot = data;
 			cursor = 0;
+
 			seekNext();
 		}
 

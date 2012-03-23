@@ -75,11 +75,18 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	protected transient int size;
 
 	/**
-	 * The next size value at which to resize (capacity * load factor).
+	 * The next upper size value at which to stretch the table.
 	 * 
 	 * @serial
 	 */
-	int threshold;
+	int upperSize;
+
+	/**
+	 * The next lower size value at which to shrink the table.
+	 * 
+	 * @serial
+	 */
+	int lowerSize;
 
 	@SuppressWarnings("unchecked")
 	public ArrayHashMap(int initialCapacity) {
@@ -92,19 +99,21 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		int capacity = 1;
 		while (capacity < initialCapacity)
 			capacity <<= 1;
-		this.threshold = computeThreshold(capacity);
 		this.keys = (K[]) new Object[capacity];
 		this.values = (V[]) new Object[capacity];
 		this.size = 0;
+		this.upperSize = computeUpperSize(capacity);
+		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	@SuppressWarnings("unchecked")
 	public ArrayHashMap() {
 		int capacity = DEFAULT_INITIAL_CAPACITY;
-		this.threshold = computeThreshold(capacity);
 		this.keys = (K[]) new Object[capacity];
 		this.values = (V[]) new Object[capacity];
 		this.size = 0;
+		this.upperSize = computeUpperSize(capacity);
+		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	public int size() {
@@ -116,21 +125,35 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	}
 
 	/**
-	 * Computes a maximum number of elements for a given capacity after which to
-	 * resize the tables.
+	 * Computes a maximum size of the table for a given capacity after which to
+	 * stretch the tables.
 	 * 
 	 * @param capacity
-	 *            the capacity of the tables.
-	 * @return the threshold for the given capacity.
+	 *            the capacity of the table.
+	 * @return maximum size of the table for a given capacity after which to
+	 *         stretch the tables.
 	 */
-	static int computeThreshold(int capacity) {
+	static private int computeUpperSize(int capacity) {
 		if (capacity > 128)
-			return (3 * capacity) / 4; // max 75%
+			return (3 * capacity) / 4; // max 75% filled
 		else
 			return capacity;
 	}
 
-	static int getIndex(Object key, int length) {
+	/**
+	 * Computes a minimum size of the table for a given capacity after which to
+	 * shrink the tables.
+	 * 
+	 * @param capacity
+	 *            the capacity of the table.
+	 * @return minimum size of the table for a given capacity after which to
+	 *         shrink the tables
+	 */
+	static private int computeLowerSize(int capacity) {
+		return capacity / 4;
+	}
+
+	static private int getIndex(Object key, int length) {
 		return key.hashCode() & (length - 1);
 	}
 
@@ -150,7 +173,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 				i = keys.length - 1;
 			else
 				i--;
-			if (i == j)
+			if (i == j) // full cycle
 				return false;
 		}
 	}
@@ -168,7 +191,8 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	public V get(Object key) {
 		if (key == null)
 			throw new NullPointerException();
-		// copy keys and values when they have the same size
+		// to avoid problems in the middle of resizing, we copy keys and values
+		// when they have the same size
 		for (;;) {
 			K[] keys = this.keys;
 			V[] values = this.values;
@@ -187,13 +211,29 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 				i = keys.length - 1;
 			else
 				i--;
-			if (i == j)
+			if (i == j) // full cycle
 				return null;
 		}
 	}
 
-	// TODO: make sure it is thread-safe to get the value while putting it
-	V putKeyValue(K[] keys, V[] values, K key, V value) {
+	/**
+	 * Associates the given key with the given value in the map defined by the
+	 * keys and value arrays. If an entry with the key equal to the given one
+	 * already exists in the map, the value for this key will be overwritten
+	 * with the given value.
+	 * 
+	 * @param keys
+	 *            the keys of the map
+	 * @param values
+	 *            the values of the map
+	 * @param key
+	 *            the key of the entry
+	 * @param value
+	 *            the value of the entry
+	 * @return the previous value associated with the key or <tt>null</tt> if
+	 *         there was no such a previous value.
+	 */
+	private V putKeyValue(K[] keys, V[] values, K key, V value) {
 		int i = getIndex(key, keys.length);
 		for (;;) {
 			K probe = keys[i];
@@ -213,7 +253,98 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	public void resize() {
+	/**
+	 * Removes an element at position <tt>i</tt> of <tt>keys</tt> and
+	 * <tt>values</tt> shifting, if necessary, other elements so that all
+	 * elements can be found by linear probing.
+	 * 
+	 * @param keys
+	 *            the keys of the map
+	 * @param values
+	 *            the values of the map
+	 * @param i
+	 *            the position at which to delete the key and value
+	 */
+	private void shift(K[] keys, V[] values, int i) {
+		int del = i; // the position at which to delete
+		int j = i; // the position at which to test if the key can be
+					// found by linear probing
+		for (;;) {
+			// decrement j modulo the length of the arrays
+			if (j == 0)
+				j = keys.length - 1;
+			else
+				j--;
+			// invariant: interval [j, del[ contains non-null elements whose
+			// index is in [j, del[
+			if (j == del) {
+				// we made a full cycle; no elements have to be shifted
+				keys[del] = null;
+				values[del] = null;
+				return;
+			}
+			K test = keys[j];
+			if (test == null) {
+				// no further elements to the left need to be shifted
+				keys[del] = null;
+				values[del] = null;
+				return;
+			}
+			int k = getIndex(test, keys.length);
+			// check if k is in [j, del[
+			if ((j < del) ? (j <= k) && (k < del) : (j <= k) || (k < del))
+				// the index is in [j, del[, so the test element should not be
+				// shifted
+				continue;
+			else {
+				// copying the keys and values to the position of deleted
+				// element and start deleting their previous locations
+				keys[del] = test;
+				values[del] = values[j];
+				del = j;
+				continue;
+			}
+		}
+	}
+
+	/**
+	 * Remove the entry in the keys and values such that the key of the entry is
+	 * equal to the given object according to the equality function.
+	 * 
+	 * @param keys
+	 *            the array of keys
+	 * @param values
+	 *            the arrays of values
+	 * @param key
+	 *            the key for which to delete the entry
+	 * @return the value of the deleted entry, <tt>null</tt> if nothing has been
+	 *         deleted
+	 */
+	private V removeEntry(K[] keys, V[] values, Object key) {
+		int i = getIndex(key, keys.length);
+		int j = i; // for cycle detection
+		for (;;) {
+			Object probe = keys[i];
+			if (probe == null) {
+				return null;
+			} else if (key.equals(probe)) {
+				V result = values[i];
+				shift(keys, values, i);
+				return result;
+			}
+			if (i == 0)
+				i = keys.length - 1;
+			else
+				i--;
+			if (i == j) // full cycle
+				return null;
+		}
+	}
+
+	/**
+	 * Increasing the capacity of the map
+	 */
+	private void stretch() {
 		int oldCapacity = keys.length;
 		if (oldCapacity == MAXIMUM_CAPACITY)
 			throw new IllegalArgumentException(
@@ -232,14 +363,40 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		}
 		this.keys = newKeys;
 		this.values = newValues;
-		this.threshold = computeThreshold(newCapacity);
+		this.upperSize = computeUpperSize(newCapacity);
+		this.lowerSize = computeLowerSize(newCapacity);
+	}
+
+	/**
+	 * Decreasing the capacity of the map
+	 */
+	private void shrink() {
+		int oldCapacity = keys.length;
+		if (oldCapacity == 1)
+			return;
+		K oldKeys[] = keys;
+		V oldValues[] = values;
+		int newCapacity = oldCapacity >> 1;
+		@SuppressWarnings("unchecked")
+		K newKeys[] = (K[]) new Object[newCapacity];
+		@SuppressWarnings("unchecked")
+		V newValues[] = (V[]) new Object[newCapacity];
+		for (int i = 0; i < oldCapacity; i++) {
+			K key = oldKeys[i];
+			if (key != null)
+				putKeyValue(newKeys, newValues, key, oldValues[i]);
+		}
+		this.keys = newKeys;
+		this.values = newValues;
+		this.upperSize = computeUpperSize(newCapacity);
+		this.lowerSize = computeLowerSize(newCapacity);
 	}
 
 	public V put(K key, V value) {
 		if (key == null)
 			throw new NullPointerException();
-		if (size == threshold)
-			resize();
+		if (size == upperSize)
+			stretch();
 		V result = putKeyValue(keys, values, key, value);
 		if (result == null)
 			size++;
@@ -247,11 +404,22 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	}
 
 	public V remove(Object key) {
-		throw new UnsupportedOperationException();
+		if (key == null)
+			throw new NullPointerException();
+		if (size == upperSize)
+			stretch();
+		V result = removeEntry(keys, values, key);
+		if (result != null)
+			size--;
+		if (size == lowerSize)
+			shrink();
+		return result;
 	}
 
 	public void putAll(Map<? extends K, ? extends V> m) {
-		throw new UnsupportedOperationException();
+		for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+			put(entry.getKey(), entry.getValue());
+		}
 	}
 
 	public void clear() {
@@ -330,7 +498,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		}
 
 		public boolean remove(Object o) {
-			throw new UnsupportedOperationException();
+			return ArrayHashMap.this.remove(o) != null;
 		}
 
 		public int size() {
@@ -482,7 +650,10 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		}
 
 		public boolean remove(Object o) {
-			throw new UnsupportedOperationException();
+			if (!(o instanceof Map.Entry<?, ?>))
+				return false;
+			Object k = ((Map.Entry<?, ?>) o).getKey();
+			return ArrayHashMap.this.remove(k) != null;
 		}
 
 		public int size() {

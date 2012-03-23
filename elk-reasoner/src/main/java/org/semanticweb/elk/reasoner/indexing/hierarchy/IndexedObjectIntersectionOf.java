@@ -62,13 +62,15 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement) {
+	protected void updateOccurrenceNumbers(IndexUpdater indexUpdater,
+			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			firstConjunct.addNegConjunctionByConjunct(this, secondConjunct);
-			secondConjunct.addNegConjunctionByConjunct(this, firstConjunct);
+			indexUpdater.addNegConjunctionByConjunct(firstConjunct, this,
+					secondConjunct);
+			indexUpdater.addNegConjunctionByConjunct(secondConjunct, this,
+					firstConjunct);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -76,8 +78,10 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
-			firstConjunct.removeNegConjunctionByConjunct(this, secondConjunct);
-			secondConjunct.removeNegConjunctionByConjunct(this, firstConjunct);
+			indexUpdater.removeNegConjunctionByConjunct(firstConjunct, this,
+					secondConjunct);
+			indexUpdater.removeNegConjunctionByConjunct(secondConjunct, this,
+					firstConjunct);
 		}
 
 	}

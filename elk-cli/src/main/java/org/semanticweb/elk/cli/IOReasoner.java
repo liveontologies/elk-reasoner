@@ -46,21 +46,21 @@ public class IOReasoner extends Reasoner {
 		super(executor, workerNo);
 	}
 
-	public void loadOntologyFromStream(InputStream stream) throws ParseException,
-	IOException {
+	public void loadOntologyFromStream(InputStream stream)
+			throws ParseException, IOException {
 		Statistics.logOperationStart("Loading", LOGGER_);
 
 		reset();
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
 		parser.setPrefixDeclarations(new ElkPrefixDeclarationsImpl());
-		parser.ontologyDocument(ontologyIndex.getAxiomInserter());
+		parser.ontologyDocument(ontologyIndex.getDirectAxiomInserter());
 		stream.close();
 		Statistics.logOperationFinish("Loading", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 	}
 
 	public void loadOntologyFromFile(File file) throws ParseException,
-	IOException {
+			IOException {
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Loading ontology from " + file);
 		}
@@ -68,12 +68,12 @@ public class IOReasoner extends Reasoner {
 	}
 
 	public void loadOntologyFromFile(String fileName) throws ParseException,
-	IOException {
+			IOException {
 		loadOntologyFromFile(new File(fileName));
 	}
 
 	public void loadOntologyFromString(String text) throws ParseException,
-	IOException {
+			IOException {
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Loading ontology from string");
 		}

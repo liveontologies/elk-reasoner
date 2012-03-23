@@ -67,12 +67,12 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement) {
+	protected void updateOccurrenceNumbers(IndexUpdater indexUpdater,
+			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			filler.addNegExistential(this);
+			indexUpdater.addNegExistential(filler, this);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -80,7 +80,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			filler.removeNegExistential(this);
+			indexUpdater.removeNegExistential(filler, this);
 		}
 	}
 

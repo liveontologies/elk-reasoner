@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.indexing;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexChange;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -42,22 +43,34 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  */
 public interface OntologyIndex {
 
-	IndexedClassExpression getIndexed(
-			ElkClassExpression elkClassExpression);
+	IndexedClassExpression getIndexed(ElkClassExpression elkClassExpression);
 
 	IndexedPropertyChain getIndexed(
 			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression);
 
-
 	Iterable<IndexedClassExpression> getIndexedClassExpressions();
+
 	Iterable<IndexedClass> getIndexedClasses();
+
 	int getIndexedClassCount();
 
 	Iterable<IndexedPropertyChain> getIndexedPropertyChains();
+
 	Iterable<IndexedObjectProperty> getIndexedObjectProperties();
+
 	int getIndexedObjectPropertyCount();
 
-	ElkAxiomProcessor getAxiomInserter();
+	ElkAxiomProcessor getDirectAxiomInserter();
 
-	ElkAxiomProcessor getAxiomDeleter();
+	ElkAxiomProcessor getDirectAxiomDeleter();
+
+	ElkAxiomProcessor getIncrementalAxiomInserter();
+
+	ElkAxiomProcessor getIncrementalAxiomDeleter();
+
+	/**
+	 * @return index change in case of incremental load
+	 */
+	IndexChange getIndexChange();
+
 }

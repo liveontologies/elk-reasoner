@@ -28,28 +28,40 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectIndexerVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexChange;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectLookup;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.Operations;
 
-public class OntologyIndexImpl extends IndexedObjectCache implements
+public class OntologyIndexImpl extends IndexedObjectLookup implements
 		OntologyIndex {
 
 	private final ElkObjectIndexerVisitor elkObjectIndexer;
-	private final ElkAxiomIndexerVisitor axiomInserter;
-	private final ElkAxiomIndexerVisitor axiomDeleter;
+	private final ElkAxiomIndexerVisitor directAxiomInserter;
+	private final ElkAxiomIndexerVisitor directAxiomDeleter;
+	private final ElkAxiomIndexerVisitor incrementalAxiomInserter;
+	private final ElkAxiomIndexerVisitor incrementalAxiomDeleter;
+	private final IndexChange indexChange;
 
 	public OntologyIndexImpl() {
 		this.elkObjectIndexer = new ElkObjectIndexerVisitor(this);
-		this.axiomInserter = new ElkAxiomIndexerVisitor(this, true);
-		this.axiomDeleter = new ElkAxiomIndexerVisitor(this, false);
+		this.directAxiomInserter = ElkAxiomIndexerVisitor
+				.getDirectAxiomIndexer(this, true);
+		this.directAxiomDeleter = ElkAxiomIndexerVisitor.getDirectAxiomIndexer(
+				this, false);
+		this.indexChange = new IndexChange();
+		this.incrementalAxiomInserter = ElkAxiomIndexerVisitor
+				.getIncrementalAxiomIndexer(this, indexChange, true);
+		this.incrementalAxiomDeleter = ElkAxiomIndexerVisitor
+				.getIncrementalAxiomIndexer(this, indexChange, false);
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
-		axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_THING);
-		axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
+		directAxiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_THING);
+		directAxiomInserter
+				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	public IndexedClassExpression getIndexed(ElkClassExpression representative) {
@@ -96,12 +108,24 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 		return indexedObjectPropertyCount;
 	}
 
-	public ElkAxiomProcessor getAxiomInserter() {
-		return axiomInserter;
+	public ElkAxiomProcessor getDirectAxiomInserter() {
+		return directAxiomInserter;
 	}
 
-	public ElkAxiomProcessor getAxiomDeleter() {
-		return axiomDeleter;
+	public ElkAxiomProcessor getDirectAxiomDeleter() {
+		return directAxiomDeleter;
+	}
+
+	public ElkAxiomProcessor getIncrementalAxiomInserter() {
+		return incrementalAxiomInserter;
+	}
+
+	public ElkAxiomProcessor getIncrementalAxiomDeleter() {
+		return incrementalAxiomDeleter;
+	}
+
+	public IndexChange getIndexChange() {
+		return this.indexChange;
 	}
 
 }

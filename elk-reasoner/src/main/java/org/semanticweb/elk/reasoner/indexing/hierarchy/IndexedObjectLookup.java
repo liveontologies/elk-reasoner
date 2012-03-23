@@ -23,43 +23,34 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
+import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
-import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 
 /**
- * A cache of all indexed objects in the ontology backed by a KeyEntryHashSet.
- * It uses indexed Entries to compare object with respect to structural
- * equality. Supports (non-recursive) addition, removal, and retrieval of single
- * indexed objects. The recursion for indexing subobjects is in the 
- * ElkObjectIndexerVisitor.
+ * The cache for indexed objects which can be used for canonization of indexed
+ * objects modulo structural equality. A basic operation is, given an indexed
+ * objects of a particular type, retrieve a structurally equivalent object
+ * stored in the cache, or, otherwise, save the given object in the cache and
+ * return it.
  * 
  * @author Frantisek Simancik
- * 
+ * @author Yevgeny Kazakov
  */
-public class IndexedObjectCache implements IndexedObjectFilter {
+public class IndexedObjectLookup implements IndexedObjectFilter {
 
 	protected final KeyEntryHashSet<IndexedClassExpression> indexedClassExpressionLookup;
 	protected final KeyEntryHashSet<IndexedPropertyChain> indexedPropertyChainLookup;
 	protected int indexedClassCount = 0;
 	protected int indexedObjectPropertyCount = 0;
 
-	protected IndexedObjectCache() {
+	protected IndexedObjectLookup() {
 		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
 				indexedClassExpressionViewFactory, 1024);
 		indexedPropertyChainLookup = new KeyEntryHashSet<IndexedPropertyChain>(
 				indexedPropertyChainViewFactory, 128);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFilter#filter
-	 * (org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression)
-	 * 
-	 * Returns the indexed canonical representative of the argument.
-	 */
 	public IndexedClassExpression filter(IndexedClassExpression ice) {
 		IndexedClassExpression result = indexedClassExpressionLookup.get(ice);
 		if (result == null)
@@ -68,15 +59,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFilter#filter
-	 * (org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain)
-	 * 
-	 * Returns the indexed canonical representative of the argument.
-	 */
 	public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
 		IndexedPropertyChain result = indexedPropertyChainLookup.get(ipc);
 		if (result == null)
