@@ -454,10 +454,10 @@ public class RuleApplicationEngine implements
 
 			// don't modify saturated contexts
 			if (!saturationModificationMode && context.isSaturated()) {
-				// TODO: this should never happen during non-incremental
-				// classification
-				// LOGGER_.warn(context.root + ": new " + indexedClassExpression
-				// + " in a saturated context!");
+				if (!deletionMode)
+					LOGGER_.warn(context.root + ": new "
+							+ indexedClassExpression
+							+ " in a saturated context!");
 				return null;
 			}
 
@@ -489,10 +489,10 @@ public class RuleApplicationEngine implements
 
 			// don't modify saturated contexts
 			if (!saturationModificationMode && context.isSaturated()) {
-				// TODO: this should never happen during non-incremental
-				// classification
-				// LOGGER_.warn(context.root + ": adding "
-				// + indexedClassExpression + " to a saturated context!");
+				if (!deletionMode)
+					LOGGER_.warn(context.root + ": adding "
+							+ indexedClassExpression
+							+ " to a saturated context!");
 				return null;
 			}
 
