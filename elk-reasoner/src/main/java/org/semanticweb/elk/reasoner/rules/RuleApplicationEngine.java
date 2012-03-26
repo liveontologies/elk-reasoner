@@ -91,11 +91,6 @@ public class RuleApplicationEngine implements
 	 */
 	protected final Queue<SaturatedClassExpression> activeContexts;
 	/**
-	 * The number of contexts ever created by this engine
-	 */
-	protected final AtomicInteger contextNo = new AtomicInteger(0);
-
-	/**
 	 * <tt>true</tt> if the {@link #activeContexts} queue is empty
 	 */
 	protected final AtomicBoolean activeContextsEmpty;
@@ -106,15 +101,9 @@ public class RuleApplicationEngine implements
 	protected final boolean deletionMode;
 
 	/**
-	 * if <tt>true</tt>, saturated contexts are marked as un-saturated
+	 * if <tt>true</tt> if saturated contexts can be modified
 	 */
-	protected final boolean unSaturationMode;
-
-	/**
-	 * In case of the {@link #unSaturationMode} is <tt>true</tt>, all contexts
-	 * that are unsaturated are stored in this queue
-	 */
-	protected final Queue<SaturatedClassExpression> unSaturatedContexts;
+	protected final boolean saturationModificationMode;
 
 	public RuleApplicationEngine(OntologyIndex ontologyIndex,
 			RuleApplicationListener listener, boolean deletionMode,
@@ -124,8 +113,7 @@ public class RuleApplicationEngine implements
 		this.activeContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
 		this.activeContextsEmpty = new AtomicBoolean(true);
 		this.deletionMode = deletionMode;
-		this.unSaturationMode = unSaturationMode;
-		this.unSaturatedContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
+		this.saturationModificationMode = unSaturationMode;
 
 		// reset saturation in case of re-saturation after changes
 		// TODO: introduce a separate method for this
@@ -156,28 +144,10 @@ public class RuleApplicationEngine implements
 	}
 
 	/**
-	 * Returns the total number of contexts created
-	 * 
-	 * @return number of created contexts
-	 */
-	public int getContextNo() {
-		return contextNo.get();
-	}
-
-	/**
-	 * Return the queue of contexts that have been un-saturated in case of the
-	 * deletion phase
-	 */
-	public Queue<SaturatedClassExpression> getUnSaturatedContexts() {
-		return this.unSaturatedContexts;
-	}
-
-	/**
 	 * Prints statistic of rule applications
 	 */
 	public void printStatistics() {
 		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Contexts created:" + contextNo.get());
 			LOGGER_.debug("Derived Produced/Unique:" + derivedInfNo.get() + "/"
 					+ derivedNo.get());
 			LOGGER_.debug("Backward Links Produced/Unique:"
@@ -215,7 +185,7 @@ public class RuleApplicationEngine implements
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": context created");
 				}
-				contextNo.incrementAndGet();
+				listener.notifyCreated(sce);
 				initContext(sce);
 			}
 		}
@@ -295,8 +265,8 @@ public class RuleApplicationEngine implements
 
 			Linkable target = backwardLink.getTarget();
 
-			// for cleaning up don't change unaffected contexts
-			if (deletionMode && !unSaturationMode
+			// don't modify saturated contexts
+			if (!saturationModificationMode
 					&& (target instanceof SaturatedClassExpression)
 					&& ((SaturatedClassExpression) target).isSaturated()) {
 				return null;
@@ -380,8 +350,8 @@ public class RuleApplicationEngine implements
 
 		public Void visit(ForwardLink forwardLink) {
 
-			// for cleaning up don't change unaffected contexts
-			if (deletionMode && !unSaturationMode && context.isSaturated()) {
+			// don't modify saturated contexts
+			if (!saturationModificationMode && context.isSaturated()) {
 				return null;
 			}
 
@@ -404,10 +374,8 @@ public class RuleApplicationEngine implements
 
 			forwLinkNo.incrementAndGet();
 
-			if (unSaturationMode && context.isSaturated()) {
-				if (context.setNotSaturated())
-					unSaturatedContexts.add(context);
-			}
+			if (context.isSaturated() && context.setNotSaturated())
+				listener.notifyMofidified(context);
 
 			/* compose the link with all backward links */
 			assert linkRelation.getSaturated().propertyCompositionsByLeftSubProperty != null;
@@ -440,11 +408,6 @@ public class RuleApplicationEngine implements
 
 		public Void visit(Propagation propagation) {
 
-			// for cleaning up don't change unaffected contexts
-			if (deletionMode && !unSaturationMode && context.isSaturated()) {
-				return null;
-			}
-
 			propInfNo.incrementAndGet();
 			IndexedPropertyChain propRelation = propagation.getRelation();
 			Queueable carry = propagation.getCarry();
@@ -463,11 +426,6 @@ public class RuleApplicationEngine implements
 				return null;
 
 			propNo.incrementAndGet();
-
-			if (unSaturationMode && context.isSaturated()) {
-				if (context.setNotSaturated())
-					unSaturatedContexts.add(context);
-			}
 
 			/* propagate over all backward links */
 			if (context.backwardLinksByObjectProperty != null) {
@@ -491,19 +449,19 @@ public class RuleApplicationEngine implements
 
 		public Void visit(DecomposedClassExpression compositeClassExpression) {
 
-			// for cleaning up don't change saturated contexts
-			if (deletionMode && !unSaturationMode && context.isSaturated()) {
+			IndexedClassExpression indexedClassExpression = compositeClassExpression
+					.getClassExpression();
+
+			// don't modify saturated contexts
+			if (!saturationModificationMode && context.isSaturated()) {
+				// TODO: this should never happen during non-incremental
+				// classification
+				// LOGGER_.warn(context.root + ": new " + indexedClassExpression
+				// + " in a saturated context!");
 				return null;
 			}
 
 			derivedInfNo.incrementAndGet();
-
-			IndexedClassExpression indexedClassExpression = compositeClassExpression
-					.getClassExpression();
-
-			if (!unSaturationMode && context.isSaturated())
-				LOGGER_.warn(context.root + ": adding "
-						+ indexedClassExpression + " to a saturated context!");
 
 			boolean updated = deletionMode ? context.derived
 					.contains(compositeClassExpression.getClassExpression())
@@ -512,14 +470,9 @@ public class RuleApplicationEngine implements
 			if (!updated)
 				return null;
 
-			if (unSaturationMode && context.isSaturated()) {
-				if (context.setNotSaturated())
-					unSaturatedContexts.add(context);
-			}
+			if (context.isSaturated() && context.setNotSaturated())
+				listener.notifyMofidified(context);
 
-			if (!unSaturationMode && context.isSaturated())
-				LOGGER_.error(context.root + ": new " + indexedClassExpression
-						+ " in a saturated context!");
 			derivedNo.incrementAndGet();
 			processClass(indexedClassExpression);
 			if (deletionMode)
@@ -534,16 +487,16 @@ public class RuleApplicationEngine implements
 
 		public Void visit(IndexedClassExpression indexedClassExpression) {
 
-			// for cleaning up don't change saturated contexts
-			if (deletionMode && !unSaturationMode && context.isSaturated()) {
+			// don't modify saturated contexts
+			if (!saturationModificationMode && context.isSaturated()) {
+				// TODO: this should never happen during non-incremental
+				// classification
+				// LOGGER_.warn(context.root + ": adding "
+				// + indexedClassExpression + " to a saturated context!");
 				return null;
 			}
 
 			derivedInfNo.incrementAndGet();
-
-			if (!unSaturationMode && context.isSaturated())
-				LOGGER_.warn(context.root + ": adding "
-						+ indexedClassExpression + " to a saturated context!");
 
 			boolean updated = deletionMode ? context.derived
 					.contains(indexedClassExpression) : context.derived
@@ -552,14 +505,9 @@ public class RuleApplicationEngine implements
 			if (!updated)
 				return null;
 
-			if (unSaturationMode && context.isSaturated()) {
-				if (context.setNotSaturated())
-					unSaturatedContexts.add(context);
-			}
+			if (context.isSaturated() && context.setNotSaturated())
+				listener.notifyMofidified(context);
 
-			if (!unSaturationMode && context.isSaturated())
-				LOGGER_.error(context.root + ": new " + indexedClassExpression
-						+ " in a saturated context!");
 			derivedNo.incrementAndGet();
 			processClass(indexedClassExpression);
 			indexedClassExpression.accept(classExpressionDecomposer);

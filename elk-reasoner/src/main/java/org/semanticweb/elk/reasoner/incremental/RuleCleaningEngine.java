@@ -39,6 +39,14 @@ public class RuleCleaningEngine extends RuleApplicationEngine {
 			public void notifyCanProcess() {
 
 			}
+
+			public void notifyCreated(SaturatedClassExpression context) {
+
+			}
+
+			public void notifyMofidified(SaturatedClassExpression context) {
+
+			}
 		});
 	}
 

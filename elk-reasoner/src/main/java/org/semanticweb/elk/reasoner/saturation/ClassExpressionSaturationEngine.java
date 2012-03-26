@@ -84,18 +84,37 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 */
 	protected final AtomicInteger countJobsSubmitted = new AtomicInteger(0);
 	/**
-	 * The number of processed jobs, as determined by the procedure
+	 * The number of processed jobs, as determined by the procedure; should
+	 * never exceed {@link #countJobsSubmitted}.
 	 */
 	protected final AtomicInteger countJobsProcessed = new AtomicInteger(0);
 	/**
 	 * The number of finished jobs, i.e., those for which
-	 * {@link #listener.notifyFinished(J)} is executed.
+	 * {@link #listener.notifyFinished(J)} is executed; should never exceed
+	 * {@link #countJobsProcessed}
 	 */
 	protected final AtomicInteger countJobsFinished = new AtomicInteger(0);
 	/**
-	 * The number of processed contexts; used to control batches of jobs
+	 * The queue to collect the context created during the saturation; emptied
+	 * every time the rule application finishes
 	 */
-	final AtomicInteger countContextsProcessed = new AtomicInteger(0);
+	protected final Queue<SaturatedClassExpression> contextCreated;
+	/**
+	 * The counter for created contexts; used to control batches of jobs
+	 */
+	protected final AtomicInteger contextCreatedNo = new AtomicInteger(0);
+	/**
+	 * The counter for processed contexts, should never exceed
+	 * {@link #contextCreatedNo}
+	 */
+	protected final AtomicInteger contextProcessedNo = new AtomicInteger(0);
+	/**
+	 * The number of contexts marked as saturated saturated contexts, i.e.,
+	 * those marked as saturated; should never exceed
+	 * {@link #contextProcessedNo}
+	 */
+	protected final AtomicInteger contextSaturatedNo = new AtomicInteger(0);
+
 	/**
 	 * The threshold used to submit new jobs. The job is successfully submitted
 	 * if difference between the number of created contexts and processed
@@ -150,6 +169,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		this.threshold = threshold;
 		this.listener = listener;
 		this.buffer = new ConcurrentLinkedQueue<J>();
+		this.contextCreated = new ConcurrentLinkedQueue<SaturatedClassExpression>();
 		this.ruleApplicationEngine = new RuleApplicationEngine(ontologyIndex,
 				new ThisRuleApplicationListener());
 	}
@@ -241,16 +261,14 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		 * the computation; whenever workers wake up, try to process the jobs
 		 */
 		for (;;) {
-			if (ruleApplicationEngine.getContextNo()
-					- countContextsProcessed.get() <= threshold)
+			if (contextCreatedNo.get() - contextProcessedNo.get() <= threshold)
 				return;
 			suspendLock.lock();
 			try {
 				for (;;) {
 					if (canProcess())
 						break;
-					if (ruleApplicationEngine.getContextNo()
-							- countContextsProcessed.get() <= threshold)
+					if (contextCreatedNo.get() - contextProcessedNo.get() <= threshold)
 						return;
 					workersWaiting = true;
 					canProcessOrSubmit.await();
@@ -291,7 +309,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		/*
 		 * cache the current snapshot for created contexts and jobs
 		 */
-		int snapshotContextNo = ruleApplicationEngine.getContextNo();
+		int snapshotContextNo = contextCreatedNo.get();
 		int snapshotCountJobsSubmitted = countJobsSubmitted.get();
 		if (activeWorkers.get() > 0)
 			return;
@@ -307,10 +325,10 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		 * the counter will be updated to the largest of them.
 		 */
 		for (;;) {
-			int snapshotContextsProcessed = countContextsProcessed.get();
+			int snapshotContextsProcessed = contextProcessedNo.get();
 			if (snapshotContextNo <= snapshotContextsProcessed)
 				break;
-			if (countContextsProcessed.compareAndSet(snapshotContextsProcessed,
+			if (contextProcessedNo.compareAndSet(snapshotContextsProcessed,
 					snapshotContextNo)) {
 				updated = true;
 				break;
@@ -349,6 +367,28 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 */
 	void processFinishedJobs() throws InterruptedException {
 		for (;;) {
+			int shapshotContextSaturatedNo = contextSaturatedNo.get();
+			if (shapshotContextSaturatedNo == contextProcessedNo.get()) {
+				break;
+			}
+			/*
+			 * at this place we know that the number of saturated contexts is
+			 * smaller than the number of processed contexts; we try to
+			 * increment this counter if it has not been changed.
+			 */
+			if (contextSaturatedNo.compareAndSet(shapshotContextSaturatedNo,
+					shapshotContextSaturatedNo + 1)) {
+				/*
+				 * It is safe to assume that the next context in the buffer is
+				 * saturated since we increment the counter for the processed
+				 * context number only after the corresponding number of
+				 * contexts are processed
+				 */
+				SaturatedClassExpression nextContext = contextCreated.poll();
+				nextContext.setSaturated();
+			}
+		}
+		for (;;) {
 			int shapshotJobsFinished = countJobsFinished.get();
 			if (shapshotJobsFinished == countJobsProcessed.get()) {
 				break;
@@ -368,8 +408,8 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				 */
 				J nextJob = buffer.poll();
 				IndexedClassExpression root = nextJob.getInput();
+				// this should be set as saturated in the previous loop
 				SaturatedClassExpression rootSaturation = root.getSaturated();
-				rootSaturation.setSaturated();
 				nextJob.setOutput(rootSaturation);
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": saturation finished");
@@ -404,6 +444,16 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 			}
 			/* tell also that the saturation engine can process */
 			listener.notifyCanProcess();
+		}
+
+		public void notifyCreated(SaturatedClassExpression context) {
+			contextCreatedNo.incrementAndGet();
+			contextCreated.add(context);
+		}
+
+		public void notifyMofidified(SaturatedClassExpression context) {
+			// TODO Auto-generated method stub
+
 		}
 	}
 

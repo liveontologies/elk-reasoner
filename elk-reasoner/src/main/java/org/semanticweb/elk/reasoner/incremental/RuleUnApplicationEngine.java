@@ -28,7 +28,6 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionChange;
 import org.semanticweb.elk.reasoner.rules.RuleApplicationEngine;
-import org.semanticweb.elk.reasoner.rules.RuleApplicationListener;
 import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
@@ -37,17 +36,10 @@ public class RuleUnApplicationEngine extends RuleApplicationEngine {
 	final Map<IndexedClassExpression, IndexedClassExpressionChange> indexDeletions;
 
 	public RuleUnApplicationEngine(OntologyIndex ontologyIndex,
-			RuleApplicationListener listener) {
+			ContextModificationListener listener) {
 		super(ontologyIndex, listener, true, true);
-		indexDeletions = ontologyIndex.getIndexChange().getIndexDeletions();
-	}
-
-	public RuleUnApplicationEngine(OntologyIndex ontologyIndex) {
-		this(ontologyIndex, new RuleApplicationListener() {
-			public void notifyCanProcess() {
-
-			}
-		});
+		this.indexDeletions = ontologyIndex.getIndexChange()
+				.getIndexDeletions();
 	}
 
 	void processContextDeletions(SaturatedClassExpression context) {
@@ -62,4 +54,5 @@ public class RuleUnApplicationEngine extends RuleApplicationEngine {
 			queueProcessor.processClass(change);
 		}
 	}
+
 }

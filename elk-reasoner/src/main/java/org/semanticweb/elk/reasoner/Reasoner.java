@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.incremental.ContextModificationListener;
 import org.semanticweb.elk.reasoner.incremental.RuleCleaningEngine;
 import org.semanticweb.elk.reasoner.incremental.RuleReApplicationEngine;
 import org.semanticweb.elk.reasoner.incremental.RuleUnApplicationEngine;
@@ -60,6 +61,8 @@ public class Reasoner {
 
 	protected final RuleUnApplicationEngine ruleUnApplicationEngine;
 
+	protected final ContextModificationListener contextModificationListener;
+
 	protected final RuleCleaningEngine ruleCleaningEngine;
 
 	protected final SaturationDeletionInit saturationDeletionInit;
@@ -87,8 +90,9 @@ public class Reasoner {
 		this.ontologyIndex = new OntologyIndexImpl();
 		this.taxonomyComputation = new TaxonomyComputation(executor, workerNo,
 				ontologyIndex);
+		this.contextModificationListener = new ContextModificationListener();
 		this.ruleUnApplicationEngine = new RuleUnApplicationEngine(
-				ontologyIndex);
+				ontologyIndex, contextModificationListener);
 		this.ruleCleaningEngine = new RuleCleaningEngine(ontologyIndex);
 		this.saturationDeletionInit = new SaturationDeletionInit(executor,
 				workerNo, ruleUnApplicationEngine);
@@ -97,7 +101,7 @@ public class Reasoner {
 		this.saturationCleaning = new SaturationCleaning(executor, workerNo,
 				ruleCleaningEngine);
 		this.ruleReApplicationEngine = new RuleReApplicationEngine(
-				ontologyIndex);
+				ontologyIndex, contextModificationListener);
 		this.saturationAdditionInit = new SaturationAdditionInit(executor,
 				workerNo, ruleReApplicationEngine);
 		this.saturationAdditionInitDeleted = new SaturationAdditionInitDeleted(
@@ -199,14 +203,14 @@ public class Reasoner {
 			Statistics.logMemoryUsage(LOGGER_);
 			ruleUnApplicationEngine.printStatistics();
 			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("affected contexts: "
-						+ ruleUnApplicationEngine.getUnSaturatedContexts()
+				LOGGER_.info("overall affected contexts: "
+						+ contextModificationListener.getModifiedContexts()
 								.size());
 			// cleaning affected contexts
 			Statistics.logOperationStart("Cleaning contexts", LOGGER_);
 			saturationCleaning.start();
-			for (SaturatedClassExpression context : ruleUnApplicationEngine
-					.getUnSaturatedContexts()) {
+			for (SaturatedClassExpression context : contextModificationListener
+					.getModifiedContexts()) {
 				try {
 					saturationCleaning.submit(context);
 				} catch (InterruptedException e) {
@@ -256,8 +260,8 @@ public class Reasoner {
 		Statistics.logOperationStart("Inferences re-application deleted init",
 				LOGGER_);
 		saturationAdditionInitDeleted.start();
-		Queue<SaturatedClassExpression> unSaturatedContexts = ruleUnApplicationEngine
-				.getUnSaturatedContexts();
+		Queue<SaturatedClassExpression> unSaturatedContexts = contextModificationListener
+				.getModifiedContexts();
 		for (SaturatedClassExpression saturation : unSaturatedContexts) {
 			try {
 				saturationAdditionInitDeleted.submit(saturation);
@@ -289,17 +293,10 @@ public class Reasoner {
 		Statistics.logMemoryUsage(LOGGER_);
 		ruleReApplicationEngine.printStatistics();
 		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("affected contexts: "
-					+ ruleReApplicationEngine.getUnSaturatedContexts().size());
+			LOGGER_.info("overall affected contexts: "
+					+ contextModificationListener.getModifiedContexts().size());
 		// marking all contexts as saturated
-		unSaturatedContexts = ruleUnApplicationEngine.getUnSaturatedContexts();
-		for (;;) {
-			SaturatedClassExpression context = unSaturatedContexts.poll();
-			if (context == null)
-				break;
-			context.setSaturated();
-		}
-		unSaturatedContexts = ruleReApplicationEngine.getUnSaturatedContexts();
+		unSaturatedContexts = contextModificationListener.getModifiedContexts();
 		for (;;) {
 			SaturatedClassExpression context = unSaturatedContexts.poll();
 			if (context == null)
@@ -332,14 +329,6 @@ public class Reasoner {
 		try {
 			taxonomyComputation.waitCompletion();
 		} catch (InterruptedException e) {
-		}
-		// setting all contexts as saturated
-		for (IndexedClassExpression ice : ontologyIndex
-				.getIndexedClassExpressions()) {
-			SaturatedClassExpression saturation = ice.getSaturated();
-			if (saturation == null)
-				continue;
-			saturation.setSaturated();
 		}
 		classTaxonomy = taxonomyComputation.getClassTaxonomy();
 		progressMonitor.finish();

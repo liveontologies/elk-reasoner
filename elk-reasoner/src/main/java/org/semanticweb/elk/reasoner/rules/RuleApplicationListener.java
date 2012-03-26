@@ -40,4 +40,18 @@ public interface RuleApplicationListener {
 	 */
 	public void notifyCanProcess();
 
+	/**
+	 * This function is called with the context when it is created
+	 * 
+	 * @param context
+	 */
+	public void notifyCreated(SaturatedClassExpression context);
+
+	/**
+	 * This function called whenever a saturation for the context has changed
+	 * 
+	 * @param context
+	 */
+	public void notifyMofidified(SaturatedClassExpression context);
+
 }
