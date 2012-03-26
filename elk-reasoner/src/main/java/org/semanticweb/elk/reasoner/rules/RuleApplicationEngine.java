@@ -292,9 +292,18 @@ public class RuleApplicationEngine implements
 		}
 
 		public Void visit(BackwardLink backwardLink) {
-			backLinkInfNo.incrementAndGet();
-			IndexedPropertyChain linkRelation = backwardLink.getRelation();
+
 			Linkable target = backwardLink.getTarget();
+
+			// for cleaning up don't change unaffected contexts
+			if (deletionMode && !unSaturationMode
+					&& (target instanceof SaturatedClassExpression)
+					&& ((SaturatedClassExpression) target).isSaturated()) {
+				return null;
+			}
+
+			IndexedPropertyChain linkRelation = backwardLink.getRelation();
+			backLinkInfNo.incrementAndGet();
 
 			if (context.backwardLinksByObjectProperty == null) {
 				context.backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Linkable>();
@@ -310,17 +319,14 @@ public class RuleApplicationEngine implements
 			}
 
 			boolean updated = deletionMode ? context.backwardLinksByObjectProperty
-					.remove(linkRelation, target)
+					.contains(linkRelation, target)
 					: context.backwardLinksByObjectProperty.add(linkRelation,
 							target);
 
-			if (updated)
-				backLinkNo.incrementAndGet();
+			if (!updated)
+				return null;
 
-			if (unSaturationMode && context.isSaturated()) {
-				if (context.setNotSaturated())
-					unSaturatedContexts.add(context);
-			}
+			backLinkNo.incrementAndGet();
 
 			// apply all propagations over the link
 			if (context.propagationsByObjectProperty != null) {
@@ -365,12 +371,20 @@ public class RuleApplicationEngine implements
 				}
 			}
 
-			// }
+			if (deletionMode)
+				context.backwardLinksByObjectProperty.remove(linkRelation,
+						target);
 
 			return null;
 		}
 
 		public Void visit(ForwardLink forwardLink) {
+
+			// for cleaning up don't change unaffected contexts
+			if (deletionMode && !unSaturationMode && context.isSaturated()) {
+				return null;
+			}
+
 			forwLinkInfNo.incrementAndGet();
 			IndexedPropertyChain linkRelation = forwardLink.getRelation();
 			Linkable target = forwardLink.getTarget();
@@ -381,12 +395,14 @@ public class RuleApplicationEngine implements
 			}
 
 			boolean updated = deletionMode ? context.forwardLinksByObjectProperty
-					.remove(linkRelation, target)
+					.contains(linkRelation, target)
 					: context.forwardLinksByObjectProperty.add(linkRelation,
 							target);
 
-			if (updated)
-				forwLinkNo.incrementAndGet();
+			if (!updated)
+				return null;
+
+			forwLinkNo.incrementAndGet();
 
 			if (unSaturationMode && context.isSaturated()) {
 				if (context.setNotSaturated())
@@ -394,9 +410,7 @@ public class RuleApplicationEngine implements
 			}
 
 			/* compose the link with all backward links */
-			// assert
-			// linkRelation.getSaturated().propertyCompositionsByLeftSubProperty
-			// != null
+			assert linkRelation.getSaturated().propertyCompositionsByLeftSubProperty != null;
 			if (context.backwardLinksByObjectProperty != null) {
 
 				for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
@@ -417,10 +431,20 @@ public class RuleApplicationEngine implements
 				}
 			}
 
+			if (deletionMode)
+				context.forwardLinksByObjectProperty.remove(linkRelation,
+						target);
+
 			return null;
 		}
 
 		public Void visit(Propagation propagation) {
+
+			// for cleaning up don't change unaffected contexts
+			if (deletionMode && !unSaturationMode && context.isSaturated()) {
+				return null;
+			}
+
 			propInfNo.incrementAndGet();
 			IndexedPropertyChain propRelation = propagation.getRelation();
 			Queueable carry = propagation.getCarry();
@@ -431,12 +455,14 @@ public class RuleApplicationEngine implements
 			}
 
 			boolean updated = deletionMode ? context.propagationsByObjectProperty
-					.remove(propRelation, carry)
+					.contains(propRelation, carry)
 					: context.propagationsByObjectProperty.add(propRelation,
 							carry);
 
-			if (updated)
-				propNo.incrementAndGet();
+			if (!updated)
+				return null;
+
+			propNo.incrementAndGet();
 
 			if (unSaturationMode && context.isSaturated()) {
 				if (context.setNotSaturated())
@@ -456,39 +482,63 @@ public class RuleApplicationEngine implements
 						enqueue(target, carry);
 			}
 
+			if (deletionMode)
+				context.propagationsByObjectProperty
+						.remove(propRelation, carry);
+
 			return null;
 		}
 
 		public Void visit(DecomposedClassExpression compositeClassExpression) {
+			//
+			// for cleaning up don't change unaffected contexts
+			if (deletionMode && !unSaturationMode && context.isSaturated()) {
+				return null;
+			}
+
 			derivedInfNo.incrementAndGet();
+
+			IndexedClassExpression indexedClassExpression = compositeClassExpression
+					.getClassExpression();
 
 			if (!unSaturationMode && context.isSaturated())
 				LOGGER_.warn(context.root + ": adding "
-						+ compositeClassExpression.getClassExpression()
-						+ " to a saturated context!");
+						+ indexedClassExpression + " to a saturated context!");
 
 			boolean updated = deletionMode ? context.derived
-					.remove(compositeClassExpression.getClassExpression())
-					: context.derived.add(compositeClassExpression
-							.getClassExpression());
-			if (updated) {
+					.contains(compositeClassExpression.getClassExpression())
+					: context.derived.add(indexedClassExpression);
 
-				if (unSaturationMode && context.isSaturated()) {
-					if (context.setNotSaturated())
-						unSaturatedContexts.add(context);
-				}
+			if (!updated)
+				return null;
 
-				if (!unSaturationMode && context.isSaturated())
-					LOGGER_.error(context.root + ": new "
-							+ compositeClassExpression.getClassExpression()
-							+ " in a saturated context!");
-				derivedNo.incrementAndGet();
-				processClass(compositeClassExpression.getClassExpression());
+			if (unSaturationMode && context.isSaturated()) {
+				if (context.setNotSaturated())
+					unSaturatedContexts.add(context);
 			}
+
+			if (!unSaturationMode && context.isSaturated())
+				LOGGER_.error(context.root + ": new " + indexedClassExpression
+						+ " in a saturated context!");
+			derivedNo.incrementAndGet();
+			processClass(indexedClassExpression);
+			// if (deletionMode)
+			indexedClassExpression.accept(classExpressionDecomposer);
+
+			if (deletionMode)
+				context.derived.remove(compositeClassExpression
+						.getClassExpression());
+
 			return null;
 		}
 
 		public Void visit(IndexedClassExpression indexedClassExpression) {
+
+			// for cleaning up don't change unaffected contexts
+			if (deletionMode && !unSaturationMode && context.isSaturated()) {
+				return null;
+			}
+
 			derivedInfNo.incrementAndGet();
 
 			if (!unSaturationMode && context.isSaturated())
@@ -496,24 +546,27 @@ public class RuleApplicationEngine implements
 						+ indexedClassExpression + " to a saturated context!");
 
 			boolean updated = deletionMode ? context.derived
-					.remove(indexedClassExpression) : context.derived
+					.contains(indexedClassExpression) : context.derived
 					.add(indexedClassExpression);
 
-			if (updated) {
+			if (!updated)
+				return null;
 
-				if (unSaturationMode && context.isSaturated()) {
-					if (context.setNotSaturated())
-						unSaturatedContexts.add(context);
-				}
-
-				if (!unSaturationMode && context.isSaturated())
-					LOGGER_.error(context.root + ": new "
-							+ indexedClassExpression
-							+ " in a saturated context!");
-				derivedNo.incrementAndGet();
-				processClass(indexedClassExpression);
-				indexedClassExpression.accept(classExpressionDecomposer);
+			if (unSaturationMode && context.isSaturated()) {
+				if (context.setNotSaturated())
+					unSaturatedContexts.add(context);
 			}
+
+			if (!unSaturationMode && context.isSaturated())
+				LOGGER_.error(context.root + ": new " + indexedClassExpression
+						+ " in a saturated context!");
+			derivedNo.incrementAndGet();
+			processClass(indexedClassExpression);
+			indexedClassExpression.accept(classExpressionDecomposer);
+
+			if (deletionMode)
+				context.derived.remove(indexedClassExpression);
+
 			return null;
 		}
 

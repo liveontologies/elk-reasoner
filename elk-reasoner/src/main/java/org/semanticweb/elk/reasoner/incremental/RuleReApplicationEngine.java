@@ -64,16 +64,8 @@ public class RuleReApplicationEngine extends RuleApplicationEngine {
 	}
 
 	void processContext(SaturatedClassExpression context) {
-//		final QueueProcessor queueProcessor = new QueueProcessor(context);
 		// re-initializing context just in case
 		context.clear();
 		initContext(context);
-
-		// re-applying inferences for all indexed class expressions of the
-		// context
-//		for (IndexedClassExpression derived : context
-//				.getSuperClassExpressions()) {
-//			queueProcessor.processClass(derived);
-//		}
 	}
 }

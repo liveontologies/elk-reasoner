@@ -28,11 +28,13 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.incremental.RuleCleaningEngine;
 import org.semanticweb.elk.reasoner.incremental.RuleReApplicationEngine;
 import org.semanticweb.elk.reasoner.incremental.RuleUnApplicationEngine;
 import org.semanticweb.elk.reasoner.incremental.SaturationAdditionEngine;
 import org.semanticweb.elk.reasoner.incremental.SaturationAdditionInitDeletedEngine;
 import org.semanticweb.elk.reasoner.incremental.SaturationAdditionInitEngine;
+import org.semanticweb.elk.reasoner.incremental.SaturationCleaningEngine;
 import org.semanticweb.elk.reasoner.incremental.SaturationDeletionEngine;
 import org.semanticweb.elk.reasoner.incremental.SaturationDeletionInitEngine;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -58,9 +60,13 @@ public class Reasoner {
 
 	protected final RuleUnApplicationEngine ruleUnApplicationEngine;
 
+	protected final RuleCleaningEngine ruleCleaningEngine;
+
 	protected final SaturationDeletionInit saturationDeletionInit;
 
 	protected final SaturationDeletion saturationDeletion;
+
+	protected final SaturationCleaning saturationCleaning;
 
 	protected final RuleReApplicationEngine ruleReApplicationEngine;
 
@@ -83,10 +89,13 @@ public class Reasoner {
 				ontologyIndex);
 		this.ruleUnApplicationEngine = new RuleUnApplicationEngine(
 				ontologyIndex);
+		this.ruleCleaningEngine = new RuleCleaningEngine(ontologyIndex);
 		this.saturationDeletionInit = new SaturationDeletionInit(executor,
 				workerNo, ruleUnApplicationEngine);
 		this.saturationDeletion = new SaturationDeletion(executor, workerNo,
 				ruleUnApplicationEngine);
+		this.saturationCleaning = new SaturationCleaning(executor, workerNo,
+				ruleCleaningEngine);
 		this.ruleReApplicationEngine = new RuleReApplicationEngine(
 				ontologyIndex);
 		this.saturationAdditionInit = new SaturationAdditionInit(executor,
@@ -193,6 +202,23 @@ public class Reasoner {
 				LOGGER_.info("affected contexts: "
 						+ ruleUnApplicationEngine.getUnSaturatedContexts()
 								.size());
+			// cleaning affected contexts
+			Statistics.logOperationStart("Cleaning contexts", LOGGER_);
+			saturationCleaning.start();
+			for (SaturatedClassExpression context : ruleUnApplicationEngine
+					.getUnSaturatedContexts()) {
+				try {
+					saturationCleaning.submit(context);
+				} catch (InterruptedException e) {
+				}
+			}
+			try {
+				saturationCleaning.waitCompletion();
+			} catch (InterruptedException e) {
+			}
+			Statistics.logOperationFinish("Cleaning contexts", LOGGER_);
+			Statistics.logMemoryUsage(LOGGER_);
+			ruleCleaningEngine.printStatistics();
 		}
 
 		// re-application of inferences after additions
@@ -222,6 +248,7 @@ public class Reasoner {
 			Statistics.logOperationFinish("Inferences re-application init",
 					LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
+			ruleReApplicationEngine.printStatistics();
 		}
 		// applying the changes in the index
 		ontologyIndex.getIndexChange().commit();
@@ -244,6 +271,7 @@ public class Reasoner {
 		Statistics.logOperationFinish("Inferences re-application deleted init",
 				LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
+		ruleReApplicationEngine.printStatistics();
 
 		Statistics.logOperationStart("Inferences re-application", LOGGER_);
 		saturationAddition.start();
@@ -334,8 +362,8 @@ public class Reasoner {
 		public SaturationDeletionInit(
 				ExecutorService executor,
 				int maxWorkers,
-				SaturationDeletionInitEngine<SaturatedClassExpression> saturationCleanupInitEngine) {
-			super(saturationCleanupInitEngine, executor, maxWorkers,
+				SaturationDeletionInitEngine<SaturatedClassExpression> saturationDeletionInitEngine) {
+			super(saturationDeletionInitEngine, executor, maxWorkers,
 					8 * maxWorkers, 16);
 		}
 
@@ -359,6 +387,25 @@ public class Reasoner {
 				RuleUnApplicationEngine ruleUnApplicationEngine) {
 			this(executor, maxWorkers, new SaturationDeletionEngine(
 					ruleUnApplicationEngine));
+		}
+	}
+
+	class SaturationCleaning extends
+			ConcurrentComputation<SaturatedClassExpression> {
+
+		public SaturationCleaning(
+				ExecutorService executor,
+				int maxWorkers,
+				SaturationCleaningEngine<SaturatedClassExpression> saturationCleaningEngine) {
+			super(saturationCleaningEngine, executor, maxWorkers,
+					8 * maxWorkers, 16);
+		}
+
+		public SaturationCleaning(ExecutorService executor, int maxWorkers,
+				RuleCleaningEngine ruleCleaningEngine) {
+			this(executor, maxWorkers,
+					new SaturationCleaningEngine<SaturatedClassExpression>(
+							ruleCleaningEngine));
 		}
 	}
 
