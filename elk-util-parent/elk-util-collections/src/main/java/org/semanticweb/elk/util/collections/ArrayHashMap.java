@@ -406,8 +406,6 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	public V remove(Object key) {
 		if (key == null)
 			throw new NullPointerException();
-		if (size == upperSize)
-			stretch();
 		V result = removeEntry(keys, values, key);
 		if (result != null)
 			size--;

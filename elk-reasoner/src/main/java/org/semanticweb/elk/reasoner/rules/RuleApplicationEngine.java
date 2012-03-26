@@ -490,8 +490,8 @@ public class RuleApplicationEngine implements
 		}
 
 		public Void visit(DecomposedClassExpression compositeClassExpression) {
-			//
-			// for cleaning up don't change unaffected contexts
+
+			// for cleaning up don't change saturated contexts
 			if (deletionMode && !unSaturationMode && context.isSaturated()) {
 				return null;
 			}
@@ -522,8 +522,8 @@ public class RuleApplicationEngine implements
 						+ " in a saturated context!");
 			derivedNo.incrementAndGet();
 			processClass(indexedClassExpression);
-			// if (deletionMode)
-			indexedClassExpression.accept(classExpressionDecomposer);
+			if (deletionMode)
+				indexedClassExpression.accept(classExpressionDecomposer);
 
 			if (deletionMode)
 				context.derived.remove(compositeClassExpression
@@ -534,7 +534,7 @@ public class RuleApplicationEngine implements
 
 		public Void visit(IndexedClassExpression indexedClassExpression) {
 
-			// for cleaning up don't change unaffected contexts
+			// for cleaning up don't change saturated contexts
 			if (deletionMode && !unSaturationMode && context.isSaturated()) {
 				return null;
 			}
