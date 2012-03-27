@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
@@ -34,9 +33,9 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
  * @author Frantisek Simancik
  *
  */
-public class RuleConjunctionPlus<C extends ContextElClassSaturation> implements InferenceRule<C> {
+public class RuleConjunctionPlus<C extends ContextElClassSaturation> implements InferenceRuleSCE<C> {
 
-	public void apply(SuperClassExpression<C> argument, C context,
+	public void applySCE(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
 
 		final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjs = argument

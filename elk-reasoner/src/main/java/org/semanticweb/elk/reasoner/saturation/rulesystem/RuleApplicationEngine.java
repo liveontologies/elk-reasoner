@@ -33,7 +33,9 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.classes.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.classes.ContextElClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemElClassSaturation;
+import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemInvocationManagerSCE;
 import org.semanticweb.elk.reasoner.saturation.classes.SuperClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
@@ -53,7 +55,7 @@ public class RuleApplicationEngine implements InputProcessor<IndexedClassExpress
 
 	protected InferenceSystem<? extends Context> inferenceSystem = new InferenceSystemElClassSaturation();
 
-	protected final InferenceSystemInvocationManager inferenceSystemInvocationManager;
+	protected InferenceSystemInvocationManager inferenceSystemInvocationManager;
 
 	// TODO Try to get rid of the ontology index, if possible.
 	/**
@@ -106,7 +108,8 @@ public class RuleApplicationEngine implements InputProcessor<IndexedClassExpress
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 
-		inferenceSystemInvocationManager = new InferenceSystemInvocationManager(
+		// TODO: provide an option for specifying the invocation manager
+		inferenceSystemInvocationManager = new InferenceSystemInvocationManagerSCE<ContextElClassSaturation>(
 				this);
 		try {
 			inferenceSystemInvocationManager

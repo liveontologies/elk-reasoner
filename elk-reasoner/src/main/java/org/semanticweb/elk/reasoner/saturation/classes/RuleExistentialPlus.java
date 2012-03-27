@@ -28,7 +28,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -39,7 +38,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  *
  */
 public class RuleExistentialPlus<C extends ContextElClassSaturation> extends RuleWithBackwardLinks<C>
-		implements InferenceRule<C> {
+		implements InferenceRuleSCE<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
 			RuleApplicationEngine engine) {
@@ -67,7 +66,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends Rul
 				engine.enqueue(target, carry);
 	}
 
-	public void apply(SuperClassExpression<C> argument, C context,
+	public void applySCE(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
 		final List<IndexedObjectSomeValuesFrom> exists = argument.getExpression()
 				.getNegExistentials();

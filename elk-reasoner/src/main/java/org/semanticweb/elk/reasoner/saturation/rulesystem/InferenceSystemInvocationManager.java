@@ -26,7 +26,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -81,9 +80,6 @@ public class InferenceSystemInvocationManager {
 	 */
 	protected final static Class<?>[] parameterTypesStoreMethod = { Context.class };
 
-	static AtomicInteger debugProcessedQueueables = new AtomicInteger(0);
-	static AtomicInteger debugRuleApplications = new AtomicInteger(0);
-
 	/**
 	 * RuleApplicationEngine that owns this object. Rule applications need to
 	 * know this for enqueueing new derivations.
@@ -111,7 +107,6 @@ public class InferenceSystemInvocationManager {
 		public void invoke(Queueable<?> argument, Context context)
 				throws IllegalArgumentException, IllegalAccessException,
 				InvocationTargetException {
-			debugRuleApplications.incrementAndGet();
 			firstMethod.invoke(firstInferenceRule, argument, context, engine);
 			if (rest != null) {
 				rest.invoke(argument, context);
@@ -382,10 +377,11 @@ public class InferenceSystemInvocationManager {
 	 */
 	protected void registerRuleMethodForClass(InferenceRule<?> inferenceRule,
 			Method ruleMethod, Class<?> clazz) {
-		
+
 		for (Class<?> keyclass : methodsForQueueable.keySet()) {
 			if (clazz.isAssignableFrom(keyclass)) {
-				InferenceMethods inferenceMethods = methodsForQueueable.get(keyclass);
+				InferenceMethods inferenceMethods = methodsForQueueable
+						.get(keyclass);
 				inferenceMethods.ruleMethods = addRuleMethod(inferenceRule,
 						ruleMethod, inferenceMethods.ruleMethods);
 			}
@@ -514,7 +510,6 @@ public class InferenceSystemInvocationManager {
 	 */
 	public void processItemInContext(Queueable<?> queueable, Context context)
 			throws IllegalArgumentException {
-		debugRuleApplications.incrementAndGet();
 		Class<?> clazz = queueable.getClass();
 		InferenceMethods inferenceMethods = methodsForQueueable.get(clazz);
 		if (inferenceMethods == null) {
@@ -529,6 +524,8 @@ public class InferenceSystemInvocationManager {
 				if (inferenceMethods.ruleMethods != null) {
 					inferenceMethods.ruleMethods.invoke(queueable, context);
 				}
+
+				applyAdditionalMethodsToItem(queueable, context);
 			}
 		} catch (IllegalAccessException e) {
 			// Happens if VM security configuration prevents method call.
@@ -544,6 +541,16 @@ public class InferenceSystemInvocationManager {
 				throw new RuntimeException(e.getMessage(), e);
 			}
 		}
+	}
+
+	/**
+	 * handle for applying other methods to the item in subclasses of this
+	 * invocation manager without using reflection
+	 * 
+	 * @author Frantisek Simancik
+	 */
+	protected void applyAdditionalMethodsToItem(Queueable<?> queueable,
+			Context context) {
 	}
 
 }

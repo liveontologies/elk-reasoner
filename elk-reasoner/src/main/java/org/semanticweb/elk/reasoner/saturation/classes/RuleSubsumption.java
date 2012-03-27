@@ -25,16 +25,15 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
 /**
  * @author Frantisek Simancik
  *
  */
-public class RuleSubsumption<C extends ContextElClassSaturation> implements InferenceRule<C> {
+public class RuleSubsumption<C extends ContextElClassSaturation> implements InferenceRuleSCE<C> {
 
-	public void apply(SuperClassExpression<C> argument, C context,
+	public void applySCE(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
 
 		final List<IndexedClassExpression> implied = argument.getExpression()

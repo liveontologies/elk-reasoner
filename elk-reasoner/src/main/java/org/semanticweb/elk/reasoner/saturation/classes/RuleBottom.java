@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -32,7 +31,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  * @author Frantisek Simancik
  *
  */
-public class RuleBottom<C extends ContextElClassSaturation> implements InferenceRule<C> {
+public class RuleBottom<C extends ContextElClassSaturation> implements InferenceRulePosSCE<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
 			RuleApplicationEngine engine) {
@@ -42,7 +41,7 @@ public class RuleBottom<C extends ContextElClassSaturation> implements Inference
 					new PositiveSuperClassExpression<C> (engine.owlNothing));
 	}
 
-	public void apply(PositiveSuperClassExpression<C> argument, C context,
+	public void applySCE(PositiveSuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
 
 		if (argument.getExpression() != engine.owlNothing)

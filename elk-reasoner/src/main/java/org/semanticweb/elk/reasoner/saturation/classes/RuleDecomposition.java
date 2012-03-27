@@ -28,14 +28,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
 /**
  * @author Frantisek Simancik
  *
  */
-public class RuleDecomposition<C extends ContextElClassSaturation> implements InferenceRule<C> {
+public class RuleDecomposition<C extends ContextElClassSaturation> implements InferenceRulePosSCE<C> {
 
 	private class ClassExpressionDecomposer implements
 			IndexedClassExpressionVisitor<Void> {
@@ -76,7 +75,7 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements In
 		}
 	};
 
-	public void apply(PositiveSuperClassExpression<C> argument,
+	public void applySCE(PositiveSuperClassExpression<C> argument,
 			C context, RuleApplicationEngine engine) {
 		ClassExpressionDecomposer decomposer = new ClassExpressionDecomposer(
 				context, engine);
