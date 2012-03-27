@@ -144,7 +144,8 @@ public class ReasonerTest extends TestCase {
 				aNode.getDirectSuperNodes().contains(taxonomy.getNode(e)));
 	}
 
-	public void testPropertyChains() throws ParseException, IOException {
+	public void testPropertyChains() throws ParseException, IOException,
+			InterruptedException {
 		IOReasoner IOReasoner = new IOReasoner();
 		IOReasoner
 				.loadOntologyFromString(""//

@@ -25,35 +25,39 @@ package org.semanticweb.elk.reasoner.incremental;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
- * The engine to perform re-application of inferences within contexts. It is
- * indented to be executed after the initialization stage using
- * {@link SaturationAdditionInitEngine}.
+ * The engine to perform inferences of the respective
+ * {@link IncrementalRuleApplicationEngine}, which can be initialized by either
+ * {@link SaturationChangesInitEngine} or
+ * {@link IncrementalRuleApplicationEngine}. This engine has only dummy submit
+ * method just to make sure that the workers start processing inferences through
+ * the {@link IncrementalRuleApplicationEngine}.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SaturationAdditionEngine implements InputProcessor<Void> {
+public class SaturationProcessEngine implements InputProcessor<Void> {
 
 	/**
-	 * The engine for re-applying the inferences
+	 * The engine for revering inferences
 	 */
-	protected final RuleReApplicationEngine ruleReApplicationEngine;
+	protected final IncrementalRuleApplicationEngine incrementalRuleApplicationEngine;
 
-	public SaturationAdditionEngine(
-			RuleReApplicationEngine ruleReApplicationEngine) {
-		this.ruleReApplicationEngine = ruleReApplicationEngine;
+	public SaturationProcessEngine(
+			IncrementalRuleApplicationEngine incrementalRuleApplicationEngine) {
+		this.incrementalRuleApplicationEngine = incrementalRuleApplicationEngine;
 	}
 
 	public void submit(Void job) throws InterruptedException {
-		// nothing to do here
+		// dummy method just to make sure that the workers start
+		// processing inferences
 	}
 
 	public void process() throws InterruptedException {
-		ruleReApplicationEngine.process();
+		incrementalRuleApplicationEngine.process();
 	}
 
 	public boolean canProcess() {
-		return ruleReApplicationEngine.canProcess();
+		return incrementalRuleApplicationEngine.canProcess();
 	}
 
 }

@@ -103,23 +103,17 @@ public class RuleApplicationEngine implements
 	/**
 	 * if <tt>true</tt> if saturated contexts can be modified
 	 */
-	protected final boolean saturationModificationMode;
+	protected final boolean modificationMode;
 
 	public RuleApplicationEngine(OntologyIndex ontologyIndex,
 			RuleApplicationListener listener, boolean deletionMode,
-			boolean unSaturationMode) {
+			boolean modificationMode) {
 		this.ontologyIndex = ontologyIndex;
 		this.listener = listener;
 		this.activeContexts = new ConcurrentLinkedQueue<SaturatedClassExpression>();
 		this.activeContextsEmpty = new AtomicBoolean(true);
 		this.deletionMode = deletionMode;
-		this.saturationModificationMode = unSaturationMode;
-
-		// reset saturation in case of re-saturation after changes
-		// TODO: introduce a separate method for this
-		// for (IndexedClassExpression ice : ontologyIndex
-		// .getIndexedClassExpressions())
-		// ice.resetSaturated();
+		this.modificationMode = modificationMode;
 
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
@@ -148,13 +142,13 @@ public class RuleApplicationEngine implements
 	 */
 	public void printStatistics() {
 		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Derived Produced/Unique:" + derivedInfNo.get() + "/"
-					+ derivedNo.get());
-			LOGGER_.debug("Backward Links Produced/Unique:"
+			LOGGER_.debug("Derived: Produced/Unique:" + derivedInfNo.get()
+					+ "/" + derivedNo.get());
+			LOGGER_.debug("Backward: Links Produced/Unique:"
 					+ backLinkInfNo.get() + "/" + backLinkNo.get());
-			LOGGER_.debug("Propagations Produced/Unique:" + propInfNo.get()
+			LOGGER_.debug("Propagations: Produced/Unique:" + propInfNo.get()
 					+ "/" + propNo.get());
-			LOGGER_.debug("Forward Links Produced/Unique:"
+			LOGGER_.debug("Forward Links: Produced/Unique:"
 					+ forwLinkInfNo.get() + "/" + forwLinkNo.get());
 		}
 	}
@@ -192,11 +186,21 @@ public class RuleApplicationEngine implements
 		return root.getSaturated();
 	}
 
-	protected void initContext(SaturatedClassExpression sce) {
-		enqueue(sce, sce.getRoot());
+	/**
+	 * Initialize context for saturation under inference rules; this method
+	 * should be typically called when a new context is created, but can be also
+	 * called if the saturation for the context has been cleared and should be
+	 * recomputed.
+	 * 
+	 * @param context
+	 *            the context to be initialized
+	 * 
+	 */
+	protected void initContext(SaturatedClassExpression context) {
+		enqueue(context, context.getRoot());
 
 		if (owlThing.occursNegatively())
-			enqueue(sce, owlThing);
+			enqueue(context, owlThing);
 	}
 
 	protected void activateContext(SaturatedClassExpression context) {
@@ -266,7 +270,7 @@ public class RuleApplicationEngine implements
 			Linkable target = backwardLink.getTarget();
 
 			// don't modify saturated contexts
-			if (!saturationModificationMode
+			if (!modificationMode
 					&& (target instanceof SaturatedClassExpression)
 					&& ((SaturatedClassExpression) target).isSaturated()) {
 				return null;
@@ -351,7 +355,7 @@ public class RuleApplicationEngine implements
 		public Void visit(ForwardLink forwardLink) {
 
 			// don't modify saturated contexts
-			if (!saturationModificationMode && context.isSaturated()) {
+			if (!modificationMode && context.isSaturated()) {
 				return null;
 			}
 
@@ -453,7 +457,7 @@ public class RuleApplicationEngine implements
 					.getClassExpression();
 
 			// don't modify saturated contexts
-			if (!saturationModificationMode && context.isSaturated()) {
+			if (!modificationMode && context.isSaturated()) {
 				if (!deletionMode)
 					LOGGER_.warn(context.root + ": new "
 							+ indexedClassExpression
@@ -488,7 +492,7 @@ public class RuleApplicationEngine implements
 		public Void visit(IndexedClassExpression indexedClassExpression) {
 
 			// don't modify saturated contexts
-			if (!saturationModificationMode && context.isSaturated()) {
+			if (!modificationMode && context.isSaturated()) {
 				if (!deletionMode)
 					LOGGER_.warn(context.root + ": adding "
 							+ indexedClassExpression

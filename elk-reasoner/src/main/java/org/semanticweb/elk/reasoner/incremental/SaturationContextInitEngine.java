@@ -26,37 +26,37 @@ import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
- * The engine to initialize re-application of inferences in contexts. It works
- * by identifying indexed class expressions in the context for which some
- * entries have been added, and re-applying inferences with respect to these
- * entries. The re-application of inferences will be continued in the next stage
- * using {@link SaturationAdditionEngine} to avoid the problem with the
- * concurrent access to the derived indexed class expressions of the context.
+ * The engine used to initialize re-computation the inferences for contexts. It
+ * can be used for both deletion of inferences in contexts (cleaning of the
+ * saturation), or computation of the saturation for concepts from scratch
+ * (after cleaning). The appropriate mode is determined by the
+ * {@link IncrementalRuleApplicationEngine} used in this engine.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <J>
- *            the type of the contexts with which this engine works
+ *            the type of the contexts which this engine can accept
  */
-public class SaturationAdditionInitEngine<J extends SaturatedClassExpression>
+public class SaturationContextInitEngine<J extends SaturatedClassExpression>
 		implements InputProcessor<J> {
 
 	/**
 	 * The engine for re-applying the inferences
 	 */
-	protected final RuleReApplicationEngine ruleReApplicationEngine;
+	protected final IncrementalRuleApplicationEngine incrementalRuleApplicationEngine;
 
-	public SaturationAdditionInitEngine(
-			RuleReApplicationEngine ruleReApplicationEngine) {
-		this.ruleReApplicationEngine = ruleReApplicationEngine;
+	public SaturationContextInitEngine(
+			IncrementalRuleApplicationEngine incrementalRuleApplicationEngine) {
+		this.incrementalRuleApplicationEngine = incrementalRuleApplicationEngine;
 	}
 
 	public void submit(J job) throws InterruptedException {
-		ruleReApplicationEngine.processContextAdditions(job);
+		incrementalRuleApplicationEngine.initContext(job);
 	}
 
 	public void process() throws InterruptedException {
-		// nothing to do here
+		// nothing to do here; this engine should be used only for
+		// initialization, not for processing
 	}
 
 	public boolean canProcess() {

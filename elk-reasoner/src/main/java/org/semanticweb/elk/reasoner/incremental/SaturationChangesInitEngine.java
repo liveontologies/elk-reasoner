@@ -26,37 +26,37 @@ import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
- * The engine to initialize reverting of inferences in contexts. It works by
- * identifying indexed class expressions in the context for which some entries
- * have been deleted, and reverting inferences with respect to these entries.
- * The reverting of inferences will be continued in the next stage using
- * {@link SaturationDeletionEngine} to avoid the problem with the concurrent
- * access to the derived indexed class expressions of the context.
+ * The engine that can be used to initialize changes in the saturation after
+ * incremental index update. It should be used either for index additions or
+ * index deletions. The appropriate mode is determined by the
+ * {@link IncrementalRuleApplicationEngine} used in this engine.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <J>
- *            the type of the contexts with which this engine works
+ *            the type of the contexts which this engine can accept
  */
-public class SaturationDeletionInitEngine<J extends SaturatedClassExpression>
+public class SaturationChangesInitEngine<J extends SaturatedClassExpression>
 		implements InputProcessor<J> {
 
 	/**
-	 * The engine for revering inferences
+	 * The rule application engine used for initialization of the saturation
+	 * changes
 	 */
-	protected final RuleUnApplicationEngine ruleUnApplicationEngine;
+	protected final IncrementalRuleApplicationEngine incrementalRuleApplicationEngine;
 
-	public SaturationDeletionInitEngine(
-			RuleUnApplicationEngine ruleUnApplicationEngine) {
-		this.ruleUnApplicationEngine = ruleUnApplicationEngine;
+	public SaturationChangesInitEngine(
+			IncrementalRuleApplicationEngine incrementalRuleApplicationEngine) {
+		this.incrementalRuleApplicationEngine = incrementalRuleApplicationEngine;
 	}
 
 	public void submit(J job) throws InterruptedException {
-		ruleUnApplicationEngine.processContextDeletions(job);
+		incrementalRuleApplicationEngine.initChanges(job);
 	}
 
 	public void process() throws InterruptedException {
-		// nothing to do here
+		// nothing to do here; this engine should be used only for
+		// initialization, not for processing
 	}
 
 	public boolean canProcess() {

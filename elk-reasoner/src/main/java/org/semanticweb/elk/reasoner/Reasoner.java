@@ -28,16 +28,12 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkPropertyAxiom;
 import org.semanticweb.elk.reasoner.incremental.ContextModificationListener;
-import org.semanticweb.elk.reasoner.incremental.RuleCleaningEngine;
-import org.semanticweb.elk.reasoner.incremental.RuleReApplicationEngine;
-import org.semanticweb.elk.reasoner.incremental.RuleUnApplicationEngine;
-import org.semanticweb.elk.reasoner.incremental.SaturationAdditionEngine;
-import org.semanticweb.elk.reasoner.incremental.SaturationAdditionInitDeletedEngine;
-import org.semanticweb.elk.reasoner.incremental.SaturationAdditionInitEngine;
-import org.semanticweb.elk.reasoner.incremental.SaturationCleaningEngine;
-import org.semanticweb.elk.reasoner.incremental.SaturationDeletionEngine;
-import org.semanticweb.elk.reasoner.incremental.SaturationDeletionInitEngine;
+import org.semanticweb.elk.reasoner.incremental.IncrementalRuleApplicationEngine;
+import org.semanticweb.elk.reasoner.incremental.SaturationChangesInitEngine;
+import org.semanticweb.elk.reasoner.incremental.SaturationContextInitEngine;
+import org.semanticweb.elk.reasoner.incremental.SaturationProcessEngine;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -50,36 +46,77 @@ import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.logging.Statistics;
 
 public class Reasoner {
-	// executor used to run the jobs
+	/**
+	 * the executor for running concurrent jobs
+	 */
 	protected final ExecutorService executor;
-	// number of workers for concurrent jobs
+	/**
+	 * the limit on the number of concurrent jobs
+	 */
 	protected final int workerNo;
-
+	/**
+	 * indexed representation of the ontology
+	 */
 	protected final OntologyIndex ontologyIndex;
-
+	/**
+	 * the object used for computing the taxonomy
+	 */
 	protected final TaxonomyComputation taxonomyComputation;
-
-	protected final RuleUnApplicationEngine ruleUnApplicationEngine;
-
+	/**
+	 * the listener used for collecting information about modified contexts
+	 * during incremental classification
+	 */
 	protected final ContextModificationListener contextModificationListener;
-
-	protected final RuleCleaningEngine ruleCleaningEngine;
-
-	protected final SaturationDeletionInit saturationDeletionInit;
-
-	protected final SaturationDeletion saturationDeletion;
-
-	protected final SaturationCleaning saturationCleaning;
-
-	protected final RuleReApplicationEngine ruleReApplicationEngine;
-
-	protected final SaturationAdditionInit saturationAdditionInit;
-
-	protected final SaturationAdditionInitDeleted saturationAdditionInitDeleted;
-
-	protected final SaturationAddition saturationAddition;
-
+	/**
+	 * the engine used to de-apply inference rules
+	 */
+	protected final IncrementalRuleApplicationEngine ruleDeApplicationEngine;
+	/**
+	 * the engine used to re-apply inference rules
+	 */
+	protected final IncrementalRuleApplicationEngine ruleReApplicationEngine;
+	/**
+	 * the engine to clean the modified contexts by de-applying inferences for
+	 * them; it should not modify contexts that are saturated
+	 */
+	protected final IncrementalRuleApplicationEngine ruleCleaningEngine;
+	/**
+	 * initializing saturation update for deleted index entries
+	 */
+	protected final SaturationChangesInit saturationChangesDeletionInit;
+	/**
+	 * performing saturation update for deletions
+	 */
+	protected final SaturationProcessor saturationChangesDeletion;
+	/**
+	 * initializing removal of computed saturations for modified contexts
+	 */
+	protected final SaturationContextInit saturationCleaningInit;
+	/**
+	 * removal of computed saturations for modified contexts; after removal the
+	 * saturation for contexts should be empty
+	 */
+	protected final SaturationProcessor saturationCleaning;
+	/**
+	 * initializing saturation update for added index entries
+	 */
+	protected final SaturationChangesInit saturationChangesAdditionInit;
+	/**
+	 * initializing saturation update for contexts with empty saturation
+	 */
+	protected final SaturationContextInit saturationContextInit;
+	/**
+	 * performing saturation update for additions
+	 */
+	protected final SaturationProcessor saturationAddition;
+	/**
+	 * the linked to the class taxonomy computed by the reasoner
+	 */
 	protected ClassTaxonomy classTaxonomy;
+	/**
+	 * if <tt>true</tt> the next classification will be performed incrementally
+	 */
+	protected boolean incrementalMode;
 
 	// logger for events
 	protected final static Logger LOGGER_ = Logger.getLogger(Reasoner.class);
@@ -91,23 +128,32 @@ public class Reasoner {
 		this.taxonomyComputation = new TaxonomyComputation(executor, workerNo,
 				ontologyIndex);
 		this.contextModificationListener = new ContextModificationListener();
-		this.ruleUnApplicationEngine = new RuleUnApplicationEngine(
-				ontologyIndex, contextModificationListener);
-		this.ruleCleaningEngine = new RuleCleaningEngine(ontologyIndex);
-		this.saturationDeletionInit = new SaturationDeletionInit(executor,
-				workerNo, ruleUnApplicationEngine);
-		this.saturationDeletion = new SaturationDeletion(executor, workerNo,
-				ruleUnApplicationEngine);
-		this.saturationCleaning = new SaturationCleaning(executor, workerNo,
+		this.ruleDeApplicationEngine = new IncrementalRuleApplicationEngine(
+				ontologyIndex, contextModificationListener, true, true);
+		this.ruleCleaningEngine = new IncrementalRuleApplicationEngine(
+				ontologyIndex, contextModificationListener, true, false);
+		this.ruleReApplicationEngine = new IncrementalRuleApplicationEngine(
+				ontologyIndex, contextModificationListener, false, true);
+
+		this.saturationChangesDeletionInit = new SaturationChangesInit(
+				executor, workerNo, ruleDeApplicationEngine);
+		this.saturationChangesDeletion = new SaturationProcessor(executor,
+				workerNo, ruleDeApplicationEngine);
+
+		this.saturationCleaningInit = new SaturationContextInit(executor,
+				workerNo, ruleCleaningEngine);
+		this.saturationCleaning = new SaturationProcessor(executor, workerNo,
 				ruleCleaningEngine);
-		this.ruleReApplicationEngine = new RuleReApplicationEngine(
-				ontologyIndex, contextModificationListener);
-		this.saturationAdditionInit = new SaturationAdditionInit(executor,
-				workerNo, ruleReApplicationEngine);
-		this.saturationAdditionInitDeleted = new SaturationAdditionInitDeleted(
+
+		this.saturationChangesAdditionInit = new SaturationChangesInit(
 				executor, workerNo, ruleReApplicationEngine);
-		this.saturationAddition = new SaturationAddition(executor, workerNo,
+		this.saturationContextInit = new SaturationContextInit(executor,
+				workerNo, ruleReApplicationEngine);
+		this.saturationAddition = new SaturationProcessor(executor, workerNo,
 				ruleReApplicationEngine);
+
+		incrementalMode = true;
+
 		reset();
 	}
 
@@ -125,33 +171,95 @@ public class Reasoner {
 	}
 
 	/**
-	 * Returns null if the current state of the index is not classified.
+	 * @return the class taxonomy computed by the reasoner by the last
+	 *         classification or <tt>null</tt> if no classification has been
+	 *         done yet
 	 */
 	public ClassTaxonomy getTaxonomy() {
 		return classTaxonomy;
 	}
 
+	/**
+	 * switching to non-incremental mode
+	 */
+	protected void switchOffIncrementalMode() {
+		if (incrementalMode) {
+			incrementalMode = false;
+			// applying incremental changes to the index
+			ontologyIndex.getIndexChange().commit();
+		}
+	}
+
+	/**
+	 * Loads an axiom to the reasoner non-incrementally; the ontology will be
+	 * classified from scratch after such a modification
+	 * 
+	 * @param axiom
+	 *            the axiom to be loaded
+	 */
 	public void addAxiom(ElkAxiom axiom) {
+		switchOffIncrementalMode();
 		ontologyIndex.getDirectAxiomInserter().process(axiom);
 		classTaxonomy = null;
 	}
 
+	/**
+	 * Removes an axiom from the reasoner non-incrementally; the ontology will
+	 * be classified from scratch after such a modification. The reasoner will
+	 * not check if the given axiom was previously loaded and might produce
+	 * incorrect results if it was not the case
+	 * 
+	 * @param axiom
+	 *            the axiom to be removed
+	 */
 	public void removeAxiom(ElkAxiom axiom) {
+		switchOffIncrementalMode();
 		ontologyIndex.getDirectAxiomDeleter().process(axiom);
 		classTaxonomy = null;
 	}
 
+	/**
+	 * Loads an axiom to the reasoner incrementally; the next classification
+	 * will be performed incrementally unless some axiom has been loaded or
+	 * removed non-incrementally since the last classification. Incremental
+	 * addition for instances of {@link ElkPropertyAxiom} is currently not
+	 * supported. When this method is called for such an axiom, addition will be
+	 * done non-incrementally.
+	 * 
+	 * @param axiom
+	 */
 	public void addAxiomIncrementally(ElkAxiom axiom) {
-		ontologyIndex.getIncrementalAxiomInserter().process(axiom);
+		if (axiom instanceof ElkPropertyAxiom<?>)
+			switchOffIncrementalMode();
+		if (incrementalMode)
+			ontologyIndex.getIncrementalAxiomInserter().process(axiom);
+		else
+			ontologyIndex.getDirectAxiomInserter().process(axiom);
 		classTaxonomy = null;
 	}
 
+	/**
+	 * Removes an axiom from the reasoner incrementally; the next classification
+	 * will be performed incrementally unless some axiom has been loaded or
+	 * removed non-incrementally since the last classification. Incremental
+	 * removal for instances of {@link ElkPropertyAxiom} is currently not
+	 * supported. When this method is called for such an axiom, removal will be
+	 * done non-incrementally.
+	 * 
+	 * @param axiom
+	 */
 	public void removeAxiomIncrementally(ElkAxiom axiom) {
-		ontologyIndex.getIncrementalAxiomDeleter().process(axiom);
+		if (axiom instanceof ElkPropertyAxiom<?>)
+			switchOffIncrementalMode();
+		if (incrementalMode)
+			ontologyIndex.getIncrementalAxiomDeleter().process(axiom);
+		else
+			ontologyIndex.getDirectAxiomDeleter().process(axiom);
 		classTaxonomy = null;
 	}
 
-	public void classify(ProgressMonitor progressMonitor) {
+	public void classify(ProgressMonitor progressMonitor)
+			throws InterruptedException {
 		// number of indexed classes
 		final int maxIndexedClassCount = ontologyIndex.getIndexedClassCount();
 		// variable used in progress monitors
@@ -161,183 +269,168 @@ public class Reasoner {
 		ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
 				executor, workerNo, ontologyIndex);
 
-		// reverting of inferences after an incremental removal
-		if (!ontologyIndex.getIndexChange().getIndexDeletions().isEmpty()) {
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("Removed entries for "
-						+ ontologyIndex.getIndexChange().getIndexDeletions()
-								.size() + " indexed class expressions");
-			// initialization reversion of inferences
-			Statistics.logOperationStart("Inferences revert init", LOGGER_);
-			saturationDeletionInit.start();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info("Classification using " + workerNo + " workers");
+
+		Statistics.logOperationStart("Classification", LOGGER_);
+		objectPropertySaturation.compute();
+
+		if (!incrementalMode) {
+			// discarding all previously computed saturations
 			for (IndexedClassExpression ice : ontologyIndex
 					.getIndexedClassExpressions()) {
-				try {
+				ice.resetSaturated();
+			}
+		} else {
+			// incremental classification
+
+			boolean deletionMode = !ontologyIndex.getIndexChange()
+					.getIndexDeletions().isEmpty();
+
+			if (deletionMode) {
+				// deletion of inferences after removal
+				if (LOGGER_.isDebugEnabled())
+					LOGGER_.debug("Removed entries for "
+							+ ontologyIndex.getIndexChange()
+									.getIndexDeletions().size()
+							+ " indexed class expressions");
+				Statistics.logOperationStart("Reverting deleted inferences",
+						LOGGER_);
+				// initialization reversion of inferences
+				saturationChangesDeletionInit.start();
+				for (IndexedClassExpression ice : ontologyIndex
+						.getIndexedClassExpressions()) {
 					SaturatedClassExpression saturation = ice.getSaturated();
 					if (saturation == null)
 						continue;
-					saturationDeletionInit.submit(saturation);
-				} catch (InterruptedException e) {
+					saturationChangesDeletionInit.submit(saturation);
 				}
-			}
-			try {
-				saturationDeletionInit.waitCompletion();
-			} catch (InterruptedException e) {
-			}
-			Statistics.logOperationFinish("Inferences revert init", LOGGER_);
-			Statistics.logMemoryUsage(LOGGER_);
-			// reversion of inferences
-			Statistics.logOperationStart("Inferences revert", LOGGER_);
-			saturationDeletion.start();
-			for (int i = 0; i < workerNo; i++) {
-				try {
-					saturationDeletion.submit(null);
-				} catch (InterruptedException e) {
+				saturationChangesDeletionInit.waitCompletion();
+				// reversion of inferences
+				saturationChangesDeletion.start();
+				for (int i = 0; i < workerNo; i++) {
+					saturationChangesDeletion.submit(null);
 				}
-			}
-			try {
-				saturationDeletion.waitCompletion();
-			} catch (InterruptedException e) {
-			}
-			Statistics.logOperationFinish("Inferences revert", LOGGER_);
-			Statistics.logMemoryUsage(LOGGER_);
-			ruleUnApplicationEngine.printStatistics();
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("overall affected contexts: "
-						+ contextModificationListener.getModifiedContexts()
-								.size());
-			// cleaning affected contexts
-			Statistics.logOperationStart("Cleaning contexts", LOGGER_);
-			saturationCleaning.start();
-			for (SaturatedClassExpression context : contextModificationListener
-					.getModifiedContexts()) {
-				try {
-					saturationCleaning.submit(context);
-				} catch (InterruptedException e) {
+				saturationChangesDeletion.waitCompletion();
+				Statistics.logOperationFinish("Reverting deleted inferences",
+						LOGGER_);
+				Statistics.logMemoryUsage(LOGGER_);
+				ruleDeApplicationEngine.printStatistics();
+				if (LOGGER_.isDebugEnabled())
+					LOGGER_.debug("overall modified contexts: "
+							+ contextModificationListener.getModifiedContexts()
+									.size());
+				// cleaning of modified contexts
+				Statistics.logOperationStart("Cleaning of modified contexts",
+						LOGGER_);
+				// initialization of cleaning
+				saturationCleaningInit.start();
+				for (SaturatedClassExpression context : contextModificationListener
+						.getModifiedContexts()) {
+					saturationCleaningInit.submit(context);
 				}
-			}
-			try {
+				saturationCleaningInit.waitCompletion();
+				// cleaning
+				saturationCleaning.start();
+				for (int i = 0; i < workerNo; i++) {
+					saturationCleaning.submit(null);
+				}
 				saturationCleaning.waitCompletion();
-			} catch (InterruptedException e) {
+				Statistics.logOperationFinish("Cleaning of modified contexts",
+						LOGGER_);
+				Statistics.logMemoryUsage(LOGGER_);
+				ruleCleaningEngine.printStatistics();
 			}
-			Statistics.logOperationFinish("Cleaning contexts", LOGGER_);
-			Statistics.logMemoryUsage(LOGGER_);
-			ruleCleaningEngine.printStatistics();
-		}
 
-		// re-application of inferences after additions
-		if (!ontologyIndex.getIndexChange().getIndexAdditions().isEmpty()) {
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("Added entries for "
-						+ ontologyIndex.getIndexChange().getIndexAdditions()
-								.size() + " indexed class expressions");
-			// initialization re-application for additions
-			Statistics.logOperationStart("Inferences re-application init",
-					LOGGER_);
-			saturationAdditionInit.start();
-			for (IndexedClassExpression ice : ontologyIndex
-					.getIndexedClassExpressions()) {
-				try {
+			boolean contextsCleaned = !contextModificationListener
+					.getModifiedContexts().isEmpty();
+
+			boolean additionMode = !ontologyIndex.getIndexChange()
+					.getIndexAdditions().isEmpty();
+
+			// re-application of inferences after removal
+			if (additionMode || contextsCleaned) {
+				Statistics.logOperationStart("Inferences re-application",
+						LOGGER_);
+			}
+
+			// re-application of inferences after additions
+			if (additionMode) {
+				// initialization re-application for additions
+				saturationChangesAdditionInit.start();
+				for (IndexedClassExpression ice : ontologyIndex
+						.getIndexedClassExpressions()) {
 					SaturatedClassExpression saturation = ice.getSaturated();
 					if (saturation == null || !saturation.isSaturated())
 						continue;
-					saturationAdditionInit.submit(saturation);
-				} catch (InterruptedException e) {
+					saturationChangesAdditionInit.submit(saturation);
+				}
+				saturationChangesAdditionInit.waitCompletion();
+			}
+			// applying the changes in the index
+			ontologyIndex.getIndexChange().commit();
+
+			if (contextsCleaned) {
+				// initialization of re-application for deletions
+				saturationContextInit.start();
+				Queue<SaturatedClassExpression> unSaturatedContexts = contextModificationListener
+						.getModifiedContexts();
+				for (SaturatedClassExpression saturation : unSaturatedContexts) {
+					saturationContextInit.submit(saturation);
+				}
+				saturationContextInit.waitCompletion();
+			}
+
+			if (additionMode || contextsCleaned) {
+				saturationAddition.start();
+				for (int i = 0; i < workerNo; i++) {
+					saturationAddition.submit(null);
+				}
+				saturationAddition.waitCompletion();
+				Statistics.logOperationFinish("Inferences re-application",
+						LOGGER_);
+				Statistics.logMemoryUsage(LOGGER_);
+				ruleReApplicationEngine.printStatistics();
+				if (LOGGER_.isDebugEnabled())
+					LOGGER_.debug("overall modified contexts: "
+							+ contextModificationListener.getModifiedContexts()
+									.size());
+				// marking all contexts as saturated
+				Queue<SaturatedClassExpression> modifiedContexts = contextModificationListener
+						.getModifiedContexts();
+				for (;;) {
+					SaturatedClassExpression context = modifiedContexts.poll();
+					if (context == null)
+						break;
+					context.setSaturated();
 				}
 			}
-			try {
-				saturationAdditionInit.waitCompletion();
-			} catch (InterruptedException e) {
-			}
-			Statistics.logOperationFinish("Inferences re-application init",
-					LOGGER_);
-			Statistics.logMemoryUsage(LOGGER_);
-			ruleReApplicationEngine.printStatistics();
-		}
-		// applying the changes in the index
-		ontologyIndex.getIndexChange().commit();
-		// initialization of re-application for deletions
-		Statistics.logOperationStart("Inferences re-application deleted init",
-				LOGGER_);
-		saturationAdditionInitDeleted.start();
-		Queue<SaturatedClassExpression> unSaturatedContexts = contextModificationListener
-				.getModifiedContexts();
-		for (SaturatedClassExpression saturation : unSaturatedContexts) {
-			try {
-				saturationAdditionInitDeleted.submit(saturation);
-			} catch (InterruptedException e) {
-			}
-		}
-		try {
-			saturationAdditionInitDeleted.waitCompletion();
-		} catch (InterruptedException e) {
-		}
-		Statistics.logOperationFinish("Inferences re-application deleted init",
-				LOGGER_);
-		Statistics.logMemoryUsage(LOGGER_);
-		ruleReApplicationEngine.printStatistics();
 
-		Statistics.logOperationStart("Inferences re-application", LOGGER_);
-		saturationAddition.start();
-		for (int i = 0; i < workerNo; i++) {
-			try {
-				saturationAddition.submit(null);
-			} catch (InterruptedException e) {
-			}
-		}
-		try {
-			saturationAddition.waitCompletion();
-		} catch (InterruptedException e) {
-		}
-		Statistics.logOperationFinish("Inferences re-application", LOGGER_);
-		Statistics.logMemoryUsage(LOGGER_);
-		ruleReApplicationEngine.printStatistics();
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("overall affected contexts: "
-					+ contextModificationListener.getModifiedContexts().size());
-		// marking all contexts as saturated
-		unSaturatedContexts = contextModificationListener.getModifiedContexts();
-		for (;;) {
-			SaturatedClassExpression context = unSaturatedContexts.poll();
-			if (context == null)
-				break;
-			context.setSaturated();
 		}
 
-		// classification
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Classification using " + workerNo + " workers");
-		Statistics.logOperationStart("Classification", LOGGER_);
+		// taxonomy computation
 		progressMonitor.start("Classification");
-
-		try {
-			objectPropertySaturation.compute();
-		} catch (InterruptedException e1) {
-		}
 
 		TaxonomyComputation taxonomyComputation = new TaxonomyComputation(
 				executor, workerNo, ontologyIndex);
 		progress = 0;
 		taxonomyComputation.start();
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
-			try {
-				taxonomyComputation.submit(ic);
-			} catch (InterruptedException e) {
-			}
+			taxonomyComputation.submit(ic);
 			progressMonitor.report(++progress, maxIndexedClassCount);
 		}
-		try {
-			taxonomyComputation.waitCompletion();
-		} catch (InterruptedException e) {
-		}
+		taxonomyComputation.waitCompletion();
 		classTaxonomy = taxonomyComputation.getClassTaxonomy();
 		progressMonitor.finish();
 		Statistics.logOperationFinish("Classification", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 		taxonomyComputation.printStatistics();
+
+		// trying to classify incrementally next time
+		incrementalMode = true;
 	}
 
-	public void classify() {
+	public void classify() throws InterruptedException {
 		classify(new DummyProgressMonitor());
 	}
 
@@ -345,117 +438,82 @@ public class Reasoner {
 		executor.shutdownNow();
 	}
 
-	class SaturationDeletionInit extends
+	/**
+	 * The computation to initialize modification of the saturations using
+	 * changes made in the index used for incremental classification
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	class SaturationChangesInit extends
 			ConcurrentComputation<SaturatedClassExpression> {
 
-		public SaturationDeletionInit(
+		public SaturationChangesInit(
 				ExecutorService executor,
 				int maxWorkers,
-				SaturationDeletionInitEngine<SaturatedClassExpression> saturationDeletionInitEngine) {
-			super(saturationDeletionInitEngine, executor, maxWorkers,
+				SaturationChangesInitEngine<SaturatedClassExpression> saturationChangesInitEngine) {
+			super(saturationChangesInitEngine, executor, maxWorkers,
 					8 * maxWorkers, 16);
 		}
 
-		public SaturationDeletionInit(ExecutorService executor, int maxWorkers,
-				RuleUnApplicationEngine ruleUnApplicationEngine) {
+		public SaturationChangesInit(ExecutorService executor, int maxWorkers,
+				IncrementalRuleApplicationEngine ruleApplicationEngine) {
 			this(executor, maxWorkers,
-					new SaturationDeletionInitEngine<SaturatedClassExpression>(
-							ruleUnApplicationEngine));
-		}
-
-	}
-
-	class SaturationDeletion extends ConcurrentComputation<Void> {
-
-		public SaturationDeletion(ExecutorService executor, int maxWorkers,
-				SaturationDeletionEngine saturationDeletionEngine) {
-			super(saturationDeletionEngine, executor, maxWorkers, maxWorkers, 1);
-		}
-
-		public SaturationDeletion(ExecutorService executor, int maxWorkers,
-				RuleUnApplicationEngine ruleUnApplicationEngine) {
-			this(executor, maxWorkers, new SaturationDeletionEngine(
-					ruleUnApplicationEngine));
-		}
-	}
-
-	class SaturationCleaning extends
-			ConcurrentComputation<SaturatedClassExpression> {
-
-		public SaturationCleaning(
-				ExecutorService executor,
-				int maxWorkers,
-				SaturationCleaningEngine<SaturatedClassExpression> saturationCleaningEngine) {
-			super(saturationCleaningEngine, executor, maxWorkers,
-					8 * maxWorkers, 16);
-		}
-
-		public SaturationCleaning(ExecutorService executor, int maxWorkers,
-				RuleCleaningEngine ruleCleaningEngine) {
-			this(executor, maxWorkers,
-					new SaturationCleaningEngine<SaturatedClassExpression>(
-							ruleCleaningEngine));
-		}
-	}
-
-	class SaturationAdditionInitDeleted extends
-			ConcurrentComputation<SaturatedClassExpression> {
-
-		public SaturationAdditionInitDeleted(
-				ExecutorService executor,
-				int maxWorkers,
-				SaturationAdditionInitDeletedEngine<SaturatedClassExpression> saturationAdditionInitDeletedEngine) {
-			super(saturationAdditionInitDeletedEngine, executor, maxWorkers,
-					8 * maxWorkers, 16);
-		}
-
-		public SaturationAdditionInitDeleted(ExecutorService executor,
-				int maxWorkers, RuleReApplicationEngine ruleReApplicationEngine) {
-			this(
-					executor,
-					maxWorkers,
-					new SaturationAdditionInitDeletedEngine<SaturatedClassExpression>(
-							ruleReApplicationEngine));
-		}
-
-	}
-
-	class SaturationAdditionInit extends
-			ConcurrentComputation<SaturatedClassExpression> {
-
-		public SaturationAdditionInit(
-				ExecutorService executor,
-				int maxWorkers,
-				SaturationAdditionInitEngine<SaturatedClassExpression> saturationAdditionInitEngine) {
-			super(saturationAdditionInitEngine, executor, maxWorkers,
-					8 * maxWorkers, 16);
-		}
-
-		public SaturationAdditionInit(ExecutorService executor, int maxWorkers,
-				RuleReApplicationEngine ruleReApplicationEngine) {
-			this(executor, maxWorkers,
-					new SaturationAdditionInitEngine<SaturatedClassExpression>(
-							ruleReApplicationEngine));
-		}
-
-	}
-
-	class SaturationAddition extends ConcurrentComputation<Void> {
-
-		public SaturationAddition(ExecutorService executor, int maxWorkers,
-				SaturationAdditionEngine saturationAdditionEngine) {
-			super(saturationAdditionEngine, executor, maxWorkers, maxWorkers, 1);
-		}
-
-		public SaturationAddition(ExecutorService executor, int maxWorkers,
-				RuleReApplicationEngine ruleReApplicationEngine) {
-			this(executor, maxWorkers, new SaturationAdditionEngine(
-					ruleReApplicationEngine));
+					new SaturationChangesInitEngine<SaturatedClassExpression>(
+							ruleApplicationEngine));
 		}
 	}
 
 	/**
-	 * Concurrent computation of the taxonomy
+	 * The computation to initialize computation of saturated class expressions
+	 * from the beginning used for incremental classification
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	class SaturationContextInit extends
+			ConcurrentComputation<SaturatedClassExpression> {
+
+		public SaturationContextInit(
+				ExecutorService executor,
+				int maxWorkers,
+				SaturationContextInitEngine<SaturatedClassExpression> saturationContextInitEngine) {
+			super(saturationContextInitEngine, executor, maxWorkers,
+					8 * maxWorkers, 16);
+		}
+
+		public SaturationContextInit(ExecutorService executor, int maxWorkers,
+				IncrementalRuleApplicationEngine ruleApplicationEngine) {
+			this(executor, maxWorkers,
+					new SaturationContextInitEngine<SaturatedClassExpression>(
+							ruleApplicationEngine));
+		}
+	}
+
+	/**
+	 * The computation to process the saturation used for incremental
+	 * classification
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	class SaturationProcessor extends ConcurrentComputation<Void> {
+
+		public SaturationProcessor(ExecutorService executor, int maxWorkers,
+				SaturationProcessEngine saturationProcessEngine) {
+			super(saturationProcessEngine, executor, maxWorkers, maxWorkers, 1);
+		}
+
+		public SaturationProcessor(ExecutorService executor, int maxWorkers,
+				IncrementalRuleApplicationEngine ruleApplicationEngine) {
+			this(executor, maxWorkers, new SaturationProcessEngine(
+					ruleApplicationEngine));
+		}
+	}
+
+	/**
+	 * Concurrent computation of the taxonomy which triggers saturation
+	 * computation if necessary
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 

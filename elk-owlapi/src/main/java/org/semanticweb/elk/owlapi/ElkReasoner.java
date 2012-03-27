@@ -144,6 +144,14 @@ public class ElkReasoner implements OWLReasoner {
 		reasoner.removeAxiom(owlConverter.convert(ax));
 	}
 
+	protected void addAxiomIncrementally(OWLAxiom ax) {
+		reasoner.addAxiomIncrementally(owlConverter.convert(ax));
+	}
+
+	protected void removeAxiomIncrementally(OWLAxiom ax) {
+		reasoner.removeAxiomIncrementally(owlConverter.convert(ax));
+	}
+
 	protected void syncOntology() {
 		if (!isSynced) {
 			reasoner.reset();
@@ -191,9 +199,9 @@ public class ElkReasoner implements OWLReasoner {
 			int currentAxiom = 0;
 			for (OWLOntologyChange change : pendingChanges) {
 				if (change instanceof AddAxiom)
-					addAxiom(change.getAxiom());
+					addAxiomIncrementally(change.getAxiom());
 				if (change instanceof RemoveAxiom) {
-					removeAxiom(change.getAxiom());
+					removeAxiomIncrementally(change.getAxiom());
 				}
 				currentAxiom++;
 				elkProgressMonitor.report(currentAxiom, axiomCount);
@@ -205,10 +213,15 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	protected void classifyOntology() {
-		reasoner.classify(elkProgressMonitor);
+		try {
+			reasoner.classify(elkProgressMonitor);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
-	protected ClassNode getElkClassNode(ElkClass cls) throws FreshEntitiesException {
+	protected ClassNode getElkClassNode(ElkClass cls)
+			throws FreshEntitiesException {
 		if (reasoner.getTaxonomy() == null)
 			classifyOntology();
 		ClassNode node = reasoner.getTaxonomy().getNode(cls);
@@ -536,8 +549,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	public boolean isConsistent() throws ReasonerInterruptedException,
 			TimeOutException {
-		return getElkClassNode(PredefinedElkClass.OWL_NOTHING) !=
-			getElkClassNode(PredefinedElkClass.OWL_THING);
+		return getElkClassNode(PredefinedElkClass.OWL_NOTHING) != getElkClassNode(PredefinedElkClass.OWL_THING);
 	}
 
 	public boolean isEntailed(OWLAxiom arg0)
