@@ -22,6 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -108,6 +112,19 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			superIndexedProperty
 					.removeToldSubObjectProperty(subIndexedProperty);
 		}
+	}
+	
+	@Override
+	public void indexDisjointClassExpressions(List<? extends ElkClassExpression> disjointsElk) {
+		Set<IndexedClassExpression> disjointsIndexed = new HashSet<IndexedClassExpression> (disjointsElk.size());
+		for (ElkClassExpression c : disjointsElk)
+			disjointsIndexed.add(c.accept(negativeIndexer));
+		
+		for (IndexedClassExpression ice : disjointsIndexed)
+			if (multiplicity == 1)
+				ice.addDisjoint(disjointsIndexed);
+			else
+				ice.removeDisjoint(disjointsIndexed);
 	}
 
 	@Override

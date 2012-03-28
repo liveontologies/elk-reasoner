@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -68,7 +68,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends Rul
 
 	public void applySCE(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
-		final List<IndexedObjectSomeValuesFrom> exists = argument.getExpression()
+		final Collection<IndexedObjectSomeValuesFrom> exists = argument.getExpression()
 				.getNegExistentials();
 
 		if (!context.derivePropagations || exists == null)

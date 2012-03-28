@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -98,6 +99,8 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	public abstract void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
+	
+	public abstract void indexDisjointClassExpressions(List<? extends ElkClassExpression> list);
 
 	public abstract void indexClassDeclaration(ElkClass ec);
 
@@ -315,10 +318,9 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 		return null;
 	}
 
-	public Void visit(ElkDisjointClassesAxiom elkDisjointClasses) {
-		throw new IndexingException(
-				ElkDisjointClassesAxiom.class.getSimpleName()
-						+ " not supported");
+	public Void visit(ElkDisjointClassesAxiom axiom) {
+		indexDisjointClassExpressions(axiom.getClassExpressions());
+		return null;
 	}
 
 	public Void visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
