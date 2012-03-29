@@ -22,12 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionEngine;
@@ -68,10 +62,6 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 * reduction
 	 */
 	protected final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
-	/**
-	 * The reference to cache the value of the top node for frequent use
-	 */
-	protected final AtomicReference<NonBottomNode> topNodeRef = new AtomicReference<NonBottomNode>();
 
 	/**
 	 * Creates a new class taxonomy engine for the input ontology index and a
@@ -167,36 +157,26 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 			TransitiveReductionOutputVisitor<IndexedClass> {
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
-			NonBottomNode node = taxonomy.getCreate(output.getEquivalent());
+			SatisfiableClassNode node = taxonomy.getCreate(output
+					.getEquivalent());
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSuperClasses()) {
-				NonBottomNode superNode = taxonomy
+				SatisfiableClassNode superNode = taxonomy
 						.getCreate(directSuperEquivalent.getEquivalent());
-				assignDirectSuperClassNode(node, superNode);
+				addDirectSuperClassNode(node, superNode);
 			}
-			// if there are no direct super nodes, then the top node is the only
-			// direct super node
-			if (node.getDirectSuperNodes().isEmpty()) {
-				NonBottomNode topNode = topNodeRef.get();
-				if (topNode == null) {
-					if (node.getMembers()
-							.contains(PredefinedElkClass.OWL_THING))
-						topNode = node;
-					else {
-						List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
-						topMembers.add(PredefinedElkClass.OWL_THING);
-						topNode = taxonomy.getCreate(topMembers);
-					}
-					topNodeRef.set(topNode);
-				}
-				if (node != topNode)
-					assignDirectSuperClassNode(node, topNode);
-			}
+			// if there are no direct super nodes, then the top node is the
+			// only direct super node
+			if (node.getDirectSuperNodes().isEmpty()
+					&& node != taxonomy.getTopNode())
+				addDirectSuperClassNode(node, taxonomy.getTopNode());
+			node.trySetNotModified();
 		}
 
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
-			taxonomy.unsatisfiableClasses.add(output.getRoot().getElkClass());
+			taxonomy.getUnsatisfiableClasses().add(
+					output.getRoot().getElkClass());
 		}
 
 		public void visit(
@@ -206,7 +186,7 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	}
 
 	/**
-	 * Connecting the given pair of nodes in sub/super-node relation. The method
+	 * Adding the given pair of nodes in sub/super-node relation. The method
 	 * should not be called concurrently for the same first argument.
 	 * 
 	 * @param subNode
@@ -215,16 +195,34 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 * @param superNode
 	 *            the node that should be the super-node of the first node
 	 */
-	void assignDirectSuperClassNode(NonBottomNode subNode,
-			NonBottomNode superNode) {
+	void addDirectSuperClassNode(SatisfiableClassNode subNode,
+			SatisfiableClassNode superNode) {
 		subNode.addDirectSuperNode(superNode);
-		/*
-		 * since super-nodes can be added from different nodes, this call should
-		 * be synchronized
-		 */
-		synchronized (superNode) {
-			superNode.addDirectSubNode(subNode);
-		}
+		superNode.addDirectSubNode(subNode);
+	}
+
+	/**
+	 * Removing the given pair of nodes from sub/super-node relation. The method
+	 * should not be called concurrently for the same first argument.
+	 * 
+	 * @param subNode
+	 *            the node to be removed from the sub-nodes of the second node
+	 * 
+	 * @param superNode
+	 *            the node to be removed from the super-nodes of the first node
+	 */
+	void removeDirectSuperClassNode(SatisfiableClassNode subNode,
+			SatisfiableClassNode superNode) {
+		subNode.removeDirectSuperNode(superNode);
+		superNode.removeDirectSubNode(subNode);
+	}
+
+	/**
+	 * @return the taxonomy cleaner engine for the taxonomy constructed by this
+	 *         engine
+	 */
+	public TaxonomyCleanerEngine getTaxonomyCleaner() {
+		return new TaxonomyCleanerEngine(taxonomy);
 	}
 
 }

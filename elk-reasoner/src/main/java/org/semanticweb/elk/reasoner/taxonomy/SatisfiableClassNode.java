@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -41,15 +42,13 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * Class for storing information about a class in the context of classification.
- * It is the main data container for ClassTaxonomy objects. Like most such data
- * containers in ELK, it is read-only for public access but provides
- * package-private ways of modifying it. Modifications of this class happen in
- * implementations of ClassTaxonomy only.
+ * A class to represent satisfiable class nodes, i.e., those that do not contain
+ * <tt>owl:Nothing</tt> as one of the members.
  * 
- * @author Yevgeny Kazakov
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public class NonBottomNode implements ClassNode {
+public class SatisfiableClassNode implements ClassNode {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger.getLogger(ClassNode.class);
@@ -62,17 +61,22 @@ public class NonBottomNode implements ClassNode {
 	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
 	 */
-	private final List<ElkClass> members;
+	protected final List<ElkClass> members;
 	/**
 	 * ElkClass nodes whose members are direct super-classes of the members of
 	 * this node.
 	 */
-	private final Set<ClassNode> directSuperNodes;
+	private final Set<SatisfiableClassNode> directSuperNodes;
 	/**
 	 * ElkClass nodes, except for the bottom node, whose members are direct
 	 * sub-classes of the members of this node.
 	 */
-	private final Set<ClassNode> directSubNodes;
+	private final Set<SatisfiableClassNode> directSubNodes;
+	/**
+	 * <tt>true</tt> if the direct super-nodes of this node need to be
+	 * recomputed
+	 */
+	private final AtomicBoolean modified;
 
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
@@ -83,40 +87,98 @@ public class NonBottomNode implements ClassNode {
 	 * @param members
 	 *            non-empty list of equivalent ElkClass objects
 	 */
-	protected NonBottomNode(ConcurrentClassTaxonomy taxonomy,
+	protected SatisfiableClassNode(ConcurrentClassTaxonomy taxonomy,
 			Collection<ElkClass> members) {
 		this.taxonomy = taxonomy;
 		this.members = new ArrayList<ElkClass>(members);
-		this.directSubNodes = new ArrayHashSet<ClassNode>();
-		this.directSuperNodes = new ArrayHashSet<ClassNode>();
+		this.directSubNodes = new ArrayHashSet<SatisfiableClassNode>();
+		this.directSuperNodes = new ArrayHashSet<SatisfiableClassNode>();
 		Collections.sort(this.members, Comparators.ELK_CLASS_COMPARATOR);
+		this.modified = new AtomicBoolean(true);
 	}
 
 	/**
-	 * Add a direct super-class node. This method is not thread safe.
+	 * Add a direct super-class node.
 	 * 
 	 * @param superNode
 	 *            node to add
 	 */
-	void addDirectSuperNode(NonBottomNode superNode) {
+	synchronized void addDirectSuperNode(SatisfiableClassNode superNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct super-node " + superNode);
 		directSuperNodes.add(superNode);
 	}
 
 	/**
-	 * Add a direct sub-class node. This method is not thread safe.
+	 * Remove a direct super-class node.
+	 * 
+	 * @param superNode
+	 *            node to remove
+	 */
+	synchronized void removeDirectSuperNode(SatisfiableClassNode superNode) {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(this + ": removed direct super-node " + superNode);
+		directSuperNodes.remove(superNode);
+	}
+
+	/**
+	 * Removes all direct super nodes of this node
+	 */
+	void clearSuperNodes() {
+		directSuperNodes.clear();
+	}
+
+	/**
+	 * Add a direct sub-class node.
 	 * 
 	 * @param subNode
 	 *            node to add
 	 */
-	void addDirectSubNode(NonBottomNode subNode) {
+	synchronized void addDirectSubNode(SatisfiableClassNode subNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct sub-node " + subNode);
 		if (directSubNodes.isEmpty()) {
-			this.taxonomy.countNodesWithSubClasses.incrementAndGet();
+			this.taxonomy.incrementCountNodesWithSubClasses();
 		}
 		directSubNodes.add(subNode);
+	}
+
+	/**
+	 * Remove a direct sub-class node.
+	 * 
+	 * @param subNode
+	 *            node to remove
+	 */
+	synchronized void removeDirectSubNode(SatisfiableClassNode subNode) {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(this + ": removed direct sub-node " + subNode);
+		directSubNodes.remove(subNode);
+		if (directSubNodes.isEmpty()) {
+			this.taxonomy.decrementCountNodesWithSubClasses();
+		}
+	}
+
+	/**
+	 * Removes all direct satisfiable sub-class nodes of this node
+	 */
+	synchronized void clearSatisfiableSubNodes() {
+		directSubNodes.clear();
+	}
+
+	Set<SatisfiableClassNode> getDirectSatisfiableSubNodes() {
+		return directSubNodes;
+	}
+
+	boolean trySetModified() {
+		return modified.compareAndSet(false, true);
+	}
+
+	boolean trySetNotModified() {
+		return modified.compareAndSet(true, false);
+	}
+
+	public boolean isModified() {
+		return modified.get();
 	}
 
 	public Set<ElkClass> getMembers() {
@@ -190,7 +252,7 @@ public class NonBottomNode implements ClassNode {
 		return members.get(0);
 	}
 
-	public Set<ClassNode> getDirectSuperNodes() {
+	public Set<SatisfiableClassNode> getDirectSuperNodes() {
 		return Collections.unmodifiableSet(directSuperNodes);
 	}
 
@@ -211,7 +273,7 @@ public class NonBottomNode implements ClassNode {
 		return Collections.unmodifiableSet(result);
 	}
 
-	public Set<ClassNode> getDirectSubNodes() {
+	public Set<? extends ClassNode> getDirectSubNodes() {
 		if (!directSubNodes.isEmpty()) {
 			return Collections.unmodifiableSet(directSubNodes);
 		} else {

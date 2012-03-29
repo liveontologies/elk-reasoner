@@ -28,6 +28,9 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkPropertyAxiom;
 import org.semanticweb.elk.reasoner.incremental.ContextModificationListener;
 import org.semanticweb.elk.reasoner.incremental.IncrementalRuleApplicationEngine;
@@ -40,8 +43,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.rules.ObjectPropertySaturation;
 import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyEngine;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyCleanerEngine;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.logging.Statistics;
 
@@ -58,10 +63,6 @@ public class Reasoner {
 	 * indexed representation of the ontology
 	 */
 	protected final OntologyIndex ontologyIndex;
-	/**
-	 * the object used for computing the taxonomy
-	 */
-	protected final TaxonomyComputation taxonomyComputation;
 	/**
 	 * the listener used for collecting information about modified contexts
 	 * during incremental classification
@@ -110,9 +111,14 @@ public class Reasoner {
 	 */
 	protected final SaturationProcessor saturationAddition;
 	/**
-	 * the linked to the class taxonomy computed by the reasoner
+	 * computation of the taxonomy
 	 */
-	protected ClassTaxonomy classTaxonomy;
+	protected final TaxonomyComputation taxonomyComputation;
+	/**
+	 * cleaning of the taxonomy
+	 */
+	protected final TaxonomyCleaner taxonomyCleaner;
+
 	/**
 	 * if <tt>true</tt> the next classification will be performed incrementally
 	 */
@@ -125,8 +131,6 @@ public class Reasoner {
 		this.executor = executor;
 		this.workerNo = workerNo;
 		this.ontologyIndex = new OntologyIndexImpl();
-		this.taxonomyComputation = new TaxonomyComputation(executor, workerNo,
-				ontologyIndex);
 		this.contextModificationListener = new ContextModificationListener();
 		this.ruleDeApplicationEngine = new IncrementalRuleApplicationEngine(
 				ontologyIndex, contextModificationListener, true, true);
@@ -152,18 +156,16 @@ public class Reasoner {
 		this.saturationAddition = new SaturationProcessor(executor, workerNo,
 				ruleReApplicationEngine);
 
-		incrementalMode = true;
+		this.taxonomyComputation = new TaxonomyComputation(executor, workerNo,
+				ontologyIndex);
+		this.taxonomyCleaner = taxonomyComputation.getTaxonomyCleaner();
 
-		reset();
+		incrementalMode = true;
 	}
 
 	public Reasoner() {
 		this(Executors.newCachedThreadPool(), Runtime.getRuntime()
 				.availableProcessors());
-	}
-
-	public void reset() {
-		classTaxonomy = null;
 	}
 
 	public OntologyIndex getOntologyIndex() {
@@ -176,7 +178,7 @@ public class Reasoner {
 	 *         done yet
 	 */
 	public ClassTaxonomy getTaxonomy() {
-		return classTaxonomy;
+		return taxonomyComputation.getClassTaxonomy();
 	}
 
 	/**
@@ -200,7 +202,6 @@ public class Reasoner {
 	public void addAxiom(ElkAxiom axiom) {
 		switchOffIncrementalMode();
 		ontologyIndex.getDirectAxiomInserter().process(axiom);
-		classTaxonomy = null;
 	}
 
 	/**
@@ -215,47 +216,50 @@ public class Reasoner {
 	public void removeAxiom(ElkAxiom axiom) {
 		switchOffIncrementalMode();
 		ontologyIndex.getDirectAxiomDeleter().process(axiom);
-		classTaxonomy = null;
 	}
 
 	/**
 	 * Loads an axiom to the reasoner incrementally; the next classification
 	 * will be performed incrementally unless some axiom has been loaded or
 	 * removed non-incrementally since the last classification. Incremental
-	 * addition for instances of {@link ElkPropertyAxiom} is currently not
-	 * supported. When this method is called for such an axiom, addition will be
-	 * done non-incrementally.
+	 * addition for instances of {@link ElkObjectPropertyAxiom},
+	 * {@link ElkDataPropertyAxiom}, and {@link ElkPropertyAxiom} is currently
+	 * not supported. When this method is called for such an axiom, addition
+	 * will be done non-incrementally.
 	 * 
 	 * @param axiom
 	 */
 	public void addAxiomIncrementally(ElkAxiom axiom) {
-		if (axiom instanceof ElkPropertyAxiom<?>)
+		if (axiom instanceof ElkObjectPropertyAxiom
+				|| axiom instanceof ElkDataPropertyAxiom
+				|| axiom instanceof ElkPropertyAxiom<?>)
 			switchOffIncrementalMode();
 		if (incrementalMode)
 			ontologyIndex.getIncrementalAxiomInserter().process(axiom);
 		else
 			ontologyIndex.getDirectAxiomInserter().process(axiom);
-		classTaxonomy = null;
 	}
 
 	/**
 	 * Removes an axiom from the reasoner incrementally; the next classification
 	 * will be performed incrementally unless some axiom has been loaded or
 	 * removed non-incrementally since the last classification. Incremental
-	 * removal for instances of {@link ElkPropertyAxiom} is currently not
-	 * supported. When this method is called for such an axiom, removal will be
-	 * done non-incrementally.
+	 * addition for instances of {@link ElkObjectPropertyAxiom},
+	 * {@link ElkDataPropertyAxiom}, and {@link ElkPropertyAxiom} is currently
+	 * not supported. When this method is called for such an axiom, removal will
+	 * be done non-incrementally.
 	 * 
 	 * @param axiom
 	 */
 	public void removeAxiomIncrementally(ElkAxiom axiom) {
-		if (axiom instanceof ElkPropertyAxiom<?>)
+		if (axiom instanceof ElkObjectPropertyAxiom
+				|| axiom instanceof ElkDataPropertyAxiom
+				|| axiom instanceof ElkPropertyAxiom<?>)
 			switchOffIncrementalMode();
 		if (incrementalMode)
 			ontologyIndex.getIncrementalAxiomDeleter().process(axiom);
 		else
 			ontologyIndex.getDirectAxiomDeleter().process(axiom);
-		classTaxonomy = null;
 	}
 
 	public void classify(ProgressMonitor progressMonitor)
@@ -272,17 +276,33 @@ public class Reasoner {
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("Classification using " + workerNo + " workers");
 
-		Statistics.logOperationStart("Classification", LOGGER_);
-		objectPropertySaturation.compute();
-
 		if (!incrementalMode) {
+			Statistics.logOperationStart("Classification", LOGGER_);
+			taxonomyComputation.getClassTaxonomy().clear();
+			objectPropertySaturation.compute();
+
 			// discarding all previously computed saturations
 			for (IndexedClassExpression ice : ontologyIndex
 					.getIndexedClassExpressions()) {
 				ice.resetSaturated();
 			}
+
+			// taxonomy computation
+			progressMonitor.start("Classification");
+			progress = 0;
+			taxonomyComputation.start();
+			for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
+				taxonomyComputation.submit(ic);
+				progressMonitor.report(++progress, maxIndexedClassCount);
+			}
+			taxonomyComputation.waitCompletion();
+			progressMonitor.finish();
+			Statistics.logOperationFinish("Classification", LOGGER_);
+			Statistics.logMemoryUsage(LOGGER_);
+			taxonomyComputation.printStatistics();
+
 		} else {
-			// incremental classification
+			Statistics.logOperationStart("Incremental classification", LOGGER_);
 
 			boolean deletionMode = !ontologyIndex.getIndexChange()
 					.getIndexDeletions().isEmpty();
@@ -395,36 +415,53 @@ public class Reasoner {
 					LOGGER_.debug("overall modified contexts: "
 							+ contextModificationListener.getModifiedContexts()
 									.size());
-				// marking all contexts as saturated
+
+				// updating the taxonomy
+				Statistics.logOperationStart("Taxonomy update", LOGGER_);
+				// cleaning the taxonomy using modified contexts
+				taxonomyCleaner.start();
 				Queue<SaturatedClassExpression> modifiedContexts = contextModificationListener
 						.getModifiedContexts();
+				// marking modified contexts as saturated and submitting those
+				// whose roots are classes to the taxonomy cleaner
 				for (;;) {
 					SaturatedClassExpression context = modifiedContexts.poll();
 					if (context == null)
 						break;
 					context.setSaturated();
+					IndexedClassExpression root = context.getRoot();
+					if (root instanceof IndexedClass) {
+						taxonomyCleaner.submit(((IndexedClass) root)
+								.getElkClass());
+					}
 				}
+				// cleaning the taxonomy for the removed classes
+				for (ElkClass elkClass : ontologyIndex.getIndexChange()
+						.getRemovedClasses()) {
+					taxonomyCleaner.submit(elkClass);
+				}
+				taxonomyCleaner.waitCompletion();
+
+				taxonomyComputation.start();
+				ClassTaxonomy taxonomy = taxonomyComputation.getClassTaxonomy();
+				for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
+					ClassNode node = taxonomy.getNode(ic.getElkClass());
+					if (node == null || node.isModified())
+						taxonomyComputation.submit(ic);
+				}
+				taxonomyComputation.waitCompletion();
+				// we do not need the changes in the signature anymore
+				ontologyIndex.getIndexChange().clearSignatureChange();
+
+				Statistics.logOperationFinish("Taxonomy update", LOGGER_);
+				Statistics.logMemoryUsage(LOGGER_);
+
 			}
-
+			Statistics
+					.logOperationFinish("Incremental classification", LOGGER_);
+			Statistics.logMemoryUsage(LOGGER_);
+			taxonomyComputation.printStatistics();
 		}
-
-		// taxonomy computation
-		progressMonitor.start("Classification");
-
-		TaxonomyComputation taxonomyComputation = new TaxonomyComputation(
-				executor, workerNo, ontologyIndex);
-		progress = 0;
-		taxonomyComputation.start();
-		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
-			taxonomyComputation.submit(ic);
-			progressMonitor.report(++progress, maxIndexedClassCount);
-		}
-		taxonomyComputation.waitCompletion();
-		classTaxonomy = taxonomyComputation.getClassTaxonomy();
-		progressMonitor.finish();
-		Statistics.logOperationFinish("Classification", LOGGER_);
-		Statistics.logMemoryUsage(LOGGER_);
-		taxonomyComputation.printStatistics();
 
 		// trying to classify incrementally next time
 		incrementalMode = true;
@@ -540,5 +577,28 @@ public class Reasoner {
 		public void printStatistics() {
 			classTaxonomyEngine.printStatistics();
 		}
+
+		public TaxonomyCleaner getTaxonomyCleaner() {
+			return new TaxonomyCleaner(executor, maxWorkers,
+					classTaxonomyEngine);
+		}
 	}
+
+	class TaxonomyCleaner extends ConcurrentComputation<ElkClass> {
+
+		final TaxonomyCleanerEngine classTaxonomyCleaner;
+
+		public TaxonomyCleaner(ExecutorService executor, int maxWorkers,
+				TaxonomyCleanerEngine classTaxonomyCleaner) {
+			super(classTaxonomyCleaner, executor, maxWorkers, 8 * maxWorkers,
+					16);
+			this.classTaxonomyCleaner = classTaxonomyCleaner;
+		}
+
+		public TaxonomyCleaner(ExecutorService executor, int maxWorkers,
+				ClassTaxonomyEngine classTaxonomyEngine) {
+			this(executor, maxWorkers, classTaxonomyEngine.getTaxonomyCleaner());
+		}
+	}
+
 }

@@ -22,9 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
@@ -44,22 +47,40 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
 public class IndexChange {
 
 	/**
-	 * A map from indexed class expression to index class expression objects
-	 * whose fields represent deleted entries for these class expressions
+	 * The map representing entries to be added to the ontology index; it maps
+	 * indexed class expression to dummy index class expression objects whose
+	 * fields represent the added entries for these class expressions
 	 */
 	final Map<IndexedClassExpression, IndexedClassExpressionChange> indexAdditions;
+
+	/**
+	 * The map representing entries to be removed from the ontology index; it
+	 * maps indexed class expression to dummy index class expression objects
+	 * whose fields represent the removed entries for these class expressions
+	 */
+	final Map<IndexedClassExpression, IndexedClassExpressionChange> indexDeletions;
+
+	/**
+	 * The list of ELK classes to be added to the signature of the ontology; the
+	 * new signature of the ontology will be obtained by {@link #addedClasses}
+	 * and removing {@link #removedClasses}; these sets are not necessarily
+	 * disjoint.
+	 */
+	final List<ElkClass> addedClasses;
+
+	/**
+	 * The list of ELK classes to be removed from the signature of the ontology;
+	 * the new signature of the ontology will be obtained by
+	 * {@link #addedClasses} and removing {@link #removedClasses}; these sets
+	 * are not necessarily disjoint.
+	 */
+	final List<ElkClass> removedClasses;
 
 	/**
 	 * The index updater which is used to commit all saved changes to the
 	 * respective objects;
 	 */
 	final IndexUpdater directIndexUpdater;
-
-	/**
-	 * A map from indexed class expression to index class expressions whose
-	 * fields represent added entries for these class expressions
-	 */
-	final Map<IndexedClassExpression, IndexedClassExpressionChange> indexDeletions;
 
 	/**
 	 * @return the map from indexed class expressions to the corresponding
@@ -118,11 +139,29 @@ public class IndexChange {
 		return result;
 	}
 
+	/**
+	 * @return the list of ELK classes to be added to the signature of the
+	 *         ontology
+	 */
+	public List<ElkClass> getAddedClasses() {
+		return this.addedClasses;
+	}
+
+	/**
+	 * @return the list of ELK classes to be removed from the signature of the
+	 *         ontology
+	 */
+	public List<ElkClass> getRemovedClasses() {
+		return this.removedClasses;
+	}
+
 	public IndexChange() {
 		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, IndexedClassExpressionChange>(
 				127);
 		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, IndexedClassExpressionChange>(
 				127);
+		this.addedClasses = new ArrayList<ElkClass>(127);
+		this.removedClasses = new ArrayList<ElkClass>(127);
 		this.directIndexUpdater = new DirectIndexUpdater();
 	}
 
@@ -173,6 +212,10 @@ public class IndexChange {
 				}
 		}
 		indexAdditions.clear();
+	}
 
+	public void clearSignatureChange() {
+		addedClasses.clear();
+		removedClasses.clear();
 	}
 }

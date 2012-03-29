@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
@@ -130,6 +131,14 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 			IndexedObjectProperty superObjectProperty) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void addClass(ElkClass newClass) {
+		indexChange.addedClasses.add(newClass);
+	}
+
+	public void removeClass(ElkClass oldClass) {
+		indexChange.removedClasses.add(oldClass);
 	}
 
 }

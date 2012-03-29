@@ -71,9 +71,18 @@ public class IndexedClass extends IndexedClassExpression {
 	@Override
 	protected void updateOccurrenceNumbers(IndexUpdater indexUpdater,
 			int increment, int positiveIncrement, int negativeIncrement) {
+
+		if (occurrenceNo == 0 && increment > 0) {
+			indexUpdater.addClass(elkClass);
+		}
+
 		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
+
+		if (occurrenceNo == 0 && increment < 0) {
+			indexUpdater.removeClass(elkClass);
+		}
 	}
 
 	@Override

@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -44,8 +43,10 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 
 /**
- * Class taxonomy that is suitable for concurrent processing. It also implements
- * method for the bottom node.
+ * Class taxonomy that is suitable for concurrent processing. It also represents
+ * the bottom class node of this taxonomy, i.e., the class node containing all
+ * unsatisfiable classes of the taxonomy as the members (including
+ * <tt>owl:NoThing</tt>).
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
@@ -57,28 +58,47 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ConcurrentClassTaxonomy.class);
 
-	/* thread safe map from class IRIs to class nodes */
-	protected final ConcurrentMap<String, NonBottomNode> nodeLookup;
-	/* thread safe set of all nodes */
-	protected final Set<ClassNode> allNodes;
-	/* boolean to guard access to the set of all nodes */
-	protected final AtomicBoolean processingNewNodes;
-	/* counts the number of nodes which have non-bottom sub-classes */
-	protected final AtomicInteger countNodesWithSubClasses;
-	/* thread safe set of unsatisfiable classes */
-	protected final Set<ElkClass> unsatisfiableClasses;
+	/** thread safe map from class IRIs to class nodes */
+	private final ConcurrentMap<String, SatisfiableClassNode> nodeLookup;
+	/** thread safe set of all nodes */
+	private final Set<ClassNode> allNodes;
+	/** counts the number of nodes which have non-bottom sub-classes */
+	private final AtomicInteger countNodesWithSubClasses;
+	/** thread safe set of unsatisfiable classes */
+	private final Set<ElkClass> unsatisfiableClasses;
+	/**
+	 * the reference to the top node of this taxonomy
+	 */
+	private final TopClassNode topClassNode;
+
+	// TODO: how to represent an inconsistent ontology?
 
 	ConcurrentClassTaxonomy() {
-		this.nodeLookup = new ConcurrentHashMap<String, NonBottomNode>();
+		this.nodeLookup = new ConcurrentHashMap<String, SatisfiableClassNode>();
 		this.allNodes = Collections
 				.newSetFromMap(new ConcurrentHashMap<ClassNode, Boolean>());
 		allNodes.add(this);
-		this.processingNewNodes = new AtomicBoolean(false);
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 		this.unsatisfiableClasses = Collections
 				.synchronizedSet(new TreeSet<ElkClass>(
 						Comparators.ELK_CLASS_COMPARATOR));
 		this.unsatisfiableClasses.add(PredefinedElkClass.OWL_NOTHING);
+		this.topClassNode = new TopClassNode(this);
+		nodeLookup.put(getKey(topClassNode.getCanonicalMember()), topClassNode);
+		allNodes.add(topClassNode);
+	}
+
+	public void clear() {
+		this.nodeLookup.clear();
+		this.allNodes.clear();
+		allNodes.add(this);
+		this.countNodesWithSubClasses.set(0);
+		this.unsatisfiableClasses.clear();
+		this.unsatisfiableClasses.add(PredefinedElkClass.OWL_NOTHING);
+		this.topClassNode.clearMembers();
+		this.topClassNode.clearSatisfiableSubNodes();
+		nodeLookup.put(getKey(topClassNode.getCanonicalMember()), topClassNode);
+		allNodes.add(topClassNode);
 	}
 
 	public Set<ClassNode> getNodes() {
@@ -102,8 +122,18 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	 *            the class for which to find the node non-bottom
 	 * @return the non-bottom node for the given {@link ElkClass}
 	 */
-	protected NonBottomNode getNonBottomNode(ElkClass elkClass) {
+	protected SatisfiableClassNode getSatisfiableClassNode(ElkClass elkClass) {
 		return nodeLookup.get(getKey(elkClass));
+	}
+
+	protected void removeSatisfiableClassNode(ElkClass elkClass) {
+		nodeLookup.remove(getKey(elkClass));
+	}
+
+	protected boolean removeNode(SatisfiableClassNode node) {
+		if (!node.equals(topClassNode))
+			return allNodes.remove(node);
+		return false;
 	}
 
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
@@ -116,34 +146,65 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	 * @return ClassNode object for elkClass, possibly still incomplete
 	 */
 	public ClassNode getNode(ElkClass elkClass) {
-		ClassNode result = getNonBottomNode(elkClass);
+		ClassNode result = getSatisfiableClassNode(elkClass);
 		if (result != null)
 			return result;
 		if (unsatisfiableClasses.contains(elkClass))
 			return this;
-		LOGGER_.error("No taxonomy node for class "
-				+ elkClass.getIri().asString());
+		// LOGGER_.error("No taxonomy node for class "
+		// + elkClass.getIri().asString());
 		return null;
 	}
 
-	NonBottomNode getCreate(Collection<ElkClass> members) {
-		NonBottomNode node = new NonBottomNode(this, members);
-		// we assign first for the node to the canonical member to avoid
-		// concurrency problems
-		ElkClass canonical = node.getCanonicalMember();
-		NonBottomNode previous = nodeLookup
-				.putIfAbsent(getKey(canonical), node);
-		if (previous != null)
-			return previous;		
-		allNodes.add(node);
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(canonical + ": node created");
+	public TopClassNode getTopNode() {
+		return topClassNode;
+	}
+
+	public ClassNode getBottomNode() {
+		return this;
+	}
+
+	SatisfiableClassNode getCreate(Collection<ElkClass> members) {
+		SatisfiableClassNode result = new SatisfiableClassNode(this, members);
+		ElkClass canonical = result.getCanonicalMember();
+
+		// check if it is a top node
+		if (canonical.equals(PredefinedElkClass.OWL_THING)) {
+			if (members.size() > topClassNode.getMembers().size())
+				topClassNode.setMembers(members);
+			result = topClassNode;
+		} else {
+			// we assign first for the node to the canonical member to avoid
+			// concurrency problems
+			SatisfiableClassNode previous = nodeLookup.putIfAbsent(
+					getKey(canonical), result);
+			if (previous != null)
+				return previous;
+			allNodes.add(result);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(canonical + ": node created");
+			}
 		}
 		for (ElkClass member : members) {
 			if (member != canonical)
-				nodeLookup.put(getKey(member), node);
+				nodeLookup.put(getKey(member), result);
 		}
-		return node;
+		return result;
+	}
+
+	/**
+	 * @return the set of unsatisfiable classes of this taxonomy
+	 */
+	Set<ElkClass> getUnsatisfiableClasses() {
+		return this.unsatisfiableClasses;
+	}
+
+	void incrementCountNodesWithSubClasses() {
+		countNodesWithSubClasses.incrementAndGet();
+	}
+
+	void decrementCountNodesWithSubClasses() {
+		countNodesWithSubClasses.decrementAndGet();
 	}
 
 	/* functions required by the {@link ClassNode} representing the bottom node */
@@ -192,6 +253,12 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 
 	public ClassTaxonomy getTaxonomy() {
 		return this;
+	}
+
+	public boolean isModified() {
+		// always returns true since there is no way to know if all nodes in the
+		// taxonomy are constructed
+		return true;
 	}
 
 }

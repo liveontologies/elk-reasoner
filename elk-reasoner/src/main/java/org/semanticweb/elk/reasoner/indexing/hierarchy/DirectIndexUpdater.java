@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
@@ -131,6 +132,12 @@ class DirectIndexUpdater implements IndexUpdater {
 				target.toldSuperProperties = null;
 		}
 		return success;
+	}
+
+	public void addClass(ElkClass newClass) {
+	}
+
+	public void removeClass(ElkClass oldClass) {
 	}
 
 }

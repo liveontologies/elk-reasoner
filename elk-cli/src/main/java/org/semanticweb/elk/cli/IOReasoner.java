@@ -49,8 +49,7 @@ public class IOReasoner extends Reasoner {
 	public void loadOntologyFromStream(InputStream stream)
 			throws ParseException, IOException {
 		Statistics.logOperationStart("Loading", LOGGER_);
-
-		reset();
+		incrementalMode = false;
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
 		parser.setPrefixDeclarations(new ElkPrefixDeclarationsImpl());
 		parser.ontologyDocument(ontologyIndex.getDirectAxiomInserter());

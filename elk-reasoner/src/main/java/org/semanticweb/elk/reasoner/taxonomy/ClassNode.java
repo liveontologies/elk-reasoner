@@ -25,7 +25,18 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 
+/**
+ * An object representing a primitive taxonomic entry. A class node is
+ * essentially a maximal set of equivalent classes of the taxonomy. In addition
+ * to the members of this equivalent class, the node contain information about
+ * the direct sub-classes and super-classes of the members (which are the same
+ * for all members and are closed under concept equivalence). This are stored as
+ * sets of direct sub-class nodes and super-class nodes.
+ * 
+ * @author Yevgeny Kazakov
+ */
 public interface ClassNode {
 
 	/**
@@ -34,12 +45,12 @@ public interface ClassNode {
 	 * 
 	 * @return collection of equivalent ElkClass objects
 	 */
-	public Set<ElkClass> getMembers();
+	public Set<? extends ElkClass> getMembers();
 
 	/**
 	 * Get one ElkClass object to canonically represent the classes in this
 	 * ClassNode. It is guaranteed that the least object is the least one
-	 * according to the ordering defined by PredefinedElkIri.compare().
+	 * according to the ordering defined by {@link PredefinedElkIri#compare()}.
 	 * 
 	 * @return canonical ElkClass object
 	 */
@@ -51,7 +62,7 @@ public interface ClassNode {
 	 * 
 	 * @return list of nodes for direct super-classes of this node members
 	 */
-	public Set<ClassNode> getDirectSuperNodes();
+	public Set<? extends ClassNode> getDirectSuperNodes();
 
 	/**
 	 * Computes an unmodifiable set of nodes for ElkClass objects that are
@@ -61,7 +72,7 @@ public interface ClassNode {
 	 * 
 	 * @return set of nodes for sub-classes of this node members
 	 */
-	public Set<ClassNode> getAllSuperNodes();
+	public Set<? extends ClassNode> getAllSuperNodes();
 
 	/**
 	 * Get an unmodifiable set of nodes for ElkClass objects that are direct
@@ -69,7 +80,7 @@ public interface ClassNode {
 	 * 
 	 * @return list of nodes for direct sub-classes of this node members
 	 */
-	public Set<ClassNode> getDirectSubNodes();
+	public Set<? extends ClassNode> getDirectSubNodes();
 
 	/**
 	 * Computes an unmodifiable set of nodes for ElkClass objects that are
@@ -79,7 +90,7 @@ public interface ClassNode {
 	 * 
 	 * @return set of nodes for sub-classes of this node members
 	 */
-	public Set<ClassNode> getAllSubNodes();
+	public Set<? extends ClassNode> getAllSubNodes();
 
 	/**
 	 * Returns the class taxonomy to which this node belongs.
@@ -87,4 +98,10 @@ public interface ClassNode {
 	 * @return the class taxonomy to which this node belongs
 	 */
 	public ClassTaxonomy getTaxonomy();
+
+	/**
+	 * @return <tt>true</tt> if the direct super-nodes of this node need to be
+	 *         recomputed
+	 */
+	boolean isModified();
 }

@@ -154,7 +154,6 @@ public class ElkReasoner implements OWLReasoner {
 
 	protected void syncOntology() {
 		if (!isSynced) {
-			reasoner.reset();
 			try {
 				Set<OWLOntology> importsClosure = owlOntology
 						.getImportsClosure();

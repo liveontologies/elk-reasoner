@@ -48,10 +48,25 @@ public interface ClassTaxonomy {
 	public ClassNode getNode(ElkClass elkClass);
 
 	/**
+	 * @return the top node of this taxonomy
+	 */
+	public ClassNode getTopNode();
+
+	/**
+	 * @return the bottom node of this taxonomy
+	 */
+	public ClassNode getBottomNode();
+
+	/**
 	 * Obtain an unmodifiable Set of all nodes in this ClassTaxonomy.
 	 * 
 	 * @return an unmodifiable Collection
 	 */
 	public Set<ClassNode> getNodes();
+
+	/**
+	 * Reverts the taxonomy into the original state
+	 */
+	public void clear();
 
 }

@@ -85,7 +85,7 @@ public class ElkConverter {
 		return new OWLClassNode(owlClasses);
 	}
 
-	public OWLClassNodeSet convert(Iterable<ClassNode> nodes) {
+	public OWLClassNodeSet convert(Iterable<? extends ClassNode> nodes) {
 		Set<Node<OWLClass>> owlNodes = new HashSet<Node<OWLClass>>();
 		for (ClassNode node : nodes) {
 			owlNodes.add(convert(node));
