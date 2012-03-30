@@ -20,19 +20,20 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * @author Frantisek Simancik
  * 
  */
-class ForwardLink extends Pair<IndexedPropertyChain, Linkable> implements
-		Queueable {
+public class ForwardLink<C extends ContextElClassSaturation> extends
+		Pair<IndexedPropertyChain, C> implements Queueable<C> {
 
-	public ForwardLink(IndexedPropertyChain relation, Linkable target) {
+	public ForwardLink(IndexedPropertyChain relation, C target) {
 		super(relation, target);
 	}
 
@@ -40,12 +41,21 @@ class ForwardLink extends Pair<IndexedPropertyChain, Linkable> implements
 		return first;
 	}
 
-	public Linkable getTarget() {
+	public C getTarget() {
 		return second;
 	}
 
-	public <O> O accept(QueueableVisitor<O> visitor) {
-		return visitor.visit(this);
+	public boolean storeInContext(C context) {
+		// forwLinkInfNo.incrementAndGet();
+
+		if (context.forwardLinksByObjectProperty == null)
+			context.initForwardLinksByProperty();
+
+		if (context.forwardLinksByObjectProperty.add(first, second)) {
+			// forwLinkNo.incrementAndGet();
+			return true;
+		}
+		return false;
 	}
 
 }

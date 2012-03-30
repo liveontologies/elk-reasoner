@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,20 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.classes;
+
+import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 
 /**
- * Common interface for object that can be linked to during
- * ClassExpressionSaturation. SaturatedClassExpression is the
- * only Linkable class in the current implementation.
+ * Inference rule with a PositiveSuperClassExpressions as an argument.
  * 
  * @author Frantisek Simancik
  *
  */
-public interface Linkable {
+public interface InferenceRulePosSCE<C extends ContextElClassSaturation> extends InferenceRule<C> {
+	
+	void applySCE(PositiveSuperClassExpression<C> argument, C context,
+			RuleApplicationEngine engine);
 
 }

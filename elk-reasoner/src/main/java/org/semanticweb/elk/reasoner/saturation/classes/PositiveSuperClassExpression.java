@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,32 +20,22 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.classes;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.util.collections.Pair;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
+ * Kind of SuperClassExpression to which decomposition rules need to be applied.
+ * 
  * @author Frantisek Simancik
  * 
  */
-class BackwardLink extends Pair<IndexedPropertyChain, Linkable> implements
-		Queueable {
+public class PositiveSuperClassExpression<C extends ContextElClassSaturation>
+		extends SuperClassExpression<C> {
 
-	public BackwardLink(IndexedPropertyChain relation, Linkable target) {
-		super(relation, target);
-	}
-
-	public IndexedPropertyChain getRelation() {
-		return first;
-	}
-
-	public Linkable getTarget() {
-		return second;
-	}
-
-	public <O> O accept(QueueableVisitor<O> visitor) {
-		return visitor.visit(this);
+	public PositiveSuperClassExpression(
+			IndexedClassExpression superClassExpression) {
+		super(superClassExpression);
 	}
 
 }

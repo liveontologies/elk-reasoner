@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
@@ -172,9 +173,73 @@ public class ReasonerTest extends TestCase {
 						taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
 								"http://example.org/X")))));
 	}
+	
+	public void testBottom() throws InterruptedException,
+			ExecutionException, ParseException, IOException {
+		
+		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner
+				.loadOntologyFromString(""//
+						+ "Prefix( : = <http://example.org/> )"//
+						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:C ObjectSomeValuesFrom(:S :A))"//
+						+ "SubClassOf(:B owl:Nothing)"//
+						+ ")"//
+				);
+
+		IOReasoner.classify();
+		
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/C"));
+		
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+
+		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
+		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
+		assertSame("C unsatisfiable", bottom, taxonomy.getNode(c));
+	}
+	
+	public void testDisjoint() throws InterruptedException,
+	ExecutionException, ParseException, IOException {
+
+		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner
+		.loadOntologyFromString(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "SubClassOf(:A :C)"//
+				+ "SubClassOf(:B :C)"//
+				+ "DisjointClasses(:A :B :C)"//
+				+ ")"//
+		);
+
+		IOReasoner.classify();
+
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/C"));
+
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+
+		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
+		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
+		assertNotSame("C satisfiable", bottom, taxonomy.getNode(c));
+	}
 
 	public void testAncestors() throws InterruptedException,
-			ExecutionException, ParseException, IOException {
+	ExecutionException, ParseException, IOException {
 
 		final IOReasoner IOReasoner = new IOReasoner();
 		IOReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"

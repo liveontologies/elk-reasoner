@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,22 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.classes;
+
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
- * Common interface for objects that can be queued during
- * ClassExpressionSaturation.
+ * King of SuperClassExpression that was obtained by composition rules. 
+ * Decomposition rules do not need to by applied to this.
  * 
  * @author Frantisek Simancik
+ *
  */
-public interface Queueable {
-	<O> O accept(QueueableVisitor<O> visitor);
+public class NegativeSuperClassExpression<C extends ContextElClassSaturation> extends SuperClassExpression<C>  {
+	
+	public NegativeSuperClassExpression(
+			IndexedClassExpression superClassExpression) {
+		super(superClassExpression);
+	}
+
 }

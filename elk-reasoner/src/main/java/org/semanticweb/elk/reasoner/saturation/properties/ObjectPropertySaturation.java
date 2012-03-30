@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.rules;
+package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.ArrayDeque;
 import java.util.concurrent.ExecutorService;
@@ -89,16 +89,16 @@ public class ObjectPropertySaturation {
 
 					SaturatedPropertyChain right = rightSubProperty
 							.getSaturated();
-					if (right.propertyCompositionsByLeftSubProperty == null)
-						right.propertyCompositionsByLeftSubProperty = new HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain>();
-					right.propertyCompositionsByLeftSubProperty.add(
+					if (right.compositionsByLeftSubProperty == null)
+						right.compositionsByLeftSubProperty = new HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain>();
+					right.compositionsByLeftSubProperty.add(
 							leftSubProperty, chain);
 
 					SaturatedPropertyChain left = leftSubProperty
 							.getSaturated();
-					if (left.propertyCompositionsByRightSubProperty == null)
-						left.propertyCompositionsByRightSubProperty = new HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain>();
-					left.propertyCompositionsByRightSubProperty.add(
+					if (left.compositionsByRightSubProperty == null)
+						left.compositionsByRightSubProperty = new HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain>();
+					left.compositionsByRightSubProperty.add(
 							rightSubProperty, chain);
 
 					/*

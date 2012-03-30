@@ -23,15 +23,15 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.rules.Derivable;
-import org.semanticweb.elk.reasoner.rules.QueueableVisitor;
-import org.semanticweb.elk.reasoner.rules.SaturatedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -49,15 +49,17 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression implements Derivable {
+abstract public class IndexedClassExpression {
 
 	/**
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
 	 * is a List.
 	 */
 	protected List<IndexedClassExpression> toldSuperClassExpressions;
+
 	protected Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
-	protected List<IndexedObjectSomeValuesFrom> negExistentials;
+	protected Collection<IndexedObjectSomeValuesFrom> negExistentials;
+	protected Collection<Set<IndexedClassExpression>> disjoints;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -74,7 +76,8 @@ abstract public class IndexedClassExpression implements Derivable {
 	protected int negativeOccurrenceNo = 0;
 
 	/**
-	 * This method should always return true apart from intermediate steps during the indexing.
+	 * This method should always return true apart from intermediate steps
+	 * during the indexing.
 	 * 
 	 * @return true if the represented class expression occurs in the ontology
 	 */
@@ -83,14 +86,16 @@ abstract public class IndexedClassExpression implements Derivable {
 	}
 
 	/**
-	 * @return true if the represented class expression occurs negatively in the ontology
+	 * @return true if the represented class expression occurs negatively in the
+	 *         ontology
 	 */
 	public boolean occursNegatively() {
 		return negativeOccurrenceNo > 0;
 	}
 
 	/**
-	 * @return true if the represented class expression occurs positively in the ontologu
+	 * @return true if the represented class expression occurs positively in the
+	 *         ontologu
 	 */
 	public boolean occursPositively() {
 		return positiveOccurrenceNo > 0;
@@ -98,7 +103,7 @@ abstract public class IndexedClassExpression implements Derivable {
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
-	 */ 
+	 */
 	protected abstract void updateOccurrenceNumbers(int increment,
 			int positiveIncrement, int negativeIncrement);
 
@@ -122,8 +127,16 @@ abstract public class IndexedClassExpression implements Derivable {
 	 * @return Indexed existentials that occur negatively and have this class
 	 *         expression as the filler, possibly null.
 	 */
-	public List<IndexedObjectSomeValuesFrom> getNegExistentials() {
+	public Collection<IndexedObjectSomeValuesFrom> getNegExistentials() {
 		return negExistentials;
+	}
+
+	/**
+	 * @return Each returned set is a group of mutually disjoint
+	 *         class expressions including this class expression. Possibly null.
+	 */
+	public Collection<Set<IndexedClassExpression>> getDisjoints() {
+		return disjoints;
 	}
 
 	protected void addToldSuperClassExpression(
@@ -196,37 +209,56 @@ abstract public class IndexedClassExpression implements Derivable {
 		return success;
 	}
 
-	
-	// TODO: replace pointers to contexts by a mapping
-	
-	/**
-	 * Used for efficient retrieval of the Context corresponding to this class expression.  
-	 */
-	protected final AtomicReference<SaturatedClassExpression> saturated = new AtomicReference<SaturatedClassExpression>();
-
-	/**
-	 * @return The corresponding SaturatedClassExpression, null if none was
-	 *         assigned.
-	 */
-	public SaturatedClassExpression getSaturated() {
-		return saturated.get();
+	protected void addDisjoint(Set<IndexedClassExpression> disjointSet) {
+		if (disjoints == null)
+			disjoints = new ArrayList<Set<IndexedClassExpression>>(1);
+		disjoints.add(disjointSet);
 	}
 
 	/**
-	 * Sets the corresponding SaturatedClassExpression if none was yet assigned.
+	 * @param existential
+	 * @return true if successfully removed
+	 */
+	protected boolean removeDisjoint(Set<IndexedClassExpression> disjointSet) {
+		boolean success = false;
+		if (disjoints != null) {
+			success = disjoints.remove(disjointSet);
+			if (disjoints.isEmpty())
+				disjoints = null;
+		}
+		System.err.println(success);
+		return success;
+	}
+
+	// TODO: replace pointers to contexts by a mapping
+
+	/**
+	 * Used for efficient retrieval of the Context corresponding to this class
+	 * expression.
+	 */
+	protected final AtomicReference<Context> context = new AtomicReference<Context>();
+
+	/**
+	 * @return The corresponding context, null if none was assigned.
+	 */
+	public Context getContext() {
+		return context.get();
+	}
+
+	/**
+	 * Sets the corresponding context if none was yet assigned.
 	 * 
 	 * @return True if the operation succeeded.
 	 */
-	public boolean setSaturated(
-			SaturatedClassExpression saturatedClassExpression) {
-		return saturated.compareAndSet(null, saturatedClassExpression);
+	public boolean setContext(Context context) {
+		return this.context.compareAndSet(null, context);
 	}
 
 	/**
-	 * Resets the corresponding SaturatedClassExpression to null.
+	 * Resets the corresponding context to null.
 	 */
-	public void resetSaturated() {
-		saturated.set(null);
+	public void resetContext() {
+		context.set(null);
 	}
 
 	/** Hash code for this object. */
@@ -243,10 +275,6 @@ abstract public class IndexedClassExpression implements Derivable {
 	}
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
-
-	public <O> O accept(QueueableVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
 
 	@Override
 	public abstract String toString();
