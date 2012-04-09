@@ -130,8 +130,10 @@ import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
+import org.semanticweb.elk.owl.parsing.Owl2Parser;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 
-public class Owl2FunctionalStyleParser {
+public class Owl2FunctionalStyleParser implements Owl2Parser {
 
 	/**
 	 * Object factory used for creation of ELK Objects.
@@ -158,6 +160,17 @@ public class Owl2FunctionalStyleParser {
 	public void setPrefixDeclarations(ElkPrefixDeclarations prefixDeclarations) {
 		this.prefixDeclarations = prefixDeclarations;
 	}
+	
+        /**
+         * The main parse method
+         */
+        public void parseOntology(final ElkAxiomProcessor processor) throws Owl2ParseException {
+        	try {
+				ontologyDocument(processor);
+			} catch (ParseException e) {
+				throw new Owl2ParseException(e);
+			}
+        }
 
 }
 
