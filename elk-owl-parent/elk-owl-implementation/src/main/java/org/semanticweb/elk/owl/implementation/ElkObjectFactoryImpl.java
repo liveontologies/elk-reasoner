@@ -23,6 +23,7 @@
 package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
@@ -65,6 +66,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
@@ -841,4 +843,11 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						objectPropertyExpression));
 	}
 
+	@Override
+	public ElkHasKeyAxiom getHasKeyAxiom(ElkClassExpression classExpr,
+			Set<ElkObjectPropertyExpression> objectPEs,
+			Set<ElkDataPropertyExpression> dataPEs) {
+
+		return (ElkHasKeyAxiom)objectManager.getCanonicalElkObject(new ElkHasKeyAxiomImpl(classExpr, objectPEs, dataPEs));
+	}
 }

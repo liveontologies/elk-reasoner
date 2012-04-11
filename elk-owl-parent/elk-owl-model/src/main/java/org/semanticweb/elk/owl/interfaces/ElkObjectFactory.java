@@ -26,6 +26,7 @@
 package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.iris.ElkIri;
 
@@ -959,5 +960,17 @@ public interface ElkObjectFactory {
 	 */
 	public abstract ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
+	
+	/**
+	 * Create an {@link ElkHasKeyAxiom}
+	 * 
+	 * @param classExpr
+	 * @param objectPEs
+	 * @param dataPEs
+	 * @return
+	 */
+	public abstract ElkHasKeyAxiom getHasKeyAxiom(	ElkClassExpression classExpr,
+													Set<ElkObjectPropertyExpression> objectPEs,
+													Set<ElkDataPropertyExpression> dataPEs);
 
 }

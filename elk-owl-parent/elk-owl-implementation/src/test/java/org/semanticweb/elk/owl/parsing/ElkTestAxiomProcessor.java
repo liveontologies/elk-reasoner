@@ -48,7 +48,9 @@ public class ElkTestAxiomProcessor implements ElkAxiomProcessor {
 	
 	@Override
 	public void process(ElkAxiom elkAxiom) {
-		if (elkAxiom == null) return;
+		if (elkAxiom == null) {
+			return;
+		}
 		//assert elkAxiom != null : "The parser failed to parse an axiom";
 		//System.out.println(OwlFunctionalStylePrinter.toString(elkAxiom));
 		

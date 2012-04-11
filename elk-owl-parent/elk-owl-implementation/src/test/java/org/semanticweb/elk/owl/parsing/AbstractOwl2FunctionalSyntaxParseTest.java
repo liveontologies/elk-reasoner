@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.owl.parsing;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -39,7 +40,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkAsymmetricObjectPropertyAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkClassAssertionAxiomImpl;
@@ -58,9 +58,11 @@ import org.semanticweb.elk.owl.implementation.ElkInverseFunctionalObjectProperty
 import org.semanticweb.elk.owl.implementation.ElkInverseObjectPropertiesAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkIrreflexiveObjectPropertyAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkNegativeDataPropertyAssertionAxiomImpl;
+import org.semanticweb.elk.owl.implementation.ElkNegativeObjectPropertyAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkObjectPropertyAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkObjectPropertyDomainAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkObjectPropertyRangeAxiomImpl;
+import org.semanticweb.elk.owl.implementation.ElkReflexiveObjectPropertyAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkSameIndividualAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkSubClassOfAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkSubObjectPropertyOfAxiomImpl;
@@ -149,7 +151,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		}
 		
 		for (Map.Entry<Class<?>, Integer> expectedEntry : axiomTypeCounts.entrySet()) {			
-			System.err.println(expectedEntry.getValue() + " axioms of the type " + expectedEntry.getKey() + " were not parsed");
+			System.err.println(expectedEntry.getValue() + " axiom(s) of the type " + expectedEntry.getKey() + " were not parsed");
 			error = true;
 		}
 		
@@ -179,7 +181,6 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 	/*
 	 * See if we can parse the OWL2 primer sample ontology
 	 */
-	@Ignore
 	@Test
 	public void testOWL2Primer() throws Exception {
 		InputStream input = getInputOntology("owl2primer.owl");
@@ -204,7 +205,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		
 		expectedCountMap.put(ElkSymmetricObjectPropertyAxiomImpl.class, 1);
 		expectedCountMap.put(ElkAsymmetricObjectPropertyAxiomImpl.class, 1);
-		//expectedCountMap.put(ElkReflexiveObjectPropertyAxiom.class, 1);
+		expectedCountMap.put(ElkReflexiveObjectPropertyAxiomImpl.class, 1);
 		expectedCountMap.put(ElkIrreflexiveObjectPropertyAxiomImpl.class, 1);
 		
 		expectedCountMap.put(ElkFunctionalObjectPropertyAxiomImpl.class, 1);
@@ -215,11 +216,11 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		
 		//expectedCountMap.put(ElkHasKeyAxiomImpl.class, 1);
 		
-		//TODO What's the deal with datatype definitions?
+		//FIXME Add tests for datatype definitions and keys
 		
 		expectedCountMap.put(ElkClassAssertionAxiomImpl.class, 9);
 		expectedCountMap.put(ElkObjectPropertyAssertionAxiomImpl.class, 1);
-		//expectedCountMap.put(ElkNegativeObjectPropertyAssertionAxiom.class, 2);
+		expectedCountMap.put(ElkNegativeObjectPropertyAssertionAxiomImpl.class, 2);
 		expectedCountMap.put(ElkDataPropertyAssertionAxiomImpl.class, 1);
 		expectedCountMap.put(ElkNegativeDataPropertyAssertionAxiomImpl.class, 1);
 		
