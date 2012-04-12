@@ -41,6 +41,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
@@ -353,14 +354,19 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 	
-	
-
 	@Override
 	public Void visit(ElkHasKeyAxiom elkHasKey) {
 		throw new IndexingException(
 				ElkHasKeyAxiom.class.getSimpleName()
 						+ " not supported");
 	}
+	
+	@Override
+	public Void visit(ElkDatatypeDefinitionAxiom elkDatatypeDefn) {
+		throw new IndexingException(
+				ElkHasKeyAxiom.class.getSimpleName()
+						+ " not supported");
+	}	
 
 	/* (non-Javadoc)
 	 * @see org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom)

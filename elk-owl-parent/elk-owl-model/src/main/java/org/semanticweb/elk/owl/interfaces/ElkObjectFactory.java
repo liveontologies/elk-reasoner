@@ -972,5 +972,14 @@ public interface ElkObjectFactory {
 	public abstract ElkHasKeyAxiom getHasKeyAxiom(	ElkClassExpression classExpr,
 													Set<ElkObjectPropertyExpression> objectPEs,
 													Set<ElkDataPropertyExpression> dataPEs);
+	
+	/**
+	 * Create an {@link ElkDatatypeDefinitionAxiom}
+	 * 
+	 * @param datatype
+	 * @param dataRange
+	 * @return
+	 */
+	public abstract ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom( ElkDatatype datatype, ElkDataRange dataRange);	
 
 }

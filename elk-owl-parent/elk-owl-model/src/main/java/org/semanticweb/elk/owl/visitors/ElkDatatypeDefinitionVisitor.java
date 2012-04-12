@@ -20,19 +20,20 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * 
+ */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 
 /**
- * Visitor pattern interface for instances of {@link ElkHasKeyAxiom}.
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  *
  */
-public interface ElkHasKeyAxiomVisitor<O> {
+public interface ElkDatatypeDefinitionVisitor<O> {
 
-	O visit(ElkHasKeyAxiom elkHasKey);
+	O visit(ElkDatatypeDefinitionAxiom datatypeDefn);
 }

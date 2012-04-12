@@ -52,6 +52,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
@@ -849,5 +850,11 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			Set<ElkDataPropertyExpression> dataPEs) {
 
 		return (ElkHasKeyAxiom)objectManager.getCanonicalElkObject(new ElkHasKeyAxiomImpl(classExpr, objectPEs, dataPEs));
+	}
+	
+	@Override
+	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom( ElkDatatype datatype, ElkDataRange dataRange) {
+		
+		return 	(ElkDatatypeDefinitionAxiom)objectManager.getCanonicalElkObject(new ElkDatatypeDefinitionAxiomImpl(datatype, dataRange));
 	}
 }

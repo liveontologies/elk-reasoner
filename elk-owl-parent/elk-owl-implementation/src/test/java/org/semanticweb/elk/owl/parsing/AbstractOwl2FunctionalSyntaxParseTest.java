@@ -46,6 +46,7 @@ import org.semanticweb.elk.owl.implementation.ElkClassAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyDomainAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyRangeAxiomImpl;
+import org.semanticweb.elk.owl.implementation.ElkDatatypeDefinitionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDifferentIndividualsAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDisjointClassesAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDisjointObjectPropertiesAxiomImpl;
@@ -54,6 +55,7 @@ import org.semanticweb.elk.owl.implementation.ElkEquivalentDataPropertiesAxiomIm
 import org.semanticweb.elk.owl.implementation.ElkEquivalentObjectPropertiesAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkFunctionalDataPropertyAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkFunctionalObjectPropertyAxiomImpl;
+import org.semanticweb.elk.owl.implementation.ElkHasKeyAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkInverseFunctionalObjectPropertyAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkInverseObjectPropertiesAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkIrreflexiveObjectPropertyAxiomImpl;
@@ -214,9 +216,8 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		expectedCountMap.put(ElkTransitiveObjectPropertyAxiomImpl.class, 1);
 		expectedCountMap.put(ElkFunctionalDataPropertyAxiomImpl.class, 1);
 		
-		//expectedCountMap.put(ElkHasKeyAxiomImpl.class, 1);
-		
-		//FIXME Add tests for datatype definitions and keys
+		expectedCountMap.put(ElkHasKeyAxiomImpl.class, 1);
+		expectedCountMap.put(ElkDatatypeDefinitionAxiomImpl.class, 3);
 		
 		expectedCountMap.put(ElkClassAssertionAxiomImpl.class, 9);
 		expectedCountMap.put(ElkObjectPropertyAssertionAxiomImpl.class, 1);
@@ -228,6 +229,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		expectedCountMap.put(ElkDifferentIndividualsAxiomImpl.class, 1);
 		
 		checkAxiomTypeCounts(counter, expectedCountMap, false);
+		assertEquals(109L, counter.getTotalAxiomCount());
 	}
 	
 	

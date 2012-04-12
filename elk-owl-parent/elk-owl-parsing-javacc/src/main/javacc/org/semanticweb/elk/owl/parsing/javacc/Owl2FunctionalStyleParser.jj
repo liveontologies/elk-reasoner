@@ -128,6 +128,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
@@ -1281,7 +1282,7 @@ ElkAxiom axiom():
 	| x = classAxiom()
 	| x = objectPropertyAxiom()
 	| x = dataPropertyAxiom()
-	| datatypeDefinition()
+	| x = datatypeDefinition()
 	| x = hasKey()
 	| x = assertion()
 	| x = annotationAxiom()
@@ -1706,13 +1707,18 @@ ElkFunctionalDataPropertyAxiom functionalDataProperty():
 }
 
 /* 9.4 Datatype Definitions */
-void datatypeDefinition():
-{}{
+ElkDatatypeDefinitionAxiom datatypeDefinition():
+{
+	ElkDatatype dt = null;
+	ElkDataRange dr = null;
+}{
 	<DATATYPE_DEFINITION> <OPEN_BRACKET>
 		axiomAnnotations()
-		datatype()
-		dataRange()
-	<CLOSE_BRACKET>
+		dt = datatype()
+		dr = dataRange()
+	<CLOSE_BRACKET> {
+		return objectFactory.getDatatypeDefinitionAxiom(dt, dr);
+	}
 }
 
 /* 9.5 Keys */

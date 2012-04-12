@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
  */
 public interface ElkAxiomVisitor<O> extends
 		ElkClassAxiomVisitor<O>,
+		ElkDatatypeDefinitionVisitor<O>,
 		ElkHasKeyAxiomVisitor<O>,
 		ElkObjectPropertyAxiomVisitor<O>,
 		ElkDataPropertyAxiomVisitor<O>,
