@@ -43,6 +43,9 @@ PARSER_BEGIN(Owl2FunctionalStyleParser)
 package org.semanticweb.elk.owl.parsing.javacc;
 
 import java.util.Vector;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collection;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
@@ -124,6 +127,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
@@ -820,6 +824,15 @@ ElkObjectPropertyExpression objectPropertyExpression():
 	) { return x; }
 }
 
+void addObjectPropertyExpression(Collection<ElkObjectPropertyExpression> opexprs):
+{
+	ElkObjectPropertyExpression x;
+}{
+	(
+	x = objectPropertyExpression()
+	) { opexprs.add(x); }
+}
+
 /* 6.1.1 Inverse Object Properties */
 ElkObjectInverseOf inverseObjectProperty():
 {
@@ -840,6 +853,13 @@ ElkDataPropertyExpression dataPropertyExpression():
 	x = dataProperty() { return x; }
 }
 
+
+void addDataPropertyExpression(Collection<ElkDataPropertyExpression> dpexprs):
+{
+	ElkDataPropertyExpression x;
+}{
+	x = dataProperty() { dpexprs.add(x); }
+}
 
 /* 7 Data Ranges */
 
@@ -1262,7 +1282,7 @@ ElkAxiom axiom():
 	| x = objectPropertyAxiom()
 	| x = dataPropertyAxiom()
 	| datatypeDefinition()
-	| hasKey()
+	| x = hasKey()
 	| x = assertion()
 	| x = annotationAxiom()
 	) { return x; }
@@ -1438,6 +1458,7 @@ Vector<ElkObjectPropertyExpression> objectPropertyExpressionList():
 	( x = objectPropertyExpression() { v.add(x); } )+
 	{ return v; }
 }
+
 
 /* 9.2.4 Inverse Object Properties */
 ElkInverseObjectPropertiesAxiom inverseObjectProperties():
@@ -1640,6 +1661,7 @@ Vector<ElkDataPropertyExpression> dataPropertyExpressionList():
 	{ return v; }
 }
 
+
 /* 9.3.4 Data Property Domain */
 ElkDataPropertyDomainAxiom dataPropertyDomain():
 {
@@ -1694,14 +1716,20 @@ void datatypeDefinition():
 }
 
 /* 9.5 Keys */
-void hasKey():
-{}{
+ElkHasKeyAxiom hasKey():
+{
+	ElkClassExpression ce = null;
+	Set<ElkObjectPropertyExpression> opexprs = new HashSet<ElkObjectPropertyExpression>();
+	Set<ElkDataPropertyExpression> dpexprs = new HashSet<ElkDataPropertyExpression>();
+}{
 	<HAS_KEY> <OPEN_BRACKET>
 		axiomAnnotations()
-		classExpression()
-		<OPEN_BRACKET> ( objectPropertyExpression() )* <CLOSE_BRACKET>
-		<OPEN_BRACKET> ( dataPropertyExpression() )* <CLOSE_BRACKET>
-	<CLOSE_BRACKET>
+		ce = classExpression()
+		<OPEN_BRACKET> ( addObjectPropertyExpression(opexprs) )* <CLOSE_BRACKET>
+		<OPEN_BRACKET> ( addDataPropertyExpression(dpexprs) )* <CLOSE_BRACKET>
+	<CLOSE_BRACKET> {
+		return objectFactory.getHasKeyAxiom(ce, opexprs, dpexprs);
+	}
 }
 
 /* 9.6 Assertions */
