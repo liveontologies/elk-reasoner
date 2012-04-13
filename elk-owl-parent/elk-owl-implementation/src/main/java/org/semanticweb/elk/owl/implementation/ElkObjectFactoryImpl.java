@@ -198,13 +198,6 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 						classExpression, individual));
 	}
 
-	public ElkDataAllValuesFrom getDataAllValuesFrom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkDataRange dataRange) {
-		return (ElkDataAllValuesFrom) objectManager
-				.getCanonicalElkObject(new ElkDataAllValuesFromImpl(
-						dataPropertyExpression, dataRange));
-	}
 
 	public ElkDataComplementOf getDataComplementOf(ElkDataRange dataRange) {
 		return (ElkDataComplementOf) objectManager
@@ -316,14 +309,6 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkDataRange dataRange) {
 		return (ElkDataPropertyRangeAxiom) objectManager
 				.getCanonicalElkObject(new ElkDataPropertyRangeAxiomImpl(
-						dataPropertyExpression, dataRange));
-	}
-
-	public ElkDataSomeValuesFrom getDataSomeValuesFrom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkDataRange dataRange) {
-		return (ElkDataSomeValuesFrom) objectManager
-				.getCanonicalElkObject(new ElkDataSomeValuesFromImpl(
 						dataPropertyExpression, dataRange));
 	}
 
@@ -857,4 +842,32 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 		
 		return 	(ElkDatatypeDefinitionAxiom)objectManager.getCanonicalElkObject(new ElkDatatypeDefinitionAxiomImpl(datatype, dataRange));
 	}
+
+	@Override
+	public ElkDataAllValuesFrom getDataAllValuesFrom(
+			ElkDataRange dataRange,
+			ElkDataPropertyExpression dpe1,
+			ElkDataPropertyExpression... dpe) {
+		return (ElkDataAllValuesFrom)objectManager.getCanonicalElkObject(
+				new ElkDataAllValuesFromImpl(ElkObjectListObject.varArgsToList(dpe1, dpe), dataRange));
+	}
+
+	@Override
+	public ElkDataAllValuesFrom getDataAllValuesFrom(	ElkDataRange dataRange,
+														List<? extends ElkDataPropertyExpression> dpList) {
+		return (ElkDataAllValuesFrom)objectManager.getCanonicalElkObject(new ElkDataAllValuesFromImpl(dpList, dataRange));
+	}	
+	
+	@Override
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
+			ElkDataPropertyExpression dpe1, ElkDataPropertyExpression... dpe) {
+		return (ElkDataSomeValuesFrom)objectManager.getCanonicalElkObject(
+				new ElkDataSomeValuesFromImpl(ElkObjectListObject.varArgsToList(dpe1, dpe), dataRange));
+	}
+	
+	@Override
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(	ElkDataRange dataRange,
+														List<? extends ElkDataPropertyExpression> dpList) {
+		return (ElkDataSomeValuesFrom)objectManager.getCanonicalElkObject(new ElkDataSomeValuesFromImpl(dpList, dataRange));
+	}	
 }

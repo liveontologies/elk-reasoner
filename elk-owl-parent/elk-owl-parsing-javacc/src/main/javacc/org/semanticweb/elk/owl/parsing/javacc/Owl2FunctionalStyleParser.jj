@@ -1170,30 +1170,65 @@ ElkObjectExactCardinality objectExactCardinality():
 /* 8.4.1 Existential Quantification */
 ElkDataSomeValuesFrom dataSomeValuesFrom():
 {
-	ElkDataPropertyExpression x;
-	ElkDataRange y;
+	Vector<ElkDataPropertyExpression> dpList = new Vector<ElkDataPropertyExpression>();
+	ElkDataRange dr;
+	ElkDataSomeValuesFrom result = null;
 }{
 	<DATA_SOME_VALUES_FROM> <OPEN_BRACKET>
-		x = dataPropertyExpression()
-		//(LOOKAHEAD( 2 ) dataPropertyExpression() )+ // TODO: nary data ranges not supported in ELK so far
-		y = dataRange()
-	<CLOSE_BRACKET> {
-		return objectFactory.getDataSomeValuesFrom(x, y);
+		addDataPropertyExpression(dpList)
+		result = dataSomeValuesFromSuffix(dpList)
+	{
+		return result;
 	}
 }
+
+ElkDataSomeValuesFrom dataSomeValuesFromSuffix(Vector<ElkDataPropertyExpression> dpList):
+{
+	ElkDataRange dr = null;
+	ElkDataSomeValuesFrom result = null;
+}{
+	(
+	LOOKAHEAD(3)
+	dr = dataRange() <CLOSE_BRACKET>
+	| 	(	addDataPropertyExpression(dpList)
+			result = dataSomeValuesFromSuffix(dpList)
+		) 
+	)
+	{
+		return objectFactory.getDataSomeValuesFrom(dr, dpList);
+	}
+}
+
 
 /* 8.4.2 Universal Quantification */
 ElkDataAllValuesFrom dataAllValuesFrom():
 {
-	ElkDataPropertyExpression x;
-	ElkDataRange y;
+	Vector<ElkDataPropertyExpression> dpList = new Vector<ElkDataPropertyExpression>();
+	ElkDataRange dr;
+	ElkDataAllValuesFrom result = null;
 }{
 	<DATA_ALL_VALUES_FROM> <OPEN_BRACKET>
-		x = dataPropertyExpression()
-		//(LOOKAHEAD( 2 ) dataPropertyExpression() )+ // TODO: nary data ranges not supported in ELK so far
-		y = dataRange()
-	<CLOSE_BRACKET> {
-		return objectFactory.getDataAllValuesFrom(x, y);
+		addDataPropertyExpression(dpList)
+		result = dataAllValuesFromSuffix(dpList)
+	{
+		return result;
+	}
+}
+
+ElkDataAllValuesFrom dataAllValuesFromSuffix(Vector<ElkDataPropertyExpression> dpList):
+{
+	ElkDataRange dr = null;
+	ElkDataAllValuesFrom result = null;
+}{
+	(
+	LOOKAHEAD(3)
+	dr = dataRange() <CLOSE_BRACKET>
+	| 	(	addDataPropertyExpression(dpList)
+			result = dataAllValuesFromSuffix(dpList)
+		) 
+	)
+	{
+		return objectFactory.getDataAllValuesFrom(dr, dpList);
 	}
 }
 

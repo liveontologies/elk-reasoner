@@ -32,8 +32,6 @@ package org.semanticweb.elk.owl.interfaces;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDataSomeValuesFrom
-		extends
-		ElkPropertyRestrictionQualified<ElkDataPropertyExpression, ElkDataRange> {
+public interface ElkDataSomeValuesFrom 	extends ElkDataPropertyListRestrictionQualified {
 
 }

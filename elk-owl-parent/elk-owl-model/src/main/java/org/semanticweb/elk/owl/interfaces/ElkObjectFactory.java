@@ -91,13 +91,19 @@ public interface ElkObjectFactory {
 	/**
 	 * Create an {@link ElkDataAllValuesFrom}.
 	 * 
-	 * @param dataPropertyExpression
 	 * @param dataRange
+	 * @param dpe1
+	 * @param dpe
 	 * @return
 	 */
 	public abstract ElkDataAllValuesFrom getDataAllValuesFrom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkDataRange dataRange);
+			ElkDataRange dataRange,
+			ElkDataPropertyExpression dpe1,
+			ElkDataPropertyExpression... dpe);
+	
+	public abstract ElkDataAllValuesFrom getDataAllValuesFrom(
+			ElkDataRange dataRange,
+			List<? extends ElkDataPropertyExpression> dpList);	
 
 	/**
 	 * Create an {@link ElkDataComplementOf}.
@@ -267,15 +273,21 @@ public interface ElkObjectFactory {
 			ElkDataRange dataRange);
 
 	/**
-	 * Create an {@link ElkDataSomeValuesFrom}.
+	 * Create an {@link ElkDataSomeValuesFrom}
 	 * 
-	 * @param dataPropertyExpression
 	 * @param dataRange
+	 * @param dpe1
+	 * @param dpe
 	 * @return
 	 */
 	public abstract ElkDataSomeValuesFrom getDataSomeValuesFrom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkDataRange dataRange);
+			ElkDataRange dataRange,
+			ElkDataPropertyExpression dpe1,
+			ElkDataPropertyExpression... dpe);
+	
+	public abstract ElkDataSomeValuesFrom getDataSomeValuesFrom(
+			ElkDataRange dataRange,
+			List<? extends ElkDataPropertyExpression> dpList);
 
 	/**
 	 * Create an {@link ElkDatatype}.

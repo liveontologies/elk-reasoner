@@ -252,20 +252,24 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 	
 	@Test
 	public void testOntologyDocument() throws Owl2ParseException {
-		String testString = "Prefix ( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )"
-				+ "Prefix ( xsd: = <http://www.w3.org/2001/XMLSchema#> )"
-				+ "Ontology(<http://www.example.org/>"
+		String testString = "Prefix ( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )\n"
+				+ "Prefix ( a: = <http://www.example.org#> )\n"
+				+ "Prefix ( xsd: = <http://www.w3.org/2001/XMLSchema#> )\n"
+				+ "Ontology(<http://www.example.org/>\n"
 				// Testing if literal parsing is ambiguous
-				+ "Annotation(rdfs:comment \"String literal with langauge\"@en)"
-				+ "Annotation(rdfs:comment \"String literal no language\")"
-				+ "Annotation(rdfs:label \"Typed literal\"^^xsd:string)"
+				+ "Annotation(rdfs:comment \"String literal with language\"@en)\n"
+				+ "Annotation(rdfs:comment \"String literal no language\")\n"
+				+ "Annotation(rdfs:label \"Typed literal\"^^xsd:string)\n"
 				// Testing if DataSomeValuesFrom parsing is ambiguous
-				// + "SubClassOf(a:2DFigure \n"
-				// + "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)"
-				// + ")\n"
-				// + "SubClassOf(a:1DFigure "
-				// + "   DataSomeValuesFrom(a:hasLength xsd:integer)"
-				// + ")"
+				 + "SubClassOf(a:2DFigure \n"
+				 + "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)\n"
+				 + ")\n"
+				 + "SubClassOf(a:2DFigure \n"
+				 + "   DataAllValuesFrom(a:hasWidth a:hasLength xsd:integer)\n"
+				 + ")\n"				 
+				 + "SubClassOf(a:1DFigure "
+				 + "   DataSomeValuesFrom(a:hasLength xsd:integer)"
+				 + ")"
 				+ ")";
 
 		parseOntology(testString);

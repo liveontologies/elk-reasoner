@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
@@ -44,16 +47,18 @@ public class ElkDataAllValuesFromWrap<T extends OWLDataAllValuesFrom> extends
 		super(owlDataAllValuesFrom);
 	}
 
-	public ElkDataPropertyExpression getProperty() {
-		return converter.convert(this.owlObject.getProperty());
-	}
-
-	public ElkDataRange getFiller() {
-		return converter.convert(this.owlObject.getFiller());
-	}
-
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions() {
+		return Collections.singletonList(converter.convert(owlObject.getProperty()));
+	}
+
+	@Override
+	public ElkDataRange getDataRange() {
+		return converter.convert(owlObject.getFiller());
 	}
 }
