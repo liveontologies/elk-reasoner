@@ -27,27 +27,47 @@ package org.semanticweb.elk.owl.iris;
  * IRIs are considered equal iff their string representations are equal.  
  * 
  * @author Frantisek Simancik
+ * 
  */
-public abstract class ElkIri {
-	
-	
+public abstract class ElkIri implements Comparable<ElkIri> {
+
+	protected final int hashCode;
+
 	/**
 	 * Returns the full IRI as a string;
 	 */
 	public abstract String asString();
-	
+
+	public ElkIri(String fullIri) {
+		this.hashCode = fullIri.hashCode();
+	}
+
 	@Override
 	public final int hashCode() {
-		return asString().hashCode();
+		return hashCode;
 	}
-	
+
 	@Override
 	public final boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj instanceof ElkIri) {
-			return this.asString().equals(((ElkIri) obj).asString());
-		}
-		return false;	
+
+		if (obj instanceof ElkIri && hashCode == ((ElkIri) obj).hashCode)
+			return this.compareTo((ElkIri) obj) == 0;
+
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 * 
+	 * Implements alphabetical comparison of iris. This is overriden in
+	 * ElkAbbreviatedIris to optimize the case when the two iris have the same
+	 * prefix.
+	 */
+	public int compareTo(ElkIri arg) {
+		return this.asString().compareTo(arg.asString());
 	}
 }

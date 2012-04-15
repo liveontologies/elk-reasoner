@@ -36,6 +36,7 @@ public class ElkAbbreviatedIri extends ElkIri {
 	protected final String localName;
 	
 	public ElkAbbreviatedIri(ElkPrefix prefix, String localName) {
+		super (prefix.getIri().asString() + localName);
 		this.prefix = prefix;
 		this.localName = localName;
 	}
@@ -53,4 +54,12 @@ public class ElkAbbreviatedIri extends ElkIri {
 		return prefix.getIri().asString() + localName;
 	}
 
+	@Override
+	public int compareTo(ElkIri arg) {
+		if (arg instanceof ElkAbbreviatedIri && this.prefix == ((ElkAbbreviatedIri) arg).prefix)
+			return this.localName.compareTo(((ElkAbbreviatedIri) arg).localName);
+		
+		return super.compareTo(arg);
+	}
+	
 }

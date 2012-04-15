@@ -60,7 +60,7 @@ public class PredefinedElkIri {
 						|| arg1.equals(OWL_NOTHING);
 		
 		if (isOwl0 == isOwl1)
-			return arg0.asString().compareTo(arg1.asString());
+			return arg0.compareTo(arg1);
 		else
 			return isOwl0 ? -1 : 1; 
 	}
