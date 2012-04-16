@@ -28,6 +28,7 @@ package org.semanticweb.elk.owl.parsing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -45,7 +46,9 @@ import org.semanticweb.elk.owl.implementation.ElkAsymmetricObjectPropertyAxiomIm
 import org.semanticweb.elk.owl.implementation.ElkClassAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyDomainAxiomImpl;
+import org.semanticweb.elk.owl.implementation.ElkDataPropertyListRestrictionQualifiedImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyRangeAxiomImpl;
+import org.semanticweb.elk.owl.implementation.ElkDataSomeValuesFromImpl;
 import org.semanticweb.elk.owl.implementation.ElkDatatypeDefinitionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDifferentIndividualsAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDisjointClassesAxiomImpl;
@@ -71,6 +74,7 @@ import org.semanticweb.elk.owl.implementation.ElkSubObjectPropertyOfAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkSymmetricObjectPropertyAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkTransitiveObjectPropertyAxiomImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
@@ -126,9 +130,10 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 	 * @param axiomTypeCounts
 	 * @param checkAll 	If set to true, the check will fail if the parser created axioms of other types, in addition to those
 	 * 					specified in the count map
+	 * @throws IOException 
 	 * @throws Exception
 	 */
-	protected void checkAxiomTypeCounts(ElkTestAxiomProcessor processor, Map<Class<?>, Integer> axiomTypeCounts, boolean checkAll) throws Exception {
+	protected void checkAxiomTypeCounts(ElkTestAxiomProcessor processor, Map<Class<?>, Integer> axiomTypeCounts, boolean checkAll) throws IOException {
 		boolean error = false;
 		//parsed without errors, check the output
 		for (Iterator<Entry<Class<?>, Set<ElkAxiom>>> actualEntryIter = processor.getAxiomMapEntries().iterator(); actualEntryIter.hasNext();) {
@@ -251,8 +256,8 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 	}
 	
 	@Test
-	public void testOntologyDocument() throws Owl2ParseException {
-		String testString = "Prefix ( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )\n"
+	public void testLiteralParsing() throws Owl2ParseException, IOException {
+		String input = "Prefix ( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )\n"
 				+ "Prefix ( a: = <http://www.example.org#> )\n"
 				+ "Prefix ( xsd: = <http://www.w3.org/2001/XMLSchema#> )\n"
 				+ "Ontology(<http://www.example.org/>\n"
@@ -260,20 +265,44 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 				+ "Annotation(rdfs:comment \"String literal with language\"@en)\n"
 				+ "Annotation(rdfs:comment \"String literal no language\")\n"
 				+ "Annotation(rdfs:label \"Typed literal\"^^xsd:string)\n"
-				// Testing if DataSomeValuesFrom parsing is ambiguous
+				+ ")";
+
+		parseOntology(input);
+	}
+	
+	/*
+	 * Testing if DataSomeValuesFrom parsing could be ambiguous
+	 */
+	@Test
+	public void testNaryDataSomeValuesFrom() throws Owl2ParseException {
+		String input = "Prefix ( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )\n"
+				+ "Prefix ( a: = <http://www.example.org#> )\n"
+				+ "Prefix ( xsd: = <http://www.w3.org/2001/XMLSchema#> )\n"
+				+ "Ontology(<http://www.example.org/>\n"
 				 + "SubClassOf(a:2DFigure \n"
 				 + "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)\n"
 				 + ")\n"
 				 + "SubClassOf(a:2DFigure \n"
 				 + "   DataAllValuesFrom(a:hasWidth a:hasLength xsd:integer)\n"
 				 + ")\n"				 
-				 + "SubClassOf(a:1DFigure "
-				 + "   DataSomeValuesFrom(a:hasLength xsd:integer)"
-				 + ")"
 				+ ")";
 
-		parseOntology(testString);
-	}
+		ElkTestAxiomProcessor counter = parseOntology(input);
+		Set<ElkAxiom> axioms = counter.getAxiomsForType(ElkSubClassOfAxiomImpl.class);
+		
+		assertEquals(2, axioms.size());
+		
+		for (ElkAxiom axiom : axioms) {
+			ElkSubClassOfAxiom sbAxiom = (ElkSubClassOfAxiom) axiom;
+			
+			assertTrue(sbAxiom.getSuperClassExpression() instanceof ElkDataPropertyListRestrictionQualifiedImpl);
+			
+			ElkDataPropertyListRestrictionQualifiedImpl superCE =
+					(ElkDataPropertyListRestrictionQualifiedImpl) sbAxiom.getSuperClassExpression();
+			
+			assertEquals(2, superCE.getDataPropertyExpressions().size());
+		}
+	}	
 	
 	@Test
 	public void testEmptyPrefix() throws Owl2ParseException {
