@@ -25,14 +25,17 @@
  */
 package org.semanticweb.elk.owl.parsing.javacc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -41,16 +44,14 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
+import org.semanticweb.elk.owl.parsing.AbstractOwl2FunctionalSyntaxParseTest;
+import org.semanticweb.elk.owl.parsing.Owl2Parser;
 
 /**
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class Owl2FunctionalStyleParserTest extends TestCase {
-
-	public Owl2FunctionalStyleParserTest(String testName) {
-		super(testName);
-	}
+public class Owl2FunctionalStyleParserTest extends AbstractOwl2FunctionalSyntaxParseTest {
 
 	class DummyElkAxiomProcessor implements ElkAxiomProcessor {
 		public final List<ElkAxiom> axiomList = new ArrayList<ElkAxiom>();
@@ -72,72 +73,12 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		return parser;
 	}
 
-	protected List<ElkAxiom> parseOntologyDocument(String testString)
-			throws ParseException {
-		DummyElkAxiomProcessor axiomProcessor = new DummyElkAxiomProcessor();
-		getParserForString(testString, false).ontologyDocument(axiomProcessor);
-		return axiomProcessor.axiomList;
-	}
-
-	public void testPrefixDeclarations() {
-		String testString = "Ontology( <http://www.my.example.com/example>"
-				+ "Declaration( Class( :Person ) )"
-				+ "SubClassOf( :Person owl:Thing )" + ") ";
-		try {
-			parseOntologyDocument(testString);
-			assertFalse(true);
-		} catch (ParseException e) {
-			// expected behaviour
-		}
-	}
-	
-	public void testObjectOneOf() throws ParseException {
-		String testString = "Ontology(SubClassOf( <A> ObjectOneOf(<i>)))";
-		parseOntologyDocument(testString);
-	}
-
-	public void testOntologyDocument() throws ParseException {
-		String testString = "Prefix ( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )"
-				+ "Prefix ( xsd: = <http://www.w3.org/2001/XMLSchema#> )"
-				+ "Ontology(<http://www.example.org/>"
-				// Testing if literal parsing is ambiguous
-				+ "Annotation(rdfs:comment \"String literal with langauge\"@en)"
-				+ "Annotation(rdfs:comment \"String literal no language\")"
-				+ "Annotation(rdfs:label \"Typed literal\"^^xsd:string)"
-				// Testing if DataSomeValuesFrom parsing is ambiguous
-				// + "SubClassOf(a:2DFigure \n"
-				// + "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)"
-				// + ")\n"
-				// + "SubClassOf(a:1DFigure "
-				// + "   DataSomeValuesFrom(a:hasLength xsd:integer)"
-				// + ")"
-				+ ")";
-
-		parseOntologyDocument(testString);
-	}
-	
-	public void testEmptyPrefix() throws ParseException {
-		String testString = "Prefix(:=<>)" +
-		"Ontology("
-		+ "Declaration(Class(:A))"
-		+ ")";
-		parseOntologyDocument(testString);
-	}
-	
-	public void testQualifiedNamesInIris() throws ParseException {
-		String testString = "Prefix(p: = <>)" +
-				"Ontology("
-				+ "SubClassOf(p:Class p:Ontology)"
-				+ ")";
-
-		parseOntologyDocument(testString);
-	}
-
 	protected ElkClass parseElkClass(String testString) throws ParseException,
 			InterruptedException, ExecutionException {
 		return getParserForString(testString, true).clazz();
 	}
 
+	@Test
 	public void testOwlThing() throws InterruptedException, ExecutionException,
 			ParseException {
 		ElkClass clazz = parseElkClass("owl:Thing");
@@ -151,6 +92,7 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 		return getParserForString(testString, true).literal();
 	}
 
+	@Test
 	public void testPlainLiterals() throws InterruptedException,
 			ExecutionException, ParseException {
 		ElkLiteral literal1 = parseElkLiteral("\"Test\"@en");
@@ -168,6 +110,17 @@ public class Owl2FunctionalStyleParserTest extends TestCase {
 				"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 		assertEquals(literal1.getDatatype().getIri(), literal2.getDatatype().getIri());
 		// assertEquals(literal1, literal2);
+	}
+
+	
+	@Override
+	protected Owl2Parser instantiateParser(InputStream stream) {
+		return new Owl2FunctionalStyleParser(stream);
+	}
+	
+	@Override
+	protected Owl2Parser instantiateParser(Reader reader) {
+		return new Owl2FunctionalStyleParser(reader);
 	}
 
 }

@@ -53,6 +53,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
@@ -67,6 +68,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
@@ -707,6 +709,27 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 		write(')');
 		return null;
 	}
+	
+	@Override
+	public Void visit(ElkHasKeyAxiom elkHasKey) {
+		write("HasKey( ");
+		write(elkHasKey.getClassExpression());
+		write(" ( ");
+		write(elkHasKey.getObjectPropertyExpressions());
+		write(" )( ");
+		write(elkHasKey.getDataPropertyExpressions());
+		write(" )) ");
+		return null;
+	}
+	
+	@Override
+	public Void visit(ElkDatatypeDefinitionAxiom elkDatatypeDefn) {
+		write("DatatypeDefinition( ");
+		write(elkDatatypeDefn.getDatatype());
+		write(elkDatatypeDefn.getDataRange());
+		write(" )");
+		return null;
+	}	
 
 	protected final void write(char ch) {
 		try {

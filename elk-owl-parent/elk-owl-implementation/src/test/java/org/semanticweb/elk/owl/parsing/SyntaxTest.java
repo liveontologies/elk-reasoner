@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl;
+package org.semanticweb.elk.owl.parsing;
 
 import junit.framework.TestCase;
 

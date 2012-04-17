@@ -41,6 +41,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
@@ -52,6 +53,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
@@ -351,6 +353,20 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 				ElkNegativeObjectPropertyAssertionAxiom.class.getSimpleName()
 						+ " not supported");
 	}
+	
+	@Override
+	public Void visit(ElkHasKeyAxiom elkHasKey) {
+		throw new IndexingException(
+				ElkHasKeyAxiom.class.getSimpleName()
+						+ " not supported");
+	}
+	
+	@Override
+	public Void visit(ElkDatatypeDefinitionAxiom elkDatatypeDefn) {
+		throw new IndexingException(
+				ElkHasKeyAxiom.class.getSimpleName()
+						+ " not supported");
+	}	
 
 	/* (non-Javadoc)
 	 * @see org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom)
