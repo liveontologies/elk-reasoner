@@ -229,7 +229,9 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 
 	public Void visit(ElkDataAllValuesFrom elkDataAllValuesFrom) {
 		write("DataAllValuesFrom(");
-		write((ElkPropertyRestrictionQualified<ElkDataPropertyExpression, ElkDataRange>) elkDataAllValuesFrom);
+		write(elkDataAllValuesFrom.getDataPropertyExpressions());
+		write(' ');
+		write(elkDataAllValuesFrom.getDataRange());
 		write(')');
 		return null;
 	}
@@ -336,7 +338,9 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 
 	public Void visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
 		write("DataSomeValuesFrom(");
-		write((ElkPropertyRestrictionQualified<ElkDataPropertyExpression, ElkDataRange>) elkDataSomeValuesFrom);
+		write(elkDataSomeValuesFrom.getDataPropertyExpressions());
+		write(' ');
+		write(elkDataSomeValuesFrom.getDataRange());		
 		write(')');
 		return null;
 	}
@@ -483,8 +487,9 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	}
 
 	public Void visit(ElkLiteral elkLiteral) {
+		write("\"");
 		write(elkLiteral.getLexicalForm());
-		write("^^");
+		write("\"^^");
 		write(elkLiteral.getDatatype());
 		return null;
 	}
@@ -811,9 +816,9 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 			ElkPropertyAssertionAxiom<P, O, R> elkPropertyAssertionAxiom) {
 		write((ElkPropertyAxiom<P>) elkPropertyAssertionAxiom);
 		write(' ');
-		write(elkPropertyAssertionAxiom.getObject());
-		write(' ');
 		write(elkPropertyAssertionAxiom.getSubject());
+		write(' ');
+		write(elkPropertyAssertionAxiom.getObject());
 	}
 
 	protected final <P extends ElkObject, D extends ElkObject> void write(
