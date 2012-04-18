@@ -48,7 +48,6 @@ import org.semanticweb.elk.owl.implementation.ElkDataPropertyAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyDomainAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyListRestrictionQualifiedImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyRangeAxiomImpl;
-import org.semanticweb.elk.owl.implementation.ElkDataSomeValuesFromImpl;
 import org.semanticweb.elk.owl.implementation.ElkDatatypeDefinitionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDifferentIndividualsAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDisjointClassesAxiomImpl;
