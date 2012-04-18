@@ -34,23 +34,26 @@ public abstract class AbstractImplOwl2FunctionalSyntaxPrinterTest extends ModelO
 		
 		assertNotNull(input);
 		
-		return parseAxioms(new InputStreamReader(input));
+		return parseAxioms(new InputStreamReader(input), false);
 	}
 
 	@Override
 	protected Set<? extends ElkObject> loadPrintedElkObjects(String input) {
 		String ontology = " Ontology(<http://example.com/owl/> \n" + input + "\n)"; 
 		
-		return parseAxioms(new StringReader(ontology));
+		return parseAxioms(new StringReader(ontology), true);
 	}
 	
-	protected Set<? extends ElkObject> parseAxioms(Reader reader) {
+	protected Set<? extends ElkObject> parseAxioms(Reader reader, boolean addDefaultDecl) {
 		Owl2Parser parser = instantiateParser(reader);
 		ElkTestAxiomProcessor counter = new ElkTestAxiomProcessor();
-		/*ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
 		
-		prefixDeclarations.addOwlDefaultPrefixes();
-		parser.setPrefixDeclarations(prefixDeclarations);*/
+		if (addDefaultDecl) {
+			ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
+
+			prefixDeclarations.addOwlDefaultPrefixes();
+			parser.setPrefixDeclarations(prefixDeclarations);
+		}
 		
 		try {
 			parser.parseOntology(counter);
