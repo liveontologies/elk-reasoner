@@ -981,9 +981,9 @@ public interface ElkObjectFactory {
 	 * @param dataPEs
 	 * @return
 	 */
-	public abstract ElkHasKeyAxiom getHasKeyAxiom(	ElkClassExpression classExpr,
-													Set<ElkObjectPropertyExpression> objectPEs,
-													Set<ElkDataPropertyExpression> dataPEs);
+	public ElkHasKeyAxiom getHasKeyAxiom(	ElkClassExpression classExpr,
+											Set<ElkObjectPropertyExpression> objectPEs,
+											Set<ElkDataPropertyExpression> dataPEs);
 	
 	/**
 	 * Create an {@link ElkDatatypeDefinitionAxiom}
@@ -992,6 +992,8 @@ public interface ElkObjectFactory {
 	 * @param dataRange
 	 * @return
 	 */
-	public abstract ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom( ElkDatatype datatype, ElkDataRange dataRange);	
+	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom( ElkDatatype datatype, ElkDataRange dataRange);
+	
+	public ElkFacetRestriction getFacetRestriction( ElkIri iri, ElkLiteral literal);
 
 }

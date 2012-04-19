@@ -22,7 +22,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  */
 public abstract class ModelOwl2FunctionalSyntaxPrinterTest {
 
-	@Ignore
+	//@Ignore
 	/*
 	ignored because the printer can't print constructs which are not instantiated during parsing
 	*/ 

@@ -869,5 +869,11 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkDataSomeValuesFrom getDataSomeValuesFrom(	ElkDataRange dataRange,
 														List<? extends ElkDataPropertyExpression> dpList) {
 		return (ElkDataSomeValuesFrom)objectManager.getCanonicalElkObject(new ElkDataSomeValuesFromImpl(dpList, dataRange));
+	}
+
+	@Override
+	public ElkFacetRestriction getFacetRestriction(ElkIri iri, ElkLiteral literal) {
+
+		return (ElkFacetRestriction)objectManager.getCanonicalElkObject(new ElkFacetRestrictionImpl(iri.asString(), literal));
 	}	
 }

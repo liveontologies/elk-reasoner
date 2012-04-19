@@ -944,20 +944,24 @@ ElkDataOneOf dataOneOf():
 ElkDatatypeRestriction datatypeRestriction():
 {
 	ElkDatatype x;
-	Vector<ElkFacetRestriction> v =
-		new Vector<ElkFacetRestriction> ();
+	Vector<ElkFacetRestriction> v = new Vector<ElkFacetRestriction>();
 }{
 	<DATATYPE_RESTRICTION> <OPEN_BRACKET>
 		x = datatype()
-		( constrainingFacet() literal() )+ //TODO
+		(addFacetRestriction(v))+
+		//( constrainingFacet() literal() )+ //TODO
 	<CLOSE_BRACKET> {
 		return objectFactory.getDatatypeRestriction(x,v);
 	}
 }
 
-void constrainingFacet(): // TODO
-{}{
-	iri()
+void addFacetRestriction(Collection<ElkFacetRestriction> facetRestrs): // TODO
+{
+	ElkIri restrIRI = null;
+	ElkLiteral literal = null;
+}{
+	restrIRI = iri()
+	literal = literal()
 // 	| <XSD_MIN_INCLUSIVE>
 // 	| <XSD_MAX_INCLUSIVE>
 // 	| <XSD_MIN_EXCLUSIVE>
@@ -967,6 +971,9 @@ void constrainingFacet(): // TODO
 // 	| <XSD_MAX_LENGTH>
 // 	| <XSD_PATTERN>
 // 	| <RDF_LANG_RANGE>
+	{
+		facetRestrs.add(objectFactory.getFacetRestriction(restrIRI, literal));
+	}
 }
 
 /* 8 Class Expressions */
