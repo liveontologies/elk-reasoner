@@ -949,7 +949,6 @@ ElkDatatypeRestriction datatypeRestriction():
 	<DATATYPE_RESTRICTION> <OPEN_BRACKET>
 		x = datatype()
 		(addFacetRestriction(v))+
-		//( constrainingFacet() literal() )+ //TODO
 	<CLOSE_BRACKET> {
 		return objectFactory.getDatatypeRestriction(x,v);
 	}
