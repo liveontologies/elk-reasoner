@@ -32,7 +32,7 @@ package org.semanticweb.elk.owl.interfaces;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkAnonymousIndividual extends ElkIndividual {
+public interface ElkAnonymousIndividual extends ElkIndividual, ElkAnnotationValue {
 
 	/**
 	 * Get the nodeID of this anonymous individual.

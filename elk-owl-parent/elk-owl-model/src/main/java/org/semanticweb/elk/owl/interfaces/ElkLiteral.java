@@ -46,7 +46,7 @@ import org.semanticweb.elk.owl.visitors.ElkLiteralVisitor;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkLiteral extends ElkObject {
+public interface ElkLiteral extends ElkObject, ElkAnnotationValue {
 
 	/**
 	 * Get the lexical form of this literal.

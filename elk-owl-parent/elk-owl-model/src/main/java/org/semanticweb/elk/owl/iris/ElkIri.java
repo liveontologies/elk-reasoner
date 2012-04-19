@@ -22,13 +22,16 @@
  */
 package org.semanticweb.elk.owl.iris;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
+import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
+
 /**
  * This class represents an IRI. It redefines hash and equality so that two
  * IRIs are considered equal iff their string representations are equal.  
  * 
  * @author Frantisek Simancik
  */
-public abstract class ElkIri {
+public abstract class ElkIri implements ElkAnnotationSubject {
 	
 	
 	/**
@@ -50,4 +53,12 @@ public abstract class ElkIri {
 		}
 		return false;	
 	}
+
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		//by default does nothing
+		return null;
+	}
+	
+	
 }
