@@ -51,14 +51,12 @@ public class ElkDatatypeDefinitionAxiomImpl implements ElkDatatypeDefinitionAxio
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		// TODO Auto-generated method stub
-		return null;
+		return visitor.visit(this);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		// TODO Auto-generated method stub
-		return null;
+		return visitor.visit(this);
 	}
 
 	@Override

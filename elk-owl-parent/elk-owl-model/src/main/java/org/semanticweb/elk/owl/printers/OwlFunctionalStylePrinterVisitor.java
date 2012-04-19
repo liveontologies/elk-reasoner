@@ -731,6 +731,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(ElkDatatypeDefinitionAxiom elkDatatypeDefn) {
 		write("DatatypeDefinition( ");
 		write(elkDatatypeDefn.getDatatype());
+		write(" ");
 		write(elkDatatypeDefn.getDataRange());
 		write(" )");
 		return null;
