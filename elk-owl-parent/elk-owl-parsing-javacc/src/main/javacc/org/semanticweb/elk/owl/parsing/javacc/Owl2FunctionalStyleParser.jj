@@ -954,7 +954,7 @@ ElkDatatypeRestriction datatypeRestriction():
 	}
 }
 
-void addFacetRestriction(Collection<ElkFacetRestriction> facetRestrs): // TODO
+void addFacetRestriction(Collection<ElkFacetRestriction> facetRestrs): 
 {
 	ElkIri restrIRI = null;
 	ElkLiteral literal = null;
@@ -1316,7 +1316,7 @@ ElkDataExactCardinality dataExactCardinality():
 /* 9 Axioms */
 ElkAxiom axiom():
 {
-	ElkAxiom x = null; // TODO
+	ElkAxiom x = null; 
 }{
 	(
 	x = declaration()
