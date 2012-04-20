@@ -23,6 +23,7 @@
 package org.semanticweb.elk.owl.iris;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -31,7 +32,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * 
  * @author Frantisek Simancik
  */
-public abstract class ElkIri implements ElkAnnotationSubject {
+public abstract class ElkIri implements ElkAnnotationSubject, ElkAnnotationValue {
 	
 	
 	/**
@@ -56,9 +57,6 @@ public abstract class ElkIri implements ElkAnnotationSubject {
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		//by default does nothing
-		return null;
-	}
-	
-	
+		return visitor.visit(this);
+	}	
 }

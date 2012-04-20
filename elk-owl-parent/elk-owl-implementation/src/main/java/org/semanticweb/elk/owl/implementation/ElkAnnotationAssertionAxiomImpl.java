@@ -25,7 +25,7 @@ public class ElkAnnotationAssertionAxiomImpl implements ElkAnnotationAssertionAx
 	private final ElkAnnotationProperty annProperty;
 	private final ElkAnnotationValue annValue;
 	
-	ElkAnnotationAssertionAxiomImpl(ElkAnnotationSubject annSubject, ElkAnnotationProperty annProperty, ElkAnnotationValue annValue) {
+	ElkAnnotationAssertionAxiomImpl(ElkAnnotationProperty annProperty, ElkAnnotationSubject annSubject, ElkAnnotationValue annValue) {
 		this.annSubject = annSubject;
 		this.annProperty = annProperty;
 		this.annValue = annValue;
@@ -33,8 +33,7 @@ public class ElkAnnotationAssertionAxiomImpl implements ElkAnnotationAssertionAx
 	
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		// TODO extend the visitor
-		return null;
+		return visitor.visit(this);
 	}
 
 	@Override
@@ -49,8 +48,7 @@ public class ElkAnnotationAssertionAxiomImpl implements ElkAnnotationAssertionAx
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		// TODO extend the visitor
-		return null;
+		return visitor.visit(this);
 	}
 
 	@Override

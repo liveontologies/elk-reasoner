@@ -25,8 +25,11 @@ package org.semanticweb.elk.owl.implementation;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -140,8 +143,6 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	protected static final ElkDatatype ELK_RDF_PLAIN_LITERAL = new ElkDatatypeImpl(
 			PredefinedElkIri.RDF_PLAIN_LITERAL);
 
-	protected static final ElkAnnotationAxiom ELK_ANNOTATION_AXIOM = new ElkAnnotationAxiomImpl();
-
 	protected final ElkObjectManager objectManager;
 
 	/**
@@ -163,10 +164,6 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	 */
 	public ElkObjectFactoryImpl(ElkObjectManager objectManager) {
 		this.objectManager = objectManager;
-	}
-
-	public ElkAnnotationAxiom getAnnotationAxiom() {
-		return ELK_ANNOTATION_AXIOM;
 	}
 
 	public ElkAnnotationProperty getAnnotationProperty(ElkIri iri) {
@@ -873,7 +870,19 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	@Override
 	public ElkFacetRestriction getFacetRestriction(ElkIri iri, ElkLiteral literal) {
-
 		return (ElkFacetRestriction)objectManager.getCanonicalElkObject(new ElkFacetRestrictionImpl(iri.asString(), literal));
-	}	
+	}
+
+	@Override
+	public ElkAnnotation getAnnotation(ElkAnnotationProperty property, ElkAnnotationValue value) {
+		return (ElkAnnotation)objectManager.getCanonicalElkObject(new ElkAnnotationImpl(property, value));
+	}
+
+	@Override
+	public ElkAnnotationAssertionAxiom getAnnotationAssertionAxiom(
+			ElkAnnotationProperty property, ElkAnnotationSubject subject,
+			ElkAnnotationValue value) {
+		
+		return (ElkAnnotationAssertionAxiom)objectManager.getCanonicalElkObject(new ElkAnnotationAssertionAxiomImpl(property, subject, value));
+	}
 }

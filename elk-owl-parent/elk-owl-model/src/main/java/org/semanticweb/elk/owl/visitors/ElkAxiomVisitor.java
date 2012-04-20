@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 
 /**
@@ -37,10 +36,9 @@ public interface ElkAxiomVisitor<O> extends
 		ElkHasKeyAxiomVisitor<O>,
 		ElkObjectPropertyAxiomVisitor<O>,
 		ElkDataPropertyAxiomVisitor<O>,
-		ElkAssertionAxiomVisitor<O> {
+		ElkAssertionAxiomVisitor<O>,
+		ElkAnnotationAxiomVisitor<O> {
 
 	O visit(ElkDeclarationAxiom elkDeclarationAxiom);
-
-	O visit(ElkAnnotationAxiom elkAnnotationAxiom);
 
 }
