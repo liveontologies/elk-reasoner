@@ -25,48 +25,40 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Implementation of <@link ElkDatatypeDefinitionAxiom>
+ * Implementation of {@link ElkFacetRestriction}
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  *
  */
-public class ElkDatatypeDefinitionAxiomImpl implements ElkDatatypeDefinitionAxiom {
-	
-	private final ElkDatatype datatype;
-	private final ElkDataRange dataRange;
-	
-	ElkDatatypeDefinitionAxiomImpl(ElkDatatype dt, ElkDataRange dr) {
-		datatype = dt;
-		dataRange = dr;
-	}
+public class ElkFacetRestrictionImpl implements ElkFacetRestriction {
 
-	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+	private final String facetURI;
+	private final ElkLiteral literal;
+	
+	ElkFacetRestrictionImpl(String facetURI, ElkLiteral literal) {
+		this.facetURI = facetURI;
+		this.literal = literal;
 	}
-
+	
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public ElkDatatype getDatatype() {
-		return datatype;
+	public String getConstrainingFacet() {
+		return facetURI;
 	}
 
 	@Override
-	public ElkDataRange getDataRange() {
-		return dataRange;
+	public ElkLiteral getRestrictionValue() {
+		return literal;
 	}
-
 }

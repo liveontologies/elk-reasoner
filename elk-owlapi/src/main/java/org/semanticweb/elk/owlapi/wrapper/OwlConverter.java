@@ -23,6 +23,8 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
@@ -97,6 +99,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationSubject;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAsymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -202,6 +206,8 @@ public class OwlConverter {
 
 	protected static OwlObjectPropertyExpressionConverterVisitor OWL_OBJECT_PROPERTY_EXPRESSION_CONVERTER = OwlObjectPropertyExpressionConverterVisitor
 			.getInstance();
+	
+	protected static OwlAnnotationVisitor OWL_ANNOTATION_CONVERTER = OwlAnnotationVisitor.getInstance();
 
 	public ElkAnnotationProperty convert(
 			OWLAnnotationProperty owlAnnotationProperty) {
@@ -625,5 +631,14 @@ public class OwlConverter {
 		return new ElkTransitiveObjectPropertyAxiomWrap<OWLTransitiveObjectPropertyAxiom>(
 				owlTransitiveObjectPropertyAxiom);
 	}
+
+	public ElkAnnotationSubject convert(OWLAnnotationSubject subject) {
+		return OWL_ANNOTATION_CONVERTER.visit(subject);
+	}
+
+	public ElkAnnotationValue convert(OWLAnnotationValue value) {
+		return OWL_ANNOTATION_CONVERTER.visit(value);
+	}
+
 
 }

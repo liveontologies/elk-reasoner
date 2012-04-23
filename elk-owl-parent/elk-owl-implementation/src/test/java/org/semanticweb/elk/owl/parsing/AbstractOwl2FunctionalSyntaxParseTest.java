@@ -42,13 +42,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.junit.Test;
+import org.semanticweb.elk.owl.implementation.ElkAnnotationAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkAsymmetricObjectPropertyAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkClassAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyAssertionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyDomainAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyListRestrictionQualifiedImpl;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyRangeAxiomImpl;
-import org.semanticweb.elk.owl.implementation.ElkDataSomeValuesFromImpl;
 import org.semanticweb.elk.owl.implementation.ElkDatatypeDefinitionAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDifferentIndividualsAxiomImpl;
 import org.semanticweb.elk.owl.implementation.ElkDisjointClassesAxiomImpl;
@@ -209,6 +209,8 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		expectedCountMap.put(ElkObjectPropertyRangeAxiomImpl.class, 1);
 		expectedCountMap.put(ElkDataPropertyDomainAxiomImpl.class, 1);
 		expectedCountMap.put(ElkDataPropertyRangeAxiomImpl.class, 1);
+		
+		expectedCountMap.put(ElkAnnotationAssertionAxiomImpl.class, 1);
 		
 		expectedCountMap.put(ElkSymmetricObjectPropertyAxiomImpl.class, 1);
 		expectedCountMap.put(ElkAsymmetricObjectPropertyAxiomImpl.class, 1);
