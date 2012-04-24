@@ -26,6 +26,19 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-reasoner</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+			<scope>test</scope>
+			<classifier>tests</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-util-testing</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.jopt-simple</groupId>
 			<artifactId>jopt-simple</artifactId>
 			<version>4.0-beta1</version>

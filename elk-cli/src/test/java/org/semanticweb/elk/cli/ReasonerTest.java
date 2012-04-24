@@ -34,7 +34,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;

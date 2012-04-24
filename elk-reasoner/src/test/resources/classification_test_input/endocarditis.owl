@@ -1,0 +1,22 @@
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(
+SubClassOf(<Anonymous-9#Endocarditis> ObjectIntersectionOf(ObjectSomeValuesFrom(<Anonymous-9#has-location> <Anonymous-9#Endocardium>) <Anonymous-9#Inflammation>))
+SubClassOf(<Anonymous-9#Endocardium> ObjectIntersectionOf(ObjectSomeValuesFrom(<Anonymous-9#contained-in> <Anonymous-9#HeartValve>) <Anonymous-9#Tissue>))
+SubClassOf(<Anonymous-9#HeartValve> ObjectIntersectionOf(ObjectSomeValuesFrom(<Anonymous-9#part-of> <Anonymous-9#Heart>) <Anonymous-9#BodyValve>))
+EquivalentClasses(<Anonymous-9#Heartdisease> ObjectIntersectionOf(ObjectSomeValuesFrom(<Anonymous-9#has-location> <Anonymous-9#Heart>) <Anonymous-9#Disease>))
+SubClassOf(<Anonymous-9#Inflammation> ObjectIntersectionOf(ObjectSomeValuesFrom(<Anonymous-9#acts-on> <Anonymous-9#Tissue>) <Anonymous-9#Disease>))
+SubClassOf(<Anonymous-9#Pericarditis> ObjectIntersectionOf(ObjectSomeValuesFrom(<Anonymous-9#has-location> <Anonymous-9#Pericardium>) <Anonymous-9#Inflammation>))
+SubClassOf(<Anonymous-9#Pericardium> ObjectIntersectionOf(ObjectSomeValuesFrom(<Anonymous-9#contained-in> <Anonymous-9#Heart>) <Anonymous-9#Tissue>))
+Declaration(ObjectProperty(<Anonymous-9#contained-in>))
+Declaration(ObjectProperty(<Anonymous-9#has-location>))
+Declaration(ObjectProperty(<Anonymous-9#part-of>))
+SubObjectPropertyOf(<Anonymous-9#part-of> <Anonymous-9#contained-in>)
+SubObjectPropertyOf(ObjectPropertyChain(<Anonymous-9#has-location> <Anonymous-9#contained-in>) <Anonymous-9#has-location>)
+SubClassOf(ObjectIntersectionOf(ObjectSomeValuesFrom(<Anonymous-9#has-location> <Anonymous-9#HeartValve>) <Anonymous-9#Heartdisease>) <Anonymous-9#IsStateNeedsTreatment>)
+)

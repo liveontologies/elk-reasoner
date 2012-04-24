@@ -1,0 +1,20 @@
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(
+SubClassOf(<Anonymous-18#Beast> ObjectIntersectionOf(<Anonymous-18#Irrational> <Anonymous-18#Animal>))
+SubClassOf(<Anonymous-18#Human> ObjectIntersectionOf(<Anonymous-18#Rational> <Anonymous-18#Animal>))
+DisjointClasses(<Anonymous-18#Irrational> <Anonymous-18#Rational>)
+SubClassOf(<Anonymous-18#Kangaroo> <Anonymous-18#Beast>)
+SubClassOf(<Anonymous-18#KangarooInfant> ObjectIntersectionOf(ObjectSomeValuesFrom(<Anonymous-18#lives-in> <Anonymous-18#Pouch>) <Anonymous-18#Kangaroo>))
+EquivalentClasses(<Anonymous-18#MaternityKangaroo> ObjectIntersectionOf(<Anonymous-18#Kangaroo> ObjectSomeValuesFrom(<Anonymous-18#has-body-part> <Anonymous-18#Pouch>) ObjectSomeValuesFrom(<Anonymous-18#has-child> <Anonymous-18#KangarooInfant>)))
+EquivalentClasses(<Anonymous-18#Parent> ObjectSomeValuesFrom(<Anonymous-18#has-child> owl:Thing))
+DisjointClasses(<Anonymous-18#Rational> <Anonymous-18#Irrational>)
+Declaration(ObjectProperty(<Anonymous-18#has-child>))
+ObjectPropertyDomain(<Anonymous-18#has-child> <Anonymous-18#Human>)
+ObjectPropertyRange(<Anonymous-18#has-child> <Anonymous-18#Human>)
+)
