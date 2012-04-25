@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK OWL Model Implementation
+ * ELK OWL API Binding
  * 
  * $Id$
  * $HeadURL$
@@ -23,30 +23,25 @@
 /**
  * 
  */
-package org.semanticweb.elk.owl.implementation;
+package org.semanticweb.elk.owlapi.wrapper;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 
 /**
- * Implementation of <@link ElkDatatypeDefinitionAxiom>
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  *
  */
-public class ElkDatatypeDefinitionAxiomImpl implements ElkDatatypeDefinitionAxiom {
-	
-	private final ElkDatatype datatype;
-	private final ElkDataRange dataRange;
-	
-	ElkDatatypeDefinitionAxiomImpl(ElkDatatype dt, ElkDataRange dr) {
-		datatype = dt;
-		dataRange = dr;
+public class ElkAnnotationAssertionAxiomWrap<T extends OWLAnnotationAssertionAxiom> extends ElkAxiomWrap<T> implements ElkAnnotationAssertionAxiom {
+
+	public ElkAnnotationAssertionAxiomWrap(T owlAxiom) {
+		super(owlAxiom);
 	}
 
 	@Override
@@ -55,18 +50,19 @@ public class ElkDatatypeDefinitionAxiomImpl implements ElkDatatypeDefinitionAxio
 	}
 
 	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
+	public ElkAnnotationSubject getSubject() {
+		return converter.convert(owlObject.getSubject());
 	}
 
 	@Override
-	public ElkDatatype getDatatype() {
-		return datatype;
+	public ElkAnnotationProperty getProperty() {
+		return converter.convert(owlObject.getProperty());
 	}
 
 	@Override
-	public ElkDataRange getDataRange() {
-		return dataRange;
+	public ElkAnnotationValue getValue() {
+		return converter.convert(owlObject.getValue());
 	}
+	
 
 }

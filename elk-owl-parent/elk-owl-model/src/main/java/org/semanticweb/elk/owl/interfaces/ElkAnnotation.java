@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,25 +20,23 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.visitors;
+/**
+ * 
+ */
+package org.semanticweb.elk.owl.interfaces;
 
-import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 
 /**
- * Super interface of all visitors for ElkAxioms.
+ * The basic interface for annotation objects in OWL 2
+ * as defined in <a href="http://www.w3.org/TR/owl2-syntax/#Annotations">Section 10</a> of the specification
  * 
- * @author Markus Kroetzsch
- * @param <O>
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ *
  */
-public interface ElkAxiomVisitor<O> extends
-		ElkClassAxiomVisitor<O>,
-		ElkDatatypeDefinitionVisitor<O>,
-		ElkHasKeyAxiomVisitor<O>,
-		ElkObjectPropertyAxiomVisitor<O>,
-		ElkDataPropertyAxiomVisitor<O>,
-		ElkAssertionAxiomVisitor<O>,
-		ElkAnnotationAxiomVisitor<O> {
+public interface ElkAnnotation extends ElkObject {
 
-	O visit(ElkDeclarationAxiom elkDeclarationAxiom);
-
+	public ElkAnnotationProperty getProperty();
+	public ElkAnnotationValue getValue();
 }

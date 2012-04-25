@@ -29,6 +29,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
@@ -190,6 +191,11 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 				ElkDisjointObjectPropertiesAxiom.class.getSimpleName()
 						+ " not supported");
 	}
+	
+	@Override
+	public Void visit(ElkAnnotationAssertionAxiom annAssertionAxiom) {
+		throw new IndexingException(ElkAnnotationAssertionAxiom.class.getSimpleName() + " not supported");
+	}	
 
 	/* (non-Javadoc)
 	 * @see org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom)

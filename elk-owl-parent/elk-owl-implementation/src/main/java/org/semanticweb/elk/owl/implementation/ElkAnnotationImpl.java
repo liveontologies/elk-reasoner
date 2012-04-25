@@ -25,48 +25,40 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Implementation of <@link ElkDatatypeDefinitionAxiom>
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  *
  */
-public class ElkDatatypeDefinitionAxiomImpl implements ElkDatatypeDefinitionAxiom {
-	
-	private final ElkDatatype datatype;
-	private final ElkDataRange dataRange;
-	
-	ElkDatatypeDefinitionAxiomImpl(ElkDatatype dt, ElkDataRange dr) {
-		datatype = dt;
-		dataRange = dr;
-	}
+public class ElkAnnotationImpl implements ElkAnnotation {
 
-	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+	private final ElkAnnotationProperty annProperty;
+	private final ElkAnnotationValue annValue;
+	
+	ElkAnnotationImpl(ElkAnnotationProperty annProperty, ElkAnnotationValue annValue) {
+		this.annProperty = annProperty;
+		this.annValue = annValue;
 	}
-
+	
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
+		// TODO extend the visitor
+		return null;
 	}
 
 	@Override
-	public ElkDatatype getDatatype() {
-		return datatype;
+	public ElkAnnotationProperty getProperty() {
+		return annProperty;
 	}
 
 	@Override
-	public ElkDataRange getDataRange() {
-		return dataRange;
+	public ElkAnnotationValue getValue() {
+		return annValue;
 	}
-
 }

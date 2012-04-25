@@ -61,29 +61,33 @@ public class ElkTestAxiomProcessor implements ElkAxiomProcessor {
 		axiomMap.put(elkAxiom.getClass(), axioms);
 	}
 
-	int getAxiomCountForType(Class<?> axiomClass) {
+	public int getAxiomCountForType(Class<?> axiomClass) {
 		Set<ElkAxiom> axioms = axiomMap.get(axiomClass);
 		
 		return axioms == null ? 0 : axioms.size();
 	}
 	
-	Set<ElkAxiom> getAxiomsForType(Class<?> axiomClass) {
+	public Set<ElkAxiom> getAxiomsForType(Class<?> axiomClass) {
 		Set<ElkAxiom> axioms = axiomMap.get(axiomClass);
 		
 		return axioms == null ? Collections.<ElkAxiom>emptySet() : axioms;
 	}
 	
-	Set<Map.Entry<Class<?>, Set<ElkAxiom>>> getAxiomMapEntries() {
+	public Set<Map.Entry<Class<?>, Set<ElkAxiom>>> getAxiomMapEntries() {
 		return axiomMap.entrySet();
 	}
 	
-	long getTotalAxiomCount() {
-		long count = 0;
+	public Set<ElkAxiom> getAllAxioms() {
+		Set<ElkAxiom> axioms = new HashSet<ElkAxiom>();
 		
-		for (Map.Entry<Class<?>, Set<ElkAxiom>> actualEntry : getAxiomMapEntries()) {
-			count += actualEntry.getValue().size();
+		for (Map.Entry<Class<?>, Set<ElkAxiom>> entry : getAxiomMapEntries()) {
+			axioms.addAll(entry.getValue());
 		}
 		
-		return count;
+		return axioms;
+	}
+	
+	long getTotalAxiomCount() {
+		return getAllAxioms().size();
 	}
 }
