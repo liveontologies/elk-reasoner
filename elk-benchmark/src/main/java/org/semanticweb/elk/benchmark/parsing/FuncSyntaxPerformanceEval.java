@@ -29,21 +29,26 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.semanticweb.elk.benchmark.StaticTimers;
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
-import org.semanticweb.elk.testing.IOUtils;
+import org.semanticweb.elk.testing.io.IOUtils;
+import org.semanticweb.elk.util.logging.Statistics;
 
 
 /**
+ * A simple utility to eval loading performance
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  *
  */
 public class FuncSyntaxPerformanceEval {
+	
+	final static Logger LOGGER_ = Logger.getLogger(FuncSyntaxPerformanceEval.class);
 
 	public static void main(String...args) throws Exception {
 		if (args.length == 0) {
@@ -66,7 +71,7 @@ public class FuncSyntaxPerformanceEval {
 			stream = new FileInputStream(file);
 			Owl2Parser parser = createParser(stream);
 			
-			StaticTimers.start("elk.loading");
+			Statistics.logOperationStart("loading", LOGGER_);
 			
 			parser.parseOntology(new ElkAxiomProcessor() {
 				@Override
@@ -79,9 +84,7 @@ public class FuncSyntaxPerformanceEval {
 			IOUtils.closeQuietly(stream);
 		}
 		
-		StaticTimers.stop("elk.loading");
-		StaticTimers.printAll();
-		
+		Statistics.logOperationFinish("loading", LOGGER_);
 	}
 
 	private static Owl2Parser createParser(InputStream stream) {
