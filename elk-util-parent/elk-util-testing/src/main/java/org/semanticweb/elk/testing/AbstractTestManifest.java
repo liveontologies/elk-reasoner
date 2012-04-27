@@ -32,33 +32,37 @@ package org.semanticweb.elk.testing;
  * pavel.klinov@uni-ulm.de
  *
  */
-public abstract class AbstractTestManifest implements TestManifest {
+public abstract class AbstractTestManifest<I extends TestInput, EO extends TestOutput, AO extends TestOutput> implements TestManifest<I, EO, AO> {
 
-	private final TestInput input;
-	private final TestOutput expOutput;
+	private final String name;
+	private final I input;
+	private final EO expOutput;
 	
-	public AbstractTestManifest(TestInput input, TestOutput expOutput) {
+	public AbstractTestManifest(String name, I input, EO expOutput) {
+		this.name = name;
 		this.input = input;
 		this.expOutput = expOutput;
 	}
 	
+	public String getName() {
+		return name;
+	}
+
 	@Override
-	public TestInput getInput() {
+	public I getInput() {
 		return input;
 	}
 
 	@Override
-	public TestOutput getExpectedOutput() {
+	public EO getExpectedOutput() {
 		return expOutput;
 	}
-
-	
 
 	@Override
 	public String toString() {
 		return "Input: " + input + System.getProperty("line.separator") + "Expected output: " + expOutput;
 	}
 
-	public abstract void compare(TestOutput actualOutput) throws TestResultComparisonException;
+	public abstract void compare(AO actualOutput) throws TestResultComparisonException;
 
 }

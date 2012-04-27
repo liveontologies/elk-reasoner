@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Utilities for Testing
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -23,23 +23,24 @@
 /**
  * 
  */
-package org.semanticweb.elk.testing;
+package org.semanticweb.elk.reasoner;
+
+import java.net.URL;
+
+import org.semanticweb.elk.testing.AbstractTestManifest;
+import org.semanticweb.elk.testing.TestOutput;
+import org.semanticweb.elk.testing.io.IOUtils;
+import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
- * The base interface for a test instance which defines:
- * - the input
- * - the expected output
- * - the method of comparison
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  *
  */
-public interface TestManifest<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
+public abstract class ReasoningTestManifest<EO extends TestOutput, AO extends TestOutput> extends AbstractTestManifest<URLTestIO, EO, AO> {
 
-	public String getName();
-	public I getInput();
-	public EO getExpectedOutput();
-	public void compare(AO actualOutput) throws TestResultComparisonException;
+	public ReasoningTestManifest(URL input, EO expOutput) {
+		super(IOUtils.getFileName(IOUtils.dropExtension(input.toString())), new URLTestIO(input), expOutput);
+	}
 }

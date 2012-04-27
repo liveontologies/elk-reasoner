@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Command Line Interface
+ * ELK OWL API Binding
  * 
  * $Id$
  * $HeadURL$
@@ -23,37 +23,34 @@
 /**
  * 
  */
-package org.semanticweb.elk.cli;
+package org.semanticweb.elk.owlapi;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.ClassificationCorrectnessTest;
+import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.HashClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.testing.HashTestOutput;
 
 /**
- * Loads test ontologies using Elk's native OWL 2 functional syntax parser
+ * Loads test ontologies via the OWL API and runs the hashcode-based test
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  *
  */
-public class CLIClassificationCorrectnessTest extends ClassificationCorrectnessTest {
+public class OWLAPIHashClassificationCorrectnessTest extends HashClassificationCorrectnessTest {
 
-	public CLIClassificationCorrectnessTest(final TestManifest testManifest) {
+	public OWLAPIHashClassificationCorrectnessTest(final ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
 
 	@Override
-	protected Reasoner createReasoner(final InputStream input) throws Owl2ParseException, IOException {
-		IOReasoner reasoner = new IOReasoner();
-		
-		reasoner.loadOntologyFromStream(input);
-		
-		return reasoner;
+	protected Reasoner createReasoner(InputStream input) throws IOException, Owl2ParseException {
+		return OWLAPITestUtils.loadOntologyIntoReasoner(input).getInternalReasoner();
 	}
-
 }

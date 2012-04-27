@@ -44,6 +44,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
 
+//TODO This test won't be necessary as soon as we can specify the expected class taxonomy
+//for our main classification tests, see BaseClassificationCorrectnessTest
+
 public class ReasonerTest extends TestCase {
 
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();

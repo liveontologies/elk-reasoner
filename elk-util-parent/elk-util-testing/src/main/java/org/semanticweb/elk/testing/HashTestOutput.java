@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK Utilities for Testing
  * 
  * $Id$
  * $HeadURL$
@@ -23,12 +23,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner;
-
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
-import org.semanticweb.elk.testing.AbstractTestManifest;
-import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestOutput;
+package org.semanticweb.elk.testing;
 
 /**
  * @author Pavel Klinov
@@ -36,30 +31,24 @@ import org.semanticweb.elk.testing.TestOutput;
  * pavel.klinov@uni-ulm.de
  *
  */
-public class ClassificationTestManifest extends AbstractTestManifest {
+public class HashTestOutput implements TestOutput {
 
-	public ClassificationTestManifest(TestInput input, TestOutput expOutput) {
-		super(input, expOutput);
+	private final int hash;
+	
+	public HashTestOutput(final int hash) {
+		this.hash = hash;
+	}
+	
+	public HashTestOutput(final String hashHex, final int radix) {
+		this.hash = Integer.parseInt(hashHex, radix);
+	}
+	
+	public int getHash() {
+		return hash;
 	}
 
 	@Override
-	public void compare(TestOutput actualOutput) {
-		// TODO taxonomy diff here?
-
-	}
-
-	
-}
-
-class ClassTaxonomyTestOutput implements TestOutput {
-	
-	private final ClassTaxonomy taxonomy;
-	
-	ClassTaxonomyTestOutput(ClassTaxonomy taxonomy) {
-		this.taxonomy = taxonomy;
-	}
-	
-	ClassTaxonomy getTaxonomy() {
-		return taxonomy;
+	public String toString() {
+		return "HashTestOutput [hash=" + hash + "]";
 	}
 }

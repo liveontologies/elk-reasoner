@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Utilities for Testing
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,26 +20,22 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.testing;
+package org.semanticweb.elk.reasoner;
 
-/**
- * The base interface for a test instance which defines:
- * - the input
- * - the expected output
- * - the method of comparison
- * 
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
- */
-public interface TestManifest<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
+import java.net.URL;
 
-	public String getName();
-	public I getInput();
-	public EO getExpectedOutput();
-	public void compare(AO actualOutput) throws TestResultComparisonException;
+import org.semanticweb.elk.testing.TestResultComparisonException;
+import org.semanticweb.elk.testing.io.URLTestIO;
+
+public class ClassTaxonomyDiffManifest extends ReasoningTestManifest<URLTestIO, ClassTaxonomyTestOutput> {
+
+	public ClassTaxonomyDiffManifest(URL input, URL expOutput) {
+		super(input, new URLTestIO(expOutput));
+	}
+
+	@Override
+	public void compare(ClassTaxonomyTestOutput actualOutput) throws TestResultComparisonException {
+		//TODO Implement: load the expected taxonomy and do a diff
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
 }

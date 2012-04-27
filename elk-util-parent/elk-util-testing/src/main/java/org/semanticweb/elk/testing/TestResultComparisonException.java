@@ -26,6 +26,8 @@
 package org.semanticweb.elk.testing;
 
 /**
+ * Thrown if the actual test value does not match the expected test value as specified in the test manifest.
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
@@ -33,6 +35,19 @@ package org.semanticweb.elk.testing;
  */
 public class TestResultComparisonException extends Exception {
 
+	public TestResultComparisonException() {}
+	
+	public TestResultComparisonException(String msg) {
+		super(msg);
+	}
+	
+	public TestResultComparisonException(Throwable e) {
+		super(e);
+	}
+	
+	public TestResultComparisonException(String msg, Throwable e) {
+		super(msg, e);
+	}
 	/**
 	 * 
 	 */

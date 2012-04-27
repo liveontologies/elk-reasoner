@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Utilities for Testing
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,26 +20,25 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.testing;
+package org.semanticweb.elk.reasoner;
 
-/**
- * The base interface for a test instance which defines:
- * - the input
- * - the expected output
- * - the method of comparison
- * 
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
- */
-public interface TestManifest<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
+import org.semanticweb.elk.testing.TestOutput;
 
-	public String getName();
-	public I getInput();
-	public EO getExpectedOutput();
-	public void compare(AO actualOutput) throws TestResultComparisonException;
+public class ClassTaxonomyTestOutput implements TestOutput {
+	
+	private final ClassTaxonomy taxonomy;
+	
+	ClassTaxonomyTestOutput(ClassTaxonomy taxonomy) {
+		this.taxonomy = taxonomy;
+	}
+	
+	ClassTaxonomy getTaxonomy() {
+		return taxonomy;
+	}
+	
+	int getHashCode() {
+		return ClassTaxonomyHasher.hash(taxonomy);
+	}
 }
