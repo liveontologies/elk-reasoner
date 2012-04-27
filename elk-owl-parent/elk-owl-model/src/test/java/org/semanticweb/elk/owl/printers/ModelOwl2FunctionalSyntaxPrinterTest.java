@@ -40,10 +40,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  */
 public abstract class ModelOwl2FunctionalSyntaxPrinterTest {
 
-	//@Ignore
-	/*
-	ignored because the printer can't print constructs which are not instantiated during parsing
-	*/ 
 	@Test
 	public void testRoundtrip() throws IOException {
 		Set<? extends ElkObject> elkObjects = getOriginalElkObjects();
@@ -54,11 +50,6 @@ public abstract class ModelOwl2FunctionalSyntaxPrinterTest {
 			OwlFunctionalStylePrinter.append(builder, elkObject);
 			builder.append(System.getProperty("line.separator"));
 		}
-		
-		/*Writer writer = new FileWriter(new File("test.owl"));
-		writer.write(builder.toString());
-		writer.flush();
-		writer.close();*/
 		
 		Set<? extends ElkObject> loadedElkObjects = loadPrintedElkObjects(builder.toString());
 		//TODO A diff here?
