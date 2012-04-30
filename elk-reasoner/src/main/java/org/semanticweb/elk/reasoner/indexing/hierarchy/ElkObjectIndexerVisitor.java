@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.List;
 import java.util.ListIterator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -31,6 +32,14 @@ import org.semanticweb.elk.owl.visitors.ElkDataPropertyExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 
+/**
+ * Visitor for Elk classes, properties, and individuals that returns the
+ * corresponding indexed objects, already filtered through the
+ * IndexedObjectFilter provided in the constructor.
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
 public class ElkObjectIndexerVisitor implements
 		ElkClassExpressionVisitor<IndexedClassExpression>,
 		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain>,
@@ -43,6 +52,11 @@ public class ElkObjectIndexerVisitor implements
 
 	private IndexedObjectFilter objectFilter;
 
+	/**
+	 * @param objectFilter
+	 *            filter that is applied to the indexed objects after
+	 *            construction
+	 */
 	public ElkObjectIndexerVisitor(IndexedObjectFilter objectFilter) {
 		this.objectFilter = objectFilter;
 	}
@@ -84,11 +98,24 @@ public class ElkObjectIndexerVisitor implements
 
 	public IndexedClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
 		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectHasValue
-			.getProperty().accept(this);
+				.getProperty().accept(this);
 		return objectFilter.filter(new IndexedObjectSomeValuesFrom(iop,
 				elkObjectHasValue.getFiller().accept(this)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor#visit(org.
+	 * semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf)
+	 * 
+	 * Binarization of conjunctions. To be able to use a map instead of a
+	 * multimap in IndexedClassExpression.negConjunctionsByConjunct It is
+	 * important to ensure that we never create both (A & B) and (B & A). This
+	 * is achieved by ordering conjucts so that A < B in each binary
+	 * conjunction.
+	 */
 	public IndexedClassExpression visit(
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
 
@@ -150,7 +177,7 @@ public class ElkObjectIndexerVisitor implements
 	public IndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
 		if (elkObjectOneOf.getIndividuals().size() != 1)
 			throw new IndexingException(ElkObjectOneOf.class.getSimpleName()
-				+ "is supported only for singletons");
+					+ "is supported only for singletons");
 		return elkObjectOneOf.getIndividuals().get(0).accept(this);
 	}
 
@@ -220,8 +247,14 @@ public class ElkObjectIndexerVisitor implements
 		if (LOGGER_.isEnabledFor(Level.WARN)) {
 			LOGGER_.warn(ElkDataSomeValuesFrom.class.getSimpleName() + " is supported only partially.");
 		}
-		IndexedDataProperty idp = (IndexedDataProperty) elkDataSomeValuesFrom.getProperty().accept(this);
-		return objectFilter.filter(new IndexedDataSomeValuesFrom(idp, elkDataSomeValuesFrom.getFiller()));
+		List<? extends ElkDataPropertyExpression> exps = elkDataSomeValuesFrom.getDataPropertyExpressions();
+		if (exps != null && exps.size() == 1) {
+			IndexedDataProperty idp = (IndexedDataProperty) exps.get(0).accept(this);
+			return objectFilter.filter(new IndexedDataSomeValuesFrom(idp, elkDataSomeValuesFrom.getDataRange()));
+		} else {
+			throw new IndexingException(ElkDataSomeValuesFrom.class.getSimpleName() 
+					+ "with multiple properties not supported");
+		}
 	}
 
 	public IndexedClassExpression visit(
@@ -244,6 +277,15 @@ public class ElkObjectIndexerVisitor implements
 		return objectFilter.filter(new IndexedDataProperty(elkDataProperty));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor
+	 * #visit(org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain)
+	 * 
+	 * Binarization of role chains. Order must be preserved.
+	 */
 	public IndexedPropertyChain visit(
 			ElkObjectPropertyChain elkObjectPropertyChain) {
 
@@ -270,12 +312,12 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	public IndexedNominal visit(ElkAnonymousIndividual elkAnonymousIndividual) {
-		throw new IndexingException(ElkAnonymousIndividual.class.getSimpleName()
-				+ " not supported");
+		throw new IndexingException(
+				ElkAnonymousIndividual.class.getSimpleName() + " not supported");
 	}
 
 	public IndexedNominal visit(ElkNamedIndividual elkNamedIndividual) {
-		return (IndexedNominal) objectFilter.filter(
-				new IndexedNominal(elkNamedIndividual));
+		return (IndexedNominal) objectFilter.filter(new IndexedNominal(
+				elkNamedIndividual));
 	}
 }

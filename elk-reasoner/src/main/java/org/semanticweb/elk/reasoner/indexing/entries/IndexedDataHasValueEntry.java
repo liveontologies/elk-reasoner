@@ -22,11 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing.entries;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 
 /**
- * Implements a view for instances of {@link IndexedClass}
+ * Implements an equality view for instances of {@link IndexedClassDataHasValue}
  *
  * @author "Yevgeny Kazakov"
  *

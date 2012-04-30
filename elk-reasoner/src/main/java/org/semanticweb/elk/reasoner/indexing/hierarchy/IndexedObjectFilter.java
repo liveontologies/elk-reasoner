@@ -22,11 +22,26 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-
+/**
+ * A simple interface for filtering IndexedClassExpression and
+ * IndexedPropertyChains. The intended use in concrete implementations is to
+ * return an equivalent canonical representative of the argument.
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
 interface IndexedObjectFilter {
 
+	/**
+	 * @param ice
+	 * @return an indexed object equivalent to the argument
+	 */
 	IndexedClassExpression filter(IndexedClassExpression ice);
 
+	/**
+	 * @param ipc
+	 * @return an indexed object equivalent to the argument
+	 */
 	IndexedPropertyChain filter(IndexedPropertyChain ipc);
 
 	IndexedDataProperty filter(IndexedDataProperty idp);

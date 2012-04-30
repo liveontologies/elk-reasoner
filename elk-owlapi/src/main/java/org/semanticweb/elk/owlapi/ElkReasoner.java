@@ -136,6 +136,10 @@ public class ElkReasoner implements OWLReasoner {
 		this.elkConverter = ElkConverter.getInstance();
 	}
 
+	protected Reasoner getInternalReasoner() {
+		return reasoner;
+	}
+	
 	protected void addAxiom(OWLAxiom ax) {
 		reasoner.addAxiom(owlConverter.convert(ax));
 	}

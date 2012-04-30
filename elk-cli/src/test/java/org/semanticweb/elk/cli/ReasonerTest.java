@@ -33,7 +33,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.owl.parsing.javacc.ParseException;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
@@ -42,6 +43,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+
+//TODO This test won't be necessary as soon as we can specify the expected class taxonomy
+//for our main classification tests, see BaseClassificationCorrectnessTest
 
 public class ReasonerTest extends TestCase {
 
@@ -52,7 +56,7 @@ public class ReasonerTest extends TestCase {
 	}
 
 	public void testExistentials() throws InterruptedException,
-			ExecutionException, ParseException, IOException {
+			ExecutionException, Owl2ParseException, IOException {
 
 		IOReasoner IOReasoner = new IOReasoner();
 		IOReasoner.loadOntologyFromString(""//
@@ -93,7 +97,7 @@ public class ReasonerTest extends TestCase {
 	}
 
 	public void testConjunctions() throws InterruptedException,
-			ExecutionException, ParseException, IOException {
+			ExecutionException, Owl2ParseException, IOException {
 
 		final IOReasoner IOReasoner = new IOReasoner();
 		IOReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
@@ -144,7 +148,7 @@ public class ReasonerTest extends TestCase {
 				aNode.getDirectSuperNodes().contains(taxonomy.getNode(e)));
 	}
 
-	public void testPropertyChains() throws ParseException, IOException {
+	public void testPropertyChains() throws Owl2ParseException, IOException {
 		IOReasoner IOReasoner = new IOReasoner();
 		IOReasoner
 				.loadOntologyFromString(""//
@@ -172,9 +176,73 @@ public class ReasonerTest extends TestCase {
 						taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
 								"http://example.org/X")))));
 	}
+	
+	public void testBottom() throws InterruptedException,
+			ExecutionException, Owl2ParseException, IOException {
+		
+		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner
+				.loadOntologyFromString(""//
+						+ "Prefix( : = <http://example.org/> )"//
+						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:C ObjectSomeValuesFrom(:S :A))"//
+						+ "SubClassOf(:B owl:Nothing)"//
+						+ ")"//
+				);
+
+		IOReasoner.classify();
+		
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/C"));
+		
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+
+		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
+		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
+		assertSame("C unsatisfiable", bottom, taxonomy.getNode(c));
+	}
+	
+	public void testDisjoint() throws InterruptedException,
+	ExecutionException, Owl2ParseException, IOException {
+
+		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner
+		.loadOntologyFromString(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "SubClassOf(:A :C)"//
+				+ "SubClassOf(:B :C)"//
+				+ "DisjointClasses(:A :B :C)"//
+				+ ")"//
+		);
+
+		IOReasoner.classify();
+
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/C"));
+
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+
+		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
+		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
+		assertNotSame("C satisfiable", bottom, taxonomy.getNode(c));
+	}
 
 	public void testAncestors() throws InterruptedException,
-			ExecutionException, ParseException, IOException {
+	ExecutionException, Owl2ParseException, IOException {
 
 		final IOReasoner IOReasoner = new IOReasoner();
 		IOReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
@@ -230,8 +298,7 @@ public class ReasonerTest extends TestCase {
 				4, aNode.getAllSuperNodes().size());
 	}
 
-	public void testTop() throws InterruptedException, ExecutionException,
-			ParseException, IOException {
+	public void testTop() throws InterruptedException, ExecutionException, Owl2ParseException, IOException {
 
 		final IOReasoner IOReasoner = new IOReasoner();
 		IOReasoner.loadOntologyFromString(""//

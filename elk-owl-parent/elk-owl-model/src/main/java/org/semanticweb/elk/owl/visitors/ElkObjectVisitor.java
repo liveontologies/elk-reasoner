@@ -42,8 +42,8 @@ public interface ElkObjectVisitor<O> extends
 		ElkDataPropertyExpressionVisitor<O>,
 		ElkIndividualVisitor<O>,
 		ElkLiteralVisitor<O>,
-		ElkEntityVisitor<O> {
+		ElkEntityVisitor<O>,
+		ElkAnnotationVisitor<O> {
 
 	O visit(ElkFacetRestriction elkFacetRestriction);
-
 }

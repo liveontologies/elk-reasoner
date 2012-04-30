@@ -21,6 +21,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-owl-model</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+			<scope>test</scope>
+			<classifier>tests</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-concurrent</artifactId>
 			<version>0.2.1-SNAPSHOT</version>
 		</dependency>
@@ -30,5 +37,21 @@
 			<version>0.2.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>test-jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
 
 </project>

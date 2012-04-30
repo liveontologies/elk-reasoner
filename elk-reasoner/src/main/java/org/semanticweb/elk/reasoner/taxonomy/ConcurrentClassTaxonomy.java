@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.util.collections.Operations;
@@ -58,7 +59,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 			.getLogger(ConcurrentClassTaxonomy.class);
 
 	/* thread safe map from class IRIs to class nodes */
-	protected final ConcurrentMap<String, NonBottomNode> nodeLookup;
+	protected final ConcurrentMap<ElkIri, NonBottomNode> nodeLookup;
 	/* thread safe set of all nodes */
 	protected final Set<ClassNode> allNodes;
 	/* boolean to guard access to the set of all nodes */
@@ -69,7 +70,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	protected final Set<ElkClass> unsatisfiableClasses;
 
 	ConcurrentClassTaxonomy() {
-		this.nodeLookup = new ConcurrentHashMap<String, NonBottomNode>();
+		this.nodeLookup = new ConcurrentHashMap<ElkIri, NonBottomNode>();
 		this.allNodes = Collections
 				.newSetFromMap(new ConcurrentHashMap<ClassNode, Boolean>());
 		allNodes.add(this);
@@ -86,12 +87,12 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	}
 
 	/**
-	 * Returns a unique string representation of the given ELK class.
+	 * Returns the IRI of the given ELK class.
 	 * 
-	 * @return a unique string representation of the given ELK class
+	 * @return the IRI of the given ELK class
 	 */
-	static String getKey(ElkClass elkClass) {
-		return elkClass.getIri().asString();
+	static ElkIri getKey(ElkClass elkClass) {
+		return elkClass.getIri();
 	}
 
 	/**
@@ -127,15 +128,29 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	}
 
 	NonBottomNode getCreate(Collection<ElkClass> members) {
+		
+		ElkClass someMember = null;
+		for (ElkClass member : members) {
+			someMember = member;
+			break;
+		}
+		
+		NonBottomNode previous = nodeLookup.get(getKey(someMember));
+		if (previous != null)
+			return previous;
+			
 		NonBottomNode node = new NonBottomNode(this, members);
 		// we assign first for the node to the canonical member to avoid
 		// concurrency problems
 		ElkClass canonical = node.getCanonicalMember();
-		NonBottomNode previous = nodeLookup
-				.putIfAbsent(getKey(canonical), node);
+		previous = nodeLookup.putIfAbsent(getKey(canonical), node);
 		if (previous != null)
-			return previous;
+			return previous;		
+		
 		allNodes.add(node);
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace(canonical + ": node created");
+		}
 		for (ElkClass member : members) {
 			if (member != canonical)
 				nodeLookup.put(getKey(member), node);

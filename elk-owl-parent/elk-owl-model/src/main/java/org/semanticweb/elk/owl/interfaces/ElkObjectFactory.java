@@ -26,6 +26,7 @@
 package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.iris.ElkIri;
 
@@ -37,28 +38,35 @@ import org.semanticweb.elk.owl.iris.ElkIri;
 public interface ElkObjectFactory {
 
 	/**
-	 * Create an {@link ElkAnnotationAxiom}.
+	 * Create an {@link ElkAnnotation}}
 	 * 
-	 * @param nodeId
 	 * @return
 	 */
-	public abstract ElkAnnotationAxiom getAnnotationAxiom();
-
+	public ElkAnnotation getAnnotation(ElkAnnotationProperty property, ElkAnnotationValue value);
+	
 	/**
 	 * Create an {@link ElkAnnotationProperty}.
 	 * 
 	 * @param iri
 	 * @return
 	 */
-	public abstract ElkAnnotationProperty getAnnotationProperty(ElkIri iri);
-
+	public  ElkAnnotationProperty getAnnotationProperty(ElkIri iri);
+	
+	/**
+	 * Create an {@link ElkAnnotationAssertionAxiom}}
+	 * 
+	 * @return
+	 */
+	public ElkAnnotationAssertionAxiom getAnnotationAssertionAxiom(ElkAnnotationProperty property, ElkAnnotationSubject subject, ElkAnnotationValue value);
+	
+	
 	/**
 	 * Create an {@link ElkAnonymousIndividual}.
 	 * 
 	 * @param nodeId
 	 * @return
 	 */
-	public abstract ElkAnonymousIndividual getAnonymousIndividual(String nodeId);
+	public  ElkAnonymousIndividual getAnonymousIndividual(String nodeId);
 
 	/**
 	 * Create an {@link ElkAsymmetricObjectPropertyAxiom}.
@@ -66,7 +74,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkAsymmetricObjectPropertyAxiom getAsymmetricObjectPropertyAxiom(
+	public  ElkAsymmetricObjectPropertyAxiom getAsymmetricObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
@@ -75,7 +83,7 @@ public interface ElkObjectFactory {
 	 * @param iri
 	 * @return
 	 */
-	public abstract ElkClass getClass(ElkIri iri);
+	public  ElkClass getClass(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkClassAssertionAxiom}.
@@ -84,19 +92,25 @@ public interface ElkObjectFactory {
 	 * @param individual
 	 * @return
 	 */
-	public abstract ElkClassAssertionAxiom getClassAssertionAxiom(
+	public  ElkClassAssertionAxiom getClassAssertionAxiom(
 			ElkClassExpression classExpression, ElkIndividual individual);
 
 	/**
 	 * Create an {@link ElkDataAllValuesFrom}.
 	 * 
-	 * @param dataPropertyExpression
 	 * @param dataRange
+	 * @param dpe1
+	 * @param dpe
 	 * @return
 	 */
-	public abstract ElkDataAllValuesFrom getDataAllValuesFrom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkDataRange dataRange);
+	public  ElkDataAllValuesFrom getDataAllValuesFrom(
+			ElkDataRange dataRange,
+			ElkDataPropertyExpression dpe1,
+			ElkDataPropertyExpression... dpe);
+	
+	public  ElkDataAllValuesFrom getDataAllValuesFrom(
+			ElkDataRange dataRange,
+			List<? extends ElkDataPropertyExpression> dpList);	
 
 	/**
 	 * Create an {@link ElkDataComplementOf}.
@@ -104,7 +118,7 @@ public interface ElkObjectFactory {
 	 * @param dataRange
 	 * @return
 	 */
-	public abstract ElkDataComplementOf getDataComplementOf(
+	public  ElkDataComplementOf getDataComplementOf(
 			ElkDataRange dataRange);
 
 	/**
@@ -114,7 +128,7 @@ public interface ElkObjectFactory {
 	 * @param cardinality
 	 * @return
 	 */
-	public abstract ElkDataExactCardinality getDataExactCardinality(
+	public  ElkDataExactCardinality getDataExactCardinality(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
 
 	/**
@@ -125,7 +139,7 @@ public interface ElkObjectFactory {
 	 * @param dataRange
 	 * @return
 	 */
-	public abstract ElkDataExactCardinalityQualified getDataExactCardinalityQualified(
+	public  ElkDataExactCardinalityQualified getDataExactCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange);
 
@@ -136,7 +150,7 @@ public interface ElkObjectFactory {
 	 * @param literal
 	 * @return
 	 */
-	public abstract ElkDataHasValue getDataHasValue(
+	public  ElkDataHasValue getDataHasValue(
 			ElkDataPropertyExpression dataPropertyExpression, ElkLiteral literal);
 
 	/**
@@ -147,7 +161,7 @@ public interface ElkObjectFactory {
 	 * @param otherDataRanges
 	 * @return
 	 */
-	public abstract ElkDataIntersectionOf getDataIntersectionOf(
+	public  ElkDataIntersectionOf getDataIntersectionOf(
 			ElkDataRange firstDataRange, ElkDataRange secondDataRange,
 			ElkDataRange... otherDataRanges);
 
@@ -157,7 +171,7 @@ public interface ElkObjectFactory {
 	 * @param dataRanges
 	 * @return
 	 */
-	public abstract ElkDataIntersectionOf getDataIntersectionOf(
+	public  ElkDataIntersectionOf getDataIntersectionOf(
 			List<? extends ElkDataRange> dataRanges);
 
 	/**
@@ -167,7 +181,7 @@ public interface ElkObjectFactory {
 	 * @param cardinality
 	 * @return
 	 */
-	public abstract ElkDataMaxCardinality getDataMaxCardinality(
+	public  ElkDataMaxCardinality getDataMaxCardinality(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
 
 	/**
@@ -178,7 +192,7 @@ public interface ElkObjectFactory {
 	 * @param dataRange
 	 * @return
 	 */
-	public abstract ElkDataMaxCardinalityQualified getDataMaxCardinalityQualified(
+	public  ElkDataMaxCardinalityQualified getDataMaxCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange);
 
@@ -189,7 +203,7 @@ public interface ElkObjectFactory {
 	 * @param cardinality
 	 * @return
 	 */
-	public abstract ElkDataMinCardinality getDataMinCardinality(
+	public  ElkDataMinCardinality getDataMinCardinality(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
 
 	/**
@@ -200,7 +214,7 @@ public interface ElkObjectFactory {
 	 * @param dataRange
 	 * @return
 	 */
-	public abstract ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
+	public  ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange);
 
@@ -211,7 +225,7 @@ public interface ElkObjectFactory {
 	 * @param otherIndividuals
 	 * @return
 	 */
-	public abstract ElkDataOneOf getDataOneOf(ElkLiteral firstLiteral,
+	public  ElkDataOneOf getDataOneOf(ElkLiteral firstLiteral,
 			ElkLiteral... otherLiterals);
 
 	/**
@@ -220,7 +234,7 @@ public interface ElkObjectFactory {
 	 * @param literals
 	 * @return
 	 */
-	public abstract ElkDataOneOf getDataOneOf(
+	public  ElkDataOneOf getDataOneOf(
 			List<? extends ElkLiteral> literals);
 
 	/**
@@ -229,7 +243,7 @@ public interface ElkObjectFactory {
 	 * @param dataPropertyIri
 	 * @return
 	 */
-	public abstract ElkDataProperty getDataProperty(ElkIri iri);
+	public  ElkDataProperty getDataProperty(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkDataPropertyAssertionAxiom}.
@@ -239,7 +253,7 @@ public interface ElkObjectFactory {
 	 * @param secondIndividual
 	 * @return
 	 */
-	public abstract ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
+	public  ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkIndividual individual, ElkLiteral literal);
 
@@ -250,7 +264,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
+	public  ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -261,20 +275,26 @@ public interface ElkObjectFactory {
 	 * @param dataRange
 	 * @return
 	 */
-	public abstract ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
+	public  ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkDataRange dataRange);
 
 	/**
-	 * Create an {@link ElkDataSomeValuesFrom}.
+	 * Create an {@link ElkDataSomeValuesFrom}
 	 * 
-	 * @param dataPropertyExpression
 	 * @param dataRange
+	 * @param dpe1
+	 * @param dpe
 	 * @return
 	 */
-	public abstract ElkDataSomeValuesFrom getDataSomeValuesFrom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkDataRange dataRange);
+	public  ElkDataSomeValuesFrom getDataSomeValuesFrom(
+			ElkDataRange dataRange,
+			ElkDataPropertyExpression dpe1,
+			ElkDataPropertyExpression... dpe);
+	
+	public  ElkDataSomeValuesFrom getDataSomeValuesFrom(
+			ElkDataRange dataRange,
+			List<? extends ElkDataPropertyExpression> dpList);
 
 	/**
 	 * Create an {@link ElkDatatype}.
@@ -282,14 +302,14 @@ public interface ElkObjectFactory {
 	 * @param iri
 	 * @return
 	 */
-	public abstract ElkDatatype getDatatype(ElkIri iri);
+	public  ElkDatatype getDatatype(ElkIri iri);
 
 	/**
 	 * Create the ElkDatatype for rdf:PlainLiteral}.
 	 * 
 	 * @return
 	 */
-	public abstract ElkDatatype getDatatypeRdfPlainLiteral();
+	public  ElkDatatype getDatatypeRdfPlainLiteral();
 
 	/**
 	 * Create an {@link ElkDatatypeRestriction}.
@@ -298,7 +318,7 @@ public interface ElkObjectFactory {
 	 * @param facetRestrictions
 	 * @return
 	 */
-	public abstract ElkDatatypeRestriction getDatatypeRestriction(
+	public  ElkDatatypeRestriction getDatatypeRestriction(
 			ElkDatatype datatype, List<ElkFacetRestriction> facetRestrictions);
 
 	/**
@@ -309,7 +329,7 @@ public interface ElkObjectFactory {
 	 * @param otherDataRanges
 	 * @return
 	 */
-	public abstract ElkDataUnionOf getDataUnionOf(ElkDataRange firstDataRange,
+	public  ElkDataUnionOf getDataUnionOf(ElkDataRange firstDataRange,
 			ElkDataRange secondDataRange, ElkDataRange... otherDataRanges);
 
 	/**
@@ -318,7 +338,7 @@ public interface ElkObjectFactory {
 	 * @param dataRanges
 	 * @return
 	 */
-	public abstract ElkDataUnionOf getDataUnionOf(
+	public  ElkDataUnionOf getDataUnionOf(
 			List<? extends ElkDataRange> dataRanges);
 
 	/**
@@ -327,7 +347,7 @@ public interface ElkObjectFactory {
 	 * @param entity
 	 * @return
 	 */
-	public abstract ElkDeclarationAxiom getDeclarationAxiom(ElkEntity entity);
+	public  ElkDeclarationAxiom getDeclarationAxiom(ElkEntity entity);
 
 	/**
 	 * Create an {@link ElkDifferentIndividualsAxiom}.
@@ -337,7 +357,7 @@ public interface ElkObjectFactory {
 	 * @param otherIndividuals
 	 * @return
 	 */
-	public abstract ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
+	public  ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
 			ElkIndividual... otherIndividuals);
 
@@ -347,7 +367,7 @@ public interface ElkObjectFactory {
 	 * @param individuals
 	 * @return
 	 */
-	public abstract ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
+	public  ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
 			List<? extends ElkIndividual> individuals);
 
 	/**
@@ -358,7 +378,7 @@ public interface ElkObjectFactory {
 	 * @param otherClassExpressions
 	 * @return
 	 */
-	public abstract ElkDisjointClassesAxiom getDisjointClassesAxiom(
+	public  ElkDisjointClassesAxiom getDisjointClassesAxiom(
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
@@ -369,7 +389,7 @@ public interface ElkObjectFactory {
 	 * @param disjointClassExpressions
 	 * @return
 	 */
-	public abstract ElkDisjointClassesAxiom getDisjointClassesAxiom(
+	public  ElkDisjointClassesAxiom getDisjointClassesAxiom(
 			List<? extends ElkClassExpression> disjointClassExpressions);
 
 	/**
@@ -380,7 +400,7 @@ public interface ElkObjectFactory {
 	 * @param otherDataPropertyExpressions
 	 * @return
 	 */
-	public abstract ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
+	public  ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
 			ElkDataPropertyExpression firstDataPropertyExpression,
 			ElkDataPropertyExpression secondDataPropertyExpression,
 			ElkDataPropertyExpression... otherDataPropertyExpressions);
@@ -391,7 +411,7 @@ public interface ElkObjectFactory {
 	 * @param disjointDataPropertyExpressions
 	 * @return
 	 */
-	public abstract ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
+	public  ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
 			List<? extends ElkDataPropertyExpression> disjointDataPropertyExpressions);
 
 	/**
@@ -402,7 +422,7 @@ public interface ElkObjectFactory {
 	 * @param otherObjectPropertyExpressions
 	 * @return
 	 */
-	public abstract ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
+	public  ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression,
 			ElkObjectPropertyExpression... otherObjectPropertyExpressions);
@@ -413,7 +433,7 @@ public interface ElkObjectFactory {
 	 * @param disjointObjectPropertyExpressions
 	 * @return
 	 */
-	public abstract ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
+	public  ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
 			List<? extends ElkObjectPropertyExpression> disjointObjectPropertyExpressions);
 
 	/**
@@ -424,7 +444,7 @@ public interface ElkObjectFactory {
 	 * @param otherClassExpressions
 	 * @return
 	 */
-	public abstract ElkDisjointUnionAxiom getDisjointUnionAxiom(
+	public  ElkDisjointUnionAxiom getDisjointUnionAxiom(
 			ElkClass definedClass, ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
@@ -435,7 +455,7 @@ public interface ElkObjectFactory {
 	 * @param disjointClassExpressions
 	 * @return
 	 */
-	public abstract ElkDisjointUnionAxiom getDisjointUnionAxiom(
+	public  ElkDisjointUnionAxiom getDisjointUnionAxiom(
 			ElkClass definedClass,
 			List<? extends ElkClassExpression> disjointClassExpressions);
 
@@ -447,7 +467,7 @@ public interface ElkObjectFactory {
 	 * @param otherClassExpressions
 	 * @return
 	 */
-	public abstract ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
+	public  ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
@@ -458,7 +478,7 @@ public interface ElkObjectFactory {
 	 * @param equivalentClassExpressions
 	 * @return
 	 */
-	public abstract ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
+	public  ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
 			List<? extends ElkClassExpression> equivalentClassExpressions);
 
 	/**
@@ -469,7 +489,7 @@ public interface ElkObjectFactory {
 	 * @param otherDataPropertyExpressions
 	 * @return
 	 */
-	public abstract ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+	public  ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
 			ElkDataPropertyExpression firstDataPropertyExpression,
 			ElkDataPropertyExpression secondDataPropertyExpression,
 			ElkDataPropertyExpression... otherDataPropertyExpressions);
@@ -480,7 +500,7 @@ public interface ElkObjectFactory {
 	 * @param equivalentDataPropertyExpressions
 	 * @return
 	 */
-	public abstract ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+	public  ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
 			List<? extends ElkDataPropertyExpression> equivalentDataPropertyExpressions);
 
 	/**
@@ -491,7 +511,7 @@ public interface ElkObjectFactory {
 	 * @param otherObjectPropertyExpressions
 	 * @return
 	 */
-	public abstract ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
+	public  ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression,
 			ElkObjectPropertyExpression... otherObjectPropertyExpressions);
@@ -502,7 +522,7 @@ public interface ElkObjectFactory {
 	 * @param equivalentObjectPropertyExpressions
 	 * @return
 	 */
-	public abstract ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
+	public  ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
 			List<? extends ElkObjectPropertyExpression> equivalentObjectPropertyExpressions);
 
 	/**
@@ -511,7 +531,7 @@ public interface ElkObjectFactory {
 	 * @param dataPropertyExpression
 	 * @return
 	 */
-	public abstract ElkFunctionalDataPropertyAxiom getFunctionalDataPropertyAxiom(
+	public  ElkFunctionalDataPropertyAxiom getFunctionalDataPropertyAxiom(
 			ElkDataPropertyExpression dataPropertyExpression);
 
 	/**
@@ -520,7 +540,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkFunctionalObjectPropertyAxiom getFunctionalObjectPropertyAxiom(
+	public  ElkFunctionalObjectPropertyAxiom getFunctionalObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
@@ -529,7 +549,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkInverseFunctionalObjectPropertyAxiom getInverseFunctionalObjectPropertyAxiom(
+	public  ElkInverseFunctionalObjectPropertyAxiom getInverseFunctionalObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
@@ -539,7 +559,7 @@ public interface ElkObjectFactory {
 	 * @param secondObjectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkInverseObjectPropertiesAxiom getInverseObjectPropertiesAxiom(
+	public  ElkInverseObjectPropertiesAxiom getInverseObjectPropertiesAxiom(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression);
 
@@ -549,7 +569,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
+	public  ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
@@ -559,7 +579,7 @@ public interface ElkObjectFactory {
 	 * @param datatype
 	 * @return
 	 */
-	public abstract ElkLiteral getLiteral(String lexicalForm,
+	public  ElkLiteral getLiteral(String lexicalForm,
 			ElkDatatype datatype);
 
 	/**
@@ -568,7 +588,7 @@ public interface ElkObjectFactory {
 	 * @param iri
 	 * @return
 	 */
-	public abstract ElkNamedIndividual getNamedIndividual(ElkIri iri);
+	public  ElkNamedIndividual getNamedIndividual(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkNegativeDataPropertyAssertionAxiom}.
@@ -578,7 +598,7 @@ public interface ElkObjectFactory {
 	 * @param secondIndividual
 	 * @return
 	 */
-	public abstract ElkNegativeDataPropertyAssertionAxiom getNegativeDataPropertyAssertionAxiom(
+	public  ElkNegativeDataPropertyAssertionAxiom getNegativeDataPropertyAssertionAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkIndividual individual, ElkLiteral literal);
 
@@ -590,7 +610,7 @@ public interface ElkObjectFactory {
 	 * @param secondIndividual
 	 * @return
 	 */
-	public abstract ElkNegativeObjectPropertyAssertionAxiom getNegativeObjectPropertyAssertionAxiom(
+	public  ElkNegativeObjectPropertyAssertionAxiom getNegativeObjectPropertyAssertionAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual);
 
@@ -601,7 +621,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectAllValuesFrom getObjectAllValuesFrom(
+	public  ElkObjectAllValuesFrom getObjectAllValuesFrom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -611,7 +631,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectComplementOf getObjectComplementOf(
+	public  ElkObjectComplementOf getObjectComplementOf(
 			ElkClassExpression classExpression);
 
 	/**
@@ -621,7 +641,7 @@ public interface ElkObjectFactory {
 	 * @param cardinality
 	 * @return
 	 */
-	public abstract ElkObjectExactCardinality getObjectExactCardinality(
+	public  ElkObjectExactCardinality getObjectExactCardinality(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality);
 
@@ -633,7 +653,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectExactCardinalityQualified getObjectExactCardinalityQualified(
+	public  ElkObjectExactCardinalityQualified getObjectExactCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression);
 
@@ -643,7 +663,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkObjectHasSelf getObjectHasSelf(
+	public  ElkObjectHasSelf getObjectHasSelf(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
@@ -653,7 +673,7 @@ public interface ElkObjectFactory {
 	 * @param individual
 	 * @return
 	 */
-	public abstract ElkObjectHasValue getObjectHasValue(
+	public  ElkObjectHasValue getObjectHasValue(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual individual);
 
@@ -665,7 +685,7 @@ public interface ElkObjectFactory {
 	 * @param otherClassExpressions
 	 * @return
 	 */
-	public abstract ElkObjectIntersectionOf getObjectIntersectionOf(
+	public  ElkObjectIntersectionOf getObjectIntersectionOf(
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
@@ -676,7 +696,7 @@ public interface ElkObjectFactory {
 	 * @param classExpressions
 	 * @return
 	 */
-	public abstract ElkObjectIntersectionOf getObjectIntersectionOf(
+	public  ElkObjectIntersectionOf getObjectIntersectionOf(
 			List<? extends ElkClassExpression> classExpressions);
 
 	/**
@@ -685,7 +705,7 @@ public interface ElkObjectFactory {
 	 * @param objectProperty
 	 * @return
 	 */
-	public abstract ElkObjectInverseOf getObjectInverseOf(
+	public  ElkObjectInverseOf getObjectInverseOf(
 			ElkObjectProperty objectProperty);
 
 	/**
@@ -695,7 +715,7 @@ public interface ElkObjectFactory {
 	 * @param cardinality
 	 * @return
 	 */
-	public abstract ElkObjectMaxCardinality getObjectMaxCardinality(
+	public  ElkObjectMaxCardinality getObjectMaxCardinality(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality);
 
@@ -707,7 +727,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectMaxCardinalityQualified getObjectMaxCardinalityQualified(
+	public  ElkObjectMaxCardinalityQualified getObjectMaxCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression);
 
@@ -718,7 +738,7 @@ public interface ElkObjectFactory {
 	 * @param cardinality
 	 * @return
 	 */
-	public abstract ElkObjectMinCardinality getObjectMinCardinality(
+	public  ElkObjectMinCardinality getObjectMinCardinality(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality);
 
@@ -730,7 +750,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectMinCardinalityQualified getObjectMinCardinalityQualified(
+	public  ElkObjectMinCardinalityQualified getObjectMinCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression);
 
@@ -741,7 +761,7 @@ public interface ElkObjectFactory {
 	 * @param otherIndividuals
 	 * @return
 	 */
-	public abstract ElkObjectOneOf getObjectOneOf(
+	public  ElkObjectOneOf getObjectOneOf(
 			ElkIndividual firstIndividual, ElkIndividual... otherIndividuals);
 
 	/**
@@ -750,7 +770,7 @@ public interface ElkObjectFactory {
 	 * @param individuals
 	 * @return
 	 */
-	public abstract ElkObjectOneOf getObjectOneOf(
+	public  ElkObjectOneOf getObjectOneOf(
 			List<? extends ElkIndividual> individuals);
 
 	/**
@@ -759,7 +779,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyIri
 	 * @return
 	 */
-	public abstract ElkObjectProperty getObjectProperty(ElkIri iri);
+	public  ElkObjectProperty getObjectProperty(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkObjectPropertyAssertionAxiom}.
@@ -769,7 +789,7 @@ public interface ElkObjectFactory {
 	 * @param secondIndividual
 	 * @return
 	 */
-	public abstract ElkObjectPropertyAssertionAxiom getObjectPropertyAssertionAxiom(
+	public  ElkObjectPropertyAssertionAxiom getObjectPropertyAssertionAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual);
 
@@ -779,7 +799,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyExpressions
 	 * @return
 	 */
-	public abstract ElkObjectPropertyChain getObjectPropertyChain(
+	public  ElkObjectPropertyChain getObjectPropertyChain(
 			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions);
 
 	/**
@@ -789,7 +809,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(
+	public  ElkObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -800,7 +820,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(
+	public  ElkObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -811,7 +831,7 @@ public interface ElkObjectFactory {
 	 * @param classExpression
 	 * @return
 	 */
-	public abstract ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
+	public  ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -823,7 +843,7 @@ public interface ElkObjectFactory {
 	 * @param otherClassExpressions
 	 * @return
 	 */
-	public abstract ElkObjectUnionOf getObjectUnionOf(
+	public  ElkObjectUnionOf getObjectUnionOf(
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
@@ -834,7 +854,7 @@ public interface ElkObjectFactory {
 	 * @param classExpressions
 	 * @return
 	 */
-	public abstract ElkObjectUnionOf getObjectUnionOf(
+	public  ElkObjectUnionOf getObjectUnionOf(
 			List<? extends ElkClassExpression> classExpressions);
 
 	/**
@@ -842,42 +862,42 @@ public interface ElkObjectFactory {
 	 * 
 	 * @return
 	 */
-	public abstract ElkDataProperty getOwlBottomDataProperty();
+	public  ElkDataProperty getOwlBottomDataProperty();
 
 	/**
 	 * Create the ElkObjectProperty representing owl:BottomObjectProperty}.
 	 * 
 	 * @return
 	 */
-	public abstract ElkObjectProperty getOwlBottomObjectProperty();
+	public  ElkObjectProperty getOwlBottomObjectProperty();
 
 	/**
 	 * Create the ElkClass representing owl:Nothing}.
 	 * 
 	 * @return
 	 */
-	public abstract ElkClass getOwlNothing();
+	public  ElkClass getOwlNothing();
 
 	/**
 	 * Create the ElkClass representing owl:Thing}.
 	 * 
 	 * @return
 	 */
-	public abstract ElkClass getOwlThing();
+	public  ElkClass getOwlThing();
 
 	/**
 	 * Create the ElkDataProperty representing owl:TopDataProperty}.
 	 * 
 	 * @return
 	 */
-	public abstract ElkDataProperty getOwlTopDataProperty();
+	public  ElkDataProperty getOwlTopDataProperty();
 
 	/**
 	 * Create the ElkObjectProperty representing owl:TopObjectProperty}.
 	 * 
 	 * @return
 	 */
-	public abstract ElkObjectProperty getOwlTopObjectProperty();
+	public  ElkObjectProperty getOwlTopObjectProperty();
 
 	/**
 	 * Create an {@link ElkReflexiveObjectPropertyAxiom}.
@@ -885,7 +905,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkReflexiveObjectPropertyAxiom getReflexiveObjectPropertyAxiom(
+	public  ElkReflexiveObjectPropertyAxiom getReflexiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
@@ -896,7 +916,7 @@ public interface ElkObjectFactory {
 	 * @param otherIndividuals
 	 * @return
 	 */
-	public abstract ElkSameIndividualAxiom getSameIndividualAxiom(
+	public  ElkSameIndividualAxiom getSameIndividualAxiom(
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
 			ElkIndividual... otherIndividuals);
 
@@ -906,7 +926,7 @@ public interface ElkObjectFactory {
 	 * @param individuals
 	 * @return
 	 */
-	public abstract ElkSameIndividualAxiom getSameIndividualAxiom(
+	public  ElkSameIndividualAxiom getSameIndividualAxiom(
 			List<? extends ElkIndividual> individuals);
 
 	/**
@@ -916,7 +936,7 @@ public interface ElkObjectFactory {
 	 * @param superClassExpression
 	 * @return
 	 */
-	public abstract ElkSubClassOfAxiom getSubClassOfAxiom(
+	public  ElkSubClassOfAxiom getSubClassOfAxiom(
 			ElkClassExpression subClassExpression,
 			ElkClassExpression superClassExpression);
 
@@ -927,7 +947,7 @@ public interface ElkObjectFactory {
 	 * @param superDataPropertyExpression
 	 * @return
 	 */
-	public abstract ElkSubDataPropertyOfAxiom getSubDataPropertyOfAxiom(
+	public  ElkSubDataPropertyOfAxiom getSubDataPropertyOfAxiom(
 			ElkDataPropertyExpression subDataPropertyExpression,
 			ElkDataPropertyExpression superDataPropertyExpression);
 
@@ -938,7 +958,7 @@ public interface ElkObjectFactory {
 	 * @param superObjectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkSubObjectPropertyOfAxiom getSubObjectPropertyOfAxiom(
+	public  ElkSubObjectPropertyOfAxiom getSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression);
 
@@ -948,7 +968,7 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
+	public  ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
@@ -957,7 +977,29 @@ public interface ElkObjectFactory {
 	 * @param objectPropertyExpression
 	 * @return
 	 */
-	public abstract ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
+	public  ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
-
+	
+	/**
+	 * Create an {@link ElkHasKeyAxiom}
+	 * 
+	 * @param classExpr
+	 * @param objectPEs
+	 * @param dataPEs
+	 * @return
+	 */
+	public ElkHasKeyAxiom getHasKeyAxiom(	ElkClassExpression classExpr,
+											Set<ElkObjectPropertyExpression> objectPEs,
+											Set<ElkDataPropertyExpression> dataPEs);
+	
+	/**
+	 * Create an {@link ElkDatatypeDefinitionAxiom}
+	 * 
+	 * @param datatype
+	 * @param dataRange
+	 * @return
+	 */
+	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom( ElkDatatype datatype, ElkDataRange dataRange);
+	
+	public ElkFacetRestriction getFacetRestriction( ElkIri iri, ElkLiteral literal);
 }

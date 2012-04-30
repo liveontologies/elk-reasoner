@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.rules.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -68,12 +68,16 @@ public abstract class IndexedPropertyChain {
 	public abstract List<IndexedPropertyChain> getToldSubProperties();
 
 	protected void addToldSuperObjectProperty(
-			IndexedObjectProperty superObjectProperty) {
+			IndexedObjectProperty superObjectProperty) { 
 		if (toldSuperProperties == null)
 			toldSuperProperties = new ArrayList<IndexedObjectProperty>(1);
 		toldSuperProperties.add(superObjectProperty);
 	}
 
+	/**
+	 * @param superObjectProperty
+	 * @return true if successfully removed
+	 */
 	protected boolean removeToldSuperObjectProperty(
 			IndexedObjectProperty superObjectProperty) {
 		boolean success = false;
@@ -93,7 +97,7 @@ public abstract class IndexedPropertyChain {
 	protected final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
 
 	/**
-	 * Non-recursively.
+	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
 	protected void updateOccurrenceNumber(int increment) {
 		occurrenceNo += increment;
