@@ -44,6 +44,7 @@ public class ElkObjectOneOfImpl extends ElkObjectListObject<ElkIndividual>
 		super(individuals);
 	}
 
+	@Override
 	public List<? extends ElkIndividual> getIndividuals() {
 		return elkObjects;
 	}
@@ -53,10 +54,12 @@ public class ElkObjectOneOfImpl extends ElkObjectListObject<ElkIndividual>
 		return buildFssString("ObjectOneOf");
 	}
 
+	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

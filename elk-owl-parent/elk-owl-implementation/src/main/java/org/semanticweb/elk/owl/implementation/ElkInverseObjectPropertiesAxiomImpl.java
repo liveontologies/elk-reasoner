@@ -52,10 +52,12 @@ public class ElkInverseObjectPropertiesAxiomImpl extends ElkObjectImpl
 		this.secondObjectPropertyExpression = secondObjectPropertyExpression;
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getFirstObjectPropertyExpression() {
 		return firstObjectPropertyExpression;
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getSecondObjectPropertyExpression() {
 		return secondObjectPropertyExpression;
 	}
@@ -70,14 +72,17 @@ public class ElkInverseObjectPropertiesAxiomImpl extends ElkObjectImpl
 		return result.toString();
 	}
 
+	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

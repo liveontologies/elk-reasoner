@@ -56,18 +56,22 @@ public abstract class StrongKeyEntry<T, K> implements KeyEntry<T, K> {
 		this.hash = computeHashCode();
 	}
 
+	@Override
 	public K getKey() {
 		return this.key;
 	}
 
+	@Override
 	public void setNext(KeyEntry<T, ? extends T> next) {
 		this.next = next;
 	}
 
+	@Override
 	public KeyEntry<T, ? extends T> getNext() {
 		return next;
 	}
 
+	@Override
 	public int hashCode() {
 		return hash;
 	}
@@ -81,6 +85,7 @@ public abstract class StrongKeyEntry<T, K> implements KeyEntry<T, K> {
 	public abstract int computeHashCode();
 
 	// don't forget to redefine equality
+	@Override
 	public abstract boolean equals(Object object);
 
 }

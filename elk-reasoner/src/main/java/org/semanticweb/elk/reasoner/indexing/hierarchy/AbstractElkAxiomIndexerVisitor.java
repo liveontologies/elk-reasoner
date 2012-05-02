@@ -119,6 +119,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 */
 	private final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
+	@Override
 	public void process(ElkAxiom elkAxiom) {
 		try {
 			elkAxiom.accept(this);
@@ -135,10 +136,12 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 * 
 	 * Nothing is done, annotations are ignored during indexing.
 	 */
+	@SuppressWarnings("static-method")
 	public Void visit(ElkAnnotationAxiom elkAnnotationAxiom) {
 		return null;
 	}
 
+	@Override
 	public Void visit(
 			ElkDisjointDataPropertiesAxiom elkDisjointDataPropertiesAxiom) {
 		throw new IndexingException(
@@ -146,6 +149,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(
 			ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties) {
 		throw new IndexingException(
@@ -153,6 +157,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(
 			ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom) {
 		throw new IndexingException(
@@ -160,24 +165,28 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom) {
 		throw new IndexingException(
 				ElkDataPropertyDomainAxiom.class.getSimpleName()
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom) {
 		throw new IndexingException(
 				ElkDataPropertyRangeAxiom.class.getSimpleName()
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom) {
 		throw new IndexingException(
 				ElkSubDataPropertyOfAxiom.class.getSimpleName()
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(
 			ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom) {
 		throw new IndexingException(
@@ -185,6 +194,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(
 			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
 		throw new IndexingException(
@@ -202,6 +212,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 * 
 	 * Reduces equivalent properties to subproperty axioms 
 	 */
+	@Override
 	public Void visit(ElkEquivalentObjectPropertiesAxiom axiom) {
 		ElkObjectPropertyExpression first = null;
 		for (ElkObjectPropertyExpression p : axiom
@@ -218,6 +229,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 		return null;
 	}
 
+	@Override
 	public Void visit(
 			ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom) {
 		throw new IndexingException(
@@ -225,6 +237,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(
 			ElkInverseFunctionalObjectPropertyAxiom elkInverseFunctionalObjectPropertyAxiom) {
 		throw new IndexingException(
@@ -232,6 +245,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(
 			ElkInverseObjectPropertiesAxiom elkInverseObjectPropertiesAxiom) {
 		throw new IndexingException(
@@ -239,6 +253,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(
 			ElkIrreflexiveObjectPropertyAxiom elkIrreflexiveObjectPropertyAxiom) {
 		throw new IndexingException(
@@ -246,6 +261,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(ElkObjectPropertyDomainAxiom axiom) {
 		indexSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(
 				axiom.getProperty(), PredefinedElkClass.OWL_THING),
@@ -253,12 +269,14 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 		return null;
 	}
 
+	@Override
 	public Void visit(ElkObjectPropertyRangeAxiom elkObjectPropertyRangeAxiom) {
 		throw new IndexingException(
 				ElkObjectPropertyRangeAxiom.class.getSimpleName()
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(
 			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
 		throw new IndexingException(
@@ -271,12 +289,14 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 * 
 	 * subproperty axioms are supported directly
 	 */
+	@Override
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
 		indexSubObjectPropertyOfAxiom(axiom.getSubObjectPropertyExpression(),
 				axiom.getSuperObjectPropertyExpression());
 		return null;
 	}
 
+	@Override
 	public Void visit(
 			ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom) {
 		throw new IndexingException(
@@ -289,6 +309,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 * 
 	 * Reduces a transitivity axioms to a subproperty axiom with a role chain on left
 	 */
+	@Override
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
 		ElkObjectPropertyExpression ope = axiom.getProperty();
 		indexSubObjectPropertyOfAxiom(
@@ -302,6 +323,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 * 
 	 * Reduces equivalent classes to subclass axioms.
 	 */
+	@Override
 	public Void visit(ElkEquivalentClassesAxiom axiom) {
 		ElkClassExpression first = null;
 		for (ElkClassExpression c : axiom.getClassExpressions()) {
@@ -320,17 +342,20 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 * 
 	 * Subclass axioms are supported directly.
 	 */
+	@Override
 	public Void visit(ElkSubClassOfAxiom axiom) {
 		indexSubClassOfAxiom(axiom.getSubClassExpression(),
 				axiom.getSuperClassExpression());
 		return null;
 	}
 
+	@Override
 	public Void visit(ElkDisjointClassesAxiom axiom) {
 		indexDisjointClassExpressions(axiom.getClassExpressions());
 		return null;
 	}
 
+	@Override
 	public Void visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
 		throw new IndexingException(ElkDisjointUnionAxiom.class.getSimpleName()
 				+ " not supported");
@@ -341,6 +366,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 * 
 	 * Reduces a class assertion to a subclass axiom with a nominal on left.
 	 */
+	@Override
 	public Void visit(ElkClassAssertionAxiom axiom) {
 		indexSubClassOfAxiom(
 				objectFactory.getObjectOneOf(axiom.getIndividual()),
@@ -348,12 +374,14 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 		return null;
 	}
 
+	@Override
 	public Void visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom) {
 		throw new IndexingException(
 				ElkDifferentIndividualsAxiom.class.getSimpleName()
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(ElkNegativeObjectPropertyAssertionAxiom axiom) {
 		throw new IndexingException(
 				ElkNegativeObjectPropertyAssertionAxiom.class.getSimpleName()
@@ -379,6 +407,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 * 
 	 * Reduces property assertions to subclass axioms with nominals.
 	 */
+	@Override
 	public Void visit(ElkObjectPropertyAssertionAxiom axiom) {
 		indexSubClassOfAxiom(objectFactory.getObjectOneOf(axiom.getSubject()),
 				objectFactory.getObjectSomeValuesFrom(axiom.getProperty(),
@@ -386,11 +415,13 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 		return null;
 	}
 
+	@Override
 	public Void visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
 		throw new IndexingException(
 				ElkSameIndividualAxiom.class.getSimpleName() + " not supported");
 	}
 
+	@Override
 	public Void visit(
 			ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion) {
 		throw new IndexingException(
@@ -398,6 +429,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public Void visit(ElkDataPropertyAssertionAxiom elkObjectDataAssertionAxiom) {
 		throw new IndexingException(
 				ElkDataPropertyAssertionAxiom.class.getSimpleName()
@@ -409,6 +441,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 * 
 	 * Declares the corresponding entity
 	 */
+	@Override
 	public Void visit(ElkDeclarationAxiom axiom) {
 		return axiom.getEntity().accept(entityDeclarator);
 	}
@@ -418,28 +451,33 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 */
 	private final ElkEntityVisitor<Void> entityDeclarator = new ElkEntityVisitor<Void>() {
 
+		@Override
 		public Void visit(ElkClass elkClass) {
 			indexClassDeclaration(elkClass);
 			return null;
 		}
 
+		@Override
 		public Void visit(ElkDatatype elkDatatype) {
 			LOGGER_.warn(ElkDatatype.class.getSimpleName()
 					+ " is supported only partially.");
 			return null;
 		}
 
+		@Override
 		public Void visit(ElkObjectProperty elkObjectProperty) {
 			indexObjectPropertyDeclaration(elkObjectProperty);
 			return null;
 		}
 
+		@Override
 		public Void visit(ElkDataProperty elkDataProperty) {
 			LOGGER_.warn(ElkDataProperty.class.getSimpleName()
 					+ " is supported only partially.");
 			return null;
 		}
 
+		@Override
 		public Void visit(ElkNamedIndividual elkNamedIndividual) {
 			indexNamedIndividualDeclaration(elkNamedIndividual);
 			return null;
@@ -451,6 +489,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 		 * 
 		 * Nothing is done, annotations are ignored during indexing.
 		 */
+		@Override
 		public Void visit(ElkAnnotationProperty elkAnnotationProperty) {
 			return null;
 		}

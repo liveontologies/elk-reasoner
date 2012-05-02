@@ -54,30 +54,36 @@ public class WeakElkEntityManager implements ElkObjectManager {
 	private ElkEntityVisitor<WeakWrapper<? extends ElkEntity>> wrapper =
 		new ElkEntityVisitor<WeakWrapper<? extends ElkEntity>>() {
 
+			@Override
 			public WeakWrapper<? extends ElkEntity> visit(ElkClass elkClass) {
 				return new WeakElkClassWrapper(elkClass, referenceQueue);
 			}
 
+			@Override
 			public WeakWrapper<? extends ElkEntity> visit(
 					ElkDatatype elkDatatype) {
 				return new WeakElkDatatypeWrapper (elkDatatype, referenceQueue);
 			}
 
+			@Override
 			public WeakWrapper<? extends ElkEntity> visit(
 					ElkObjectProperty elkObjectProperty) {
 				return new WeakElkObjectPropertyWrapper(elkObjectProperty, referenceQueue);
 			}
 
+			@Override
 			public WeakWrapper<? extends ElkEntity> visit(
 					ElkDataProperty elkDataProperty) {
 				return new WeakElkDataPropertyWrapper(elkDataProperty, referenceQueue);
 			}
 
+			@Override
 			public WeakWrapper<? extends ElkEntity> visit(
 					ElkNamedIndividual elkNamedIndividual) {
 				return new WeakElkNamedIndividualWrapper(elkNamedIndividual, referenceQueue);
 			}
 
+			@Override
 			public WeakWrapper<? extends ElkEntity> visit(
 					ElkAnnotationProperty elkAnnotationProperty) {
 				return new WeakElkAnnotationPropertyWrapper(elkAnnotationProperty, referenceQueue);
@@ -85,6 +91,7 @@ public class WeakElkEntityManager implements ElkObjectManager {
 		
 	};
 	
+	@Override
 	public ElkObject getCanonicalElkObject(ElkObject object) {
 		if (object instanceof ElkEntity)
 			return getCanonicalElkEntity((ElkEntity) object);

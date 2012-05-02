@@ -44,6 +44,7 @@ public class ArrayHashSetTest extends TestCase {
 		super(testName);
 	}
 
+	@SuppressWarnings("static-method")
 	public void testAddContains() {
 		
 		// random number generator for elements

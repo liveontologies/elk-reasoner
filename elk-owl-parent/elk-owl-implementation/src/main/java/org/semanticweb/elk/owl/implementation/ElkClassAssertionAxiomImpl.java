@@ -48,10 +48,12 @@ public class ElkClassAssertionAxiomImpl extends ElkObjectImpl implements
 		this.classExpression = classExpression;
 	}
 
+	@Override
 	public ElkClassExpression getClassExpression() {
 		return classExpression;
 	}
 
+	@Override
 	public ElkIndividual getIndividual() {
 		return individual;
 	}
@@ -66,14 +68,17 @@ public class ElkClassAssertionAxiomImpl extends ElkObjectImpl implements
 		return result.toString();
 	}
 
+	@Override
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

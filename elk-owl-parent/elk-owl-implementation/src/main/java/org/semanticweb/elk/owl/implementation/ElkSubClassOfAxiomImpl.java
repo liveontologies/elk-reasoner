@@ -52,10 +52,12 @@ public class ElkSubClassOfAxiomImpl extends ElkObjectImpl implements
 		this.superClassExpression = superClassExpression;
 	}
 
+	@Override
 	public ElkClassExpression getSubClassExpression() {
 		return subClassExpression;
 	}
 
+	@Override
 	public ElkClassExpression getSuperClassExpression() {
 		return superClassExpression;
 	}
@@ -70,14 +72,17 @@ public class ElkSubClassOfAxiomImpl extends ElkObjectImpl implements
 		return result.toString();
 	}
 
+	@Override
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

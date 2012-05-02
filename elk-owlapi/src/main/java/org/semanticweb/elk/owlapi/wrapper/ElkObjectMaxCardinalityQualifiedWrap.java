@@ -43,6 +43,7 @@ public class ElkObjectMaxCardinalityQualifiedWrap<T extends OWLObjectMaxCardinal
 		super(owlObjectMaxCardinality);
 	}
 
+	@Override
 	public ElkClassExpression getFiller() {
 		return converter.convert(this.owlObject.getFiller());
 	}

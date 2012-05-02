@@ -73,6 +73,7 @@ public abstract class ElkIri implements Comparable<ElkIri>, ElkAnnotationSubject
 	 * ElkAbbreviatedIris to optimize the case when the two iris have the same
 	 * prefix.
 	 */
+	@Override
 	public int compareTo(ElkIri arg) {
 		return this.asString().compareTo(arg.asString());
 	}

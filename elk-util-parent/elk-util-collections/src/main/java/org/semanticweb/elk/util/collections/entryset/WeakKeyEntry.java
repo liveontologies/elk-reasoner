@@ -86,18 +86,22 @@ public abstract class WeakKeyEntry<K, T> extends WeakReference<K> implements
 		hash = computeHashCode();
 	}
 
+	@Override
 	public K getKey() {
 		return this.get();
 	}
 
+	@Override
 	public void setNext(KeyEntry<T, ? extends T> next) {
 		this.next = next;
 	}
 
+	@Override
 	public KeyEntry<T, ? extends T> getNext() {
 		return next;
 	}
 
+	@Override
 	public int hashCode() {
 		return hash;
 	}
@@ -111,6 +115,7 @@ public abstract class WeakKeyEntry<K, T> extends WeakReference<K> implements
 	public abstract int computeHashCode();
 
 	// don't forget to redefine equality
+	@Override
 	public abstract boolean equals(Object object);
 
 }

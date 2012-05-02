@@ -48,6 +48,7 @@ public class ElkClassWrap<T extends OWLClass> extends ElkEntityWrap<T>
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

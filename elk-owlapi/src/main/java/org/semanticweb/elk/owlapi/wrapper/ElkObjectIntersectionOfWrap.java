@@ -47,6 +47,7 @@ public class ElkObjectIntersectionOfWrap<T extends OWLObjectIntersectionOf>
 		super(owlObjectIntersectionOf);
 	}
 
+	@Override
 	public List<? extends ElkClassExpression> getClassExpressions() {
 		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
 		for (OWLClassExpression ce : this.owlObject.getOperands()) {

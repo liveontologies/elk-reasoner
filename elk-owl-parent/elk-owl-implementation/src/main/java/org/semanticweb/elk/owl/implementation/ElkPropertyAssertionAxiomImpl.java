@@ -50,14 +50,17 @@ public abstract class ElkPropertyAssertionAxiomImpl<P, S, O> extends
 		this.object = object;
 	}
 
+	@Override
 	public S getSubject() {
 		return this.subject;
 	}
 
+	@Override
 	public O getObject() {
 		return this.object;
 	}
 
+	@Override
 	public abstract <T> T accept(ElkAssertionAxiomVisitor<T> visitor);
 
 	@Override

@@ -38,19 +38,23 @@ public class Operations {
 
 	public static <T> Iterable<T> singleton(final T element) {
 		return new Iterable<T>() {
+			@Override
 			public Iterator<T> iterator() {
 				return new Iterator<T>() {
 					boolean hasNext = true;
 
+					@Override
 					public boolean hasNext() {
 						return hasNext;
 					}
 
+					@Override
 					public T next() {
 						hasNext = false;
 						return element;
 					}
 
+					@Override
 					public void remove() {
 						throw new UnsupportedOperationException();
 					}
@@ -65,6 +69,7 @@ public class Operations {
 
 		return new Iterable<T>() {
 
+			@Override
 			public Iterator<T> iterator() {
 
 				return new Iterator<T>() {
@@ -74,10 +79,12 @@ public class Operations {
 					Iterator<? extends T> inner;
 					boolean hasNext = advance();
 
+					@Override
 					public boolean hasNext() {
 						return hasNext;
 					}
 
+					@Override
 					public T next() {
 						if (hasNext) {
 							T result = inner.next();
@@ -87,6 +94,7 @@ public class Operations {
 						throw new NoSuchElementException();
 					}
 
+					@Override
 					public void remove() {
 						throw new UnsupportedOperationException();
 					}
@@ -128,6 +136,7 @@ public class Operations {
 
 		return new Iterable<T>() {
 
+			@Override
 			public Iterator<T> iterator() {
 
 				return new Iterator<T>() {
@@ -135,10 +144,12 @@ public class Operations {
 					T next;
 					boolean hasNext = advance();
 
+					@Override
 					public boolean hasNext() {
 						return hasNext;
 					}
 
+					@Override
 					public T next() {
 						if (hasNext) {
 							T result = next;
@@ -148,6 +159,7 @@ public class Operations {
 						throw new NoSuchElementException();
 					}
 
+					@Override
 					public void remove() {
 						i.remove();
 					}
@@ -170,6 +182,7 @@ public class Operations {
 			final Class<T> type) {
 
 		return (Iterable<T>) filter(input, new Condition() {
+			@Override
 			public boolean holds(Object element) {
 				return type.isInstance(element);
 			}
@@ -193,22 +206,27 @@ public class Operations {
 			final Condition condition, final int size) {
 		return new Set<T>() {
 
+			@Override
 			public int size() {
 				return size;
 			}
 
+			@Override
 			public boolean isEmpty() {
 				return size == 0;
 			}
 
+			@Override
 			public boolean contains(Object o) {
 				return input.contains(o) && condition.holds(o);
 			}
 
+			@Override
 			public Iterator<T> iterator() {
 				return filter(input, condition).iterator();
 			}
 
+			@Override
 			public Object[] toArray() {
 				Object[] result = new Object[size];
 				int i = 0;
@@ -218,18 +236,22 @@ public class Operations {
 				return result;
 			}
 
+			@Override
 			public <S> S[] toArray(S[] a) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean add(T e) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean remove(Object o) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean containsAll(Collection<?> c) {
 				for (Object o : c) {
 					if (!condition.holds(o) || !input.contains(o))
@@ -238,18 +260,22 @@ public class Operations {
 				return true;
 			}
 
+			@Override
 			public boolean addAll(Collection<? extends T> c) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean retainAll(Collection<?> c) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean removeAll(Collection<?> c) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public void clear() {
 				throw new UnsupportedOperationException();
 			}

@@ -35,6 +35,7 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
  */
 public class RuleConjunctionPlus<C extends ContextElClassSaturation> implements InferenceRuleSCE<C> {
 
+	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
 

@@ -88,6 +88,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * 
 	 * @return the set of derived indexed class expressions
 	 */
+	@Override
 	public Set<IndexedClassExpression> getSuperClassExpressions() {
 		return superClassExpressions;
 	}
@@ -98,6 +99,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * 
 	 * @return
 	 */
+	@Override
 	public boolean isSatisfiable() {
 		return isSatisfiable;
 	}
@@ -108,6 +110,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * 
 	 * @param satisfiable
 	 */
+	@Override
 	public void setSatisfiable(boolean satisfiable) {
 		isSatisfiable = satisfiable;
 	}
@@ -171,6 +174,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * Mark context as saturated. A context is saturated if all superclass
 	 * expressions of the root expression have been computed.
 	 */
+	@Override
 	public void setSaturated() {
 		isSaturated = true;
 	}
@@ -183,6 +187,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * @return <tt>true</tt> if this context is saturated and <tt>false</tt>
 	 *         otherwise
 	 */
+	@Override
 	public boolean isSaturated() {
 		return isSaturated;
 	}

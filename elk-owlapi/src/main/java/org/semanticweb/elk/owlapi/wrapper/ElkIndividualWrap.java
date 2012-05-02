@@ -43,8 +43,10 @@ public abstract class ElkIndividualWrap<T extends OWLIndividual> extends
 		super(owlIndividual);
 	}
 
+	@Override
 	public abstract <O> O accept(ElkIndividualVisitor<O> visitor);
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return accept((ElkIndividualVisitor<O>) visitor);
 	}

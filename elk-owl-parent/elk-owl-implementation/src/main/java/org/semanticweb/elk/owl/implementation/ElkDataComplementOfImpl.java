@@ -44,6 +44,7 @@ public class ElkDataComplementOfImpl extends ElkObjectImpl implements
 		this.dataRange = dataRange;
 	}
 
+	@Override
 	public ElkDataRange getDataRange() {
 		return dataRange;
 	}
@@ -56,10 +57,12 @@ public class ElkDataComplementOfImpl extends ElkObjectImpl implements
 		return result.toString();
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -49,6 +49,7 @@ public class ElkEquivalentDataPropertiesAxiomWrap<T extends OWLEquivalentDataPro
 		super(owlEquivalentDataPropertiesAxiom);
 	}
 
+	@Override
 	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions() {
 		List<ElkDataPropertyExpression> result = new ArrayList<ElkDataPropertyExpression>();
 		for (OWLDataPropertyExpression dpe : this.owlObject.getProperties()) {

@@ -69,6 +69,7 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 		this.secondSet = secondSet;
 	}
 
+	@Override
 	public Iterator<E> iterator() {
 		if (firstSet.size() < secondSet.size())
 			// iterating over the fist set
@@ -78,10 +79,12 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 			return new SetIntersectionIterator<E>(secondSet, firstSet);
 	}
 
+	@Override
 	public boolean contains(Object o) {
 		return firstSet.contains(o) && secondSet.contains(o);
 	}
 
+	@Override
 	public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
 	}
@@ -113,10 +116,12 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 			}
 		}
 
+		@Override
 		public boolean hasNext() {
 			return hasNext;
 		}
 
+		@Override
 		public E next() {
 			if (!hasNext)
 				throw new NoSuchElementException();
@@ -125,6 +130,7 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 			return result;
 		}
 
+		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}

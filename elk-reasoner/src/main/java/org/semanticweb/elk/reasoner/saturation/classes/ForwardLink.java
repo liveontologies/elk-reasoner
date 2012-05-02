@@ -45,6 +45,7 @@ public class ForwardLink<C extends ContextElClassSaturation> extends
 		return second;
 	}
 
+	@Override
 	public boolean storeInContext(C context) {
 		// forwLinkInfNo.incrementAndGet();
 

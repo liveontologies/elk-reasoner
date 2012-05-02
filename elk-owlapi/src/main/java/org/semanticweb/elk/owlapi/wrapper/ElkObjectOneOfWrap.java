@@ -47,6 +47,7 @@ public class ElkObjectOneOfWrap<T extends OWLObjectOneOf> extends
 		super(owlObjectOneOf);
 	}
 
+	@Override
 	public List<? extends ElkIndividual> getIndividuals() {
 		List<ElkIndividual> result = new ArrayList<ElkIndividual>();
 		for (OWLIndividual ce : this.owlObject.getIndividuals()) {

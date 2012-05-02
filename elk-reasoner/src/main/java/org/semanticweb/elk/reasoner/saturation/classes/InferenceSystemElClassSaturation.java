@@ -45,6 +45,7 @@ public final class InferenceSystemElClassSaturation extends InferenceSystem<Cont
 		add(new RuleDisjoint<ContextElClassSaturation>());
 	}
 
+	@Override
 	public final ContextElClassSaturation createContext(IndexedClassExpression root) {
 		return new ContextElClassSaturation(root);
 	}

@@ -47,6 +47,7 @@ public class ElkSameIndividualAxiomWrap<T extends OWLSameIndividualAxiom>
 		super(owlSameIndividualAxiom);
 	}
 
+	@Override
 	public List<? extends ElkIndividual> getIndividuals() {
 		List<ElkIndividual> result = new ArrayList<ElkIndividual>();
 		for (OWLIndividual ind : this.owlObject.getIndividuals()) {

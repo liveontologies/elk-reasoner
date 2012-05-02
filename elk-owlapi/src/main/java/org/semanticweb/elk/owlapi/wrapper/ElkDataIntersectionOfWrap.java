@@ -47,6 +47,7 @@ public class ElkDataIntersectionOfWrap<T extends OWLDataIntersectionOf> extends
 		super(owlDataIntersectionOf);
 	}
 
+	@Override
 	public List<? extends ElkDataRange> getDataRanges() {
 		List<ElkDataRange> result = new ArrayList<ElkDataRange>();
 		for (OWLDataRange dr : this.owlObject.getOperands()) {

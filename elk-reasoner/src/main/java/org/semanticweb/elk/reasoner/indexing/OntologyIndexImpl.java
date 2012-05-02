@@ -52,6 +52,7 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 		axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 	}
 
+	@Override
 	public IndexedClassExpression getIndexed(ElkClassExpression representative) {
 		IndexedClassExpression result = representative.accept(elkObjectIndexer);
 		if (result.occurs())
@@ -60,6 +61,7 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 			return null;
 	}
 
+	@Override
 	public IndexedPropertyChain getIndexed(
 			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression) {
 		IndexedPropertyChain result = elkSubObjectPropertyExpression
@@ -70,36 +72,44 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 			return null;
 	}
 
+	@Override
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
 		return indexedClassExpressionLookup;
 	}
 
+	@Override
 	public Iterable<IndexedClass> getIndexedClasses() {
 		return Operations.filter(getIndexedClassExpressions(),
 				IndexedClass.class);
 	}
 
+	@Override
 	public int getIndexedClassCount() {
 		return indexedClassCount;
 	}
 
+	@Override
 	public Iterable<IndexedPropertyChain> getIndexedPropertyChains() {
 		return indexedPropertyChainLookup;
 	}
 
+	@Override
 	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
 		return Operations.filter(getIndexedPropertyChains(),
 				IndexedObjectProperty.class);
 	}
 
+	@Override
 	public int getIndexedObjectPropertyCount() {
 		return indexedObjectPropertyCount;
 	}
 
+	@Override
 	public ElkAxiomProcessor getAxiomInserter() {
 		return axiomInserter;
 	}
 
+	@Override
 	public ElkAxiomProcessor getAxiomDeleter() {
 		return axiomDeleter;
 	}

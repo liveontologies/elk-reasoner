@@ -51,6 +51,7 @@ public class ElkInverseFunctionalObjectPropertyAxiomImpl extends
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -123,14 +123,17 @@ public class RuleApplicationEngine implements InputProcessor<IndexedClassExpress
 		}
 	}
 
+	@Override
 	public void submit(IndexedClassExpression job) {
 		getCreateContext(job);
 	}
 
+	@Override
 	public void process() throws InterruptedException {
 		processActiveContexts();
 	}
 
+	@Override
 	public boolean canProcess() {
 		return !activeContextsEmpty.get();
 	}

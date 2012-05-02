@@ -45,6 +45,7 @@ public abstract class ElkCardinalityRestrictionQualifiedImpl<P, F> extends
 		this.filler = filler;
 	}
 
+	@Override
 	public F getFiller() {
 		return this.filler;
 	}

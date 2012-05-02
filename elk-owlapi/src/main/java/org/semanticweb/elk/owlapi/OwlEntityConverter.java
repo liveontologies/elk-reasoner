@@ -53,29 +53,35 @@ public class OwlEntityConverter implements OWLEntityVisitorEx<ElkEntity> {
 		this.propertyExpressionConverter = propertyExpressionConverter;
 	}
 
+	@Override
 	public ElkEntity visit(OWLClass cls) {
 		return classExpressionConverter.visit(cls);
 	}
 
+	@Override
 	public ElkEntity visit(OWLObjectProperty property) {
 		return propertyExpressionConverter.visit(property);
 	}
 
+	@Override
 	public ElkEntity visit(OWLDataProperty property) {
 		// TODO Support this constructor
 		return null;
 	}
 
+	@Override
 	public ElkEntity visit(OWLNamedIndividual individual) {
 		// TODO Support this constructor
 		return null;
 	}
 
+	@Override
 	public ElkEntity visit(OWLDatatype datatype) {
 		// TODO Support this constructor
 		return null;
 	}
 
+	@Override
 	public ElkEntity visit(OWLAnnotationProperty property) {
 		// TODO Support this constructor
 		return null;

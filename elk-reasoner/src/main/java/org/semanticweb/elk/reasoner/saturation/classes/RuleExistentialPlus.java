@@ -66,6 +66,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends Rul
 				engine.enqueue(target, carry);
 	}
 
+	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
 		final Collection<IndexedObjectSomeValuesFrom> exists = argument.getExpression()

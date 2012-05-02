@@ -44,22 +44,27 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 protected final OWLReasonerFactory factory=new ElkReasonerFactory(); 
     
-    public BufferingMode getRecommendedBuffering() {
+    @Override
+	public BufferingMode getRecommendedBuffering() {
         return BufferingMode.BUFFERING;
     }
     
-    public OWLReasonerFactory getReasonerFactory() {
+    @Override
+	public OWLReasonerFactory getReasonerFactory() {
         return factory;
     }
         
-    public OWLReasonerConfiguration getConfiguration(ReasonerProgressMonitor monitor) {
+    @Override
+	public OWLReasonerConfiguration getConfiguration(ReasonerProgressMonitor monitor) {
     	return new SimpleConfiguration(monitor, FreshEntityPolicy.DISALLOW, 0, IndividualNodeSetPolicy.BY_NAME);
     }
     
-    public void initialise() throws Exception {
+    @Override
+	public void initialise() throws Exception {
     }
     
-    public void dispose() throws Exception {
+    @Override
+	public void dispose() throws Exception {
     }
 
 }

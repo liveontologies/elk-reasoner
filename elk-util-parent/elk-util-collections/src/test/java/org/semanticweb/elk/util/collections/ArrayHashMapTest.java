@@ -44,6 +44,8 @@ public class ArrayHashMapTest extends TestCase {
 		super(testName);
 	}
 
+
+	@SuppressWarnings("static-method")
 	public void testPutGet() {
 		// random number generator for elements
 		Random generator = new Random(123);

@@ -43,6 +43,7 @@ public class ElkObjectExactCardinalityQualifiedWrap<T extends OWLObjectExactCard
 		super(owlObjectExactCardinality);
 	}
 
+	@Override
 	public ElkClassExpression getFiller() {
 		return converter.convert(this.owlObject.getFiller());
 	}

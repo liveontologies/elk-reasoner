@@ -38,18 +38,22 @@ import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
  */
 public class ElkReasonerFactory implements OWLReasonerFactory {
 
+	@Override
 	public String getReasonerName() {
 		return ElkReasonerFactory.class.getPackage().getImplementationTitle();
 	}
 
+	@Override
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology) {
 		return new ElkReasoner(ontology, false, null);
 	}
 
+	@Override
 	public OWLReasoner createReasoner(OWLOntology ontology) {
 		return new ElkReasoner(ontology, true, null);
 	}
 
+	@Override
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
@@ -59,6 +63,7 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 		return new ElkReasoner(ontology, false, progressMonitor);
 	}
 
+	@Override
 	public OWLReasoner createReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {

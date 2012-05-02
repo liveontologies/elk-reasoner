@@ -169,15 +169,18 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				ontologyIndex,
 				new ClassExpressionSaturationListener<J, ClassExpressionSaturationEngine<J>>() {
 
+					@Override
 					public void notifyCanProcess() {
 					}
 
+					@Override
 					public void notifyFinished(J job)
 							throws InterruptedException {
 					}
 				});
 	}
 
+	@Override
 	public void submit(J job) throws InterruptedException {
 
 		IndexedClassExpression root = job.getInput();
@@ -228,6 +231,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		processFinishedJobs();
 	}
 
+	@Override
 	public void process() throws InterruptedException {
 		if (ruleApplicationEngine.canProcess()) {
 			activeWorkers.incrementAndGet();
@@ -238,6 +242,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		processFinishedJobs();
 	}
 
+	@Override
 	public boolean canProcess() {
 		return ruleApplicationEngine.canProcess()
 				|| countJobsFinished.get() > countJobsProcessed.get();
@@ -351,6 +356,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 */
 	class ThisRuleApplicationListener implements RuleApplicationListener {
 
+		@Override
 		public void notifyCanProcess() {
 			/*
 			 * the rule application engine can process; wake up all sleeping

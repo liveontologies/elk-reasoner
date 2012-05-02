@@ -163,6 +163,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			this.negativeIncrement = negativeIncrement;
 		}
 
+		@Override
 		public IndexedClassExpression filter(IndexedClassExpression ice) {
 			IndexedClassExpression result = objectCache.filter(ice);
 
@@ -178,6 +179,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			return result;
 		}
 
+		@Override
 		public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
 			IndexedPropertyChain result = objectCache.filter(ipc);
 

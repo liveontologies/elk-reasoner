@@ -60,6 +60,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	 * 
 	 * Returns the indexed canonical representative of the argument.
 	 */
+	@Override
 	public IndexedClassExpression filter(IndexedClassExpression ice) {
 		IndexedClassExpression result = indexedClassExpressionLookup.get(ice);
 		if (result == null)
@@ -77,6 +78,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	 * 
 	 * Returns the indexed canonical representative of the argument.
 	 */
+	@Override
 	public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
 		IndexedPropertyChain result = indexedPropertyChainLookup.get(ipc);
 		if (result == null)
@@ -119,6 +121,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		final IndexedEntryConverter<IndexedClassExpression> converter = new IndexedEntryConverter<IndexedClassExpression>();
 
+		@Override
 		public KeyEntry<IndexedClassExpression, ? extends IndexedClassExpression> createEntry(
 				IndexedClassExpression key) {
 			return key.accept(converter);
@@ -137,6 +140,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		final IndexedEntryConverter<IndexedPropertyChain> converter = new IndexedEntryConverter<IndexedPropertyChain>();
 
+		@Override
 		public KeyEntry<IndexedPropertyChain, ? extends IndexedPropertyChain> createEntry(
 				IndexedPropertyChain key) {
 			return key.accept(converter);
