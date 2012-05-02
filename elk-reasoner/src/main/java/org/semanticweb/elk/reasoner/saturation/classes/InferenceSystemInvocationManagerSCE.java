@@ -60,6 +60,7 @@ public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturat
 				RuleMethodListNegSCE rest) {
 			this.firstInferenceRule = new InferenceRuleNegSCE<C> () {
 
+				@Override
 				public void applySCE(NegativeSuperClassExpression<C> argument,
 						C context, RuleApplicationEngine engine) {
 					firstInferenceRule.applySCE(argument, context, engine);
@@ -90,6 +91,7 @@ public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturat
 				RuleMethodListPosSCE rest) {
 			this.firstInferenceRule = new InferenceRulePosSCE<C> () {
 
+				@Override
 				public void applySCE(PositiveSuperClassExpression<C> argument,
 						C context, RuleApplicationEngine engine) {
 					firstInferenceRule.applySCE(argument, context, engine);

@@ -42,18 +42,22 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 		this.datatype = datatype;
 	}
 
+	@Override
 	public String getLexicalForm() {
 		return lexicalForm;
 	}
 
+	@Override
 	public ElkDatatype getDatatype() {
 		return datatype;
 	}
 
+	@Override
 	public <O> O accept(ElkLiteralVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

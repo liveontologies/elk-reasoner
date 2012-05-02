@@ -46,14 +46,17 @@ public class ElkNegativeObjectPropertyAssertionAxiomWrap<T extends OWLNegativeOb
 		super(owlNegativeObjectPropertyAssertionAxiom);
 	}
 
+	@Override
 	public ElkIndividual getObject() {
 		return converter.convert(this.owlObject.getSubject());
 	}
 
+	@Override
 	public ElkIndividual getSubject() {
 		return converter.convert(this.owlObject.getObject());
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}

@@ -48,6 +48,7 @@ public class ElkDataPropertyWrap<T extends OWLDataProperty> extends
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkDataPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -49,10 +49,12 @@ public class ElkSubDataPropertyOfAxiomImpl extends ElkObjectImpl implements
 		this.superDataPropertyExpression = superDataPropertyExpression;
 	}
 
+	@Override
 	public ElkDataPropertyExpression getSubDataPropertyExpression() {
 		return subDataPropertyExpression;
 	}
 
+	@Override
 	public ElkDataPropertyExpression getSuperDataPropertyExpression() {
 		return superDataPropertyExpression;
 	}
@@ -67,14 +69,17 @@ public class ElkSubDataPropertyOfAxiomImpl extends ElkObjectImpl implements
 		return result.toString();
 	}
 
+	@Override
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

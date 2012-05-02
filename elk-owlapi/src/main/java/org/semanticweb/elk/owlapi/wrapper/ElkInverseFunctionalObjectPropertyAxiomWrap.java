@@ -45,6 +45,7 @@ public class ElkInverseFunctionalObjectPropertyAxiomWrap<T extends OWLInverseFun
 		super(owlInverseFunctionalObjectPropertyAxiom);
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}

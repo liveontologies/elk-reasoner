@@ -45,12 +45,15 @@ public abstract class ElkEntityWrap<T extends OWLEntity> extends
 		super(owlEntity);
 	}
 
+	@Override
 	public ElkIri getIri() {
 		return new ElkFullIri(this.owlObject.getIRI().toString());
 	}
 
+	@Override
 	public abstract <O> O accept(ElkEntityVisitor<O> visitor);
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return accept((ElkEntityVisitor<O>) visitor);
 	}

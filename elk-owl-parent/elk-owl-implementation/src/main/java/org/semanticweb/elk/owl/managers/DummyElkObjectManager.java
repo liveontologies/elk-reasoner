@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  */
 public class DummyElkObjectManager implements ElkObjectManager {
 
+	@Override
 	public ElkObject getCanonicalElkObject(ElkObject object) {
 		return object;
 	}

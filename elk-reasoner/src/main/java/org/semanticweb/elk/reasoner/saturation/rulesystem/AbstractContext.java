@@ -76,6 +76,7 @@ public class AbstractContext implements Context {
 	 * 
 	 * @return root expression
 	 */
+	@Override
 	public IndexedClassExpression getRoot() {
 		return root;
 	}
@@ -86,6 +87,7 @@ public class AbstractContext implements Context {
 	 * 
 	 * @return queue
 	 */
+	@Override
 	public final Queue<Queueable<?>> getQueue() {
 		return queue;
 	}
@@ -97,6 +99,7 @@ public class AbstractContext implements Context {
 	 * 
 	 * @return true if the context was not active; returns false otherwise
 	 */
+	@Override
 	public boolean tryActivate() {
 		if (isActive.get()) {
 			return false;
@@ -111,6 +114,7 @@ public class AbstractContext implements Context {
 	 * 
 	 * @return true if the context was active; returns false otherwise
 	 */
+	@Override
 	public boolean tryDeactivate() {
 		if (!isActive.get()) {
 			return false;

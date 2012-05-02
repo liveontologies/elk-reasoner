@@ -44,6 +44,7 @@ public class ElkObjectComplementOfImpl extends ElkObjectImpl implements
 		this.classExpression = classExpression;
 	}
 
+	@Override
 	public ElkClassExpression getClassExpression() {
 		return classExpression;
 	}
@@ -56,10 +57,12 @@ public class ElkObjectComplementOfImpl extends ElkObjectImpl implements
 		return result.toString();
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

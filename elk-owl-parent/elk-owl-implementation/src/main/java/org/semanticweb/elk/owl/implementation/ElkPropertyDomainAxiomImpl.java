@@ -44,6 +44,7 @@ public abstract class ElkPropertyDomainAxiomImpl<P, D> extends
 		this.domain = domain;
 	}
 
+	@Override
 	public D getDomain() {
 		return this.domain;
 	}

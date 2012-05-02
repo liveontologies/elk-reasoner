@@ -139,6 +139,7 @@ public class ConcurrentComputation<I> {
 	 */
 	protected final class Worker implements JobProcessor<I, Boolean>, Runnable {
 
+		@Override
 		public final Boolean process(JobBatch<I> batch)
 				throws InterruptedException {
 			for (I input : batch) {
@@ -149,10 +150,12 @@ public class ConcurrentComputation<I> {
 			return true;
 		}
 
+		@Override
 		public final Boolean process(JobPoison<I> job) {
 			return false;
 		}
 
+		@Override
 		public final void run() {
 			for (;;) {
 				try {

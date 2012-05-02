@@ -44,10 +44,12 @@ public class ElkObjectMaxCardinalityWrap<T extends OWLObjectMaxCardinality>
 		super(owlObjectMaxCardinality);
 	}
 
+	@Override
 	public int getCardinality() {
 		return this.owlObject.getCardinality();
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}

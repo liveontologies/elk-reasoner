@@ -50,6 +50,7 @@ public class BackwardLink<C extends ContextElClassSaturation> extends
 		return second;
 	}
 
+	@Override
 	public boolean storeInContext(C context) {
 		backLinkInfNo.incrementAndGet();
 

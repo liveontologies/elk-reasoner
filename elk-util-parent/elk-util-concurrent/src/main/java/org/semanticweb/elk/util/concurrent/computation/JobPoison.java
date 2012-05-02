@@ -33,6 +33,7 @@ package org.semanticweb.elk.util.concurrent.computation;
  */
 public final class JobPoison<I> implements Job<I> {
 
+	@Override
 	public <O> O accept(JobProcessor<I, O> processor) {
 		return processor.process(this);
 	}

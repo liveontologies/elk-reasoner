@@ -96,10 +96,12 @@ public class ArrayHashSet<E> implements Set<E> {
 		this.threshold = computeThreshold(capacity);
 	}
 
+	@Override
 	public int size() {
 		return size;
 	}
 
+	@Override
 	public boolean isEmpty() {
 		return size == 0;
 	}
@@ -123,6 +125,7 @@ public class ArrayHashSet<E> implements Set<E> {
 		return o.hashCode() & (length - 1);
 	}
 
+	@Override
 	public boolean contains(Object o) {
 		if (o == null)
 			throw new NullPointerException();
@@ -179,6 +182,7 @@ public class ArrayHashSet<E> implements Set<E> {
 		this.threshold = computeThreshold(newCapacity);
 	}
 
+	@Override
 	public boolean add(E e) {
 		if (e == null)
 			throw new NullPointerException();
@@ -190,10 +194,12 @@ public class ArrayHashSet<E> implements Set<E> {
 		return result;
 	}
 
+	@Override
 	public Iterator<E> iterator() {
 		return new ElementIterator();
 	}
 
+	@Override
 	public Object[] toArray() {
 		Object[] result = new Object[size];
 		int i = 0;
@@ -203,30 +209,37 @@ public class ArrayHashSet<E> implements Set<E> {
 		return result;
 	}
 
+	@Override
 	public <T> T[] toArray(T[] a) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean containsAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean addAll(Collection<? extends E> c) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean retainAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean removeAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void clear() {
 		for (int i = 0; i < data.length; i++)
 			if (data[i] != null)
@@ -257,10 +270,12 @@ public class ArrayHashSet<E> implements Set<E> {
 				;
 		}
 
+		@Override
 		public boolean hasNext() {
 			return nextElement != null;
 		}
 
+		@Override
 		public E next() {
 			if (expectedSize != size)
 				throw new ConcurrentModificationException();
@@ -272,6 +287,7 @@ public class ArrayHashSet<E> implements Set<E> {
 			return result;
 		}
 
+		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}

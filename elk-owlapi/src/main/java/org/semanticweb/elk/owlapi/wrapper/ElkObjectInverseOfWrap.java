@@ -49,6 +49,7 @@ public class ElkObjectInverseOfWrap<T extends OWLObjectProperty> extends
 		super(owlObjectInverseOf);
 	}
 
+	@Override
 	public ElkObjectProperty getObjectProperty() {
 		return new ElkObjectPropertyWrap<OWLObjectProperty>(this.owlObject);
 	}

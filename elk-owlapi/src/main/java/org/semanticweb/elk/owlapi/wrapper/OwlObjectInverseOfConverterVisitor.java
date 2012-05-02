@@ -54,14 +54,17 @@ public class OwlObjectInverseOfConverterVisitor implements
 	private static OwlObjectInverseOfConverterVisitor OWL_OBJECT_INVERSE_OF_CONVERTER = OwlObjectInverseOfConverterVisitor
 			.getInstance();
 
+	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectProperty property) {
 		return new ElkObjectInverseOfWrap<OWLObjectProperty>(property);
 	}
 
+	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectInverseOf property) {
 		return property.accept(OWL_OBJECT_INVERSE_OF_CONVERTER);
 	}
 
+	@Override
 	public ElkObjectPropertyExpression visit(OWLDataProperty property) {
 		throw new IllegalArgumentException(property.getClass().getSimpleName()
 				+ " cannot be converted to "

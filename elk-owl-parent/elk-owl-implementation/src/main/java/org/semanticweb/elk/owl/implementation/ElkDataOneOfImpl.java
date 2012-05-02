@@ -42,6 +42,7 @@ public class ElkDataOneOfImpl extends ElkObjectListObject<ElkLiteral>
 		super(literals);
 	}
 
+	@Override
 	public List<? extends ElkLiteral> getLiterals() {
 		return elkObjects;
 	}
@@ -51,10 +52,12 @@ public class ElkDataOneOfImpl extends ElkObjectListObject<ElkLiteral>
 		return buildFssString("DataOneOf");
 	}
 
+	@Override
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -43,6 +43,7 @@ public class ElkDataComplementOfWrap<T extends OWLDataComplementOf> extends
 		super(owlDataComplementOf);
 	}
 
+	@Override
 	public ElkDataRange getDataRange() {
 		return converter.convert(this.owlObject.getDataRange());
 	}

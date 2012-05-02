@@ -47,6 +47,7 @@ public abstract class SuperClassExpression<C extends ContextElClassSaturation> i
 		return expression;
 	}
 
+	@Override
 	public boolean storeInContext(C context) {
 		superClassExpressionInfNo.incrementAndGet();
 		if (context.superClassExpressions.add(expression)) {

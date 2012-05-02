@@ -286,7 +286,7 @@ public class InferenceSystemInvocationManager {
 	 * @param parameterTypes
 	 * @throws IllegalInferenceMethodException
 	 */
-	protected void checkMethodSignature(Method method, String methodName,
+	protected static void checkMethodSignature(Method method, String methodName,
 			Class<?>[] parameterTypes) throws IllegalInferenceMethodException {
 		if (!methodName.equals(method.getName())) {
 			throw new IllegalInferenceMethodException(method,

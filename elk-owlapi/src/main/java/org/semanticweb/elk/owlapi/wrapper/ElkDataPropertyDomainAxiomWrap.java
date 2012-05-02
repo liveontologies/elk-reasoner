@@ -45,10 +45,12 @@ public class ElkDataPropertyDomainAxiomWrap<T extends OWLDataPropertyDomainAxiom
 		super(owlDataPropertyDomainAxiom);
 	}
 
+	@Override
 	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 
+	@Override
 	public ElkClassExpression getDomain() {
 		return converter.convert(this.owlObject.getDomain());
 	}

@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 public class Comparators {
 
 	public static Comparator<ElkClass> ELK_CLASS_COMPARATOR = new Comparator<ElkClass>() {
+		@Override
 		public int compare(ElkClass o1, ElkClass o2) {
 			return PredefinedElkIri.compare(o1.getIri(), o2.getIri());
 		}

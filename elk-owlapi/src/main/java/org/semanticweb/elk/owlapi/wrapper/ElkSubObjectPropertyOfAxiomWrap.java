@@ -45,10 +45,12 @@ public class ElkSubObjectPropertyOfAxiomWrap<T extends OWLSubObjectPropertyOfAxi
 		super(owlSubObjectPropertyOfAxiom);
 	}
 
+	@Override
 	public ElkSubObjectPropertyExpression getSubObjectPropertyExpression() {
 		return converter.convert(this.owlObject.getSubProperty());
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getSuperObjectPropertyExpression() {
 		return converter.convert(this.owlObject.getSuperProperty());
 	}

@@ -64,6 +64,7 @@ public class IndexedClass extends IndexedClassExpression {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
@@ -88,6 +89,7 @@ public class IndexedClass extends IndexedClassExpression {
 	 * 
 	 * @return String representation.
 	 */
+	@Override
 	public String toString() {
 		return '<' + getElkClass().getIri().asString() + '>';
 	}

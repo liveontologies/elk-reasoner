@@ -144,6 +144,7 @@ public class ObjectPropertySaturation {
 	class RoleHierarchyComputation implements
 			InputProcessor<IndexedPropertyChain> {
 
+		@Override
 		public void submit(IndexedPropertyChain ipc) {
 			SaturatedPropertyChain saturated = new SaturatedPropertyChain(ipc);
 			ipc.setSaturated(saturated);
@@ -174,11 +175,13 @@ public class ObjectPropertySaturation {
 
 		}
 
+		@Override
 		public void process() throws InterruptedException {
 			// nothing to do here, everything should be processed during the
 			// submission
 		}
 
+		@Override
 		public boolean canProcess() {
 			return false;
 		}

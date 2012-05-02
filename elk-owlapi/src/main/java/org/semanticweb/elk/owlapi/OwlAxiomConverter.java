@@ -111,167 +111,195 @@ public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 		this.entityConverter = entityConverter;
 	}
 
+	@Override
 	public ElkAxiom visit(OWLSubAnnotationPropertyOfAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLAnnotationPropertyDomainAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLAnnotationPropertyRangeAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkSubClassOfAxiom visit(OWLSubClassOfAxiom axiom) {
 		return objectFactory.getSubClassOfAxiom(
 				axiom.getSubClass().accept(classExpressionConverter), axiom
 						.getSuperClass().accept(classExpressionConverter));
 	}
 
+	@Override
 	public ElkAxiom visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLAsymmetricObjectPropertyAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLReflexiveObjectPropertyAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDisjointClassesAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDataPropertyDomainAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLObjectPropertyDomainAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLEquivalentObjectPropertiesAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDifferentIndividualsAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDisjointDataPropertiesAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDisjointObjectPropertiesAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLObjectPropertyRangeAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLObjectPropertyAssertionAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLFunctionalObjectPropertyAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkSubObjectPropertyOfAxiom visit(OWLSubObjectPropertyOfAxiom axiom) {
 		return objectFactory.getSubObjectPropertyOfAxiom(axiom.getSubProperty()
 				.accept(propertyExpressionConverter), axiom.getSuperProperty()
 				.accept(propertyExpressionConverter));
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDisjointUnionAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDeclarationAxiom axiom) {
 		return objectFactory.getDeclarationAxiom(axiom.getEntity().accept(
 				entityConverter));
 	}
 
+	@Override
 	public ElkAxiom visit(OWLAnnotationAssertionAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLSymmetricObjectPropertyAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDataPropertyRangeAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLFunctionalDataPropertyAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLEquivalentDataPropertiesAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLClassAssertionAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkEquivalentClassesAxiom visit(OWLEquivalentClassesAxiom axiom) {
 		List<OWLClassExpression> owlClassExpressions = axiom
 				.getClassExpressionsAsList();
@@ -283,66 +311,77 @@ public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 		return objectFactory.getEquivalentClassesAxiom(elkClassExpressions);
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDataPropertyAssertionAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkTransitiveObjectPropertyAxiom visit(
 			OWLTransitiveObjectPropertyAxiom axiom) {
 		return objectFactory.getTransitiveObjectPropertyAxiom(axiom
 				.getProperty().accept(propertyExpressionConverter));
 	}
 
+	@Override
 	public ElkAxiom visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLSubDataPropertyOfAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLSameIndividualAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLSubPropertyChainOfAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLInverseObjectPropertiesAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLHasKeyAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(OWLDatatypeDefinitionAxiom axiom) {
 		// TODO Support this axiom type
 		throw new ConverterException(axiom.getAxiomType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkAxiom visit(SWRLRule rule) {
 		// TODO Support this axiom type
 		throw new ConverterException(rule.getAxiomType().getName()

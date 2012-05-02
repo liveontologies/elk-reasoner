@@ -65,38 +65,40 @@ public class Owl2FunctionalStyleParser implements Owl2Parser {
 	 * Object factory used for creation of ELK Objects.
 	 */
 	protected ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-			
+
 	/**
 	 * Setting an object factory to be used for creation of ELK Objects.
 	 */
 	public void setObjectFactory(ElkObjectFactory objectFactory) {
 		this.objectFactory = objectFactory;
 	}
-	
-	/**
-	 * Prefix declarations as found in the parsed document. 
-	 */
-	protected ElkPrefixDeclarations prefixDeclarations =
-		 new ElkPrefixDeclarationsImpl();
 
 	/**
-	 * This method should be used to reset prefixDeclarations before
-	 * parsing a new ontology document.
+	 * Prefix declarations as found in the parsed document.
 	 */
+	protected ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
+
+	/**
+	 * This method should be used to reset prefixDeclarations before parsing a
+	 * new ontology document.
+	 */
+	@Override
 	public void setPrefixDeclarations(ElkPrefixDeclarations prefixDeclarations) {
 		this.prefixDeclarations = prefixDeclarations;
 	}
-	
-        /**
-         * The main parse method
-         */
-        public void parseOntology(final ElkAxiomProcessor processor) throws Owl2ParseException {
-        	try {
-				ontologyDocument(processor);
-			} catch (ParseException e) {
-				throw new Owl2ParseException(e);
-			}
-        }
+
+	/**
+	 * The main parse method
+	 */
+	@Override
+	public void parseOntology(final ElkAxiomProcessor processor)
+			throws Owl2ParseException {
+		try {
+			ontologyDocument(processor);
+		} catch (ParseException e) {
+			throw new Owl2ParseException(e);
+		}
+	}
 
 }
 

@@ -48,10 +48,12 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements In
 			this.engine = engine;
 		}
 
+		@Override
 		public Void visit(IndexedClass ice) {
 			return null;
 		}
 
+		@Override
 		public Void visit(IndexedObjectIntersectionOf ice) {
 			engine.enqueue(context,
 					new PositiveSuperClassExpression<C>(ice.getFirstConjunct()));
@@ -60,21 +62,25 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements In
 			return null;
 		}
 
+		@Override
 		public Void visit(IndexedObjectSomeValuesFrom ice) {
 			engine.enqueue(engine.getCreateContext(ice.getFiller()),
 					new BackwardLink<C>(ice.getRelation(), context));
 			return null;
 		}
 
+		@Override
 		public Void visit(IndexedDataHasValue element) {
 			return null;
 		}
 
+		@Override
 		public Void visit(IndexedNominal element) {
 			return null;
 		}
 	};
 
+	@Override
 	public void applySCE(PositiveSuperClassExpression<C> argument,
 			C context, RuleApplicationEngine engine) {
 		ClassExpressionDecomposer decomposer = new ClassExpressionDecomposer(

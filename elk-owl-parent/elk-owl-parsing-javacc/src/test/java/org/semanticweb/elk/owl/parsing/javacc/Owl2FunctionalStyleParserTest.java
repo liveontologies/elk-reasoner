@@ -56,12 +56,13 @@ public class Owl2FunctionalStyleParserTest extends AbstractOwl2FunctionalSyntaxP
 	class DummyElkAxiomProcessor implements ElkAxiomProcessor {
 		public final List<ElkAxiom> axiomList = new ArrayList<ElkAxiom>();
 
+		@Override
 		public void process(ElkAxiom axiom) {
 			axiomList.add(axiom);
 		}
 	}
 
-	protected Owl2FunctionalStyleParser getParserForString(String testString,
+	protected static Owl2FunctionalStyleParser getParserForString(String testString,
 			boolean defaultPrefixes) {
 		InputStream stream = new ByteArrayInputStream(testString.getBytes());
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
@@ -73,11 +74,12 @@ public class Owl2FunctionalStyleParserTest extends AbstractOwl2FunctionalSyntaxP
 		return parser;
 	}
 
-	protected ElkClass parseElkClass(String testString) throws ParseException,
+	protected static ElkClass parseElkClass(String testString) throws ParseException,
 			InterruptedException, ExecutionException {
 		return getParserForString(testString, true).clazz();
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testOwlThing() throws InterruptedException, ExecutionException,
 			ParseException {
@@ -87,11 +89,12 @@ public class Owl2FunctionalStyleParserTest extends AbstractOwl2FunctionalSyntaxP
 		assertEquals(objectFactory.getOwlThing().getIri(), clazz.getIri());
 	}
 
-	protected ElkLiteral parseElkLiteral(String testString)
+	protected static ElkLiteral parseElkLiteral(String testString)
 			throws ParseException, InterruptedException, ExecutionException {
 		return getParserForString(testString, true).literal();
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testPlainLiterals() throws InterruptedException,
 			ExecutionException, ParseException {

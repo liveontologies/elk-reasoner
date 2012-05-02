@@ -45,6 +45,7 @@ public class ElkIrreflexiveObjectPropertyAxiomWrap<T extends OWLIrreflexiveObjec
 		super(owlIrreflexiveObjectPropertyAxiom);
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}

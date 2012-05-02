@@ -43,10 +43,12 @@ public class ElkDataExactCardinalityWrap<T extends OWLDataExactCardinality>
 		super(owlDataExactCardinality);
 	}
 
+	@Override
 	public int getCardinality() {
 		return this.owlObject.getCardinality();
 	}
 
+	@Override
 	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}

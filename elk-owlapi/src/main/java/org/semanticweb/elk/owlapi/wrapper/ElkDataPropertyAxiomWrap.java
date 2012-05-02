@@ -43,6 +43,7 @@ public abstract class ElkDataPropertyAxiomWrap<T extends OWLDataPropertyAxiom>
 		super(owlDataPropertyAxiom);
 	}
 
+	@Override
 	abstract public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor);
 
 	@Override

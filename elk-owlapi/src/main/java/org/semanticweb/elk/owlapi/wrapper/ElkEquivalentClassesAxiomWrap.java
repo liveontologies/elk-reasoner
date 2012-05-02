@@ -47,6 +47,7 @@ public class ElkEquivalentClassesAxiomWrap<T extends OWLEquivalentClassesAxiom>
 		super(owlEquivalentClasses);
 	}
 
+	@Override
 	public List<? extends ElkClassExpression> getClassExpressions() {
 		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
 		for (OWLClassExpression ce : this.owlObject.getClassExpressions()) {

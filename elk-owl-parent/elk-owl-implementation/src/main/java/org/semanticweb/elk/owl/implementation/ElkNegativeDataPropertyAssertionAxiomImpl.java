@@ -52,6 +52,7 @@ public class ElkNegativeDataPropertyAssertionAxiomImpl
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
