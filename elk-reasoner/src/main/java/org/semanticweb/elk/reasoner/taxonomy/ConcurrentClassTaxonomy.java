@@ -182,9 +182,9 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 
 	public Set<ClassNode> getAllSuperNodes() {
 		/* all nodes except this one */
-		return Operations.filter(allNodes, new Condition<ClassNode>() {
-			public boolean holds(ClassNode element) {
-				return (Object)element != this;
+		return Operations.filter(allNodes, new Condition<Object>() {
+			public boolean holds(Object element) {
+				return element != this;
 			}
 		}, allNodes.size() - 1);
 	}
