@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Bencharking Package
+ * ELK Utilities for Testing
  * 
  * $Id$
  * $HeadURL$
@@ -20,36 +20,35 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.benchmark;
-
 /**
  * 
+ */
+package org.semanticweb.elk.testing;
+
+/**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  *
  */
-public class StaticTimers {
+public class HashTestOutput implements TestOutput {
 
-	private static final Timers sTimers = new Timers();
+	private final int hash;
 	
-	public static void start(String name) {
-		sTimers.start(name);
+	public HashTestOutput(final int hash) {
+		this.hash = hash;
 	}
 	
-	public static void stop(String name) {
-		sTimers.stop(name);
+	public HashTestOutput(final String hashHex, final int radix) {
+		this.hash = Integer.parseInt(hashHex, radix);
 	}
 	
-	public static void restart(String name) {
-		sTimers.restart(name);
+	public int getHash() {
+		return hash;
 	}
-	
-	public static void stopAll() {
-		sTimers.stopAll();
-	}
-	
-	public static void printAll() {
-		sTimers.printAll(System.out);
+
+	@Override
+	public String toString() {
+		return "HashTestOutput [hash=" + hash + "]";
 	}
 }

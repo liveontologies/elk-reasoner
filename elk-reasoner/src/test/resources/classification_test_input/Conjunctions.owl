@@ -1,0 +1,7 @@
+Prefix( : = <http://example.org/> )
+Ontology(
+SubClassOf(:A :B) 
+SubClassOf(:A :C)
+SubClassOf(:A :D)
+SubClassOf(ObjectIntersectionOf(:B :C :D) :E)
+)

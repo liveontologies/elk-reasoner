@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.semanticweb.elk</groupId>
   <artifactId>elk-util-testing</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.1-SNAPSHOT</version>
 
 	<name>ELK Utilities for Testing</name>
 	<description>ELK Utilities for Testing</description>

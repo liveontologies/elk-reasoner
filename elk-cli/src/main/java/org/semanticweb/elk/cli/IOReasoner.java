@@ -30,8 +30,8 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
-import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -46,34 +46,30 @@ public class IOReasoner extends Reasoner {
 		super(executor, workerNo);
 	}
 
-	public void loadOntologyFromStream(InputStream stream) throws ParseException,
-	IOException {
+	public void loadOntologyFromStream(InputStream stream) throws IOException, Owl2ParseException {
 		Statistics.logOperationStart("Loading", LOGGER_);
 
 		reset();
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
 		parser.setPrefixDeclarations(new ElkPrefixDeclarationsImpl());
-		parser.ontologyDocument(ontologyIndex.getAxiomInserter());
+		parser.parseOntology(ontologyIndex.getAxiomInserter());
 		stream.close();
 		Statistics.logOperationFinish("Loading", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 	}
 
-	public void loadOntologyFromFile(File file) throws ParseException,
-	IOException {
+	public void loadOntologyFromFile(File file) throws IOException, Owl2ParseException {
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Loading ontology from " + file);
 		}
 		loadOntologyFromStream(new FileInputStream(file));
 	}
 
-	public void loadOntologyFromFile(String fileName) throws ParseException,
-	IOException {
+	public void loadOntologyFromFile(String fileName) throws Owl2ParseException, IOException {
 		loadOntologyFromFile(new File(fileName));
 	}
 
-	public void loadOntologyFromString(String text) throws ParseException,
-	IOException {
+	public void loadOntologyFromString(String text) throws Owl2ParseException, IOException {
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Loading ontology from string");
 		}

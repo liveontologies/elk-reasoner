@@ -23,10 +23,14 @@
 /**
  * 
  */
-package org.semanticweb.elk.testing;
+package org.semanticweb.elk.testing.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+
+import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.TestOutput;
 
 /**
  * @author Pavel Klinov
@@ -34,14 +38,21 @@ import java.io.InputStream;
  * pavel.klinov@uni-ulm.de
  *
  */
-public class IOUtils {
+public class URLTestIO implements TestInput, TestOutput {
 
-	public static void closeQuietly(InputStream stream) {
-		if (stream != null) {
-			try {
-				stream.close();
-			} catch (IOException e) {}
-		}
+	private final URL url;
+	
+	
+	public URLTestIO(final URL file) {
+		this.url = file;
 	}
 	
+	public InputStream getInputStream() throws IOException {
+		return url.openStream();
+	}
+
+	@Override
+	public String toString() {
+		return url.toString();
+	}
 }

@@ -80,6 +80,17 @@
 			</roles>
 			<timezone>0</timezone>
 		</developer>
+		<developer>
+			<id>pavel</id>
+			<name>Pavel Klinov</name>
+			<email>pavel.klinov@uni-ulm.de</email>
+			<organization>Institute of Artificial Intelligence, University of Ulm</organization>
+			<organizationUrl>http://www.uni-ulm.de/en/in/ki.html</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>1</timezone>
+		</developer>
 	</developers>
 
 	<dependencies>
