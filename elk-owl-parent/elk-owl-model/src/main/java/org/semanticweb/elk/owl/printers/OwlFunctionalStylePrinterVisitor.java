@@ -26,6 +26,8 @@ import java.io.IOException;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyDomainAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkCardinalityRestriction;
@@ -107,6 +109,7 @@ import org.semanticweb.elk.owl.interfaces.ElkPropertyRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkPropertyRestrictionQualified;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
@@ -934,6 +937,40 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(ElkIri iri) {
 		write("<" + iri.asString() + ">");
 		return null;
+	}
+
+	@Override
+	public Void visit(
+			ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOfAxiom) {
+		write("SubAnnotationPropertyOf(");
+		write(subAnnotationPropertyOfAxiom.getSubAnnotationProperty());
+		write(' ');
+		write(subAnnotationPropertyOfAxiom.getSuperAnnotationProperty());
+		write(')');
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			ElkAnnotationPropertyDomainAxiom annotationPropertyDomainAxiom) {
+		write("AnnotationPropertyDomain(");
+		write(annotationPropertyDomainAxiom.getProperty());
+		write(' ');
+		write(annotationPropertyDomainAxiom.getDomain());
+		write(')');
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			ElkAnnotationPropertyRangeAxiom annotationPropertyRangeAxiom) {
+		write("AnnotationPropertyRange(");
+		write(annotationPropertyRangeAxiom.getProperty());
+		write(' ');
+		write(annotationPropertyRangeAxiom.getRange());
+		write(')');
+		return null;
+
 	}
 
 }

@@ -28,6 +28,8 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyDomainAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
@@ -103,6 +105,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
@@ -199,7 +202,6 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 				.getCanonicalElkObject(new ElkClassAssertionAxiomImpl(
 						classExpression, individual));
 	}
-
 
 	@Override
 	public ElkDataComplementOf getDataComplementOf(ElkDataRange dataRange) {
@@ -920,58 +922,101 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			Set<ElkObjectPropertyExpression> objectPEs,
 			Set<ElkDataPropertyExpression> dataPEs) {
 
-		return (ElkHasKeyAxiom)objectManager.getCanonicalElkObject(new ElkHasKeyAxiomImpl(classExpr, objectPEs, dataPEs));
-	}
-	
-	@Override
-	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom( ElkDatatype datatype, ElkDataRange dataRange) {
-		
-		return 	(ElkDatatypeDefinitionAxiom)objectManager.getCanonicalElkObject(new ElkDatatypeDefinitionAxiomImpl(datatype, dataRange));
+		return (ElkHasKeyAxiom) objectManager
+				.getCanonicalElkObject(new ElkHasKeyAxiomImpl(classExpr,
+						objectPEs, dataPEs));
 	}
 
 	@Override
-	public ElkDataAllValuesFrom getDataAllValuesFrom(
-			ElkDataRange dataRange,
-			ElkDataPropertyExpression dpe1,
-			ElkDataPropertyExpression... dpe) {
-		return (ElkDataAllValuesFrom)objectManager.getCanonicalElkObject(
-				new ElkDataAllValuesFromImpl(ElkObjectListObject.varArgsToList(dpe1, dpe), dataRange));
+	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom(
+			ElkDatatype datatype, ElkDataRange dataRange) {
+
+		return (ElkDatatypeDefinitionAxiom) objectManager
+				.getCanonicalElkObject(new ElkDatatypeDefinitionAxiomImpl(
+						datatype, dataRange));
 	}
 
 	@Override
-	public ElkDataAllValuesFrom getDataAllValuesFrom(	ElkDataRange dataRange,
-														List<? extends ElkDataPropertyExpression> dpList) {
-		return (ElkDataAllValuesFrom)objectManager.getCanonicalElkObject(new ElkDataAllValuesFromImpl(dpList, dataRange));
-	}	
-	
+	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
+			ElkDataPropertyExpression dpe1, ElkDataPropertyExpression... dpe) {
+		return (ElkDataAllValuesFrom) objectManager
+				.getCanonicalElkObject(new ElkDataAllValuesFromImpl(
+						ElkObjectListObject.varArgsToList(dpe1, dpe), dataRange));
+	}
+
+	@Override
+	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
+			List<? extends ElkDataPropertyExpression> dpList) {
+		return (ElkDataAllValuesFrom) objectManager
+				.getCanonicalElkObject(new ElkDataAllValuesFromImpl(dpList,
+						dataRange));
+	}
+
 	@Override
 	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
 			ElkDataPropertyExpression dpe1, ElkDataPropertyExpression... dpe) {
-		return (ElkDataSomeValuesFrom)objectManager.getCanonicalElkObject(
-				new ElkDataSomeValuesFromImpl(ElkObjectListObject.varArgsToList(dpe1, dpe), dataRange));
-	}
-	
-	@Override
-	public ElkDataSomeValuesFrom getDataSomeValuesFrom(	ElkDataRange dataRange,
-														List<? extends ElkDataPropertyExpression> dpList) {
-		return (ElkDataSomeValuesFrom)objectManager.getCanonicalElkObject(new ElkDataSomeValuesFromImpl(dpList, dataRange));
+		return (ElkDataSomeValuesFrom) objectManager
+				.getCanonicalElkObject(new ElkDataSomeValuesFromImpl(
+						ElkObjectListObject.varArgsToList(dpe1, dpe), dataRange));
 	}
 
 	@Override
-	public ElkFacetRestriction getFacetRestriction(ElkIri iri, ElkLiteral literal) {
-		return (ElkFacetRestriction)objectManager.getCanonicalElkObject(new ElkFacetRestrictionImpl(iri.asString(), literal));
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
+			List<? extends ElkDataPropertyExpression> dpList) {
+		return (ElkDataSomeValuesFrom) objectManager
+				.getCanonicalElkObject(new ElkDataSomeValuesFromImpl(dpList,
+						dataRange));
 	}
 
 	@Override
-	public ElkAnnotation getAnnotation(ElkAnnotationProperty property, ElkAnnotationValue value) {
-		return (ElkAnnotation)objectManager.getCanonicalElkObject(new ElkAnnotationImpl(property, value));
+	public ElkFacetRestriction getFacetRestriction(ElkIri iri,
+			ElkLiteral literal) {
+		return (ElkFacetRestriction) objectManager
+				.getCanonicalElkObject(new ElkFacetRestrictionImpl(iri
+						.asString(), literal));
+	}
+
+	@Override
+	public ElkAnnotation getAnnotation(ElkAnnotationProperty property,
+			ElkAnnotationValue value) {
+		return (ElkAnnotation) objectManager
+				.getCanonicalElkObject(new ElkAnnotationImpl(property, value));
 	}
 
 	@Override
 	public ElkAnnotationAssertionAxiom getAnnotationAssertionAxiom(
 			ElkAnnotationProperty property, ElkAnnotationSubject subject,
 			ElkAnnotationValue value) {
-		
-		return (ElkAnnotationAssertionAxiom)objectManager.getCanonicalElkObject(new ElkAnnotationAssertionAxiomImpl(property, subject, value));
+
+		return (ElkAnnotationAssertionAxiom) objectManager
+				.getCanonicalElkObject(new ElkAnnotationAssertionAxiomImpl(
+						property, subject, value));
 	}
+
+	@Override
+	public ElkAnnotationPropertyDomainAxiom getAnnotationPropertyDomainAxiom(
+			ElkAnnotationProperty property, ElkIri domain) {
+
+		return (ElkAnnotationPropertyDomainAxiom) objectManager
+				.getCanonicalElkObject(new ElkAnnotationPropertyDomainAxiomImpl(
+						property, domain));
+	}
+
+	@Override
+	public ElkAnnotationPropertyRangeAxiom getAnnotationPropertyRangeAxiom(
+			ElkAnnotationProperty property, ElkIri range) {
+		return (ElkAnnotationPropertyRangeAxiom) objectManager
+				.getCanonicalElkObject(new ElkAnnotationPropertyRangeAxiomImpl(
+						property, range));
+	}
+
+	@Override
+	public ElkSubAnnotationPropertyOfAxiom getSubAnnotationPropertyOfAxiom(
+			ElkAnnotationProperty subAnnotationProperty,
+			ElkAnnotationProperty superAnnotationProperty) {
+		return (ElkSubAnnotationPropertyOfAxiom) objectManager
+				.getCanonicalElkObject(new ElkSubAnnotationPropertyOfAxiomImpl(
+						subAnnotationProperty, superAnnotationProperty));
+	}
+
 }

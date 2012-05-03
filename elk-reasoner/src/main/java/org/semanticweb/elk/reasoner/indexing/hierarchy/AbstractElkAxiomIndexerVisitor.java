@@ -30,8 +30,9 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyDomainAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -69,6 +70,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
@@ -82,15 +84,16 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 /**
  * An abstract class for indexing axioms. Its purpose is to reduce many
- * syntactically different forms of OWL axioms to a small number of
- * canonical axiom forms. Concrete instances of this class then only need
- * to implement indexing of the canonical axioms.
+ * syntactically different forms of OWL axioms to a small number of canonical
+ * axiom forms. Concrete instances of this class then only need to implement
+ * indexing of the canonical axioms.
  * 
  * @author Frantisek Simancik
  * 
  */
 public abstract class AbstractElkAxiomIndexerVisitor implements
 		ElkAxiomProcessor, ElkAxiomVisitor<Void> {
+
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -102,8 +105,9 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	public abstract void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
-	
-	public abstract void indexDisjointClassExpressions(List<? extends ElkClassExpression> list);
+
+	public abstract void indexDisjointClassExpressions(
+			List<? extends ElkClassExpression> list);
 
 	public abstract void indexClassDeclaration(ElkClass ec);
 
@@ -129,16 +133,6 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ OwlFunctionalStylePrinter.toString(elkAxiom) + " : "
 						+ e.getMessage());
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkEntityVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty)
-	 * 
-	 * Nothing is done, annotations are ignored during indexing.
-	 */
-	@SuppressWarnings("static-method")
-	public Void visit(ElkAnnotationAxiom elkAnnotationAxiom) {
-		return null;
 	}
 
 	@Override
@@ -201,23 +195,60 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 				ElkDisjointObjectPropertiesAxiom.class.getSimpleName()
 						+ " not supported");
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkEntityVisitor#visit(org.semanticweb
+	 * .elk.owl.interfaces.ElkAnnotationProperty)
+	 * 
+	 * Nothing is done, annotations assertions are ignored during indexing.
+	 */
 	@Override
 	public Void visit(ElkAnnotationAssertionAxiom annAssertionAxiom) {
-		throw new IndexingException(ElkAnnotationAssertionAxiom.class.getSimpleName() + " not supported");
-	}	
+		return null;
+	}
+	
+	@Override
+	public Void visit(
+			ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOfAxiom) {
+		throw new IndexingException(
+				ElkSubAnnotationPropertyOfAxiom.class.getSimpleName()
+						+ " not supported");
+	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom)
+	@Override
+	public Void visit(
+			ElkAnnotationPropertyDomainAxiom annotationPropertyDomainAxiom) {
+		throw new IndexingException(
+				ElkAnnotationPropertyDomainAxiom.class.getSimpleName()
+						+ " not supported");
+	}
+
+	@Override
+	public Void visit(
+			ElkAnnotationPropertyRangeAxiom annotationPropertyRangeAxiom) {
+		throw new IndexingException(
+				ElkAnnotationPropertyRangeAxiom.class.getSimpleName()
+						+ " not supported");
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * Reduces equivalent properties to subproperty axioms 
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor#visit(
+	 * org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom)
+	 * 
+	 * Reduces equivalent object properties to subproperty axioms.
 	 */
 	@Override
 	public Void visit(ElkEquivalentObjectPropertiesAxiom axiom) {
 		ElkObjectPropertyExpression first = null;
 		for (ElkObjectPropertyExpression p : axiom
 				.getObjectPropertyExpressions()) {
-			// 
+			//
 
 			if (first == null)
 				first = p;
@@ -284,8 +315,12 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor#visit(
+	 * org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom)
 	 * 
 	 * subproperty axioms are supported directly
 	 */
@@ -304,10 +339,15 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom)
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * Reduces a transitivity axioms to a subproperty axiom with a role chain on left
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor#visit(
+	 * org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom)
+	 * 
+	 * Reduces a transitivity axioms to a subproperty axiom with a role chain on
+	 * left
 	 */
 	@Override
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
@@ -318,8 +358,12 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor#visit(org.semanticweb
+	 * .elk.owl.interfaces.ElkEquivalentClassesAxiom)
 	 * 
 	 * Reduces equivalent classes to subclass axioms.
 	 */
@@ -337,8 +381,12 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor#visit(org.semanticweb
+	 * .elk.owl.interfaces.ElkSubClassOfAxiom)
 	 * 
 	 * Subclass axioms are supported directly.
 	 */
@@ -361,8 +409,11 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 				+ " not supported");
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor#visit(org.
+	 * semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom)
 	 * 
 	 * Reduces a class assertion to a subclass axiom with a nominal on left.
 	 */
@@ -387,23 +438,24 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 				ElkNegativeObjectPropertyAssertionAxiom.class.getSimpleName()
 						+ " not supported");
 	}
-	
+
 	@Override
 	public Void visit(ElkHasKeyAxiom elkHasKey) {
-		throw new IndexingException(
-				ElkHasKeyAxiom.class.getSimpleName()
-						+ " not supported");
+		throw new IndexingException(ElkHasKeyAxiom.class.getSimpleName()
+				+ " not supported");
 	}
-	
+
 	@Override
 	public Void visit(ElkDatatypeDefinitionAxiom elkDatatypeDefn) {
-		throw new IndexingException(
-				ElkHasKeyAxiom.class.getSimpleName()
-						+ " not supported");
-	}	
+		throw new IndexingException(ElkHasKeyAxiom.class.getSimpleName()
+				+ " not supported");
+	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor#visit(org.
+	 * semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom)
 	 * 
 	 * Reduces property assertions to subclass axioms with nominals.
 	 */
@@ -436,8 +488,12 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 						+ " not supported");
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkAxiomVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkAxiomVisitor#visit(org.semanticweb
+	 * .elk.owl.interfaces.ElkDeclarationAxiom)
 	 * 
 	 * Declares the corresponding entity
 	 */
@@ -483,9 +539,12 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 			return null;
 		}
 
-		
-		/* (non-Javadoc)
-		 * @see org.semanticweb.elk.owl.visitors.ElkEntityVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.semanticweb.elk.owl.visitors.ElkEntityVisitor#visit(org.semanticweb
+		 * .elk.owl.interfaces.ElkAnnotationProperty)
 		 * 
 		 * Nothing is done, annotations are ignored during indexing.
 		 */
@@ -494,4 +553,5 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 			return null;
 		}
 	};
+
 }
