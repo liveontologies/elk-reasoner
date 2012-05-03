@@ -174,15 +174,9 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 
 	@Override
 	public Set<ClassNode> getDirectSuperNodes() {
-		return Operations.filter(allNodes, new Condition() {
-			@Override
-			public boolean holds(Object element) {
-				if (element instanceof ClassNode) {
-					ClassNode node = (ClassNode) element;
-					return (node.getDirectSubNodes()
-							.contains(ConcurrentClassTaxonomy.this));
-				}
-				return false;
+		return Operations.filter(allNodes, new Condition<ClassNode>() {
+			public boolean holds(ClassNode element) {
+				return element.getDirectSubNodes().contains(ConcurrentClassTaxonomy.this);
 			}
 			/*
 			 * the direct super nodes of the bottom node are all nodes except
@@ -194,7 +188,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	@Override
 	public Set<ClassNode> getAllSuperNodes() {
 		/* all nodes except this one */
-		return Operations.filter(allNodes, new Condition() {
+		return Operations.filter(allNodes, new Condition<Object>() {
 			@Override
 			public boolean holds(Object element) {
 				return element != this;
