@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.AbstractContext;
@@ -49,8 +50,10 @@ public class ContextElClassSaturation extends AbstractContext implements
 	public Multimap<IndexedPropertyChain, ContextElClassSaturation> backwardLinksByObjectProperty;
 
 	public Multimap<IndexedPropertyChain, ContextElClassSaturation> forwardLinksByObjectProperty;
-
+	
 	protected Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> propagationsByObjectProperty;
+	
+	protected Set<IndexedDisjointnessAxiom> disjointnessAxioms;
 
 	/**
 	 * A context is saturated if all superclass expressions of the root
@@ -168,6 +171,13 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 */
 	public void initPropagationsByProperty() {
 		propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>>();
+	}
+	
+	public boolean addDisjointessAxiom(IndexedDisjointnessAxiom disjointnessAxiom) {
+		if (disjointnessAxioms == null)
+			disjointnessAxioms = new ArrayHashSet<IndexedDisjointnessAxiom>();
+		
+		return disjointnessAxioms.add(disjointnessAxiom);
 	}
 
 	/**

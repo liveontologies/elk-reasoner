@@ -240,6 +240,37 @@ public class ReasonerTest extends TestCase {
 		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
 		assertNotSame("C satisfiable", bottom, taxonomy.getNode(c));
 	}
+	
+	public void testDisjointSelf() throws InterruptedException,
+	ExecutionException, Owl2ParseException, IOException {
+
+		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner
+		.loadOntologyFromString(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "DisjointClasses(:A :B :A)"//
+				+ "DisjointClasses(:C :C)"//
+				+ ")"//
+		);
+
+		IOReasoner.classify();
+
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(
+		"http://example.org/C"));
+
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+
+		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
+		assertNotSame("B satisfiable", bottom, taxonomy.getNode(b));
+		assertSame("C unsatisfiable", bottom, taxonomy.getNode(c));
+	}
 
 	public void testAncestors() throws InterruptedException,
 	ExecutionException, Owl2ParseException, IOException {
