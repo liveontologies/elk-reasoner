@@ -36,6 +36,8 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
  */
 public interface ElkAxiom extends ElkObject {
 
+	// TODO getAnnotation();
+	
 	/**
 	 * Accept an ElkAxiomVisitor. 
 	 * 
