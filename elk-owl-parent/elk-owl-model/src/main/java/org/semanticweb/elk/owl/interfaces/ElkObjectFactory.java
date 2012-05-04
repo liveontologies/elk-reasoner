@@ -59,6 +59,27 @@ public interface ElkObjectFactory {
 	 */
 	public ElkAnnotationAssertionAxiom getAnnotationAssertionAxiom(ElkAnnotationProperty property, ElkAnnotationSubject subject, ElkAnnotationValue value);
 	
+	/**
+	 * Create an {@link ElkAnnotationPropertyDomainAxiom}
+	 *
+	 * @param property
+	 * @param domain
+	 * @return
+	 */
+	public ElkAnnotationPropertyDomainAxiom getAnnotationPropertyDomainAxiom(
+			ElkAnnotationProperty property, ElkIri domain);
+	
+	/**
+	 * Create an {@link ElkAnnotationPropertyRangeAxiom}
+	 * 
+	 * @param property
+	 * @param range
+	 * @return
+	 */
+	public ElkAnnotationPropertyRangeAxiom getAnnotationPropertyRangeAxiom(
+			ElkAnnotationProperty property, ElkIri range);
+	
+	
 	
 	/**
 	 * Create an {@link ElkAnonymousIndividual}.
@@ -928,6 +949,17 @@ public interface ElkObjectFactory {
 	 */
 	public  ElkSameIndividualAxiom getSameIndividualAxiom(
 			List<? extends ElkIndividual> individuals);
+	
+	/**
+	 * Create an {@link ElkSubAnnotationPropertyOfAxiom}
+	 * 
+	 * @param subAnnotationProperty
+	 * @param superAnnotationProperty
+	 * @return
+	 */
+	public ElkSubAnnotationPropertyOfAxiom getSubAnnotationPropertyOfAxiom(
+			ElkAnnotationProperty subAnnotationProperty,
+			ElkAnnotationProperty superAnnotationProperty);
 
 	/**
 	 * Create an {@link ElkSubClassOfAxiom}.
@@ -1001,5 +1033,7 @@ public interface ElkObjectFactory {
 	 */
 	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom( ElkDatatype datatype, ElkDataRange dataRange);
 	
+	
+
 	public ElkFacetRestriction getFacetRestriction( ElkIri iri, ElkLiteral literal);
 }
