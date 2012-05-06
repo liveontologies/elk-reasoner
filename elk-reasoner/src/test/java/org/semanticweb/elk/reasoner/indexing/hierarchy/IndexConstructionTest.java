@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Set;
-
 import junit.framework.TestCase;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
@@ -97,7 +95,7 @@ public class IndexConstructionTest extends TestCase {
 		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri("C"));
 		
-		ElkDisjointClassesAxiom axiom = objectFactory.getDisjointClassesAxiom(a,b,c);
+		ElkDisjointClassesAxiom axiom = objectFactory.getDisjointClassesAxiom(a,b,c,b);
 		
 		OntologyIndex index = new OntologyIndexImpl();
 		ElkAxiomProcessor inserter = index.getAxiomInserter();
@@ -109,23 +107,20 @@ public class IndexConstructionTest extends TestCase {
 		IndexedClassExpression B = index.getIndexed(b);
 		IndexedClassExpression C = index.getIndexed(c);
 		
-		assertEquals(1, A.getDisjoints().size());
-		assertEquals(1, B.getDisjoints().size());
-		assertEquals(1, C.getDisjoints().size());
+		assertEquals(1, A.getDisjointnessAxioms().size());
+		assertEquals(2, B.getDisjointnessAxioms().size());
+		assertEquals(1, C.getDisjointnessAxioms().size());
 		
-		Set<IndexedClassExpression> disj = A.getDisjoints().iterator().next();
-		
-		assertSame(disj, B.getDisjoints().iterator().next());
-		assertSame(disj, C.getDisjoints().iterator().next());
-		assertTrue(disj.contains(A));
-		assertTrue(disj.contains(B));
-		assertTrue(disj.contains(C));
+		IndexedDisjointnessAxiom disAxiom = A.getDisjointnessAxioms().get(0);
+		assertSame(disAxiom, B.getDisjointnessAxioms().get(0));
+		assertSame(disAxiom, B.getDisjointnessAxioms().get(1));
+		assertSame(disAxiom, C.getDisjointnessAxioms().get(0));
 		
 		deleter.process(axiom);
 		
-		assertNull(A.getDisjoints());
-		assertNull(B.getDisjoints());
-		assertNull(C.getDisjoints());
+		assertNull(A.getDisjointnessAxioms());
+		assertNull(B.getDisjointnessAxioms());
+		assertNull(C.getDisjointnessAxioms());
 		
 		assertNull(index.getIndexed(a));
 		assertNull(index.getIndexed(b));

@@ -22,39 +22,32 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
 
 /**
- * Implements the {@link ElkEntity} interface by wrapping instances of
- * {@link OWLEntity}
+ * Implements the {@link ElkAnnotationAxiom} interface by wrapping instances
+ * of {@link OWLAnnotationAxiom}
  * 
- * @author Yevgeny Kazakov
+ * @author Frantisek Simancik
  * 
  * @param <T>
  *            the type of the wrapped object
  */
-public abstract class ElkEntityWrap<T extends OWLEntity> extends
-		ElkObjectWrap<T> implements ElkEntity {
+public abstract class ElkAnnotationAxiomWrap<T extends OWLAnnotationAxiom>
+		extends ElkAxiomWrap<T> implements ElkAnnotationAxiom {
 
-	ElkEntityWrap(T owlEntity) {
-		super(owlEntity);
+	public ElkAnnotationAxiomWrap(T owlAnnotationAxiom) {
+		super(owlAnnotationAxiom);
 	}
 
 	@Override
-	public ElkIri getIri() {
-		return converter.convert(this.owlObject.getIRI());
-	}
+	abstract public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor);
 
 	@Override
-	public abstract <O> O accept(ElkEntityVisitor<O> visitor);
-
-	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return accept((ElkEntityVisitor<O>) visitor);
+	public <O> O accept(ElkAxiomVisitor<O> visitor) {
+		return accept((ElkAnnotationAxiomVisitor<O>) visitor);
 	}
-
 }

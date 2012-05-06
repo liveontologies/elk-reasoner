@@ -29,7 +29,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
@@ -47,12 +46,12 @@ import org.semanticweb.owlapi.model.OWLLiteral;
  * pavel.klinov@uni-ulm.de
  *
  */
-public class OwlAnnotationVisitor implements OWLAnnotationSubjectVisitorEx<ElkAnnotationSubject>, OWLAnnotationValueVisitorEx<ElkAnnotationValue> {
+public class OwlAnnotationSubjectValueVisitor implements OWLAnnotationSubjectVisitorEx<ElkAnnotationSubject>, OWLAnnotationValueVisitorEx<ElkAnnotationValue> {
 
-	private final static OwlAnnotationVisitor INSTANCE_ = new OwlAnnotationVisitor();
+	private final static OwlAnnotationSubjectValueVisitor INSTANCE_ = new OwlAnnotationSubjectValueVisitor();
 	protected static OwlConverter CONVERTER = OwlConverter.getInstance();
 	
-	static OwlAnnotationVisitor getInstance() {
+	static OwlAnnotationSubjectValueVisitor getInstance() {
 		return INSTANCE_;
 	}
 	
@@ -66,7 +65,7 @@ public class OwlAnnotationVisitor implements OWLAnnotationSubjectVisitorEx<ElkAn
 	
 	@Override
 	public ElkIri visit(IRI iri) {
-		return new ElkFullIri(iri.toString());
+		return CONVERTER.convert(iri);
 	}
 
 	@Override

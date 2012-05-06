@@ -22,9 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -53,7 +52,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	private final int multiplicity;
 
 	/**
-	 * The ElkObjectIndexer used for indexing a netural, a positive, and a
+	 * The ElkObjectIndexer used for indexing a neutral, a positive, and a
 	 * negative occurrence of an elk object respectively.
 	 */
 	private final ElkObjectIndexerVisitor neutralIndexer, positiveIndexer,
@@ -113,18 +112,40 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 					.removeToldSubObjectProperty(subIndexedProperty);
 		}
 	}
-	
+
 	@Override
-	public void indexDisjointClassExpressions(List<? extends ElkClassExpression> disjointsElk) {
-		Set<IndexedClassExpression> disjointsIndexed = new HashSet<IndexedClassExpression> (disjointsElk.size());
-		for (ElkClassExpression c : disjointsElk)
-			disjointsIndexed.add(c.accept(negativeIndexer));
+	public void indexDisjointClassExpressions(
+			List<? extends ElkClassExpression> disjointClasses) {
 		
-		for (IndexedClassExpression ice : disjointsIndexed)
-			if (multiplicity == 1)
-				ice.addDisjoint(disjointsIndexed);
-			else
-				ice.removeDisjoint(disjointsIndexed);
+		if (disjointClasses.size() == 2) {
+			IndexedClassExpression ice0 = disjointClasses.get(0).accept(
+					negativeIndexer);
+			IndexedClassExpression ice1 = disjointClasses.get(1).accept(
+					negativeIndexer);
+
+			if (multiplicity == 1) {
+				ice0.addDisjointClass(ice1);
+				ice1.addDisjointClass(ice0);
+			} else {
+				ice0.removeDisjointClass(ice1);
+				ice1.removeDisjointClass(ice0);
+			}
+		}
+		
+		else { // disjointClasses.size() > 2
+			List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression> (disjointClasses.size());
+			for (ElkClassExpression c : disjointClasses)
+				indexed.add(c.accept(negativeIndexer));
+			
+			IndexedDisjointnessAxiom indexedDisjointnessAxiom = new IndexedDisjointnessAxiom(indexed);
+
+			for (IndexedClassExpression ice : indexed) {
+				if (multiplicity == 1)
+					ice.addDisjointnessAxiom(indexedDisjointnessAxiom);
+				else
+					ice.removeDisjointnessAxiom(indexedDisjointnessAxiom);
+			}
+		}
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK OWL Object Interfaces
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,23 +20,24 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.owl.interfaces;
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
+import java.util.List;
 
 /**
- * Annotation assertion axiom as defined in 
- * <a href="http://www.w3.org/TR/owl2-syntax/#Annotation_Assertion"> Section 10.2.1</a> of the specification
- * 
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * @author Frantisek Simancik
  *
  */
-public interface ElkAnnotationAssertionAxiom extends ElkAnnotationAxiom {
+public class IndexedDisjointnessAxiom  {
 
-	public ElkAnnotationSubject getSubject();
-	public ElkAnnotationProperty getProperty();
-	public ElkAnnotationValue getValue();
+	protected final List<IndexedClassExpression> members; 
+	
+	public IndexedDisjointnessAxiom(List<IndexedClassExpression> members) {
+		this.members = members;
+	}
+	
+	public List<IndexedClassExpression> getMembers(){
+		return members;
+	}
+
 }
