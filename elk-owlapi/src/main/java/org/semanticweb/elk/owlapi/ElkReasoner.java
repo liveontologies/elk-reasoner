@@ -40,6 +40,7 @@ import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.elk.util.logging.Statistics;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -121,7 +122,7 @@ public class ElkReasoner implements OWLReasoner {
 		this.owlOntology = ontology;
 		this.manager = ontology.getOWLOntologyManager();
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
-		this.reasoner = new Reasoner();
+		this.reasoner = new ReasonerFactory().createReasoner();
 		this.ontologyChangeListener = new OntologyChangeListener();
 		this.isBufferingMode = isBufferingMode;
 		manager.addOntologyChangeListener(ontologyChangeListener);

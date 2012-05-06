@@ -60,7 +60,7 @@ public class ReasonerTest {
 	public void testExistentials() throws InterruptedException,
 			ExecutionException, Owl2ParseException, IOException {
 
-		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )" + "Ontology("//
 				+ "EquivalentClasses(:B :C)"//
@@ -102,7 +102,7 @@ public class ReasonerTest {
 	public void testConjunctions() throws InterruptedException,
 			ExecutionException, Owl2ParseException, IOException {
 
-		final IOReasoner IOReasoner = new IOReasoner();
+		final IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:A :D)"
@@ -153,7 +153,7 @@ public class ReasonerTest {
 
 	@Test
 	public void testPropertyChains() throws Owl2ParseException, IOException {
-		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner
 				.loadOntologyFromString(""//
 						+ "Prefix( : = <http://example.org/> )"//
@@ -185,7 +185,7 @@ public class ReasonerTest {
 	public void testBottom() throws InterruptedException,
 			ExecutionException, Owl2ParseException, IOException {
 		
-		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner
 				.loadOntologyFromString(""//
 						+ "Prefix( : = <http://example.org/> )"//
@@ -218,7 +218,7 @@ public class ReasonerTest {
 	public void testDisjoint() throws InterruptedException,
 	ExecutionException, Owl2ParseException, IOException {
 
-		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner
 		.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
@@ -250,7 +250,7 @@ public class ReasonerTest {
 	public void testDisjointSelf() throws InterruptedException,
 	ExecutionException, Owl2ParseException, IOException {
 
-		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner
 		.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
@@ -282,7 +282,7 @@ public class ReasonerTest {
 	public void testAncestors() throws InterruptedException,
 	ExecutionException, Owl2ParseException, IOException {
 
-		final IOReasoner IOReasoner = new IOReasoner();
+		final IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))");
@@ -339,7 +339,7 @@ public class ReasonerTest {
 	@Test
 	public void testTop() throws InterruptedException, ExecutionException, Owl2ParseException, IOException {
 
-		final IOReasoner IOReasoner = new IOReasoner();
+		final IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( owl:= <http://www.w3.org/2002/07/owl#> )"//
 				+ "Prefix( : = <http://example.org/> )"//
@@ -430,7 +430,7 @@ public class ReasonerTest {
 	@Test
 	public void testInconsistent() throws InterruptedException, ExecutionException, Owl2ParseException, IOException {
 
-		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString(""
 				+ "Prefix( : = <http://example.org/> )" 
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"

@@ -38,10 +38,6 @@ import org.semanticweb.elk.util.logging.Statistics;
 
 public class IOReasoner extends Reasoner {
 
-	public IOReasoner() {
-		super();
-	}
-
 	public IOReasoner(ExecutorService executor, int workerNo) {
 		super(executor, workerNo);
 	}
