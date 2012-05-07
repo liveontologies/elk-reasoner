@@ -60,6 +60,10 @@ public class ReasonerConfiguration {
 		defaultConfig = new ReasonerConfiguration(getDefaultParameterMap());
 	}
 	
+	/*
+	 * Populates the default configuration using the values of 
+	 * declared fields annotated with @Parameter
+	 */
 	private static Map<String, String> getDefaultParameterMap() {
 		Map<String, String> defaultMap = new HashMap<String, String>();
 		Field[] allFields = ReasonerConfiguration.class.getDeclaredFields();
@@ -104,6 +108,12 @@ public class ReasonerConfiguration {
 		
 		for (String key : properties.keySet()) {
 			propMap.put(key,  properties.getString(key));
+		}
+		//see if some default properties are not set
+		for (String key : defaultConfig.getParameterNames()) {
+			if (!propMap.containsKey(key)) {
+				propMap.put(key, defaultConfig.getParameter(key));
+			}
 		}
 		
 		return new ReasonerConfiguration(propMap);
