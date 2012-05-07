@@ -25,8 +25,6 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import java.util.ResourceBundle;
-
 import org.semanticweb.elk.reasoner.ReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.FreshEntityPolicy;
 import org.semanticweb.owlapi.reasoner.IndividualNodeSetPolicy;
@@ -45,13 +43,13 @@ public class ElkReasonerConfiguration implements OWLReasonerConfiguration {
 	private final ReasonerConfiguration elkConfig;
 	private final OWLReasonerConfiguration genericConfig;
 	
-	ElkReasonerConfiguration(OWLReasonerConfiguration genConfig) {
+	public ElkReasonerConfiguration(OWLReasonerConfiguration genConfig) {
 		elkConfig = ReasonerConfiguration.getDefaultConfiguration();
 		genericConfig = genConfig;
 	}
 	
-	ElkReasonerConfiguration(ResourceBundle bundle, OWLReasonerConfiguration genConfig) {
-		elkConfig = ReasonerConfiguration.createConfiguration(bundle);
+	public ElkReasonerConfiguration(OWLReasonerConfiguration genConfig, ReasonerConfiguration elkConfig) {
+		this.elkConfig = elkConfig;
 		genericConfig = genConfig;
 	}
 

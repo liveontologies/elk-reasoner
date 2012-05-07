@@ -26,6 +26,7 @@
 package org.semanticweb.elk.protege;
 
 import org.protege.editor.owl.model.inference.AbstractProtegeOWLReasonerInfo;
+import org.semanticweb.elk.owlapi.ElkReasonerConfiguration;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.FreshEntityPolicy;
@@ -55,8 +56,10 @@ protected final OWLReasonerFactory factory=new ElkReasonerFactory();
     }
         
     @Override
-	public OWLReasonerConfiguration getConfiguration(ReasonerProgressMonitor monitor) {
-    	return new SimpleConfiguration(monitor, FreshEntityPolicy.DISALLOW, 0, IndividualNodeSetPolicy.BY_NAME);
+	public ElkReasonerConfiguration getConfiguration(ReasonerProgressMonitor monitor) {
+    	OWLReasonerConfiguration genericConfig = new SimpleConfiguration(monitor, FreshEntityPolicy.DISALLOW, 0, IndividualNodeSetPolicy.BY_NAME);
+    	
+    	return new ElkReasonerConfiguration(genericConfig);
     }
     
     @Override
