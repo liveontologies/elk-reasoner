@@ -23,13 +23,21 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Pair;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
@@ -73,11 +81,20 @@ public class ObjectPropertySaturation {
 
 		roleHierarchyComputation.waitCompletion();
 
-		// set up property composition
-		// HashMap<Pair<IndexedPropertyChain, IndexedPropertyChain>,
-		// ArrayList<IndexedPropertyChain>> m = new
-		// HashMap<Pair<IndexedPropertyChain, IndexedPropertyChain>,
-		// ArrayList<IndexedPropertyChain>>();
+		// find auxiliary IndexedBinaryPropertyChains that occur on the right of some (longer) chain
+		Set<IndexedBinaryPropertyChain> auxiliaryChains = new HashSet<IndexedBinaryPropertyChain>();
+		for (IndexedBinaryPropertyChain chain : Operations.filter(
+				ontologyIndex.getIndexedPropertyChains(),
+				IndexedBinaryPropertyChain.class)) {
+
+			if (chain.getRightProperty() instanceof IndexedBinaryPropertyChain)
+				auxiliaryChains.add((IndexedBinaryPropertyChain) chain
+						.getRightProperty());
+		}
+
+		// set up property compositions
+		Map<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>> compositions = 
+				new HashMap<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>>();
 
 		for (IndexedBinaryPropertyChain chain : Operations.filter(
 				ontologyIndex.getIndexedPropertyChains(),
@@ -87,61 +104,73 @@ public class ObjectPropertySaturation {
 				for (IndexedPropertyChain leftSubProperty : chain
 						.getLeftProperty().getSaturated().getSubProperties()) {
 
-					SaturatedPropertyChain right = rightSubProperty
-							.getSaturated();
-					if (right.compositionsByLeftSubProperty == null)
-						right.compositionsByLeftSubProperty = new HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain>();
-					right.compositionsByLeftSubProperty.add(
-							leftSubProperty, chain);
+					// SaturatedPropertyChain right = rightSubProperty
+					// .getSaturated();
+					// if (right.compositionsByLeftSubProperty == null)
+					// right.compositionsByLeftSubProperty = new
+					// HashListMultimap<IndexedPropertyChain,
+					// IndexedBinaryPropertyChain>();
+					// right.compositionsByLeftSubProperty.add(
+					// leftSubProperty, chain);
+					//
+					// SaturatedPropertyChain left = leftSubProperty
+					// .getSaturated();
+					// if (left.compositionsByRightSubProperty == null)
+					// left.compositionsByRightSubProperty = new
+					// HashListMultimap<IndexedPropertyChain,
+					// IndexedBinaryPropertyChain>();
+					// left.compositionsByRightSubProperty.add(
+					// rightSubProperty, chain);
 
-					SaturatedPropertyChain left = leftSubProperty
-							.getSaturated();
-					if (left.compositionsByRightSubProperty == null)
-						left.compositionsByRightSubProperty = new HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain>();
-					left.compositionsByRightSubProperty.add(
-							rightSubProperty, chain);
+					Pair<IndexedPropertyChain, IndexedPropertyChain> key = new Pair<IndexedPropertyChain, IndexedPropertyChain>(
+							leftSubProperty, rightSubProperty);
+					Vector<IndexedPropertyChain> value = compositions.get(key);
 
-					/*
-					 * Pair<IndexedPropertyChain, IndexedPropertyChain> body =
-					 * new Pair<IndexedPropertyChain, IndexedPropertyChain>(
-					 * leftsubProperty, rightsubProperty);
-					 * ArrayList<IndexedPropertyChain> list = m.get(body);
-					 * 
-					 * if (list == null) { list = new
-					 * ArrayList<IndexedPropertyChain>(); m.put(body, list); }
-					 * 
-					 * list.add(ria.getSuperProperty());
-					 */
+					if (value == null) {
+						value = new Vector<IndexedPropertyChain>();
+						compositions.put(key, value);
+					}
+
+					if (auxiliaryChains.contains(chain))
+						value.add(chain);
+					else
+						for (IndexedObjectProperty superProperty : chain
+								.getToldSuperProperties())
+							value.add(superProperty);
 				}
-		/*
-		 * RedundantCompositionsElimination elimination = new
-		 * RedundantCompositionsElimination( executor, maxWorkers);
-		 * 
-		 * elimination.start();
-		 * 
-		 * for (Map.Entry<Pair<IndexedPropertyChain, IndexedPropertyChain>,
-		 * ArrayList<IndexedPropertyChain>> e : m .entrySet()) {
-		 * 
-		 * SaturatedPropertyChain firstSat = e.getKey().getFirst()
-		 * .getSaturated(); if (firstSat.propertyCompositionsByRightSubProperty
-		 * == null) firstSat.propertyCompositionsByRightSubProperty = new
-		 * HashListMultimap<IndexedPropertyChain, IndexedPropertyChain>();
-		 * firstSat.propertyCompositionsByRightSubProperty.put(e.getKey()
-		 * .getSecond(), e.getValue());
-		 * 
-		 * SaturatedPropertyChain secondSat = e.getKey().getSecond()
-		 * .getSaturated(); if (secondSat.propertyCompositionsByLeftSubProperty
-		 * == null) secondSat.propertyCompositionsByLeftSubProperty = new
-		 * HashListMultimap<IndexedPropertyChain, IndexedPropertyChain>();
-		 * secondSat.propertyCompositionsByLeftSubProperty.put(e.getKey()
-		 * .getFirst(), e.getValue());
-		 * 
-		 * elimination.submit(e.getValue()); } m = null;
-		 * elimination.waitCompletion();
-		 */
+		
+		if (compositions.isEmpty())
+			return;
+		
+		ConcurrentComputation<Vector<IndexedPropertyChain>> redundantCompositionsElimination = new ConcurrentComputation<Vector<IndexedPropertyChain>>(
+				new RedundantCompositionsElimination(), executor, maxWorkers,
+				2 * maxWorkers, 128);
+		 redundantCompositionsElimination.start();
+		 
+		for (Map.Entry<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>> e : compositions
+				.entrySet()) {
+			
+			SaturatedPropertyChain firstSat = e.getKey().getFirst()
+					.getSaturated();
+			if (firstSat.compositionsByRightSubProperty == null)
+				firstSat.compositionsByRightSubProperty = new CompositionMultimap();
+			firstSat.compositionsByRightSubProperty.put(e.getKey().getSecond(),
+					e.getValue());
+
+			SaturatedPropertyChain secondSat = e.getKey().getSecond()
+					.getSaturated();
+			if (secondSat.compositionsByLeftSubProperty == null)
+				secondSat.compositionsByLeftSubProperty = new CompositionMultimap();
+			secondSat.compositionsByLeftSubProperty.put(e.getKey().getFirst(),
+					e.getValue());
+			
+			redundantCompositionsElimination.submit(e.getValue());
+		}
+
+		redundantCompositionsElimination.waitCompletion();
 	}
 
-	class RoleHierarchyComputation implements
+	private class RoleHierarchyComputation implements
 			InputProcessor<IndexedPropertyChain> {
 
 		@Override
@@ -191,26 +220,48 @@ public class ObjectPropertySaturation {
 	 * if R1.R2 -> S1 and R1.R2 -> S2 with S1 -> S2, then the latter composition
 	 * is redundant and is removed
 	 */
-	/*
-	 * class RedundantCompositionsElimination extends
-	 * AbstractConcurrentComputation<ArrayList<IndexedPropertyChain>> {
-	 * 
-	 * public RedundantCompositionsElimination(ExecutorService executor, int
-	 * maxWorkers) { super(executor, maxWorkers, 2 * maxWorkers, 128); }
-	 * 
-	 * @Override protected void process(ArrayList<IndexedPropertyChain> list) {
-	 * for (int i = 0; i < list.size(); i++) if (list.get(i) != null) {
-	 * Set<IndexedPropertyChain> superProperties = list
-	 * .get(i).getSaturated().getSuperProperties();
-	 * 
-	 * for (int j = 0; j < list.size(); j++) if (j != i && list.get(j) != null
-	 * && superProperties.contains(list.get(j))) list.set(j, null); }
-	 * 
-	 * Iterator<IndexedPropertyChain> iter = list.iterator(); while
-	 * (iter.hasNext()) { if (iter.next() == null) { iter.remove(); } }
-	 * 
-	 * list.trimToSize(); }
-	 * 
-	 * }
-	 */
+
+	private class RedundantCompositionsElimination implements
+			InputProcessor<Vector<IndexedPropertyChain>> {
+
+		@Override
+		public void submit(Vector<IndexedPropertyChain> v) {
+			for (int i = 0; i < v.size(); i++)
+				if (v.get(i) != null) {
+					Set<IndexedPropertyChain> superProperties = v.get(i)
+							.getSaturated().getSuperProperties();
+
+					for (int j = 0; j < v.size(); j++)
+						if (j != i && v.get(j) != null
+								&& superProperties.contains(v.get(j)))
+							v.set(j, null);
+				}
+
+			int next = 0;
+			for (int i = 0; i < v.size(); i++)
+				if (v.get(i) != null) {
+					v.set(next++, v.get(i));
+				}
+
+			v.setSize(next);
+		}
+
+		@Override
+		public void process() throws InterruptedException {
+			// nothing to do here, everything should be processed during the
+			// submission
+		}
+
+		@Override
+		public boolean canProcess() {
+			return false;
+		}
+	}
+	
+	private class CompositionMultimap extends AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> {
+		@Override
+		protected Collection<IndexedPropertyChain> newRecord() {
+			throw new UnsupportedOperationException();
+		}
+	}
 }

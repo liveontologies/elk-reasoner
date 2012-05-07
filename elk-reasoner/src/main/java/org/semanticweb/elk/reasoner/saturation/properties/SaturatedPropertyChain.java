@@ -25,10 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * 
@@ -47,12 +47,12 @@ public class SaturatedPropertyChain {
 	protected final Set<IndexedPropertyChain>
 		derivedSuperProperties;
 	
-	protected HashListMultimap<IndexedPropertyChain,
-			IndexedBinaryPropertyChain>
+	protected AbstractHashMultimap<IndexedPropertyChain,
+			IndexedPropertyChain>
 		compositionsByLeftSubProperty;
 	
-	protected HashListMultimap<IndexedPropertyChain,
-			IndexedBinaryPropertyChain>
+	protected AbstractHashMultimap<IndexedPropertyChain,
+			IndexedPropertyChain>
 		compositionsByRightSubProperty;
 
 	
@@ -76,11 +76,11 @@ public class SaturatedPropertyChain {
 		return derivedSuperProperties;
 	}
 
-	public HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getCompositionsByLeftSubProperty() {
+	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByLeftSubProperty() {
 		return compositionsByLeftSubProperty;
 	}
 
-	public HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getCompositionsByRightSubProperty() {
+	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByRightSubProperty() {
 		return compositionsByRightSubProperty;
 	}
 
