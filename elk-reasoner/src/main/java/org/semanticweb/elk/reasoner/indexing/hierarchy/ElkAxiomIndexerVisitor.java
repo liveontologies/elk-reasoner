@@ -33,7 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /**
- * An object that indexes axioms into a given IndexedObjectCache. Each instance
+ * An object that indexes axioms into a given ontology index. Each instance
  * can either only add or only remove axioms.
  * 
  * @author Frantisek Simancik
@@ -44,7 +44,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
 	 */
-	private final IndexedObjectCache objectCache;
+	private final OntologyIndexImpl ontologyIndex;
 
 	/**
 	 * 1 if adding axioms, -1 if removing axioms
@@ -59,12 +59,12 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			negativeIndexer;
 
 	/**
-	 * @param objectCache
+	 * @param ontologyIndex
 	 * @param insert
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
-	public ElkAxiomIndexerVisitor(IndexedObjectCache objectCache, boolean insert) {
-		this.objectCache = objectCache;
+	public ElkAxiomIndexerVisitor(OntologyIndexImpl ontologyIndex, boolean insert) {
+		this.ontologyIndex = ontologyIndex;
 		this.multiplicity = insert ? 1 : -1;
 		this.neutralIndexer = new ElkObjectIndexerVisitor(
 				new UpdateCacheFilter(multiplicity, 0, 0));
@@ -147,6 +147,20 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			}
 		}
 	}
+	
+	
+	@Override
+	public void indexReflexiveObjectProperty(
+			ElkObjectPropertyExpression reflexiveProperty) {
+
+		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
+				.accept(positiveIndexer);
+		
+		if (multiplicity == 1)
+			ontologyIndex.addReflexiveObjectProperty(indexedReflexiveProperty);
+		else
+			ontologyIndex.removeReflexiveObjectProperty(indexedReflexiveProperty);
+	}
 
 	@Override
 	public void indexClassDeclaration(ElkClass ec) {
@@ -167,7 +181,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 * A filter that is applied after the given indexed object has been
 	 * retrieved from the cache. It is used to update the occurrence counts of
 	 * the indexed object, add it to the cache in case of first occurrence, and
-	 * remove it from the cache in case of last occurrence no more.
+	 * remove it from the cache in case of last occurrence.
 	 * 
 	 * 
 	 * @author Frantisek Simancik
@@ -186,31 +200,31 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		@Override
 		public IndexedClassExpression filter(IndexedClassExpression ice) {
-			IndexedClassExpression result = objectCache.filter(ice);
+			IndexedClassExpression result = ontologyIndex.filter(ice);
 
 			if (!result.occurs() && increment > 0)
-				objectCache.add(result);
+				ontologyIndex.add(result);
 
 			result.updateOccurrenceNumbers(increment, positiveIncrement,
 					negativeIncrement);
 
 			if (!result.occurs() && increment < 0)
-				objectCache.remove(result);
+				ontologyIndex.remove(result);
 
 			return result;
 		}
 
 		@Override
 		public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
-			IndexedPropertyChain result = objectCache.filter(ipc);
+			IndexedPropertyChain result = ontologyIndex.filter(ipc);
 
 			if (!result.occurs() && increment > 0)
-				objectCache.add(result);
+				ontologyIndex.add(result);
 
 			result.updateOccurrenceNumber(increment);
 
 			if (!result.occurs() && increment < 0)
-				objectCache.remove(result);
+				ontologyIndex.remove(result);
 
 			return result;
 		}

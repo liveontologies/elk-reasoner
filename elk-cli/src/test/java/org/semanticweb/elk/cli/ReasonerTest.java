@@ -271,6 +271,41 @@ public class ReasonerTest extends TestCase {
 		assertNotSame("B satisfiable", bottom, taxonomy.getNode(b));
 		assertSame("C unsatisfiable", bottom, taxonomy.getNode(c));
 	}
+	
+	public void testReflexiveRole() throws InterruptedException,
+	ExecutionException, Owl2ParseException, IOException {
+
+		IOReasoner IOReasoner = new IOReasoner();
+		IOReasoner
+		.loadOntologyFromString(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "ReflexiveObjectProperty(:R)"//
+				+ "EquivalentClasses(:B ObjectSomeValuesFrom(:R :A))"//
+				+ "EquivalentClasses(:D ObjectSomeValuesFrom(:S :C))"//
+				+ "SubObjectPropertyOf(ObjectPropertyChain(:R :R) :S)"//
+				+ ")"//
+		);
+
+		IOReasoner.classify();
+
+		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		
+		ClassNode A = taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
+				"http://example.org/A")));
+		ClassNode B = taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
+				"http://example.org/B")));
+		ClassNode C = taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
+				"http://example.org/C")));
+		ClassNode D = taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
+				"http://example.org/D")));
+
+		
+		assertTrue("SubClassOf(A B)", A.getDirectSuperNodes().contains(B));
+		assertTrue("SubClassOf(C D)", C.getDirectSuperNodes().contains(D));
+	}
+
 
 	public void testAncestors() throws InterruptedException,
 	ExecutionException, Owl2ParseException, IOException {

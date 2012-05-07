@@ -61,7 +61,7 @@ public class RuleApplicationEngine implements InputProcessor<IndexedClassExpress
 	/**
 	 * The index used for executing the rules
 	 */
-	protected final OntologyIndex ontologyIndex;
+	public final OntologyIndex ontologyIndex;
 
 	/**
 	 * Cached constants

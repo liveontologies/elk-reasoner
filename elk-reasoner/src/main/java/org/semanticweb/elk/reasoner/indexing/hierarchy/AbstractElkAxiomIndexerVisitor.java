@@ -108,6 +108,8 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 
 	public abstract void indexDisjointClassExpressions(
 			List<? extends ElkClassExpression> list);
+	
+	public abstract void indexReflexiveObjectProperty(ElkObjectPropertyExpression reflexiveProperty);
 
 	public abstract void indexClassDeclaration(ElkClass ec);
 
@@ -309,10 +311,9 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 
 	@Override
 	public Void visit(
-			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
-		throw new IndexingException(
-				ElkReflexiveObjectPropertyAxiom.class.getSimpleName()
-						+ " not supported");
+			ElkReflexiveObjectPropertyAxiom axiom) {
+		indexReflexiveObjectProperty(axiom.getProperty());
+		return null;
 	}
 
 	/*

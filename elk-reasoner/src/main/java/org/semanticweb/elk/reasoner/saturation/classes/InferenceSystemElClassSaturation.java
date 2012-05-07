@@ -43,6 +43,7 @@ public final class InferenceSystemElClassSaturation extends InferenceSystem<Cont
 		add(new RuleRoleComposition<ContextElClassSaturation>());
 		add(new RuleBottom<ContextElClassSaturation>());
 		add(new RuleDisjoint<ContextElClassSaturation>());
+		add(new RuleReflexiveRole<ContextElClassSaturation>());
 	}
 
 	@Override

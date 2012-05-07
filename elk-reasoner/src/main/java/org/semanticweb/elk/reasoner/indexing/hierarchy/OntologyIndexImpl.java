@@ -20,19 +20,16 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing;
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectIndexerVisitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.util.collections.Operations;
 
 public class OntologyIndexImpl extends IndexedObjectCache implements
@@ -41,6 +38,8 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	private final ElkObjectIndexerVisitor elkObjectIndexer;
 	private final ElkAxiomIndexerVisitor axiomInserter;
 	private final ElkAxiomIndexerVisitor axiomDeleter;
+
+	protected Collection<IndexedObjectProperty> reflexiveObjectProperties;
 
 	public OntologyIndexImpl() {
 		this.elkObjectIndexer = new ElkObjectIndexerVisitor(this);
@@ -112,6 +111,26 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	@Override
 	public ElkAxiomProcessor getAxiomDeleter() {
 		return axiomDeleter;
+	}
+
+	@Override
+	public Iterable<IndexedObjectProperty> getReflexiveObjectProperties() {
+		return reflexiveObjectProperties;
+	}
+
+	protected void addReflexiveObjectProperty(
+			IndexedObjectProperty reflexiveObjectProperty) {
+		if (reflexiveObjectProperties == null)
+			reflexiveObjectProperties = new LinkedList<IndexedObjectProperty>();
+		reflexiveObjectProperties.add(reflexiveObjectProperty);
+	}
+
+	protected boolean removeReflexiveObjectProperty(
+			IndexedObjectProperty reflexiveObjectProperty) {
+		boolean success = reflexiveObjectProperties.remove(reflexiveObjectProperty);
+		if (reflexiveObjectProperties.isEmpty())
+			reflexiveObjectProperties = null;
+		return success;
 	}
 
 }
