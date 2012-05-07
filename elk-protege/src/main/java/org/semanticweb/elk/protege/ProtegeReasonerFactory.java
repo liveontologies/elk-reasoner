@@ -28,6 +28,7 @@ package org.semanticweb.elk.protege;
 import org.protege.editor.owl.model.inference.AbstractProtegeOWLReasonerInfo;
 import org.semanticweb.elk.owlapi.ElkReasonerConfiguration;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
+import org.semanticweb.elk.reasoner.ReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.FreshEntityPolicy;
 import org.semanticweb.owlapi.reasoner.IndividualNodeSetPolicy;
@@ -43,7 +44,8 @@ import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
  */
 public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
-protected final OWLReasonerFactory factory=new ElkReasonerFactory(); 
+	protected final OWLReasonerFactory factory = new ElkReasonerFactory(); 
+	protected final ReasonerConfiguration elkConfig = ReasonerConfiguration.getDefaultConfiguration();
     
     @Override
 	public BufferingMode getRecommendedBuffering() {
@@ -59,7 +61,7 @@ protected final OWLReasonerFactory factory=new ElkReasonerFactory();
 	public ElkReasonerConfiguration getConfiguration(ReasonerProgressMonitor monitor) {
     	OWLReasonerConfiguration genericConfig = new SimpleConfiguration(monitor, FreshEntityPolicy.DISALLOW, 0, IndividualNodeSetPolicy.BY_NAME);
     	
-    	return new ElkReasonerConfiguration(genericConfig);
+    	return new ElkReasonerConfiguration(genericConfig, elkConfig);
     }
     
     @Override
@@ -70,4 +72,7 @@ protected final OWLReasonerFactory factory=new ElkReasonerFactory();
 	public void dispose() throws Exception {
     }
 
+    public ReasonerConfiguration getElkConfiguration() {
+    	return elkConfig;
+    }
 }
