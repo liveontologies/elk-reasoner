@@ -30,7 +30,6 @@ import org.semanticweb.owlapi.reasoner.IllegalConfigurationException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 
 /**
  * @author Yevgeny Kazakov
@@ -57,17 +56,23 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		ReasonerProgressMonitor progressMonitor = null;
-		if (config != null)
-			progressMonitor = config.getProgressMonitor();
-		return new ElkReasoner(ontology, false, progressMonitor);
+		return createElkReasoner(ontology, true, config);
 	}
 
 	@Override
 	public OWLReasoner createReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		return new ElkReasoner(ontology, true, config.getProgressMonitor());
+		return createElkReasoner(ontology, false, config);
 	}
 
+	ElkReasoner createElkReasoner(OWLOntology ontology, boolean isBufferingMode, OWLReasonerConfiguration config) throws IllegalConfigurationException {
+		//here we check if the passed configuration also has ELK's parameters
+		if (config != null && config instanceof ElkReasonerConfiguration) {
+			return new ElkReasoner(ontology, isBufferingMode, config.getProgressMonitor(), ((ElkReasonerConfiguration)config).getElkConfiguration());
+		}
+		else {
+			return new ElkReasoner(ontology, isBufferingMode, config != null ? config.getProgressMonitor() : null);	
+		}
+	}
 }

@@ -40,6 +40,7 @@ import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -117,24 +118,27 @@ public class ElkReasoner implements OWLReasoner {
 	// logger the messages
 	protected final static Logger LOGGER_ = Logger.getLogger(ElkReasoner.class);
 
-	public ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
-			ReasonerProgressMonitor progressMonitor) {
+	ElkReasoner(OWLOntology ontology, boolean isBufferingMode, ReasonerProgressMonitor progressMonitor, ReasonerConfiguration elkConfig) {
 		this.owlOntology = ontology;
 		this.manager = ontology.getOWLOntologyManager();
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
-		this.reasoner = new ReasonerFactory().createReasoner();
+		this.reasoner = new ReasonerFactory().createReasoner(elkConfig);
 		this.ontologyChangeListener = new OntologyChangeListener();
 		this.isBufferingMode = isBufferingMode;
-		manager.addOntologyChangeListener(ontologyChangeListener);
-		if (progressMonitor == null)
-			this.elkProgressMonitor = new DummyProgressMonitor();
-		else
-			this.elkProgressMonitor = new ElkReasonerProgressMonitor(
-					progressMonitor);
+		this.manager.addOntologyChangeListener(ontologyChangeListener);
+		this.elkProgressMonitor = progressMonitor == null ? new DummyProgressMonitor() :  new ElkReasonerProgressMonitor(progressMonitor);
 		this.pendingChanges = new ArrayList<OWLOntologyChange>();
 		this.objectFactory = new ElkObjectFactoryImpl();
 		this.owlConverter = OwlConverter.getInstance();
 		this.elkConverter = ElkConverter.getInstance();
+	}
+	
+	ElkReasoner(OWLOntology ontology, boolean isBufferingMode, 	ReasonerProgressMonitor progressMonitor) {
+		this(ontology, isBufferingMode, progressMonitor, ReasonerConfiguration.getDefaultConfiguration());
+	}
+	
+	ElkReasoner(OWLOntology ontology, boolean isBufferingMode) {
+		this(ontology, isBufferingMode, null, ReasonerConfiguration.getDefaultConfiguration());
 	}
 
 	protected Reasoner getInternalReasoner() {

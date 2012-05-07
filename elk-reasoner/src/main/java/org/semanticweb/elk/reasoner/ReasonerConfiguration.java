@@ -82,7 +82,7 @@ public class ReasonerConfiguration {
 	}
 	
 	
-	private ReasonerConfiguration(Map<String, String> paramMap) {
+	protected ReasonerConfiguration(Map<String, String> paramMap) {
 		this.paramMap = paramMap;
 	}
 	
