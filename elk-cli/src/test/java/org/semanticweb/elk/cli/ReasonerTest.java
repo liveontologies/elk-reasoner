@@ -486,6 +486,7 @@ public class ReasonerTest {
 		ClassNode nothing = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
 		
 		assertEquals(nothing.getMembers(), thing.getMembers());
+		assertSame(nothing.getCanonicalMember(), thing.getCanonicalMember());
 	}
 	
 
