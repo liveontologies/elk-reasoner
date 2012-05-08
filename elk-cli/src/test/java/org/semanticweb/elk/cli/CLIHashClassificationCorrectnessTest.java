@@ -51,7 +51,7 @@ public class CLIHashClassificationCorrectnessTest extends HashClassificationCorr
 
 	@Override
 	protected Reasoner createReasoner(final InputStream input) throws Owl2ParseException, IOException {
-		IOReasoner reasoner = new IOReasoner();
+		IOReasoner reasoner = new IOReasonerFactory().createReasoner();
 		
 		reasoner.loadOntologyFromStream(input);
 		

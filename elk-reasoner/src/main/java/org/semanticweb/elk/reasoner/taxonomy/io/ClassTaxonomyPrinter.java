@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.io;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -39,6 +39,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
+import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
@@ -54,7 +57,7 @@ public class ClassTaxonomyPrinter {
 	 * Convenience method for printing a ClassTaxonomy to a file at the given
 	 * location.
 	 * 
-	 * @see org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter#dumpClassTaxomomy
+	 * @see org.semanticweb.elk.reasoner.taxonomy.io.ClassTaxonomyPrinter#dumpClassTaxomomy
 	 * 
 	 * @param classTaxonomy
 	 * @param fileName

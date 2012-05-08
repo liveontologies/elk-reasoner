@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -49,15 +48,10 @@ public class Reasoner {
 	// logger for events
 	protected final static Logger LOGGER_ = Logger.getLogger(Reasoner.class);
 
-	public Reasoner(ExecutorService executor, int workerNo) {
+	protected Reasoner(ExecutorService executor, int workerNo) {
 		this.executor = executor;
 		this.workerNo = workerNo;
 		reset();
-	}
-
-	public Reasoner() {
-		this(Executors.newCachedThreadPool(), Runtime.getRuntime()
-				.availableProcessors());
 	}
 
 	public void reset() {
@@ -135,6 +129,11 @@ public class Reasoner {
 
 	public void shutdown() {
 		executor.shutdownNow();
+	}
+	
+	//used for testing
+	int getNumberOfWorkers() {
+		return workerNo;
 	}
 
 	public class TaxonomyComputation extends
