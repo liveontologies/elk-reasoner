@@ -50,6 +50,7 @@ public class ElkDisjointObjectPropertiesAxiomWrap<T extends OWLDisjointObjectPro
 		super(owlDisjointObjectPropertiesAxiom);
 	}
 
+	@Override
 	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions() {
 		List<ElkObjectPropertyExpression> result = new ArrayList<ElkObjectPropertyExpression>();
 		for (OWLObjectPropertyExpression ope : this.owlObject.getProperties()) {

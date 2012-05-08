@@ -57,6 +57,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return accept((IndexedObjectIntersectionOfVisitor<O>) visitor);
 	}

@@ -51,6 +51,7 @@ public class ElkFunctionalDataPropertyAxiomImpl extends
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -47,6 +47,7 @@ public class ElkObjectUnionOfWrap<T extends OWLObjectUnionOf> extends
 		super(owlObjectUnionOf);
 	}
 
+	@Override
 	public List<? extends ElkClassExpression> getClassExpressions() {
 		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
 		for (OWLClassExpression ce : this.owlObject.getOperands()) {

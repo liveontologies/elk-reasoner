@@ -42,6 +42,7 @@ public abstract class ElkCardinalityRestrictionImpl<P> extends
 		this.cardinality = cardinality;
 	}
 
+	@Override
 	public int getCardinality() {
 		return this.cardinality;
 	}

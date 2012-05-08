@@ -61,7 +61,7 @@ public class RuleApplicationEngine implements InputProcessor<IndexedClassExpress
 	/**
 	 * The index used for executing the rules
 	 */
-	protected final OntologyIndex ontologyIndex;
+	public final OntologyIndex ontologyIndex;
 
 	/**
 	 * Cached constants
@@ -123,14 +123,17 @@ public class RuleApplicationEngine implements InputProcessor<IndexedClassExpress
 		}
 	}
 
+	@Override
 	public void submit(IndexedClassExpression job) {
 		getCreateContext(job);
 	}
 
+	@Override
 	public void process() throws InterruptedException {
 		processActiveContexts();
 	}
 
+	@Override
 	public boolean canProcess() {
 		return !activeContextsEmpty.get();
 	}

@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
@@ -98,6 +99,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
@@ -191,6 +196,8 @@ public class OwlConverter {
 
 	protected static OwlAxiomConverterVisitor OWL_AXIOM_CONVERTER = OwlAxiomConverterVisitor
 			.getInstance();
+	
+	protected static OwlAnnotationAxiomConverterVisitor OWL_ANNOTATION_AXIOM_CONVERTER = OwlAnnotationAxiomConverterVisitor.getInstance();
 
 	protected static OwlClassAxiomConverterVisitor OWL_CLASS_AXIOM_CONVERTER = OwlClassAxiomConverterVisitor
 			.getInstance();
@@ -207,7 +214,7 @@ public class OwlConverter {
 	protected static OwlObjectPropertyExpressionConverterVisitor OWL_OBJECT_PROPERTY_EXPRESSION_CONVERTER = OwlObjectPropertyExpressionConverterVisitor
 			.getInstance();
 	
-	protected static OwlAnnotationVisitor OWL_ANNOTATION_CONVERTER = OwlAnnotationVisitor.getInstance();
+	protected static OwlAnnotationSubjectValueVisitor OWL_ANNOTATION_CONVERTER = OwlAnnotationSubjectValueVisitor.getInstance();
 
 	public ElkAnnotationProperty convert(
 			OWLAnnotationProperty owlAnnotationProperty) {
@@ -221,6 +228,10 @@ public class OwlConverter {
 				owlAnonymousIndividual);
 	}
 
+	public ElkAnnotationAxiom convert(OWLAnnotationAxiom owlAnnotationAxiom) {
+		return owlAnnotationAxiom.accept(OWL_ANNOTATION_AXIOM_CONVERTER);
+	}
+	
 	public ElkAssertionAxiom convert(OWLIndividualAxiom owlIndividualAxiom) {
 		return owlIndividualAxiom.accept(OWL_INDIVIDUAL_AXIOM_CONVERTER);
 	}
@@ -307,7 +318,7 @@ public class OwlConverter {
 	public ElkDataOneOf convert(OWLDataOneOf owlDataOneOf) {
 		return new ElkDataOneOfWrap<OWLDataOneOf>(owlDataOneOf);
 	}
-
+	
 	public ElkDataPropertyAssertionAxiom convert(
 			OWLDataPropertyAssertionAxiom owlDataPropertyAssertionAxiom) {
 		return new ElkDataPropertyAssertionAxiomWrap<OWLDataPropertyAssertionAxiom>(
@@ -640,5 +651,8 @@ public class OwlConverter {
 		return OWL_ANNOTATION_CONVERTER.visit(value);
 	}
 
+	public ElkIri convert(IRI iri) {
+		return new ElkFullIri(iri.toString());
+	}
 
 }

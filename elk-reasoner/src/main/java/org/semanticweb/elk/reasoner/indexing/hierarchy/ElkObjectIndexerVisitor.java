@@ -89,22 +89,26 @@ public class ElkObjectIndexerVisitor implements
 		this.objectFilter = objectFilter;
 	}
 
+	@Override
 	public IndexedClassExpression visit(ElkClass elkClass) {
 		return objectFilter.filter(new IndexedClass(elkClass));
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
 		throw new IndexingException(
 				ElkObjectAllValuesFrom.class.getSimpleName() + " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectComplementOf elkObjectComplementOf) {
 		throw new IndexingException(ElkObjectComplementOf.class.getSimpleName()
 				+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectExactCardinality elkObjectExactCardinality) {
 		throw new IndexingException(
@@ -112,6 +116,7 @@ public class ElkObjectIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectExactCardinalityQualified elkObjectExactCardinalityQualified) {
 		throw new IndexingException(
@@ -119,11 +124,13 @@ public class ElkObjectIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
 		throw new IndexingException(ElkObjectHasSelf.class.getSimpleName()
 				+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
 		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectHasValue
 				.getProperty().accept(this);
@@ -144,6 +151,7 @@ public class ElkObjectIndexerVisitor implements
 	 * is achieved by ordering conjucts so that A < B in each binary
 	 * conjunction.
 	 */
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
 
@@ -174,6 +182,7 @@ public class ElkObjectIndexerVisitor implements
 		return result;
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectMaxCardinality elkObjectMaxCardinality) {
 		throw new IndexingException(
@@ -181,6 +190,7 @@ public class ElkObjectIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectMaxCardinalityQualified elkObjectMaxCardinalityQualified) {
 		throw new IndexingException(
@@ -188,6 +198,7 @@ public class ElkObjectIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectMinCardinality elkObjectMinCardinality) {
 		throw new IndexingException(
@@ -195,6 +206,7 @@ public class ElkObjectIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectMinCardinalityQualified elkObjectMinCardinalityQualified) {
 		throw new IndexingException(
@@ -202,6 +214,7 @@ public class ElkObjectIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
 		if (elkObjectOneOf.getIndividuals().size() != 1)
 			throw new IndexingException(ElkObjectOneOf.class.getSimpleName()
@@ -209,6 +222,7 @@ public class ElkObjectIndexerVisitor implements
 		return elkObjectOneOf.getIndividuals().get(0).accept(this);
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
 		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectSomeValuesFrom
@@ -217,11 +231,13 @@ public class ElkObjectIndexerVisitor implements
 				elkObjectSomeValuesFrom.getFiller().accept(this)));
 	}
 
+	@Override
 	public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
 		throw new IndexingException(ElkObjectUnionOf.class.getSimpleName()
 				+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
 		if (LOGGER_.isEnabledFor(Level.WARN))
 			LOGGER_.warn(ElkDataHasValue.class.getSimpleName()
@@ -229,12 +245,14 @@ public class ElkObjectIndexerVisitor implements
 		return objectFilter.filter(new IndexedDataHasValue(elkDataHasValue));
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkDataMaxCardinality elkDataMaxCardinality) {
 		throw new IndexingException(ElkDataMaxCardinality.class.getSimpleName()
 				+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkDataMaxCardinalityQualified elkDataMaxCardinalityQualified) {
 		throw new IndexingException(
@@ -242,12 +260,14 @@ public class ElkObjectIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkDataMinCardinality elkDataMinCardinality) {
 		throw new IndexingException(ElkDataMinCardinality.class.getSimpleName()
 				+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkDataMinCardinalityQualified elkDataMinCardinalityQualified) {
 		throw new IndexingException(
@@ -255,12 +275,14 @@ public class ElkObjectIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkDataExactCardinality elkDataExactCardinality) {
 		throw new IndexingException(ElkDataMinCardinality.class.getSimpleName()
 				+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkDataExactCardinalityQualified elkDataExactCardinalityQualified) {
 		throw new IndexingException(
@@ -268,23 +290,27 @@ public class ElkObjectIndexerVisitor implements
 						+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
 		throw new IndexingException(ElkDataSomeValuesFrom.class.getSimpleName()
 				+ " not supported");
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkDataAllValuesFrom elkDataAllValuesFrom) {
 		throw new IndexingException(ElkDataAllValuesFrom.class.getSimpleName()
 				+ " not supported");
 	}
 
+	@Override
 	public IndexedObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
 		throw new IndexingException(ElkObjectInverseOf.class.getSimpleName()
 				+ " not supported");
 	}
 
+	@Override
 	public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
 		return objectFilter
 				.filter(new IndexedObjectProperty(elkObjectProperty));
@@ -299,6 +325,7 @@ public class ElkObjectIndexerVisitor implements
 	 * 
 	 * Binarization of role chains. Order must be preserved.
 	 */
+	@Override
 	public IndexedPropertyChain visit(
 			ElkObjectPropertyChain elkObjectPropertyChain) {
 
@@ -324,11 +351,13 @@ public class ElkObjectIndexerVisitor implements
 		return result;
 	}
 
+	@Override
 	public IndexedNominal visit(ElkAnonymousIndividual elkAnonymousIndividual) {
 		throw new IndexingException(
 				ElkAnonymousIndividual.class.getSimpleName() + " not supported");
 	}
 
+	@Override
 	public IndexedNominal visit(ElkNamedIndividual elkNamedIndividual) {
 		return (IndexedNominal) objectFilter.filter(new IndexedNominal(
 				elkNamedIndividual));

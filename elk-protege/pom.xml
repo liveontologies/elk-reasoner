@@ -67,7 +67,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Implementation-Title>${project.parent.name}</Implementation-Title>
+						<Implementation-Title>ELK Reasoner</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
 						<Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.owlapi</Export-Package>

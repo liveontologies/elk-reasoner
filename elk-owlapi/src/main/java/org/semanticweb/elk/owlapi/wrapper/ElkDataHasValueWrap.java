@@ -44,10 +44,12 @@ public class ElkDataHasValueWrap<T extends OWLDataHasValue> extends
 		super(owlDataHasValue);
 	}
 
+	@Override
 	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 
+	@Override
 	public ElkLiteral getFiller() {
 		return converter.convert(this.owlObject.getValue());
 	}

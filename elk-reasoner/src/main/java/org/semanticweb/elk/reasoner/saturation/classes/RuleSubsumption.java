@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
  */
 public class RuleSubsumption<C extends ContextElClassSaturation> implements InferenceRuleSCE<C> {
 
+	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
 

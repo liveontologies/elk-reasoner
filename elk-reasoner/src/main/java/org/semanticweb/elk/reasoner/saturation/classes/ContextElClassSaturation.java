@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.AbstractContext;
@@ -49,8 +50,10 @@ public class ContextElClassSaturation extends AbstractContext implements
 	public Multimap<IndexedPropertyChain, ContextElClassSaturation> backwardLinksByObjectProperty;
 
 	public Multimap<IndexedPropertyChain, ContextElClassSaturation> forwardLinksByObjectProperty;
-
+	
 	protected Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> propagationsByObjectProperty;
+	
+	protected Set<IndexedDisjointnessAxiom> disjointnessAxioms;
 
 	/**
 	 * A context is saturated if all superclass expressions of the root
@@ -88,6 +91,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * 
 	 * @return the set of derived indexed class expressions
 	 */
+	@Override
 	public Set<IndexedClassExpression> getSuperClassExpressions() {
 		return superClassExpressions;
 	}
@@ -98,6 +102,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * 
 	 * @return
 	 */
+	@Override
 	public boolean isSatisfiable() {
 		return isSatisfiable;
 	}
@@ -108,6 +113,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * 
 	 * @param satisfiable
 	 */
+	@Override
 	public void setSatisfiable(boolean satisfiable) {
 		isSatisfiable = satisfiable;
 	}
@@ -166,11 +172,19 @@ public class ContextElClassSaturation extends AbstractContext implements
 	public void initPropagationsByProperty() {
 		propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>>();
 	}
+	
+	public boolean addDisjointessAxiom(IndexedDisjointnessAxiom disjointnessAxiom) {
+		if (disjointnessAxioms == null)
+			disjointnessAxioms = new ArrayHashSet<IndexedDisjointnessAxiom>();
+		
+		return disjointnessAxioms.add(disjointnessAxiom);
+	}
 
 	/**
 	 * Mark context as saturated. A context is saturated if all superclass
 	 * expressions of the root expression have been computed.
 	 */
+	@Override
 	public void setSaturated() {
 		isSaturated = true;
 	}
@@ -183,6 +197,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * @return <tt>true</tt> if this context is saturated and <tt>false</tt>
 	 *         otherwise
 	 */
+	@Override
 	public boolean isSaturated() {
 		return isSaturated;
 	}

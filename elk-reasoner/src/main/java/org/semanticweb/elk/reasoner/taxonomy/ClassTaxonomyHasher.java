@@ -46,6 +46,7 @@ public class ClassTaxonomyHasher {
 
 	public static Hasher<ElkClass> elkClassHasher = new Hasher<ElkClass>() {
 
+		@Override
 		public int hash(ElkClass elkClass) {
 			return elkClass.getIri().hashCode();
 		}
@@ -86,6 +87,7 @@ public class ClassTaxonomyHasher {
 			}
 		};
 
+		@Override
 		public int hash(ClassNode node) {
 			int memberHash = HashGenerator.combineMultisetHash(true,
 					node.getMembers(), elkClassHasher);
@@ -137,6 +139,7 @@ public class ClassTaxonomyHasher {
 	 */
 	protected static Hasher<ClassTaxonomy> classTaxonomyHasher = new Hasher<ClassTaxonomy>() {
 
+		@Override
 		public int hash(ClassTaxonomy taxonomy) {
 			return HashGenerator.combineMultisetHash(true, taxonomy.getNodes(),
 					classNodeHasher);

@@ -82,6 +82,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 		this.unsatisfiableClasses.add(PredefinedElkClass.OWL_NOTHING);
 	}
 
+	@Override
 	public Set<ClassNode> getNodes() {
 		return Collections.unmodifiableSet(allNodes);
 	}
@@ -116,6 +117,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	 * @param elkClass
 	 * @return ClassNode object for elkClass, possibly still incomplete
 	 */
+	@Override
 	public ClassNode getNode(ElkClass elkClass) {
 		ClassNode result = getNonBottomNode(elkClass);
 		if (result != null)
@@ -160,14 +162,17 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 
 	/* functions required by the {@link ClassNode} representing the bottom node */
 
+	@Override
 	public Set<ElkClass> getMembers() {
 		return unsatisfiableClasses;
 	}
 
+	@Override
 	public ElkClass getCanonicalMember() {
 		return PredefinedElkClass.OWL_NOTHING;
 	}
 
+	@Override
 	public Set<ClassNode> getDirectSuperNodes() {
 		return Operations.filter(allNodes, new Condition<ClassNode>() {
 			public boolean holds(ClassNode element) {
@@ -180,23 +185,28 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 		}, allNodes.size() - countNodesWithSubClasses.get() - 1);
 	}
 
+	@Override
 	public Set<ClassNode> getAllSuperNodes() {
 		/* all nodes except this one */
 		return Operations.filter(allNodes, new Condition<Object>() {
+			@Override
 			public boolean holds(Object element) {
 				return element != this;
 			}
 		}, allNodes.size() - 1);
 	}
 
+	@Override
 	public Set<ClassNode> getDirectSubNodes() {
 		return Collections.emptySet();
 	}
 
+	@Override
 	public Set<ClassNode> getAllSubNodes() {
 		return Collections.emptySet();
 	}
 
+	@Override
 	public ClassTaxonomy getTaxonomy() {
 		return this;
 	}

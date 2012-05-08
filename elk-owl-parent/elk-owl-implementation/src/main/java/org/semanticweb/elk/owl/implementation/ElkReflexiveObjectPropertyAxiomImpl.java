@@ -42,6 +42,7 @@ public class ElkReflexiveObjectPropertyAxiomImpl extends
 		super(property);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

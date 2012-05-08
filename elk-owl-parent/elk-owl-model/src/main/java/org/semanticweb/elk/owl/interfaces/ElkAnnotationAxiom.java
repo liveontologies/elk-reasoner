@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Annotation_Axioms">Annotation Axiom<a> in
@@ -34,5 +36,12 @@ package org.semanticweb.elk.owl.interfaces;
  * 
  */
 public interface ElkAnnotationAxiom extends ElkAxiom {
-
+	
+	/**
+	 * Accept an ElkAnnotationAxiomVisitor. 
+	 * 
+	 * @param visitor
+	 * @return
+	 */
+	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor);
 }

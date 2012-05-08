@@ -43,6 +43,7 @@ public class ElkObjectComplementOfWrap<T extends OWLObjectComplementOf> extends
 		super(owlObjectComplementOf);
 	}
 
+	@Override
 	public ElkClassExpression getClassExpression() {
 		return converter.convert(this.owlObject.getOperand());
 	}

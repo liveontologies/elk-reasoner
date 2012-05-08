@@ -43,6 +43,7 @@ public abstract class ElkClassAxiomWrap<T extends OWLClassAxiom> extends
 		super(owlClassAxiom);
 	}
 
+	@Override
 	abstract public <O> O accept(ElkClassAxiomVisitor<O> visitor);
 
 	@Override

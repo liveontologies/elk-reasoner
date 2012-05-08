@@ -45,11 +45,13 @@ public class ElkSubObjectPropertyChainOfAxiomWrap<T extends OWLSubPropertyChainO
 		super(owlSubPropertyChainOfAxiom);
 	}
 
+	@Override
 	public ElkSubObjectPropertyExpression getSubObjectPropertyExpression() {
 		return new ElkObjectPropertyChainWrap<OWLSubPropertyChainOfAxiom>(
 				this.owlObject);
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getSuperObjectPropertyExpression() {
 		return converter.convert(this.owlObject.getSuperProperty());
 	}

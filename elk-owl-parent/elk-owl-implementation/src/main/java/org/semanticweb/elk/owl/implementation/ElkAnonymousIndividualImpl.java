@@ -42,6 +42,7 @@ public class ElkAnonymousIndividualImpl extends ElkObjectImpl implements
 		this.nodeId = nodeId;
 	}
 
+	@Override
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -51,10 +52,12 @@ public class ElkAnonymousIndividualImpl extends ElkObjectImpl implements
 		return nodeId;
 	}
 
+	@Override
 	public <O> O accept(ElkIndividualVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

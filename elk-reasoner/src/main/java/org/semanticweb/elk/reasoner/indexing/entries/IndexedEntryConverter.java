@@ -47,39 +47,46 @@ public class IndexedEntryConverter<T>
 		IndexedClassExpressionVisitor<KeyEntry<T, ? extends IndexedClassExpression>>,
 		IndexedPropertyChainVisitor<IndexedPropertyChainEntry<T, ? extends IndexedPropertyChain>> {
 
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedClass> visit(
 			IndexedClass element) {
 		return new IndexedClassEntry<T, IndexedClass>(element);
 	}
 
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedObjectIntersectionOf> visit(
 			IndexedObjectIntersectionOf element) {
 		return new IndexedObjectIntersectionOfEntry<T, IndexedObjectIntersectionOf>(
 				element);
 	}
 
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedDataHasValue> visit(
 			IndexedDataHasValue element) {
 		return new IndexedDataHasValueEntry<T, IndexedDataHasValue>(element);
 	}
 
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedObjectSomeValuesFrom> visit(
 			IndexedObjectSomeValuesFrom element) {
 		return new IndexedObjectSomeValuesFromEntry<T, IndexedObjectSomeValuesFrom>(
 				element);
 	}
 
+	@Override
 	public IndexedPropertyChainEntry<T, IndexedObjectProperty> visit(
 			IndexedObjectProperty element) {
 		return new IndexedObjectPropertyEntry<T, IndexedObjectProperty>(element);
 	}
 
+	@Override
 	public IndexedPropertyChainEntry<T, IndexedBinaryPropertyChain> visit(
 			IndexedBinaryPropertyChain element) {
 		return new IndexedBinaryPropertyChainEntry<T, IndexedBinaryPropertyChain>(
 				element);
 	}
 
+	@Override
 	public IndexedNominalEntry<T, IndexedNominal> visit(
 			IndexedNominal element) {
 		return new IndexedNominalEntry<T, IndexedNominal> (element);

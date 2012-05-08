@@ -98,23 +98,28 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 */
 	public ClassTaxonomyEngine(OntologyIndex ontologyIndex) {
 		this(ontologyIndex, new ClassTaxonomyListener<ClassTaxonomyEngine>() {
+			@Override
 			public void notifyCanProcess() {
 			}
 
+			@Override
 			public void notifyFinished(IndexedClass job) {
 			}
 		});
 	}
 
+	@Override
 	public final void submit(IndexedClass job) throws InterruptedException {
 		transitiveReductionEngine
 				.submit(new TransitiveReductionJob<IndexedClass>(job));
 	}
 
+	@Override
 	public final void process() throws InterruptedException {
 		transitiveReductionEngine.process();
 	}
 
+	@Override
 	public boolean canProcess() {
 		return transitiveReductionEngine.canProcess();
 	}
@@ -145,9 +150,11 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 			implements
 			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>, TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>> {
 
+		@Override
 		public void notifyCanProcess() {
 		}
 
+		@Override
 		public void notifyFinished(TransitiveReductionJob<IndexedClass> job)
 				throws InterruptedException {
 			job.getOutput().accept(outputProcessor);
@@ -165,6 +172,7 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 */
 	class TransitiveReductionOutputProcessor implements
 			TransitiveReductionOutputVisitor<IndexedClass> {
+		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 			NonBottomNode node = taxonomy.getCreate(output.getEquivalent());
@@ -194,11 +202,13 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 			}
 		}
 
+		@Override
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 			taxonomy.unsatisfiableClasses.add(output.getRoot().getElkClass());
 		}
 
+		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalent<IndexedClass> output) {
 			throw new IllegalArgumentException();
@@ -215,7 +225,7 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 * @param superNode
 	 *            the node that should be the super-node of the first node
 	 */
-	void assignDirectSuperClassNode(NonBottomNode subNode,
+	static void assignDirectSuperClassNode(NonBottomNode subNode,
 			NonBottomNode superNode) {
 		subNode.addDirectSuperNode(superNode);
 		/*

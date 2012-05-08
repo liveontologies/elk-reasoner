@@ -43,14 +43,17 @@ public class ElkFacetRestrictionWrap<T extends OWLFacetRestriction> extends
 		super(owlFacetRestriction);
 	}
 
+	@Override
 	public String getConstrainingFacet() {
 		return this.owlObject.getFacet().getIRI().toString();
 	}
 
+	@Override
 	public ElkLiteral getRestrictionValue() {
 		return converter.convert(this.owlObject.getFacetValue());
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

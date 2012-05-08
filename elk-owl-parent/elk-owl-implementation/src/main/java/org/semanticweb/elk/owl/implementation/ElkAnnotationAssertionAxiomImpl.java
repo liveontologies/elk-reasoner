@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -54,11 +55,6 @@ public class ElkAnnotationAssertionAxiomImpl implements ElkAnnotationAssertionAx
 	}
 	
 	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
 	public ElkAnnotationProperty getProperty() {
 		return annProperty;
 	}
@@ -76,5 +72,15 @@ public class ElkAnnotationAssertionAxiomImpl implements ElkAnnotationAssertionAx
 	@Override
 	public ElkAnnotationSubject getSubject() {
 		return annSubject;
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

@@ -44,10 +44,12 @@ public class ElkSubDataPropertyOfAxiomWrap<T extends OWLSubDataPropertyOfAxiom>
 		super(owlSubDataPropertyOfAxiom);
 	}
 
+	@Override
 	public ElkDataPropertyExpression getSubDataPropertyExpression() {
 		return converter.convert(this.owlObject.getSubProperty());
 	}
 
+	@Override
 	public ElkDataPropertyExpression getSuperDataPropertyExpression() {
 		return converter.convert(this.owlObject.getSuperProperty());
 	}

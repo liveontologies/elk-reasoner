@@ -132,6 +132,7 @@ public class RecordHashSetTest extends TestCase {
 
 	class IntegerKeyRecordFactory implements KeyEntryFactory<Int> {
 
+		@Override
 		public KeyEntry<Int, ? extends Int> createEntry(Int key) {
 			return new IntegerKeyRecord(key);
 		}

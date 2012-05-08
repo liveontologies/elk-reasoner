@@ -49,6 +49,7 @@ public class ElkDisjointUnionAxiomWrap<T extends OWLDisjointUnionAxiom> extends
 		super(owlClassAxiom);
 	}
 
+	@Override
 	public List<? extends ElkClassExpression> getClassExpressions() {
 		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
 		for (OWLClassExpression ce : this.owlObject.getClassExpressions()) {
@@ -57,6 +58,7 @@ public class ElkDisjointUnionAxiomWrap<T extends OWLDisjointUnionAxiom> extends
 		return result;
 	}
 
+	@Override
 	public ElkClass getDefinedClass() {
 		return new ElkClassWrap<OWLClass>(this.owlObject.getOWLClass());
 	}

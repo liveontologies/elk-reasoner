@@ -54,6 +54,7 @@ public abstract class ElkObjectWrap<T extends OWLObject> implements ElkObject {
 		this.owlObject = owlObject;
 	}
 
+	@Override
 	public final int hashCode() {
 		return owlObject.hashCode();
 	}

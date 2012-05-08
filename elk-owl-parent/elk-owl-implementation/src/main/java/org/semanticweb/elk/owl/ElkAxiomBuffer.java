@@ -40,6 +40,7 @@ public class ElkAxiomBuffer implements ElkAxiomProcessor {
 
 	final protected ArrayList<ElkAxiom> axioms = new ArrayList<ElkAxiom>();
 
+	@Override
 	public void process(ElkAxiom elkAxiom) {
 		axioms.add(elkAxiom);
 	}

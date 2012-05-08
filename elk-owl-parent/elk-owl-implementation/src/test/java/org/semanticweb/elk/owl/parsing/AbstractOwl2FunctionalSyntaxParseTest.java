@@ -115,7 +115,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		return axiomCounter;
 	}
 	
-	protected void setDefaultPrefixes(Owl2Parser parser) {
+	protected static void setDefaultPrefixes(Owl2Parser parser) {
 		ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
 		
 		prefixDeclarations.addOwlDefaultPrefixes();
@@ -133,7 +133,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 	 * @throws IOException 
 	 * @throws Exception
 	 */
-	protected void checkAxiomTypeCounts(ElkTestAxiomProcessor processor, Map<Class<?>, Integer> axiomTypeCounts, boolean checkAll) throws IOException {
+	protected static void checkAxiomTypeCounts(ElkTestAxiomProcessor processor, Map<Class<?>, Integer> axiomTypeCounts, boolean checkAll) throws IOException {
 		boolean error = false;
 		//parsed without errors, check the output
 		for (Iterator<Entry<Class<?>, Set<ElkAxiom>>> actualEntryIter = processor.getAxiomMapEntries().iterator(); actualEntryIter.hasNext();) {
@@ -165,7 +165,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		assertFalse("Parsing errors detected (see the output above)", error);
 	}
 	
-	private void dumpAxioms(Set<ElkAxiom> axioms) throws IOException {
+	private static void dumpAxioms(Set<ElkAxiom> axioms) throws IOException {
 		StringBuilder builder = new StringBuilder();
 		
 		for (ElkAxiom axiom : axioms) {

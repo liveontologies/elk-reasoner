@@ -41,6 +41,7 @@ public class RuleBottom<C extends ContextElClassSaturation> implements Inference
 					new PositiveSuperClassExpression<C> (engine.owlNothing));
 	}
 
+	@Override
 	public void applySCE(PositiveSuperClassExpression<C> argument, C context,
 			RuleApplicationEngine engine) {
 

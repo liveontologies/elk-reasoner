@@ -120,6 +120,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		this.jobQueueEmpty = new AtomicBoolean(true);
 	}
 
+	@Override
 	public final void submit(J job) throws InterruptedException {
 		R root = job.getInput();
 		if (LOGGER_.isTraceEnabled()) {
@@ -128,6 +129,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		saturationEngine.submit(new SaturationJobRoot<R, J>(job));
 	}
 
+	@Override
 	public final void process() throws InterruptedException {
 		for (;;) {
 			saturationEngine.process();
@@ -145,6 +147,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 		}
 	}
 
+	@Override
 	public boolean canProcess() {
 		return !auxJobQueue.isEmpty() || saturationEngine.canProcess();
 	}
@@ -176,10 +179,12 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 			implements
 			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>, ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>> {
 
+		@Override
 		public void notifyCanProcess() {
 			listener.notifyCanProcess();
 		}
 
+		@Override
 		public void notifyFinished(
 				SaturationJobForTransitiveReduction<R, ?, J> output)
 				throws InterruptedException {
@@ -196,6 +201,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 */
 	class SaturationOutputProcessor implements SaturationJobVisitor<R, J> {
 
+		@Override
 		public void visit(SaturationJobRoot<R, J> saturationJob)
 				throws InterruptedException {
 			/*
@@ -235,6 +241,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 			processTransitiveReductionState(state);
 		}
 
+		@Override
 		public void visit(SaturationJobSuperClass<R, J> saturationJob)
 				throws InterruptedException {
 			/*

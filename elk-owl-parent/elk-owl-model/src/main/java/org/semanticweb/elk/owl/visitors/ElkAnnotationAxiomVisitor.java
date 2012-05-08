@@ -26,15 +26,23 @@
 package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyDomainAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyRangeAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  *
+ * @author Frantisek Simancik
+ *
  */
 public interface ElkAnnotationAxiomVisitor<O> {
-	
-	O visit(ElkAnnotationAssertionAxiom annAssertionAxiom);
+
+	O visit(ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOfAxiom);
+	O visit(ElkAnnotationPropertyDomainAxiom annotationPropertyDomainAxiom);
+	O visit(ElkAnnotationPropertyRangeAxiom annotationPropertyRangeAxiom);
+	O visit(ElkAnnotationAssertionAxiom annotationAssertionAxiom);
 
 }

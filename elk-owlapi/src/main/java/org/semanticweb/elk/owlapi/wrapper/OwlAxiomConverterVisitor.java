@@ -23,6 +23,9 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationPropertyDomainAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLAsymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
@@ -48,6 +51,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
+import org.semanticweb.owlapi.model.OWLSubAnnotationPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubDataPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
@@ -253,4 +257,24 @@ public class OwlAxiomConverterVisitor extends
 			OWLTransitiveObjectPropertyAxiom owlTransitiveObjectPropertyAxiom) {
 		return CONVERTER.convert(owlTransitiveObjectPropertyAxiom);
 	};
+	
+	@Override
+	public ElkAxiom visit(OWLAnnotationAssertionAxiom owlAnnotationAssertion) {
+		return CONVERTER.convert(owlAnnotationAssertion);
+	}
+
+	@Override
+	public ElkAxiom visit(OWLAnnotationPropertyDomainAxiom owlAnnotationPropertyDomain) {
+		return CONVERTER.convert(owlAnnotationPropertyDomain);
+	}
+
+	@Override
+	public ElkAxiom visit(OWLAnnotationPropertyRangeAxiom owlAnnotationPropertyRange) {
+		return CONVERTER.convert(owlAnnotationPropertyRange);
+	}
+
+	@Override
+	public ElkAxiom visit(OWLSubAnnotationPropertyOfAxiom owlSubAnnotationPropertyOfAxiom) {
+		return CONVERTER.convert(owlSubAnnotationPropertyOfAxiom);
+	}
 }

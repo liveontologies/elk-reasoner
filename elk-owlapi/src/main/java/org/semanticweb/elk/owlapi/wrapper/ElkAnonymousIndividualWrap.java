@@ -42,6 +42,7 @@ public class ElkAnonymousIndividualWrap<T extends OWLAnonymousIndividual>
 		super(owlAnonymousIndividual);
 	}
 
+	@Override
 	public String getNodeId() {
 		return this.owlObject.getID().toString();
 	}

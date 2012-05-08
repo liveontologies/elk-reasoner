@@ -44,6 +44,7 @@ public abstract class AbstractTestManifest<I extends TestInput, EO extends TestO
 		this.expOutput = expOutput;
 	}
 	
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -63,6 +64,7 @@ public abstract class AbstractTestManifest<I extends TestInput, EO extends TestO
 		return "Input: " + input + System.getProperty("line.separator") + "Expected output: " + expOutput;
 	}
 
+	@Override
 	public abstract void compare(AO actualOutput) throws TestResultComparisonException;
 
 }

@@ -43,12 +43,15 @@ public abstract class ElkPropertyRestrictionImpl<P> extends ElkObjectImpl
 		this.property = property;
 	}
 
+	@Override
 	public P getProperty() {
 		return this.property;
 	}
 
+	@Override
 	public abstract <O> O accept(ElkClassExpressionVisitor<O> visitor);
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return accept((ElkClassExpressionVisitor<O>) visitor);
 	}

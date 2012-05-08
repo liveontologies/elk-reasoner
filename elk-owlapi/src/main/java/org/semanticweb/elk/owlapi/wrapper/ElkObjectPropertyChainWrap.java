@@ -49,6 +49,7 @@ public class ElkObjectPropertyChainWrap<T extends OWLSubPropertyChainOfAxiom>
 		super(owlSubPropertyChainOfAxiom);
 	}
 
+	@Override
 	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions() {
 		List<ElkObjectPropertyExpression> result = new ArrayList<ElkObjectPropertyExpression>();
 		for (OWLObjectPropertyExpression ope : this.owlObject

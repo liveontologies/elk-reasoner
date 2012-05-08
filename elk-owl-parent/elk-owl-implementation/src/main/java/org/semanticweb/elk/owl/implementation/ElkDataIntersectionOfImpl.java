@@ -51,10 +51,12 @@ public class ElkDataIntersectionOfImpl extends ElkDataRangeListObject
 		return buildFssString("DataIntersectionOf");
 	}
 
+	@Override
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

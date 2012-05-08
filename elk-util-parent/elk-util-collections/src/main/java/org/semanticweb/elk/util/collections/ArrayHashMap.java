@@ -107,10 +107,12 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		this.size = 0;
 	}
 
+	@Override
 	public int size() {
 		return size;
 	}
 
+	@Override
 	public boolean isEmpty() {
 		return size == 0;
 	}
@@ -134,6 +136,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		return key.hashCode() & (length - 1);
 	}
 
+	@Override
 	public boolean containsKey(Object key) {
 		if (key == null)
 			throw new NullPointerException();
@@ -155,6 +158,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		}
 	}
 
+	@Override
 	public boolean containsValue(Object value) {
 		if (value == null)
 			throw new NullPointerException();
@@ -165,6 +169,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		return false;
 	}
 
+	@Override
 	public V get(Object key) {
 		if (key == null)
 			throw new NullPointerException();
@@ -235,6 +240,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		this.threshold = computeThreshold(newCapacity);
 	}
 
+	@Override
 	public V put(K key, V value) {
 		if (key == null)
 			throw new NullPointerException();
@@ -246,14 +252,17 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		return result;
 	}
 
+	@Override
 	public V remove(Object key) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void clear() {
 		for (int i = 0; i < keys.length; i++)
 			if (keys[i] != null) {
@@ -263,14 +272,17 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		size = 0;
 	}
 
+	@Override
 	public Set<K> keySet() {
 		return new KeySet();
 	}
 
+	@Override
 	public Collection<V> values() {
 		return new ValueCollection();
 	}
 
+	@Override
 	public Set<java.util.Map.Entry<K, V>> entrySet() {
 		return new EntrySet();
 	}
@@ -298,10 +310,12 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 				;
 		}
 
+		@Override
 		public boolean hasNext() {
 			return nextKey != null;
 		}
 
+		@Override
 		public K next() {
 			if (expectedSize != size)
 				throw new ConcurrentModificationException();
@@ -313,6 +327,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 			return result;
 		}
 
+		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
@@ -321,18 +336,22 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 
 	private final class KeySet extends AbstractSet<K> {
 
+		@Override
 		public Iterator<K> iterator() {
 			return new KeyIterator();
 		}
 
+		@Override
 		public boolean contains(Object o) {
 			return ArrayHashMap.this.containsKey(o);
 		}
 
+		@Override
 		public boolean remove(Object o) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public int size() {
 			return size;
 		}
@@ -362,10 +381,12 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 				;
 		}
 
+		@Override
 		public boolean hasNext() {
 			return nextValue != null;
 		}
 
+		@Override
 		public V next() {
 			if (expectedSize != size)
 				throw new ConcurrentModificationException();
@@ -377,6 +398,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 			return result;
 		}
 
+		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
@@ -384,10 +406,12 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 
 	private final class ValueCollection extends AbstractCollection<V> {
 
+		@Override
 		public Iterator<V> iterator() {
 			return new ValueIterator();
 		}
 
+		@Override
 		public int size() {
 			return size;
 		}
@@ -421,10 +445,12 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 				;
 		}
 
+		@Override
 		public boolean hasNext() {
 			return nextKey != null;
 		}
 
+		@Override
 		public Entry next() {
 			if (expectedSize != size)
 				throw new ConcurrentModificationException();
@@ -436,6 +462,7 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 			return result;
 		}
 
+		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
@@ -453,14 +480,17 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 			this.cursor = cursor;
 		}
 
+		@Override
 		public K getKey() {
 			return iterator.keysSnapshot[cursor];
 		}
 
+		@Override
 		public V getValue() {
 			return iterator.valuesSnapshot[cursor];
 		}
 
+		@Override
 		public V setValue(V value) {
 			V previous = iterator.valuesSnapshot[cursor];
 			iterator.valuesSnapshot[cursor] = value;
@@ -470,10 +500,12 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 	}
 
 	private final class EntrySet extends AbstractSet<Map.Entry<K, V>> {
+		@Override
 		public Iterator<Map.Entry<K, V>> iterator() {
 			return new EntryIterator();
 		}
 
+		@Override
 		public boolean contains(Object o) {
 			if (!(o instanceof Map.Entry<?, ?>))
 				return false;
@@ -481,14 +513,17 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 			return ArrayHashMap.this.containsKey(k);
 		}
 
+		@Override
 		public boolean remove(Object o) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public int size() {
 			return size;
 		}
 
+		@Override
 		public void clear() {
 			ArrayHashMap.this.clear();
 		}

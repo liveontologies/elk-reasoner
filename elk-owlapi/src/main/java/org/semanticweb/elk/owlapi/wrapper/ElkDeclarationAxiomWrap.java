@@ -43,6 +43,7 @@ public class ElkDeclarationAxiomWrap<T extends OWLDeclarationAxiom> extends
 		super(owlDeclarationAxiom);
 	}
 
+	@Override
 	public ElkEntity getEntity() {
 		return converter.convert(this.owlObject.getEntity());
 	}

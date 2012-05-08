@@ -49,10 +49,12 @@ public class ElkObjectPropertyWrap<T extends OWLObjectProperty> extends
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

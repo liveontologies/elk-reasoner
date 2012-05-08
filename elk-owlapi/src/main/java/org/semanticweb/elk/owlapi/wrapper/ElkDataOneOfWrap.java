@@ -47,6 +47,7 @@ public class ElkDataOneOfWrap<T extends OWLDataOneOf> extends
 		super(refOWLDataOneOf);
 	}
 
+	@Override
 	public List<? extends ElkLiteral> getLiterals() {
 		List<ElkLiteral> result = new ArrayList<ElkLiteral>();
 		for (OWLLiteral ltr : this.owlObject.getValues()) {

@@ -48,14 +48,17 @@ public class ElkSameIndividualAxiomImpl extends ElkIndividualListObject
 		return buildFssString("SameIndividual");
 	}
 
+	@Override
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -44,10 +44,12 @@ public class ElkClassAssertionAxiomWrap<T extends OWLClassAssertionAxiom>
 		super(owlClassAssertionAxiom);
 	}
 
+	@Override
 	public ElkIndividual getIndividual() {
 		return converter.convert(this.owlObject.getIndividual());
 	}
 
+	@Override
 	public ElkClassExpression getClassExpression() {
 		return converter.convert(this.owlObject.getClassExpression());
 	}

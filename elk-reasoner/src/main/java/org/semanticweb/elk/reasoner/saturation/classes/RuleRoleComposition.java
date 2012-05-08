@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
@@ -53,7 +52,7 @@ public class RuleRoleComposition<C extends ContextElClassSaturation>  extends Ru
 			engine.enqueue(target, new ForwardLink<C>(linkRelation, context));
 
 		/* compose the link with all forward links */
-		final Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> comps =
+		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps =
 			linkRelation.getSaturated().getCompositionsByRightSubProperty();
 		final Multimap<IndexedPropertyChain, ? extends ContextElClassSaturation> forwLinks =
 			context.forwardLinksByObjectProperty;
@@ -62,7 +61,7 @@ public class RuleRoleComposition<C extends ContextElClassSaturation>  extends Ru
 			for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 					comps.keySet(), forwLinks.keySet())) {
 
-				Collection<IndexedBinaryPropertyChain> compositions = comps.get(forwardRelation);
+				Collection<IndexedPropertyChain> compositions = comps.get(forwardRelation);
 				Collection<? extends ContextElClassSaturation> forwardTargets = forwLinks.get(forwardRelation);
 
 				for (IndexedPropertyChain composition : compositions)
@@ -84,7 +83,7 @@ public class RuleRoleComposition<C extends ContextElClassSaturation>  extends Ru
 		final C target = argument.getTarget();
 
 		/* compose the link with all backward links */
-		final Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> comps =
+		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps =
 			linkRelation.getSaturated().getCompositionsByLeftSubProperty();
 		final Multimap<IndexedPropertyChain, ? extends ContextElClassSaturation> backLinks =
 			context.backwardLinksByObjectProperty;
@@ -94,7 +93,7 @@ public class RuleRoleComposition<C extends ContextElClassSaturation>  extends Ru
 			for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 					comps.keySet(), backLinks.keySet())) {
 
-				Collection<IndexedBinaryPropertyChain> compositions = comps.get(backwardRelation);
+				Collection<IndexedPropertyChain> compositions = comps.get(backwardRelation);
 				Collection<? extends ContextElClassSaturation> backwardTargets = backLinks.get(backwardRelation);
 
 				for (IndexedPropertyChain composition : compositions)

@@ -48,6 +48,7 @@ public class ElkObjectInverseOfImpl extends ElkObjectImpl implements
 		this.objectProperty = objectProperty;
 	}
 
+	@Override
 	public ElkObjectProperty getObjectProperty() {
 		return objectProperty;
 	}
@@ -60,14 +61,17 @@ public class ElkObjectInverseOfImpl extends ElkObjectImpl implements
 		return result.toString();
 	}
 
+	@Override
 	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

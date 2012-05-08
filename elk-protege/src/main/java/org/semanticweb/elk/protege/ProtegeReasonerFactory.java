@@ -26,7 +26,9 @@
 package org.semanticweb.elk.protege;
 
 import org.protege.editor.owl.model.inference.AbstractProtegeOWLReasonerInfo;
+import org.semanticweb.elk.owlapi.ElkReasonerConfiguration;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
+import org.semanticweb.elk.reasoner.ReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.FreshEntityPolicy;
 import org.semanticweb.owlapi.reasoner.IndividualNodeSetPolicy;
@@ -42,24 +44,35 @@ import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
  */
 public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
-protected final OWLReasonerFactory factory=new ElkReasonerFactory(); 
+	protected final OWLReasonerFactory factory = new ElkReasonerFactory(); 
+	protected final ReasonerConfiguration elkConfig = ReasonerConfiguration.getDefaultConfiguration();
     
-    public BufferingMode getRecommendedBuffering() {
+    @Override
+	public BufferingMode getRecommendedBuffering() {
         return BufferingMode.BUFFERING;
     }
     
-    public OWLReasonerFactory getReasonerFactory() {
+    @Override
+	public OWLReasonerFactory getReasonerFactory() {
         return factory;
     }
         
-    public OWLReasonerConfiguration getConfiguration(ReasonerProgressMonitor monitor) {
-    	return new SimpleConfiguration(monitor, FreshEntityPolicy.DISALLOW, 0, IndividualNodeSetPolicy.BY_NAME);
+    @Override
+	public ElkReasonerConfiguration getConfiguration(ReasonerProgressMonitor monitor) {
+    	OWLReasonerConfiguration genericConfig = new SimpleConfiguration(monitor, FreshEntityPolicy.DISALLOW, 0, IndividualNodeSetPolicy.BY_NAME);
+    	
+    	return new ElkReasonerConfiguration(genericConfig, elkConfig);
     }
     
-    public void initialise() throws Exception {
+    @Override
+	public void initialise() throws Exception {
     }
     
-    public void dispose() throws Exception {
+    @Override
+	public void dispose() throws Exception {
     }
 
+    public ReasonerConfiguration getElkConfiguration() {
+    	return elkConfig;
+    }
 }

@@ -50,6 +50,7 @@ public class ElkDataPropertyDomainAxiomImpl
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

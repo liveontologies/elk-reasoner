@@ -49,6 +49,7 @@ public class OwlPropertyExpressionConverter implements
 		this.objectFactory = objectFactory;
 	}
 
+	@Override
 	public ElkObjectProperty visit(OWLObjectProperty property) {
 		if (property.isOWLTopObjectProperty())
 			return objectFactory.getOwlTopObjectProperty();
@@ -58,11 +59,13 @@ public class OwlPropertyExpressionConverter implements
 			return objectFactory.getObjectProperty(new ElkFullIri(property.getIRI().toString()));
 	}
 
+	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectInverseOf property) {
 		// TODO Support this constructor
 		throw new ConverterException("OWLObjectInverseOf not supported");
 	}
 
+	@Override
 	public ElkObjectPropertyExpression visit(OWLDataProperty property) {
 		// TODO Auto-generated method stub
 		throw new ConverterException(property.getEntityType().getName()

@@ -119,23 +119,28 @@ public class NonBottomNode implements ClassNode {
 		directSubNodes.add(subNode);
 	}
 
+	@Override
 	public Set<ElkClass> getMembers() {
 		// create an unmodifiable set view of the members; alternatively, one
 		// could have created a TreeSet, but it consumes more memory
 		return new Set<ElkClass>() {
 
+			@Override
 			public boolean add(ElkClass arg0) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean addAll(Collection<? extends ElkClass> arg0) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public void clear() {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean contains(Object arg0) {
 				if (arg0 instanceof ElkClass)
 					return (Collections.binarySearch(members, (ElkClass) arg0,
@@ -144,6 +149,7 @@ public class NonBottomNode implements ClassNode {
 					return false;
 			}
 
+			@Override
 			public boolean containsAll(Collection<?> arg0) {
 				for (Object element : arg0) {
 					if (!this.contains(element))
@@ -152,48 +158,59 @@ public class NonBottomNode implements ClassNode {
 				return true;
 			}
 
+			@Override
 			public boolean isEmpty() {
 				return members.isEmpty();
 			}
 
+			@Override
 			public Iterator<ElkClass> iterator() {
 				return members.iterator();
 			}
 
+			@Override
 			public boolean remove(Object arg0) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean removeAll(Collection<?> arg0) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean retainAll(Collection<?> arg0) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public int size() {
 				return members.size();
 			}
 
+			@Override
 			public Object[] toArray() {
 				return members.toArray();
 			}
 
+			@Override
 			public <T> T[] toArray(T[] arg0) {
 				return members.toArray(arg0);
 			}
 		};
 	}
 
+	@Override
 	public ElkClass getCanonicalMember() {
 		return members.get(0);
 	}
 
+	@Override
 	public Set<ClassNode> getDirectSuperNodes() {
 		return Collections.unmodifiableSet(directSuperNodes);
 	}
 
+	@Override
 	public Set<ClassNode> getAllSuperNodes() {
 		Set<ClassNode> result = new ArrayHashSet<ClassNode>(
 				directSuperNodes.size());
@@ -211,6 +228,7 @@ public class NonBottomNode implements ClassNode {
 		return Collections.unmodifiableSet(result);
 	}
 
+	@Override
 	public Set<ClassNode> getDirectSubNodes() {
 		if (!directSubNodes.isEmpty()) {
 			return Collections.unmodifiableSet(directSubNodes);
@@ -221,6 +239,7 @@ public class NonBottomNode implements ClassNode {
 		}
 	}
 
+	@Override
 	public Set<ClassNode> getAllSubNodes() {
 		Set<ClassNode> result;
 		if (!directSubNodes.isEmpty()) {
@@ -245,14 +264,17 @@ public class NonBottomNode implements ClassNode {
 
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
+	@Override
 	public final int hashCode() {
 		return hashCode_;
 	}
 
+	@Override
 	public ClassTaxonomy getTaxonomy() {
 		return this.taxonomy;
 	}
 
+	@Override
 	public String toString() {
 		return getCanonicalMember().getIri().asString();
 	}

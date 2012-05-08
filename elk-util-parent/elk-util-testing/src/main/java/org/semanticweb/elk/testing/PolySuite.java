@@ -117,11 +117,11 @@ public class PolySuite extends Suite {
   // //////////////////////////////
   // Private
 
-  private Configuration getConfiguration(TestClass testClass) throws Throwable {
+  private static Configuration getConfiguration(TestClass testClass) throws Throwable {
     return (Configuration) getConfigMethod(testClass).invokeExplosively(null);
   }
 
-  private FrameworkMethod getConfigMethod(TestClass testClass) {
+  private static FrameworkMethod getConfigMethod(TestClass testClass) {
     List<FrameworkMethod> methods = testClass.getAnnotatedMethods(Config.class);
     if (methods.isEmpty()) {
       throw new IllegalStateException("@" + Config.class.getSimpleName() + " method not found");

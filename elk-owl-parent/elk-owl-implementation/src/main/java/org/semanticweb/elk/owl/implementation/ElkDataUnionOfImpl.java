@@ -47,10 +47,12 @@ public class ElkDataUnionOfImpl extends ElkDataRangeListObject
 		return buildFssString("DataUnionOf");
 	}
 
+	@Override
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

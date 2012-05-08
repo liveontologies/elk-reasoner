@@ -49,6 +49,7 @@ public class ElkObjectPropertyRangeAxiomImpl
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -44,6 +44,7 @@ public final class JobBatch<I> extends ArrayList<I> implements Job<I> {
 		super(size);
 	}
 
+	@Override
 	public <O> O accept(JobProcessor<I, O> processor) throws InterruptedException {
 		return processor.process(this);
 	}
