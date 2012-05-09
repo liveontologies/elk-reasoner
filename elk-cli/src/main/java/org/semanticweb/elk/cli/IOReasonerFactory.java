@@ -27,8 +27,8 @@ package org.semanticweb.elk.cli;
 
 import java.util.concurrent.Executors;
 
-import org.semanticweb.elk.reasoner.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 
 /**
  * Instantiates {@link IOReasoner}
@@ -46,7 +46,7 @@ public class IOReasonerFactory extends ReasonerFactory {
 
 	@Override
 	public IOReasoner createReasoner(ReasonerConfiguration config) {
-		return new IOReasoner(Executors.newCachedThreadPool(), config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS.getName()));
+		return new IOReasoner(Executors.newCachedThreadPool(), config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
 	}
 	
 	

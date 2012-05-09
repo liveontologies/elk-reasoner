@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.junit.Test;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 
 /**
  * 

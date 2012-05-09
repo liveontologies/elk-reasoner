@@ -23,26 +23,33 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner;
-
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+package org.semanticweb.elk.reasoner.config;
 
 /**
+ * Thrown if an instance of ELK cannot be created due to misconfiguration
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReasoningConfigurationTest {
+public class ReasonerConfigurationException extends RuntimeException {
 
-	@Test
-	public void defaultConfig() {
-		
-		ReasonerConfiguration config = ReasonerConfiguration.getDefaultConfiguration();
-		
-		assertTrue(config.getParameterNames().contains(ReasonerConfiguration.NUM_OF_WORKING_THREADS.getName()));
-		assertEquals(Runtime.getRuntime().availableProcessors(), config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS.getName()));
+	private static final long serialVersionUID = 6644245038744863339L;
+
+	public ReasonerConfigurationException() {
+		super();
+	}
+
+	public ReasonerConfigurationException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public ReasonerConfigurationException(String message) {
+		super(message);
+	}
+
+	public ReasonerConfigurationException(Throwable cause) {
+		super(cause);
 	}
 
 }

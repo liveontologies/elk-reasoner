@@ -23,34 +23,15 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.config;
 
 /**
- * A simple bean to hold name and value for a configuration parameter
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public final class ConfigurationParameter<V> {
-	
-	private final String name;
-	private final V value;
-	
-	ConfigurationParameter(String name, V value) {
-		this.name = name;
-		this.value = value;
-	}
+public enum UnsupportedFeatureTreatment {
+	IGNORE,
+	THROW_EXCEPTION
+}	
 
-	public String getName() {
-		return name;
-	}
-
-	public V getValue() {
-		return value;
-	}
-	
-	public String toString() {
-		return value.toString();
-	}
-}
