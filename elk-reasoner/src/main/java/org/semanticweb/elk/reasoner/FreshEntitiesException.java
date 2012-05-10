@@ -22,6 +22,11 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+
 /**
  * Exception that is thrown when a query that is asked to the reasoner
  * refers to vocabulary symbols that do not occur in the ontology yet.
@@ -33,20 +38,21 @@ public class FreshEntitiesException extends Exception {
 
 	private static final long serialVersionUID = -4462031988813386808L;
 	
-	public FreshEntitiesException() {
+	protected final Set<ElkEntity> entities;
+	
+	public FreshEntitiesException(ElkEntity entity) {
 		super();
+		entities = new HashSet<ElkEntity>();
+		entities.add(entity);
+	}
+	
+	public FreshEntitiesException(Set<ElkEntity> entities) {
+		super();
+		this.entities = entities;
 	}
 
-	public FreshEntitiesException(String message) {
-		super(message);
-	}
-
-	public FreshEntitiesException(Throwable cause) {
-		super(cause);
-	}
-
-	public FreshEntitiesException(String message, Throwable cause) {
-		super(message, cause);
+	public Set<ElkEntity> getEntities() {
+		return entities;
 	}
 
 }

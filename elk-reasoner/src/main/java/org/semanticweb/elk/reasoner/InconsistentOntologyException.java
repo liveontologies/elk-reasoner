@@ -40,16 +40,4 @@ public class InconsistentOntologyException extends Exception {
 		super();
 	}
 
-	public InconsistentOntologyException(String message) {
-		super(message);
-	}
-
-	public InconsistentOntologyException(Throwable cause) {
-		super(cause);
-	}
-
-	public InconsistentOntologyException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
 }
