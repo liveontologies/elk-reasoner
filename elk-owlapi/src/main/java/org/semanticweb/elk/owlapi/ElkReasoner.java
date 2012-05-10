@@ -219,10 +219,6 @@ public class ElkReasoner implements OWLReasoner {
 		}
 	}
 
-	protected void classifyOntology() {
-		reasoner.classify(elkProgressMonitor);
-	}
-
 	protected FreshEntitiesException convertFreshEntitiesException(
 			org.semanticweb.elk.reasoner.FreshEntitiesException e) {
 		HashSet<OWLEntity> owlEntities = new HashSet<OWLEntity>();
@@ -664,7 +660,7 @@ public class ElkReasoner implements OWLReasoner {
 			if (inferenceType.equals(InferenceType.CLASS_HIERARCHY)) {
 				syncOntology();
 				reloadChanges();
-				classifyOntology();
+				reasoner.getTaxonomy();
 			}
 		}
 	}

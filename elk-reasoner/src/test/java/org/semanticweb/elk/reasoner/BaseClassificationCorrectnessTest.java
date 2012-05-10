@@ -87,8 +87,6 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	public void classify() throws TestResultComparisonException {
 		System.err.println(manifest.toString());
 		
-		reasoner.classify();
-		
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 		
 		/*try {

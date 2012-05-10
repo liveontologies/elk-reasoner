@@ -60,7 +60,6 @@ public class ComputeTaxonomyHashCodes {
 			System.err.println(ontFile.getName());
 			
 			reasoner.loadOntologyFromFile(ontFile);
-			reasoner.classify();
 			
 			ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 			int hash = ClassTaxonomyHasher.hash(taxonomy);

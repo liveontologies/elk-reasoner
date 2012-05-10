@@ -82,7 +82,6 @@ public class ReasonerTest {
 		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(
 				"http://example.org/S"));
 
-		IOReasoner.classify();
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 
 		OntologyIndex index = IOReasoner.getOntologyIndex();
@@ -136,8 +135,6 @@ public class ReasonerTest {
 		assertFalse("A SubClassOf E", A.getToldSuperClassExpressions()
 				.contains(E));
 
-		IOReasoner.classify();
-
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(a);
 
@@ -169,8 +166,6 @@ public class ReasonerTest {
 						+ ")"//
 				);
 
-		IOReasoner.classify();
-
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(objectFactory
 				.getClass(new ElkFullIri("http://example.org/A")));
@@ -196,8 +191,6 @@ public class ReasonerTest {
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ ")"//
 				);
-
-		IOReasoner.classify();
 		
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 		"http://example.org/A"));
@@ -230,8 +223,6 @@ public class ReasonerTest {
 				+ ")"//
 		);
 
-		IOReasoner.classify();
-
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 		"http://example.org/A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(
@@ -260,8 +251,6 @@ public class ReasonerTest {
 				+ "DisjointClasses(:C :C)"//
 				+ ")"//
 		);
-
-		IOReasoner.classify();
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 		"http://example.org/A"));
@@ -293,8 +282,6 @@ public class ReasonerTest {
 				+ "SubObjectPropertyOf(ObjectPropertyChain(:R :R) :S)"//
 				+ ")"//
 		);
-
-		IOReasoner.classify();
 
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		
@@ -347,8 +334,6 @@ public class ReasonerTest {
 		assertTrue("B SubClassOf D",
 				B.getToldSuperClassExpressions().contains(D));
 
-		IOReasoner.classify();
-
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode aNode = taxonomy.getNode(a);
 		ClassNode bNode = taxonomy.getNode(b);
@@ -390,8 +375,6 @@ public class ReasonerTest {
 		ElkClass a = new TestElkClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = new TestElkClass(new ElkFullIri("http://example.org/B"));
 		ElkClass c = new TestElkClass(new ElkFullIri("http://example.org/C"));
-
-		IOReasoner.classify();
 
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode botNode = taxonomy.getNode(bot);
@@ -479,7 +462,6 @@ public class ReasonerTest {
 				+ ")"
 		);
 
-		IOReasoner.classify();
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 
 		ClassNode thing = taxonomy.getNode(PredefinedElkClass.OWL_THING);
