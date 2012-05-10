@@ -89,6 +89,18 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	public int getIndexedClassCount() {
 		return indexedClassCount;
 	}
+	
+	@Override
+	public Iterable<IndexedIndividual> getIndexedIndividuals() {
+		return Operations.filter(getIndexedClassExpressions(),
+				IndexedIndividual.class);
+	}
+
+	@Override
+	public int getIndexedIndividualCount() {
+		return indexedIndividualCount;
+	}
+
 
 	@Override
 	public Iterable<IndexedPropertyChain> getIndexedPropertyChains() {

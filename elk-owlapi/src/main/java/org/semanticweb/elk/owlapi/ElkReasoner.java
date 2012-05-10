@@ -644,7 +644,7 @@ public class ElkReasoner implements OWLReasoner {
 			ClassExpressionNotInProfileException, FreshEntitiesException,
 			InconsistentOntologyException {
 		try {
-			return reasoner.isConsistent(owlConverter.convert(classExpression));
+			return reasoner.isSatisfiable(owlConverter.convert(classExpression));
 		} catch (org.semanticweb.elk.reasoner.FreshEntitiesException e) {
 			throw convertFreshEntitiesException(e);
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {

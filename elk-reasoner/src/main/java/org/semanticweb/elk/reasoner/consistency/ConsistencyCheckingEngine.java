@@ -60,7 +60,7 @@ public class ConsistencyCheckingEngine implements
 	 */
 	public ConsistencyCheckingEngine(OntologyIndex ontologyIndex) {
 		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJob<IndexedClassExpression>>(
-				ontologyIndex);
+				ontologyIndex, new ThisClassExpressionSaturationListener());
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class ConsistencyCheckingEngine implements
 	 * Returns whether all submitted class expressions are satisfiable
 	 */
 	public boolean isConsistent() {
-		return isConsistent();
+		return isConsistent;
 	}
 
 	/**
