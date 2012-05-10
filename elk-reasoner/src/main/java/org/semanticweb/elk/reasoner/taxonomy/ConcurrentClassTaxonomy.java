@@ -52,7 +52,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Frantisek Simancik
  * 
  */
-class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
+class ConcurrentClassTaxonomy implements ClassTaxonomy, TaxonomyClassNode {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -61,7 +61,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	/* thread safe map from class IRIs to class nodes */
 	protected final ConcurrentMap<ElkIri, NonBottomNode> nodeLookup;
 	/* thread safe set of all nodes */
-	protected final Set<ClassNode> allNodes;
+	protected final Set<TaxonomyClassNode> allNodes;
 	/* boolean to guard access to the set of all nodes */
 	protected final AtomicBoolean processingNewNodes;
 	/* counts the number of nodes which have non-bottom sub-classes */
@@ -72,7 +72,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	ConcurrentClassTaxonomy() {
 		this.nodeLookup = new ConcurrentHashMap<ElkIri, NonBottomNode>();
 		this.allNodes = Collections
-				.newSetFromMap(new ConcurrentHashMap<ClassNode, Boolean>());
+				.newSetFromMap(new ConcurrentHashMap<TaxonomyClassNode, Boolean>());
 		allNodes.add(this);
 		this.processingNewNodes = new AtomicBoolean(false);
 		this.countNodesWithSubClasses = new AtomicInteger(0);
@@ -83,7 +83,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	}
 
 	@Override
-	public Set<ClassNode> getNodes() {
+	public Set<TaxonomyClassNode> getNodes() {
 		return Collections.unmodifiableSet(allNodes);
 	}
 
@@ -118,8 +118,8 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	 * @return ClassNode object for elkClass, possibly still incomplete
 	 */
 	@Override
-	public ClassNode getNode(ElkClass elkClass) {
-		ClassNode result = getNonBottomNode(elkClass);
+	public TaxonomyClassNode getNode(ElkClass elkClass) {
+		TaxonomyClassNode result = getNonBottomNode(elkClass);
 		if (result != null)
 			return result;
 		if (unsatisfiableClasses.contains(elkClass))
@@ -173,9 +173,9 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	}
 
 	@Override
-	public Set<ClassNode> getDirectSuperNodes() {
-		return Operations.filter(allNodes, new Condition<ClassNode>() {
-			public boolean holds(ClassNode element) {
+	public Set<TaxonomyClassNode> getDirectSuperNodes() {
+		return Operations.filter(allNodes, new Condition<TaxonomyClassNode>() {
+			public boolean holds(TaxonomyClassNode element) {
 				return element.getDirectSubNodes().contains(ConcurrentClassTaxonomy.this);
 			}
 			/*
@@ -186,7 +186,7 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	}
 
 	@Override
-	public Set<ClassNode> getAllSuperNodes() {
+	public Set<TaxonomyClassNode> getAllSuperNodes() {
 		/* all nodes except this one */
 		return Operations.filter(allNodes, new Condition<Object>() {
 			@Override
@@ -197,12 +197,12 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 	}
 
 	@Override
-	public Set<ClassNode> getDirectSubNodes() {
+	public Set<TaxonomyClassNode> getDirectSubNodes() {
 		return Collections.emptySet();
 	}
 
 	@Override
-	public Set<ClassNode> getAllSubNodes() {
+	public Set<TaxonomyClassNode> getAllSubNodes() {
 		return Collections.emptySet();
 	}
 

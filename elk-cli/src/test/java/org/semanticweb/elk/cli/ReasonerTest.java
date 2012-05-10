@@ -29,6 +29,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
@@ -43,11 +44,14 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
+import org.semanticweb.elk.reasoner.FreshEntitiesException;
+import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyClassNode;
 
 //TODO This test won't be necessary as soon as we can specify the expected class taxonomy
 //for our main classification tests, see BaseClassificationCorrectnessTest
@@ -99,10 +103,11 @@ public class ReasonerTest {
 
 	@Test
 	public void testConjunctions() throws InterruptedException,
-			ExecutionException, Owl2ParseException, IOException {
+			ExecutionException, Owl2ParseException, IOException,
+			FreshEntitiesException, InconsistentOntologyException {
 
-		final IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
-		IOReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
+		final IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		ioReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:A :D)"
 				+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)" + ")");
@@ -118,7 +123,7 @@ public class ReasonerTest {
 		ElkClass e = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/E"));
 
-		OntologyIndex index = IOReasoner.getOntologyIndex();
+		OntologyIndex index = ioReasoner.getOntologyIndex();
 
 		IndexedClassExpression A = index.getIndexed(a);
 		IndexedClassExpression B = index.getIndexed(b);
@@ -135,23 +140,24 @@ public class ReasonerTest {
 		assertFalse("A SubClassOf E", A.getToldSuperClassExpressions()
 				.contains(E));
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
-		ClassNode aNode = taxonomy.getNode(a);
+		Set<? extends ClassNode> superClassesOfA = ioReasoner.getSuperClasses(
+				a, true);
 
 		assertTrue("A contains B",
-				aNode.getDirectSuperNodes().contains(taxonomy.getNode(b)));
+				superClassesOfA.contains(ioReasoner.getClassNode(b)));
 		assertTrue("A contains C",
-				aNode.getDirectSuperNodes().contains(taxonomy.getNode(c)));
+				superClassesOfA.contains(ioReasoner.getClassNode(c)));
 		assertTrue("A contains D",
-				aNode.getDirectSuperNodes().contains(taxonomy.getNode(d)));
+				superClassesOfA.contains(ioReasoner.getClassNode(d)));
 		assertTrue("A contains E",
-				aNode.getDirectSuperNodes().contains(taxonomy.getNode(e)));
+				superClassesOfA.contains(ioReasoner.getClassNode(e)));
 	}
 
 	@Test
-	public void testPropertyChains() throws Owl2ParseException, IOException {
-		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
-		IOReasoner
+	public void testPropertyChains() throws Owl2ParseException, IOException,
+			FreshEntitiesException, InconsistentOntologyException {
+		IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		ioReasoner
 				.loadOntologyFromString(""//
 						+ "Prefix( : = <http://example.org/> )"//
 						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
@@ -166,39 +172,42 @@ public class ReasonerTest {
 						+ ")"//
 				);
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
-		ClassNode aNode = taxonomy.getNode(objectFactory
-				.getClass(new ElkFullIri("http://example.org/A")));
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/A"));
+		ElkClass x = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/X"));
+
+		Set<? extends ClassNode> superClassesOfA = ioReasoner.getSuperClasses(
+				a, true);
+
 		assertTrue(
 				"A SubClassOf X",
-				aNode.getDirectSuperNodes().contains(
-						taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
-								"http://example.org/X")))));
+				superClassesOfA.contains(
+						ioReasoner.getClassNode(x)));
 	}
-	
+
 	@Test
-	public void testBottom() throws InterruptedException,
-			ExecutionException, Owl2ParseException, IOException {
-		
+	public void testBottom() throws InterruptedException, ExecutionException,
+			Owl2ParseException, IOException {
+
 		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
-		IOReasoner
-				.loadOntologyFromString(""//
-						+ "Prefix( : = <http://example.org/> )"//
-						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-						+ "Ontology("//
-						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
-						+ "SubClassOf(:C ObjectSomeValuesFrom(:S :A))"//
-						+ "SubClassOf(:B owl:Nothing)"//
-						+ ")"//
-				);
-		
+		IOReasoner.loadOntologyFromString(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+				+ "SubClassOf(:C ObjectSomeValuesFrom(:S :A))"//
+				+ "SubClassOf(:B owl:Nothing)"//
+				+ ")"//
+		);
+
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
-		"http://example.org/A"));
+				"http://example.org/A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(
-		"http://example.org/B"));
+				"http://example.org/B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(
-		"http://example.org/C"));
-		
+				"http://example.org/C"));
+
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
 
@@ -206,14 +215,13 @@ public class ReasonerTest {
 		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
 		assertSame("C unsatisfiable", bottom, taxonomy.getNode(c));
 	}
-	
+
 	@Test
-	public void testDisjoint() throws InterruptedException,
-	ExecutionException, Owl2ParseException, IOException {
+	public void testDisjoint() throws InterruptedException, ExecutionException,
+			Owl2ParseException, IOException {
 
 		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
-		IOReasoner
-		.loadOntologyFromString(""//
+		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
 				+ "Ontology("//
@@ -224,11 +232,11 @@ public class ReasonerTest {
 		);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
-		"http://example.org/A"));
+				"http://example.org/A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(
-		"http://example.org/B"));
+				"http://example.org/B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(
-		"http://example.org/C"));
+				"http://example.org/C"));
 
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
@@ -237,13 +245,12 @@ public class ReasonerTest {
 		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
 		assertNotSame("C satisfiable", bottom, taxonomy.getNode(c));
 	}
-	
+
 	public void testDisjointSelf() throws InterruptedException,
-	ExecutionException, Owl2ParseException, IOException {
+			ExecutionException, Owl2ParseException, IOException {
 
 		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
-		IOReasoner
-		.loadOntologyFromString(""//
+		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
 				+ "Ontology("//
@@ -253,11 +260,11 @@ public class ReasonerTest {
 		);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
-		"http://example.org/A"));
+				"http://example.org/A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(
-		"http://example.org/B"));
+				"http://example.org/B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(
-		"http://example.org/C"));
+				"http://example.org/C"));
 
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
@@ -266,13 +273,13 @@ public class ReasonerTest {
 		assertNotSame("B satisfiable", bottom, taxonomy.getNode(b));
 		assertSame("C unsatisfiable", bottom, taxonomy.getNode(c));
 	}
-	
-	public void testReflexiveRole() throws InterruptedException,
-	ExecutionException, Owl2ParseException, IOException {
 
-		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
-		IOReasoner
-		.loadOntologyFromString(""//
+	public void testReflexiveRole() throws InterruptedException,
+			ExecutionException, Owl2ParseException, IOException,
+			FreshEntitiesException, InconsistentOntologyException {
+
+		IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		ioReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
 				+ "Ontology("//
@@ -283,29 +290,31 @@ public class ReasonerTest {
 				+ ")"//
 		);
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		ElkClass a = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(
+				"http://example.org/D"));
 		
-		ClassNode A = taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
-				"http://example.org/A")));
-		ClassNode B = taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
-				"http://example.org/B")));
-		ClassNode C = taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
-				"http://example.org/C")));
-		ClassNode D = taxonomy.getNode(objectFactory.getClass(new ElkFullIri(
-				"http://example.org/D")));
+		Set<? extends ClassNode> superClassesOfA = ioReasoner.getSuperClasses(
+				a, true);
+		Set<? extends ClassNode> superClassesOfC = ioReasoner.getSuperClasses(
+				c, true);
 
-		
-		assertTrue("SubClassOf(A B)", A.getDirectSuperNodes().contains(B));
-		assertTrue("SubClassOf(C D)", C.getDirectSuperNodes().contains(D));
+		assertTrue("SubClassOf(A B)", superClassesOfA.contains(ioReasoner.getClassNode(b)));
+		assertTrue("SubClassOf(C D)", superClassesOfC.contains(ioReasoner.getClassNode(d)));
 	}
-
 
 	@Test
 	public void testAncestors() throws InterruptedException,
-	ExecutionException, Owl2ParseException, IOException {
+			ExecutionException, Owl2ParseException, IOException,
+			FreshEntitiesException, InconsistentOntologyException {
 
-		final IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
-		IOReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
+		final IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		ioReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))");
 
@@ -318,7 +327,7 @@ public class ReasonerTest {
 		ElkClass d = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/D"));
 
-		OntologyIndex index = IOReasoner.getOntologyIndex();
+		OntologyIndex index = ioReasoner.getOntologyIndex();
 
 		IndexedClassExpression A = index.getIndexed(a);
 		IndexedClassExpression B = index.getIndexed(b);
@@ -334,33 +343,36 @@ public class ReasonerTest {
 		assertTrue("B SubClassOf D",
 				B.getToldSuperClassExpressions().contains(D));
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
-		ClassNode aNode = taxonomy.getNode(a);
-		ClassNode bNode = taxonomy.getNode(b);
+		ClassNode bNode = ioReasoner.getClassNode(b);
+		ClassNode cNode = ioReasoner.getClassNode(c);
+		ClassNode dNode = ioReasoner.getClassNode(d);
+		
+		Set<? extends ClassNode> directSuperClassesOfA = ioReasoner.getSuperClasses(a,true);
+		Set<? extends ClassNode> indirectSuperClassesOfA = ioReasoner.getSuperClasses(a,false);
 
-		assertTrue("A direct subclass of B", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(b)));
-		assertTrue("A direct subclass of C", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(c)));
-		assertFalse("A not direct subclass of D", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(d)));
-		assertTrue("B direct subclass of D", bNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(d)));
-		assertTrue("A indirect subclass of B", aNode.getDirectSuperNodes()
-				.contains(taxonomy.getNode(b)));
-		assertTrue("A indirect subclass of D", aNode.getAllSuperNodes()
-				.contains(taxonomy.getNode(d)));
-		assertEquals("A has exactly two direct super-classes", 2, aNode
-				.getDirectSuperNodes().size());
+		assertTrue("A direct subclass of B", directSuperClassesOfA
+				.contains(bNode));
+		assertTrue("A direct subclass of C", directSuperClassesOfA 
+				.contains(cNode));
+		assertFalse("A not direct subclass of D", directSuperClassesOfA
+				.contains(dNode));
+		assertTrue("B direct subclass of D", ioReasoner.getSuperClasses(b,true)
+				.contains(dNode));
+		assertTrue("A indirect subclass of B", indirectSuperClassesOfA
+				.contains(bNode));
+		assertTrue("A indirect subclass of D", indirectSuperClassesOfA
+				.contains(dNode));
+		assertEquals("A has exactly two direct super-classes", 2, directSuperClassesOfA.size());
 		assertEquals("A has exactly four super-classes: B, C, D and owl:Thing",
-				4, aNode.getAllSuperNodes().size());
+				4, indirectSuperClassesOfA.size());
 	}
 
 	@Test
-	public void testTop() throws InterruptedException, ExecutionException, Owl2ParseException, IOException {
+	public void testTop() throws InterruptedException, ExecutionException,
+			Owl2ParseException, IOException {
 
-		final IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
-		IOReasoner.loadOntologyFromString(""//
+		final IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		ioReasoner.loadOntologyFromString(""//
 				+ "Prefix( owl:= <http://www.w3.org/2002/07/owl#> )"//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Ontology("//
@@ -376,12 +388,12 @@ public class ReasonerTest {
 		ElkClass b = new TestElkClass(new ElkFullIri("http://example.org/B"));
 		ElkClass c = new TestElkClass(new ElkFullIri("http://example.org/C"));
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
-		ClassNode botNode = taxonomy.getNode(bot);
-		ClassNode aNode = taxonomy.getNode(a);
-		ClassNode bNode = taxonomy.getNode(b);
-		ClassNode cNode = taxonomy.getNode(c);
-		ClassNode topNode = taxonomy.getNode(top);
+		ClassTaxonomy taxonomy = ioReasoner.getTaxonomy();
+		TaxonomyClassNode botNode = taxonomy.getNode(bot);
+		TaxonomyClassNode aNode = taxonomy.getNode(a);
+		TaxonomyClassNode bNode = taxonomy.getNode(b);
+		TaxonomyClassNode cNode = taxonomy.getNode(c);
+		TaxonomyClassNode topNode = taxonomy.getNode(top);
 
 		assertEquals("C and owl:Ting belong to the same node", cNode, topNode);
 
@@ -443,34 +455,30 @@ public class ReasonerTest {
 				cNode.getDirectSubNodes().contains(bNode));
 
 	}
-	
 
 	@Test
-	public void testInconsistent() throws InterruptedException, ExecutionException, Owl2ParseException, IOException {
+	public void testInconsistent() throws InterruptedException,
+			ExecutionException, Owl2ParseException, IOException {
 
 		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString(""
-				+ "Prefix( : = <http://example.org/> )" 
+				+ "Prefix( : = <http://example.org/> )"
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"
-				+ "Ontology("
-				+ "EquivalentClasses(:A :C)"
+				+ "Ontology(" + "EquivalentClasses(:A :C)"
 				+ "SubClassOf(owl:Thing ObjectSomeValuesFrom(:R :B))"
 				+ "SubClassOf(ObjectSomeValuesFrom(:S :B) :A)"
 				+ "SubObjectPropertyOf(:R :S)"
 				+ "SubClassOf(:C ObjectSomeValuesFrom(:T :B))"
-				+ "ObjectPropertyDomain(:T owl:Nothing)"
-				+ ")"
-		);
+				+ "ObjectPropertyDomain(:T owl:Nothing)" + ")");
 
 		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
 
 		ClassNode thing = taxonomy.getNode(PredefinedElkClass.OWL_THING);
 		ClassNode nothing = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
-		
+
 		assertEquals(nothing.getMembers(), thing.getMembers());
 		assertSame(nothing.getCanonicalMember(), thing.getCanonicalMember());
 	}
-	
 
 	class TestElkClass implements ElkClass {
 		protected final ElkIri iri;

@@ -45,13 +45,13 @@ public interface ClassTaxonomy {
 	 * Returns the ClassNode containing the given elkClass as a member. Null if
 	 * elkClass does not occur in the ontology.
 	 */
-	public ClassNode getNode(ElkClass elkClass);
+	public TaxonomyClassNode getNode(ElkClass elkClass);
 
 	/**
 	 * Obtain an unmodifiable Set of all nodes in this ClassTaxonomy.
 	 * 
 	 * @return an unmodifiable Collection
 	 */
-	public Set<ClassNode> getNodes();
+	public Set<TaxonomyClassNode> getNodes();
 
 }

@@ -57,7 +57,7 @@ public class ClassTaxonomyHasher {
 	 * caching to ensure good performance even when some nodes have unusually
 	 * many members.
 	 */
-	protected static Hasher<ClassNode> classNodeHasher = new Hasher<ClassNode>() {
+	protected static Hasher<TaxonomyClassNode> classNodeHasher = new Hasher<TaxonomyClassNode>() {
 
 		/**
 		 * For nodes with at least this number of member classes, hash codes are
@@ -88,12 +88,12 @@ public class ClassTaxonomyHasher {
 		};
 
 		@Override
-		public int hash(ClassNode node) {
+		public int hash(TaxonomyClassNode node) {
 			int memberHash = HashGenerator.combineMultisetHash(true,
 					node.getMembers(), elkClassHasher);
 
 			int subClassHash = "subClassOf".hashCode();
-			for (ClassNode o : node.getDirectSubNodes()) {
+			for (TaxonomyClassNode o : node.getDirectSubNodes()) {
 				subClassHash = HashGenerator.combineMultisetHash(false,
 						subClassHash, getClassNodeMemberHash(o));
 			}

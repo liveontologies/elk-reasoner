@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturati
 import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyEngine;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyClassNode;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.logging.Statistics;
 
@@ -112,12 +113,12 @@ public class Reasoner {
 		ontologyIndex = new OntologyIndexImpl();
 		invalidate();
 	}
-	
+
 	protected void invalidate() {
 		recomputeIsConsistent = true;
 		recomputeClassTaxonomy = true;
 	}
-	
+
 	/**
 	 * Get the OntologyIndex. When changing this index (adding ro deleting
 	 * axioms), the Reasoner will not be notified, and may thus fail to return
@@ -177,12 +178,26 @@ public class Reasoner {
 	}
 
 	/**
-	 * Get the class node for one named class.
+	 * Helper method to get a suitable node from the taxonomy.
 	 * 
-	 * TODO This is meant to provide equivalent classes. Since this could be
-	 * computed without full classification, it might be better to return less
-	 * than a ClassNode here (ClassNodes give indirect access to the whole
-	 * taxonomy, which must thus be precomputed to get them).
+	 * @param elkClass
+	 * @return
+	 * @throws FreshEntitiesException
+	 * @throws InconsistentOntologyException
+	 */
+	protected TaxonomyClassNode getTaxonomyClassNode(ElkClass elkClass)
+			throws FreshEntitiesException, InconsistentOntologyException {
+		TaxonomyClassNode node = getTaxonomy().getNode(elkClass);
+		if (node == null)
+			throw new FreshEntitiesException(elkClass);
+		return node;
+	}
+
+	/**
+	 * Get the class node for one named class. This provides information about
+	 * all equivalent classes. In theory, this does not demand that a full
+	 * taxonomy is built, and the result does not provide access to such an
+	 * object (or to sub- or superclasses).
 	 * 
 	 * @param elkClass
 	 * @return
@@ -191,17 +206,15 @@ public class Reasoner {
 	 */
 	public ClassNode getClassNode(ElkClass elkClass)
 			throws FreshEntitiesException, InconsistentOntologyException {
-		ClassNode node = getTaxonomy().getNode(elkClass);
-		if (node == null)
-			throw new FreshEntitiesException(elkClass);
-		return node;
+		return getTaxonomyClassNode(elkClass);
 	}
 
 	/**
 	 * Return the (direct or indirect) subclasses of the given
-	 * {@link ElkClassExpression}. The method returns a set of ClassNodes from
-	 * the ontology's taxonomy, each of which might represent multiple
-	 * equivalent classes.
+	 * {@link ElkClassExpression}. The method returns a set of ClassNodes from,
+	 * each of which might represent multiple equivalent classes. In theory,
+	 * this method does not require the whole taxonomy to be constructed, and
+	 * the result does not provide (indirect) access to a taxonomy object.
 	 * 
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
@@ -211,11 +224,11 @@ public class Reasoner {
 	 * @throws FreshEntitiesException
 	 * @throws InconsistentOntologyException
 	 */
-	public Set<ClassNode> getSubClasses(ElkClassExpression classExpression,
-			boolean direct) throws FreshEntitiesException,
-			InconsistentOntologyException {
+	public Set<? extends ClassNode> getSubClasses(
+			ElkClassExpression classExpression, boolean direct)
+			throws FreshEntitiesException, InconsistentOntologyException {
 		if (classExpression instanceof ElkClass) {
-			ClassNode ceClassNode = getClassNode((ElkClass) classExpression);
+			TaxonomyClassNode ceClassNode = getTaxonomyClassNode((ElkClass) classExpression);
 			return (direct) ? ceClassNode.getDirectSubNodes() : ceClassNode
 					.getAllSubNodes();
 		} else { // TODO: complex class expressions currently not supported
@@ -226,9 +239,10 @@ public class Reasoner {
 
 	/**
 	 * Return the (direct or indirect) superclasses of the given
-	 * {@link ElkClassExpression}. The method returns a set of ClassNodes from
-	 * the ontology's taxonomy, each of which might represent multiple
-	 * equivalent classes.
+	 * {@link ElkClassExpression}. The method returns a set of ClassNodes, each
+	 * of which might represent multiple equivalent classes. In theory, this
+	 * method does not require the whole taxonomy to be constructed, and the
+	 * result does not provide (indirect) access to a taxonomy object.
 	 * 
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
@@ -238,11 +252,11 @@ public class Reasoner {
 	 * @throws FreshEntitiesException
 	 * @throws InconsistentOntologyException
 	 */
-	public Set<ClassNode> getSuperClasses(ElkClassExpression classExpression,
-			boolean direct) throws FreshEntitiesException,
-			InconsistentOntologyException {
+	public Set<? extends ClassNode> getSuperClasses(
+			ElkClassExpression classExpression, boolean direct)
+			throws FreshEntitiesException, InconsistentOntologyException {
 		if (classExpression instanceof ElkClass) {
-			ClassNode ceClassNode = getClassNode((ElkClass) classExpression);
+			TaxonomyClassNode ceClassNode = getTaxonomyClassNode((ElkClass) classExpression);
 			return (direct) ? ceClassNode.getDirectSuperNodes() : ceClassNode
 					.getAllSuperNodes();
 		} else { // TODO: complex class expressions currently not supported
@@ -295,7 +309,7 @@ public class Reasoner {
 		return workerNo;
 	}
 
-	public void classify(ProgressMonitor progressMonitor) {
+	protected void classify(ProgressMonitor progressMonitor) {
 		// number of indexed classes
 		final int maxIndexedClassCount = ontologyIndex.getIndexedClassCount();
 		// variable used in progress monitors
@@ -342,11 +356,11 @@ public class Reasoner {
 		taxonomyComputation.printStatistics();
 	}
 
-	public void classify() {
+	protected void classify() {
 		classify(new DummyProgressMonitor());
 	}
 
-	public class TaxonomyComputation extends
+	protected class TaxonomyComputation extends
 			ConcurrentComputation<IndexedClass> {
 
 		final ClassTaxonomyEngine classTaxonomyEngine;
@@ -372,14 +386,15 @@ public class Reasoner {
 	}
 
 	public void checkConsistent(ProgressMonitor progressMonitor) {
-		
+
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
 			isConsistent = true;
 			return;
 		}
-		
+
 		// number of indexed classes
-		final int maxIndexedIndividualCount = ontologyIndex.getIndexedIndividualCount();
+		final int maxIndexedIndividualCount = ontologyIndex
+				.getIndexedIndividualCount();
 		// variable used in progress monitors
 		int progress;
 
@@ -409,7 +424,7 @@ public class Reasoner {
 			// FIXME Either document why this is ignored or do something
 			// better.
 		}
-		
+
 		for (IndexedIndividual ind : ontologyIndex.getIndexedIndividuals()) {
 			try {
 				consistencyChecking.submit(ind);
@@ -435,7 +450,7 @@ public class Reasoner {
 		checkConsistent(new DummyProgressMonitor());
 	}
 
-	public class ConsistencyChecking extends
+	protected class ConsistencyChecking extends
 			ConcurrentComputation<IndexedClassExpression> {
 
 		final ConsistencyCheckingEngine consistencyCheckingEngine;

@@ -26,6 +26,12 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 
+/**
+ * Basic interface for representing sets of equivalent classes with one
+ * canonical representative.
+ * 
+ * @author Markus Kroetzsch
+ */
 public interface ClassNode {
 
 	/**
@@ -45,46 +51,5 @@ public interface ClassNode {
 	 */
 	public ElkClass getCanonicalMember();
 
-	/**
-	 * Get an unmodifiable set of nodes for ElkClass objects that are direct
-	 * sub-classes of this ClassNode.
-	 * 
-	 * @return list of nodes for direct super-classes of this node members
-	 */
-	public Set<ClassNode> getDirectSuperNodes();
 
-	/**
-	 * Computes an unmodifiable set of nodes for ElkClass objects that are
-	 * (possibly indirect) super-classes of members of this ClassNode. This is
-	 * the smallest set of nodes that contains all direct super-nodes of this
-	 * node, and all direct super-nodes of every node in this set.
-	 * 
-	 * @return set of nodes for sub-classes of this node members
-	 */
-	public Set<ClassNode> getAllSuperNodes();
-
-	/**
-	 * Get an unmodifiable set of nodes for ElkClass objects that are direct
-	 * sub-classes of this ClassNode.
-	 * 
-	 * @return list of nodes for direct sub-classes of this node members
-	 */
-	public Set<ClassNode> getDirectSubNodes();
-
-	/**
-	 * Computes an unmodifiable set of nodes for ElkClass objects that are
-	 * (possibly indirect) sub-classes of members of this ClassNode. This is the
-	 * smallest set of nodes that contains all direct sub-nodes of this node,
-	 * and all direct sub-nodes of every node in this set.
-	 * 
-	 * @return set of nodes for sub-classes of this node members
-	 */
-	public Set<ClassNode> getAllSubNodes();
-
-	/**
-	 * Returns the class taxonomy to which this node belongs.
-	 * 
-	 * @return the class taxonomy to which this node belongs
-	 */
-	public ClassTaxonomy getTaxonomy();
 }

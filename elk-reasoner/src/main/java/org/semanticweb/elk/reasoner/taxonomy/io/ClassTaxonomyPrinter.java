@@ -39,9 +39,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyClassNode;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
@@ -120,11 +120,11 @@ public class ClassTaxonomyPrinter {
 
 		TreeSet<ElkClass> canonicalElkClasses = new TreeSet<ElkClass>(
 				comparator);
-		for (ClassNode classNode : classTaxonomy.getNodes())
+		for (TaxonomyClassNode classNode : classTaxonomy.getNodes())
 			canonicalElkClasses.add(classNode.getCanonicalMember());
 
 		for (ElkClass elkClass : canonicalElkClasses) {
-			ClassNode classNode = classTaxonomy.getNode(elkClass);
+			TaxonomyClassNode classNode = classTaxonomy.getNode(elkClass);
 
 			ArrayList<ElkClass> orderedEquivalentClasses = new ArrayList<ElkClass>(
 					classNode.getMembers());
@@ -132,7 +132,7 @@ public class ClassTaxonomyPrinter {
 
 			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass>(
 					comparator);
-			for (ClassNode childNode : classNode.getDirectSubNodes()) {
+			for (TaxonomyClassNode childNode : classNode.getDirectSubNodes()) {
 				orderedSubClasses.add(childNode.getCanonicalMember());
 			}
 

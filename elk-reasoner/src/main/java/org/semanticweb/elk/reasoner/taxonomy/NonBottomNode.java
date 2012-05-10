@@ -49,10 +49,10 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Yevgeny Kazakov
  */
-public class NonBottomNode implements ClassNode {
+public class NonBottomNode implements TaxonomyClassNode {
 
 	// logger for events
-	private static final Logger LOGGER_ = Logger.getLogger(ClassNode.class);
+	private static final Logger LOGGER_ = Logger.getLogger(NonBottomNode.class);
 
 	/**
 	 * The link to the taxonomy to which this node belongs
@@ -67,12 +67,12 @@ public class NonBottomNode implements ClassNode {
 	 * ElkClass nodes whose members are direct super-classes of the members of
 	 * this node.
 	 */
-	private final Set<ClassNode> directSuperNodes;
+	private final Set<TaxonomyClassNode> directSuperNodes;
 	/**
 	 * ElkClass nodes, except for the bottom node, whose members are direct
 	 * sub-classes of the members of this node.
 	 */
-	private final Set<ClassNode> directSubNodes;
+	private final Set<TaxonomyClassNode> directSubNodes;
 
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
@@ -87,8 +87,8 @@ public class NonBottomNode implements ClassNode {
 			Collection<ElkClass> members) {
 		this.taxonomy = taxonomy;
 		this.members = new ArrayList<ElkClass>(members);
-		this.directSubNodes = new ArrayHashSet<ClassNode>();
-		this.directSuperNodes = new ArrayHashSet<ClassNode>();
+		this.directSubNodes = new ArrayHashSet<TaxonomyClassNode>();
+		this.directSuperNodes = new ArrayHashSet<TaxonomyClassNode>();
 		Collections.sort(this.members, Comparators.ELK_CLASS_COMPARATOR);
 	}
 
@@ -206,21 +206,21 @@ public class NonBottomNode implements ClassNode {
 	}
 
 	@Override
-	public Set<ClassNode> getDirectSuperNodes() {
+	public Set<TaxonomyClassNode> getDirectSuperNodes() {
 		return Collections.unmodifiableSet(directSuperNodes);
 	}
 
 	@Override
-	public Set<ClassNode> getAllSuperNodes() {
-		Set<ClassNode> result = new ArrayHashSet<ClassNode>(
+	public Set<TaxonomyClassNode> getAllSuperNodes() {
+		Set<TaxonomyClassNode> result = new ArrayHashSet<TaxonomyClassNode>(
 				directSuperNodes.size());
-		Queue<ClassNode> todo = new LinkedList<ClassNode>();
+		Queue<TaxonomyClassNode> todo = new LinkedList<TaxonomyClassNode>();
 		todo.add(this);
 		for (;;) {
-			ClassNode next = todo.poll();
+			TaxonomyClassNode next = todo.poll();
 			if (next == null)
 				break;
-			for (ClassNode nextSuperNode : next.getDirectSuperNodes()) {
+			for (TaxonomyClassNode nextSuperNode : next.getDirectSuperNodes()) {
 				result.add(nextSuperNode);
 				todo.add(nextSuperNode);
 			}
@@ -229,34 +229,34 @@ public class NonBottomNode implements ClassNode {
 	}
 
 	@Override
-	public Set<ClassNode> getDirectSubNodes() {
+	public Set<TaxonomyClassNode> getDirectSubNodes() {
 		if (!directSubNodes.isEmpty()) {
 			return Collections.unmodifiableSet(directSubNodes);
 		} else {
-			Set<ClassNode> result = new ArrayHashSet<ClassNode>(1);
+			Set<TaxonomyClassNode> result = new ArrayHashSet<TaxonomyClassNode>(1);
 			result.add(this.taxonomy);
 			return Collections.unmodifiableSet(result);
 		}
 	}
 
 	@Override
-	public Set<ClassNode> getAllSubNodes() {
-		Set<ClassNode> result;
+	public Set<TaxonomyClassNode> getAllSubNodes() {
+		Set<TaxonomyClassNode> result;
 		if (!directSubNodes.isEmpty()) {
-			result = new ArrayHashSet<ClassNode>(directSubNodes.size());
-			Queue<ClassNode> todo = new LinkedList<ClassNode>();
+			result = new ArrayHashSet<TaxonomyClassNode>(directSubNodes.size());
+			Queue<TaxonomyClassNode> todo = new LinkedList<TaxonomyClassNode>();
 			todo.add(this);
 			for (;;) {
-				ClassNode next = todo.poll();
+				TaxonomyClassNode next = todo.poll();
 				if (next == null)
 					break;
-				for (ClassNode nextSubNode : next.getDirectSubNodes()) {
+				for (TaxonomyClassNode nextSubNode : next.getDirectSubNodes()) {
 					result.add(nextSubNode);
 					todo.add(nextSubNode);
 				}
 			}
 		} else {
-			result = new ArrayHashSet<ClassNode>(1);
+			result = new ArrayHashSet<TaxonomyClassNode>(1);
 			result.add(this.taxonomy);
 		}
 		return Collections.unmodifiableSet(result);
