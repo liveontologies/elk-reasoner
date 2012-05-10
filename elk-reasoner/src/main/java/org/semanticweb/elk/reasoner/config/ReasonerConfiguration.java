@@ -39,7 +39,13 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 /**
- * A simple class to hold ELK configuration parameters
+ * A simple class to hold ELK configuration parameters.
+ * Each parameter should be a static field annotated with @Parameter.
+ * You must specify its type and, optionally, the default value.
+ * The type must be an Enum or a Java class with a constructor that takes a String argument.
+ * When loading the property from file, the framework will call that constructor to check that it can
+ * parse the String value (to prevent passing incorrect values).
+ * 
  * 
  * @author Pavel Klinov
  *
