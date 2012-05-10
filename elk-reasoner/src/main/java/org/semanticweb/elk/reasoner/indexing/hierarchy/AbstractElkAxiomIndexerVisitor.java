@@ -56,6 +56,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
@@ -94,7 +95,6 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 public abstract class AbstractElkAxiomIndexerVisitor implements
 		ElkAxiomProcessor, ElkAxiomVisitor<Void> {
 
-
 	// logger for events
 	private static final Logger LOGGER_ = Logger
 			.getLogger(AbstractElkAxiomIndexerVisitor.class);
@@ -106,16 +106,22 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
 
+	public abstract void indexClassAssertion(ElkIndividual individual,
+			ElkClassExpression type);
+	
 	public abstract void indexDisjointClassExpressions(
 			List<? extends ElkClassExpression> list);
-	
-	public abstract void indexReflexiveObjectProperty(ElkObjectPropertyExpression reflexiveProperty);
 
-	public abstract void indexClassDeclaration(ElkClass ec);
+	public abstract void indexReflexiveObjectProperty(
+			ElkObjectPropertyExpression reflexiveProperty);
 
-	public abstract void indexObjectPropertyDeclaration(ElkObjectProperty eop);
+	public abstract IndexedClass indexClassDeclaration(ElkClass ec);
 
-	public abstract void indexNamedIndividualDeclaration(ElkNamedIndividual eni);
+	public abstract IndexedObjectProperty indexObjectPropertyDeclaration(
+			ElkObjectProperty eop);
+
+	public abstract IndexedIndividual indexNamedIndividualDeclaration(
+			ElkNamedIndividual eni);
 
 	/**
 	 * Object factory that is used internally to replace some syntactic
@@ -211,7 +217,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	public Void visit(ElkAnnotationAssertionAxiom annAssertionAxiom) {
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(
 			ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOfAxiom) {
@@ -310,8 +316,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	}
 
 	@Override
-	public Void visit(
-			ElkReflexiveObjectPropertyAxiom axiom) {
+	public Void visit(ElkReflexiveObjectPropertyAxiom axiom) {
 		indexReflexiveObjectProperty(axiom.getProperty());
 		return null;
 	}
@@ -420,9 +425,7 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 */
 	@Override
 	public Void visit(ElkClassAssertionAxiom axiom) {
-		indexSubClassOfAxiom(
-				objectFactory.getObjectOneOf(axiom.getIndividual()),
-				axiom.getClassExpression());
+		indexClassAssertion(axiom.getIndividual(), axiom.getClassExpression());
 		return null;
 	}
 
@@ -462,9 +465,8 @@ public abstract class AbstractElkAxiomIndexerVisitor implements
 	 */
 	@Override
 	public Void visit(ElkObjectPropertyAssertionAxiom axiom) {
-		indexSubClassOfAxiom(objectFactory.getObjectOneOf(axiom.getSubject()),
-				objectFactory.getObjectSomeValuesFrom(axiom.getProperty(),
-						objectFactory.getObjectOneOf(axiom.getObject())));
+		indexClassAssertion(axiom.getSubject(),
+				objectFactory.getObjectHasValue(axiom.getProperty(), axiom.getObject()));
 		return null;
 	}
 

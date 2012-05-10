@@ -35,6 +35,9 @@ import org.semanticweb.elk.util.collections.Operations;
 public class OntologyIndexImpl extends IndexedObjectCache implements
 		OntologyIndex {
 
+	private final IndexedClass indexedOwlThing;
+	private final IndexedClass indexedOwlNothing;
+	
 	private final ElkObjectIndexerVisitor elkObjectIndexer;
 	private final ElkAxiomIndexerVisitor axiomInserter;
 	private final ElkAxiomIndexerVisitor axiomDeleter;
@@ -47,8 +50,8 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 		this.axiomDeleter = new ElkAxiomIndexerVisitor(this, false);
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
-		axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_THING);
-		axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
+		this.indexedOwlThing = axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_THING);
+		this.indexedOwlNothing = axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	@Override
@@ -131,6 +134,16 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 		if (reflexiveObjectProperties.isEmpty())
 			reflexiveObjectProperties = null;
 		return success;
+	}
+
+	@Override
+	public IndexedClass getIndexedOwlThing() {
+		return indexedOwlThing;
+	}
+
+	@Override
+	public IndexedClass getIndexedOwlNothing() {
+		return indexedOwlNothing;
 	}
 
 }

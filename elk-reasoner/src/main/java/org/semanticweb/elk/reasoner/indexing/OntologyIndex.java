@@ -47,7 +47,13 @@ public interface OntologyIndex {
 
 	IndexedPropertyChain getIndexed(
 			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression);
+	
+	IndexedClass getIndexedOwlThing();
+	IndexedClass getIndexedOwlNothing();
 
+	/**
+	 * Should always contain owl:Thing and owl:Nothing 
+	 */
 	Iterable<IndexedClassExpression> getIndexedClassExpressions();
 	Iterable<IndexedClass> getIndexedClasses();
 	int getIndexedClassCount();
@@ -57,7 +63,7 @@ public interface OntologyIndex {
 	int getIndexedObjectPropertyCount();
 	
 	Iterable<IndexedObjectProperty> getReflexiveObjectProperties();
-
+	
 	ElkAxiomProcessor getAxiomInserter();
 
 	ElkAxiomProcessor getAxiomDeleter();
