@@ -30,9 +30,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
+import org.semanticweb.elk.owl.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.testing.io.IOUtils;
 
 /**
  * A simple class to load class taxonomy from an input stream or a reader
@@ -46,7 +48,15 @@ public class ClassTaxonomyLoader {
 
 
 	public static ClassTaxonomy load(Owl2Parser parser, InputStream input) throws IOException, Owl2ParseException {
-		
+		final ConcurrentClassTaxonomy taxonomy = new ConcurrentClassTaxonomy();
+		ElkAxiomProcessor listener = new ElkAxiomProcessor() {
+			
+			@Override
+			public void process(ElkAxiom elkAxiom) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
 				
 		return null;
 	}
@@ -60,7 +70,16 @@ public class ClassTaxonomyLoader {
 			
 			return load(parser, stream);
 		} finally {
-			IOUtils.closeQuietly(stream);
+			//IOUtils.closeQuietly(stream);
+		}
+	}
+	
+	static class TaxonomyInserter extends AbstractElkAxiomVisitor<Void> {
+
+		@Override
+		protected Void defaultLogicalVisit(ElkAxiom axiom) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 }
