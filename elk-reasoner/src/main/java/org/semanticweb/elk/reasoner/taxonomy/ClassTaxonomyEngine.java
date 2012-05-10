@@ -42,11 +42,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 /**
  * The engine for constructing of the {@link ClassTaxonomy}. The jobs are
  * submitted using the method {@link #submit(IndexedClass)}, which require the
- * computation of the {@link ClassNode} for the input {@link IndexedClass}. To
- * every class taxonomy engine it is possible to attach a
- * {@link ClassTaxonomyListener}, which can implement hook methods that perform
- * certain actions during the processing, e.g., notifying when the jobs are
- * finished.
+ * computation of the {@link ClassNode} for the input {@link IndexedClass}. 
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -55,10 +51,6 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 * The class taxonomy object into which we write the result
 	 */
 	protected final ConcurrentClassTaxonomy taxonomy;
-	/**
-	 * The listener for the taxonomy computation callbacks
-	 */
-	protected final ClassTaxonomyListener<ClassTaxonomyEngine> listener;
 	/**
 	 * The transitive reduction engine used in the taxonomy construction
 	 */
@@ -82,31 +74,12 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 * @param listener
 	 *            the listener object implementing callback functions
 	 */
-	public ClassTaxonomyEngine(OntologyIndex ontologyIndex,
-			ClassTaxonomyListener<ClassTaxonomyEngine> listener) {
-		this.listener = listener;
+	public ClassTaxonomyEngine(OntologyIndex ontologyIndex) {
 		this.taxonomy = new ConcurrentClassTaxonomy();
 		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>(
 				ontologyIndex, new ThisTransitiveReductionListener());
 	}
 
-	/**
-	 * Creates a new class taxonomy engine for the input ontology index.
-	 * 
-	 * @param ontologyIndex
-	 *            the ontology index for which the engine is created
-	 */
-	public ClassTaxonomyEngine(OntologyIndex ontologyIndex) {
-		this(ontologyIndex, new ClassTaxonomyListener<ClassTaxonomyEngine>() {
-			@Override
-			public void notifyCanProcess() {
-			}
-
-			@Override
-			public void notifyFinished(IndexedClass job) {
-			}
-		});
-	}
 
 	@Override
 	public final void submit(IndexedClass job) throws InterruptedException {
