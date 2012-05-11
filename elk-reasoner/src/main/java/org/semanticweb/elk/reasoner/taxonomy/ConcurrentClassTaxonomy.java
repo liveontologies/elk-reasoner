@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -61,11 +60,9 @@ class ConcurrentClassTaxonomy implements InstanceTaxonomy<ElkClass,ElkIndividual
 			.getLogger(ConcurrentClassTaxonomy.class);
 
 	/* thread safe map from class IRIs to class nodes */
-	protected final ConcurrentMap<ElkIri, NonBottomNode> nodeLookup;
+	private final ConcurrentMap<ElkIri, NonBottomNode> nodeLookup;
 	/* thread safe set of all nodes */
-	protected final Set<TaxonomyInstanceNode<ElkClass,ElkIndividual>> allNodes;
-	/* boolean to guard access to the set of all nodes */
-	protected final AtomicBoolean processingNewNodes;
+	private final Set<TaxonomyInstanceNode<ElkClass,ElkIndividual>> allNodes;
 	/* counts the number of nodes which have non-bottom sub-classes */
 	protected final AtomicInteger countNodesWithSubClasses;
 	/* thread safe set of unsatisfiable classes */
@@ -81,7 +78,6 @@ class ConcurrentClassTaxonomy implements InstanceTaxonomy<ElkClass,ElkIndividual
 				.newSetFromMap(new ConcurrentHashMap<TaxonomyInstanceNode<ElkClass,ElkIndividual>, Boolean>());
 		this.bottomNode = new BottomNode();
 		allNodes.add(this.bottomNode);
-		this.processingNewNodes = new AtomicBoolean(false);
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 		this.unsatisfiableClasses = Collections
 				.synchronizedSet(new TreeSet<ElkClass>(
