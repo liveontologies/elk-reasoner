@@ -27,32 +27,35 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * Extended {@link: Taxonomy} that also provides instances for each of its
- * members.
+ * A node of instances in an InstanceTaxonomy.
  * 
- * @author Markus Kroetzsch
+ * @author Frantisek Simancik
  * 
  * @param <T>
- *            the type of objects in the nodes of this taxonomy
+ *            the type of types of objects in this node
  * @param <I>
- *            the type of instances of nodes of this taxonomy
+ *            the type of instances in this node
+ * 
+ * 
  */
-public interface InstanceTaxonomy<T extends ElkObject, I extends ElkObject>
-		extends Taxonomy<T> {
-
+public interface InstanceNode<T extends ElkObject, I extends ElkObject> extends
+		Node<I> {
 	/**
-	 * Returns the TaxonomyNode containing the given elkObject as a member. Null
-	 * if elkObject does not occur in the taxonomy.
-	 */
-	@Override
-	public TypeNode<T, I> getNode(T elkObject);
-
-	/**
-	 * Obtain an unmodifiable Set of all nodes in this taxonomy.
+	 * Get an unmodifiable set of nodes for ElkObjects that are direct types of
+	 * this Node.
 	 * 
-	 * @return an unmodifiable Collection
+	 * @return list of nodes for direct types of this node's members
 	 */
-	@Override
-	public Set<TypeNode<T, I>> getNodes();
+	public Set<TypeNode<T, I>> getDirectTypeNodes();
+
+	/**
+	 * Get an unmodifiable set of nodes for ElkObjects that are (possibly
+	 * indirect) types of this Node.
+	 * 
+	 * @return list of nodes for instances of this node's members
+	 */
+	public Set<TypeNode<T, I>> getAllTypeNodes();
+
+	public InstanceTaxonomy<T, I> getTaxonomy();
 
 }

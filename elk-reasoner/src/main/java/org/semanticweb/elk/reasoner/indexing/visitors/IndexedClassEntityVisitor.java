@@ -22,18 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.indexing.visitors;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 
 /**
- * Visitor pattern interface for instances of {@link IndexedClassExpression}.
+ * Visitor pattern interface for instances of {@link IndexedClassEntity}.
  * 
- * @author "Yevgeny Kazakov"
  * @author Frantisek Simancik
  *
  */
-public interface IndexedClassExpressionVisitor<O> extends
-		IndexedClassEntityVisitor<O>, 
-		IndexedObjectIntersectionOfVisitor<O>,
-		IndexedObjectSomeValuesFromVisitor<O>, 
-		IndexedDataHasValueVisitor<O> { 
+public interface IndexedClassEntityVisitor<O> extends
+		IndexedClassVisitor<O>, 
+		IndexedIndividualVisitor<O> {
 }

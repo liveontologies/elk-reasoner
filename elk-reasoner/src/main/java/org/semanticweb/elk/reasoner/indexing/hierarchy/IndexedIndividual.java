@@ -23,10 +23,10 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
 
-public class IndexedIndividual extends IndexedClassExpression {
+public class IndexedIndividual extends IndexedClassEntity {
 	/**
 	 * The ElkNamedIndividual that is the sole instance of this nominal
 	 */
@@ -50,7 +50,7 @@ public class IndexedIndividual extends IndexedClassExpression {
 	}
 
 	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,17 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.visitors;
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 
-/**
- * Visitor pattern interface for instances of {@link IndexedClassExpression}.
- * 
- * @author "Yevgeny Kazakov"
- * @author Frantisek Simancik
- *
- */
-public interface IndexedClassExpressionVisitor<O> extends
-		IndexedClassEntityVisitor<O>, 
-		IndexedObjectIntersectionOfVisitor<O>,
-		IndexedObjectSomeValuesFromVisitor<O>, 
-		IndexedDataHasValueVisitor<O> { 
+public abstract class IndexedClassEntity extends IndexedClassExpression {
+	
+	abstract public <O> O accept(IndexedClassEntityVisitor<O> visitor);
+
+	@Override
+	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+		return accept((IndexedClassEntityVisitor<O>) visitor);
+	}
 }

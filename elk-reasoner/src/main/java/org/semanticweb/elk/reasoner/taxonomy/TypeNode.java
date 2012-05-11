@@ -31,13 +31,14 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * and individuals, and for properties and pairs of individuals.
  * 
  * @author Markus Kroetzsch
+ * @author Frantisek Simancik
  * 
  * @param <T>
  *            the type of objects in this node
  * @param <I>
  *            the type of instances of this node
  */
-public interface TaxonomyInstanceNode<T extends ElkObject, I extends ElkObject>
+public interface TypeNode<T extends ElkObject, I extends ElkObject>
 		extends TaxonomyNode<T> {
 
 	/**
@@ -46,7 +47,7 @@ public interface TaxonomyInstanceNode<T extends ElkObject, I extends ElkObject>
 	 * 
 	 * @return list of nodes for direct instances of this node's members
 	 */
-	public Set<Node<I>> getDirectInstances();
+	public Set<InstanceNode<T, I>> getDirectInstanceNodes();
 
 	/**
 	 * Get an unmodifiable set of nodes for ElkObjects that are (possibly
@@ -54,16 +55,16 @@ public interface TaxonomyInstanceNode<T extends ElkObject, I extends ElkObject>
 	 * 
 	 * @return list of nodes for instances of this node's members
 	 */
-	public Set<Node<I>> getInstances();
+	public Set<InstanceNode<T, I>> getAllInstanceNodes();
 	
 	@Override
-	public Set<TaxonomyInstanceNode<T,I>> getDirectSuperNodes();
+	public Set<TypeNode<T,I>> getDirectSuperNodes();
 	@Override
-	public Set<TaxonomyInstanceNode<T,I>> getAllSuperNodes();
+	public Set<TypeNode<T,I>> getAllSuperNodes();
 	@Override
-	public Set<TaxonomyInstanceNode<T,I>> getDirectSubNodes();
+	public Set<TypeNode<T,I>> getDirectSubNodes();
 	@Override
-	public Set<TaxonomyInstanceNode<T,I>> getAllSubNodes();
+	public Set<TypeNode<T,I>> getAllSubNodes();
 	@Override
 	public InstanceTaxonomy<T,I> getTaxonomy();
 

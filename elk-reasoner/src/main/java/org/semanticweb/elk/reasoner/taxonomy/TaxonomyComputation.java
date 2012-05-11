@@ -26,10 +26,10 @@ import java.util.concurrent.ExecutorService;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 
-public class TaxonomyComputation extends ConcurrentComputation<IndexedClass> {
+public class TaxonomyComputation extends ConcurrentComputation<IndexedClassEntity> {
 
 	final ClassTaxonomyEngine classTaxonomyEngine;
 

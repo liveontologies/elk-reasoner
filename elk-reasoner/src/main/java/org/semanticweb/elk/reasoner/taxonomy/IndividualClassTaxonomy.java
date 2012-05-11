@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 
 /**
  * Abstract taxonomy for classes and their instances (individuals). The main
@@ -37,9 +37,9 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
  * 
  */
 public abstract class IndividualClassTaxonomy implements
-		InstanceTaxonomy<ElkClass, ElkIndividual> {
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> {
 
-	abstract NonBottomNode getCreate(Collection<ElkClass> members);
+	abstract NonBottomClassNode getCreate(Collection<ElkClass> members);
 
 	abstract void addUnsatisfiableClass(ElkClass elkClass);
 }

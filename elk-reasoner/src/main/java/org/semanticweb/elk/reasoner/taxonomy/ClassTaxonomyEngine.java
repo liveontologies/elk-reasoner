@@ -30,6 +30,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionEngine;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionListener;
@@ -47,7 +50,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
+public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
@@ -55,16 +58,18 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	/**
 	 * The transitive reduction engine used in the taxonomy construction
 	 */
-	protected final TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>> transitiveReductionEngine;
+	protected final TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>> transitiveReductionEngine;
 	/**
-	 * The object creating or update the nodes from the result of the transitive
+	 * The objects creating or update the nodes from the result of the transitive
 	 * reduction
 	 */
 	protected final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
+	protected final SatisfiableOutputProcessor satisfiableOutputProcessor = new SatisfiableOutputProcessor();
+	protected final UnsatisfiableOutputProcessor unsatisfiableOutputProcessor = new UnsatisfiableOutputProcessor();
 	/**
 	 * The reference to cache the value of the top node for frequent use
 	 */
-	protected final AtomicReference<NonBottomNode> topNodeRef = new AtomicReference<NonBottomNode>();
+	protected final AtomicReference<NonBottomClassNode> topNodeRef = new AtomicReference<NonBottomClassNode>();
 
 	/**
 	 * Create a new class taxonomy engine for the input ontology index and a
@@ -82,7 +87,7 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	public ClassTaxonomyEngine(OntologyIndex ontologyIndex,
 			IndividualClassTaxonomy individualClassTaxonomy) {
 		this.taxonomy = individualClassTaxonomy;
-		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>(
+		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>(
 				ontologyIndex, new ThisTransitiveReductionListener());
 	}
 
@@ -97,9 +102,9 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	}
 
 	@Override
-	public final void submit(IndexedClass job) throws InterruptedException {
+	public final void submit(IndexedClassEntity job) throws InterruptedException {
 		transitiveReductionEngine
-				.submit(new TransitiveReductionJob<IndexedClass>(job));
+				.submit(new TransitiveReductionJob<IndexedClassEntity>(job));
 	}
 
 	@Override
@@ -136,14 +141,14 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 */
 	class ThisTransitiveReductionListener
 			implements
-			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>, TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>> {
+			TransitiveReductionListener<TransitiveReductionJob<IndexedClassEntity>, TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>> {
 
 		@Override
 		public void notifyCanProcess() {
 		}
 
 		@Override
-		public void notifyFinished(TransitiveReductionJob<IndexedClass> job)
+		public void notifyFinished(TransitiveReductionJob<IndexedClassEntity> job)
 				throws InterruptedException {
 			job.getOutput().accept(outputProcessor);
 		}
@@ -159,21 +164,21 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 * 
 	 */
 	class TransitiveReductionOutputProcessor implements
-			TransitiveReductionOutputVisitor<IndexedClass> {
+			TransitiveReductionOutputVisitor<IndexedClassEntity> {
 		@Override
 		public void visit(
-				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
-			NonBottomNode node = taxonomy.getCreate(output.getEquivalent());
+				TransitiveReductionOutputEquivalentDirect<IndexedClassEntity> output) {
+			NonBottomClassNode node = taxonomy.getCreate(output.getEquivalent());
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSuperClasses()) {
-				NonBottomNode superNode = taxonomy
+				NonBottomClassNode superNode = taxonomy
 						.getCreate(directSuperEquivalent.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);
 			}
 			// if there are no direct super nodes, then the top node is the only
 			// direct super node
 			if (node.getDirectSuperNodes().isEmpty()) {
-				NonBottomNode topNode = topNodeRef.get();
+				NonBottomClassNode topNode = topNodeRef.get();
 				if (topNode == null) {
 					if (node.getMembers()
 							.contains(PredefinedElkClass.OWL_THING))
@@ -192,15 +197,47 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 
 		@Override
 		public void visit(
-				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
-			taxonomy.addUnsatisfiableClass(output.getRoot().getElkClass());
+				TransitiveReductionOutputUnsatisfiable<IndexedClassEntity> output) {
+			taxonomy.addUnsatisfiableClass(((IndexedClass) output.getRoot()).getElkClass());
 		}
 
 		@Override
 		public void visit(
-				TransitiveReductionOutputEquivalent<IndexedClass> output) {
+				TransitiveReductionOutputEquivalent<IndexedClassEntity> output) {
 			throw new IllegalArgumentException();
 		}
+	}
+	
+	class SatisfiableOutputProcessor implements IndexedClassEntityVisitor<Void> {
+
+		@Override
+		public Void visit(IndexedClass element) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedIndividual element) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+	}
+	
+	class UnsatisfiableOutputProcessor implements IndexedClassEntityVisitor<Void> {
+
+		@Override
+		public Void visit(IndexedClass element) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedIndividual element) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
 	}
 
 	/**
@@ -213,8 +250,8 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 * @param superNode
 	 *            the node that should be the super-node of the first node
 	 */
-	static void assignDirectSuperClassNode(NonBottomNode subNode,
-			NonBottomNode superNode) {
+	static void assignDirectSuperClassNode(NonBottomClassNode subNode,
+			NonBottomClassNode superNode) {
 		subNode.addDirectSuperNode(superNode);
 		/*
 		 * since super-nodes can be added from different nodes, this call should
