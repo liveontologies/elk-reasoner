@@ -27,31 +27,30 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * Classes that implement this interface represent a class hierarchy based on
- * ElkClass objects. For each such object, the taxonomy holds a ClassNode object
- * from which direct sub- and superclasses can be retrieved.
+ * A hierarchy of certain ElkObjects. For each such object, the taxonomy holds a
+ * TaxonomyNode object from which direct sub- and supernodes can be retrieved.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
  * 
  */
-public interface ClassTaxonomy {
+public interface Taxonomy<T extends ElkObject> {
 
 	/**
-	 * Returns the ClassNode containing the given elkClass as a member. Null if
-	 * elkClass does not occur in the ontology.
+	 * Returns the TaxonomyNode containing the given elkObject as a member. Null
+	 * if elkObject does not occur in the taxonomy.
 	 */
-	public TaxonomyClassNode getNode(ElkClass elkClass);
+	public TaxonomyNode<T> getNode(T elkObject);
 
 	/**
-	 * Obtain an unmodifiable Set of all nodes in this ClassTaxonomy.
+	 * Obtain an unmodifiable Set of all nodes in this taxonomy.
 	 * 
 	 * @return an unmodifiable Collection
 	 */
-	public Set<TaxonomyClassNode> getNodes();
+	public Set<? extends TaxonomyNode<T>> getNodes();
 
 }

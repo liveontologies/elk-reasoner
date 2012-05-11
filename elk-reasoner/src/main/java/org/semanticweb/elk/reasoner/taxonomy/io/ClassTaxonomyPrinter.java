@@ -39,9 +39,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyClassNode;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
@@ -65,7 +65,7 @@ public class ClassTaxonomyPrinter {
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
 	 */
-	public static void dumpClassTaxomomyToFile(ClassTaxonomy classTaxonomy,
+	public static void dumpClassTaxomomyToFile(Taxonomy<ElkClass> classTaxonomy,
 			String fileName, boolean addHash) throws IOException {
 		FileWriter fstream = new FileWriter(fileName);
 		BufferedWriter writer = new BufferedWriter(fstream);
@@ -84,7 +84,7 @@ public class ClassTaxonomyPrinter {
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
 	 */
-	public static void dumpClassTaxomomy(ClassTaxonomy classTaxonomy,
+	public static void dumpClassTaxomomy(Taxonomy<ElkClass> classTaxonomy,
 			Writer writer, boolean addHash) throws IOException {
 		processClassTaxomomy(classTaxonomy, writer);
 		if (addHash) {
@@ -102,7 +102,7 @@ public class ClassTaxonomyPrinter {
 	 * @param classTaxonomy
 	 * @return hash string
 	 */
-	public static String getHashString(ClassTaxonomy classTaxonomy) {
+	public static String getHashString(Taxonomy<ElkClass> classTaxonomy) {
 		return Integer.toHexString(ClassTaxonomyHasher.hash(classTaxonomy));
 	}
 
@@ -113,18 +113,18 @@ public class ClassTaxonomyPrinter {
 	 * @param writer
 	 * @throws IOException
 	 */
-	protected static void processClassTaxomomy(ClassTaxonomy classTaxonomy,
+	protected static void processClassTaxomomy(Taxonomy<ElkClass> classTaxonomy,
 			Writer writer) throws IOException {
 
 		writer.write("Ontology(\n");
 
 		TreeSet<ElkClass> canonicalElkClasses = new TreeSet<ElkClass>(
 				comparator);
-		for (TaxonomyClassNode classNode : classTaxonomy.getNodes())
+		for (TaxonomyNode<ElkClass> classNode : classTaxonomy.getNodes())
 			canonicalElkClasses.add(classNode.getCanonicalMember());
 
 		for (ElkClass elkClass : canonicalElkClasses) {
-			TaxonomyClassNode classNode = classTaxonomy.getNode(elkClass);
+			TaxonomyNode<ElkClass> classNode = classTaxonomy.getNode(elkClass);
 
 			ArrayList<ElkClass> orderedEquivalentClasses = new ArrayList<ElkClass>(
 					classNode.getMembers());
@@ -132,7 +132,7 @@ public class ClassTaxonomyPrinter {
 
 			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass>(
 					comparator);
-			for (TaxonomyClassNode childNode : classNode.getDirectSubNodes()) {
+			for (TaxonomyNode<ElkClass> childNode : classNode.getDirectSubNodes()) {
 				orderedSubClasses.add(childNode.getCanonicalMember());
 			}
 

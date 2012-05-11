@@ -31,47 +31,54 @@ import java.io.OutputStreamWriter;
 import java.util.concurrent.Executors;
 
 import org.semanticweb.elk.cli.IOReasoner;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
 import org.semanticweb.elk.testing.io.IOUtils;
 
 /**
- * Computes correct class taxonomy hash codes for a set of ontologies 
+ * Computes correct class taxonomy hash codes for a set of ontologies
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 public class ComputeTaxonomyHashCodes {
 
-	static final String OWL_PATH = "../elk-reasoner/src/test/resources/classification_test_input"; 
-	
+	static final String OWL_PATH = "../elk-reasoner/src/test/resources/classification_test_input";
+
 	/**
 	 * args[0]: path to the dir with source ontologies
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
 		File srcDir = new File(OWL_PATH);
-		IOReasoner reasoner = new IOReasoner(Executors.newCachedThreadPool(), 1);//use just one worker to minimize the risk of errors
-		
-		for (File ontFile : srcDir.listFiles(IOUtils.getExtBasedFilenameFilter("owl"))) {
-			
+		// use just one worker to minimize the risk of errors:
+		IOReasoner reasoner = new IOReasoner(Executors.newCachedThreadPool(), 1);
+
+		for (File ontFile : srcDir.listFiles(IOUtils
+				.getExtBasedFilenameFilter("owl"))) {
+
 			System.err.println(ontFile.getName());
-			
+
 			reasoner.loadOntologyFromFile(ontFile);
-			
-			ClassTaxonomy taxonomy = reasoner.getTaxonomy();
+
+			Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 			int hash = ClassTaxonomyHasher.hash(taxonomy);
-			//create the expected result file
-			File out = new File(srcDir.getAbsolutePath() + "/" + IOUtils.dropExtension(ontFile.getName()) + ".expected.hash");
-			OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(out));
-			
+			// create the expected result file
+			File out = new File(srcDir.getAbsolutePath() + "/"
+					+ IOUtils.dropExtension(ontFile.getName())
+					+ ".expected.hash");
+			OutputStreamWriter writer = new OutputStreamWriter(
+					new FileOutputStream(out));
+
 			writer.write(Integer.valueOf(hash).toString());
 			writer.flush();
 			writer.close();
 		}
-		
+
 		reasoner.shutdown();
 	}
 

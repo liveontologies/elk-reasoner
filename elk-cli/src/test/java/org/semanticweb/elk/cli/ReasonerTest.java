@@ -49,9 +49,9 @@ import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyClassNode;
+import org.semanticweb.elk.reasoner.taxonomy.Node;
+import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 
 //TODO This test won't be necessary as soon as we can specify the expected class taxonomy
 //for our main classification tests, see BaseClassificationCorrectnessTest
@@ -86,7 +86,7 @@ public class ReasonerTest {
 		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(
 				"http://example.org/S"));
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		Taxonomy<ElkClass> taxonomy = IOReasoner.getTaxonomy();
 
 		OntologyIndex index = IOReasoner.getOntologyIndex();
 
@@ -140,8 +140,8 @@ public class ReasonerTest {
 		assertFalse("A SubClassOf E", A.getToldSuperClassExpressions()
 				.contains(E));
 
-		Set<? extends ClassNode> superClassesOfA = ioReasoner.getSuperClasses(
-				a, true);
+		Set<? extends Node<ElkClass>> superClassesOfA = ioReasoner
+				.getSuperClasses(a, true);
 
 		assertTrue("A contains B",
 				superClassesOfA.contains(ioReasoner.getClassNode(b)));
@@ -177,13 +177,11 @@ public class ReasonerTest {
 		ElkClass x = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/X"));
 
-		Set<? extends ClassNode> superClassesOfA = ioReasoner.getSuperClasses(
-				a, true);
+		Set<? extends Node<ElkClass>> superClassesOfA = ioReasoner
+				.getSuperClasses(a, true);
 
-		assertTrue(
-				"A SubClassOf X",
-				superClassesOfA.contains(
-						ioReasoner.getClassNode(x)));
+		assertTrue("A SubClassOf X",
+				superClassesOfA.contains(ioReasoner.getClassNode(x)));
 	}
 
 	@Test
@@ -208,8 +206,9 @@ public class ReasonerTest {
 		ElkClass c = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/C"));
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
-		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+		Taxonomy<ElkClass> taxonomy = IOReasoner.getTaxonomy();
+		Node<ElkClass> bottom = taxonomy
+				.getNode(PredefinedElkClass.OWL_NOTHING);
 
 		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
 		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
@@ -238,8 +237,9 @@ public class ReasonerTest {
 		ElkClass c = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/C"));
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
-		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+		Taxonomy<ElkClass> taxonomy = IOReasoner.getTaxonomy();
+		Node<ElkClass> bottom = taxonomy
+				.getNode(PredefinedElkClass.OWL_NOTHING);
 
 		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
 		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
@@ -266,8 +266,9 @@ public class ReasonerTest {
 		ElkClass c = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/C"));
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
-		ClassNode bottom = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+		Taxonomy<ElkClass> taxonomy = IOReasoner.getTaxonomy();
+		Node<ElkClass> bottom = taxonomy
+				.getNode(PredefinedElkClass.OWL_NOTHING);
 
 		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
 		assertNotSame("B satisfiable", bottom, taxonomy.getNode(b));
@@ -298,14 +299,16 @@ public class ReasonerTest {
 				"http://example.org/C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/D"));
-		
-		Set<? extends ClassNode> superClassesOfA = ioReasoner.getSuperClasses(
-				a, true);
-		Set<? extends ClassNode> superClassesOfC = ioReasoner.getSuperClasses(
-				c, true);
 
-		assertTrue("SubClassOf(A B)", superClassesOfA.contains(ioReasoner.getClassNode(b)));
-		assertTrue("SubClassOf(C D)", superClassesOfC.contains(ioReasoner.getClassNode(d)));
+		Set<? extends Node<ElkClass>> superClassesOfA = ioReasoner
+				.getSuperClasses(a, true);
+		Set<? extends Node<ElkClass>> superClassesOfC = ioReasoner
+				.getSuperClasses(c, true);
+
+		assertTrue("SubClassOf(A B)",
+				superClassesOfA.contains(ioReasoner.getClassNode(b)));
+		assertTrue("SubClassOf(C D)",
+				superClassesOfC.contains(ioReasoner.getClassNode(d)));
 	}
 
 	@Test
@@ -343,26 +346,29 @@ public class ReasonerTest {
 		assertTrue("B SubClassOf D",
 				B.getToldSuperClassExpressions().contains(D));
 
-		ClassNode bNode = ioReasoner.getClassNode(b);
-		ClassNode cNode = ioReasoner.getClassNode(c);
-		ClassNode dNode = ioReasoner.getClassNode(d);
-		
-		Set<? extends ClassNode> directSuperClassesOfA = ioReasoner.getSuperClasses(a,true);
-		Set<? extends ClassNode> indirectSuperClassesOfA = ioReasoner.getSuperClasses(a,false);
+		Node<ElkClass> bNode = ioReasoner.getClassNode(b);
+		Node<ElkClass> cNode = ioReasoner.getClassNode(c);
+		Node<ElkClass> dNode = ioReasoner.getClassNode(d);
 
-		assertTrue("A direct subclass of B", directSuperClassesOfA
-				.contains(bNode));
-		assertTrue("A direct subclass of C", directSuperClassesOfA 
-				.contains(cNode));
-		assertFalse("A not direct subclass of D", directSuperClassesOfA
-				.contains(dNode));
-		assertTrue("B direct subclass of D", ioReasoner.getSuperClasses(b,true)
-				.contains(dNode));
-		assertTrue("A indirect subclass of B", indirectSuperClassesOfA
-				.contains(bNode));
-		assertTrue("A indirect subclass of D", indirectSuperClassesOfA
-				.contains(dNode));
-		assertEquals("A has exactly two direct super-classes", 2, directSuperClassesOfA.size());
+		Set<? extends Node<ElkClass>> directSuperClassesOfA = ioReasoner
+				.getSuperClasses(a, true);
+		Set<? extends Node<ElkClass>> indirectSuperClassesOfA = ioReasoner
+				.getSuperClasses(a, false);
+
+		assertTrue("A direct subclass of B",
+				directSuperClassesOfA.contains(bNode));
+		assertTrue("A direct subclass of C",
+				directSuperClassesOfA.contains(cNode));
+		assertFalse("A not direct subclass of D",
+				directSuperClassesOfA.contains(dNode));
+		assertTrue("B direct subclass of D", ioReasoner
+				.getSuperClasses(b, true).contains(dNode));
+		assertTrue("A indirect subclass of B",
+				indirectSuperClassesOfA.contains(bNode));
+		assertTrue("A indirect subclass of D",
+				indirectSuperClassesOfA.contains(dNode));
+		assertEquals("A has exactly two direct super-classes", 2,
+				directSuperClassesOfA.size());
 		assertEquals("A has exactly four super-classes: B, C, D and owl:Thing",
 				4, indirectSuperClassesOfA.size());
 	}
@@ -388,12 +394,12 @@ public class ReasonerTest {
 		ElkClass b = new TestElkClass(new ElkFullIri("http://example.org/B"));
 		ElkClass c = new TestElkClass(new ElkFullIri("http://example.org/C"));
 
-		ClassTaxonomy taxonomy = ioReasoner.getTaxonomy();
-		TaxonomyClassNode botNode = taxonomy.getNode(bot);
-		TaxonomyClassNode aNode = taxonomy.getNode(a);
-		TaxonomyClassNode bNode = taxonomy.getNode(b);
-		TaxonomyClassNode cNode = taxonomy.getNode(c);
-		TaxonomyClassNode topNode = taxonomy.getNode(top);
+		Taxonomy<ElkClass> taxonomy = ioReasoner.getTaxonomy();
+		TaxonomyNode<ElkClass> botNode = taxonomy.getNode(bot);
+		TaxonomyNode<ElkClass> aNode = taxonomy.getNode(a);
+		TaxonomyNode<ElkClass> bNode = taxonomy.getNode(b);
+		TaxonomyNode<ElkClass> cNode = taxonomy.getNode(c);
+		TaxonomyNode<ElkClass> topNode = taxonomy.getNode(top);
 
 		assertEquals("C and owl:Ting belong to the same node", cNode, topNode);
 
@@ -471,10 +477,11 @@ public class ReasonerTest {
 				+ "SubClassOf(:C ObjectSomeValuesFrom(:T :B))"
 				+ "ObjectPropertyDomain(:T owl:Nothing)" + ")");
 
-		ClassTaxonomy taxonomy = IOReasoner.getTaxonomy();
+		Taxonomy<ElkClass> taxonomy = IOReasoner.getTaxonomy();
 
-		ClassNode thing = taxonomy.getNode(PredefinedElkClass.OWL_THING);
-		ClassNode nothing = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+		Node<ElkClass> thing = taxonomy.getNode(PredefinedElkClass.OWL_THING);
+		Node<ElkClass> nothing = taxonomy
+				.getNode(PredefinedElkClass.OWL_NOTHING);
 
 		assertEquals(nothing.getMembers(), thing.getMembers());
 		assertSame(nothing.getCanonicalMember(), thing.getCanonicalMember());

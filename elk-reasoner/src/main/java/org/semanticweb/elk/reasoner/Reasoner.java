@@ -37,10 +37,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
-import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.Node;
+import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyEngine;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyClassNode;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.logging.Statistics;
 
@@ -79,7 +79,7 @@ public class Reasoner {
 	/**
 	 * Class taxonomy of the current ontology, after it was computed.
 	 */
-	protected ClassTaxonomy classTaxonomy;
+	protected Taxonomy<ElkClass> classTaxonomy;
 	/**
 	 * Indicates if classTaxonomy needs to be recomputed due to ontology change
 	 */
@@ -198,7 +198,7 @@ public class Reasoner {
 	 * 
 	 * @return class taxonomy (not null)
 	 */
-	public ClassTaxonomy getTaxonomy() {
+	public Taxonomy<ElkClass> getTaxonomy() {
 		if (recomputeClassTaxonomy) {
 			classify();
 			recomputeClassTaxonomy = false;
@@ -214,9 +214,9 @@ public class Reasoner {
 	 * @throws FreshEntitiesException
 	 * @throws InconsistentOntologyException
 	 */
-	protected TaxonomyClassNode getTaxonomyClassNode(ElkClass elkClass)
+	protected TaxonomyNode<ElkClass> getTaxonomyClassNode(ElkClass elkClass)
 			throws FreshEntitiesException, InconsistentOntologyException {
-		TaxonomyClassNode node = getTaxonomy().getNode(elkClass);
+		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
 		if (node == null)
 			throw new FreshEntitiesException(elkClass);
 		return node;
@@ -233,7 +233,7 @@ public class Reasoner {
 	 * @throws FreshEntitiesException
 	 *             thrown if the given class is not known in the ontology yet
 	 */
-	public ClassNode getClassNode(ElkClass elkClass)
+	public Node<ElkClass> getClassNode(ElkClass elkClass)
 			throws FreshEntitiesException, InconsistentOntologyException {
 		return getTaxonomyClassNode(elkClass);
 	}
@@ -253,11 +253,11 @@ public class Reasoner {
 	 * @throws FreshEntitiesException
 	 * @throws InconsistentOntologyException
 	 */
-	public Set<? extends ClassNode> getSubClasses(
+	public Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws FreshEntitiesException, InconsistentOntologyException {
 		if (classExpression instanceof ElkClass) {
-			TaxonomyClassNode ceClassNode = getTaxonomyClassNode((ElkClass) classExpression);
+			TaxonomyNode<ElkClass> ceClassNode = getTaxonomyClassNode((ElkClass) classExpression);
 			return (direct) ? ceClassNode.getDirectSubNodes() : ceClassNode
 					.getAllSubNodes();
 		} else { // TODO: complex class expressions currently not supported
@@ -281,11 +281,11 @@ public class Reasoner {
 	 * @throws FreshEntitiesException
 	 * @throws InconsistentOntologyException
 	 */
-	public Set<? extends ClassNode> getSuperClasses(
+	public Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws FreshEntitiesException, InconsistentOntologyException {
 		if (classExpression instanceof ElkClass) {
-			TaxonomyClassNode ceClassNode = getTaxonomyClassNode((ElkClass) classExpression);
+			TaxonomyNode<ElkClass> ceClassNode = getTaxonomyClassNode((ElkClass) classExpression);
 			return (direct) ? ceClassNode.getDirectSuperNodes() : ceClassNode
 					.getAllSuperNodes();
 		} else { // TODO: complex class expressions currently not supported
@@ -320,7 +320,7 @@ public class Reasoner {
 	public boolean isSatisfiable(ElkClassExpression classExpression)
 			throws FreshEntitiesException, InconsistentOntologyException {
 		if (classExpression instanceof ElkClass) {
-			ClassNode classNode = getClassNode((ElkClass) classExpression);
+			Node<ElkClass> classNode = getClassNode((ElkClass) classExpression);
 			return (!classNode.getMembers().contains(
 					PredefinedElkClass.OWL_NOTHING));
 		} else {
@@ -401,7 +401,7 @@ public class Reasoner {
 			this(executor, maxWorkers, new ClassTaxonomyEngine(ontologyIndex));
 		}
 
-		public ClassTaxonomy getClassTaxonomy() {
+		public Taxonomy<ElkClass> getClassTaxonomy() {
 			return classTaxonomyEngine.getClassTaxonomy();
 		}
 

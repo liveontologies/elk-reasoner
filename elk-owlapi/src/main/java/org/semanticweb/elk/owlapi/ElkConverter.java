@@ -32,12 +32,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
+import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
-import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNodeSet;
 
@@ -77,7 +76,7 @@ public class ElkConverter {
 		return ce.accept(ELK_CLASS_EXPRESSION_CONVERTER);
 	}
 
-	public OWLClassNode convert(ClassNode node) {
+	public OWLClassNode convert(Node<ElkClass> node) {
 		Set<OWLClass> owlClasses = new HashSet<OWLClass>();
 		for (ElkClass cls : node.getMembers()) {
 			owlClasses.add(convert(cls));
@@ -85,9 +84,9 @@ public class ElkConverter {
 		return new OWLClassNode(owlClasses);
 	}
 
-	public OWLClassNodeSet convert(Iterable<? extends ClassNode> nodes) {
-		Set<Node<OWLClass>> owlNodes = new HashSet<Node<OWLClass>>();
-		for (ClassNode node : nodes) {
+	public OWLClassNodeSet convert(Iterable<? extends Node<ElkClass>> nodes) {
+		Set<org.semanticweb.owlapi.reasoner.Node<OWLClass>> owlNodes = new HashSet<org.semanticweb.owlapi.reasoner.Node<OWLClass>>();
+		for (Node<ElkClass> node : nodes) {
 			owlNodes.add(convert(node));
 		}
 		return new OWLClassNodeSet(owlNodes);

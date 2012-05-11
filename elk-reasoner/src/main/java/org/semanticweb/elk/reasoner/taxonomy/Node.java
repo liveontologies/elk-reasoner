@@ -24,32 +24,35 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * Basic interface for representing sets of equivalent classes with one
- * canonical representative.
+ * Basic interface for representing sets of equivalent ElkObjects with one
+ * canonical representative. The notion of equivalence depends on the
+ * application but will usually be implied extensional equality.
  * 
  * @author Markus Kroetzsch
  */
-public interface ClassNode {
+public interface Node<T extends ElkObject> {
 
 	/**
-	 * Get an unmodifiable set of ElkClass objects that this ClassNode
-	 * represents.
+	 * Get an unmodifiable set of objects that this Node represents.
 	 * 
-	 * @return collection of equivalent ElkClass objects
+	 * @return collection of equivalent objects
 	 */
-	public Set<ElkClass> getMembers();
+	public Set<T> getMembers();
 
 	/**
-	 * Get one ElkClass object to canonically represent the classes in this
-	 * ClassNode. It is guaranteed that the least object is the least one
-	 * according to the ordering defined by PredefinedElkIri.compare().
+	 * Get one object to canonically represent the classes in this Node.
 	 * 
-	 * @return canonical ElkClass object
+	 * It is guaranteed that the least object is the least one according to the
+	 * ordering defined by PredefinedElkIri.compare().
+	 * 
+	 * TODO The above remark is a bit mysterious. Does the interface really make
+	 * such guarantees?
+	 * 
+	 * @return canonical object
 	 */
-	public ElkClass getCanonicalMember();
-
+	public T getCanonicalMember();
 
 }

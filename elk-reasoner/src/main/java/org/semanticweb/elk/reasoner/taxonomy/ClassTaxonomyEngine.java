@@ -40,9 +40,9 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
- * The engine for constructing of the {@link ClassTaxonomy}. The jobs are
- * submitted using the method {@link #submit(IndexedClass)}, which require the
- * computation of the {@link ClassNode} for the input {@link IndexedClass}. 
+ * The engine for constructing of the {@link Taxonomy}. The jobs are submitted
+ * using the method {@link #submit(IndexedClass)}, which require the computation
+ * of the {@link Node} for the input {@link IndexedClass}.
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -80,7 +80,6 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 				ontologyIndex, new ThisTransitiveReductionListener());
 	}
 
-
 	@Override
 	public final void submit(IndexedClass job) throws InterruptedException {
 		transitiveReductionEngine
@@ -109,7 +108,7 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 * 
 	 * @return the class taxonomy constructed by this engine
 	 */
-	public ClassTaxonomy getClassTaxonomy() {
+	public Taxonomy<ElkClass> getClassTaxonomy() {
 		return this.taxonomy;
 	}
 
