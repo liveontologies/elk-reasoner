@@ -32,10 +32,12 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
 import org.semanticweb.elk.testing.io.IOUtils;
 import org.semanticweb.elk.testing.io.URLTestIO;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Runs classification tests for all test input in the test directory
@@ -60,6 +62,8 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	
 	@Before
 	public void before() throws IOException, Owl2ParseException {
+		assumeTrue(!ignore(manifest.getInput()));
+		
 		inputStream = ((URLTestIO)manifest.getInput()).getInputStream();
 		reasoner = createReasoner(inputStream);
 	}
@@ -67,6 +71,10 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	@After
 	public void after() {
 		IOUtils.closeQuietly(inputStream);
+	}
+	
+	protected boolean ignore(TestInput input) {
+		return false;
 	}
 	
 	protected abstract Reasoner createReasoner(final InputStream input) throws IOException, Owl2ParseException;
@@ -86,17 +94,17 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	@Test
 	public void classify() throws TestResultComparisonException {
 		System.err.println(manifest.toString());
-		
+
 		reasoner.classify();
-		
+
 		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
-		
-		/*try {
-			Writer writer = new OutputStreamWriter(System.out);
-			ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, true);
-			writer.flush();
-		} catch (IOException e) {}*/
-		
+
+		/*
+		 * try { Writer writer = new OutputStreamWriter(System.out);
+		 * ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, true);
+		 * writer.flush(); } catch (IOException e) {}
+		 */
+
 		manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
 	}
 }

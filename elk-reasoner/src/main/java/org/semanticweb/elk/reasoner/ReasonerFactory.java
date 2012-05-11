@@ -31,6 +31,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 
 /**
  * The main factory to instantiate {@link Reasoner}
@@ -60,7 +61,7 @@ public class ReasonerFactory {
 	 * @return ELK reasoner
 	 */
 	public Reasoner createReasoner(ReasonerConfiguration config) {
-		return new Reasoner(Executors.newCachedThreadPool(), config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS.getName()));
+		return new Reasoner(Executors.newCachedThreadPool(), config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
 	}
 	
 	protected ReasonerConfiguration loadReasonerConfiguration() {

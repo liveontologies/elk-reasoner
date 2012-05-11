@@ -23,34 +23,31 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.taxonomy.io;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+package org.semanticweb.elk.reasoner.config;
 
 /**
- * A simple class to load class taxonomy from an input stream or a reader
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
- *
  */
-public class ClassTaxonomyLoader {
+public class NumberOfWorkers {
 
-
-	public static ClassTaxonomy load(Owl2Parser parser, InputStream input) throws IOException, Owl2ParseException {
-		
-		return null;
+	private final int numOfWorkers;
+	
+	public NumberOfWorkers(String value) {
+		if (value == null || value.length() == 0) {
+			numOfWorkers = Runtime.getRuntime().availableProcessors();
+		}
+		else {
+			numOfWorkers = Integer.valueOf(value);
+		}
 	}
 	
-	public static ClassTaxonomy load(Owl2Parser parser, File file) throws IOException, Owl2ParseException {
-		
-		return null;
+	public int getNumberOfWorkers() {
+		return numOfWorkers;
+	}
+	
+	public String toString() {
+		return String.valueOf(numOfWorkers);
 	}
 }

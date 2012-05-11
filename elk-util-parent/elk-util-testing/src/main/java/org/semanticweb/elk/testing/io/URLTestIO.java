@@ -55,4 +55,9 @@ public class URLTestIO implements TestInput, TestOutput {
 	public String toString() {
 		return url.toString();
 	}
+
+	@Override
+	public String getName() {
+		return IOUtils.getFileName(url.getPath());
+	}
 }

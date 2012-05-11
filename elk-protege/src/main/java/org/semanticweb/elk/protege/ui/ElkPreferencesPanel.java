@@ -39,7 +39,7 @@ import javax.swing.SpinnerNumberModel;
 import org.protege.editor.owl.model.inference.ProtegeOWLReasonerInfo;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.elk.protege.ProtegeReasonerFactory;
-import org.semanticweb.elk.reasoner.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 
 /**
  * UI panel for setting preferences for ELK
@@ -63,7 +63,7 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		setLayout(new BorderLayout());
         
 		JPanel numOfWorkersPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        final int numOfWorkers = elkConfig.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS.getName());
+        final int numOfWorkers = elkConfig.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
         nwSpinner = new JSpinner(new SpinnerNumberModel(numOfWorkers, 1, 100, 1));
         numOfWorkersPanel.add(new JLabel("Number of working threads"));
         numOfWorkersPanel.add(nwSpinner);
@@ -92,7 +92,7 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		ProtegeReasonerFactory elkFactory = (ProtegeReasonerFactory) reasonerInfo;
 		ReasonerConfiguration elkConfig = elkFactory.getElkConfiguration();
 		
-		elkConfig.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS.getName(), nwSpinner.getValue().toString());
+		elkConfig.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, nwSpinner.getValue().toString());
 	}
 
 	@Override

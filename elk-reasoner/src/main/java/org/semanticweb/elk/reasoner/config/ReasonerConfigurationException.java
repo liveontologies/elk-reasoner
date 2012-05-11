@@ -23,7 +23,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.config;
 
 /**
  * Thrown if an instance of ELK cannot be created due to misconfiguration
