@@ -125,11 +125,12 @@ public class ElkReasoner implements OWLReasoner {
 		this.manager = ontology.getOWLOntologyManager();
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
 		this.reasoner = new ReasonerFactory().createReasoner(elkConfig);
+		this.elkProgressMonitor = progressMonitor == null ? new DummyProgressMonitor()
+				: new ElkReasonerProgressMonitor(progressMonitor);
+		this.reasoner.setProgressMonitor(this.elkProgressMonitor);
 		this.ontologyChangeListener = new OntologyChangeListener();
 		this.isBufferingMode = isBufferingMode;
 		this.manager.addOntologyChangeListener(ontologyChangeListener);
-		this.elkProgressMonitor = progressMonitor == null ? new DummyProgressMonitor()
-				: new ElkReasonerProgressMonitor(progressMonitor);
 		this.pendingChanges = new ArrayList<OWLOntologyChange>();
 		this.objectFactory = new ElkObjectFactoryImpl();
 		this.owlConverter = OwlConverter.getInstance();

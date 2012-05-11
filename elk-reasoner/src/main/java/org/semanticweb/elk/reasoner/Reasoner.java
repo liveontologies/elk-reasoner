@@ -76,16 +76,19 @@ public class Reasoner {
 	 * Indicates if isConsistent needs to be recomputed due to ontology change
 	 */
 	protected boolean recomputeIsConsistent = true;
-
 	/**
-	 * Class taxonomy of the current ontology
+	 * Class taxonomy of the current ontology, after it was computed.
 	 */
 	protected ClassTaxonomy classTaxonomy;
-
 	/**
 	 * Indicates if classTaxonomy needs to be recomputed due to ontology change
 	 */
 	protected boolean recomputeClassTaxonomy = true;
+
+	/**
+	 * The progress monitor that is used for reporting progress.
+	 */
+	protected ProgressMonitor progressMonitor;
 
 	/**
 	 * Logger for events.
@@ -102,7 +105,26 @@ public class Reasoner {
 	protected Reasoner(ExecutorService executor, int workerNo) {
 		this.executor = executor;
 		this.workerNo = workerNo;
+		this.progressMonitor = new DummyProgressMonitor();
 		reset();
+	}
+
+	/**
+	 * Set the progress monitor that will be used for reporting progress on all
+	 * potentially long-running operations.
+	 * 
+	 * @param progressMonitor
+	 */
+	public void setProgressMonitor(ProgressMonitor progressMonitor) {
+		this.progressMonitor = progressMonitor;
+	}
+
+	/**
+	 * Get the progress monitor that is used for reporting progress on all
+	 * potentially long-running operations.
+	 */
+	public ProgressMonitor getProgressMonitor() {
+		return progressMonitor;
 	}
 
 	/**
@@ -114,6 +136,13 @@ public class Reasoner {
 		invalidate();
 	}
 
+	/**
+	 * Invalidate all previously computed reasoning results. This does not mean
+	 * that the deductions that have been made are deleted. Rather, this method
+	 * would be called if the deductions (and the index in general) have
+	 * changed, and the Reasoner should not rely on its records of earlier
+	 * deductions any longer.
+	 */
 	protected void invalidate() {
 		recomputeIsConsistent = true;
 		recomputeClassTaxonomy = true;
@@ -309,7 +338,7 @@ public class Reasoner {
 		return workerNo;
 	}
 
-	protected void classify(ProgressMonitor progressMonitor) {
+	protected void classify() {
 		// number of indexed classes
 		final int maxIndexedClassCount = ontologyIndex.getIndexedClassCount();
 		// variable used in progress monitors
@@ -356,10 +385,6 @@ public class Reasoner {
 		taxonomyComputation.printStatistics();
 	}
 
-	protected void classify() {
-		classify(new DummyProgressMonitor());
-	}
-
 	protected class TaxonomyComputation extends
 			ConcurrentComputation<IndexedClass> {
 
@@ -385,7 +410,7 @@ public class Reasoner {
 		}
 	}
 
-	public void checkConsistent(ProgressMonitor progressMonitor) {
+	public void checkConsistent() {
 
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
 			isConsistent = true;
@@ -444,10 +469,6 @@ public class Reasoner {
 		Statistics.logOperationFinish("ConsistencyChecking", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 		consistencyChecking.printStatistics();
-	}
-
-	public void checkConsistent() {
-		checkConsistent(new DummyProgressMonitor());
 	}
 
 	protected class ConsistencyChecking extends
