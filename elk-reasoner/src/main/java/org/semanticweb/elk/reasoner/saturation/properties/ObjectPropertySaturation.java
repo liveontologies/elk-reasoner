@@ -68,7 +68,7 @@ public class ObjectPropertySaturation {
 	public void compute() throws InterruptedException {
 		// set up property hierarchy
 		ConcurrentComputation<IndexedPropertyChain> roleHierarchyComputation = new ConcurrentComputation<IndexedPropertyChain>(
-				new RoleHierarchyComputation(), executor, maxWorkers,
+				new RoleHierarchyComputationEngine(), executor, maxWorkers,
 				2 * maxWorkers, 128);
 
 		roleHierarchyComputation.start();
@@ -143,7 +143,7 @@ public class ObjectPropertySaturation {
 			return;
 		
 		ConcurrentComputation<Vector<IndexedPropertyChain>> redundantCompositionsElimination = new ConcurrentComputation<Vector<IndexedPropertyChain>>(
-				new RedundantCompositionsElimination(), executor, maxWorkers,
+				new RedundantCompositionsEliminationEngine(), executor, maxWorkers,
 				2 * maxWorkers, 128);
 		 redundantCompositionsElimination.start();
 		 
@@ -170,7 +170,7 @@ public class ObjectPropertySaturation {
 		redundantCompositionsElimination.waitCompletion();
 	}
 
-	private class RoleHierarchyComputation implements
+	private class RoleHierarchyComputationEngine implements
 			InputProcessor<IndexedPropertyChain> {
 
 		@Override
@@ -221,7 +221,7 @@ public class ObjectPropertySaturation {
 	 * is redundant and is removed
 	 */
 
-	private class RedundantCompositionsElimination implements
+	private class RedundantCompositionsEliminationEngine implements
 			InputProcessor<Vector<IndexedPropertyChain>> {
 
 		@Override

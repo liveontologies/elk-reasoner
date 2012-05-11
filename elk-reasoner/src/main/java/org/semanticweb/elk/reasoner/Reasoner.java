@@ -30,18 +30,16 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingEngine;
+import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyEngine;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
-import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.logging.Statistics;
 
 /**
@@ -385,31 +383,6 @@ public class Reasoner {
 		taxonomyComputation.printStatistics();
 	}
 
-	protected class TaxonomyComputation extends
-			ConcurrentComputation<IndexedClass> {
-
-		final ClassTaxonomyEngine classTaxonomyEngine;
-
-		public TaxonomyComputation(ExecutorService executor, int maxWorkers,
-				ClassTaxonomyEngine classTaxonomyEngine) {
-			super(classTaxonomyEngine, executor, maxWorkers, 8 * maxWorkers, 16);
-			this.classTaxonomyEngine = classTaxonomyEngine;
-		}
-
-		public TaxonomyComputation(ExecutorService executor, int maxWorkers,
-				OntologyIndex ontologyIndex) {
-			this(executor, maxWorkers, new ClassTaxonomyEngine(ontologyIndex));
-		}
-
-		public Taxonomy<ElkClass> getClassTaxonomy() {
-			return classTaxonomyEngine.getClassTaxonomy();
-		}
-
-		public void printStatistics() {
-			classTaxonomyEngine.printStatistics();
-		}
-	}
-
 	public void checkConsistent() {
 
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
@@ -469,33 +442,6 @@ public class Reasoner {
 		Statistics.logOperationFinish("ConsistencyChecking", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 		consistencyChecking.printStatistics();
-	}
-
-	protected class ConsistencyChecking extends
-			ConcurrentComputation<IndexedClassExpression> {
-
-		final ConsistencyCheckingEngine consistencyCheckingEngine;
-
-		public ConsistencyChecking(ExecutorService executor, int maxWorkers,
-				ConsistencyCheckingEngine consistencyCheckingEngine) {
-			super(consistencyCheckingEngine, executor, maxWorkers,
-					8 * maxWorkers, 16);
-			this.consistencyCheckingEngine = consistencyCheckingEngine;
-		}
-
-		public ConsistencyChecking(ExecutorService executor, int maxWorkers,
-				OntologyIndex ontologyIndex) {
-			this(executor, maxWorkers, new ConsistencyCheckingEngine(
-					ontologyIndex));
-		}
-
-		public boolean isConsistent() {
-			return consistencyCheckingEngine.isConsistent();
-		}
-
-		public void printStatistics() {
-			consistencyCheckingEngine.printStatistics();
-		}
 	}
 
 }
