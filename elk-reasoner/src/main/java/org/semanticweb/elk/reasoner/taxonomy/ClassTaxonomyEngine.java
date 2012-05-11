@@ -44,13 +44,14 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * using the method {@link #submit(IndexedClass)}, which require the computation
  * of the {@link Node} for the input {@link IndexedClass}.
  * 
- * @author "Yevgeny Kazakov"
+ * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  */
 public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
-	protected final ConcurrentClassTaxonomy taxonomy;
+	protected final IndividualClassTaxonomy taxonomy;
 	/**
 	 * The transitive reduction engine used in the taxonomy construction
 	 */
@@ -66,18 +67,33 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	protected final AtomicReference<NonBottomNode> topNodeRef = new AtomicReference<NonBottomNode>();
 
 	/**
-	 * Creates a new class taxonomy engine for the input ontology index and a
-	 * listener for executing callback functions.
+	 * Create a new class taxonomy engine for the input ontology index and a
+	 * partially pre-computed taxonomy object. The taxonomy is used to avoid
+	 * computations that have been made before. For this to work, the taxonomy
+	 * object must originate from an earlier run of this engine on the same
+	 * ontology.
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
-	 * @param listener
-	 *            the listener object implementing callback functions
+	 * @param individualClassTaxonomy
+	 *            the (partially pre-computed) class taxonomy object to store
+	 *            results in
 	 */
-	public ClassTaxonomyEngine(OntologyIndex ontologyIndex) {
-		this.taxonomy = new ConcurrentClassTaxonomy();
+	public ClassTaxonomyEngine(OntologyIndex ontologyIndex,
+			IndividualClassTaxonomy individualClassTaxonomy) {
+		this.taxonomy = individualClassTaxonomy;
 		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClass, TransitiveReductionJob<IndexedClass>>(
 				ontologyIndex, new ThisTransitiveReductionListener());
+	}
+
+	/**
+	 * Create a new class taxonomy engine for the input ontology index.
+	 * 
+	 * @param ontologyIndex
+	 *            the ontology index for which the engine is created
+	 */
+	public ClassTaxonomyEngine(OntologyIndex ontologyIndex) {
+		this(ontologyIndex, new ConcurrentClassTaxonomy());
 	}
 
 	@Override
@@ -108,7 +124,7 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 	 * 
 	 * @return the class taxonomy constructed by this engine
 	 */
-	public Taxonomy<ElkClass> getClassTaxonomy() {
+	public IndividualClassTaxonomy getClassTaxonomy() {
 		return this.taxonomy;
 	}
 
@@ -177,7 +193,7 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClass> {
 		@Override
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
-			taxonomy.unsatisfiableClasses.add(output.getRoot().getElkClass());
+			taxonomy.addUnsatisfiableClass(output.getRoot().getElkClass());
 		}
 
 		@Override

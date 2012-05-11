@@ -53,7 +53,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-class ConcurrentClassTaxonomy implements InstanceTaxonomy<ElkClass,ElkIndividual> {
+class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -160,6 +160,10 @@ class ConcurrentClassTaxonomy implements InstanceTaxonomy<ElkClass,ElkIndividual
 				nodeLookup.put(getKey(member), node);
 		}
 		return node;
+	}
+	
+	void addUnsatisfiableClass(ElkClass elkClass) {
+		unsatisfiableClasses.add(elkClass);
 	}
 
 	/**
