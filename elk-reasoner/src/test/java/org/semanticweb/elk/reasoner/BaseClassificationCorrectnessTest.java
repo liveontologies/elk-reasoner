@@ -29,6 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
@@ -87,7 +88,7 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	public void classify() throws TestResultComparisonException {
 		System.err.println(manifest.toString());
 		
-		Taxonomy taxonomy = reasoner.getTaxonomy();
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 		
 		/*try {
 			Writer writer = new OutputStreamWriter(System.out);

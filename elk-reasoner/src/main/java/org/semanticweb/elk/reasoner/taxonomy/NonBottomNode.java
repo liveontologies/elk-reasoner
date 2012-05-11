@@ -236,7 +236,7 @@ public class NonBottomNode implements TaxonomyNode<ElkClass> {
 		} else {
 			Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>(
 					1);
-			result.add(this.taxonomy);
+			result.add(this.taxonomy.bottomNode);
 			return Collections.unmodifiableSet(result);
 		}
 	}
@@ -261,7 +261,7 @@ public class NonBottomNode implements TaxonomyNode<ElkClass> {
 			}
 		} else {
 			result = new ArrayHashSet<TaxonomyNode<ElkClass>>(1);
-			result.add(this.taxonomy);
+			result.add(this.taxonomy.bottomNode);
 		}
 		return Collections.unmodifiableSet(result);
 	}

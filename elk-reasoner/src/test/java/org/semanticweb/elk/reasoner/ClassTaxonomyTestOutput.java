@@ -22,19 +22,20 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
 import org.semanticweb.elk.testing.TestOutput;
 
 public class ClassTaxonomyTestOutput implements TestOutput {
 	
-	private final Taxonomy taxonomy;
+	private final Taxonomy<ElkClass> taxonomy;
 	
-	ClassTaxonomyTestOutput(Taxonomy taxonomy) {
+	ClassTaxonomyTestOutput(Taxonomy<ElkClass> taxonomy) {
 		this.taxonomy = taxonomy;
 	}
 	
-	Taxonomy getTaxonomy() {
+	Taxonomy<ElkClass> getTaxonomy() {
 		return taxonomy;
 	}
 	

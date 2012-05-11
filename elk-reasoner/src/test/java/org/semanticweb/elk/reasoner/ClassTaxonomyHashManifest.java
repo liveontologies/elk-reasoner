@@ -28,18 +28,21 @@ import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
 import org.semanticweb.elk.testing.HashTestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
 
-public class ClassTaxonomyHashManifest extends ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> {
+public class ClassTaxonomyHashManifest extends
+		ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> {
 
 	public ClassTaxonomyHashManifest(URL input, int expHash) {
 		super(input, new HashTestOutput(expHash));
 	}
 
 	@Override
-	public void compare(ClassTaxonomyTestOutput actualOutput) throws TestResultComparisonException {
+	public void compare(ClassTaxonomyTestOutput actualOutput)
+			throws TestResultComparisonException {
 		int actualHash = ClassTaxonomyHasher.hash(actualOutput.getTaxonomy());
-		
+
 		if (actualHash != getExpectedOutput().getHash()) {
-			throw new TestResultComparisonException("Actual taxonomy hash code is not equal to the expected hash code");
+			throw new TestResultComparisonException(
+					"Actual taxonomy hash code is not equal to the expected hash code");
 		}
 	}
 }
