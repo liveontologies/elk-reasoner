@@ -37,40 +37,45 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
  * The main factory to instantiate {@link Reasoner}
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class ReasonerFactory {
 
 	final static Logger LOGGER_ = Logger.getLogger(ReasonerFactory.class);
 	static final String PROPERTY_RESOURCE_NAME = "elk";
-	
+
 	/**
-	 * Creates {@link Reasoner} with the configuration loaded from elk.properties (if exists in the classpath) or the default configuration
+	 * Creates {@link Reasoner} with the configuration loaded from
+	 * elk.properties (if exists in the classpath) or the default configuration
 	 * 
 	 * @return ELK reasoner
 	 */
 	public Reasoner createReasoner() {
 		return createReasoner(loadReasonerConfiguration());
 	}
-	
+
 	/**
-	 *  Creates {@link Reasoner} with the provided configuration
+	 * Creates {@link Reasoner} with the provided configuration
 	 * 
 	 * @param config
 	 * @return ELK reasoner
 	 */
 	public Reasoner createReasoner(ReasonerConfiguration config) {
-		return new Reasoner(Executors.newCachedThreadPool(), config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
+		return new Reasoner(
+				Executors.newCachedThreadPool(),
+				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
 	}
-	
+
 	protected ReasonerConfiguration loadReasonerConfiguration() {
 		// see if there's a property file in the classpath
 		ResourceBundle bundle = null;
 		ReasonerConfiguration config = null;
 
 		try {
-			bundle = ResourceBundle.getBundle(PROPERTY_RESOURCE_NAME, Locale.getDefault(), ReasonerFactory.class.getClassLoader());
+			bundle = ResourceBundle
+					.getBundle(PROPERTY_RESOURCE_NAME, Locale.getDefault(),
+							ReasonerFactory.class.getClassLoader());
 		} catch (MissingResourceException e) {
 		}
 
@@ -80,7 +85,7 @@ public class ReasonerFactory {
 		} else {
 			config = ReasonerConfiguration.createConfiguration(bundle);
 		}
-		
+
 		return config;
 	}
 }
