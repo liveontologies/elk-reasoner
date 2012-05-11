@@ -44,6 +44,7 @@ public interface InstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 	 * Returns the TaxonomyNode containing the given elkObject as a member. Null
 	 * if elkObject does not occur in the taxonomy.
 	 */
+	@Override
 	public TaxonomyInstanceNode<T, I> getNode(T elkObject);
 
 	/**
@@ -51,6 +52,7 @@ public interface InstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 	 * 
 	 * @return an unmodifiable Collection
 	 */
+	@Override
 	public Set<TaxonomyInstanceNode<T, I>> getNodes();
 
 }

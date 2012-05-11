@@ -39,7 +39,7 @@ public interface TaxonomyNode<T extends ElkObject> extends Node<T> {
 	 * 
 	 * @return list of nodes for direct super-objects of this node's members
 	 */
-	public Set<TaxonomyNode<T>> getDirectSuperNodes();
+	public Set<? extends TaxonomyNode<T>> getDirectSuperNodes();
 
 	/**
 	 * Computes an unmodifiable set of nodes for ElkObjects that are (possibly
@@ -49,7 +49,7 @@ public interface TaxonomyNode<T extends ElkObject> extends Node<T> {
 	 * 
 	 * @return set of nodes for sub-objects of this node's members
 	 */
-	public Set<TaxonomyNode<T>> getAllSuperNodes();
+	public Set<? extends TaxonomyNode<T>> getAllSuperNodes();
 
 	/**
 	 * Get an unmodifiable set of nodes for ElkObjects that are direct
@@ -57,7 +57,7 @@ public interface TaxonomyNode<T extends ElkObject> extends Node<T> {
 	 * 
 	 * @return list of nodes for direct sub-objects of this node's members
 	 */
-	public Set<TaxonomyNode<T>> getDirectSubNodes();
+	public Set<? extends TaxonomyNode<T>> getDirectSubNodes();
 
 	/**
 	 * Computes an unmodifiable set of nodes for ElkObjects that are (possibly
@@ -67,7 +67,7 @@ public interface TaxonomyNode<T extends ElkObject> extends Node<T> {
 	 * 
 	 * @return set of nodes for sub-objects of this node's members
 	 */
-	public Set<TaxonomyNode<T>> getAllSubNodes();
+	public Set<? extends TaxonomyNode<T>> getAllSubNodes();
 
 	/**
 	 * Returns the taxonomy to which this node belongs.

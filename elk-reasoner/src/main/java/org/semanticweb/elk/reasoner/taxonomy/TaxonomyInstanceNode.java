@@ -55,5 +55,16 @@ public interface TaxonomyInstanceNode<T extends ElkObject, I extends ElkObject>
 	 * @return list of nodes for instances of this node's members
 	 */
 	public Set<Node<I>> getInstances();
+	
+	@Override
+	public Set<TaxonomyInstanceNode<T,I>> getDirectSuperNodes();
+	@Override
+	public Set<TaxonomyInstanceNode<T,I>> getAllSuperNodes();
+	@Override
+	public Set<TaxonomyInstanceNode<T,I>> getDirectSubNodes();
+	@Override
+	public Set<TaxonomyInstanceNode<T,I>> getAllSubNodes();
+	@Override
+	public InstanceTaxonomy<T,I> getTaxonomy();
 
 }
