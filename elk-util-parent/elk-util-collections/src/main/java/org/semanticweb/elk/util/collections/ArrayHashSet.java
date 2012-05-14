@@ -226,7 +226,10 @@ public class ArrayHashSet<E> implements Set<E> {
 
 	@Override
 	public boolean addAll(Collection<? extends E> c) {
-		throw new UnsupportedOperationException();
+		boolean change = false;
+		for (E element : c)
+			change = add(element) || change; // order is important here
+		return change;
 	}
 
 	@Override

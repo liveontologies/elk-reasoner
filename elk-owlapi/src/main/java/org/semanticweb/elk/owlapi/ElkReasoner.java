@@ -26,7 +26,7 @@
 package org.semanticweb.elk.owlapi;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -458,7 +458,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public Set<InferenceType> getPrecomputableInferenceTypes() {
-		return Collections.singleton(InferenceType.CLASS_HIERARCHY);
+		return new HashSet<InferenceType>(Arrays.asList(InferenceType.CLASS_ASSERTIONS, InferenceType.CLASS_HIERARCHY));
 	}
 
 	@Override
@@ -714,6 +714,9 @@ public class ElkReasoner implements OWLReasoner {
 				} else if (change.isImportChange())
 					isSynced = false;
 			}
+			
+			if (!isBufferingMode)
+				flush();
 		}
 	}
 

@@ -79,13 +79,9 @@ public class Reasoner {
 	protected IndividualClassTaxonomy taxonomy;
 
 	/**
-	 * Indicates if properties have been saturated after ontology change.
+	 * Indicates if the reasoner has been initialized after ontology change.
 	 */
-	protected boolean doneObjectPropertySaturation = false;
-	/**
-	 * Indicates if consistency has been checked after ontology change.
-	 */
-	protected boolean doneConsistencyCheck = false;
+	protected boolean doneInitialization = false;
 	/**
 	 * Indicates if classes have been classified after ontology change.
 	 */
@@ -145,7 +141,7 @@ public class Reasoner {
 		ontologyIndex = new OntologyIndexImpl();
 		// no need to reset contexts since a fresh index starts with empty
 		// contexts
-		invalidate(false);
+		invalidate();
 	}
 
 	/**
@@ -155,16 +151,16 @@ public class Reasoner {
 	 * changed, and the Reasoner should not rely on its records of earlier
 	 * deductions any longer.
 	 */
-	protected void invalidate(boolean resetContexts) {
-		doneObjectPropertySaturation = false;
-		doneConsistencyCheck = false;
-		doneClassTaxonomy = false;
-		doneIndividualTaxonomy = false;
+	protected void invalidate() {
+		if (doneInitialization) {
+			doneInitialization = false;
+			doneClassTaxonomy = false;
+			doneIndividualTaxonomy = false;
 
-		if (resetContexts)
 			for (IndexedClassExpression ice : ontologyIndex
 					.getIndexedClassExpressions())
 				ice.resetContext();
+		}
 	}
 
 	/**
@@ -193,7 +189,7 @@ public class Reasoner {
 	 */
 	public void addAxiom(ElkAxiom axiom) {
 		ontologyIndex.getAxiomInserter().process(axiom);
-		invalidate(true);
+		invalidate();
 	}
 
 	/**
@@ -208,20 +204,24 @@ public class Reasoner {
 	 */
 	public void removeAxiom(ElkAxiom axiom) {
 		ontologyIndex.getAxiomDeleter().process(axiom);
-		invalidate(true);
+		invalidate();
 	}
 
 	/**
-	 * Saturates object properties, if not yet done.
+	 * Initialises reasoning by saturating object properties and checking
+	 * consistency, if not yet done.
 	 */
-	protected void saturateObjectProperties() {
-		if (doneObjectPropertySaturation)
+	protected void initializeReasoning() {
+		if (doneInitialization)
 			return;
 
 		(new ObjectPropertySaturation(executor, workerNo, ontologyIndex))
 				.compute();
+		
+		consistentOntology = (new ConsistencyChecking(executor, workerNo,
+				progressMonitor, ontologyIndex)).checkConsistent();
 
-		doneObjectPropertySaturation = true;
+		doneInitialization = true;
 	}
 
 	/**
@@ -229,15 +229,7 @@ public class Reasoner {
 	 * 
 	 */
 	public boolean isConsistent() {
-		if (doneConsistencyCheck)
-			return consistentOntology;
-
-		saturateObjectProperties();
-
-		consistentOntology = (new ConsistencyChecking(executor, workerNo,
-				progressMonitor, ontologyIndex)).checkConsistent();
-		doneConsistencyCheck = true;
-
+		initializeReasoning();
 		return consistentOntology;
 	}
 
@@ -285,6 +277,7 @@ public class Reasoner {
 		else
 			taxonomy = (new TaxonomyComputation(executor, workerNo,
 					progressMonitor, ontologyIndex).computeTaxonomy(true, true));
+		doneClassTaxonomy = true;
 		doneIndividualTaxonomy = true;
 
 		return taxonomy;

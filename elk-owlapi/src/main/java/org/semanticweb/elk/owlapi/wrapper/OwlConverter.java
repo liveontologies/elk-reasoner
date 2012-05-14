@@ -196,8 +196,9 @@ public class OwlConverter {
 
 	protected static OwlAxiomConverterVisitor OWL_AXIOM_CONVERTER = OwlAxiomConverterVisitor
 			.getInstance();
-	
-	protected static OwlAnnotationAxiomConverterVisitor OWL_ANNOTATION_AXIOM_CONVERTER = OwlAnnotationAxiomConverterVisitor.getInstance();
+
+	protected static OwlAnnotationAxiomConverterVisitor OWL_ANNOTATION_AXIOM_CONVERTER = OwlAnnotationAxiomConverterVisitor
+			.getInstance();
 
 	protected static OwlClassAxiomConverterVisitor OWL_CLASS_AXIOM_CONVERTER = OwlClassAxiomConverterVisitor
 			.getInstance();
@@ -213,8 +214,9 @@ public class OwlConverter {
 
 	protected static OwlObjectPropertyExpressionConverterVisitor OWL_OBJECT_PROPERTY_EXPRESSION_CONVERTER = OwlObjectPropertyExpressionConverterVisitor
 			.getInstance();
-	
-	protected static OwlAnnotationSubjectValueVisitor OWL_ANNOTATION_CONVERTER = OwlAnnotationSubjectValueVisitor.getInstance();
+
+	protected static OwlAnnotationSubjectValueVisitor OWL_ANNOTATION_CONVERTER = OwlAnnotationSubjectValueVisitor
+			.getInstance();
 
 	public ElkAnnotationProperty convert(
 			OWLAnnotationProperty owlAnnotationProperty) {
@@ -231,7 +233,7 @@ public class OwlConverter {
 	public ElkAnnotationAxiom convert(OWLAnnotationAxiom owlAnnotationAxiom) {
 		return owlAnnotationAxiom.accept(OWL_ANNOTATION_AXIOM_CONVERTER);
 	}
-	
+
 	public ElkAssertionAxiom convert(OWLIndividualAxiom owlIndividualAxiom) {
 		return owlIndividualAxiom.accept(OWL_INDIVIDUAL_AXIOM_CONVERTER);
 	}
@@ -318,7 +320,7 @@ public class OwlConverter {
 	public ElkDataOneOf convert(OWLDataOneOf owlDataOneOf) {
 		return new ElkDataOneOfWrap<OWLDataOneOf>(owlDataOneOf);
 	}
-	
+
 	public ElkDataPropertyAssertionAxiom convert(
 			OWLDataPropertyAssertionAxiom owlDataPropertyAssertionAxiom) {
 		return new ElkDataPropertyAssertionAxiomWrap<OWLDataPropertyAssertionAxiom>(
