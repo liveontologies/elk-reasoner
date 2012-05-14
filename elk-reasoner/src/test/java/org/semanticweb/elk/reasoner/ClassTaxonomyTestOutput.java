@@ -28,18 +28,24 @@ import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
 import org.semanticweb.elk.testing.TestOutput;
 
 public class ClassTaxonomyTestOutput implements TestOutput {
-	
+
+	private final boolean consistent;
 	private final Taxonomy<ElkClass> taxonomy;
-	
+
 	ClassTaxonomyTestOutput(Taxonomy<ElkClass> taxonomy) {
+		this.consistent = true;
 		this.taxonomy = taxonomy;
 	}
-	
-	Taxonomy<ElkClass> getTaxonomy() {
-		return taxonomy;
+
+	public ClassTaxonomyTestOutput() {
+		this.consistent = false;
+		this.taxonomy = null;
 	}
-	
+
 	int getHashCode() {
-		return ClassTaxonomyHasher.hash(taxonomy);
+		if (consistent)
+			return ClassTaxonomyHasher.hash(taxonomy);
+		else
+			return 0;
 	}
 }

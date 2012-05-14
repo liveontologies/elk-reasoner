@@ -29,18 +29,19 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
+import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
-import org.semanticweb.elk.util.logging.Statistics;
 
 /**
  * The Reasoner manages an ontology (using an OntologyIndex) and provides
@@ -69,19 +70,28 @@ public class Reasoner {
 	/**
 	 * Consistency flag for the current ontology;
 	 */
-	protected boolean isConsistent;
-	/**
-	 * Indicates if isConsistent needs to be recomputed due to ontology change
-	 */
-	protected boolean recomputeIsConsistent = true;
+	protected boolean consistentOntology;
 	/**
 	 * Class taxonomy of the current ontology, after it was computed.
 	 */
-	protected Taxonomy<ElkClass> classTaxonomy;
+	protected IndividualClassTaxonomy taxonomy;
+
 	/**
-	 * Indicates if classTaxonomy needs to be recomputed due to ontology change
+	 * Indicates if properties have been saturated after ontology change.
 	 */
-	protected boolean recomputeClassTaxonomy = true;
+	protected boolean doneObjectPropertySaturation = false;
+	/**
+	 * Indicates if consistency has been checked after ontology change.
+	 */
+	protected boolean doneConsistencyCheck = false;
+	/**
+	 * Indicates if classes have been classified after ontology change.
+	 */
+	protected boolean doneClassTaxonomy = false;
+	/**
+	 * Indicates if individuals have been classified after ontology change.
+	 */
+	protected boolean doneIndividualTaxonomy = false;
 
 	/**
 	 * The progress monitor that is used for reporting progress.
@@ -131,7 +141,9 @@ public class Reasoner {
 	 */
 	public void reset() {
 		ontologyIndex = new OntologyIndexImpl();
-		invalidate();
+		// no need to reset contexts since a fresh index starts with empty
+		// contexts
+		invalidate(false);
 	}
 
 	/**
@@ -141,9 +153,16 @@ public class Reasoner {
 	 * changed, and the Reasoner should not rely on its records of earlier
 	 * deductions any longer.
 	 */
-	protected void invalidate() {
-		recomputeIsConsistent = true;
-		recomputeClassTaxonomy = true;
+	protected void invalidate(boolean resetContexts) {
+		doneObjectPropertySaturation = false;
+		doneConsistencyCheck = false;
+		doneClassTaxonomy = false;
+		doneIndividualTaxonomy = false;
+
+		if (resetContexts)
+			for (IndexedClassExpression ice : ontologyIndex
+					.getIndexedClassExpressions())
+				ice.resetContext();
 	}
 
 	/**
@@ -172,7 +191,7 @@ public class Reasoner {
 	 */
 	public void addAxiom(ElkAxiom axiom) {
 		ontologyIndex.getAxiomInserter().process(axiom);
-		invalidate();
+		invalidate(true);
 	}
 
 	/**
@@ -187,21 +206,83 @@ public class Reasoner {
 	 */
 	public void removeAxiom(ElkAxiom axiom) {
 		ontologyIndex.getAxiomDeleter().process(axiom);
-		invalidate();
+		invalidate(true);
+	}
+	
+	
+	/**
+	 * Saturates object properties, if not yet done.
+	 */
+	protected void saturateObjectProperties() {
+		if (doneObjectPropertySaturation)
+			return;
+
+		(new ObjectPropertySaturation(executor, workerNo, ontologyIndex))
+				.compute();
+		
+		doneObjectPropertySaturation = true;
 	}
 
+	/**
+	 * Check if the ontology is consistent, that is, satisfiable.
+	 * 
+	 */
+	public boolean isConsistent() {
+		if (doneConsistencyCheck)
+			return consistentOntology;
+		
+		saturateObjectProperties();
+		
+		consistentOntology = (new ConsistencyChecking(executor, workerNo, progressMonitor, ontologyIndex)).checkConsistent();
+		doneConsistencyCheck = true;
+		
+		return consistentOntology;
+	}
+	
 	/**
 	 * Return the inferred taxonomy of the named classes. If this has not been
 	 * computed yet, then it will be computed at this point.
 	 * 
-	 * @return class taxonomy (not null)
+	 * @return class taxonomy
 	 */
-	public Taxonomy<ElkClass> getTaxonomy() {
-		if (recomputeClassTaxonomy) {
-			classify();
-			recomputeClassTaxonomy = false;
-		}
-		return classTaxonomy;
+	public Taxonomy<ElkClass> getTaxonomy() throws InconsistentOntologyException {
+		if (!isConsistent())
+			throw new InconsistentOntologyException();
+		
+		if (doneClassTaxonomy)
+			return taxonomy;
+		
+		taxonomy = (new TaxonomyComputation(executor, workerNo,
+				progressMonitor, ontologyIndex)).computeTaxonomy(true, false);
+		doneClassTaxonomy = true;
+		
+		return taxonomy;
+	}
+
+	/**
+	 * Return the inferred taxonomy of the named classes and named individuals. If this has not been
+	 * computed yet, then it will be computed at this point.
+	 * 
+	 * @return instance taxonomy
+	 */
+	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy() throws InconsistentOntologyException {
+		if (!isConsistent())
+			throw new InconsistentOntologyException();
+		
+		if (doneIndividualTaxonomy)
+			return taxonomy;
+
+		// reuse class taxonomy if already computed
+		if (doneClassTaxonomy)
+			taxonomy = (new TaxonomyComputation(executor, workerNo,
+					progressMonitor, ontologyIndex, taxonomy).computeTaxonomy(
+					false, true));
+		else
+			taxonomy = (new TaxonomyComputation(executor, workerNo,
+					progressMonitor, ontologyIndex).computeTaxonomy(true, true));
+		doneIndividualTaxonomy = true;
+		
+		return taxonomy;
 	}
 
 	/**
@@ -292,17 +373,7 @@ public class Reasoner {
 		}
 	}
 
-	/**
-	 * Check if the ontology is consistent, that is, satisfiable.
-	 * 
-	 */
-	public boolean isConsistent() {
-		if (recomputeIsConsistent) {
-			checkConsistent();
-			recomputeIsConsistent = false;
-		}
-		return isConsistent;
-	}
+
 
 	/**
 	 * Check if the given class expression is satisfiable, that is, if it can
@@ -323,7 +394,7 @@ public class Reasoner {
 					PredefinedElkClass.OWL_NOTHING));
 		} else {
 			throw new UnsupportedOperationException(
-					"ELK does not support consistency checking for unnamed class expressions");
+					"ELK does not currently support satisfiability checking for unnamed class expressions");
 		}
 	}
 
@@ -334,114 +405,6 @@ public class Reasoner {
 	// used for testing
 	int getNumberOfWorkers() {
 		return workerNo;
-	}
-
-	protected void classify() {
-		// number of indexed classes
-		final int maxIndexedClassCount = ontologyIndex.getIndexedClassCount();
-		// variable used in progress monitors
-		int progress;
-
-		// Saturation stage
-		ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
-				executor, workerNo, ontologyIndex);
-
-		TaxonomyComputation taxonomyComputation = new TaxonomyComputation(
-				executor, workerNo, ontologyIndex);
-
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Classification using " + workerNo + " workers");
-		Statistics.logOperationStart("Classification", LOGGER_);
-		progressMonitor.start("Classification");
-
-		try {
-			objectPropertySaturation.compute();
-		} catch (InterruptedException e1) {
-			// FIXME Either document why this is ignored or do something better.
-		}
-
-		progress = 0;
-		taxonomyComputation.start();
-		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
-			try {
-				taxonomyComputation.submit(ic);
-			} catch (InterruptedException e) {
-				// FIXME Either document why this is ignored or do something
-				// better.
-			}
-			progressMonitor.report(++progress, maxIndexedClassCount);
-		}
-		try {
-			taxonomyComputation.waitCompletion();
-		} catch (InterruptedException e) {
-			// FIXME Either document why this is ignored or do something better.
-		}
-		classTaxonomy = taxonomyComputation.getClassTaxonomy();
-		progressMonitor.finish();
-		Statistics.logOperationFinish("Classification", LOGGER_);
-		Statistics.logMemoryUsage(LOGGER_);
-		taxonomyComputation.printStatistics();
-	}
-
-	public void checkConsistent() {
-
-		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
-			isConsistent = true;
-			return;
-		}
-
-		// number of indexed classes
-		final int maxIndexedIndividualCount = ontologyIndex
-				.getIndexedIndividualCount();
-		// variable used in progress monitors
-		int progress;
-
-		// Saturation stage
-		ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
-				executor, workerNo, ontologyIndex);
-
-		ConsistencyChecking consistencyChecking = new ConsistencyChecking(
-				executor, workerNo, ontologyIndex);
-
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Consistency checking  using " + workerNo + " workers");
-		Statistics.logOperationStart("Consistency checking", LOGGER_);
-		progressMonitor.start("Consistency checking");
-
-		try {
-			objectPropertySaturation.compute();
-		} catch (InterruptedException e1) {
-			// FIXME Either document why this is ignored or do something better.
-		}
-
-		progress = 0;
-		consistencyChecking.start();
-		try {
-			consistencyChecking.submit(ontologyIndex.getIndexedOwlThing());
-		} catch (InterruptedException e) {
-			// FIXME Either document why this is ignored or do something
-			// better.
-		}
-
-		for (IndexedIndividual ind : ontologyIndex.getIndexedIndividuals()) {
-			try {
-				consistencyChecking.submit(ind);
-			} catch (InterruptedException e) {
-				// FIXME Either document why this is ignored or do something
-				// better.
-			}
-			progressMonitor.report(++progress, maxIndexedIndividualCount);
-		}
-		try {
-			consistencyChecking.waitCompletion();
-		} catch (InterruptedException e) {
-			// FIXME Either document why this is ignored or do something better.
-		}
-		isConsistent = consistencyChecking.isConsistent();
-		progressMonitor.finish();
-		Statistics.logOperationFinish("ConsistencyChecking", LOGGER_);
-		Statistics.logMemoryUsage(LOGGER_);
-		consistencyChecking.printStatistics();
 	}
 
 }

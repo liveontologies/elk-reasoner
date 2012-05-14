@@ -34,11 +34,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
@@ -63,19 +61,18 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 	/* thread safe map from class IRIs to class nodes */
 	protected final ConcurrentMap<ElkIri, NonBottomClassNode> classNodeLookup;
 	/* thread safe set of all class nodes */
-	protected final Set<TypeNode<ElkClass,ElkNamedIndividual>> classNodes;
+	protected final Set<TypeNode<ElkClass,ElkNamedIndividual>> allClassNodes;
 	/* counts the number of nodes which have non-bottom sub-classes */
 
 	/* thread safe map from class IRIs to individual nodes */
 	protected final ConcurrentMap<ElkIri, IndividualNode> individualNodeLookup;
 	/* thread safe set of all individual nodes */
-	protected final Set<InstanceNode<ElkClass,ElkNamedIndividual>> individualNodes;
+	protected final Set<InstanceNode<ElkClass,ElkNamedIndividual>> allIndividualNodes;
 
 	protected final AtomicInteger countNodesWithSubClasses;
 	/* thread safe set of unsatisfiable classes */
 	protected final Set<ElkClass> unsatisfiableClasses;
 	
-
 	/**
 	 * The bottom node.
 	 */
@@ -83,25 +80,20 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 
 	ConcurrentClassTaxonomy() {
 		this.classNodeLookup = new ConcurrentHashMap<ElkIri, NonBottomClassNode>();
-		this.classNodes = Collections
+		this.allClassNodes = Collections
 				.newSetFromMap(new ConcurrentHashMap<TypeNode<ElkClass,ElkNamedIndividual>, Boolean>());
 		
 		this.individualNodeLookup = new ConcurrentHashMap<ElkIri, IndividualNode>();
-		this.individualNodes = Collections
+		this.allIndividualNodes = Collections
 				.newSetFromMap(new ConcurrentHashMap<InstanceNode<ElkClass,ElkNamedIndividual>, Boolean>());
 		
 		this.bottomClassNode = new BottomClassNode();
-		classNodes.add(this.bottomClassNode);
+		allClassNodes.add(this.bottomClassNode);
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 		this.unsatisfiableClasses = Collections
 				.synchronizedSet(new TreeSet<ElkClass>(
 						Comparators.ELK_CLASS_COMPARATOR));
 		this.unsatisfiableClasses.add(PredefinedElkClass.OWL_NOTHING);
-	}
-
-	@Override
-	public Set<TypeNode<ElkClass,ElkNamedIndividual>> getNodes() {
-		return Collections.unmodifiableSet(classNodes);
 	}
 
 	/**
@@ -114,20 +106,6 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 	}
 
 	/**
-	 * Get non-bottom node assigned to the given {@link ElkClass}, or
-	 * <tt>null</tt> if none is assigned.
-	 * 
-	 * @param elkClass
-	 *            the class for which to find the node non-bottom
-	 * @return the non-bottom node for the given {@link ElkClass}
-	 */
-	protected NonBottomClassNode getNonBottomClassNode(ElkClass elkClass) {
-		return classNodeLookup.get(getKey(elkClass));
-	}
-
-	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-
-	/**
 	 * Obtain a ClassNode object for a given {@link ElkClass}, <tt>null</tt> if
 	 * none assigned
 	 * 
@@ -135,8 +113,8 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 	 * @return ClassNode object for elkClass, possibly still incomplete
 	 */
 	@Override
-	public TypeNode<ElkClass,ElkNamedIndividual> getNode(ElkClass elkClass) {
-		TypeNode<ElkClass,ElkNamedIndividual> result = getNonBottomClassNode(elkClass);
+	public TypeNode<ElkClass,ElkNamedIndividual> getTypeNode(ElkClass elkClass) {
+		NonBottomClassNode result = classNodeLookup.get(getKey(elkClass));
 		if (result != null)
 			return result;
 		if (unsatisfiableClasses.contains(elkClass))
@@ -145,7 +123,38 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 				+ elkClass.getIri().asString());
 		return null;
 	}
+	
+	@Override
+	public InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
+			ElkNamedIndividual individual) {
+		IndividualNode result = individualNodeLookup.get(getKey(individual));
+		if (result == null)
+			LOGGER_.error("No taxonomy node for individual "
+					+ individual.getIri().asString());
+		return null;
+	}
+	
+	@Override
+	public TaxonomyNode<ElkClass> getNode(ElkClass elkClass) {
+		return getTypeNode(elkClass);
+	}
+	
+	@Override
+	public Set<? extends TypeNode<ElkClass,ElkNamedIndividual>> getTypeNodes() {
+		return Collections.unmodifiableSet(allClassNodes);
+	}
+	
+	@Override
+	public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getInstanceNodes() {
+		return Collections.unmodifiableSet(allIndividualNodes);
+	}
 
+	@Override
+	public Set<? extends TaxonomyNode<ElkClass>> getNodes() {
+		return getTypeNodes();
+	}
+	
+	@Override
 	NonBottomClassNode getCreateClassNode(Collection<ElkClass> members) {
 		ElkClass someMember = null;
 		for (ElkClass member : members) {
@@ -165,7 +174,7 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 		if (previous != null)
 			return previous;
 
-		classNodes.add(node);
+		allClassNodes.add(node);
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace(canonical + ": node created");
 		}
@@ -176,26 +185,6 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 		return node;
 	}
 	
-	void addUnsatisfiableClass(ElkClass elkClass) {
-		unsatisfiableClasses.add(elkClass);
-	}
-	
-	
-	@Override
-	public InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
-			ElkNamedIndividual individual) {
-		IndividualNode result = individualNodeLookup.get(getKey(individual));
-		if (result == null)
-			LOGGER_.error("No taxonomy node for individual "
-				+ individual.getIri().asString());
-		return null;
-		}
-
-	@Override
-	public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getInstanceNodes() {
-		return Collections.unmodifiableSet(individualNodes);
-	}
-
 	@Override
 	IndividualNode getCreateIndividualNode(
 			Collection<ElkNamedIndividual> members) {
@@ -208,7 +197,7 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 		if (previous != null)
 			return previous;
 
-		individualNodes.add(node);
+		allIndividualNodes.add(node);
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace(canonical + ": node created");
 		}
@@ -219,7 +208,12 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 		return node;
 	}
 
+	@Override
+	void addUnsatisfiableClass(ElkClass elkClass) {
+		unsatisfiableClasses.add(elkClass);
+	}
 
+	
 
 	/**
 	 * Special implementation for the bottom node in the taxonomy. Instead of
@@ -242,7 +236,7 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 
 		@Override
 		public Set<TypeNode<ElkClass,ElkNamedIndividual>> getDirectSuperNodes() {
-			return Operations.filter(classNodes,
+			return Operations.filter(allClassNodes,
 					new Condition<TaxonomyNode<ElkClass>>() {
 						public boolean holds(TaxonomyNode<ElkClass> element) {
 							return element.getDirectSubNodes().contains(
@@ -253,18 +247,18 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 						 * nodes except the nodes that have no non-bottom
 						 * sub-classes and the bottom node
 						 */
-					}, classNodes.size() - countNodesWithSubClasses.get() - 1);
+					}, allClassNodes.size() - countNodesWithSubClasses.get() - 1);
 		}
 
 		@Override
 		public Set<TypeNode<ElkClass,ElkNamedIndividual>> getAllSuperNodes() {
 			/* all nodes except this one */
-			return Operations.filter(classNodes, new Condition<Object>() {
+			return Operations.filter(allClassNodes, new Condition<Object>() {
 				@Override
 				public boolean holds(Object element) {
 					return element != bottomClassNode;
 				}
-			}, classNodes.size() - 1);
+			}, allClassNodes.size() - 1);
 		}
 
 		@Override

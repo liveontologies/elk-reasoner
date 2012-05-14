@@ -633,10 +633,7 @@ public class ElkReasoner implements OWLReasoner {
 	@Override
 	public boolean isPrecomputed(InferenceType inferenceType) {
 		// TODO Auto-generated method stub
-		if (inferenceType.equals(InferenceType.CLASS_HIERARCHY))
-			return reasoner.getTaxonomy() != null;
-		else
-			return false;
+		return false;
 	}
 
 	@Override
@@ -645,7 +642,8 @@ public class ElkReasoner implements OWLReasoner {
 			ClassExpressionNotInProfileException, FreshEntitiesException,
 			InconsistentOntologyException {
 		try {
-			return reasoner.isSatisfiable(owlConverter.convert(classExpression));
+			return reasoner
+					.isSatisfiable(owlConverter.convert(classExpression));
 		} catch (org.semanticweb.elk.reasoner.FreshEntitiesException e) {
 			throw convertFreshEntitiesException(e);
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
@@ -661,7 +659,11 @@ public class ElkReasoner implements OWLReasoner {
 			if (inferenceType.equals(InferenceType.CLASS_HIERARCHY)) {
 				syncOntology();
 				reloadChanges();
-				reasoner.getTaxonomy();
+				try {
+					reasoner.getTaxonomy();
+				} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
+					throw new InconsistentOntologyException();
+				}
 			}
 		}
 	}

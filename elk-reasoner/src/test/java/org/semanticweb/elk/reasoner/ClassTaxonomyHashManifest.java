@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner;
 
 import java.net.URL;
 
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
 import org.semanticweb.elk.testing.HashTestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
 
@@ -38,7 +37,7 @@ public class ClassTaxonomyHashManifest extends
 	@Override
 	public void compare(ClassTaxonomyTestOutput actualOutput)
 			throws TestResultComparisonException {
-		int actualHash = ClassTaxonomyHasher.hash(actualOutput.getTaxonomy());
+		int actualHash = actualOutput.getHashCode();
 
 		if (actualHash != getExpectedOutput().getHash()) {
 			throw new TestResultComparisonException(

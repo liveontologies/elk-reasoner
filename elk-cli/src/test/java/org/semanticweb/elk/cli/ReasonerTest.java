@@ -61,8 +61,8 @@ public class ReasonerTest {
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
 	@Test
-	public void testExistentials() throws InterruptedException,
-			ExecutionException, Owl2ParseException, IOException {
+	public void testExistentials() throws Owl2ParseException, IOException,
+			InconsistentOntologyException {
 
 		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString(""//
@@ -102,8 +102,7 @@ public class ReasonerTest {
 	}
 
 	@Test
-	public void testConjunctions() throws InterruptedException,
-			ExecutionException, Owl2ParseException, IOException,
+	public void testConjunctions() throws Owl2ParseException, IOException,
 			FreshEntitiesException, InconsistentOntologyException {
 
 		final IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
@@ -185,8 +184,8 @@ public class ReasonerTest {
 	}
 
 	@Test
-	public void testBottom() throws InterruptedException, ExecutionException,
-			Owl2ParseException, IOException {
+	public void testBottom() throws Owl2ParseException, IOException,
+			InconsistentOntologyException {
 
 		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString(""//
@@ -216,8 +215,8 @@ public class ReasonerTest {
 	}
 
 	@Test
-	public void testDisjoint() throws InterruptedException, ExecutionException,
-			Owl2ParseException, IOException {
+	public void testDisjoint() throws Owl2ParseException, IOException,
+			InconsistentOntologyException {
 
 		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString(""//
@@ -246,8 +245,8 @@ public class ReasonerTest {
 		assertNotSame("C satisfiable", bottom, taxonomy.getNode(c));
 	}
 
-	public void testDisjointSelf() throws InterruptedException,
-			ExecutionException, Owl2ParseException, IOException {
+	public void testDisjointSelf() throws Owl2ParseException, IOException,
+			InconsistentOntologyException {
 
 		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString(""//
@@ -275,8 +274,7 @@ public class ReasonerTest {
 		assertSame("C unsatisfiable", bottom, taxonomy.getNode(c));
 	}
 
-	public void testReflexiveRole() throws InterruptedException,
-			ExecutionException, Owl2ParseException, IOException,
+	public void testReflexiveRole() throws Owl2ParseException, IOException,
 			FreshEntitiesException, InconsistentOntologyException {
 
 		IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
@@ -312,9 +310,8 @@ public class ReasonerTest {
 	}
 
 	@Test
-	public void testAncestors() throws InterruptedException,
-			ExecutionException, Owl2ParseException, IOException,
-			FreshEntitiesException, InconsistentOntologyException {
+	public void testAncestors() throws Owl2ParseException, IOException,
+			InconsistentOntologyException, FreshEntitiesException {
 
 		final IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
 		ioReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
@@ -374,8 +371,8 @@ public class ReasonerTest {
 	}
 
 	@Test
-	public void testTop() throws InterruptedException, ExecutionException,
-			Owl2ParseException, IOException {
+	public void testTop() throws ExecutionException, Owl2ParseException,
+			IOException, InconsistentOntologyException {
 
 		final IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
 		ioReasoner.loadOntologyFromString(""//
@@ -463,8 +460,8 @@ public class ReasonerTest {
 	}
 
 	@Test
-	public void testInconsistent() throws InterruptedException,
-			ExecutionException, Owl2ParseException, IOException {
+	public void testInconsistent() throws ExecutionException,
+			Owl2ParseException, IOException {
 
 		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
 		IOReasoner.loadOntologyFromString(""
@@ -477,14 +474,9 @@ public class ReasonerTest {
 				+ "SubClassOf(:C ObjectSomeValuesFrom(:T :B))"
 				+ "ObjectPropertyDomain(:T owl:Nothing)" + ")");
 
-		Taxonomy<ElkClass> taxonomy = IOReasoner.getTaxonomy();
+		boolean consistent = IOReasoner.isConsistent();
 
-		Node<ElkClass> thing = taxonomy.getNode(PredefinedElkClass.OWL_THING);
-		Node<ElkClass> nothing = taxonomy
-				.getNode(PredefinedElkClass.OWL_NOTHING);
-
-		assertEquals(nothing.getMembers(), thing.getMembers());
-		assertSame(nothing.getCanonicalMember(), thing.getCanonicalMember());
+		assertFalse(consistent);
 	}
 
 	class TestElkClass implements ElkClass {

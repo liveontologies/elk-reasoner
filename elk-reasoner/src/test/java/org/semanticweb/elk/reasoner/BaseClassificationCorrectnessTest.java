@@ -88,7 +88,13 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	public void classify() throws TestResultComparisonException {
 		System.err.println(manifest.toString());
 		
-		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+		Taxonomy<ElkClass> taxonomy;
+		try {
+			taxonomy = reasoner.getTaxonomy();
+			manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
+		} catch (InconsistentOntologyException e) {
+			manifest.compare(new ClassTaxonomyTestOutput());
+		}
 		
 		/*try {
 			Writer writer = new OutputStreamWriter(System.out);
@@ -96,6 +102,6 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 			writer.flush();
 		} catch (IOException e) {}*/
 		
-		manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
+
 	}
 }

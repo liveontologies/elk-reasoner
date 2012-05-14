@@ -56,7 +56,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
+public class TaxonomyComputationEngine implements InputProcessor<IndexedClassEntity> {
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
@@ -84,13 +84,13 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
-	 * @param individualClassTaxonomy
+	 * @param partialTaxonomy
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
-	public ClassTaxonomyEngine(OntologyIndex ontologyIndex,
-			IndividualClassTaxonomy individualClassTaxonomy) {
-		this.taxonomy = individualClassTaxonomy;
+	public TaxonomyComputationEngine(OntologyIndex ontologyIndex,
+			IndividualClassTaxonomy partialTaxonomy) {
+		this.taxonomy = partialTaxonomy;
 		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>(
 				ontologyIndex, new ThisTransitiveReductionListener());
 	}
@@ -101,7 +101,7 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
 	 */
-	public ClassTaxonomyEngine(OntologyIndex ontologyIndex) {
+	public TaxonomyComputationEngine(OntologyIndex ontologyIndex) {
 		this(ontologyIndex, new ConcurrentClassTaxonomy());
 	}
 
