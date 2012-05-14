@@ -134,7 +134,7 @@ public class NonBottomClassNode implements
 	 * @param instanceNode
 	 *            node to add
 	 */
-	void addInstanceNode(InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
+	void addDirectInstanceNode(InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct instance " + instanceNode);
 		directInstanceNodes.add(instanceNode);

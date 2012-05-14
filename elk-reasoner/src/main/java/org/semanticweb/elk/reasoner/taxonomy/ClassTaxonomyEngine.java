@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -42,6 +43,11 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfi
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
+/*
+ * TODO: current implementation does not support equivalent individuals,
+ * i.e. assumes that all individual nodes are singletons
+ */
+
 /**
  * The engine for constructing of the {@link Taxonomy}. The jobs are submitted
  * using the method {@link #submit(IndexedClass)}, which require the computation
@@ -60,12 +66,10 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
 	 */
 	protected final TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>> transitiveReductionEngine;
 	/**
-	 * The objects creating or update the nodes from the result of the transitive
-	 * reduction
+	 * The objects creating or update the nodes from the result of the
+	 * transitive reduction
 	 */
 	protected final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
-	protected final SatisfiableOutputProcessor satisfiableOutputProcessor = new SatisfiableOutputProcessor();
-	protected final UnsatisfiableOutputProcessor unsatisfiableOutputProcessor = new UnsatisfiableOutputProcessor();
 	/**
 	 * The reference to cache the value of the top node for frequent use
 	 */
@@ -102,7 +106,8 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
 	}
 
 	@Override
-	public final void submit(IndexedClassEntity job) throws InterruptedException {
+	public final void submit(IndexedClassEntity job)
+			throws InterruptedException {
 		transitiveReductionEngine
 				.submit(new TransitiveReductionJob<IndexedClassEntity>(job));
 	}
@@ -148,7 +153,8 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
 		}
 
 		@Override
-		public void notifyFinished(TransitiveReductionJob<IndexedClassEntity> job)
+		public void notifyFinished(
+				TransitiveReductionJob<IndexedClassEntity> job)
 				throws InterruptedException {
 			job.getOutput().accept(outputProcessor);
 		}
@@ -158,47 +164,29 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
 	/**
 	 * The class for processing the finished transitive reduction jobs. It
 	 * implements the visitor pattern for
-	 * {@link TransitiveReductionOutputVisitor<IndexedClass>}.
+	 * {@link TransitiveReductionOutputVisitor<IndexedClassEntity>}.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
 	class TransitiveReductionOutputProcessor implements
 			TransitiveReductionOutputVisitor<IndexedClassEntity> {
+
 		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClassEntity> output) {
-			NonBottomClassNode node = taxonomy.getCreate(output.getEquivalent());
-			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
-					.getDirectSuperClasses()) {
-				NonBottomClassNode superNode = taxonomy
-						.getCreate(directSuperEquivalent.getEquivalent());
-				assignDirectSuperClassNode(node, superNode);
-			}
-			// if there are no direct super nodes, then the top node is the only
-			// direct super node
-			if (node.getDirectSuperNodes().isEmpty()) {
-				NonBottomClassNode topNode = topNodeRef.get();
-				if (topNode == null) {
-					if (node.getMembers()
-							.contains(PredefinedElkClass.OWL_THING))
-						topNode = node;
-					else {
-						List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
-						topMembers.add(PredefinedElkClass.OWL_THING);
-						topNode = taxonomy.getCreate(topMembers);
-					}
-					topNodeRef.set(topNode);
-				}
-				if (node != topNode)
-					assignDirectSuperClassNode(node, topNode);
-			}
+
+			SatisfiableOutputProcessor processor = new SatisfiableOutputProcessor(
+					output);
+			output.getRoot().accept(processor);
 		}
 
 		@Override
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClassEntity> output) {
-			taxonomy.addUnsatisfiableClass(((IndexedClass) output.getRoot()).getElkClass());
+
+			UnsatisfiableOutputProcessor processor = new UnsatisfiableOutputProcessor();
+			output.getRoot().accept(processor);
 		}
 
 		@Override
@@ -206,38 +194,108 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
 				TransitiveReductionOutputEquivalent<IndexedClassEntity> output) {
 			throw new IllegalArgumentException();
 		}
+
 	}
-	
+
 	class SatisfiableOutputProcessor implements IndexedClassEntityVisitor<Void> {
 
+		private final TransitiveReductionOutputEquivalentDirect<IndexedClassEntity> output;
+
+		public SatisfiableOutputProcessor(
+				TransitiveReductionOutputEquivalentDirect<IndexedClassEntity> output) {
+			this.output = output;
+		}
+
 		@Override
-		public Void visit(IndexedClass element) {
-			// TODO Auto-generated method stub
+		public Void visit(IndexedClass root) {
+
+			NonBottomClassNode node = taxonomy.getCreateClassNode(output
+					.getEquivalent());
+
+			// FIXME this sort of equality check is not guaranteed to work
+			// for
+			// ElkClasses
+			if (node.getMembers().contains(PredefinedElkClass.OWL_THING)) {
+				topNodeRef.compareAndSet(null, node);
+				return null;
+			}
+
+			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
+					.getDirectSuperClasses()) {
+				NonBottomClassNode superNode = taxonomy
+						.getCreateClassNode(directSuperEquivalent
+								.getEquivalent());
+				assignDirectSuperClassNode(node, superNode);
+			}
+			// if there are no direct super nodes, then the top node is the
+			// only direct super node
+			if (node.getDirectSuperNodes().isEmpty()) {
+				NonBottomClassNode topNode = getCreateTopNode();
+				assignDirectSuperClassNode(node, topNode);
+			}
+
 			return null;
 		}
 
 		@Override
-		public Void visit(IndexedIndividual element) {
-			// TODO Auto-generated method stub
+		public Void visit(IndexedIndividual root) {
+			// only supports singleton individuals
+			IndividualNode node = taxonomy.getCreateIndividualNode(Collections
+					.singleton(root.getElkNamedIndividual()));
+
+			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
+					.getDirectSuperClasses()) {
+				NonBottomClassNode superNode = taxonomy
+						.getCreateClassNode(directSuperEquivalent
+								.getEquivalent());
+				assignDirectTypeNode(node, superNode);
+			}
+			// if there are no direct type nodes, then the top node is the
+			// only direct type node
+			if (node.getDirectTypeNodes().isEmpty()) {
+				NonBottomClassNode topNode = getCreateTopNode();
+				assignDirectTypeNode(node, topNode);
+			}
+
 			return null;
 		}
-		
 	}
-	
-	class UnsatisfiableOutputProcessor implements IndexedClassEntityVisitor<Void> {
+
+	class UnsatisfiableOutputProcessor implements
+			IndexedClassEntityVisitor<Void> {
 
 		@Override
-		public Void visit(IndexedClass element) {
-			// TODO Auto-generated method stub
+		public Void visit(IndexedClass root) {
+			taxonomy.addUnsatisfiableClass(root.getElkClass());
 			return null;
 		}
 
 		@Override
 		public Void visit(IndexedIndividual element) {
-			// TODO Auto-generated method stub
-			return null;
+			// the ontology is inconsistent, this should have been checked
+			// earlier
+			throw new RuntimeException(
+					"Inconsistent ontology found during taxonomy construction.");
 		}
-		
+	}
+
+	/**
+	 * This function is called only when some (non-top) nodes have no direct
+	 * parents. This can happen only when owl:Thing does not occur negatively in
+	 * the ontology, so that owl:Thing is not explicitly derived as a superclass
+	 * of each class. Under these conditions, it is safe to create a singleton
+	 * top node.
+	 * 
+	 */
+	NonBottomClassNode getCreateTopNode() {
+		if (topNodeRef.get() == null) {
+			List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
+			topMembers.add(PredefinedElkClass.OWL_THING);
+			NonBottomClassNode topNode = taxonomy
+					.getCreateClassNode(topMembers);
+			topNodeRef.compareAndSet(null, topNode);
+		}
+		return topNodeRef.get();
 	}
 
 	/**
@@ -259,6 +317,28 @@ public class ClassTaxonomyEngine implements InputProcessor<IndexedClassEntity> {
 		 */
 		synchronized (superNode) {
 			superNode.addDirectSubNode(subNode);
+		}
+	}
+
+	/**
+	 * Connecting the given pair of nodes in instance/type-node relation. The
+	 * method should not be called concurrently for the same first argument.
+	 * 
+	 * @param instanceNode
+	 *            the node that should be the sub-node of the second node
+	 * 
+	 * @param typeNode
+	 *            the node that should be the super-node of the first node
+	 */
+	static void assignDirectTypeNode(IndividualNode instanceNode,
+			NonBottomClassNode typeNode) {
+		instanceNode.addDirectTypeNode(typeNode);
+		/*
+		 * since type-nodes can be added from different nodes, this call should
+		 * be synchronized
+		 */
+		synchronized (typeNode) {
+			typeNode.addDirectInstanceNode(instanceNode);
 		}
 	}
 

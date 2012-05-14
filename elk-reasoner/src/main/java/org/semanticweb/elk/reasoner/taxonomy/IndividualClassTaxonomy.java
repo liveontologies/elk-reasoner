@@ -39,7 +39,9 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 public abstract class IndividualClassTaxonomy implements
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> {
 
-	abstract NonBottomClassNode getCreate(Collection<ElkClass> members);
+	abstract NonBottomClassNode getCreateClassNode(Collection<ElkClass> members);
+	
+	abstract IndividualNode getCreateIndividualNode(Collection<ElkNamedIndividual> members);
 
 	abstract void addUnsatisfiableClass(ElkClass elkClass);
 }
