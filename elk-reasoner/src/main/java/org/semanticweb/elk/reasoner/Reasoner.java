@@ -37,11 +37,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
 import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
 
 /**
  * The Reasoner manages an ontology (using an OntologyIndex) and provides
@@ -208,8 +210,7 @@ public class Reasoner {
 		ontologyIndex.getAxiomDeleter().process(axiom);
 		invalidate(true);
 	}
-	
-	
+
 	/**
 	 * Saturates object properties, if not yet done.
 	 */
@@ -219,7 +220,7 @@ public class Reasoner {
 
 		(new ObjectPropertySaturation(executor, workerNo, ontologyIndex))
 				.compute();
-		
+
 		doneObjectPropertySaturation = true;
 	}
 
@@ -230,45 +231,49 @@ public class Reasoner {
 	public boolean isConsistent() {
 		if (doneConsistencyCheck)
 			return consistentOntology;
-		
+
 		saturateObjectProperties();
-		
-		consistentOntology = (new ConsistencyChecking(executor, workerNo, progressMonitor, ontologyIndex)).checkConsistent();
+
+		consistentOntology = (new ConsistencyChecking(executor, workerNo,
+				progressMonitor, ontologyIndex)).checkConsistent();
 		doneConsistencyCheck = true;
-		
+
 		return consistentOntology;
 	}
-	
+
 	/**
 	 * Return the inferred taxonomy of the named classes. If this has not been
 	 * computed yet, then it will be computed at this point.
 	 * 
 	 * @return class taxonomy
 	 */
-	public Taxonomy<ElkClass> getTaxonomy() throws InconsistentOntologyException {
+	public Taxonomy<ElkClass> getTaxonomy()
+			throws InconsistentOntologyException {
 		if (!isConsistent())
 			throw new InconsistentOntologyException();
-		
+
 		if (doneClassTaxonomy)
 			return taxonomy;
-		
+
 		taxonomy = (new TaxonomyComputation(executor, workerNo,
 				progressMonitor, ontologyIndex)).computeTaxonomy(true, false);
 		doneClassTaxonomy = true;
-		
+
 		return taxonomy;
 	}
 
 	/**
-	 * Return the inferred taxonomy of the named classes and named individuals. If this has not been
-	 * computed yet, then it will be computed at this point.
+	 * Return the inferred taxonomy of the named classes and named individuals.
+	 * If this has not been computed yet, then it will be computed at this
+	 * point.
 	 * 
 	 * @return instance taxonomy
 	 */
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy() throws InconsistentOntologyException {
+	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
+			throws InconsistentOntologyException {
 		if (!isConsistent())
 			throw new InconsistentOntologyException();
-		
+
 		if (doneIndividualTaxonomy)
 			return taxonomy;
 
@@ -281,21 +286,57 @@ public class Reasoner {
 			taxonomy = (new TaxonomyComputation(executor, workerNo,
 					progressMonitor, ontologyIndex).computeTaxonomy(true, true));
 		doneIndividualTaxonomy = true;
-		
+
 		return taxonomy;
 	}
 
 	/**
-	 * Helper method to get a suitable node from the taxonomy.
+	 * Helper method to get a taxonomy node node from the taxonomy.
 	 * 
 	 * @param elkClass
 	 * @return
 	 * @throws FreshEntitiesException
 	 * @throws InconsistentOntologyException
 	 */
-	protected TaxonomyNode<ElkClass> getTaxonomyClassNode(ElkClass elkClass)
+	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
 			throws FreshEntitiesException, InconsistentOntologyException {
 		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
+		if (node == null)
+			throw new FreshEntitiesException(elkClass);
+		return node;
+	}
+
+	/**
+	 * Helper method to get an instance node node from the taxonomy.
+	 * 
+	 * @param elkNamedIndividual
+	 * @return
+	 * @throws FreshEntitiesException
+	 * @throws InconsistentOntologyException
+	 */
+	protected InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
+			ElkNamedIndividual elkNamedIndividual)
+			throws FreshEntitiesException, InconsistentOntologyException {
+		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
+				.getInstanceNode(elkNamedIndividual);
+		if (node == null)
+			throw new FreshEntitiesException(elkNamedIndividual);
+		return node;
+	}
+
+	/**
+	 * Helper method to get a type node node from the taxonomy.
+	 * 
+	 * @param elkClass
+	 * @return
+	 * @throws FreshEntitiesException
+	 * @throws InconsistentOntologyException
+	 */
+	protected TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(
+			ElkClass elkClass) throws FreshEntitiesException,
+			InconsistentOntologyException {
+		TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
+				.getTypeNode(elkClass);
 		if (node == null)
 			throw new FreshEntitiesException(elkClass);
 		return node;
@@ -314,12 +355,12 @@ public class Reasoner {
 	 */
 	public Node<ElkClass> getClassNode(ElkClass elkClass)
 			throws FreshEntitiesException, InconsistentOntologyException {
-		return getTaxonomyClassNode(elkClass);
+		return getTaxonomyNode(elkClass);
 	}
 
 	/**
 	 * Return the (direct or indirect) subclasses of the given
-	 * {@link ElkClassExpression}. The method returns a set of ClassNodes from,
+	 * {@link ElkClassExpression}. The method returns a set of Node<ElkClass>,
 	 * each of which might represent multiple equivalent classes. In theory,
 	 * this method does not require the whole taxonomy to be constructed, and
 	 * the result does not provide (indirect) access to a taxonomy object.
@@ -328,7 +369,6 @@ public class Reasoner {
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
 	 *            if true, only direct subclasses are returned
-	 * @return a set of ClassNodes
 	 * @throws FreshEntitiesException
 	 * @throws InconsistentOntologyException
 	 */
@@ -336,27 +376,25 @@ public class Reasoner {
 			ElkClassExpression classExpression, boolean direct)
 			throws FreshEntitiesException, InconsistentOntologyException {
 		if (classExpression instanceof ElkClass) {
-			TaxonomyNode<ElkClass> ceClassNode = getTaxonomyClassNode((ElkClass) classExpression);
-			return (direct) ? ceClassNode.getDirectSubNodes() : ceClassNode
-					.getAllSubNodes();
+			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
+			return (direct) ? node.getDirectSubNodes() : node.getAllSubNodes();
 		} else { // TODO: complex class expressions currently not supported
 			throw new UnsupportedOperationException(
-					"ELK does not support the retrieval of subclasses for unnamed class expressions.");
+					"ELK does not support retrieval of superclasses for unnamed class expressions.");
 		}
 	}
 
 	/**
 	 * Return the (direct or indirect) superclasses of the given
-	 * {@link ElkClassExpression}. The method returns a set of ClassNodes, each
-	 * of which might represent multiple equivalent classes. In theory, this
-	 * method does not require the whole taxonomy to be constructed, and the
-	 * result does not provide (indirect) access to a taxonomy object.
+	 * {@link ElkClassExpression}. The method returns a set of Node<ElkClass>,
+	 * each of which might represent multiple equivalent classes. In theory,
+	 * this method does not require the whole taxonomy to be constructed, and
+	 * the result does not provide (indirect) access to a taxonomy object.
 	 * 
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
-	 *            if true, only direct subclasses are returned
-	 * @return a set of ClassNodes
+	 *            if true, only direct superclasses are returned
 	 * @throws FreshEntitiesException
 	 * @throws InconsistentOntologyException
 	 */
@@ -364,16 +402,62 @@ public class Reasoner {
 			ElkClassExpression classExpression, boolean direct)
 			throws FreshEntitiesException, InconsistentOntologyException {
 		if (classExpression instanceof ElkClass) {
-			TaxonomyNode<ElkClass> ceClassNode = getTaxonomyClassNode((ElkClass) classExpression);
-			return (direct) ? ceClassNode.getDirectSuperNodes() : ceClassNode
+			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
+			return (direct) ? node.getDirectSuperNodes() : node
 					.getAllSuperNodes();
 		} else { // TODO: complex class expressions currently not supported
 			throw new UnsupportedOperationException(
-					"ELK does not support the retrieval of subclasses for unnamed class expressions.");
+					"ELK does not support retrieval of superclasses for unnamed class expressions.");
 		}
 	}
 
+	/**
+	 * Return the (direct or indirect) instances of the given
+	 * {@link ElkClassExpression}. The method returns a set of
+	 * Node<ElkNamedIndividual>, each of which might represent multiple
+	 * equivalent classes. In theory, this method does not require the whole
+	 * taxonomy to be constructed, and the result does not provide (indirect)
+	 * access to a taxonomy object.
+	 * 
+	 * @param classExpression
+	 *            currently, only objects of type ElkClass are supported
+	 * @param direct
+	 *            if true, only direct subclasses are returned
+	 * @throws FreshEntitiesException
+	 * @throws InconsistentOntologyException
+	 */
+	public Set<? extends Node<ElkNamedIndividual>> getInstances(
+			ElkClassExpression classExpression, boolean direct)
+			throws FreshEntitiesException, InconsistentOntologyException {
+		if (classExpression instanceof ElkClass) {
+			TypeNode<ElkClass, ElkNamedIndividual> node = getTypeNode((ElkClass) classExpression);
+			return direct ? node.getDirectInstanceNodes() : node
+					.getAllInstanceNodes();
+		} else { // TODO: complex class expressions currently not supported
+			throw new UnsupportedOperationException(
+					"ELK does not support retrieval of instances for unnamed class expressions.");
+		}
+	}
 
+	/**
+	 * Return the (direct or indirect) types of the given
+	 * {@link ElkNamedIndividual}. The method returns a set of Node<ElkClass>,
+	 * each of which might represent multiple equivalent classes. In theory,
+	 * this method does not require the whole taxonomy to be constructed, and
+	 * the result does not provide (indirect) access to a taxonomy object.
+	 * 
+	 * @param elkNamedIndividual
+	 * @param direct
+	 *            if true, only direct types are returned
+	 * @throws FreshEntitiesException
+	 * @throws InconsistentOntologyException
+	 */
+	public Set<? extends Node<ElkClass>> getTypes(
+			ElkNamedIndividual elkNamedIndividual, boolean direct)
+			throws FreshEntitiesException, InconsistentOntologyException {
+		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceNode(elkNamedIndividual);
+		return direct ? node.getDirectTypeNodes() : node.getAllTypeNodes();
+	}
 
 	/**
 	 * Check if the given class expression is satisfiable, that is, if it can
@@ -394,7 +478,7 @@ public class Reasoner {
 					PredefinedElkClass.OWL_NOTHING));
 		} else {
 			throw new UnsupportedOperationException(
-					"ELK does not currently support satisfiability checking for unnamed class expressions");
+					"ELK does not support satisfiability checking for unnamed class expressions");
 		}
 	}
 

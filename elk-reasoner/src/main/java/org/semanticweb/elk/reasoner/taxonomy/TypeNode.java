@@ -47,7 +47,7 @@ public interface TypeNode<T extends ElkObject, I extends ElkObject>
 	 * 
 	 * @return list of nodes for direct instances of this node's members
 	 */
-	public Set<InstanceNode<T, I>> getDirectInstanceNodes();
+	public Set<? extends InstanceNode<T, I>> getDirectInstanceNodes();
 
 	/**
 	 * Get an unmodifiable set of nodes for ElkObjects that are (possibly
@@ -55,7 +55,7 @@ public interface TypeNode<T extends ElkObject, I extends ElkObject>
 	 * 
 	 * @return list of nodes for instances of this node's members
 	 */
-	public Set<InstanceNode<T, I>> getAllInstanceNodes();
+	public Set<? extends InstanceNode<T, I>> getAllInstanceNodes();
 	
 	@Override
 	public Set<TypeNode<T,I>> getDirectSuperNodes();

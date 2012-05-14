@@ -34,6 +34,8 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 
 /**
  * Converter from ElkEntities to OWL API entities.
@@ -81,15 +83,15 @@ public final class ElkEntityConverter implements
 	}
 
 	@Override
-	public OWLEntity visit(ElkNamedIndividual elkNamedIndividual) {
-		// TODO Auto-generated method stub
-		return null;
+	public OWLNamedIndividual visit(ElkNamedIndividual elkNamedIndividual) {
+		String iri = elkNamedIndividual.getIri().asString();
+		return owlDataFactory.getOWLNamedIndividual(IRI.create(iri));
 	}
 
 	@Override
-	public OWLEntity visit(ElkObjectProperty elkObjectProperty) {
-		// TODO Auto-generated method stub
-		return null;
+	public OWLObjectProperty visit(ElkObjectProperty elkObjectProperty) {
+		String iri = elkObjectProperty.getIri().asString();
+		return owlDataFactory.getOWLObjectProperty(IRI.create(iri));
 	}
 
 }
