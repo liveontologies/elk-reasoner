@@ -135,6 +135,8 @@ public class ElkReasoner implements OWLReasoner {
 		this.objectFactory = new ElkObjectFactoryImpl();
 		this.owlConverter = OwlConverter.getInstance();
 		this.elkConverter = ElkConverter.getInstance();
+		
+		flush();
 	}
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
@@ -632,8 +634,12 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public boolean isPrecomputed(InferenceType inferenceType) {
-		// TODO Auto-generated method stub
-		return false;
+		if (inferenceType.equals(InferenceType.CLASS_HIERARCHY))
+			// TODO: Needs another method in the Reasoner.
+			// TODO: This does not flush(); is this correct?
+			return false;
+		else
+			return false;
 	}
 
 	@Override
@@ -657,8 +663,6 @@ public class ElkReasoner implements OWLReasoner {
 			InconsistentOntologyException {
 		for (InferenceType inferenceType : inferenceTypes) {
 			if (inferenceType.equals(InferenceType.CLASS_HIERARCHY)) {
-				syncOntology();
-				reloadChanges();
 				try {
 					reasoner.getTaxonomy();
 				} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
