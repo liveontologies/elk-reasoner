@@ -56,6 +56,7 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
  * An abstract class for indexing axioms. Its purpose is to reduce many
@@ -111,9 +112,9 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			elkAxiom.accept(this);
 		} catch (RuntimeException e) {
 			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn("Axiom ignored: "
+				LOGGER_.warn(new ElkMessage("Axiom ignored: "
 						+ OwlFunctionalStylePrinter.toString(elkAxiom) + " : "
-						+ e.getMessage());
+						+ e.getMessage(),"reasoner.indexing.hierarchy.axiomIgnored"));
 		}
 	}
 
