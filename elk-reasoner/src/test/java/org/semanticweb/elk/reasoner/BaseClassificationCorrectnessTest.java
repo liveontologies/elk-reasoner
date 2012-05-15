@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -33,6 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
 import org.semanticweb.elk.testing.io.IOUtils;
@@ -61,6 +64,8 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	
 	@Before
 	public void before() throws IOException, Owl2ParseException {
+		assumeTrue(!ignore(manifest.getInput()));
+		
 		inputStream = ((URLTestIO)manifest.getInput()).getInputStream();
 		reasoner = createReasoner(inputStream);
 	}
@@ -68,6 +73,10 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	@After
 	public void after() {
 		IOUtils.closeQuietly(inputStream);
+	}
+	
+	protected boolean ignore(TestInput input) {
+		return false;
 	}
 	
 	protected abstract Reasoner createReasoner(final InputStream input) throws IOException, Owl2ParseException;
@@ -78,7 +87,6 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	 * ---------------------------------------------
 	 */
 	
-
 	/**
 	 * Checks that the computed taxonomy is correct and complete
 	 * 

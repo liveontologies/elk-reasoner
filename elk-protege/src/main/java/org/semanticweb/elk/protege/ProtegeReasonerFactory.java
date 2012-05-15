@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.protege.editor.owl.model.inference.AbstractProtegeOWLReasonerInfo;
 import org.semanticweb.elk.owlapi.ElkReasonerConfiguration;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
-import org.semanticweb.elk.reasoner.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.util.logging.MessageDialogAppender;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.FreshEntityPolicy;

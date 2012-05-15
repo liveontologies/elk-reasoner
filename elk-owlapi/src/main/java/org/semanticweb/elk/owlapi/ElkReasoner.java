@@ -41,8 +41,8 @@ import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.util.logging.Statistics;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
@@ -239,7 +239,8 @@ public class ElkReasoner implements OWLReasoner {
 	protected Node<OWLClass> getClassNode(ElkClass elkClass)
 			throws FreshEntitiesException, InconsistentOntologyException {
 		try {
-			return elkConverter.convertClassNode(reasoner.getClassNode(elkClass));
+			return elkConverter.convertClassNode(reasoner
+					.getClassNode(elkClass));
 		} catch (org.semanticweb.elk.reasoner.FreshEntitiesException e) {
 			throw convertFreshEntitiesException(e);
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
@@ -458,7 +459,8 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public Set<InferenceType> getPrecomputableInferenceTypes() {
-		return new HashSet<InferenceType>(Arrays.asList(InferenceType.CLASS_ASSERTIONS, InferenceType.CLASS_HIERARCHY));
+		return new HashSet<InferenceType>(Arrays.asList(
+				InferenceType.CLASS_ASSERTIONS, InferenceType.CLASS_HIERARCHY));
 	}
 
 	@Override
@@ -677,7 +679,7 @@ public class ElkReasoner implements OWLReasoner {
 	public void precomputeInferences(InferenceType... inferenceTypes)
 			throws ReasonerInterruptedException, TimeOutException,
 			InconsistentOntologyException {
-		
+
 		// first check if we need to compute InstanceTaxonomy
 		for (InferenceType inferenceType : inferenceTypes) {
 			if (inferenceType.equals(InferenceType.CLASS_ASSERTIONS)) {
@@ -714,7 +716,7 @@ public class ElkReasoner implements OWLReasoner {
 				} else if (change.isImportChange())
 					isSynced = false;
 			}
-			
+
 			if (!isBufferingMode)
 				flush();
 		}

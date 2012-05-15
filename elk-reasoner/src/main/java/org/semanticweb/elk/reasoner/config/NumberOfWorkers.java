@@ -23,33 +23,31 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.config;
 
 /**
- * Thrown if an instance of ELK cannot be created due to misconfiguration
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReasonerConfigurationException extends RuntimeException {
+public class NumberOfWorkers {
 
-	private static final long serialVersionUID = 6644245038744863339L;
-
-	public ReasonerConfigurationException() {
-		super();
+	private final int numOfWorkers;
+	
+	public NumberOfWorkers(String value) {
+		if (value == null || value.length() == 0) {
+			numOfWorkers = Runtime.getRuntime().availableProcessors();
+		}
+		else {
+			numOfWorkers = Integer.valueOf(value);
+		}
 	}
-
-	public ReasonerConfigurationException(String message, Throwable cause) {
-		super(message, cause);
+	
+	public int getNumberOfWorkers() {
+		return numOfWorkers;
 	}
-
-	public ReasonerConfigurationException(String message) {
-		super(message);
+	
+	public String toString() {
+		return String.valueOf(numOfWorkers);
 	}
-
-	public ReasonerConfigurationException(Throwable cause) {
-		super(cause);
-	}
-
 }

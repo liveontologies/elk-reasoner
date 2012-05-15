@@ -66,13 +66,17 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 		return createElkReasoner(ontology, false, config);
 	}
 
-	ElkReasoner createElkReasoner(OWLOntology ontology, boolean isBufferingMode, OWLReasonerConfiguration config) throws IllegalConfigurationException {
-		//here we check if the passed configuration also has ELK's parameters
+	ElkReasoner createElkReasoner(OWLOntology ontology,
+			boolean isBufferingMode, OWLReasonerConfiguration config)
+			throws IllegalConfigurationException {
+		// here we check if the passed configuration also has ELK's parameters
 		if (config != null && config instanceof ElkReasonerConfiguration) {
-			return new ElkReasoner(ontology, isBufferingMode, config.getProgressMonitor(), ((ElkReasonerConfiguration)config).getElkConfiguration());
-		}
-		else {
-			return new ElkReasoner(ontology, isBufferingMode, config != null ? config.getProgressMonitor() : null);	
+			return new ElkReasoner(ontology, isBufferingMode,
+					config.getProgressMonitor(),
+					((ElkReasonerConfiguration) config).getElkConfiguration());
+		} else {
+			return new ElkReasoner(ontology, isBufferingMode,
+					config != null ? config.getProgressMonitor() : null);
 		}
 	}
 }

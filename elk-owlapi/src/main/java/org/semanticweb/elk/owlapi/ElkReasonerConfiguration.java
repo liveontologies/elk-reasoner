@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import org.semanticweb.elk.reasoner.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.FreshEntityPolicy;
 import org.semanticweb.owlapi.reasoner.IndividualNodeSetPolicy;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;

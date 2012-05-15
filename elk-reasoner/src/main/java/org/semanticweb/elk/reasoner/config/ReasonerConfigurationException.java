@@ -23,36 +23,33 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.taxonomy.io;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
+package org.semanticweb.elk.reasoner.config;
 
 /**
- * A simple class to load class taxonomy from an input stream or a reader
+ * Thrown if an instance of ELK cannot be created due to misconfiguration
  * 
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- * 
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public class ClassTaxonomyLoader {
+public class ReasonerConfigurationException extends RuntimeException {
 
-	public static Taxonomy<ElkClass> load(Owl2Parser parser, InputStream input)
-			throws IOException, Owl2ParseException {
+	private static final long serialVersionUID = 6644245038744863339L;
 
-		return null;
+	public ReasonerConfigurationException() {
+		super();
 	}
 
-	public static Taxonomy<ElkClass> load(Owl2Parser parser, File file)
-			throws IOException, Owl2ParseException {
-
-		return null;
+	public ReasonerConfigurationException(String message, Throwable cause) {
+		super(message, cause);
 	}
+
+	public ReasonerConfigurationException(String message) {
+		super(message);
+	}
+
+	public ReasonerConfigurationException(Throwable cause) {
+		super(cause);
+	}
+
 }

@@ -71,4 +71,9 @@ public final class PredefinedElkClass implements ElkClass {
 		return visitor.visit(this);
 	}
 
+	@Override
+	public String toString() {
+		return iri.asString();
+	}
+
 }

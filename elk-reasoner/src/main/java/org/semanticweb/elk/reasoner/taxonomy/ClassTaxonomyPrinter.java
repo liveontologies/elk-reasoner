@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy.io;
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -39,9 +39,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
@@ -54,10 +51,10 @@ public class ClassTaxonomyPrinter {
 	protected static Comparator<ElkClass> comparator = Comparators.ELK_CLASS_COMPARATOR;
 
 	/**
-	 * Convenience method for printing a ClassTaxonomy to a file at the given
+	 * Convenience method for printing a Taxonomy<ElkClass> to a file at the given
 	 * location.
 	 * 
-	 * @see org.semanticweb.elk.reasoner.taxonomy.io.ClassTaxonomyPrinter#dumpClassTaxomomy
+	 * @see org.semanticweb.elk.reasoner.taxonomy.Taxonomy<ElkClass>Printer#dumpClassTaxomomy
 	 * 
 	 * @param classTaxonomy
 	 * @param fileName
@@ -74,7 +71,7 @@ public class ClassTaxonomyPrinter {
 	}
 
 	/**
-	 * Print the contents of the given ClassTaxonomy to the specified Writer.
+	 * Print the contents of the given Taxonomy<ElkClass> to the specified Writer.
 	 * Class expressions are ordered for generating the output, ensuring that
 	 * the output is deterministic.
 	 * 
@@ -94,7 +91,7 @@ public class ClassTaxonomyPrinter {
 	}
 
 	/**
-	 * Get a has string for the given ClassTaxonomy. Besides possible hash
+	 * Get a has string for the given Taxonomy<ElkClass>. Besides possible hash
 	 * collisions (which have very low probability) the hash string is the same
 	 * for two inputs if and only if the inputs describe the same taxonomy. So
 	 * it can be used to compare classification results.

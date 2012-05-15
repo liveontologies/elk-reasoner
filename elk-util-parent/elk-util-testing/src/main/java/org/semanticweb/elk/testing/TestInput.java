@@ -33,4 +33,5 @@ package org.semanticweb.elk.testing;
  */
 public interface TestInput {
 
+	public String getName();
 }
