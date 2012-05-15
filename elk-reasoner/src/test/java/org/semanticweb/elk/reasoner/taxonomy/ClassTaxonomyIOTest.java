@@ -29,10 +29,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.concurrent.Executors;
 
 import org.junit.Test;
@@ -40,7 +38,6 @@ import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.testing.io.IOUtils;
 
@@ -58,12 +55,6 @@ public class ClassTaxonomyIOTest {
 		ClassTaxonomy original = loadAndClassify("io/taxonomy.owl");
 		StringWriter writer = new StringWriter();
 		
-		/*for (ClassNode node : original.getNodes()) {
-			System.out.println(node.getMembers());
-		}
-		
-		System.out.println(original.getNode(PredefinedElkClass.OWL_NOTHING).getDirectSuperNodes().size());*/
-		
 		/*Writer outWriter = new OutputStreamWriter(System.out);
 		ClassTaxonomyPrinter.dumpClassTaxomomy(original, outWriter, false);
 		outWriter.flush();*/
@@ -77,11 +68,6 @@ public class ClassTaxonomyIOTest {
 		/*outWriter = new OutputStreamWriter(System.out);
 		ClassTaxonomyPrinter.dumpClassTaxomomy(original, outWriter, false);
 		outWriter.flush();*/
-		/*for (ClassNode node : loaded.getNodes()) {
-			System.out.println(node.getMembers());
-		}
-		
-		System.out.println(loaded.getNode(PredefinedElkClass.OWL_NOTHING).getDirectSuperNodes().size());*/
 		
 		assertEquals(ClassTaxonomyPrinter.getHashString(original), ClassTaxonomyPrinter.getHashString(loaded));
 	}

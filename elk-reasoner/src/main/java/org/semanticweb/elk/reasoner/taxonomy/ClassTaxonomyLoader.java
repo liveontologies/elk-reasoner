@@ -45,8 +45,8 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 
 /**
- * A simple class to load class taxonomy using a prepared parser.
- * To be used mostly for testing.
+ * A simple class to load class taxonomy using a prepared parser. To be used
+ * mostly for testing.
  * 
  * WARNING: currently this class can only load taxonomies dumped by
  * {@link ClassTaxonomyPrinter}
@@ -65,23 +65,26 @@ public class ClassTaxonomyLoader {
 
 		parser.parseOntology(listener);
 		listener.createNodes = true;
-		//process the remaining axioms
+		// process the remaining axioms
 		for (ElkAxiom remaining : listener.nonProcessedAxioms) {
 			remaining.accept(listener);
 		}
-		//add owl:Thing if needed
+		// add owl:Thing if needed
 		ElkClass thing = PredefinedElkClass.OWL_THING;
-		//unless it's inconsistent
-		if (taxonomy.getNode(thing) == taxonomy) return taxonomy;
-		
-		NonBottomNode topNode = taxonomy.getCreate(Collections.singleton(thing));
+		// unless it's inconsistent
+		if (taxonomy.getNode(thing) == taxonomy)
+			return taxonomy;
+
+		NonBottomNode topNode = taxonomy
+				.getCreate(Collections.singleton(thing));
 		ClassNode botNode = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
-		
+
 		for (ClassNode node : taxonomy.getNodes()) {
-			if (node == topNode || node == botNode) continue;
-			
+			if (node == topNode || node == botNode)
+				continue;
+
 			NonBottomNode nbNode = (NonBottomNode) node;
-			
+
 			if (node.getDirectSuperNodes().isEmpty()) {
 				nbNode.addDirectSuperNode(topNode);
 				topNode.addDirectSubNode(nbNode);
@@ -116,20 +119,19 @@ public class ClassTaxonomyLoader {
 			for (ElkClassExpression ce : elkEquivalentClassesAxiom
 					.getClassExpressions()) {
 				if (ce instanceof ElkClass) {
-					ElkClass clazz = (ElkClass) ce; 
-					
+					ElkClass clazz = (ElkClass) ce;
+
 					if (clazz.getIri().equals(PredefinedElkIri.OWL_NOTHING)) {
 						nothing = true;
 					} else {
-						classes.add(clazz);	
+						classes.add(clazz);
 					}
 				}
 			}
 
-			if (!nothing){
+			if (!nothing) {
 				taxonomy.getCreate(classes);
-			}
-			else {
+			} else {
 				taxonomy.unsatisfiableClasses.addAll(classes);
 			}
 
@@ -154,12 +156,16 @@ public class ClassTaxonomyLoader {
 				NonBottomNode superNonBot = null;
 
 				if ((subNode == null || superNode == null) && !createNodes) {
-					//wait, maybe we'll create these nodes later
+					// wait, maybe we'll create these nodes later
 					nonProcessedAxioms.add(elkSubClassOfAxiom);
 				} else {
-					subNonBot = (NonBottomNode) (subNode == null ? taxonomy.getCreate(Collections.singleton(subClass)) : subNode);
-					superNonBot = (NonBottomNode) (superNode == null ? taxonomy.getCreate(Collections.singleton(superClass)) : superNode);
-					
+					subNonBot = (NonBottomNode) (subNode == null ? taxonomy
+							.getCreate(Collections.singleton(subClass))
+							: subNode);
+					superNonBot = (NonBottomNode) (superNode == null ? taxonomy
+							.getCreate(Collections.singleton(superClass))
+							: superNode);
+
 					subNonBot.addDirectSuperNode(superNonBot);
 					superNonBot.addDirectSubNode(subNonBot);
 				}
