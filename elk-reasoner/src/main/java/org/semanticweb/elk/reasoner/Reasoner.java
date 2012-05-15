@@ -156,10 +156,6 @@ public class Reasoner {
 			doneInitialization = false;
 			doneClassTaxonomy = false;
 			doneIndividualTaxonomy = false;
-
-			for (IndexedClassExpression ice : ontologyIndex
-					.getIndexedClassExpressions())
-				ice.resetContext();
 		}
 	}
 
@@ -215,9 +211,16 @@ public class Reasoner {
 		if (doneInitialization)
 			return;
 
+		// saturate object properties
 		(new ObjectPropertySaturation(executor, workerNo, ontologyIndex))
 				.compute();
 		
+		// reset context
+		for (IndexedClassExpression ice : ontologyIndex
+				.getIndexedClassExpressions())
+			ice.resetContext();
+		
+		// check consistency
 		consistentOntology = (new ConsistencyChecking(executor, workerNo,
 				progressMonitor, ontologyIndex)).checkConsistent();
 
