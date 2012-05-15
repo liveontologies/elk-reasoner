@@ -23,13 +23,13 @@
 package org.semanticweb.elk.util.logging;
 
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -52,8 +52,9 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 	protected final ConcurrentLinkedQueue<LoggingEvent> eventBuffer = new ConcurrentLinkedQueue<LoggingEvent>();
 
-	protected final AtomicReference<String> messengerThreadName = new AtomicReference<String>("");
-	
+	protected final AtomicReference<String> messengerThreadName = new AtomicReference<String>(
+			"");
+
 	protected final Set<String> ignoredMessageTypes = new HashSet<String>();
 
 	public MessageDialogAppender() {
@@ -70,9 +71,12 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		threshold = Level.WARN;
 	}
 
+	/**
+	 * Shut down. This discards all events, to ensure that the message reporting
+	 * thread will die too.
+	 */
 	@Override
 	public void close() {
-		// shutting down, just discard unreported events
 		synchronized (eventBuffer) {
 			eventBuffer.clear();
 		}
@@ -83,6 +87,9 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		return false;
 	}
 
+	/**
+	 * Append a logging event. This is what log4j calls to log an event.
+	 */
 	@Override
 	protected void append(LoggingEvent event) {
 		if (!Thread.currentThread().getName().equals(messengerThreadName)) {
@@ -97,6 +104,11 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		}
 	}
 
+	/**
+	 * Display a dialog window to inform the user about one message event.
+	 * 
+	 * @param event
+	 */
 	protected void showMessage(LoggingEvent event) {
 		String messageTitle;
 		int messageLevel;
@@ -122,14 +134,23 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 			messageType = null;
 		}
 
-		JPanel radioPanel = new JPanel(new GridLayout(0, 1));
-		radioPanel.add(new JLabel(event.getRenderedMessage()));
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+		String displayLabel = event.getRenderedMessage();
+		// A simple heuristic to force linebreaks into very long messages:
+		if (displayLabel.length() > 80) {
+			displayLabel = String.format(
+					"<html><div style=\"width:%dpx;\">%s</div></html>", 500,
+					displayLabel);
+		}
+		panel.add(new JLabel(displayLabel));
 
 		JCheckBox ignoreMessageButton = new JCheckBox(
 				"Do not show further messages of this kind");
 		if (messageType != null) {
-			radioPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-			radioPanel.add(ignoreMessageButton);
+			panel.add(Box.createRigidArea(new Dimension(0, 10)));
+			panel.add(ignoreMessageButton);
 		}
 
 		// // Later, it will be possible to abort the reasoner here:
@@ -139,8 +160,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		// JOptionPane.DEFAULT_OPTION, messageLevel, null, options,
 		// options[0]);
 
-		JOptionPane.showMessageDialog(null, radioPanel, messageTitle,
-				messageLevel);
+		JOptionPane.showMessageDialog(null, panel, messageTitle, messageLevel);
 
 		if (ignoreMessageButton.isSelected()) {
 			ignoredMessageTypes.add(messageType);
@@ -148,6 +168,9 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 	}
 
+	/**
+	 * Display messages until none are left to display.
+	 */
 	@Override
 	public void run() {
 		while (!eventBuffer.isEmpty()) {
