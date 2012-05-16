@@ -37,13 +37,25 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
  * A Log4J Appender that creates dialogs in order to "log" messages.
  * 
  * Like all Log4J loggers, this logger can be set to report only messages above
- * a certain threshold using the setThreshold(). The default threshold is WARN.
+ * a certain threshold using setThreshold(). The default threshold is WARN.
+ * 
+ * Only one dialog is shown at any single time: the user has to close it before
+ * getting the next. The display of message dialogs is controlled by an
+ * independent thread, so that the code that reports a message does not have to
+ * wait for the user to close dialogs. Incoming events are queued and processed
+ * in order.
+ * 
+ * For events of type ElkMessage (rather than plain String), the appender allows
+ * to filter by message type, that is, it offers the user the option to not show
+ * such messages again. Here, "such messages" means messages of the same message
+ * type.
  * 
  * @author Markus Kroetzsch
  * 
@@ -78,7 +90,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	@Override
 	public void close() {
 		synchronized (eventBuffer) {
-			eventBuffer.clear();
+			eventBuffer.clear(); // shoot the messenger
 		}
 	}
 
@@ -92,11 +104,22 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	 */
 	@Override
 	protected void append(LoggingEvent event) {
-		if (!Thread.currentThread().getName().equals(messengerThreadName)) {
+		if (!Thread.currentThread().getName().equals(messengerThreadName.get())) {
 			eventBuffer.add(event);
-		} // else: recursive message creation is blocked; the messenger should
-			// not do this, but who knows
+		}
+		// Else: drop event. Recursive message creation is thus blocked; even if
+		// displaying the message would create new events, they will not lead to
+		// endless reporting (unless the messenger creates new threads; we
+		// cannot prevent this).
+		// Also note that get() above is needed.
 
+		ensureMessengerRuns();
+	}
+
+	/**
+	 * Make sure that a messenger thread is run.
+	 */
+	protected void ensureMessengerRuns() {
 		if (messengerThreadName.compareAndSet("", "Initialising thread ...")) {
 			Thread messengerThread = new Thread(this);
 			messengerThreadName.set(messengerThread.getName());
@@ -153,7 +176,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 			panel.add(ignoreMessageButton);
 		}
 
-		// // Later, it will be possible to abort the reasoner here:
+		// // Later, it could be possible to abort the reasoner here:
 		// Object[] options = { "Continue", "Abort Reaoner" };
 		// int result = JOptionPane.showOptionDialog(null, radioPanel,
 		// messageTitle,
@@ -165,11 +188,11 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		if (ignoreMessageButton.isSelected()) {
 			ignoredMessageTypes.add(messageType);
 		}
-
 	}
 
 	/**
-	 * Display messages until none are left to display.
+	 * Display messages until none are left to display. Then reset the
+	 * registered thread name and die.
 	 */
 	@Override
 	public void run() {
@@ -177,6 +200,13 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 			showMessage(eventBuffer.poll());
 		}
 		messengerThreadName.set("");
+		// If another thread has added new events just before the
+		// messengerThreadName was reset here, then it could happen that the
+		// messenger dies while there is still work to do. To avoid this, we
+		// check again one last time, and create a new messenger if needed:
+		if (!eventBuffer.isEmpty()) {
+			ensureMessengerRuns();
+		}
 	}
 
 }
