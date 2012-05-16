@@ -106,33 +106,40 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 	}
 
 	/**
-	 * Obtain a ClassNode object for a given {@link ElkClass}, <tt>null</tt> if
-	 * none assigned
+	 * Obtain a ClassNode object for a given {@link ElkClass}, or <tt>null</tt> if
+	 * none assigned.
 	 * 
 	 * @param elkClass
-	 * @return ClassNode object for elkClass, possibly still incomplete
+	 * @return type node object for elkClass, possibly still incomplete
 	 */
 	@Override
 	public TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(ElkClass elkClass) {
 		NonBottomClassNode result = classNodeLookup.get(getKey(elkClass));
-		if (result != null)
+		if (result != null) {
 			return result;
-		if (unsatisfiableClasses.contains(elkClass))
+		} else if (unsatisfiableClasses.contains(elkClass)) {
 			return this.bottomClassNode;
-		LOGGER_.error("No taxonomy node for class "
-				+ elkClass.getIri().asString());
-		return null;
+		} else {
+			return null;
+		}
 	}
 
+	/**
+	 * Obtain a ClassNode object for a given {@link ElkClass}, or <tt>null</tt> if
+	 * none assigned.
+	 * 
+	 * @param individual
+	 * @return instance node object for elkClass, possibly still incomplete
+	 */
 	@Override
 	public InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
 			ElkNamedIndividual individual) {
 		IndividualNode result = individualNodeLookup.get(getKey(individual));
-		if (result != null)
+		if (result != null) {
 			return result;
-		LOGGER_.error("No taxonomy node for individual "
-				+ individual.getIri().asString());
-		return null;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
