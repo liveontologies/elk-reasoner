@@ -56,14 +56,14 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		return createElkReasoner(ontology, true, config);
+		return createElkReasoner(ontology, false, config);
 	}
 
 	@Override
 	public OWLReasoner createReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		return createElkReasoner(ontology, false, config);
+		return createElkReasoner(ontology, true, config);
 	}
 
 	ElkReasoner createElkReasoner(OWLOntology ontology,
