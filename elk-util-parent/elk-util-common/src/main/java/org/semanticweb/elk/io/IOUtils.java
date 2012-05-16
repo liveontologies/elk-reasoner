@@ -23,11 +23,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.testing.io;
+package org.semanticweb.elk.io;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -55,42 +54,28 @@ public class IOUtils {
 		}
 	}
 	
-	public static FilenameFilter getExtBasedFilenameFilter(final String extension) {
-		return new FilenameFilter() {
-			@Override
-			public boolean accept(File file, String name) {
-				return name.endsWith("." + extension);
-			}
-		};
-	}
 	
-	public static String dropExtension(String filename) {
-		int index = -1;
-		
-		if ((index = filename.lastIndexOf('.')) < 0) {
-			return filename;
-		}
-		else {
-			return filename.substring(0, index);
-		}
-	}
-
-	public static String getFileName(String path) {
-		return new File(path).getName();
-	}
-	
-	public static List<String> getTestResourceNamesFromDir(File dir, String owlExt) {
+	public static List<String> getResourceNamesFromDir(File dir, String extension) {
 		List<String> testResources = new ArrayList<String>();
 		
-		for (String fileName : dir.list(IOUtils.getExtBasedFilenameFilter(owlExt))) {
+		for (String fileName : dir.list(FileUtils.getExtBasedFilenameFilter(extension))) {
 			testResources.add(dir.getName() + "/" + fileName);
 		}
 		
 		return testResources;
 	}
 
-	public static List<String> getTestResourceNamesFromJAR(URI inputURI, String owlExt, Class<?> srcClass) throws IOException {
-		CodeSource src = srcClass.getProtectionDomain().getCodeSource();
+	/**
+	 * Retrieves a set of resource names from a JAR file (the code source for the given Java class)
+	 * 
+	 * @param inputURI
+	 * @param extension
+	 * @param clazz
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<String> getResourceNamesFromJAR(URI inputURI, String extension, Class<?> clazz) throws IOException {
+		CodeSource src = clazz.getProtectionDomain().getCodeSource();
 		List<String> testResources = new ArrayList<String>();
 		ZipInputStream zip = null;
 
@@ -103,7 +88,7 @@ public class IOUtils {
 				
 				while( ( ze = zip.getNextEntry() ) != null ) {
 				    String entryName = ze.getName();
-				    if( entryName.endsWith("." + owlExt) ) {
+				    if( entryName.endsWith("." + extension) ) {
 				    	testResources.add( entryName );
 				    }
 				}
@@ -112,7 +97,7 @@ public class IOUtils {
 			}
 		 }
 		else {
-			throw new IOException("Unable to get code source for " + srcClass.getSimpleName());
+			throw new IOException("Unable to get code source for " + clazz.getSimpleName());
 		}
 		
 		return testResources;

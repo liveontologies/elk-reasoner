@@ -34,8 +34,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.semanticweb.elk.io.FileUtils;
+import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.io.IOUtils;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
@@ -64,11 +65,11 @@ public class ConfigurationUtils {
 																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException {
 		//Load inputs and expected results
 		final List<String> inputs = srcURI.isOpaque() 
-				? IOUtils.getTestResourceNamesFromJAR(srcURI, inputFileExt, srcClass)
-				: IOUtils.getTestResourceNamesFromDir(new File(srcURI), inputFileExt);
+				? IOUtils.getResourceNamesFromJAR(srcURI, inputFileExt, srcClass)
+				: IOUtils.getResourceNamesFromDir(new File(srcURI), inputFileExt);
 		final List<String> results = srcURI.isOpaque() 
-				? IOUtils.getTestResourceNamesFromJAR(srcURI, outputFileExt, srcClass)
-				: IOUtils.getTestResourceNamesFromDir(new File(srcURI), outputFileExt);				
+				? IOUtils.getResourceNamesFromJAR(srcURI, outputFileExt, srcClass)
+				: IOUtils.getResourceNamesFromDir(new File(srcURI), outputFileExt);				
 		
 		Collections.sort(inputs);
 		Collections.sort(results);
@@ -81,7 +82,7 @@ public class ConfigurationUtils {
 		String nextInput = inputIter.next();
 		
 		while (true) {
-			int cmp = IOUtils.dropExtension(nextResult).compareTo(IOUtils.dropExtension(nextInput) + EXPECTED_SUFFIX); 
+			int cmp = FileUtils.dropExtension(nextResult).compareTo(FileUtils.dropExtension(nextInput) + EXPECTED_SUFFIX); 
 			
 			if (cmp == 0) {
 				//Match

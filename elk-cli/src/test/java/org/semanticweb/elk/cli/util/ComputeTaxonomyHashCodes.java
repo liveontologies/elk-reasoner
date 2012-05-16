@@ -31,9 +31,9 @@ import java.io.OutputStreamWriter;
 import java.util.concurrent.Executors;
 
 import org.semanticweb.elk.cli.IOReasoner;
+import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
-import org.semanticweb.elk.testing.io.IOUtils;
 
 /**
  * Computes correct class taxonomy hash codes for a set of ontologies 
@@ -55,7 +55,7 @@ public class ComputeTaxonomyHashCodes {
 		File srcDir = new File(OWL_PATH);
 		IOReasoner reasoner = new IOReasoner(Executors.newCachedThreadPool(), 1);//use just one worker to minimize the risk of errors
 		
-		for (File ontFile : srcDir.listFiles(IOUtils.getExtBasedFilenameFilter("owl"))) {
+		for (File ontFile : srcDir.listFiles(FileUtils.getExtBasedFilenameFilter("owl"))) {
 			
 			System.err.println(ontFile.getName());
 			
@@ -65,7 +65,7 @@ public class ComputeTaxonomyHashCodes {
 			ClassTaxonomy taxonomy = reasoner.getTaxonomy();
 			int hash = ClassTaxonomyHasher.hash(taxonomy);
 			//create the expected result file
-			File out = new File(srcDir.getAbsolutePath() + "/" + IOUtils.dropExtension(ontFile.getName()) + ".expected.hash");
+			File out = new File(srcDir.getAbsolutePath() + "/" + FileUtils.dropExtension(ontFile.getName()) + ".expected.hash");
 			OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(out));
 			
 			writer.write(Integer.valueOf(hash).toString());
