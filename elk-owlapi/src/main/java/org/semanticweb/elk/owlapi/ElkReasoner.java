@@ -437,7 +437,7 @@ public class ElkReasoner implements OWLReasoner {
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
 			throw new InconsistentOntologyException();
 		} catch (UnsupportedOperationException e) {
-			LOGGER_.warn(e.getMessage());
+			LOGGER_.warn(new ElkMessage(e.getMessage(),"owlapi.unsupportedOperation"));
 			return new OWLNamedIndividualNodeSet();
 		}
 	}
@@ -571,7 +571,7 @@ public class ElkReasoner implements OWLReasoner {
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
 			throw new InconsistentOntologyException();
 		} catch (UnsupportedOperationException e) {
-			LOGGER_.warn(e.getMessage());
+			LOGGER_.warn(new ElkMessage(e.getMessage(),"owlapi.unsupportedOperation"));
 			return new OWLClassNodeSet();
 		}
 	}
@@ -611,7 +611,7 @@ public class ElkReasoner implements OWLReasoner {
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
 			throw new InconsistentOntologyException();
 		} catch (UnsupportedOperationException e) {
-			LOGGER_.warn(e.getMessage());
+			LOGGER_.warn(new ElkMessage(e.getMessage(),"owlapi.unsupportedOperation"));
 			return new OWLClassNodeSet();
 		}
 	}
@@ -746,7 +746,7 @@ public class ElkReasoner implements OWLReasoner {
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
 			throw convertInconsistentOntologyException(e);
 		} catch (UnsupportedOperationException e) {
-			LOGGER_.warn(e.getMessage());
+			LOGGER_.warn(new ElkMessage(e.getMessage(),"owlapi.unsupportedOperation"));
 			return true;
 		}
 	}
