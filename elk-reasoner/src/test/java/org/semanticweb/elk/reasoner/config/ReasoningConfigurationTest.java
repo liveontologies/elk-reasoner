@@ -25,47 +25,49 @@
  */
 package org.semanticweb.elk.reasoner.config;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.config.ConfigurationException;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class ReasoningConfigurationTest {
 
 	@Test
 	public void defaultConfig() {
-		ReasonerConfiguration config = ReasonerConfiguration.getDefaultConfiguration();
-		
-		assertTrue(config.getParameterNames().contains(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
-		assertTrue(config.getParameterNames().contains(ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT));
-		assertEquals(Runtime.getRuntime().availableProcessors(), config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
-		assertEquals(UnsupportedFeatureTreatment.IGNORE.toString(), config.getParameter(ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT));
-	}
-	
-	@Test(expected=ReasonerConfigurationException.class)
-	public void wrongParameterValue1() {
-		ReasonerConfiguration config = ReasonerConfiguration.getDefaultConfiguration().clone();
-		
-		config.setParameter(ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT, "something unsupported here");
-	}
-	
-	@Test(expected=ReasonerConfigurationException.class)
-	public void wrongParameterValue2() {
-		ReasonerConfiguration config = ReasonerConfiguration.getDefaultConfiguration().clone();
-		
-		config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, "not an integer");
-	}
-	
-	@Test(expected=Exception.class)
-	public void modificationsToDefaultConfigProhibited() {
-		ReasonerConfiguration config = ReasonerConfiguration.getDefaultConfiguration();
-		
-		config.setParameter(ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT, UnsupportedFeatureTreatment.THROW_EXCEPTION.toString());
+		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
+
+		assertTrue(config.getParameterNames().contains(
+				ReasonerConfiguration.NUM_OF_WORKING_THREADS));
+		assertTrue(config.getParameterNames().contains(
+				ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT));
+		assertEquals(
+				Runtime.getRuntime().availableProcessors(),
+				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
+		assertEquals(
+				UnsupportedFeatureTreatment.IGNORE.toString(),
+				config.getParameter(ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT));
 	}
 
+	@Test(expected = ConfigurationException.class)
+	public void wrongIntParameterValue() {
+		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
+
+		config.setParameter(
+				ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT,
+				"something unsupported here");
+	}
+
+	@Test(expected = ConfigurationException.class)
+	public void wrongEnumParameterValue() {
+		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
+
+		config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
+				"not an integer");
+	}
 }

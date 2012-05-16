@@ -23,40 +23,22 @@
 /**
  * 
  */
-package org.semanticweb.elk.io;
+package org.semanticweb.elk.config;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.util.Collection;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class FileUtils {
+public interface Configuration extends Cloneable {
 
-	public static FilenameFilter getExtBasedFilenameFilter(final String extension) {
-		return new FilenameFilter() {
-			@Override
-			public boolean accept(File file, String name) {
-				return name.endsWith("." + extension);
-			}
-		};
-	}
+	public String getParameter(String name);
 	
-	public static String dropExtension(String filename) {
-		int index = -1;
-		
-		if ((index = filename.lastIndexOf('.')) < 0) {
-			return filename;
-		}
-		else {
-			return filename.substring(0, index);
-		}
-	}
-
-	public static String getFileName(String path) {
-		return new File(path).getName();
-	}
-
+	public void setParameter(String name, String value);
+	
+	public Collection<String> getParameterNames();
+	
+	public Configuration clone();
 }

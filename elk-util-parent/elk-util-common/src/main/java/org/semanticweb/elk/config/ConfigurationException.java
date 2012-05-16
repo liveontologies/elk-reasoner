@@ -23,7 +23,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.config;
+package org.semanticweb.elk.config;
 
 /**
  * Thrown if an instance of ELK cannot be created due to misconfiguration
@@ -32,23 +32,23 @@ package org.semanticweb.elk.reasoner.config;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReasonerConfigurationException extends RuntimeException {
+public class ConfigurationException extends RuntimeException {
 
 	private static final long serialVersionUID = 6644245038744863339L;
 
-	public ReasonerConfigurationException() {
+	public ConfigurationException() {
 		super();
 	}
 
-	public ReasonerConfigurationException(String message, Throwable cause) {
+	public ConfigurationException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ReasonerConfigurationException(String message) {
+	public ConfigurationException(String message) {
 		super(message);
 	}
 
-	public ReasonerConfigurationException(Throwable cause) {
+	public ConfigurationException(Throwable cause) {
 		super(cause);
 	}
 

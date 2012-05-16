@@ -44,7 +44,7 @@ public class ElkReasonerConfiguration implements OWLReasonerConfiguration {
 	private final OWLReasonerConfiguration genericConfig;
 	
 	public ElkReasonerConfiguration(OWLReasonerConfiguration genConfig) {
-		elkConfig = ReasonerConfiguration.getDefaultConfiguration();
+		elkConfig = ReasonerConfiguration.getConfiguration();
 		genericConfig = genConfig;
 	}
 	

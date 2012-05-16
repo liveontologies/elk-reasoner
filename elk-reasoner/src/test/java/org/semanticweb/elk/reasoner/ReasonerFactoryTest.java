@@ -25,34 +25,40 @@ package org.semanticweb.elk.reasoner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.io.IOException;
 
 import org.junit.Test;
+import org.semanticweb.elk.config.ConfigurationException;
+import org.semanticweb.elk.config.ConfigurationFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 
 /**
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class ReasonerFactoryTest {
 
 	@Test
 	public void createReasonerDefaultConfig() {
 		Reasoner reasoner = new ReasonerFactory().createReasoner();
-		
-		assertEquals(Runtime.getRuntime().availableProcessors(), reasoner.getNumberOfWorkers());
+
+		assertEquals(Runtime.getRuntime().availableProcessors(),
+				reasoner.getNumberOfWorkers());
 	}
 
 	@Test
-	public void createReasonerCustomConfig() {
-		ResourceBundle bundle = ResourceBundle.getBundle("elk_test", Locale.getDefault(), this.getClass().getClassLoader());
-		Reasoner reasoner = new ReasonerFactory().createReasoner(ReasonerConfiguration.createConfiguration(bundle));
-		
+	public void createReasonerCustomConfig() throws ConfigurationException,
+			IOException {
+		Reasoner reasoner = new ReasonerFactory()
+				.createReasoner((ReasonerConfiguration) new ConfigurationFactory()
+						.getConfiguration(getClass().getClassLoader()
+								.getResourceAsStream("elk_test.properties"),
+								ReasonerConfiguration.REASONER_CONFIG_PREFIX,
+								ReasonerConfiguration.class));
+
 		assertNotNull(reasoner);
 		assertEquals(10, reasoner.getNumberOfWorkers());
 	}
-
 }

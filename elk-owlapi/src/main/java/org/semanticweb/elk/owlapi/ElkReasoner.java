@@ -134,11 +134,11 @@ public class ElkReasoner implements OWLReasoner {
 	}
 	
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode, 	ReasonerProgressMonitor progressMonitor) {
-		this(ontology, isBufferingMode, progressMonitor, ReasonerConfiguration.getDefaultConfiguration());
+		this(ontology, isBufferingMode, progressMonitor, ReasonerConfiguration.getConfiguration());
 	}
 	
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode) {
-		this(ontology, isBufferingMode, null, ReasonerConfiguration.getDefaultConfiguration());
+		this(ontology, isBufferingMode, null, ReasonerConfiguration.getConfiguration());
 	}
 
 	protected Reasoner getInternalReasoner() {

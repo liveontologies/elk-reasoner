@@ -45,7 +45,7 @@ import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	protected final OWLReasonerFactory factory = new ElkReasonerFactory(); 
-	protected final ReasonerConfiguration elkConfig = ReasonerConfiguration.getDefaultConfiguration();
+	protected final ReasonerConfiguration elkConfig = ReasonerConfiguration.getConfiguration();
     
     @Override
 	public BufferingMode getRecommendedBuffering() {

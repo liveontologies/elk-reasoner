@@ -58,7 +58,7 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 	public void initialise() throws Exception {
 		//Create a simple JPanel with the ELK's settings
 		//pre-populate with default settings
-		ReasonerConfiguration elkConfig = ReasonerConfiguration.getDefaultConfiguration();
+		ReasonerConfiguration elkConfig = ReasonerConfiguration.getConfiguration();
 		
 		setLayout(new BorderLayout());
         
