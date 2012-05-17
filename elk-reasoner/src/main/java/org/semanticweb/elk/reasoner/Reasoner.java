@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -30,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -57,6 +59,14 @@ import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
  */
 public class Reasoner {
 	/**
+	 * The progress monitor that is used for reporting progress.
+	 */
+	protected ProgressMonitor progressMonitor;
+	/**
+	 * Logger for events.
+	 */
+	protected final static Logger LOGGER_ = Logger.getLogger(Reasoner.class);
+	/**
 	 * Executor used to run the jobs.
 	 */
 	protected final ExecutorService executor;
@@ -64,6 +74,13 @@ public class Reasoner {
 	 * Number of workers for concurrent jobs.
 	 */
 	protected final int workerNo;
+	/**
+	 * Should fresh entities in reasoner queries be accepted (configuration
+	 * setting). If false, a FreshEntityException will be thrown when
+	 * encountering entities that did not occur in the ontology.
+	 */
+	protected boolean allowFreshEntities;
+
 	/**
 	 * OntologyIndex for the ontology on which this reasoner operates.
 	 */
@@ -74,10 +91,9 @@ public class Reasoner {
 	 */
 	protected boolean consistentOntology;
 	/**
-	 * Class taxonomy of the current ontology, after it was computed.
+	 * Taxonomy that stores (partial) reasoning results.
 	 */
 	protected IndividualClassTaxonomy taxonomy;
-
 	/**
 	 * Indicates if the reasoner has been initialized after ontology change.
 	 */
@@ -92,16 +108,6 @@ public class Reasoner {
 	protected boolean doneIndividualTaxonomy = false;
 
 	/**
-	 * The progress monitor that is used for reporting progress.
-	 */
-	protected ProgressMonitor progressMonitor;
-
-	/**
-	 * Logger for events.
-	 */
-	protected final static Logger LOGGER_ = Logger.getLogger(Reasoner.class);
-
-	/**
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
 	 * 
@@ -112,6 +118,7 @@ public class Reasoner {
 		this.executor = executor;
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
+		this.allowFreshEntities = true;
 		reset();
 	}
 
@@ -131,6 +138,29 @@ public class Reasoner {
 	 */
 	public ProgressMonitor getProgressMonitor() {
 		return progressMonitor;
+	}
+
+	/**
+	 * Set if fresh entities should be allowed. Fresh entities are entities that
+	 * occur as parameters of reasoner queries without occurring in the loaded
+	 * ontology. If false, a FreshENtityException will be thrown in such cases.
+	 * If true, the reasoner will answer as if the entity had been declared (but
+	 * not used in any axiom).
+	 * 
+	 * @param allow
+	 */
+	public void setAllowFreshEntities(boolean allow) {
+		allowFreshEntities = allow;
+	}
+
+	/**
+	 * Get whether fresh entities are allowed. See setAllowFreshEntities() for
+	 * details.
+	 * 
+	 * @return
+	 */
+	public boolean getAllowFreshEntities() {
+		return allowFreshEntities;
 	}
 
 	/**
@@ -214,12 +244,12 @@ public class Reasoner {
 		// saturate object properties
 		(new ObjectPropertySaturation(executor, workerNo, ontologyIndex))
 				.compute();
-		
+
 		// reset context
 		for (IndexedClassExpression ice : ontologyIndex
 				.getIndexedClassExpressions())
 			ice.resetContext();
-		
+
 		// check consistency
 		consistentOntology = (new ConsistencyChecking(executor, workerNo,
 				progressMonitor, ontologyIndex)).checkConsistent();
@@ -229,7 +259,6 @@ public class Reasoner {
 
 	/**
 	 * Check if the ontology is consistent, that is, satisfiable.
-	 * 
 	 */
 	public boolean isConsistent() {
 		initializeReasoning();
@@ -247,12 +276,12 @@ public class Reasoner {
 		if (!isConsistent())
 			throw new InconsistentOntologyException();
 
-		if (doneClassTaxonomy)
-			return taxonomy;
-
-		taxonomy = (new TaxonomyComputation(executor, workerNo,
-				progressMonitor, ontologyIndex)).computeTaxonomy(true, false);
-		doneClassTaxonomy = true;
+		if (!doneClassTaxonomy) {
+			taxonomy = (new TaxonomyComputation(executor, workerNo,
+					progressMonitor, ontologyIndex)).computeTaxonomy(true,
+					false);
+			doneClassTaxonomy = true;
+		}
 
 		return taxonomy;
 	}
@@ -297,8 +326,13 @@ public class Reasoner {
 	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
 			throws FreshEntitiesException, InconsistentOntologyException {
 		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
-		if (node == null)
-			throw new FreshEntitiesException(elkClass);
+		if (node == null) {
+			if (allowFreshEntities) {
+				node = new FreshClassTypeNode(elkClass);
+			} else {
+				throw new FreshEntitiesException(elkClass);
+			}
+		}
 		return node;
 	}
 
@@ -315,8 +349,13 @@ public class Reasoner {
 			throws FreshEntitiesException, InconsistentOntologyException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getInstanceNode(elkNamedIndividual);
-		if (node == null)
-			throw new FreshEntitiesException(elkNamedIndividual);
+		if (node == null) {
+			if (allowFreshEntities) {
+				node = new FreshClassInstanceNode(elkNamedIndividual);
+			} else {
+				throw new FreshEntitiesException(elkNamedIndividual);
+			}
+		}
 		return node;
 	}
 
@@ -333,8 +372,13 @@ public class Reasoner {
 			InconsistentOntologyException {
 		TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getTypeNode(elkClass);
-		if (node == null)
-			throw new FreshEntitiesException(elkClass);
+		if (node == null) {
+			if (allowFreshEntities) {
+				node = new FreshClassTypeNode(elkClass);
+			} else {
+				throw new FreshEntitiesException(elkClass);
+			}
+		}
 		return node;
 	}
 
@@ -485,6 +529,118 @@ public class Reasoner {
 	// used for testing
 	int getNumberOfWorkers() {
 		return workerNo;
+	}
+
+	/**
+	 * Auxiliary class for representing taxonomy nodes for fresh entities.
+	 * 
+	 * @author Markus Kroetzsch
+	 * 
+	 * @param <T>
+	 */
+	protected abstract class FreshTaxonomyNode<T extends ElkObject> implements
+			Node<T> {
+		protected final T elkClass;
+		protected final TypeNode<ElkClass, ElkNamedIndividual> bottomNode;
+		protected final TypeNode<ElkClass, ElkNamedIndividual> topNode;
+		protected final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy;
+
+		public FreshTaxonomyNode(T elkClass)
+				throws InconsistentOntologyException {
+			// Get bottom and top node *now*; cannot do this later as ontology
+			// might change
+			this.taxonomy = Reasoner.this.getInstanceTaxonomy();
+			this.bottomNode = taxonomy
+					.getTypeNode(PredefinedElkClass.OWL_NOTHING);
+			this.topNode = taxonomy.getTypeNode(PredefinedElkClass.OWL_THING);
+			this.elkClass = elkClass;
+		}
+
+		@Override
+		public Set<T> getMembers() {
+			return Collections.unmodifiableSet(Collections.singleton(elkClass));
+		}
+
+		@Override
+		public T getCanonicalMember() {
+			return elkClass;
+		}
+
+		public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
+			return taxonomy;
+		}
+	}
+
+	/**
+	 * Class for representing type nodes for fresh classes.
+	 * 
+	 * @author Markus Kroetzsch
+	 */
+	protected class FreshClassTypeNode extends FreshTaxonomyNode<ElkClass>
+			implements TypeNode<ElkClass, ElkNamedIndividual> {
+
+		public FreshClassTypeNode(ElkClass elkClass)
+				throws InconsistentOntologyException {
+			super(elkClass);
+		}
+
+		@Override
+		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
+			Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> result = Collections
+					.emptySet();
+			return Collections.unmodifiableSet(result);
+		}
+
+		@Override
+		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
+			return getDirectInstanceNodes();
+		}
+
+		@Override
+		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
+			return Collections.unmodifiableSet(Collections.singleton(topNode));
+		}
+
+		@Override
+		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {
+			return getDirectSuperNodes();
+		}
+
+		@Override
+		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
+			return Collections.unmodifiableSet(Collections
+					.singleton(bottomNode));
+		}
+
+		@Override
+		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
+			return getDirectSubNodes();
+		}
+	}
+
+	/**
+	 * Class for representing instance nodes for fresh named individuals.
+	 * 
+	 * @author Markus Kroetzsch
+	 */
+	protected class FreshClassInstanceNode extends
+			FreshTaxonomyNode<ElkNamedIndividual> implements
+			InstanceNode<ElkClass, ElkNamedIndividual> {
+
+		public FreshClassInstanceNode(ElkNamedIndividual elkClass)
+				throws InconsistentOntologyException {
+			super(elkClass);
+		}
+
+		@Override
+		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getDirectTypeNodes() {
+			return Collections.unmodifiableSet(Collections.singleton(topNode));
+		}
+
+		@Override
+		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getAllTypeNodes() {
+			return getDirectTypeNodes();
+		}
 	}
 
 }
