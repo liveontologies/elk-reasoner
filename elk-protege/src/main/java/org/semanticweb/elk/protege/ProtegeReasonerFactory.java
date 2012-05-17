@@ -32,12 +32,9 @@ import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.util.logging.MessageDialogAppender;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
-import org.semanticweb.owlapi.reasoner.FreshEntityPolicy;
-import org.semanticweb.owlapi.reasoner.IndividualNodeSetPolicy;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
 /**
  * Entry point for Protege reasoner plugin. As part of the initialisation, a
@@ -68,11 +65,8 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 	@Override
 	public ElkReasonerConfiguration getConfiguration(
 			ReasonerProgressMonitor monitor) {
-		OWLReasonerConfiguration genericConfig = new SimpleConfiguration(
-				monitor, FreshEntityPolicy.DISALLOW, 0,
-				IndividualNodeSetPolicy.BY_NAME);
-
-		return new ElkReasonerConfiguration(genericConfig, elkConfig);
+		OWLReasonerConfiguration defaultOwlConfig = ElkReasonerConfiguration.getDefaultOwlReasonerConfiguration(monitor);
+		return new ElkReasonerConfiguration(defaultOwlConfig, elkConfig);
 	}
 
 	@Override

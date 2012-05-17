@@ -42,7 +42,6 @@ import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
-import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.logging.ElkMessage;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -125,14 +124,16 @@ public class ElkReasoner implements OWLReasoner {
 	protected final static Logger LOGGER_ = Logger.getLogger(ElkReasoner.class);
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
-			ReasonerProgressMonitor progressMonitor,
-			ReasonerConfiguration elkConfig) {
+			ElkReasonerConfiguration elkConfig) {
 		this.owlOntology = ontology;
 		this.manager = ontology.getOWLOntologyManager();
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
-		this.reasoner = new ReasonerFactory().createReasoner(elkConfig);
-		this.elkProgressMonitor = progressMonitor == null ? new DummyProgressMonitor()
-				: new ElkReasonerProgressMonitor(progressMonitor);
+		this.reasoner = new ReasonerFactory().createReasoner(elkConfig
+				.getElkConfiguration());
+		this.reasoner
+				.setAllowFreshEntities(elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW);
+		this.elkProgressMonitor = elkConfig.getProgressMonitor() == null ? new DummyProgressMonitor()
+				: new ElkReasonerProgressMonitor(elkConfig.getProgressMonitor());
 		this.reasoner.setProgressMonitor(this.elkProgressMonitor);
 		this.ontologyChangeListener = new OntologyChangeListener();
 		this.isBufferingMode = isBufferingMode;
@@ -147,13 +148,12 @@ public class ElkReasoner implements OWLReasoner {
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
 			ReasonerProgressMonitor progressMonitor) {
-		this(ontology, isBufferingMode, progressMonitor, ReasonerConfiguration
-				.getDefaultConfiguration());
+		this(ontology, isBufferingMode, new ElkReasonerConfiguration(
+				progressMonitor));
 	}
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode) {
-		this(ontology, isBufferingMode, null, ReasonerConfiguration
-				.getDefaultConfiguration());
+		this(ontology, isBufferingMode, new ElkReasonerConfiguration());
 	}
 
 	protected Reasoner getInternalReasoner() {
@@ -416,7 +416,8 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public FreshEntityPolicy getFreshEntityPolicy() {
-		return FreshEntityPolicy.DISALLOW;
+		return reasoner.getAllowFreshEntities() ? FreshEntityPolicy.ALLOW
+				: FreshEntityPolicy.DISALLOW;
 	}
 
 	@Override
@@ -437,7 +438,8 @@ public class ElkReasoner implements OWLReasoner {
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
 			throw new InconsistentOntologyException();
 		} catch (UnsupportedOperationException e) {
-			LOGGER_.warn(new ElkMessage(e.getMessage(),"owlapi.unsupportedOperation"));
+			LOGGER_.warn(new ElkMessage(e.getMessage(),
+					"owlapi.unsupportedOperation"));
 			return new OWLNamedIndividualNodeSet();
 		}
 	}
@@ -571,7 +573,8 @@ public class ElkReasoner implements OWLReasoner {
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
 			throw new InconsistentOntologyException();
 		} catch (UnsupportedOperationException e) {
-			LOGGER_.warn(new ElkMessage(e.getMessage(),"owlapi.unsupportedOperation"));
+			LOGGER_.warn(new ElkMessage(e.getMessage(),
+					"owlapi.unsupportedOperation"));
 			return new OWLClassNodeSet();
 		}
 	}
@@ -611,7 +614,8 @@ public class ElkReasoner implements OWLReasoner {
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
 			throw new InconsistentOntologyException();
 		} catch (UnsupportedOperationException e) {
-			LOGGER_.warn(new ElkMessage(e.getMessage(),"owlapi.unsupportedOperation"));
+			LOGGER_.warn(new ElkMessage(e.getMessage(),
+					"owlapi.unsupportedOperation"));
 			return new OWLClassNodeSet();
 		}
 	}
@@ -746,7 +750,8 @@ public class ElkReasoner implements OWLReasoner {
 		} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
 			throw convertInconsistentOntologyException(e);
 		} catch (UnsupportedOperationException e) {
-			LOGGER_.warn(new ElkMessage(e.getMessage(),"owlapi.unsupportedOperation"));
+			LOGGER_.warn(new ElkMessage(e.getMessage(),
+					"owlapi.unsupportedOperation"));
 			return true;
 		}
 	}
