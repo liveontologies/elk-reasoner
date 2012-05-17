@@ -51,7 +51,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -59,16 +58,14 @@ import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 
 /**
- * @author Yevgeny Kazakov
+ * Converter of ElkClassExpressions to OWL API class expressions.
  * 
+ * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  */
 public final class ElkClassExpressionConverter implements
 		ElkClassExpressionVisitor<OWLClassExpression> {
-
-	public static ElkClassExpressionConverter getInstance() {
-		return INSTANCE_;
-	}
-
+	
 	final OWLDataFactory owlDataFactory = OWLManager.getOWLDataFactory();
 
 	private static ElkClassExpressionConverter INSTANCE_ = new ElkClassExpressionConverter();
@@ -76,10 +73,13 @@ public final class ElkClassExpressionConverter implements
 	private ElkClassExpressionConverter() {
 	}
 
+	public static ElkClassExpressionConverter getInstance() {
+		return INSTANCE_;
+	}
+
 	@Override
 	public OWLClass visit(ElkClass elkClass) {
-		String iri = elkClass.getIri().asString();
-		return owlDataFactory.getOWLClass(IRI.create(iri));
+		return ElkEntityConverter.getInstance().visit(elkClass);
 	}
 
 	@Override

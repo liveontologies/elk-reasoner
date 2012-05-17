@@ -32,8 +32,10 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 /**
- * @author Yevgeny Kazakov
+ * Factory for the OWLAPI reasoner implementation of the ELK reasoner.
  * 
+ * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  */
 public class ElkReasonerFactory implements OWLReasonerFactory {
 
@@ -44,35 +46,43 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 
 	@Override
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology) {
-		return new ElkReasoner(ontology, false, null);
+		return createElkReasoner(ontology, false, null);
 	}
 
 	@Override
 	public OWLReasoner createReasoner(OWLOntology ontology) {
-		return new ElkReasoner(ontology, true, null);
+		return createElkReasoner(ontology, true, null);
 	}
 
 	@Override
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		return createElkReasoner(ontology, true, config);
+		return createElkReasoner(ontology, false, config);
 	}
 
 	@Override
 	public OWLReasoner createReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		return createElkReasoner(ontology, false, config);
+		return createElkReasoner(ontology, true, config);
 	}
 
-	ElkReasoner createElkReasoner(OWLOntology ontology, boolean isBufferingMode, OWLReasonerConfiguration config) throws IllegalConfigurationException {
-		//here we check if the passed configuration also has ELK's parameters
-		if (config != null && config instanceof ElkReasonerConfiguration) {
-			return new ElkReasoner(ontology, isBufferingMode, config.getProgressMonitor(), ((ElkReasonerConfiguration)config).getElkConfiguration());
+	ElkReasoner createElkReasoner(OWLOntology ontology,
+			boolean isBufferingMode, OWLReasonerConfiguration config)
+			throws IllegalConfigurationException {
+		// here we check if the passed configuration also has ELK's parameters
+		ElkReasonerConfiguration elkReasonerConfig;
+		if (config != null) {
+			if (config instanceof ElkReasonerConfiguration) {
+				elkReasonerConfig = (ElkReasonerConfiguration) config;
+			} else {
+				elkReasonerConfig = new ElkReasonerConfiguration(config);
+			}
+		} else {
+			elkReasonerConfig = new ElkReasonerConfiguration();
 		}
-		else {
-			return new ElkReasoner(ontology, isBufferingMode, config != null ? config.getProgressMonitor() : null);	
-		}
+
+		return new ElkReasoner(ontology, isBufferingMode, elkReasonerConfig);
 	}
 }

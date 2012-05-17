@@ -22,26 +22,22 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.net.URL;
+/**
+ * Thrown when irrelevant reasoning methods are called for an ontology that is
+ * inconsistent. Most reasoning tasks also have well-defined results for
+ * inconsistent ontologies, so it is not required that this exception is used in
+ * all cases. Callers should not rely on this exception being thrown as a method
+ * for checking inconsistency; there are dedicated methods for this purpose.
+ * 
+ * @author Markus Kroetzsch
+ * 
+ */
+public class InconsistentOntologyException extends Exception {
 
-import org.semanticweb.elk.testing.HashTestOutput;
-import org.semanticweb.elk.testing.TestResultComparisonException;
+	private static final long serialVersionUID = -8696304480425201859L;
 
-public class ClassTaxonomyHashManifest extends
-		ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> {
-
-	public ClassTaxonomyHashManifest(URL input, int expHash) {
-		super(input, new HashTestOutput(expHash));
+	public InconsistentOntologyException() {
+		super();
 	}
 
-	@Override
-	public void compare(ClassTaxonomyTestOutput actualOutput)
-			throws TestResultComparisonException {
-		int actualHash = actualOutput.getHashCode();
-
-		if (actualHash != getExpectedOutput().getHash()) {
-			throw new TestResultComparisonException(
-					"Actual taxonomy hash code is not equal to the expected hash code");
-		}
-	}
 }

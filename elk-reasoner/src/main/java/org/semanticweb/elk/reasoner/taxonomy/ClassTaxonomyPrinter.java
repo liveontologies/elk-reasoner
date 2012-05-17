@@ -51,10 +51,10 @@ public class ClassTaxonomyPrinter {
 	protected static Comparator<ElkClass> comparator = Comparators.ELK_CLASS_COMPARATOR;
 
 	/**
-	 * Convenience method for printing a ClassTaxonomy to a file at the given
+	 * Convenience method for printing a Taxonomy<ElkClass> to a file at the given
 	 * location.
 	 * 
-	 * @see org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter#dumpClassTaxomomy
+	 * @see org.semanticweb.elk.reasoner.taxonomy.Taxonomy<ElkClass>Printer#dumpClassTaxomomy
 	 * 
 	 * @param classTaxonomy
 	 * @param fileName
@@ -62,7 +62,7 @@ public class ClassTaxonomyPrinter {
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
 	 */
-	public static void dumpClassTaxomomyToFile(ClassTaxonomy classTaxonomy,
+	public static void dumpClassTaxomomyToFile(Taxonomy<ElkClass> classTaxonomy,
 			String fileName, boolean addHash) throws IOException {
 		FileWriter fstream = new FileWriter(fileName);
 		BufferedWriter writer = new BufferedWriter(fstream);
@@ -71,7 +71,7 @@ public class ClassTaxonomyPrinter {
 	}
 
 	/**
-	 * Print the contents of the given ClassTaxonomy to the specified Writer.
+	 * Print the contents of the given Taxonomy<ElkClass> to the specified Writer.
 	 * Class expressions are ordered for generating the output, ensuring that
 	 * the output is deterministic.
 	 * 
@@ -81,7 +81,7 @@ public class ClassTaxonomyPrinter {
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
 	 */
-	public static void dumpClassTaxomomy(ClassTaxonomy classTaxonomy,
+	public static void dumpClassTaxomomy(Taxonomy<ElkClass> classTaxonomy,
 			Writer writer, boolean addHash) throws IOException {
 		processClassTaxomomy(classTaxonomy, writer);
 		if (addHash) {
@@ -91,7 +91,7 @@ public class ClassTaxonomyPrinter {
 	}
 
 	/**
-	 * Get a has string for the given ClassTaxonomy. Besides possible hash
+	 * Get a has string for the given Taxonomy<ElkClass>. Besides possible hash
 	 * collisions (which have very low probability) the hash string is the same
 	 * for two inputs if and only if the inputs describe the same taxonomy. So
 	 * it can be used to compare classification results.
@@ -99,7 +99,7 @@ public class ClassTaxonomyPrinter {
 	 * @param classTaxonomy
 	 * @return hash string
 	 */
-	public static String getHashString(ClassTaxonomy classTaxonomy) {
+	public static String getHashString(Taxonomy<ElkClass> classTaxonomy) {
 		return Integer.toHexString(ClassTaxonomyHasher.hash(classTaxonomy));
 	}
 
@@ -110,18 +110,18 @@ public class ClassTaxonomyPrinter {
 	 * @param writer
 	 * @throws IOException
 	 */
-	protected static void processClassTaxomomy(ClassTaxonomy classTaxonomy,
+	protected static void processClassTaxomomy(Taxonomy<ElkClass> classTaxonomy,
 			Writer writer) throws IOException {
 
 		writer.write("Ontology(\n");
 
 		TreeSet<ElkClass> canonicalElkClasses = new TreeSet<ElkClass>(
 				comparator);
-		for (ClassNode classNode : classTaxonomy.getNodes())
+		for (TaxonomyNode<ElkClass> classNode : classTaxonomy.getNodes())
 			canonicalElkClasses.add(classNode.getCanonicalMember());
 
 		for (ElkClass elkClass : canonicalElkClasses) {
-			ClassNode classNode = classTaxonomy.getNode(elkClass);
+			TaxonomyNode<ElkClass> classNode = classTaxonomy.getNode(elkClass);
 
 			ArrayList<ElkClass> orderedEquivalentClasses = new ArrayList<ElkClass>(
 					classNode.getMembers());
@@ -129,7 +129,7 @@ public class ClassTaxonomyPrinter {
 
 			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass>(
 					comparator);
-			for (ClassNode childNode : classNode.getDirectSubNodes()) {
+			for (TaxonomyNode<ElkClass> childNode : classNode.getDirectSubNodes()) {
 				orderedSubClasses.add(childNode.getCanonicalMember());
 			}
 

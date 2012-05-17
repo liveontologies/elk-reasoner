@@ -20,19 +20,17 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyCanProcess;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyFinishedJob;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 
-/**
- * A listener to be used with {@link ClassTaxonomyEngine}. The listener defines
- * functions that are triggered during the construction of the taxonomy.
- * 
- * @author "Yevgeny Kazakov"
- */
-public interface ClassTaxonomyListener<P extends ClassTaxonomyEngine> extends
-		InputProcessorListenerNotifyCanProcess<P>,
-		InputProcessorListenerNotifyFinishedJob<IndexedClass, P> {
+public abstract class IndexedClassEntity extends IndexedClassExpression {
+	
+	abstract public <O> O accept(IndexedClassEntityVisitor<O> visitor);
+
+	@Override
+	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+		return accept((IndexedClassEntityVisitor<O>) visitor);
+	}
 }

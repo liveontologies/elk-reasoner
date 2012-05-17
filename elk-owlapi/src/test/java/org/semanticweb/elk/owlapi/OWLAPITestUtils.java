@@ -57,7 +57,7 @@ public class OWLAPITestUtils {
 			throw new Owl2ParseException(e);
 		}
 		
-		ElkReasoner reasoner = new ElkReasoner(ontology, false, null);
+		ElkReasoner reasoner = new ElkReasoner(ontology, false);
 		
 		reasoner.syncOntology();
 		

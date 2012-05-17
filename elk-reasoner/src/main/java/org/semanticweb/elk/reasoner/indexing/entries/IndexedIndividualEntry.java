@@ -22,10 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing.entries;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 
 /**
- * Implements an equality view for instances of {@link IndexedNominal}
+ * Implements an equality view for instances of {@link IndexedIndividual}
  * 
  * @author Frantisek Simancik
  * 
@@ -36,10 +36,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
  *            the type of the wrapped indexed object used as the key of the
  *            entry
  */
-public class IndexedNominalEntry<T, K extends IndexedNominal> extends
+public class IndexedIndividualEntry<T, K extends IndexedIndividual> extends
 		IndexedClassExpressionEntry<T, K> {
 
-	public IndexedNominalEntry(K representative) {
+	public IndexedIndividualEntry(K representative) {
 		super(representative);
 	}
 
@@ -54,8 +54,8 @@ public class IndexedNominalEntry<T, K extends IndexedNominal> extends
 		if (this == other) {
 			return true;
 		}
-		if (other instanceof IndexedNominalEntry<?, ?>) {
-			IndexedNominalEntry<?, ?> otherEntry = (IndexedNominalEntry<?, ?>) other;
+		if (other instanceof IndexedIndividualEntry<?, ?>) {
+			IndexedIndividualEntry<?, ?> otherEntry = (IndexedIndividualEntry<?, ?>) other;
 			return this.key.getElkNamedIndividual().getIri()
 					.equals(otherEntry.key.getElkNamedIndividual().getIri());
 		}

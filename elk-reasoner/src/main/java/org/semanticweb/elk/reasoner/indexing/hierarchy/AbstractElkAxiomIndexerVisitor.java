@@ -41,6 +41,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -55,6 +56,7 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
  * An abstract class for indexing axioms. Its purpose is to reduce many
@@ -65,8 +67,8 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
  * @author Frantisek Simancik
  * 
  */
-public abstract class AbstractElkAxiomIndexerVisitor extends AbstractElkAxiomVisitor<Void> implements ElkAxiomProcessor {
-
+public abstract class AbstractElkAxiomIndexerVisitor extends
+		AbstractElkAxiomVisitor<Void> implements ElkAxiomProcessor {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -79,16 +81,22 @@ public abstract class AbstractElkAxiomIndexerVisitor extends AbstractElkAxiomVis
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
 
+	public abstract void indexClassAssertion(ElkIndividual individual,
+			ElkClassExpression type);
+
 	public abstract void indexDisjointClassExpressions(
 			List<? extends ElkClassExpression> list);
-	
-	public abstract void indexReflexiveObjectProperty(ElkObjectPropertyExpression reflexiveProperty);
 
-	public abstract void indexClassDeclaration(ElkClass ec);
+	public abstract void indexReflexiveObjectProperty(
+			ElkObjectPropertyExpression reflexiveProperty);
 
-	public abstract void indexObjectPropertyDeclaration(ElkObjectProperty eop);
+	public abstract IndexedClass indexClassDeclaration(ElkClass ec);
 
-	public abstract void indexNamedIndividualDeclaration(ElkNamedIndividual eni);
+	public abstract IndexedObjectProperty indexObjectPropertyDeclaration(
+			ElkObjectProperty eop);
+
+	public abstract IndexedIndividual indexNamedIndividualDeclaration(
+			ElkNamedIndividual eni);
 
 	/**
 	 * Object factory that is used internally to replace some syntactic
@@ -104,17 +112,18 @@ public abstract class AbstractElkAxiomIndexerVisitor extends AbstractElkAxiomVis
 			elkAxiom.accept(this);
 		} catch (RuntimeException e) {
 			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn("Axiom ignored: "
+				LOGGER_.warn(new ElkMessage("Axiom ignored: "
 						+ OwlFunctionalStylePrinter.toString(elkAxiom) + " : "
-						+ e.getMessage());
+						+ e.getMessage(),"reasoner.indexing.hierarchy.axiomIgnored"));
 		}
 	}
 
-	
 	@Override
 	protected Void defaultLogicalVisit(ElkAxiom axiom) {
-		//FIXME this will print the name of the class while it's nicer to print a readable type of the axiom
-		throw new IndexingException(axiom.getClass().getSimpleName() + " not supported");
+		// FIXME this will print the name of the class while it's nicer to print
+		// a readable type of the axiom
+		throw new IndexingException(axiom.getClass().getSimpleName()
+				+ " not supported");
 	}
 
 	/*
@@ -143,7 +152,6 @@ public abstract class AbstractElkAxiomIndexerVisitor extends AbstractElkAxiomVis
 		return null;
 	}
 
-
 	@Override
 	public Void visit(ElkObjectPropertyDomainAxiom axiom) {
 		indexSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(
@@ -153,8 +161,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends AbstractElkAxiomVis
 	}
 
 	@Override
-	public Void visit(
-			ElkReflexiveObjectPropertyAxiom axiom) {
+	public Void visit(ElkReflexiveObjectPropertyAxiom axiom) {
 		indexReflexiveObjectProperty(axiom.getProperty());
 		return null;
 	}
@@ -249,9 +256,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends AbstractElkAxiomVis
 	 */
 	@Override
 	public Void visit(ElkClassAssertionAxiom axiom) {
-		indexSubClassOfAxiom(
-				objectFactory.getObjectOneOf(axiom.getIndividual()),
-				axiom.getClassExpression());
+		indexClassAssertion(axiom.getIndividual(), axiom.getClassExpression());
 		return null;
 	}
 
@@ -265,9 +270,10 @@ public abstract class AbstractElkAxiomIndexerVisitor extends AbstractElkAxiomVis
 	 */
 	@Override
 	public Void visit(ElkObjectPropertyAssertionAxiom axiom) {
-		indexSubClassOfAxiom(objectFactory.getObjectOneOf(axiom.getSubject()),
-				objectFactory.getObjectSomeValuesFrom(axiom.getProperty(),
-						objectFactory.getObjectOneOf(axiom.getObject())));
+		indexClassAssertion(
+				axiom.getSubject(),
+				objectFactory.getObjectHasValue(axiom.getProperty(),
+						axiom.getObject()));
 		return null;
 	}
 

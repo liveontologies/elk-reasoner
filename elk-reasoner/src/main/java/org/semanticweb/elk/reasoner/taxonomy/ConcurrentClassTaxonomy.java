@@ -31,13 +31,12 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
@@ -45,36 +44,51 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 
 /**
- * Class taxonomy that is suitable for concurrent processing. It also implements
- * method for the bottom node.
+ * Class taxonomy that is suitable for concurrent processing. Taxonomy objects
+ * are only constructed for consistent ontologies, and some consequences of this
+ * are hardcoded here.
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
- * 
+ * @author Markus Kroetzsch
  */
-class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
+class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ConcurrentClassTaxonomy.class);
 
 	/* thread safe map from class IRIs to class nodes */
-	protected final ConcurrentMap<ElkIri, NonBottomNode> nodeLookup;
-	/* thread safe set of all nodes */
-	protected final Set<ClassNode> allNodes;
-	/* boolean to guard access to the set of all nodes */
-	protected final AtomicBoolean processingNewNodes;
+	protected final ConcurrentMap<ElkIri, NonBottomClassNode> classNodeLookup;
+	/* thread safe set of all class nodes */
+	protected final Set<TypeNode<ElkClass, ElkNamedIndividual>> allClassNodes;
 	/* counts the number of nodes which have non-bottom sub-classes */
+
+	/* thread safe map from class IRIs to individual nodes */
+	protected final ConcurrentMap<ElkIri, IndividualNode> individualNodeLookup;
+	/* thread safe set of all individual nodes */
+	protected final Set<InstanceNode<ElkClass, ElkNamedIndividual>> allIndividualNodes;
+
 	protected final AtomicInteger countNodesWithSubClasses;
 	/* thread safe set of unsatisfiable classes */
 	protected final Set<ElkClass> unsatisfiableClasses;
 
+	/**
+	 * The bottom node.
+	 */
+	protected final BottomClassNode bottomClassNode;
+
 	ConcurrentClassTaxonomy() {
-		this.nodeLookup = new ConcurrentHashMap<ElkIri, NonBottomNode>();
-		this.allNodes = Collections
-				.newSetFromMap(new ConcurrentHashMap<ClassNode, Boolean>());
-		allNodes.add(this);
-		this.processingNewNodes = new AtomicBoolean(false);
+		this.classNodeLookup = new ConcurrentHashMap<ElkIri, NonBottomClassNode>();
+		this.allClassNodes = Collections
+				.newSetFromMap(new ConcurrentHashMap<TypeNode<ElkClass, ElkNamedIndividual>, Boolean>());
+
+		this.individualNodeLookup = new ConcurrentHashMap<ElkIri, IndividualNode>();
+		this.allIndividualNodes = Collections
+				.newSetFromMap(new ConcurrentHashMap<InstanceNode<ElkClass, ElkNamedIndividual>, Boolean>());
+
+		this.bottomClassNode = new BottomClassNode();
+		allClassNodes.add(this.bottomClassNode);
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 		this.unsatisfiableClasses = Collections
 				.synchronizedSet(new TreeSet<ElkClass>(
@@ -82,133 +96,204 @@ class ConcurrentClassTaxonomy implements ClassTaxonomy, ClassNode {
 		this.unsatisfiableClasses.add(PredefinedElkClass.OWL_NOTHING);
 	}
 
-	@Override
-	public Set<ClassNode> getNodes() {
-		return Collections.unmodifiableSet(allNodes);
-	}
-
 	/**
-	 * Returns the IRI of the given ELK class.
+	 * Returns the IRI of the given ELK entity.
 	 * 
-	 * @return the IRI of the given ELK class
+	 * @return the IRI of the given ELK entity
 	 */
-	static ElkIri getKey(ElkClass elkClass) {
-		return elkClass.getIri();
+	static ElkIri getKey(ElkEntity elkEntity) {
+		return elkEntity.getIri();
 	}
 
 	/**
-	 * Get non-bottom node assigned to the given {@link ElkClass}, or
-	 * <tt>null</tt> if none is assigned.
+	 * Obtain a ClassNode object for a given {@link ElkClass}, or <tt>null</tt> if
+	 * none assigned.
 	 * 
 	 * @param elkClass
-	 *            the class for which to find the node non-bottom
-	 * @return the non-bottom node for the given {@link ElkClass}
-	 */
-	protected NonBottomNode getNonBottomNode(ElkClass elkClass) {
-		return nodeLookup.get(getKey(elkClass));
-	}
-
-	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-
-	/**
-	 * Obtain a ClassNode object for a given {@link ElkClass}, <tt>null</tt> if
-	 * none assigned
-	 * 
-	 * @param elkClass
-	 * @return ClassNode object for elkClass, possibly still incomplete
+	 * @return type node object for elkClass, possibly still incomplete
 	 */
 	@Override
-	public ClassNode getNode(ElkClass elkClass) {
-		ClassNode result = getNonBottomNode(elkClass);
-		if (result != null)
+	public TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(ElkClass elkClass) {
+		NonBottomClassNode result = classNodeLookup.get(getKey(elkClass));
+		if (result != null) {
 			return result;
-		if (unsatisfiableClasses.contains(elkClass))
-			return this;
-		LOGGER_.error("No taxonomy node for class "
-				+ elkClass.getIri().asString());
-		return null;
+		} else if (unsatisfiableClasses.contains(elkClass)) {
+			return this.bottomClassNode;
+		} else {
+			return null;
+		}
 	}
 
-	NonBottomNode getCreate(Collection<ElkClass> members) {
-		
+	/**
+	 * Obtain a ClassNode object for a given {@link ElkClass}, or <tt>null</tt> if
+	 * none assigned.
+	 * 
+	 * @param individual
+	 * @return instance node object for elkClass, possibly still incomplete
+	 */
+	@Override
+	public InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
+			ElkNamedIndividual individual) {
+		IndividualNode result = individualNodeLookup.get(getKey(individual));
+		if (result != null) {
+			return result;
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public TaxonomyNode<ElkClass> getNode(ElkClass elkClass) {
+		return getTypeNode(elkClass);
+	}
+
+	@Override
+	public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getTypeNodes() {
+		return Collections.unmodifiableSet(allClassNodes);
+	}
+
+	@Override
+	public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getInstanceNodes() {
+		return Collections.unmodifiableSet(allIndividualNodes);
+	}
+
+	@Override
+	public Set<? extends TaxonomyNode<ElkClass>> getNodes() {
+		return getTypeNodes();
+	}
+
+	@Override
+	NonBottomClassNode getCreateClassNode(Collection<ElkClass> members) {
 		ElkClass someMember = null;
 		for (ElkClass member : members) {
 			someMember = member;
 			break;
 		}
-		
-		NonBottomNode previous = nodeLookup.get(getKey(someMember));
+
+		NonBottomClassNode previous = classNodeLookup.get(getKey(someMember));
 		if (previous != null)
 			return previous;
-			
-		NonBottomNode node = new NonBottomNode(this, members);
+
+		NonBottomClassNode node = new NonBottomClassNode(this, members);
 		// we assign first for the node to the canonical member to avoid
 		// concurrency problems
 		ElkClass canonical = node.getCanonicalMember();
-		previous = nodeLookup.putIfAbsent(getKey(canonical), node);
+		previous = classNodeLookup.putIfAbsent(getKey(canonical), node);
 		if (previous != null)
-			return previous;		
-		
-		allNodes.add(node);
+			return previous;
+
+		allClassNodes.add(node);
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace(canonical + ": node created");
 		}
 		for (ElkClass member : members) {
 			if (member != canonical)
-				nodeLookup.put(getKey(member), node);
+				classNodeLookup.put(getKey(member), node);
 		}
 		return node;
 	}
 
-	/* functions required by the {@link ClassNode} representing the bottom node */
-
 	@Override
-	public Set<ElkClass> getMembers() {
-		return unsatisfiableClasses;
+	IndividualNode getCreateIndividualNode(
+			Collection<ElkNamedIndividual> members) {
+
+		IndividualNode node = new IndividualNode(this, members);
+		// we assign first for the node to the canonical member to avoid
+		// concurrency problems
+		ElkNamedIndividual canonical = node.getCanonicalMember();
+		IndividualNode previous = individualNodeLookup.putIfAbsent(
+				getKey(canonical), node);
+		if (previous != null)
+			return previous;
+
+		allIndividualNodes.add(node);
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace(canonical + ": node created");
+		}
+		for (ElkNamedIndividual member : members) {
+			if (member != canonical)
+				individualNodeLookup.put(getKey(member), node);
+		}
+		return node;
 	}
 
 	@Override
-	public ElkClass getCanonicalMember() {
-		return PredefinedElkClass.OWL_NOTHING;
+	void addUnsatisfiableClass(ElkClass elkClass) {
+		unsatisfiableClasses.add(elkClass);
 	}
 
-	@Override
-	public Set<ClassNode> getDirectSuperNodes() {
-		return Operations.filter(allNodes, new Condition<ClassNode>() {
-			public boolean holds(ClassNode element) {
-				return element.getDirectSubNodes().contains(ConcurrentClassTaxonomy.this);
-			}
-			/*
-			 * the direct super nodes of the bottom node are all nodes except
-			 * the nodes that have no non-bottom sub-classes and the bottom node
-			 */
-		}, allNodes.size() - countNodesWithSubClasses.get() - 1);
-	}
+	/**
+	 * Special implementation for the bottom node in the taxonomy. Instead of
+	 * storing its sub- and super-classes, the respective answers are computed
+	 * or taken from the taxonomy object directly. This safes memory at the cost
+	 * of some performance if somebody should wish to traverse an ontology
+	 * bottom-up starting from this node.
+	 */
+	protected class BottomClassNode implements
+			TypeNode<ElkClass, ElkNamedIndividual> {
 
-	@Override
-	public Set<ClassNode> getAllSuperNodes() {
-		/* all nodes except this one */
-		return Operations.filter(allNodes, new Condition<Object>() {
-			@Override
-			public boolean holds(Object element) {
-				return element != this;
-			}
-		}, allNodes.size() - 1);
-	}
+		@Override
+		public Set<ElkClass> getMembers() {
+			return unsatisfiableClasses;
+		}
 
-	@Override
-	public Set<ClassNode> getDirectSubNodes() {
-		return Collections.emptySet();
-	}
+		@Override
+		public ElkClass getCanonicalMember() {
+			return PredefinedElkClass.OWL_NOTHING;
+		}
 
-	@Override
-	public Set<ClassNode> getAllSubNodes() {
-		return Collections.emptySet();
-	}
+		@Override
+		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
+			return Operations.filter(allClassNodes,
+					new Condition<TaxonomyNode<ElkClass>>() {
+						public boolean holds(TaxonomyNode<ElkClass> element) {
+							return element.getDirectSubNodes().contains(
+									bottomClassNode);
+						}
+						/*
+						 * the direct super nodes of the bottom node are all
+						 * nodes except the nodes that have no non-bottom
+						 * sub-classes and the bottom node
+						 */
+					}, allClassNodes.size() - countNodesWithSubClasses.get()
+							- 1);
+		}
 
-	@Override
-	public ClassTaxonomy getTaxonomy() {
-		return this;
+		@Override
+		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {
+			/* all nodes except this one */
+			return Operations.filter(allClassNodes, new Condition<Object>() {
+				@Override
+				public boolean holds(Object element) {
+					return element != bottomClassNode;
+				}
+			}, allClassNodes.size() - 1);
+		}
+
+		@Override
+		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
+			return ConcurrentClassTaxonomy.this;
+		}
+
+		@Override
+		public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
+			return Collections.emptySet();
+		}
 	}
 
 }

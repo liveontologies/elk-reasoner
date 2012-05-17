@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
+import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -72,7 +73,7 @@ public class IOReasoner extends Reasoner {
 		loadOntologyFromStream(new ByteArrayInputStream(text.getBytes()));
 	}
 
-	public void writeTaxonomyToFile(File file) throws IOException {
+	public void writeTaxonomyToFile(File file) throws IOException, InconsistentOntologyException {
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Writing taxonomy to " + file);
 		}

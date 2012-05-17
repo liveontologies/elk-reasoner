@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
@@ -90,6 +91,23 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			subIndexedClass.removeToldSuperClassExpression(superIndexedClass);
 		}
 	}
+	
+	@Override
+	public void indexClassAssertion(ElkIndividual individual,
+			ElkClassExpression type) {
+
+		IndexedClassExpression indexedIndividual = individual
+				.accept(negativeIndexer);
+
+		IndexedClassExpression indexedType = type
+				.accept(positiveIndexer);
+
+		if (multiplicity == 1) {
+			indexedIndividual.addToldSuperClassExpression(indexedType);
+		} else {
+			indexedIndividual.removeToldSuperClassExpression(indexedType);
+		}
+	}
 
 	@Override
 	public void indexSubObjectPropertyOfAxiom(
@@ -116,6 +134,9 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	@Override
 	public void indexDisjointClassExpressions(
 			List<? extends ElkClassExpression> disjointClasses) {
+		
+		// treat this as a positive occurrence of owl:Nothing
+		ontologyIndex.getIndexedOwlNothing().updateOccurrenceNumbers(multiplicity, multiplicity, 0);
 		
 		if (disjointClasses.size() == 2) {
 			IndexedClassExpression ice0 = disjointClasses.get(0).accept(
@@ -163,18 +184,18 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	}
 
 	@Override
-	public void indexClassDeclaration(ElkClass ec) {
-		ec.accept(neutralIndexer);
+	public IndexedClass indexClassDeclaration(ElkClass ec) {
+		return (IndexedClass) ec.accept(neutralIndexer);
 	}
 
 	@Override
-	public void indexObjectPropertyDeclaration(ElkObjectProperty ep) {
-		ep.accept(neutralIndexer);
+	public IndexedObjectProperty indexObjectPropertyDeclaration(ElkObjectProperty ep) {
+		return (IndexedObjectProperty) ep.accept(neutralIndexer);
 	}
 
 	@Override
-	public void indexNamedIndividualDeclaration(ElkNamedIndividual eni) {
-		eni.accept(neutralIndexer);
+	public IndexedIndividual indexNamedIndividualDeclaration(ElkNamedIndividual eni) {
+		return eni.accept(neutralIndexer);
 	}
 
 	/**

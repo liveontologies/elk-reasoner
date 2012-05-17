@@ -23,10 +23,10 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedNominalVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
 
-public class IndexedNominal extends IndexedClassExpression {
+public class IndexedIndividual extends IndexedClassEntity {
 	/**
 	 * The ElkNamedIndividual that is the sole instance of this nominal
 	 */
@@ -34,7 +34,7 @@ public class IndexedNominal extends IndexedClassExpression {
 	
 	protected int occurrenceNo = 0;
 
-	protected IndexedNominal(ElkNamedIndividual elkNamedIndividual) {
+	protected IndexedIndividual(ElkNamedIndividual elkNamedIndividual) {
 		this.elkNamedIndividual = elkNamedIndividual;
 	}
 
@@ -45,12 +45,12 @@ public class IndexedNominal extends IndexedClassExpression {
 		return elkNamedIndividual;
 	}
 
-	public <O> O accept(IndexedNominalVisitor<O> visitor) {
+	public <O> O accept(IndexedIndividualVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

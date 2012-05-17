@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -29,15 +31,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
 import org.semanticweb.elk.testing.io.IOUtils;
 import org.semanticweb.elk.testing.io.URLTestIO;
-import static org.junit.Assume.assumeTrue;
 
 /**
  * Runs classification tests for all test input in the test directory
@@ -85,7 +87,6 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	 * ---------------------------------------------
 	 */
 	
-
 	/**
 	 * Checks that the computed taxonomy is correct and complete
 	 * 
@@ -94,17 +95,21 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	@Test
 	public void classify() throws TestResultComparisonException {
 		System.err.println(manifest.toString());
+		
+		Taxonomy<ElkClass> taxonomy;
+		try {
+			taxonomy = reasoner.getTaxonomy();
+			manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
+		} catch (InconsistentOntologyException e) {
+			manifest.compare(new ClassTaxonomyTestOutput());
+		}
+		
+		/*try {
+			Writer writer = new OutputStreamWriter(System.out);
+			ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, true);
+			writer.flush();
+		} catch (IOException e) {}*/
+		
 
-		reasoner.classify();
-
-		ClassTaxonomy taxonomy = reasoner.getTaxonomy();
-
-		/*
-		 * try { Writer writer = new OutputStreamWriter(System.out);
-		 * ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, true);
-		 * writer.flush(); } catch (IOException e) {}
-		 */
-
-		manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
 	}
 }
