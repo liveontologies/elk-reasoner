@@ -77,6 +77,7 @@ public class ReasonerFactory {
 					.getBundle(PROPERTY_RESOURCE_NAME, Locale.getDefault(),
 							ReasonerFactory.class.getClassLoader());
 		} catch (MissingResourceException e) {
+			//FIXME Document why this is ignored or do something appropriate
 		}
 
 		if (bundle == null) {
