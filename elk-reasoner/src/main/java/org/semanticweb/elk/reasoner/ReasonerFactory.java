@@ -77,7 +77,8 @@ public class ReasonerFactory {
 					.getBundle(PROPERTY_RESOURCE_NAME, Locale.getDefault(),
 							ReasonerFactory.class.getClassLoader());
 		} catch (MissingResourceException e) {
-			//FIXME Document why this is ignored or do something appropriate
+			// no handling needed, this simply means that the resource isn't in
+			// the classpath - a perfectly OK situation
 		}
 
 		if (bundle == null) {
