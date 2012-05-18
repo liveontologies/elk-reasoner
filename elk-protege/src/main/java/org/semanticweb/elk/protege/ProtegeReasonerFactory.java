@@ -48,7 +48,7 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	protected final OWLReasonerFactory factory = new ElkReasonerFactory();
 	protected final ReasonerConfiguration elkConfig = ReasonerConfiguration
-			.getDefaultConfiguration();
+			.getConfiguration();
 
 	protected final MessageDialogAppender messageDialogAppender = new MessageDialogAppender();
 
@@ -65,7 +65,8 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 	@Override
 	public ElkReasonerConfiguration getConfiguration(
 			ReasonerProgressMonitor monitor) {
-		OWLReasonerConfiguration defaultOwlConfig = ElkReasonerConfiguration.getDefaultOwlReasonerConfiguration(monitor);
+		OWLReasonerConfiguration defaultOwlConfig = ElkReasonerConfiguration
+				.getDefaultOwlReasonerConfiguration(monitor);
 		return new ElkReasonerConfiguration(defaultOwlConfig, elkConfig);
 	}
 

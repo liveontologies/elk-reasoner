@@ -34,6 +34,7 @@ import java.io.StringWriter;
 import java.util.concurrent.Executors;
 
 import org.junit.Test;
+import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
@@ -41,7 +42,6 @@ import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.testing.io.IOUtils;
 
 /**
  * Tests loading/dumping of class taxonomies

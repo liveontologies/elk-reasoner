@@ -47,6 +47,16 @@
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-util-common</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-util-io</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-testing</artifactId>
 			<version>0.2.1-SNAPSHOT</version>
 			<scope>test</scope>

@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.HashTestOutput;
@@ -35,7 +36,6 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.io.IOUtils;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**

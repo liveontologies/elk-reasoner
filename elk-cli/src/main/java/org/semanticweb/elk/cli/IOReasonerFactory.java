@@ -41,7 +41,7 @@ public class IOReasonerFactory extends ReasonerFactory {
 
 	@Override
 	public IOReasoner createReasoner() {
-		return createReasoner(super.loadReasonerConfiguration());
+		return createReasoner(ReasonerConfiguration.getConfiguration());
 	}
 
 	@Override

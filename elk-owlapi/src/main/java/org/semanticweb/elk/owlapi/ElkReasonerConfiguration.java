@@ -54,16 +54,16 @@ public class ElkReasonerConfiguration implements OWLReasonerConfiguration {
 
 	public ElkReasonerConfiguration() {
 		this(getDefaultOwlReasonerConfiguration(null), ReasonerConfiguration
-				.getDefaultConfiguration());
+				.getConfiguration());
 	}
 
 	public ElkReasonerConfiguration(ReasonerProgressMonitor monitor) {
 		this(getDefaultOwlReasonerConfiguration(monitor), ReasonerConfiguration
-				.getDefaultConfiguration());
+				.getConfiguration());
 	}
 
 	public ElkReasonerConfiguration(OWLReasonerConfiguration genConfig) {
-		this(genConfig, ReasonerConfiguration.getDefaultConfiguration());
+		this(genConfig, ReasonerConfiguration.getConfiguration());
 	}
 
 	public static OWLReasonerConfiguration getDefaultOwlReasonerConfiguration(

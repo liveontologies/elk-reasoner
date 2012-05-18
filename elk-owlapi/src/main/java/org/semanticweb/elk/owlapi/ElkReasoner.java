@@ -145,11 +145,12 @@ public class ElkReasoner implements OWLReasoner {
 
 		flush();
 	}
-
+	
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
 			ReasonerProgressMonitor progressMonitor) {
 		this(ontology, isBufferingMode, new ElkReasonerConfiguration(
 				progressMonitor));
+
 	}
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode) {
