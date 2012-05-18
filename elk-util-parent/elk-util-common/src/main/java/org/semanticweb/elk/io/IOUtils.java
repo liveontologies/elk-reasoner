@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.security.CodeSource;
@@ -53,6 +54,14 @@ public class IOUtils {
 			} catch (IOException e) {}
 		}
 	}
+	
+	public static void closeQuietly(OutputStream stream) {
+		if (stream != null) {
+			try {
+				stream.close();
+			} catch (IOException e) {}
+		}
+	}	
 	
 	
 	public static List<String> getResourceNamesFromDir(File dir, String extension) {
