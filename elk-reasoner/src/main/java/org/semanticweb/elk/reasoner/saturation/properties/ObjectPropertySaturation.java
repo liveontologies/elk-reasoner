@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -49,6 +50,12 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * 
  */
 public class ObjectPropertySaturation {
+	
+	/**
+	 * Logger for events.
+	 */
+	protected final static Logger LOGGER_ = Logger.getLogger(ObjectPropertySaturation.class);
+	
 
 	protected final ExecutorService executor;
 	protected final int maxWorkers;
@@ -61,14 +68,22 @@ public class ObjectPropertySaturation {
 		this.ontologyIndex = ontologyIndex;
 	}
 
+	public void compute() {
+		try {
+			tryCompute();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	/**
 	 * @throws InterruptedException
 	 * 
 	 */
-	public void compute() throws InterruptedException {
+	protected void tryCompute() throws InterruptedException {
 		// set up property hierarchy
 		ConcurrentComputation<IndexedPropertyChain> roleHierarchyComputation = new ConcurrentComputation<IndexedPropertyChain>(
-				new RoleHierarchyComputation(), executor, maxWorkers,
+				new RoleHierarchyComputationEngine(), executor, maxWorkers,
 				2 * maxWorkers, 128);
 
 		roleHierarchyComputation.start();
@@ -143,7 +158,7 @@ public class ObjectPropertySaturation {
 			return;
 		
 		ConcurrentComputation<Vector<IndexedPropertyChain>> redundantCompositionsElimination = new ConcurrentComputation<Vector<IndexedPropertyChain>>(
-				new RedundantCompositionsElimination(), executor, maxWorkers,
+				new RedundantCompositionsEliminationEngine(), executor, maxWorkers,
 				2 * maxWorkers, 128);
 		 redundantCompositionsElimination.start();
 		 
@@ -170,7 +185,7 @@ public class ObjectPropertySaturation {
 		redundantCompositionsElimination.waitCompletion();
 	}
 
-	private class RoleHierarchyComputation implements
+	private class RoleHierarchyComputationEngine implements
 			InputProcessor<IndexedPropertyChain> {
 
 		@Override
@@ -221,7 +236,7 @@ public class ObjectPropertySaturation {
 	 * is redundant and is removed
 	 */
 
-	private class RedundantCompositionsElimination implements
+	private class RedundantCompositionsEliminationEngine implements
 			InputProcessor<Vector<IndexedPropertyChain>> {
 
 		@Override

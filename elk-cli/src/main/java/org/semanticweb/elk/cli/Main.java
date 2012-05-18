@@ -89,7 +89,7 @@ public class Main {
 					Executors.newCachedThreadPool(), nWorkers.value(options));
 			reasoner.loadOntologyFromFile(inputOntologyFile.value(options));
 			if (options.has(classify))
-				reasoner.classify();
+				reasoner.getTaxonomy();
 			if (options.hasArgument(outputTaxonomyFile))
 				reasoner.writeTaxonomyToFile(outputTaxonomyFile.value(options));
 			reasoner.shutdown();

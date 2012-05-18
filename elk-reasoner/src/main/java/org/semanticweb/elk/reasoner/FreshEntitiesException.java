@@ -22,26 +22,37 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.semanticweb.elk.testing.HashTestOutput;
-import org.semanticweb.elk.testing.TestResultComparisonException;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public class ClassTaxonomyHashManifest extends
-		ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> {
+/**
+ * Exception that is thrown when a query that is asked to the reasoner
+ * refers to vocabulary symbols that do not occur in the ontology yet.
+ * 
+ * @author Markus Kroetzsch
+ *
+ */
+public class FreshEntitiesException extends Exception {
 
-	public ClassTaxonomyHashManifest(URL input, int expHash) {
-		super(input, new HashTestOutput(expHash));
+	private static final long serialVersionUID = -4462031988813386808L;
+	
+	protected final Set<ElkEntity> entities;
+	
+	public FreshEntitiesException(ElkEntity entity) {
+		super();
+		entities = new HashSet<ElkEntity>();
+		entities.add(entity);
+	}
+	
+	public FreshEntitiesException(Set<ElkEntity> entities) {
+		super();
+		this.entities = entities;
 	}
 
-	@Override
-	public void compare(ClassTaxonomyTestOutput actualOutput)
-			throws TestResultComparisonException {
-		int actualHash = actualOutput.getHashCode();
-
-		if (actualHash != getExpectedOutput().getHash()) {
-			throw new TestResultComparisonException(
-					"Actual taxonomy hash code is not equal to the expected hash code");
-		}
+	public Set<ElkEntity> getEntities() {
+		return entities;
 	}
+
 }

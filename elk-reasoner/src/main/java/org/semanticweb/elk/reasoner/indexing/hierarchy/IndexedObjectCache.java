@@ -42,6 +42,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	protected final KeyEntryHashSet<IndexedClassExpression> indexedClassExpressionLookup;
 	protected final KeyEntryHashSet<IndexedPropertyChain> indexedPropertyChainLookup;
 	protected int indexedClassCount = 0;
+	protected int indexedIndividualCount = 0;
 	protected int indexedObjectPropertyCount = 0;
 
 	protected IndexedObjectCache() {
@@ -91,6 +92,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		indexedClassExpressionLookup.merge(ice);
 		if (ice instanceof IndexedClass)
 			indexedClassCount++;
+		else if (ice instanceof IndexedIndividual)
+			indexedIndividualCount++;
 	}
 
 	protected void add(IndexedPropertyChain ipc) {
@@ -103,6 +106,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		indexedClassExpressionLookup.remove(ice);
 		if (ice instanceof IndexedClass)
 			indexedClassCount--;
+		else if (ice instanceof IndexedIndividual)
+			indexedIndividualCount--;
 	}
 
 	protected void remove(IndexedPropertyChain ipc) {

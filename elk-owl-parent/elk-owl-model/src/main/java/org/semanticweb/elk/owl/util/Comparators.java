@@ -25,6 +25,7 @@ package org.semanticweb.elk.owl.util;
 import java.util.Comparator;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 
 public class Comparators {
@@ -33,6 +34,13 @@ public class Comparators {
 		@Override
 		public int compare(ElkClass o1, ElkClass o2) {
 			return PredefinedElkIri.compare(o1.getIri(), o2.getIri());
+		}
+	};
+	
+	public static Comparator<ElkNamedIndividual> ELK_NAMED_INDIVIDUAL_COMPARATOR = new Comparator<ElkNamedIndividual>() {
+		@Override
+		public int compare(ElkNamedIndividual o1, ElkNamedIndividual o2) {
+			return o1.getIri().compareTo(o2.getIri());
 		}
 	};
 

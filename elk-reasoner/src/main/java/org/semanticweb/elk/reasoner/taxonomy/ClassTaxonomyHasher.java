@@ -57,7 +57,7 @@ public class ClassTaxonomyHasher {
 	 * caching to ensure good performance even when some nodes have unusually
 	 * many members.
 	 */
-	protected static Hasher<ClassNode> classNodeHasher = new Hasher<ClassNode>() {
+	protected static Hasher<TaxonomyNode<ElkClass>> classNodeHasher = new Hasher<TaxonomyNode<ElkClass>>() {
 
 		/**
 		 * For nodes with at least this number of member classes, hash codes are
@@ -77,29 +77,29 @@ public class ClassTaxonomyHasher {
 		 * such nodes in typical ontologies. Normally, this occurs if many
 		 * classes are equivalent to owl:Nothing due to some modelling error.
 		 */
-		final LinkedHashMap<ClassNode, Integer> hashCache = new LinkedHashMap<ClassNode, Integer>() {
+		final LinkedHashMap<Node<ElkClass>, Integer> hashCache = new LinkedHashMap<Node<ElkClass>, Integer>() {
 			private static final long serialVersionUID = 1;
 
 			@Override
 			protected boolean removeEldestEntry(
-					Map.Entry<ClassNode, Integer> eldest) {
+					Map.Entry<Node<ElkClass>, Integer> eldest) {
 				return size() > cacheMaxSize;
 			}
 		};
 
 		@Override
-		public int hash(ClassNode node) {
+		public int hash(TaxonomyNode<ElkClass> node) {
 			int memberHash = HashGenerator.combineMultisetHash(true,
 					node.getMembers(), elkClassHasher);
 
 			int subClassHash = "subClassOf".hashCode();
-			for (ClassNode o : node.getDirectSubNodes()) {
+			for (TaxonomyNode<ElkClass> o : node.getDirectSubNodes()) {
 				subClassHash = HashGenerator.combineMultisetHash(false,
 						subClassHash, getClassNodeMemberHash(o));
 			}
 
 			int superClassHash = "superClassOf".hashCode();
-			for (ClassNode o : node.getDirectSuperNodes()) {
+			for (Node<ElkClass> o : node.getDirectSuperNodes()) {
 				superClassHash = HashGenerator.combineMultisetHash(false,
 						superClassHash, getClassNodeMemberHash(o));
 			}
@@ -117,7 +117,7 @@ public class ClassTaxonomyHasher {
 		 * @param classNode
 		 * @return
 		 */
-		private final int getClassNodeMemberHash(ClassNode classNode) {
+		private final int getClassNodeMemberHash(Node<ElkClass> classNode) {
 			if (classNode.getMembers().size() >= cacheNodeMemberNo) {
 				if (hashCache.containsKey(classNode)) {
 					return hashCache.get(classNode);
@@ -137,10 +137,10 @@ public class ClassTaxonomyHasher {
 	/**
 	 * Helper class for hashing a class taxonomy.
 	 */
-	protected static Hasher<ClassTaxonomy> classTaxonomyHasher = new Hasher<ClassTaxonomy>() {
+	protected static Hasher<Taxonomy<ElkClass>> classTaxonomyHasher = new Hasher<Taxonomy<ElkClass>>() {
 
 		@Override
-		public int hash(ClassTaxonomy taxonomy) {
+		public int hash(Taxonomy<ElkClass> taxonomy) {
 			return HashGenerator.combineMultisetHash(true, taxonomy.getNodes(),
 					classNodeHasher);
 		}
@@ -152,7 +152,7 @@ public class ClassTaxonomyHasher {
 	 * @param taxonomy
 	 * @return hash
 	 */
-	public static int hash(ClassTaxonomy taxonomy) {
+	public static int hash(Taxonomy<ElkClass> taxonomy) {
 		return classTaxonomyHasher.hash(taxonomy);
 	}
 

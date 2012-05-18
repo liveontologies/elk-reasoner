@@ -22,15 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.indexing.visitors;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 
 /**
- * Visitor pattern interface for instances of {@link IndexedNominal}.
+ * Visitor pattern interface for instances of {@link IndexedIndividual}.
  * 
  * @author Frantisek Simancik
  */
-public interface IndexedNominalVisitor<O> {
+public interface IndexedIndividualVisitor<O> {
 
-	O visit(IndexedNominal element);
+	O visit(IndexedIndividual element);
 
 }

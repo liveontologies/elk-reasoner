@@ -58,7 +58,7 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
  */
 public class ClassTaxonomyLoader {
 
-	public static ClassTaxonomy load(Owl2Parser parser) throws IOException,
+	public static Taxonomy<ElkClass> load(Owl2Parser parser) throws IOException,
 			Owl2ParseException {
 		final ConcurrentClassTaxonomy taxonomy = new ConcurrentClassTaxonomy();
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);
@@ -75,15 +75,15 @@ public class ClassTaxonomyLoader {
 		if (taxonomy.getNode(thing) == taxonomy)
 			return taxonomy;
 
-		NonBottomNode topNode = taxonomy
-				.getCreate(Collections.singleton(thing));
-		ClassNode botNode = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+		NonBottomClassNode topNode = taxonomy
+				.getCreateClassNode(Collections.singleton(thing));
+		TaxonomyNode<ElkClass> botNode = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
 
-		for (ClassNode node : taxonomy.getNodes()) {
+		for (TaxonomyNode<ElkClass> node : taxonomy.getNodes()) {
 			if (node == topNode || node == botNode)
 				continue;
 
-			NonBottomNode nbNode = (NonBottomNode) node;
+			NonBottomClassNode nbNode = (NonBottomClassNode) node;
 
 			if (node.getDirectSuperNodes().isEmpty()) {
 				nbNode.addDirectSuperNode(topNode);
@@ -130,7 +130,7 @@ public class ClassTaxonomyLoader {
 			}
 
 			if (!nothing) {
-				taxonomy.getCreate(classes);
+				taxonomy.getCreateClassNode(classes);
 			} else {
 				taxonomy.unsatisfiableClasses.addAll(classes);
 			}
@@ -150,20 +150,20 @@ public class ClassTaxonomyLoader {
 				ElkClass subClass = (ElkClass) subCE;
 				ElkClass superClass = (ElkClass) superCE;
 				// check if both nodes are there yet
-				ClassNode subNode = taxonomy.getNode(subClass);
-				ClassNode superNode = taxonomy.getNode(superClass);
-				NonBottomNode subNonBot = null;
-				NonBottomNode superNonBot = null;
+				TaxonomyNode<ElkClass> subNode = taxonomy.getNode(subClass);
+				TaxonomyNode<ElkClass> superNode = taxonomy.getNode(superClass);
+				NonBottomClassNode subNonBot = null;
+				NonBottomClassNode superNonBot = null;
 
 				if ((subNode == null || superNode == null) && !createNodes) {
 					// wait, maybe we'll create these nodes later
 					nonProcessedAxioms.add(elkSubClassOfAxiom);
 				} else {
-					subNonBot = (NonBottomNode) (subNode == null ? taxonomy
-							.getCreate(Collections.singleton(subClass))
+					subNonBot = (NonBottomClassNode) (subNode == null ? taxonomy
+							.getCreateClassNode(Collections.singleton(subClass))
 							: subNode);
-					superNonBot = (NonBottomNode) (superNode == null ? taxonomy
-							.getCreate(Collections.singleton(superClass))
+					superNonBot = (NonBottomClassNode) (superNode == null ? taxonomy
+							.getCreateClassNode(Collections.singleton(superClass))
 							: superNode);
 
 					subNonBot.addDirectSuperNode(superNonBot);
