@@ -25,14 +25,23 @@
  */
 package org.semanticweb.elk.config;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Properties;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.io.IOUtils;
 
 /**
  * The base class responsible for loading configurations
@@ -88,6 +97,72 @@ public class ConfigurationFactory {
 		copyParameters(prefix, config, bundle);
 
 		return config;
+	}
+
+	/**
+	 * Not a thread-safe method. Shouldn't be invoked concurrently.
+	 * 
+	 * @param configOnDisk
+	 * @param config
+	 * @throws ConfigurationException
+	 * @throws IOException
+	 */
+	public void saveConfiguration(File configOnDisk, BaseConfiguration config)
+			throws ConfigurationException, IOException {
+		/*
+		 * Unfortunately, we can't directly write the config on disk because the
+		 * parameters in it may be just a subset of those on disk. So we load it
+		 * first (alternatively one may use a singleton, which I typically try
+		 * to avoid). It should work reasonably well unless there're too many
+		 * parameters (in which case we should think of a mini key-value store).
+		 */
+		InputStream stream = null;
+		BaseConfiguration loadedConfig = null;
+		Properties diskProps = new Properties();
+
+		try {
+			stream = new FileInputStream(configOnDisk);
+			loadedConfig = getConfiguration(stream, "", config.getClass());
+			// copy parameters
+			copyParameters(loadedConfig, diskProps);
+		} catch (Exception e) {
+			LOGGER_.info("Overwriting configuration since it can't be loaded (perhaps doesn't exist?)");
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
+
+		copyParameters(config, diskProps);
+		// now save it to the file
+		saveProperties(diskProps, configOnDisk);
+	}
+
+	private void saveProperties(Properties diskProps, File configOnDisk) {
+		OutputStream stream = null;
+
+		try {
+			stream = new FileOutputStream(configOnDisk);
+			diskProps.store(
+					stream,
+					"ELK parameters saved at "
+							+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+									.format(new Date()));
+		} catch (FileNotFoundException e) {
+			throw new ConfigurationException(
+					"Configuration cannot be saved because the destination file cannot be written",
+					e);
+		} catch (IOException e) {
+			throw new ConfigurationException(
+					"Configuration cannot be saved because the destination file cannot be written",
+					e);
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
+	}
+
+	private void copyParameters(BaseConfiguration config, Properties diskProps) {
+		for (String key : config.getParameterNames()) {
+			diskProps.setProperty(key, config.getParameter(key));
+		}
 	}
 
 	private void copyParameters(String prefix, BaseConfiguration config,

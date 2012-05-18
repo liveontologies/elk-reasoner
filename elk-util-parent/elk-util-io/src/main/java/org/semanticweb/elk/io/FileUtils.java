@@ -27,6 +27,7 @@ package org.semanticweb.elk.io;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 
 /**
  * @author Pavel Klinov
@@ -57,6 +58,16 @@ public class FileUtils {
 
 	public static String getFileName(String path) {
 		return new File(path).getName();
+	}
+
+	public static void deleteRecursively(File file) throws IOException {
+		if (file.isDirectory()) {
+		    for (File c : file.listFiles())
+		    	deleteRecursively(c);
+		  }
+		  if (!file.delete()) {
+		    throw new IOException("Failed to delete file: " + file);
+		  }
 	}
 
 }
