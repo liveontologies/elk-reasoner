@@ -59,7 +59,7 @@ public class BaseConfiguration {
 
 	private final Map<String, String> paramMap = new HashMap<String, String>();
 
-	protected BaseConfiguration() {}
+	public BaseConfiguration() {}
 	
 	protected BaseConfiguration(BaseConfiguration config) {
 		this.paramMap.putAll(config.paramMap);
