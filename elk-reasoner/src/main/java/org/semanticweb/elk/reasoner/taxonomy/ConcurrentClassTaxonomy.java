@@ -58,19 +58,19 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ConcurrentClassTaxonomy.class);
 
-	/* thread safe map from class IRIs to class nodes */
+	/** thread safe map from class IRIs to class nodes */
 	protected final ConcurrentMap<ElkIri, NonBottomClassNode> classNodeLookup;
-	/* thread safe set of all class nodes */
+	/** thread safe set of all class nodes */
 	protected final Set<TypeNode<ElkClass, ElkNamedIndividual>> allClassNodes;
-	/* counts the number of nodes which have non-bottom sub-classes */
 
-	/* thread safe map from class IRIs to individual nodes */
+	/** thread safe map from class IRIs to individual nodes */
 	protected final ConcurrentMap<ElkIri, IndividualNode> individualNodeLookup;
-	/* thread safe set of all individual nodes */
+	/** thread safe set of all individual nodes */
 	protected final Set<InstanceNode<ElkClass, ElkNamedIndividual>> allIndividualNodes;
 
+	/** counts the number of nodes which have non-bottom sub-classes */
 	protected final AtomicInteger countNodesWithSubClasses;
-	/* thread safe set of unsatisfiable classes */
+	/** thread safe set of unsatisfiable classes */
 	protected final Set<ElkClass> unsatisfiableClasses;
 
 	/**
@@ -106,8 +106,8 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 	}
 
 	/**
-	 * Obtain a ClassNode object for a given {@link ElkClass}, or <tt>null</tt> if
-	 * none assigned.
+	 * Obtain a {@link TypeNode} object for a given {@link ElkClass}, or
+	 * <tt>null</tt> if none assigned.
 	 * 
 	 * @param elkClass
 	 * @return type node object for elkClass, possibly still incomplete
@@ -125,8 +125,8 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 	}
 
 	/**
-	 * Obtain a ClassNode object for a given {@link ElkClass}, or <tt>null</tt> if
-	 * none assigned.
+	 * Obtain a {@link TypeNode} object for a given {@link ElkClass}, or
+	 * <tt>null</tt> if none assigned.
 	 * 
 	 * @param individual
 	 * @return instance node object for elkClass, possibly still incomplete
@@ -175,7 +175,7 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 			return previous;
 
 		NonBottomClassNode node = new NonBottomClassNode(this, members);
-		// we assign first for the node to the canonical member to avoid
+		// we first assign the node to the canonical member to avoid
 		// concurrency problems
 		ElkClass canonical = node.getCanonicalMember();
 		previous = classNodeLookup.putIfAbsent(getKey(canonical), node);
@@ -198,7 +198,7 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 			Collection<ElkNamedIndividual> members) {
 
 		IndividualNode node = new IndividualNode(this, members);
-		// we assign first for the node to the canonical member to avoid
+		// we first assign the node to the canonical member to avoid
 		// concurrency problems
 		ElkNamedIndividual canonical = node.getCanonicalMember();
 		IndividualNode previous = individualNodeLookup.putIfAbsent(
@@ -225,7 +225,7 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 	/**
 	 * Special implementation for the bottom node in the taxonomy. Instead of
 	 * storing its sub- and super-classes, the respective answers are computed
-	 * or taken from the taxonomy object directly. This safes memory at the cost
+	 * or taken from the taxonomy object directly. This saves memory at the cost
 	 * of some performance if somebody should wish to traverse an ontology
 	 * bottom-up starting from this node.
 	 */

@@ -143,9 +143,9 @@ public class Reasoner {
 	/**
 	 * Set if fresh entities should be allowed. Fresh entities are entities that
 	 * occur as parameters of reasoner queries without occurring in the loaded
-	 * ontology. If false, a FreshENtityException will be thrown in such cases.
-	 * If true, the reasoner will answer as if the entity had been declared (but
-	 * not used in any axiom).
+	 * ontology. If false, a {@link FreshEntitiesException} will be thrown in
+	 * such cases. If true, the reasoner will answer as if the entity had been
+	 * declared (but not used in any axiom).
 	 * 
 	 * @param allow
 	 */
@@ -190,9 +190,9 @@ public class Reasoner {
 	}
 
 	/**
-	 * Get the OntologyIndex. When changing this index (adding ro deleting
-	 * axioms), the Reasoner will not be notified, and may thus fail to return
-	 * up-to-date answers for reasoning tasks.
+	 * Get the {@link OntologyIndex}. When changing this index (adding or
+	 * deleting axioms), the Reasoner will not be notified, and may thus fail to
+	 * return up-to-date answers for reasoning tasks.
 	 * 
 	 * FIXME Should this really be public? If yes, then the index should notify
 	 * the reasoner of changes.
@@ -204,10 +204,10 @@ public class Reasoner {
 	}
 
 	/**
-	 * Add an axom to the ontology. This method makes sure that internal
-	 * reasoning results are updated as required, so that all reasoning methods
-	 * return correct answers in the future. Previously returned results (e.g.,
-	 * taxonomies) will not be updated.
+	 * Add an axiom to the ontology. This method updates the
+	 * {@link OntologyIndex} according to the added axiom. The previously
+	 * computed reasoner results (e.g., taxonomies) will become invalid when new
+	 * axioms are added.
 	 * 
 	 * TODO Clarify what happens if an axiom is added twice.
 	 * 
@@ -219,10 +219,10 @@ public class Reasoner {
 	}
 
 	/**
-	 * Remove an axom from the ontology. This method makes sure that internal
-	 * reasoning results are updated as required, so that all reasoning methods
-	 * return correct answers in the future. Previously returned results (e.g.,
-	 * taxonomies) will not be updated.
+	 * Remove an axiom from the ontology.This method updates the
+	 * {@link OntologyIndex} according to the deleted axiom. The previously
+	 * computed reasoner results (e.g., taxonomies) will become invalid when new
+	 * axioms are added.
 	 * 
 	 * TODO Clarify what happens when deleting axioms that were not added.
 	 * 
@@ -234,7 +234,7 @@ public class Reasoner {
 	}
 
 	/**
-	 * Initialises reasoning by saturating object properties and checking
+	 * Initializes reasoning by saturating object properties and checking
 	 * consistency, if not yet done.
 	 */
 	protected void initializeReasoning() {

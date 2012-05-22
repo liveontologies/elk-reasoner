@@ -56,7 +56,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class TaxonomyComputationEngine implements InputProcessor<IndexedClassEntity> {
+public class TaxonomyComputationEngine implements
+		InputProcessor<IndexedClassEntity> {
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
@@ -192,6 +193,8 @@ public class TaxonomyComputationEngine implements InputProcessor<IndexedClassEnt
 		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalent<IndexedClassEntity> output) {
+			// this should not happen: all transitive reduction results should
+			// be computed with direct super classes
 			throw new IllegalArgumentException();
 		}
 
