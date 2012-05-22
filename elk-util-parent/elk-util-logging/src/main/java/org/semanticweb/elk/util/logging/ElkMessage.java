@@ -61,10 +61,12 @@ public class ElkMessage {
 		return messageType;
 	}
 
+	@Override
 	public String toString() {
 		return message;
 	}
 
+	@Override
 	public int hashCode() {
 		return HashGenerator.combinedHashCode(message, messageType);
 	}

@@ -187,6 +187,7 @@ public class Operations {
 	public static <T, S> Iterable<T> filter(final Iterable<S> input, final Class<T> type) {
 
 		return (Iterable<T>) filter(input, new Condition<S>() {
+			@Override
 			public boolean holds(S element) {
 				return type.isInstance(element);
 			}

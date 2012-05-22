@@ -64,6 +64,7 @@ public class IndexedClass extends IndexedClassEntity {
 		return visitor.visit(this);
 	}
 	
+	@Override
 	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

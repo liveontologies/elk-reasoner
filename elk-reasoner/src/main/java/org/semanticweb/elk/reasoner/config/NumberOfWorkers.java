@@ -47,6 +47,7 @@ public class NumberOfWorkers {
 		return numOfWorkers;
 	}
 	
+	@Override
 	public String toString() {
 		return String.valueOf(numOfWorkers);
 	}
