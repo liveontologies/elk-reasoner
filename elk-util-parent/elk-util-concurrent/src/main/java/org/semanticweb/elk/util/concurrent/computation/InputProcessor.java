@@ -32,7 +32,7 @@ package org.semanticweb.elk.util.concurrent.computation;
  * @param <J>
  *            the type of the jobs to be submitted and processed
  */
-public interface InputProcessor<J> {
+public interface InputProcessor<J> extends Interrupter {
 
 	/**
 	 * Submit a job to be processed by this manager.

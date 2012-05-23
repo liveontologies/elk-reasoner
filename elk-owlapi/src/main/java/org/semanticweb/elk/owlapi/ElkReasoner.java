@@ -101,22 +101,24 @@ public class ElkReasoner implements OWLReasoner {
 	protected final OWLOntology owlOntology;
 	protected final OWLOntologyManager manager;
 	protected final OWLDataFactory owlDataFactory;
-	// the ELK reasoner instance used for reasoning
+	/** the ELK reasoner instance used for reasoning */
 	protected final Reasoner reasoner;
-	// ELK progress monitor implementation to display progress
+	/** ELK progress monitor implementation to display progress */
 	protected final ProgressMonitor elkProgressMonitor;
-	// isBufferingMode == true iff the buffering mode for reasoner is {@link
-	// BufferingMode.BUFFERING}
+	/**
+	 * isBufferingMode == true iff the buffering mode for reasoner is
+	 * {@link BufferingMode.BUFFERING}
+	 */
 	protected final boolean isBufferingMode;
-	// listener to implement addition and removal of axioms
+	/** listener to implement addition and removal of axioms */
 	protected final OntologyChangeListener ontologyChangeListener;
-	// list to accumulate the unprocessed changes to the ontology
+	/** list to accumulate the unprocessed changes to the ontology */
 	protected final List<OWLOntologyChange> pendingChanges;
-	// ELK object factory used to create any ElkObjects
+	/** ELK object factory used to create any ElkObjects */
 	protected final ElkObjectFactory objectFactory;
-	// Converter from OWL API to ELK OWL
+	/** Converter from OWL API to ELK OWL */
 	protected final OwlConverter owlConverter;
-	// Converter from ELK OWL to OWL API
+	/** Converter from ELK OWL to OWL API */
 	protected final ElkConverter elkConverter;
 
 	protected boolean isSynced = false;
@@ -145,7 +147,7 @@ public class ElkReasoner implements OWLReasoner {
 
 		flush();
 	}
-	
+
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
 			ReasonerProgressMonitor progressMonitor) {
 		this(ontology, isBufferingMode, new ElkReasonerConfiguration(
@@ -693,6 +695,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public void interrupt() {
+		LOGGER_.warn("ELK is interrupted");
 		// TODO Auto-generated method stub
 	}
 
