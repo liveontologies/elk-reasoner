@@ -34,15 +34,15 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.semanticweb.elk.util.logging.Statistics;
 
 public class IOReasoner extends Reasoner {
 
-	public IOReasoner(Interrupter interrupter, ExecutorService executor,
-			int workerNo) {
-		super(interrupter, executor, workerNo);
+	public IOReasoner(ReasonerStageExecutor stageExecutor,
+			ExecutorService executor, int workerNo) {
+		super(stageExecutor, executor, workerNo);
 	}
 
 	public void loadOntologyFromStream(InputStream stream) throws IOException,

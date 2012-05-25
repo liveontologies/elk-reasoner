@@ -34,13 +34,13 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.reasoner.ReasonerStageExecutor;
+import org.semanticweb.elk.reasoner.TestStageExecutor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
-import org.semanticweb.elk.util.concurrent.computation.TestInterrupters;
 
 public class ConcurrentSaturatorTest extends TestCase {
 
@@ -64,7 +64,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		OntologyIndex ontologyIndex = new OntologyIndexImpl();
 
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		Interrupter interrupter = TestInterrupters.newFailingInterrupter();
+		ReasonerStageExecutor stageExecutor = new TestStageExecutor();
 
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 		inserter.process(objectFactory.getEquivalentClassesAxiom(b, c));
@@ -78,12 +78,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression D = ontologyIndex.getIndexed(d);
 
 		final ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
-				interrupter, executor, 16, ontologyIndex);
+				stageExecutor, executor, 16, ontologyIndex);
 
 		objectPropertySaturation.compute();
 
 		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				interrupter, executor, 16, ontologyIndex);
+				stageExecutor, executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
 		classExpressionSaturation
@@ -107,7 +107,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		final OntologyIndex ontologyIndex = new OntologyIndexImpl();
 		final ExecutorService executor = Executors.newCachedThreadPool();
-		Interrupter interrupter = TestInterrupters.newFailingInterrupter();
+		ReasonerStageExecutor stageExecutor = new TestStageExecutor();
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 
 		inserter.process(objectFactory.getSubClassOfAxiom(a, b));
@@ -132,7 +132,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 				I.getToldSuperClassExpressions().contains(D));
 
 		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				interrupter, executor, 16, ontologyIndex);
+				stageExecutor, executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
 		classExpressionSaturation

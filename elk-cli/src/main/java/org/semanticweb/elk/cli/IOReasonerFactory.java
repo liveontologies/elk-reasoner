@@ -28,8 +28,8 @@ package org.semanticweb.elk.cli;
 import java.util.concurrent.Executors;
 
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * Instantiates {@link IOReasoner}
@@ -42,16 +42,16 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 public class IOReasonerFactory extends ReasonerFactory {
 
 	@Override
-	public IOReasoner createReasoner(Interrupter interrupter) {
-		return createReasoner(interrupter,
+	public IOReasoner createReasoner(ReasonerStageExecutor stageExecutor) {
+		return createReasoner(stageExecutor,
 				ReasonerConfiguration.getConfiguration());
 	}
 
 	@Override
-	public IOReasoner createReasoner(Interrupter interrupter,
+	public IOReasoner createReasoner(ReasonerStageExecutor stageExecutor,
 			ReasonerConfiguration config) {
 		return new IOReasoner(
-				interrupter,
+				stageExecutor,
 				Executors.newCachedThreadPool(),
 				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
 	}

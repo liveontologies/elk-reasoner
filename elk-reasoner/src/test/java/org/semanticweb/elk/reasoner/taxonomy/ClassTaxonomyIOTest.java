@@ -40,10 +40,10 @@ import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
+import org.semanticweb.elk.reasoner.TestStageExecutor;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
-import org.semanticweb.elk.util.concurrent.computation.TestInterrupters;
+import org.semanticweb.elk.reasoner.ReasonerStageExecutor;
 
 /**
  * Tests loading/dumping of class taxonomies
@@ -87,13 +87,11 @@ public class ClassTaxonomyIOTest {
 			throws IOException, Owl2ParseException,
 			InconsistentOntologyException {
 		InputStream stream = null;
-		TestReasoner reasoner = new TestReasoner(
-				TestInterrupters.newFailingInterrupter());
+		TestReasoner reasoner = new TestReasoner(new TestStageExecutor());
 
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(resource);
-			reasoner = new TestReasoner(
-					TestInterrupters.newFailingInterrupter());
+			reasoner = new TestReasoner(new TestStageExecutor());
 			reasoner.loadOntologyFromStream(stream);
 			return reasoner.getTaxonomy();
 		} finally {
@@ -104,8 +102,8 @@ public class ClassTaxonomyIOTest {
 
 class TestReasoner extends Reasoner {
 
-	protected TestReasoner(Interrupter interrupter) {
-		super(interrupter, Executors.newSingleThreadExecutor(), 1);
+	protected TestReasoner(ReasonerStageExecutor stageExecutor) {
+		super(stageExecutor, Executors.newSingleThreadExecutor(), 1);
 	}
 
 	public void loadOntologyFromStream(InputStream stream) throws IOException,

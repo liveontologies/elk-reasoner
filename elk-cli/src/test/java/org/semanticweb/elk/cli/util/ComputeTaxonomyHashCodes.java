@@ -33,9 +33,9 @@ import java.util.concurrent.Executors;
 import org.semanticweb.elk.cli.IOReasoner;
 import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.TestStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
-import org.semanticweb.elk.util.concurrent.computation.TestInterrupters;
 
 /**
  * Computes correct class taxonomy hash codes for a set of ontologies
@@ -57,8 +57,7 @@ public class ComputeTaxonomyHashCodes {
 	public static void main(String[] args) throws Exception {
 		File srcDir = new File(OWL_PATH);
 		// use just one worker to minimize the risk of errors:
-		IOReasoner reasoner = new IOReasoner(
-				TestInterrupters.newFailingInterrupter(),
+		IOReasoner reasoner = new IOReasoner(new TestStageExecutor(),
 				Executors.newCachedThreadPool(), 1);
 
 		for (File ontFile : srcDir.listFiles(FileUtils

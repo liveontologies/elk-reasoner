@@ -22,37 +22,25 @@
  */
 package org.semanticweb.elk.util.concurrent.computation;
 
+import static org.junit.Assert.fail;
+
 /**
- * Common implementations of {@link Interrupter}
- * 
+ * An interrupter to be used in unit tests, which always fails for interruption
+ * attempts
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class Interrupters {
+public class FailingInterrupter implements Interrupter {
 
-	/**
-	 * @return simple interrupter which just saves the interrupt status and
-	 *         teturns it
-	 */
-	public static Interrupter newSimpleInterrupter() {
-		return
+	@Override
+	public void interrupt() {
+		fail();
+	}
 
-		new Interrupter() {
-
-			volatile boolean interrupted = false;
-
-			@Override
-			public void interrupt() {
-				interrupted = true;
-			}
-
-			@Override
-			public boolean isInterrupted() {
-				return interrupted;
-			}
-
-		};
+	@Override
+	public boolean isInterrupted() {
+		return false;
 	}
 
 }

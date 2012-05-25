@@ -38,7 +38,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.FreshEntitiesException;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
-import org.semanticweb.elk.util.concurrent.computation.TestInterrupters;
+import org.semanticweb.elk.reasoner.TestStageExecutor;
 
 //TODO This test won't be necessary as soon as we can compute hash code of InstanceTaxonomies
 
@@ -49,7 +49,7 @@ public class ABoxTest {
 	public void testInconsistent() throws Owl2ParseException, IOException {
 
 		IOReasoner reasoner = new IOReasonerFactory()
-				.createReasoner(TestInterrupters.newFailingInterrupter());
+				.createReasoner(new TestStageExecutor());
 		reasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"
 				+ "Ontology(" + "SubClassOf(owl:Thing :B)"
@@ -64,7 +64,7 @@ public class ABoxTest {
 			FreshEntitiesException, InconsistentOntologyException {
 
 		IOReasoner reasoner = new IOReasonerFactory()
-				.createReasoner(TestInterrupters.newFailingInterrupter());
+				.createReasoner(new TestStageExecutor());
 		reasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology("
 				+ "ObjectPropertyAssertion(:R :a :b)"

@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Utilities for Concurrency
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,38 +20,23 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util.concurrent.computation;
+package org.semanticweb.elk.reasoner;
 
-import static org.junit.Assert.fail;
+import org.semanticweb.elk.util.concurrent.computation.FailingInterrupter;
 
 /**
- * Common implementations of {@link Interrupter}
- * 
+ * A simple {@link ReasonerStageExecutor} used for testing reasoners. All stages
+ * are executed directly.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class TestInterrupters {
+public class TestStageExecutor extends FailingInterrupter implements
+		ReasonerStageExecutor {
 
-	/**
-	 * @return interrupter which fails the test on every interrupt request
-	 */
-	public static Interrupter newFailingInterrupter() {
-		return
-
-		new Interrupter() {
-
-			@Override
-			public void interrupt() {
-				fail();
-			}
-
-			@Override
-			public boolean isInterrupted() {
-				return false;
-			}
-
-		};
+	@Override
+	public void execute(ReasonerStage stage) {
+		stage.run();
 	}
 
 }

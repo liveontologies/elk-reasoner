@@ -36,8 +36,7 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
-import org.semanticweb.elk.util.concurrent.computation.Interrupters;
+import org.semanticweb.elk.reasoner.SimpleStageExecutor;
 
 /**
  * 
@@ -87,8 +86,7 @@ public class Main {
 		else if (!options.has(inputOntologyFile))
 			parser.printHelpOn(System.out);
 		else {
-			IOReasoner reasoner = new IOReasoner(
-					Interrupters.newSimpleInterrupter(),
+			IOReasoner reasoner = new IOReasoner(new SimpleStageExecutor(),
 					Executors.newCachedThreadPool(), nWorkers.value(options));
 			reasoner.loadOntologyFromFile(inputOntologyFile.value(options));
 			if (options.has(classify))

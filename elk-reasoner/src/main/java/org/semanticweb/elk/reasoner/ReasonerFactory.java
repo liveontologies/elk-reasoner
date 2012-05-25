@@ -29,7 +29,6 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * The main factory to instantiate {@link Reasoner}
@@ -49,25 +48,25 @@ public class ReasonerFactory {
 	 * Creates {@link Reasoner} with the configuration loaded from
 	 * elk.properties (if exists in the classpath) or the default configuration
 	 * 
-	 * @param interrupter
+	 * @param stageExecutor
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(Interrupter interrupter) {
-		return createReasoner(interrupter,
+	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor) {
+		return createReasoner(stageExecutor,
 				ReasonerConfiguration.getConfiguration());
 	}
 
 	/**
 	 * Creates {@link Reasoner} with the provided configuration
 	 * 
-	 * @param interrupter
+	 * @param stageExecutor
 	 * @param config
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(Interrupter interrupter,
+	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor,
 			ReasonerConfiguration config) {
 		return new Reasoner(
-				interrupter,
+				stageExecutor,
 				Executors.newCachedThreadPool(),
 				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
 	}

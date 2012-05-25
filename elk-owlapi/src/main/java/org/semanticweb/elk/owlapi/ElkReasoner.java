@@ -42,9 +42,9 @@ import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.ReasonerStageExecutor;
+import org.semanticweb.elk.reasoner.SimpleStageExecutor;
 import org.semanticweb.elk.util.collections.ArraySet;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
-import org.semanticweb.elk.util.concurrent.computation.Interrupters;
 import org.semanticweb.elk.util.logging.ElkMessage;
 import org.semanticweb.elk.util.logging.Statistics;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -126,10 +126,9 @@ public class ElkReasoner implements OWLReasoner {
 	protected boolean isSynced = false;
 
 	/**
-	 * The interrupter used for the reasoner
+	 * The stage executor used for execution the stages of the reasoner
 	 */
-	protected final Interrupter interrupter = Interrupters
-			.newSimpleInterrupter();
+	protected final ReasonerStageExecutor stageExecutor = new SimpleStageExecutor();
 
 	// logger the messages
 	protected final static Logger LOGGER_ = Logger.getLogger(ElkReasoner.class);
@@ -139,7 +138,7 @@ public class ElkReasoner implements OWLReasoner {
 		this.owlOntology = ontology;
 		this.manager = ontology.getOWLOntologyManager();
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
-		this.reasoner = new ReasonerFactory().createReasoner(interrupter,
+		this.reasoner = new ReasonerFactory().createReasoner(stageExecutor,
 				elkConfig.getElkConfiguration());
 		this.reasoner
 				.setAllowFreshEntities(elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW);
@@ -704,7 +703,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public void interrupt() {
-		interrupter.interrupt();
+		stageExecutor.interrupt();
 	}
 
 	@Override

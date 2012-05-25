@@ -46,7 +46,6 @@ import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * The Reasoner manages an ontology (using an OntologyIndex) and provides
@@ -68,10 +67,9 @@ public class Reasoner {
 	 */
 	protected final static Logger LOGGER_ = Logger.getLogger(Reasoner.class);
 	/**
-	 * The interrupter used to interrupt and monitor interruptions for this
-	 * reasoner
+	 * The executor for various stages of the reasoner
 	 */
-	protected final Interrupter interrupter;
+	protected final ReasonerStageExecutor stageExecutor;
 	/**
 	 * Executor used to run the jobs.
 	 */
@@ -120,9 +118,9 @@ public class Reasoner {
 	 * @param executor
 	 * @param workerNo
 	 */
-	protected Reasoner(Interrupter interrupter, ExecutorService executor,
-			int workerNo) {
-		this.interrupter = interrupter;
+	protected Reasoner(ReasonerStageExecutor stageExecutor,
+			ExecutorService executor, int workerNo) {
+		this.stageExecutor = stageExecutor;
 		this.executor = executor;
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
@@ -241,6 +239,155 @@ public class Reasoner {
 		invalidate();
 	}
 
+	protected ReasonerStage getObjectPropertySaturationStage() {
+		return new ReasonerStage() {
+			final ObjectPropertySaturation computation = new ObjectPropertySaturation(
+					stageExecutor, executor, workerNo, ontologyIndex);
+
+			@Override
+			public String getName() {
+				return "Object Property Saturation";
+			}
+
+			@Override
+			public void run() {
+				computation.compute();
+			}
+
+			@Override
+			public void printInfo() {
+			}
+		};
+	}
+
+	protected ReasonerStage getContextResetStage() {
+		return new ReasonerStage() {
+
+			@Override
+			public String getName() {
+				return "Resetting Contexts";
+			}
+
+			@Override
+			public void run() {
+				for (IndexedClassExpression ice : ontologyIndex
+						.getIndexedClassExpressions())
+					ice.resetContext();
+			}
+
+			@Override
+			public void printInfo() {
+			}
+
+		};
+	}
+
+	protected ReasonerStage getConsistencyCheckingStage() {
+		return new ReasonerStage() {
+
+			final ConsistencyChecking computation = new ConsistencyChecking(
+					stageExecutor, executor, workerNo, progressMonitor,
+					ontologyIndex);
+
+			@Override
+			public String getName() {
+				return "Consistency Checking";
+			}
+
+			@Override
+			public void run() {
+				consistentOntology = computation.checkConsistent();
+			}
+
+			@Override
+			public void printInfo() {
+			}
+
+		};
+	}
+
+	protected ReasonerStage getClassTaxonomyComputationStage() {
+		return new ReasonerStage() {
+
+			final TaxonomyComputation computation = new TaxonomyComputation(
+					stageExecutor, executor, workerNo, progressMonitor,
+					ontologyIndex);
+
+			@Override
+			public String getName() {
+				return "Class Taxonomy Computation";
+			}
+
+			@Override
+			public void run() {
+				if (!doneClassTaxonomy) {
+					taxonomy = computation.computeTaxonomy(true, false);
+					if (!stageExecutor.isInterrupted())
+						doneClassTaxonomy = true;
+				}
+
+			}
+
+			@Override
+			public void printInfo() {
+				// TODO Auto-generated method stub
+			}
+
+		};
+	}
+
+	protected ReasonerStage getFullTaxonomyComputationStage() {
+		return new ReasonerStage() {
+
+			final TaxonomyComputation computation = new TaxonomyComputation(
+					stageExecutor, executor, workerNo, progressMonitor,
+					ontologyIndex);
+
+			@Override
+			public String getName() {
+				return "Class and Instance Taxonomy Computation";
+			}
+
+			@Override
+			public void run() {
+				computation.computeTaxonomy(true, true);
+			}
+
+			@Override
+			public void printInfo() {
+				// TODO Auto-generated method stub
+
+			}
+
+		};
+	}
+
+	protected ReasonerStage getInstanceTaxonomyComputationStage() {
+		return new ReasonerStage() {
+
+			final TaxonomyComputation computation = new TaxonomyComputation(
+					stageExecutor, executor, workerNo, progressMonitor,
+					ontologyIndex, taxonomy);
+
+			@Override
+			public String getName() {
+				return "Instance Taxonomy Computation";
+			}
+
+			@Override
+			public void run() {
+				computation.computeTaxonomy(false, true);
+			}
+
+			@Override
+			public void printInfo() {
+				// TODO Auto-generated method stub
+
+			}
+
+		};
+	}
+
 	/**
 	 * Initializes reasoning by saturating object properties and checking
 	 * consistency, if not yet done.
@@ -248,26 +395,15 @@ public class Reasoner {
 	protected void initializeReasoning() {
 		if (doneInitialization)
 			return;
-
-		// saturate object properties
-		(new ObjectPropertySaturation(interrupter, executor, workerNo,
-				ontologyIndex)).compute();
-		if (interrupter.isInterrupted())
+		stageExecutor.execute(getObjectPropertySaturationStage());
+		if (stageExecutor.isInterrupted())
 			return;
-
-		// reset context
-		for (IndexedClassExpression ice : ontologyIndex
-				.getIndexedClassExpressions())
-			ice.resetContext();
-		if (interrupter.isInterrupted())
+		stageExecutor.execute(getContextResetStage());
+		if (stageExecutor.isInterrupted())
 			return;
-
-		// check consistency
-		consistentOntology = (new ConsistencyChecking(interrupter, executor,
-				workerNo, progressMonitor, ontologyIndex)).checkConsistent();
-		if (interrupter.isInterrupted())
+		stageExecutor.execute(getConsistencyCheckingStage());
+		if (stageExecutor.isInterrupted())
 			return;
-
 		doneInitialization = true;
 	}
 
@@ -291,10 +427,8 @@ public class Reasoner {
 			throw new InconsistentOntologyException();
 
 		if (!doneClassTaxonomy) {
-			taxonomy = (new TaxonomyComputation(interrupter, executor,
-					workerNo, progressMonitor, ontologyIndex)).computeTaxonomy(
-					true, false);
-			if (!interrupter.isInterrupted())
+			stageExecutor.execute(getClassTaxonomyComputationStage());
+			if (!stageExecutor.isInterrupted())
 				doneClassTaxonomy = true;
 		}
 
@@ -318,14 +452,10 @@ public class Reasoner {
 
 		// reuse class taxonomy if already computed
 		if (doneClassTaxonomy)
-			taxonomy = (new TaxonomyComputation(interrupter, executor,
-					workerNo, progressMonitor, ontologyIndex, taxonomy)
-					.computeTaxonomy(false, true));
+			stageExecutor.execute(getInstanceTaxonomyComputationStage());
 		else
-			taxonomy = (new TaxonomyComputation(interrupter, executor,
-					workerNo, progressMonitor, ontologyIndex).computeTaxonomy(
-					true, true));
-		if (!interrupter.isInterrupted()) {
+			stageExecutor.execute(getFullTaxonomyComputationStage());
+		if (!stageExecutor.isInterrupted()) {
 			doneClassTaxonomy = true;
 			doneIndividualTaxonomy = true;
 		}
