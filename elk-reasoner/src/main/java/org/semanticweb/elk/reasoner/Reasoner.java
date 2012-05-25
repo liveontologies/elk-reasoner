@@ -46,6 +46,7 @@ import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * The Reasoner manages an ontology (using an OntologyIndex) and provides
@@ -66,6 +67,11 @@ public class Reasoner {
 	 * Logger for events.
 	 */
 	protected final static Logger LOGGER_ = Logger.getLogger(Reasoner.class);
+	/**
+	 * The interrupter used to interrupt and monitor interruptions for this
+	 * reasoner
+	 */
+	protected final Interrupter interrupter;
 	/**
 	 * Executor used to run the jobs.
 	 */
@@ -114,7 +120,9 @@ public class Reasoner {
 	 * @param executor
 	 * @param workerNo
 	 */
-	protected Reasoner(ExecutorService executor, int workerNo) {
+	protected Reasoner(Interrupter interrupter, ExecutorService executor,
+			int workerNo) {
+		this.interrupter = interrupter;
 		this.executor = executor;
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
@@ -242,17 +250,23 @@ public class Reasoner {
 			return;
 
 		// saturate object properties
-		(new ObjectPropertySaturation(executor, workerNo, ontologyIndex))
-				.compute();
+		(new ObjectPropertySaturation(interrupter, executor, workerNo,
+				ontologyIndex)).compute();
+		if (interrupter.isInterrupted())
+			return;
 
 		// reset context
 		for (IndexedClassExpression ice : ontologyIndex
 				.getIndexedClassExpressions())
 			ice.resetContext();
+		if (interrupter.isInterrupted())
+			return;
 
 		// check consistency
-		consistentOntology = (new ConsistencyChecking(executor, workerNo,
-				progressMonitor, ontologyIndex)).checkConsistent();
+		consistentOntology = (new ConsistencyChecking(interrupter, executor,
+				workerNo, progressMonitor, ontologyIndex)).checkConsistent();
+		if (interrupter.isInterrupted())
+			return;
 
 		doneInitialization = true;
 	}
@@ -277,10 +291,11 @@ public class Reasoner {
 			throw new InconsistentOntologyException();
 
 		if (!doneClassTaxonomy) {
-			taxonomy = (new TaxonomyComputation(executor, workerNo,
-					progressMonitor, ontologyIndex)).computeTaxonomy(true,
-					false);
-			doneClassTaxonomy = true;
+			taxonomy = (new TaxonomyComputation(interrupter, executor,
+					workerNo, progressMonitor, ontologyIndex)).computeTaxonomy(
+					true, false);
+			if (!interrupter.isInterrupted())
+				doneClassTaxonomy = true;
 		}
 
 		return taxonomy;
@@ -303,14 +318,17 @@ public class Reasoner {
 
 		// reuse class taxonomy if already computed
 		if (doneClassTaxonomy)
-			taxonomy = (new TaxonomyComputation(executor, workerNo,
-					progressMonitor, ontologyIndex, taxonomy).computeTaxonomy(
-					false, true));
+			taxonomy = (new TaxonomyComputation(interrupter, executor,
+					workerNo, progressMonitor, ontologyIndex, taxonomy)
+					.computeTaxonomy(false, true));
 		else
-			taxonomy = (new TaxonomyComputation(executor, workerNo,
-					progressMonitor, ontologyIndex).computeTaxonomy(true, true));
-		doneClassTaxonomy = true;
-		doneIndividualTaxonomy = true;
+			taxonomy = (new TaxonomyComputation(interrupter, executor,
+					workerNo, progressMonitor, ontologyIndex).computeTaxonomy(
+					true, true));
+		if (!interrupter.isInterrupted()) {
+			doneClassTaxonomy = true;
+			doneIndividualTaxonomy = true;
+		}
 
 		return taxonomy;
 	}

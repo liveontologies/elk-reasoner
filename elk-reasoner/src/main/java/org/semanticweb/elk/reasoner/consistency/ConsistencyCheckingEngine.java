@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * The engine for checking consistency of an ontology by checking satisfiability
@@ -36,6 +37,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * {@link #submit(IndexedClassExpressions)}.
  * 
  * @author Frantisek Simancik
+ * @author Yevgeny Kazakov
  * 
  */
 public class ConsistencyCheckingEngine implements
@@ -57,15 +59,20 @@ public class ConsistencyCheckingEngine implements
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
+	 * @param interrupter
+	 *            the interrupter used to interrupt and monitor interruption for
+	 *            this engine
+	 * 
 	 */
-	public ConsistencyCheckingEngine(OntologyIndex ontologyIndex) {
+	public ConsistencyCheckingEngine(OntologyIndex ontologyIndex,
+			Interrupter interrupter) {
 		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJob<IndexedClassExpression>>(
-				ontologyIndex, new ThisClassExpressionSaturationListener());
+				ontologyIndex, interrupter,
+				new ThisClassExpressionSaturationListener());
 	}
 
 	@Override
-	public final void submit(IndexedClassExpression job)
-			throws InterruptedException {
+	public final void submit(IndexedClassExpression job) {
 		if (isConsistent)
 			saturationEngine.submit(new SaturationJob<IndexedClassExpression>(
 					job));

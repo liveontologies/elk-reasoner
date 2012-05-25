@@ -38,6 +38,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.FreshEntitiesException;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
+import org.semanticweb.elk.util.concurrent.computation.TestInterrupters;
 
 //TODO This test won't be necessary as soon as we can compute hash code of InstanceTaxonomies
 
@@ -47,27 +48,24 @@ public class ABoxTest {
 	@Test
 	public void testInconsistent() throws Owl2ParseException, IOException {
 
-		IOReasoner reasoner = new IOReasonerFactory().createReasoner();
-		reasoner.loadOntologyFromString(
-				"Prefix( : = <http://example.org/> )"
+		IOReasoner reasoner = new IOReasonerFactory()
+				.createReasoner(TestInterrupters.newFailingInterrupter());
+		reasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"
-				+ "Ontology("
-				+ "SubClassOf(owl:Thing :B)"
-				+ "ClassAssertion(:A :ind)"
-				+ "DisjointClasses(:A :B)"
-				+ ")"
-		);
+				+ "Ontology(" + "SubClassOf(owl:Thing :B)"
+				+ "ClassAssertion(:A :ind)" + "DisjointClasses(:A :B)" + ")");
 
 		boolean isConsistent = reasoner.isConsistent();
 		assertFalse("inconsisten", isConsistent);
 	}
-	
-	@Test
-	public void testInstances() throws Owl2ParseException, IOException, FreshEntitiesException, InconsistentOntologyException {
 
-		IOReasoner reasoner = new IOReasonerFactory().createReasoner();
-		reasoner.loadOntologyFromString(
-				"Prefix( : = <http://example.org/> )"
+	@Test
+	public void testInstances() throws Owl2ParseException, IOException,
+			FreshEntitiesException, InconsistentOntologyException {
+
+		IOReasoner reasoner = new IOReasonerFactory()
+				.createReasoner(TestInterrupters.newFailingInterrupter());
+		reasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology("
 				+ "ObjectPropertyAssertion(:R :a :b)"
 				+ "ObjectPropertyAssertion(:R :b :c)"
@@ -76,19 +74,18 @@ public class ABoxTest {
 				+ "ClassAssertion(:C :c)"
 				+ "SubClassOf(:A :B)"
 				+ "SubClassOf(ObjectIntersectionOf(:A ObjectSomeValuesFrom(:R :C)) :X)"
-				+ ")"
-		);
+				+ ")");
 
 		boolean isConsistent = reasoner.isConsistent();
 		assertTrue("consistent", isConsistent);
-		
+
 		ElkNamedIndividual a = objectFactory.getNamedIndividual(new ElkFullIri(
 				"http://example.org/a"));
 		ElkNamedIndividual b = objectFactory.getNamedIndividual(new ElkFullIri(
 				"http://example.org/b"));
 		ElkNamedIndividual c = objectFactory.getNamedIndividual(new ElkFullIri(
 				"http://example.org/c"));
-		
+
 		ElkClass A = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(
@@ -97,9 +94,9 @@ public class ABoxTest {
 				"http://example.org/C"));
 		ElkClass X = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/X"));
-		
+
 		ElkClass thing = PredefinedElkClass.OWL_THING;
-		
+
 		reasoner.getTaxonomy();
 		assertEquals(reasoner.getInstances(thing, false).size(), 3);
 		assertEquals(reasoner.getInstances(thing, true).size(), 1);
@@ -108,7 +105,7 @@ public class ABoxTest {
 		assertEquals(reasoner.getInstances(A, true).size(), 1);
 		assertEquals(reasoner.getInstances(C, true).size(), 1);
 		assertEquals(reasoner.getInstances(X, true).size(), 1);
-		
+
 		assertEquals(reasoner.getTypes(a, true).size(), 2);
 		assertEquals(reasoner.getTypes(a, false).size(), 4);
 		assertEquals(reasoner.getTypes(c, true).size(), 1);

@@ -57,6 +57,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-util-concurrent</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-testing</artifactId>
 			<version>0.2.1-SNAPSHOT</version>
 			<scope>test</scope>
@@ -65,6 +70,13 @@
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owl-parsing-javacc</artifactId>
 			<version>0.2.1-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-util-concurrent</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

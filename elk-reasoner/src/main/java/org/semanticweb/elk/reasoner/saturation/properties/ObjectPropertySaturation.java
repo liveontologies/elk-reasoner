@@ -41,28 +41,58 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Pair;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * Computes the transitive closure of object property inclusions. Sets up
  * multimaps for fast retrieval of property compositions.
  * 
  * @author Frantisek Simancik
- * 
+ * @author Yevgeny Kazakov
  */
 public class ObjectPropertySaturation {
-	
+
 	/**
 	 * Logger for events.
 	 */
-	protected final static Logger LOGGER_ = Logger.getLogger(ObjectPropertySaturation.class);
-	
+	protected final static Logger LOGGER_ = Logger
+			.getLogger(ObjectPropertySaturation.class);
 
+	/**
+	 * the interrupter used to interrupt and monitor interruption for the
+	 * computation
+	 */
+	protected final Interrupter interrupter;
+	/**
+	 * the execution service used to run the concurrent workers
+	 */
 	protected final ExecutorService executor;
+	/**
+	 * the maximal number of concurrent workers
+	 */
 	protected final int maxWorkers;
+	/**
+	 * the ontology index used to compute the hierarchy
+	 */
 	protected final OntologyIndex ontologyIndex;
 
-	public ObjectPropertySaturation(ExecutorService executor, int maxWorkers,
+	/**
+	 * Creates a new object property saturation object.
+	 * 
+	 * @param interrupter
+	 *            the interrupter used to interrupt and monitor interruption for
+	 *            the computation
+	 * @param executor
+	 *            the execution service used to run the concurrent workers
+	 * @param maxWorkers
+	 *            the maximal number of concurrent workers
+	 * @param ontologyIndex
+	 *            the ontology index used to compute the hierarchy
+	 */
+	public ObjectPropertySaturation(Interrupter interrupter,
+			ExecutorService executor, int maxWorkers,
 			OntologyIndex ontologyIndex) {
+		this.interrupter = interrupter;
 		this.executor = executor;
 		this.maxWorkers = maxWorkers;
 		this.ontologyIndex = ontologyIndex;
@@ -75,7 +105,7 @@ public class ObjectPropertySaturation {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * @throws InterruptedException
 	 * 
@@ -83,20 +113,24 @@ public class ObjectPropertySaturation {
 	protected void tryCompute() throws InterruptedException {
 		// set up property hierarchy
 		ConcurrentComputation<IndexedPropertyChain> roleHierarchyComputation = new ConcurrentComputation<IndexedPropertyChain>(
-				new RoleHierarchyComputationEngine(), executor, maxWorkers,
-				2 * maxWorkers, 128);
+				new RoleHierarchyComputationEngine(), interrupter, executor,
+				maxWorkers, 2 * maxWorkers, 128);
 
 		roleHierarchyComputation.start();
 
 		for (IndexedPropertyChain ipc : ontologyIndex
 				.getIndexedPropertyChains()) {
+			if (interrupter.isInterrupted())
+				return;
 			ipc.resetSaturated();
 			roleHierarchyComputation.submit(ipc);
 		}
+		
+		roleHierarchyComputation.finish();
+		roleHierarchyComputation.waitWorkersToStop();
 
-		roleHierarchyComputation.waitCompletion();
-
-		// find auxiliary IndexedBinaryPropertyChains that occur on the right of some (longer) chain
+		// find auxiliary IndexedBinaryPropertyChains that occur on the right of
+		// some (longer) chain
 		Set<IndexedBinaryPropertyChain> auxiliaryChains = new HashSet<IndexedBinaryPropertyChain>();
 		for (IndexedBinaryPropertyChain chain : Operations.filter(
 				ontologyIndex.getIndexedPropertyChains(),
@@ -108,8 +142,7 @@ public class ObjectPropertySaturation {
 		}
 
 		// set up property compositions
-		Map<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>> compositions = 
-				new HashMap<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>>();
+		Map<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>> compositions = new HashMap<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>>();
 
 		for (IndexedBinaryPropertyChain chain : Operations.filter(
 				ontologyIndex.getIndexedPropertyChains(),
@@ -153,18 +186,19 @@ public class ObjectPropertySaturation {
 								.getToldSuperProperties())
 							value.add(superProperty);
 				}
-		
+
 		if (compositions.isEmpty())
 			return;
-		
+
 		ConcurrentComputation<Vector<IndexedPropertyChain>> redundantCompositionsElimination = new ConcurrentComputation<Vector<IndexedPropertyChain>>(
-				new RedundantCompositionsEliminationEngine(), executor, maxWorkers,
-				2 * maxWorkers, 128);
-		 redundantCompositionsElimination.start();
-		 
+				new RedundantCompositionsEliminationEngine(), interrupter,
+				executor, maxWorkers, 2 * maxWorkers, 128);
+		redundantCompositionsElimination.start();
+
 		for (Map.Entry<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>> e : compositions
 				.entrySet()) {
-			
+			if (interrupter.isInterrupted())
+				return;
 			SaturatedPropertyChain firstSat = e.getKey().getFirst()
 					.getSaturated();
 			if (firstSat.compositionsByRightSubProperty == null)
@@ -178,11 +212,12 @@ public class ObjectPropertySaturation {
 				secondSat.compositionsByLeftSubProperty = new CompositionMultimap();
 			secondSat.compositionsByLeftSubProperty.put(e.getKey().getFirst(),
 					e.getValue());
-			
+
 			redundantCompositionsElimination.submit(e.getValue());
 		}
 
-		redundantCompositionsElimination.waitCompletion();
+		redundantCompositionsElimination.finish();
+		redundantCompositionsElimination.waitWorkersToStop();
 	}
 
 	private class RoleHierarchyComputationEngine implements
@@ -272,8 +307,9 @@ public class ObjectPropertySaturation {
 			return false;
 		}
 	}
-	
-	private class CompositionMultimap extends AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> {
+
+	private class CompositionMultimap extends
+			AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> {
 		@Override
 		protected Collection<IndexedPropertyChain> newRecord() {
 			throw new UnsupportedOperationException();

@@ -32,13 +32,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.semanticweb.elk.util.logging.Statistics;
 
 /**
- * Class for computing taxonomies for classification and instance retrieval tasks.
+ * Class for computing taxonomies for classification and instance retrieval
+ * tasks.
  * 
  * 
  * @author Frantisek Simancik
+ * @author Yevgeny Kazakov
  * 
  */
 public class TaxonomyComputation extends
@@ -47,30 +50,37 @@ public class TaxonomyComputation extends
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ObjectPropertySaturation.class);
 
+	protected final Interrupter interrupter;
 	protected final ProgressMonitor progressMonitor;
 	protected final OntologyIndex ontologyIndex;
 	protected final TaxonomyComputationEngine taxonomyComputationEngine;
 
-	protected TaxonomyComputation(ExecutorService executor, int maxWorkers,
+	protected TaxonomyComputation(Interrupter interrupter,
+			ExecutorService executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
 			TaxonomyComputationEngine taxonomyComputationEngine) {
-		super(taxonomyComputationEngine, executor, maxWorkers, 8 * maxWorkers, 16);
+		super(taxonomyComputationEngine, interrupter, executor, maxWorkers,
+				8 * maxWorkers, 16);
+		this.interrupter = interrupter;
 		this.progressMonitor = progressMonitor;
 		this.ontologyIndex = ontologyIndex;
 		this.taxonomyComputationEngine = taxonomyComputationEngine;
 	}
 
-	public TaxonomyComputation(ExecutorService executor, int maxWorkers,
+	public TaxonomyComputation(Interrupter interrupter,
+			ExecutorService executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(executor, maxWorkers, progressMonitor, ontologyIndex,
-				new TaxonomyComputationEngine(ontologyIndex));
+		this(interrupter, executor, maxWorkers, progressMonitor, ontologyIndex,
+				new TaxonomyComputationEngine(ontologyIndex, interrupter));
 	}
 
-	public TaxonomyComputation(ExecutorService executor, int maxWorkers,
+	public TaxonomyComputation(Interrupter interrupter,
+			ExecutorService executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
 			IndividualClassTaxonomy partialTaxonomy) {
-		this(executor, maxWorkers, progressMonitor, ontologyIndex,
-				new TaxonomyComputationEngine(ontologyIndex, partialTaxonomy));
+		this(interrupter, executor, maxWorkers, progressMonitor, ontologyIndex,
+				new TaxonomyComputationEngine(ontologyIndex, interrupter,
+						partialTaxonomy));
 	}
 
 	/**
@@ -107,7 +117,8 @@ public class TaxonomyComputation extends
 					submit(ind);
 					progressMonitor.report(++progress, maxProgress);
 				}
-			waitCompletion();
+			finish();
+			waitWorkersToStop();
 		} catch (InterruptedException e) {
 			// FIXME Either document why this is ignored or do something
 			// better.

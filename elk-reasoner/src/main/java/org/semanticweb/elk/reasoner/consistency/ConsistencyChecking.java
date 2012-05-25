@@ -31,13 +31,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.semanticweb.elk.util.logging.Statistics;
 
 /**
  * Class for checking ontology consistency.
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
 public class ConsistencyChecking extends
 		ConcurrentComputation<IndexedClassExpression> {
@@ -47,22 +48,26 @@ public class ConsistencyChecking extends
 
 	protected final ProgressMonitor progressMonitor;
 	protected final OntologyIndex ontologyIndex;
+	protected final Interrupter interrupter;
 	protected final ConsistencyCheckingEngine consistencyCheckingEngine;
 
-	protected ConsistencyChecking(ExecutorService executor, int maxWorkers,
+	protected ConsistencyChecking(Interrupter interrupter,
+			ExecutorService executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
 			ConsistencyCheckingEngine consistencyCheckingEngine) {
-		super(consistencyCheckingEngine, executor, maxWorkers, 8 * maxWorkers,
-				16);
+		super(consistencyCheckingEngine, interrupter, executor, maxWorkers,
+				8 * maxWorkers, 16);
 		this.progressMonitor = progressMonitor;
 		this.ontologyIndex = ontologyIndex;
+		this.interrupter = interrupter;
 		this.consistencyCheckingEngine = consistencyCheckingEngine;
 	}
 
-	public ConsistencyChecking(ExecutorService executor, int maxWorkers,
+	public ConsistencyChecking(Interrupter interrupter,
+			ExecutorService executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(executor, maxWorkers, progressMonitor, ontologyIndex,
-				new ConsistencyCheckingEngine(ontologyIndex));
+		this(interrupter, executor, maxWorkers, progressMonitor, ontologyIndex,
+				new ConsistencyCheckingEngine(ontologyIndex, interrupter));
 	}
 
 	/**
@@ -93,7 +98,8 @@ public class ConsistencyChecking extends
 				progressMonitor.report(++progress, maxProgress);
 
 			}
-			waitCompletion();
+			finish();
+			waitWorkersToStop();
 		} catch (InterruptedException e) {
 			// FIXME Either document why this is ignored or do something
 			// better.

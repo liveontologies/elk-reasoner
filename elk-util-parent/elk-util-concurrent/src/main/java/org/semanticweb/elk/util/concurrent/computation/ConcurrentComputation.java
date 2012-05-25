@@ -48,9 +48,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ConcurrentComputation<I> {
 	/**
-	 * processor for the input
+	 * the processor for the input to be executed by workers
 	 */
 	protected final InputProcessor<I> inputProcessor;
+	/**
+	 * the interrupter to interrupt and monitor task interruption
+	 */
+	protected final Interrupter interrupter;
 	/**
 	 * executor used to run the jobs
 	 */
@@ -78,13 +82,13 @@ public class ConcurrentComputation<I> {
 	/**
 	 * The poison instance used to terminate the jobs
 	 */
-	protected final JobPoison<I> poison = new JobPoison<I>();	
+	protected final JobPoison<I> poison = new JobPoison<I>();
 	/**
-	 * the number of times a workers ever started
+	 * increments every time a worker starts
 	 */
 	protected volatile int startedWorkers;
 	/**
-	 * the number of times a workers ever finished
+	 * increments every time a worker finishes
 	 */
 	protected final AtomicInteger finishedWorkers;
 	/**
@@ -102,6 +106,8 @@ public class ConcurrentComputation<I> {
 	 * 
 	 * @param inputProcessor
 	 *            the processor for the input to be executed by workers
+	 * @param interrupter
+	 *            the interrupter to interrupt and monitor task interruption
 	 * @param executor
 	 *            the executor used to execute the concurrent jobs
 	 * @param maxWorkers
@@ -112,9 +118,10 @@ public class ConcurrentComputation<I> {
 	 *            available
 	 */
 	public ConcurrentComputation(InputProcessor<I> inputProcesor,
-			ExecutorService executor, int maxWorkers, int bufferCapacity,
-			int batchSize) {
+			Interrupter interrupter, ExecutorService executor, int maxWorkers,
+			int bufferCapacity, int batchSize) {
 		this.inputProcessor = inputProcesor;
+		this.interrupter = interrupter;
 		this.executor = executor;
 		this.maxWorkers = maxWorkers;
 		this.buffer = new ArrayBlockingQueue<Job<I>>(bufferCapacity);
@@ -134,6 +141,7 @@ public class ConcurrentComputation<I> {
 			if (startedWorkers == finishedWorkers.get() + maxWorkers)
 				break;
 			executor.execute(worker);
+			startedWorkers++;
 		}
 	}
 
@@ -190,7 +198,7 @@ public class ConcurrentComputation<I> {
 		public final void run() {
 			Job<I> nextJob;
 			for (;;) {
-				if (inputProcessor.isInterrupted()) {
+				if (interrupter.isInterrupted()) {
 					Thread.currentThread().interrupt();
 					break;
 				}
@@ -202,7 +210,7 @@ public class ConcurrentComputation<I> {
 					}
 				} catch (InterruptedException e) {
 					// we interrupt all workers if one has been interrupted
-					inputProcessor.interrupt();
+					interrupter.interrupt();
 				}
 			}
 			if (finishedWorkers.incrementAndGet() == startedWorkers) {
@@ -212,7 +220,6 @@ public class ConcurrentComputation<I> {
 					finishedWorkers.notify();
 				}
 			}
-
 		}
 	}
 
@@ -220,9 +227,9 @@ public class ConcurrentComputation<I> {
 	 * Block and wait until all workers terminate. The workers terminate either
 	 * if the finish request has been issued using
 	 * {@link ConcurrentComputation#finish()} or the workers were interrupted,
-	 * e.g., by calling the {@link ConcurrentComputation#interrupt()} method. If
-	 * interrupted, this method can be executed again to wait until all workers
-	 * terminate.
+	 * e.g., by calling the {@link Interrupter#interrupt()} method of the
+	 * interrupter associated with this computation. If interrupted, this method
+	 * can be executed again to wait until all workers terminate.
 	 * 
 	 * @throws InterruptedException
 	 *             thrown if interrupted during waiting
@@ -261,23 +268,10 @@ public class ConcurrentComputation<I> {
 		}
 		// poisoning the running workers
 		for (;;) {
-			if (poisonCount + finishedWorkers.get() == startedWorkers)
+			if (poisonCount == maxWorkers)
 				break;
-			try {
-				buffer.put(poison);
-			} catch (InterruptedException e) {
-				// revert the number of inserted poison
-				throw e;
-			}
+			buffer.put(poison);
 			poisonCount++;
 		}
 	}
-
-	/**
-	 * The interrupter for this computation
-	 */
-	public Interrupter getInterrupter() {
-		return this.inputProcessor;
-	}
-
 }

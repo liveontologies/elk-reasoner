@@ -22,23 +22,36 @@
  */
 package org.semanticweb.elk.util.concurrent.computation;
 
+import static org.junit.Assert.fail;
+
 /**
- * An abstract interface for interrupting computations and monitoring if
- * computations have been interrupted.
+ * Common implementations of {@link Interrupter}
+ * 
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface Interrupter {
+public class TestInterrupters {
 
 	/**
-	 * Requests the computation to be interrupted
+	 * @return interrupter which fails the test on every interrupt request
 	 */
-	public void interrupt();
+	public static Interrupter newFailingInterrupter() {
+		return
 
-	/**
-	 * Checks if the computation was requested to be interrupted
-	 */
-	public boolean isInterrupted();
+		new Interrupter() {
+
+			@Override
+			public void interrupt() {
+				fail();
+			}
+
+			@Override
+			public boolean isInterrupted() {
+				return false;
+			}
+
+		};
+	}
 
 }

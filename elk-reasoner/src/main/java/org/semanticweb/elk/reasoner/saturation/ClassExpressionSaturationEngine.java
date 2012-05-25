@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationListener;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * The engine for submitting, processing, and post-processing of saturation
@@ -66,16 +67,27 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 */
 	protected final ClassExpressionSaturationListener<J, ClassExpressionSaturationEngine<J>> listener;
 	/**
+	 * The interrupter used to interrupt and monitor interruption for this
+	 * engine
+	 */
+	protected final Interrupter interrupter;
+	/**
 	 * The rule application engine used internally for execution of the
 	 * saturation rules.
 	 */
 	protected final RuleApplicationEngine ruleApplicationEngine;
 	/**
-	 * The buffer for jobs in progress, i.e., those jobs for which the method
-	 * {@link #submit(J)} was executed but not
-	 * {@link #listener.notifyFinished(J)}.
+	 * The buffer for jobs that need to be processed, i.e., those for which the
+	 * method {@link #submit(J)} was executed but processing of jobs has not
+	 * been started yet.
 	 */
-	protected final Queue<J> buffer;
+	protected final Queue<J> jobsToDo;
+	/**
+	 * The buffer for jobs in progress, i.e., those for which processing has
+	 * started but the method {@link #listener.notifyFinished(J)} was not
+	 * executed yet.
+	 */
+	protected final Queue<J> jobsInProgress;
 	/**
 	 * This number of submitted jobs, i.e., those for which the method
 	 * {@link #submit(J)} was executed.
@@ -125,6 +137,9 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index used to apply the rules
+	 * @param interrupter
+	 *            the interrupter used to interrupt and monitor interruption for
+	 *            this engine
 	 * @param listener
 	 *            the listener object implementing callback functions
 	 * @param threshold
@@ -133,13 +148,16 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 */
 	public ClassExpressionSaturationEngine(
 			OntologyIndex ontologyIndex,
+			Interrupter interrupter,
 			ClassExpressionSaturationListener<J, ClassExpressionSaturationEngine<J>> listener,
 			int threshold) {
 		this.threshold = threshold;
+		this.interrupter = interrupter;
 		this.listener = listener;
-		this.buffer = new ConcurrentLinkedQueue<J>();
+		this.jobsToDo = new ConcurrentLinkedQueue<J>();
+		this.jobsInProgress = new ConcurrentLinkedQueue<J>();
 		this.ruleApplicationEngine = new RuleApplicationEngine(ontologyIndex,
-				new ThisRuleApplicationListener());
+				interrupter, new ThisRuleApplicationListener());
 	}
 
 	/**
@@ -148,13 +166,17 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index used to apply the rules
+	 * @param interrupter
+	 *            the interrupter used to interrupt and monitor interruption for
+	 *            this engine
 	 * @param listener
 	 *            The listener object implementing callback functions
 	 */
 	public ClassExpressionSaturationEngine(
 			OntologyIndex ontologyIndex,
+			Interrupter interrupter,
 			ClassExpressionSaturationListener<J, ClassExpressionSaturationEngine<J>> listener) {
-		this(ontologyIndex, listener, 256);
+		this(ontologyIndex, interrupter, listener, 256);
 	}
 
 	/**
@@ -162,11 +184,16 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index used to apply the rules
+	 * @param interrupter
+	 *            the interrupter used to interrupt and monitor interruption for
+	 *            this engine
 	 */
-	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex) {
+	public ClassExpressionSaturationEngine(OntologyIndex ontologyIndex,
+			Interrupter interrupter) {
 		/* we use a dummy listener */
 		this(
 				ontologyIndex,
+				interrupter,
 				new ClassExpressionSaturationListener<J, ClassExpressionSaturationEngine<J>>() {
 
 					@Override
@@ -181,65 +208,81 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	}
 
 	@Override
-	public void submit(J job) throws InterruptedException {
-
-		IndexedClassExpression root = job.getInput();
-		/*
-		 * if saturation is already assigned, this job is already started or
-		 * finished
-		 */
-		Context rootSaturation = root.getContext();
-		if (rootSaturation != null
-				&& ((ContextClassSaturation) rootSaturation).isSaturated()) {
-			listener.notifyFinished(job);
-			return;
-		}
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(root + ": saturation started");
-		}
-		/*
-		 * if the number of unprocessed contexts exceeds the threshold, suspend
-		 * the computation; whenever workers wake up, try to process the jobs
-		 */
-		for (;; process()) {
-			if (ruleApplicationEngine.getContextNumber()
-					- countContextsProcessed.get() <= threshold)
-				break;
-			synchronized (countContextsProcessed) {
-				if (canProcess())
-					continue;
-				if (ruleApplicationEngine.getContextNumber()
-						- countContextsProcessed.get() <= threshold)
-					break;
-				workersWaiting = true;
-				countContextsProcessed.wait();
-			}
-		}
-		/*
-		 * submit the job to the rule engine and start processing it; the
-		 * counter of active workers overestimates the number of workers
-		 * processing the tasks using the rule engine, so that when there are no
-		 * active workers, we know that all submitted jobs are processed
-		 */
-		activeWorkers.incrementAndGet();
-		buffer.add(job);
-		countJobsSubmitted.incrementAndGet();
-		ruleApplicationEngine.submit(root);
-		ruleApplicationEngine.process();
-		if (activeWorkers.decrementAndGet() == 0)
-			updateProcessedCounters();
-		processFinishedJobs();
+	public void submit(J job) {
+		jobsToDo.add(job);
 	}
 
 	@Override
 	public void process() throws InterruptedException {
-		if (ruleApplicationEngine.canProcess()) {
+		/*
+		 * if the number of unprocessed contexts exceeds the threshold, suspend
+		 * the computation; whenever workers wake up, try to process the jobs
+		 */
+		for (;;) {
+			if (interrupter.isInterrupted()) {
+				// wake up other workers if sleeping
+				listener.notifyCanProcess();
+				return;
+			}
+			/*
+			 * try to process the jobs in progress; the counter of active
+			 * workers overestimates the number of workers processing the tasks
+			 * using the rule engine, so that when there are no active workers
+			 * and the process has not been interrupted, we know that all
+			 * submitted jobs in progress are processed
+			 */
+			if (ruleApplicationEngine.canProcess()) {
+				activeWorkers.incrementAndGet();
+				ruleApplicationEngine.process();
+				if (activeWorkers.decrementAndGet() == 0
+						&& !interrupter.isInterrupted())
+					updateProcessedCounters();
+			}
+			processFinishedJobs();
+			if (ruleApplicationEngine.getContextNumber()
+					- countContextsProcessed.get() > threshold) {
+				synchronized (countContextsProcessed) {
+					if (canProcess())
+						continue;
+					if (ruleApplicationEngine.getContextNumber()
+							- countContextsProcessed.get() > threshold) {
+						workersWaiting = true;
+						countContextsProcessed.wait();
+						continue;
+					}
+				}
+			}
+			J nextJob = jobsToDo.poll();
+			if (nextJob == null)
+				return;
+			IndexedClassExpression root = nextJob.getInput();
+			/*
+			 * if saturation is already assigned, this job is already started or
+			 * finished
+			 */
+			Context rootContext = root.getContext();
+			if (rootContext != null
+					&& ((ContextClassSaturation) rootContext).isSaturated()) {
+				listener.notifyFinished(nextJob);
+				continue;
+			}
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(root + ": saturation started");
+			}
+			/*
+			 * submit the job to the rule engine and start processing it
+			 */
 			activeWorkers.incrementAndGet();
+			jobsInProgress.add(nextJob);
+			countJobsSubmitted.incrementAndGet();
+			ruleApplicationEngine.submit(root);
 			ruleApplicationEngine.process();
-			if (activeWorkers.decrementAndGet() == 0)
+			if (activeWorkers.decrementAndGet() == 0
+					&& !interrupter.isInterrupted())
 				updateProcessedCounters();
+			processFinishedJobs();
 		}
-		processFinishedJobs();
+
 	}
 
 	@Override
@@ -334,7 +377,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				 * after the job is submitted, and the number of active workers
 				 * remains positive until the job is processed.
 				 */
-				J nextJob = buffer.poll();
+				J nextJob = jobsInProgress.poll();
 				IndexedClassExpression root = nextJob.getInput();
 				Context rootSaturation = root.getContext();
 				((ContextClassSaturation) rootSaturation).setSaturated();
