@@ -350,7 +350,14 @@ public class Reasoner {
 
 			@Override
 			public void run() {
-				computation.computeTaxonomy(true, true);
+				if (!doneClassTaxonomy || !doneIndividualTaxonomy) {
+					taxonomy = computation.computeTaxonomy(true, true);
+					if (!stageExecutor.isInterrupted()) {
+						doneClassTaxonomy = true;
+						doneIndividualTaxonomy = true;
+					}
+				}
+
 			}
 
 			@Override
@@ -376,7 +383,11 @@ public class Reasoner {
 
 			@Override
 			public void run() {
-				computation.computeTaxonomy(false, true);
+				if (doneClassTaxonomy && !doneIndividualTaxonomy) {
+					taxonomy = computation.computeTaxonomy(false, true);
+				}
+				if (!stageExecutor.isInterrupted())
+					doneIndividualTaxonomy = true;
 			}
 
 			@Override

@@ -37,7 +37,6 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
@@ -71,11 +70,6 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 	public MessageDialogAppender() {
 		super();
-		initConfiguration();
-	}
-
-	public MessageDialogAppender(boolean isActive) {
-		super(isActive);
 		initConfiguration();
 	}
 
