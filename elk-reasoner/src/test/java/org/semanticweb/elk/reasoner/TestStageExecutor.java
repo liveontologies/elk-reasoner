@@ -22,11 +22,14 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import org.semanticweb.elk.reasoner.stages.ReasonerStage;
+import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.util.concurrent.computation.FailingInterrupter;
 
 /**
- * A simple {@link ReasonerStageExecutor} used for testing reasoners. All stages
- * are executed directly.
+ * A simple {@link ReasonerStageExecutor} for unit tests. If a stage has not
+ * been done, first, all its dependencies are executed, and then this stage
+ * itself. If a stage was interrupted, the test fails.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -35,8 +38,13 @@ public class TestStageExecutor extends FailingInterrupter implements
 		ReasonerStageExecutor {
 
 	@Override
-	public void execute(ReasonerStage stage) {
-		stage.run();
+	public void complete(ReasonerStage stage) {
+		if (!stage.done()) {
+			for (ReasonerStage dependentStage : stage.getDependencies()) {
+				complete(dependentStage);
+			}
+			stage.execute();
+		}
 	}
 
 }

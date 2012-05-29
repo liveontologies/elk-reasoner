@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
@@ -36,11 +36,12 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 public interface ReasonerStageExecutor extends Interrupter {
 
 	/**
-	 * Executes the reasoner stage
+	 * Makes sure that the given stage is completed; it might not necessarily
+	 * execute this stage if the results are already computed
 	 * 
 	 * @param stage
-	 *            the reasoner stage to be executed
+	 *            the reasoner stage to be completed
 	 */
-	public void execute(ReasonerStage stage);
+	public void complete(ReasonerStage stage);
 
 }

@@ -28,8 +28,8 @@ package org.semanticweb.elk.cli;
 import java.util.concurrent.Executors;
 
 import org.semanticweb.elk.reasoner.ReasonerFactory;
-import org.semanticweb.elk.reasoner.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
  * Instantiates {@link IOReasoner}

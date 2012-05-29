@@ -29,6 +29,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
  * The main factory to instantiate {@link Reasoner}

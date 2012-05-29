@@ -40,10 +40,10 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
-import org.semanticweb.elk.reasoner.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.SimpleStageExecutor;
+import org.semanticweb.elk.reasoner.stages.ReasonerState;
+import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.logging.ElkMessage;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -92,7 +92,7 @@ import org.semanticweb.owlapi.reasoner.impl.OWLObjectPropertyNodeSet;
 import org.semanticweb.owlapi.util.Version;
 
 /**
- * {@link OWLReasoner} interface implementation for ELK {@link Reasoner}
+ * {@link OWLReasoner} interface implementation for ELK {@link ReasonerState}
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
@@ -104,7 +104,7 @@ public class ElkReasoner implements OWLReasoner {
 	protected final OWLOntologyManager manager;
 	protected final OWLDataFactory owlDataFactory;
 	/** the ELK reasoner instance used for reasoning */
-	protected final Reasoner reasoner;
+	protected final ReasonerState reasoner;
 	/** ELK progress monitor implementation to display progress */
 	protected final ProgressMonitor elkProgressMonitor;
 	/**
@@ -167,7 +167,7 @@ public class ElkReasoner implements OWLReasoner {
 		this(ontology, isBufferingMode, new ElkReasonerConfiguration());
 	}
 
-	protected Reasoner getInternalReasoner() {
+	protected ReasonerState getInternalReasoner() {
 		return reasoner;
 	}
 

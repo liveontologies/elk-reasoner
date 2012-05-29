@@ -32,8 +32,8 @@ import java.util.Arrays;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.HashClassificationCorrectnessTest;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.reasoner.stages.ReasonerState;
 import org.semanticweb.elk.testing.HashTestOutput;
 import org.semanticweb.elk.testing.TestInput;
 
@@ -58,7 +58,7 @@ public class OWLAPIHashClassificationCorrectnessTest extends HashClassificationC
 	}
 
 	@Override
-	protected Reasoner createReasoner(InputStream input) throws IOException, Owl2ParseException {
+	protected ReasonerState createReasoner(InputStream input) throws IOException, Owl2ParseException {
 		return OWLAPITestUtils.loadOntologyIntoReasoner(input).getInternalReasoner();
 	}
 

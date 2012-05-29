@@ -34,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.reasoner.stages.ReasonerState;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
@@ -56,7 +57,7 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 	
 	private final ReasoningTestManifest<EO, ClassTaxonomyTestOutput> manifest;
 	private InputStream inputStream;
-	private Reasoner reasoner;
+	private ReasonerState reasoner;
 	
 	public BaseClassificationCorrectnessTest(ReasoningTestManifest<EO, ClassTaxonomyTestOutput> testManifest) {
 		manifest = testManifest;
@@ -79,7 +80,7 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 		return false;
 	}
 	
-	protected abstract Reasoner createReasoner(final InputStream input) throws IOException, Owl2ParseException;
+	protected abstract ReasonerState createReasoner(final InputStream input) throws IOException, Owl2ParseException;
 	
 	/*
 	 * ---------------------------------------------

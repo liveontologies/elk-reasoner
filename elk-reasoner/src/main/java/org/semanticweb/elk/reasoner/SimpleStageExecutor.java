@@ -22,10 +22,13 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import org.semanticweb.elk.reasoner.stages.ReasonerStage;
+import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /**
- * A simple stage executor. All stages are executed directly.
+ * A simple {@link ReasonerStageExecutor}. If a stage has not been done, first,
+ * all its dependencies are executed, and then this stage itself.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -34,8 +37,14 @@ public class SimpleStageExecutor extends SimpleInterrupter implements
 		ReasonerStageExecutor {
 
 	@Override
-	public void execute(ReasonerStage stage) {
-		stage.run();
+	public void complete(ReasonerStage stage) {
+		if (!stage.done()) {
+			for (ReasonerStage dependentStage : stage.getDependencies()) {
+				complete(dependentStage);
+				if (stage.isInterrupted())
+					return;
+			}
+			stage.execute();
+		}
 	}
-
 }

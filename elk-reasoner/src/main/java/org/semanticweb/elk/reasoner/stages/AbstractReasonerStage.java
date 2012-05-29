@@ -20,29 +20,18 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.stages;
 
-/**
- * An abstract interface for defining reasoner stages to be used by reasoner.
- * 
- * @author "Yevgeny Kazakov"
- * 
- */
-public interface ReasonerStage {
+public abstract class AbstractReasonerStage implements ReasonerStage {
 
-	/**
-	 * @return a string identifier of this stage
-	 */
-	public String getName();
+	final ReasonerState reasoner;
 
-	/**
-	 * execution of this stage
-	 */
-	public void run();
+	public AbstractReasonerStage(ReasonerState reasoner) {
+		this.reasoner = reasoner;
+	}
 
-	/**
-	 * print detailed information about this stage
-	 */
-	public void printInfo();
-
+	@Override
+	public boolean isInterrupted() {
+		return reasoner.stageExecutor.isInterrupted();
+	}
 }
