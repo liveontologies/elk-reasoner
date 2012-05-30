@@ -113,7 +113,7 @@ class TestReasoner extends Reasoner {
 		Owl2Parser parser = new Owl2FunctionalStyleParser(stream);
 		parser.setPrefixDeclarations(new ElkPrefixDeclarationsImpl());
 
-		parser.parseOntology(ontologyIndex.getAxiomInserter());
+		parser.parseOntology(getAxiomInserter());
 	}
 
 }

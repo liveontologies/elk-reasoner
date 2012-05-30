@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.concurrent.ExecutorService;
 
+import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -73,7 +74,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * the index representing the current ongology
 	 */
-	protected OntologyIndex ontologyIndex;
+	OntologyIndex ontologyIndex;
 	/**
 	 * <tt>true</tt> if the current ontology is consistent
 	 */
@@ -166,6 +167,32 @@ public abstract class AbstractReasonerState {
 	public void removeAxiom(ElkAxiom axiom) {
 		ontologyIndex.getAxiomDeleter().process(axiom);
 		resetStages();
+	}
+
+	/**
+	 * @return an {@link ElkAxiomProcessor} that adds axiom to the given
+	 *         ontology
+	 */
+	protected ElkAxiomProcessor getAxiomInserter() {
+		return new ElkAxiomProcessor() {
+			@Override
+			public void process(ElkAxiom elkAxiom) {
+				addAxiom(elkAxiom);
+			}
+		};
+	}
+
+	/**
+	 * @return an {@link ElkAxiomProcessor} that removes axiom from the given
+	 *         ontology
+	 */
+	protected ElkAxiomProcessor getAxiomDeleter() {
+		return new ElkAxiomProcessor() {
+			@Override
+			public void process(ElkAxiom elkAxiom) {
+				removeAxiom(elkAxiom);
+			}
+		};
 	}
 
 	/**

@@ -57,7 +57,7 @@ public class IOReasoner extends Reasoner {
 		reset();
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
 		parser.setPrefixDeclarations(new ElkPrefixDeclarationsImpl());
-		parser.parseOntology(ontologyIndex.getAxiomInserter());
+		parser.parseOntology(getAxiomInserter());
 		stream.close();
 		Statistics.logOperationFinish("Loading", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
