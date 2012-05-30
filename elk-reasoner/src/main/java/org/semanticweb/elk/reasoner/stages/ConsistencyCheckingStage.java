@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
 /**
@@ -35,6 +37,12 @@ import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
  * 
  */
 class ConsistencyCheckingStage extends AbstractReasonerStage {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ConsistencyCheckingStage.class);
+
+	ConsistencyChecking computation = null;
 
 	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -58,17 +66,28 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
-		reasoner.consistentOntology = (new ConsistencyChecking(
-				reasoner.getStageExecutor(), reasoner.getExecutor(),
-				reasoner.getNumberOfWorkers(), reasoner.getProgressMonitor(),
-				reasoner.ontologyIndex)).checkConsistent();
-		if (isInterrupted())
+		int workerNo = reasoner.getNumberOfWorkers();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info("Consistency checking  using " + workerNo + " workers");
+		ProgressMonitor progressMonitor = reasoner.getProgressMonitor();
+		progressMonitor.start(getName());
+		computation = new ConsistencyChecking(reasoner.getStageExecutor(),
+				reasoner.getExecutor(), workerNo,
+				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
+		reasoner.consistentOntology = computation.checkConsistent();
+		progressMonitor.finish();
+		if (isInterrupted()) {
+			LOGGER_.warn(getName()
+					+ " is interrupted! The ontology might be inconsistent!");
 			return;
+		}
 		reasoner.doneConsistencyCheck = true;
 	}
 
 	@Override
 	public void printInfo() {
+		if (computation != null)
+			computation.printStatistics();
 	}
 
 }

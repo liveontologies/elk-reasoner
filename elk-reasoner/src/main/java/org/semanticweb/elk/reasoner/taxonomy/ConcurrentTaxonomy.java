@@ -52,11 +52,11 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
+class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
-			.getLogger(ConcurrentClassTaxonomy.class);
+			.getLogger(ConcurrentTaxonomy.class);
 
 	/** thread safe map from class IRIs to class nodes */
 	protected final ConcurrentMap<ElkIri, NonBottomClassNode> classNodeLookup;
@@ -78,7 +78,7 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 	 */
 	protected final BottomClassNode bottomClassNode;
 
-	ConcurrentClassTaxonomy() {
+	ConcurrentTaxonomy() {
 		this.classNodeLookup = new ConcurrentHashMap<ElkIri, NonBottomClassNode>();
 		this.allClassNodes = Collections
 				.newSetFromMap(new ConcurrentHashMap<TypeNode<ElkClass, ElkNamedIndividual>, Boolean>());
@@ -283,7 +283,7 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 
 		@Override
 		public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
-			return ConcurrentClassTaxonomy.this;
+			return ConcurrentTaxonomy.this;
 		}
 
 		@Override

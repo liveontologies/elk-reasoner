@@ -78,7 +78,7 @@ public class ConcurrentComputation<I> {
 	/**
 	 * The worker instance used to process the jobs
 	 */
-	protected final Worker worker = new Worker();
+	protected final Worker worker = new Worker(Thread.currentThread());
 	/**
 	 * The poison instance used to terminate the jobs
 	 */
@@ -178,6 +178,15 @@ public class ConcurrentComputation<I> {
 	 */
 	protected final class Worker implements JobProcessor<I, Boolean>, Runnable {
 
+		/**
+		 * The thread that has created this worker
+		 */
+		protected final Thread creator;
+
+		public Worker(Thread creator) {
+			this.creator = creator;
+		}
+
 		@Override
 		public final Boolean process(JobBatch<I> batch)
 				throws InterruptedException {
@@ -200,6 +209,8 @@ public class ConcurrentComputation<I> {
 			for (;;) {
 				if (interrupter.isInterrupted()) {
 					Thread.currentThread().interrupt();
+					if (!creator.isInterrupted())
+						creator.interrupt();
 					break;
 				}
 				try {

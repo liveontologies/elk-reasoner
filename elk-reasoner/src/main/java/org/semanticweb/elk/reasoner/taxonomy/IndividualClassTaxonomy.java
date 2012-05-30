@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
  * Abstract taxonomy for classes and their instances (individuals). The main
  * purpose of this is to provide an "interface" that is specific enough for
  * engines to modify the data without needing to refer to a particular
- * implementation, such as {@link ConcurrentClassTaxonomy}.
+ * implementation, such as {@link ConcurrentTaxonomy}.
  * 
  * @author Markus Kroetzsch
  * 

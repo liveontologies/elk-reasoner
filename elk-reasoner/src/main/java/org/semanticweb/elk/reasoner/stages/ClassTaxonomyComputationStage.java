@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 
 /**
@@ -35,6 +37,12 @@ import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
  * 
  */
 class ClassTaxonomyComputationStage extends AbstractReasonerStage {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ClassTaxonomyComputationStage.class);
+
+	TaxonomyComputation computation = null;
 
 	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -58,22 +66,28 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
-		if (!reasoner.doneClassTaxonomy) {
-			reasoner.taxonomy = (new TaxonomyComputation(
-					reasoner.getStageExecutor(), reasoner.getExecutor(),
-					reasoner.getNumberOfWorkers(),
-					reasoner.getProgressMonitor(), reasoner.ontologyIndex))
-					.computeTaxonomy(true, false);
-			if (isInterrupted())
-				return;
-			reasoner.doneClassTaxonomy = true;
+		int workerNo = reasoner.getNumberOfWorkers();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		ProgressMonitor progressMonitor = reasoner.getProgressMonitor();
+		progressMonitor.start(getName());
+		computation = new TaxonomyComputation(reasoner.getStageExecutor(),
+				reasoner.getExecutor(), workerNo, progressMonitor,
+				reasoner.ontologyIndex);
+		reasoner.taxonomy = computation.computeTaxonomy(true, false);
+		progressMonitor.finish();
+		if (isInterrupted()) {
+			LOGGER_.warn(getName()
+					+ " is interrupted! The taxonomy may be incomplete!");
+			return;
 		}
+		reasoner.doneClassTaxonomy = true;
 	}
 
 	@Override
 	public void printInfo() {
-		// TODO Auto-generated method stub
-
+		if (computation != null)
+			computation.printStatistics();
 	}
 
 }

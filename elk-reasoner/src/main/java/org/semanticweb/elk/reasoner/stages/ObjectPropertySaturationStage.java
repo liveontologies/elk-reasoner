@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
 
 /**
@@ -35,6 +36,12 @@ import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturati
  * 
  */
 class ObjectPropertySaturationStage extends AbstractReasonerStage {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ObjectPropertySaturationStage.class);
+
+	ObjectPropertySaturation computation = null;
 
 	public ObjectPropertySaturationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -57,11 +64,17 @@ class ObjectPropertySaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
-		(new ObjectPropertySaturation(reasoner.getStageExecutor(),
-				reasoner.getExecutor(), reasoner.getNumberOfWorkers(),
-				reasoner.ontologyIndex)).compute();
-		if (isInterrupted())
+		int workerNo = reasoner.getNumberOfWorkers();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		computation = new ObjectPropertySaturation(reasoner.getStageExecutor(),
+				reasoner.getExecutor(), workerNo, reasoner.ontologyIndex);
+		computation.compute();
+		if (isInterrupted()) {
+			LOGGER_.warn(getName()
+					+ " is interrupted! The reasoning results might be incorrect!");
 			return;
+		}
 		reasoner.doneObjectPropertySaturation = true;
 	}
 

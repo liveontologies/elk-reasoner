@@ -24,16 +24,13 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.concurrent.ExecutorService;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
-import org.semanticweb.elk.util.logging.Statistics;
 
 /**
  * Class for computing taxonomies for classification and instance retrieval
@@ -46,9 +43,6 @@ import org.semanticweb.elk.util.logging.Statistics;
  */
 public class TaxonomyComputation extends
 		ConcurrentComputation<IndexedClassEntity> {
-
-	protected final static Logger LOGGER_ = Logger
-			.getLogger(ObjectPropertySaturation.class);
 
 	protected final Interrupter interrupter;
 	protected final ProgressMonitor progressMonitor;
@@ -91,11 +85,6 @@ public class TaxonomyComputation extends
 	public IndividualClassTaxonomy computeTaxonomy(boolean includeClasses,
 			boolean includeIndividuals) {
 
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Classification using " + maxWorkers + " workers");
-		Statistics.logOperationStart("Classification", LOGGER_);
-		progressMonitor.start("Classification");
-
 		// number of indexed entities to classify
 		final int maxProgress = (includeClasses ? ontologyIndex
 				.getIndexedClassCount() : 0)
@@ -120,16 +109,27 @@ public class TaxonomyComputation extends
 			finish();
 			waitWorkersToStop();
 		} catch (InterruptedException e) {
-			// FIXME Either document why this is ignored or do something
-			// better.
+			interrupter.interrupt();
+			Thread.interrupted();
+			// wait until all workers are killed
+			for (;;) {
+				try {
+					waitWorkersToStop();
+					break;
+				} catch (InterruptedException ex) {
+					continue;
+				}
+			}
 		}
 
-		Statistics.logOperationFinish("Classification", LOGGER_);
-		Statistics.logMemoryUsage(LOGGER_);
-		taxonomyComputationEngine.printStatistics();
-		progressMonitor.finish();
-
 		return taxonomyComputationEngine.getClassTaxonomy();
+	}
+
+	/**
+	 * Print statistics about class taxonomy computation
+	 */
+	public void printStatistics() {
+		taxonomyComputationEngine.printStatistics();
 	}
 
 }

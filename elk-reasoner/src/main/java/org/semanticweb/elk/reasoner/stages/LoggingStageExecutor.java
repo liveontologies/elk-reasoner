@@ -22,27 +22,39 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.logging.Statistics;
 
 /**
- * A simple {@link ReasonerStageExecutor}. If a stage has not been done, first,
- * all its dependencies are executed, and then this stage itself.
+ * A {@link ReasonerStageExecutor} which prints log messages about the executed
+ * stages. If a stage has not been done, first, all its dependencies are
+ * executed, and then this stage itself.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SimpleStageExecutor extends SimpleInterrupter implements
+public class LoggingStageExecutor extends SimpleInterrupter implements
 		ReasonerStageExecutor {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(LoggingStageExecutor.class);
 
 	@Override
 	public void complete(ReasonerStage stage) {
 		if (!stage.done()) {
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);
-				if (dependentStage.isInterrupted())
+				if (dependentStage.isInterrupted()) {
 					return;
+				}
 			}
+			Statistics.logOperationStart(stage.getName(), LOGGER_);
 			stage.execute();
+			Statistics.logOperationFinish(stage.getName(), LOGGER_);
+			Statistics.logMemoryUsage(LOGGER_);
+			stage.printInfo();
 		}
 	}
 }

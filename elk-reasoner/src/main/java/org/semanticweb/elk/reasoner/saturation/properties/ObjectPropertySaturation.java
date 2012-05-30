@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -51,12 +50,6 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  * @author Yevgeny Kazakov
  */
 public class ObjectPropertySaturation {
-
-	/**
-	 * Logger for events.
-	 */
-	protected final static Logger LOGGER_ = Logger
-			.getLogger(ObjectPropertySaturation.class);
 
 	/**
 	 * the interrupter used to interrupt and monitor interruption for the
@@ -106,6 +99,8 @@ public class ObjectPropertySaturation {
 		}
 	}
 
+	// TODO Collect some statistics
+
 	/**
 	 * @throws InterruptedException
 	 * 
@@ -125,7 +120,7 @@ public class ObjectPropertySaturation {
 			ipc.resetSaturated();
 			roleHierarchyComputation.submit(ipc);
 		}
-		
+
 		roleHierarchyComputation.finish();
 		roleHierarchyComputation.waitWorkersToStop();
 

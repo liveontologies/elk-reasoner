@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 
 /**
@@ -35,6 +37,12 @@ import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
  * 
  */
 class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(InstanceTaxonomyComputationStage.class);
+
+	TaxonomyComputation computation = null;
 
 	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -58,29 +66,36 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
+		int workerNo = reasoner.getNumberOfWorkers();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		ProgressMonitor progressMonitor = reasoner.getProgressMonitor();
+		progressMonitor.start(getName());
 		if (reasoner.doneClassTaxonomy) {
-			reasoner.taxonomy = (new TaxonomyComputation(
-					reasoner.getStageExecutor(), reasoner.getExecutor(),
-					reasoner.getNumberOfWorkers(),
-					reasoner.getProgressMonitor(), reasoner.ontologyIndex,
-					reasoner.taxonomy)).computeTaxonomy(false, true);
+			computation = new TaxonomyComputation(reasoner.getStageExecutor(),
+					reasoner.getExecutor(), workerNo, progressMonitor,
+					reasoner.ontologyIndex, reasoner.taxonomy);
+			reasoner.taxonomy = computation.computeTaxonomy(false, true);
 		} else {
-			reasoner.taxonomy = (new TaxonomyComputation(
-					reasoner.getStageExecutor(), reasoner.getExecutor(),
-					reasoner.getNumberOfWorkers(),
-					reasoner.getProgressMonitor(), reasoner.ontologyIndex))
-					.computeTaxonomy(true, true);
+			computation = new TaxonomyComputation(reasoner.getStageExecutor(),
+					reasoner.getExecutor(), reasoner.getNumberOfWorkers(),
+					progressMonitor, reasoner.ontologyIndex);
+			reasoner.taxonomy = computation.computeTaxonomy(true, true);
 		}
-		if (isInterrupted())
+		progressMonitor.finish();
+		if (isInterrupted()) {
+			LOGGER_.warn(getName()
+					+ " is interrupted! The taxonomy might be incomplete!");
 			return;
+		}
 		reasoner.doneClassTaxonomy = true;
 		reasoner.doneInstanceTaxonomy = true;
 	}
 
 	@Override
 	public void printInfo() {
-		// TODO Auto-generated method stub
-
+		if (computation != null)
+			computation.printStatistics();
 	}
 
 }

@@ -118,7 +118,7 @@ public class TaxonomyComputationEngine implements
 	 */
 	public TaxonomyComputationEngine(OntologyIndex ontologyIndex,
 			Interrupter interrupter) {
-		this(ontologyIndex, interrupter, new ConcurrentClassTaxonomy());
+		this(ontologyIndex, interrupter, new ConcurrentTaxonomy());
 	}
 
 	@Override

@@ -72,7 +72,7 @@ public abstract class AbstractReasonerState {
 	 */
 	boolean doneReset = true;
 	/**
-	 * the index representing the current ongology
+	 * the index representing the current ontology
 	 */
 	OntologyIndex ontologyIndex;
 	/**
@@ -170,7 +170,7 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * @return an {@link ElkAxiomProcessor} that adds axiom to the given
+	 * @return an {@link ElkAxiomProcessor} that adds axioms to the current
 	 *         ontology
 	 */
 	protected ElkAxiomProcessor getAxiomInserter() {
@@ -183,7 +183,7 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * @return an {@link ElkAxiomProcessor} that removes axiom from the given
+	 * @return an {@link ElkAxiomProcessor} that removes axioms from the current
 	 *         ontology
 	 */
 	protected ElkAxiomProcessor getAxiomDeleter() {

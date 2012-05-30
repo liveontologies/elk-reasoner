@@ -42,8 +42,8 @@ import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.logging.ElkMessage;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -128,7 +128,7 @@ public class ElkReasoner implements OWLReasoner {
 	/**
 	 * The stage executor used for execution the stages of the reasoner
 	 */
-	protected final ReasonerStageExecutor stageExecutor = new SimpleStageExecutor();
+	protected final ReasonerStageExecutor stageExecutor = new LoggingStageExecutor();
 
 	// logger the messages
 	protected final static Logger LOGGER_ = Logger.getLogger(ElkReasoner.class);

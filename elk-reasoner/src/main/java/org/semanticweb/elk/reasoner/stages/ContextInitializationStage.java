@@ -25,16 +25,26 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
  * The reasoner stage, which purpose is to ensure that no context is assigned to
- * {@link IndexedClassExpression}s of the current ongology
+ * {@link IndexedClassExpression}s of the current ontology
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 class ContextInitializationStage extends AbstractReasonerStage {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ContextInitializationStage.class);
+
+	/**
+	 * The counter for deleted contexts
+	 */
+	int deletedContexts = 0;
 
 	public ContextInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -57,16 +67,24 @@ class ContextInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
+
 		for (IndexedClassExpression ice : reasoner.ontologyIndex
-				.getIndexedClassExpressions())
+				.getIndexedClassExpressions()) {
 			ice.resetContext();
-		if (isInterrupted())
+			deletedContexts++;
+		}
+		if (isInterrupted()) {
+			LOGGER_.warn(getName()
+					+ " is interrupted! The reasoning results might be incorrect!");
 			return;
+		}
 		reasoner.doneContextReset = true;
 	}
 
 	@Override
 	public void printInfo() {
+		if (deletedContexts > 0 && LOGGER_.isDebugEnabled())
+			LOGGER_.debug("Contexts deleted:" + deletedContexts);
 	}
 
 }

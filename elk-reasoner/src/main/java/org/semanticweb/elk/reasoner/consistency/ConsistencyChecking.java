@@ -79,12 +79,6 @@ public class ConsistencyChecking extends
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively())
 			return true;
 
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Consistency checking  using " + maxWorkers
-					+ " workers");
-		Statistics.logOperationStart("Consistency checking", LOGGER_);
-		progressMonitor.start("Consistency checking");
-
 		// number of indexed classes
 		final int maxProgress = ontologyIndex.getIndexedIndividualCount();
 		// variable used in progress monitors
@@ -101,17 +95,28 @@ public class ConsistencyChecking extends
 			finish();
 			waitWorkersToStop();
 		} catch (InterruptedException e) {
-			// FIXME Either document why this is ignored or do something
-			// better.
+			interrupter.interrupt();
+			Thread.interrupted();
+			// wait until all workers are killed
+			for (;;) {
+				try {
+					waitWorkersToStop();
+					break;
+				} catch (InterruptedException ex) {
+					continue;
+				}
+			}
 		}
-
-		Statistics.logOperationFinish("ConsistencyChecking", LOGGER_);
-		Statistics.logMemoryUsage(LOGGER_);
-		consistencyCheckingEngine.printStatistics();
-		progressMonitor.finish();
 
 		return consistencyCheckingEngine.isConsistent();
 
+	}
+
+	/**
+	 * Print statistics about consistency checking
+	 */
+	public void printStatistics() {
+		consistencyCheckingEngine.printStatistics();
 	}
 
 }
