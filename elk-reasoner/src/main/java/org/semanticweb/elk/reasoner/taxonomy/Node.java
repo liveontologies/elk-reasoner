@@ -32,6 +32,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * application but will usually be implied extensional equality.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of members of the node
  */
 public interface Node<T extends ElkObject> {
 

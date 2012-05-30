@@ -20,20 +20,21 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.reasoner.stages.ReasonerStage;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.FailingInterrupter;
 
 /**
- * A simple {@link ReasonerStageExecutor}. If a stage has not been done, first,
- * all its dependencies are executed, and then this stage itself.
+ * A simple {@link ReasonerStageExecutor} for unit tests. If a stage has not
+ * been done, first, all its dependencies are executed, and then this stage
+ * itself. If a stage was interrupted, the test fails.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SimpleStageExecutor extends SimpleInterrupter implements
+public class TestStageExecutor extends FailingInterrupter implements
 		ReasonerStageExecutor {
 
 	@Override
@@ -41,10 +42,9 @@ public class SimpleStageExecutor extends SimpleInterrupter implements
 		if (!stage.done()) {
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);
-				if (stage.isInterrupted())
-					return;
 			}
 			stage.execute();
 		}
 	}
+
 }

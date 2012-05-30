@@ -27,9 +27,16 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
 
-public class ObjectPropertySaturationStage extends AbstractReasonerStage {
+/**
+ * The reasoner stage, which purpose is to compute the saturation for object
+ * properties of the given ontology
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+class ObjectPropertySaturationStage extends AbstractReasonerStage {
 
-	public ObjectPropertySaturationStage(ReasonerState reasoner) {
+	public ObjectPropertySaturationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -50,9 +57,9 @@ public class ObjectPropertySaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
-		(new ObjectPropertySaturation(reasoner.stageExecutor,
-				reasoner.executor, reasoner.workerNo, reasoner.ontologyIndex))
-				.compute();
+		(new ObjectPropertySaturation(reasoner.getStageExecutor(),
+				reasoner.getExecutor(), reasoner.getNumberOfWorkers(),
+				reasoner.ontologyIndex)).compute();
 		if (isInterrupted())
 			return;
 		reasoner.doneObjectPropertySaturation = true;

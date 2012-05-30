@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.semanticweb.elk.config.ConfigurationException;
 import org.semanticweb.elk.config.ConfigurationFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 
 /**
  * 

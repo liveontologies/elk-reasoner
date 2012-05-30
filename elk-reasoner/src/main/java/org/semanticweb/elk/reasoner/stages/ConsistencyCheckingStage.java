@@ -27,9 +27,16 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
-public class ConsistencyCheckingStage extends AbstractReasonerStage {
+/**
+ * The reasoner stage, which purpose is to check consistency of the current
+ * ontology
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+class ConsistencyCheckingStage extends AbstractReasonerStage {
 
-	public ConsistencyCheckingStage(ReasonerState reasoner) {
+	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -52,9 +59,9 @@ public class ConsistencyCheckingStage extends AbstractReasonerStage {
 	@Override
 	public void execute() {
 		reasoner.consistentOntology = (new ConsistencyChecking(
-				reasoner.stageExecutor, reasoner.executor, reasoner.workerNo,
-				reasoner.progressMonitor, reasoner.ontologyIndex))
-				.checkConsistent();
+				reasoner.getStageExecutor(), reasoner.getExecutor(),
+				reasoner.getNumberOfWorkers(), reasoner.getProgressMonitor(),
+				reasoner.ontologyIndex)).checkConsistent();
 		if (isInterrupted())
 			return;
 		reasoner.doneConsistencyCheck = true;

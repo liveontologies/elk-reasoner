@@ -38,7 +38,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.FreshEntitiesException;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
-import org.semanticweb.elk.reasoner.TestStageExecutor;
+import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 
 //TODO This test won't be necessary as soon as we can compute hash code of InstanceTaxonomies
 

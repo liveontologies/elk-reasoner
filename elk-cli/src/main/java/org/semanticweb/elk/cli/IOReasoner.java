@@ -29,16 +29,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
 import org.semanticweb.elk.util.logging.Statistics;
 
 public class IOReasoner extends Reasoner {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger.getLogger(IOReasoner.class);
 
 	public IOReasoner(ReasonerStageExecutor stageExecutor,
 			ExecutorService executor, int workerNo) {
@@ -89,4 +94,11 @@ public class IOReasoner extends Reasoner {
 				file.getPath(), true);
 		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
 	}
+
+	// used only in tests
+	@Override
+	protected OntologyIndex getOntologyIndex() {
+		return super.getOntologyIndex();
+	}
+
 }

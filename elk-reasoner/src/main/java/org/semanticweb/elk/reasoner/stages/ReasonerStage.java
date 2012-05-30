@@ -22,8 +22,14 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.List;
-
+/**
+ * An basic computation unit that can be executed by a reasoner. A
+ * {@link ReasonerStage} can specify other {@link ReasonerStage}s as
+ * dependencies. Thus, several stages can be chained within a reasoning process.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public interface ReasonerStage {
 
 	/**
@@ -32,21 +38,25 @@ public interface ReasonerStage {
 	public String getName();
 
 	/**
-	 * @return <tt>true</tt> if the computation for this stage was already done;
-	 *         this does not necessarily mean that this stage was run: the
-	 *         results of the computation could have been computed by other
-	 *         stages
+	 * @return <tt>true</tt> if the results for this stage have been already
+	 *         computed; this does not necessarily mean that this stage was
+	 *         executed: the results of the computation could have been computed
+	 *         by other stages
 	 */
 	public boolean done();
 
 	/**
 	 * @return the list of stages that are required to be executed before
-	 *         executing this stage
+	 *         executing this stage; the order of the execution does not matter
 	 */
-	public List<ReasonerStage> getDependencies();
+	public Iterable<ReasonerStage> getDependencies();
 
 	/**
-	 * execution of this stage
+	 * Performs the execution of this stage; in order to ensure correctness of
+	 * the execution, it is necessary that all staged from the dependencies are
+	 * done. If the execution of this stage has not been interrupted, the
+	 * results for this stage should be computed and the function
+	 * {@link #done()} should return <tt>true</tt>.
 	 */
 	public void execute();
 
@@ -57,7 +67,9 @@ public interface ReasonerStage {
 	public boolean isInterrupted();
 
 	/**
-	 * print detailed information about this stage
+	 * Prints detailed information about the (progress) of this stage. This
+	 * function can be used to print statistics after this stage is executed or
+	 * interrupted.
 	 */
 	public void printInfo();
 

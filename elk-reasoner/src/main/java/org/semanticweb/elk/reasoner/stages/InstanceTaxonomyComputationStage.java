@@ -27,9 +27,16 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 
-public class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
+/**
+ * The reasoner stage, which purpose is to compute the instance taxonomy of the
+ * current ontology
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
-	public InstanceTaxonomyComputationStage(ReasonerState reasoner) {
+	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -40,7 +47,7 @@ public class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean done() {
-		return reasoner.doneIndividualTaxonomy;
+		return reasoner.doneInstanceTaxonomy;
 	}
 
 	@Override
@@ -53,20 +60,21 @@ public class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	public void execute() {
 		if (reasoner.doneClassTaxonomy) {
 			reasoner.taxonomy = (new TaxonomyComputation(
-					reasoner.stageExecutor, reasoner.executor,
-					reasoner.workerNo, reasoner.progressMonitor,
-					reasoner.ontologyIndex, reasoner.taxonomy))
-					.computeTaxonomy(false, true);
+					reasoner.getStageExecutor(), reasoner.getExecutor(),
+					reasoner.getNumberOfWorkers(),
+					reasoner.getProgressMonitor(), reasoner.ontologyIndex,
+					reasoner.taxonomy)).computeTaxonomy(false, true);
 		} else {
 			reasoner.taxonomy = (new TaxonomyComputation(
-					reasoner.stageExecutor, reasoner.executor,
-					reasoner.workerNo, reasoner.progressMonitor,
-					reasoner.ontologyIndex)).computeTaxonomy(true, true);
+					reasoner.getStageExecutor(), reasoner.getExecutor(),
+					reasoner.getNumberOfWorkers(),
+					reasoner.getProgressMonitor(), reasoner.ontologyIndex))
+					.computeTaxonomy(true, true);
 		}
 		if (isInterrupted())
 			return;
 		reasoner.doneClassTaxonomy = true;
-		reasoner.doneIndividualTaxonomy = true;
+		reasoner.doneInstanceTaxonomy = true;
 	}
 
 	@Override

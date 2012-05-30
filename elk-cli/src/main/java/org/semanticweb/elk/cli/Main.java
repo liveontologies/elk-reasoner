@@ -36,7 +36,7 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
-import org.semanticweb.elk.reasoner.SimpleStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 
 /**
  * 

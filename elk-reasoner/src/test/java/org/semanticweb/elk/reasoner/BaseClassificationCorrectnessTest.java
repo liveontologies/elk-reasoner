@@ -34,7 +34,6 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.stages.ReasonerState;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
@@ -46,57 +45,59 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * Runs classification tests for all test input in the test directory
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 @RunWith(PolySuite.class)
 public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
-	
+
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
-	
+
 	private final ReasoningTestManifest<EO, ClassTaxonomyTestOutput> manifest;
 	private InputStream inputStream;
-	private ReasonerState reasoner;
-	
-	public BaseClassificationCorrectnessTest(ReasoningTestManifest<EO, ClassTaxonomyTestOutput> testManifest) {
+	private Reasoner reasoner;
+
+	public BaseClassificationCorrectnessTest(
+			ReasoningTestManifest<EO, ClassTaxonomyTestOutput> testManifest) {
 		manifest = testManifest;
 	}
-	
+
 	@Before
 	public void before() throws IOException, Owl2ParseException {
 		assumeTrue(!ignore(manifest.getInput()));
-		
-		inputStream = ((URLTestIO)manifest.getInput()).getInputStream();
+
+		inputStream = ((URLTestIO) manifest.getInput()).getInputStream();
 		reasoner = createReasoner(inputStream);
 	}
-	
+
 	@After
 	public void after() {
 		IOUtils.closeQuietly(inputStream);
 	}
-	
+
 	protected boolean ignore(TestInput input) {
 		return false;
 	}
-	
-	protected abstract ReasonerState createReasoner(final InputStream input) throws IOException, Owl2ParseException;
-	
+
+	protected abstract Reasoner createReasoner(final InputStream input)
+			throws IOException, Owl2ParseException;
+
 	/*
-	 * ---------------------------------------------
-	 * Tests
+	 * --------------------------------------------- Tests
 	 * ---------------------------------------------
 	 */
-	
+
 	/**
 	 * Checks that the computed taxonomy is correct and complete
 	 * 
-	 * @throws TestResultComparisonException  in case the comparison fails
+	 * @throws TestResultComparisonException
+	 *             in case the comparison fails
 	 */
 	@Test
 	public void classify() throws TestResultComparisonException {
 		System.err.println(manifest.toString());
-		
+
 		Taxonomy<ElkClass> taxonomy;
 		try {
 			taxonomy = reasoner.getTaxonomy();
@@ -104,13 +105,12 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 		} catch (InconsistentOntologyException e) {
 			manifest.compare(new ClassTaxonomyTestOutput());
 		}
-		
-		/*try {
-			Writer writer = new OutputStreamWriter(System.out);
-			ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, true);
-			writer.flush();
-		} catch (IOException e) {}*/
-		
+
+		/*
+		 * try { Writer writer = new OutputStreamWriter(System.out);
+		 * ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, true);
+		 * writer.flush(); } catch (IOException e) {}
+		 */
 
 	}
 }

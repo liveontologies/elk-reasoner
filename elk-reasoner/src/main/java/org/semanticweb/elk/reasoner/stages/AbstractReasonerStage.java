@@ -22,16 +22,28 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-public abstract class AbstractReasonerStage implements ReasonerStage {
+/**
+ * A common implementation {@link ReasonerStage}s for a given reasoner.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+abstract class AbstractReasonerStage implements ReasonerStage {
 
-	final ReasonerState reasoner;
+	final AbstractReasonerState reasoner;
 
-	public AbstractReasonerStage(ReasonerState reasoner) {
+	/**
+	 * Creates a new reasoner stage for a given reasoner.
+	 * 
+	 * @param reasoner
+	 *            the reasoner for which the reasoner stage is created
+	 */
+	public AbstractReasonerStage(AbstractReasonerState reasoner) {
 		this.reasoner = reasoner;
 	}
 
 	@Override
 	public boolean isInterrupted() {
-		return reasoner.stageExecutor.isInterrupted();
+		return reasoner.getStageExecutor().isInterrupted();
 	}
 }

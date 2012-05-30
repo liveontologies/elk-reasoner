@@ -27,9 +27,16 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
-public class ContextInitializationStage extends AbstractReasonerStage {
+/**
+ * The reasoner stage, which purpose is to ensure that no context is assigned to
+ * {@link IndexedClassExpression}s of the current ongology
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+class ContextInitializationStage extends AbstractReasonerStage {
 
-	public ContextInitializationStage(ReasonerState reasoner) {
+	public ContextInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -40,7 +47,7 @@ public class ContextInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean done() {
-		return reasoner.doneContextInitialization;
+		return reasoner.doneContextReset;
 	}
 
 	@Override
@@ -55,7 +62,7 @@ public class ContextInitializationStage extends AbstractReasonerStage {
 			ice.resetContext();
 		if (isInterrupted())
 			return;
-		reasoner.doneContextInitialization = true;
+		reasoner.doneContextReset = true;
 	}
 
 	@Override

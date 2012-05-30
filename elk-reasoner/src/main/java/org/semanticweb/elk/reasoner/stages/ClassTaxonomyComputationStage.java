@@ -27,9 +27,16 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 
-public class ClassTaxonomyComputationStage extends AbstractReasonerStage {
+/**
+ * The reasoner stage, which purpose is to compute the class taxonomy of the
+ * current ontology
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
-	public ClassTaxonomyComputationStage(ReasonerState reasoner) {
+	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -53,9 +60,10 @@ public class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	public void execute() {
 		if (!reasoner.doneClassTaxonomy) {
 			reasoner.taxonomy = (new TaxonomyComputation(
-					reasoner.stageExecutor, reasoner.executor,
-					reasoner.workerNo, reasoner.progressMonitor,
-					reasoner.ontologyIndex)).computeTaxonomy(true, false);
+					reasoner.getStageExecutor(), reasoner.getExecutor(),
+					reasoner.getNumberOfWorkers(),
+					reasoner.getProgressMonitor(), reasoner.ontologyIndex))
+					.computeTaxonomy(true, false);
 			if (isInterrupted())
 				return;
 			reasoner.doneClassTaxonomy = true;
