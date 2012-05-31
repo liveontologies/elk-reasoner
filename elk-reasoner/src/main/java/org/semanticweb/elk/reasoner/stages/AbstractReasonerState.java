@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
@@ -31,10 +33,12 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
+import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * The execution state of the reasoner containing information about which
@@ -46,6 +50,19 @@ import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
  * 
  */
 public abstract class AbstractReasonerState {
+	/**
+	 * <tt>true</tt> if the object property hierarchy has been computed
+	 */
+	boolean doneObjectPropertyHierarchyComputation = false;
+	/**
+	 * <tt>true</tt> if the object property composition has been initialized
+	 */
+	boolean doneObjectPropertyCompositionsInitialization = false;
+	/**
+	 * <tt>true</tt> if the object redundant object property compositions have
+	 * been eliminated
+	 */
+	boolean doneRedundantCompositionsElimination = false;
 	/**
 	 * <tt>true</tt> if the object property saturation has been computed
 	 */
@@ -76,13 +93,17 @@ public abstract class AbstractReasonerState {
 	 */
 	OntologyIndex ontologyIndex;
 	/**
+	 * the object property compositions
+	 */
+	Map<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>> compositions = null;
+	/**
 	 * <tt>true</tt> if the current ontology is consistent
 	 */
-	boolean consistentOntology;
+	boolean consistentOntology = true;
 	/**
 	 * Taxonomy that stores (partial) reasoning results.
 	 */
-	IndividualClassTaxonomy taxonomy;
+	IndividualClassTaxonomy taxonomy = null;
 
 	/**
 	 * Invalidates all previously computed reasoning results. By calling this

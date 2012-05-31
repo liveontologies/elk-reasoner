@@ -26,44 +26,35 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
+import org.semanticweb.elk.reasoner.saturation.properties.RedundantCompositionsElimination;
 
-/**
- * The reasoner stage, which purpose is to check consistency of the current
- * ontology
- * 
- * @author "Yevgeny Kazakov"
- * 
- */
-class ConsistencyCheckingStage extends AbstractReasonerStage {
+public class RedundantCompositionsEliminationStage extends
+		AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-			.getLogger(ConsistencyCheckingStage.class);
+			.getLogger(RedundantCompositionsEliminationStage.class);
 
-	ConsistencyChecking computation = null;
+	RedundantCompositionsElimination computation = null;
 
-	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
+	public RedundantCompositionsEliminationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
 	@Override
 	public String getName() {
-		return "Consistency Checking";
+		return "Redundant Compositions Elimination";
 	}
 
 	@Override
 	public boolean done() {
-		return reasoner.doneConsistencyCheck;
+		return reasoner.doneRedundantCompositionsElimination;
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(
-				(ReasonerStage) new ObjectPropertyHierarchyComputationStage(
-						reasoner),
-				(ReasonerStage) new RedundantCompositionsEliminationStage(
+		return Arrays
+				.asList((ReasonerStage) new ObjectPropertyCompositionsInitializationStage(
 						reasoner));
 	}
 
@@ -71,26 +62,21 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	public void execute() {
 		int workerNo = reasoner.getNumberOfWorkers();
 		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Consistency checking  using " + workerNo + " workers");
-		ProgressMonitor progressMonitor = reasoner.getProgressMonitor();
-		progressMonitor.start(getName());
-		computation = new ConsistencyChecking(reasoner.getStageExecutor(),
-				reasoner.getExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
-		reasoner.consistentOntology = computation.checkConsistent();
-		progressMonitor.finish();
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		computation = new RedundantCompositionsElimination(
+				reasoner.getStageExecutor(), reasoner.getExecutor(), workerNo,
+				reasoner.compositions);
+		computation.compute();
 		if (isInterrupted()) {
 			LOGGER_.warn(getName()
-					+ " is interrupted! The ontology might be inconsistent!");
+					+ " is interrupted! The reasoning results might be incorrect!");
 			return;
 		}
-		reasoner.doneConsistencyCheck = true;
+		reasoner.doneRedundantCompositionsElimination = true;
 	}
 
 	@Override
 	public void printInfo() {
-		if (computation != null)
-			computation.printStatistics();
 	}
 
 }

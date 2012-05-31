@@ -43,7 +43,10 @@ public class LoggingStageExecutor extends SimpleInterrupter implements
 
 	@Override
 	public void complete(ReasonerStage stage) {
+		if (stage.isInterrupted())
+			return;
 		if (!stage.done()) {
+			LOGGER_.info(stage.getName() + ":");
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);
 				if (dependentStage.isInterrupted()) {

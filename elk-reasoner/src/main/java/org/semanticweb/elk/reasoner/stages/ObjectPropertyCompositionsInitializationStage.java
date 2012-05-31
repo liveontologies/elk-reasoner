@@ -22,60 +22,59 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
+import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyCompositionsInitialization;
 
+// TODO: Document what is going on in this stage
 /**
- * The reasoner stage, which purpose is to compute the saturation for object
- * properties of the given ontology
- * 
  * @author "Yevgeny Kazakov"
  * 
  */
-class ObjectPropertySaturationStage extends AbstractReasonerStage {
+public class ObjectPropertyCompositionsInitializationStage extends
+		AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-			.getLogger(ObjectPropertySaturationStage.class);
+			.getLogger(ObjectPropertyCompositionsInitializationStage.class);
 
-	ObjectPropertySaturation computation = null;
+	ObjectPropertyCompositionsInitialization computation = null;
 
-	public ObjectPropertySaturationStage(AbstractReasonerState reasoner) {
+	public ObjectPropertyCompositionsInitializationStage(
+			AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
 	@Override
 	public String getName() {
-		return "Object Property Saturation";
+		return "Object Property Compositions Initialization";
 	}
 
 	@Override
 	public boolean done() {
-		return reasoner.doneObjectPropertySaturation;
+		return reasoner.doneObjectPropertyCompositionsInitialization;
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Collections.emptyList();
+		return Arrays
+				.asList((ReasonerStage) new ObjectPropertyHierarchyComputationStage(
+						reasoner));
 	}
 
 	@Override
 	public void execute() {
-		int workerNo = reasoner.getNumberOfWorkers();
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		computation = new ObjectPropertySaturation(reasoner.getStageExecutor(),
-				reasoner.getExecutor(), workerNo, reasoner.ontologyIndex);
-		computation.compute();
+		computation = new ObjectPropertyCompositionsInitialization(
+				reasoner.ontologyIndex);
+		reasoner.compositions = computation.getCompositions();
 		if (isInterrupted()) {
 			LOGGER_.warn(getName()
 					+ " is interrupted! The reasoning results might be incorrect!");
 			return;
 		}
-		reasoner.doneObjectPropertySaturation = true;
+		reasoner.doneObjectPropertyCompositionsInitialization = true;
 	}
 
 	@Override

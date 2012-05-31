@@ -25,6 +25,7 @@ package org.semanticweb.elk.util.concurrent.computation;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -140,8 +141,14 @@ public class ConcurrentComputation<I> {
 		for (;;) {
 			if (startedWorkers == finishedWorkers.get() + maxWorkers)
 				break;
-			executor.execute(worker);
-			startedWorkers++;
+			try {
+				executor.execute(worker);
+				startedWorkers++;
+			} catch (RejectedExecutionException e) {
+				// something wrong, cancel everything
+				interrupter.interrupt();
+				return;
+			}
 		}
 	}
 

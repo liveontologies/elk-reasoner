@@ -24,15 +24,12 @@ package org.semanticweb.elk.reasoner.consistency;
 
 import java.util.concurrent.ExecutorService;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
-import org.semanticweb.elk.util.logging.Statistics;
 
 /**
  * Class for checking ontology consistency.
@@ -42,9 +39,6 @@ import org.semanticweb.elk.util.logging.Statistics;
  */
 public class ConsistencyChecking extends
 		ConcurrentComputation<IndexedClassExpression> {
-
-	protected final static Logger LOGGER_ = Logger
-			.getLogger(ObjectPropertySaturation.class);
 
 	protected final ProgressMonitor progressMonitor;
 	protected final OntologyIndex ontologyIndex;

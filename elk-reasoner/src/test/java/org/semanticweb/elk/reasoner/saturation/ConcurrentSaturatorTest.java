@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
-import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
+import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputation;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 
@@ -77,10 +77,10 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression A = ontologyIndex.getIndexed(a);
 		IndexedClassExpression D = ontologyIndex.getIndexed(d);
 
-		final ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
+		final ObjectPropertyHierarchyComputation objectPropertyHierarchyComputation = new ObjectPropertyHierarchyComputation(
 				stageExecutor, executor, 16, ontologyIndex);
 
-		objectPropertySaturation.compute();
+		objectPropertyHierarchyComputation.compute();
 
 		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				stageExecutor, executor, 16, ontologyIndex);
