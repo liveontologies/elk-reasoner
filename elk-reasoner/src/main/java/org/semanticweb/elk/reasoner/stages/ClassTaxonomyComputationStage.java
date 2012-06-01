@@ -42,10 +42,30 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ClassTaxonomyComputationStage.class);
 
-	TaxonomyComputation computation = null;
+	/**
+	 * the computation used for this stage
+	 */
+	private final TaxonomyComputation computation;
+
+	/**
+	 * the number of workers used in the computation for this stage
+	 */
+	private final int workerNo;
+
+	/**
+	 * the progress monitor used to report progress of this stage
+	 */
+	final ProgressMonitor progressMonitor;
 
 	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
+		this.progressMonitor = reasoner.getProgressMonitor();
+		this.workerNo = reasoner.getNumberOfWorkers();
+		computation = new TaxonomyComputation(
+				reasoner.ontologyIndex.getIndexedClasses(),
+				reasoner.ontologyIndex.getIndexedClassCount(),
+				reasoner.getStageExecutor(), workerNo, progressMonitor,
+				reasoner.getOntologyIndex());
 	}
 
 	@Override
@@ -66,28 +86,23 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
-		int workerNo = reasoner.getNumberOfWorkers();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		ProgressMonitor progressMonitor = reasoner.getProgressMonitor();
 		progressMonitor.start(getName());
-		computation = new TaxonomyComputation(reasoner.getStageExecutor(),
-				reasoner.getExecutor(), workerNo, progressMonitor,
-				reasoner.ontologyIndex);
-		reasoner.taxonomy = computation.computeTaxonomy(true, false);
+		computation.process();
 		progressMonitor.finish();
 		if (isInterrupted()) {
 			LOGGER_.warn(getName()
 					+ " is interrupted! The taxonomy may be incomplete!");
 			return;
 		}
+		reasoner.taxonomy = computation.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
 	}
 
 	@Override
 	public void printInfo() {
-		if (computation != null)
-			computation.printStatistics();
+		computation.printStatistics();
 	}
 
 }

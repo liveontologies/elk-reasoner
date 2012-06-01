@@ -42,4 +42,9 @@ public class SimpleInterrupter implements Interrupter {
 		return interrupted;
 	}
 
+	@Override
+	public void clearInterrupt() {
+		interrupted = false;
+	}
+
 }

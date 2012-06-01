@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyCompositionsInitialization;
 
 // TODO: Document what is going on in this stage
@@ -37,8 +36,8 @@ public class ObjectPropertyCompositionsInitializationStage extends
 		AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ObjectPropertyCompositionsInitializationStage.class);
+	// private static final Logger LOGGER_ = Logger
+	// .getLogger(ObjectPropertyCompositionsInitializationStage.class);
 
 	ObjectPropertyCompositionsInitialization computation = null;
 
@@ -69,11 +68,12 @@ public class ObjectPropertyCompositionsInitializationStage extends
 		computation = new ObjectPropertyCompositionsInitialization(
 				reasoner.ontologyIndex);
 		reasoner.compositions = computation.getCompositions();
-		if (isInterrupted()) {
-			LOGGER_.warn(getName()
-					+ " is interrupted! The reasoning results might be incorrect!");
-			return;
-		}
+		// TODO: this computation cannot be currently terminated
+//		if (isInterrupted()) {
+//			LOGGER_.warn(getName()
+//					+ " is interrupted! The reasoning results might be incorrect!");
+//			return;
+//		}
 		reasoner.doneObjectPropertyCompositionsInitialization = true;
 	}
 

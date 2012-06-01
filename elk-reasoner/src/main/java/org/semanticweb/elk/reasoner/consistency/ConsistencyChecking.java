@@ -22,95 +22,70 @@
  */
 package org.semanticweb.elk.reasoner.consistency;
 
-import java.util.concurrent.ExecutorService;
-
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
+import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * Class for checking ontology consistency.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class ConsistencyChecking extends
-		ConcurrentComputation<IndexedClassExpression> {
+		ReasonerComputation<IndexedClassExpression, ConsistencyCheckingEngine> {
 
-	protected final ProgressMonitor progressMonitor;
+	/**
+	 * the index of the ontology used for computation
+	 */
 	protected final OntologyIndex ontologyIndex;
-	protected final Interrupter interrupter;
-	protected final ConsistencyCheckingEngine consistencyCheckingEngine;
 
-	protected ConsistencyChecking(Interrupter interrupter,
-			ExecutorService executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
-			ConsistencyCheckingEngine consistencyCheckingEngine) {
-		super(consistencyCheckingEngine, interrupter, executor, maxWorkers,
-				8 * maxWorkers, 16);
-		this.progressMonitor = progressMonitor;
+	public ConsistencyChecking(ConsistencyCheckingEngine inputProcessor,
+			Interrupter interrupter, int maxWorkers,
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+		/*
+		 * first consistency is checked for <tt>owl:Thing</tt>, then for the
+		 * individuals in the ontology
+		 */
+		super(Operations.concat(
+				Operations.singleton(ontologyIndex.getIndexedOwlThing()),
+				ontologyIndex.getIndexedIndividuals()), ontologyIndex
+				.getIndexedIndividualCount() + 1, inputProcessor, interrupter,
+				maxWorkers, progressMonitor);
 		this.ontologyIndex = ontologyIndex;
-		this.interrupter = interrupter;
-		this.consistencyCheckingEngine = consistencyCheckingEngine;
 	}
 
-	public ConsistencyChecking(Interrupter interrupter,
-			ExecutorService executor, int maxWorkers,
+	public ConsistencyChecking(Interrupter interrupter, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(interrupter, executor, maxWorkers, progressMonitor, ontologyIndex,
-				new ConsistencyCheckingEngine(ontologyIndex, interrupter));
+		this(new ConsistencyCheckingEngine(ontologyIndex, interrupter),
+				interrupter, maxWorkers, progressMonitor, ontologyIndex);
+	}
+
+	@Override
+	public void process() {
+		if (!ontologyIndex.getIndexedOwlNothing().occursPositively())
+			return;
+		super.process();
 	}
 
 	/**
-	 * Prerequisites: object properties must be already saturated.
-	 * 
+	 * @return <tt>true</tt> if the ontology is consistent; should be called
+	 *         after the consistency checking is performed using the method
+	 *         {@link #process()}
 	 */
-	public boolean checkConsistent() {
-
-		if (!ontologyIndex.getIndexedOwlNothing().occursPositively())
-			return true;
-
-		// number of indexed classes
-		final int maxProgress = ontologyIndex.getIndexedIndividualCount();
-		// variable used in progress monitors
-		int progress = 0;
-		start();
-
-		try {
-			submit(ontologyIndex.getIndexedOwlThing());
-			for (IndexedIndividual ind : ontologyIndex.getIndexedIndividuals()) {
-				submit(ind);
-				progressMonitor.report(++progress, maxProgress);
-
-			}
-			finish();
-			waitWorkersToStop();
-		} catch (InterruptedException e) {
-			interrupter.interrupt();
-			Thread.interrupted();
-			// wait until all workers are killed
-			for (;;) {
-				try {
-					waitWorkersToStop();
-					break;
-				} catch (InterruptedException ex) {
-					continue;
-				}
-			}
-		}
-
-		return consistencyCheckingEngine.isConsistent();
-
+	public boolean isConsistent() {
+		return inputProcessor.isConsistent();
 	}
 
 	/**
 	 * Print statistics about consistency checking
 	 */
 	public void printStatistics() {
-		consistencyCheckingEngine.printStatistics();
+		inputProcessor.printStatistics();
 	}
 
 }

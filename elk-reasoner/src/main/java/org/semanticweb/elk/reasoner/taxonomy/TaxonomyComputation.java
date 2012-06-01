@@ -22,114 +22,53 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.concurrent.ExecutorService;
-
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
+// TODO: documentation
+
 /**
- * Class for computing taxonomies for classification and instance retrieval
- * tasks.
- * 
+ * Computing taxonomy relations between atomic classes of the ontology.
  * 
  * @author Frantisek Simancik
  * @author Yevgeny Kazakov
  * 
  */
 public class TaxonomyComputation extends
-		ConcurrentComputation<IndexedClassEntity> {
+		ReasonerComputation<IndexedClassEntity, TaxonomyComputationEngine> {
 
-	protected final Interrupter interrupter;
-	protected final ProgressMonitor progressMonitor;
-	protected final OntologyIndex ontologyIndex;
-	protected final TaxonomyComputationEngine taxonomyComputationEngine;
-
-	protected TaxonomyComputation(Interrupter interrupter,
-			ExecutorService executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
-			TaxonomyComputationEngine taxonomyComputationEngine) {
-		super(taxonomyComputationEngine, interrupter, executor, maxWorkers,
-				8 * maxWorkers, 16);
-		this.interrupter = interrupter;
-		this.progressMonitor = progressMonitor;
-		this.ontologyIndex = ontologyIndex;
-		this.taxonomyComputationEngine = taxonomyComputationEngine;
-	}
-
-	public TaxonomyComputation(Interrupter interrupter,
-			ExecutorService executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(interrupter, executor, maxWorkers, progressMonitor, ontologyIndex,
-				new TaxonomyComputationEngine(ontologyIndex, interrupter));
-	}
-
-	public TaxonomyComputation(Interrupter interrupter,
-			ExecutorService executor, int maxWorkers,
+	public TaxonomyComputation(Iterable<? extends IndexedClassEntity> inputs,
+			int inputsSize, Interrupter interrupter, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
 			IndividualClassTaxonomy partialTaxonomy) {
-		this(interrupter, executor, maxWorkers, progressMonitor, ontologyIndex,
-				new TaxonomyComputationEngine(ontologyIndex, interrupter,
-						partialTaxonomy));
+		super(inputs, inputsSize, new TaxonomyComputationEngine(ontologyIndex,
+				interrupter, partialTaxonomy), interrupter, maxWorkers,
+				progressMonitor);
+	}
+
+	public TaxonomyComputation(Iterable<? extends IndexedClassEntity> inputs,
+			int inputsSize, Interrupter interrupter, int maxWorkers,
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+		this(inputs, inputsSize, interrupter, maxWorkers, progressMonitor,
+				ontologyIndex, new ConcurrentTaxonomy());
 	}
 
 	/**
-	 * Prerequisites: object properties must be already saturated and the
-	 * ontology must be consistent.
-	 * 
+	 * @return the taxonomy computed by this computation; the method
+	 *         {@link #process()} should be called first to compute the taxonomy
 	 */
-	public IndividualClassTaxonomy computeTaxonomy(boolean includeClasses,
-			boolean includeIndividuals) {
-
-		// number of indexed entities to classify
-		final int maxProgress = (includeClasses ? ontologyIndex
-				.getIndexedClassCount() : 0)
-				+ (includeIndividuals ? ontologyIndex
-						.getIndexedIndividualCount() : 0);
-		// variable used in progress monitors
-		int progress = 0;
-		start();
-
-		try {
-			if (includeClasses)
-				for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
-					submit(ic);
-					progressMonitor.report(++progress, maxProgress);
-				}
-			if (includeIndividuals)
-				for (IndexedIndividual ind : ontologyIndex
-						.getIndexedIndividuals()) {
-					submit(ind);
-					progressMonitor.report(++progress, maxProgress);
-				}
-			finish();
-			waitWorkersToStop();
-		} catch (InterruptedException e) {
-			interrupter.interrupt();
-			Thread.interrupted();
-			// wait until all workers are killed
-			for (;;) {
-				try {
-					waitWorkersToStop();
-					break;
-				} catch (InterruptedException ex) {
-					continue;
-				}
-			}
-		}
-
-		return taxonomyComputationEngine.getClassTaxonomy();
+	public IndividualClassTaxonomy getTaxonomy() {
+		return inputProcessor.getTaxonomy();
 	}
 
 	/**
-	 * Print statistics about class taxonomy computation
+	 * Print statistics about taxonomy computation
 	 */
 	public void printStatistics() {
-		taxonomyComputationEngine.printStatistics();
+		inputProcessor.printStatistics();
 	}
 
 }

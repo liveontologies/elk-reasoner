@@ -27,34 +27,33 @@ import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.semanticweb.elk.util.logging.Statistics;
 
 /**
- * A {@link ReasonerStageExecutor} which prints log messages about the executed
- * stages. If a stage has not been done, first, all its dependencies are
- * executed, and then this stage itself.
+ * A {@link ReasonerStageExecutor} which refuses to interrupt: it will restart
+ * any interrupted stage.
+ * 
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class LoggingStageExecutor extends SimpleInterrupter implements
+public class RestartingStageExecutor extends SimpleInterrupter implements
 		ReasonerStageExecutor {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-			.getLogger(LoggingStageExecutor.class);
+			.getLogger(RestartingStageExecutor.class);
 
 	@Override
 	public void complete(ReasonerStage stage) {
-		if (stage.isInterrupted())
-			return;
 		if (!stage.done()) {
 			LOGGER_.debug(stage.getName() + " stage:");
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);
-				if (dependentStage.isInterrupted()) {
-					return;
-				}
 			}
 			Statistics.logOperationStart(stage.getName(), LOGGER_);
-			stage.execute();
+			do {
+				stage.clearInterrupt();
+				Thread.interrupted();
+				stage.execute();
+			} while (stage.isInterrupted());
 			Statistics.logOperationFinish(stage.getName(), LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
 			stage.printInfo();

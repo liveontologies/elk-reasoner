@@ -129,11 +129,6 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	@Override
-	protected ExecutorService getExecutor() {
-		return executor;
-	}
-
-	@Override
 	protected ReasonerStageExecutor getStageExecutor() {
 		return stageExecutor;
 	}

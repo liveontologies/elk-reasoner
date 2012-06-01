@@ -98,19 +98,19 @@ public class ABoxTest {
 		ElkClass thing = PredefinedElkClass.OWL_THING;
 
 		reasoner.getTaxonomy();
-		assertEquals(reasoner.getInstances(thing, false).size(), 3);
-		assertEquals(reasoner.getInstances(thing, true).size(), 1);
-		assertEquals(reasoner.getInstances(B, false).size(), 1);
-		assertEquals(reasoner.getInstances(B, true).size(), 0);
-		assertEquals(reasoner.getInstances(A, true).size(), 1);
-		assertEquals(reasoner.getInstances(C, true).size(), 1);
-		assertEquals(reasoner.getInstances(X, true).size(), 1);
+		assertEquals(3, reasoner.getInstances(thing, false).size());
+		assertEquals(1, reasoner.getInstances(thing, true).size());
+		assertEquals(1, reasoner.getInstances(B, false).size());
+		assertEquals(0, reasoner.getInstances(B, true).size());
+		assertEquals(1, reasoner.getInstances(A, true).size());
+		assertEquals(1, reasoner.getInstances(C, true).size());
+		assertEquals(1, reasoner.getInstances(X, true).size());
 
-		assertEquals(reasoner.getTypes(a, true).size(), 2);
-		assertEquals(reasoner.getTypes(a, false).size(), 4);
-		assertEquals(reasoner.getTypes(c, true).size(), 1);
-		assertEquals(reasoner.getTypes(c, false).size(), 2);
-		assertEquals(reasoner.getTypes(b, false).size(), 1);
+		assertEquals(2, reasoner.getTypes(a, true).size());
+		assertEquals(4, reasoner.getTypes(a, false).size());
+		assertEquals(1, reasoner.getTypes(c, true).size());
+		assertEquals(2, reasoner.getTypes(c, false).size());
+		assertEquals(1, reasoner.getTypes(b, false).size());
 	}
 
 }

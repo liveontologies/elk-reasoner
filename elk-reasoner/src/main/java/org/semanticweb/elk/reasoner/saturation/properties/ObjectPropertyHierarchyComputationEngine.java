@@ -38,6 +38,7 @@ class RoleHierarchyComputationEngine implements
 
 	@Override
 	public void submit(IndexedPropertyChain ipc) {
+		ipc.resetSaturated();
 		SaturatedPropertyChain saturated = new SaturatedPropertyChain(ipc);
 		ipc.setSaturated(saturated);
 

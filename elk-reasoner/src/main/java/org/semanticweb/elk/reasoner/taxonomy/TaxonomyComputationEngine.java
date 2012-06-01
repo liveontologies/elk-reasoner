@@ -138,18 +138,18 @@ public class TaxonomyComputationEngine implements
 	}
 
 	/**
-	 * Print statistics about class taxonomy construction
+	 * Print statistics about taxonomy construction
 	 */
 	public void printStatistics() {
 		transitiveReductionEngine.printStatistics();
 	}
 
 	/**
-	 * Returns the class taxonomy constructed by this engine
+	 * Returns the taxonomy constructed by this engine
 	 * 
-	 * @return the class taxonomy constructed by this engine
+	 * @return the taxonomy constructed by this engine
 	 */
-	public IndividualClassTaxonomy getClassTaxonomy() {
+	public IndividualClassTaxonomy getTaxonomy() {
 		return this.taxonomy;
 	}
 

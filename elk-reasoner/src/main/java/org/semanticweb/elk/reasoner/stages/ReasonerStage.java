@@ -67,6 +67,11 @@ public interface ReasonerStage {
 	public boolean isInterrupted();
 
 	/**
+	 * Clears the interrupt status: the stage is no longer interrupted
+	 */
+	public void clearInterrupt();
+
+	/**
 	 * Prints detailed information about the (progress) of this stage. This
 	 * function can be used to print statistics after this stage is executed or
 	 * interrupted.

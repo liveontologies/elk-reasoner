@@ -43,4 +43,8 @@ public class FailingInterrupter implements Interrupter {
 		return false;
 	}
 
+	@Override
+	public void clearInterrupt() {
+	}
+
 }

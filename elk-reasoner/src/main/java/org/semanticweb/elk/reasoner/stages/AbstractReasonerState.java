@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Map;
 import java.util.Vector;
-import java.util.concurrent.ExecutorService;
 
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -126,12 +125,6 @@ public abstract class AbstractReasonerState {
 			doneReset = true;
 		}
 	}
-
-	/**
-	 * @return the {@link ExecutorService} that is used for running concurrent
-	 *         reasoning tasks
-	 */
-	protected abstract ExecutorService getExecutor();
 
 	/**
 	 * @return the maximal number of workers that can be used for running

@@ -22,15 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.saturation.properties;
 
-import java.util.concurrent.ExecutorService;
-
+import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
-//TODO: Document this class
-//TODO: Add progress monitor
 /**
  * Computes the transitive closure of object property inclusions.
  * 
@@ -38,70 +35,29 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  * @author "Yevgeny Kazakov"
  */
 
-public class ObjectPropertyHierarchyComputation extends
-		ConcurrentComputation<IndexedPropertyChain> {
-
-	// TODO: add progress monitor
+public class ObjectPropertyHierarchyComputation
+		extends
+		ReasonerComputation<IndexedPropertyChain, RoleHierarchyComputationEngine> {
 
 	/**
-	 * the interrupter used to interrupt and monitor interruption for the
-	 * computation
-	 */
-	protected final Interrupter interrupter;
-	/**
-	 * the ontology index used to compute the hierarchy
+	 * the index of the ontology used for computation
 	 */
 	protected final OntologyIndex ontologyIndex;
 
-	/**
-	 * Creates a new object property hierarhy computation object.
-	 * 
-	 * @param interrupter
-	 *            the interrupter used to interrupt and monitor interruption for
-	 *            the computation
-	 * @param executor
-	 *            the execution service used to run the concurrent workers
-	 * @param maxWorkers
-	 *            the maximal number of concurrent workers
-	 * @param ontologyIndex
-	 *            the ontology index used to compute the hierarchy
-	 */
-	public ObjectPropertyHierarchyComputation(Interrupter interrupter,
-			ExecutorService executor, int maxWorkers,
-			OntologyIndex ontologyIndex) {
-		super(new RoleHierarchyComputationEngine(), interrupter, executor,
-				maxWorkers, 2 * maxWorkers, 128);
-		this.interrupter = interrupter;
+	public ObjectPropertyHierarchyComputation(
+			RoleHierarchyComputationEngine inputProcessor,
+			Interrupter interrupter, int maxWorkers,
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
+				.getIndexedObjectPropertyCount(), inputProcessor, interrupter,
+				maxWorkers, progressMonitor);
 		this.ontologyIndex = ontologyIndex;
 	}
 
-	public void compute() {
-		start();
-
-		try {
-			for (IndexedPropertyChain ipc : ontologyIndex
-					.getIndexedPropertyChains()) {
-				if (interrupter.isInterrupted())
-					return;
-				ipc.resetSaturated();
-				submit(ipc);
-			}
-
-			finish();
-			waitWorkersToStop();
-		} catch (InterruptedException e) {
-			interrupter.interrupt();
-			Thread.interrupted();
-			// wait until all workers are killed
-			for (;;) {
-				try {
-					waitWorkersToStop();
-					break;
-				} catch (InterruptedException ex) {
-					continue;
-				}
-			}
-		}
-
+	public ObjectPropertyHierarchyComputation(Interrupter interrupter,
+			int maxWorkers, ProgressMonitor progressMonitor,
+			OntologyIndex ontologyIndex) {
+		this(new RoleHierarchyComputationEngine(), interrupter, maxWorkers,
+				progressMonitor, ontologyIndex);
 	}
 }

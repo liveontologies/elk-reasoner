@@ -35,10 +35,20 @@ public class RedundantCompositionsEliminationStage extends
 	private static final Logger LOGGER_ = Logger
 			.getLogger(RedundantCompositionsEliminationStage.class);
 
-	RedundantCompositionsElimination computation = null;
+	/**
+	 * the computation used for this stage
+	 */
+	private RedundantCompositionsElimination computation;
+
+	/**
+	 * the number of workers used in the computation for this stage
+	 */
+	private final int workerNo;
 
 	public RedundantCompositionsEliminationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
+		this.workerNo = reasoner.getNumberOfWorkers();
+		this.computation = null;
 	}
 
 	@Override
@@ -60,13 +70,13 @@ public class RedundantCompositionsEliminationStage extends
 
 	@Override
 	public void execute() {
-		int workerNo = reasoner.getNumberOfWorkers();
+		if (computation == null)
+			computation = new RedundantCompositionsElimination(
+					reasoner.getStageExecutor(), workerNo,
+					reasoner.compositions);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		computation = new RedundantCompositionsElimination(
-				reasoner.getStageExecutor(), reasoner.getExecutor(), workerNo,
-				reasoner.compositions);
-		computation.compute();
+		computation.process();
 		if (isInterrupted()) {
 			LOGGER_.warn(getName()
 					+ " is interrupted! The reasoning results might be incorrect!");

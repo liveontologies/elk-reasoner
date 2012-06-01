@@ -42,10 +42,27 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ConsistencyCheckingStage.class);
 
-	ConsistencyChecking computation = null;
+	/**
+	 * the computation used for this stage
+	 */
+	private final ConsistencyChecking computation;
+
+	/**
+	 * the number of workers used in the computation for this stage
+	 */
+	private final int workerNo;
+
+	/**
+	 * the progress monitor used to report progress of this stage
+	 */
+	final ProgressMonitor progressMonitor;
 
 	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
+		this.progressMonitor = reasoner.getProgressMonitor();
+		this.workerNo = reasoner.getNumberOfWorkers();
+		this.computation = new ConsistencyChecking(reasoner.getStageExecutor(),
+				workerNo, reasoner.getProgressMonitor(), reasoner.ontologyIndex);
 	}
 
 	@Override
@@ -69,28 +86,23 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
-		int workerNo = reasoner.getNumberOfWorkers();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("Consistency checking  using " + workerNo + " workers");
-		ProgressMonitor progressMonitor = reasoner.getProgressMonitor();
 		progressMonitor.start(getName());
-		computation = new ConsistencyChecking(reasoner.getStageExecutor(),
-				reasoner.getExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
-		reasoner.consistentOntology = computation.checkConsistent();
+		computation.process();
 		progressMonitor.finish();
 		if (isInterrupted()) {
 			LOGGER_.warn(getName()
 					+ " is interrupted! The ontology might be inconsistent!");
 			return;
 		}
+		reasoner.consistentOntology = computation.isConsistent();
 		reasoner.doneConsistencyCheck = true;
 	}
 
 	@Override
 	public void printInfo() {
-		if (computation != null)
-			computation.printStatistics();
+		computation.printStatistics();
 	}
 
 }

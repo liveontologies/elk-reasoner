@@ -41,4 +41,9 @@ public interface Interrupter {
 	 */
 	public boolean isInterrupted();
 
+	/**
+	 * Clears the interrupt status: computation is no longer interrupted
+	 */
+	public void clearInterrupt();
+
 }

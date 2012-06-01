@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -44,10 +45,17 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The counter for deleted contexts
 	 */
-	int deletedContexts = 0;
+	private int deletedContexts = 0;
+
+	/**
+	 * The state of the iterator of the input to be processed
+	 */
+	private final Iterator<IndexedClassExpression> todo;
 
 	public ContextInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
+		this.todo = reasoner.ontologyIndex.getIndexedClassExpressions()
+				.iterator();
 	}
 
 	@Override
@@ -68,15 +76,15 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	@Override
 	public void execute() {
 
-		for (IndexedClassExpression ice : reasoner.ontologyIndex
-				.getIndexedClassExpressions()) {
+		while (todo.hasNext()) {
+			if (isInterrupted()) {
+				LOGGER_.warn(getName()
+						+ " is interrupted! The reasoning results might be incorrect!");
+				return;
+			}
+			IndexedClassExpression ice = todo.next();
 			ice.resetContext();
 			deletedContexts++;
-		}
-		if (isInterrupted()) {
-			LOGGER_.warn(getName()
-					+ " is interrupted! The reasoning results might be incorrect!");
-			return;
 		}
 		reasoner.doneContextReset = true;
 	}

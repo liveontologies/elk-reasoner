@@ -27,7 +27,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * The reasoner stage, which purpose is to compute the instance taxonomy of the
@@ -42,10 +44,40 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(InstanceTaxonomyComputationStage.class);
 
-	TaxonomyComputation computation = null;
+	/**
+	 * the computation used for this stage
+	 */
+	private final TaxonomyComputation computation;
+
+	/**
+	 * the number of workers used in the computation for this stage
+	 */
+	private final int workerNo;
+
+	/**
+	 * the progress monitor used to report progress of this stage
+	 */
+	private final ProgressMonitor progressMonitor;
 
 	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
+		this.workerNo = reasoner.getNumberOfWorkers();
+		this.progressMonitor = reasoner.getProgressMonitor();
+		OntologyIndex ontologyIndex = reasoner.ontologyIndex;
+		if (reasoner.doneClassTaxonomy)
+			computation = new TaxonomyComputation(
+					ontologyIndex.getIndexedIndividuals(),
+					ontologyIndex.getIndexedIndividualCount(),
+					reasoner.getStageExecutor(), workerNo, progressMonitor,
+					reasoner.getOntologyIndex(), reasoner.taxonomy);
+		else
+			computation = new TaxonomyComputation(Operations.concat(
+					ontologyIndex.getIndexedClasses(),
+					ontologyIndex.getIndexedIndividuals()),
+					ontologyIndex.getIndexedClassCount()
+							+ ontologyIndex.getIndexedIndividualCount(),
+					reasoner.getStageExecutor(), workerNo, progressMonitor,
+					reasoner.getOntologyIndex());
 	}
 
 	@Override
@@ -66,36 +98,24 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
-		int workerNo = reasoner.getNumberOfWorkers();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		ProgressMonitor progressMonitor = reasoner.getProgressMonitor();
 		progressMonitor.start(getName());
-		if (reasoner.doneClassTaxonomy) {
-			computation = new TaxonomyComputation(reasoner.getStageExecutor(),
-					reasoner.getExecutor(), workerNo, progressMonitor,
-					reasoner.ontologyIndex, reasoner.taxonomy);
-			reasoner.taxonomy = computation.computeTaxonomy(false, true);
-		} else {
-			computation = new TaxonomyComputation(reasoner.getStageExecutor(),
-					reasoner.getExecutor(), reasoner.getNumberOfWorkers(),
-					progressMonitor, reasoner.ontologyIndex);
-			reasoner.taxonomy = computation.computeTaxonomy(true, true);
-		}
+		computation.process();
 		progressMonitor.finish();
 		if (isInterrupted()) {
 			LOGGER_.warn(getName()
 					+ " is interrupted! The taxonomy might be incomplete!");
 			return;
 		}
+		reasoner.taxonomy = computation.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
 		reasoner.doneInstanceTaxonomy = true;
 	}
 
 	@Override
 	public void printInfo() {
-		if (computation != null)
-			computation.printStatistics();
+		computation.printStatistics();
 	}
 
 }
