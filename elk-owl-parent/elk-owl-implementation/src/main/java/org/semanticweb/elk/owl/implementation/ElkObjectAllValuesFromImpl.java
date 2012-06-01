@@ -39,7 +39,7 @@ public class ElkObjectAllValuesFromImpl
 		ElkPropertyRestrictionQualifiedImpl<ElkObjectPropertyExpression, ElkClassExpression>
 		implements ElkObjectAllValuesFrom {
 
-	/* package-private */ElkObjectAllValuesFromImpl(
+	ElkObjectAllValuesFromImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
 		super(objectPropertyExpression, classExpression);

@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,24 +20,18 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 
 /**
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * Visitor interface for {@link ElkAnnotation}. 
+ * 
+ * @author Frantisek Simancik
  *
  */
 public interface ElkAnnotationVisitor<O> {
 
-	O visit(ElkIri iri);
-	O visit(ElkLiteral literal);
-	O visit(ElkAnonymousIndividual anon);
+	O visit(ElkAnnotation elkAnnotation);
+
 }

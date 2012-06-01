@@ -38,23 +38,13 @@ public class ElkObjectComplementOfImpl extends ElkObjectImpl implements
 
 	protected final ElkClassExpression classExpression;
 
-	/* package-private */ElkObjectComplementOfImpl(
-			ElkClassExpression classExpression) {
-
+	ElkObjectComplementOfImpl(ElkClassExpression classExpression) {
 		this.classExpression = classExpression;
 	}
 
 	@Override
 	public ElkClassExpression getClassExpression() {
 		return classExpression;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("ObjectComplementOf(");
-		result.append(classExpression.toString());
-		result.append(")");
-		return result.toString();
 	}
 
 	@Override

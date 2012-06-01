@@ -33,7 +33,7 @@ public abstract class ElkObjectPropertyExpressionObject extends ElkObjectImpl {
 
 	protected final ElkObjectPropertyExpression objectPropertyExpression;
 
-	/* package-private */ElkObjectPropertyExpressionObject(
+	ElkObjectPropertyExpressionObject(
 			ElkObjectPropertyExpression objectPropertyExpression) {
 		this.objectPropertyExpression = objectPropertyExpression;
 	}
@@ -41,13 +41,4 @@ public abstract class ElkObjectPropertyExpressionObject extends ElkObjectImpl {
 	public ElkObjectPropertyExpression getProperty() {
 		return objectPropertyExpression;
 	}
-
-	public String buildFssString(String operatorName) {
-		StringBuilder result = new StringBuilder(operatorName);
-		result.append("(");
-		result.append(objectPropertyExpression.toString());
-		result.append(")");
-		return result.toString();
-	}
-
 }

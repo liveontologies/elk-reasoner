@@ -25,18 +25,26 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
-
 /**
- * The basic interface for annotation objects in OWL 2
- * as defined in <a href="http://www.w3.org/TR/owl2-syntax/#Annotations">Section 10</a> of the specification
+ * The basic interface for annotation objects in OWL 2 as defined in <a
+ * href="http://www.w3.org/TR/owl2-syntax/#Annotations">Section 10</a> of the
+ * specification
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
+
+/*
+ * TODO: Annotations are not included in our model. We should extend the model
+ * so that every ontology, axiom, and annotation can link to a list of
+ * annotations.
+ */
+
 public interface ElkAnnotation extends ElkObject {
 
 	public ElkAnnotationProperty getProperty();
+
 	public ElkAnnotationValue getValue();
 }

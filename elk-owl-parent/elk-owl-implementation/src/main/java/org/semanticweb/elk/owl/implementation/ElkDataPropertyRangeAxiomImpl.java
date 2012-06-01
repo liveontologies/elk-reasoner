@@ -38,8 +38,7 @@ public class ElkDataPropertyRangeAxiomImpl extends
 		ElkPropertyRangeAxiomImpl<ElkDataPropertyExpression, ElkDataRange>
 		implements ElkDataPropertyRangeAxiom {
 
-	ElkDataPropertyRangeAxiomImpl(
-			ElkDataPropertyExpression property,
+	ElkDataPropertyRangeAxiomImpl(ElkDataPropertyExpression property,
 			ElkDataRange range) {
 		super(property, range);
 	}

@@ -972,8 +972,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkFacetRestriction getFacetRestriction(ElkIri iri,
 			ElkLiteral literal) {
 		return (ElkFacetRestriction) objectManager
-				.getCanonicalElkObject(new ElkFacetRestrictionImpl(iri
-						.asString(), literal));
+				.getCanonicalElkObject(new ElkFacetRestrictionImpl(iri, literal));
 	}
 
 	@Override

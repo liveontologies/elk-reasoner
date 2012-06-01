@@ -34,8 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 public abstract class ElkDataRangeListObject extends
 		ElkObjectListObject<ElkDataRange> {
 
-	/* package-private */ElkDataRangeListObject(
-			List<? extends ElkDataRange> dataRanges) {
+	ElkDataRangeListObject(List<? extends ElkDataRange> dataRanges) {
 		super(dataRanges);
 	}
 

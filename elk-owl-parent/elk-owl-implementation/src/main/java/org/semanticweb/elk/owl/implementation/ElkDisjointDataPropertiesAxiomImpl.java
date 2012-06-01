@@ -32,8 +32,8 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Data_Properties">Disjoint
- * Data Properties Axiom<a> in the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Data_Properties">Disjoint Data
+ * Properties Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -41,14 +41,9 @@ public class ElkDisjointDataPropertiesAxiomImpl extends
 		ElkDataPropertyExpressionListObject implements
 		ElkDisjointDataPropertiesAxiom {
 
-	/* package-private */ElkDisjointDataPropertiesAxiomImpl(
+	ElkDisjointDataPropertiesAxiomImpl(
 			List<? extends ElkDataPropertyExpression> disjointDataPropertyExpressions) {
 		super(disjointDataPropertyExpressions);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("DisjointDataProperties");
 	}
 
 	@Override

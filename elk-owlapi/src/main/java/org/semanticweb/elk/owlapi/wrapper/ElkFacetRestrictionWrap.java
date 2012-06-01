@@ -24,6 +24,7 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.owlapi.model.OWLFacetRestriction;
 
@@ -44,8 +45,8 @@ public class ElkFacetRestrictionWrap<T extends OWLFacetRestriction> extends
 	}
 
 	@Override
-	public String getConstrainingFacet() {
-		return this.owlObject.getFacet().getIRI().toString();
+	public ElkIri getConstrainingFacet() {
+		return converter.convert(this.owlObject.getFacet().getIRI());
 	}
 
 	@Override

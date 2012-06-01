@@ -25,7 +25,7 @@ package org.semanticweb.elk.owl.visitors;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 
 /**
- * Visitor interface for ELKLiteral. 
+ * Visitor interface for {@link ElkLiteral}. 
  * 
  * @author Markus Kroetzsch
  */

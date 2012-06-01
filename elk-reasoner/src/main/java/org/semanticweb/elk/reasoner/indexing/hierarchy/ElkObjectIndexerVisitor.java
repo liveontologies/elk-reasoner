@@ -26,40 +26,17 @@ import java.util.ListIterator;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
-import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
-import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
  * Visitor for Elk classes, properties, and individuals that returns the
@@ -69,16 +46,13 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
  * @author Frantisek Simancik
  * 
  */
-public class ElkObjectIndexerVisitor implements
-		ElkClassExpressionVisitor<IndexedClassExpression>,
-		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain>,
-		ElkIndividualVisitor<IndexedIndividual> {
+public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ElkObjectIndexerVisitor.class);
 
-	private IndexedObjectFilter objectFilter;
+	protected IndexedObjectFilter objectFilter;
 
 	/**
 	 * @param objectFilter
@@ -92,42 +66,6 @@ public class ElkObjectIndexerVisitor implements
 	@Override
 	public IndexedClassExpression visit(ElkClass elkClass) {
 		return objectFilter.filter(new IndexedClass(elkClass));
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
-		throw new IndexingException(
-				ElkObjectAllValuesFrom.class.getSimpleName() + " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkObjectComplementOf elkObjectComplementOf) {
-		throw new IndexingException(ElkObjectComplementOf.class.getSimpleName()
-				+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkObjectExactCardinality elkObjectExactCardinality) {
-		throw new IndexingException(
-				ElkObjectExactCardinality.class.getSimpleName()
-						+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkObjectExactCardinalityQualified elkObjectExactCardinalityQualified) {
-		throw new IndexingException(
-				ElkObjectExactCardinalityQualified.class.getSimpleName()
-						+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
-		throw new IndexingException(ElkObjectHasSelf.class.getSimpleName()
-				+ " not supported");
 	}
 
 	@Override
@@ -184,44 +122,6 @@ public class ElkObjectIndexerVisitor implements
 
 	@Override
 	public IndexedClassExpression visit(
-			ElkObjectMaxCardinality elkObjectMaxCardinality) {
-		throw new IndexingException(
-				ElkObjectMaxCardinality.class.getSimpleName()
-						+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkObjectMaxCardinalityQualified elkObjectMaxCardinalityQualified) {
-		throw new IndexingException(
-				ElkObjectMaxCardinalityQualified.class.getSimpleName()
-						+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkObjectMinCardinality elkObjectMinCardinality) {
-		throw new IndexingException(
-				ElkObjectMinCardinality.class.getSimpleName()
-						+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkObjectMinCardinalityQualified elkObjectMinCardinalityQualified) {
-		throw new IndexingException(
-				ElkObjectMinCardinalityQualified.class.getSimpleName()
-						+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
-		throw new IndexingException(ElkObjectOneOf.class.getSimpleName()
-				+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
 		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectSomeValuesFrom
 				.getProperty().accept(this);
@@ -230,82 +130,11 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	@Override
-	public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
-		throw new IndexingException(ElkObjectUnionOf.class.getSimpleName()
-				+ " not supported");
-	}
-
-	@Override
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
 		if (LOGGER_.isEnabledFor(Level.WARN))
-			LOGGER_.warn(ElkDataHasValue.class.getSimpleName()
-					+ " is supported only partially.");
+			LOGGER_.warn(new ElkMessage("ELK supports DataHasValue only partially. Reasoning might be incomplete.",
+					"reasoner.indexing.dataHasValue"));
 		return objectFilter.filter(new IndexedDataHasValue(elkDataHasValue));
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkDataMaxCardinality elkDataMaxCardinality) {
-		throw new IndexingException(ElkDataMaxCardinality.class.getSimpleName()
-				+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkDataMaxCardinalityQualified elkDataMaxCardinalityQualified) {
-		throw new IndexingException(
-				ElkDataMaxCardinalityQualified.class.getSimpleName()
-						+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkDataMinCardinality elkDataMinCardinality) {
-		throw new IndexingException(ElkDataMinCardinality.class.getSimpleName()
-				+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkDataMinCardinalityQualified elkDataMinCardinalityQualified) {
-		throw new IndexingException(
-				ElkDataMinCardinalityQualified.class.getSimpleName()
-						+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkDataExactCardinality elkDataExactCardinality) {
-		throw new IndexingException(ElkDataMinCardinality.class.getSimpleName()
-				+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkDataExactCardinalityQualified elkDataExactCardinalityQualified) {
-		throw new IndexingException(
-				ElkDataMinCardinalityQualified.class.getSimpleName()
-						+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
-		throw new IndexingException(ElkDataSomeValuesFrom.class.getSimpleName()
-				+ " not supported");
-	}
-
-	@Override
-	public IndexedClassExpression visit(
-			ElkDataAllValuesFrom elkDataAllValuesFrom) {
-		throw new IndexingException(ElkDataAllValuesFrom.class.getSimpleName()
-				+ " not supported");
-	}
-
-	@Override
-	public IndexedObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
-		throw new IndexingException(ElkObjectInverseOf.class.getSimpleName()
-				+ " not supported");
 	}
 
 	@Override
@@ -347,12 +176,6 @@ public class ElkObjectIndexerVisitor implements
 		}
 
 		return result;
-	}
-
-	@Override
-	public IndexedIndividual visit(ElkAnonymousIndividual elkAnonymousIndividual) {
-		throw new IndexingException(
-				ElkAnonymousIndividual.class.getSimpleName() + " not supported");
 	}
 
 	@Override

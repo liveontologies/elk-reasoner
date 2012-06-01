@@ -78,10 +78,12 @@ public abstract class AbstractElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 	/**
 	 * Invoked to visit every logical axiom
 	 */
-	protected abstract O defaultLogicalVisit(ElkAxiom axiom);
+	protected O defaultLogicalVisit(ElkAxiom axiom) {
+		return null;
+	}
 	
 	/**
-	 * Invoked to visit every non-logical logical axiom, e.g. annotations
+	 * Invoked to visit every non-logical (annotation) axiom
 	 */
 	protected O defaultNonLogicalVisit(ElkAxiom axiom) {
 		return null;

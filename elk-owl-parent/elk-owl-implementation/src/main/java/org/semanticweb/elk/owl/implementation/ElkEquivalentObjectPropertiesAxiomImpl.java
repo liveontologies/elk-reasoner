@@ -41,14 +41,9 @@ public class ElkEquivalentObjectPropertiesAxiomImpl extends
 		ElkObjectPropertyExpressionListObject implements
 		ElkEquivalentObjectPropertiesAxiom {
 
-	/* package-private */ElkEquivalentObjectPropertiesAxiomImpl(
+	ElkEquivalentObjectPropertiesAxiomImpl(
 			List<? extends ElkObjectPropertyExpression> equivalentObjectPropertyExpressions) {
 		super(equivalentObjectPropertyExpressions);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("EquivalentObjectProperties");
 	}
 
 	@Override
