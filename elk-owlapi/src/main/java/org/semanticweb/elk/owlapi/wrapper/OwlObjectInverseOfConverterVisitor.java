@@ -51,9 +51,6 @@ public class OwlObjectInverseOfConverterVisitor implements
 		return INSTANCE_;
 	}
 
-	private static OwlObjectInverseOfConverterVisitor OWL_OBJECT_INVERSE_OF_CONVERTER = OwlObjectInverseOfConverterVisitor
-			.getInstance();
-
 	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectProperty property) {
 		return new ElkObjectInverseOfWrap<OWLObjectProperty>(property);
@@ -61,7 +58,9 @@ public class OwlObjectInverseOfConverterVisitor implements
 
 	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectInverseOf property) {
-		return property.accept(OWL_OBJECT_INVERSE_OF_CONVERTER);
+		//return property.accept(OWL_OBJECT_INVERSE_OF_CONVERTER);
+		//Isn't the following sufficient?
+		return new ElkObjectInverseOfWrap<OWLObjectProperty>(property.getNamedProperty());
 	}
 
 	@Override
