@@ -106,11 +106,6 @@ public class ClassTaxonomyLoader {
 		}
 
 		@Override
-		protected Void defaultLogicalVisit(ElkAxiom axiom) {
-			return null;
-		}
-
-		@Override
 		public Void visit(ElkEquivalentClassesAxiom elkEquivalentClassesAxiom) {
 			// a new node
 			Set<ElkClass> classes = new HashSet<ElkClass>();

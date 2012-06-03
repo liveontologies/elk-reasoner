@@ -41,14 +41,9 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkObjectIntersectionOfImpl extends ElkClassExpressionListObject
 		implements ElkObjectIntersectionOf {
 
-	/* package-private */ElkObjectIntersectionOfImpl(
+	ElkObjectIntersectionOfImpl(
 			List<? extends ElkClassExpression> classExpressions) {
 		super(classExpressions);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("ObjectIntersectionOf");
 	}
 
 	@Override

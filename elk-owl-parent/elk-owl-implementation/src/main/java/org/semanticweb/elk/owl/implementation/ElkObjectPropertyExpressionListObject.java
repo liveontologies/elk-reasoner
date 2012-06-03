@@ -35,7 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 public abstract class ElkObjectPropertyExpressionListObject extends
 		ElkObjectListObject<ElkObjectPropertyExpression> {
 
-	/* package-private */ElkObjectPropertyExpressionListObject(
+	ElkObjectPropertyExpressionListObject(
 			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
 		super(objectPropertyExpressions);
 	}

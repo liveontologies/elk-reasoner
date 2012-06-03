@@ -1,11 +1,11 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,27 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.implementation;
+/**
+ * 
+ */
+package org.semanticweb.elk.owl.visitors;
 
-import java.util.List;
-
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
+import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.iris.ElkIri;
 
 /**
- * Implementation for ElkObjects that maintain a list of literals.
+ * Visitor interface for {@link ElkAnnotationValue}. 
  * 
- * @author Markus Kroetzsch
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ *
  */
-public abstract class ElkLiteralListObject extends
-		ElkObjectListObject<ElkLiteral> {
+public interface ElkAnnotationValueVisitor<O> {
 
-	ElkLiteralListObject(
-			List<? extends ElkLiteral> literals) {
-		super(literals);
-	}
-
-	public List<? extends ElkLiteral> getIndividuals() {
-		return elkObjects;
-	}
-
+	O visit(ElkIri iri);
+	O visit(ElkLiteral literal);
+	O visit(ElkAnonymousIndividual anon);
 }

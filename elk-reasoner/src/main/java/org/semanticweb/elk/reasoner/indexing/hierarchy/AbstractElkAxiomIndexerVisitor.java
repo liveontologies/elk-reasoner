@@ -110,20 +110,18 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	public void process(ElkAxiom elkAxiom) {
 		try {
 			elkAxiom.accept(this);
-		} catch (RuntimeException e) {
+		} catch (IndexingException e) {
 			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn(new ElkMessage("Axiom ignored: "
-						+ OwlFunctionalStylePrinter.toString(elkAxiom) + " : "
-						+ e.getMessage(),"reasoner.indexing.hierarchy.axiomIgnored"));
+				LOGGER_.warn(new ElkMessage(e.getMessage()
+						+ " Axiom ignored:\n"
+						+ OwlFunctionalStylePrinter.toString(elkAxiom),
+						"reasoner.indexing.axiomIgnored"));
 		}
 	}
 
 	@Override
 	protected Void defaultLogicalVisit(ElkAxiom axiom) {
-		// FIXME this will print the name of the class while it's nicer to print
-		// a readable type of the axiom
-		throw new IndexingException(axiom.getClass().getSimpleName()
-				+ " not supported");
+		throw new IndexingException(axiom);
 	}
 
 	/*
@@ -252,7 +250,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	 * @see org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor#visit(org.
 	 * semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom)
 	 * 
-	 * Reduces a class assertion to a subclass axiom with a nominal on left.
+	 * Class assertions are supported directly.
 	 */
 	@Override
 	public Void visit(ElkClassAssertionAxiom axiom) {
@@ -266,7 +264,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	 * @see org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor#visit(org.
 	 * semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom)
 	 * 
-	 * Reduces property assertions to subclass axioms with nominals.
+	 * Reduces property assertions to class assertions with ObjectHasValue.
 	 */
 	@Override
 	public Void visit(ElkObjectPropertyAssertionAxiom axiom) {
@@ -302,10 +300,18 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.semanticweb.elk.owl.visitors.ElkEntityVisitor#visit(org.semanticweb
+		 * .elk.owl.interfaces.ElkDatatype)
+		 * 
+		 * Nothing is done, datatypes are supported only syntactically. Warning
+		 * is logged when indexing ElkDataHasValue.
+		 */
 		@Override
 		public Void visit(ElkDatatype elkDatatype) {
-			LOGGER_.warn(ElkDatatype.class.getSimpleName()
-					+ " is supported only partially.");
 			return null;
 		}
 
@@ -315,10 +321,18 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.semanticweb.elk.owl.visitors.ElkEntityVisitor#visit(org.semanticweb
+		 * .elk.owl.interfaces.ElkDatatype)
+		 * 
+		 * Nothing is done, datatypes are supported only syntactically. Warning
+		 * is logged when indexing ElkDataHasValue.
+		 */
 		@Override
 		public Void visit(ElkDataProperty elkDataProperty) {
-			LOGGER_.warn(ElkDataProperty.class.getSimpleName()
-					+ " is supported only partially.");
 			return null;
 		}
 

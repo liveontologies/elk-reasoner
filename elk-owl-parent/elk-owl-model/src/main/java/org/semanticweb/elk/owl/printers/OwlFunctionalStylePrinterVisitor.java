@@ -24,6 +24,7 @@ package org.semanticweb.elk.owl.printers;
 
 import java.io.IOException;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyDomainAxiom;
@@ -970,7 +971,16 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 		write(annotationPropertyRangeAxiom.getRange());
 		write(')');
 		return null;
+	}
 
+	@Override
+	public Void visit(ElkAnnotation elkAnnotation) {
+		write("Annotation(");
+		write(elkAnnotation.getProperty());
+		write(' ');
+		write(elkAnnotation.getValue());
+		write(')');
+		return null;
 	}
 
 }

@@ -246,6 +246,7 @@ class ConcurrentClassTaxonomy extends IndividualClassTaxonomy {
 		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
 			return Operations.filter(allClassNodes,
 					new Condition<TaxonomyNode<ElkClass>>() {
+						@Override
 						public boolean holds(TaxonomyNode<ElkClass> element) {
 							return element.getDirectSubNodes().contains(
 									bottomClassNode);

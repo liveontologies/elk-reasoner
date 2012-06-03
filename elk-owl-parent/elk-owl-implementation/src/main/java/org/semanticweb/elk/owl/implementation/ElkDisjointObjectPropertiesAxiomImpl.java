@@ -41,14 +41,9 @@ public class ElkDisjointObjectPropertiesAxiomImpl extends
 		ElkObjectPropertyExpressionListObject implements
 		ElkDisjointObjectPropertiesAxiom {
 
-	/* package-private */ElkDisjointObjectPropertiesAxiomImpl(
+	ElkDisjointObjectPropertiesAxiomImpl(
 			List<? extends ElkObjectPropertyExpression> disjointObjectPropertyExpressions) {
 		super(disjointObjectPropertyExpressions);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("DisjointObjectProperties");
 	}
 
 	@Override

@@ -38,14 +38,8 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkSameIndividualAxiomImpl extends ElkIndividualListObject
 		implements ElkSameIndividualAxiom {
 
-	/* package-private */ElkSameIndividualAxiomImpl(
-			List<? extends ElkIndividual> individuals) {
+	ElkSameIndividualAxiomImpl(List<? extends ElkIndividual> individuals) {
 		super(individuals);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("SameIndividual");
 	}
 
 	@Override

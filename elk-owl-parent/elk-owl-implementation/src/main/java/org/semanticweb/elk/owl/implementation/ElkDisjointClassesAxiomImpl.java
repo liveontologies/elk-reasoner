@@ -40,14 +40,9 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDisjointClassesAxiomImpl extends ElkClassExpressionListObject
 		implements ElkDisjointClassesAxiom {
 
-	/* package-private */ElkDisjointClassesAxiomImpl(
+	ElkDisjointClassesAxiomImpl(
 			List<? extends ElkClassExpression> disjointClassExpressions) {
 		super(disjointClassExpressions);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("DisjointClasses");
 	}
 
 	@Override

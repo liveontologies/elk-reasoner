@@ -44,7 +44,7 @@ public class ElkSubAnnotationPropertyOfAxiomImpl extends ElkObjectImpl implement
 	protected final ElkAnnotationProperty subAnnotationProperty;
 	protected final ElkAnnotationProperty superAnnotationProperty;
 
-	/* package-private */ElkSubAnnotationPropertyOfAxiomImpl(
+	ElkSubAnnotationPropertyOfAxiomImpl(
 			ElkAnnotationProperty subAnnotationProperty,
 			ElkAnnotationProperty superAnnotationProperty) {
 		this.subAnnotationProperty = subAnnotationProperty;
