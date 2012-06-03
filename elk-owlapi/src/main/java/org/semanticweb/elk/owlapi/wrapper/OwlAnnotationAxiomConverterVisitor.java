@@ -58,22 +58,22 @@ public final class OwlAnnotationAxiomConverterVisitor extends
 
 	@Override
 	public ElkAnnotationAxiom visit(OWLAnnotationAssertionAxiom owlAnnotationAssertion) {
-		return CONVERTER.convert(owlAnnotationAssertion);
+		return new ElkAnnotationAssertionAxiomWrap<OWLAnnotationAssertionAxiom>(owlAnnotationAssertion);
 	}
 
 	@Override
 	public ElkAnnotationAxiom visit(OWLAnnotationPropertyDomainAxiom owlAnnotationPropertyDomain) {
-		return CONVERTER.convert(owlAnnotationPropertyDomain);
+		return new ElkAnnotationPropertyDomainAxiomWrap<OWLAnnotationPropertyDomainAxiom>(owlAnnotationPropertyDomain);
 	}
 
 	@Override
 	public ElkAnnotationAxiom visit(OWLAnnotationPropertyRangeAxiom owlAnnotationPropertyRange) {
-		return CONVERTER.convert(owlAnnotationPropertyRange);
+		return new ElkAnnotationPropertyRangeAxiomWrap<OWLAnnotationPropertyRangeAxiom>(owlAnnotationPropertyRange);
 	}
 
 	@Override
 	public ElkAnnotationAxiom visit(OWLSubAnnotationPropertyOfAxiom owlSubAnnotationPropertyOfAxiom) {
-		return CONVERTER.convert(owlSubAnnotationPropertyOfAxiom);
+		return new ElkSubAnnotationPropertyOfAxiomWrap<OWLSubAnnotationPropertyOfAxiom>(owlSubAnnotationPropertyOfAxiom);
 	}
 
 }

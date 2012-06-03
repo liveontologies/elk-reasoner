@@ -52,6 +52,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
@@ -66,6 +67,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
@@ -131,6 +133,7 @@ import org.semanticweb.owlapi.model.OWLDataRange;
 import org.semanticweb.owlapi.model.OWLDataSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLDataUnionOf;
 import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLDatatypeDefinitionAxiom;
 import org.semanticweb.owlapi.model.OWLDatatypeRestriction;
 import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
 import org.semanticweb.owlapi.model.OWLDifferentIndividualsAxiom;
@@ -145,6 +148,7 @@ import org.semanticweb.owlapi.model.OWLEquivalentObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLFacetRestriction;
 import org.semanticweb.owlapi.model.OWLFunctionalDataPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLFunctionalObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLHasKeyAxiom;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLIndividualAxiom;
 import org.semanticweb.owlapi.model.OWLInverseFunctionalObjectPropertyAxiom;
@@ -367,6 +371,12 @@ public class OwlConverter {
 			OWLDatatypeRestriction owlDatatypeRestriction) {
 		return new ElkDatatypeRestrictionWrap<OWLDatatypeRestriction>(
 				owlDatatypeRestriction);
+	}
+
+	public ElkDatatypeDefinitionAxiom convert(
+			OWLDatatypeDefinitionAxiom owlDatatypeDefinition) {
+		return new ElkDatatypeDefinitionAxiomWrap<OWLDatatypeDefinitionAxiom>(
+				owlDatatypeDefinition);
 	}
 
 	public ElkDatatype convert(OWLDatatype owlDatatype) {
@@ -643,6 +653,10 @@ public class OwlConverter {
 			OWLTransitiveObjectPropertyAxiom owlTransitiveObjectPropertyAxiom) {
 		return new ElkTransitiveObjectPropertyAxiomWrap<OWLTransitiveObjectPropertyAxiom>(
 				owlTransitiveObjectPropertyAxiom);
+	}
+
+	public ElkHasKeyAxiom convert(OWLHasKeyAxiom owlHasKey) {
+		return new ElkHasKeyAxiomWrap<OWLHasKeyAxiom>(owlHasKey);
 	}
 
 	public ElkAnnotationSubject convert(OWLAnnotationSubject subject) {
