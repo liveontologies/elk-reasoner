@@ -89,6 +89,7 @@ public class ObjectPropertyHierarchyComputationStage extends
 		if (isInterrupted())
 			return;
 		reasoner.doneObjectPropertyHierarchyComputation = true;
+		reasoner.doneReset = false;
 	}
 
 	@Override

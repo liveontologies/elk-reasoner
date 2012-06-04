@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.semanticweb.elk.reasoner.ProgressMonitor;
+
 /**
  * A common implementation {@link ReasonerStage}s for a given reasoner.
  * 
@@ -31,6 +33,16 @@ package org.semanticweb.elk.reasoner.stages;
 abstract class AbstractReasonerStage implements ReasonerStage {
 
 	final AbstractReasonerState reasoner;
+
+	/**
+	 * the number of workers used in the computation for this stage
+	 */
+	int workerNo;
+
+	/**
+	 * the progress monitor used to report progress of this stage
+	 */
+	ProgressMonitor progressMonitor;
 
 	/**
 	 * Creates a new reasoner stage for a given reasoner.
@@ -50,5 +62,14 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	@Override
 	public void clearInterrupt() {
 		reasoner.getStageExecutor().clearInterrupt();
+	}
+
+	/**
+	 * Initialize the parameters of the computation for this stage. This is
+	 * usually done the first time the stage is executed.
+	 */
+	void initComputation() {
+		this.workerNo = reasoner.getNumberOfWorkers();
+		this.progressMonitor = reasoner.getProgressMonitor();
 	}
 }

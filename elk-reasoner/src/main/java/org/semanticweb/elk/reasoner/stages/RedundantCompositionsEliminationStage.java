@@ -34,7 +34,7 @@ public class RedundantCompositionsEliminationStage extends
 	/**
 	 * the computation used for this stage
 	 */
-	private RedundantCompositionsElimination computation;
+	private RedundantCompositionsElimination computation = null;
 
 	/**
 	 * the progress monitor used to report progress of this stage
@@ -66,18 +66,21 @@ public class RedundantCompositionsEliminationStage extends
 
 	@Override
 	public void execute() {
-		/*
-		 * since the compositions can be computed only at the dependent stage,
-		 * we need to initialize the computation the first time it is executed
-		 */
 		if (computation == null)
-			computation = new RedundantCompositionsElimination(
-					reasoner.compositions.entrySet(),
-					reasoner.getStageExecutor(), progressMonitor);
+			initComputation();
 		computation.process();
 		if (isInterrupted())
 			return;
 		reasoner.doneRedundantCompositionsElimination = true;
+		reasoner.doneReset = false;
+	}
+
+	@Override
+	void initComputation() {
+		super.initComputation();
+		computation = new RedundantCompositionsElimination(
+				reasoner.compositions.entrySet(), reasoner.getStageExecutor(),
+				progressMonitor);
 	}
 
 	@Override

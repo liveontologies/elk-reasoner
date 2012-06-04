@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
 /**
@@ -45,24 +44,10 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private final ConsistencyChecking computation;
-
-	/**
-	 * the number of workers used in the computation for this stage
-	 */
-	private final int workerNo;
-
-	/**
-	 * the progress monitor used to report progress of this stage
-	 */
-	final ProgressMonitor progressMonitor;
+	private ConsistencyChecking computation = null;
 
 	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
-		this.progressMonitor = reasoner.getProgressMonitor();
-		this.workerNo = reasoner.getNumberOfWorkers();
-		this.computation = new ConsistencyChecking(reasoner.getStageExecutor(),
-				workerNo, reasoner.getProgressMonitor(), reasoner.ontologyIndex);
 	}
 
 	@Override
@@ -78,14 +63,15 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	@Override
 	public List<ReasonerStage> getDependencies() {
 		return Arrays.asList(
-				(ReasonerStage) new ObjectPropertyHierarchyComputationStage(
-						reasoner),
 				(ReasonerStage) new RedundantCompositionsEliminationStage(
-						reasoner));
+						reasoner),
+				(ReasonerStage) new ContextInitializationStage(reasoner));
 	}
 
 	@Override
 	public void execute() {
+		if (computation == null)
+			initComputation();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		progressMonitor.start(getName());
@@ -95,6 +81,14 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 			return;
 		reasoner.consistentOntology = computation.isConsistent();
 		reasoner.doneConsistencyCheck = true;
+		reasoner.doneReset = false;
+	}
+
+	@Override
+	void initComputation() {
+		super.initComputation();
+		this.computation = new ConsistencyChecking(reasoner.getStageExecutor(),
+				workerNo, reasoner.getProgressMonitor(), reasoner.ontologyIndex);
 	}
 
 	@Override

@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
+// TODO: add progress monitor, make concurrent if possible
+
 /**
  * The reasoner stage, which purpose is to ensure that no context is assigned to
  * {@link IndexedClassExpression}s of the current ontology
@@ -50,12 +52,10 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
-	private final Iterator<IndexedClassExpression> todo;
+	private Iterator<IndexedClassExpression> todo = null;
 
 	public ContextInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
-		this.todo = reasoner.ontologyIndex.getIndexedClassExpressions()
-				.iterator();
 	}
 
 	@Override
@@ -75,7 +75,8 @@ class ContextInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
-
+		if (todo == null)
+			initComputation();
 		while (todo.hasNext()) {
 			if (isInterrupted())
 				return;
@@ -84,6 +85,13 @@ class ContextInitializationStage extends AbstractReasonerStage {
 			deletedContexts++;
 		}
 		reasoner.doneContextReset = true;
+		reasoner.doneReset = false;
+	}
+
+	@Override
+	void initComputation() {
+		super.initComputation();
+		todo = reasoner.ontologyIndex.getIndexedClassExpressions().iterator();
 	}
 
 	@Override

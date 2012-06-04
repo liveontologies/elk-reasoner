@@ -65,8 +65,8 @@ public class ObjectPropertyCompositionsInitializationStage extends
 
 	@Override
 	public void execute() {
-		computation = new ObjectPropertyCompositionsInitialization(
-				reasoner.ontologyIndex);
+		if (computation == null)
+			initComputation();
 		reasoner.compositions = computation.getCompositions();
 		// TODO: this computation cannot be currently interrupted
 		// if (isInterrupted()) {
@@ -75,6 +75,14 @@ public class ObjectPropertyCompositionsInitializationStage extends
 		// return;
 		// }
 		reasoner.doneObjectPropertyCompositionsInitialization = true;
+		reasoner.doneReset = false;
+	}
+
+	@Override
+	void initComputation() {
+		super.initComputation();
+		computation = new ObjectPropertyCompositionsInitialization(
+				reasoner.ontologyIndex);
 	}
 
 	@Override

@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 
 /**
@@ -45,27 +44,10 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private final TaxonomyComputation computation;
-
-	/**
-	 * the number of workers used in the computation for this stage
-	 */
-	private final int workerNo;
-
-	/**
-	 * the progress monitor used to report progress of this stage
-	 */
-	final ProgressMonitor progressMonitor;
+	private TaxonomyComputation computation = null;
 
 	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
-		this.progressMonitor = reasoner.getProgressMonitor();
-		this.workerNo = reasoner.getNumberOfWorkers();
-		computation = new TaxonomyComputation(
-				reasoner.ontologyIndex.getIndexedClasses(),
-				reasoner.ontologyIndex.getIndexedClassCount(),
-				reasoner.getStageExecutor(), workerNo, progressMonitor,
-				reasoner.getOntologyIndex());
 	}
 
 	@Override
@@ -86,6 +68,8 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
+		if (computation == null)
+			initComputation();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		progressMonitor.start(getName());
@@ -95,11 +79,23 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 			return;
 		reasoner.taxonomy = computation.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
+		reasoner.doneReset = false;
+	}
+
+	@Override
+	void initComputation() {
+		super.initComputation();
+		this.computation = new TaxonomyComputation(
+				reasoner.ontologyIndex.getIndexedClasses(),
+				reasoner.ontologyIndex.getIndexedClassCount(),
+				reasoner.getStageExecutor(), workerNo, progressMonitor,
+				reasoner.getOntologyIndex());
 	}
 
 	@Override
 	public void printInfo() {
-		computation.printStatistics();
+		if (computation != null)
+			computation.printStatistics();
 	}
 
 }

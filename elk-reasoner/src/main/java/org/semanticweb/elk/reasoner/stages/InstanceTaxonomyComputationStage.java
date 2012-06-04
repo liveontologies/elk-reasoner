@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
@@ -47,37 +46,10 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private final TaxonomyComputation computation;
-
-	/**
-	 * the number of workers used in the computation for this stage
-	 */
-	private final int workerNo;
-
-	/**
-	 * the progress monitor used to report progress of this stage
-	 */
-	private final ProgressMonitor progressMonitor;
+	private TaxonomyComputation computation = null;
 
 	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
-		this.workerNo = reasoner.getNumberOfWorkers();
-		this.progressMonitor = reasoner.getProgressMonitor();
-		OntologyIndex ontologyIndex = reasoner.ontologyIndex;
-		if (reasoner.doneClassTaxonomy)
-			computation = new TaxonomyComputation(
-					ontologyIndex.getIndexedIndividuals(),
-					ontologyIndex.getIndexedIndividualCount(),
-					reasoner.getStageExecutor(), workerNo, progressMonitor,
-					reasoner.getOntologyIndex(), reasoner.taxonomy);
-		else
-			computation = new TaxonomyComputation(Operations.concat(
-					ontologyIndex.getIndexedClasses(),
-					ontologyIndex.getIndexedIndividuals()),
-					ontologyIndex.getIndexedClassCount()
-							+ ontologyIndex.getIndexedIndividualCount(),
-					reasoner.getStageExecutor(), workerNo, progressMonitor,
-					reasoner.getOntologyIndex());
 	}
 
 	@Override
@@ -98,6 +70,8 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
+		if (computation == null)
+			initComputation();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		progressMonitor.start(getName());
@@ -108,6 +82,27 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		reasoner.taxonomy = computation.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
 		reasoner.doneInstanceTaxonomy = true;
+		reasoner.doneReset = false;
+	}
+
+	@Override
+	void initComputation() {
+		super.initComputation();
+		OntologyIndex ontologyIndex = reasoner.ontologyIndex;
+		if (reasoner.doneClassTaxonomy)
+			this.computation = new TaxonomyComputation(
+					ontologyIndex.getIndexedIndividuals(),
+					ontologyIndex.getIndexedIndividualCount(),
+					reasoner.getStageExecutor(), workerNo, progressMonitor,
+					reasoner.getOntologyIndex(), reasoner.taxonomy);
+		else
+			this.computation = new TaxonomyComputation(Operations.concat(
+					ontologyIndex.getIndexedClasses(),
+					ontologyIndex.getIndexedIndividuals()),
+					ontologyIndex.getIndexedClassCount()
+							+ ontologyIndex.getIndexedIndividualCount(),
+					reasoner.getStageExecutor(), workerNo, progressMonitor,
+					reasoner.getOntologyIndex());
 	}
 
 	@Override

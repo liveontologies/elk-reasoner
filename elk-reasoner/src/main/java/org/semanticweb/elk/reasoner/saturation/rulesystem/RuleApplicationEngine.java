@@ -106,12 +106,6 @@ public class RuleApplicationEngine implements
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
 		this.activeContextsEmpty = new AtomicBoolean(true);
 
-		// reset saturation in case of re-saturation after changes
-		// TODO: introduce a separate method for this
-		for (IndexedClassExpression ice : ontologyIndex
-				.getIndexedClassExpressions())
-			ice.resetContext();
-
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 

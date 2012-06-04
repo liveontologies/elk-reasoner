@@ -63,10 +63,6 @@ public abstract class AbstractReasonerState {
 	 */
 	boolean doneRedundantCompositionsElimination = false;
 	/**
-	 * <tt>true</tt> if the object property saturation has been computed
-	 */
-	boolean doneObjectPropertySaturation = false;
-	/**
 	 * <tt>true</tt> if the assignment of contexts to class expressions has been
 	 * reset
 	 */
@@ -116,8 +112,10 @@ public abstract class AbstractReasonerState {
 	 * earlier deductions any longer.
 	 */
 	protected void resetStages() {
-		if (!doneReset) {
-			doneObjectPropertySaturation = false;
+		if (!doneReset) {			
+			doneObjectPropertyHierarchyComputation = false;
+			doneObjectPropertyCompositionsInitialization = false;			
+			doneRedundantCompositionsElimination = false;		
 			doneContextReset = false;
 			doneConsistencyCheck = false;
 			doneClassTaxonomy = false;
