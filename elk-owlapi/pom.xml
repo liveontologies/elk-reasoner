@@ -17,9 +17,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-all</artifactId>
+			<artifactId>owlapi-reasoner</artifactId>
 			<version>${owlapi.version}</version>
-			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.owlapi</groupId>
+			<artifactId>owlapi-apibinding</artifactId>
+			<version>${owlapi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>

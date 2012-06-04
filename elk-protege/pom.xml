@@ -26,11 +26,6 @@
 			<version>${protege.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-all</artifactId>
-			<version>${owlapi.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owlapi</artifactId>
 			<version>0.2.1-SNAPSHOT</version>
