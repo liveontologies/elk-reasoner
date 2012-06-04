@@ -68,12 +68,12 @@ public class ObjectPropertyCompositionsInitializationStage extends
 		computation = new ObjectPropertyCompositionsInitialization(
 				reasoner.ontologyIndex);
 		reasoner.compositions = computation.getCompositions();
-		// TODO: this computation cannot be currently terminated
-//		if (isInterrupted()) {
-//			LOGGER_.warn(getName()
-//					+ " is interrupted! The reasoning results might be incorrect!");
-//			return;
-//		}
+		// TODO: this computation cannot be currently interrupted
+		// if (isInterrupted()) {
+		// LOGGER_.warn(getName()
+		// + " is interrupted! The reasoning results might be incorrect!");
+		// return;
+		// }
 		reasoner.doneObjectPropertyCompositionsInitialization = true;
 	}
 

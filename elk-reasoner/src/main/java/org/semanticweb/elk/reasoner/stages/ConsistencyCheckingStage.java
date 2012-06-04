@@ -91,11 +91,8 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		progressMonitor.start(getName());
 		computation.process();
 		progressMonitor.finish();
-		if (isInterrupted()) {
-			LOGGER_.warn(getName()
-					+ " is interrupted! The ontology might be inconsistent!");
+		if (isInterrupted())
 			return;
-		}
 		reasoner.consistentOntology = computation.isConsistent();
 		reasoner.doneConsistencyCheck = true;
 	}

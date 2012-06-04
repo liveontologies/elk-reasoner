@@ -22,47 +22,30 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
-import org.semanticweb.elk.util.logging.Statistics;
 
 /**
- * A {@link ReasonerStageExecutor} which prints log messages about the executed
- * stages. If a stage has not been done, first, all its dependencies are
- * executed, and then this stage itself.
+ * A {@link ReasonerStageExecutor} which refuses to interrupt: it will restart
+ * any interrupted stage. Used for unit tests.
+ * 
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class LoggingStageExecutor extends SimpleInterrupter implements
+public class RestartingTestStageExecutor extends SimpleInterrupter implements
 		ReasonerStageExecutor {
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(LoggingStageExecutor.class);
 
 	@Override
 	public void complete(ReasonerStage stage) {
-		if (stage.isInterrupted())
-			return;
 		if (!stage.done()) {
-			LOGGER_.debug(stage.getName() + " stage:");
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);
-				if (dependentStage.isInterrupted()) {
-					return;
-				}
 			}
-			Statistics.logOperationStart(stage.getName(), LOGGER_);
-			stage.execute();
-			if (stage.isInterrupted()) {
-				LOGGER_.warn(stage.getName()
-						+ " is interrupted! The reasoning results might be incomplete!");
-			}
-			Statistics.logOperationFinish(stage.getName(), LOGGER_);
-			Statistics.logMemoryUsage(LOGGER_);
-			stage.printInfo();
-			LOGGER_.debug(stage.getName() + " done.");
+			do {
+				stage.clearInterrupt();
+				Thread.interrupted();
+				stage.execute();
+			} while (stage.isInterrupted());
 		}
 	}
 }

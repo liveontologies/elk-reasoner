@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.HashClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
+import org.semanticweb.elk.reasoner.stages.RestartingTestStageExecutor;
 import org.semanticweb.elk.testing.HashTestOutput;
 
 /**
@@ -58,7 +58,7 @@ public class CLIHashClassificationCorrectnessTest extends
 	protected Reasoner createReasoner(final InputStream input)
 			throws Owl2ParseException, IOException {
 		IOReasoner reasoner = new IOReasonerFactory()
-				.createReasoner(new TestStageExecutor());
+				.createReasoner(new RestartingTestStageExecutor());
 
 		reasoner.loadOntologyFromStream(input);
 

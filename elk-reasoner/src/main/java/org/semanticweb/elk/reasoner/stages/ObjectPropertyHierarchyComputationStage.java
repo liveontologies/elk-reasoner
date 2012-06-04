@@ -86,11 +86,8 @@ public class ObjectPropertyHierarchyComputationStage extends
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		computation.process();
-		if (isInterrupted()) {
-			LOGGER_.warn(getName()
-					+ " is interrupted! The reasoning results might be incorrect!");
+		if (isInterrupted())
 			return;
-		}
 		reasoner.doneObjectPropertyHierarchyComputation = true;
 	}
 

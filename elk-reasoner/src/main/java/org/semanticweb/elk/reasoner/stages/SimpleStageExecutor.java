@@ -36,13 +36,16 @@ public class SimpleStageExecutor extends SimpleInterrupter implements
 
 	@Override
 	public void complete(ReasonerStage stage) {
+		System.out.println("Running "+ stage.getName());
 		if (!stage.done()) {
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);
 				if (dependentStage.isInterrupted())
 					return;
 			}
+			System.out.println("Starting "+ stage.getName());
 			stage.execute();
+			System.out.println("Finished "+ stage.getName());
 		}
 	}
 }

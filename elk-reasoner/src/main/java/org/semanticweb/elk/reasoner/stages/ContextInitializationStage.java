@@ -77,11 +77,8 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	public void execute() {
 
 		while (todo.hasNext()) {
-			if (isInterrupted()) {
-				LOGGER_.warn(getName()
-						+ " is interrupted! The reasoning results might be incorrect!");
+			if (isInterrupted())
 				return;
-			}
 			IndexedClassExpression ice = todo.next();
 			ice.resetContext();
 			deletedContexts++;

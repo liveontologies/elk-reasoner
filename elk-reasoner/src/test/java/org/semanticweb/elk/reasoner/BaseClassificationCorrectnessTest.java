@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
@@ -113,4 +114,71 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 		 */
 
 	}
+
+	/**
+	 * Compute the taxonomy using interruptions and checks that the computed
+	 * taxonomy is correct and complete
+	 * 
+	 * @throws TestResultComparisonException
+	 *             in case the comparison fails
+	 */
+	@Test
+	public void classifyWithInterruptions()
+			throws TestResultComparisonException {
+		System.err.println(manifest.toString());
+
+		ReasoningProcess reasoningProcess = new ReasoningProcess();
+		Thread reasonerThread = new Thread(reasoningProcess);
+		reasonerThread.start();
+
+		while (reasonerThread.isAlive()) {
+			// interrupt every millisecond
+			reasonerThread.interrupt();
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				fail();
+			}
+		}
+
+		if (reasoningProcess.consistent) {
+			manifest.compare(new ClassTaxonomyTestOutput(reasoningProcess
+					.getTaxonomy()));
+		} else {
+			manifest.compare(new ClassTaxonomyTestOutput());
+		}
+
+	}
+
+	/**
+	 * A simple class for running a reasoner in a separate thread and query the
+	 * result
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	class ReasoningProcess implements Runnable {
+
+		Taxonomy<ElkClass> taxonomy = null;
+		boolean consistent = true;
+
+		@Override
+		public void run() {
+			try {
+				taxonomy = reasoner.getTaxonomy();
+			} catch (InconsistentOntologyException e) {
+				consistent = false;
+			}
+		}
+
+		public Taxonomy<ElkClass> getTaxonomy() {
+			return this.taxonomy;
+		}
+
+		public boolean isConsistent() {
+			return consistent;
+		}
+
+	};
+
 }

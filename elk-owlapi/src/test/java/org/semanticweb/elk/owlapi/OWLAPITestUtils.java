@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.reasoner.stages.RestartingTestStageExecutor;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -36,19 +37,20 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
- * A collection of utility methods to be used in OWL API related tests 
+ * A collection of utility methods to be used in OWL API related tests
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 public class OWLAPITestUtils {
 
-	public static ElkReasoner loadOntologyIntoReasoner(InputStream stream) throws IOException, Owl2ParseException {
+	public static ElkReasoner loadOntologyIntoReasoner(InputStream stream)
+			throws IOException, Owl2ParseException {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology ontology = null;
-		
+
 		try {
 			ontology = manager.loadOntologyFromOntologyDocument(stream);
 		} catch (OWLOntologyCreationIOException e) {
@@ -56,11 +58,12 @@ public class OWLAPITestUtils {
 		} catch (OWLOntologyCreationException e) {
 			throw new Owl2ParseException(e);
 		}
-		
-		ElkReasoner reasoner = new ElkReasoner(ontology, false);
-		
+
+		ElkReasoner reasoner = new ElkReasoner(ontology, false,
+				new RestartingTestStageExecutor());
+
 		reasoner.syncOntology();
-		
+
 		return reasoner;
 	}
 }

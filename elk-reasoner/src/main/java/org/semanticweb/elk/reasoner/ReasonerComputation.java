@@ -32,6 +32,9 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 		ConcurrentComputation<I, P> {
 
+	/**
+	 * the progress monitor used to report the progress of this computation
+	 */
 	protected final ProgressMonitor progressMonitor;
 	/**
 	 * the inputs to be processed
@@ -79,9 +82,6 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 	 * then this method can be called again to continue the computation.
 	 */
 	public void process() {
-
-		if (!todo.hasNext() && nextInput == null)
-			return;
 
 		start();
 

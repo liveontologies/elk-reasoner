@@ -91,11 +91,8 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		progressMonitor.start(getName());
 		computation.process();
 		progressMonitor.finish();
-		if (isInterrupted()) {
-			LOGGER_.warn(getName()
-					+ " is interrupted! The taxonomy may be incomplete!");
+		if (isInterrupted())
 			return;
-		}
 		reasoner.taxonomy = computation.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
 	}

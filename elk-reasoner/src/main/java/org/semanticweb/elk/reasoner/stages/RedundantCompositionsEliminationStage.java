@@ -25,15 +25,11 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.saturation.properties.RedundantCompositionsElimination;
 
 public class RedundantCompositionsEliminationStage extends
 		AbstractReasonerStage {
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(RedundantCompositionsEliminationStage.class);
 
 	/**
 	 * the computation used for this stage
@@ -41,14 +37,14 @@ public class RedundantCompositionsEliminationStage extends
 	private RedundantCompositionsElimination computation;
 
 	/**
-	 * the number of workers used in the computation for this stage
+	 * the progress monitor used to report progress of this stage
 	 */
-	private final int workerNo;
+	private final ProgressMonitor progressMonitor;
 
 	public RedundantCompositionsEliminationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
-		this.workerNo = reasoner.getNumberOfWorkers();
 		this.computation = null;
+		this.progressMonitor = reasoner.getProgressMonitor();
 	}
 
 	@Override
@@ -70,18 +66,17 @@ public class RedundantCompositionsEliminationStage extends
 
 	@Override
 	public void execute() {
+		/*
+		 * since the compositions can be computed only at the dependent stage,
+		 * we need to initialize the computation the first time it is executed
+		 */
 		if (computation == null)
 			computation = new RedundantCompositionsElimination(
-					reasoner.getStageExecutor(), workerNo,
-					reasoner.compositions);
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
+					reasoner.compositions.entrySet(),
+					reasoner.getStageExecutor(), progressMonitor);
 		computation.process();
-		if (isInterrupted()) {
-			LOGGER_.warn(getName()
-					+ " is interrupted! The reasoning results might be incorrect!");
+		if (isInterrupted())
 			return;
-		}
 		reasoner.doneRedundantCompositionsElimination = true;
 	}
 

@@ -128,13 +128,14 @@ public class ElkReasoner implements OWLReasoner {
 	/**
 	 * The stage executor used for execution the stages of the reasoner
 	 */
-	protected final ReasonerStageExecutor stageExecutor = new LoggingStageExecutor();
+	protected final ReasonerStageExecutor stageExecutor;
 
 	// logger the messages
 	protected final static Logger LOGGER_ = Logger.getLogger(ElkReasoner.class);
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
-			ElkReasonerConfiguration elkConfig) {
+			ElkReasonerConfiguration elkConfig,
+			ReasonerStageExecutor stageExecutor) {
 		this.owlOntology = ontology;
 		this.manager = ontology.getOWLOntologyManager();
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
@@ -152,19 +153,33 @@ public class ElkReasoner implements OWLReasoner {
 		this.objectFactory = new ElkObjectFactoryImpl();
 		this.owlConverter = OwlConverter.getInstance();
 		this.elkConverter = ElkConverter.getInstance();
+		this.stageExecutor = stageExecutor;
 
 		flush();
 	}
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
+			ElkReasonerConfiguration elkConfig) {
+		this(ontology, isBufferingMode, elkConfig, new LoggingStageExecutor());
+	}
+
+	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
+			ReasonerStageExecutor stageExecutor,
 			ReasonerProgressMonitor progressMonitor) {
 		this(ontology, isBufferingMode, new ElkReasonerConfiguration(
-				progressMonitor));
+				progressMonitor), stageExecutor);
 
 	}
 
+	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
+			ReasonerStageExecutor stageExecutor) {
+		this(ontology, isBufferingMode, new ElkReasonerConfiguration(),
+				stageExecutor);
+	}
+
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode) {
-		this(ontology, isBufferingMode, new ElkReasonerConfiguration());
+		this(ontology, isBufferingMode, new ElkReasonerConfiguration(),
+				new LoggingStageExecutor());
 	}
 
 	protected Reasoner getInternalReasoner() {

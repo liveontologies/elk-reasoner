@@ -65,7 +65,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	/**
 	 * the executor used internally to run the jobs
 	 */
-	protected volatile ExecutorService executor;
+	protected volatile ExecutorService executor; // TODO: use one thread pool
 	/**
 	 * the internal buffer for queuing input
 	 */
@@ -205,8 +205,9 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 			I nextInput;
 			for (;;) {
 				if (interrupter.isInterrupted()) {
-					if (!executor.isShutdown())
-						executor.shutdownNow();
+					// FIXME: not safe when workers start
+					// if (!executor.isShutdown())
+					// executor.shutdownNow();
 					break;
 				}
 				try {

@@ -61,10 +61,6 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	protected final ReasonerStageExecutor stageExecutor;
 	/**
-	 * Executor used to run the jobs.
-	 */
-	protected final ExecutorService executor;
-	/**
 	 * Number of workers for concurrent jobs.
 	 */
 	protected final int workerNo;
@@ -83,7 +79,6 @@ public class Reasoner extends AbstractReasonerState {
 	protected Reasoner(ReasonerStageExecutor stageExecutor,
 			ExecutorService executor, int workerNo) {
 		this.stageExecutor = stageExecutor;
-		this.executor = executor;
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
@@ -139,7 +134,7 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	public void shutdown() {
-		executor.shutdownNow();
+		// TODO: execute shutdown hooks
 	}
 
 	/**
