@@ -49,6 +49,7 @@ import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
@@ -64,7 +65,8 @@ public class ReasonerTest {
 	public void testExistentials() throws Owl2ParseException, IOException,
 			InconsistentOntologyException {
 
-		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )" + "Ontology("//
 				+ "EquivalentClasses(:B :C)"//
@@ -105,7 +107,8 @@ public class ReasonerTest {
 	public void testConjunctions() throws Owl2ParseException, IOException,
 			FreshEntitiesException, InconsistentOntologyException {
 
-		final IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		final IOReasoner ioReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		ioReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:A :D)"
@@ -155,7 +158,8 @@ public class ReasonerTest {
 	@Test
 	public void testPropertyChains() throws Owl2ParseException, IOException,
 			FreshEntitiesException, InconsistentOntologyException {
-		IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		IOReasoner ioReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		ioReasoner
 				.loadOntologyFromString(""//
 						+ "Prefix( : = <http://example.org/> )"//
@@ -187,7 +191,8 @@ public class ReasonerTest {
 	public void testBottom() throws Owl2ParseException, IOException,
 			InconsistentOntologyException {
 
-		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
@@ -218,7 +223,8 @@ public class ReasonerTest {
 	public void testDisjoint() throws Owl2ParseException, IOException,
 			InconsistentOntologyException {
 
-		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
@@ -248,7 +254,8 @@ public class ReasonerTest {
 	public void testDisjointSelf() throws Owl2ParseException, IOException,
 			InconsistentOntologyException {
 
-		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		IOReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
@@ -277,7 +284,8 @@ public class ReasonerTest {
 	public void testReflexiveRole() throws Owl2ParseException, IOException,
 			FreshEntitiesException, InconsistentOntologyException {
 
-		IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		IOReasoner ioReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		ioReasoner.loadOntologyFromString(""//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
@@ -313,7 +321,8 @@ public class ReasonerTest {
 	public void testAncestors() throws Owl2ParseException, IOException,
 			InconsistentOntologyException, FreshEntitiesException {
 
-		final IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		final IOReasoner ioReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		ioReasoner.loadOntologyFromString("Prefix( : = <http://example.org/> )"
 				+ "Ontology(" + "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 				+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))");
@@ -374,7 +383,8 @@ public class ReasonerTest {
 	public void testTop() throws ExecutionException, Owl2ParseException,
 			IOException, InconsistentOntologyException {
 
-		final IOReasoner ioReasoner = new IOReasonerFactory().createReasoner();
+		final IOReasoner ioReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		ioReasoner.loadOntologyFromString(""//
 				+ "Prefix( owl:= <http://www.w3.org/2002/07/owl#> )"//
 				+ "Prefix( : = <http://example.org/> )"//
@@ -463,7 +473,8 @@ public class ReasonerTest {
 	public void testInconsistent() throws ExecutionException,
 			Owl2ParseException, IOException {
 
-		IOReasoner IOReasoner = new IOReasonerFactory().createReasoner();
+		IOReasoner IOReasoner = new IOReasonerFactory()
+				.createReasoner(new TestStageExecutor());
 		IOReasoner.loadOntologyFromString(""
 				+ "Prefix( : = <http://example.org/> )"
 				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"

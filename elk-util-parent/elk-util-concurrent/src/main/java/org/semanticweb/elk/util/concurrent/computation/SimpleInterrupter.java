@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,28 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * A dummy class for "poison" elements, typically used to terminate the workers
- * in the producer-consumer framework.
+ * A simple interrupter, which just saves the interrupt status and teturns it
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I>
- *            the type of the input elements
  */
-public final class JobPoison<I> implements Job<I> {
+public class SimpleInterrupter implements Interrupter {
+
+	volatile boolean interrupted = false;
 
 	@Override
-	public <O> O accept(JobProcessor<I, O> processor) {
-		return processor.process(this);
+	public void interrupt() {
+		interrupted = true;
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return interrupted;
+	}
+
+	@Override
+	public void clearInterrupt() {
+		interrupted = false;
 	}
 
 }

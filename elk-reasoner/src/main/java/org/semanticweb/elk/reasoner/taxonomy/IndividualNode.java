@@ -60,7 +60,7 @@ InstanceNode<ElkClass, ElkNamedIndividual> {
 	/**
 	 * The link to the taxonomy to which this node belongs
 	 */
-	final ConcurrentClassTaxonomy taxonomy;
+	final ConcurrentTaxonomy taxonomy;
 
 	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
@@ -80,7 +80,7 @@ InstanceNode<ElkClass, ElkNamedIndividual> {
 	 * @param members
 	 *            non-empty list of equivalent ElkClass objects
 	 */
-	protected IndividualNode(ConcurrentClassTaxonomy taxonomy,
+	protected IndividualNode(ConcurrentTaxonomy taxonomy,
 			Collection<ElkNamedIndividual> members) {
 		this.taxonomy = taxonomy;
 		this.members = new ArrayList<ElkNamedIndividual>(members);

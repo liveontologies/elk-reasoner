@@ -25,63 +25,68 @@ package org.semanticweb.elk.util.concurrent.computation;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An class for concurrent processing of a number of tasks. The input for the
- * tasks are submitted, buffered, and processed in batches by concurrent workers
- * using an {@link InputProcessor} . The implementation is loosely based on a
- * produce-consumer framework with one producer and many consumers.
+ * tasks are submitted, buffered, and processed by concurrent workers using the
+ * supplied {@link InputProcessor}. The implementation is loosely based on a
+ * produce-consumer framework with one producer and many consumers. The
+ * processing of the input should start by calling the {@link #start()} method,
+ * following by {@link #submit(I)} method for submitting input to be processed.
+ * The workers will always wait for new input, unless interrupted or
+ * {@link #finish()} method is called. The workers can be interrupted by calling
+ * the {@link Interrupter#interrupt()} method of the supplied interrupter. If
+ * {@link #finish()} is called then no further input can be submitted and the
+ * workers will terminate when all input has been processed, unless they are
+ * interrupt
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <I>
  *            the type of the input to be processed.
+ * @param <P>
+ *            the type of the processor for the input
  */
-public class ConcurrentComputation<I> {
+public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	/**
-	 * processor for the input
+	 * the processor for the input to be executed by workers
 	 */
-	protected final InputProcessor<I> inputProcessor;
+	protected final P inputProcessor;
 	/**
-	 * executor used to run the jobs
+	 * the interrupter to interrupt and monitor task interruption
 	 */
-	protected final ExecutorService executor;
+	protected final Interrupter interrupter;
 	/**
 	 * maximum number of concurrent workers
 	 */
 	protected final int maxWorkers;
 	/**
-	 * the buffer for queuing jobs
+	 * the executor used internally to run the jobs
 	 */
-	protected final BlockingQueue<Job<I>> buffer;
+	protected volatile ExecutorService executor; // TODO: use one thread pool
 	/**
-	 * the maximum number of jobs in a batch
+	 * the internal buffer for queuing input
 	 */
-	protected final int batchSize;
+	protected final BlockingQueue<I> buffer;
 	/**
-	 * the current batch
+	 * <tt>true</tt> if the finish of computation was requested using the
+	 * function {@link #finish()}
 	 */
-	protected JobBatch<I> batch;
+	protected volatile boolean finishRequested;
 	/**
-	 * The worker instance used to process the jobs
+	 * the worker instance used to process the jobs
 	 */
-	protected final Worker worker = new Worker();
-	/**
-	 * The poison instance used to terminate the jobs
-	 */
-	protected final JobPoison<I> poison = new JobPoison<I>();
-	/**
-	 * counts the number of poison values submitted to terminate the jobs
-	 */
-	protected int poisonCounter;
+	protected final Runnable worker;
 
 	/**
-	 * Creating a computation instance.
+	 * Creating a {@link ConcurrentComputation} instance.
 	 * 
 	 * @param inputProcessor
 	 *            the processor for the input to be executed by workers
-	 * @param executor
-	 *            the executor used to execute the concurrent jobs
+	 * @param interrupter
+	 *            the interrupter to interrupt and monitor task interruption
 	 * @param maxWorkers
 	 *            the maximal number of concurrent workers processing the jobs
 	 * @param bufferCapacity
@@ -89,23 +94,37 @@ public class ConcurrentComputation<I> {
 	 *            full, submitting new jobs will block until new space is
 	 *            available
 	 */
-	public ConcurrentComputation(InputProcessor<I> inputProcesor,
-			ExecutorService executor, int maxWorkers, int bufferCapacity,
-			int batchSize) {
-		this.inputProcessor = inputProcesor;
-		this.executor = executor;
+	public ConcurrentComputation(P inputProcessor, Interrupter interrupter,
+			int maxWorkers, int bufferCapacity) {
+		this.inputProcessor = inputProcessor;
+		this.interrupter = interrupter;
 		this.maxWorkers = maxWorkers;
-		this.buffer = new ArrayBlockingQueue<Job<I>>(bufferCapacity);
-		this.batchSize = batchSize;
+		this.buffer = new ArrayBlockingQueue<I>(bufferCapacity);
+		this.finishRequested = false;
+		this.worker = new Worker();
 	}
 
 	/**
-	 * Start processing of the input.
+	 * Creating a {@link ConcurrentComputation} instance.
+	 * 
+	 * @param inputProcessor
+	 *            the processor for the input to be executed by workers
+	 * @param interrupter
+	 *            the interrupter to interrupt and monitor task interruption
+	 * @param maxWorkers
+	 *            the maximal number of concurrent workers processing the jobs
 	 */
-	public final void start() {
-		buffer.clear();
-		batch = new JobBatch<I>(batchSize);
-		poisonCounter = 0;
+	public ConcurrentComputation(P inputProcesor, Interrupter interrupter,
+			int maxWorkers) {
+		this(inputProcesor, interrupter, maxWorkers, 64);
+	}
+
+	/**
+	 * Starts {@link #maxWorkers} workers to process the input.
+	 */
+	public synchronized void start() {
+		executor = Executors.newFixedThreadPool(maxWorkers);
+		finishRequested = false;
 		for (int i = 0; i < maxWorkers; i++) {
 			executor.execute(worker);
 		}
@@ -113,93 +132,105 @@ public class ConcurrentComputation<I> {
 
 	/**
 	 * Submitting a new input for processing. Submitted input jobs are first
-	 * added to a buffer, after which they are concurrently processed by
-	 * workers. If the buffer is full, the method blocks until new space is
-	 * available.
+	 * buffered, and then concurrently processed by workers. If the buffer is
+	 * full, the method blocks until new space is available.
 	 * 
 	 * @param input
 	 *            the input to be processed
+	 * @return <tt>true</tt> if the input has been successfully submitted for
+	 *         computation; the input cannot be submitted, e.g., if
+	 *         {@link #finish()} has been called
 	 * @throws InterruptedException
 	 *             thrown if interrupted during waiting for space to be
 	 *             available
 	 */
-	public final void submit(I input) throws InterruptedException {
-		batch.add(input);
-		if (batch.size() == batchSize) {
-			buffer.put(batch);
-			batch = new JobBatch<I>(batchSize);
-		}
-	}
-
-	/**
-	 * The class that is used to process and run the input jobs.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
-	protected final class Worker implements JobProcessor<I, Boolean>, Runnable {
-
-		@Override
-		public final Boolean process(JobBatch<I> batch)
-				throws InterruptedException {
-			for (I input : batch) {
-				// processing the input using the input processor
-				inputProcessor.submit(input);
-				inputProcessor.process();
-			}
-			return true;
-		}
-
-		@Override
-		public final Boolean process(JobPoison<I> job) {
+	public synchronized boolean submit(I input) throws InterruptedException {
+		if (finishRequested)
 			return false;
-		}
-
-		@Override
-		public final void run() {
-			for (;;) {
-				try {
-					Job<I> nextJob = buffer.take();
-					if (!nextJob.accept(this)) {
-						// the element is a poison; the worker should die
-						break;
-					}
-				} catch (InterruptedException e) {
-				}
-			}
-			if (buffer.isEmpty()) {
-				// if the buffer is empty, this might be the last worker running
-				synchronized (buffer) {
-					// notify the producer thread about it
-					buffer.notify();
-				}
-			}
-
-		}
+		buffer.put(input);
+		return true;
 	}
 
 	/**
-	 * Block until all pending jobs are processed. If interrupted, this method
-	 * can be executed again to wait until the jobs are finished.
+	 * Block and wait until all workers terminate. The workers terminate either
+	 * if the finish request has been issued using
+	 * {@link ConcurrentComputation#finish()} or the workers were interrupted,
+	 * e.g., by calling the {@link Interrupter#interrupt()} method of the
+	 * interrupter associated with this computation. If interrupted, this method
+	 * can be executed again to wait until all workers terminate.
 	 * 
 	 * @throws InterruptedException
 	 *             thrown if interrupted during waiting
 	 */
-	public final void waitCompletion() throws InterruptedException {
-		// submit the remaining jobs
-		buffer.put(batch);
-		while (poisonCounter < maxWorkers) {
-			// for each worker we put a poison to die
-			buffer.put(poison);
-			poisonCounter++;
+
+	/**
+	 * Marks the end of the input and requests all workers to terminate when all
+	 * currently submitted input has been processed. After calling this method,
+	 * no new input can be submitted anymore, i.e., calling {@link #submit(I)}
+	 * will always return <tt>false</tt>. The method blocks until all workers
+	 * have been stopped. If the computation has been interrupted through
+	 * {@link Interrupter#interrupt()} either before or after calling this
+	 * method, the method will return the submitted input elements that have not
+	 * been yet submitted to the {@link InputProcessor}. If interrupted while
+	 * blocked, this method should be called again in order to complete the
+	 * termination request.
+	 * 
+	 * @return the submitted input elements that have not been yet submitted to
+	 *         the supplied {@link InputProcessor}
+	 * @throws InterruptedException
+	 *             if interrupted during waiting for finish request
+	 */
+	public synchronized Iterable<I> finish() throws InterruptedException {
+		if (!finishRequested) {
+			finishRequested = true;
+			// make sure all waiting workers wake up
+			executor.shutdownNow();
 		}
-		// wait until the buffer becomes empty; it will mean that all the
-		// workers are dead
-		synchronized (buffer) {
-			while (!buffer.isEmpty()) {
-				buffer.wait();
+		for (;;) {
+			executor.awaitTermination(60, TimeUnit.SECONDS);
+			if (executor.isTerminated())
+				return buffer;
+		}
+	}
+
+	/**
+	 * The {@link Runnable} for workers processing the input
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	private class Worker implements Runnable {
+		@Override
+		public final void run() {
+			I nextInput;
+			for (;;) {
+				if (interrupter.isInterrupted()) {
+					// FIXME: not safe when workers start
+					// if (!executor.isShutdown())
+					// executor.shutdownNow();
+					break;
+				}
+				try {
+					if (finishRequested) {
+						nextInput = buffer.poll();
+						if (nextInput == null) {
+							// make sure nothing is left unprocessed
+							inputProcessor.process();
+							break;
+						}
+					} else
+						nextInput = buffer.take();
+					inputProcessor.submit(nextInput); // should never fail
+					inputProcessor.process(); // can be interrupted
+				} catch (InterruptedException e) {
+					/*
+					 * something has happened: either the whole execution was
+					 * interrupted in which case we need to quit as soon as
+					 * possible, or finish has been requested, in which case we
+					 * need to drain the buffer before exiting
+					 */
+				}
 			}
 		}
-
 	}
 }

@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemElClassSat
 import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemInvocationManagerSCE;
 import org.semanticweb.elk.reasoner.saturation.classes.SuperClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * The engine for computing the saturation of class expressions. This is the
@@ -48,7 +49,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @author Markus Kroetzsch
  * 
  */
-public class RuleApplicationEngine implements InputProcessor<IndexedClassExpression> {
+public class RuleApplicationEngine implements
+		InputProcessor<IndexedClassExpression> {
 
 	protected final static Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationEngine.class);
@@ -86,24 +88,23 @@ public class RuleApplicationEngine implements InputProcessor<IndexedClassExpress
 	 * <tt>true</tt> if the {@link #activeContexts} queue is empty
 	 */
 	protected final AtomicBoolean activeContextsEmpty;
-	
+	/**
+	 * The interrupter used to interrupt and monitor interruption for this
+	 * engine
+	 */
+	protected final Interrupter interrupter;
 	/**
 	 * The listener for rule application callbacks
 	 */
 	protected final RuleApplicationListener listener;
 
 	public RuleApplicationEngine(OntologyIndex ontologyIndex,
-			RuleApplicationListener listener) {
+			Interrupter interrupter, RuleApplicationListener listener) {
 		this.ontologyIndex = ontologyIndex;
+		this.interrupter = interrupter;
 		this.listener = listener;
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
 		this.activeContextsEmpty = new AtomicBoolean(true);
-
-		// reset saturation in case of re-saturation after changes
-		// TODO: introduce a separate method for this
-		for (IndexedClassExpression ice : ontologyIndex
-				.getIndexedClassExpressions())
-			ice.resetContext();
 
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
@@ -130,7 +131,23 @@ public class RuleApplicationEngine implements InputProcessor<IndexedClassExpress
 
 	@Override
 	public void process() throws InterruptedException {
-		processActiveContexts();
+		for (;;) {
+			if (interrupter.isInterrupted()) {
+				// wake up other workers if sleeping
+				listener.notifyCanProcess();
+				return;
+			}
+			Context nextContext = activeContexts.poll();
+			if (nextContext == null) {
+				if (!activeContextsEmpty.compareAndSet(false, true))
+					return;
+				nextContext = activeContexts.poll();
+				if (nextContext == null)
+					return;
+				tryNotifyCanProcess();
+			}
+			process(nextContext);
+		}
 	}
 
 	@Override
@@ -217,21 +234,6 @@ public class RuleApplicationEngine implements InputProcessor<IndexedClassExpress
 	public void enqueue(Context context, Queueable<?> item) {
 		context.getQueue().add(item);
 		activateContext(context);
-	}
-
-	protected void processActiveContexts() throws InterruptedException {
-		for (;;) {
-			Context nextContext = activeContexts.poll();
-			if (nextContext == null) {
-				if (!activeContextsEmpty.compareAndSet(false, true))
-					return;
-				nextContext = activeContexts.poll();
-				if (nextContext == null)
-					return;
-				tryNotifyCanProcess();
-			}
-			process(nextContext);
-		}
 	}
 
 	protected void process(Context context) {

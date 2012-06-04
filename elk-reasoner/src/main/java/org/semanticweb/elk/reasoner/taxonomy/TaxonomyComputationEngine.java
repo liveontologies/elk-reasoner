@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalen
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /*
  * TODO: current implementation does not support equivalent individuals,
@@ -56,11 +57,17 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class TaxonomyComputationEngine implements InputProcessor<IndexedClassEntity> {
+public class TaxonomyComputationEngine implements
+		InputProcessor<IndexedClassEntity> {
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
 	protected final IndividualClassTaxonomy taxonomy;
+	/**
+	 * The interrupter used to interrupt and monitor interruption for this
+	 * computation
+	 */
+	protected final Interrupter interrupter;
 	/**
 	 * The transitive reduction engine used in the taxonomy construction
 	 */
@@ -84,15 +91,20 @@ public class TaxonomyComputationEngine implements InputProcessor<IndexedClassEnt
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
+	 * @param interrupter
+	 *            the interrupter used to interrupt and monitor interruption for
+	 *            this computation
 	 * @param partialTaxonomy
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
 	public TaxonomyComputationEngine(OntologyIndex ontologyIndex,
-			IndividualClassTaxonomy partialTaxonomy) {
+			Interrupter interrupter, IndividualClassTaxonomy partialTaxonomy) {
 		this.taxonomy = partialTaxonomy;
+		this.interrupter = interrupter;
 		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>(
-				ontologyIndex, new ThisTransitiveReductionListener());
+				ontologyIndex, interrupter,
+				new ThisTransitiveReductionListener());
 	}
 
 	/**
@@ -100,14 +112,17 @@ public class TaxonomyComputationEngine implements InputProcessor<IndexedClassEnt
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
+	 * @param interrupter
+	 *            the interrupter used to interrupt and monitor interruption for
+	 *            this computation
 	 */
-	public TaxonomyComputationEngine(OntologyIndex ontologyIndex) {
-		this(ontologyIndex, new ConcurrentClassTaxonomy());
+	public TaxonomyComputationEngine(OntologyIndex ontologyIndex,
+			Interrupter interrupter) {
+		this(ontologyIndex, interrupter, new ConcurrentTaxonomy());
 	}
 
 	@Override
-	public final void submit(IndexedClassEntity job)
-			throws InterruptedException {
+	public final void submit(IndexedClassEntity job) {
 		transitiveReductionEngine
 				.submit(new TransitiveReductionJob<IndexedClassEntity>(job));
 	}
@@ -123,18 +138,18 @@ public class TaxonomyComputationEngine implements InputProcessor<IndexedClassEnt
 	}
 
 	/**
-	 * Print statistics about class taxonomy construction
+	 * Print statistics about taxonomy construction
 	 */
 	public void printStatistics() {
 		transitiveReductionEngine.printStatistics();
 	}
 
 	/**
-	 * Returns the class taxonomy constructed by this engine
+	 * Returns the taxonomy constructed by this engine
 	 * 
-	 * @return the class taxonomy constructed by this engine
+	 * @return the taxonomy constructed by this engine
 	 */
-	public IndividualClassTaxonomy getClassTaxonomy() {
+	public IndividualClassTaxonomy getTaxonomy() {
 		return this.taxonomy;
 	}
 
@@ -192,6 +207,8 @@ public class TaxonomyComputationEngine implements InputProcessor<IndexedClassEnt
 		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalent<IndexedClassEntity> output) {
+			// this should not happen: all transitive reduction results should
+			// be computed with direct super classes
 			throw new IllegalArgumentException();
 		}
 

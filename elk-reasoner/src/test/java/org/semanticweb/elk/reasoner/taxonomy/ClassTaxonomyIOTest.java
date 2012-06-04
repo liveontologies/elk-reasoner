@@ -42,6 +42,8 @@ import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
+import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 
 /**
  * Tests loading/dumping of class taxonomies
@@ -49,11 +51,13 @@ import org.semanticweb.elk.reasoner.Reasoner;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
  */
 public class ClassTaxonomyIOTest {
 
 	@Test
-	public void roundtrip() throws IOException, Owl2ParseException, InconsistentOntologyException {
+	public void roundtrip() throws IOException, Owl2ParseException,
+			InconsistentOntologyException {
 		Taxonomy<ElkClass> original = loadAndClassify("io/taxonomy.owl");
 		StringWriter writer = new StringWriter();
 
@@ -83,11 +87,11 @@ public class ClassTaxonomyIOTest {
 			throws IOException, Owl2ParseException,
 			InconsistentOntologyException {
 		InputStream stream = null;
-		TestReasoner reasoner = new TestReasoner();
+		TestReasoner reasoner = new TestReasoner(new TestStageExecutor());
 
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(resource);
-			reasoner = new TestReasoner();
+			reasoner = new TestReasoner(new TestStageExecutor());
 			reasoner.loadOntologyFromStream(stream);
 			return reasoner.getTaxonomy();
 		} finally {
@@ -98,8 +102,8 @@ public class ClassTaxonomyIOTest {
 
 class TestReasoner extends Reasoner {
 
-	protected TestReasoner() {
-		super(Executors.newSingleThreadExecutor(), 1);
+	protected TestReasoner(ReasonerStageExecutor stageExecutor) {
+		super(stageExecutor, Executors.newSingleThreadExecutor(), 1);
 	}
 
 	public void loadOntologyFromStream(InputStream stream) throws IOException,
@@ -109,7 +113,7 @@ class TestReasoner extends Reasoner {
 		Owl2Parser parser = new Owl2FunctionalStyleParser(stream);
 		parser.setPrefixDeclarations(new ElkPrefixDeclarationsImpl());
 
-		parser.parseOntology(ontologyIndex.getAxiomInserter());
+		parser.parseOntology(getAxiomInserter());
 	}
 
 }

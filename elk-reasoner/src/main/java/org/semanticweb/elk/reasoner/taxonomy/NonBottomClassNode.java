@@ -60,7 +60,7 @@ public class NonBottomClassNode implements
 	/**
 	 * The link to the taxonomy to which this node belongs
 	 */
-	final ConcurrentClassTaxonomy taxonomy;
+	final ConcurrentTaxonomy taxonomy;
 
 	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
@@ -91,7 +91,7 @@ public class NonBottomClassNode implements
 	 * @param members
 	 *            non-empty list of equivalent ElkClass objects
 	 */
-	protected NonBottomClassNode(ConcurrentClassTaxonomy taxonomy,
+	protected NonBottomClassNode(ConcurrentTaxonomy taxonomy,
 			Collection<ElkClass> members) {
 		this.taxonomy = taxonomy;
 		this.members = new ArrayList<ElkClass>(members);

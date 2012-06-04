@@ -42,6 +42,8 @@ import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.logging.ElkMessage;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -101,35 +103,44 @@ public class ElkReasoner implements OWLReasoner {
 	protected final OWLOntology owlOntology;
 	protected final OWLOntologyManager manager;
 	protected final OWLDataFactory owlDataFactory;
-	// the ELK reasoner instance used for reasoning
+	/** the ELK reasoner instance used for reasoning */
 	protected final Reasoner reasoner;
-	// ELK progress monitor implementation to display progress
+	/** ELK progress monitor implementation to display progress */
 	protected final ProgressMonitor elkProgressMonitor;
-	// isBufferingMode == true iff the buffering mode for reasoner is {@link
-	// BufferingMode.BUFFERING}
+	/**
+	 * isBufferingMode == true iff the buffering mode for reasoner is
+	 * {@link BufferingMode.BUFFERING}
+	 */
 	protected final boolean isBufferingMode;
-	// listener to implement addition and removal of axioms
+	/** listener to implement addition and removal of axioms */
 	protected final OntologyChangeListener ontologyChangeListener;
-	// list to accumulate the unprocessed changes to the ontology
+	/** list to accumulate the unprocessed changes to the ontology */
 	protected final List<OWLOntologyChange> pendingChanges;
-	// ELK object factory used to create any ElkObjects
+	/** ELK object factory used to create any ElkObjects */
 	protected final ElkObjectFactory objectFactory;
-	// Converter from OWL API to ELK OWL
+	/** Converter from OWL API to ELK OWL */
 	protected final OwlConverter owlConverter;
-	// Converter from ELK OWL to OWL API
+	/** Converter from ELK OWL to OWL API */
 	protected final ElkConverter elkConverter;
 
 	protected boolean isSynced = false;
+
+	/**
+	 * The stage executor used for execution the stages of the reasoner
+	 */
+	protected final ReasonerStageExecutor stageExecutor;
+
 	// logger the messages
 	protected final static Logger LOGGER_ = Logger.getLogger(ElkReasoner.class);
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
-			ElkReasonerConfiguration elkConfig) {
+			ElkReasonerConfiguration elkConfig,
+			ReasonerStageExecutor stageExecutor) {
 		this.owlOntology = ontology;
 		this.manager = ontology.getOWLOntologyManager();
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
-		this.reasoner = new ReasonerFactory().createReasoner(elkConfig
-				.getElkConfiguration());
+		this.reasoner = new ReasonerFactory().createReasoner(stageExecutor,
+				elkConfig.getElkConfiguration());
 		this.reasoner
 				.setAllowFreshEntities(elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW);
 		this.elkProgressMonitor = elkConfig.getProgressMonitor() == null ? new DummyProgressMonitor()
@@ -142,19 +153,33 @@ public class ElkReasoner implements OWLReasoner {
 		this.objectFactory = new ElkObjectFactoryImpl();
 		this.owlConverter = OwlConverter.getInstance();
 		this.elkConverter = ElkConverter.getInstance();
+		this.stageExecutor = stageExecutor;
 
 		flush();
 	}
-	
+
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
+			ElkReasonerConfiguration elkConfig) {
+		this(ontology, isBufferingMode, elkConfig, new LoggingStageExecutor());
+	}
+
+	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
+			ReasonerStageExecutor stageExecutor,
 			ReasonerProgressMonitor progressMonitor) {
 		this(ontology, isBufferingMode, new ElkReasonerConfiguration(
-				progressMonitor));
+				progressMonitor), stageExecutor);
 
 	}
 
+	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
+			ReasonerStageExecutor stageExecutor) {
+		this(ontology, isBufferingMode, new ElkReasonerConfiguration(),
+				stageExecutor);
+	}
+
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode) {
-		this(ontology, isBufferingMode, new ElkReasonerConfiguration());
+		this(ontology, isBufferingMode, new ElkReasonerConfiguration(),
+				new LoggingStageExecutor());
 	}
 
 	protected Reasoner getInternalReasoner() {
@@ -693,7 +718,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public void interrupt() {
-		// TODO Auto-generated method stub
+		stageExecutor.interrupt();
 	}
 
 	@Override

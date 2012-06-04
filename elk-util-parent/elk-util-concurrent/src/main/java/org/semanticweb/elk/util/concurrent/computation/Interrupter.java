@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,27 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * An interface for a job processor based on the visitor pattern.
+ * An abstract interface for interrupting computations and monitoring if
+ * computations have been interrupted.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I>
- *            the type of the input of the job
- * @param <O>
- *            the type of the output of the processor
  */
-public interface JobProcessor<I, O> {
+public interface Interrupter {
 
-	public O process(JobBatch<I> job) throws InterruptedException;
+	/**
+	 * Requests the computation to be interrupted
+	 */
+	public void interrupt();
 
-	public O process(JobPoison<I> job);
+	/**
+	 * Checks if the computation was requested to be interrupted
+	 */
+	public boolean isInterrupted();
+
+	/**
+	 * Clears the interrupt status: computation is no longer interrupted
+	 */
+	public void clearInterrupt();
 
 }

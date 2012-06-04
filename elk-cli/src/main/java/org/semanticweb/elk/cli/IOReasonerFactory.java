@@ -29,26 +29,31 @@ import java.util.concurrent.Executors;
 
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
  * Instantiates {@link IOReasoner}
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
  */
 public class IOReasonerFactory extends ReasonerFactory {
 
 	@Override
-	public IOReasoner createReasoner() {
-		return createReasoner(ReasonerConfiguration.getConfiguration());
+	public IOReasoner createReasoner(ReasonerStageExecutor stageExecutor) {
+		return createReasoner(stageExecutor,
+				ReasonerConfiguration.getConfiguration());
 	}
 
 	@Override
-	public IOReasoner createReasoner(ReasonerConfiguration config) {
-		return new IOReasoner(Executors.newCachedThreadPool(), config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
+	public IOReasoner createReasoner(ReasonerStageExecutor stageExecutor,
+			ReasonerConfiguration config) {
+		return new IOReasoner(
+				stageExecutor,
+				Executors.newCachedThreadPool(),
+				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
 	}
-	
-	
 
 }

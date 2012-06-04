@@ -60,7 +60,7 @@ public class ClassTaxonomyLoader {
 
 	public static Taxonomy<ElkClass> load(Owl2Parser parser) throws IOException,
 			Owl2ParseException {
-		final ConcurrentClassTaxonomy taxonomy = new ConcurrentClassTaxonomy();
+		final ConcurrentTaxonomy taxonomy = new ConcurrentTaxonomy();
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);
 
 		parser.parseOntology(listener);
@@ -98,10 +98,10 @@ public class ClassTaxonomyLoader {
 			implements ElkAxiomProcessor {
 
 		boolean createNodes = false;
-		final ConcurrentClassTaxonomy taxonomy;
+		final ConcurrentTaxonomy taxonomy;
 		final List<ElkSubClassOfAxiom> nonProcessedAxioms = new ArrayList<ElkSubClassOfAxiom>();
 
-		TaxonomyInserter(final ConcurrentClassTaxonomy taxonomy) {
+		TaxonomyInserter(final ConcurrentTaxonomy taxonomy) {
 			this.taxonomy = taxonomy;
 		}
 

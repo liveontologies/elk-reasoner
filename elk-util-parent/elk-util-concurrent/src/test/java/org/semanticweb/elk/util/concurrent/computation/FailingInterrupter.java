@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,29 @@
  */
 package org.semanticweb.elk.util.concurrent.computation;
 
+import static org.junit.Assert.fail;
+
 /**
- * A general interface for jobs processed by workers.
+ * An interrupter to be used in unit tests, which always fails for interruption
+ * attempts
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I>
- *            the type of the input to be processed
  */
-public interface Job<I> {
+public class FailingInterrupter implements Interrupter {
 
-	/**
-	 * processing of the job using a job processor
-	 * 
-	 * @param processor
-	 *            the job processor with the input type {@link I} and output
-	 *            type {@link O}
-	 * @return
-	 * @throws InterruptedException 
-	 */
-	public <O> O accept(JobProcessor<I, O> processor) throws InterruptedException;
+	@Override
+	public void interrupt() {
+		fail();
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return false;
+	}
+
+	@Override
+	public void clearInterrupt() {
+	}
 
 }

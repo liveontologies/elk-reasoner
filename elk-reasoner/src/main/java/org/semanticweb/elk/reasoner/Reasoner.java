@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,54 +26,45 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
-import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertySaturation;
-import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
+import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
+import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
 
 /**
- * The Reasoner manages an ontology (using an OntologyIndex) and provides
- * methods for solving reasoning tasks over that ontology. Ontologies are loaded
- * and updated by adding or removing {@link ElkAxiom}s (methods addAxiom() and
- * removeAxiom()). The Reasoner will ensure that all methods that solve
- * reasoning tasks return an answer that is correct for the current ontology,
- * that is, the reasoner updates its answers when changes occur.
+ * The class for querying the results of the reasoning tasks for a given
+ * ontology. The input ontology is represented internally by the
+ * {@link OntologyIndex} object, which is updated by adding or removing
+ * {@link ElkAxiom}s (methods addAxiom() and removeAxiom()). When querying the
+ * results of the reasoning tasks, the reasoner will ensure that all necessary
+ * reasoning stages, such as consistency checking, are performed.
  * 
  * Reasoners are created (and pre-configured) by the {@link ReasonerFactory}.
  */
-public class Reasoner {
+public class Reasoner extends AbstractReasonerState {
 	/**
 	 * The progress monitor that is used for reporting progress.
 	 */
 	protected ProgressMonitor progressMonitor;
 	/**
-	 * Logger for events.
+	 * The executor for various stages of the reasoner
 	 */
-	protected final static Logger LOGGER_ = Logger.getLogger(Reasoner.class);
-	/**
-	 * Executor used to run the jobs.
-	 */
-	protected final ExecutorService executor;
+	protected final ReasonerStageExecutor stageExecutor;
 	/**
 	 * Number of workers for concurrent jobs.
 	 */
 	protected final int workerNo;
+
 	/**
 	 * Should fresh entities in reasoner queries be accepted (configuration
 	 * setting). If false, a FreshEntityException will be thrown when
@@ -82,40 +73,12 @@ public class Reasoner {
 	protected boolean allowFreshEntities;
 
 	/**
-	 * OntologyIndex for the ontology on which this reasoner operates.
-	 */
-	protected OntologyIndex ontologyIndex;
-
-	/**
-	 * Consistency flag for the current ontology;
-	 */
-	protected boolean consistentOntology;
-	/**
-	 * Taxonomy that stores (partial) reasoning results.
-	 */
-	protected IndividualClassTaxonomy taxonomy;
-	/**
-	 * Indicates if the reasoner has been initialized after ontology change.
-	 */
-	protected boolean doneInitialization = false;
-	/**
-	 * Indicates if classes have been classified after ontology change.
-	 */
-	protected boolean doneClassTaxonomy = false;
-	/**
-	 * Indicates if individuals have been classified after ontology change.
-	 */
-	protected boolean doneIndividualTaxonomy = false;
-
-	/**
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
-	 * 
-	 * @param executor
-	 * @param workerNo
-	 */
-	protected Reasoner(ExecutorService executor, int workerNo) {
-		this.executor = executor;
+	 * */
+	protected Reasoner(ReasonerStageExecutor stageExecutor,
+			ExecutorService executor, int workerNo) {
+		this.stageExecutor = stageExecutor;
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
@@ -133,19 +96,11 @@ public class Reasoner {
 	}
 
 	/**
-	 * Get the progress monitor that is used for reporting progress on all
-	 * potentially long-running operations.
-	 */
-	public ProgressMonitor getProgressMonitor() {
-		return progressMonitor;
-	}
-
-	/**
 	 * Set if fresh entities should be allowed. Fresh entities are entities that
 	 * occur as parameters of reasoner queries without occurring in the loaded
-	 * ontology. If false, a FreshENtityException will be thrown in such cases.
-	 * If true, the reasoner will answer as if the entity had been declared (but
-	 * not used in any axiom).
+	 * ontology. If false, a {@link FreshEntitiesException} will be thrown in
+	 * such cases. If true, the reasoner will answer as if the entity had been
+	 * declared (but not used in any axiom).
 	 * 
 	 * @param allow
 	 */
@@ -163,156 +118,23 @@ public class Reasoner {
 		return allowFreshEntities;
 	}
 
-	/**
-	 * Reset the ontology all data. After this, the Reasoner holds an empty
-	 * ontology.
-	 */
-	public void reset() {
-		ontologyIndex = new OntologyIndexImpl();
-		// no need to reset contexts since a fresh index starts with empty
-		// contexts
-		invalidate();
+	@Override
+	protected int getNumberOfWorkers() {
+		return workerNo;
 	}
 
-	/**
-	 * Invalidate all previously computed reasoning results. This does not mean
-	 * that the deductions that have been made are deleted. Rather, this method
-	 * would be called if the deductions (and the index in general) have
-	 * changed, and the Reasoner should not rely on its records of earlier
-	 * deductions any longer.
-	 */
-	protected void invalidate() {
-		if (doneInitialization) {
-			doneInitialization = false;
-			doneClassTaxonomy = false;
-			doneIndividualTaxonomy = false;
-		}
+	@Override
+	protected ReasonerStageExecutor getStageExecutor() {
+		return stageExecutor;
 	}
 
-	/**
-	 * Get the OntologyIndex. When changing this index (adding ro deleting
-	 * axioms), the Reasoner will not be notified, and may thus fail to return
-	 * up-to-date answers for reasoning tasks.
-	 * 
-	 * FIXME Should this really be public? If yes, then the index should notify
-	 * the reasoner of changes.
-	 * 
-	 * @return the internal ontology index
-	 */
-	public OntologyIndex getOntologyIndex() {
-		return ontologyIndex;
+	@Override
+	protected ProgressMonitor getProgressMonitor() {
+		return progressMonitor;
 	}
 
-	/**
-	 * Add an axom to the ontology. This method makes sure that internal
-	 * reasoning results are updated as required, so that all reasoning methods
-	 * return correct answers in the future. Previously returned results (e.g.,
-	 * taxonomies) will not be updated.
-	 * 
-	 * TODO Clarify what happens if an axiom is added twice.
-	 * 
-	 * @param axiom
-	 */
-	public void addAxiom(ElkAxiom axiom) {
-		ontologyIndex.getAxiomInserter().process(axiom);
-		invalidate();
-	}
-
-	/**
-	 * Remove an axom from the ontology. This method makes sure that internal
-	 * reasoning results are updated as required, so that all reasoning methods
-	 * return correct answers in the future. Previously returned results (e.g.,
-	 * taxonomies) will not be updated.
-	 * 
-	 * TODO Clarify what happens when deleting axioms that were not added.
-	 * 
-	 * @param axiom
-	 */
-	public void removeAxiom(ElkAxiom axiom) {
-		ontologyIndex.getAxiomDeleter().process(axiom);
-		invalidate();
-	}
-
-	/**
-	 * Initialises reasoning by saturating object properties and checking
-	 * consistency, if not yet done.
-	 */
-	protected void initializeReasoning() {
-		if (doneInitialization)
-			return;
-
-		// saturate object properties
-		(new ObjectPropertySaturation(executor, workerNo, ontologyIndex))
-				.compute();
-
-		// reset context
-		for (IndexedClassExpression ice : ontologyIndex
-				.getIndexedClassExpressions())
-			ice.resetContext();
-
-		// check consistency
-		consistentOntology = (new ConsistencyChecking(executor, workerNo,
-				progressMonitor, ontologyIndex)).checkConsistent();
-
-		doneInitialization = true;
-	}
-
-	/**
-	 * Check if the ontology is consistent, that is, satisfiable.
-	 */
-	public boolean isConsistent() {
-		initializeReasoning();
-		return consistentOntology;
-	}
-
-	/**
-	 * Return the inferred taxonomy of the named classes. If this has not been
-	 * computed yet, then it will be computed at this point.
-	 * 
-	 * @return class taxonomy
-	 */
-	public Taxonomy<ElkClass> getTaxonomy()
-			throws InconsistentOntologyException {
-		if (!isConsistent())
-			throw new InconsistentOntologyException();
-
-		if (!doneClassTaxonomy) {
-			taxonomy = (new TaxonomyComputation(executor, workerNo,
-					progressMonitor, ontologyIndex)).computeTaxonomy(true,
-					false);
-			doneClassTaxonomy = true;
-		}
-
-		return taxonomy;
-	}
-
-	/**
-	 * Return the inferred taxonomy of the named classes and named individuals.
-	 * If this has not been computed yet, then it will be computed at this
-	 * point.
-	 * 
-	 * @return instance taxonomy
-	 */
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
-			throws InconsistentOntologyException {
-		if (!isConsistent())
-			throw new InconsistentOntologyException();
-
-		if (doneIndividualTaxonomy)
-			return taxonomy;
-
-		// reuse class taxonomy if already computed
-		if (doneClassTaxonomy)
-			taxonomy = (new TaxonomyComputation(executor, workerNo,
-					progressMonitor, ontologyIndex, taxonomy).computeTaxonomy(
-					false, true));
-		else
-			taxonomy = (new TaxonomyComputation(executor, workerNo,
-					progressMonitor, ontologyIndex).computeTaxonomy(true, true));
-		doneClassTaxonomy = true;
-		doneIndividualTaxonomy = true;
-
-		return taxonomy;
+	public void shutdown() {
+		// TODO: execute shutdown hooks
 	}
 
 	/**
@@ -321,7 +143,9 @@ public class Reasoner {
 	 * @param elkClass
 	 * @return
 	 * @throws FreshEntitiesException
+	 *             if the given {@link ElkClass} does not occur in the ontology
 	 * @throws InconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 */
 	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
 			throws FreshEntitiesException, InconsistentOntologyException {
@@ -342,7 +166,10 @@ public class Reasoner {
 	 * @param elkNamedIndividual
 	 * @return
 	 * @throws FreshEntitiesException
+	 *             if the given {@link ElkNamedIndividual} does not occur in the
+	 *             ontology
 	 * @throws InconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 */
 	protected InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
 			ElkNamedIndividual elkNamedIndividual)
@@ -365,7 +192,9 @@ public class Reasoner {
 	 * @param elkClass
 	 * @return
 	 * @throws FreshEntitiesException
+	 *             if the given {@link ElkClass} does not occur in the ontology
 	 * @throws InconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 */
 	protected TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(
 			ElkClass elkClass) throws FreshEntitiesException,
@@ -391,7 +220,9 @@ public class Reasoner {
 	 * @param elkClass
 	 * @return
 	 * @throws FreshEntitiesException
-	 *             thrown if the given class is not known in the ontology yet
+	 *             if the given {@link ElkClass} does not occur in the ontology
+	 * @throws InconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 */
 	public Node<ElkClass> getClassNode(ElkClass elkClass)
 			throws FreshEntitiesException, InconsistentOntologyException {
@@ -408,9 +239,12 @@ public class Reasoner {
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
-	 *            if true, only direct subclasses are returned
+	 *            if <tt>true</tt>, only direct subclasses are returned
 	 * @throws FreshEntitiesException
+	 *             if the given {@link ElkClassExpression} contains entities
+	 *             that do not occur in the ontology
 	 * @throws InconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 */
 	public Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
@@ -434,9 +268,12 @@ public class Reasoner {
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
-	 *            if true, only direct superclasses are returned
+	 *            if <tt>true</tt>, only direct superclasses are returned
 	 * @throws FreshEntitiesException
+	 *             if the given {@link ElkClassExpression} contains entities
+	 *             that do not occur in the ontology
 	 * @throws InconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 */
 	public Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
@@ -462,9 +299,12 @@ public class Reasoner {
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
-	 *            if true, only direct subclasses are returned
+	 *            if <tt>true</tt>, only direct subclasses are returned
 	 * @throws FreshEntitiesException
+	 *             if the given {@link ElkClassExpression} contains entities
+	 *             that do not occur in the ontology
 	 * @throws InconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 */
 	public Set<? extends Node<ElkNamedIndividual>> getInstances(
 			ElkClassExpression classExpression, boolean direct)
@@ -522,21 +362,13 @@ public class Reasoner {
 		}
 	}
 
-	public void shutdown() {
-		executor.shutdownNow();
-	}
-
-	// used for testing
-	int getNumberOfWorkers() {
-		return workerNo;
-	}
-
 	/**
 	 * Auxiliary class for representing taxonomy nodes for fresh entities.
 	 * 
 	 * @author Markus Kroetzsch
 	 * 
 	 * @param <T>
+	 *            the type of members of the node
 	 */
 	protected abstract class FreshTaxonomyNode<T extends ElkObject> implements
 			Node<T> {
@@ -549,7 +381,7 @@ public class Reasoner {
 				throws InconsistentOntologyException {
 			// Get bottom and top node *now*; cannot do this later as ontology
 			// might change
-			this.taxonomy = Reasoner.this.getInstanceTaxonomy();
+			this.taxonomy = getInstanceTaxonomy();
 			this.bottomNode = taxonomy
 					.getTypeNode(PredefinedElkClass.OWL_NOTHING);
 			this.topNode = taxonomy.getTypeNode(PredefinedElkClass.OWL_THING);
@@ -641,6 +473,12 @@ public class Reasoner {
 		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getAllTypeNodes() {
 			return getDirectTypeNodes();
 		}
+	}
+
+	// used only in tests
+	@Override
+	protected OntologyIndex getOntologyIndex() {
+		return super.getOntologyIndex();
 	}
 
 }

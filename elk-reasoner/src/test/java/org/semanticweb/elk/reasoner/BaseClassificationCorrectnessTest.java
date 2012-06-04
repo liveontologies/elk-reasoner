@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
@@ -45,57 +46,59 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * Runs classification tests for all test input in the test directory
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 @RunWith(PolySuite.class)
 public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
-	
+
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
-	
+
 	private final ReasoningTestManifest<EO, ClassTaxonomyTestOutput> manifest;
 	private InputStream inputStream;
 	private Reasoner reasoner;
-	
-	public BaseClassificationCorrectnessTest(ReasoningTestManifest<EO, ClassTaxonomyTestOutput> testManifest) {
+
+	public BaseClassificationCorrectnessTest(
+			ReasoningTestManifest<EO, ClassTaxonomyTestOutput> testManifest) {
 		manifest = testManifest;
 	}
-	
+
 	@Before
 	public void before() throws IOException, Owl2ParseException {
 		assumeTrue(!ignore(manifest.getInput()));
-		
-		inputStream = ((URLTestIO)manifest.getInput()).getInputStream();
+
+		inputStream = ((URLTestIO) manifest.getInput()).getInputStream();
 		reasoner = createReasoner(inputStream);
 	}
-	
+
 	@After
 	public void after() {
 		IOUtils.closeQuietly(inputStream);
 	}
-	
+
 	protected boolean ignore(TestInput input) {
 		return false;
 	}
-	
-	protected abstract Reasoner createReasoner(final InputStream input) throws IOException, Owl2ParseException;
-	
+
+	protected abstract Reasoner createReasoner(final InputStream input)
+			throws IOException, Owl2ParseException;
+
 	/*
-	 * ---------------------------------------------
-	 * Tests
+	 * --------------------------------------------- Tests
 	 * ---------------------------------------------
 	 */
-	
+
 	/**
 	 * Checks that the computed taxonomy is correct and complete
 	 * 
-	 * @throws TestResultComparisonException  in case the comparison fails
+	 * @throws TestResultComparisonException
+	 *             in case the comparison fails
 	 */
 	@Test
 	public void classify() throws TestResultComparisonException {
 		System.err.println(manifest.toString());
-		
+
 		Taxonomy<ElkClass> taxonomy;
 		try {
 			taxonomy = reasoner.getTaxonomy();
@@ -103,13 +106,79 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 		} catch (InconsistentOntologyException e) {
 			manifest.compare(new ClassTaxonomyTestOutput());
 		}
-		
-		/*try {
-			Writer writer = new OutputStreamWriter(System.out);
-			ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, true);
-			writer.flush();
-		} catch (IOException e) {}*/
-		
+
+		/*
+		 * try { Writer writer = new OutputStreamWriter(System.out);
+		 * ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, true);
+		 * writer.flush(); } catch (IOException e) {}
+		 */
 
 	}
+
+	/**
+	 * Compute the taxonomy using interruptions and checks that the computed
+	 * taxonomy is correct and complete
+	 * 
+	 * @throws TestResultComparisonException
+	 *             in case the comparison fails
+	 */
+	@Test
+	public void classifyWithInterruptions()
+			throws TestResultComparisonException {
+		System.err.println(manifest.toString());
+
+		ReasoningProcess reasoningProcess = new ReasoningProcess();
+		Thread reasonerThread = new Thread(reasoningProcess);
+		reasonerThread.start();
+
+		while (reasonerThread.isAlive()) {
+			// interrupt every millisecond
+			reasonerThread.interrupt();
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				fail();
+			}
+		}
+
+		if (reasoningProcess.consistent) {
+			manifest.compare(new ClassTaxonomyTestOutput(reasoningProcess
+					.getTaxonomy()));
+		} else {
+			manifest.compare(new ClassTaxonomyTestOutput());
+		}
+
+	}
+
+	/**
+	 * A simple class for running a reasoner in a separate thread and query the
+	 * result
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	class ReasoningProcess implements Runnable {
+
+		Taxonomy<ElkClass> taxonomy = null;
+		boolean consistent = true;
+
+		@Override
+		public void run() {
+			try {
+				taxonomy = reasoner.getTaxonomy();
+			} catch (InconsistentOntologyException e) {
+				consistent = false;
+			}
+		}
+
+		public Taxonomy<ElkClass> getTaxonomy() {
+			return this.taxonomy;
+		}
+
+		public boolean isConsistent() {
+			return consistent;
+		}
+
+	};
+
 }

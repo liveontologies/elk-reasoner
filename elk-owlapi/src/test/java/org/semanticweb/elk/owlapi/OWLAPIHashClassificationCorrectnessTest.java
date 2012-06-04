@@ -41,31 +41,34 @@ import org.semanticweb.elk.testing.TestInput;
  * Loads test ontologies via the OWL API and runs the hashcode-based test
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
-public class OWLAPIHashClassificationCorrectnessTest extends HashClassificationCorrectnessTest {
-	
-	static final String[] IGNORE_LIST = {"DisjointSelf.owl"};
-	
+public class OWLAPIHashClassificationCorrectnessTest extends
+		HashClassificationCorrectnessTest {
+
+	static final String[] IGNORE_LIST = { "DisjointSelf.owl" };
+
 	static {
 		Arrays.sort(IGNORE_LIST);
 	}
 
-	public OWLAPIHashClassificationCorrectnessTest(final ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> testManifest) {
+	public OWLAPIHashClassificationCorrectnessTest(
+			final ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
 
 	@Override
-	protected Reasoner createReasoner(InputStream input) throws IOException, Owl2ParseException {
-		return OWLAPITestUtils.loadOntologyIntoReasoner(input).getInternalReasoner();
+	protected Reasoner createReasoner(InputStream input) throws IOException,
+			Owl2ParseException {
+		return OWLAPITestUtils.loadOntologyIntoReasoner(input)
+				.getInternalReasoner();
 	}
 
 	@Override
 	protected boolean ignore(TestInput input) {
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
-	
-	
+
 }
