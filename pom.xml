@@ -138,7 +138,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<owlapi.version>3.2.4</owlapi.version>
+		<owlapi.version>3.3</owlapi.version>
 		<protege.version>4.1.0</protege.version>
 	</properties>
 
@@ -150,6 +150,13 @@
 		<repository>
 			<id>elk-reasoner-releases</id>
 			<url>http://elk-reasoner.googlecode.com/svn/m2/releases</url>
+		</repository>
+		<!-- adding a repository for official owlapi; remove once it is synced 
+			with Maven central -->
+		<repository>
+			<id>Sonatype repository</id>
+			<name>Sonatype's Maven repository</name>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
 		</repository>
 	</repositories>
 
