@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.iris.ElkIri;
+
 
 /**
  * Corresponds to a pair of constraining facet and restriction value as used in
@@ -37,7 +39,7 @@ public interface ElkFacetRestriction extends ElkObject {
 	 * 
 	 * @return IRI of the facet
 	 */
-	public String getConstrainingFacet();
+	public ElkIri getConstrainingFacet();
 
 	/**
 	 * Get the literal used as a restriction value.

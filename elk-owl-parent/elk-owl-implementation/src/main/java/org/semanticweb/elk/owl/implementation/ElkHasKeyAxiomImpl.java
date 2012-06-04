@@ -38,22 +38,24 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * Implementation of {@link ElkHasKeyAxiom}
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 public class ElkHasKeyAxiomImpl implements ElkHasKeyAxiom {
 
 	private final ElkClassExpression classExpr;
 	private final Set<ElkObjectPropertyExpression> objectPropExprs;
 	private final Set<ElkDataPropertyExpression> dataPropExprs;
-	
-	ElkHasKeyAxiomImpl(ElkClassExpression clazz, Set<ElkObjectPropertyExpression> objectPEs, Set<ElkDataPropertyExpression> dataPEs) {
+
+	ElkHasKeyAxiomImpl(ElkClassExpression clazz,
+			Set<ElkObjectPropertyExpression> objectPEs,
+			Set<ElkDataPropertyExpression> dataPEs) {
 		classExpr = clazz;
 		objectPropExprs = objectPEs;
 		dataPropExprs = dataPEs;
 	}
-	
+
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);

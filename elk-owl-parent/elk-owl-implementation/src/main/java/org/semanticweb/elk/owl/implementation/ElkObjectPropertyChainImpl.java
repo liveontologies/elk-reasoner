@@ -32,15 +32,9 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 public class ElkObjectPropertyChainImpl extends
 		ElkObjectPropertyExpressionListObject implements ElkObjectPropertyChain {
 
-
-	/* package-private */ElkObjectPropertyChainImpl(
+	ElkObjectPropertyChainImpl(
 			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
 		super(objectPropertyExpressions);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("ObjectPropertyChain");
 	}
 
 	@Override

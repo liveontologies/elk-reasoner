@@ -36,7 +36,7 @@ public class ElkDatatypeRestrictionImpl extends ElkObjectImpl implements
 	protected final ElkDatatype datatype;
 	protected final List<ElkFacetRestriction> facetRestrictions;
 
-	/* package-private */ElkDatatypeRestrictionImpl(ElkDatatype datatype,
+	ElkDatatypeRestrictionImpl(ElkDatatype datatype,
 			List<ElkFacetRestriction> facetRestrictions) {
 		this.datatype = datatype;
 		this.facetRestrictions = facetRestrictions;

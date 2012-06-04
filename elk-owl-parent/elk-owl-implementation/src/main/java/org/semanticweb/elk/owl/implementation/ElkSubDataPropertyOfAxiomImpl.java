@@ -42,7 +42,7 @@ public class ElkSubDataPropertyOfAxiomImpl extends ElkObjectImpl implements
 	protected final ElkDataPropertyExpression subDataPropertyExpression;
 	protected final ElkDataPropertyExpression superDataPropertyExpression;
 
-	/* package-private */ElkSubDataPropertyOfAxiomImpl(
+	ElkSubDataPropertyOfAxiomImpl(
 			ElkDataPropertyExpression subDataPropertyExpression,
 			ElkDataPropertyExpression superDataPropertyExpression) {
 		this.subDataPropertyExpression = subDataPropertyExpression;
@@ -57,16 +57,6 @@ public class ElkSubDataPropertyOfAxiomImpl extends ElkObjectImpl implements
 	@Override
 	public ElkDataPropertyExpression getSuperDataPropertyExpression() {
 		return superDataPropertyExpression;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("SubDataPropertyOf(");
-		result.append(subDataPropertyExpression.toString());
-		result.append(" ");
-		result.append(superDataPropertyExpression.toString());
-		result.append(")");
-		return result.toString();
 	}
 
 	@Override

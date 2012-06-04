@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 public abstract class ElkClassExpressionListObject extends
 		ElkObjectListObject<ElkClassExpression> {
 
-	/* package-private */ElkClassExpressionListObject(
+	ElkClassExpressionListObject(
 			List<? extends ElkClassExpression> classExpressions) {
 		super(classExpressions);
 	}

@@ -39,7 +39,7 @@ public class ElkDataHasValueImpl
 		ElkPropertyRestrictionQualifiedImpl<ElkDataPropertyExpression, ElkLiteral>
 		implements ElkDataHasValue {
 
-	/* package-private */ElkDataHasValueImpl(
+	ElkDataHasValueImpl(
 			ElkDataPropertyExpression dataPropertyExpression, ElkLiteral literal) {
 		super(dataPropertyExpression, literal);
 	}

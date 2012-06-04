@@ -22,16 +22,16 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
+import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 
 /**
- * Visitor interface for {@link ElkAnnotation}. 
+ * Visitor interface for {@link ElkFacetRestriction}
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
-public interface ElkAnnotationVisitor<O> {
+public interface ElkFacetRestrictionVisitor<O> {
 
-	O visit(ElkAnnotation elkAnnotation);
+	O visit(ElkFacetRestriction elkFacetRestriction);
 
 }

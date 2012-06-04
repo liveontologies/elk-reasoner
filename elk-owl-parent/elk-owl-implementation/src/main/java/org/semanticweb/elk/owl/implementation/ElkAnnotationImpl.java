@@ -48,8 +48,7 @@ public class ElkAnnotationImpl implements ElkAnnotation {
 	
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		// TODO extend the visitor
-		return null;
+		return visitor.visit(this);
 	}
 
 	@Override

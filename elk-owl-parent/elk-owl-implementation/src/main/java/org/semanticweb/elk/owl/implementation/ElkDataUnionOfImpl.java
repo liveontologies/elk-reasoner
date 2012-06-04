@@ -35,16 +35,11 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * @author Markus Kroetzsch
  * 
  */
-public class ElkDataUnionOfImpl extends ElkDataRangeListObject
-		implements ElkDataUnionOf {
+public class ElkDataUnionOfImpl extends ElkDataRangeListObject implements
+		ElkDataUnionOf {
 
 	ElkDataUnionOfImpl(List<? extends ElkDataRange> dataRanges) {
 		super(dataRanges);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("DataUnionOf");
 	}
 
 	@Override

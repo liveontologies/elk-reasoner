@@ -87,7 +87,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	@Override
 	public void execute() {
 		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Consistency checking  using " + workerNo + " workers");
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		progressMonitor.start(getName());
 		computation.process();
 		progressMonitor.finish();

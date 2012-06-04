@@ -37,7 +37,7 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 	protected final String lexicalForm;
 	protected final ElkDatatype datatype;
 
-	/* package-private */ElkLiteralImpl(String lexicalForm, ElkDatatype datatype) {
+	ElkLiteralImpl(String lexicalForm, ElkDatatype datatype) {
 		this.lexicalForm = lexicalForm;
 		this.datatype = datatype;
 	}
