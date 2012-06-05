@@ -26,27 +26,27 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
- * Resets all saturated object properties and computes the transitive closure of
- * object property inclusions.
+ * Sets up multimaps for fast look-up of object property compositions to be used
+ * in {@link RuleRoleComposition}.
  * 
  * @author Frantisek Simancik
- * @author "Yevgeny Kazakov"
+ * 
  */
-
-public class ObjectPropertyHierarchyComputation
+public class ObjectPropertyCompositionsPrecomputation
 		extends
-		ReasonerComputation<IndexedPropertyChain, ObjectPropertyHierarchyComputationEngine> {
+		ReasonerComputation<IndexedPropertyChain, ObjectPropertyCompositionsPrecomputationEngine> {
 
 	/**
-	 * the index of the ontology used for computation
+	 * the ontology index used for computation
 	 */
 	protected final OntologyIndex ontologyIndex;
 
-	public ObjectPropertyHierarchyComputation(
-			ObjectPropertyHierarchyComputationEngine inputProcessor,
+	public ObjectPropertyCompositionsPrecomputation(
+			ObjectPropertyCompositionsPrecomputationEngine inputProcessor,
 			Interrupter interrupter, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
@@ -55,10 +55,11 @@ public class ObjectPropertyHierarchyComputation
 		this.ontologyIndex = ontologyIndex;
 	}
 
-	public ObjectPropertyHierarchyComputation(Interrupter interrupter,
+	public ObjectPropertyCompositionsPrecomputation(Interrupter interrupter,
 			int maxWorkers, ProgressMonitor progressMonitor,
 			OntologyIndex ontologyIndex) {
-		this(new ObjectPropertyHierarchyComputationEngine(), interrupter,
+		this(new ObjectPropertyCompositionsPrecomputationEngine(), interrupter,
 				maxWorkers, progressMonitor, ontologyIndex);
 	}
+
 }

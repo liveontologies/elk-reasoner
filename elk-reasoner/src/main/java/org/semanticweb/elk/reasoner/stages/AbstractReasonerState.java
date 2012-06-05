@@ -54,14 +54,9 @@ public abstract class AbstractReasonerState {
 	 */
 	boolean doneObjectPropertyHierarchyComputation = false;
 	/**
-	 * <tt>true</tt> if the object property composition has been initialized
+	 * <tt>true</tt> if the object property compositions have been precomputed
 	 */
-	boolean doneObjectPropertyCompositionsInitialization = false;
-	/**
-	 * <tt>true</tt> if the object redundant object property compositions have
-	 * been eliminated
-	 */
-	boolean doneRedundantCompositionsElimination = false;
+	boolean doneObjectPropertyCompositionsPrecomputation = false;
 	/**
 	 * <tt>true</tt> if the assignment of contexts to class expressions has been
 	 * reset
@@ -114,8 +109,7 @@ public abstract class AbstractReasonerState {
 	protected void resetStages() {
 		if (!doneReset) {			
 			doneObjectPropertyHierarchyComputation = false;
-			doneObjectPropertyCompositionsInitialization = false;			
-			doneRedundantCompositionsElimination = false;		
+			doneObjectPropertyCompositionsPrecomputation = false;
 			doneContextReset = false;
 			doneConsistencyCheck = false;
 			doneClassTaxonomy = false;

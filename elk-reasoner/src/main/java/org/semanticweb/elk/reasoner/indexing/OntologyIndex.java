@@ -56,6 +56,8 @@ public interface OntologyIndex {
 	 * Should always contain owl:Thing and owl:Nothing 
 	 */
 	Iterable<IndexedClassExpression> getIndexedClassExpressions();
+	int getIndexedClassExpressionCount();
+	
 	Iterable<IndexedClass> getIndexedClasses();
 	int getIndexedClassCount();
 	
@@ -64,6 +66,8 @@ public interface OntologyIndex {
 	
 
 	Iterable<IndexedPropertyChain> getIndexedPropertyChains();
+	int getIndexedPropertyChainCount();
+	
 	Iterable<IndexedObjectProperty> getIndexedObjectProperties();
 	int getIndexedObjectPropertyCount();
 	

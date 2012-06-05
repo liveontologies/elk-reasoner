@@ -72,24 +72,21 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 		return rightProperty;
 	}
 
-	/**
-	 * Counts the number of times this chain occurs within some longer (at least
-	 * ternary) chain.
-	 */
-	protected int auxiliaryOccurrenceNo = 0;
-
 	@Override
 	protected void updateOccurrenceNumber(int increment) {
-		super.updateOccurrenceNumber(increment);
-		if (rightProperty instanceof IndexedBinaryPropertyChain)
-			((IndexedBinaryPropertyChain) rightProperty).auxiliaryOccurrenceNo += increment;
-	}
-	
-	/**
-	 * Whether this chain occurs auxiliarily within some longer chain.
-	 */
-	public boolean occursAuxiliarily() {
-		return auxiliaryOccurrenceNo > 0;
+
+		if (occurrenceNo == 0 && increment > 0) {
+			// first occurrence of this expression
+			rightProperty.addRightChain(this);
+		}
+
+		occurrenceNo += increment;
+
+		if (occurrenceNo == 0 && increment < 0) {
+			// no occurrences of this conjunction left
+			rightProperty.removeRightChain(this);
+		}
+
 	}
 
 	@Override
