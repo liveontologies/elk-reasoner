@@ -33,7 +33,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
-class RoleHierarchyComputationEngine implements
+class ObjectPropertyHierarchyComputationEngine implements
 		InputProcessor<IndexedPropertyChain> {
 
 	@Override

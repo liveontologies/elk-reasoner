@@ -23,9 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -56,18 +54,6 @@ public class ObjectPropertyCompositionsInitialization {
 	}
 
 	public Map<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>> getCompositions() {
-		// find auxiliary IndexedBinaryPropertyChains that occur on the right of
-		// some (longer) chain
-		Set<IndexedBinaryPropertyChain> auxiliaryChains = new HashSet<IndexedBinaryPropertyChain>();
-		for (IndexedBinaryPropertyChain chain : Operations.filter(
-				ontologyIndex.getIndexedPropertyChains(),
-				IndexedBinaryPropertyChain.class)) {
-
-			if (chain.getRightProperty() instanceof IndexedBinaryPropertyChain)
-				auxiliaryChains.add((IndexedBinaryPropertyChain) chain
-						.getRightProperty());
-		}
-
 		// set up property compositions
 		Map<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>> compositions = new HashMap<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>>();
 
@@ -106,7 +92,7 @@ public class ObjectPropertyCompositionsInitialization {
 						compositions.put(key, value);
 					}
 
-					if (auxiliaryChains.contains(chain))
+					if (chain.occursAuxiliarily())
 						value.add(chain);
 					else
 						for (IndexedObjectProperty superProperty : chain
