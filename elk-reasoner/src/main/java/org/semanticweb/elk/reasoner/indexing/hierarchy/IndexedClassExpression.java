@@ -73,8 +73,8 @@ abstract public class IndexedClassExpression {
 	protected Set<IndexedClassExpression> disjointClasses;
 
 	/**
-	 * List of all larger (non-binary) disjointness axioms in which this
-	 * object appears.
+	 * List of all larger (non-binary) disjointness axioms in which this object
+	 * appears.
 	 * 
 	 */
 	protected List<IndexedDisjointnessAxiom> disjointnessAxioms;
@@ -190,11 +190,19 @@ abstract public class IndexedClassExpression {
 	protected void addNegConjunctionByConjunct(
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
+
 		if (negConjunctionsByConjunct == null)
 			// TODO possibly replace by ArrayHashMap when it supports removal
 			negConjunctionsByConjunct = new HashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);
-		negConjunctionsByConjunct.put(conjunct, conjunction);
+
+		if (negConjunctionsByConjunct.put(conjunct, conjunction) != null) {
+			// Can be caused e.g. when ElkObjectIndexerVisitor indexed conjuncts
+			// with equals hashCodes.
+			throw new RuntimeException(
+					"Internal error: duplicate indexing in IndexedClassExpression.addNegConjunctionByConjunct.");
+		}
+
 	}
 
 	/**
@@ -255,7 +263,8 @@ abstract public class IndexedClassExpression {
 		return success;
 	}
 
-	protected void addDisjointnessAxiom(IndexedDisjointnessAxiom disjointnessAxiom) {
+	protected void addDisjointnessAxiom(
+			IndexedDisjointnessAxiom disjointnessAxiom) {
 		if (disjointnessAxioms == null)
 			disjointnessAxioms = new LinkedList<IndexedDisjointnessAxiom>();
 		disjointnessAxioms.add(disjointnessAxiom);
@@ -265,17 +274,20 @@ abstract public class IndexedClassExpression {
 	 * @param disjointnessAxiom
 	 * @return true if successfully removed
 	 */
-	protected boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom disjointnessAxiom) {
+	protected boolean removeDisjointnessAxiom(
+			IndexedDisjointnessAxiom disjointnessAxiom) {
 		boolean success = false;
-		
+
 		if (disjointnessAxioms != null) {
-			Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms.iterator();
+			Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms
+					.iterator();
 			while (i.hasNext())
-				if (i.next().getMembers().equals(disjointnessAxiom.getMembers())) {
+				if (i.next().getMembers()
+						.equals(disjointnessAxiom.getMembers())) {
 					i.remove();
 					break;
 				}
-			
+
 			if (disjointnessAxioms.isEmpty())
 				disjointnessAxioms = null;
 		}
