@@ -87,8 +87,8 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		this.computation = new ConsistencyChecking(reasoner.getStageExecutor(),
-				workerNo, reasoner.getProgressMonitor(), reasoner.ontologyIndex);
+		this.computation = new ConsistencyChecking(workerNo,
+				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
 	}
 
 	@Override

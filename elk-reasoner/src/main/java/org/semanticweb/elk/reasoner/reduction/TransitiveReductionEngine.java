@@ -37,7 +37,6 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * The engine for computing equivalent classes and direct super classes of the
@@ -70,11 +69,6 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 * The listener object implementing callback functions for this engine
 	 */
 	protected final TransitiveReductionListener<J, TransitiveReductionEngine<R, J>> listener;
-	/**
-	 * The interrupter used to interrupt and monitor interruption for this
-	 * engine
-	 */
-	protected final Interrupter interrupter;
 	/**
 	 * The saturation engine for transitive reduction that can only process
 	 * instances of {@link SaturationJobForTransitiveReduction}. There are two
@@ -114,22 +108,16 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 *            the ontology index for which the engine is created
 	 * @param listener
 	 *            the listener object implementing callback functions
-	 * @param interrupter
-	 *            the interrupter used to interrupt and monitor interruption for
-	 *            this engine
 	 * @param listener
 	 *            the listener object implementing callback functions for this
 	 *            engine
 	 */
 	public TransitiveReductionEngine(
 			OntologyIndex ontologyIndex,
-			Interrupter interrupter,
 			TransitiveReductionListener<J, TransitiveReductionEngine<R, J>> listener) {
 		this.listener = listener;
-		this.interrupter = interrupter;
 		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>(
-				ontologyIndex, interrupter,
-				new ThisClassExpressionSaturationListener());
+				ontologyIndex, new ThisClassExpressionSaturationListener());
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.jobQueueEmpty = new AtomicBoolean(true);
 	}
@@ -146,11 +134,8 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	@Override
 	public final void process() throws InterruptedException {
 		for (;;) {
-			if (interrupter.isInterrupted()) {
-				// wake up other workers if sleeping
-				listener.notifyCanProcess();
+			if (Thread.currentThread().isInterrupted())
 				return;
-			}
 			saturationEngine.process();
 			SaturationJobForTransitiveReduction<R, ?, J> nextJob = auxJobQueue
 					.poll();

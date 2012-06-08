@@ -50,8 +50,8 @@ public class ObjectPropertyCompositionsPrecomputation
 			Interrupter interrupter, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
-				.getIndexedPropertyChainCount(), inputProcessor, interrupter,
-				maxWorkers, progressMonitor);
+				.getIndexedPropertyChainCount(), inputProcessor, maxWorkers,
+				progressMonitor);
 		this.ontologyIndex = ontologyIndex;
 	}
 

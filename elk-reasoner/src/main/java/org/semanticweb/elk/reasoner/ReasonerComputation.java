@@ -27,7 +27,6 @@ import java.util.Iterator;
 
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 		ConcurrentComputation<I, P> {
@@ -54,9 +53,8 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 	I nextInput;
 
 	public ReasonerComputation(Collection<? extends I> inputs,
-			P inputProcessor, Interrupter interrupter, int maxWorkers,
-			ProgressMonitor progressMonitor) {
-		super(inputProcessor, interrupter, maxWorkers);
+			P inputProcessor, int maxWorkers, ProgressMonitor progressMonitor) {
+		super(inputProcessor, maxWorkers);
 		this.progressMonitor = progressMonitor;
 		this.todo = inputs.iterator();
 		this.maxProgress = inputs.size();
@@ -65,9 +63,8 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 	}
 
 	public ReasonerComputation(Iterable<? extends I> inputs, int inputsSize,
-			P inputProcessor, Interrupter interrupter, int maxWorkers,
-			ProgressMonitor progressMonitor) {
-		super(inputProcessor, interrupter, maxWorkers);
+			P inputProcessor, int maxWorkers, ProgressMonitor progressMonitor) {
+		super(inputProcessor, maxWorkers);
 		this.progressMonitor = progressMonitor;
 		this.todo = inputs.iterator();
 		this.maxProgress = inputsSize;
@@ -77,9 +74,8 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 
 	/**
 	 * Process the given input concurrently using the provided input processor.
-	 * If the process has been interrupted as can be determined by calling
-	 * {@link Interrupter#isInterrupted()} method for the supplied interrupter,
-	 * then this method can be called again to continue the computation.
+	 * If the process has been interrupted, this method can be called again to
+	 * continue the computation.
 	 */
 	public void process() {
 
@@ -87,29 +83,40 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 
 		try {
 			// submit the leftover from the previous run
-			if (nextInput != null)
-				submit(nextInput);
+			if (nextInput != null) {
+				if (!processNextInput())
+					return;
+			}
 			// submit the next inputs from todo
-			while (todo.hasNext() && !interrupter.isInterrupted()) {
+			while (todo.hasNext()) {
 				nextInput = todo.next();
-				submit(nextInput);
-				progressMonitor.report(++progress, maxProgress);
+				if (!processNextInput())
+					return;
 			}
 			finish();
 		} catch (InterruptedException e) {
-			// request all workers to stop as soon as possible
-			interrupter.interrupt();
-			// wait until all workers are killed
+			// interrupt all workers
 			for (;;) {
 				try {
-					finish();
+					interrupt();
 					break;
 				} catch (InterruptedException e1) {
 					// we'll still wait until all workers stop
 					continue;
 				}
 			}
+			// restore interrupt status
+			Thread.currentThread().interrupt();
 		}
+	}
 
+	private boolean processNextInput() throws InterruptedException {
+		submit(nextInput);
+		if (Thread.currentThread().isInterrupted()) {
+			interrupt();
+			return false;
+		}
+		progressMonitor.report(++progress, maxProgress);
+		return true;
 	}
 }

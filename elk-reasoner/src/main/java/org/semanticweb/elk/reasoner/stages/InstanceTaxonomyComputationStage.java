@@ -92,17 +92,16 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		if (reasoner.doneClassTaxonomy)
 			this.computation = new TaxonomyComputation(
 					ontologyIndex.getIndexedIndividuals(),
-					ontologyIndex.getIndexedIndividualCount(),
-					reasoner.getStageExecutor(), workerNo, progressMonitor,
-					reasoner.getOntologyIndex(), reasoner.taxonomy);
+					ontologyIndex.getIndexedIndividualCount(), workerNo,
+					progressMonitor, reasoner.getOntologyIndex(),
+					reasoner.taxonomy);
 		else
 			this.computation = new TaxonomyComputation(Operations.concat(
 					ontologyIndex.getIndexedClasses(),
 					ontologyIndex.getIndexedIndividuals()),
 					ontologyIndex.getIndexedClassCount()
 							+ ontologyIndex.getIndexedIndividualCount(),
-					reasoner.getStageExecutor(), workerNo, progressMonitor,
-					reasoner.getOntologyIndex());
+					workerNo, progressMonitor, reasoner.getOntologyIndex());
 	}
 
 	@Override

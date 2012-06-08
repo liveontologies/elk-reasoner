@@ -61,9 +61,8 @@ public class ObjectPropertyHierarchyComputationStage extends
 		super(reasoner);
 		this.workerNo = reasoner.getNumberOfWorkers();
 		this.progressMonitor = reasoner.getProgressMonitor();
-		this.computation = new ObjectPropertyHierarchyComputation(
-				reasoner.getStageExecutor(), workerNo, progressMonitor,
-				reasoner.ontologyIndex);
+		this.computation = new ObjectPropertyHierarchyComputation(workerNo,
+				progressMonitor, reasoner.ontologyIndex);
 	}
 
 	@Override

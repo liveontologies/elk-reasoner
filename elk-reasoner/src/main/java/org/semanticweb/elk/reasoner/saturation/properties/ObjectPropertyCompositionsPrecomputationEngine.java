@@ -162,7 +162,7 @@ class ObjectPropertyCompositionsPrecomputationEngine implements
 	 * If R and S are in the vector and R is a subproperty of S, then S is
 	 * removed from the vector.
 	 */
-	void eliminateImpliedCompositions(Vector<IndexedPropertyChain> v) {
+	static void eliminateImpliedCompositions(Vector<IndexedPropertyChain> v) {
 		// replace all redundant elements by null
 		for (int i = 0; i < v.size(); i++)
 			if (v.get(i) != null) {

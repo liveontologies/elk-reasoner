@@ -38,8 +38,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputation;
-import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 
 public class ConcurrentSaturatorTest extends TestCase {
 
@@ -62,8 +60,6 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		OntologyIndex ontologyIndex = new OntologyIndexImpl();
 
-		ReasonerStageExecutor stageExecutor = new TestStageExecutor();
-
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 		inserter.process(objectFactory.getEquivalentClassesAxiom(b, c));
 		inserter.process(objectFactory.getSubClassOfAxiom(a,
@@ -76,12 +72,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression D = ontologyIndex.getIndexed(d);
 
 		final ObjectPropertyHierarchyComputation objectPropertyHierarchyComputation = new ObjectPropertyHierarchyComputation(
-				stageExecutor, 16, new DummyProgressMonitor(), ontologyIndex);
+				16, new DummyProgressMonitor(), ontologyIndex);
 
 		objectPropertyHierarchyComputation.process();
 
 		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				stageExecutor, 16, ontologyIndex);
+				16, ontologyIndex);
 
 		classExpressionSaturation.start();
 		classExpressionSaturation
@@ -102,7 +98,6 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 
 		final OntologyIndex ontologyIndex = new OntologyIndexImpl();
-		ReasonerStageExecutor stageExecutor = new TestStageExecutor();
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 
 		inserter.process(objectFactory.getSubClassOfAxiom(a, b));
@@ -127,7 +122,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 				I.getToldSuperClassExpressions().contains(D));
 
 		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				stageExecutor, 16, ontologyIndex);
+				16, ontologyIndex);
 
 		classExpressionSaturation.start();
 		classExpressionSaturation
