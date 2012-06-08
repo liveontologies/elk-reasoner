@@ -80,6 +80,8 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	 * 
 	 * @param inputProcessor
 	 *            the processor for the input to be executed by workers
+	 * @param executor
+	 *            the executor used internally to run the jobs
 	 * @param maxWorkers
 	 *            the maximal number of concurrent workers processing the jobs
 	 * @param bufferCapacity
@@ -87,39 +89,41 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	 *            full, submitting new jobs will block until new space is
 	 *            available
 	 */
-	public ConcurrentComputation(P inputProcessor, int maxWorkers,
-			int bufferCapacity) {
+	public ConcurrentComputation(P inputProcessor,
+			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
 		this.inputProcessor = inputProcessor;
-		this.maxWorkers = maxWorkers;
 		this.buffer = new ArrayBlockingQueue<I>(bufferCapacity);
 		this.finishRequested = false;
 		this.interrupted = false;
 		this.worker = new Worker();
-		this.executor = new ComputationExecutor(maxWorkers, new ThreadGroup(
-				"elk-computation"));
+		this.executor = executor;
+		this.maxWorkers = maxWorkers;
 	}
 
 	/**
 	 * Creating a {@link ConcurrentComputation} instance.
 	 * 
 	 * @param inputProcessor
-	 *            the processor for the input to be executed by workers
+	 *            the processor for the input to be executed by workers * @param
+	 * @param executor
+	 *            the executor used internally to run the jobs
 	 * @param interrupter
 	 *            the interrupter to interrupt and monitor task interruption
 	 * @param maxWorkers
 	 *            the maximal number of concurrent workers processing the jobs
 	 */
-	public ConcurrentComputation(P inputProcesor, int maxWorkers) {
-		this(inputProcesor, maxWorkers, 64);
+	public ConcurrentComputation(P inputProcesor, ComputationExecutor executor,
+			int maxWorkers) {
+		this(inputProcesor, executor, maxWorkers, 64);
 	}
 
 	/**
-	 * Starts {@link #maxWorkers} workers to process the input.
+	 * Starts the workers to process the input.
 	 */
 	public synchronized void start() {
 		finishRequested = false;
 		interrupted = false;
-		executor.start(worker);
+		executor.start(worker, maxWorkers);
 	}
 
 	/**

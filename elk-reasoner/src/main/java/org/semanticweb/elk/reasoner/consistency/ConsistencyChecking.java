@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
  * Class for checking ontology consistency.
@@ -44,8 +45,8 @@ public class ConsistencyChecking extends
 	protected final OntologyIndex ontologyIndex;
 
 	public ConsistencyChecking(ConsistencyCheckingEngine inputProcessor,
-			int maxWorkers, ProgressMonitor progressMonitor,
-			OntologyIndex ontologyIndex) {
+			ComputationExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		/*
 		 * first consistency is checked for <tt>owl:Thing</tt>, then for the
 		 * individuals in the ontology
@@ -53,15 +54,15 @@ public class ConsistencyChecking extends
 		super(Operations.concat(
 				Operations.singleton(ontologyIndex.getIndexedOwlThing()),
 				ontologyIndex.getIndexedIndividuals()), ontologyIndex
-				.getIndexedIndividualCount() + 1, inputProcessor, maxWorkers,
-				progressMonitor);
+				.getIndexedIndividualCount() + 1, inputProcessor, executor,
+				maxWorkers, progressMonitor);
 		this.ontologyIndex = ontologyIndex;
 	}
 
-	public ConsistencyChecking(int maxWorkers, ProgressMonitor progressMonitor,
-			OntologyIndex ontologyIndex) {
-		this(new ConsistencyCheckingEngine(ontologyIndex), maxWorkers,
-				progressMonitor, ontologyIndex);
+	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+		this(new ConsistencyCheckingEngine(ontologyIndex), executor,
+				maxWorkers, progressMonitor, ontologyIndex);
 	}
 
 	@Override

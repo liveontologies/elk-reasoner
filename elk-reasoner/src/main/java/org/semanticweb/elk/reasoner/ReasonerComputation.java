@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
@@ -53,8 +54,9 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 	I nextInput;
 
 	public ReasonerComputation(Collection<? extends I> inputs,
-			P inputProcessor, int maxWorkers, ProgressMonitor progressMonitor) {
-		super(inputProcessor, maxWorkers);
+			P inputProcessor, ComputationExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor) {
+		super(inputProcessor, executor, maxWorkers);
 		this.progressMonitor = progressMonitor;
 		this.todo = inputs.iterator();
 		this.maxProgress = inputs.size();
@@ -63,8 +65,9 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 	}
 
 	public ReasonerComputation(Iterable<? extends I> inputs, int inputsSize,
-			P inputProcessor, int maxWorkers, ProgressMonitor progressMonitor) {
-		super(inputProcessor, maxWorkers);
+			P inputProcessor, ComputationExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor) {
+		super(inputProcessor, executor, maxWorkers);
 		this.progressMonitor = progressMonitor;
 		this.todo = inputs.iterator();
 		this.maxProgress = inputsSize;

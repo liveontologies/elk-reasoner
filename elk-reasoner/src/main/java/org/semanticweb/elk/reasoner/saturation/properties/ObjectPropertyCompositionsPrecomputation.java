@@ -27,8 +27,10 @@ import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
+import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
+// TODO: Support concurrent computation?
 /**
  * Sets up multimaps for fast look-up of object property compositions to be used
  * in {@link RuleRoleComposition}.
@@ -47,19 +49,19 @@ public class ObjectPropertyCompositionsPrecomputation
 
 	public ObjectPropertyCompositionsPrecomputation(
 			ObjectPropertyCompositionsPrecomputationEngine inputProcessor,
-			Interrupter interrupter, int maxWorkers,
+			Interrupter interrupter, ComputationExecutor executor,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
-				.getIndexedPropertyChainCount(), inputProcessor, maxWorkers,
+				.getIndexedPropertyChainCount(), inputProcessor, executor, 1,
 				progressMonitor);
 		this.ontologyIndex = ontologyIndex;
 	}
 
 	public ObjectPropertyCompositionsPrecomputation(Interrupter interrupter,
-			int maxWorkers, ProgressMonitor progressMonitor,
+			ComputationExecutor executor, ProgressMonitor progressMonitor,
 			OntologyIndex ontologyIndex) {
 		this(new ObjectPropertyCompositionsPrecomputationEngine(), interrupter,
-				maxWorkers, progressMonitor, ontologyIndex);
+				executor, progressMonitor, ontologyIndex);
 	}
 
 }

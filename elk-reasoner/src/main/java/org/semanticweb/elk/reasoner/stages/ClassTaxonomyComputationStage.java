@@ -87,8 +87,9 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		super.initComputation();
 		this.computation = new TaxonomyComputation(
 				reasoner.ontologyIndex.getIndexedClasses(),
-				reasoner.ontologyIndex.getIndexedClassCount(), workerNo,
-				progressMonitor, reasoner.getOntologyIndex());
+				reasoner.ontologyIndex.getIndexedClassCount(),
+				reasoner.getProcessExecutor(), workerNo, progressMonitor,
+				reasoner.getOntologyIndex());
 	}
 
 	@Override

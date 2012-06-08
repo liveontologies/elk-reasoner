@@ -31,11 +31,6 @@ import java.util.concurrent.TimeUnit;
 public class ComputationExecutor extends ThreadPoolExecutor {
 
 	/**
-	 * the number of workers of this executor
-	 */
-	private final int maxWorkers;
-
-	/**
 	 * the thread group used for this executor
 	 */
 	private final ThreadGroup threadGroup;
@@ -60,11 +55,14 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 						return result;
 					}
 				});
-		this.maxWorkers = maxWorkers;
 		this.threadGroup = threadGroup;
 	}
 
-	public void start(Runnable job) {
+	public ComputationExecutor(int maxWorkers) {
+		this(maxWorkers, new ThreadGroup("elk-computation"));
+	}
+
+	public void start(Runnable job, int maxWorkers) {
 
 		this.done = new CountDownLatch(maxWorkers);
 		Worker worker = new Worker(job, done);

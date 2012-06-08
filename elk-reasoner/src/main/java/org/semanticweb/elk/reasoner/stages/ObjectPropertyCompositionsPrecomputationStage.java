@@ -25,11 +25,10 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyCompositionsPrecomputation;
 
+//TODO: Concurrent?
 /**
  * The reasoner stage whose purpose is to set up multimaps for fast look-up of
  * object property compositions to be used in {@link RuleRoleComposition}.
@@ -40,31 +39,14 @@ import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyComposit
 public class ObjectPropertyCompositionsPrecomputationStage extends
 		AbstractReasonerStage {
 
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ObjectPropertyCompositionsPrecomputationStage.class);
-
 	/**
 	 * the computation used for this stage
 	 */
-	private final ObjectPropertyCompositionsPrecomputation computation;
-	/**
-	 * the number of workers used in the computation for this stage
-	 */
-	private final int workerNo;
-	/**
-	 * the progress monitor used to report progress of this stage
-	 */
-	private final ProgressMonitor progressMonitor;
+	private ObjectPropertyCompositionsPrecomputation computation;
 
 	public ObjectPropertyCompositionsPrecomputationStage(
 			AbstractReasonerState reasoner) {
 		super(reasoner);
-		this.workerNo = reasoner.getNumberOfWorkers();
-		this.progressMonitor = reasoner.getProgressMonitor();
-		this.computation = new ObjectPropertyCompositionsPrecomputation(
-				reasoner.getStageExecutor(), workerNo, progressMonitor,
-				reasoner.ontologyIndex);
 	}
 
 	@Override
@@ -86,13 +68,21 @@ public class ObjectPropertyCompositionsPrecomputationStage extends
 
 	@Override
 	public void execute() {
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		if (computation == null)
+			initComputation();
 		computation.process();
 		if (isInterrupted())
 			return;
 		reasoner.doneObjectPropertyCompositionsPrecomputation = true;
 		reasoner.doneReset = false;
+	}
+
+	@Override
+	void initComputation() {
+		super.initComputation();
+		this.computation = new ObjectPropertyCompositionsPrecomputation(
+				reasoner.getStageExecutor(), reasoner.getProcessExecutor(),
+				progressMonitor, reasoner.ontologyIndex);
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
  * Resets all saturated object properties and computes the transitive closure of
@@ -46,17 +47,18 @@ public class ObjectPropertyHierarchyComputation
 
 	public ObjectPropertyHierarchyComputation(
 			ObjectPropertyHierarchyComputationEngine inputProcessor,
-			int maxWorkers, ProgressMonitor progressMonitor,
-			OntologyIndex ontologyIndex) {
+			ComputationExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
-				.getIndexedObjectPropertyCount(), inputProcessor, maxWorkers,
-				progressMonitor);
+				.getIndexedObjectPropertyCount(), inputProcessor, executor,
+				maxWorkers, progressMonitor);
 		this.ontologyIndex = ontologyIndex;
 	}
 
-	public ObjectPropertyHierarchyComputation(int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(new ObjectPropertyHierarchyComputationEngine(), maxWorkers,
-				progressMonitor, ontologyIndex);
+	public ObjectPropertyHierarchyComputation(ComputationExecutor executor,
+			int maxWorkers, ProgressMonitor progressMonitor,
+			OntologyIndex ontologyIndex) {
+		this(new ObjectPropertyHierarchyComputationEngine(), executor,
+				maxWorkers, progressMonitor, ontologyIndex);
 	}
 }

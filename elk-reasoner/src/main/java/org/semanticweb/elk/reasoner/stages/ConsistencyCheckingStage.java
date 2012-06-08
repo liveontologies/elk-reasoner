@@ -62,10 +62,10 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(
-				(ReasonerStage) new ObjectPropertyCompositionsPrecomputationStage(
+		return Arrays
+				.asList((ReasonerStage) new ObjectPropertyCompositionsPrecomputationStage(
 						reasoner),
-				(ReasonerStage) new ContextInitializationStage(reasoner));
+						(ReasonerStage) new ContextInitializationStage(reasoner));
 	}
 
 	@Override
@@ -87,7 +87,8 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		this.computation = new ConsistencyChecking(workerNo,
+		this.computation = new ConsistencyChecking(
+				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
 	}
 

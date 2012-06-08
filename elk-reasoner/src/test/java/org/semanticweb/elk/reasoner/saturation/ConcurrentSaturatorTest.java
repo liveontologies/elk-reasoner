@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputation;
+import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 public class ConcurrentSaturatorTest extends TestCase {
 
@@ -59,6 +60,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 				"S"));
 
 		OntologyIndex ontologyIndex = new OntologyIndexImpl();
+		ComputationExecutor executor = new ComputationExecutor(16);
 
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 		inserter.process(objectFactory.getEquivalentClassesAxiom(b, c));
@@ -72,12 +74,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression D = ontologyIndex.getIndexed(d);
 
 		final ObjectPropertyHierarchyComputation objectPropertyHierarchyComputation = new ObjectPropertyHierarchyComputation(
-				16, new DummyProgressMonitor(), ontologyIndex);
+				executor, 16, new DummyProgressMonitor(), ontologyIndex);
 
 		objectPropertyHierarchyComputation.process();
 
 		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				16, ontologyIndex);
+				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
 		classExpressionSaturation
@@ -98,6 +100,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 
 		final OntologyIndex ontologyIndex = new OntologyIndexImpl();
+		ComputationExecutor executor = new ComputationExecutor(16);
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 
 		inserter.process(objectFactory.getSubClassOfAxiom(a, b));
@@ -122,7 +125,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 				I.getToldSuperClassExpressions().contains(D));
 
 		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				16, ontologyIndex);
+				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
 		classExpressionSaturation
