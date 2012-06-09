@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
@@ -100,7 +101,7 @@ public class ClassTaxonomyPrinter {
 	 * @return hash string
 	 */
 	public static String getHashString(Taxonomy<ElkClass> classTaxonomy) {
-		return Integer.toHexString(ClassTaxonomyHasher.hash(classTaxonomy));
+		return Integer.toHexString(TaxonomyHasher.hash(classTaxonomy));
 	}
 
 	/**

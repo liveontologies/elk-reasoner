@@ -23,7 +23,7 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * A simple interrupter, which just saves the interrupt status and teturns it
+ * A simple interrupter, which just saves the interrupt status and returns it
  * 
  * @author "Yevgeny Kazakov"
  * 

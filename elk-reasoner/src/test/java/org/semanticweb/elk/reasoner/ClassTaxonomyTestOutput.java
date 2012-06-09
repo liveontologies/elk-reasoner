@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.testing.TestOutput;
 
 public class ClassTaxonomyTestOutput implements TestOutput {
@@ -44,7 +44,7 @@ public class ClassTaxonomyTestOutput implements TestOutput {
 
 	int getHashCode() {
 		if (consistent)
-			return ClassTaxonomyHasher.hash(taxonomy);
+			return TaxonomyHasher.hash(taxonomy);
 		else
 			return 0;
 	}
