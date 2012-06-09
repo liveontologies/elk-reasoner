@@ -20,6 +20,9 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * 
+ */
 package org.semanticweb.elk.reasoner;
 
 import java.net.URL;
@@ -27,21 +30,22 @@ import java.net.URL;
 import org.semanticweb.elk.testing.HashTestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
 
-public class ClassTaxonomyHashManifest extends
-		ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> {
+/**
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
+public class HashClassificationTestManifest extends ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> {
 
-	public ClassTaxonomyHashManifest(URL input, int expHash) {
-		super(input, new HashTestOutput(expHash));
+	public HashClassificationTestManifest(URL input, HashTestOutput expOutput) {
+		super(input, expOutput);
 	}
 
 	@Override
 	public void compare(ClassTaxonomyTestOutput actualOutput)
 			throws TestResultComparisonException {
-		int actualHash = actualOutput.getHashCode();
-
-		if (actualHash != getExpectedOutput().getHash()) {
-			throw new TestResultComparisonException(
-					"Actual taxonomy hash code is not equal to the expected hash code");
+		if (getExpectedOutput().getHash() != (actualOutput.getHashCode())) {
+			throw new TestResultComparisonException("Expected hashcode not equal to the actual hashcode", getExpectedOutput(), actualOutput);
 		}
 	}
 }

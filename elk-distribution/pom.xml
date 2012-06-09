@@ -131,7 +131,7 @@
 				<!-- the plugin to generate changes log and release announcements -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-changes-plugin</artifactId>
-				<version>2.6</version>
+				<version>2.7</version>
 				<configuration>
 					<!-- the changes filtered source changes file -->
 					<xmlPath>${basedir}/target/changes.xml</xmlPath>
@@ -336,7 +336,7 @@
 				<!-- the plugin to generate changes log and release announcements -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-changes-plugin</artifactId>
-				<version>2.6</version>
+				<version>2.7</version>
 				<configuration>
 					<!-- the changes filtered source changes file -->
 					<xmlPath>${basedir}/target/changes.xml</xmlPath>

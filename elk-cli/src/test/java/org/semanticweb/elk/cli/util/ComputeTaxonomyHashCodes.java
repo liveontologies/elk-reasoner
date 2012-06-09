@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 import org.semanticweb.elk.cli.IOReasoner;
 import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
@@ -66,7 +67,14 @@ public class ComputeTaxonomyHashCodes {
 
 			reasoner.loadOntologyFromFile(ontFile);
 
-			Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+			Taxonomy<ElkClass> taxonomy = null;
+			
+			try {
+				taxonomy = reasoner.getTaxonomy();
+			} catch (InconsistentOntologyException e) {
+				continue;
+			}
+			
 			int hash = TaxonomyHasher.hash(taxonomy);
 			// create the expected result file
 			File out = new File(srcDir.getAbsolutePath() + "/"

@@ -11,6 +11,7 @@
 	</parent>
 
 	<artifactId>elk-util-io</artifactId>
+	<packaging>jar</packaging>
 
 	<name>ELK Utilities for Input-Output</name>
 	<description>ELK Utilities for Input-Output</description>

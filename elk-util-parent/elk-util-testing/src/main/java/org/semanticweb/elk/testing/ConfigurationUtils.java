@@ -109,8 +109,37 @@ public class ConfigurationUtils {
 			}
 		}
 		
-		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests);
+		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests); 
 	}
+	
+	
+	/**
+	 * In case there're no expected results
+	 * 
+	 * @return
+	 */
+	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
+																final URI srcURI,
+																final Class<?> srcClass,
+																final String inputFileExt,
+																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException {
+		//Load inputs 
+		final List<String> inputs = srcURI.isOpaque() 
+				? IOUtils.getResourceNamesFromJAR(srcURI, inputFileExt, srcClass)
+				: IOUtils.getResourceNamesFromDir(new File(srcURI), inputFileExt);
+		
+		final List<TestManifest<URLTestIO, EO, AO>> manifests = new ArrayList<TestManifest<URLTestIO,EO,AO>>(inputs.size());
+		
+		for (String input : inputs) {
+			URL inputURL = srcClass.getClassLoader().getResource(input);
+			TestManifest<URLTestIO, EO, AO> manifest = creator.create(inputURL, null);
+				
+			if (manifest != null) manifests.add(manifest);
+		}
+		
+		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests); 
+	}	
+	
 	
 	private static boolean endOfData(Iterator<String> inputIter, Iterator<String> resultIter) {
 		return !resultIter.hasNext() || !inputIter.hasNext();
@@ -127,36 +156,5 @@ public class ConfigurationUtils {
 	public interface TestManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
 		
 		public TestManifest<I, EO, AO> create(URL input, URL output);
-	}
-}
-
-/**
- * 
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
- */
-class SimpleConfiguration<I extends TestInput, EO extends TestOutput, AO extends TestOutput> implements Configuration {
-
-	private final List<TestManifest<I, EO, AO>> manifests;
-	
-	SimpleConfiguration(List<TestManifest<I, EO, AO>> manifests) {
-		this.manifests = manifests;
-	}
-	
-	@Override
-	public int size() {
-		return manifests.size();
-	}
-
-	@Override
-	public TestManifest<I, EO, AO> getTestValue(int index) {
-		return manifests.get(index);
-	}
-
-	@Override
-	public String getTestName(int index) {
-		return "test" + manifests.get(index).getName();
 	}
 }

@@ -106,13 +106,6 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
 		} catch (InconsistentOntologyException e) {
 			manifest.compare(new ClassTaxonomyTestOutput());
 		}
-
-		/*
-		 * try { Writer writer = new OutputStreamWriter(System.out);
-		 * ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, true);
-		 * writer.flush(); } catch (IOException e) {}
-		 */
-
 	}
 
 	/**

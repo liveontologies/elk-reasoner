@@ -74,7 +74,7 @@ public abstract class HashClassificationCorrectnessTest extends BaseClassificati
 				try {
 					int hash = IOUtils.readInteger(output, 10);
 					
-					return new ClassTaxonomyHashManifest(input, hash);
+					return new HashClassificationTestManifest(input, new HashTestOutput(hash));
 				} catch (IOException e) {
 					// TODO Log it
 					return null;

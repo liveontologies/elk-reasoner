@@ -29,34 +29,21 @@ package org.semanticweb.elk.testing;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
- *
  */
-public class HashTestOutput implements TestOutput {
+public class BooleanTestOutput implements TestOutput {
 
-	private final int hash;
+	final boolean value;
 	
-	public HashTestOutput(final int hash) {
-		this.hash = hash;
-	}
-	
-	public HashTestOutput(final String hashHex, final int radix) {
-		this.hash = Integer.parseInt(hashHex, radix);
-	}
-	
-	public int getHash() {
-		return hash;
+	public BooleanTestOutput(boolean value) {
+		this.value = value;
 	}
 
-	@Override
-	public String toString() {
-		return "HashTestOutput [hash=" + hash + "]";
-	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + hash;
+		result = prime * result + (value ? 1231 : 1237);
 		return result;
 	}
 
@@ -68,11 +55,9 @@ public class HashTestOutput implements TestOutput {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		HashTestOutput other = (HashTestOutput) obj;
-		if (hash != other.hash)
+		BooleanTestOutput other = (BooleanTestOutput) obj;
+		if (value != other.value)
 			return false;
 		return true;
 	}
-
-
 }

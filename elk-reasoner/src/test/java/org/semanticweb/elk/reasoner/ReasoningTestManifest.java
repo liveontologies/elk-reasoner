@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner;
 import java.net.URL;
 
 import org.semanticweb.elk.io.FileUtils;
-import org.semanticweb.elk.testing.AbstractTestManifest;
+import org.semanticweb.elk.testing.BasicTestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
@@ -39,7 +39,7 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * pavel.klinov@uni-ulm.de
  *
  */
-public abstract class ReasoningTestManifest<EO extends TestOutput, AO extends TestOutput> extends AbstractTestManifest<URLTestIO, EO, AO> {
+public class ReasoningTestManifest<EO extends TestOutput, AO extends TestOutput> extends BasicTestManifest<URLTestIO, EO, AO> {
 
 	public ReasoningTestManifest(URL input, EO expOutput) {
 		super(FileUtils.getFileName(FileUtils.dropExtension(input.toString())), new URLTestIO(input), expOutput);
