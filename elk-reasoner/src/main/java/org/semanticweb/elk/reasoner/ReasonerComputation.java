@@ -41,11 +41,11 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 	 */
 	protected final Iterator<? extends I> todo;
 	/**
-	 * number of indexed entities to classify
+	 * the final value of the progress monitor: the total number of inputs
 	 */
 	private final int maxProgress;
 	/**
-	 * variable used in progress monitors
+	 * the current value of the progress monitors: the current input
 	 */
 	private int progress;
 	/**
@@ -90,7 +90,7 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 				if (!processNextInput())
 					return;
 			}
-			// submit the next inputs from todo
+			// repeatedly submit the next inputs from todo
 			while (todo.hasNext()) {
 				nextInput = todo.next();
 				if (!processNextInput())

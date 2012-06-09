@@ -51,6 +51,7 @@ public class ObjectPropertyCompositionsPrecomputation
 			ObjectPropertyCompositionsPrecomputationEngine inputProcessor,
 			Interrupter interrupter, ComputationExecutor executor,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+		// the engine is not thread safe; use 1 worker
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
 				.getIndexedPropertyChainCount(), inputProcessor, executor, 1,
 				progressMonitor);

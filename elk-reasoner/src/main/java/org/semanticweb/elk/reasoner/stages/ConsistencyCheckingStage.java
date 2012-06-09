@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
 /**
- * The reasoner stage, which purpose is to check consistency of the current
- * ontology
+ * The reasoner stage, during which consistency of the current ontology is
+ * checked
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -72,8 +72,6 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	public void execute() {
 		if (computation == null)
 			initComputation();
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		progressMonitor.start(getName());
 		computation.process();
 		progressMonitor.finish();
@@ -90,6 +88,8 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		this.computation = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
 
 	@Override

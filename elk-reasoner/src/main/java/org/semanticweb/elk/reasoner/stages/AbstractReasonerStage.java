@@ -35,7 +35,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	final AbstractReasonerState reasoner;
 
 	/**
-	 * the number of workers used in the computation for this stage
+	 * the maximal number of concurrent workers used in this computation stage
 	 */
 	int workerNo;
 

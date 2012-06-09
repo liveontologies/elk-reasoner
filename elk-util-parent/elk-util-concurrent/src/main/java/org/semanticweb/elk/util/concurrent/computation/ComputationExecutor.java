@@ -24,25 +24,48 @@ package org.semanticweb.elk.util.concurrent.computation;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A custom {@link ExecutorService} for starting a several copies of runnable
+ * tasks, and waiting for it computation; it allows to interrupt all running
+ * tasks without shutting down the {@link ExecutorService}. If terminated, the
+ * tasks can be started again.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class ComputationExecutor extends ThreadPoolExecutor {
 
 	/**
-	 * the thread group used for this executor
+	 * the thread group used for executor
 	 */
 	private final ThreadGroup threadGroup;
 
 	/**
-	 * all jobs are done
+	 * the latch indicating that all jobs are done
 	 */
 	CountDownLatch done;
 
-	public ComputationExecutor(int maxWorkers, final ThreadGroup threadGroup) {
-		super(maxWorkers, maxWorkers, 0, TimeUnit.SECONDS,
-				new ArrayBlockingQueue<Runnable>(maxWorkers),
+	/**
+	 * <tt>true</tt> if new tasks can be started to be executed; this can happen
+	 * only if no tasks are running in this executor
+	 */
+	volatile boolean canStart = true;
+
+	/**
+	 * Create a {@link ComputationExecutor} with a given maximal number of
+	 * threads and the given thread group
+	 * 
+	 * @param threadCount
+	 * @param threadGroup
+	 */
+	public ComputationExecutor(int threadCount, final ThreadGroup threadGroup) {
+		super(threadCount, threadCount, 0, TimeUnit.SECONDS,
+				new ArrayBlockingQueue<Runnable>(threadCount),
 				new ThreadFactory() {
 					int threadCount = 0;
 
@@ -50,7 +73,7 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 					public Thread newThread(Runnable r) {
 						Thread result = new Thread(threadGroup, r,
 								threadGroup.getName() + "-thread-"
-										+ threadCount++);
+										+ ++threadCount);
 						result.setPriority(Thread.NORM_PRIORITY);
 						return result;
 					}
@@ -58,17 +81,35 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 		this.threadGroup = threadGroup;
 	}
 
-	public ComputationExecutor(int maxWorkers) {
-		this(maxWorkers, new ThreadGroup("elk-computation"));
+	/**
+	 * Create a {@link ComputationExecutor} with a given maximal number of
+	 * threads and the the given name which is used to identify threads
+	 * 
+	 * @param threadCount
+	 * @param name
+	 */
+	public ComputationExecutor(int threadCount, String name) {
+		this(threadCount, new ThreadGroup(name));
 	}
 
-	public void start(Runnable job, int maxWorkers) {
-
-		this.done = new CountDownLatch(maxWorkers);
+	/**
+	 * Starts a several copies of jobs. The jobs cannot be started again until
+	 * the method {@link #waitDone()} is called
+	 * 
+	 * @param job
+	 * @param noCopies
+	 * @return <tt>true</tt> if the jobs have been started
+	 */
+	public synchronized boolean start(Runnable job, int noCopies) {
+		if (!canStart)
+			return false;
+		this.done = new CountDownLatch(noCopies);
 		Worker worker = new Worker(job, done);
-		for (int i = 0; i < maxWorkers; i++) {
+		for (int i = 0; i < noCopies; i++) {
 			execute(worker);
 		}
+		canStart = false;
+		return true;
 	}
 
 	/**
@@ -83,11 +124,20 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	 * Waits until all computations are done
 	 * 
 	 * @throws InterruptedException
+	 *             if was interrupted while waiting
 	 */
-	public void waitDone() throws InterruptedException {
+	public synchronized void waitDone() throws InterruptedException {
 		done.await();
+		canStart = true;
 	}
 
+	/**
+	 * the {@link Runnable} that wraps the job and allows to keep track of the
+	 * counter for running jobs
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
 	private class Worker implements Runnable {
 
 		protected final Runnable job;

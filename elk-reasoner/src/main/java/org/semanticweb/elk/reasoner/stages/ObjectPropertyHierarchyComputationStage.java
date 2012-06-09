@@ -77,8 +77,6 @@ public class ObjectPropertyHierarchyComputationStage extends
 	public void execute() {
 		if (computation == null)
 			initComputation();
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		computation.process();
 		if (isInterrupted())
 			return;
@@ -92,6 +90,8 @@ public class ObjectPropertyHierarchyComputationStage extends
 		this.computation = new ObjectPropertyHierarchyComputation(
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
 				reasoner.ontologyIndex);
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
 
 	@Override

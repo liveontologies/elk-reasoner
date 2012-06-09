@@ -221,18 +221,19 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 			if (Thread.currentThread().isInterrupted())
 				return;
 			/*
-			 * try to process the jobs in progress; the counter of active
-			 * workers overestimates the number of workers processing the tasks
-			 * using the rule engine, so that when there are no active workers
-			 * and the process has not been interrupted, we know that all
-			 * submitted jobs in progress are processed
+			 * try to process the jobs in progress; there are counters to keep
+			 * track of how many workers have been started and finished: if
+			 * their values coincide, then there is no worker in the block
+			 * between them. In addition, there is a variable to save the
+			 * identifier of the last started worker which has been interrupted;
+			 * this is used to check if the computation has been finished or
+			 * not.
 			 */
 			int snapshotFinishedWorkers;
-			// if (ruleApplicationEngine.canProcess()) {
 			startedWorkers.incrementAndGet();
 			ruleApplicationEngine.process();
 			if (Thread.currentThread().isInterrupted())
-				updateLastInterruptedWorkerId(startedWorkers.get());
+				updateIfSmaller(lastInterruptedWorker, startedWorkers.get());
 			snapshotFinishedWorkers = finishedWorkers.incrementAndGet();
 			updateProcessedCounters(snapshotFinishedWorkers);
 			processFinishedJobs();
@@ -241,15 +242,11 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 				synchronized (countContextsProcessed) {
 					if (canProcess())
 						continue;
-					if (ruleApplicationEngine.getContextNumber()
-							- countContextsProcessed.get() > threshold) {
-						workersWaiting = true;
-						countContextsProcessed.wait();
-						continue;
-					}
+					workersWaiting = true;
+					countContextsProcessed.wait();
+					continue;
 				}
 			}
-			// }
 			J nextJob = jobsToDo.poll();
 			if (nextJob == null)
 				return;
@@ -277,7 +274,7 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 			ruleApplicationEngine.submit(root);
 			ruleApplicationEngine.process();
 			if (Thread.currentThread().isInterrupted())
-				updateLastInterruptedWorkerId(startedWorkers.get());
+				updateIfSmaller(lastInterruptedWorker, startedWorkers.get());
 			snapshotFinishedWorkers = finishedWorkers.incrementAndGet();
 			updateProcessedCounters(snapshotFinishedWorkers);
 			processFinishedJobs();
@@ -299,19 +296,23 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	}
 
 	/**
-	 * Updates the id of the last interrupted worker to the given value provided
-	 * it is not greater
+	 * Update the counter to the value provided it is greater. Regardless of the
+	 * returned value, it is guaranteed that the value of the counter after
+	 * execution will be at least the input value.
 	 * 
-	 * @param snapshotStartedWorkers
+	 * @param counter
+	 *            the counter that should be updated
+	 * @param value
+	 *            the value to which the counter should be updated
+	 * @return true if the counter has been updated
 	 */
-	void updateLastInterruptedWorkerId(int snapshotStartedWorkers) {
+	static boolean updateIfSmaller(AtomicInteger counter, int value) {
 		for (;;) {
-			int snapshotLastInterruptedWorker = lastInterruptedWorker.get();
-			if (snapshotStartedWorkers <= snapshotLastInterruptedWorker)
-				return;
-			if (lastInterruptedWorker.compareAndSet(
-					snapshotLastInterruptedWorker, snapshotStartedWorkers))
-				return;
+			int snapshotCoutner = counter.get();
+			if (snapshotCoutner >= value)
+				return false;
+			if (counter.compareAndSet(snapshotCoutner, value))
+				return true;
 		}
 	}
 
@@ -321,52 +322,31 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	void updateProcessedCounters(int snapshotFinishedWorkers) {
 		if (lastInterruptedWorker.get() >= startedWorkers.get()) {
 			// after the last started worker has interrupted, no worker
-			// has started yet; in this case the result might not be computed
+			// has started yet; in this case we cannot be sure that new
+			// submitted jobs are processed
 			return;
 		}
 		/*
-		 * cache the current snapshot for created contexts and jobs
+		 * cache the current snapshot for created contexts and jobs; it is
+		 * important for correctness to get measure the number of started
+		 * workers only after that
 		 */
 		int snapshotContextNo = ruleApplicationEngine.getContextNumber();
 		int snapshotCountJobsSubmitted = countJobsSubmitted.get();
-		if (startedWorkers.get() > snapshotFinishedWorkers) {
-			// some started worker did not finish yet
+		if (startedWorkers.get() > snapshotFinishedWorkers)
+			// this means that some started worker did not finish yet
 			return;
-		}
-
-		/* the value will be true if any of the counters are updated */
-		boolean updated = false;
-
 		/*
-		 * right before this test (1) no worker is processing anything and (2)
-		 * after every interrupted worker there was a started and finished
-		 * worker that was not interrupted. This means that the taken snapshots
-		 * represent at least the number of processed contexts and jobs. In this
-		 * case we update the counter for processed jobs and tasks using the
-		 * snapshot taken before; since several workers can enter this block
-		 * with different values of snapshot, we make sure that the values of
-		 * the counter will be updated to the largest of them.
+		 * if we arrived here, then right before this test (1) no worker is
+		 * processing anything and (2) after every interrupted worker there was
+		 * a started and finished worker that was not interrupted. This means
+		 * that the taken snapshots represent at least the number of processed
+		 * contexts and jobs. In this case we update the counter for processed
+		 * jobs and tasks using the snapshot taken before, if it is smaller.
 		 */
-		for (;;) {
-			int snapshotContextsProcessed = countContextsProcessed.get();
-			if (snapshotContextNo <= snapshotContextsProcessed)
-				break;
-			if (countContextsProcessed.compareAndSet(snapshotContextsProcessed,
-					snapshotContextNo)) {
-				updated = true;
-				break;
-			}
-		}
-		for (;;) {
-			int snapshotCountJobsProcessed = countJobsProcessed.get();
-			if (snapshotCountJobsSubmitted <= snapshotCountJobsProcessed)
-				break;
-			if (countJobsProcessed.compareAndSet(snapshotCountJobsProcessed,
-					snapshotCountJobsSubmitted)) {
-				updated = true;
-				break;
-			}
-		}
+		updateIfSmaller(countJobsProcessed, snapshotCountJobsSubmitted);
+		boolean updated = updateIfSmaller(countContextsProcessed,
+				snapshotContextNo);
 		if (updated && workersWaiting) {
 			/*
 			 * waking up all workers waiting to submit the jobs
