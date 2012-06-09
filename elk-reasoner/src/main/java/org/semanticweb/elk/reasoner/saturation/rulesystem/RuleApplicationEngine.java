@@ -126,18 +126,20 @@ public class RuleApplicationEngine implements
 	public void process() {
 		for (;;) {
 			if (Thread.currentThread().isInterrupted())
-				return;
+				break;
 			Context nextContext = activeContexts.poll();
 			if (nextContext == null) {
 				if (!activeContextsEmpty.compareAndSet(false, true))
-					return;
+					break;
 				nextContext = activeContexts.poll();
 				if (nextContext == null)
-					return;
+					break;
 				tryNotifyCanProcess();
 			}
 			process(nextContext);
 		}
+		SuperClassExpression.sync();
+		BackwardLink.sync();
 	}
 
 	@Override
