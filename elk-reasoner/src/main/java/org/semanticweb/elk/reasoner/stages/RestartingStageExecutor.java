@@ -51,7 +51,6 @@ public class RestartingStageExecutor extends SimpleInterrupter implements
 			Statistics.logOperationStart(stage.getName(), LOGGER_);
 			do {
 				stage.clearInterrupt();
-				Thread.interrupted();
 				stage.execute();
 			} while (stage.isInterrupted());
 			Statistics.logOperationFinish(stage.getName(), LOGGER_);

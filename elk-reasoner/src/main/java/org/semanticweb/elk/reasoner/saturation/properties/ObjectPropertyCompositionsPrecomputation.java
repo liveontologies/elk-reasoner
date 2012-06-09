@@ -26,39 +26,43 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
+// TODO: Support concurrent computation?
 /**
- * Resets all saturated object properties and computes the transitive closure of
- * object property inclusions.
+ * Sets up multimaps for fast look-up of object property compositions to be used
+ * in {@link RuleRoleComposition}.
  * 
  * @author Frantisek Simancik
- * @author "Yevgeny Kazakov"
+ * 
  */
-
-public class ObjectPropertyHierarchyComputation
+public class ObjectPropertyCompositionsPrecomputation
 		extends
-		ReasonerComputation<IndexedPropertyChain, ObjectPropertyHierarchyComputationEngine> {
+		ReasonerComputation<IndexedPropertyChain, ObjectPropertyCompositionsPrecomputationEngine> {
 
 	/**
-	 * the index of the ontology used for computation
+	 * the ontology index used for computation
 	 */
 	protected final OntologyIndex ontologyIndex;
 
-	public ObjectPropertyHierarchyComputation(
-			ObjectPropertyHierarchyComputationEngine inputProcessor,
-			ComputationExecutor executor, int maxWorkers,
+	public ObjectPropertyCompositionsPrecomputation(
+			ObjectPropertyCompositionsPrecomputationEngine inputProcessor,
+			Interrupter interrupter, ComputationExecutor executor,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+		// the engine is not thread safe; use 1 worker
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
-				.getIndexedObjectPropertyCount(), inputProcessor, executor,
-				maxWorkers, progressMonitor);
+				.getIndexedPropertyChainCount(), inputProcessor, executor, 1,
+				progressMonitor);
 		this.ontologyIndex = ontologyIndex;
 	}
 
-	public ObjectPropertyHierarchyComputation(ComputationExecutor executor,
-			int maxWorkers, ProgressMonitor progressMonitor,
+	public ObjectPropertyCompositionsPrecomputation(Interrupter interrupter,
+			ComputationExecutor executor, ProgressMonitor progressMonitor,
 			OntologyIndex ontologyIndex) {
-		this(new ObjectPropertyHierarchyComputationEngine(), executor,
-				maxWorkers, progressMonitor, ontologyIndex);
+		this(new ObjectPropertyCompositionsPrecomputationEngine(), interrupter,
+				executor, progressMonitor, ontologyIndex);
 	}
+
 }

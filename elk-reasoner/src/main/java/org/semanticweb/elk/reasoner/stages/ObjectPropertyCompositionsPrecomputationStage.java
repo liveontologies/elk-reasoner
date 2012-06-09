@@ -25,42 +25,44 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.saturation.properties.RedundantCompositionsElimination;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
+import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyCompositionsPrecomputation;
 
-public class RedundantCompositionsEliminationStage extends
+//TODO: Concurrent?
+/**
+ * The reasoner stage whose purpose is to set up multimaps for fast look-up of
+ * object property compositions to be used in {@link RuleRoleComposition}.
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
+public class ObjectPropertyCompositionsPrecomputationStage extends
 		AbstractReasonerStage {
 
 	/**
 	 * the computation used for this stage
 	 */
-	private RedundantCompositionsElimination computation = null;
+	private ObjectPropertyCompositionsPrecomputation computation;
 
-	/**
-	 * the progress monitor used to report progress of this stage
-	 */
-	private final ProgressMonitor progressMonitor;
-
-	public RedundantCompositionsEliminationStage(AbstractReasonerState reasoner) {
+	public ObjectPropertyCompositionsPrecomputationStage(
+			AbstractReasonerState reasoner) {
 		super(reasoner);
-		this.computation = null;
-		this.progressMonitor = reasoner.getProgressMonitor();
 	}
 
 	@Override
 	public String getName() {
-		return "Redundant Compositions Elimination";
+		return "Object Property Compositions Precomputation";
 	}
 
 	@Override
 	public boolean done() {
-		return reasoner.doneRedundantCompositionsElimination;
+		return reasoner.doneObjectPropertyCompositionsPrecomputation;
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
 		return Arrays
-				.asList((ReasonerStage) new ObjectPropertyCompositionsInitializationStage(
+				.asList((ReasonerStage) new ObjectPropertyHierarchyComputationStage(
 						reasoner));
 	}
 
@@ -71,16 +73,16 @@ public class RedundantCompositionsEliminationStage extends
 		computation.process();
 		if (isInterrupted())
 			return;
-		reasoner.doneRedundantCompositionsElimination = true;
+		reasoner.doneObjectPropertyCompositionsPrecomputation = true;
 		reasoner.doneReset = false;
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		computation = new RedundantCompositionsElimination(
-				reasoner.compositions.entrySet(), reasoner.getStageExecutor(),
-				progressMonitor);
+		this.computation = new ObjectPropertyCompositionsPrecomputation(
+				reasoner.getStageExecutor(), reasoner.getProcessExecutor(),
+				progressMonitor, reasoner.ontologyIndex);
 	}
 
 	@Override

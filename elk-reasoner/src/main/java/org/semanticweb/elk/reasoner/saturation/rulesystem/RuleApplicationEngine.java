@@ -38,7 +38,6 @@ import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemElClassSat
 import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemInvocationManagerSCE;
 import org.semanticweb.elk.reasoner.saturation.classes.SuperClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * The engine for computing the saturation of class expressions. This is the
@@ -89,19 +88,13 @@ public class RuleApplicationEngine implements
 	 */
 	protected final AtomicBoolean activeContextsEmpty;
 	/**
-	 * The interrupter used to interrupt and monitor interruption for this
-	 * engine
-	 */
-	protected final Interrupter interrupter;
-	/**
 	 * The listener for rule application callbacks
 	 */
 	protected final RuleApplicationListener listener;
 
 	public RuleApplicationEngine(OntologyIndex ontologyIndex,
-			Interrupter interrupter, RuleApplicationListener listener) {
+			RuleApplicationListener listener) {
 		this.ontologyIndex = ontologyIndex;
-		this.interrupter = interrupter;
 		this.listener = listener;
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
 		this.activeContextsEmpty = new AtomicBoolean(true);
@@ -130,13 +123,10 @@ public class RuleApplicationEngine implements
 	}
 
 	@Override
-	public void process() throws InterruptedException {
+	public void process() {
 		for (;;) {
-			if (interrupter.isInterrupted()) {
-				// wake up other workers if sleeping
-				listener.notifyCanProcess();
+			if (Thread.currentThread().isInterrupted())
 				return;
-			}
 			Context nextContext = activeContexts.poll();
 			if (nextContext == null) {
 				if (!activeContextsEmpty.compareAndSet(false, true))

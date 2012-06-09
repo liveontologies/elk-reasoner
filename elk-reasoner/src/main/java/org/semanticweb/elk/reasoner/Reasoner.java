@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
+import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
  * The class for querying the results of the reasoning tasks for a given
@@ -61,6 +62,10 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	protected final ReasonerStageExecutor stageExecutor;
 	/**
+	 * the executor used for concurrent tasks
+	 */
+	protected final ComputationExecutor executor;
+	/**
 	 * Number of workers for concurrent jobs.
 	 */
 	protected final int workerNo;
@@ -79,6 +84,7 @@ public class Reasoner extends AbstractReasonerState {
 	protected Reasoner(ReasonerStageExecutor stageExecutor,
 			ExecutorService executor, int workerNo) {
 		this.stageExecutor = stageExecutor;
+		this.executor = new ComputationExecutor(workerNo, "elk-computation");
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
@@ -124,6 +130,11 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	@Override
+	protected ComputationExecutor getProcessExecutor() {
+		return this.executor;
+	}
+
+	@Override
 	protected ReasonerStageExecutor getStageExecutor() {
 		return stageExecutor;
 	}
@@ -134,7 +145,7 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	public void shutdown() {
-		// TODO: execute shutdown hooks
+		executor.shutdown();
 	}
 
 	/**

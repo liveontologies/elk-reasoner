@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * The engine for checking consistency of an ontology by checking satisfiability
@@ -59,16 +58,10 @@ public class ConsistencyCheckingEngine implements
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
-	 * @param interrupter
-	 *            the interrupter used to interrupt and monitor interruption for
-	 *            this engine
-	 * 
 	 */
-	public ConsistencyCheckingEngine(OntologyIndex ontologyIndex,
-			Interrupter interrupter) {
+	public ConsistencyCheckingEngine(OntologyIndex ontologyIndex) {
 		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJob<IndexedClassExpression>>(
-				ontologyIndex, interrupter,
-				new ThisClassExpressionSaturationListener());
+				ontologyIndex, new ThisClassExpressionSaturationListener());
 	}
 
 	@Override

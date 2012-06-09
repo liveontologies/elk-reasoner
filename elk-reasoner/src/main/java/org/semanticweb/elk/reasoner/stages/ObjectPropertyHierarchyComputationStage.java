@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputation;
 
 /**
@@ -46,24 +45,17 @@ public class ObjectPropertyHierarchyComputationStage extends
 	/**
 	 * the computation used for this stage
 	 */
-	private final ObjectPropertyHierarchyComputation computation;
+	private ObjectPropertyHierarchyComputation computation;
 	/**
 	 * the number of workers used in the computation for this stage
 	 */
 	private final int workerNo;
-	/**
-	 * the progress monitor used to report progress of this stage
-	 */
-	private final ProgressMonitor progressMonitor;
 
 	public ObjectPropertyHierarchyComputationStage(
 			AbstractReasonerState reasoner) {
 		super(reasoner);
 		this.workerNo = reasoner.getNumberOfWorkers();
 		this.progressMonitor = reasoner.getProgressMonitor();
-		this.computation = new ObjectPropertyHierarchyComputation(
-				reasoner.getStageExecutor(), workerNo, progressMonitor,
-				reasoner.ontologyIndex);
 	}
 
 	@Override
@@ -83,13 +75,23 @@ public class ObjectPropertyHierarchyComputationStage extends
 
 	@Override
 	public void execute() {
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		if (computation == null)
+			initComputation();
 		computation.process();
 		if (isInterrupted())
 			return;
 		reasoner.doneObjectPropertyHierarchyComputation = true;
 		reasoner.doneReset = false;
+	}
+
+	@Override
+	void initComputation() {
+		super.initComputation();
+		this.computation = new ObjectPropertyHierarchyComputation(
+				reasoner.getProcessExecutor(), workerNo, progressMonitor,
+				reasoner.ontologyIndex);
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
 
 	@Override

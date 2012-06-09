@@ -31,8 +31,8 @@ import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
- * The reasoner stage, which purpose is to compute the instance taxonomy of the
- * current ontology
+ * The reasoner stage, during which the instance taxonomy of the current
+ * ontology is computed
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -72,8 +72,6 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	public void execute() {
 		if (computation == null)
 			initComputation();
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		progressMonitor.start(getName());
 		computation.process();
 		progressMonitor.finish();
@@ -93,7 +91,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			this.computation = new TaxonomyComputation(
 					ontologyIndex.getIndexedIndividuals(),
 					ontologyIndex.getIndexedIndividualCount(),
-					reasoner.getStageExecutor(), workerNo, progressMonitor,
+					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.getOntologyIndex(), reasoner.taxonomy);
 		else
 			this.computation = new TaxonomyComputation(Operations.concat(
@@ -101,8 +99,10 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 					ontologyIndex.getIndexedIndividuals()),
 					ontologyIndex.getIndexedClassCount()
 							+ ontologyIndex.getIndexedIndividualCount(),
-					reasoner.getStageExecutor(), workerNo, progressMonitor,
+					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.getOntologyIndex());
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
 
 	@Override

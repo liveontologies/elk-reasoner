@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
 /**
- * The reasoner stage, which purpose is to check consistency of the current
- * ontology
+ * The reasoner stage, during which consistency of the current ontology is
+ * checked
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -62,18 +62,16 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(
-				(ReasonerStage) new RedundantCompositionsEliminationStage(
+		return Arrays
+				.asList((ReasonerStage) new ObjectPropertyCompositionsPrecomputationStage(
 						reasoner),
-				(ReasonerStage) new ContextInitializationStage(reasoner));
+						(ReasonerStage) new ContextInitializationStage(reasoner));
 	}
 
 	@Override
 	public void execute() {
 		if (computation == null)
 			initComputation();
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		progressMonitor.start(getName());
 		computation.process();
 		progressMonitor.finish();
@@ -87,8 +85,11 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		this.computation = new ConsistencyChecking(reasoner.getStageExecutor(),
-				workerNo, reasoner.getProgressMonitor(), reasoner.ontologyIndex);
+		this.computation = new ConsistencyChecking(
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
 
 	@Override

@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Map;
-import java.util.Vector;
-
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -32,12 +29,11 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
-import org.semanticweb.elk.util.collections.Pair;
+import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
  * The execution state of the reasoner containing information about which
@@ -54,14 +50,9 @@ public abstract class AbstractReasonerState {
 	 */
 	boolean doneObjectPropertyHierarchyComputation = false;
 	/**
-	 * <tt>true</tt> if the object property composition has been initialized
+	 * <tt>true</tt> if the object property compositions have been precomputed
 	 */
-	boolean doneObjectPropertyCompositionsInitialization = false;
-	/**
-	 * <tt>true</tt> if the object redundant object property compositions have
-	 * been eliminated
-	 */
-	boolean doneRedundantCompositionsElimination = false;
+	boolean doneObjectPropertyCompositionsPrecomputation = false;
 	/**
 	 * <tt>true</tt> if the assignment of contexts to class expressions has been
 	 * reset
@@ -88,10 +79,6 @@ public abstract class AbstractReasonerState {
 	 */
 	OntologyIndex ontologyIndex;
 	/**
-	 * the object property compositions
-	 */
-	Map<Pair<IndexedPropertyChain, IndexedPropertyChain>, Vector<IndexedPropertyChain>> compositions = null;
-	/**
 	 * <tt>true</tt> if the current ontology is consistent
 	 */
 	boolean consistentOntology = true;
@@ -112,10 +99,9 @@ public abstract class AbstractReasonerState {
 	 * earlier deductions any longer.
 	 */
 	protected void resetStages() {
-		if (!doneReset) {			
+		if (!doneReset) {
 			doneObjectPropertyHierarchyComputation = false;
-			doneObjectPropertyCompositionsInitialization = false;			
-			doneRedundantCompositionsElimination = false;		
+			doneObjectPropertyCompositionsPrecomputation = false;
 			doneContextReset = false;
 			doneConsistencyCheck = false;
 			doneClassTaxonomy = false;
@@ -135,6 +121,12 @@ public abstract class AbstractReasonerState {
 	 *         stages of the reasoner.
 	 */
 	protected abstract ReasonerStageExecutor getStageExecutor();
+
+	/**
+	 * @return the {@link ComputationExecutor} that is used for execution of
+	 *         reasoning processes
+	 */
+	protected abstract ComputationExecutor getProcessExecutor();
 
 	/**
 	 * @return the {@link ProgressMonitor} that is used for reporting progress

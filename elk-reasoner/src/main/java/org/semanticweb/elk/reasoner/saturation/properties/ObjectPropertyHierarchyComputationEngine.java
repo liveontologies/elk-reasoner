@@ -27,22 +27,24 @@ import java.util.ArrayDeque;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
-//TODO: Document this class
-//TODO: Add progress monitor
 /**
+ * The engine for resetting the saturation and computing the transitively closed
+ * suproperties and superproperties of each submitted property chain.
+ * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
-class RoleHierarchyComputationEngine implements
+class ObjectPropertyHierarchyComputationEngine implements
 		InputProcessor<IndexedPropertyChain> {
 
 	@Override
 	public void submit(IndexedPropertyChain ipc) {
+		// reset the saturation of this property chain
 		ipc.resetSaturated();
 		SaturatedPropertyChain saturated = new SaturatedPropertyChain(ipc);
 		ipc.setSaturated(saturated);
 
-		// compute all subproperties
+		// compute all transitively closed subproperties
 		ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
 		saturated.derivedSubProperties.add(ipc);
 		queue.addLast(ipc);
@@ -54,7 +56,7 @@ class RoleHierarchyComputationEngine implements
 						queue.addLast(s);
 		}
 
-		// compute all superproperties
+		// compute all transitively closed superproperties
 		queue.clear();
 		saturated.derivedSuperProperties.add(ipc);
 		queue.addLast(ipc);

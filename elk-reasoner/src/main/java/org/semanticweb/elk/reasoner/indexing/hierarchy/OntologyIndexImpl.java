@@ -78,6 +78,11 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
 		return indexedClassExpressionLookup;
 	}
+	
+	@Override 
+	public int getIndexedClassExpressionCount() {
+		return indexedClassExpressionLookup.size();
+	}
 
 	@Override
 	public Iterable<IndexedClass> getIndexedClasses() {
@@ -101,10 +106,14 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 		return indexedIndividualCount;
 	}
 
-
 	@Override
 	public Iterable<IndexedPropertyChain> getIndexedPropertyChains() {
 		return indexedPropertyChainLookup;
+	}
+	
+	@Override 
+	public int getIndexedPropertyChainCount() {
+		return indexedPropertyChainLookup.size();
 	}
 
 	@Override
