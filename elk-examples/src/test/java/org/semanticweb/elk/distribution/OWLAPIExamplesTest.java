@@ -33,7 +33,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -197,12 +196,9 @@ public class OWLAPIExamplesTest {
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {
-		final URI inputURI = OWLAPIExamplesTest.class.getClassLoader()
-				.getResource("owlapi-examples-src").toURI();
-
 		return ConfigurationUtils
 				.loadFileBasedTestConfiguration(
-						inputURI,
+						"owlapi-examples-src",
 						OWLAPIExamplesTest.class,
 						"java",
 

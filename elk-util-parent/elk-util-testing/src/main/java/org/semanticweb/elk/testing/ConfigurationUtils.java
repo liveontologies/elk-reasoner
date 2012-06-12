@@ -28,6 +28,7 @@ package org.semanticweb.elk.testing;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,19 +57,21 @@ public class ConfigurationUtils {
 	 * Loads configuration from a set of files by passing both input and expected output URLs to the test manifest creator
 	 * 
 	 * @return
+	 * @throws URISyntaxException 
 	 */
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
-																final URI srcURI,
+																final String path,
 																final Class<?> srcClass,
 																final String inputFileExt,
 																final String outputFileExt,
-																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException {
+																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException, URISyntaxException {
+		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
 		//Load inputs and expected results
 		final List<String> inputs = srcURI.isOpaque() 
-				? IOUtils.getResourceNamesFromJAR(srcURI, inputFileExt, srcClass)
+				? IOUtils.getResourceNamesFromJAR(path, inputFileExt, srcClass)
 				: IOUtils.getResourceNamesFromDir(new File(srcURI), inputFileExt);
 		final List<String> results = srcURI.isOpaque() 
-				? IOUtils.getResourceNamesFromJAR(srcURI, outputFileExt, srcClass)
+				? IOUtils.getResourceNamesFromJAR(path, outputFileExt, srcClass)
 				: IOUtils.getResourceNamesFromDir(new File(srcURI), outputFileExt);				
 		
 		Collections.sort(inputs);
@@ -117,15 +120,17 @@ public class ConfigurationUtils {
 	 * In case there're no expected results
 	 * 
 	 * @return
+	 * @throws URISyntaxException 
 	 */
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
-																final URI srcURI,
+																final String path,
 																final Class<?> srcClass,
 																final String inputFileExt,
-																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException {
+																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException, URISyntaxException {
+		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
 		//Load inputs 
 		final List<String> inputs = srcURI.isOpaque() 
-				? IOUtils.getResourceNamesFromJAR(srcURI, inputFileExt, srcClass)
+				? IOUtils.getResourceNamesFromJAR(path, inputFileExt, srcClass)
 				: IOUtils.getResourceNamesFromDir(new File(srcURI), inputFileExt);
 		
 		final List<TestManifest<URLTestIO, EO, AO>> manifests = new ArrayList<TestManifest<URLTestIO,EO,AO>>(inputs.size());

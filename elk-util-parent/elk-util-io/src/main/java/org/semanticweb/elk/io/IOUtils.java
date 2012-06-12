@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
@@ -114,7 +113,7 @@ public class IOUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List<String> getResourceNamesFromJAR(URI inputURI, String extension, Class<?> clazz) throws IOException {
+	public static List<String> getResourceNamesFromJAR(String path, String extension, Class<?> clazz) throws IOException {
 		CodeSource src = clazz.getProtectionDomain().getCodeSource();
 		List<String> testResources = new ArrayList<String>();
 		ZipInputStream zip = null;
@@ -128,7 +127,8 @@ public class IOUtils {
 				
 				while( ( ze = zip.getNextEntry() ) != null ) {
 				    String entryName = ze.getName();
-				    if( entryName.endsWith("." + extension) ) {
+				    
+				    if( entryName.startsWith(path) && entryName.endsWith("." + extension) ) {
 				    	testResources.add( entryName );
 				    }
 				}

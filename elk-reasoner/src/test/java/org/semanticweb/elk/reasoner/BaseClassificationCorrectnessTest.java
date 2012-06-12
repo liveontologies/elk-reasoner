@@ -23,24 +23,14 @@
 package org.semanticweb.elk.reasoner;
 
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
-import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
  * Runs classification tests for all test input in the test directory
@@ -51,42 +41,17 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * 
  */
 @RunWith(PolySuite.class)
-public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> {
+public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> extends BaseReasoningCorrectnessTest<EO, ClassTaxonomyTestOutput> {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
-	private final ReasoningTestManifest<EO, ClassTaxonomyTestOutput> manifest;
-	private InputStream inputStream;
-	private Reasoner reasoner;
-
 	public BaseClassificationCorrectnessTest(
 			ReasoningTestManifest<EO, ClassTaxonomyTestOutput> testManifest) {
-		manifest = testManifest;
+		super(testManifest);
 	}
-
-	@Before
-	public void before() throws IOException, Owl2ParseException {
-		assumeTrue(!ignore(manifest.getInput()));
-
-		inputStream = ((URLTestIO) manifest.getInput()).getInputStream();
-		reasoner = createReasoner(inputStream);
-	}
-
-	@After
-	public void after() {
-		IOUtils.closeQuietly(inputStream);
-	}
-
-	protected boolean ignore(TestInput input) {
-		return false;
-	}
-
-	protected abstract Reasoner createReasoner(final InputStream input)
-			throws IOException, Owl2ParseException;
 
 	/*
-	 * --------------------------------------------- Tests
-	 * ---------------------------------------------
+	 * Tests
 	 */
 
 	/**

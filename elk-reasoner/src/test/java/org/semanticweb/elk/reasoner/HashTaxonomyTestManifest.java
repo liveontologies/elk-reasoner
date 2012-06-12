@@ -35,17 +35,17 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class HashClassificationTestManifest extends ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> {
+public class HashTaxonomyTestManifest<AO extends ClassTaxonomyTestOutput> extends ReasoningTestManifest<HashTestOutput, AO> {
 
-	public HashClassificationTestManifest(URL input, HashTestOutput expOutput) {
+	public HashTaxonomyTestManifest(URL input, HashTestOutput expOutput) {
 		super(input, expOutput);
 	}
 
 	@Override
-	public void compare(ClassTaxonomyTestOutput actualOutput)
+	public void compare(AO actualOutput)
 			throws TestResultComparisonException {
 		if (getExpectedOutput().getHash() != (actualOutput.getHashCode())) {
-			throw new TestResultComparisonException("Expected hashcode not equal to the actual hashcode", getExpectedOutput(), actualOutput);
+			throw new TestResultComparisonException("Expected taxonomy hashcode not equal to the actual hashcode", getExpectedOutput(), actualOutput);
 		}
 	}
 }
