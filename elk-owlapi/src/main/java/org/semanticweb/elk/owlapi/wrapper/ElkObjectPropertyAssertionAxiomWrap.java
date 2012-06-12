@@ -47,12 +47,12 @@ public class ElkObjectPropertyAssertionAxiomWrap<T extends OWLObjectPropertyAsse
 
 	@Override
 	public ElkIndividual getObject() {
-		return converter.convert(this.owlObject.getSubject());
+		return converter.convert(this.owlObject.getObject());
 	}
 
 	@Override
 	public ElkIndividual getSubject() {
-		return converter.convert(this.owlObject.getObject());
+		return converter.convert(this.owlObject.getSubject());
 	}
 
 	@Override
