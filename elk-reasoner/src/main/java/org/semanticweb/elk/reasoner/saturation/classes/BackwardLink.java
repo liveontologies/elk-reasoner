@@ -72,13 +72,13 @@ public class BackwardLink<C extends ContextElClassSaturation> extends
 
 	@Override
 	public boolean storeInContext(C context) {
-		localBackLinkInfNo.get().incrementAndGet();
+//		localBackLinkInfNo.get().incrementAndGet();
 
 		if (context.backwardLinksByObjectProperty == null)
 			context.initBackwardLinksByProperty();
 
 		if (context.backwardLinksByObjectProperty.add(first, second)) {
-			localBackLinkNo.get().incrementAndGet();
+//			localBackLinkNo.get().incrementAndGet();
 			return true;
 		}
 		return false;

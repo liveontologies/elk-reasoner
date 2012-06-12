@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK Utilities for Concurrency
  * 
  * $Id$
  * $HeadURL$
@@ -20,21 +20,23 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
-
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * Inference rule with a NegativeSuperClassExpressions as an argument.
+ * An factory for creation of an input processor for a given type.
  * 
- * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <I>
+ *            the type of the input processed by the input processors
+ * @param <P>
+ *            the type of the input processors produced by this factory
  */
-public interface InferenceRuleNegSCE<C extends ContextElClassSaturation>
-		extends InferenceRule<C> {
+public interface InputProcessorFactory<I, P extends InputProcessor<I>> {
 
-	void applySCE(NegativeSuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine);
+	/**
+	 * @return a new input processor of the given type
+	 */
+	public P createProcessor();
 
 }

@@ -20,21 +20,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
+package org.semanticweb.elk.reasoner.saturation.properties;
 
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
-/**
- * Inference rule with a NegativeSuperClassExpressions as an argument.
- * 
- * @author Frantisek Simancik
- * 
- */
-public interface InferenceRuleNegSCE<C extends ContextElClassSaturation>
-		extends InferenceRule<C> {
+public class ObjectPropertyHierarchyComputationFactory
+		implements
+		InputProcessorFactory<IndexedPropertyChain, ObjectPropertyHierarchyComputationEngine> {
 
-	void applySCE(NegativeSuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine);
+	/**
+	 * We use a single engine for this factory
+	 */
+	private final ObjectPropertyHierarchyComputationEngine engine;
 
+	ObjectPropertyHierarchyComputationFactory() {
+		this.engine = new ObjectPropertyHierarchyComputationEngine();
+	}
+
+	@Override
+	public ObjectPropertyHierarchyComputationEngine createProcessor() {
+		return this.engine;
+	}
 }

@@ -24,19 +24,23 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
 
 /**
  * @author Frantisek Simancik
- *
+ * 
  */
-public class RuleReflexiveRole<C extends ContextElClassSaturation> implements InferenceRule<C> {
+public class RuleReflexiveRole<C extends ContextElClassSaturation> implements
+		InferenceRule<C> {
 
-	public void init(C context, RuleApplicationEngine engine) {
-		Iterable<IndexedObjectProperty> reflexiveProperties = engine.ontologyIndex.getReflexiveObjectProperties();
+	public void init(C context, RuleApplicationShared engine) {
+		Iterable<IndexedObjectProperty> reflexiveProperties = engine.ontologyIndex
+				.getReflexiveObjectProperties();
 		if (reflexiveProperties != null)
 			for (IndexedObjectProperty reflexiveProperty : reflexiveProperties)
-				engine.enqueue(context, new BackwardLink<ContextElClassSaturation>(reflexiveProperty, context));
+				engine.enqueue(context,
+						new BackwardLink<ContextElClassSaturation>(
+								reflexiveProperty, context));
 	}
-	
+
 }

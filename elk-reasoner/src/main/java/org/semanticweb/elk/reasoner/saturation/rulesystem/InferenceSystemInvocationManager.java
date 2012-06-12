@@ -54,7 +54,7 @@ public class InferenceSystemInvocationManager {
 	 * InferenceSystem that stores the rules).
 	 */
 	protected final static Class<?>[] parameterTypesRuleMethod = {
-			Queueable.class, Context.class, RuleApplicationEngine.class };
+			Queueable.class, Context.class, RuleApplicationShared.class };
 	/**
 	 * Name of the method that InferenceRule objects use for initializing a
 	 * context. These methods implement inference rules without premises.
@@ -67,7 +67,7 @@ public class InferenceSystemInvocationManager {
 	 * InferenceSystem that stores the rules).
 	 */
 	protected final static Class<?>[] parameterTypesInitMethod = {
-			Context.class, RuleApplicationEngine.class };
+			Context.class, RuleApplicationShared.class };
 	/**
 	 * Name of the method that Queueable objects use for storing their date in a
 	 * given context. This is also part of the required interface of Queueable,
@@ -84,7 +84,7 @@ public class InferenceSystemInvocationManager {
 	 * RuleApplicationEngine that owns this object. Rule applications need to
 	 * know this for enqueueing new derivations.
 	 */
-	protected final RuleApplicationEngine engine;
+	protected final RuleApplicationShared engine;
 
 	/**
 	 * Simple linked list implementation for rule methods.
@@ -172,7 +172,7 @@ public class InferenceSystemInvocationManager {
 	 * 
 	 * @param engine
 	 */
-	public InferenceSystemInvocationManager(RuleApplicationEngine engine) {
+	public InferenceSystemInvocationManager(RuleApplicationShared engine) {
 		this.engine = engine;
 	}
 
@@ -286,8 +286,9 @@ public class InferenceSystemInvocationManager {
 	 * @param parameterTypes
 	 * @throws IllegalInferenceMethodException
 	 */
-	protected static void checkMethodSignature(Method method, String methodName,
-			Class<?>[] parameterTypes) throws IllegalInferenceMethodException {
+	protected static void checkMethodSignature(Method method,
+			String methodName, Class<?>[] parameterTypes)
+			throws IllegalInferenceMethodException {
 		if (!methodName.equals(method.getName())) {
 			throw new IllegalInferenceMethodException(method,
 					"Method must be called '" + methodName + "'.");

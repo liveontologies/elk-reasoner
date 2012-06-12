@@ -20,21 +20,28 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
+package org.semanticweb.elk.reasoner.consistency;
 
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
-/**
- * Inference rule with a NegativeSuperClassExpressions as an argument.
- * 
- * @author Frantisek Simancik
- * 
- */
-public interface InferenceRuleNegSCE<C extends ContextElClassSaturation>
-		extends InferenceRule<C> {
+public class ConsistencyCheckingFactory
+		implements
+		InputProcessorFactory<IndexedClassExpression, ConsistencyCheckingEngine> {
 
-	void applySCE(NegativeSuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine);
+	private final ConsistencyCheckingShared shared;
+
+	public ConsistencyCheckingFactory(ConsistencyCheckingShared shared) {
+		this.shared = shared;
+	}
+
+	@Override
+	public ConsistencyCheckingEngine createProcessor() {
+		return new ConsistencyCheckingEngine(shared);
+	}
+
+	ConsistencyCheckingShared getShared() {
+		return this.shared;
+	}
 
 }

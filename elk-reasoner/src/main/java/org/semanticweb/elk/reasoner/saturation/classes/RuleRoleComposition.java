@@ -26,82 +26,86 @@ import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * @author Frantisek Simancik
- *
+ * 
  */
-public class RuleRoleComposition<C extends ContextElClassSaturation>  extends RuleWithBackwardLinks<C> 
-		implements InferenceRule<C> {
+public class RuleRoleComposition<C extends ContextElClassSaturation> extends
+		RuleWithBackwardLinks<C> implements InferenceRule<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
-			RuleApplicationEngine engine) {
+			RuleApplicationShared engine) {
 
 		final IndexedPropertyChain linkRelation = argument.getRelation();
 		final C target = argument.getTarget();
 
 		/*
-		 * if composeBackwardLinks, then add a forward copy of the link
-		 * to consider the link in property compositions
+		 * if composeBackwardLinks, then add a forward copy of the link to
+		 * consider the link in property compositions
 		 */
 		if (context.composeBackwardLinks
-				&& linkRelation.getSaturated().getCompositionsByLeftSubProperty() != null)
+				&& linkRelation.getSaturated()
+						.getCompositionsByLeftSubProperty() != null)
 			engine.enqueue(target, new ForwardLink<C>(linkRelation, context));
 
 		/* compose the link with all forward links */
-		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps =
-			linkRelation.getSaturated().getCompositionsByRightSubProperty();
-		final Multimap<IndexedPropertyChain, ? extends ContextElClassSaturation> forwLinks =
-			context.forwardLinksByObjectProperty;
-		
+		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = linkRelation
+				.getSaturated().getCompositionsByRightSubProperty();
+		final Multimap<IndexedPropertyChain, ? extends ContextElClassSaturation> forwLinks = context.forwardLinksByObjectProperty;
+
 		if (comps != null && forwLinks != null) {
 			for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 					comps.keySet(), forwLinks.keySet())) {
 
-				Collection<IndexedPropertyChain> compositions = comps.get(forwardRelation);
-				Collection<? extends ContextElClassSaturation> forwardTargets = forwLinks.get(forwardRelation);
+				Collection<IndexedPropertyChain> compositions = comps
+						.get(forwardRelation);
+				Collection<? extends ContextElClassSaturation> forwardTargets = forwLinks
+						.get(forwardRelation);
 
 				for (IndexedPropertyChain composition : compositions)
 					for (ContextElClassSaturation forwardTarget : forwardTargets)
-						engine.enqueue(forwardTarget, new BackwardLink<C>(composition, target));
+						engine.enqueue(forwardTarget, new BackwardLink<C>(
+								composition, target));
 			}
 		}
-
 
 	}
 
 	public void apply(ForwardLink<C> argument, C context,
-			RuleApplicationEngine engine) {
+			RuleApplicationShared engine) {
 
 		// start deriving backward links for composition
 		initializeCompositionOfBackwardLinks(context, engine);
-		
+
 		final IndexedPropertyChain linkRelation = argument.getRelation();
 		final C target = argument.getTarget();
 
 		/* compose the link with all backward links */
-		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps =
-			linkRelation.getSaturated().getCompositionsByLeftSubProperty();
-		final Multimap<IndexedPropertyChain, ? extends ContextElClassSaturation> backLinks =
-			context.backwardLinksByObjectProperty;
-		
-		//		assert comps != null
+		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = linkRelation
+				.getSaturated().getCompositionsByLeftSubProperty();
+		final Multimap<IndexedPropertyChain, ? extends ContextElClassSaturation> backLinks = context.backwardLinksByObjectProperty;
+
+		// assert comps != null
 		if (backLinks != null) {
 			for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 					comps.keySet(), backLinks.keySet())) {
 
-				Collection<IndexedPropertyChain> compositions = comps.get(backwardRelation);
-				Collection<? extends ContextElClassSaturation> backwardTargets = backLinks.get(backwardRelation);
+				Collection<IndexedPropertyChain> compositions = comps
+						.get(backwardRelation);
+				Collection<? extends ContextElClassSaturation> backwardTargets = backLinks
+						.get(backwardRelation);
 
 				for (IndexedPropertyChain composition : compositions)
 					for (ContextElClassSaturation backwardTarget : backwardTargets)
-						engine.enqueue(target, new BackwardLink<ContextElClassSaturation> (composition, backwardTarget));
+						engine.enqueue(target,
+								new BackwardLink<ContextElClassSaturation>(
+										composition, backwardTarget));
 			}
 		}
 	}
-	
-	
+
 }

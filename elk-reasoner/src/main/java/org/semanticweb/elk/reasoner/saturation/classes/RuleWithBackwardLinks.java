@@ -23,12 +23,12 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * Abstract super class of all rules that require that BackwardLinks are fully
- * derived. 
+ * derived.
  * 
  * @author Frantisek Simancik
  * 
@@ -41,7 +41,7 @@ public abstract class RuleWithBackwardLinks<C extends ContextElClassSaturation> 
 	 * 
 	 */
 	protected void initializeCompositionOfBackwardLinks(C context,
-			RuleApplicationEngine engine) {
+			RuleApplicationShared engine) {
 		if (context.composeBackwardLinks)
 			return;
 

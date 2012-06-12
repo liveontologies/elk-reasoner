@@ -36,15 +36,17 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ConsistencyChecking extends
-		ReasonerComputation<IndexedClassExpression, ConsistencyCheckingEngine> {
+public class ConsistencyChecking
+		extends
+		ReasonerComputation<IndexedClassExpression, ConsistencyCheckingEngine, ConsistencyCheckingFactory> {
 
 	/**
 	 * the index of the ontology used for computation
 	 */
 	protected final OntologyIndex ontologyIndex;
 
-	public ConsistencyChecking(ConsistencyCheckingEngine inputProcessor,
+	public ConsistencyChecking(
+			ConsistencyCheckingFactory inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		/*
@@ -54,15 +56,16 @@ public class ConsistencyChecking extends
 		super(Operations.concat(
 				Operations.singleton(ontologyIndex.getIndexedOwlThing()),
 				ontologyIndex.getIndexedIndividuals()), ontologyIndex
-				.getIndexedIndividualCount() + 1, inputProcessor, executor,
-				maxWorkers, progressMonitor);
+				.getIndexedIndividualCount() + 1, inputProcessorFactory,
+				executor, maxWorkers, progressMonitor);
 		this.ontologyIndex = ontologyIndex;
 	}
 
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(new ConsistencyCheckingEngine(ontologyIndex), executor,
-				maxWorkers, progressMonitor, ontologyIndex);
+		this(new ConsistencyCheckingFactory(new ConsistencyCheckingShared(
+				ontologyIndex)), executor, maxWorkers, progressMonitor,
+				ontologyIndex);
 	}
 
 	@Override
@@ -78,14 +81,14 @@ public class ConsistencyChecking extends
 	 *         {@link #process()}
 	 */
 	public boolean isConsistent() {
-		return inputProcessor.isConsistent();
+		return inputProcessorFactory.getShared().isConsistent();
 	}
 
 	/**
 	 * Print statistics about consistency checking
 	 */
 	public void printStatistics() {
-		inputProcessor.printStatistics();
+		inputProcessorFactory.getShared().printStatistics();
 	}
 
 }

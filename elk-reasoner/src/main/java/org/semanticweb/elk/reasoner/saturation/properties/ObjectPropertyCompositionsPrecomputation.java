@@ -40,7 +40,7 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  */
 public class ObjectPropertyCompositionsPrecomputation
 		extends
-		ReasonerComputation<IndexedPropertyChain, ObjectPropertyCompositionsPrecomputationEngine> {
+		ReasonerComputation<IndexedPropertyChain, ObjectPropertyCompositionsPrecomputationEngine, ObjectPropertyCompositionsPrecomputationFactory> {
 
 	/**
 	 * the ontology index used for computation
@@ -48,21 +48,21 @@ public class ObjectPropertyCompositionsPrecomputation
 	protected final OntologyIndex ontologyIndex;
 
 	public ObjectPropertyCompositionsPrecomputation(
-			ObjectPropertyCompositionsPrecomputationEngine inputProcessor,
+			ObjectPropertyCompositionsPrecomputationFactory inputProcessorFactory,
 			Interrupter interrupter, ComputationExecutor executor,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		// the engine is not thread safe; use 1 worker
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
-				.getIndexedPropertyChainCount(), inputProcessor, executor, 1,
-				progressMonitor);
+				.getIndexedPropertyChainCount(), inputProcessorFactory,
+				executor, 1, progressMonitor);
 		this.ontologyIndex = ontologyIndex;
 	}
 
 	public ObjectPropertyCompositionsPrecomputation(Interrupter interrupter,
 			ComputationExecutor executor, ProgressMonitor progressMonitor,
 			OntologyIndex ontologyIndex) {
-		this(new ObjectPropertyCompositionsPrecomputationEngine(), interrupter,
-				executor, progressMonitor, ontologyIndex);
+		this(new ObjectPropertyCompositionsPrecomputationFactory(),
+				interrupter, executor, progressMonitor, ontologyIndex);
 	}
 
 }

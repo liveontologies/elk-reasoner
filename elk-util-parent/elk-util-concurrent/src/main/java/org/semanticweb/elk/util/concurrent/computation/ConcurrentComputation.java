@@ -43,12 +43,14 @@ import java.util.concurrent.BlockingQueue;
  *            the type of the input to be processed.
  * @param <P>
  *            the type of the processor for the input
+ * @param <F>
+ *            the type of the factory for the input processors
  */
-public class ConcurrentComputation<I, P extends InputProcessor<I>> {
+public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends InputProcessorFactory<I, P>> {
 	/**
-	 * the processor for the input to be executed by workers
+	 * the factory for input processors
 	 */
-	protected final P inputProcessor;
+	protected final F inputProcessorFactory;
 	/**
 	 * maximum number of concurrent workers
 	 */
@@ -78,8 +80,8 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	/**
 	 * Creating a {@link ConcurrentComputation} instance.
 	 * 
-	 * @param inputProcessor
-	 *            the processor for the input to be executed by workers
+	 * @param inputProcessorFactory
+	 *            the factory for input processors
 	 * @param executor
 	 *            the executor used internally to run the jobs
 	 * @param maxWorkers
@@ -89,9 +91,9 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	 *            full, submitting new jobs will block until new space is
 	 *            available
 	 */
-	public ConcurrentComputation(P inputProcessor,
+	public ConcurrentComputation(F inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
-		this.inputProcessor = inputProcessor;
+		this.inputProcessorFactory = inputProcessorFactory;
 		this.buffer = new ArrayBlockingQueue<I>(bufferCapacity);
 		this.finishRequested = false;
 		this.interrupted = false;
@@ -103,8 +105,8 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	/**
 	 * Creating a {@link ConcurrentComputation} instance.
 	 * 
-	 * @param inputProcessor
-	 *            the processor for the input to be executed by workers * @param
+	 * @param inputProcessorFactory
+	 *            the factory for input processors
 	 * @param executor
 	 *            the executor used internally to run the jobs
 	 * @param interrupter
@@ -112,9 +114,9 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	 * @param maxWorkers
 	 *            the maximal number of concurrent workers processing the jobs
 	 */
-	public ConcurrentComputation(P inputProcesor, ComputationExecutor executor,
-			int maxWorkers) {
-		this(inputProcesor, executor, maxWorkers, 64);
+	public ConcurrentComputation(F inputProcessorFactory,
+			ComputationExecutor executor, int maxWorkers) {
+		this(inputProcessorFactory, executor, maxWorkers, 64);
 	}
 
 	/**
@@ -190,6 +192,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 		@Override
 		public final void run() {
 			I nextInput;
+			P inputProcessor = inputProcessorFactory.createProcessor();
 			for (;;) {
 				if (interrupted)
 					break;

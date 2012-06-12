@@ -22,12 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.consistency;
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
-import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
@@ -41,32 +38,20 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  */
 public class ConsistencyCheckingEngine implements
 		InputProcessor<IndexedClassExpression> {
-	/**
-	 * The saturation engine used for saturating submitted indexed class
-	 * expressions
-	 */
-	protected final ClassExpressionSaturationEngine<SaturationJob<IndexedClassExpression>> saturationEngine;
-	/**
-	 * The result of the computation. True iff all submitted class expressions
-	 * are satisfiable.
-	 */
-	protected boolean isConsistent = true;
 
-	/**
-	 * Creates a new class taxonomy engine for the input ontology index and a
-	 * listener for executing callback functions.
-	 * 
-	 * @param ontologyIndex
-	 *            the ontology index for which the engine is created
-	 */
-	public ConsistencyCheckingEngine(OntologyIndex ontologyIndex) {
+	protected final ConsistencyCheckingShared shared;
+
+	protected final ClassExpressionSaturationEngine<SaturationJob<IndexedClassExpression>> saturationEngine;
+
+	public ConsistencyCheckingEngine(ConsistencyCheckingShared shared) {
+		this.shared = shared;
 		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJob<IndexedClassExpression>>(
-				ontologyIndex, new ThisClassExpressionSaturationListener());
+				shared.saturationShared);
 	}
 
 	@Override
 	public final void submit(IndexedClassExpression job) {
-		if (isConsistent)
+		if (shared.isConsistent)
 			saturationEngine.submit(new SaturationJob<IndexedClassExpression>(
 					job));
 	}
@@ -79,43 +64,6 @@ public class ConsistencyCheckingEngine implements
 	@Override
 	public boolean canProcess() {
 		return saturationEngine.canProcess();
-	}
-
-	/**
-	 * Print statistics about class taxonomy construction
-	 */
-	public void printStatistics() {
-		saturationEngine.printStatistics();
-	}
-
-	/**
-	 * Returns whether all submitted class expressions are satisfiable
-	 */
-	public boolean isConsistent() {
-		return isConsistent;
-	}
-
-	/**
-	 * The listener class used for the class expression saturation engine, which
-	 * is used within this consistency engine
-	 * 
-	 */
-	class ThisClassExpressionSaturationListener
-			implements
-			ClassExpressionSaturationListener<SaturationJob<IndexedClassExpression>, ClassExpressionSaturationEngine<SaturationJob<IndexedClassExpression>>> {
-
-		@Override
-		public void notifyCanProcess() {
-		}
-
-		@Override
-		public void notifyFinished(SaturationJob<IndexedClassExpression> job)
-				throws InterruptedException {
-			if (!((ContextClassSaturation) job.getOutput()).isSatisfiable())
-				isConsistent = false;
-
-		}
-
 	}
 
 }

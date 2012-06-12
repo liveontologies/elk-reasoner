@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,22 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
-import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
-public class ClassExpressionSaturation<J extends SaturationJob<? extends IndexedClassExpression>>
-		extends
-		ConcurrentComputation<J, ClassExpressionSaturationEngine<J>, ClassExpressionSaturationFactory<J>> {
+public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends IndexedClassExpression>>
+		implements InputProcessorFactory<J, ClassExpressionSaturationEngine<J>> {
 
-	public ClassExpressionSaturation(ComputationExecutor executor,
-			int maxWorkers, OntologyIndex ontologyIndex) {
-		super(new ClassExpressionSaturationFactory<J>(
-				new ClassExpressionSaturationShared<J>(ontologyIndex)),
-				executor, maxWorkers);
+	private final ClassExpressionSaturationShared<J> shared;
+
+	public ClassExpressionSaturationFactory(
+			ClassExpressionSaturationShared<J> shared) {
+		this.shared = shared;
 	}
+
+	@Override
+	public ClassExpressionSaturationEngine<J> createProcessor() {
+		return new ClassExpressionSaturationEngine<J>(shared);
+	}
+
 }

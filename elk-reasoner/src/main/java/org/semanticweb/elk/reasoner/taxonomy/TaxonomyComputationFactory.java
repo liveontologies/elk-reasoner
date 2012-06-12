@@ -20,21 +20,27 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
+package org.semanticweb.elk.reasoner.taxonomy;
 
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
-/**
- * Inference rule with a NegativeSuperClassExpressions as an argument.
- * 
- * @author Frantisek Simancik
- * 
- */
-public interface InferenceRuleNegSCE<C extends ContextElClassSaturation>
-		extends InferenceRule<C> {
+public class TaxonomyComputationFactory implements
+		InputProcessorFactory<IndexedClassEntity, TaxonomyComputationEngine> {
 
-	void applySCE(NegativeSuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine);
+	private final TaxonomyComputationShared shared;
+
+	public TaxonomyComputationFactory(TaxonomyComputationShared shared) {
+		this.shared = shared;
+	}
+
+	@Override
+	public TaxonomyComputationEngine createProcessor() {
+		return new TaxonomyComputationEngine(shared);
+	}
+
+	TaxonomyComputationShared getShared() {
+		return this.shared;
+	}
 
 }

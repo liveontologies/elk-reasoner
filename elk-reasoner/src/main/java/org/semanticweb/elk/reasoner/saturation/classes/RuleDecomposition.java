@@ -28,22 +28,22 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
 
 /**
  * @author Frantisek Simancik
- *
+ * 
  */
-public class RuleDecomposition<C extends ContextElClassSaturation> implements InferenceRulePosSCE<C> {
+public class RuleDecomposition<C extends ContextElClassSaturation> implements
+		InferenceRulePosSCE<C> {
 
 	private class ClassExpressionDecomposer implements
 			IndexedClassExpressionVisitor<Void> {
 
 		private final C context;
-		private final RuleApplicationEngine engine;
+		private final RuleApplicationShared engine;
 
-		public ClassExpressionDecomposer(C context,
-				RuleApplicationEngine engine) {
+		public ClassExpressionDecomposer(C context, RuleApplicationShared engine) {
 			this.context = context;
 			this.engine = engine;
 		}
@@ -57,7 +57,8 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements In
 		public Void visit(IndexedObjectIntersectionOf ice) {
 			engine.enqueue(context,
 					new PositiveSuperClassExpression<C>(ice.getFirstConjunct()));
-			engine.enqueue(context,
+			engine.enqueue(
+					context,
 					new PositiveSuperClassExpression<C>(ice.getSecondConjunct()));
 			return null;
 		}
@@ -81,8 +82,8 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements In
 	};
 
 	@Override
-	public void applySCE(PositiveSuperClassExpression<C> argument,
-			C context, RuleApplicationEngine engine) {
+	public void applySCE(PositiveSuperClassExpression<C> argument, C context,
+			RuleApplicationShared engine) {
 		ClassExpressionDecomposer decomposer = new ClassExpressionDecomposer(
 				context, engine);
 		argument.getExpression().accept(decomposer);
