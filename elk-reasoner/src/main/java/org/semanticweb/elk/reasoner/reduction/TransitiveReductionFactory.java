@@ -40,14 +40,16 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
- * The saturation engine for transitive reduction that can only process
- * instances of {@link SaturationJobForTransitiveReduction}. There are two types
- * of the jobs. The instances of {@link SaturationJobRoot} are saturation jobs
- * for the indexed class expression, for which a transitive reduction is
- * required to be computed. The transitive reduction is computed by iterating
- * over the derived super classes and computing saturation for them in order to
- * filter out non-direct super classes. For this purpose, the second kind of
- * jobs, which are instances of {@link SaturationJobSuperClass} are used.
+ * The factory for engines that concurrently perform the transitive reduction of
+ * the derived subsumption hierarchy between classes. The engines can only
+ * process instances of {@link SaturationJobForTransitiveReduction}. There are
+ * two types of the jobs. The instances of {@link SaturationJobRoot} are
+ * saturation jobs for the indexed class expression, for which a transitive
+ * reduction is required to be computed. The transitive reduction is computed by
+ * iterating over the derived super classes and computing saturation for them in
+ * order to filter out non-direct super classes. For this purpose, the second
+ * kind of jobs, which are instances of {@link SaturationJobSuperClass} are
+ * used.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -70,11 +72,11 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	/**
 	 * The listener object implementing callback functions for this engine
 	 */
-	protected final TransitiveReductionListener<J, Engine> listener;
+	private final TransitiveReductionListener<J, Engine> listener;
 	/**
 	 * The object used to process the finished saturation jobs
 	 */
-	protected final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor();
+	private final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor();
 	/**
 	 * The processed jobs can create new saturation jobs for super classes to be
 	 * submitted to this engine. In order to avoid stack overflow due to the
@@ -82,15 +84,19 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * but use a queue to buffer such created jobs. This queue will be emptied
 	 * every time the {@link #process()} method is called.
 	 */
-	protected final Queue<SaturationJobSuperClass<R, J>> auxJobQueue;
+	private final Queue<SaturationJobSuperClass<R, J>> auxJobQueue;
 
 	/**
 	 * <tt>true</tt> if the {@link #auxJobQueue} queue is empty. This flag is
 	 * used for notification that new jobs can be processed.
 	 */
-	protected final AtomicBoolean jobQueueEmpty;
+	private final AtomicBoolean jobQueueEmpty;
 
-	protected final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>> saturationFactory;
+	/**
+	 * The saturation factory used for computing saturations for relevant
+	 * indexed class expressions
+	 */
+	private final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>> saturationFactory;
 
 	/**
 	 * Creating a new transitive reduction engine for the input ontology index
@@ -115,7 +121,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * executes the notification function of the listenerq the first time the
 	 * job queue becomes non-empty
 	 */
-	protected void tryNotifyCanProcess() {
+	private void tryNotifyCanProcess() {
 		if (jobQueueEmpty.compareAndSet(true, false))
 			listener.notifyCanProcess();
 	}
@@ -134,7 +140,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	class ThisClassExpressionSaturationListener
+	private class ThisClassExpressionSaturationListener
 			implements
 			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>, ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>.Engine> {
 
@@ -158,7 +164,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	class SaturationOutputProcessor implements SaturationJobVisitor<R, J> {
+	private class SaturationOutputProcessor implements
+			SaturationJobVisitor<R, J> {
 
 		@Override
 		public void visit(SaturationJobRoot<R, J> saturationJob)
@@ -357,8 +364,15 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 
 	public class Engine implements InputProcessor<J> {
 
-		protected final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>.Engine saturationEngine = saturationFactory
+		/**
+		 * The saturation engine used for transitive reduction computation
+		 */
+		private final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>.Engine saturationEngine = saturationFactory
 				.getEngine();
+
+		// don't allow creating of engines directly; only through the factory
+		private Engine() {
+		}
 
 		@Override
 		public final void submit(J job) {

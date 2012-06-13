@@ -29,8 +29,14 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
- * @author Frantisek Simancik
+ * The rule for propagating of inconsistencies (<tt>owl:Nothing</tt>) in
+ * contexts
  * 
+ * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
 public class RuleBottom<C extends ContextElClassSaturation> implements
 		InferenceRulePosSCE<C> {

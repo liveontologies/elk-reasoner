@@ -34,8 +34,12 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
+ * TODO: documentation
+ * 
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
 public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 		RuleWithBackwardLinks<C> implements InferenceRuleSCE<C> {
@@ -80,7 +84,8 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 					new NegativeSuperClassExpression<C>(e), context, engine);
 	}
 
-	private void initializePropagations(C context, RuleApplicationFactory.Engine engine) {
+	private void initializePropagations(C context,
+			RuleApplicationFactory.Engine engine) {
 		context.setDerivePropagations(true);
 
 		for (IndexedClassExpression ice : context.superClassExpressions)

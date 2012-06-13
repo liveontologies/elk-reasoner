@@ -37,14 +37,15 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
- * The engine for submitting, processing, and post-processing of saturation
- * jobs. Each saturation job requires to compute implied super-classes of a
- * given indexed class expression. The jobs are submitted using the
- * {@link #submit(SaturationJob)} method, and all currently submitted jobs are
- * processed using the {@link #process()} method. To every saturation engine it
- * is possible to attach a {@link ClassExpressionSaturationListener}, which can
- * implement hook methods that perform certain actions during the processing,
- * e.g., notifying when the jobs are finished.
+ * The factory for engines concurrently that submit, process, and post-process
+ * saturation jobs. Each saturation job requires to compute implied
+ * super-classes of a given indexed class expression. The jobs are submitted
+ * using the {@link Engine#submit(SaturationJob)}, and all currently submitted
+ * jobs are processed using the {@link Engine#process()}. To every
+ * {@link ClassExpressionSaturationFactory} it is possible to attach a
+ * {@link ClassExpressionSaturationListener}, which can implement hook methods
+ * that perform certain actions during the processing, e.g., notifying when the
+ * jobs are finished.
  * 
  * The implementation relies heavily on the Java's concurrency package and uses
  * several atomic integer to monitor the progress of the computation.
@@ -64,75 +65,70 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturationFactory.class);
 
+	// TODO: switch to listener factory
 	/**
 	 * The listener object implementing callback functions for this engine
 	 */
-	protected final ClassExpressionSaturationListener<J, Engine> listener;
+	private final ClassExpressionSaturationListener<J, Engine> listener;
 	/**
 	 * The rule application engine used internally for execution of the
 	 * saturation rules.
 	 */
-	protected final RuleApplicationFactory ruleApplicationFactory;
+	private final RuleApplicationFactory ruleApplicationFactory;
 	/**
 	 * The buffer for jobs that need to be processed, i.e., those for which the
 	 * method {@link #submit(J)} was executed but processing of jobs has not
 	 * been started yet.
 	 */
-	protected final Queue<J> jobsToDo;
+	private final Queue<J> jobsToDo;
 	/**
 	 * The buffer for jobs in progress, i.e., those for which processing has
 	 * started but the method {@link #listener.notifyFinished(J)} was not
 	 * executed yet.
 	 */
-	protected final Queue<J> jobsInProgress;
+	private final Queue<J> jobsInProgress;
 	/**
 	 * This number of submitted jobs, i.e., those for which the method
 	 * {@link #submit(J)} was executed.
 	 */
-	protected final AtomicInteger countJobsSubmitted = new AtomicInteger(0);
+	private final AtomicInteger countJobsSubmitted = new AtomicInteger(0);
 	/**
 	 * The number of processed jobs, as determined by the procedure
 	 */
-	protected final AtomicInteger countJobsProcessed = new AtomicInteger(0);
+	private final AtomicInteger countJobsProcessed = new AtomicInteger(0);
 	/**
 	 * The number of finished jobs, i.e., those for which
 	 * {@link #listener.notifyFinished(J)} is executed.
 	 */
-	protected final AtomicInteger countJobsFinished = new AtomicInteger(0);
+	private final AtomicInteger countJobsFinished = new AtomicInteger(0);
 	/**
 	 * The number of processed contexts; used to control batches of jobs
 	 */
-	final AtomicInteger countContextsProcessed = new AtomicInteger(0);
+	private final AtomicInteger countContextsProcessed = new AtomicInteger(0);
 	/**
 	 * The threshold used to submit new jobs. The job is successfully submitted
 	 * if difference between the number of created contexts and processed
 	 * contexts does not exceed this threshold; otherwise the computation is
 	 * suspended, and will resume when all possible rules are applied.
 	 */
-	final int threshold;
+	private final int threshold;
 	/**
 	 * <tt>true</tt> if any worker is blocked from submitting the jobs because
 	 * threshold is exceeded.
 	 */
-	volatile boolean workersWaiting = false;
-	/**
-	 * The number of workers applying the rules of the rule application engine.
-	 * If the number of workers is zero, all rules must have been applied.
-	 */
-	final AtomicInteger activeWorkers = new AtomicInteger(0);
-
+	private volatile boolean workersWaiting = false;
 	/**
 	 * counter incremented every time a worker starts applying the rules
 	 */
-	final AtomicInteger startedWorkers = new AtomicInteger(0);
+	private final AtomicInteger startedWorkers = new AtomicInteger(0);
 	/**
 	 * counter incremented every time a worker finishes applying the rules
 	 */
-	final AtomicInteger finishedWorkers = new AtomicInteger(0);
+	private final AtomicInteger finishedWorkers = new AtomicInteger(0);
 	/**
 	 * the largest started id of a worker that has been interrupted
 	 */
-	final AtomicInteger lastInterruptedWorker = new AtomicInteger(0);
+	private final AtomicInteger lastInterruptedWorker = new AtomicInteger(0);
 
 	/**
 	 * Creates a new saturation engine using the given ontology index, listener
@@ -198,81 +194,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	}
 
 	/**
-	 * Update the counter to the value provided it is greater. Regardless of the
-	 * returned value, it is guaranteed that the value of the counter after
-	 * execution will be at least the input value.
-	 * 
-	 * @param counter
-	 *            the counter that should be updated
-	 * @param value
-	 *            the value to which the counter should be updated
-	 * @return true if the counter has been updated
-	 */
-	static boolean updateIfSmaller(AtomicInteger counter, int value) {
-		for (;;) {
-			int snapshotCoutner = counter.get();
-			if (snapshotCoutner >= value)
-				return false;
-			if (counter.compareAndSet(snapshotCoutner, value))
-				return true;
-		}
-	}
-
-	/**
-	 * Updates the counter for processed contexts and jobs
-	 */
-	void updateProcessedCounters(int snapshotFinishedWorkers) {
-		if (lastInterruptedWorker.get() >= startedWorkers.get()) {
-			/*
-			 * after the last started worker has interrupted, no worker has
-			 * started yet; in this case we cannot be sure that new submitted
-			 * jobs are processed
-			 */
-			return;
-		}
-		/*
-		 * cache the current snapshot for created contexts and jobs; it is
-		 * important for correctness to measure the number of started workers
-		 * only after that
-		 */
-		int snapshotContextNo = ruleApplicationFactory
-				.getApproximateContextNumber();
-		int snapshotCountJobsSubmitted = countJobsSubmitted.get();
-		if (startedWorkers.get() > snapshotFinishedWorkers)
-			// this means that some started worker did not finish yet
-			return;
-		/*
-		 * if we arrived here, then at the period of time from the beginning of
-		 * this function until the test (1) there is no worker that started
-		 * processing but did not finished, and (2) after every interrupted
-		 * worker there was a started (and thus finished) worker that was not
-		 * interrupted. This means that the taken snapshots represent at least
-		 * the number of processed contexts and jobs. In this case we update the
-		 * counter for processed jobs and tasks using the snapshot taken before,
-		 * if it is smaller.
-		 */
-		updateIfSmaller(countJobsProcessed, snapshotCountJobsSubmitted);
-		boolean updated = updateIfSmaller(countContextsProcessed,
-				snapshotContextNo);
-		if (updated && workersWaiting) {
-			/*
-			 * waking up all workers waiting to submit the jobs
-			 */
-			synchronized (countContextsProcessed) {
-				workersWaiting = false;
-				countContextsProcessed.notifyAll();
-			}
-			listener.notifyCanProcess();
-		}
-	}
-
-	/**
 	 * Check if the counter for processed jobs can be increased and post-process
 	 * the finished jobs
 	 * 
 	 * @throws InterruptedException
 	 */
-	void processFinishedJobs() throws InterruptedException {
+	private void processFinishedJobs() throws InterruptedException {
 		for (;;) {
 			int shapshotJobsFinished = countJobsFinished.get();
 			if (shapshotJobsFinished == countJobsProcessed.get()) {
@@ -317,7 +244,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	class ThisRuleApplicationListener implements RuleApplicationListener {
+	private class ThisRuleApplicationListener implements
+			RuleApplicationListener {
 
 		@Override
 		public void notifyCanProcess() {
@@ -335,11 +263,36 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		}
 	}
 
+	/**
+	 * Update the counter to the value provided it is greater. Regardless of the
+	 * returned value, it is guaranteed that the value of the counter after
+	 * execution will be at least the input value.
+	 * 
+	 * @param counter
+	 *            the counter that should be updated
+	 * @param value
+	 *            the value to which the counter should be updated
+	 * @return true if the counter has been updated
+	 */
+	private static boolean updateIfSmaller(AtomicInteger counter, int value) {
+		for (;;) {
+			int snapshotCoutner = counter.get();
+			if (snapshotCoutner >= value)
+				return false;
+			if (counter.compareAndSet(snapshotCoutner, value))
+				return true;
+		}
+	}
+
 	public class Engine implements InputProcessor<J> {
 
 		// thread local objects
-		protected RuleApplicationFactory.Engine ruleApplicationEngine = ruleApplicationFactory
+		private final RuleApplicationFactory.Engine ruleApplicationEngine = ruleApplicationFactory
 				.getEngine();
+
+		// don't allow creating of engines directly; only through the factory
+		private Engine() {
+		}
 
 		@Override
 		public void submit(J job) {
@@ -357,13 +310,13 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				if (Thread.currentThread().isInterrupted())
 					return;
 				/*
-				 * try to process the jobs in progress; there are counters to
+				 * try to process the submitted jobs; there are two counters to
 				 * keep track of how many workers have been started and
 				 * finished: if their values coincide, then there is no worker
 				 * in the block between them. In addition, there is a variable
 				 * to save the identifier of the last started worker which has
 				 * been interrupted; this is used to check if the computation
-				 * has been finished or not.
+				 * has been finished uninterruptedly by some worker.
 				 */
 				int snapshotFinishedWorkers;
 				startedWorkers.incrementAndGet();
@@ -427,6 +380,54 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		@Override
 		public void finish() {
 			ruleApplicationEngine.finish();
+		}
+
+		/**
+		 * Updates the counter for processed contexts and jobs
+		 */
+		private void updateProcessedCounters(int snapshotFinishedWorkers) {
+			if (lastInterruptedWorker.get() >= startedWorkers.get()) {
+				/*
+				 * after the last started worker has interrupted, no worker has
+				 * started yet; in this case we cannot be sure that new
+				 * submitted jobs are processed
+				 */
+				return;
+			}
+			/*
+			 * cache the current snapshot for created contexts and jobs; it is
+			 * important for correctness to measure the number of started
+			 * workers only after that
+			 */
+			int snapshotContextNo = ruleApplicationFactory
+					.getApproximateContextNumber();
+			int snapshotCountJobsSubmitted = countJobsSubmitted.get();
+			if (startedWorkers.get() > snapshotFinishedWorkers)
+				// this means that some started worker did not finish yet
+				return;
+			/*
+			 * if we arrived here, then at the period of time from the beginning
+			 * of this function until the test we have: (1) there is no worker
+			 * that started processing but did not finished, and (2) after every
+			 * interrupted worker there was a started (and thus finished) worker
+			 * that was not interrupted. This means that the taken snapshots
+			 * represent at least the number of processed contexts and jobs. In
+			 * this case we update the counter for processed jobs and tasks
+			 * using the snapshot taken before, if it is smaller.
+			 */
+			updateIfSmaller(countJobsProcessed, snapshotCountJobsSubmitted);
+			boolean updated = updateIfSmaller(countContextsProcessed,
+					snapshotContextNo);
+			if (updated && workersWaiting) {
+				/*
+				 * waking up all workers waiting to submit the jobs
+				 */
+				synchronized (countContextsProcessed) {
+					workersWaiting = false;
+					countContextsProcessed.notifyAll();
+				}
+				listener.notifyCanProcess();
+			}
 		}
 
 	}

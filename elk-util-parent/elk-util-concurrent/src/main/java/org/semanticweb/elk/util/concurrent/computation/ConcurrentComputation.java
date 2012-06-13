@@ -28,14 +28,15 @@ import java.util.concurrent.BlockingQueue;
 /**
  * An class for concurrent processing of a number of tasks. The input for the
  * tasks are submitted, buffered, and processed by concurrent workers using the
- * supplied {@link InputProcessor}. The implementation is loosely based on a
- * produce-consumer framework with one producer and many consumers. The
+ * the {@link InputProcessor} objects created by the supplied
+ * {@link InputProcessorFactory}. The implementation is loosely based on a
+ * producer-consumer framework with one producer and many consumers. The
  * processing of the input should start by calling the {@link #start()} method,
  * following by {@link #submit(I)} method for submitting input to be processed.
  * The workers will always wait for new input, unless interrupted or
  * {@link #finish()} method is called. If {@link #finish()} is called then no
  * further input can be submitted and the workers will terminate when all input
- * has been processed, unless they are interrupt
+ * has been processed or they are interrupted earlier, whichever is earlier.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -48,7 +49,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends InputProcessorFactory<I, P>> {
 	/**
-	 * the factory for input processors
+	 * the factory for the input processor engines
 	 */
 	protected final F inputProcessorFactory;
 	/**
@@ -192,6 +193,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 		@Override
 		public final void run() {
 			I nextInput;
+			// we use one engine per worker run
 			P inputProcessor = inputProcessorFactory.getEngine();
 			for (;;) {
 				if (interrupted)

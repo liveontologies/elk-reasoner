@@ -38,7 +38,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 public class ObjectPropertyHierarchyComputation
 		extends
-		ReasonerComputation<IndexedPropertyChain, ObjectPropertyHierarchyComputationEngine, ObjectPropertyHierarchyComputationFactory> {
+		ReasonerComputation<IndexedPropertyChain, ObjectPropertyHierarchyComputationFactory.Engine, ObjectPropertyHierarchyComputationFactory> {
 
 	/**
 	 * the index of the ontology used for computation

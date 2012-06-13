@@ -32,6 +32,9 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
+ * 
  */
 public abstract class RuleWithBackwardLinks<C extends ContextElClassSaturation> {
 

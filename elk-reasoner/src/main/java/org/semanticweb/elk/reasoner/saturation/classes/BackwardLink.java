@@ -30,6 +30,8 @@ import org.semanticweb.elk.util.collections.Pair;
 /**
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this {@link Queueable}
  */
 public class BackwardLink<C extends ContextElClassSaturation> extends
 		Pair<IndexedPropertyChain, C> implements Queueable<C> {
@@ -47,8 +49,9 @@ public class BackwardLink<C extends ContextElClassSaturation> extends
 	}
 
 	@Override
-	public boolean storeInContext(C context, RuleApplicationFactory.Engine engine) {
-		RuleStatistics statistics = engine.getStatistics();
+	public boolean storeInContext(C context,
+			RuleApplicationFactory.Engine engine) {
+		RuleStatistics statistics = engine.getRuleStatistics();
 		statistics.incrementBackLinkInfNo();
 
 		if (context.backwardLinksByObjectProperty == null)

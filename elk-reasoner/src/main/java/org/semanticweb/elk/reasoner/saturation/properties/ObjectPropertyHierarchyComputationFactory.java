@@ -22,24 +22,98 @@
  */
 package org.semanticweb.elk.reasoner.saturation.properties;
 
+import java.util.ArrayDeque;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputationFactory.Engine;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
-public class ObjectPropertyHierarchyComputationFactory
-		implements
-		InputProcessorFactory<IndexedPropertyChain, ObjectPropertyHierarchyComputationEngine> {
+/**
+ * The factory for engines that reset and compute the transitive closure of the
+ * suproperties and superproperties relations for each submitted
+ * {@link IndexedPropertyChain}. The engines are not thread safe at the moment
+ * (only one engine can be used at a time).
+ * 
+ * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ */
+public class ObjectPropertyHierarchyComputationFactory implements
+		InputProcessorFactory<IndexedPropertyChain, Engine> {
 
 	/**
 	 * We use a single engine for this factory
 	 */
-	private final ObjectPropertyHierarchyComputationEngine engine;
+	private final Engine engine;
 
 	ObjectPropertyHierarchyComputationFactory() {
-		this.engine = new ObjectPropertyHierarchyComputationEngine();
+		this.engine = new Engine();
+	}
+
+	/**
+	 * The engine for resetting the saturation and computing the transitively
+	 * closed suproperties and superproperties of each submitted property chain.
+	 * 
+	 * @author Frantisek Simancik
+	 * @author "Yevgeny Kazakov"
+	 */
+	class Engine implements InputProcessor<IndexedPropertyChain> {
+
+		// don't allow creating of engines directly; only through the factory
+		private Engine() {
+		}
+
+		@Override
+		public void submit(IndexedPropertyChain ipc) {
+			// reset the saturation of this property chain
+			ipc.resetSaturated();
+			SaturatedPropertyChain saturated = new SaturatedPropertyChain(ipc);
+			ipc.setSaturated(saturated);
+
+			// compute all transitively closed subproperties
+			ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
+			saturated.derivedSubProperties.add(ipc);
+			queue.addLast(ipc);
+			while (!queue.isEmpty()) {
+				IndexedPropertyChain r = queue.removeLast();
+				if (r.getToldSubProperties() != null)
+					for (IndexedPropertyChain s : r.getToldSubProperties())
+						if (saturated.derivedSubProperties.add(s))
+							queue.addLast(s);
+			}
+
+			// compute all transitively closed superproperties
+			queue.clear();
+			saturated.derivedSuperProperties.add(ipc);
+			queue.addLast(ipc);
+			while (!queue.isEmpty()) {
+				IndexedPropertyChain r = queue.removeLast();
+				if (r.getToldSuperProperties() != null)
+					for (IndexedPropertyChain s : r.getToldSuperProperties())
+						if (saturated.derivedSuperProperties.add(s))
+							queue.addLast(s);
+			}
+
+		}
+
+		@Override
+		public void process() throws InterruptedException {
+			// nothing to do here, everything should be processed during the
+			// submission
+		}
+
+		@Override
+		public boolean canProcess() {
+			return false;
+		}
+
+		@Override
+		public void finish() {
+		}
 	}
 
 	@Override
-	public ObjectPropertyHierarchyComputationEngine getEngine() {
+	public Engine getEngine() {
 		return this.engine;
 	}
 }

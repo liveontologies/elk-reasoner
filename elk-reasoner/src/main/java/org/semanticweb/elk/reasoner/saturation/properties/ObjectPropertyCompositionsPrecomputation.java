@@ -40,7 +40,7 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  */
 public class ObjectPropertyCompositionsPrecomputation
 		extends
-		ReasonerComputation<IndexedPropertyChain, ObjectPropertyCompositionsPrecomputationEngine, ObjectPropertyCompositionsPrecomputationFactory> {
+		ReasonerComputation<IndexedPropertyChain, ObjectPropertyCompositionsPrecomputationFactory.Engine, ObjectPropertyCompositionsPrecomputationFactory> {
 
 	/**
 	 * the ontology index used for computation

@@ -31,8 +31,12 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
+ * TODO: documentation
+ * 
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
 public class RuleDecomposition<C extends ContextElClassSaturation> implements
 		InferenceRulePosSCE<C> {

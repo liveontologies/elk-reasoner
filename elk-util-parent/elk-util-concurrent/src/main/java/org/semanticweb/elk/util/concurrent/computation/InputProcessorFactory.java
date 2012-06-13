@@ -23,7 +23,12 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * An factory for creation of an input processor for a given type.
+ * An factory for creation of an input processor engines of a given type. This
+ * factory is intended to be used in {@link ConcurrentComputation} to process
+ * the input concurrently by independent workers. In this case, an engine will
+ * be created for every worker. This allows one to store some worker-local
+ * objects in engines as well as shared objects to obtain an optimal performance
+ * of the computation.
  * 
  * @author "Yevgeny Kazakov"
  * 

@@ -30,8 +30,12 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
+ * TODO: documentation
+ * 
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
 public class RuleConjunctionPlus<C extends ContextElClassSaturation> implements
 		InferenceRuleSCE<C> {

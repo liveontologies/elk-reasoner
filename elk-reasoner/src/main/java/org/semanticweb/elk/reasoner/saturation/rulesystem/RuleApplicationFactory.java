@@ -41,8 +41,9 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
- * The engine for computing the saturation of class expressions. This is the
- * class that implements the application of inference rules.
+ * The factory for engines for concurrently computing the saturation of class
+ * expressions. This is the class that implements the application of inference
+ * rules.
  * 
  * @author Frantisek Simancik
  * @author Yevgeny Kazakov
@@ -56,62 +57,78 @@ public class RuleApplicationFactory implements
 	private static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	protected InferenceSystem<? extends Context> inferenceSystem = new InferenceSystemElClassSaturation();
+	/**
+	 * The inference system used with this factory
+	 */
+	private final InferenceSystem<? extends Context> inferenceSystem;
 
-	protected InferenceSystemInvocationManager inferenceSystemInvocationManager;
+	/**
+	 * The manager for rule applications
+	 */
+	private final InferenceSystemInvocationManager inferenceSystemInvocationManager;
 
 	// TODO Try to get rid of the ontology index, if possible.
 	/**
 	 * The index used for executing the rules
 	 */
-	public final OntologyIndex ontologyIndex;
+	private final OntologyIndex ontologyIndex;
 
 	/**
 	 * Cached constants
 	 */
-	public final IndexedClassExpression owlThing, owlNothing;
+	private final IndexedClassExpression owlThing, owlNothing;
 
 	/**
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
-	protected final Queue<Context> activeContexts;
+	private final Queue<Context> activeContexts;
 
 	/**
-	 * The number of contexts ever created by this engine. This number is used
-	 * not only for statistical purposes, but also by some callers to control
-	 * the number of parallel workers (if the number of new contexts is too
-	 * small, it does not make sense to run independent workers).
+	 * The approximate number of contexts ever created by this engine. This
+	 * number is used not only for statistical purposes, but also by saturation
+	 * engine callers to control when to submit new saturation tasks: if there
+	 * are too many unprocessed contexts, new saturation tasks are not
+	 * submitted.
 	 */
-	protected final AtomicInteger contextNumber = new AtomicInteger(0);
+	protected final AtomicInteger approximateContextNumber = new AtomicInteger(
+			0);
+
+	/**
+	 * To reduce thread congestion, {@link #approximateContextNumber} is not
+	 * updated immediately when contexts are created, but after a worker creates
+	 * {@link #contextUpdateInterval} new contexts.
+	 */
+	private final int contextUpdateInterval = 32;
 
 	/**
 	 * <tt>true</tt> if the {@link #activeContexts} queue is empty
 	 */
-	protected final AtomicBoolean activeContextsEmpty;
+	private final AtomicBoolean activeContextsEmpty;
 	/**
 	 * The listener for rule application callbacks
 	 */
-	protected final RuleApplicationListener listener;
+	private final RuleApplicationListener listener;
 
 	/**
 	 * The aggregated statistics of all workers
 	 */
-	protected final RuleStatistics sharedStatistics;
+	private final RuleStatistics aggregatedStatistics;
 
 	public RuleApplicationFactory(OntologyIndex ontologyIndex,
 			RuleApplicationListener listener) {
+		// TODO: provide an option for specifying the invocation manager
+		this.inferenceSystem = new InferenceSystemElClassSaturation();
+		this.inferenceSystemInvocationManager = new InferenceSystemInvocationManagerSCE<ContextElClassSaturation>();
 		this.ontologyIndex = ontologyIndex;
 		this.listener = listener;
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
 		this.activeContextsEmpty = new AtomicBoolean(true);
-		this.sharedStatistics = new RuleStatistics();
+		this.aggregatedStatistics = new RuleStatistics();
 
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 
-		// TODO: provide an option for specifying the invocation manager
-		inferenceSystemInvocationManager = new InferenceSystemInvocationManagerSCE<ContextElClassSaturation>();
 		try {
 			inferenceSystemInvocationManager
 					.addInferenceSystem(inferenceSystem);
@@ -127,12 +144,13 @@ public class RuleApplicationFactory implements
 	/**
 	 * Returns the approximate number of contexts created. The real number of
 	 * contexts is larger, but to ensure good concurrency performance it is not
-	 * updated often. It is exact when all engines finish.
+	 * updated often. It is exact when all engines created by this factory
+	 * finish.
 	 * 
 	 * @return the approximate number of created contexts
 	 */
 	public int getApproximateContextNumber() {
-		return contextNumber.get();
+		return approximateContextNumber.get();
 	}
 
 	/**
@@ -140,28 +158,33 @@ public class RuleApplicationFactory implements
 	 */
 	public void printStatistics() {
 		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Contexts created:" + contextNumber);
+			LOGGER_.debug("Contexts created:" + approximateContextNumber);
 			LOGGER_.debug("Derived Produced/Unique:"
-					+ sharedStatistics.getSuperClassExpressionInfNo() + "/"
-					+ sharedStatistics.getSuperClassExpressionNo());
+					+ aggregatedStatistics.getSuperClassExpressionInfNo() + "/"
+					+ aggregatedStatistics.getSuperClassExpressionNo());
 			LOGGER_.debug("Backward Links Produced/Unique:"
-					+ sharedStatistics.getBackLinkInfNo() + "/"
-					+ sharedStatistics.getBackLinkNo());
-			// LOGGER_.debug("Forward Links Produced/Unique:" +
-			// QueueableStore.forwLinkInfNo + "/" +
-			// QueueableStore.forwLinkNo.get());
-			// LOGGER_.debug("Processed queueables:" +
-			// InferenceRuleManager.debugProcessedQueueables);
-			// LOGGER_.debug("Rule applications:" +
-			// InferenceRuleManager.debugRuleApplications);
+					+ aggregatedStatistics.getBackLinkInfNo() + "/"
+					+ aggregatedStatistics.getBackLinkNo());
+			LOGGER_.debug("Forward Links Produced/Unique:"
+					+ aggregatedStatistics.getForwLinkInfNo() + "/"
+					+ aggregatedStatistics.getForwLinkNo());
 		}
 	}
 
 	public class Engine implements InputProcessor<IndexedClassExpression> {
 
-		// non-thread safe objects created for every worker
+		/**
+		 * Local statistics created for every worker
+		 */
 		private final RuleStatistics statistics = new RuleStatistics();
+		/**
+		 * Worker-local counter for the number of created contexts
+		 */
 		private int localContextNumber = 0;
+
+		// don't allow creating of engines directly; only through the factory
+		private Engine() {
+		}
 
 		@Override
 		public void submit(IndexedClassExpression job) {
@@ -193,31 +216,43 @@ public class RuleApplicationFactory implements
 
 		@Override
 		public void finish() {
-			contextNumber.addAndGet(localContextNumber);
+			approximateContextNumber.addAndGet(localContextNumber);
 			localContextNumber = 0;
-			sharedStatistics.merge(statistics);
+			aggregatedStatistics.merge(statistics);
 		}
 
+		/**
+		 * @return the <tt>owl:Thing</tt> object in this ontology
+		 */
 		public IndexedClassExpression getOwlNothing() {
 			return owlNothing;
 		}
 
+		/**
+		 * @return the <tt>owl:Nothing</tt> object in this ontology
+		 */
 		public IndexedClassExpression getOwlThing() {
 			return owlThing;
 		}
 
+		/**
+		 * @return the reflexive object properties in this ontology
+		 */
 		public Iterable<IndexedObjectProperty> getReflexiveObjectProperties() {
 			return ontologyIndex.getReflexiveObjectProperties();
 		}
 
-		public RuleStatistics getStatistics() {
+		/**
+		 * @return the object collecting statistics of rule applications
+		 */
+		public RuleStatistics getRuleStatistics() {
 			return this.statistics;
 		}
 
 		/**
-		 * Return the context which has the input indexed class expression as a
-		 * root. In case no such context exists, a new one is created with the
-		 * given root and is returned. It is ensured that no two different
+		 * Return the context which has the input indexed class expression as
+		 * the root. In case no such context exists, a new one is created with
+		 * the given root and is returned. It is ensured that no two different
 		 * contexts are created with the same root. In case a new context is
 		 * created, it is scheduled to be processed.
 		 * 
@@ -231,8 +266,8 @@ public class RuleApplicationFactory implements
 			if (root.getContext() == null) {
 				Context context = inferenceSystem.createContext(root);
 				if (root.setContext(context)) {
-					if (++localContextNumber == 16) {
-						contextNumber.addAndGet(localContextNumber);
+					if (++localContextNumber == contextUpdateInterval) {
+						approximateContextNumber.addAndGet(localContextNumber);
 						localContextNumber = 0;
 					}
 					if (LOGGER_.isTraceEnabled()) {
@@ -244,14 +279,28 @@ public class RuleApplicationFactory implements
 			return root.getContext();
 		}
 
+		/**
+		 * Schedule the given item to be processed in the given context
+		 * 
+		 * @param context
+		 *            the context in which the item should be processed
+		 * @param item
+		 *            the item to be processed in the given context
+		 */
 		public void enqueue(Context context, Queueable<?> item) {
-			context.getQueue().add(item);
+			context.getToDo().add(item);
 			activateContext(context);
 		}
 
+		/**
+		 * Process all scheduled items in the given context
+		 * 
+		 * @param context
+		 *            the context in which to process the scheduled items
+		 */
 		protected void process(Context context) {
 			for (;;) {
-				Queueable<?> item = context.getQueue().poll();
+				Queueable<?> item = context.getToDo().poll();
 				if (item == null)
 					break;
 
@@ -262,21 +311,21 @@ public class RuleApplicationFactory implements
 			deactivateContext(context);
 		}
 
-		protected void tryNotifyCanProcess() {
+		private void tryNotifyCanProcess() {
 			if (activeContextsEmpty.compareAndSet(true, false))
 				listener.notifyCanProcess();
 		}
 
-		protected void activateContext(Context context) {
+		private void activateContext(Context context) {
 			if (context.tryActivate()) {
 				activeContexts.add(context);
 				tryNotifyCanProcess();
 			}
 		}
 
-		protected void deactivateContext(Context context) {
+		private void deactivateContext(Context context) {
 			if (context.tryDeactivate())
-				if (!context.getQueue().isEmpty())
+				if (!context.getToDo().isEmpty())
 					activateContext(context);
 		}
 

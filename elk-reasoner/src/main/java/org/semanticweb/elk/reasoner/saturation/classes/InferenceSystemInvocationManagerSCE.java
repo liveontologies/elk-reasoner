@@ -32,12 +32,15 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory
 
 /**
  * An optimized implementation of the InferenceSystemInvocationManager that does
- * not use Java reflection for inference rules with SuperClassExpressions.
- * Instead, all methods applicable to negative and positive
- * SuperClassExpressions are stored in separate fields.
+ * not use Java reflection for inference rules that have a
+ * {@link SuperClassExpression} as one of the arguments. Instead, all methods
+ * applicable to negative and positive {@link SuperClassExpression}s are stored
+ * in separate fields.
  * 
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this invocation manager
  */
 public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturation>
 		extends InferenceSystemInvocationManager {

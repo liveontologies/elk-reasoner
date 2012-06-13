@@ -30,6 +30,9 @@ import org.semanticweb.elk.util.collections.Pair;
 /**
  * @author Frantisek Simancik
  * 
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this {@link Queueable}
  */
 public class ForwardLink<C extends ContextElClassSaturation> extends
 		Pair<IndexedPropertyChain, C> implements Queueable<C> {
@@ -47,15 +50,16 @@ public class ForwardLink<C extends ContextElClassSaturation> extends
 	}
 
 	@Override
-	public boolean storeInContext(C context, RuleApplicationFactory.Engine engine) {
-		// TODO: update the statistics
-		// forwLinkInfNo.incrementAndGet();
+	public boolean storeInContext(C context,
+			RuleApplicationFactory.Engine engine) {
+		RuleStatistics statistics = engine.getRuleStatistics();
+		statistics.incrementForwLinkInfNo();
 
 		if (context.forwardLinksByObjectProperty == null)
 			context.initForwardLinksByProperty();
 
 		if (context.forwardLinksByObjectProperty.add(first, second)) {
-			// forwLinkNo.incrementAndGet();
+			statistics.incrementForwLinkNo();
 			return true;
 		}
 		return false;

@@ -26,6 +26,8 @@ public class RuleStatistics {
 
 	int backLinkInfNo;
 	int backLinkNo;
+	int forwLinkInfNo;
+	int forwLinkNo;
 	int superClassExpressionInfNo;
 	int superClassExpressionNo;
 
@@ -35,6 +37,14 @@ public class RuleStatistics {
 
 	public int getBackLinkNo() {
 		return backLinkNo;
+	}
+
+	public int getForwLinkInfNo() {
+		return forwLinkInfNo;
+	}
+
+	public int getForwLinkNo() {
+		return forwLinkNo;
 	}
 
 	public int getSuperClassExpressionInfNo() {
@@ -53,6 +63,14 @@ public class RuleStatistics {
 		backLinkNo++;
 	}
 
+	void incrementForwLinkInfNo() {
+		forwLinkInfNo++;
+	}
+
+	void incrementForwLinkNo() {
+		forwLinkNo++;
+	}
+
 	void incrementSuperClassExpressionInfNo() {
 		superClassExpressionInfNo++;
 	}
@@ -64,6 +82,8 @@ public class RuleStatistics {
 	public synchronized void merge(RuleStatistics statistics) {
 		this.backLinkInfNo += statistics.backLinkInfNo;
 		this.backLinkNo += statistics.backLinkNo;
+		this.forwLinkInfNo += statistics.forwLinkInfNo;
+		this.forwLinkNo += statistics.forwLinkNo;
 		this.superClassExpressionInfNo += statistics.superClassExpressionInfNo;
 		this.superClassExpressionNo += statistics.superClassExpressionNo;
 	}

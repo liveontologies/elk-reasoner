@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory
 
 /**
  * 
- * Inference rule with a SuperClassExpressions as an argument.
+ * Inference rule with a {@link SuperClassExpression} as an argument.
  * 
  * @author Frantisek Simancik
  * 

@@ -32,10 +32,11 @@ import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
+//TODO: move the control of global consistency to ConsistencyChecking class
 /**
- * The engine for checking consistency of an ontology by checking satisfiability
- * of all submitted class expressions. The jobs are submitted using the method
- * {@link #submit(IndexedClassExpressions)}.
+ * The factory for engines that concurrently check consistency of submitted
+ * class expressions. The jobs are submitted using the method
+ * {@link Engine#submit(IndexedClassExpression)}.
  * 
  * @author Frantisek Simancik
  * @author Yevgeny Kazakov
@@ -45,15 +46,15 @@ public class ConsistencyCheckingFactory implements
 		InputProcessorFactory<IndexedClassExpression, Engine> {
 
 	/**
-	 * The saturation engine used for saturating submitted indexed class
-	 * expressions
+	 * The saturation factory used for computing saturations for the submitted
+	 * indexed class expressions
 	 */
-	protected final ClassExpressionSaturationFactory<SaturationJob<IndexedClassExpression>> saturationFactory;
+	private final ClassExpressionSaturationFactory<SaturationJob<IndexedClassExpression>> saturationFactory;
 	/**
 	 * The result of the computation. True iff all submitted class expressions
 	 * are satisfiable.
 	 */
-	protected boolean isConsistent = true;
+	private boolean isConsistent = true;
 
 	/**
 	 * Creates a new class taxonomy engine for the input ontology index and a
@@ -86,7 +87,7 @@ public class ConsistencyCheckingFactory implements
 	 * is used within this consistency engine
 	 * 
 	 */
-	class ThisClassExpressionSaturationListener
+	private class ThisClassExpressionSaturationListener
 			implements
 			ClassExpressionSaturationListener<SaturationJob<IndexedClassExpression>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassExpression>>.Engine> {
 
@@ -106,8 +107,15 @@ public class ConsistencyCheckingFactory implements
 
 	public class Engine implements InputProcessor<IndexedClassExpression> {
 
-		protected final ClassExpressionSaturationFactory<SaturationJob<IndexedClassExpression>>.Engine saturationEngine = saturationFactory
+		/**
+		 * The saturation engine used for consistency checking
+		 */
+		private final ClassExpressionSaturationFactory<SaturationJob<IndexedClassExpression>>.Engine saturationEngine = saturationFactory
 				.getEngine();
+
+		// don't allow creating of engines directly; only through the factory
+		private Engine() {
+		}
 
 		@Override
 		public final void submit(IndexedClassExpression job) {

@@ -29,6 +29,9 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory
 /**
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this {@link Queueable}
+ * 
  */
 public abstract class SuperClassExpression<C extends ContextElClassSaturation>
 		implements Queueable<C> {
@@ -44,8 +47,9 @@ public abstract class SuperClassExpression<C extends ContextElClassSaturation>
 	}
 
 	@Override
-	public boolean storeInContext(C context, RuleApplicationFactory.Engine engine) {
-		RuleStatistics statistics = engine.getStatistics();
+	public boolean storeInContext(C context,
+			RuleApplicationFactory.Engine engine) {
+		RuleStatistics statistics = engine.getRuleStatistics();
 		statistics.incrementSuperClassExpressionInfNo();
 		if (context.superClassExpressions.add(expression)) {
 			statistics.incrementSuperClassExpressionNo();

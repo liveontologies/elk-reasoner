@@ -453,10 +453,11 @@ public class InferenceSystemInvocationManager {
 	 * Execute all known initialization rules for the given context.
 	 * Initialization rules are rules that do not require premises that are
 	 * derived first. There should always be initialization rules (otherwise
-	 * nothing would ever be derived): a RuntimeException will be thrown if no
-	 * rules are given to alert the user of this problem.
+	 * nothing would ever be derived): a {@link RuntimeException} will be thrown
+	 * if no rules are given to alert the user of this problem.
 	 * 
 	 * @param context
+	 * @param engine
 	 * @throws IllegalArgumentException
 	 */
 	public void initContext(Context context,
@@ -499,6 +500,7 @@ public class InferenceSystemInvocationManager {
 	 * 
 	 * @param queueable
 	 * @param context
+	 * @param engine
 	 * 
 	 * @throws IllegalArgumentException
 	 *             Can potentially happen since the use of reflection implicitly

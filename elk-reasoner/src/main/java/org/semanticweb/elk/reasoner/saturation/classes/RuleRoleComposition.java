@@ -31,8 +31,12 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
+ * TODO: documentation
+ * 
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
 public class RuleRoleComposition<C extends ContextElClassSaturation> extends
 		RuleWithBackwardLinks<C> implements InferenceRule<C> {

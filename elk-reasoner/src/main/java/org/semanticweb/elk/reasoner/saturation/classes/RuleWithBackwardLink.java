@@ -26,6 +26,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.Multimap;
 
+/**
+ * TODO: documentation
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
+ */
 public abstract class RuleWithBackwardLink<C extends ContextElClassSaturation> {
 
 	protected void initializeCompositionOfBackwardLinks(C context,
