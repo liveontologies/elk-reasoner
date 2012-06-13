@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystem;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystemInvocationManager;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
  * An optimized implementation of the InferenceSystemInvocationManager that does
@@ -42,8 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
 public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturation>
 		extends InferenceSystemInvocationManager {
 
-	public InferenceSystemInvocationManagerSCE(RuleApplicationShared engine) {
-		super(engine);
+	public InferenceSystemInvocationManagerSCE() {
 	}
 
 	protected class RuleMethodListNegSCE {
@@ -63,17 +62,18 @@ public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturat
 
 				@Override
 				public void applySCE(NegativeSuperClassExpression<C> argument,
-						C context, RuleApplicationShared engine) {
+						C context, RuleApplicationFactory.Engine engine) {
 					firstInferenceRule.applySCE(argument, context, engine);
 				}
 			};
 			this.rest = rest;
 		}
 
-		public void invoke(NegativeSuperClassExpression<C> argument, C context) {
+		public void invoke(NegativeSuperClassExpression<C> argument, C context,
+				RuleApplicationFactory.Engine engine) {
 			firstInferenceRule.applySCE(argument, context, engine);
 			if (rest != null) {
-				rest.invoke(argument, context);
+				rest.invoke(argument, context, engine);
 			}
 		}
 	}
@@ -95,17 +95,18 @@ public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturat
 
 				@Override
 				public void applySCE(PositiveSuperClassExpression<C> argument,
-						C context, RuleApplicationShared engine) {
+						C context, RuleApplicationFactory.Engine engine) {
 					firstInferenceRule.applySCE(argument, context, engine);
 				}
 			};
 			this.rest = rest;
 		}
 
-		public void invoke(PositiveSuperClassExpression<C> argument, C context) {
+		public void invoke(PositiveSuperClassExpression<C> argument, C context,
+				RuleApplicationFactory.Engine engine) {
 			firstInferenceRule.applySCE(argument, context, engine);
 			if (rest != null) {
-				rest.invoke(argument, context);
+				rest.invoke(argument, context, engine);
 			}
 		}
 	}
@@ -149,15 +150,15 @@ public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturat
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void applyAdditionalMethodsToItem(Queueable<?> queueable,
-			Context context) {
+			Context context, RuleApplicationFactory.Engine engine) {
 		if (rulesNegSCE != null
 				&& queueable instanceof NegativeSuperClassExpression)
 			rulesNegSCE.invoke((NegativeSuperClassExpression<C>) queueable,
-					(C) context);
+					(C) context, engine);
 		if (rulesPosSCE != null
 				&& queueable instanceof PositiveSuperClassExpression)
 			rulesPosSCE.invoke((PositiveSuperClassExpression<C>) queueable,
-					(C) context);
+					(C) context, engine);
 	}
 
 }

@@ -39,15 +39,14 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class TaxonomyComputation
 		extends
-		ReasonerComputation<IndexedClassEntity, TaxonomyComputationEngine, TaxonomyComputationFactory> {
+		ReasonerComputation<IndexedClassEntity, TaxonomyComputationFactory.Engine, TaxonomyComputationFactory> {
 
 	public TaxonomyComputation(Iterable<? extends IndexedClassEntity> inputs,
 			int inputsSize, ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
 			IndividualClassTaxonomy partialTaxonomy) {
-		super(inputs, inputsSize, new TaxonomyComputationFactory(
-				new TaxonomyComputationShared(ontologyIndex, partialTaxonomy)),
-				executor, maxWorkers, progressMonitor);
+		super(inputs, inputsSize, new TaxonomyComputationFactory(ontologyIndex,
+				partialTaxonomy), executor, maxWorkers, progressMonitor);
 	}
 
 	public TaxonomyComputation(Iterable<? extends IndexedClassEntity> inputs,
@@ -62,14 +61,14 @@ public class TaxonomyComputation
 	 *         {@link #process()} should be called first to compute the taxonomy
 	 */
 	public IndividualClassTaxonomy getTaxonomy() {
-		return inputProcessorFactory.getShared().getTaxonomy();
+		return inputProcessorFactory.getTaxonomy();
 	}
 
 	/**
 	 * Print statistics about taxonomy computation
 	 */
 	public void printStatistics() {
-		inputProcessorFactory.getShared().printStatistics();
+		inputProcessorFactory.printStatistics();
 	}
 
 }

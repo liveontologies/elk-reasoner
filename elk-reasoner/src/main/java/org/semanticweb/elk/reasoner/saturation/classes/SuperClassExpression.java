@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
  * @author Frantisek Simancik
@@ -43,7 +44,8 @@ public abstract class SuperClassExpression<C extends ContextElClassSaturation>
 	}
 
 	@Override
-	public boolean storeInContext(C context, RuleStatistics statistics) {
+	public boolean storeInContext(C context, RuleApplicationFactory.Engine engine) {
+		RuleStatistics statistics = engine.getStatistics();
 		statistics.incrementSuperClassExpressionInfNo();
 		if (context.superClassExpressions.add(expression)) {
 			statistics.incrementSuperClassExpressionNo();

@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
  * @author Frantisek Simancik
@@ -41,9 +41,10 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements
 			IndexedClassExpressionVisitor<Void> {
 
 		private final C context;
-		private final RuleApplicationShared engine;
+		private final RuleApplicationFactory.Engine engine;
 
-		public ClassExpressionDecomposer(C context, RuleApplicationShared engine) {
+		public ClassExpressionDecomposer(C context,
+				RuleApplicationFactory.Engine engine) {
 			this.context = context;
 			this.engine = engine;
 		}
@@ -83,7 +84,7 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements
 
 	@Override
 	public void applySCE(PositiveSuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine) {
+			RuleApplicationFactory.Engine engine) {
 		ClassExpressionDecomposer decomposer = new ClassExpressionDecomposer(
 				context, engine);
 		argument.getExpression().accept(decomposer);

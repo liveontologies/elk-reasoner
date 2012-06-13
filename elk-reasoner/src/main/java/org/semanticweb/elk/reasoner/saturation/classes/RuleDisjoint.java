@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
@@ -36,7 +36,7 @@ public class RuleDisjoint<C extends ContextElClassSaturation> implements
 
 	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine) {
+			RuleApplicationFactory.Engine engine) {
 
 		IndexedClassExpression ice = argument.getExpression();
 
@@ -46,7 +46,7 @@ public class RuleDisjoint<C extends ContextElClassSaturation> implements
 					ice.getDisjointClasses(),
 					context.getSuperClassExpressions())) {
 				engine.enqueue(context, new PositiveSuperClassExpression<C>(
-						engine.owlNothing));
+						engine.getOwlNothing()));
 				return;
 			}
 
@@ -54,8 +54,9 @@ public class RuleDisjoint<C extends ContextElClassSaturation> implements
 			for (IndexedDisjointnessAxiom disAxiom : ice
 					.getDisjointnessAxioms())
 				if (!context.addDisjointessAxiom(disAxiom))
-					engine.enqueue(context,
-							new PositiveSuperClassExpression<C>(
-									engine.owlNothing));
+					engine.enqueue(
+							context,
+							new PositiveSuperClassExpression<C>(engine
+									.getOwlNothing()));
 	}
 }

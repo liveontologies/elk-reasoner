@@ -192,7 +192,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 		@Override
 		public final void run() {
 			I nextInput;
-			P inputProcessor = inputProcessorFactory.createProcessor();
+			P inputProcessor = inputProcessorFactory.getEngine();
 			for (;;) {
 				if (interrupted)
 					break;

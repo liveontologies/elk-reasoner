@@ -39,7 +39,7 @@ public class ObjectPropertyCompositionsPrecomputationFactory
 	}
 
 	@Override
-	public ObjectPropertyCompositionsPrecomputationEngine createProcessor() {
+	public ObjectPropertyCompositionsPrecomputationEngine getEngine() {
 		return this.engine;
 	}
 

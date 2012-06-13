@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
  * Inference rule with a NegativeSuperClassExpressions as an argument.
@@ -35,6 +35,6 @@ public interface InferenceRuleNegSCE<C extends ContextElClassSaturation>
 		extends InferenceRule<C> {
 
 	void applySCE(NegativeSuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine);
+			RuleApplicationFactory.Engine engine);
 
 }

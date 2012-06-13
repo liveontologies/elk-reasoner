@@ -37,6 +37,6 @@ public interface InputProcessorFactory<I, P extends InputProcessor<I>> {
 	/**
 	 * @return a new input processor of the given type
 	 */
-	public P createProcessor();
+	public P getEngine();
 
 }

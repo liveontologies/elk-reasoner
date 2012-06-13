@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
@@ -38,7 +38,7 @@ public class RuleConjunctionPlus<C extends ContextElClassSaturation> implements
 
 	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine) {
+			RuleApplicationFactory.Engine engine) {
 
 		final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjs = argument
 				.getExpression().getNegConjunctionsByConjunct();

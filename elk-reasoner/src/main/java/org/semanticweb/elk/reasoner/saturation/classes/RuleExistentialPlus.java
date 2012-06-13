@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -41,7 +41,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 		RuleWithBackwardLinks<C> implements InferenceRuleSCE<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
-			RuleApplicationShared engine) {
+			RuleApplicationFactory.Engine engine) {
 		final IndexedPropertyChain linkRelation = argument.getRelation();
 		final Context target = argument.getTarget();
 
@@ -68,7 +68,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 
 	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine) {
+			RuleApplicationFactory.Engine engine) {
 		final Collection<IndexedObjectSomeValuesFrom> exists = argument
 				.getExpression().getNegExistentials();
 
@@ -80,7 +80,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 					new NegativeSuperClassExpression<C>(e), context, engine);
 	}
 
-	private void initializePropagations(C context, RuleApplicationShared engine) {
+	private void initializePropagations(C context, RuleApplicationFactory.Engine engine) {
 		context.setDerivePropagations(true);
 
 		for (IndexedClassExpression ice : context.superClassExpressions)
@@ -92,7 +92,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 	}
 
 	private void addPropagation(IndexedPropertyChain propRelation,
-			Queueable<C> carry, C context, RuleApplicationShared engine) {
+			Queueable<C> carry, C context, RuleApplicationFactory.Engine engine) {
 
 		if (context.propagationsByObjectProperty == null) {
 			context.initPropagationsByProperty();

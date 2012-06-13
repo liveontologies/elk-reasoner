@@ -38,7 +38,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ConsistencyChecking
 		extends
-		ReasonerComputation<IndexedClassExpression, ConsistencyCheckingEngine, ConsistencyCheckingFactory> {
+		ReasonerComputation<IndexedClassExpression, ConsistencyCheckingFactory.Engine, ConsistencyCheckingFactory> {
 
 	/**
 	 * the index of the ontology used for computation
@@ -63,9 +63,8 @@ public class ConsistencyChecking
 
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(new ConsistencyCheckingFactory(new ConsistencyCheckingShared(
-				ontologyIndex)), executor, maxWorkers, progressMonitor,
-				ontologyIndex);
+		this(new ConsistencyCheckingFactory(ontologyIndex), executor,
+				maxWorkers, progressMonitor, ontologyIndex);
 	}
 
 	@Override
@@ -81,14 +80,14 @@ public class ConsistencyChecking
 	 *         {@link #process()}
 	 */
 	public boolean isConsistent() {
-		return inputProcessorFactory.getShared().isConsistent();
+		return inputProcessorFactory.isConsistent();
 	}
 
 	/**
 	 * Print statistics about consistency checking
 	 */
 	public void printStatistics() {
-		inputProcessorFactory.getShared().printStatistics();
+		inputProcessorFactory.printStatistics();
 	}
 
 }

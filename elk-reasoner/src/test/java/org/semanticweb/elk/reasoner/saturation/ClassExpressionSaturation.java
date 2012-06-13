@@ -29,12 +29,11 @@ import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 
 public class ClassExpressionSaturation<J extends SaturationJob<? extends IndexedClassExpression>>
 		extends
-		ConcurrentComputation<J, ClassExpressionSaturationEngine<J>, ClassExpressionSaturationFactory<J>> {
+		ConcurrentComputation<J, ClassExpressionSaturationFactory<J>.Engine, ClassExpressionSaturationFactory<J>> {
 
 	public ClassExpressionSaturation(ComputationExecutor executor,
 			int maxWorkers, OntologyIndex ontologyIndex) {
-		super(new ClassExpressionSaturationFactory<J>(
-				new ClassExpressionSaturationShared<J>(ontologyIndex)),
-				executor, maxWorkers);
+		super(new ClassExpressionSaturationFactory<J>(ontologyIndex), executor,
+				maxWorkers);
 	}
 }

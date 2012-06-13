@@ -39,7 +39,7 @@ public class ObjectPropertyHierarchyComputationFactory
 	}
 
 	@Override
-	public ObjectPropertyHierarchyComputationEngine createProcessor() {
+	public ObjectPropertyHierarchyComputationEngine getEngine() {
 		return this.engine;
 	}
 }

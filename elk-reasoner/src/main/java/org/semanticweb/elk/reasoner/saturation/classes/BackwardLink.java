@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
@@ -46,7 +47,8 @@ public class BackwardLink<C extends ContextElClassSaturation> extends
 	}
 
 	@Override
-	public boolean storeInContext(C context, RuleStatistics statistics) {
+	public boolean storeInContext(C context, RuleApplicationFactory.Engine engine) {
+		RuleStatistics statistics = engine.getStatistics();
 		statistics.incrementBackLinkInfNo();
 
 		if (context.backwardLinksByObjectProperty == null)

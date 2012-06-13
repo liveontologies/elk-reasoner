@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
  * @author Frantisek Simancik
@@ -36,7 +36,7 @@ public class RuleSubsumption<C extends ContextElClassSaturation> implements
 
 	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine) {
+			RuleApplicationFactory.Engine engine) {
 
 		final List<IndexedClassExpression> implied = argument.getExpression()
 				.getToldSuperClassExpressions();

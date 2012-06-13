@@ -26,7 +26,7 @@ import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -38,7 +38,7 @@ public class RuleRoleComposition<C extends ContextElClassSaturation> extends
 		RuleWithBackwardLinks<C> implements InferenceRule<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
-			RuleApplicationShared engine) {
+			RuleApplicationFactory.Engine engine) {
 
 		final IndexedPropertyChain linkRelation = argument.getRelation();
 		final C target = argument.getTarget();
@@ -76,7 +76,7 @@ public class RuleRoleComposition<C extends ContextElClassSaturation> extends
 	}
 
 	public void apply(ForwardLink<C> argument, C context,
-			RuleApplicationShared engine) {
+			RuleApplicationFactory.Engine engine) {
 
 		// start deriving backward links for composition
 		initializeCompositionOfBackwardLinks(context, engine);

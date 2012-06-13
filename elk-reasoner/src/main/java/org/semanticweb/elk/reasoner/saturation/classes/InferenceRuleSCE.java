@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationShared;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
  * 
@@ -36,5 +36,5 @@ public interface InferenceRuleSCE<C extends ContextElClassSaturation> extends
 		InferenceRule<C> {
 
 	void applySCE(SuperClassExpression<C> argument, C context,
-			RuleApplicationShared engine);
+			RuleApplicationFactory.Engine engine);
 }
