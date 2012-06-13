@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 public class TaxonomyComputationFactory implements
@@ -36,7 +37,7 @@ public class TaxonomyComputationFactory implements
 
 	@Override
 	public TaxonomyComputationEngine createProcessor() {
-		return new TaxonomyComputationEngine(shared);
+		return new TaxonomyComputationEngine(shared, new RuleStatistics());
 	}
 
 	TaxonomyComputationShared getShared() {

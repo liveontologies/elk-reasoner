@@ -66,4 +66,12 @@ public interface InputProcessor<J> {
 	 */
 	public boolean canProcess();
 
+	/**
+	 * Indicate that processing of the input is finished. This method should be
+	 * eventually called after every call of {@link #process()} (but it is not
+	 * necessary that every call of {@link #process()} should be followed by
+	 * {@link #finish()}).
+	 */
+	public void finish();
+
 }

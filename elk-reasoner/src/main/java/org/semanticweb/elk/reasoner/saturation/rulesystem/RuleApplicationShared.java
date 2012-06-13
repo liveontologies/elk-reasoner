@@ -32,11 +32,10 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
-import org.semanticweb.elk.reasoner.saturation.classes.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextElClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemElClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemInvocationManagerSCE;
-import org.semanticweb.elk.reasoner.saturation.classes.SuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 
 public class RuleApplicationShared {
 
@@ -81,12 +80,18 @@ public class RuleApplicationShared {
 	 */
 	protected final RuleApplicationListener listener;
 
+	/**
+	 * The aggregated statistics of all workers
+	 */
+	protected final RuleStatistics sharedStatistics;
+
 	public RuleApplicationShared(OntologyIndex ontologyIndex,
 			RuleApplicationListener listener) {
 		this.ontologyIndex = ontologyIndex;
 		this.listener = listener;
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
 		this.activeContextsEmpty = new AtomicBoolean(true);
+		this.sharedStatistics = new RuleStatistics();
 
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
@@ -165,14 +170,14 @@ public class RuleApplicationShared {
 		activateContext(context);
 	}
 
-	protected void process(Context context) {
+	protected void process(Context context, RuleStatistics statistics) {
 		for (;;) {
 			Queueable<?> item = context.getQueue().poll();
 			if (item == null)
 				break;
 
-			inferenceSystemInvocationManager
-					.processItemInContext(item, context);
+			inferenceSystemInvocationManager.processItemInContext(item,
+					context, statistics);
 		}
 
 		deactivateContext(context);
@@ -185,11 +190,11 @@ public class RuleApplicationShared {
 		if (LOGGER_.isDebugEnabled()) {
 			LOGGER_.debug("Contexts created:" + contextNumber);
 			LOGGER_.debug("Derived Produced/Unique:"
-					+ SuperClassExpression.superClassExpressionInfNo + "/"
-					+ SuperClassExpression.superClassExpressionNo);
+					+ sharedStatistics.getSuperClassExpressionInfNo() + "/"
+					+ sharedStatistics.getSuperClassExpressionNo());
 			LOGGER_.debug("Backward Links Produced/Unique:"
-					+ BackwardLink.backLinkInfNo + "/"
-					+ BackwardLink.backLinkNo);
+					+ sharedStatistics.getBackLinkInfNo() + "/"
+					+ sharedStatistics.getBackLinkNo());
 			// LOGGER_.debug("Forward Links Produced/Unique:" +
 			// QueueableStore.forwLinkInfNo + "/" +
 			// QueueableStore.forwLinkNo.get());
@@ -199,5 +204,4 @@ public class RuleApplicationShared {
 			// InferenceRuleManager.debugRuleApplications);
 		}
 	}
-
 }

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.consistency;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
@@ -43,10 +44,11 @@ public class ConsistencyCheckingEngine implements
 
 	protected final ClassExpressionSaturationEngine<SaturationJob<IndexedClassExpression>> saturationEngine;
 
-	public ConsistencyCheckingEngine(ConsistencyCheckingShared shared) {
+	public ConsistencyCheckingEngine(ConsistencyCheckingShared shared,
+			RuleStatistics statistics) {
 		this.shared = shared;
 		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJob<IndexedClassExpression>>(
-				shared.saturationShared);
+				shared.saturationShared, statistics);
 	}
 
 	@Override
@@ -64,6 +66,11 @@ public class ConsistencyCheckingEngine implements
 	@Override
 	public boolean canProcess() {
 		return saturationEngine.canProcess();
+	}
+
+	@Override
+	public void finish() {
+		saturationEngine.finish();
 	}
 
 }

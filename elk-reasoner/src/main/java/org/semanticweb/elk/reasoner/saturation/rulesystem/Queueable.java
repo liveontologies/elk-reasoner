@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
+
 /**
  * Common interface for derivations that can be queued when computing a
  * saturation. Objects of this class contain partial information about a
@@ -49,6 +51,6 @@ public interface Queueable<C extends Context> {
 	 * @param context
 	 * @return if context has been modified
 	 */
-	public boolean storeInContext(C context);
+	public boolean storeInContext(C context, RuleStatistics s);
 
 }

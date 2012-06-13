@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.consistency;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 public class ConsistencyCheckingFactory
@@ -37,7 +38,7 @@ public class ConsistencyCheckingFactory
 
 	@Override
 	public ConsistencyCheckingEngine createProcessor() {
-		return new ConsistencyCheckingEngine(shared);
+		return new ConsistencyCheckingEngine(shared, new RuleStatistics());
 	}
 
 	ConsistencyCheckingShared getShared() {

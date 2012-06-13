@@ -197,4 +197,8 @@ class ObjectPropertyCompositionsPrecomputationEngine implements
 		}
 	}
 
+	@Override
+	public void finish() {
+	}
+
 }

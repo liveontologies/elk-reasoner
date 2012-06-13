@@ -46,7 +46,7 @@ public class ForwardLink<C extends ContextElClassSaturation> extends
 	}
 
 	@Override
-	public boolean storeInContext(C context) {
+	public boolean storeInContext(C context, RuleStatistics s) {
 		// forwLinkInfNo.incrementAndGet();
 
 		if (context.forwardLinksByObjectProperty == null)

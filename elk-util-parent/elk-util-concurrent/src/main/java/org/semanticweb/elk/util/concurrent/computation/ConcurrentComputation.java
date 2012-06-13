@@ -204,7 +204,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 							inputProcessor.process();
 							if (!interrupted && Thread.interrupted())
 								continue;
-							return;
+							break;
 						}
 					} else {
 						nextInput = buffer.take();
@@ -215,10 +215,11 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 					if (interrupted) {
 						// restore the interrupt status and exit
 						Thread.currentThread().interrupt();
-						return;
+						break;
 					}
 				}
 			}
+			inputProcessor.finish();
 		}
 	}
 }

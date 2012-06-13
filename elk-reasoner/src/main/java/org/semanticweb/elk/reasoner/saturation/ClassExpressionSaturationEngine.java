@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -60,10 +61,10 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 	protected RuleApplicationEngine ruleApplicationEngine;
 
 	public ClassExpressionSaturationEngine(
-			ClassExpressionSaturationShared<J> shared) {
+			ClassExpressionSaturationShared<J> shared, RuleStatistics statistics) {
 		this.shared = shared;
 		this.ruleApplicationEngine = new RuleApplicationEngine(
-				shared.ruleApplicationShared);
+				shared.ruleApplicationShared, statistics);
 	}
 
 	@Override
@@ -157,6 +158,11 @@ public class ClassExpressionSaturationEngine<J extends SaturationJob<? extends I
 		return ruleApplicationEngine.canProcess()
 				|| shared.countJobsFinished.get() > shared.countJobsProcessed
 						.get();
+	}
+
+	@Override
+	public void finish() {
+		ruleApplicationEngine.finish();
 	}
 
 }

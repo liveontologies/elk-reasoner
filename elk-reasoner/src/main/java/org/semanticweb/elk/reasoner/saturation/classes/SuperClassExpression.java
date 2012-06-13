@@ -22,11 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
-import org.semanticweb.elk.util.concurrent.sync.AtomicIntegerFork;
 
 /**
  * @author Frantisek Simancik
@@ -34,28 +31,6 @@ import org.semanticweb.elk.util.concurrent.sync.AtomicIntegerFork;
  */
 public abstract class SuperClassExpression<C extends ContextElClassSaturation>
 		implements Queueable<C> {
-
-	public static AtomicInteger superClassExpressionNo = new AtomicInteger(0);
-	public static AtomicInteger superClassExpressionInfNo = new AtomicInteger(0);
-
-	private static ThreadLocal<AtomicIntegerFork> localSuperClassExpressionNo = new ThreadLocal<AtomicIntegerFork>() {
-		@Override
-		protected synchronized AtomicIntegerFork initialValue() {
-			return new AtomicIntegerFork(superClassExpressionNo);
-		}
-	};
-
-	private static ThreadLocal<AtomicIntegerFork> localSuperClassExpressionInfNo = new ThreadLocal<AtomicIntegerFork>() {
-		@Override
-		protected synchronized AtomicIntegerFork initialValue() {
-			return new AtomicIntegerFork(superClassExpressionInfNo);
-		}
-	};
-
-	public static void sync() {
-		localSuperClassExpressionNo.get().sync();
-		localSuperClassExpressionInfNo.get().sync();
-	}
 
 	protected final IndexedClassExpression expression;
 
@@ -68,10 +43,10 @@ public abstract class SuperClassExpression<C extends ContextElClassSaturation>
 	}
 
 	@Override
-	public boolean storeInContext(C context) {
-//		localSuperClassExpressionInfNo.get().incrementAndGet();
+	public boolean storeInContext(C context, RuleStatistics statistics) {
+		statistics.incrementSuperClassExpressionInfNo();
 		if (context.superClassExpressions.add(expression)) {
-//			localSuperClassExpressionNo.get().incrementAndGet();
+			statistics.incrementSuperClassExpressionNo();
 			return true;
 		}
 		return false;

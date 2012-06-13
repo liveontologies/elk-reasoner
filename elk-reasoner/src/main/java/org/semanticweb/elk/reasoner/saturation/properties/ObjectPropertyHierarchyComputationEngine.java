@@ -80,4 +80,8 @@ class ObjectPropertyHierarchyComputationEngine implements
 	public boolean canProcess() {
 		return false;
 	}
+
+	@Override
+	public void finish() {
+	}
 }

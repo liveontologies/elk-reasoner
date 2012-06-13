@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.reduction;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
@@ -69,10 +70,11 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 */
 	protected final ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>> saturationEngine;
 
-	public TransitiveReductionEngine(TransitiveReductionShared<R, J> shared) {
+	public TransitiveReductionEngine(TransitiveReductionShared<R, J> shared,
+			RuleStatistics statistics) {
 		this.shared = shared;
 		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>(
-				shared.saturationShared);
+				shared.saturationShared, statistics);
 	}
 
 	@Override
@@ -107,6 +109,11 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	@Override
 	public boolean canProcess() {
 		return !shared.auxJobQueue.isEmpty() || saturationEngine.canProcess();
-	}	
+	}
+
+	@Override
+	public void finish() {
+		saturationEngine.finish();
+	}
 
 }

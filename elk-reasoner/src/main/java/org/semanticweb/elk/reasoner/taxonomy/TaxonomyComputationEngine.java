@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionEngine;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /*
@@ -49,9 +50,10 @@ public class TaxonomyComputationEngine implements
 	 */
 	protected final TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>> transitiveReductionEngine;
 
-	public TaxonomyComputationEngine(TaxonomyComputationShared shared) {
+	public TaxonomyComputationEngine(TaxonomyComputationShared shared,
+			RuleStatistics statistics) {
 		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>(
-				shared.transitiveReductionShared);
+				shared.transitiveReductionShared, statistics);
 	}
 
 	@Override
@@ -68,6 +70,11 @@ public class TaxonomyComputationEngine implements
 	@Override
 	public boolean canProcess() {
 		return transitiveReductionEngine.canProcess();
-	}	
+	}
+
+	@Override
+	public void finish() {
+		transitiveReductionEngine.finish();
+	}
 
 }

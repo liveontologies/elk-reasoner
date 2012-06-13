@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 
 /**
  * Class for managing the application of inference rules and related methods
@@ -78,7 +79,8 @@ public class InferenceSystemInvocationManager {
 	 * Required parameter types of the store method in Queueable objects. A
 	 * generic type used for Context can be more specific than this.
 	 */
-	protected final static Class<?>[] parameterTypesStoreMethod = { Context.class };
+	protected final static Class<?>[] parameterTypesStoreMethod = {
+			Context.class, RuleStatistics.class };
 
 	/**
 	 * RuleApplicationEngine that owns this object. Rule applications need to
@@ -104,12 +106,12 @@ public class InferenceSystemInvocationManager {
 			this.rest = rest;
 		}
 
-		public void invoke(Queueable<?> argument, Context context)
-				throws IllegalArgumentException, IllegalAccessException,
-				InvocationTargetException {
+		public void invoke(Queueable<?> argument, Context context,
+				RuleStatistics statistics) throws IllegalArgumentException,
+				IllegalAccessException, InvocationTargetException {
 			firstMethod.invoke(firstInferenceRule, argument, context, engine);
 			if (rest != null) {
-				rest.invoke(argument, context);
+				rest.invoke(argument, context, statistics);
 			}
 		}
 	}
@@ -509,8 +511,8 @@ public class InferenceSystemInvocationManager {
 	 *             generic in InferenceSystem, this is extremely unlikely to
 	 *             ever happen. Nevertheless, we declare it here for clarity.
 	 */
-	public void processItemInContext(Queueable<?> queueable, Context context)
-			throws IllegalArgumentException {
+	public void processItemInContext(Queueable<?> queueable, Context context,
+			RuleStatistics statistics) throws IllegalArgumentException {
 		Class<?> clazz = queueable.getClass();
 		InferenceMethods inferenceMethods = methodsForQueueable.get(clazz);
 		if (inferenceMethods == null) {
@@ -521,9 +523,10 @@ public class InferenceSystemInvocationManager {
 
 		try {
 			if (Boolean.TRUE.equals(inferenceMethods.storeMethod.invoke(
-					queueable, context))) {
+					queueable, context, statistics))) {
 				if (inferenceMethods.ruleMethods != null) {
-					inferenceMethods.ruleMethods.invoke(queueable, context);
+					inferenceMethods.ruleMethods.invoke(queueable, context,
+							statistics);
 				}
 
 				applyAdditionalMethodsToItem(queueable, context);

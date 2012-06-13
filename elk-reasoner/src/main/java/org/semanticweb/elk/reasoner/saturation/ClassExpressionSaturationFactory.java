@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends IndexedClassExpression>>
@@ -37,7 +38,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 	@Override
 	public ClassExpressionSaturationEngine<J> createProcessor() {
-		return new ClassExpressionSaturationEngine<J>(shared);
+		return new ClassExpressionSaturationEngine<J>(shared, new RuleStatistics());
 	}
 
 }

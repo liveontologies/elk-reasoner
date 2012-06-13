@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
@@ -38,9 +39,12 @@ public class RuleApplicationEngine implements
 		InputProcessor<IndexedClassExpression> {
 
 	private final RuleApplicationShared shared;
+	private final RuleStatistics statistics;
 
-	public RuleApplicationEngine(RuleApplicationShared shared) {
+	public RuleApplicationEngine(RuleApplicationShared shared,
+			RuleStatistics statistics) {
 		this.shared = shared;
+		this.statistics = statistics;
 	}
 
 	@Override
@@ -62,12 +66,17 @@ public class RuleApplicationEngine implements
 					break;
 				shared.tryNotifyCanProcess();
 			}
-			shared.process(nextContext);
+			shared.process(nextContext, statistics);
 		}
 	}
 
 	@Override
 	public boolean canProcess() {
 		return !shared.activeContextsEmpty.get();
+	}
+
+	@Override
+	public void finish() {
+		shared.sharedStatistics.merge(statistics);
 	}
 }
