@@ -89,15 +89,18 @@ public class TaxonomyComputationFactory implements
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
+	 * @param maxWorkers
+	 *            the maximum number of workers that can use this factory
 	 * @param partialTaxonomy
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
 	public TaxonomyComputationFactory(OntologyIndex ontologyIndex,
-			IndividualClassTaxonomy partialTaxonomy) {
+			int maxWorkers, IndividualClassTaxonomy partialTaxonomy) {
 		this.taxonomy = partialTaxonomy;
 		this.transitiveReductionShared = new TransitiveReductionFactory<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>(
-				ontologyIndex, new ThisTransitiveReductionListener());
+				ontologyIndex, maxWorkers,
+				new ThisTransitiveReductionListener());
 	}
 
 	/**
@@ -105,9 +108,12 @@ public class TaxonomyComputationFactory implements
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
+	 * @param maxWorkers
+	 *            the maximum number of workers that can use this factory
 	 */
-	public TaxonomyComputationFactory(OntologyIndex ontologyIndex) {
-		this(ontologyIndex, new ConcurrentTaxonomy());
+	public TaxonomyComputationFactory(OntologyIndex ontologyIndex,
+			int maxWorkers) {
+		this(ontologyIndex, maxWorkers, new ConcurrentTaxonomy());
 	}
 
 	/**

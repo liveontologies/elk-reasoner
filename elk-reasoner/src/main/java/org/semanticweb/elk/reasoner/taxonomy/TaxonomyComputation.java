@@ -46,7 +46,8 @@ public class TaxonomyComputation
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
 			IndividualClassTaxonomy partialTaxonomy) {
 		super(inputs, inputsSize, new TaxonomyComputationFactory(ontologyIndex,
-				partialTaxonomy), executor, maxWorkers, progressMonitor);
+				maxWorkers, partialTaxonomy), executor, maxWorkers,
+				progressMonitor);
 	}
 
 	public TaxonomyComputation(Iterable<? extends IndexedClassEntity> inputs,

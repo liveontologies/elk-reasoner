@@ -52,13 +52,13 @@ public class BackwardLink<C extends ContextElClassSaturation> extends
 	public boolean storeInContext(C context,
 			RuleApplicationFactory.Engine engine) {
 		RuleStatistics statistics = engine.getRuleStatistics();
-		statistics.incrementBackLinkInfNo();
+		statistics.backLinkInfNo++;
 
 		if (context.backwardLinksByObjectProperty == null)
 			context.initBackwardLinksByProperty();
 
 		if (context.backwardLinksByObjectProperty.add(first, second)) {
-			statistics.incrementBackLinNo();
+			statistics.backLinkNo++;
 			return true;
 		}
 		return false;

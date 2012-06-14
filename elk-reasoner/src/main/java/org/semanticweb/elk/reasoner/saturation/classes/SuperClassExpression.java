@@ -50,9 +50,9 @@ public abstract class SuperClassExpression<C extends ContextElClassSaturation>
 	public boolean storeInContext(C context,
 			RuleApplicationFactory.Engine engine) {
 		RuleStatistics statistics = engine.getRuleStatistics();
-		statistics.incrementSuperClassExpressionInfNo();
+		statistics.superClassExpressionInfNo++;
 		if (context.superClassExpressions.add(expression)) {
-			statistics.incrementSuperClassExpressionNo();
+			statistics.superClassExpressionNo++;
 			return true;
 		}
 		return false;

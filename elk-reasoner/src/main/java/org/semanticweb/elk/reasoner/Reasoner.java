@@ -72,7 +72,7 @@ public class Reasoner extends AbstractReasonerState {
 
 	/**
 	 * Should fresh entities in reasoner queries be accepted (configuration
-	 * setting). If false, a FreshEntityException will be thrown when
+	 * setting). If false, a {@link FreshEntityException} will be thrown when
 	 * encountering entities that did not occur in the ontology.
 	 */
 	protected boolean allowFreshEntities;

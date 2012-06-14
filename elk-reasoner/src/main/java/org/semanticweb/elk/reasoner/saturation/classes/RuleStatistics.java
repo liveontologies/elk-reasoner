@@ -55,30 +55,25 @@ public class RuleStatistics {
 		return superClassExpressionNo;
 	}
 
-	void incrementBackLinkInfNo() {
-		backLinkInfNo++;
+	/**
+	 * Reset all statistics counters (make them zero).
+	 */
+	public void reset() {
+		backLinkInfNo = 0;
+		backLinkNo = 0;
+		forwLinkInfNo = 0;
+		forwLinkNo = 0;
+		superClassExpressionInfNo = 0;
+		superClassExpressionNo = 0;
 	}
 
-	void incrementBackLinNo() {
-		backLinkNo++;
-	}
-
-	void incrementForwLinkInfNo() {
-		forwLinkInfNo++;
-	}
-
-	void incrementForwLinkNo() {
-		forwLinkNo++;
-	}
-
-	void incrementSuperClassExpressionInfNo() {
-		superClassExpressionInfNo++;
-	}
-
-	void incrementSuperClassExpressionNo() {
-		superClassExpressionNo++;
-	}
-
+	/**
+	 * Add all statistic counters of the argument to the corresponding statistic
+	 * counter of this object
+	 * 
+	 * @param statistics
+	 *            the object which counters should be added
+	 */
 	public synchronized void merge(RuleStatistics statistics) {
 		this.backLinkInfNo += statistics.backLinkInfNo;
 		this.backLinkNo += statistics.backLinkNo;

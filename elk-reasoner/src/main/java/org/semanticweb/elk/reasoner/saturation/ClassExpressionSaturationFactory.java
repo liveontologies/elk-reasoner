@@ -143,15 +143,15 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index used to apply the rules
+	 * @param maxWorkers
+	 *            the maximum number of workers that can use this factory
 	 * @param listener
 	 *            the listener object implementing callback functions
-	 * @param threshold
-	 *            the maximal difference between unprocessed and processed
-	 *            contexts under which new jobs can be submitted.
 	 */
 	public ClassExpressionSaturationFactory(OntologyIndex ontologyIndex,
-			ClassExpressionSaturationListener<J, Engine> listener, int threshold) {
-		this.threshold = threshold;
+			int maxWorkers,
+			ClassExpressionSaturationListener<J, Engine> listener) {
+		this.threshold = 64 + 32 * maxWorkers;
 		this.listener = listener;
 		this.jobsToDo = new ConcurrentLinkedQueue<J>();
 		this.jobsInProgress = new ConcurrentLinkedQueue<J>();
@@ -160,37 +160,28 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	}
 
 	/**
-	 * Creates a new saturation engine using the given ontology index and the
-	 * listener for callback functions.
-	 * 
-	 * @param ontologyIndex
-	 *            the ontology index used to apply the rules
-	 * @param listener
-	 *            The listener object implementing callback functions
-	 */
-	public ClassExpressionSaturationFactory(OntologyIndex ontologyIndex,
-			ClassExpressionSaturationListener<J, Engine> listener) {
-		this(ontologyIndex, listener, 256);
-	}
-
-	/**
 	 * Creates a new saturation engine using the given ontology index.
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index used to apply the rules
+	 * @param maxWorkers
+	 *            the maximum number of workers that can use this factory
 	 */
-	public ClassExpressionSaturationFactory(OntologyIndex ontologyIndex) {
+	public ClassExpressionSaturationFactory(OntologyIndex ontologyIndex,
+			int maxWorkers) {
 		/* we use a dummy listener */
-		this(ontologyIndex, new ClassExpressionSaturationListener<J, Engine>() {
+		this(ontologyIndex, maxWorkers,
+				new ClassExpressionSaturationListener<J, Engine>() {
 
-			@Override
-			public void notifyCanProcess() {
-			}
+					@Override
+					public void notifyCanProcess() {
+					}
 
-			@Override
-			public void notifyFinished(J job) throws InterruptedException {
-			}
-		});
+					@Override
+					public void notifyFinished(J job)
+							throws InterruptedException {
+					}
+				});
 	}
 
 	/**

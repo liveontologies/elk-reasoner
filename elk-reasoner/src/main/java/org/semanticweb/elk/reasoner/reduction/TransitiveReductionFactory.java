@@ -104,17 +104,20 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
+	 * @param maxWorkers
+	 *            the maximum number of workers that can use this factory
 	 * @param listener
 	 *            the listener object implementing callback functions for this
 	 *            engine
 	 */
 	public TransitiveReductionFactory(OntologyIndex ontologyIndex,
-			TransitiveReductionListener<J, Engine> listener) {
+			int maxWorkers, TransitiveReductionListener<J, Engine> listener) {
 		this.listener = listener;
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.jobQueueEmpty = new AtomicBoolean(true);
 		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
-				ontologyIndex, new ThisClassExpressionSaturationListener());
+				ontologyIndex, maxWorkers,
+				new ThisClassExpressionSaturationListener());
 	}
 
 	/**

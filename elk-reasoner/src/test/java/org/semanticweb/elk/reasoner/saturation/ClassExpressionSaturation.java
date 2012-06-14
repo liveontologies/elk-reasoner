@@ -33,7 +33,8 @@ public class ClassExpressionSaturation<J extends SaturationJob<? extends Indexed
 
 	public ClassExpressionSaturation(ComputationExecutor executor,
 			int maxWorkers, OntologyIndex ontologyIndex) {
-		super(new ClassExpressionSaturationFactory<J>(ontologyIndex), executor,
-				maxWorkers);
+		super(
+				new ClassExpressionSaturationFactory<J>(ontologyIndex,
+						maxWorkers), executor, maxWorkers);
 	}
 }

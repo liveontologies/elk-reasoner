@@ -63,8 +63,8 @@ public class ConsistencyChecking
 
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(new ConsistencyCheckingFactory(ontologyIndex), executor,
-				maxWorkers, progressMonitor, ontologyIndex);
+		this(new ConsistencyCheckingFactory(ontologyIndex, maxWorkers),
+				executor, maxWorkers, progressMonitor, ontologyIndex);
 	}
 
 	@Override

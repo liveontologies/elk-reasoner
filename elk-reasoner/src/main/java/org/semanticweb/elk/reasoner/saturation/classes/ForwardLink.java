@@ -53,13 +53,13 @@ public class ForwardLink<C extends ContextElClassSaturation> extends
 	public boolean storeInContext(C context,
 			RuleApplicationFactory.Engine engine) {
 		RuleStatistics statistics = engine.getRuleStatistics();
-		statistics.incrementForwLinkInfNo();
+		statistics.forwLinkInfNo++;
 
 		if (context.forwardLinksByObjectProperty == null)
 			context.initForwardLinksByProperty();
 
 		if (context.forwardLinksByObjectProperty.add(first, second)) {
-			statistics.incrementForwLinkNo();
+			statistics.forwLinkNo++;
 			return true;
 		}
 		return false;

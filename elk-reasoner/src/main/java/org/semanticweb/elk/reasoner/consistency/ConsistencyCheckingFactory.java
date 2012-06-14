@@ -62,10 +62,14 @@ public class ConsistencyCheckingFactory implements
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
+	 * @param maxWorkers
+	 *            the maximum number of workers that can use this factory
 	 */
-	public ConsistencyCheckingFactory(OntologyIndex ontologyIndex) {
+	public ConsistencyCheckingFactory(OntologyIndex ontologyIndex,
+			int maxWorkers) {
 		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJob<IndexedClassExpression>>(
-				ontologyIndex, new ThisClassExpressionSaturationListener());
+				ontologyIndex, maxWorkers,
+				new ThisClassExpressionSaturationListener());
 	}
 
 	/**
