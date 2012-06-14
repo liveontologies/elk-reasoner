@@ -48,7 +48,6 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -184,11 +183,6 @@ public class OWLAPIExamplesTest {
 			srcLibFile.delete();
 		}
 	}
-	
-	@AfterClass
-	public static void cleanUp() {
-		TestUtils.cleanUp(new File("."));
-	}
 
 	/*
 	 * Configuration: loading all test input data
@@ -233,7 +227,7 @@ public class OWLAPIExamplesTest {
 
 		boolean result = task.call();
 
-		System.out.println(classpath);
+		System.out.println("CLASSPATH " + classpath);
 
 		assertTrue(result);
 	}
