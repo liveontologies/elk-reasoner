@@ -20,32 +20,43 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * 
+ */
 package org.semanticweb.elk.reasoner;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
-import org.semanticweb.elk.testing.TestOutput;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 
-public class ClassTaxonomyTestOutput implements TestOutput {
+/**
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
+public class InstanceTaxonomyTestOutput extends ClassTaxonomyTestOutput {
 
-	protected final boolean consistent;
-	protected final Taxonomy<ElkClass> taxonomy;
-
-	ClassTaxonomyTestOutput(Taxonomy<ElkClass> taxonomy) {
-		this.consistent = true;
-		this.taxonomy = taxonomy;
+	InstanceTaxonomyTestOutput() {
+		super();
 	}
-
-	public ClassTaxonomyTestOutput() {
-		this.consistent = false;
-		this.taxonomy = null;
+	
+	InstanceTaxonomyTestOutput(InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
+		super(taxonomy);
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
+		return (InstanceTaxonomy<ElkClass, ElkNamedIndividual>) taxonomy;
+	}
+	
+	@Override
 	int getHashCode() {
-		if (consistent)
-			return TaxonomyHasher.hash(taxonomy);
-		else
+		if (consistent) {
+			return InstanceTaxonomyHasher.hash(getTaxonomy());
+		}
+		else {
 			return 0;
+		}
 	}
 }

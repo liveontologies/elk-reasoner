@@ -84,7 +84,7 @@ public class Reasoner extends AbstractReasonerState {
 	protected Reasoner(ReasonerStageExecutor stageExecutor,
 			ExecutorService executor, int workerNo) {
 		this.stageExecutor = stageExecutor;
-		this.executor = new ComputationExecutor(workerNo, "elk-computation");
+		this.executor = new ComputationExecutor(workerNo, "elk-reasoner");
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;

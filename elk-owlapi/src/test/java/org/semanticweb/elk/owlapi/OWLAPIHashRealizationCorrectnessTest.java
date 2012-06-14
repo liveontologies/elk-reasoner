@@ -27,38 +27,27 @@ package org.semanticweb.elk.owlapi;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.HashClassificationCorrectnessTest;
+import org.semanticweb.elk.reasoner.HashRealizationCorrectnessTest;
+import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.testing.HashTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 
 /**
- * Loads test ontologies via the OWL API and runs the hashcode-based test
- * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * 
  */
 @RunWith(PolySuite.class)
-public class OWLAPIHashClassificationCorrectnessTest extends
-		HashClassificationCorrectnessTest {
+public class OWLAPIHashRealizationCorrectnessTest extends
+		HashRealizationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = { "DisjointSelf.owl" };
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
-	public OWLAPIHashClassificationCorrectnessTest(
-			final ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> testManifest) {
+	public OWLAPIHashRealizationCorrectnessTest(
+			final ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
 
@@ -68,10 +57,4 @@ public class OWLAPIHashClassificationCorrectnessTest extends
 		return OWLAPITestUtils.loadOntologyIntoReasoner(input)
 				.getInternalReasoner();
 	}
-
-	@Override
-	protected boolean ignore(TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
-	}
-
 }

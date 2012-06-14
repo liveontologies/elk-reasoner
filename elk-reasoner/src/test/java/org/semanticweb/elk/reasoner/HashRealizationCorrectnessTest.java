@@ -20,6 +20,9 @@
  * limitations under the License.
  * #L%
  */
+/**
+ * 
+ */
 package org.semanticweb.elk.reasoner;
 
 import java.io.IOException;
@@ -32,17 +35,14 @@ import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 
 /**
- * Runs classification tests for all test input in the test directory
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
- *
  */
 @RunWith(PolySuite.class)
-public abstract class HashClassificationCorrectnessTest extends BaseClassificationCorrectnessTest<HashTestOutput> {
-	
-	public HashClassificationCorrectnessTest(ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> testManifest) {
+public abstract class HashRealizationCorrectnessTest extends BaseRealizationCorrectnessTest<HashTestOutput> {
+
+	public HashRealizationCorrectnessTest(ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput> testManifest) { 
 		super(testManifest);
 	}
 	
@@ -53,6 +53,6 @@ public abstract class HashClassificationCorrectnessTest extends BaseClassificati
 	 */	
 	@Config
 	public static Configuration getConfig() throws URISyntaxException, IOException {
-		return HashConfigurationUtils.<ClassTaxonomyTestOutput>loadConfiguration(INPUT_DATA_LOCATION, HashClassificationCorrectnessTest.class);
-	}
+		return HashConfigurationUtils.<InstanceTaxonomyTestOutput>loadConfiguration(INPUT_DATA_LOCATION, HashRealizationCorrectnessTest.class);
+	}	
 }

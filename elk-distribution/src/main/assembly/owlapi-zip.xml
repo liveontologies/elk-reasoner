@@ -27,7 +27,7 @@
 		<dependencySet>
 			<!-- including the binaries -->
 			<includes>
-				<include>*:elk-owlapi-standalone:jar</include>
+				<include>*:elk-owlapi-standalone:jar:bin</include>
 			</includes>
 			<!-- we omit the version numbers in the included artifact names -->
 			<outputFileNameMapping>${elk-owlapi.base}.jar</outputFileNameMapping>

@@ -1,0 +1,11 @@
+Prefix( : = <http://example.org/> )
+
+Ontology(
+ObjectPropertyAssertion(:R :a :b)
+ObjectPropertyAssertion(:R :b :c)
+TransitiveObjectProperty(:R)
+ClassAssertion(:A :a)
+ClassAssertion(:C :c)
+SubClassOf(:A :B)
+SubClassOf(ObjectIntersectionOf(:A ObjectSomeValuesFrom(:R :C)) :X)
+)

@@ -117,7 +117,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 	 */
 	public ConcurrentComputation(F inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers) {
-		this(inputProcessorFactory, executor, maxWorkers, 256 + 64 * maxWorkers);
+		this(inputProcessorFactory, executor, maxWorkers, 512 + 32 * maxWorkers);
 	}
 
 	/**
