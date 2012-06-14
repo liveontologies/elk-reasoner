@@ -28,14 +28,15 @@ import java.util.concurrent.BlockingQueue;
 /**
  * An class for concurrent processing of a number of tasks. The input for the
  * tasks are submitted, buffered, and processed by concurrent workers using the
- * supplied {@link InputProcessor}. The implementation is loosely based on a
- * produce-consumer framework with one producer and many consumers. The
+ * the {@link InputProcessor} objects created by the supplied
+ * {@link InputProcessorFactory}. The implementation is loosely based on a
+ * producer-consumer framework with one producer and many consumers. The
  * processing of the input should start by calling the {@link #start()} method,
  * following by {@link #submit(I)} method for submitting input to be processed.
  * The workers will always wait for new input, unless interrupted or
  * {@link #finish()} method is called. If {@link #finish()} is called then no
  * further input can be submitted and the workers will terminate when all input
- * has been processed, unless they are interrupt
+ * has been processed or they are interrupted earlier, whichever is earlier.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -43,12 +44,14 @@ import java.util.concurrent.BlockingQueue;
  *            the type of the input to be processed.
  * @param <P>
  *            the type of the processor for the input
+ * @param <F>
+ *            the type of the factory for the input processors
  */
-public class ConcurrentComputation<I, P extends InputProcessor<I>> {
+public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends InputProcessorFactory<I, P>> {
 	/**
-	 * the processor for the input to be executed by workers
+	 * the factory for the input processor engines
 	 */
-	protected final P inputProcessor;
+	protected final F inputProcessorFactory;
 	/**
 	 * maximum number of concurrent workers
 	 */
@@ -78,8 +81,8 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	/**
 	 * Creating a {@link ConcurrentComputation} instance.
 	 * 
-	 * @param inputProcessor
-	 *            the processor for the input to be executed by workers
+	 * @param inputProcessorFactory
+	 *            the factory for input processors
 	 * @param executor
 	 *            the executor used internally to run the jobs
 	 * @param maxWorkers
@@ -89,9 +92,9 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	 *            full, submitting new jobs will block until new space is
 	 *            available
 	 */
-	public ConcurrentComputation(P inputProcessor,
+	public ConcurrentComputation(F inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
-		this.inputProcessor = inputProcessor;
+		this.inputProcessorFactory = inputProcessorFactory;
 		this.buffer = new ArrayBlockingQueue<I>(bufferCapacity);
 		this.finishRequested = false;
 		this.interrupted = false;
@@ -103,8 +106,8 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	/**
 	 * Creating a {@link ConcurrentComputation} instance.
 	 * 
-	 * @param inputProcessor
-	 *            the processor for the input to be executed by workers * @param
+	 * @param inputProcessorFactory
+	 *            the factory for input processors
 	 * @param executor
 	 *            the executor used internally to run the jobs
 	 * @param interrupter
@@ -112,9 +115,9 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 	 * @param maxWorkers
 	 *            the maximal number of concurrent workers processing the jobs
 	 */
-	public ConcurrentComputation(P inputProcesor, ComputationExecutor executor,
-			int maxWorkers) {
-		this(inputProcesor, executor, maxWorkers, 64);
+	public ConcurrentComputation(F inputProcessorFactory,
+			ComputationExecutor executor, int maxWorkers) {
+		this(inputProcessorFactory, executor, maxWorkers, 512 + 32 * maxWorkers);
 	}
 
 	/**
@@ -190,6 +193,8 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 		@Override
 		public final void run() {
 			I nextInput;
+			// we use one engine per worker run
+			P inputProcessor = inputProcessorFactory.getEngine();
 			for (;;) {
 				if (interrupted)
 					break;
@@ -201,7 +206,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 							inputProcessor.process();
 							if (!interrupted && Thread.interrupted())
 								continue;
-							return;
+							break;
 						}
 					} else {
 						nextInput = buffer.take();
@@ -212,10 +217,11 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>> {
 					if (interrupted) {
 						// restore the interrupt status and exit
 						Thread.currentThread().interrupt();
-						return;
+						break;
 					}
 				}
 			}
+			inputProcessor.finish();
 		}
 	}
 }

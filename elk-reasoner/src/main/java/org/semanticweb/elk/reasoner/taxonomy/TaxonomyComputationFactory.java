@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,14 +34,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
-import org.semanticweb.elk.reasoner.reduction.TransitiveReductionEngine;
+import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionListener;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalent;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalentDirect;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /*
  * TODO: current implementation does not support equivalent individuals,
@@ -49,51 +51,56 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  */
 
 /**
- * The engine for constructing of the {@link Taxonomy}. The jobs are submitted
- * using the method {@link #submit(IndexedClass)}, which require the computation
- * of the {@link Node} for the input {@link IndexedClass}.
+ * The factory for engines that concurrently construct a {@link Taxonomy}. The
+ * jobs are submitted using the method {@link #submit(IndexedClass)}, which
+ * require the computation of the {@link Node} for the input
+ * {@link IndexedClass}.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class TaxonomyComputationEngine implements
-		InputProcessor<IndexedClassEntity> {
+public class TaxonomyComputationFactory implements
+		InputProcessorFactory<IndexedClassEntity, Engine> {
+
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
-	protected final IndividualClassTaxonomy taxonomy;
+	private final IndividualClassTaxonomy taxonomy;
 	/**
-	 * The transitive reduction engine used in the taxonomy construction
+	 * The transitive reduction shared structures used in the taxonomy
+	 * construction
 	 */
-	protected final TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>> transitiveReductionEngine;
+	private final TransitiveReductionFactory<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>> transitiveReductionShared;
 	/**
 	 * The objects creating or update the nodes from the result of the
 	 * transitive reduction
 	 */
-	protected final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
+	private final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
 	/**
 	 * The reference to cache the value of the top node for frequent use
 	 */
-	protected final AtomicReference<NonBottomClassNode> topNodeRef = new AtomicReference<NonBottomClassNode>();
+	private final AtomicReference<NonBottomClassNode> topNodeRef = new AtomicReference<NonBottomClassNode>();
 
 	/**
-	 * Create a new class taxonomy engine for the input ontology index and a
-	 * partially pre-computed taxonomy object. The taxonomy is used to avoid
-	 * computations that have been made before. For this to work, the taxonomy
-	 * object must originate from an earlier run of this engine on the same
-	 * ontology.
+	 * Create a shared engine for the input ontology index and a partially
+	 * pre-computed taxonomy object. The taxonomy is used to avoid computations
+	 * that have been made before. For this to work, the taxonomy object must
+	 * originate from an earlier run of this engine on the same ontology.
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
+	 * @param maxWorkers
+	 *            the maximum number of workers that can use this factory
 	 * @param partialTaxonomy
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
-	public TaxonomyComputationEngine(OntologyIndex ontologyIndex,
-			IndividualClassTaxonomy partialTaxonomy) {
+	public TaxonomyComputationFactory(OntologyIndex ontologyIndex,
+			int maxWorkers, IndividualClassTaxonomy partialTaxonomy) {
 		this.taxonomy = partialTaxonomy;
-		this.transitiveReductionEngine = new TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>(
-				ontologyIndex, new ThisTransitiveReductionListener());
+		this.transitiveReductionShared = new TransitiveReductionFactory<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>(
+				ontologyIndex, maxWorkers,
+				new ThisTransitiveReductionListener());
 	}
 
 	/**
@@ -101,41 +108,12 @@ public class TaxonomyComputationEngine implements
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
+	 * @param maxWorkers
+	 *            the maximum number of workers that can use this factory
 	 */
-	public TaxonomyComputationEngine(OntologyIndex ontologyIndex) {
-		this(ontologyIndex, new ConcurrentTaxonomy());
-	}
-
-	@Override
-	public final void submit(IndexedClassEntity job) {
-		transitiveReductionEngine
-				.submit(new TransitiveReductionJob<IndexedClassEntity>(job));
-	}
-
-	@Override
-	public final void process() throws InterruptedException {
-		transitiveReductionEngine.process();
-	}
-
-	@Override
-	public boolean canProcess() {
-		return transitiveReductionEngine.canProcess();
-	}
-
-	/**
-	 * Print statistics about taxonomy construction
-	 */
-	public void printStatistics() {
-		transitiveReductionEngine.printStatistics();
-	}
-
-	/**
-	 * Returns the taxonomy constructed by this engine
-	 * 
-	 * @return the taxonomy constructed by this engine
-	 */
-	public IndividualClassTaxonomy getTaxonomy() {
-		return this.taxonomy;
+	public TaxonomyComputationFactory(OntologyIndex ontologyIndex,
+			int maxWorkers) {
+		this(ontologyIndex, maxWorkers, new ConcurrentTaxonomy());
 	}
 
 	/**
@@ -144,9 +122,9 @@ public class TaxonomyComputationEngine implements
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	class ThisTransitiveReductionListener
+	private class ThisTransitiveReductionListener
 			implements
-			TransitiveReductionListener<TransitiveReductionJob<IndexedClassEntity>, TransitiveReductionEngine<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>> {
+			TransitiveReductionListener<TransitiveReductionJob<IndexedClassEntity>, TransitiveReductionFactory<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>.Engine> {
 
 		@Override
 		public void notifyCanProcess() {
@@ -169,7 +147,7 @@ public class TaxonomyComputationEngine implements
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	class TransitiveReductionOutputProcessor implements
+	private class TransitiveReductionOutputProcessor implements
 			TransitiveReductionOutputVisitor<IndexedClassEntity> {
 
 		@Override
@@ -199,7 +177,8 @@ public class TaxonomyComputationEngine implements
 
 	}
 
-	class SatisfiableOutputProcessor implements IndexedClassEntityVisitor<Void> {
+	private class SatisfiableOutputProcessor implements
+			IndexedClassEntityVisitor<Void> {
 
 		private final TransitiveReductionOutputEquivalentDirect<IndexedClassEntity> output;
 
@@ -263,7 +242,7 @@ public class TaxonomyComputationEngine implements
 		}
 	}
 
-	class UnsatisfiableOutputProcessor implements
+	private class UnsatisfiableOutputProcessor implements
 			IndexedClassEntityVisitor<Void> {
 
 		@Override
@@ -310,7 +289,7 @@ public class TaxonomyComputationEngine implements
 	 * @param superNode
 	 *            the node that should be the super-node of the first node
 	 */
-	static void assignDirectSuperClassNode(NonBottomClassNode subNode,
+	private static void assignDirectSuperClassNode(NonBottomClassNode subNode,
 			NonBottomClassNode superNode) {
 		subNode.addDirectSuperNode(superNode);
 		/*
@@ -332,7 +311,7 @@ public class TaxonomyComputationEngine implements
 	 * @param typeNode
 	 *            the node that should be the super-node of the first node
 	 */
-	static void assignDirectTypeNode(IndividualNode instanceNode,
+	private static void assignDirectTypeNode(IndividualNode instanceNode,
 			NonBottomClassNode typeNode) {
 		instanceNode.addDirectTypeNode(typeNode);
 		/*
@@ -342,6 +321,63 @@ public class TaxonomyComputationEngine implements
 		synchronized (typeNode) {
 			typeNode.addDirectInstanceNode(instanceNode);
 		}
+	}
+
+	/**
+	 * Returns the taxonomy constructed by this engine
+	 * 
+	 * @return the taxonomy constructed by this engine
+	 */
+	public IndividualClassTaxonomy getTaxonomy() {
+		return this.taxonomy;
+	}
+
+	/**
+	 * Print statistics about taxonomy construction
+	 */
+	public void printStatistics() {
+		transitiveReductionShared.printStatistics();
+	}
+
+	public class Engine implements InputProcessor<IndexedClassEntity> {
+
+		/**
+		 * The transitive reduction engine used in the taxonomy construction
+		 */
+		protected final TransitiveReductionFactory<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>.Engine transitiveReductionEngine = transitiveReductionShared
+				.getEngine();
+
+		// don't allow creating of engines directly; only through the factory
+		private Engine() {
+		}
+
+		@Override
+		public final void submit(IndexedClassEntity job) {
+			transitiveReductionEngine
+					.submit(new TransitiveReductionJob<IndexedClassEntity>(job));
+		}
+
+		@Override
+		public final void process() throws InterruptedException {
+			transitiveReductionEngine.process();
+		}
+
+		@Override
+		public boolean canProcess() {
+			return transitiveReductionEngine.canProcess();
+		}
+
+		@Override
+		public void finish() {
+			transitiveReductionEngine.finish();
+		}
+
+	}
+
+	@Override
+	public Engine getEngine() {
+		return new Engine();
+
 	}
 
 }

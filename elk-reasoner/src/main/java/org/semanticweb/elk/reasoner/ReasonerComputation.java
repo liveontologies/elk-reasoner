@@ -28,9 +28,22 @@ import java.util.Iterator;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
-public class ReasonerComputation<I, P extends InputProcessor<I>> extends
-		ConcurrentComputation<I, P> {
+/**
+ * A {@link ConcurrentComputation} used for executing of reasoner stages
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <I>
+ *            the input that can be processed by the computation
+ * @param <P>
+ *            the processor of the input
+ * @param <F>
+ *            the type of the factory for the input processors
+ */
+public class ReasonerComputation<I, P extends InputProcessor<I>, F extends InputProcessorFactory<I, P>>
+		extends ConcurrentComputation<I, P, F> {
 
 	/**
 	 * the progress monitor used to report the progress of this computation
@@ -54,9 +67,9 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 	I nextInput;
 
 	public ReasonerComputation(Collection<? extends I> inputs,
-			P inputProcessor, ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor) {
-		super(inputProcessor, executor, maxWorkers);
+			F inputProcessorFactory, ComputationExecutor executor,
+			int maxWorkers, ProgressMonitor progressMonitor) {
+		super(inputProcessorFactory, executor, maxWorkers);
 		this.progressMonitor = progressMonitor;
 		this.todo = inputs.iterator();
 		this.maxProgress = inputs.size();
@@ -65,9 +78,9 @@ public class ReasonerComputation<I, P extends InputProcessor<I>> extends
 	}
 
 	public ReasonerComputation(Iterable<? extends I> inputs, int inputsSize,
-			P inputProcessor, ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor) {
-		super(inputProcessor, executor, maxWorkers);
+			F inputProcessorFactory, ComputationExecutor executor,
+			int maxWorkers, ProgressMonitor progressMonitor) {
+		super(inputProcessorFactory, executor, maxWorkers);
 		this.progressMonitor = progressMonitor;
 		this.todo = inputs.iterator();
 		this.maxProgress = inputsSize;

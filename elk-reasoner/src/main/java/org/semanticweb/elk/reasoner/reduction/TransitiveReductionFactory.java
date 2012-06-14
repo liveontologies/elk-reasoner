@@ -1,11 +1,11 @@
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,22 +32,24 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
- * The engine for computing equivalent classes and direct super classes of the
- * given indexed class expression, represented by the
- * {@link TransitiveReductionOutput} object. The jobs are submitted using the
- * method {@link #submit(IndexedClassExpression)}, and all currently submitted
- * jobs are processed using the {@link #process()} method. To every transitive
- * reduction engine it is possible to attach a
- * {@link TransitiveReductionListener}, which can implement hook methods that
- * perform certain actions during the processing, e.g., notifying when the jobs
- * are finished.
+ * The factory for engines that concurrently perform the transitive reduction of
+ * the derived subsumption hierarchy between classes. The engines can only
+ * process instances of {@link SaturationJobForTransitiveReduction}. There are
+ * two types of the jobs. The instances of {@link SaturationJobRoot} are
+ * saturation jobs for the indexed class expression, for which a transitive
+ * reduction is required to be computed. The transitive reduction is computed by
+ * iterating over the derived super classes and computing saturation for them in
+ * order to filter out non-direct super classes. For this purpose, the second
+ * kind of jobs, which are instances of {@link SaturationJobSuperClass} are
+ * used.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -57,34 +59,24 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @param <J>
  *            the type of the jobs that can be processed by this transitive
  *            reduction engine
+ * 
  */
-public class TransitiveReductionEngine<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
-		implements InputProcessor<J> {
+public class TransitiveReductionFactory<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
+		implements
+		InputProcessorFactory<J, TransitiveReductionFactory<R, J>.Engine> {
 
-	// logger for events
-	protected final static Logger LOGGER_ = Logger
-			.getLogger(TransitiveReductionEngine.class);
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(TransitiveReductionFactory.class);
 
 	/**
 	 * The listener object implementing callback functions for this engine
 	 */
-	protected final TransitiveReductionListener<J, TransitiveReductionEngine<R, J>> listener;
-	/**
-	 * The saturation engine for transitive reduction that can only process
-	 * instances of {@link SaturationJobForTransitiveReduction}. There are two
-	 * types of the jobs. The instances of {@link SaturationJobRoot} are
-	 * saturation jobs for the indexed class expression, for which a transitive
-	 * reduction is required to be computed. The transitive reduction is
-	 * computed by iterating over the derived super classes and computing
-	 * saturation for them in order to filter out non-direct super classes. For
-	 * this purpose, the second kind of jobs, which are instances of
-	 * {@link SaturationJobSuperClass} are used.
-	 */
-	protected final ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>> saturationEngine;
+	private final TransitiveReductionListener<J, Engine> listener;
 	/**
 	 * The object used to process the finished saturation jobs
 	 */
-	protected final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor();
+	private final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor();
 	/**
 	 * The processed jobs can create new saturation jobs for super classes to be
 	 * submitted to this engine. In order to avoid stack overflow due to the
@@ -92,13 +84,19 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 * but use a queue to buffer such created jobs. This queue will be emptied
 	 * every time the {@link #process()} method is called.
 	 */
-	protected final Queue<SaturationJobSuperClass<R, J>> auxJobQueue;
+	private final Queue<SaturationJobSuperClass<R, J>> auxJobQueue;
 
 	/**
 	 * <tt>true</tt> if the {@link #auxJobQueue} queue is empty. This flag is
 	 * used for notification that new jobs can be processed.
 	 */
-	protected final AtomicBoolean jobQueueEmpty;
+	private final AtomicBoolean jobQueueEmpty;
+
+	/**
+	 * The saturation factory used for computing saturations for relevant
+	 * indexed class expressions
+	 */
+	private final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>> saturationFactory;
 
 	/**
 	 * Creating a new transitive reduction engine for the input ontology index
@@ -106,54 +104,20 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 * 
 	 * @param ontologyIndex
 	 *            the ontology index for which the engine is created
-	 * @param listener
-	 *            the listener object implementing callback functions
+	 * @param maxWorkers
+	 *            the maximum number of workers that can use this factory
 	 * @param listener
 	 *            the listener object implementing callback functions for this
 	 *            engine
 	 */
-	public TransitiveReductionEngine(
-			OntologyIndex ontologyIndex,
-			TransitiveReductionListener<J, TransitiveReductionEngine<R, J>> listener) {
+	public TransitiveReductionFactory(OntologyIndex ontologyIndex,
+			int maxWorkers, TransitiveReductionListener<J, Engine> listener) {
 		this.listener = listener;
-		this.saturationEngine = new ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>(
-				ontologyIndex, new ThisClassExpressionSaturationListener());
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.jobQueueEmpty = new AtomicBoolean(true);
-	}
-
-	@Override
-	public final void submit(J job) {
-		R root = job.getInput();
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(root + ": transitive reduction started");
-		}
-		saturationEngine.submit(new SaturationJobRoot<R, J>(job));
-	}
-
-	@Override
-	public final void process() throws InterruptedException {
-		for (;;) {
-			if (Thread.currentThread().isInterrupted())
-				return;
-			saturationEngine.process();
-			SaturationJobForTransitiveReduction<R, ?, J> nextJob = auxJobQueue
-					.poll();
-			if (nextJob == null) {
-				if (!jobQueueEmpty.compareAndSet(false, true))
-					break;
-				nextJob = auxJobQueue.poll();
-				if (nextJob == null)
-					break;
-				tryNotifyCanProcess();
-			}
-			saturationEngine.submit(nextJob);
-		}
-	}
-
-	@Override
-	public boolean canProcess() {
-		return !auxJobQueue.isEmpty() || saturationEngine.canProcess();
+		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
+				ontologyIndex, maxWorkers,
+				new ThisClassExpressionSaturationListener());
 	}
 
 	/**
@@ -169,7 +133,7 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 * Print statistics about the transitive reduction stage
 	 */
 	public void printStatistics() {
-		saturationEngine.printStatistics();
+		saturationFactory.printStatistics();
 	}
 
 	/**
@@ -179,9 +143,9 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	class ThisClassExpressionSaturationListener
+	private class ThisClassExpressionSaturationListener
 			implements
-			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>, ClassExpressionSaturationEngine<SaturationJobForTransitiveReduction<R, ?, J>>> {
+			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>, ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>.Engine> {
 
 		@Override
 		public void notifyCanProcess() {
@@ -203,7 +167,8 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	class SaturationOutputProcessor implements SaturationJobVisitor<R, J> {
+	private class SaturationOutputProcessor implements
+			SaturationJobVisitor<R, J> {
 
 		@Override
 		public void visit(SaturationJobRoot<R, J> saturationJob)
@@ -398,6 +363,64 @@ public class TransitiveReductionEngine<R extends IndexedClassExpression, J exten
 			candidateOutput.equivalent.add(candidate.getElkClass());
 			output.directSuperClasses.add(candidateOutput);
 		}
+	}
+
+	public class Engine implements InputProcessor<J> {
+
+		/**
+		 * The saturation engine used for transitive reduction computation
+		 */
+		private final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>.Engine saturationEngine = saturationFactory
+				.getEngine();
+
+		// don't allow creating of engines directly; only through the factory
+		private Engine() {
+		}
+
+		@Override
+		public final void submit(J job) {
+			R root = job.getInput();
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(root + ": transitive reduction started");
+			}
+			saturationEngine.submit(new SaturationJobRoot<R, J>(job));
+		}
+
+		@Override
+		public final void process() throws InterruptedException {
+			for (;;) {
+				if (Thread.currentThread().isInterrupted())
+					return;
+				saturationEngine.process();
+				SaturationJobForTransitiveReduction<R, ?, J> nextJob = auxJobQueue
+						.poll();
+				if (nextJob == null) {
+					if (!jobQueueEmpty.compareAndSet(false, true))
+						break;
+					nextJob = auxJobQueue.poll();
+					if (nextJob == null)
+						break;
+					tryNotifyCanProcess();
+				}
+				saturationEngine.submit(nextJob);
+			}
+		}
+
+		@Override
+		public boolean canProcess() {
+			return !auxJobQueue.isEmpty() || saturationEngine.canProcess();
+		}
+
+		@Override
+		public void finish() {
+			saturationEngine.finish();
+		}
+
+	}
+
+	@Override
+	public Engine getEngine() {
+		return new Engine();
 	}
 
 }

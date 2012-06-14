@@ -72,7 +72,7 @@ public class Reasoner extends AbstractReasonerState {
 
 	/**
 	 * Should fresh entities in reasoner queries be accepted (configuration
-	 * setting). If false, a FreshEntityException will be thrown when
+	 * setting). If false, a {@link FreshEntityException} will be thrown when
 	 * encountering entities that did not occur in the ontology.
 	 */
 	protected boolean allowFreshEntities;
@@ -84,7 +84,7 @@ public class Reasoner extends AbstractReasonerState {
 	protected Reasoner(ReasonerStageExecutor stageExecutor,
 			ExecutorService executor, int workerNo) {
 		this.stageExecutor = stageExecutor;
-		this.executor = new ComputationExecutor(workerNo, "elk-computation");
+		this.executor = new ComputationExecutor(workerNo, "elk-reasoner");
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;

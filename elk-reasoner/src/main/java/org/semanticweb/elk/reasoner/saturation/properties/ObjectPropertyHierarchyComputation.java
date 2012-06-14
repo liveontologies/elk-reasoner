@@ -38,7 +38,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 public class ObjectPropertyHierarchyComputation
 		extends
-		ReasonerComputation<IndexedPropertyChain, ObjectPropertyHierarchyComputationEngine> {
+		ReasonerComputation<IndexedPropertyChain, ObjectPropertyHierarchyComputationFactory.Engine, ObjectPropertyHierarchyComputationFactory> {
 
 	/**
 	 * the index of the ontology used for computation
@@ -46,19 +46,19 @@ public class ObjectPropertyHierarchyComputation
 	protected final OntologyIndex ontologyIndex;
 
 	public ObjectPropertyHierarchyComputation(
-			ObjectPropertyHierarchyComputationEngine inputProcessor,
+			ObjectPropertyHierarchyComputationFactory inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
-				.getIndexedObjectPropertyCount(), inputProcessor, executor,
-				maxWorkers, progressMonitor);
+				.getIndexedObjectPropertyCount(), inputProcessorFactory,
+				executor, maxWorkers, progressMonitor);
 		this.ontologyIndex = ontologyIndex;
 	}
 
 	public ObjectPropertyHierarchyComputation(ComputationExecutor executor,
 			int maxWorkers, ProgressMonitor progressMonitor,
 			OntologyIndex ontologyIndex) {
-		this(new ObjectPropertyHierarchyComputationEngine(), executor,
+		this(new ObjectPropertyHierarchyComputationFactory(), executor,
 				maxWorkers, progressMonitor, ontologyIndex);
 	}
 }
