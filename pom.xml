@@ -16,7 +16,6 @@
 		<module>elk-standalone</module>
 		<module>elk-distribution</module>
 		<module>elk-owlapi-standalone</module>
-		<module>elk-examples</module>
 	</modules>
 
 	<name>ELK</name>

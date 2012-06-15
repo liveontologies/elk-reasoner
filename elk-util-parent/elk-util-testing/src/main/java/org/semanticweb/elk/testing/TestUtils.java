@@ -31,37 +31,58 @@ import java.io.IOException;
 import org.semanticweb.elk.io.FileUtils;
 
 /**
- * A collection of test utilities, e.g., for creating and destroying the test environment  
+ * A collection of test utilities, e.g., for creating and destroying the test
+ * environment
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class TestUtils {
 
-	public static final String TEST_ROOT = "test.home"; 
-	
+	public static final String TEST_ROOT = ".test-home";
+
 	public static void createTestEnvironment(File baseDir) {
 		File root = new File(baseDir.getAbsolutePath() + "/" + TEST_ROOT);
-		
+
 		if (root.exists()) {
 			try {
 				FileUtils.deleteRecursively(root);
 			} catch (IOException e) {
-				throw new RuntimeException("Initialization of test environment failed, unable to delete the root test folder");
+				throw new RuntimeException(
+						"Initialization of test environment failed, unable to delete the root test folder");
 			}
 		}
-		
+
 		if (!root.mkdirs()) {
-			throw new RuntimeException("Initialization of test environment failed, unable to create the root test folder");
+			throw new RuntimeException(
+					"Initialization of test environment failed, unable to create the root test folder");
 		}
 	}
-	
+
 	public static void cleanUp(File baseDir) {
 		try {
-			FileUtils.deleteRecursively(new File(baseDir.getAbsolutePath() + "/" + TEST_ROOT));
+			File root = new File(baseDir.getAbsolutePath() + "/" + TEST_ROOT);
+
+			if (root.exists()) {
+				FileUtils.deleteRecursively(root);
+			}
 		} catch (IOException e) {
-			throw new RuntimeException("Clean-up of test environment failed, unable to delete the root test folder");
+			throw new RuntimeException(
+					"Clean-up of test environment failed, unable to delete the root test folder");
+		}
+	}
+
+	public static void cleanUpOnExit(File baseDir) {
+		File root = new File(baseDir.getAbsolutePath() + "/" + TEST_ROOT);
+
+		if (root.exists()) {
+			try {
+				FileUtils.deleteRecursively(root, true);
+			} catch (IOException e) {
+				// TODO shouldn't throw any exceptions if
+				// deleting on exit
+			}
 		}
 	}
 }
