@@ -234,7 +234,7 @@ public class OWLAPIExamplesTest {
 
 		boolean result = task.call();
 
-		System.out.println("CLASSPATH " + classpath);
+		//System.out.println("CLASSPATH " + classpath);
 
 		assertTrue(result);
 	}
