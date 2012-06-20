@@ -73,14 +73,23 @@ public class ClassTaxonomyIOTest {
 		Owl2Parser parser = new Owl2FunctionalStyleParser(reader);
 		Taxonomy<ElkClass> loaded = ClassTaxonomyLoader.load(parser);
 		// compare
-		/*
-		 * outWriter = new OutputStreamWriter(System.out);
-		 * ClassTaxonomyPrinter.dumpClassTaxomomy(original, outWriter, false);
-		 * outWriter.flush();
-		 */
-
 		assertEquals(ClassTaxonomyPrinter.getHashString(original),
 				ClassTaxonomyPrinter.getHashString(loaded));
+	}
+
+	/*
+	 * Test that reordering classes in EquivalentClasses axioms and replacing a
+	 * class name by an equivalent one in SubClassOf axioms does not break class
+	 * taxonomy equivalence.
+	 */
+	@Test
+	public void taxonomyEquivalence() throws IOException, Owl2ParseException,
+			InconsistentOntologyException {
+		Taxonomy<ElkClass> taxonomy1 = load("io/taxonomy_eq_1.owl");
+		Taxonomy<ElkClass> taxonomy2 = load("io/taxonomy_eq_2.owl");
+
+		assertEquals(ClassTaxonomyPrinter.getHashString(taxonomy1),
+				ClassTaxonomyPrinter.getHashString(taxonomy2));
 	}
 
 	private Taxonomy<ElkClass> loadAndClassify(String resource)
@@ -94,6 +103,20 @@ public class ClassTaxonomyIOTest {
 			reasoner = new TestReasoner(new TestStageExecutor());
 			reasoner.loadOntologyFromStream(stream);
 			return reasoner.getTaxonomy();
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
+	}
+
+	private Taxonomy<ElkClass> load(String resource) throws IOException,
+			Owl2ParseException, InconsistentOntologyException {
+		InputStream stream = null;
+
+		try {
+			stream = getClass().getClassLoader().getResourceAsStream(resource);
+
+			return ClassTaxonomyLoader.load(new Owl2FunctionalStyleParser(
+					stream));
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
@@ -115,5 +138,4 @@ class TestReasoner extends Reasoner {
 
 		parser.parseOntology(getAxiomInserter());
 	}
-
 }
