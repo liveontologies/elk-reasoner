@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 
 /**
  * The reasoner stage, during which the class taxonomy of the current ontology
@@ -44,7 +44,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private TaxonomyComputation computation = null;
+	private ClassTaxonomyComputation computation = null;
 
 	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -85,7 +85,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		super.initComputation();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		this.computation = new TaxonomyComputation(
+		this.computation = new ClassTaxonomyComputation(
 				reasoner.ontologyIndex.getIndexedClasses(),
 				reasoner.ontologyIndex.getIndexedClassCount(),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,

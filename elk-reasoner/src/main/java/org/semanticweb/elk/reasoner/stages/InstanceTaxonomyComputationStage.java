@@ -27,8 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
-import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
 /**
  * The reasoner stage, during which the instance taxonomy of the current
@@ -46,7 +45,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private TaxonomyComputation computation = null;
+	private InstanceTaxonomyComputation computation = null;
 
 	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -64,7 +63,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ConsistencyCheckingStage(
+		return Arrays.asList((ReasonerStage) new ClassTaxonomyComputationStage(
 				reasoner));
 	}
 
@@ -88,19 +87,11 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		super.initComputation();
 		OntologyIndex ontologyIndex = reasoner.ontologyIndex;
 		if (reasoner.doneClassTaxonomy)
-			this.computation = new TaxonomyComputation(
+			this.computation = new InstanceTaxonomyComputation(
 					ontologyIndex.getIndexedIndividuals(),
 					ontologyIndex.getIndexedIndividualCount(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.getOntologyIndex(), reasoner.taxonomy);
-		else
-			this.computation = new TaxonomyComputation(Operations.concat(
-					ontologyIndex.getIndexedClasses(),
-					ontologyIndex.getIndexedIndividuals()),
-					ontologyIndex.getIndexedClassCount()
-							+ ontologyIndex.getIndexedIndividualCount(),
-					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.getOntologyIndex());
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
