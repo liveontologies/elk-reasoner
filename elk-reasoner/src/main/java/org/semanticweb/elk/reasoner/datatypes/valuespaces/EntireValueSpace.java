@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 
@@ -28,17 +28,27 @@ import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
  *
  * @author Pospishnyi Olexandr
  */
-public abstract class IndexedDatatypeExpression extends IndexedClassExpression {
+public class EntireValueSpace implements ValueSpace {
 
-	protected final IndexedDataProperty property;
+	private Datatype datatype;
 
-	public IndexedDatatypeExpression(IndexedDataProperty property) {
-		this.property = property;
+	public EntireValueSpace(Datatype datatype) {
+		this.datatype = datatype;
 	}
 
-	public IndexedDataProperty getProperty() {
-		return property;
+	public Datatype getDatatype() {
+		return datatype;
 	}
 
-	abstract public Datatype getDatatype();
+	public ValueSpaceType getType() {
+		return ValueSpaceType.ENTIRE;
+	}
+
+	public boolean isEmptyInterval() {
+		return false;
+	}
+
+	public boolean contains(ValueSpace valueSpace) {
+		return valueSpace.getDatatype().isCompatibleWith(this.datatype);
+	}
 }

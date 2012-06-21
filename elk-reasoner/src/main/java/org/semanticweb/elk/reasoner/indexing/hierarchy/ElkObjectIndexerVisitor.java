@@ -195,10 +195,6 @@ public class ElkObjectIndexerVisitor implements
 	}
 
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
-		if (LOGGER_.isEnabledFor(Level.WARN)) {
-			LOGGER_.warn(ElkDataHasValue.class.getSimpleName()
-					+ " is supported only partially.");
-		}
 		IndexedDataProperty idp = (IndexedDataProperty) elkDataHasValue.getProperty().accept(this);
 		return objectFilter.filter(new IndexedDataHasValue(idp, elkDataHasValue.getFiller()));
 	}
@@ -244,9 +240,6 @@ public class ElkObjectIndexerVisitor implements
 
 	public IndexedClassExpression visit(
 			ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
-		if (LOGGER_.isEnabledFor(Level.WARN)) {
-			LOGGER_.warn(ElkDataSomeValuesFrom.class.getSimpleName() + " is supported only partially.");
-		}
 		List<? extends ElkDataPropertyExpression> exps = elkDataSomeValuesFrom.getDataPropertyExpressions();
 		if (exps != null && exps.size() == 1) {
 			IndexedDataProperty idp = (IndexedDataProperty) exps.get(0).accept(this);

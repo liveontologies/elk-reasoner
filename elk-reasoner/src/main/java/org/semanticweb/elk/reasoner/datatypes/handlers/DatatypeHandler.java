@@ -20,25 +20,25 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
+package org.semanticweb.elk.reasoner.datatypes.handlers;
 
+import java.util.Set;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
  *
- * @author Pospishnyi Olexandr
+ * @author Pospishnyi Oleksandr
  */
-public abstract class IndexedDatatypeExpression extends IndexedClassExpression {
+public interface DatatypeHandler {
 
-	protected final IndexedDataProperty property;
+	public Set<Datatype> getSupportedDatatypes();
 
-	public IndexedDatatypeExpression(IndexedDataProperty property) {
-		this.property = property;
-	}
-
-	public IndexedDataProperty getProperty() {
-		return property;
-	}
-
-	abstract public Datatype getDatatype();
+	public Set<Facet> getSupportedFacets();
+	
+	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression);
+	
+	public Object parse(String literal, Datatype datatype);
 }

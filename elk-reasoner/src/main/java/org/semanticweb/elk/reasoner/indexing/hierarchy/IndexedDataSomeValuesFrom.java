@@ -22,16 +22,11 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
-import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeRestriction;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit.Domain;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
+import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataSomeValuesFromVisitor;
 
@@ -42,30 +37,15 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataSomeValuesFromV
 public class IndexedDataSomeValuesFrom extends IndexedDatatypeExpression {
 
 	protected final ElkDataRange filler;
-	protected boolean headlessRestriction = false;
-	protected List<DatatypeRestriction> dtRestrictions;
-	protected Domain dtDomain;
+	protected final Datatype datatype;
 
 	protected IndexedDataSomeValuesFrom(IndexedDataProperty dataProperty, ElkDataRange dataRange) {
 		super(dataProperty);
-		headlessRestriction = dataRange instanceof ElkDatatype;
 		this.filler = dataRange;
-		if (headlessRestriction) {
-			dtDomain = DatatypeToolkit.clarifyDomain((ElkDatatype) this.filler);
-			dtRestrictions = Collections.singletonList(new DatatypeRestriction(null, null, dtDomain));
+		if (filler instanceof ElkDatatype) {
+			datatype = Datatype.getByIri(((ElkDatatype) filler).getDatatypeIRI());
 		} else {
-			ElkDatatypeRestriction dtr = (ElkDatatypeRestriction) this.filler;
-			dtRestrictions = new ArrayList<DatatypeRestriction>(dtr.getFacetRestrictions().size());
-			for (ElkFacetRestriction facetRestriction : dtr.getFacetRestrictions()) {
-				if (dtDomain == null) {
-					dtDomain = DatatypeToolkit.clarifyDomain(dtr.getDatatype());
-				}
-				DatatypeRestriction restriction = new DatatypeRestriction(
-						DatatypeToolkit.clarifyRelation(facetRestriction.getConstrainingFacet()),
-						facetRestriction.getRestrictionValue().getLexicalForm(),
-						dtDomain);
-				dtRestrictions.add(restriction);
-			}
+			datatype = Datatype.getByIri(((ElkDatatypeRestriction) filler).getDatatype().getDatatypeIRI());
 		}
 	}
 
@@ -74,11 +54,16 @@ public class IndexedDataSomeValuesFrom extends IndexedDatatypeExpression {
 	}
 
 	@Override
+	public Datatype getDatatype() {
+		return datatype;
+	}
+
+	@Override
 	protected void updateOccurrenceNumbers(int increment,
 			int positiveIncrement, int negativeIncrement) {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			property.addNegExistential(this);
+			DatatypeEngine.register(property, this);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -86,7 +71,7 @@ public class IndexedDataSomeValuesFrom extends IndexedDatatypeExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			property.removeNegExistential(this);
+			DatatypeEngine.unregister(property, this);
 		}
 	}
 
@@ -102,20 +87,5 @@ public class IndexedDataSomeValuesFrom extends IndexedDatatypeExpression {
 	@Override
 	public String toString() {
 		return "DataSomeValuesFrom(<" + this.property.getIri().asString() + "> " + filler.toString() + ")";
-	}
-
-	@Override
-	public List<DatatypeRestriction> getRestrictions() {
-		return dtRestrictions;
-	}
-
-	@Override
-	public int getRestrictionCount() {
-		return headlessRestriction ? 0 : dtRestrictions.size();
-	}
-
-	@Override
-	public Domain getRestrictionDomain() {
-		return dtDomain;
 	}
 }

@@ -20,37 +20,36 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.intervals;
-
-import java.util.Comparator;
+package org.semanticweb.elk.reasoner.datatypes.numbers;
 
 /**
- * An interval is an immutable data structure defined by its two endpoints.
+ *
+ * @author Pospishnyi Olexandr
  */
-public class Interval {
+public final class PositiveInfinity extends Number {
 
-	private Number lowEndpoint;
-	private Number highEndpoint;
+	public static final PositiveInfinity INSTANCE = new PositiveInfinity();
 
-	public Interval(Number lowEndpoint, Number highEndpoint) {
-		this.lowEndpoint = lowEndpoint;
-		this.highEndpoint = highEndpoint;
+	private PositiveInfinity() {
 	}
 
-	public Number getLowEndpoint() {
-		return lowEndpoint;
+	public double doubleValue() {
+		throw new UnsupportedOperationException();
 	}
 
-	public Number getHighEndpoint() {
-		return highEndpoint;
+	public float floatValue() {
+		throw new UnsupportedOperationException();
 	}
 
-	public boolean overlays(Interval i, Comparator comparator) {
-		return comparator.compare(highEndpoint, i.getHighEndpoint()) >= 0
-				&& comparator.compare(lowEndpoint, i.getLowEndpoint()) <= 0;
+	public int intValue() {
+		throw new UnsupportedOperationException();
+	}
+
+	public long longValue() {
+		throw new UnsupportedOperationException();
 	}
 
 	public String toString() {
-		return "(" + getLowEndpoint().toString() + ", " + getHighEndpoint().toString() + ")";
+		return "+INF";
 	}
 }

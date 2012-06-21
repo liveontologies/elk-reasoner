@@ -54,6 +54,13 @@ public interface ElkLiteral extends ElkObject, ElkAnnotationValue {
 	 * @return The lexical form of this literal.
 	 */
 	public String getLexicalForm();
+	
+	/**
+	 * Get the language of this literal.
+	 * 
+	 * @return The language of this literal or null if non specified.
+	 */
+	public String getLanguage();
 
 	/**
 	 * Get the datatype of this literal. Note that "untyped" literals use the

@@ -20,9 +20,36 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.intervals;
+package org.semanticweb.elk.reasoner.datatypes.numbers;
 
-public enum RBColor {
+/**
+ *
+ * @author Pospishnyi Olexandr
+ */
+public final class NegativeInfinity extends Number {
 
-	RED, BLACK;
+	public static final NegativeInfinity INSTANCE = new NegativeInfinity();
+
+	private NegativeInfinity() {
+	}
+
+	public double doubleValue() {
+		throw new UnsupportedOperationException();
+	}
+
+	public float floatValue() {
+		throw new UnsupportedOperationException();
+	}
+
+	public int intValue() {
+		throw new UnsupportedOperationException();
+	}
+
+	public long longValue() {
+		throw new UnsupportedOperationException();
+	}
+
+	public String toString() {
+		return "-INF";
+	}
 }

@@ -22,16 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeRestriction;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit.Domain;
-import org.semanticweb.elk.reasoner.datatypes.intervals.IntervalTree;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -42,17 +36,9 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class IndexedDataProperty {
 
 	protected ElkDataProperty property;
-	protected Set<IndexedDatatypeExpression> negExistential;
-	protected IntervalTree numericIntervalTree;
-	protected IntervalTree temporalIntervalTree;
-	protected Map<String, IndexedDatatypeExpression> stringCache;
 
 	public IndexedDataProperty(ElkDataProperty property) {
 		this.property = property;
-		negExistential = new HashSet<IndexedDatatypeExpression>(5);
-		numericIntervalTree = DatatypeToolkit.makeNewIntervalTree();
-		temporalIntervalTree = DatatypeToolkit.makeNewIntervalTree();
-		stringCache = new HashMap<String, IndexedDatatypeExpression>();
 	}
 
 	public ElkIri getIri() {
@@ -67,64 +53,6 @@ public class IndexedDataProperty {
 		return visitor.visit(this);
 	}
 
-	void addNegExistential(IndexedDatatypeExpression datatypeExpression) {
-		negExistential.add(datatypeExpression);
-		Domain restrictionDomain = datatypeExpression.getRestrictionDomain();
-		switch (restrictionDomain) {
-			case N:
-			case Z:
-			case R:
-				numericIntervalTree.insert(
-						DatatypeToolkit.convertRestrictionToInterval(datatypeExpression.getRestrictions(), restrictionDomain)
-						,datatypeExpression);
-				break;
-			case TIME:
-			case DATE:
-			case DATETIME:
-				temporalIntervalTree.insert(
-						DatatypeToolkit.convertRestrictionToInterval(datatypeExpression.getRestrictions(), restrictionDomain)
-						,datatypeExpression);
-				break;
-			case TEXT:
-				for (DatatypeRestriction dr : datatypeExpression.getRestrictions()) {
-					stringCache.put(dr.getValueAsString(), datatypeExpression);
-				}
-				break;
-		}
-	}
-
-	void removeNegExistential(IndexedDatatypeExpression dataSomeValuesFrom) {
-		negExistential.remove(dataSomeValuesFrom);
-		//TODO: remove this ugly code - make proper corrections to data stuctures
-		numericIntervalTree = DatatypeToolkit.makeNewIntervalTree();
-		temporalIntervalTree = DatatypeToolkit.makeNewIntervalTree();
-		stringCache.clear();
-		for (IndexedDatatypeExpression negExt : negExistential) {
-			addNegExistential(negExt);
-		}
-		//TODO: no realy, remove it. ASAP.
-	}
-
-	public Set<IndexedDatatypeExpression> getAllNegExistentials() {
-		return negExistential;
-	}
-
-	public Set<IndexedDatatypeExpression> getSatisfyingNegExistentials(IndexedDatatypeExpression ide) {
-		switch (ide.getRestrictionDomain()) {
-			case N:
-			case Z:
-			case R:
-				return DatatypeToolkit.findSatisfyingExpressions(ide, numericIntervalTree);
-			case TIME:
-			case DATE:
-			case DATETIME:
-				return DatatypeToolkit.findSatisfyingExpressions(ide, temporalIntervalTree);
-			case TEXT:
-				return DatatypeToolkit.findSatisfyingExpressions(ide, stringCache);
-			default:
-				return null;
-		}
-	}
 	/**
 	 * This counts how often this object occurred in the ontology.
 	 */

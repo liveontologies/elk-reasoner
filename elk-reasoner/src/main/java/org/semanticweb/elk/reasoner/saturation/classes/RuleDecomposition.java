@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
+import java.util.List;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.*;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
@@ -63,22 +65,30 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements In
 		}
 
 		public Void visit(IndexedDataHasValue element) {
-			for (IndexedDatatypeExpression negDatatypeExpr :
-					element.getProperty().getSatisfyingNegExistentials(element)) {
-				if (element != negDatatypeExpr) {
-					engine.enqueue(context,
-							new PositiveSuperClassExpression<C>(negDatatypeExpr));
+			List<IndexedDatatypeExpression> satisfyingNegExistentials = 
+					DatatypeEngine.getSatisfyingNegExistentials(element.getProperty(), element);
+			if (satisfyingNegExistentials == null) {
+				engine.enqueue(context, new PositiveSuperClassExpression<C>(engine.owlNothing));
+			} else {
+				for (IndexedDatatypeExpression negDatatypeExpr : satisfyingNegExistentials) {
+					if (element != negDatatypeExpr) {
+						engine.enqueue(context, new PositiveSuperClassExpression<C>(negDatatypeExpr));
+					}
 				}
 			}
 			return null;
 		}
 
 		public Void visit(IndexedDataSomeValuesFrom element) {
-			for (IndexedDatatypeExpression negDatatypeExpr :
-					element.getProperty().getSatisfyingNegExistentials(element)) {
-				if (element != negDatatypeExpr) {
-					engine.enqueue(context,
-							new PositiveSuperClassExpression<C>(negDatatypeExpr));
+			List<IndexedDatatypeExpression> satisfyingNegExistentials = 
+					DatatypeEngine.getSatisfyingNegExistentials(element.getProperty(), element);
+			if (satisfyingNegExistentials == null) {
+				engine.enqueue(context, new PositiveSuperClassExpression<C>(engine.owlNothing));
+			} else {
+				for (IndexedDatatypeExpression negDatatypeExpr : satisfyingNegExistentials) {
+					if (element != negDatatypeExpr) {
+						engine.enqueue(context, new PositiveSuperClassExpression<C>(negDatatypeExpr));
+					}
 				}
 			}
 			return null;

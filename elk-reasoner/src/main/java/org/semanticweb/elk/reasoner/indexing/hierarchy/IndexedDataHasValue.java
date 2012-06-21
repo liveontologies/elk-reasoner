@@ -22,31 +22,21 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Collections;
-import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeRestriction;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit.Domain;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeToolkit.Relation;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
+import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
 
 public class IndexedDataHasValue extends IndexedDatatypeExpression {
 
 	protected final ElkLiteral filler;
-	protected List<DatatypeRestriction> dtRestrictions;
-	protected Domain dtDomain;
+	protected Datatype datatype;
 
 	protected IndexedDataHasValue(IndexedDataProperty dataProperty, ElkLiteral elkLiteral) {
 		super(dataProperty);
 		this.filler = elkLiteral;
-		dtDomain = DatatypeToolkit.clarifyDomain(filler.getDatatype());
-		DatatypeRestriction restriction = new DatatypeRestriction(
-				Relation.EQUAL,
-				filler.getLexicalForm(),
-				dtDomain);
-		dtRestrictions = Collections.singletonList(restriction);
+		datatype = Datatype.getByIri(filler.getDatatype().getDatatypeIRI());
 	}
 
 	public ElkLiteral getFiller() {
@@ -54,11 +44,16 @@ public class IndexedDataHasValue extends IndexedDatatypeExpression {
 	}
 
 	@Override
+	public Datatype getDatatype() {
+		return datatype;
+	}
+	
+	@Override
 	protected void updateOccurrenceNumbers(int increment,
 			int positiveIncrement, int negativeIncrement) {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			property.addNegExistential(this);
+			DatatypeEngine.register(property, this);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -66,7 +61,7 @@ public class IndexedDataHasValue extends IndexedDatatypeExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			property.removeNegExistential(this);
+			DatatypeEngine.unregister(property, this);
 		}
 	}
 
@@ -84,20 +79,5 @@ public class IndexedDataHasValue extends IndexedDatatypeExpression {
 		return "DataHasValue(" + '<' + this.property.getIri().asString()
 				+ "> \"" + this.filler.getLexicalForm() + "\"^^<"
 				+ this.filler.getDatatype().getIri().asString() + ">)";
-	}
-
-	@Override
-	public List<DatatypeRestriction> getRestrictions() {
-		return dtRestrictions;
-	}
-
-	@Override
-	public int getRestrictionCount() {
-		return 1;
-	}
-
-	@Override
-	public Domain getRestrictionDomain() {
-		return dtDomain;
 	}
 }
