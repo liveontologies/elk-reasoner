@@ -28,6 +28,9 @@ will appear in the produced result.
 			<action dev="frantisek" type="add">
 				Support for consistency checking and instance retrieval queries for named classes.
 			</action>
+			<action dev="pavel" type="update">
+				A new, principled infrastructure for automated testing of ELK's reasoning services. 
+			</action>			
 		</release>
 		<release version="0.2.0" date="2011-10-25" description="Second public release">
 			<action dev="frantisek" type="fix" issue="5">
