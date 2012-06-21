@@ -73,6 +73,7 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 	/** thread safe set of unsatisfiable classes */
 	protected final Set<ElkClass> unsatisfiableClasses;
 
+	
 	/**
 	 * The bottom node.
 	 */
@@ -160,6 +161,16 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 	@Override
 	public Set<? extends TaxonomyNode<ElkClass>> getNodes() {
 		return getTypeNodes();
+	}
+	
+	@Override
+	public TypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
+		return getTypeNode(PredefinedElkClass.OWL_THING);
+	}
+	
+	@Override
+	public TypeNode<ElkClass, ElkNamedIndividual> getBottomNode() {
+		return bottomClassNode;
 	}
 
 	@Override

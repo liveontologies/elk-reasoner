@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -30,13 +29,14 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.FreshInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.FreshTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
@@ -163,7 +163,7 @@ public class Reasoner extends AbstractReasonerState {
 		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
 		if (node == null) {
 			if (allowFreshEntities) {
-				node = new FreshClassTypeNode(elkClass);
+				node = new FreshTaxonomyNode<ElkClass>(elkClass, getTaxonomy());
 			} else {
 				throw new FreshEntitiesException(elkClass);
 			}
@@ -189,7 +189,8 @@ public class Reasoner extends AbstractReasonerState {
 				.getInstanceNode(elkNamedIndividual);
 		if (node == null) {
 			if (allowFreshEntities) {
-				node = new FreshClassInstanceNode(elkNamedIndividual);
+				node = new FreshInstanceNode<ElkClass, ElkNamedIndividual>(
+						elkNamedIndividual, getInstanceTaxonomy());
 			} else {
 				throw new FreshEntitiesException(elkNamedIndividual);
 			}
@@ -214,7 +215,8 @@ public class Reasoner extends AbstractReasonerState {
 				.getTypeNode(elkClass);
 		if (node == null) {
 			if (allowFreshEntities) {
-				node = new FreshClassTypeNode(elkClass);
+				node = new FreshTypeNode<ElkClass, ElkNamedIndividual>(
+						elkClass, getInstanceTaxonomy());
 			} else {
 				throw new FreshEntitiesException(elkClass);
 			}
@@ -367,122 +369,9 @@ public class Reasoner extends AbstractReasonerState {
 			Node<ElkClass> classNode = getClassNode((ElkClass) classExpression);
 			return (!classNode.getMembers().contains(
 					PredefinedElkClass.OWL_NOTHING));
-		} else {
+		} else { // TODO: complex class expressions currently not supported
 			throw new UnsupportedOperationException(
 					"ELK does not support satisfiability checking for unnamed class expressions");
-		}
-	}
-
-	/**
-	 * Auxiliary class for representing taxonomy nodes for fresh entities.
-	 * 
-	 * @author Markus Kroetzsch
-	 * 
-	 * @param <T>
-	 *            the type of members of the node
-	 */
-	protected abstract class FreshTaxonomyNode<T extends ElkObject> implements
-			Node<T> {
-		protected final T elkClass;
-		protected final TypeNode<ElkClass, ElkNamedIndividual> bottomNode;
-		protected final TypeNode<ElkClass, ElkNamedIndividual> topNode;
-		protected final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy;
-
-		public FreshTaxonomyNode(T elkClass)
-				throws InconsistentOntologyException {
-			// Get bottom and top node *now*; cannot do this later as ontology
-			// might change
-			this.taxonomy = getInstanceTaxonomy();
-			this.bottomNode = taxonomy
-					.getTypeNode(PredefinedElkClass.OWL_NOTHING);
-			this.topNode = taxonomy.getTypeNode(PredefinedElkClass.OWL_THING);
-			this.elkClass = elkClass;
-		}
-
-		@Override
-		public Set<T> getMembers() {
-			return Collections.unmodifiableSet(Collections.singleton(elkClass));
-		}
-
-		@Override
-		public T getCanonicalMember() {
-			return elkClass;
-		}
-
-		public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
-			return taxonomy;
-		}
-	}
-
-	/**
-	 * Class for representing type nodes for fresh classes.
-	 * 
-	 * @author Markus Kroetzsch
-	 */
-	protected class FreshClassTypeNode extends FreshTaxonomyNode<ElkClass>
-			implements TypeNode<ElkClass, ElkNamedIndividual> {
-
-		public FreshClassTypeNode(ElkClass elkClass)
-				throws InconsistentOntologyException {
-			super(elkClass);
-		}
-
-		@Override
-		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
-			Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> result = Collections
-					.emptySet();
-			return Collections.unmodifiableSet(result);
-		}
-
-		@Override
-		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
-			return getDirectInstanceNodes();
-		}
-
-		@Override
-		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
-			return Collections.unmodifiableSet(Collections.singleton(topNode));
-		}
-
-		@Override
-		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {
-			return getDirectSuperNodes();
-		}
-
-		@Override
-		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
-			return Collections.unmodifiableSet(Collections
-					.singleton(bottomNode));
-		}
-
-		@Override
-		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
-			return getDirectSubNodes();
-		}
-	}
-
-	/**
-	 * Class for representing instance nodes for fresh named individuals.
-	 * 
-	 * @author Markus Kroetzsch
-	 */
-	protected class FreshClassInstanceNode extends
-			FreshTaxonomyNode<ElkNamedIndividual> implements
-			InstanceNode<ElkClass, ElkNamedIndividual> {
-
-		public FreshClassInstanceNode(ElkNamedIndividual elkClass)
-				throws InconsistentOntologyException {
-			super(elkClass);
-		}
-
-		@Override
-		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getDirectTypeNodes() {
-			return Collections.unmodifiableSet(Collections.singleton(topNode));
-		}
-
-		@Override
-		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getAllTypeNodes() {
-			return getDirectTypeNodes();
 		}
 	}
 
