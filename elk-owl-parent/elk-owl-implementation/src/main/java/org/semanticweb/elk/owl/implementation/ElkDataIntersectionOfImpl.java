@@ -38,17 +38,11 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * @author Markus Kroetzsch
  * 
  */
-public class ElkDataIntersectionOfImpl extends ElkDataRangeListObject
-		implements ElkDataIntersectionOf {
+public class ElkDataIntersectionOfImpl extends ElkDataRangeListObject implements
+		ElkDataIntersectionOf {
 
-	/* package-private */ElkDataIntersectionOfImpl(
-			List<? extends ElkDataRange> dataRanges) {
+	ElkDataIntersectionOfImpl(List<? extends ElkDataRange> dataRanges) {
 		super(dataRanges);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("DataIntersectionOf");
 	}
 
 	@Override

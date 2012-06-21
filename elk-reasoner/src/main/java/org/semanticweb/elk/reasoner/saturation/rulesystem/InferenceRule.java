@@ -37,7 +37,7 @@ package org.semanticweb.elk.reasoner.saturation.rulesystem;
  * 
  * <p>
  * The application of inference rules further needs a
- * {@link RuleApplicationEngine} that manages all contexts and that organizes
+ * {@link RuleApplicationFactory} that manages all contexts and that organizes
  * the invocation of rules. The results of inference rules are forwarded to the
  * RuleApplicationManager, which will schedule their further processing
  * (possibly triggering new rules).

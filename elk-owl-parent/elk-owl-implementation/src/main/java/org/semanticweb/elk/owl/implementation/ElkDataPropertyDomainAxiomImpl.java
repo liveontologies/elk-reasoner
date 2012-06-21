@@ -39,8 +39,7 @@ public class ElkDataPropertyDomainAxiomImpl
 		ElkPropertyDomainAxiomImpl<ElkDataPropertyExpression, ElkClassExpression>
 		implements ElkDataPropertyDomainAxiom {
 
-	ElkDataPropertyDomainAxiomImpl(
-			ElkDataPropertyExpression property,
+	ElkDataPropertyDomainAxiomImpl(ElkDataPropertyExpression property,
 			ElkClassExpression domain) {
 		super(property, domain);
 	}

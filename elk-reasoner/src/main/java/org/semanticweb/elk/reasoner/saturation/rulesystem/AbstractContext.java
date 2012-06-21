@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * data structures for storing processed information are implemented by
  * subclasses according to the needs of the inference system.
  * 
+ * @author "Yevgeny Kazakov"
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
@@ -49,13 +50,13 @@ public class AbstractContext implements Context {
 	private final IndexedClassExpression root;
 
 	/**
-	 * The queue of derivations for that context that still need to be
-	 * processed.
+	 * The queue of items for that context that still need to be processed.
 	 */
-	private final Queue<Queueable<?>> queue;
+	private final Queue<Queueable<?>> toDo;
 
 	/**
-	 * A context is active if its queue is not empty or it is being processed.
+	 * A context is active if its {@link #toDo} queue is not empty or it is
+	 * being processed by a worker.
 	 */
 	private final AtomicBoolean isActive;
 
@@ -67,7 +68,7 @@ public class AbstractContext implements Context {
 	 */
 	public AbstractContext(IndexedClassExpression root) {
 		this.root = root;
-		this.queue = new ConcurrentLinkedQueue<Queueable<?>>();
+		this.toDo = new ConcurrentLinkedQueue<Queueable<?>>();
 		this.isActive = new AtomicBoolean(false);
 	}
 
@@ -88,16 +89,15 @@ public class AbstractContext implements Context {
 	 * @return queue
 	 */
 	@Override
-	public final Queue<Queueable<?>> getQueue() {
-		return queue;
+	public final Queue<Queueable<?>> getToDo() {
+		return toDo;
 	}
 
 	/**
-	 * Ensure that the context is active, and return true if the activation
-	 * state has been changed from false to true. This method is thread safe:
-	 * for two concurrent executions only one succeeds.
+	 * Ensure that the context is active. This method is thread safe: for two
+	 * concurrent executions only one returns <tt>true</tt>.
 	 * 
-	 * @return true if the context was not active; returns false otherwise
+	 * @return <tt>true</tt> if the active status of the contexts is changed
 	 */
 	@Override
 	public boolean tryActivate() {
@@ -108,11 +108,11 @@ public class AbstractContext implements Context {
 	}
 
 	/**
-	 * Ensure that the context is not active, and return true if the activation
-	 * state has been changed from true to false. This method is thread safe:
-	 * for two concurrent executions only one succeeds.
+	 * Ensure that the context is not active. This method is thread safe: for
+	 * two concurrent executions only one returns <tt>true</tt>.
 	 * 
-	 * @return true if the context was active; returns false otherwise
+	 * @return <tt>true</tt> if the active status of the contexts is changed
+	 * 
 	 */
 	@Override
 	public boolean tryDeactivate() {

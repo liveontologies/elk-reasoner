@@ -24,6 +24,18 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.owlapi</groupId>
+			<artifactId>owlapi-reasoner</artifactId>
+			<version>${owlapi.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.owlapi</groupId>
+			<artifactId>owlapi-apibinding</artifactId>
+			<version>${owlapi.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -99,6 +111,7 @@
 						</goals>
 						<configuration>
 							<classesDirectory>${project.build.directory}/classes</classesDirectory>
+							<classifier>bin</classifier>
 						</configuration>
 					</execution>
 					<execution>

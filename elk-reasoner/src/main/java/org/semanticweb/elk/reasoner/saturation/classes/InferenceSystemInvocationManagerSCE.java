@@ -28,24 +28,26 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystem;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystemInvocationManager;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
- * An optimized implementation of the InferenceSystemInvocationManager that
- * does not use Java reflection for inference rules with SuperClassExpressions.
- * Instead, all methods applicable to negative and positive SuperClassExpressions
- * are stored in separate fields.
+ * An optimized implementation of the InferenceSystemInvocationManager that does
+ * not use Java reflection for inference rules that have a
+ * {@link SuperClassExpression} as one of the arguments. Instead, all methods
+ * applicable to negative and positive {@link SuperClassExpression}s are stored
+ * in separate fields.
  * 
  * @author Frantisek Simancik
- *
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this invocation manager
  */
-public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturation> extends
-		InferenceSystemInvocationManager {
+public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturation>
+		extends InferenceSystemInvocationManager {
 
-	public InferenceSystemInvocationManagerSCE(RuleApplicationEngine engine) {
-		super(engine);
+	public InferenceSystemInvocationManagerSCE() {
 	}
-	
+
 	protected class RuleMethodListNegSCE {
 		InferenceRuleNegSCE<C> firstInferenceRule;
 		RuleMethodListNegSCE rest;
@@ -55,28 +57,30 @@ public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturat
 			this.firstInferenceRule = firstInferenceRule;
 			this.rest = rest;
 		}
-		
-		public RuleMethodListNegSCE(final InferenceRuleSCE<C> firstInferenceRule,
+
+		public RuleMethodListNegSCE(
+				final InferenceRuleSCE<C> firstInferenceRule,
 				RuleMethodListNegSCE rest) {
-			this.firstInferenceRule = new InferenceRuleNegSCE<C> () {
+			this.firstInferenceRule = new InferenceRuleNegSCE<C>() {
 
 				@Override
 				public void applySCE(NegativeSuperClassExpression<C> argument,
-						C context, RuleApplicationEngine engine) {
+						C context, RuleApplicationFactory.Engine engine) {
 					firstInferenceRule.applySCE(argument, context, engine);
 				}
 			};
 			this.rest = rest;
 		}
 
-		public void invoke(NegativeSuperClassExpression<C> argument, C context) {
+		public void invoke(NegativeSuperClassExpression<C> argument, C context,
+				RuleApplicationFactory.Engine engine) {
 			firstInferenceRule.applySCE(argument, context, engine);
 			if (rest != null) {
-				rest.invoke(argument, context);
+				rest.invoke(argument, context, engine);
 			}
 		}
 	}
-	
+
 	protected class RuleMethodListPosSCE {
 		InferenceRulePosSCE<C> firstInferenceRule;
 		RuleMethodListPosSCE rest;
@@ -86,41 +90,41 @@ public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturat
 			this.firstInferenceRule = firstInferenceRule;
 			this.rest = rest;
 		}
-		
-		public RuleMethodListPosSCE(final InferenceRuleSCE<C> firstInferenceRule,
+
+		public RuleMethodListPosSCE(
+				final InferenceRuleSCE<C> firstInferenceRule,
 				RuleMethodListPosSCE rest) {
-			this.firstInferenceRule = new InferenceRulePosSCE<C> () {
+			this.firstInferenceRule = new InferenceRulePosSCE<C>() {
 
 				@Override
 				public void applySCE(PositiveSuperClassExpression<C> argument,
-						C context, RuleApplicationEngine engine) {
+						C context, RuleApplicationFactory.Engine engine) {
 					firstInferenceRule.applySCE(argument, context, engine);
 				}
 			};
 			this.rest = rest;
 		}
 
-		public void invoke(PositiveSuperClassExpression<C> argument, C context) {
+		public void invoke(PositiveSuperClassExpression<C> argument, C context,
+				RuleApplicationFactory.Engine engine) {
 			firstInferenceRule.applySCE(argument, context, engine);
 			if (rest != null) {
-				rest.invoke(argument, context);
+				rest.invoke(argument, context, engine);
 			}
 		}
 	}
-	
+
 	protected RuleMethodListNegSCE rulesNegSCE = null;
 	protected RuleMethodListPosSCE rulesPosSCE = null;
-	
+
 	protected void addInferenceRuleNegSCE(InferenceRuleNegSCE<C> inferenceRule) {
 		rulesNegSCE = new RuleMethodListNegSCE(inferenceRule, rulesNegSCE);
 	}
-		
-	
+
 	protected void addInferenceRulePosSCE(InferenceRulePosSCE<C> inferenceRule) {
 		rulesPosSCE = new RuleMethodListPosSCE(inferenceRule, rulesPosSCE);
 	}
-	
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addInferenceSystem(InferenceSystem<?> inferenceSystem)
@@ -128,27 +132,36 @@ public class InferenceSystemInvocationManagerSCE<C extends ContextElClassSaturat
 		for (InferenceRule<?> inferenceRule : inferenceSystem
 				.getInferenceRules()) {
 			addInferenceRule(inferenceRule);
-			
+
 			if (inferenceRule instanceof InferenceRuleNegSCE)
-				rulesNegSCE = new RuleMethodListNegSCE((InferenceRuleNegSCE<C>) inferenceRule, rulesNegSCE);
-				
+				rulesNegSCE = new RuleMethodListNegSCE(
+						(InferenceRuleNegSCE<C>) inferenceRule, rulesNegSCE);
+
 			if (inferenceRule instanceof InferenceRulePosSCE)
-				rulesPosSCE = new RuleMethodListPosSCE((InferenceRulePosSCE<C>) inferenceRule, rulesPosSCE);
-			
+				rulesPosSCE = new RuleMethodListPosSCE(
+						(InferenceRulePosSCE<C>) inferenceRule, rulesPosSCE);
+
 			if (inferenceRule instanceof InferenceRuleSCE) {
-				rulesNegSCE = new RuleMethodListNegSCE((InferenceRuleSCE<C>) inferenceRule, rulesNegSCE);
-				rulesPosSCE = new RuleMethodListPosSCE((InferenceRuleSCE<C>) inferenceRule, rulesPosSCE);
+				rulesNegSCE = new RuleMethodListNegSCE(
+						(InferenceRuleSCE<C>) inferenceRule, rulesNegSCE);
+				rulesPosSCE = new RuleMethodListPosSCE(
+						(InferenceRuleSCE<C>) inferenceRule, rulesPosSCE);
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void applyAdditionalMethodsToItem(Queueable<?> queueable, Context context) {
-		if (rulesNegSCE != null && queueable instanceof NegativeSuperClassExpression)
-			rulesNegSCE.invoke((NegativeSuperClassExpression<C>) queueable, (C) context);
-		if (rulesPosSCE != null && queueable instanceof PositiveSuperClassExpression)
-			rulesPosSCE.invoke((PositiveSuperClassExpression<C>) queueable, (C) context);
+	protected void applyAdditionalMethodsToItem(Queueable<?> queueable,
+			Context context, RuleApplicationFactory.Engine engine) {
+		if (rulesNegSCE != null
+				&& queueable instanceof NegativeSuperClassExpression)
+			rulesNegSCE.invoke((NegativeSuperClassExpression<C>) queueable,
+					(C) context, engine);
+		if (rulesPosSCE != null
+				&& queueable instanceof PositiveSuperClassExpression)
+			rulesPosSCE.invoke((PositiveSuperClassExpression<C>) queueable,
+					(C) context, engine);
 	}
 
 }

@@ -22,21 +22,32 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
+ * TODO: documentation
+ * 
  * @author Frantisek Simancik
- *
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
-public class RuleInitialization<C extends ContextElClassSaturation> implements InferenceRule<C> {
+public class RuleInitialization<C extends ContextElClassSaturation> implements
+		InferenceRule<C> {
 
-	public void init(C context, RuleApplicationEngine engine) {
-		engine.enqueue(context, new PositiveSuperClassExpression<ContextElClassSaturation>(context.getRoot()));
+	public void init(C context, RuleApplicationFactory.Engine engine) {
+		engine.enqueue(context,
+				new PositiveSuperClassExpression<ContextElClassSaturation>(
+						context.getRoot()));
 
-		if (engine.owlThing.occursNegatively())
-			engine.enqueue(context, new PositiveSuperClassExpression<ContextElClassSaturation>(engine.owlThing));
-		
+		IndexedClassExpression owlThing = engine.getOwlThing();
+		if (owlThing.occursNegatively())
+			engine.enqueue(context,
+					new PositiveSuperClassExpression<ContextElClassSaturation>(
+							owlThing));
+
 	}
-	
+
 }

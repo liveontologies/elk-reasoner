@@ -35,15 +35,16 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * Implementation of <@link ElkDatatypeDefinitionAxiom>
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
-public class ElkDatatypeDefinitionAxiomImpl implements ElkDatatypeDefinitionAxiom {
-	
+public class ElkDatatypeDefinitionAxiomImpl implements
+		ElkDatatypeDefinitionAxiom {
+
 	private final ElkDatatype datatype;
 	private final ElkDataRange dataRange;
-	
+
 	ElkDatatypeDefinitionAxiomImpl(ElkDatatype dt, ElkDataRange dr) {
 		datatype = dt;
 		dataRange = dr;

@@ -35,19 +35,26 @@ package org.semanticweb.elk.testing;
  */
 public class TestResultComparisonException extends Exception {
 
+	private TestOutput expOutput;
+	private TestOutput actualOutput;
+	
 	public TestResultComparisonException() {}
 	
-	public TestResultComparisonException(String msg) {
+	public TestResultComparisonException(String msg, TestOutput expected, TestOutput actual) {
 		super(msg);
+		
+		expOutput = expected;
+		actualOutput = actual;
 	}
 	
-	public TestResultComparisonException(Throwable e) {
-		super(e);
+	public TestOutput getExpectedOutput() {
+		return expOutput;
 	}
-	
-	public TestResultComparisonException(String msg, Throwable e) {
-		super(msg, e);
+
+	public TestOutput getActualOutput() {
+		return actualOutput;
 	}
+
 	/**
 	 * 
 	 */

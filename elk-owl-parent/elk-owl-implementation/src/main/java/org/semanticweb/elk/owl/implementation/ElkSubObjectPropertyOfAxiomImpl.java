@@ -47,7 +47,7 @@ public class ElkSubObjectPropertyOfAxiomImpl extends ElkObjectImpl implements
 	protected final ElkSubObjectPropertyExpression subObjectPropertyExpression;
 	protected final ElkObjectPropertyExpression superObjectPropertyExpression;
 
-	/* package-private */ElkSubObjectPropertyOfAxiomImpl(
+	ElkSubObjectPropertyOfAxiomImpl(
 			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression) {
 		this.subObjectPropertyExpression = subObjectPropertyExpression;
@@ -62,16 +62,6 @@ public class ElkSubObjectPropertyOfAxiomImpl extends ElkObjectImpl implements
 	@Override
 	public ElkObjectPropertyExpression getSuperObjectPropertyExpression() {
 		return superObjectPropertyExpression;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("SubObjectPropertyOf(");
-		result.append(subObjectPropertyExpression.toString());
-		result.append(" ");
-		result.append(superObjectPropertyExpression.toString());
-		result.append(")");
-		return result.toString();
 	}
 
 	@Override

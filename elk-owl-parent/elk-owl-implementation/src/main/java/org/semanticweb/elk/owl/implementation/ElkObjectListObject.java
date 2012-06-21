@@ -37,23 +37,12 @@ public abstract class ElkObjectListObject<O extends ElkObject> extends
 
 	protected final List<? extends O> elkObjects;
 
-	/* package-private */ElkObjectListObject(List<? extends O> elkObjects) {
+	ElkObjectListObject(List<? extends O> elkObjects) {
 		this.elkObjects = elkObjects;
 	}
 
-	public String buildFssString(String operatorName) {
-		StringBuilder result = new StringBuilder(operatorName);
-		result.append("(");
-		for (ElkObject ce : elkObjects) {
-			result.append(ce.toString());
-			result.append(" ");
-		}
-		result.setCharAt(result.length() - 1, ')');
-		return result.toString();
-	}
-
-	public static<O> List<? extends O> varArgsToList(O firstObject, O secondObject,
-			O... otherObjects) {
+	public static <O> List<? extends O> varArgsToList(O firstObject,
+			O secondObject, O... otherObjects) {
 		List<O> objects = new ArrayList<O>(2 + otherObjects.length);
 		objects.add(firstObject);
 		objects.add(secondObject);
@@ -63,7 +52,8 @@ public abstract class ElkObjectListObject<O extends ElkObject> extends
 		return objects;
 	}
 
-	public static<O> List<? extends O> varArgsToList(O firstObject, O... otherObjects) {
+	public static <O> List<? extends O> varArgsToList(O firstObject,
+			O... otherObjects) {
 		List<O> objects = new ArrayList<O>(1 + otherObjects.length);
 		objects.add(firstObject);
 		for (int i = 0; i < otherObjects.length; ++i) {

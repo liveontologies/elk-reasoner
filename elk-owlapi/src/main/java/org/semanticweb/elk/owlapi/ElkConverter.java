@@ -29,17 +29,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.taxonomy.ClassNode;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
-import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
-import org.semanticweb.owlapi.reasoner.Node;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNodeSet;
+import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
+import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNodeSet;
 
 /**
  * Facade class for conversion from ELK objects to OWL API objects.
@@ -58,26 +55,33 @@ public class ElkConverter {
 		return INSTANCE_;
 	}
 
-	static protected ElkClassExpressionConverter ELK_CLASS_EXPRESSION_CONVERTER = ElkClassExpressionConverter
+	static protected ElkEntityConverter ELK_ENTITY_CONVERTER = ElkEntityConverter
 			.getInstance();
 
+	// static protected ElkClassExpressionConverter
+	// ELK_CLASS_EXPRESSION_CONVERTER =
+	// ElkClassExpressionConverter.getInstance();
+
 	public OWLClass convert(ElkClass cls) {
-		return ELK_CLASS_EXPRESSION_CONVERTER.visit(cls);
+		return ELK_ENTITY_CONVERTER.visit(cls);
 	}
 
-	public OWLObjectIntersectionOf convert(ElkObjectIntersectionOf ce) {
-		return ELK_CLASS_EXPRESSION_CONVERTER.visit(ce);
+	public OWLNamedIndividual convert(ElkNamedIndividual ind) {
+		return ELK_ENTITY_CONVERTER.visit(ind);
 	}
 
-	public OWLObjectSomeValuesFrom convert(ElkObjectSomeValuesFrom ce) {
-		return ELK_CLASS_EXPRESSION_CONVERTER.visit(ce);
-	}
+	/*
+	 * public OWLObjectIntersectionOf convert(ElkObjectIntersectionOf ce) {
+	 * return ELK_CLASS_EXPRESSION_CONVERTER.visit(ce); }
+	 * 
+	 * public OWLObjectSomeValuesFrom convert(ElkObjectSomeValuesFrom ce) {
+	 * return ELK_CLASS_EXPRESSION_CONVERTER.visit(ce); }
+	 * 
+	 * public OWLClassExpression convert(ElkClassExpression ce) { return
+	 * ce.accept(ELK_CLASS_EXPRESSION_CONVERTER); }
+	 */
 
-	public OWLClassExpression convert(ElkClassExpression ce) {
-		return ce.accept(ELK_CLASS_EXPRESSION_CONVERTER);
-	}
-
-	public OWLClassNode convert(ClassNode node) {
+	public OWLClassNode convertClassNode(Node<ElkClass> node) {
 		Set<OWLClass> owlClasses = new HashSet<OWLClass>();
 		for (ElkClass cls : node.getMembers()) {
 			owlClasses.add(convert(cls));
@@ -85,12 +89,31 @@ public class ElkConverter {
 		return new OWLClassNode(owlClasses);
 	}
 
-	public OWLClassNodeSet convert(Iterable<ClassNode> nodes) {
-		Set<Node<OWLClass>> owlNodes = new HashSet<Node<OWLClass>>();
-		for (ClassNode node : nodes) {
-			owlNodes.add(convert(node));
+	public OWLClassNodeSet convertClassNodes(
+			Iterable<? extends Node<ElkClass>> nodes) {
+		Set<org.semanticweb.owlapi.reasoner.Node<OWLClass>> owlNodes = new HashSet<org.semanticweb.owlapi.reasoner.Node<OWLClass>>();
+		for (Node<ElkClass> node : nodes) {
+			owlNodes.add(convertClassNode(node));
 		}
 		return new OWLClassNodeSet(owlNodes);
+	}
+
+	public OWLNamedIndividualNode convertIndividualNode(
+			Node<ElkNamedIndividual> node) {
+		Set<OWLNamedIndividual> owlIndividuals = new HashSet<OWLNamedIndividual>();
+		for (ElkNamedIndividual ind : node.getMembers()) {
+			owlIndividuals.add(convert(ind));
+		}
+		return new OWLNamedIndividualNode(owlIndividuals);
+	}
+
+	public OWLNamedIndividualNodeSet convertIndividualNodes(
+			Iterable<? extends Node<ElkNamedIndividual>> nodes) {
+		Set<org.semanticweb.owlapi.reasoner.Node<OWLNamedIndividual>> owlNodes = new HashSet<org.semanticweb.owlapi.reasoner.Node<OWLNamedIndividual>>();
+		for (Node<ElkNamedIndividual> node : nodes) {
+			owlNodes.add(convertIndividualNode(node));
+		}
+		return new OWLNamedIndividualNodeSet(owlNodes);
 	}
 
 }

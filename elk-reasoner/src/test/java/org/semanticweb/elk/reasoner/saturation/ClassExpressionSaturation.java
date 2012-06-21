@@ -22,18 +22,19 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
-import java.util.concurrent.ExecutorService;
-
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 
 public class ClassExpressionSaturation<J extends SaturationJob<? extends IndexedClassExpression>>
-		extends ConcurrentComputation<J> {
+		extends
+		ConcurrentComputation<J, ClassExpressionSaturationFactory<J>.Engine, ClassExpressionSaturationFactory<J>> {
 
-	public ClassExpressionSaturation(ExecutorService executor, int maxWorkers,
-			OntologyIndex ontologyIndex) {
-		super(new ClassExpressionSaturationEngine<J>(ontologyIndex), executor,
-				maxWorkers, 8 * maxWorkers, 32);
+	public ClassExpressionSaturation(ComputationExecutor executor,
+			int maxWorkers, OntologyIndex ontologyIndex) {
+		super(
+				new ClassExpressionSaturationFactory<J>(ontologyIndex,
+						maxWorkers), executor, maxWorkers);
 	}
 }

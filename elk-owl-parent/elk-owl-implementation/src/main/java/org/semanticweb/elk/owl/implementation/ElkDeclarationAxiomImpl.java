@@ -44,7 +44,7 @@ public class ElkDeclarationAxiomImpl extends ElkObjectImpl implements
 
 	protected final ElkEntity entity;
 
-	/* package-private */ElkDeclarationAxiomImpl(ElkEntity entity) {
+	ElkDeclarationAxiomImpl(ElkEntity entity) {
 		this.entity = entity;
 	}
 

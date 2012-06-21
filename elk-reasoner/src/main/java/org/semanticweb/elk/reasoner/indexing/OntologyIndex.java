@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
@@ -47,17 +48,31 @@ public interface OntologyIndex {
 
 	IndexedPropertyChain getIndexed(
 			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression);
+	
+	IndexedClass getIndexedOwlThing();
+	IndexedClass getIndexedOwlNothing();
 
+	/**
+	 * Should always contain owl:Thing and owl:Nothing 
+	 */
 	Iterable<IndexedClassExpression> getIndexedClassExpressions();
+	int getIndexedClassExpressionCount();
+	
 	Iterable<IndexedClass> getIndexedClasses();
 	int getIndexedClassCount();
+	
+	Iterable<IndexedIndividual> getIndexedIndividuals();
+	int getIndexedIndividualCount();
+	
 
 	Iterable<IndexedPropertyChain> getIndexedPropertyChains();
+	int getIndexedPropertyChainCount();
+	
 	Iterable<IndexedObjectProperty> getIndexedObjectProperties();
 	int getIndexedObjectPropertyCount();
 	
 	Iterable<IndexedObjectProperty> getReflexiveObjectProperties();
-
+	
 	ElkAxiomProcessor getAxiomInserter();
 
 	ElkAxiomProcessor getAxiomDeleter();

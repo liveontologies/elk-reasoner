@@ -22,21 +22,25 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
+ * TODO: documentation
+ * 
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
 public class RuleDisjoint<C extends ContextElClassSaturation> implements
 		InferenceRuleSCE<C> {
 
 	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
-			RuleApplicationEngine engine) {
+			RuleApplicationFactory.Engine engine) {
 
 		IndexedClassExpression ice = argument.getExpression();
 
@@ -46,15 +50,17 @@ public class RuleDisjoint<C extends ContextElClassSaturation> implements
 					ice.getDisjointClasses(),
 					context.getSuperClassExpressions())) {
 				engine.enqueue(context, new PositiveSuperClassExpression<C>(
-						engine.owlNothing));
+						engine.getOwlNothing()));
 				return;
 			}
 
 		if (ice.getDisjointnessAxioms() != null)
-			for (IndexedDisjointnessAxiom disAxiom : ice.getDisjointnessAxioms())
+			for (IndexedDisjointnessAxiom disAxiom : ice
+					.getDisjointnessAxioms())
 				if (!context.addDisjointessAxiom(disAxiom))
-					engine.enqueue(context,
-							new PositiveSuperClassExpression<C>(
-									engine.owlNothing));
+					engine.enqueue(
+							context,
+							new PositiveSuperClassExpression<C>(engine
+									.getOwlNothing()));
 	}
 }

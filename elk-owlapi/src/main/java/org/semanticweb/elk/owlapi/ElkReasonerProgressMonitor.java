@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 
 /**
- * Wrapper for OWL {@link ReasonerProgressMonitor} for ELK
+ * Wrapper of the OWL {@link ReasonerProgressMonitor} for ELK
  * {@link ProgressMonitor} interface.
  * 
  * @author Yevgeny Kazakov

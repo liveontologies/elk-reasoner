@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 
 /**
@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
  * @author Frantisek Simancik
  * 
  */
-public class IndexedClass extends IndexedClassExpression {
+public class IndexedClass extends IndexedClassEntity {
 
 	/**
 	 * The indexed ElkClass
@@ -63,9 +63,9 @@ public class IndexedClass extends IndexedClassExpression {
 	public <O> O accept(IndexedClassVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
+	
 	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

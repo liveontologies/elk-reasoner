@@ -24,8 +24,8 @@ package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
@@ -41,14 +41,9 @@ public class ElkEquivalentDataPropertiesAxiomImpl extends
 		ElkDataPropertyExpressionListObject implements
 		ElkEquivalentDataPropertiesAxiom {
 
-	/* package-private */ElkEquivalentDataPropertiesAxiomImpl(
+	ElkEquivalentDataPropertiesAxiomImpl(
 			List<? extends ElkDataPropertyExpression> equivalentDataPropertyExpressions) {
 		super(equivalentDataPropertyExpressions);
-	}
-
-	@Override
-	public String toString() {
-		return buildFssString("EquivalentDataProperties");
 	}
 
 	@Override

@@ -23,17 +23,18 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
  * 
- * Inference rule with a SuperClassExpressions as an argument.
+ * Inference rule with a {@link SuperClassExpression} as an argument.
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
-public interface InferenceRuleSCE<C extends ContextElClassSaturation> extends InferenceRule<C> {
-	
+public interface InferenceRuleSCE<C extends ContextElClassSaturation> extends
+		InferenceRule<C> {
+
 	void applySCE(SuperClassExpression<C> argument, C context,
-			RuleApplicationEngine engine);
+			RuleApplicationFactory.Engine engine);
 }

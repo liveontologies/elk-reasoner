@@ -38,8 +38,7 @@ public class ElkDataComplementOfImpl extends ElkObjectImpl implements
 
 	protected final ElkDataRange dataRange;
 
-	/* package-private */ElkDataComplementOfImpl(
-			ElkDataRange dataRange) {
+	ElkDataComplementOfImpl(ElkDataRange dataRange) {
 
 		this.dataRange = dataRange;
 	}
@@ -47,14 +46,6 @@ public class ElkDataComplementOfImpl extends ElkObjectImpl implements
 	@Override
 	public ElkDataRange getDataRange() {
 		return dataRange;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("DataComplementOf(");
-		result.append(dataRange.toString());
-		result.append(")");
-		return result.toString();
 	}
 
 	@Override

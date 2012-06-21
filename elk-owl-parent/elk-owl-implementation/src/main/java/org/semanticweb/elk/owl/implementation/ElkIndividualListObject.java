@@ -34,8 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 public abstract class ElkIndividualListObject extends
 		ElkObjectListObject<ElkIndividual> {
 
-	/* package-private */ElkIndividualListObject(
-			List<? extends ElkIndividual> individuals) {
+	ElkIndividualListObject(List<? extends ElkIndividual> individuals) {
 		super(individuals);
 	}
 

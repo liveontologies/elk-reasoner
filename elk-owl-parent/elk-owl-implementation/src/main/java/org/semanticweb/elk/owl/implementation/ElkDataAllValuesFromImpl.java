@@ -36,13 +36,16 @@ import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ElkDataAllValuesFromImpl 	extends ElkDataPropertyListRestrictionQualifiedImpl
-										implements ElkDataAllValuesFrom {
+public class ElkDataAllValuesFromImpl extends
+		ElkDataPropertyListRestrictionQualifiedImpl implements
+		ElkDataAllValuesFrom {
 
-	ElkDataAllValuesFromImpl( 	List<? extends ElkDataPropertyExpression> dataProps,
-								ElkDataRange dataRange) {
+	ElkDataAllValuesFromImpl(
+			List<? extends ElkDataPropertyExpression> dataProps,
+			ElkDataRange dataRange) {
 		super(dataProps, dataRange);
 	}
+
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
