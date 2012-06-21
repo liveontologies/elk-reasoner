@@ -52,5 +52,15 @@ public interface Taxonomy<T extends ElkObject> {
 	 * @return an unmodifiable Collection
 	 */
 	public Set<? extends TaxonomyNode<T>> getNodes();
+	
+	/**
+	 * Returns the top node of the taxonomy.
+	 */
+	public TaxonomyNode<T> getTopNode();
+	
+	/**
+	 * Returns the bottom node of the taxonomy.
+	 */
+	public TaxonomyNode<T> getBottomNode();
 
 }
