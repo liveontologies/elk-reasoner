@@ -40,11 +40,6 @@ public class ConsistencyChecking
 		extends
 		ReasonerComputation<IndexedClassExpression, ConsistencyCheckingFactory.Engine, ConsistencyCheckingFactory> {
 
-	/**
-	 * the index of the ontology used for computation
-	 */
-	protected final OntologyIndex ontologyIndex;
-
 	public ConsistencyChecking(
 			ConsistencyCheckingFactory inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers,
@@ -58,20 +53,12 @@ public class ConsistencyChecking
 				ontologyIndex.getIndexedIndividuals()), ontologyIndex
 				.getIndexedIndividualCount() + 1, inputProcessorFactory,
 				executor, maxWorkers, progressMonitor);
-		this.ontologyIndex = ontologyIndex;
 	}
 
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		this(new ConsistencyCheckingFactory(ontologyIndex, maxWorkers),
 				executor, maxWorkers, progressMonitor, ontologyIndex);
-	}
-
-	@Override
-	public void process() {
-		if (!ontologyIndex.getIndexedOwlNothing().occursPositively())
-			return;
-		super.process();
 	}
 
 	/**
