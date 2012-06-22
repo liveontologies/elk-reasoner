@@ -30,27 +30,21 @@ import java.io.InputStream;
 
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.HashClassificationCorrectnessTest;
+import org.semanticweb.elk.reasoner.DiffClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.stages.RestartingTestStageExecutor;
-import org.semanticweb.elk.testing.HashTestOutput;
 
 /**
- * Loads test ontologies using Elk's native OWL 2 functional syntax parser
- * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * 
- * @author "Yevgeny Kazakov"
- * 
  */
-public class CLIHashClassificationCorrectnessTest extends
-		HashClassificationCorrectnessTest {
+public class CLIDiffClassificationCorrectnessTest extends
+		DiffClassificationCorrectnessTest {
 
-	public CLIHashClassificationCorrectnessTest(
-			final ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> testManifest) {
+	public CLIDiffClassificationCorrectnessTest(
+			final ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
 
@@ -64,5 +58,4 @@ public class CLIHashClassificationCorrectnessTest extends
 
 		return reasoner;
 	}
-
 }

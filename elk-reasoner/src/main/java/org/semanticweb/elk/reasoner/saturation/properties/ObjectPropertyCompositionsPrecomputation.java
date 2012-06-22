@@ -28,9 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
-// TODO: Support concurrent computation?
 /**
  * Sets up multimaps for fast look-up of object property compositions to be used
  * in {@link RuleRoleComposition}.
@@ -42,27 +40,20 @@ public class ObjectPropertyCompositionsPrecomputation
 		extends
 		ReasonerComputation<IndexedPropertyChain, ObjectPropertyCompositionsPrecomputationFactory.Engine, ObjectPropertyCompositionsPrecomputationFactory> {
 
-	/**
-	 * the ontology index used for computation
-	 */
-	protected final OntologyIndex ontologyIndex;
-
-	public ObjectPropertyCompositionsPrecomputation(
+	protected ObjectPropertyCompositionsPrecomputation(
 			ObjectPropertyCompositionsPrecomputationFactory inputProcessorFactory,
-			Interrupter interrupter, ComputationExecutor executor,
+			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		// the engine is not thread safe; use 1 worker
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
 				.getIndexedPropertyChainCount(), inputProcessorFactory,
-				executor, 1, progressMonitor);
-		this.ontologyIndex = ontologyIndex;
+				executor, maxWorkers, progressMonitor);
 	}
 
-	public ObjectPropertyCompositionsPrecomputation(Interrupter interrupter,
-			ComputationExecutor executor, ProgressMonitor progressMonitor,
-			OntologyIndex ontologyIndex) {
-		this(new ObjectPropertyCompositionsPrecomputationFactory(),
-				interrupter, executor, progressMonitor, ontologyIndex);
+	public ObjectPropertyCompositionsPrecomputation(
+			ComputationExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+		this(new ObjectPropertyCompositionsPrecomputationFactory(), executor,
+				maxWorkers, progressMonitor, ontologyIndex);
 	}
 
 }

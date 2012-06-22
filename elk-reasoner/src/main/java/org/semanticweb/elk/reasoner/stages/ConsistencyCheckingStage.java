@@ -70,14 +70,19 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() {
-		if (computation == null)
-			initComputation();
-		progressMonitor.start(getName());
-		computation.process();
-		progressMonitor.finish();
-		if (isInterrupted())
-			return;
-		reasoner.consistentOntology = computation.isConsistent();
+		if (reasoner.getOntologyIndex().getIndexedOwlNothing()
+				.occursPositively()) {
+			if (computation == null)
+				initComputation();
+			progressMonitor.start(getName());
+			computation.process();
+			progressMonitor.finish();
+			if (isInterrupted())
+				return;
+			reasoner.consistentOntology = computation.isConsistent();
+		} else
+			reasoner.consistentOntology = true;
+		
 		reasoner.doneConsistencyCheck = true;
 		reasoner.doneReset = false;
 	}

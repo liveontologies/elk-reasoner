@@ -27,6 +27,8 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.reasoner.taxonomy.InconsistentTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestOutput;
@@ -41,7 +43,8 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  * 
  */
 @RunWith(PolySuite.class)
-public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> extends BaseReasoningCorrectnessTest<EO, ClassTaxonomyTestOutput> {
+public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
+		extends BaseReasoningCorrectnessTest<EO, ClassTaxonomyTestOutput> {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
@@ -69,7 +72,10 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> e
 			taxonomy = reasoner.getTaxonomy();
 			manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
 		} catch (InconsistentOntologyException e) {
-			manifest.compare(new ClassTaxonomyTestOutput());
+			manifest.compare(new ClassTaxonomyTestOutput(
+					new InconsistentTaxonomy<ElkClass>(
+							PredefinedElkClass.OWL_THING,
+							PredefinedElkClass.OWL_NOTHING)));
 		}
 	}
 
@@ -103,7 +109,10 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput> e
 			manifest.compare(new ClassTaxonomyTestOutput(reasoningProcess
 					.getTaxonomy()));
 		} else {
-			manifest.compare(new ClassTaxonomyTestOutput());
+			manifest.compare(new ClassTaxonomyTestOutput(
+					new InconsistentTaxonomy<ElkClass>(
+							PredefinedElkClass.OWL_THING,
+							PredefinedElkClass.OWL_NOTHING)));
 		}
 
 	}

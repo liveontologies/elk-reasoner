@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,7 +56,8 @@ public class NonBottomClassNode implements
 		TypeNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
-	private static final Logger LOGGER_ = Logger.getLogger(NonBottomClassNode.class);
+	private static final Logger LOGGER_ = Logger
+			.getLogger(NonBottomClassNode.class);
 
 	/**
 	 * The link to the taxonomy to which this node belongs
@@ -77,8 +79,8 @@ public class NonBottomClassNode implements
 	 */
 	private final Set<TypeNode<ElkClass, ElkNamedIndividual>> directSubNodes;
 	/**
-	 * ElkNamedIndividual nodes whose members are instances of the members of this
-	 * node.
+	 * ElkNamedIndividual nodes whose members are instances of the members of
+	 * this node.
 	 */
 	private final Set<InstanceNode<ElkClass, ElkNamedIndividual>> directInstanceNodes;
 
@@ -134,9 +136,10 @@ public class NonBottomClassNode implements
 	 * @param instanceNode
 	 *            node to add
 	 */
-	void addDirectInstanceNode(InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
+	void addDirectInstanceNode(
+			InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": new direct instance " + instanceNode);
+			LOGGER_.trace(this + ": new direct instance-node " + instanceNode);
 		directInstanceNodes.add(instanceNode);
 	}
 
@@ -144,39 +147,14 @@ public class NonBottomClassNode implements
 	public Set<ElkClass> getMembers() {
 		// create an unmodifiable set view of the members; alternatively, one
 		// could have created a TreeSet, but it consumes more memory
-		return new Set<ElkClass>() {
+		return new AbstractSet<ElkClass>() {
 
 			@Override
-			public boolean add(ElkClass arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean addAll(Collection<? extends ElkClass> arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public void clear() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean contains(Object arg0) {
-				if (arg0 instanceof ElkClass)
-					return (Collections.binarySearch(members, (ElkClass) arg0,
+			public boolean contains(Object arg) {
+				if (arg instanceof ElkClass)
+					return (Collections.binarySearch(members, (ElkClass) arg,
 							Comparators.ELK_CLASS_COMPARATOR) >= 0);
-				else
-					return false;
-			}
-
-			@Override
-			public boolean containsAll(Collection<?> arg0) {
-				for (Object element : arg0) {
-					if (!this.contains(element))
-						return false;
-				}
-				return true;
+				return false;
 			}
 
 			@Override
@@ -190,34 +168,10 @@ public class NonBottomClassNode implements
 			}
 
 			@Override
-			public boolean remove(Object arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean removeAll(Collection<?> arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean retainAll(Collection<?> arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
 			public int size() {
 				return members.size();
 			}
 
-			@Override
-			public Object[] toArray() {
-				return members.toArray();
-			}
-
-			@Override
-			public <T> T[] toArray(T[] arg0) {
-				return members.toArray(arg0);
-			}
 		};
 	}
 
@@ -240,9 +194,9 @@ public class NonBottomClassNode implements
 		while (!todo.isEmpty()) {
 			TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
 			if (result.add(next)) {
-			for (TypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
-					.getDirectSuperNodes())
-				todo.add(nextSuperNode);
+				for (TypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
+						.getDirectSuperNodes())
+					todo.add(nextSuperNode);
 			}
 		}
 		return Collections.unmodifiableSet(result);
@@ -269,17 +223,15 @@ public class NonBottomClassNode implements
 			Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
 			todo.addAll(directSubNodes);
 			while (!todo.isEmpty()) {
-				TypeNode<ElkClass, ElkNamedIndividual> next = todo
-						.poll();
+				TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
 				if (result.add(next)) {
 					for (TypeNode<ElkClass, ElkNamedIndividual> nextSubNode : next
-						.getDirectSubNodes())
+							.getDirectSubNodes())
 						todo.add(nextSubNode);
 				}
 			}
 		} else {
-			result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
-					1);
+			result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(1);
 			result.add(this.taxonomy.bottomClassNode);
 		}
 		return Collections.unmodifiableSet(result);
@@ -311,12 +263,12 @@ public class NonBottomClassNode implements
 	public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
 		Set<InstanceNode<ElkClass, ElkNamedIndividual>> result;
 		if (!directSubNodes.isEmpty()) {
-			result = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>(directInstanceNodes.size());
+			result = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>(
+					directInstanceNodes.size());
 			Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
 			todo.add(this);
 			while (!todo.isEmpty()) {
-				TypeNode<ElkClass, ElkNamedIndividual> next = todo
-						.poll();
+				TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
 				result.addAll(next.getDirectInstanceNodes());
 				for (TypeNode<ElkClass, ElkNamedIndividual> nextSubNode : next
 						.getDirectSubNodes()) {

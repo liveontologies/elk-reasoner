@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyCompositionsPrecomputation;
 
@@ -39,6 +40,10 @@ import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyComposit
 public class ObjectPropertyCompositionsPrecomputationStage extends
 		AbstractReasonerStage {
 
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ObjectPropertyCompositionsPrecomputationStage.class);
+	
 	/**
 	 * the computation used for this stage
 	 */
@@ -81,8 +86,10 @@ public class ObjectPropertyCompositionsPrecomputationStage extends
 	void initComputation() {
 		super.initComputation();
 		this.computation = new ObjectPropertyCompositionsPrecomputation(
-				reasoner.getStageExecutor(), reasoner.getProcessExecutor(),
-				progressMonitor, reasoner.ontologyIndex);
+				reasoner.getProcessExecutor(), workerNo, progressMonitor,
+				reasoner.ontologyIndex);
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
 
 	@Override

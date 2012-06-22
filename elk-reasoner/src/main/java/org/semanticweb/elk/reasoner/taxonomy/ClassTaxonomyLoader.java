@@ -37,6 +37,8 @@ import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
@@ -58,8 +60,8 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
  */
 public class ClassTaxonomyLoader {
 
-	public static Taxonomy<ElkClass> load(Owl2Parser parser) throws IOException,
-			Owl2ParseException {
+	public static Taxonomy<ElkClass> load(Owl2Parser parser)
+			throws IOException, Owl2ParseException {
 		final ConcurrentTaxonomy taxonomy = new ConcurrentTaxonomy();
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);
 
@@ -72,12 +74,14 @@ public class ClassTaxonomyLoader {
 		// add owl:Thing if needed
 		ElkClass thing = PredefinedElkClass.OWL_THING;
 		// unless it's inconsistent
-		if (taxonomy.getNode(thing) == taxonomy)
+		if (taxonomy.unsatisfiableClasses.contains(thing)) {
 			return taxonomy;
+		}
 
-		NonBottomClassNode topNode = taxonomy
-				.getCreateClassNode(Collections.singleton(thing));
-		TaxonomyNode<ElkClass> botNode = taxonomy.getNode(PredefinedElkClass.OWL_NOTHING);
+		NonBottomClassNode topNode = taxonomy.getCreateClassNode(Collections
+				.singleton(thing));
+		TaxonomyNode<ElkClass> botNode = taxonomy
+				.getNode(PredefinedElkClass.OWL_NOTHING);
 
 		for (TaxonomyNode<ElkClass> node : taxonomy.getNodes()) {
 			if (node == topNode || node == botNode)
@@ -99,7 +103,7 @@ public class ClassTaxonomyLoader {
 
 		boolean createNodes = false;
 		final ConcurrentTaxonomy taxonomy;
-		final List<ElkSubClassOfAxiom> nonProcessedAxioms = new ArrayList<ElkSubClassOfAxiom>();
+		final List<ElkAxiom> nonProcessedAxioms = new ArrayList<ElkAxiom>();
 
 		TaxonomyInserter(final ConcurrentTaxonomy taxonomy) {
 			this.taxonomy = taxonomy;
@@ -158,12 +162,31 @@ public class ClassTaxonomyLoader {
 							.getCreateClassNode(Collections.singleton(subClass))
 							: subNode);
 					superNonBot = (NonBottomClassNode) (superNode == null ? taxonomy
-							.getCreateClassNode(Collections.singleton(superClass))
-							: superNode);
+							.getCreateClassNode(Collections
+									.singleton(superClass)) : superNode);
 
 					subNonBot.addDirectSuperNode(superNonBot);
 					superNonBot.addDirectSubNode(subNonBot);
 				}
+			}
+
+			return null;
+		}
+
+		@Override
+		public Void visit(ElkDeclarationAxiom elkDeclarationAxiom) {
+			if (createNodes) {
+				ElkEntity entity = elkDeclarationAxiom.getEntity();
+
+				if (entity instanceof ElkClass) {
+					if (taxonomy.getNode((ElkClass) entity) == null) {
+						taxonomy.getCreateClassNode(Collections
+								.singleton((ElkClass) entity));
+					}
+				}
+			}
+			else {
+				nonProcessedAxioms.add(elkDeclarationAxiom);
 			}
 
 			return null;

@@ -22,18 +22,13 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionListener;
@@ -41,14 +36,9 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalen
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalentDirect;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputationFactory.Engine;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-
-/*
- * TODO: current implementation does not support equivalent individuals,
- * i.e. assumes that all individual nodes are singletons
- */
 
 /**
  * The factory for engines that concurrently construct a {@link Taxonomy}. The
@@ -59,8 +49,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class TaxonomyComputationFactory implements
-		InputProcessorFactory<IndexedClassEntity, Engine> {
+public class ClassTaxonomyComputationFactory implements
+		InputProcessorFactory<IndexedClass, Engine> {
 
 	/**
 	 * The class taxonomy object into which we write the result
@@ -70,7 +60,7 @@ public class TaxonomyComputationFactory implements
 	 * The transitive reduction shared structures used in the taxonomy
 	 * construction
 	 */
-	private final TransitiveReductionFactory<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>> transitiveReductionShared;
+	private final TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>> transitiveReductionShared;
 	/**
 	 * The objects creating or update the nodes from the result of the
 	 * transitive reduction
@@ -95,10 +85,10 @@ public class TaxonomyComputationFactory implements
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
-	public TaxonomyComputationFactory(OntologyIndex ontologyIndex,
+	public ClassTaxonomyComputationFactory(OntologyIndex ontologyIndex,
 			int maxWorkers, IndividualClassTaxonomy partialTaxonomy) {
 		this.taxonomy = partialTaxonomy;
-		this.transitiveReductionShared = new TransitiveReductionFactory<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>(
+		this.transitiveReductionShared = new TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>(
 				ontologyIndex, maxWorkers,
 				new ThisTransitiveReductionListener());
 	}
@@ -111,7 +101,7 @@ public class TaxonomyComputationFactory implements
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */
-	public TaxonomyComputationFactory(OntologyIndex ontologyIndex,
+	public ClassTaxonomyComputationFactory(OntologyIndex ontologyIndex,
 			int maxWorkers) {
 		this(ontologyIndex, maxWorkers, new ConcurrentTaxonomy());
 	}
@@ -124,15 +114,14 @@ public class TaxonomyComputationFactory implements
 	 */
 	private class ThisTransitiveReductionListener
 			implements
-			TransitiveReductionListener<TransitiveReductionJob<IndexedClassEntity>, TransitiveReductionFactory<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>.Engine> {
+			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>, TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>.Engine> {
 
 		@Override
 		public void notifyCanProcess() {
 		}
 
 		@Override
-		public void notifyFinished(
-				TransitiveReductionJob<IndexedClassEntity> job)
+		public void notifyFinished(TransitiveReductionJob<IndexedClass> job)
 				throws InterruptedException {
 			job.getOutput().accept(outputProcessor);
 		}
@@ -142,63 +131,26 @@ public class TaxonomyComputationFactory implements
 	/**
 	 * The class for processing the finished transitive reduction jobs. It
 	 * implements the visitor pattern for
-	 * {@link TransitiveReductionOutputVisitor<IndexedClassEntity>}.
+	 * {@link TransitiveReductionOutputVisitor<IndexedClass>}.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
 	private class TransitiveReductionOutputProcessor implements
-			TransitiveReductionOutputVisitor<IndexedClassEntity> {
+			TransitiveReductionOutputVisitor<IndexedClass> {
 
 		@Override
 		public void visit(
-				TransitiveReductionOutputEquivalentDirect<IndexedClassEntity> output) {
-
-			SatisfiableOutputProcessor processor = new SatisfiableOutputProcessor(
-					output);
-			output.getRoot().accept(processor);
-		}
-
-		@Override
-		public void visit(
-				TransitiveReductionOutputUnsatisfiable<IndexedClassEntity> output) {
-
-			UnsatisfiableOutputProcessor processor = new UnsatisfiableOutputProcessor();
-			output.getRoot().accept(processor);
-		}
-
-		@Override
-		public void visit(
-				TransitiveReductionOutputEquivalent<IndexedClassEntity> output) {
-			// this should not happen: all transitive reduction results should
-			// be computed with direct super classes
-			throw new IllegalArgumentException();
-		}
-
-	}
-
-	private class SatisfiableOutputProcessor implements
-			IndexedClassEntityVisitor<Void> {
-
-		private final TransitiveReductionOutputEquivalentDirect<IndexedClassEntity> output;
-
-		public SatisfiableOutputProcessor(
-				TransitiveReductionOutputEquivalentDirect<IndexedClassEntity> output) {
-			this.output = output;
-		}
-
-		@Override
-		public Void visit(IndexedClass root) {
+				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 
 			NonBottomClassNode node = taxonomy.getCreateClassNode(output
 					.getEquivalent());
 
 			// FIXME this sort of equality check is not guaranteed to work
-			// for
-			// ElkClasses
+			// for ElkClasses
 			if (node.getMembers().contains(PredefinedElkClass.OWL_THING)) {
 				topNodeRef.compareAndSet(null, node);
-				return null;
+				return;
 			}
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
@@ -214,50 +166,23 @@ public class TaxonomyComputationFactory implements
 				NonBottomClassNode topNode = getCreateTopNode();
 				assignDirectSuperClassNode(node, topNode);
 			}
-
-			return null;
 		}
 
 		@Override
-		public Void visit(IndexedIndividual root) {
-			// only supports singleton individuals
-			IndividualNode node = taxonomy.getCreateIndividualNode(Collections
-					.singleton(root.getElkNamedIndividual()));
+		public void visit(
+				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 
-			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
-					.getDirectSuperClasses()) {
-				NonBottomClassNode superNode = taxonomy
-						.getCreateClassNode(directSuperEquivalent
-								.getEquivalent());
-				assignDirectTypeNode(node, superNode);
-			}
-			// if there are no direct type nodes, then the top node is the
-			// only direct type node
-			if (node.getDirectTypeNodes().isEmpty()) {
-				NonBottomClassNode topNode = getCreateTopNode();
-				assignDirectTypeNode(node, topNode);
-			}
-
-			return null;
-		}
-	}
-
-	private class UnsatisfiableOutputProcessor implements
-			IndexedClassEntityVisitor<Void> {
-
-		@Override
-		public Void visit(IndexedClass root) {
-			taxonomy.addUnsatisfiableClass(root.getElkClass());
-			return null;
+			taxonomy.addUnsatisfiableClass(output.getRoot().getElkClass());
 		}
 
 		@Override
-		public Void visit(IndexedIndividual element) {
-			// the ontology is inconsistent, this should have been checked
-			// earlier
-			throw new RuntimeException(
-					"Inconsistent ontology found during taxonomy construction.");
+		public void visit(
+				TransitiveReductionOutputEquivalent<IndexedClass> output) {
+			// this should not happen: all transitive reduction results should
+			// be computed with direct super classes
+			throw new IllegalArgumentException();
 		}
+
 	}
 
 	/**
@@ -270,10 +195,9 @@ public class TaxonomyComputationFactory implements
 	 */
 	NonBottomClassNode getCreateTopNode() {
 		if (topNodeRef.get() == null) {
-			List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
-			topMembers.add(PredefinedElkClass.OWL_THING);
 			NonBottomClassNode topNode = taxonomy
-					.getCreateClassNode(topMembers);
+					.getCreateClassNode(Collections
+							.<ElkClass> singleton(PredefinedElkClass.OWL_THING));
 			topNodeRef.compareAndSet(null, topNode);
 		}
 		return topNodeRef.get();
@@ -302,28 +226,6 @@ public class TaxonomyComputationFactory implements
 	}
 
 	/**
-	 * Connecting the given pair of nodes in instance/type-node relation. The
-	 * method should not be called concurrently for the same first argument.
-	 * 
-	 * @param instanceNode
-	 *            the node that should be the sub-node of the second node
-	 * 
-	 * @param typeNode
-	 *            the node that should be the super-node of the first node
-	 */
-	private static void assignDirectTypeNode(IndividualNode instanceNode,
-			NonBottomClassNode typeNode) {
-		instanceNode.addDirectTypeNode(typeNode);
-		/*
-		 * since type-nodes can be added from different nodes, this call should
-		 * be synchronized
-		 */
-		synchronized (typeNode) {
-			typeNode.addDirectInstanceNode(instanceNode);
-		}
-	}
-
-	/**
 	 * Returns the taxonomy constructed by this engine
 	 * 
 	 * @return the taxonomy constructed by this engine
@@ -339,12 +241,12 @@ public class TaxonomyComputationFactory implements
 		transitiveReductionShared.printStatistics();
 	}
 
-	public class Engine implements InputProcessor<IndexedClassEntity> {
+	public class Engine implements InputProcessor<IndexedClass> {
 
 		/**
 		 * The transitive reduction engine used in the taxonomy construction
 		 */
-		protected final TransitiveReductionFactory<IndexedClassEntity, TransitiveReductionJob<IndexedClassEntity>>.Engine transitiveReductionEngine = transitiveReductionShared
+		protected final TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>.Engine transitiveReductionEngine = transitiveReductionShared
 				.getEngine();
 
 		// don't allow creating of engines directly; only through the factory
@@ -352,9 +254,9 @@ public class TaxonomyComputationFactory implements
 		}
 
 		@Override
-		public final void submit(IndexedClassEntity job) {
+		public final void submit(IndexedClass job) {
 			transitiveReductionEngine
-					.submit(new TransitiveReductionJob<IndexedClassEntity>(job));
+					.submit(new TransitiveReductionJob<IndexedClass>(job));
 		}
 
 		@Override
