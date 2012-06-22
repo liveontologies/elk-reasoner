@@ -182,6 +182,14 @@ public class ConsistencyChecking
 				ontologyIndex, executor, maxWorkers, progressMonitor);
 	}
 
+	@Override
+	public void process() {
+		super.process();
+		if (consistencyMonitor.isInconsistent())
+			// then thread was interrupted, reset the interrupted status
+			Thread.interrupted();
+	}
+
 	/**
 	 * @return <tt>true</tt> if the ontology is consistent; should be called
 	 *         after the consistency checking is performed using the method
@@ -236,6 +244,7 @@ public class ConsistencyChecking
 	 */
 	static class ConsistencyMonitor {
 		private volatile boolean inconsistent = false;
+		private final Thread mainThread = Thread.currentThread();
 
 		public boolean isInconsistent() {
 			return inconsistent;
@@ -243,6 +252,8 @@ public class ConsistencyChecking
 
 		public void setInconsistent() {
 			inconsistent = true;
+			// interrupt the reasoner
+			mainThread.interrupt();
 		}
 
 	}

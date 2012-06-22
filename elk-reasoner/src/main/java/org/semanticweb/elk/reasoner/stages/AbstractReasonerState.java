@@ -37,7 +37,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
  * The execution state of the reasoner containing information about which
- * reasoning stages that have been completed and holding the results of these
+ * reasoning stages have been completed and holding the results of these
  * reasoning stages, such as the consistency status of the ontology, class, or
  * instance taxonomy.
  * 

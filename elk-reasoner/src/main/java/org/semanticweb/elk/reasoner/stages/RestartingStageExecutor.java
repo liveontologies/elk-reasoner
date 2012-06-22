@@ -45,6 +45,7 @@ public class RestartingStageExecutor extends SimpleInterrupter implements
 	public void complete(ReasonerStage stage) {
 		if (!stage.done()) {
 			LOGGER_.debug(stage.getName() + " stage:");
+			registerCurrentThreadToInterrupt();
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);
 			}

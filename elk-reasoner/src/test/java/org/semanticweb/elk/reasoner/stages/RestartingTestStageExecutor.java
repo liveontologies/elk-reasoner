@@ -36,8 +36,9 @@ public class RestartingTestStageExecutor extends SimpleInterrupter implements
 		ReasonerStageExecutor {
 
 	@Override
-	public void complete(ReasonerStage stage) {
+	public void complete(ReasonerStage stage) {		
 		if (!stage.done()) {
+			registerCurrentThreadToInterrupt();
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);
 			}
