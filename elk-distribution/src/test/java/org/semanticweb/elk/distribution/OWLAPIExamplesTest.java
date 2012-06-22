@@ -48,6 +48,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -104,6 +105,11 @@ public class OWLAPIExamplesTest {
 		prepareClassPath();
 	}
 
+	@AfterClass
+	public static void cleanUp() throws IOException {
+		TestUtils.cleanUpOnExit(new File("."));
+	}
+
 	private static void prepareClassPath() throws IOException {
 		// unpack elk-owlapi (which is, in fact, elk-owlapi-standalone)
 		// and prepare the classpath
@@ -149,10 +155,11 @@ public class OWLAPIExamplesTest {
 	@Before
 	public void before() throws IOException {
 		owlapiClassPath = System.getProperty("owlapi-path");
-		elkOwlapiClassPath = LIB_DIR.getAbsolutePath() + "/elk-owlapi-"
-				+ System.getProperty("elk-version") + "/elk-owlapi.jar";
+		elkOwlapiClassPath = LIB_DIR.getAbsolutePath()
+				+ System.getProperty("elk-owlapi-path-in-zip");
 
-		assumeTrue(owlapiClassPath != null);//Here we gracefully exit if key properties aren't set
+		assumeTrue(owlapiClassPath != null);// Here we gracefully exit if key
+											// properties aren't set
 
 		createJavaSource();
 	}
@@ -227,7 +234,7 @@ public class OWLAPIExamplesTest {
 
 		boolean result = task.call();
 
-		System.out.println("CLASSPATH " + classpath);
+		//System.out.println("CLASSPATH " + classpath);
 
 		assertTrue(result);
 	}

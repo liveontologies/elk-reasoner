@@ -1,0 +1,10 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Ontology(
+EquivalentClasses(:A :B)
+SubClassOf(:D :A)
+SubClassOf(:E :C)
+EquivalentClasses(:E :F :G)
+EquivalentClasses(:L :K owl:Nothing)
+EquivalentClasses(owl:Thing :H)
+)

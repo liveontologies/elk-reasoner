@@ -31,12 +31,13 @@ import java.io.IOException;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class FileUtils {
 
-	public static FilenameFilter getExtBasedFilenameFilter(final String extension) {
+	public static FilenameFilter getExtBasedFilenameFilter(
+			final String extension) {
 		return new FilenameFilter() {
 			@Override
 			public boolean accept(File file, String name) {
@@ -44,14 +45,13 @@ public class FileUtils {
 			}
 		};
 	}
-	
+
 	public static String dropExtension(String filename) {
 		int index = -1;
-		
+
 		if ((index = filename.lastIndexOf('.')) < 0) {
 			return filename;
-		}
-		else {
+		} else {
 			return filename.substring(0, index);
 		}
 	}
@@ -61,13 +61,23 @@ public class FileUtils {
 	}
 
 	public static void deleteRecursively(File file) throws IOException {
-		if (file.isDirectory()) {
-		    for (File c : file.listFiles())
-		    	deleteRecursively(c);
-		  }
-		  if (!file.delete()) {
-		    throw new IOException("Failed to delete file: " + file);
-		  }
+		deleteRecursively(file, false);
 	}
 
+	public static void deleteRecursively(File file, boolean deleteOnExit)
+			throws IOException {
+		if (file.isDirectory()) {
+			for (File c : file.listFiles())
+				deleteRecursively(c);
+		}
+
+		if (deleteOnExit) {
+			file.deleteOnExit();
+		}
+		else {
+			if (!file.delete()) {
+				throw new IOException("Failed to delete file: " + file);
+			}	
+		}
+	}
 }

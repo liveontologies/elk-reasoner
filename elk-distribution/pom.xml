@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>elk-distribution</artifactId>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 
 	<name>ELK Distribution</name>
 	<description>The module for packaging of ELK products and their distribution</description>
@@ -47,24 +47,30 @@
 			<type>jar</type>
 			<classifier>lib</classifier>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.owlapi</groupId>
+			<artifactId>owlapi-distribution</artifactId>
+			<version>${owlapi.version}</version>
+			<classifier>bin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-util-testing</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<properties>
 		<elk-standalone.base>elk-standalone</elk-standalone.base>
 		<elk-protege.base>org.semanticweb.elk</elk-protege.base>
 		<elk-owlapi.base>elk-owlapi</elk-owlapi.base>
-		<!-- the base name of the zip file for elk-standalone distribution -->
-		<elk-standalone-zip.base>
-			${elk-standalone.base}-${project.version}
-		</elk-standalone-zip.base>
-		<!-- the base name of the zip file for elk-protege distribution -->
-		<elk-protege-zip.base>
-			elk-protege-${project.version}
-		</elk-protege-zip.base>
-		<!-- the base name of the zip file for elk-owlapi distribution -->
-		<elk-owlapi-zip.base>
-			${elk-owlapi.base}-${project.version}
-		</elk-owlapi-zip.base>
+		<elk-standalone.assembly-id>standalone-executable</elk-standalone.assembly-id>
+		<elk-owlapi.assembly-id>owlapi-library</elk-owlapi.assembly-id>
+		<elk-protege.assembly-id>protege-plugin</elk-protege.assembly-id>
+		<elk-standalone.file>${project.artifactId}-${project.version}-${elk-standalone.assembly-id}</elk-standalone.file>
+		<elk-owlapi.file>${project.artifactId}-${project.version}-${elk-owlapi.assembly-id}</elk-owlapi.file>
+		<elk-protege.file>${project.artifactId}-${project.version}-${elk-protege.assembly-id}</elk-protege.file>
 		<!-- the following timestamp and release.version properties are used for 
 			the current release information changes.xml file -->
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
@@ -96,6 +102,25 @@
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
 				<executions>
+					<!-- Copy Java sources to the output directory so that it's available 
+						in the classpath (the tests could compile it) -->
+					<execution>
+						<id>copy-examples-to-resources</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/classes/owlapi-examples-src</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/java/org/semanticweb/elk/owlapi/examples</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+
 					<execution>
 						<id>copy-resources</id>
 						<phase>validate</phase>
@@ -128,8 +153,45 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- A plugin to expose paths to some dependency jars as properties (they 
+				will be propagated to tests) -->
 			<plugin>
-				<!-- the plugin to generate changes log and release announcements -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>properties</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<!-- Propagating some necessary information, mostly paths to jars/zip 
+					archives, to the tests -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemProperties>
+						<property>
+							<name>elk-owlapi-path-in-zip</name>
+							<value>/${elk-owlapi.file}/${elk-owlapi.base}.jar</value>
+						</property>
+						<property>
+							<name>elk-owlapi-path</name>
+							<value>${project.build.directory}/${elk-owlapi.file}.zip</value>
+						</property>
+						<property>
+							<name>owlapi-path</name>
+							<value>${net.sourceforge.owlapi:owlapi-distribution:jar:bin}</value>
+						</property>
+					</systemProperties>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<!-- the plugin to generate changelog and release announcements -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-changes-plugin</artifactId>
 				<version>2.7</version>
@@ -202,10 +264,8 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>${elk-standalone-zip.base}</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
+							<appendAssemblyId>true</appendAssemblyId>
 							<descriptors>
-								<!-- configuration file describing how to create the archive -->
 								<descriptor>${basedir}/src/main/assembly/standalone-zip.xml</descriptor>
 							</descriptors>
 						</configuration>
@@ -218,8 +278,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>${elk-protege-zip.base}</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
+							<appendAssemblyId>true</appendAssemblyId>
 							<descriptors>
 								<!-- configuration file describing how to create the archive -->
 								<descriptor>${basedir}/src/main/assembly/protege-zip.xml</descriptor>
@@ -229,13 +288,12 @@
 					<execution>
 						<!-- creating the distribution archive for elk-owlapi-standalone -->
 						<id>create-owlapi-zip</id>
-						<phase>package</phase>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>${elk-owlapi-zip.base}</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
+							<appendAssemblyId>true</appendAssemblyId>
 							<descriptors>
 								<!-- configuration file describing how to create the archive -->
 								<descriptor>${basedir}/src/main/assembly/owlapi-zip.xml</descriptor>
@@ -244,6 +302,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 			<plugin>
 				<!-- the plugin used to upload the release files to googlecode -->
 				<groupId>com.googlecode.maven-gcu-plugin</groupId>
@@ -265,8 +324,9 @@
 					<projectName>elk-reasoner</projectName>
 					<uploads>
 						<upload>
-							<file>${project.build.directory}/${elk-standalone-zip.base}.zip</file>
-							<summary>ELK reasoner standalone executable version ${project.version}</summary>
+							<file>${project.build.directory}/${elk-standalone.file}.zip</file>
+							<summary>ELK reasoner standalone executable version
+								${project.version}</summary>
 							<labels>
 								<label>Featured</label>
 								<label>OpSys-All</label>
@@ -274,7 +334,7 @@
 							</labels>
 						</upload>
 						<upload>
-							<file>${project.build.directory}/${elk-protege-zip.base}.zip</file>
+							<file>${project.build.directory}/${elk-protege.file}.zip</file>
 							<summary>ELK reasoner Protege plugin version ${project.version}</summary>
 							<labels>
 								<label>Featured</label>
@@ -283,8 +343,9 @@
 							</labels>
 						</upload>
 						<upload>
-							<file>${project.build.directory}/${elk-owlapi-zip.base}.zip</file>
-							<summary>ELK reasoner library for OWL API version ${project.version}</summary>
+							<file>${project.build.directory}/${elk-owlapi.file}.zip</file>
+							<summary>ELK reasoner library for OWL API version
+								${project.version}</summary>
 							<labels>
 								<label>Featured</label>
 								<label>OpSys-All</label>
