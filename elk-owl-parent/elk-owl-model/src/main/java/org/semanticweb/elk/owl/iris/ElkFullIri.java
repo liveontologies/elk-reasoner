@@ -22,27 +22,25 @@
  */
 package org.semanticweb.elk.owl.iris;
 
-
-
 /**
  * Represents a fully expanded IRI. This class is just a String wrapper.
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
 public class ElkFullIri extends ElkIri {
-	
+
 	protected final String iri;
-	
+
 	public ElkFullIri(String iri) {
-		super (iri);
+		super(iri.hashCode());
 		this.iri = iri;
 	}
-	
+
 	public ElkFullIri(ElkPrefix prefix, String localName) {
-		this (prefix.getIri().asString() + localName);
+		this(prefix.getIri().asString() + localName);
 	}
-	
+
 	@Override
 	public String asString() {
 		return iri;
