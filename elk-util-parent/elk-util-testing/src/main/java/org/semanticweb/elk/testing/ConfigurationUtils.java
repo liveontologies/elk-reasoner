@@ -41,125 +41,145 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
- * A collection of utility methods to create various common test configurations to be run by {@link PolySuite}}
+ * A collection of utility methods to create various common test configurations
+ * to be run by {@link PolySuite}
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 public class ConfigurationUtils {
 
-	//final static Logger LOGGER_ = Logger.getLogger(ConfigurationUtils.class);
-	final static String EXPECTED_SUFFIX = ".expected";
-	
+	// final static Logger LOGGER_ = Logger.getLogger(ConfigurationUtils.class);
+	// final static String EXPECTED_SUFFIX = ".expected";
+
 	/**
-	 * Loads configuration from a set of files by passing both input and expected output URLs to the test manifest creator
+	 * Loads configuration from a set of files by passing both input and
+	 * expected output URLs to the test manifest creator
 	 * 
 	 * @return
-	 * @throws URISyntaxException 
+	 * @throws URISyntaxException
 	 */
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
-																final String path,
-																final Class<?> srcClass,
-																final String inputFileExt,
-																final String outputFileExt,
-																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException, URISyntaxException {
+			final String path, final Class<?> srcClass,
+			final String inputFileExt, final String outputFileExt,
+			final TestManifestCreator<URLTestIO, EO, AO> creator)
+			throws IOException, URISyntaxException {
 		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
-		//Load inputs and expected results
-		final List<String> inputs = srcURI.isOpaque() 
-				? IOUtils.getResourceNamesFromJAR(path, inputFileExt, srcClass)
-				: IOUtils.getResourceNamesFromDir(new File(srcURI), inputFileExt);
-		final List<String> results = srcURI.isOpaque() 
-				? IOUtils.getResourceNamesFromJAR(path, outputFileExt, srcClass)
-				: IOUtils.getResourceNamesFromDir(new File(srcURI), outputFileExt);				
-		
+		// Load inputs and expected results
+		final List<String> inputs = srcURI.isOpaque() ? IOUtils
+				.getResourceNamesFromJAR(path, inputFileExt, srcClass)
+				: IOUtils.getResourceNamesFromDir(new File(srcURI),
+						inputFileExt);
+		final List<String> results = srcURI.isOpaque() ? IOUtils
+				.getResourceNamesFromJAR(path, outputFileExt, srcClass)
+				: IOUtils.getResourceNamesFromDir(new File(srcURI),
+						outputFileExt);
+
 		Collections.sort(inputs);
 		Collections.sort(results);
-		
-		//do the matching via a kind of merge join
-		final List<TestManifest<URLTestIO, EO, AO>> manifests = new ArrayList<TestManifest<URLTestIO,EO,AO>>(inputs.size());
+
+		// do the matching via a kind of merge join
+		final List<TestManifest<URLTestIO, EO, AO>> manifests = new ArrayList<TestManifest<URLTestIO, EO, AO>>(
+				inputs.size());
 		Iterator<String> resultIter = results.iterator();
 		Iterator<String> inputIter = inputs.iterator();
-		String nextResult = resultIter.next();
-		String nextInput = inputIter.next();
-		
-		while (true) {
-			int cmp = FileUtils.dropExtension(nextResult).compareTo(FileUtils.dropExtension(nextInput) + EXPECTED_SUFFIX); 
-			
-			if (cmp == 0) {
-				//Match
-				URL inputURL = srcClass.getClassLoader().getResource(nextInput);
-				URL resultURL = srcClass.getClassLoader().getResource(nextResult);
-				TestManifest<URLTestIO, EO, AO> manifest = creator.create(inputURL, resultURL);
-				
-				if (manifest != null) manifests.add(manifest);
-				
-				if (endOfData(inputIter, resultIter)) break;
-				
-				nextInput = inputIter.next();
-				nextResult = resultIter.next();
-			}
-			else if (cmp > 0) {
-				if (endOfData(inputIter, resultIter)) break;
-				
-				nextInput = inputIter.next();
-			}
-			else if (cmp < 0) {
-				if (endOfData(inputIter, resultIter)) break;
-				
-				nextResult = resultIter.next();
+
+		if (!endOfData(inputIter, resultIter)) {
+			String nextResult = resultIter.next();
+			String nextInput = inputIter.next();
+
+			while (true) {
+				int cmp = FileUtils
+						.dropExtension(nextResult, outputFileExt)
+						.compareTo(
+								FileUtils
+										.dropExtension(nextInput, inputFileExt));
+
+				if (cmp == 0) {
+					// Match
+					URL inputURL = srcClass.getClassLoader().getResource(
+							nextInput);
+					URL resultURL = srcClass.getClassLoader().getResource(
+							nextResult);
+					TestManifest<URLTestIO, EO, AO> manifest = creator.create(
+							inputURL, resultURL);
+
+					if (manifest != null)
+						manifests.add(manifest);
+
+					if (endOfData(inputIter, resultIter))
+						break;
+
+					nextInput = inputIter.next();
+					nextResult = resultIter.next();
+				} else if (cmp > 0) {
+					if (endOfData(inputIter, resultIter))
+						break;
+
+					nextInput = inputIter.next();
+				} else if (cmp < 0) {
+					if (endOfData(inputIter, resultIter))
+						break;
+
+					nextResult = resultIter.next();
+				}
 			}
 		}
-		
-		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests); 
+
+		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests);
 	}
-	
-	
+
 	/**
 	 * In case there're no expected results
 	 * 
 	 * @return
-	 * @throws URISyntaxException 
+	 * @throws URISyntaxException
 	 */
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
-																final String path,
-																final Class<?> srcClass,
-																final String inputFileExt,
-																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException, URISyntaxException {
+			final String path, final Class<?> srcClass,
+			final String inputFileExt,
+			final TestManifestCreator<URLTestIO, EO, AO> creator)
+			throws IOException, URISyntaxException {
 		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
-		//Load inputs 
-		final List<String> inputs = srcURI.isOpaque() 
-				? IOUtils.getResourceNamesFromJAR(path, inputFileExt, srcClass)
-				: IOUtils.getResourceNamesFromDir(new File(srcURI), inputFileExt);
-		
-		final List<TestManifest<URLTestIO, EO, AO>> manifests = new ArrayList<TestManifest<URLTestIO,EO,AO>>(inputs.size());
-		
+		// Load inputs
+		final List<String> inputs = srcURI.isOpaque() ? IOUtils
+				.getResourceNamesFromJAR(path, inputFileExt, srcClass)
+				: IOUtils.getResourceNamesFromDir(new File(srcURI),
+						inputFileExt);
+
+		final List<TestManifest<URLTestIO, EO, AO>> manifests = new ArrayList<TestManifest<URLTestIO, EO, AO>>(
+				inputs.size());
+
 		for (String input : inputs) {
 			URL inputURL = srcClass.getClassLoader().getResource(input);
-			TestManifest<URLTestIO, EO, AO> manifest = creator.create(inputURL, null);
-				
-			if (manifest != null) manifests.add(manifest);
+			TestManifest<URLTestIO, EO, AO> manifest = creator.create(inputURL,
+					null);
+
+			if (manifest != null)
+				manifests.add(manifest);
 		}
-		
-		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests); 
-	}	
-	
-	
-	private static boolean endOfData(Iterator<String> inputIter, Iterator<String> resultIter) {
+
+		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests);
+	}
+
+	private static boolean endOfData(Iterator<String> inputIter,
+			Iterator<String> resultIter) {
 		return !resultIter.hasNext() || !inputIter.hasNext();
 	}
-	
+
 	/**
 	 * Interface for classes which create test manifest from provided arguments
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
-	 *
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 * 
 	 */
 	public interface TestManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
-		
-		public TestManifest<I, EO, AO> create(URL input, URL output);
+
+		public TestManifest<I, EO, AO> create(URL input, URL output)
+				throws IOException;
 	}
 }

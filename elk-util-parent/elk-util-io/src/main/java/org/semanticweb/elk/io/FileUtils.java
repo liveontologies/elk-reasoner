@@ -55,6 +55,16 @@ public class FileUtils {
 			return filename.substring(0, index);
 		}
 	}
+	
+	public static String dropExtension(String filename, String extension) {
+		int index = -1;
+
+		if ((index = filename.lastIndexOf("." + extension)) < 0) {
+			return filename;
+		} else {
+			return filename.substring(0, index);
+		}
+	}	
 
 	public static String getFileName(String path) {
 		return new File(path).getName();
