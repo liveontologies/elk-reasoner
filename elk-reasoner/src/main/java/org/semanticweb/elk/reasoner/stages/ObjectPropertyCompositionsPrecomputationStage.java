@@ -42,7 +42,7 @@ public class ObjectPropertyCompositionsPrecomputationStage extends
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-			.getLogger(ObjectPropertyHierarchyComputationStage.class);
+			.getLogger(ObjectPropertyCompositionsPrecomputationStage.class);
 	
 	/**
 	 * the computation used for this stage

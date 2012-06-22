@@ -22,8 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -186,7 +185,6 @@ public class ClassTaxonomyComputationFactory implements
 
 	}
 
-
 	/**
 	 * This function is called only when some (non-top) nodes have no direct
 	 * parents. This can happen only when owl:Thing does not occur negatively in
@@ -197,10 +195,9 @@ public class ClassTaxonomyComputationFactory implements
 	 */
 	NonBottomClassNode getCreateTopNode() {
 		if (topNodeRef.get() == null) {
-			List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
-			topMembers.add(PredefinedElkClass.OWL_THING);
 			NonBottomClassNode topNode = taxonomy
-					.getCreateClassNode(topMembers);
+					.getCreateClassNode(Collections
+							.<ElkClass> singleton(PredefinedElkClass.OWL_THING));
 			topNodeRef.compareAndSet(null, topNode);
 		}
 		return topNodeRef.get();

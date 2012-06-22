@@ -73,7 +73,6 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 	/** thread safe set of unsatisfiable classes */
 	protected final Set<ElkClass> unsatisfiableClasses;
 
-	
 	/**
 	 * The bottom node.
 	 */
@@ -115,14 +114,11 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 	 */
 	@Override
 	public TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(ElkClass elkClass) {
-		NonBottomClassNode result = classNodeLookup.get(getKey(elkClass));
-		if (result != null) {
-			return result;
-		} else if (unsatisfiableClasses.contains(elkClass)) {
-			return this.bottomClassNode;
-		} else {
-			return null;
-		}
+		TypeNode<ElkClass, ElkNamedIndividual> result = classNodeLookup
+				.get(getKey(elkClass));
+		if (result == null && unsatisfiableClasses.contains(elkClass))
+			result = bottomClassNode;
+		return result;
 	}
 
 	/**
@@ -135,12 +131,7 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 	@Override
 	public InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
 			ElkNamedIndividual individual) {
-		IndividualNode result = individualNodeLookup.get(getKey(individual));
-		if (result != null) {
-			return result;
-		} else {
-			return null;
-		}
+		return individualNodeLookup.get(getKey(individual));
 	}
 
 	@Override
@@ -162,12 +153,12 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 	public Set<? extends TaxonomyNode<ElkClass>> getNodes() {
 		return getTypeNodes();
 	}
-	
+
 	@Override
 	public TypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
 		return getTypeNode(PredefinedElkClass.OWL_THING);
 	}
-	
+
 	@Override
 	public TypeNode<ElkClass, ElkNamedIndividual> getBottomNode() {
 		return bottomClassNode;
@@ -175,11 +166,7 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 
 	@Override
 	NonBottomClassNode getCreateClassNode(Collection<ElkClass> members) {
-		ElkClass someMember = null;
-		for (ElkClass member : members) {
-			someMember = member;
-			break;
-		}
+		ElkClass someMember = members.iterator().next();
 
 		NonBottomClassNode previous = classNodeLookup.get(getKey(someMember));
 		if (previous != null)

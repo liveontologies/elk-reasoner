@@ -22,13 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
@@ -77,7 +72,7 @@ public class InstanceTaxonomyComputationFactory implements
 	/**
 	 * The reference to cache the value of the top node for frequent use
 	 */
-	private final AtomicReference<NonBottomClassNode> topNodeRef = new AtomicReference<NonBottomClassNode>();
+	private final NonBottomClassNode topNode;
 
 	/**
 	 * Create a shared engine for the input ontology index and a partially
@@ -99,19 +94,7 @@ public class InstanceTaxonomyComputationFactory implements
 		this.transitiveReductionShared = new TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>(
 				ontologyIndex, maxWorkers,
 				new ThisTransitiveReductionListener());
-	}
-
-	/**
-	 * Create a new class taxonomy engine for the input ontology index.
-	 * 
-	 * @param ontologyIndex
-	 *            the ontology index for which the engine is created
-	 * @param maxWorkers
-	 *            the maximum number of workers that can use this factory
-	 */
-	public InstanceTaxonomyComputationFactory(OntologyIndex ontologyIndex,
-			int maxWorkers) {
-		this(ontologyIndex, maxWorkers, new ConcurrentTaxonomy());
+		this.topNode = (NonBottomClassNode) partialTaxonomy.getTopNode();
 	}
 
 	/**
@@ -166,7 +149,6 @@ public class InstanceTaxonomyComputationFactory implements
 			// if there are no direct type nodes, then the top node is the
 			// only direct type node
 			if (node.getDirectTypeNodes().isEmpty()) {
-				NonBottomClassNode topNode = getCreateTopNode();
 				assignDirectTypeNode(node, topNode);
 			}
 		}
@@ -176,8 +158,7 @@ public class InstanceTaxonomyComputationFactory implements
 				TransitiveReductionOutputUnsatisfiable<IndexedIndividual> output) {
 			// the ontology is inconsistent, this should have been checked
 			// earlier
-			throw new RuntimeException(
-					"Internal error: Inconsistent ontology found during taxonomy construction.");
+			throw new IllegalArgumentException();
 		}
 
 		@Override
@@ -189,27 +170,6 @@ public class InstanceTaxonomyComputationFactory implements
 		}
 
 	}
-
-
-	/**
-	 * This function is called only when some (non-top) nodes have no direct
-	 * parents. This can happen only when owl:Thing does not occur negatively in
-	 * the ontology, so that owl:Thing is not explicitly derived as a superclass
-	 * of each class. Under these conditions, it is safe to create a singleton
-	 * top node.
-	 * 
-	 */
-	NonBottomClassNode getCreateTopNode() {
-		if (topNodeRef.get() == null) {
-			List<ElkClass> topMembers = new ArrayList<ElkClass>(1);
-			topMembers.add(PredefinedElkClass.OWL_THING);
-			NonBottomClassNode topNode = taxonomy
-					.getCreateClassNode(topMembers);
-			topNodeRef.compareAndSet(null, topNode);
-		}
-		return topNodeRef.get();
-	}
-
 
 	/**
 	 * Connecting the given pair of nodes in instance/type-node relation. The
