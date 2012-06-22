@@ -43,29 +43,28 @@ public class ElkDisjointUnionAxiomImpl extends ElkClassExpressionListObject
 
 	protected final ElkClass definedClass;
 
-	/* package-private */ElkDisjointUnionAxiomImpl(ElkClass definedClass,
+	ElkDisjointUnionAxiomImpl(ElkClass definedClass,
 			List<? extends ElkClassExpression> disjointClassExpressions) {
 		super(disjointClassExpressions);
 		this.definedClass = definedClass;
 	}
 
+	@Override
 	public ElkClass getDefinedClass() {
 		return definedClass;
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("DisjointUnion");
-	}
-
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

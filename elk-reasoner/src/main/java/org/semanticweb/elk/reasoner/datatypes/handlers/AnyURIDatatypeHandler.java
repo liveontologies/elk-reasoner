@@ -90,7 +90,7 @@ public class AnyURIDatatypeHandler implements DatatypeHandler {
 		List<? extends ElkFacetRestriction> facetRestrictions = filler.getFacetRestrictions();
 		outerloop:
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet());
+			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().asString());
 			String value = facetRestriction.getRestrictionValue().getLexicalForm();
 
 			switch (facet) {

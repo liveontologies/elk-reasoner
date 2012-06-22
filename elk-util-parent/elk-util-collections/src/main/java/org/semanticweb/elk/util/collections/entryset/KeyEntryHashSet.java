@@ -149,18 +149,22 @@ public class KeyEntryHashSet<T> extends
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
+	@Override
 	public Iterator<T> iterator() {
 		return new Iterator<T>() {
 			final Iterator<KeyEntry<T, ? extends T>> recordIterator = entryIterator();
 
+			@Override
 			public boolean hasNext() {
 				return recordIterator.hasNext();
 			}
 
+			@Override
 			public T next() {
 				return recordIterator.next().getKey();
 			}
 
+			@Override
 			public void remove() {
 				recordIterator.remove();
 			}

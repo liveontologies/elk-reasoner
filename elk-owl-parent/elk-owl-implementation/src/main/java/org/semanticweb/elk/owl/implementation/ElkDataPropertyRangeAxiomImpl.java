@@ -38,8 +38,7 @@ public class ElkDataPropertyRangeAxiomImpl extends
 		ElkPropertyRangeAxiomImpl<ElkDataPropertyExpression, ElkDataRange>
 		implements ElkDataPropertyRangeAxiom {
 
-	ElkDataPropertyRangeAxiomImpl(
-			ElkDataPropertyExpression property,
+	ElkDataPropertyRangeAxiomImpl(ElkDataPropertyExpression property,
 			ElkDataRange range) {
 		super(property, range);
 	}
@@ -49,6 +48,7 @@ public class ElkDataPropertyRangeAxiomImpl extends
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -47,6 +47,7 @@ public class ElkDataUnionOfWrap<T extends OWLDataUnionOf> extends
 		super(owlDataUnionOf);
 	}
 
+	@Override
 	public List<? extends ElkDataRange> getDataRanges() {
 		List<ElkDataRange> result = new ArrayList<ElkDataRange>();
 		for (OWLDataRange ran : this.owlObject.getOperands()) {

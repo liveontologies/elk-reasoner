@@ -43,6 +43,7 @@ public class LazySetIntersectionTest extends TestCase {
 		super(testName);
 	}
 
+	@SuppressWarnings("static-method")
 	public void testLazySetIntersection() {
 		// random number generator for elements
 		Random generator = new Random(123);

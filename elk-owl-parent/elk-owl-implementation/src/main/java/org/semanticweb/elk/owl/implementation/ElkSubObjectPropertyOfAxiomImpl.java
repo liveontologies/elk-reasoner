@@ -47,39 +47,34 @@ public class ElkSubObjectPropertyOfAxiomImpl extends ElkObjectImpl implements
 	protected final ElkSubObjectPropertyExpression subObjectPropertyExpression;
 	protected final ElkObjectPropertyExpression superObjectPropertyExpression;
 
-	/* package-private */ElkSubObjectPropertyOfAxiomImpl(
+	ElkSubObjectPropertyOfAxiomImpl(
 			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression) {
 		this.subObjectPropertyExpression = subObjectPropertyExpression;
 		this.superObjectPropertyExpression = superObjectPropertyExpression;
 	}
 
+	@Override
 	public ElkSubObjectPropertyExpression getSubObjectPropertyExpression() {
 		return subObjectPropertyExpression;
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getSuperObjectPropertyExpression() {
 		return superObjectPropertyExpression;
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("SubObjectPropertyOf(");
-		result.append(subObjectPropertyExpression.toString());
-		result.append(" ");
-		result.append(superObjectPropertyExpression.toString());
-		result.append(")");
-		return result.toString();
-	}
-
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -39,24 +39,22 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkObjectOneOfImpl extends ElkObjectListObject<ElkIndividual>
 		implements ElkObjectOneOf {
 
-	/* package-private */ElkObjectOneOfImpl(
+	ElkObjectOneOfImpl(
 			List<? extends ElkIndividual> individuals) {
 		super(individuals);
 	}
 
+	@Override
 	public List<? extends ElkIndividual> getIndividuals() {
 		return elkObjects;
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("ObjectOneOf");
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

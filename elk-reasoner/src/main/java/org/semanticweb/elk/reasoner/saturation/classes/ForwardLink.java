@@ -24,11 +24,15 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * @author Frantisek Simancik
  * 
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this {@link Queueable}
  */
 public class ForwardLink<C extends ContextElClassSaturation> extends
 		Pair<IndexedPropertyChain, C> implements Queueable<C> {
@@ -45,14 +49,17 @@ public class ForwardLink<C extends ContextElClassSaturation> extends
 		return second;
 	}
 
-	public boolean storeInContext(C context) {
-		// forwLinkInfNo.incrementAndGet();
+	@Override
+	public boolean storeInContext(C context,
+			RuleApplicationFactory.Engine engine) {
+		RuleStatistics statistics = engine.getRuleStatistics();
+		statistics.forwLinkInfNo++;
 
 		if (context.forwardLinksByObjectProperty == null)
 			context.initForwardLinksByProperty();
 
 		if (context.forwardLinksByObjectProperty.add(first, second)) {
-			// forwLinkNo.incrementAndGet();
+			statistics.forwLinkNo++;
 			return true;
 		}
 		return false;

@@ -22,19 +22,19 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /**
- * An object that indexes axioms into a given IndexedObjectCache. Each instance
+ * An object that indexes axioms into a given ontology index. Each instance
  * can either only add or only remove axioms.
  * 
  * @author Frantisek Simancik
@@ -45,7 +45,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
 	 */
-	private final IndexedObjectCache objectCache;
+	private final OntologyIndexImpl ontologyIndex;
 
 	/**
 	 * 1 if adding axioms, -1 if removing axioms
@@ -53,19 +53,19 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	private final int multiplicity;
 
 	/**
-	 * The ElkObjectIndexer used for indexing a netural, a positive, and a
+	 * The ElkObjectIndexer used for indexing a neutral, a positive, and a
 	 * negative occurrence of an elk object respectively.
 	 */
 	private final ElkObjectIndexerVisitor neutralIndexer, positiveIndexer,
 			negativeIndexer;
 
 	/**
-	 * @param objectCache
+	 * @param ontologyIndex
 	 * @param insert
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
-	public ElkAxiomIndexerVisitor(IndexedObjectCache objectCache, boolean insert) {
-		this.objectCache = objectCache;
+	public ElkAxiomIndexerVisitor(OntologyIndexImpl ontologyIndex, boolean insert) {
+		this.ontologyIndex = ontologyIndex;
 		this.multiplicity = insert ? 1 : -1;
 		this.neutralIndexer = new ElkObjectIndexerVisitor(
 				new UpdateCacheFilter(multiplicity, 0, 0));
@@ -91,6 +91,23 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			subIndexedClass.removeToldSuperClassExpression(superIndexedClass);
 		}
 	}
+	
+	@Override
+	public void indexClassAssertion(ElkIndividual individual,
+			ElkClassExpression type) {
+
+		IndexedClassExpression indexedIndividual = individual
+				.accept(negativeIndexer);
+
+		IndexedClassExpression indexedType = type
+				.accept(positiveIndexer);
+
+		if (multiplicity == 1) {
+			indexedIndividual.addToldSuperClassExpression(indexedType);
+		} else {
+			indexedIndividual.removeToldSuperClassExpression(indexedType);
+		}
+	}
 
 	@Override
 	public void indexSubObjectPropertyOfAxiom(
@@ -113,40 +130,79 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 					.removeToldSubObjectProperty(subIndexedProperty);
 		}
 	}
+
+	@Override
+	public void indexDisjointClassExpressions(
+			List<? extends ElkClassExpression> disjointClasses) {
+		
+		// treat this as a positive occurrence of owl:Nothing
+		ontologyIndex.getIndexedOwlNothing().updateOccurrenceNumbers(multiplicity, multiplicity, 0);
+		
+		if (disjointClasses.size() == 2) {
+			IndexedClassExpression ice0 = disjointClasses.get(0).accept(
+					negativeIndexer);
+			IndexedClassExpression ice1 = disjointClasses.get(1).accept(
+					negativeIndexer);
+
+			if (multiplicity == 1) {
+				ice0.addDisjointClass(ice1);
+				ice1.addDisjointClass(ice0);
+			} else {
+				ice0.removeDisjointClass(ice1);
+				ice1.removeDisjointClass(ice0);
+			}
+		}
+		
+		else { // disjointClasses.size() > 2
+			List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression> (disjointClasses.size());
+			for (ElkClassExpression c : disjointClasses)
+				indexed.add(c.accept(negativeIndexer));
+			
+			IndexedDisjointnessAxiom indexedDisjointnessAxiom = new IndexedDisjointnessAxiom(indexed);
+
+			for (IndexedClassExpression ice : indexed) {
+				if (multiplicity == 1)
+					ice.addDisjointnessAxiom(indexedDisjointnessAxiom);
+				else
+					ice.removeDisjointnessAxiom(indexedDisjointnessAxiom);
+			}
+		}
+	}
+	
 	
 	@Override
-	public void indexDisjointClassExpressions(List<? extends ElkClassExpression> disjointsElk) {
-		Set<IndexedClassExpression> disjointsIndexed = new HashSet<IndexedClassExpression> (disjointsElk.size());
-		for (ElkClassExpression c : disjointsElk)
-			disjointsIndexed.add(c.accept(negativeIndexer));
+	public void indexReflexiveObjectProperty(
+			ElkObjectPropertyExpression reflexiveProperty) {
+
+		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
+				.accept(positiveIndexer);
 		
-		for (IndexedClassExpression ice : disjointsIndexed)
-			if (multiplicity == 1)
-				ice.addDisjoint(disjointsIndexed);
-			else
-				ice.removeDisjoint(disjointsIndexed);
+		if (multiplicity == 1)
+			ontologyIndex.addReflexiveObjectProperty(indexedReflexiveProperty);
+		else
+			ontologyIndex.removeReflexiveObjectProperty(indexedReflexiveProperty);
 	}
 
 	@Override
-	public void indexClassDeclaration(ElkClass ec) {
-		ec.accept(neutralIndexer);
+	public IndexedClass indexClassDeclaration(ElkClass ec) {
+		return (IndexedClass) ec.accept(neutralIndexer);
 	}
 
 	@Override
-	public void indexObjectPropertyDeclaration(ElkObjectProperty ep) {
-		ep.accept(neutralIndexer);
+	public IndexedObjectProperty indexObjectPropertyDeclaration(ElkObjectProperty ep) {
+		return (IndexedObjectProperty) ep.accept(neutralIndexer);
 	}
 
 	@Override
-	public void indexNamedIndividualDeclaration(ElkNamedIndividual eni) {
-		eni.accept(neutralIndexer);
+	public IndexedIndividual indexNamedIndividualDeclaration(ElkNamedIndividual eni) {
+		return eni.accept(neutralIndexer);
 	}
 
 	/**
 	 * A filter that is applied after the given indexed object has been
 	 * retrieved from the cache. It is used to update the occurrence counts of
 	 * the indexed object, add it to the cache in case of first occurrence, and
-	 * remove it from the cache in case of last occurrence no more.
+	 * remove it from the cache in case of last occurrence.
 	 * 
 	 * 
 	 * @author Frantisek Simancik
@@ -163,46 +219,49 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			this.negativeIncrement = negativeIncrement;
 		}
 
+		@Override
 		public IndexedClassExpression filter(IndexedClassExpression ice) {
-			IndexedClassExpression result = objectCache.filter(ice);
+			IndexedClassExpression result = ontologyIndex.filter(ice);
 
 			if (!result.occurs() && increment > 0)
-				objectCache.add(result);
+				ontologyIndex.add(result);
 
 			result.updateOccurrenceNumbers(increment, positiveIncrement,
 					negativeIncrement);
 
 			if (!result.occurs() && increment < 0)
-				objectCache.remove(result);
+				ontologyIndex.remove(result);
 
 			return result;
 		}
 
+		@Override
 		public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
-			IndexedPropertyChain result = objectCache.filter(ipc);
+			IndexedPropertyChain result = ontologyIndex.filter(ipc);
 
 			if (!result.occurs() && increment > 0)
-				objectCache.add(result);
+				ontologyIndex.add(result);
 
 			result.updateOccurrenceNumber(increment);
 
 			if (!result.occurs() && increment < 0)
-				objectCache.remove(result);
+				ontologyIndex.remove(result);
 
 			return result;
 		}
 
+		@Override
 		public IndexedDataProperty filter(IndexedDataProperty idp) {
-			IndexedDataProperty result = objectCache.filter(idp);
+			IndexedDataProperty result = ontologyIndex.filter(idp);
 
 			if (!result.occurs() && increment > 0) {
-				objectCache.add(result);
+				ontologyIndex.add(result);
 			}
 
 			result.updateOccurrenceNumber(increment);
 
 			if (!result.occurs() && increment < 0) {
-				objectCache.remove(result);
+				ontologyIndex.remove(result);
 			}
 
 			return result;

@@ -39,8 +39,7 @@ public class ElkDataPropertyDomainAxiomImpl
 		ElkPropertyDomainAxiomImpl<ElkDataPropertyExpression, ElkClassExpression>
 		implements ElkDataPropertyDomainAxiom {
 
-	ElkDataPropertyDomainAxiomImpl(
-			ElkDataPropertyExpression property,
+	ElkDataPropertyDomainAxiomImpl(ElkDataPropertyExpression property,
 			ElkClassExpression domain) {
 		super(property, domain);
 	}
@@ -50,6 +49,7 @@ public class ElkDataPropertyDomainAxiomImpl
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

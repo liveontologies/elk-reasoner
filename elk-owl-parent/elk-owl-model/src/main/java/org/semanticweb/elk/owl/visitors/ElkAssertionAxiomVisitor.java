@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
  * @author Markus Kroetzsch 
  */
 public interface ElkAssertionAxiomVisitor<O> {
-
+	
 	O visit(ElkClassAssertionAxiom elkClassAssertionAxiom);
 	
 	O visit(ElkDataPropertyAssertionAxiom elkDataPropertyAssertionAxiom);

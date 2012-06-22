@@ -44,6 +44,7 @@ public class ElkLiteralWrap<T extends OWLLiteral> extends ElkObjectWrap<T>
 		super(owlLiteral);
 	}
 
+	@Override
 	public String getLexicalForm() {
 		return this.owlObject.getLiteral();
 	}
@@ -56,10 +57,12 @@ public class ElkLiteralWrap<T extends OWLLiteral> extends ElkObjectWrap<T>
 		return converter.convert(this.owlObject.getDatatype());
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkLiteralVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

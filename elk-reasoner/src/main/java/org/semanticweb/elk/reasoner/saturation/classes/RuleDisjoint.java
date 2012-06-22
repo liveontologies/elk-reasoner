@@ -22,35 +22,45 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import java.util.Set;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
+ * TODO: documentation
+ * 
  * @author Frantisek Simancik
  * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
 public class RuleDisjoint<C extends ContextElClassSaturation> implements
 		InferenceRuleSCE<C> {
 
+	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
-			RuleApplicationEngine engine) {
+			RuleApplicationFactory.Engine engine) {
 
-		if (argument.getExpression().getDisjoints() != null) {
+		IndexedClassExpression ice = argument.getExpression();
 
-			for (Set<IndexedClassExpression> disjointSet : argument
-					.getExpression().getDisjoints())
-				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-						disjointSet, context.getSuperClassExpressions()))
-					if (common != argument.getExpression()) {
-						engine.enqueue(context,
-								new PositiveSuperClassExpression<C>(
-										engine.owlNothing));
-						return;
-					}
-		}
+		if (ice.getDisjointClasses() != null)
+			for (@SuppressWarnings("unused")
+			IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+					ice.getDisjointClasses(),
+					context.getSuperClassExpressions())) {
+				engine.enqueue(context, new PositiveSuperClassExpression<C>(
+						engine.getOwlNothing()));
+				return;
+			}
 
+		if (ice.getDisjointnessAxioms() != null)
+			for (IndexedDisjointnessAxiom disAxiom : ice
+					.getDisjointnessAxioms())
+				if (!context.addDisjointessAxiom(disAxiom))
+					engine.enqueue(
+							context,
+							new PositiveSuperClassExpression<C>(engine
+									.getOwlNothing()));
 	}
 }

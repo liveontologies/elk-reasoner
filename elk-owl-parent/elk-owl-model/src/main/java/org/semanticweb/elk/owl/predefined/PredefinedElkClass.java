@@ -51,20 +51,29 @@ public final class PredefinedElkClass implements ElkClass {
 	public static final PredefinedElkClass OWL_NOTHING = new PredefinedElkClass(
 			PredefinedElkIri.OWL_NOTHING);
 
+	@Override
 	public ElkIri getIri() {
 		return iri;
 	}
 
+	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkEntityVisitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	public String toString() {
+		return iri.asString();
 	}
 
 }

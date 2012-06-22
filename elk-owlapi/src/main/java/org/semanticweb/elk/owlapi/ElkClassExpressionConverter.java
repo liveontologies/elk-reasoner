@@ -51,7 +51,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -59,16 +58,14 @@ import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 
 /**
- * @author Yevgeny Kazakov
+ * Converter of ElkClassExpressions to OWL API class expressions.
  * 
+ * @author Yevgeny Kazakov
+ * @author Markus Kroetzsch
  */
 public final class ElkClassExpressionConverter implements
 		ElkClassExpressionVisitor<OWLClassExpression> {
-
-	public static ElkClassExpressionConverter getInstance() {
-		return INSTANCE_;
-	}
-
+	
 	final OWLDataFactory owlDataFactory = OWLManager.getOWLDataFactory();
 
 	private static ElkClassExpressionConverter INSTANCE_ = new ElkClassExpressionConverter();
@@ -76,134 +73,161 @@ public final class ElkClassExpressionConverter implements
 	private ElkClassExpressionConverter() {
 	}
 
-	public OWLClass visit(ElkClass elkClass) {
-		String iri = elkClass.getIri().asString();
-		return owlDataFactory.getOWLClass(IRI.create(iri));
+	public static ElkClassExpressionConverter getInstance() {
+		return INSTANCE_;
 	}
 
+	@Override
+	public OWLClass visit(ElkClass elkClass) {
+		return ElkEntityConverter.getInstance().visit(elkClass);
+	}
+
+	@Override
 	public OWLClassExpression visit(ElkDataAllValuesFrom elkDataAllValuesFrom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkDataExactCardinality elkDataExactCardinality) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkDataExactCardinalityQualified elkDataExactCardinalityQualified) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(ElkDataHasValue elkDataHasValue) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(ElkDataMaxCardinality elkDataMaxCardinality) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkDataMaxCardinalityQualified elkDataMaxCardinalityQualified) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(ElkDataMinCardinality elkDataMinCardinality) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkDataMinCardinalityQualified elkDataMinCardinalityQualified) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(ElkObjectComplementOf elkObjectComplementOf) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkObjectExactCardinality elkObjectExactCardinality) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkObjectExactCardinalityQualified elkObjectExactCardinalityQualified) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLObjectIntersectionOf visit(
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
 		// TODO Support this constructor
 		throw new ConverterException("Not yet implemented.");
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkObjectMaxCardinality elkObjectMaxCardinality) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkObjectMaxCardinalityQualified elkObjectMaxCardinalityQualified) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkObjectMinCardinality elkObjectMaxCardinality) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(
 			ElkObjectMinCardinalityQualified elkObjectMinCardinalityQualified) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public OWLObjectSomeValuesFrom visit(
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
 		// TODO Support this constructor
 		throw new ConverterException("Not yet implemented.");
 	}
 
+	@Override
 	public OWLClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
 		// TODO Auto-generated method stub
 		return null;

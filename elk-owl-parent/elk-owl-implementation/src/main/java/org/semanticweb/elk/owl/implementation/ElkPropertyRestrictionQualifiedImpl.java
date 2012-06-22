@@ -45,6 +45,7 @@ public abstract class ElkPropertyRestrictionQualifiedImpl<P, F> extends
 		this.filler = filler;
 	}
 
+	@Override
 	public F getFiller() {
 		return this.filler;
 	}

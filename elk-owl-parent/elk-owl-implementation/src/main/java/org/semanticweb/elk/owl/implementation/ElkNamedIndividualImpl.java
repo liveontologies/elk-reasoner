@@ -43,14 +43,17 @@ public class ElkNamedIndividualImpl extends ElkIriObject implements
 		super(iri);
 	}
 
+	@Override
 	public <O> O accept(ElkIndividualVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

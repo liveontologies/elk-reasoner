@@ -81,6 +81,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 
 	protected abstract Class<T> getTargetClass();
 
+	@Override
 	public T visit(OWLSubAnnotationPropertyOfAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLSubAnnotationPropertyOfAxiom.class.getSimpleName()
@@ -88,6 +89,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLAnnotationPropertyDomainAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLAnnotationPropertyDomainAxiom.class.getSimpleName()
@@ -95,6 +97,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLAnnotationPropertyRangeAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLAnnotationPropertyRangeAxiom.class.getSimpleName()
@@ -102,6 +105,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLSubClassOfAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLSubClassOfAxiom.class.getSimpleName()
@@ -109,6 +113,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLNegativeObjectPropertyAssertionAxiom.class.getSimpleName()
@@ -116,6 +121,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLAsymmetricObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLAsymmetricObjectPropertyAxiom.class.getSimpleName()
@@ -123,6 +129,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLReflexiveObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLReflexiveObjectPropertyAxiom.class.getSimpleName()
@@ -130,6 +137,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDisjointClassesAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDisjointClassesAxiom.class.getSimpleName()
@@ -137,6 +145,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDataPropertyDomainAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDataPropertyDomainAxiom.class.getSimpleName()
@@ -144,6 +153,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLObjectPropertyDomainAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLObjectPropertyDomainAxiom.class.getSimpleName()
@@ -151,6 +161,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLEquivalentObjectPropertiesAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLEquivalentObjectPropertiesAxiom.class.getSimpleName()
@@ -158,6 +169,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLNegativeDataPropertyAssertionAxiom.class.getSimpleName()
@@ -165,6 +177,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDifferentIndividualsAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDifferentIndividualsAxiom.class.getSimpleName()
@@ -172,6 +185,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDisjointDataPropertiesAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDisjointDataPropertiesAxiom.class.getSimpleName()
@@ -179,6 +193,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDisjointObjectPropertiesAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDisjointObjectPropertiesAxiom.class.getSimpleName()
@@ -186,6 +201,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLObjectPropertyRangeAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLObjectPropertyRangeAxiom.class.getSimpleName()
@@ -193,6 +209,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLObjectPropertyAssertionAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLObjectPropertyAssertionAxiom.class.getSimpleName()
@@ -200,6 +217,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLFunctionalObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLFunctionalObjectPropertyAxiom.class.getSimpleName()
@@ -207,6 +225,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLSubObjectPropertyOfAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLSubObjectPropertyOfAxiom.class.getSimpleName()
@@ -214,6 +233,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDisjointUnionAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDisjointUnionAxiom.class.getSimpleName()
@@ -221,6 +241,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDeclarationAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDeclarationAxiom.class.getSimpleName()
@@ -228,6 +249,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLAnnotationAssertionAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLAnnotationAssertionAxiom.class.getSimpleName()
@@ -235,6 +257,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLSymmetricObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLSymmetricObjectPropertyAxiom.class.getSimpleName()
@@ -242,6 +265,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDataPropertyRangeAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDataPropertyRangeAxiom.class.getSimpleName()
@@ -249,6 +273,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLFunctionalDataPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLFunctionalDataPropertyAxiom.class.getSimpleName()
@@ -256,6 +281,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLEquivalentDataPropertiesAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLEquivalentDataPropertiesAxiom.class.getSimpleName()
@@ -263,6 +289,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLClassAssertionAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLClassAssertionAxiom.class.getSimpleName()
@@ -270,6 +297,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLEquivalentClassesAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLEquivalentClassesAxiom.class.getSimpleName()
@@ -277,6 +305,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDataPropertyAssertionAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDataPropertyAssertionAxiom.class.getSimpleName()
@@ -284,6 +313,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLTransitiveObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLTransitiveObjectPropertyAxiom.class.getSimpleName()
@@ -291,6 +321,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLIrreflexiveObjectPropertyAxiom.class.getSimpleName()
@@ -298,6 +329,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLSubDataPropertyOfAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLSubDataPropertyOfAxiom.class.getSimpleName()
@@ -305,6 +337,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLInverseFunctionalObjectPropertyAxiom.class.getSimpleName()
@@ -312,6 +345,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLSameIndividualAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLSameIndividualAxiom.class.getSimpleName()
@@ -319,6 +353,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLSubPropertyChainOfAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLSubPropertyChainOfAxiom.class.getSimpleName()
@@ -326,6 +361,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLInverseObjectPropertiesAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLInverseObjectPropertiesAxiom.class.getSimpleName()
@@ -333,11 +369,13 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLHasKeyAxiom axiom) {
 		throw new IllegalArgumentException(OWLHasKeyAxiom.class.getSimpleName()
 				+ " cannot be converted to " + getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(OWLDatatypeDefinitionAxiom axiom) {
 		throw new IllegalArgumentException(
 				OWLDatatypeDefinitionAxiom.class.getSimpleName()
@@ -345,6 +383,7 @@ public abstract class AbstractOwlAxiomConverterVisitor<T extends ElkAxiom>
 						+ getTargetClass().getSimpleName());
 	}
 
+	@Override
 	public T visit(SWRLRule rule) {
 		throw new IllegalArgumentException(SWRLRule.class.getSimpleName()
 				+ " cannot be converted to " + getTargetClass().getSimpleName());

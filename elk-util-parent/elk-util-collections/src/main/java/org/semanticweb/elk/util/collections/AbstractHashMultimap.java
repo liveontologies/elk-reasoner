@@ -48,6 +48,7 @@ public abstract class AbstractHashMultimap<Key, Value> extends ArrayHashMap<Key,
 		super(i);
 	}
 
+	@Override
 	public boolean contains(Key key, Value value) {
 		Collection<Value> record = get(key);
 		if (record == null)
@@ -56,6 +57,7 @@ public abstract class AbstractHashMultimap<Key, Value> extends ArrayHashMap<Key,
 			return record.contains(value);
 	}
 
+	@Override
 	public boolean add(Key key, Value value) {
 		Collection<Value> record = get(key);
 		if (record == null) {
@@ -65,4 +67,8 @@ public abstract class AbstractHashMultimap<Key, Value> extends ArrayHashMap<Key,
 		return record.add(value);
 	}
 
+	@Override
+	public Collection<Value> get(Object key) {
+		return super.get(key);
+	}
 }

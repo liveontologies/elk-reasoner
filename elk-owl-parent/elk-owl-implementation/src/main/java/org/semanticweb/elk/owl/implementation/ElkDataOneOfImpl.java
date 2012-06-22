@@ -34,27 +34,24 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * 
  * @author Markus Kroetzsch
  */
-public class ElkDataOneOfImpl extends ElkObjectListObject<ElkLiteral>
-		implements ElkDataOneOf {
+public class ElkDataOneOfImpl extends ElkObjectListObject<ElkLiteral> implements
+		ElkDataOneOf {
 
-	/* package-private */ElkDataOneOfImpl(
-			List<? extends ElkLiteral> literals) {
+	ElkDataOneOfImpl(List<? extends ElkLiteral> literals) {
 		super(literals);
 	}
 
+	@Override
 	public List<? extends ElkLiteral> getLiterals() {
 		return elkObjects;
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("DataOneOf");
-	}
-
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

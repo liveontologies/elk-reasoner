@@ -44,10 +44,12 @@ public class ElkInverseObjectPropertiesAxiomWrap<T extends OWLInverseObjectPrope
 		super(owlInverseObjectPropertiesAxiom);
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getFirstObjectPropertyExpression() {
 		return converter.convert(this.owlObject.getFirstProperty());
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getSecondObjectPropertyExpression() {
 		return converter.convert(this.owlObject.getSecondProperty());
 	}

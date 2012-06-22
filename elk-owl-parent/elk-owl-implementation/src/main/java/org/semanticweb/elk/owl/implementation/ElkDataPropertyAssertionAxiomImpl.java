@@ -40,8 +40,7 @@ public class ElkDataPropertyAssertionAxiomImpl
 		ElkPropertyAssertionAxiomImpl<ElkDataPropertyExpression, ElkIndividual, ElkLiteral>
 		implements ElkDataPropertyAssertionAxiom {
 
-	ElkDataPropertyAssertionAxiomImpl(
-			ElkDataPropertyExpression property,
+	ElkDataPropertyAssertionAxiomImpl(ElkDataPropertyExpression property,
 			ElkIndividual subject, ElkLiteral object) {
 		super(property, subject, object);
 	}

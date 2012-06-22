@@ -43,14 +43,11 @@ public class ElkObjectUnionOfImpl extends ElkClassExpressionListObject
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("ObjectUnionOf");
-	}
-
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

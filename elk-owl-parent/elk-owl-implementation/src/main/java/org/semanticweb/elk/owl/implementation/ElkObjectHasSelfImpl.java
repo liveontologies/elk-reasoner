@@ -37,8 +37,7 @@ public class ElkObjectHasSelfImpl extends
 		ElkPropertyRestrictionImpl<ElkObjectPropertyExpression> implements
 		ElkObjectHasSelf {
 
-	/* package-private */ElkObjectHasSelfImpl(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+	ElkObjectHasSelfImpl(ElkObjectPropertyExpression objectPropertyExpression) {
 		super(objectPropertyExpression);
 	}
 

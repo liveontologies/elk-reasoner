@@ -50,12 +50,7 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.*;
-import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.owl.iris.ElkPrefix;
-import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
-import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
+import org.semanticweb.elk.owl.iris.*;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 
@@ -65,38 +60,40 @@ public class Owl2FunctionalStyleParser implements Owl2Parser {
 	 * Object factory used for creation of ELK Objects.
 	 */
 	protected ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-			
+
 	/**
 	 * Setting an object factory to be used for creation of ELK Objects.
 	 */
 	public void setObjectFactory(ElkObjectFactory objectFactory) {
 		this.objectFactory = objectFactory;
 	}
-	
-	/**
-	 * Prefix declarations as found in the parsed document. 
-	 */
-	protected ElkPrefixDeclarations prefixDeclarations =
-		 new ElkPrefixDeclarationsImpl();
 
 	/**
-	 * This method should be used to reset prefixDeclarations before
-	 * parsing a new ontology document.
+	 * Prefix declarations as found in the parsed document.
 	 */
+	protected ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
+
+	/**
+	 * This method should be used to reset prefixDeclarations before parsing a
+	 * new ontology document.
+	 */
+	@Override
 	public void setPrefixDeclarations(ElkPrefixDeclarations prefixDeclarations) {
 		this.prefixDeclarations = prefixDeclarations;
 	}
-	
-        /**
-         * The main parse method
-         */
-        public void parseOntology(final ElkAxiomProcessor processor) throws Owl2ParseException {
-        	try {
-				ontologyDocument(processor);
-			} catch (ParseException e) {
-				throw new Owl2ParseException(e);
-			}
-        }
+
+	/**
+	 * The main parse method
+	 */
+	@Override
+	public void parseOntology(final ElkAxiomProcessor processor)
+			throws Owl2ParseException {
+		try {
+			ontologyDocument(processor);
+		} catch (ParseException e) {
+			throw new Owl2ParseException(e);
+		}
+	}
 
 }
 
@@ -1838,12 +1835,11 @@ ElkNegativeDataPropertyAssertionAxiom negativeDataPropertyAssertion():
 /* 10 Annotations */
 
 /* 10.1 Annotations of Ontologies, Axioms, and other Annotations */
-ElkAnnotation annotation():
+//TODO annotations are not part of the ELK model, the returned value is ignored 
+ElkAnnotation annotation(): 
 {
-
 	ElkAnnotationProperty property;
 	ElkAnnotationValue value;
-
 }{
 	<ANNOTATION> <OPEN_BRACKET>
 		annotationAnnotations()
@@ -1854,7 +1850,7 @@ ElkAnnotation annotation():
 	}
 }
 
-void annotationAnnotations(): //TODO currently ignore nested annotations, doesn't really look like a useful feature overall
+void annotationAnnotations():
 {}{
 	( annotation() )*
 }
@@ -1914,41 +1910,47 @@ ElkAnnotationSubject annotationSubject():
 }
 
 /* 10.2.2 Annotation Subproperties */
-void subAnnotationPropertyOf():
-{}{
+ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOf():
+{
+	ElkAnnotationProperty subProperty = null;
+	ElkAnnotationProperty superProperty = null;
+}{
 	<SUB_ANNOTATION_PROPERTY_OF> <OPEN_BRACKET>
 		axiomAnnotations()
-		subAnnotationProperty()
-		superAnnotationProperty()
-	<CLOSE_BRACKET>
+		subProperty = annotationProperty()
+		superProperty = annotationProperty()
+	<CLOSE_BRACKET> {
+		return objectFactory.getSubAnnotationPropertyOfAxiom(subProperty, superProperty);
+	}
 }
 
-void subAnnotationProperty():
-{}{
-	annotationProperty()
-}
-
-void superAnnotationProperty():
-{}{
-	annotationProperty()
-}
 
 /* 10.2.3 Annotation Property Domain */
-void annotationPropertyDomain():
-{}{
+ElkAnnotationPropertyDomainAxiom annotationPropertyDomain():
+{
+	ElkAnnotationProperty property = null;
+	ElkIri domain = null;
+}{
 	<ANNOTATION_PROPERTY_DOMAIN> <OPEN_BRACKET>
 		axiomAnnotations()
-		annotationProperty()
-		iri()
-	<CLOSE_BRACKET>
+		property = annotationProperty()
+		domain = iri()
+	<CLOSE_BRACKET> {
+		return objectFactory.getAnnotationPropertyDomainAxiom(property, domain);
+	}
 }
 
 /* 10.2.4 Annotation Property Range */
-void annotationPropertyRange():
-{}{
+ElkAnnotationPropertyRangeAxiom annotationPropertyRange():
+{
+	ElkAnnotationProperty property = null;
+	ElkIri range = null;
+}{
 	<ANNOTATION_PROPERTY_RANGE> <OPEN_BRACKET>
 		axiomAnnotations()
-		annotationProperty()
-		iri()
-	<CLOSE_BRACKET>
+		property = annotationProperty()
+		range = iri()
+	<CLOSE_BRACKET> {
+		return objectFactory.getAnnotationPropertyRangeAxiom(property, range);
+	}
 }

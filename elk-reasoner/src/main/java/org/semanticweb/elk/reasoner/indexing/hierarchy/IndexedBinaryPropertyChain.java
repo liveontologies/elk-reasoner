@@ -31,8 +31,8 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
  * Represents a complex ElkSubObjectPropertyOfAxiom. The chain consists of two
  * components: an IndexedObjectProperty on the left and an
  * IndexedPropertyExpression on the right. This reflects the fact that property
- * inclusions are binarized during index constructions. The auxiliary inclusions
- * may not represent any ElkObject in the ontology.
+ * inclusions are binarized during index constructions. The auxiliary
+ * IndexedBinaryPropertyChains may not represent any ElkObject in the ontology.
  * 
  * @author Frantisek Simancik
  * 
@@ -70,6 +70,23 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	 */
 	public IndexedPropertyChain getRightProperty() {
 		return rightProperty;
+	}
+
+	@Override
+	protected void updateOccurrenceNumber(int increment) {
+
+		if (occurrenceNo == 0 && increment > 0) {
+			// first occurrence of this expression
+			rightProperty.addRightChain(this);
+		}
+
+		occurrenceNo += increment;
+
+		if (occurrenceNo == 0 && increment < 0) {
+			// no occurrences of this conjunction left
+			rightProperty.removeRightChain(this);
+		}
+
 	}
 
 	@Override

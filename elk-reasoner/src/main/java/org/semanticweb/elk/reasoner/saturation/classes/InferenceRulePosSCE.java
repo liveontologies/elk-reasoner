@@ -23,17 +23,21 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
- * Inference rule with a PositiveSuperClassExpressions as an argument.
+ * Inference rule with a {@link PositiveSuperClassExpression} as an argument.
  * 
  * @author Frantisek Simancik
- *
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
+ * 
  */
-public interface InferenceRulePosSCE<C extends ContextElClassSaturation> extends InferenceRule<C> {
-	
+public interface InferenceRulePosSCE<C extends ContextElClassSaturation>
+		extends InferenceRule<C> {
+
 	void applySCE(PositiveSuperClassExpression<C> argument, C context,
-			RuleApplicationEngine engine);
+			RuleApplicationFactory.Engine engine);
 
 }

@@ -26,49 +26,59 @@ import java.util.List;
 import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.*;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
+ * TODO: documentation
+ * 
  * @author Frantisek Simancik
- *
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
-public class RuleDecomposition<C extends ContextElClassSaturation> implements InferenceRulePosSCE<C> {
+public class RuleDecomposition<C extends ContextElClassSaturation> implements
+		InferenceRulePosSCE<C> {
 
 	private class ClassExpressionDecomposer implements
 			IndexedClassExpressionVisitor<Void> {
 
 		private final C context;
-		private final RuleApplicationEngine engine;
+		private final RuleApplicationFactory.Engine engine;
 
 		public ClassExpressionDecomposer(C context,
-				RuleApplicationEngine engine) {
+				RuleApplicationFactory.Engine engine) {
 			this.context = context;
 			this.engine = engine;
 		}
 
+		@Override
 		public Void visit(IndexedClass ice) {
 			return null;
 		}
 
+		@Override
 		public Void visit(IndexedObjectIntersectionOf ice) {
 			engine.enqueue(context,
 					new PositiveSuperClassExpression<C>(ice.getFirstConjunct()));
-			engine.enqueue(context,
+			engine.enqueue(
+					context,
 					new PositiveSuperClassExpression<C>(ice.getSecondConjunct()));
 			return null;
 		}
 
+		@Override
 		public Void visit(IndexedObjectSomeValuesFrom ice) {
 			engine.enqueue(engine.getCreateContext(ice.getFiller()),
 					new BackwardLink<C>(ice.getRelation(), context));
 			return null;
 		}
 
+		@Override
 		public Void visit(IndexedDataHasValue element) {
 			List<IndexedDatatypeExpression> satisfyingNegExistentials = 
 					DatatypeEngine.getSatisfyingNegExistentials(element.getProperty(), element);
 			if (satisfyingNegExistentials == null) {
-				engine.enqueue(context, new PositiveSuperClassExpression<C>(engine.owlNothing));
+				engine.enqueue(context, new PositiveSuperClassExpression<C>(engine.getOwlNothing()));
 			} else {
 				for (IndexedDatatypeExpression negDatatypeExpr : satisfyingNegExistentials) {
 					if (element != negDatatypeExpr) {
@@ -83,7 +93,7 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements In
 			List<IndexedDatatypeExpression> satisfyingNegExistentials = 
 					DatatypeEngine.getSatisfyingNegExistentials(element.getProperty(), element);
 			if (satisfyingNegExistentials == null) {
-				engine.enqueue(context, new PositiveSuperClassExpression<C>(engine.owlNothing));
+				engine.enqueue(context, new PositiveSuperClassExpression<C>(engine.getOwlNothing()));
 			} else {
 				for (IndexedDatatypeExpression negDatatypeExpr : satisfyingNegExistentials) {
 					if (element != negDatatypeExpr) {
@@ -94,15 +104,18 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements In
 			return null;
 		}
 
-		public Void visit(IndexedNominal element) {
+		@Override
+		public Void visit(IndexedIndividual element) {
 			return null;
 		}
 	};
 
-	public void applySCE(PositiveSuperClassExpression<C> argument,
-			C context, RuleApplicationEngine engine) {
+	@Override
+	public void applySCE(PositiveSuperClassExpression<C> argument, C context,
+			RuleApplicationFactory.Engine engine) {
 		ClassExpressionDecomposer decomposer = new ClassExpressionDecomposer(
 				context, engine);
 		argument.getExpression().accept(decomposer);
 	}
+
 }

@@ -54,7 +54,7 @@ public class InferenceSystemInvocationManager {
 	 * InferenceSystem that stores the rules).
 	 */
 	protected final static Class<?>[] parameterTypesRuleMethod = {
-			Queueable.class, Context.class, RuleApplicationEngine.class };
+			Queueable.class, Context.class, RuleApplicationFactory.Engine.class };
 	/**
 	 * Name of the method that InferenceRule objects use for initializing a
 	 * context. These methods implement inference rules without premises.
@@ -67,7 +67,7 @@ public class InferenceSystemInvocationManager {
 	 * InferenceSystem that stores the rules).
 	 */
 	protected final static Class<?>[] parameterTypesInitMethod = {
-			Context.class, RuleApplicationEngine.class };
+			Context.class, RuleApplicationFactory.Engine.class };
 	/**
 	 * Name of the method that Queueable objects use for storing their date in a
 	 * given context. This is also part of the required interface of Queueable,
@@ -78,13 +78,14 @@ public class InferenceSystemInvocationManager {
 	 * Required parameter types of the store method in Queueable objects. A
 	 * generic type used for Context can be more specific than this.
 	 */
-	protected final static Class<?>[] parameterTypesStoreMethod = { Context.class };
+	protected final static Class<?>[] parameterTypesStoreMethod = {
+			Context.class, RuleApplicationFactory.Engine.class };
 
 	/**
 	 * RuleApplicationEngine that owns this object. Rule applications need to
 	 * know this for enqueueing new derivations.
 	 */
-	protected final RuleApplicationEngine engine;
+	// protected final RuleApplicationEngine engine;
 
 	/**
 	 * Simple linked list implementation for rule methods.
@@ -104,12 +105,13 @@ public class InferenceSystemInvocationManager {
 			this.rest = rest;
 		}
 
-		public void invoke(Queueable<?> argument, Context context)
+		public void invoke(Queueable<?> argument, Context context,
+				RuleApplicationFactory.Engine engine)
 				throws IllegalArgumentException, IllegalAccessException,
 				InvocationTargetException {
 			firstMethod.invoke(firstInferenceRule, argument, context, engine);
 			if (rest != null) {
-				rest.invoke(argument, context);
+				rest.invoke(argument, context, engine);
 			}
 		}
 	}
@@ -132,11 +134,12 @@ public class InferenceSystemInvocationManager {
 			this.rest = rest;
 		}
 
-		public void invoke(Context context) throws IllegalArgumentException,
-				IllegalAccessException, InvocationTargetException {
+		public void invoke(Context context, RuleApplicationFactory.Engine engine)
+				throws IllegalArgumentException, IllegalAccessException,
+				InvocationTargetException {
 			firstMethod.invoke(firstInferenceRule, context, engine);
 			if (rest != null) {
-				rest.invoke(context);
+				rest.invoke(context, engine);
 			}
 		}
 	}
@@ -166,14 +169,9 @@ public class InferenceSystemInvocationManager {
 	protected InitMethodList initMethods;
 
 	/**
-	 * Constructor. The object keeps a RuleApplicationEngine since this is
-	 * needed during inferencing for enqueueing derived results and for storing
-	 * processed queueables.
-	 * 
-	 * @param engine
+	 * Constructor.
 	 */
-	public InferenceSystemInvocationManager(RuleApplicationEngine engine) {
-		this.engine = engine;
+	public InferenceSystemInvocationManager() {
 	}
 
 	/**
@@ -286,8 +284,9 @@ public class InferenceSystemInvocationManager {
 	 * @param parameterTypes
 	 * @throws IllegalInferenceMethodException
 	 */
-	protected void checkMethodSignature(Method method, String methodName,
-			Class<?>[] parameterTypes) throws IllegalInferenceMethodException {
+	protected static void checkMethodSignature(Method method,
+			String methodName, Class<?>[] parameterTypes)
+			throws IllegalInferenceMethodException {
 		if (!methodName.equals(method.getName())) {
 			throw new IllegalInferenceMethodException(method,
 					"Method must be called '" + methodName + "'.");
@@ -454,19 +453,22 @@ public class InferenceSystemInvocationManager {
 	 * Execute all known initialization rules for the given context.
 	 * Initialization rules are rules that do not require premises that are
 	 * derived first. There should always be initialization rules (otherwise
-	 * nothing would ever be derived): a RuntimeException will be thrown if no
-	 * rules are given to alert the user of this problem.
+	 * nothing would ever be derived): a {@link RuntimeException} will be thrown
+	 * if no rules are given to alert the user of this problem.
 	 * 
 	 * @param context
+	 * @param engine
 	 * @throws IllegalArgumentException
 	 */
-	public void initContext(Context context) throws IllegalArgumentException {
+	public void initContext(Context context,
+			RuleApplicationFactory.Engine engine)
+			throws IllegalArgumentException {
 		if (initMethods == null) {
 			throw new RuntimeException(
 					"Incomplete inference system: no initialization rules have been provided; nothing will ever be derived.");
 		}
 		try {
-			initMethods.invoke(context);
+			initMethods.invoke(context, engine);
 		} catch (IllegalAccessException e) {
 			// Happens if VM security configuration prevents method call.
 			// Wrap and throw as unchecked exception:
@@ -498,6 +500,7 @@ public class InferenceSystemInvocationManager {
 	 * 
 	 * @param queueable
 	 * @param context
+	 * @param engine
 	 * 
 	 * @throws IllegalArgumentException
 	 *             Can potentially happen since the use of reflection implicitly
@@ -508,7 +511,8 @@ public class InferenceSystemInvocationManager {
 	 *             generic in InferenceSystem, this is extremely unlikely to
 	 *             ever happen. Nevertheless, we declare it here for clarity.
 	 */
-	public void processItemInContext(Queueable<?> queueable, Context context)
+	public void processItemInContext(Queueable<?> queueable, Context context,
+			RuleApplicationFactory.Engine engine)
 			throws IllegalArgumentException {
 		Class<?> clazz = queueable.getClass();
 		InferenceMethods inferenceMethods = methodsForQueueable.get(clazz);
@@ -520,12 +524,13 @@ public class InferenceSystemInvocationManager {
 
 		try {
 			if (Boolean.TRUE.equals(inferenceMethods.storeMethod.invoke(
-					queueable, context))) {
+					queueable, context, engine))) {
 				if (inferenceMethods.ruleMethods != null) {
-					inferenceMethods.ruleMethods.invoke(queueable, context);
+					inferenceMethods.ruleMethods.invoke(queueable, context,
+							engine);
 				}
 
-				applyAdditionalMethodsToItem(queueable, context);
+				applyAdditionalMethodsToItem(queueable, context, engine);
 			}
 		} catch (IllegalAccessException e) {
 			// Happens if VM security configuration prevents method call.
@@ -550,7 +555,7 @@ public class InferenceSystemInvocationManager {
 	 * @author Frantisek Simancik
 	 */
 	protected void applyAdditionalMethodsToItem(Queueable<?> queueable,
-			Context context) {
+			Context context, RuleApplicationFactory.Engine engine) {
 	}
 
 }

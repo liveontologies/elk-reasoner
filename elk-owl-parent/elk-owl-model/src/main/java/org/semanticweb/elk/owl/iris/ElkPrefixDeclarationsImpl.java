@@ -36,6 +36,7 @@ public class ElkPrefixDeclarationsImpl implements ElkPrefixDeclarations {
 	protected final Map<String, ElkPrefix> prefixLookup =
 		new HashMap<String, ElkPrefix> ();
 
+	@Override
 	public boolean addPrefix(ElkPrefix prefix) {
 		if (prefixLookup.containsKey(prefix.getName()))
 			return false;
@@ -44,10 +45,12 @@ public class ElkPrefixDeclarationsImpl implements ElkPrefixDeclarations {
 		return true;
 	}
 
+	@Override
 	public ElkPrefix getPrefix(String prefixName) {
 		return prefixLookup.get(prefixName);
 	}
 	
+	@Override
 	public void addOwlDefaultPrefixes() {
          addPrefix(PredefinedElkPrefix.OWL);
          addPrefix(PredefinedElkPrefix.RDF);

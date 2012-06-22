@@ -45,24 +45,22 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkEquivalentClassesAxiomImpl extends ElkClassExpressionListObject
 		implements ElkEquivalentClassesAxiom {
 
-	/* package-private */ElkEquivalentClassesAxiomImpl(
+	ElkEquivalentClassesAxiomImpl(
 			List<? extends ElkClassExpression> equivalentClassExpressions) {
 		super(equivalentClassExpressions);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("EquivalentClasses");
-	}
-
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

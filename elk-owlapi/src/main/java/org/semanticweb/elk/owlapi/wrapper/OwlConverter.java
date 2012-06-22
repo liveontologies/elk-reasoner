@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
@@ -51,6 +52,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
@@ -65,6 +67,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
@@ -98,6 +101,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
@@ -126,6 +133,7 @@ import org.semanticweb.owlapi.model.OWLDataRange;
 import org.semanticweb.owlapi.model.OWLDataSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLDataUnionOf;
 import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLDatatypeDefinitionAxiom;
 import org.semanticweb.owlapi.model.OWLDatatypeRestriction;
 import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
 import org.semanticweb.owlapi.model.OWLDifferentIndividualsAxiom;
@@ -140,6 +148,7 @@ import org.semanticweb.owlapi.model.OWLEquivalentObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLFacetRestriction;
 import org.semanticweb.owlapi.model.OWLFunctionalDataPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLFunctionalObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLHasKeyAxiom;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLIndividualAxiom;
 import org.semanticweb.owlapi.model.OWLInverseFunctionalObjectPropertyAxiom;
@@ -192,6 +201,9 @@ public class OwlConverter {
 	protected static OwlAxiomConverterVisitor OWL_AXIOM_CONVERTER = OwlAxiomConverterVisitor
 			.getInstance();
 
+	protected static OwlAnnotationAxiomConverterVisitor OWL_ANNOTATION_AXIOM_CONVERTER = OwlAnnotationAxiomConverterVisitor
+			.getInstance();
+
 	protected static OwlClassAxiomConverterVisitor OWL_CLASS_AXIOM_CONVERTER = OwlClassAxiomConverterVisitor
 			.getInstance();
 
@@ -206,8 +218,9 @@ public class OwlConverter {
 
 	protected static OwlObjectPropertyExpressionConverterVisitor OWL_OBJECT_PROPERTY_EXPRESSION_CONVERTER = OwlObjectPropertyExpressionConverterVisitor
 			.getInstance();
-	
-	protected static OwlAnnotationVisitor OWL_ANNOTATION_CONVERTER = OwlAnnotationVisitor.getInstance();
+
+	protected static OwlAnnotationSubjectValueVisitor OWL_ANNOTATION_CONVERTER = OwlAnnotationSubjectValueVisitor
+			.getInstance();
 
 	public ElkAnnotationProperty convert(
 			OWLAnnotationProperty owlAnnotationProperty) {
@@ -219,6 +232,10 @@ public class OwlConverter {
 			OWLAnonymousIndividual owlAnonymousIndividual) {
 		return new ElkAnonymousIndividualWrap<OWLAnonymousIndividual>(
 				owlAnonymousIndividual);
+	}
+
+	public ElkAnnotationAxiom convert(OWLAnnotationAxiom owlAnnotationAxiom) {
+		return owlAnnotationAxiom.accept(OWL_ANNOTATION_AXIOM_CONVERTER);
 	}
 
 	public ElkAssertionAxiom convert(OWLIndividualAxiom owlIndividualAxiom) {
@@ -354,6 +371,12 @@ public class OwlConverter {
 			OWLDatatypeRestriction owlDatatypeRestriction) {
 		return new ElkDatatypeRestrictionWrap<OWLDatatypeRestriction>(
 				owlDatatypeRestriction);
+	}
+
+	public ElkDatatypeDefinitionAxiom convert(
+			OWLDatatypeDefinitionAxiom owlDatatypeDefinition) {
+		return new ElkDatatypeDefinitionAxiomWrap<OWLDatatypeDefinitionAxiom>(
+				owlDatatypeDefinition);
 	}
 
 	public ElkDatatype convert(OWLDatatype owlDatatype) {
@@ -632,6 +655,10 @@ public class OwlConverter {
 				owlTransitiveObjectPropertyAxiom);
 	}
 
+	public ElkHasKeyAxiom convert(OWLHasKeyAxiom owlHasKey) {
+		return new ElkHasKeyAxiomWrap<OWLHasKeyAxiom>(owlHasKey);
+	}
+
 	public ElkAnnotationSubject convert(OWLAnnotationSubject subject) {
 		return OWL_ANNOTATION_CONVERTER.visit(subject);
 	}
@@ -640,5 +667,8 @@ public class OwlConverter {
 		return OWL_ANNOTATION_CONVERTER.visit(value);
 	}
 
+	public ElkIri convert(IRI iri) {
+		return new ElkFullIri(iri.toString());
+	}
 
 }

@@ -24,6 +24,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -54,6 +55,12 @@ public abstract class IndexedPropertyChain {
 	protected List<IndexedObjectProperty> toldSuperProperties;
 
 	/**
+	 * Collections of all binary role chains in which this object property
+	 * occurs on the right.
+	 */
+	protected Collection<IndexedBinaryPropertyChain> rightChains;
+
+	/**
 	 * @return All told super object properties of this object property,
 	 *         possibly null.
 	 */
@@ -67,8 +74,15 @@ public abstract class IndexedPropertyChain {
 	 */
 	public abstract List<IndexedPropertyChain> getToldSubProperties();
 
+	/**
+	 * @return All chains in which this object property occurs on right, possibly null.
+	 */
+	public Collection<IndexedBinaryPropertyChain> getRightChains() {
+		return rightChains;
+	}
+
 	protected void addToldSuperObjectProperty(
-			IndexedObjectProperty superObjectProperty) { 
+			IndexedObjectProperty superObjectProperty) {
 		if (toldSuperProperties == null)
 			toldSuperProperties = new ArrayList<IndexedObjectProperty>(1);
 		toldSuperProperties.add(superObjectProperty);
@@ -88,6 +102,28 @@ public abstract class IndexedPropertyChain {
 		}
 		return success;
 	}
+	
+	protected void addRightChain(
+			IndexedBinaryPropertyChain chain) {
+		if (rightChains == null)
+			rightChains = new ArrayList<IndexedBinaryPropertyChain>(1);
+		rightChains.add(chain);
+	}
+
+	/**
+	 * @param superObjectProperty
+	 * @return true if successfully removed
+	 */
+	protected boolean removeRightChain(
+			IndexedBinaryPropertyChain chain) {
+		boolean success = false;
+		if (rightChains != null) {
+			success = rightChains.remove(chain);
+			if (rightChains.isEmpty())
+				rightChains = null;
+		}
+		return success;
+	}
 
 	/**
 	 * This counts how often this object occurred in the ontology.
@@ -99,9 +135,7 @@ public abstract class IndexedPropertyChain {
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	protected void updateOccurrenceNumber(int increment) {
-		occurrenceNo += increment;
-	}
+	protected abstract void updateOccurrenceNumber(int increment);
 
 	public boolean occurs() {
 		return occurrenceNo > 0;

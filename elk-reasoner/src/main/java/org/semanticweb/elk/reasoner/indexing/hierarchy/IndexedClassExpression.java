@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -49,6 +52,10 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
+/**
+ * @author Frantisek Simancik
+ * 
+ */
 abstract public class IndexedClassExpression {
 
 	/**
@@ -59,7 +66,18 @@ abstract public class IndexedClassExpression {
 
 	protected Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
 	protected Collection<IndexedObjectSomeValuesFrom> negExistentials;
-	protected Collection<Set<IndexedClassExpression>> disjoints;
+
+	/**
+	 * ICEs that appear in binary disjointess axioms with this object.
+	 */
+	protected Set<IndexedClassExpression> disjointClasses;
+
+	/**
+	 * List of all larger (non-binary) disjointness axioms in which this object
+	 * appears.
+	 * 
+	 */
+	protected List<IndexedDisjointnessAxiom> disjointnessAxioms;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -132,11 +150,19 @@ abstract public class IndexedClassExpression {
 	}
 
 	/**
-	 * @return Each returned set is a group of mutually disjoint
-	 *         class expressions including this class expression. Possibly null.
+	 * @return Indexed Class Expression that occur with this object in binary
+	 *         disjointness axioms, possibly null.
 	 */
-	public Collection<Set<IndexedClassExpression>> getDisjoints() {
-		return disjoints;
+	public Set<IndexedClassExpression> getDisjointClasses() {
+		return disjointClasses;
+	}
+
+	/**
+	 * @return Collection of all larger (non-binary) disjointness axioms in
+	 *         which this object appears, possibly null.
+	 */
+	public List<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
+		return disjointnessAxioms;
 	}
 
 	protected void addToldSuperClassExpression(
@@ -164,11 +190,19 @@ abstract public class IndexedClassExpression {
 	protected void addNegConjunctionByConjunct(
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
+
 		if (negConjunctionsByConjunct == null)
 			// TODO possibly replace by ArrayHashMap when it supports removal
 			negConjunctionsByConjunct = new HashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);
-		negConjunctionsByConjunct.put(conjunct, conjunction);
+
+		if (negConjunctionsByConjunct.put(conjunct, conjunction) != null) {
+			// Can be caused e.g. when ElkObjectIndexerVisitor indexed conjuncts
+			// with equals hashCodes.
+			throw new RuntimeException(
+					"Internal error: duplicate indexing in IndexedClassExpression.addNegConjunctionByConjunct.");
+		}
+
 	}
 
 	/**
@@ -209,24 +243,54 @@ abstract public class IndexedClassExpression {
 		return success;
 	}
 
-	protected void addDisjoint(Set<IndexedClassExpression> disjointSet) {
-		if (disjoints == null)
-			disjoints = new ArrayList<Set<IndexedClassExpression>>(1);
-		disjoints.add(disjointSet);
+	protected void addDisjointClass(IndexedClassExpression disjointClass) {
+		if (disjointClasses == null)
+			disjointClasses = new ArrayHashSet<IndexedClassExpression>();
+		disjointClasses.add(disjointClass);
 	}
 
 	/**
-	 * @param existential
+	 * @param disjointClass
 	 * @return true if successfully removed
 	 */
-	protected boolean removeDisjoint(Set<IndexedClassExpression> disjointSet) {
+	protected boolean removeDisjointClass(IndexedClassExpression disjointClass) {
 		boolean success = false;
-		if (disjoints != null) {
-			success = disjoints.remove(disjointSet);
-			if (disjoints.isEmpty())
-				disjoints = null;
+		if (disjointClasses != null) {
+			success = disjointClasses.remove(disjointClass);
+			if (disjointClasses.isEmpty())
+				disjointClasses = null;
 		}
-		System.err.println(success);
+		return success;
+	}
+
+	protected void addDisjointnessAxiom(
+			IndexedDisjointnessAxiom disjointnessAxiom) {
+		if (disjointnessAxioms == null)
+			disjointnessAxioms = new LinkedList<IndexedDisjointnessAxiom>();
+		disjointnessAxioms.add(disjointnessAxiom);
+	}
+
+	/**
+	 * @param disjointnessAxiom
+	 * @return true if successfully removed
+	 */
+	protected boolean removeDisjointnessAxiom(
+			IndexedDisjointnessAxiom disjointnessAxiom) {
+		boolean success = false;
+
+		if (disjointnessAxioms != null) {
+			Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms
+					.iterator();
+			while (i.hasNext())
+				if (i.next().getMembers()
+						.equals(disjointnessAxiom.getMembers())) {
+					i.remove();
+					break;
+				}
+
+			if (disjointnessAxioms.isEmpty())
+				disjointnessAxioms = null;
+		}
 		return success;
 	}
 

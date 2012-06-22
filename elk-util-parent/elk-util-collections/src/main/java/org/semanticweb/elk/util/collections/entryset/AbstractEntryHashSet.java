@@ -432,10 +432,12 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 			}
 		}
 
+		@Override
 		public final boolean hasNext() {
 			return next != null;
 		}
 
+		@Override
 		public final E next() {
 			if (modCount != expectedModCount)
 				throw new ConcurrentModificationException();
@@ -452,6 +454,7 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 			return e;
 		}
 
+		@Override
 		public void remove() {
 			if (current == null)
 				throw new IllegalStateException();

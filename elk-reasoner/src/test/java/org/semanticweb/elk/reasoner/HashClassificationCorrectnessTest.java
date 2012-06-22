@@ -23,20 +23,13 @@
 package org.semanticweb.elk.reasoner;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.HashTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.io.IOUtils;
-import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
  * Runs classification tests for all test input in the test directory
@@ -57,29 +50,9 @@ public abstract class HashClassificationCorrectnessTest extends BaseClassificati
 	 * ---------------------------------------------
 	 * Configuration: loading all test input data
 	 * ---------------------------------------------
-	 */
-	
+	 */	
 	@Config
 	public static Configuration getConfig() throws URISyntaxException, IOException {
-		final URI inputURI = HashClassificationCorrectnessTest.class.getClassLoader().getResource(INPUT_DATA_LOCATION).toURI();
-		
-		return ConfigurationUtils.loadFileBasedTestConfiguration(	inputURI,
-																	HashClassificationCorrectnessTest.class,
-																	"owl",
-																	"expected.hash",
-																	new TestManifestCreator<URLTestIO, HashTestOutput, ClassTaxonomyTestOutput>() {
-			@Override
-			public TestManifest<URLTestIO, HashTestOutput, ClassTaxonomyTestOutput> create(URL input, URL output) {
-				//input is an OWL ontology, expected output is a hash code
-				try {
-					int hash = IOUtils.readInteger(output, 10);
-					
-					return new ClassTaxonomyHashManifest(input, hash);
-				} catch (IOException e) {
-					// TODO Log it
-					return null;
-				} 
-			}
-		});
+		return HashConfigurationUtils.<ClassTaxonomyTestOutput>loadConfiguration(INPUT_DATA_LOCATION, HashClassificationCorrectnessTest.class);
 	}
 }

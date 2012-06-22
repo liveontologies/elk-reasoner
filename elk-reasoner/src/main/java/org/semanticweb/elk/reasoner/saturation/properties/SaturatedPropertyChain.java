@@ -25,62 +25,74 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.stages.ObjectPropertyHierarchyComputationStage;
+import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * 
- * This object is used for fast retrieval of property inclusions and compositions 
- * which are needed during ClassExpressionSaturation. 
+ * This object is used for fast retrieval of property inclusions and
+ * compositions which are needed during saturation of class expressions.
  * 
  * @author Frantisek Simancik
- *
+ * 
  */
 public class SaturatedPropertyChain {
 	protected final IndexedPropertyChain root;
-	
-	protected final Set<IndexedPropertyChain>
-		derivedSubProperties;
-	
-	protected final Set<IndexedPropertyChain>
-		derivedSuperProperties;
-	
-	protected HashListMultimap<IndexedPropertyChain,
-			IndexedBinaryPropertyChain>
-		compositionsByLeftSubProperty;
-	
-	protected HashListMultimap<IndexedPropertyChain,
-			IndexedBinaryPropertyChain>
-		compositionsByRightSubProperty;
 
-	
+	protected final Set<IndexedPropertyChain> derivedSubProperties;
+	protected final Set<IndexedPropertyChain> derivedSuperProperties;
+
+	protected AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeftSubProperty;
+	protected AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRightSubProperty;
+
 	public SaturatedPropertyChain(IndexedPropertyChain iop) {
 		this.root = iop;
-		this.derivedSuperProperties =
-			new ArrayHashSet<IndexedPropertyChain>();
-		this.derivedSubProperties =
-			new ArrayHashSet<IndexedPropertyChain>();
+		this.derivedSuperProperties = new ArrayHashSet<IndexedPropertyChain>();
+		this.derivedSubProperties = new ArrayHashSet<IndexedPropertyChain>();
 	}
-	
+
 	public IndexedPropertyChain getRoot() {
 		return root;
 	}
 
+	/**
+	 * All subproperties of the root property including root itself. Computed in
+	 * the {@link ObjectPropertyHierarchyComputationStage}.
+	 */
 	public Set<IndexedPropertyChain> getSubProperties() {
 		return derivedSubProperties;
 	}
 
+	/**
+	 * All superproperties of the root property including root itself. Computed
+	 * in the {@link ObjectPropertyHierarchyComputationStage}.
+	 */
 	public Set<IndexedPropertyChain> getSuperProperties() {
 		return derivedSuperProperties;
 	}
 
-	public HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getCompositionsByLeftSubProperty() {
+	/**
+	 * A multimap from R to S such that ObjectPropertyChain(R, root) implies S,
+	 * null if empty. Computed in the
+	 * {@link ObjectPropertyCompositionsPrecomputationStage} which already
+	 * expands premises of complex property inclusions under property
+	 * hierarchies
+	 */
+	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByLeftSubProperty() {
 		return compositionsByLeftSubProperty;
 	}
 
-	public HashListMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getCompositionsByRightSubProperty() {
+	/**
+	 * A multimap from R to S such that ObjectPropertyChain(root, R) implies S,
+	 * null if empty. Computed in the
+	 * {@link ObjectPropertyCompositionsPrecomputationStage} which already
+	 * expands premises of complex property inclusions under property
+	 * hierarchies
+	 */
+	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByRightSubProperty() {
 		return compositionsByRightSubProperty;
 	}
 

@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 public abstract class ElkLiteralListObject extends
 		ElkObjectListObject<ElkLiteral> {
 
-	/* package-private */ElkLiteralListObject(
+	ElkLiteralListObject(
 			List<? extends ElkLiteral> literals) {
 		super(literals);
 	}

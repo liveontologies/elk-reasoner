@@ -44,6 +44,7 @@ public abstract class ElkPropertyRangeAxiomImpl<P, R> extends
 		this.range = range;
 	}
 
+	@Override
 	public R getRange() {
 		return this.range;
 	}

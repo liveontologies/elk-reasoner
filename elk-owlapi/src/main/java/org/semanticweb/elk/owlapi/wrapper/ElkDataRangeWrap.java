@@ -43,8 +43,10 @@ public abstract class ElkDataRangeWrap<T extends OWLDataRange> extends
 		super(owlDataRange);
 	}
 
+	@Override
 	public abstract <O> O accept(ElkDataRangeVisitor<O> visitor);
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return accept((ElkDataRangeVisitor<O>) visitor);
 	}

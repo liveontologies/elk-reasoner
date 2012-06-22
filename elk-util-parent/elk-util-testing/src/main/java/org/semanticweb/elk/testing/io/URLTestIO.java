@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
 
@@ -54,5 +55,10 @@ public class URLTestIO implements TestInput, TestOutput {
 	@Override
 	public String toString() {
 		return url.toString();
+	}
+
+	@Override
+	public String getName() {
+		return FileUtils.getFileName(url.getPath());
 	}
 }

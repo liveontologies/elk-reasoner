@@ -45,39 +45,34 @@ public class ElkInverseObjectPropertiesAxiomImpl extends ElkObjectImpl
 	protected final ElkObjectPropertyExpression firstObjectPropertyExpression;
 	protected final ElkObjectPropertyExpression secondObjectPropertyExpression;
 
-	/* package-private */ElkInverseObjectPropertiesAxiomImpl(
+	ElkInverseObjectPropertiesAxiomImpl(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression) {
 		this.firstObjectPropertyExpression = firstObjectPropertyExpression;
 		this.secondObjectPropertyExpression = secondObjectPropertyExpression;
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getFirstObjectPropertyExpression() {
 		return firstObjectPropertyExpression;
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getSecondObjectPropertyExpression() {
 		return secondObjectPropertyExpression;
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("InverseObjectProperties(");
-		result.append(firstObjectPropertyExpression.toString());
-		result.append(" ");
-		result.append(secondObjectPropertyExpression.toString());
-		result.append(")");
-		return result.toString();
-	}
-
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

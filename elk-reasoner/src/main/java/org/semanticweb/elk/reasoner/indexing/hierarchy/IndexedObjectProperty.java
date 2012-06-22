@@ -90,6 +90,11 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		}
 		return success;
 	}
+	
+	@Override
+	protected void updateOccurrenceNumber(int increment) {
+		occurrenceNo += increment;
+	}
 
 	public <O> O accept(IndexedObjectPropertyVisitor<O> visitor) {
 		return visitor.visit(this);

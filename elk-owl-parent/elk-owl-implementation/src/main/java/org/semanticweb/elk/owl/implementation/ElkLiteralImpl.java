@@ -37,11 +37,12 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 	protected final String lexicalForm;
 	protected final ElkDatatype datatype;
 
-	/* package-private */ElkLiteralImpl(String lexicalForm, ElkDatatype datatype) {
+	ElkLiteralImpl(String lexicalForm, ElkDatatype datatype) {
 		this.lexicalForm = lexicalForm;
 		this.datatype = datatype;
 	}
 
+	@Override
 	public String getLexicalForm() {
 		return lexicalForm;
 	}
@@ -54,10 +55,12 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 		return datatype;
 	}
 
+	@Override
 	public <O> O accept(ElkLiteralVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

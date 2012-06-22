@@ -82,6 +82,7 @@ public abstract class InferenceSystem<C extends Context> {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	public C castContext(Context context) {
 		return (C) context;
 	}

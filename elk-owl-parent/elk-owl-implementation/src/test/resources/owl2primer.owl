@@ -178,13 +178,7 @@ Prefix(:=<http://example.com/owl/families/>)
      )
    )
    EquivalentClasses( :Adult otherOnt:Grownup )
-   EquivalentClasses(
-     :Parent
-     ObjectSomeValuesFrom(
-       :hasChild
-       :Person
-     )
-   )
+
  
    DisjointClasses( :Woman :Man )
    DisjointClasses(

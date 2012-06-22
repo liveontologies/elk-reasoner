@@ -44,30 +44,26 @@ public class ElkObjectInverseOfImpl extends ElkObjectImpl implements
 
 	protected final ElkObjectProperty objectProperty;
 
-	/* package-private */ElkObjectInverseOfImpl(ElkObjectProperty objectProperty) {
+	ElkObjectInverseOfImpl(ElkObjectProperty objectProperty) {
 		this.objectProperty = objectProperty;
 	}
 
+	@Override
 	public ElkObjectProperty getObjectProperty() {
 		return objectProperty;
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("ObjectInverseOf(");
-		result.append(objectProperty.toString());
-		result.append(")");
-		return result.toString();
-	}
-
 	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

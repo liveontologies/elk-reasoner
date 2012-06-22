@@ -43,12 +43,15 @@ public abstract class ElkPropertyAxiomImpl<P> extends ElkObjectImpl implements
 		this.property = property;
 	}
 
+	@Override
 	public P getProperty() {
 		return this.property;
 	}
 
+	@Override
 	public abstract <O> O accept(ElkAxiomVisitor<O> visitor);
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return accept((ElkAxiomVisitor<O>) visitor);
 	}

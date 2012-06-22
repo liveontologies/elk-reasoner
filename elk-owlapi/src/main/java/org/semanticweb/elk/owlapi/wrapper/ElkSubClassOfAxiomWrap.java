@@ -43,10 +43,12 @@ public class ElkSubClassOfAxiomWrap<T extends OWLSubClassOfAxiom> extends
 		super(owlSubClassOfAxiom);
 	}
 
+	@Override
 	public ElkClassExpression getSubClassExpression() {
 		return converter.convert(this.owlObject.getSubClass());
 	}
 
+	@Override
 	public ElkClassExpression getSuperClassExpression() {
 		return converter.convert(this.owlObject.getSuperClass());
 	}

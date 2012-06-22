@@ -73,6 +73,7 @@ public class OwlClassExpressionConverter implements
 		this.propertyExpressionConverter = propertyExpressionConverter;
 	}
 
+	@Override
 	public ElkClass visit(OWLClass ce) {
 		// TODO is this needed?
 		if (ce.isOWLThing())
@@ -83,6 +84,7 @@ public class OwlClassExpressionConverter implements
 			return objectFactory.getClass(new ElkFullIri(ce.getIRI().toString()));
 	}
 
+	@Override
 	public ElkObjectIntersectionOf visit(OWLObjectIntersectionOf ce) {
 		List<OWLClassExpression> owlConjuncts = ce.getOperandsAsList();
 		List<ElkClassExpression> elkConjuncts = new ArrayList<ElkClassExpression>();
@@ -92,96 +94,112 @@ public class OwlClassExpressionConverter implements
 		return objectFactory.getObjectIntersectionOf(elkConjuncts);
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLObjectUnionOf ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLObjectComplementOf ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkObjectSomeValuesFrom visit(OWLObjectSomeValuesFrom ce) {
 		return objectFactory.getObjectSomeValuesFrom(
 				ce.getProperty().accept(propertyExpressionConverter), ce
 						.getFiller().accept(this));
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLObjectAllValuesFrom ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLObjectHasValue ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLObjectMinCardinality ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLObjectExactCardinality ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLObjectMaxCardinality ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLObjectHasSelf ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLObjectOneOf ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLDataSomeValuesFrom ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLDataAllValuesFrom ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLDataHasValue ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLDataMinCardinality ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLDataExactCardinality ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()
 				+ " not supported");
 	}
 
+	@Override
 	public ElkClassExpression visit(OWLDataMaxCardinality ce) {
 		// TODO Support this constructor
 		throw new ConverterException(ce.getClassExpressionType().getName()

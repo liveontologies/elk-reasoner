@@ -22,21 +22,19 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * @author Frantisek Simancik
- *
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this {@link Queueable}
  */
 public class BackwardLink<C extends ContextElClassSaturation> extends
 		Pair<IndexedPropertyChain, C> implements Queueable<C> {
-	
-	public static AtomicInteger backLinkNo = new AtomicInteger(0);
-	public static AtomicInteger backLinkInfNo = new AtomicInteger(0);
 
 	public BackwardLink(IndexedPropertyChain relation, C target) {
 		super(relation, target);
@@ -50,14 +48,17 @@ public class BackwardLink<C extends ContextElClassSaturation> extends
 		return second;
 	}
 
-	public boolean storeInContext(C context) {
-		backLinkInfNo.incrementAndGet();
+	@Override
+	public boolean storeInContext(C context,
+			RuleApplicationFactory.Engine engine) {
+		RuleStatistics statistics = engine.getRuleStatistics();
+		statistics.backLinkInfNo++;
 
 		if (context.backwardLinksByObjectProperty == null)
 			context.initBackwardLinksByProperty();
 
 		if (context.backwardLinksByObjectProperty.add(first, second)) {
-			backLinkNo.incrementAndGet();
+			statistics.backLinkNo++;
 			return true;
 		}
 		return false;

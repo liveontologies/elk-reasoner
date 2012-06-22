@@ -48,10 +48,12 @@ public class ElkDatatypeRestrictionWrap<T extends OWLDatatypeRestriction>
 		super(owlDatatypeRestriction);
 	}
 
+	@Override
 	public ElkDatatype getDatatype() {
 		return converter.convert(this.owlObject.getDatatype());
 	}
 
+	@Override
 	public List<? extends ElkFacetRestriction> getFacetRestrictions() {
 		List<ElkFacetRestriction> result = new ArrayList<ElkFacetRestriction>();
 		for (OWLFacetRestriction frstr : this.owlObject.getFacetRestrictions()) {

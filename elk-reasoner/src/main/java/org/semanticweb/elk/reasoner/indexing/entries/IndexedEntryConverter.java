@@ -22,7 +22,17 @@
  */
 package org.semanticweb.elk.reasoner.indexing.entries;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.*;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -41,50 +51,60 @@ public class IndexedEntryConverter<T>
 		IndexedPropertyChainVisitor<IndexedPropertyChainEntry<T, ? extends IndexedPropertyChain>>,
 		IndexedDataPropertyVisitor<KeyEntry<T, ? extends IndexedDataProperty>> {
 
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedClass> visit(
 			IndexedClass element) {
 		return new IndexedClassEntry<T, IndexedClass>(element);
 	}
 
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedObjectIntersectionOf> visit(
 			IndexedObjectIntersectionOf element) {
 		return new IndexedObjectIntersectionOfEntry<T, IndexedObjectIntersectionOf>(
 				element);
 	}
 
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedDataHasValue> visit(
 			IndexedDataHasValue element) {
 		return new IndexedDataHasValueEntry<T, IndexedDataHasValue>(element);
 	}
 
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedDataSomeValuesFrom> visit(
 			IndexedDataSomeValuesFrom element) {
 		return new IndexedDataSomeValuesFromEntry<T, IndexedDataSomeValuesFrom>(element);
 	}
 
+	@Override
 	public KeyEntry<T, ? extends IndexedDataProperty> visit(IndexedDataProperty element) {
 		return new IndexedDataPropertyEntry<T, IndexedDataProperty>(element);
 	}
 
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedObjectSomeValuesFrom> visit(
 			IndexedObjectSomeValuesFrom element) {
 		return new IndexedObjectSomeValuesFromEntry<T, IndexedObjectSomeValuesFrom>(
 				element);
 	}
 
+	@Override
 	public IndexedPropertyChainEntry<T, IndexedObjectProperty> visit(
 			IndexedObjectProperty element) {
 		return new IndexedObjectPropertyEntry<T, IndexedObjectProperty>(element);
 	}
 
+	@Override
 	public IndexedPropertyChainEntry<T, IndexedBinaryPropertyChain> visit(
 			IndexedBinaryPropertyChain element) {
 		return new IndexedBinaryPropertyChainEntry<T, IndexedBinaryPropertyChain>(
 				element);
 	}
 
-	public IndexedNominalEntry<T, IndexedNominal> visit(
-			IndexedNominal element) {
-		return new IndexedNominalEntry<T, IndexedNominal>(element);
+	@Override
+	public IndexedIndividualEntry<T, IndexedIndividual> visit(
+			IndexedIndividual element) {
+		return new IndexedIndividualEntry<T, IndexedIndividual> (element);
 	}
+
 }

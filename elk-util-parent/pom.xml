@@ -18,7 +18,9 @@
 		<module>elk-util-hashing</module>
 		<module>elk-util-collections</module>
 		<module>elk-util-concurrent</module>
+		<module>elk-util-common</module>
 		<module>elk-util-testing</module>
+    <module>elk-util-io</module>
   </modules>
 
 </project>

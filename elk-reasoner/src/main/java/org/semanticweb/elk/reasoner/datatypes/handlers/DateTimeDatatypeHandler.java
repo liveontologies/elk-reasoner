@@ -93,7 +93,7 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 		
 		List<? extends ElkFacetRestriction> facetRestrictions = filler.getFacetRestrictions();
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet());
+			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().asString());
 			Datatype restrictionDatatype = Datatype.getByIri(
 					facetRestriction.getRestrictionValue().getDatatype().getDatatypeIRI());
 			Calendar parsedValue = (Calendar) parse(

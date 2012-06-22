@@ -44,6 +44,7 @@ public class ElkSymmetricObjectPropertyAxiomWrap<T extends OWLSymmetricObjectPro
 		super(owlSymmetricObjectPropertyAxiom);
 	}
 
+	@Override
 	public ElkObjectPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}

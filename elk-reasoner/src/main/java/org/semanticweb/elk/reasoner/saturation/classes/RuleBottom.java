@@ -22,43 +22,53 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationEngine;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
+ * The rule for propagating of inconsistencies (<tt>owl:Nothing</tt>) in
+ * contexts
+ * 
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this inference rule
  */
-public class RuleBottom<C extends ContextElClassSaturation> implements InferenceRulePosSCE<C> {
+public class RuleBottom<C extends ContextElClassSaturation> implements
+		InferenceRulePosSCE<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
-			RuleApplicationEngine engine) {
-		
+			RuleApplicationFactory.Engine engine) {
+
 		if (!context.isSatisfiable())
-			engine.enqueue(argument.getTarget(), 
-					new PositiveSuperClassExpression<C> (engine.owlNothing));
+			engine.enqueue(argument.getTarget(),
+					new PositiveSuperClassExpression<C>(engine.getOwlNothing()));
 	}
 
+	@Override
 	public void applySCE(PositiveSuperClassExpression<C> argument, C context,
-			RuleApplicationEngine engine) {
+			RuleApplicationFactory.Engine engine) {
 
-		if (argument.getExpression() != engine.owlNothing)
+		IndexedClassExpression owlNothing = engine.getOwlNothing();
+		if (argument.getExpression() != owlNothing)
 			return;
-		
+
 		context.setSatisfiable(false);
 
 		// propagate over all backward links
-		final Multimap<IndexedPropertyChain, ContextElClassSaturation> backLinks = 
-			context.getBackwardLinksByObjectProperty();
+		final Multimap<IndexedPropertyChain, ContextElClassSaturation> backLinks = context
+				.getBackwardLinksByObjectProperty();
 
 		if (backLinks != null) {
 			for (IndexedPropertyChain relation : backLinks.keySet())
 				for (Context target : backLinks.get(relation))
-					engine.enqueue(target, 
-							new PositiveSuperClassExpression<C> (engine.owlNothing));
+					engine.enqueue(target, new PositiveSuperClassExpression<C>(
+							owlNothing));
 		}
 	}
-	
+
 }

@@ -47,14 +47,17 @@ public class ElkNegativeObjectPropertyAssertionAxiomImpl
 		super(property, subject, object);
 	}
 
+	@Override
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

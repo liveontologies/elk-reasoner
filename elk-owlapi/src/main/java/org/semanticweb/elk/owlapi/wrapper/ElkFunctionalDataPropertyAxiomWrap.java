@@ -44,6 +44,7 @@ public class ElkFunctionalDataPropertyAxiomWrap<T extends OWLFunctionalDataPrope
 		super(owlFunctionalDataPropertyAxiom);
 	}
 
+	@Override
 	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}

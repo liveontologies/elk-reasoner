@@ -15,17 +15,32 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-		<release version="${release.version}" date="${buildDate}" description="Current version">		
+		<release version="${release.version}" date="${buildDate}" description="Current version">
+			<action dev="frantisek" type="add">
+				Support for owl:Nothing and DisjointClasses axioms.
+			</action>
+			<action dev="frantisek" type="add">
+				Support for ReflexiveObjectProperty axioms.
+			</action>
+			<action dev="frantisek" type="add">
+				Support for individuals in ClassAssertion, ObjectPropertyAssertion, and ObjectHasValue.
+			</action>
+			<action dev="frantisek" type="add">
+				Support for consistency checking and instance retrieval queries for named classes.
+			</action>
+			<action dev="pavel" type="update">
+				A new, principled infrastructure for automated testing of ELK's reasoning services. 
+			</action>			
 		</release>
 		<release version="0.2.0" date="2011-10-25" description="Second public release">
 			<action dev="frantisek" type="fix" issue="5">
-				Fixed tokenization of IRIs containing reserved words built-in parse.
+				Fixed tokenization of IRIs containing reserved words in the built-in parser.
 			</action>
 			<action dev="frantisek" type="fix" issue="4">
 				Fixed grammar for non-negative integers in the built-in parser.
 			</action>
 			<action dev="frantisek" type="fix" issue="3">
-				Fixed grammar for ObjectOneOf in the built-in  parser.
+				Fixed grammar for ObjectOneOf in the built-in parser.
 			</action>
 			<action dev="markus" type="fix" issue="2">
 				Close all threads immediately when OWLReasoner.dispose() is called.

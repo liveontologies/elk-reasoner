@@ -38,19 +38,23 @@ public class Operations {
 
 	public static <T> Iterable<T> singleton(final T element) {
 		return new Iterable<T>() {
+			@Override
 			public Iterator<T> iterator() {
 				return new Iterator<T>() {
 					boolean hasNext = true;
 
+					@Override
 					public boolean hasNext() {
 						return hasNext;
 					}
 
+					@Override
 					public T next() {
 						hasNext = false;
 						return element;
 					}
 
+					@Override
 					public void remove() {
 						throw new UnsupportedOperationException();
 					}
@@ -65,6 +69,7 @@ public class Operations {
 
 		return new Iterable<T>() {
 
+			@Override
 			public Iterator<T> iterator() {
 
 				return new Iterator<T>() {
@@ -74,10 +79,12 @@ public class Operations {
 					Iterator<? extends T> inner;
 					boolean hasNext = advance();
 
+					@Override
 					public boolean hasNext() {
 						return hasNext;
 					}
 
+					@Override
 					public T next() {
 						if (hasNext) {
 							T result = inner.next();
@@ -87,6 +94,7 @@ public class Operations {
 						throw new NoSuchElementException();
 					}
 
+					@Override
 					public void remove() {
 						throw new UnsupportedOperationException();
 					}
@@ -108,9 +116,10 @@ public class Operations {
 	}
 
 	/**
-	 * An interface for boolean conditions over some type
+	 * An interface for boolean conditions over some type.
+	 * 
 	 */
-	public interface Condition {
+	public interface Condition<T> {
 		/**
 		 * Checks if the condition holds for an element
 		 * 
@@ -119,15 +128,21 @@ public class Operations {
 		 * @return <tt>true</tt> if the condition holds for the element and
 		 *         otherwise <tt>false</tt>
 		 */
-		public boolean holds(Object element);
+		public boolean holds(T element);
 	}
 
-	public static <T> Iterable<T> filter(final Iterable<T> input,
-			final Condition condition) {
+	/**
+	 * 
+	 * @param input
+	 * @param condition 
+	 * @return
+	 */
+	public static <T> Iterable<T> filter(final Iterable<T> input, final Condition<? super T> condition) {
 		assert input != null;
 
 		return new Iterable<T>() {
 
+			@Override
 			public Iterator<T> iterator() {
 
 				return new Iterator<T>() {
@@ -135,10 +150,12 @@ public class Operations {
 					T next;
 					boolean hasNext = advance();
 
+					@Override
 					public boolean hasNext() {
 						return hasNext;
 					}
 
+					@Override
 					public T next() {
 						if (hasNext) {
 							T result = next;
@@ -148,6 +165,7 @@ public class Operations {
 						throw new NoSuchElementException();
 					}
 
+					@Override
 					public void remove() {
 						i.remove();
 					}
@@ -166,11 +184,11 @@ public class Operations {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T, S> Iterable<T> filter(final Iterable<S> input,
-			final Class<T> type) {
+	public static <T, S> Iterable<T> filter(final Iterable<S> input, final Class<T> type) {
 
-		return (Iterable<T>) filter(input, new Condition() {
-			public boolean holds(Object element) {
+		return (Iterable<T>) filter(input, new Condition<S>() {
+			@Override
+			public boolean holds(S element) {
 				return type.isInstance(element);
 			}
 		});
@@ -183,32 +201,52 @@ public class Operations {
 	 * @param input
 	 *            the given set to be filtered
 	 * @param condition
-	 *            the condition used for filtering the set
+	 *            the condition used for filtering the set. 
+	 *            Must be consistent with equals() for T, that is: a.equals(b) must imply that holds(a) == holds(b)
 	 * @param size
 	 *            the number of elements in the filtered set
 	 * @return the set consisting of the elements of the input set satisfying
 	 *         the given condition
 	 */
-	public static <T> Set<T> filter(final Set<T> input,
-			final Condition condition, final int size) {
+	public static <T> Set<T> filter(final Set<T> input, final Condition<? super T> condition, final int size) {
 		return new Set<T>() {
 
+			@Override
 			public int size() {
 				return size;
 			}
 
+			@Override
 			public boolean isEmpty() {
 				return size == 0;
 			}
 
+			@Override
+			@SuppressWarnings("unchecked")
 			public boolean contains(Object o) {
-				return input.contains(o) && condition.holds(o);
+				
+				if (!input.contains(o)) return false;
+				
+				T elem = null;
+				
+				try {
+					elem = (T) o;
+				} catch (ClassCastException cce) {
+					return false;
+				}
+				//here's why the condition must be consistent with equals():
+				//we check it on the passed element while we really need to check it on the element 
+				//which is in the underlying set (and is equal to o according to equals()). 
+				//However, as long as the condition is consistent, the result will be the same.
+				return condition.holds(elem);				
 			}
 
+			@Override
 			public Iterator<T> iterator() {
 				return filter(input, condition).iterator();
 			}
 
+			@Override
 			public Object[] toArray() {
 				Object[] result = new Object[size];
 				int i = 0;
@@ -218,38 +256,46 @@ public class Operations {
 				return result;
 			}
 
+			@Override
 			public <S> S[] toArray(S[] a) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean add(T e) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean remove(Object o) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean containsAll(Collection<?> c) {
 				for (Object o : c) {
-					if (!condition.holds(o) || !input.contains(o))
+					if (contains(o))
 						return false;
 				}
 				return true;
 			}
 
+			@Override
 			public boolean addAll(Collection<? extends T> c) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean retainAll(Collection<?> c) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean removeAll(Collection<?> c) {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public void clear() {
 				throw new UnsupportedOperationException();
 			}

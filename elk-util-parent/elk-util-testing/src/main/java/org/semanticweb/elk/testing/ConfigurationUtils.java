@@ -28,14 +28,16 @@ package org.semanticweb.elk.testing;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.semanticweb.elk.io.FileUtils;
+import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.io.IOUtils;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
@@ -55,20 +57,22 @@ public class ConfigurationUtils {
 	 * Loads configuration from a set of files by passing both input and expected output URLs to the test manifest creator
 	 * 
 	 * @return
+	 * @throws URISyntaxException 
 	 */
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
-																final URI srcURI,
+																final String path,
 																final Class<?> srcClass,
 																final String inputFileExt,
 																final String outputFileExt,
-																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException {
+																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException, URISyntaxException {
+		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
 		//Load inputs and expected results
 		final List<String> inputs = srcURI.isOpaque() 
-				? IOUtils.getTestResourceNamesFromJAR(srcURI, inputFileExt, srcClass)
-				: IOUtils.getTestResourceNamesFromDir(new File(srcURI), inputFileExt);
+				? IOUtils.getResourceNamesFromJAR(path, inputFileExt, srcClass)
+				: IOUtils.getResourceNamesFromDir(new File(srcURI), inputFileExt);
 		final List<String> results = srcURI.isOpaque() 
-				? IOUtils.getTestResourceNamesFromJAR(srcURI, outputFileExt, srcClass)
-				: IOUtils.getTestResourceNamesFromDir(new File(srcURI), outputFileExt);				
+				? IOUtils.getResourceNamesFromJAR(path, outputFileExt, srcClass)
+				: IOUtils.getResourceNamesFromDir(new File(srcURI), outputFileExt);				
 		
 		Collections.sort(inputs);
 		Collections.sort(results);
@@ -81,7 +85,7 @@ public class ConfigurationUtils {
 		String nextInput = inputIter.next();
 		
 		while (true) {
-			int cmp = IOUtils.dropExtension(nextResult).compareTo(IOUtils.dropExtension(nextInput) + EXPECTED_SUFFIX); 
+			int cmp = FileUtils.dropExtension(nextResult).compareTo(FileUtils.dropExtension(nextInput) + EXPECTED_SUFFIX); 
 			
 			if (cmp == 0) {
 				//Match
@@ -108,8 +112,39 @@ public class ConfigurationUtils {
 			}
 		}
 		
-		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests);
+		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests); 
 	}
+	
+	
+	/**
+	 * In case there're no expected results
+	 * 
+	 * @return
+	 * @throws URISyntaxException 
+	 */
+	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
+																final String path,
+																final Class<?> srcClass,
+																final String inputFileExt,
+																final TestManifestCreator<URLTestIO, EO, AO> creator) throws IOException, URISyntaxException {
+		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
+		//Load inputs 
+		final List<String> inputs = srcURI.isOpaque() 
+				? IOUtils.getResourceNamesFromJAR(path, inputFileExt, srcClass)
+				: IOUtils.getResourceNamesFromDir(new File(srcURI), inputFileExt);
+		
+		final List<TestManifest<URLTestIO, EO, AO>> manifests = new ArrayList<TestManifest<URLTestIO,EO,AO>>(inputs.size());
+		
+		for (String input : inputs) {
+			URL inputURL = srcClass.getClassLoader().getResource(input);
+			TestManifest<URLTestIO, EO, AO> manifest = creator.create(inputURL, null);
+				
+			if (manifest != null) manifests.add(manifest);
+		}
+		
+		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests); 
+	}	
+	
 	
 	private static boolean endOfData(Iterator<String> inputIter, Iterator<String> resultIter) {
 		return !resultIter.hasNext() || !inputIter.hasNext();
@@ -126,36 +161,5 @@ public class ConfigurationUtils {
 	public interface TestManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
 		
 		public TestManifest<I, EO, AO> create(URL input, URL output);
-	}
-}
-
-/**
- * 
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
- */
-class SimpleConfiguration<I extends TestInput, EO extends TestOutput, AO extends TestOutput> implements Configuration {
-
-	private final List<TestManifest<I, EO, AO>> manifests;
-	
-	SimpleConfiguration(List<TestManifest<I, EO, AO>> manifests) {
-		this.manifests = manifests;
-	}
-	
-	@Override
-	public int size() {
-		return manifests.size();
-	}
-
-	@Override
-	public TestManifest<I, EO, AO> getTestValue(int index) {
-		return manifests.get(index);
-	}
-
-	@Override
-	public String getTestName(int index) {
-		return "test" + manifests.get(index).getName();
 	}
 }

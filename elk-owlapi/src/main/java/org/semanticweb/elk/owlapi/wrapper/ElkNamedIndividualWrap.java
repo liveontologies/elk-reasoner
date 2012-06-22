@@ -48,6 +48,7 @@ public class ElkNamedIndividualWrap<T extends OWLNamedIndividual> extends
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkIndividualVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

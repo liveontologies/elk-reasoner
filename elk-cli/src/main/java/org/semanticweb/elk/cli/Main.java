@@ -36,6 +36,7 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
+import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 
 /**
  * 
@@ -85,11 +86,11 @@ public class Main {
 		else if (!options.has(inputOntologyFile))
 			parser.printHelpOn(System.out);
 		else {
-			IOReasoner reasoner = new IOReasoner(
+			IOReasoner reasoner = new IOReasoner(new LoggingStageExecutor(),
 					Executors.newCachedThreadPool(), nWorkers.value(options));
 			reasoner.loadOntologyFromFile(inputOntologyFile.value(options));
 			if (options.has(classify))
-				reasoner.classify();
+				reasoner.getTaxonomy();
 			if (options.hasArgument(outputTaxonomyFile))
 				reasoner.writeTaxonomyToFile(outputTaxonomyFile.value(options));
 			reasoner.shutdown();

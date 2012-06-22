@@ -44,6 +44,7 @@ public class ElkObjectMinCardinalityQualifiedWrap<T extends OWLObjectMinCardinal
 		super(owlObjectMinCardinality);
 	}
 
+	@Override
 	public ElkClassExpression getFiller() {
 		return converter.convert(this.owlObject.getFiller());
 	}

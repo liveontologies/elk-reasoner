@@ -46,14 +46,17 @@ public class ElkDataPropertyAssertionAxiomWrap<T extends OWLDataPropertyAssertio
 		super(owlObjectPropertyAssertionAxiom);
 	}
 
+	@Override
 	public ElkIndividual getSubject() {
 		return converter.convert(this.owlObject.getSubject());
 	}
 
+	@Override
 	public ElkLiteral getObject() {
 		return converter.convert(this.owlObject.getObject());
 	}
 
+	@Override
 	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}

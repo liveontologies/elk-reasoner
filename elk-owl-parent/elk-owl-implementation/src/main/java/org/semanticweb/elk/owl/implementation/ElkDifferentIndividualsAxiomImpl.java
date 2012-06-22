@@ -38,24 +38,21 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDifferentIndividualsAxiomImpl extends ElkIndividualListObject
 		implements ElkDifferentIndividualsAxiom {
 
-	/* package-private */ElkDifferentIndividualsAxiomImpl(
-			List<? extends ElkIndividual> individuals) {
+	ElkDifferentIndividualsAxiomImpl(List<? extends ElkIndividual> individuals) {
 		super(individuals);
 	}
 
 	@Override
-	public String toString() {
-		return buildFssString("DifferentIndividuals");
-	}
-
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

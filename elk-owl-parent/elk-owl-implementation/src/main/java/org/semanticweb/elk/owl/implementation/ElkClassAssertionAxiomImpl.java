@@ -41,39 +41,34 @@ public class ElkClassAssertionAxiomImpl extends ElkObjectImpl implements
 	protected final ElkIndividual individual;
 	protected final ElkClassExpression classExpression;
 
-	/* package-private */ElkClassAssertionAxiomImpl(
-			ElkClassExpression classExpression, ElkIndividual individual) {
+	ElkClassAssertionAxiomImpl(ElkClassExpression classExpression,
+			ElkIndividual individual) {
 
 		this.individual = individual;
 		this.classExpression = classExpression;
 	}
 
+	@Override
 	public ElkClassExpression getClassExpression() {
 		return classExpression;
 	}
 
+	@Override
 	public ElkIndividual getIndividual() {
 		return individual;
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("ClassAssertion(");
-		result.append(classExpression.toString());
-		result.append(" ");
-		result.append(individual.toString());
-		result.append(")");
-		return result.toString();
-	}
-
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

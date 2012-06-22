@@ -22,20 +22,19 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
  * @author Frantisek Simancik
- *
+ * 
+ * @param <C>
+ *            the type of contexts that can be used with this {@link Queueable}
+ * 
  */
-public abstract class SuperClassExpression<C extends ContextElClassSaturation> implements
-		Queueable<C> {
-	
-	public static AtomicInteger superClassExpressionNo = new AtomicInteger(0);
-	public static AtomicInteger superClassExpressionInfNo = new AtomicInteger(0);
+public abstract class SuperClassExpression<C extends ContextElClassSaturation>
+		implements Queueable<C> {
 
 	protected final IndexedClassExpression expression;
 
@@ -47,10 +46,13 @@ public abstract class SuperClassExpression<C extends ContextElClassSaturation> i
 		return expression;
 	}
 
-	public boolean storeInContext(C context) {
-		superClassExpressionInfNo.incrementAndGet();
+	@Override
+	public boolean storeInContext(C context,
+			RuleApplicationFactory.Engine engine) {
+		RuleStatistics statistics = engine.getRuleStatistics();
+		statistics.superClassExpressionInfNo++;
 		if (context.superClassExpressions.add(expression)) {
-			superClassExpressionNo.incrementAndGet();
+			statistics.superClassExpressionNo++;
 			return true;
 		}
 		return false;

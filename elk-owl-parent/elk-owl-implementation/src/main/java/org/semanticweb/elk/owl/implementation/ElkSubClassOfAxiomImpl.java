@@ -45,39 +45,34 @@ public class ElkSubClassOfAxiomImpl extends ElkObjectImpl implements
 	protected final ElkClassExpression subClassExpression,
 			superClassExpression;
 
-	/* package-private */ElkSubClassOfAxiomImpl(
+	ElkSubClassOfAxiomImpl(
 			ElkClassExpression subClassExpression,
 			ElkClassExpression superClassExpression) {
 		this.subClassExpression = subClassExpression;
 		this.superClassExpression = superClassExpression;
 	}
 
+	@Override
 	public ElkClassExpression getSubClassExpression() {
 		return subClassExpression;
 	}
 
+	@Override
 	public ElkClassExpression getSuperClassExpression() {
 		return superClassExpression;
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("SubClassOf(");
-		result.append(subClassExpression.toString());
-		result.append(" ");
-		result.append(superClassExpression.toString());
-		result.append(")");
-		return result.toString();
-	}
-
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

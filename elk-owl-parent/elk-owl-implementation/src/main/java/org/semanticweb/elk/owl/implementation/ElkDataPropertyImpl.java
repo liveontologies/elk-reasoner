@@ -44,14 +44,17 @@ public class ElkDataPropertyImpl extends ElkIriObject implements ElkEntity,
 		super(iri);
 	}
 
+	@Override
 	public <O> O accept(ElkDataPropertyExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkEntityVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
+	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
