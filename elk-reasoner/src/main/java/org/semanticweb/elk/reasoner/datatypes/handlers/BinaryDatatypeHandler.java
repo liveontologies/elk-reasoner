@@ -42,6 +42,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
+ * xsd:hexBinary and xsd:base64Binary datatype handler
+ * <p>
+ * uses {@link BinaryValueSpace} and {@link LengthRestrictedValueSpace} to
+ * represent datatype restrictions. Please note that value space of
+ * xsd:hexBinary and xsd:base64Binary are disjoint.
  *
  * @author Pospishnyi Olexandr
  */

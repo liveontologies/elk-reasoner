@@ -37,6 +37,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
+ * rdfs:XMLLiteral datatype handler.
+ * <p>
+ * This datatype has no practical usage as it has no normative facets and
+ * lexical representation.Could only participate in DataSomeValuesFrom
+ * expressions.
+ * <p>
+ * Uses {@link EntireValueSpace} value space restriction only.
  *
  * @author Pospishnyi Olexandr
  */

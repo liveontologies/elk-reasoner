@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.datatypes.numbers;
 import java.math.BigInteger;
 
 /**
- *
+ * Numeric type to represent rational numbers.
+ * 
  * @author Pospishnyi Olexandr
  */
 public class BigRational extends Number implements Comparable<BigRational> {

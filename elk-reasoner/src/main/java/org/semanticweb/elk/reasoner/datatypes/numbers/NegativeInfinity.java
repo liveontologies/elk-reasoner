@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.datatypes.numbers;
 
 /**
+ * Custom numeric type that represent negative infinity
  *
  * @author Pospishnyi Olexandr
  */

@@ -27,7 +27,8 @@ import java.math.BigInteger;
 import java.util.Comparator;
 
 /**
- *
+ * Utility class for number comparison with respect to their type
+ * 
  * @author Pospishnyi Olexandr
  */
 public class NumberComparator implements Comparator<Number> {
@@ -76,6 +77,18 @@ public class NumberComparator implements Comparator<Number> {
 		}
 	}
 
+	/**
+	 * Return most specific type for this number:
+	 * <p>
+	 * 0: integer
+	 * 1: long
+	 * 2: BigInteger
+	 * 3: BigDecimal
+	 * 4: BigRational
+	 * 
+	 * @param n number
+	 * @return most specific type index
+	 */
 	private int getType(Number n) {
 		if (n instanceof Integer) {
 			return 0;

@@ -41,7 +41,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
- *
+ * rdf:PlainLiteral, xsd:string, xsd:normalizedString, xsd:token,
+ * xsd:Name, xsd:NCName, xsd:NMTOKEN datatype handler
+ * <p>
+ * uses {@link LengthRestrictedValueSpace} and {@link PatternValueSpace} 
+ * to represent datatype restrictions
+ * 
  * @author Pospishnyi Olexandr
  */
 public class PlainLiteralDatatypeHandler implements DatatypeHandler {
@@ -80,6 +85,7 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		String value = (String) parse(lexicalForm, datatype);
 		Datatype effectiveDatatype = datatype;
 		
+		//determine most specific datatype for this literal
 		switch (datatype) {
 			case rdf_PlainLiteral:
 			case xsd_string:
@@ -104,8 +110,10 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		
 		if (value != null) {
 			if (language != null && !language.isEmpty()) {
+				//language lat is present
 				return new LiteralValueSpace(new Pair<String, String>(value, language), datatype, effectiveDatatype);
 			} else {
+				//no language tag for this literal
 				return new LiteralValueSpace(value, datatype, effectiveDatatype);
 			}
 		} else {

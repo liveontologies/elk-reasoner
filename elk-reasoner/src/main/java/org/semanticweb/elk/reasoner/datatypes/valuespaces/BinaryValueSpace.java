@@ -26,7 +26,8 @@ import java.util.Arrays;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 
 /**
- *
+ * Value space that represent single binary value. 
+ * 
  * @author Pospishnyi Olexandr
  */
 public class BinaryValueSpace implements ValueSpace {
@@ -51,6 +52,13 @@ public class BinaryValueSpace implements ValueSpace {
 		return value != null;
 	}
 
+	/**
+	 * BinaryValueSpace could contain only another BinaryValueSpace
+	 * if both value spaces have equal values
+	 * 
+	 * @param valueSpace
+	 * @return true if this value space contains {@code valueSpace}
+	 */
 	public boolean contains(ValueSpace valueSpace) {
 		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.datatype);
 		if (typechek != true) {

@@ -47,6 +47,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
+ * owl:real, owl:rational, xsd:decimal, xsd:integer and xsd:nonNegativeInteger
+ * datatype handler
+ * <p>
+ * Datatype expressions are converted to interval presentation with 
+ * lower and upper bounds or single numeric value.
+ * <p>
+ * Uses {@link RestrictedValueSpace} and {@link UnipointValueSpace}
+ * to represent datatype restrictions
  *
  * @author Pospishnyi Olexandr
  */
@@ -85,16 +93,29 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		return null;
 	}
 	
+	/**
+	 * Create {@link UnipointValueSpace} to represent single numeric value
+	 */
 	private ValueSpace createUnipointValueSpace(IndexedDataHasValue datatypeExpression) {
 		Datatype datatype = datatypeExpression.getDatatype();
 		String lexicalForm = datatypeExpression.getFiller().getLexicalForm();
 		return new UnipointValueSpace(datatype, (Number) parse(lexicalForm, datatype));
 	}
 
+	/**
+	 * Create {@link EntireValueSpace} to represent complete datatype value space
+	 */
 	private ValueSpace createEntireValueSpace(ElkDatatype elkDatatype) {
 		return new EntireValueSpace(Datatype.getByIri(elkDatatype.getDatatypeIRI()));
 	}
 
+	/**
+	 * Build corresponding restricted value space. If facet restriction implies
+	 * single value then corresponding {@link UnipointValueSpace} will be
+	 * constructed. Otherwise {@link RestrictedValueSpace} will be built that
+	 * will represent specified facet restriction as an interval on numerical
+	 * axis.
+	 */
 	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
 		Number lowerBound, upperBound;
 		boolean lowerInclusive, upperInclusive;
@@ -105,12 +126,14 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 			case owl_rational:
 			case xsd_decimal:
 			case xsd_integer:
+				// [-Inf ... +Inf]
 				lowerBound = NegativeInfinity.INSTANCE;
 				upperBound = PositiveInfinity.INSTANCE;
 				lowerInclusive = true;
 				upperInclusive = true;
 				break;
 			case xsd_nonNegativeInteger:
+				// [0 ... +Inf]
 				lowerBound = Integer.valueOf(0);
 				upperBound = PositiveInfinity.INSTANCE;
 				lowerInclusive = true;
@@ -121,6 +144,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 				return null;
 		}
 
+		//process all facet restrictions
 		List<? extends ElkFacetRestriction> facetRestrictions = filler.getFacetRestrictions();
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
 			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().asString());
@@ -157,13 +181,16 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 			}
 		}
 		
+		//build representing interval
 		RestrictedValueSpace valueSpace = new RestrictedValueSpace(
 				datatype, lowerBound, lowerInclusive, upperBound, upperInclusive);
 		
 		if (valueSpace.isEmptyInterval()) {
+			//specified restrictions implies empty value (owl:Nothing)
 			return EmptyValueSpace.INSTANCE;
 		} else {
 			if (valueSpace.isUnipointInterval()) {
+				//specified restriction implies single numeric value
 				return new UnipointValueSpace(datatype, valueSpace.lowerBound);
 			} else {
 				return valueSpace;
@@ -190,6 +217,11 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
+	/**
+	 * Parse xsd:decimal literal.
+	 * Attempt to identify most specific numeric type 
+	 * (int - long - BigInteger - BigDecimal - BigRational)
+	 */
 	private Number parseRational(String literal) {
 		int divisorIndx = literal.indexOf('/');
 		if (divisorIndx == -1) {
@@ -215,6 +247,10 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		return new BigRational(numerator, denominator);
 	}
 
+	/**
+	 * Parse xsd:decimal literal. 
+	 * Attempt to identify most specific numeric type (int-long-BigInteger-BigDecimal)
+	 */
 	private Number parseDecimal(String literal) {
 		BigDecimal value = DatatypeConverter.parseDecimal(literal);
 		try {return value.intValueExact();} catch (ArithmeticException e) {}
@@ -223,6 +259,10 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		return value.stripTrailingZeros();
 	}
 
+	/**
+	 * Parse xsd:decimal literal. 
+	 * Attempt to identify most specific numeric type (int-long-BigInteger)
+	 */
 	private Number parseInteger(String literal) {
 		BigInteger value = DatatypeConverter.parseInteger(literal);
 		if (value.compareTo(BI_MIN_INTEGER) >= 0 && value.compareTo(BI_MAX_INTEGER) <= 0) {

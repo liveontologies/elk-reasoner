@@ -31,6 +31,8 @@ import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.numbers.PositiveInfinity;
 
 /**
+ * Representation of numeric value interval with specified restrictions
+ * (lower and upper bound)
  *
  * @author Pospishnyi Olexandr
  */
@@ -176,6 +178,14 @@ public class RestrictedValueSpace implements ValueSpace {
 		return ValueSpaceType.RESTRICTED;
 	}
 
+	/**
+	 * RestrictedValueSpace could contain
+	 * - another RestrictedValueSpace if this value space completely includes another 
+	 * - UnipointValueSpace that is included within specified bounds
+	 *
+	 * @param valueSpace
+	 * @return true if this value space contains {@code valueSpace}
+	 */
 	public boolean contains(ValueSpace valueSpace) {
 		switch (valueSpace.getType()) {
 			case UNIPOINT: {

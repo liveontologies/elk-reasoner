@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 
 /**
- *
+ * Representation of any value that satisfies specified length 
+ * 
  * @author Pospishnyi Olexandr
  */
 public class LengthRestrictedValueSpace implements ValueSpace {
@@ -64,6 +65,15 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 		return false;
 	}
 
+	/**
+	 * LengthRestrictedValueSpace could contain
+	 * - another LengthRestrictedValueSpace within this one 
+	 * - LiteralValueSpace that satisfies length restrictions
+	 * - BinaryValueSpace that satisfies length restrictions
+	 *
+	 * @param valueSpace
+	 * @return true if this value space contains {@code valueSpace}
+	 */
 	public boolean contains(ValueSpace valueSpace) {
 		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.datatype);
 		if (typechek != true) {

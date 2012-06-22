@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 
 /**
- *
+ * Representation of empty value space
+ * 
  * @author Pospishnyi Olexandr
  */
 public class EmptyValueSpace implements ValueSpace {

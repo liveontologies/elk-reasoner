@@ -30,6 +30,9 @@ import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 
 /**
+ * Enumeration of all known and supported datatypes. This class provides some
+ * utility methods that are used by specific datatype handlers to determine
+ * relations between datatypes.
  *
  * @author Pospishnyi Oleksandr
  */
@@ -68,6 +71,12 @@ public enum Datatype {
 		return iri;
 	}
 	
+	/**
+	 * Check weather this datatype is derived from another
+	 *
+	 * @param datatype other datatype to check against
+	 * @return true/false = yes/no
+	 */
 	public boolean isDerivedFrom(Datatype datatype) {
 		Datatype parent = this.parent;
 		while (parent != null) {
@@ -79,6 +88,13 @@ public enum Datatype {
 		return false;
 	}
 	
+	/**
+	 * Check weather this datatype is completely compatible with another.
+	 * Being compatible means being equal to or being derived from. 
+	 * 
+	 * @param datatype other datatype to check against
+	 * @return true/false = yes/no
+	 */
 	public boolean isCompatibleWith(Datatype datatype) {
 		if (this == datatype) {
 			return true;
@@ -87,6 +103,12 @@ public enum Datatype {
 		}
 	}
 	
+	/**
+	 * Return most general compatible datatype that outlines this datatype. For
+	 * example a method will return owl:real for all datatypes derived from it.
+	 *
+	 * @return
+	 */
 	public Datatype getRootValueSpaceDatatype() {
 		Datatype dt = this;
 		if (dt == rdfs_Literal) {
@@ -98,6 +120,11 @@ public enum Datatype {
 		return dt;
 	}
 	
+	/**
+	 * Return an ordered list of all datatypes that constitute this datatype
+	 * 
+	 * @return
+	 */
 	public List<Datatype> buildParentChain() {
 		ArrayList<Datatype> chain = new ArrayList<Datatype>(5);
 		Datatype parent = this.parent;
@@ -108,6 +135,12 @@ public enum Datatype {
 		return chain;
 	}
 	
+	/**
+	 * Get Datatype enum element based on it's IRI
+	 * 
+	 * @param iri full datatype IRI
+	 * @return {@link Datatype}
+	 */
 	public static Datatype getByIri(String iri) {
 		for (Datatype datatype : Datatype.values()) {
 			if (iri.equals(datatype.iri)) {
@@ -117,6 +150,12 @@ public enum Datatype {
 		return null;
 	}
 
+	/**
+	 * Get most specific datatype for specified number
+	 * 
+	 * @param number {@link Number}
+	 * @return most specific datatype
+	 */
 	public static Datatype getCorrespondingDatatype(Number number) {
 		if (number instanceof Integer || number instanceof Long || number instanceof BigInteger) {
 			if (NumberComparator.INSTANCE.compare(number, Integer.valueOf(0)) >= 0) {

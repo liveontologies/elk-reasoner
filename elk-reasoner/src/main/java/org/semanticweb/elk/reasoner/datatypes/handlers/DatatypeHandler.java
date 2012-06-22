@@ -29,16 +29,40 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
- *
+ * Datatype handler interface
+ * 
  * @author Pospishnyi Oleksandr
  */
 public interface DatatypeHandler {
 
+	/**
+	 * Get all datatypes supported by this handler
+	 */
 	public Set<Datatype> getSupportedDatatypes();
 
+	/**
+	 * Get all restriction facets supported by this handler with respect to it's
+	 * supported datatype family
+	 */
 	public Set<Facet> getSupportedFacets();
 	
+	/**
+	 * Convert specified datatype expression to internal representation being a
+	 * subset of values defined by this expression
+	 *
+	 * @param datatypeExpression indexed datatype expression to convert
+	 * @return specific {@link ValueSpace} implementation to represent all
+	 * values within a restricted value space
+	 */
 	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression);
-	
+
+	/**
+	 * Parse string literal to it's representing object (Number,Date,byte[],
+	 * etc.) with respect to specified datatype
+	 *
+	 * @param literal lexical form
+	 * @param datatype exact literal datatype
+	 * @return typed internal representation of this literal
+	 */
 	public Object parse(String literal, Datatype datatype);
 }

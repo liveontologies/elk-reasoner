@@ -43,6 +43,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
+ * xsd:dateTime ans xsd:dateTimeStamp datatype handler
+ * <p>
+ * Similar to {@link NumericDatatypeHandler} as time is internally represented
+ * as Long value (as UTC milliseconds from the epoch, see {@link Calendar#getTimeInMillis()
+ * }).
+ * <p>
+ * Uses {@link RestrictedValueSpace} and {@link UnipointValueSpace} to represent
+ * datatype restrictions
  *
  * @author Pospishnyi Olexandr
  */

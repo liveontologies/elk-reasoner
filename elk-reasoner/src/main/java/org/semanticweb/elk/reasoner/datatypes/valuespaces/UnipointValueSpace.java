@@ -26,7 +26,8 @@ import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 
 /**
- *
+ * Value space that represent single numeric value. 
+ * 
  * @author Pospishnyi Olexandr
  */
 public class UnipointValueSpace implements ValueSpace {
@@ -52,6 +53,13 @@ public class UnipointValueSpace implements ValueSpace {
 		return !mostSpecificDatatype.isCompatibleWith(datatype);
 	}
 
+	/**
+	 * UnipointValueSpace could contain only another UnipointValueSpace if both
+	 * value spaces have equal values
+	 *
+	 * @param valueSpace
+	 * @return true if this value space contains {@code valueSpace}
+	 */
 	public boolean contains(ValueSpace valueSpace) {
 		if (valueSpace.getType() != ValueSpaceType.UNIPOINT) {
 			return false;

@@ -23,6 +23,8 @@
 package org.semanticweb.elk.reasoner.datatypes.enums;
 
 /**
+ * Enumeration of all known and supported facet restrictions used within
+ * datatype expressions
  *
  * @author Pospishnyi Oleksandr
  */
@@ -45,6 +47,12 @@ public enum Facet {
 		this.symbol = symbol;
 	}
 
+	/**
+	 * Get Facet enum element by it's IRI
+	 *
+	 * @param iri full IRI
+	 * @return {@link Facet}
+	 */
 	public static Facet getByIri(String iri) {
 		for (Facet facet : Facet.values()) {
 			if (iri.equals(facet.iri)) {

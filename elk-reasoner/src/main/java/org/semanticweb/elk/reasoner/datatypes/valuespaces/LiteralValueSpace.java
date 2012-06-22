@@ -26,7 +26,8 @@ import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
- *
+ * Value space that represent single literal value. 
+ * 
  * @author Pospishnyi Olexandr
  */
 public class LiteralValueSpace implements ValueSpace {

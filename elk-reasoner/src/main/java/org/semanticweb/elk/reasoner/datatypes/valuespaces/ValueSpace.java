@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 
 /**
+ * Representation of values set within datatype value space.
  *
  * @author Pospishnyi Oleksandr
  */
@@ -35,11 +36,26 @@ public interface ValueSpace {
 		EMPTY, ENTIRE, RESTRICTED, UNIPOINT, SIZED, PATTERN, LITERAL, BINARY
 	};
 
+	/**
+	 * @return Value space datatype
+	 */
 	public Datatype getDatatype();
 
+	/**
+	 * @return Value space type
+	 */
 	public ValueSpaceType getType();
 
+	/**
+	 * @return is this value space is empty
+	 */
 	public boolean isEmptyInterval();
 
+	/**
+	 * Check value space subsumption
+	 *
+	 * @param valueSpace
+	 * @return true if this value space contains {@code valueSpace}
+	 */
 	public boolean contains(ValueSpace valueSpace);
 }

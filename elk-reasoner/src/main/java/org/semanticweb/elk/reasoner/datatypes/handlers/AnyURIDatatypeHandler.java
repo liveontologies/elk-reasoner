@@ -42,6 +42,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
+ * xsd:AnyURI datatype handler
+ * <p>
+ * Very similar to {@link PlainLiteralDatatypeHandler} and uses same ValueSpace
+ * objects for representation. Value space of anyURI is disjoint with all other
+ * datatypes.
  *
  * @author Pospishnyi Olexandr
  */

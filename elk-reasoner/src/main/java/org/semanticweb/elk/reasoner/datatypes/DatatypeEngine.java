@@ -34,7 +34,11 @@ import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
- *
+ * DatatypeEngine is a single entry point for external reasoning modules 
+ * that carry out incremental reasoning with datatype axioms.
+ * DatatypeEngine contains {@link DatatypeHandler} for each supported {@link Datatype} and
+ * centralized registry for all negatively occurring datatype expressions. 
+ * 
  * @author Pospishnyi Olexandr
  */
 public class DatatypeEngine {
@@ -60,10 +64,22 @@ public class DatatypeEngine {
 		}
 	}
 
+	/**
+	 * Get corresponding handler for specified datatype.
+	 *
+	 * @param datatype Supported datatype
+	 * @return Handler for this datatype
+	 */
 	public static DatatypeHandler getDatatypeHandler(Datatype datatype) {
 		return datatypeHandlers.get(datatype);
 	}
 
+	/**
+	 * Register negatively occurring datatype expression 
+	 * 
+	 * @param property Datatype property used with datatype expression 
+	 * @param datatypeExpression negatively occurring datatype expression 
+	 */
 	public static void register(IndexedDataProperty property, IndexedDatatypeExpression datatypeExpression) {
 		Multimap<Datatype, Pair<ValueSpace, IndexedDatatypeExpression>> propertyStore = registry.get(property);
 		if (propertyStore == null) {
@@ -78,6 +94,12 @@ public class DatatypeEngine {
 		}
 	}
 
+	/**
+	 * Unregister negatively occurring datatype expression 
+	 * 
+	 * @param property Datatype property used with datatype expression 
+	 * @param datatypeExpression negatively occurring datatype expression 
+	 */
 	public static void unregister(IndexedDataProperty property, IndexedDatatypeExpression datatypeExpression) {
 		Multimap<Datatype, Pair<ValueSpace, IndexedDatatypeExpression>> propertyStore = registry.get(property);
 		if (propertyStore != null) {
@@ -93,6 +115,16 @@ public class DatatypeEngine {
 		}
 	}
 
+	/**
+	 * Get a list of all negatively occurring datatype expression that subsume
+	 * specified datatype expression
+	 *
+	 * @param property Indexed datatype property used in datatype expressions
+	 * @param datatypeExpression Positively occurring datatype expression
+	 * @return A list of all previously registered negatively occurring datatype
+	 * expressions that subsume specified datatype expression. The method will
+	 * return null if datatypeExpression is an empty value space.
+	 */
 	public static List<IndexedDatatypeExpression> getSatisfyingNegExistentials(
 			IndexedDataProperty property, IndexedDatatypeExpression datatypeExpression) {
 		Multimap<Datatype, Pair<ValueSpace, IndexedDatatypeExpression>> propertyStore = registry.get(property);

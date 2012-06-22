@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 
 /**
- *
+ * representation of entire datatype value space
+ * 
  * @author Pospishnyi Olexandr
  */
 public class EntireValueSpace implements ValueSpace {
@@ -48,6 +49,13 @@ public class EntireValueSpace implements ValueSpace {
 		return false;
 	}
 
+	/**
+	 * EntireValueSpace contains any other value spaces that has compatible
+	 * datatype
+	 *
+	 * @param valueSpace
+	 * @return true if this value space contains {@code valueSpace}
+	 */
 	public boolean contains(ValueSpace valueSpace) {
 		return valueSpace.getDatatype().isCompatibleWith(this.datatype);
 	}

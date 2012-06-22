@@ -26,7 +26,8 @@ import java.util.regex.Pattern;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 
 /**
- *
+ * Representation of any value that satisfies specified pattern
+ * 
  * @author Pospishnyi Olexandr
  */
 public class PatternValueSpace implements ValueSpace {
@@ -54,6 +55,14 @@ public class PatternValueSpace implements ValueSpace {
 		return pattern != null;
 	}
 
+	/**
+	 * PatternValueSpace could contain
+	 * - another PatternValueSpace if both are equal 
+	 * - LiteralValueSpace that satisfies pattern
+	 *
+	 * @param valueSpace
+	 * @return true if this value space contains {@code valueSpace}
+	 */
 	public boolean contains(ValueSpace valueSpace) {
 		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.datatype);
 		if (typechek != true) {
