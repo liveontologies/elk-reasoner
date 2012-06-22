@@ -25,17 +25,20 @@ package org.semanticweb.elk.reasoner;
 import java.net.URL;
 
 import org.semanticweb.elk.testing.TestResultComparisonException;
-import org.semanticweb.elk.testing.io.URLTestIO;
 
-public class ClassTaxonomyDiffManifest extends ReasoningTestManifest<URLTestIO, ClassTaxonomyTestOutput> {
+public class TaxonomyDiffManifest<AO extends ClassTaxonomyTestOutput> extends ReasoningTestManifest<ClassTaxonomyTestOutput, AO> {
 
-	public ClassTaxonomyDiffManifest(URL input, URL expOutput) {
-		super(input, new URLTestIO(expOutput));
+	public TaxonomyDiffManifest(URL input, AO expOutput) {
+		super(input, expOutput);
 	}
 
 	@Override
-	public void compare(ClassTaxonomyTestOutput actualOutput) throws TestResultComparisonException {
-		//TODO Implement: load the expected taxonomy and do a diff
-		throw new UnsupportedOperationException("Not yet implemented");
+	public void compare(AO actualOutput)
+			throws TestResultComparisonException {
+		
+		//FIXME Implement taxonomy comparison and diff
+		if (getExpectedOutput().getHashCode() != (actualOutput.getHashCode())) {
+			throw new TestResultComparisonException("Expected taxonomy hashcode not equal to the actual hashcode", getExpectedOutput(), actualOutput);
+		}
 	}
 }

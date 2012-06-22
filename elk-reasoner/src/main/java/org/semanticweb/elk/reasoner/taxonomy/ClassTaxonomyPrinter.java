@@ -33,6 +33,7 @@ import java.util.TreeSet;
 
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -52,10 +53,11 @@ public class ClassTaxonomyPrinter {
 	protected static Comparator<ElkClass> comparator = Comparators.ELK_CLASS_COMPARATOR;
 
 	/**
-	 * Convenience method for printing a Taxonomy<ElkClass> to a file at the given
-	 * location.
+	 * Convenience method for printing a Taxonomy<ElkClass> to a file at the
+	 * given location.
 	 * 
-	 * @see org.semanticweb.elk.reasoner.taxonomy.Taxonomy<ElkClass>Printer#dumpClassTaxomomy
+	 * @see org.semanticweb.elk.reasoner.taxonomy.Taxonomy
+	 *      <ElkClass>Printer#dumpClassTaxomomy
 	 * 
 	 * @param classTaxonomy
 	 * @param fileName
@@ -63,8 +65,9 @@ public class ClassTaxonomyPrinter {
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
 	 */
-	public static void dumpClassTaxomomyToFile(Taxonomy<ElkClass> classTaxonomy,
-			String fileName, boolean addHash) throws IOException {
+	public static void dumpClassTaxomomyToFile(
+			Taxonomy<ElkClass> classTaxonomy, String fileName, boolean addHash)
+			throws IOException {
 		FileWriter fstream = new FileWriter(fileName);
 		BufferedWriter writer = new BufferedWriter(fstream);
 		dumpClassTaxomomy(classTaxonomy, writer, addHash);
@@ -72,9 +75,9 @@ public class ClassTaxonomyPrinter {
 	}
 
 	/**
-	 * Print the contents of the given Taxonomy<ElkClass> to the specified Writer.
-	 * Class expressions are ordered for generating the output, ensuring that
-	 * the output is deterministic.
+	 * Print the contents of the given Taxonomy<ElkClass> to the specified
+	 * Writer. Class expressions are ordered for generating the output, ensuring
+	 * that the output is deterministic.
 	 * 
 	 * @param classTaxonomy
 	 * @param writer
@@ -111,10 +114,14 @@ public class ClassTaxonomyPrinter {
 	 * @param writer
 	 * @throws IOException
 	 */
-	protected static void processClassTaxomomy(Taxonomy<ElkClass> classTaxonomy,
-			Writer writer) throws IOException {
+	protected static void processClassTaxomomy(
+			Taxonomy<ElkClass> classTaxonomy, Writer writer) throws IOException {
+
+		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
 		writer.write("Ontology(\n");
+
+		printDeclarations(classTaxonomy, objectFactory, writer);
 
 		TreeSet<ElkClass> canonicalElkClasses = new TreeSet<ElkClass>(
 				comparator);
@@ -130,7 +137,8 @@ public class ClassTaxonomyPrinter {
 
 			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass>(
 					comparator);
-			for (TaxonomyNode<ElkClass> childNode : classNode.getDirectSubNodes()) {
+			for (TaxonomyNode<ElkClass> childNode : classNode
+					.getDirectSubNodes()) {
 				orderedSubClasses.add(childNode.getCanonicalMember());
 			}
 
@@ -139,6 +147,29 @@ public class ClassTaxonomyPrinter {
 		}
 
 		writer.write(")");
+	}
+
+	/**
+	 * Prints class declarations
+	 * 
+	 * @param classTaxonomy
+	 * @param objectFactory
+	 * @param writer
+	 * @throws IOException
+	 */
+	protected static void printDeclarations(Taxonomy<ElkClass> classTaxonomy,
+			ElkObjectFactory objectFactory, Writer writer) throws IOException {
+		for (TaxonomyNode<ElkClass> classNode : classTaxonomy.getNodes()) {
+			for (ElkClass clazz : classNode.getMembers()) {
+				if (!clazz.getIri().equals(PredefinedElkIri.OWL_THING)
+						&& !clazz.getIri().equals(PredefinedElkIri.OWL_NOTHING)) {
+					ElkDeclarationAxiom decl = objectFactory
+							.getDeclarationAxiom(clazz);
+					OwlFunctionalStylePrinter.append(writer, decl);
+					writer.append('\n');
+				}
+			}
+		}
 	}
 
 	/**

@@ -26,6 +26,7 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,6 +91,15 @@ public class ClassTaxonomyIOTest {
 
 		assertEquals(ClassTaxonomyPrinter.getHashString(taxonomy1),
 				ClassTaxonomyPrinter.getHashString(taxonomy2));
+	}
+	
+	@Test
+	public void loadInconsistent() throws IOException, Owl2ParseException,
+			InconsistentOntologyException {
+		Taxonomy<ElkClass> taxonomy = load("io/inconsistent.owl");
+
+		assertEquals(1, taxonomy.getNodes().size());
+		assertSame(taxonomy.getTopNode(), taxonomy.getBottomNode());
 	}
 
 	private Taxonomy<ElkClass> loadAndClassify(String resource)
