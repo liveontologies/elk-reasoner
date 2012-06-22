@@ -89,7 +89,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 				reasoner.ontologyIndex.getIndexedClasses(),
 				reasoner.ontologyIndex.getIndexedClassCount(),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.getOntologyIndex());
+				reasoner.ontologyIndex);
 	}
 
 	@Override

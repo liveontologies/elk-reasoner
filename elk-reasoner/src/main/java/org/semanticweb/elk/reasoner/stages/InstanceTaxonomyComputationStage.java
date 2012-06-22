@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
 /**
@@ -85,13 +84,12 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		OntologyIndex ontologyIndex = reasoner.ontologyIndex;
 		if (reasoner.doneClassTaxonomy)
 			this.computation = new InstanceTaxonomyComputation(
-					ontologyIndex.getIndexedIndividuals(),
-					ontologyIndex.getIndexedIndividualCount(),
+					reasoner.ontologyIndex.getIndexedIndividuals(),
+					reasoner.ontologyIndex.getIndexedIndividualCount(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.getOntologyIndex(), reasoner.taxonomy);
+					reasoner.ontologyIndex, reasoner.taxonomy);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
