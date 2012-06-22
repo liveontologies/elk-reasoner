@@ -74,7 +74,6 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 						Thread result = new Thread(threadGroup, r,
 								threadGroup.getName() + "-thread-"
 										+ ++threadCount);
-						result.setPriority(Thread.NORM_PRIORITY);
 						return result;
 					}
 				});

@@ -77,15 +77,22 @@ public class ReasonerComputation<I, P extends InputProcessor<I>, F extends Input
 		this.nextInput = null;
 	}
 
-	public ReasonerComputation(Iterable<? extends I> inputs, int inputsSize,
+	public ReasonerComputation(Iterator<? extends I> inputs, int inputsSize,
 			F inputProcessorFactory, ComputationExecutor executor,
 			int maxWorkers, ProgressMonitor progressMonitor) {
 		super(inputProcessorFactory, executor, maxWorkers);
 		this.progressMonitor = progressMonitor;
-		this.todo = inputs.iterator();
+		this.todo = inputs;
 		this.maxProgress = inputsSize;
 		this.progress = 0;
 		this.nextInput = null;
+	}
+
+	public ReasonerComputation(Iterable<? extends I> inputs, int inputsSize,
+			F inputProcessorFactory, ComputationExecutor executor,
+			int maxWorkers, ProgressMonitor progressMonitor) {
+		this(inputs.iterator(), inputsSize, inputProcessorFactory, executor,
+				maxWorkers, progressMonitor);
 	}
 
 	/**

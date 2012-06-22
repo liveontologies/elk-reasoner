@@ -22,15 +22,25 @@
  */
 package org.semanticweb.elk.reasoner.consistency;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.SaturationJob;
+import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
- * Class for checking ontology consistency.
+ * A {@link ReasonerComputation} for checking consistency of the ontology. This
+ * is done by checking consistency of <tt>owl:Thing</tt> and of all individuals
+ * occurring in the ontology.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -38,40 +48,138 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ConsistencyChecking
 		extends
-		ReasonerComputation<IndexedClassExpression, ConsistencyCheckingFactory.Engine, ConsistencyCheckingFactory> {
+		ReasonerComputation<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>.Engine, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
 
 	/**
-	 * the index of the ontology used for computation
+	 * The object for setting and monitoring the consistency status of the
+	 * ontology; Once ontology becomes inconsistent, the computation can be
+	 * interrupted.
 	 */
-	protected final OntologyIndex ontologyIndex;
+	private final ConsistencyMonitor consistencyMonitor;
 
-	public ConsistencyChecking(
-			ConsistencyCheckingFactory inputProcessorFactory,
+	/**
+	 * Auxiliary class constructor
+	 * 
+	 * @param inputJobs
+	 *            the saturation jobs to be executed
+	 * @param inputsSize
+	 *            the number of the saturation jobs
+	 * @param consistencyMonitor
+	 *            the monitor for the consistency status
+	 * @param saturationFactory
+	 *            the factory for computing the saturation
+	 * @param executor
+	 *            the executor service used for running the tasks by the
+	 *            reasoner
+	 * @param maxWorkers
+	 *            the maximum number of workers that can be used
+	 * @param progressMonitor
+	 *            the monitor for reporting the progress of the computation
+	 */
+	ConsistencyChecking(
+			Iterator<SaturationJob<IndexedClassEntity>> inputJobs,
+			int inputsSize,
+			ConsistencyMonitor consistencyMonitor,
+			ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>> saturationFactory,
 			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		/*
-		 * first consistency is checked for <tt>owl:Thing</tt>, then for the
-		 * individuals in the ontology
-		 */
-		super(Operations.concat(
-				Operations.singleton(ontologyIndex.getIndexedOwlThing()),
-				ontologyIndex.getIndexedIndividuals()), ontologyIndex
-				.getIndexedIndividualCount() + 1, inputProcessorFactory,
-				executor, maxWorkers, progressMonitor);
-		this.ontologyIndex = ontologyIndex;
+			ProgressMonitor progressMonitor) {
+		super(inputJobs, inputsSize, saturationFactory, executor, maxWorkers,
+				progressMonitor);
+		this.consistencyMonitor = consistencyMonitor;
 	}
 
+	/**
+	 * Constructing the object for checking if all given entities are
+	 * consistent.
+	 * 
+	 * @param inputEntities
+	 *            the entities to check for consistency
+	 * @param inputsSize
+	 *            the number of input entities
+	 * @param consistencyMonitor
+	 *            the monitor for the consistency status
+	 * @param ontologyIndex
+	 *            the indexed representation of the ontology
+	 * @param executor
+	 *            the executor service used for running the tasks by the
+	 *            reasoner
+	 * @param maxWorkers
+	 *            the maximum number of workers that can be used
+	 * @param progressMonitor
+	 *            the monitor for reporting the progress of the computation
+	 */
+	public ConsistencyChecking(Iterator<IndexedClassEntity> inputEntities,
+			int inputsSize, ConsistencyMonitor consistencyMonitor,
+			OntologyIndex ontologyIndex, ComputationExecutor executor,
+			int maxWorkers, ProgressMonitor progressMonitor) {
+		this(
+				new JobIterator(inputEntities, consistencyMonitor),
+				inputsSize,
+				consistencyMonitor,
+				new ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>(
+						ontologyIndex, maxWorkers,
+						new ThisClassExpressionSaturationListener(
+								consistencyMonitor)), executor, maxWorkers,
+				progressMonitor);
+	}
+
+	/**
+	 * @param ontologyIndex
+	 *            the representation of the ontology
+	 * 
+	 * @return the entities such that the ontology is consistent if and only if
+	 *         all of these entities are consistent
+	 */
+	public static Iterable<IndexedClassEntity> getTestEntities(
+			OntologyIndex ontologyIndex) {
+		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
+			/*
+			 * if the ontology does not have any positive occurrence of bottom,
+			 * everything is always consistent
+			 */
+			return Collections.emptyList();
+		} else {
+			/*
+			 * first consistency is checked for <tt>owl:Thing</tt>, then for the
+			 * individuals in the ontology
+			 */
+			return Operations.concat(
+					Operations.singleton(ontologyIndex.getIndexedOwlThing()),
+					ontologyIndex.getIndexedIndividuals());
+		}
+	}
+
+	/**
+	 * @param ontologyIndex
+	 *            the representation of the ontology
+	 * @return the number of entities returned by the function
+	 *         {@link #getTestEntities(OntologyIndex)}
+	 */
+	public static int getNoTestEntities(OntologyIndex ontologyIndex) {
+		if (!ontologyIndex.getIndexedOwlNothing().occursPositively())
+			return 0;
+		else
+			return ontologyIndex.getIndexedIndividualCount() + 1;
+	}
+
+	/**
+	 * Constructing the object for checking if the given ontology is consistent
+	 * 
+	 * @param executor
+	 *            the executor service used for running the tasks by the
+	 *            reasoner
+	 * @param maxWorkers
+	 *            the maximum number of workers that can be used
+	 * @param progressMonitor
+	 *            the monitor for reporting the progress of the computation
+	 * @param ontologyIndex
+	 *            the indexed representation of the ontology
+	 */
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(new ConsistencyCheckingFactory(ontologyIndex, maxWorkers),
-				executor, maxWorkers, progressMonitor, ontologyIndex);
-	}
-
-	@Override
-	public void process() {
-		if (!ontologyIndex.getIndexedOwlNothing().occursPositively())
-			return;
-		super.process();
+		this(getTestEntities(ontologyIndex).iterator(),
+				getNoTestEntities(ontologyIndex), new ConsistencyMonitor(),
+				ontologyIndex, executor, maxWorkers, progressMonitor);
 	}
 
 	/**
@@ -80,7 +188,7 @@ public class ConsistencyChecking
 	 *         {@link #process()}
 	 */
 	public boolean isConsistent() {
-		return inputProcessorFactory.isConsistent();
+		return !consistencyMonitor.isInconsistent();
 	}
 
 	/**
@@ -88,6 +196,98 @@ public class ConsistencyChecking
 	 */
 	public void printStatistics() {
 		inputProcessorFactory.printStatistics();
+	}
+
+	/**
+	 * The listener class used for the class expression saturation engine, which
+	 * is used within this consistency engine
+	 * 
+	 */
+	private static class ThisClassExpressionSaturationListener
+			implements
+			ClassExpressionSaturationListener<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>.Engine> {
+
+		private final ConsistencyMonitor consistenceMonitor;
+
+		ThisClassExpressionSaturationListener(
+				ConsistencyMonitor consistenceMonitor) {
+			this.consistenceMonitor = consistenceMonitor;
+		}
+
+		@Override
+		public void notifyCanProcess() {
+		}
+
+		@Override
+		public void notifyFinished(SaturationJob<IndexedClassEntity> job)
+				throws InterruptedException {
+			if (!((ContextClassSaturation) job.getOutput()).isSatisfiable())
+				consistenceMonitor.setInconsistent();
+		}
+
+	}
+
+	/**
+	 * A simple monitor to set and monitor inconsistency status; it should be
+	 * thread safe; by default the monitor is not inconsistent
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	static class ConsistencyMonitor {
+		private volatile boolean inconsistent = false;
+
+		public boolean isInconsistent() {
+			return inconsistent;
+		}
+
+		public void setInconsistent() {
+			inconsistent = true;
+		}
+
+	}
+
+	/**
+	 * Iterator over consistency checking jobs that correspond to the given
+	 * input of entities. If ontology becomes inconsistent as reported by the
+	 * provided consistency monitor, iteration stops.
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	static class JobIterator implements
+			Iterator<SaturationJob<IndexedClassEntity>> {
+
+		private final Iterator<IndexedClassEntity> inputs;
+		private final ConsistencyMonitor consistencyMonitor;
+
+		JobIterator(Iterator<IndexedClassEntity> inputs,
+				ConsistencyMonitor consistenceMonitor) {
+			this.inputs = inputs;
+			this.consistencyMonitor = consistenceMonitor;
+		}
+
+		@Override
+		public boolean hasNext() {
+			if (consistencyMonitor.isInconsistent())
+				return false;
+			else
+				return inputs.hasNext();
+		}
+
+		@Override
+		public SaturationJob<IndexedClassEntity> next() {
+			if (consistencyMonitor.isInconsistent())
+				throw new NoSuchElementException();
+			else
+				return new SaturationJob<IndexedClassEntity>(inputs.next());
+		}
+
+		@Override
+		public void remove() {
+			inputs.remove();
+		}
+
 	}
 
 }
