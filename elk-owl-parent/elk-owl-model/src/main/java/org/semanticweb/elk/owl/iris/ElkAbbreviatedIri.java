@@ -36,7 +36,7 @@ public class ElkAbbreviatedIri extends ElkIri {
 	protected final String localName;
 	
 	public ElkAbbreviatedIri(ElkPrefix prefix, String localName) {
-		super (prefix.getIri().asString() + localName);
+		super (concatHashCode(prefix.getIri().asString(), localName));
 		this.prefix = prefix;
 		this.localName = localName;
 	}
@@ -60,6 +60,16 @@ public class ElkAbbreviatedIri extends ElkIri {
 			return this.localName.compareTo(((ElkAbbreviatedIri) arg).localName);
 		
 		return super.compareTo(arg);
+	}
+	
+	/**
+	 * Returns (a+b).hashCode() without actually concatenating the strings.
+	 */
+	protected static int concatHashCode(String a, String b) {
+		int hash = a.hashCode();
+		for (int i = 0; i < b.length(); i++)
+			hash = 31*hash + b.charAt(i);
+		return hash;
 	}
 	
 }

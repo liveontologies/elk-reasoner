@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,10 +53,11 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  */
 public class IndividualNode implements
-InstanceNode<ElkClass, ElkNamedIndividual> {
+		InstanceNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
-	private static final Logger LOGGER_ = Logger.getLogger(IndividualNode.class);
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IndividualNode.class);
 
 	/**
 	 * The link to the taxonomy to which this node belongs
@@ -67,10 +69,11 @@ InstanceNode<ElkClass, ElkNamedIndividual> {
 	 */
 	private final List<ElkNamedIndividual> members;
 	/**
-	 * ElkClass nodes whose members are direct types of the members of
-	 * this node.
+	 * ElkClass nodes whose members are direct types of the members of this
+	 * node.
 	 */
 	private final Set<TypeNode<ElkClass, ElkNamedIndividual>> directTypeNodes;
+
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
 	 * equivalent classes.
@@ -85,7 +88,8 @@ InstanceNode<ElkClass, ElkNamedIndividual> {
 		this.taxonomy = taxonomy;
 		this.members = new ArrayList<ElkNamedIndividual>(members);
 		this.directTypeNodes = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>();
-		Collections.sort(this.members, Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
+		Collections.sort(this.members,
+				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
 	}
 
 	/**
@@ -96,7 +100,7 @@ InstanceNode<ElkClass, ElkNamedIndividual> {
 	 */
 	void addDirectTypeNode(NonBottomClassNode typeNode) {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": new direct super-node " + typeNode);
+			LOGGER_.trace(this + ": new direct type-node " + typeNode);
 		directTypeNodes.add(typeNode);
 	}
 
@@ -104,39 +108,15 @@ InstanceNode<ElkClass, ElkNamedIndividual> {
 	public Set<ElkNamedIndividual> getMembers() {
 		// create an unmodifiable set view of the members; alternatively, one
 		// could have created a TreeSet, but it consumes more memory
-		return new Set<ElkNamedIndividual>() {
+		return new AbstractSet<ElkNamedIndividual>() {
 
 			@Override
-			public boolean add(ElkNamedIndividual arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean addAll(Collection<? extends ElkNamedIndividual> arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public void clear() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean contains(Object arg0) {
-				if (arg0 instanceof ElkClass)
-					return (Collections.binarySearch(members, (ElkNamedIndividual) arg0,
+			public boolean contains(Object arg) {
+				if (arg instanceof ElkNamedIndividual)
+					return (Collections.binarySearch(members,
+							(ElkNamedIndividual) arg,
 							Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR) >= 0);
-				else
-					return false;
-			}
-
-			@Override
-			public boolean containsAll(Collection<?> arg0) {
-				for (Object element : arg0) {
-					if (!this.contains(element))
-						return false;
-				}
-				return true;
+				return false;
 			}
 
 			@Override
@@ -150,34 +130,10 @@ InstanceNode<ElkClass, ElkNamedIndividual> {
 			}
 
 			@Override
-			public boolean remove(Object arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean removeAll(Collection<?> arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean retainAll(Collection<?> arg0) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
 			public int size() {
 				return members.size();
 			}
 
-			@Override
-			public Object[] toArray() {
-				return members.toArray();
-			}
-
-			@Override
-			public <T> T[] toArray(T[] arg0) {
-				return members.toArray(arg0);
-			}
 		};
 	}
 
@@ -209,7 +165,6 @@ InstanceNode<ElkClass, ElkNamedIndividual> {
 		return Collections.unmodifiableSet(result);
 	}
 
-
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	@Override
@@ -226,6 +181,5 @@ InstanceNode<ElkClass, ElkNamedIndividual> {
 	public String toString() {
 		return getCanonicalMember().getIri().asString();
 	}
-
 
 }

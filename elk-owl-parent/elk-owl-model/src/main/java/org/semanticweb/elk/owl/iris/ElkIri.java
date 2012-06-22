@@ -44,8 +44,8 @@ public abstract class ElkIri implements Comparable<ElkIri>, ElkAnnotationSubject
 	 */
 	public abstract String asString();
 
-	public ElkIri(String fullIri) {
-		this.hashCode = fullIri.hashCode();
+	protected ElkIri(int hashCode) {
+		this.hashCode = hashCode;
 	}
 
 	@Override
@@ -58,8 +58,8 @@ public abstract class ElkIri implements Comparable<ElkIri>, ElkAnnotationSubject
 		if (this == obj)
 			return true;
 
-		if (obj instanceof ElkIri && hashCode == ((ElkIri) obj).hashCode)
-			return this.compareTo((ElkIri) obj) == 0;
+		if (obj instanceof ElkIri)
+			return this.hashCode == ((ElkIri) obj).hashCode && this.compareTo((ElkIri) obj) == 0;
 
 		return false;
 	}
