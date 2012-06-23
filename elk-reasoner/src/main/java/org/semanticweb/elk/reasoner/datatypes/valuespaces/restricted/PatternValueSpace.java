@@ -20,24 +20,29 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.valuespaces;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
-import java.util.Arrays;
+import java.util.regex.Pattern;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 
 /**
- * Value space that represent single binary value. 
+ * Representation of any value that satisfies specified regular expression
  * 
  * @author Pospishnyi Olexandr
  */
-public class BinaryValueSpace implements ValueSpace {
+public class PatternValueSpace implements ValueSpace {
 
+	public Pattern pattern;
 	public Datatype datatype;
-	public byte[] value;
 
-	public BinaryValueSpace(byte[] value, Datatype datatype) {
-		this.datatype = datatype;
-		this.value = value;
+	public PatternValueSpace(String regexp, Datatype datatype) {
+		try {
+			this.datatype = datatype;
+			this.pattern = Pattern.compile(regexp);
+		} catch (Throwable th) {
+		}
 	}
 
 	public Datatype getDatatype() {
@@ -45,17 +50,18 @@ public class BinaryValueSpace implements ValueSpace {
 	}
 
 	public ValueSpaceType getType() {
-		return ValueSpaceType.BINARY;
+		return ValueSpaceType.PATTERN;
 	}
 
 	public boolean isEmptyInterval() {
-		return value != null;
+		return pattern != null;
 	}
 
 	/**
-	 * BinaryValueSpace could contain only another BinaryValueSpace
-	 * if both value spaces have equal values
-	 * 
+	 * PatternValueSpace could contain
+	 * - another PatternValueSpace if both are equal 
+	 * - LiteralValue that matches pattern
+	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
@@ -65,9 +71,12 @@ public class BinaryValueSpace implements ValueSpace {
 			return false;
 		}
 		switch (valueSpace.getType()) {
-			case BINARY:
-				BinaryValueSpace bvs = (BinaryValueSpace) valueSpace;
-				return Arrays.equals(this.value, bvs.value);
+			case LITERAL_VALUE:
+				LiteralValue lvs = (LiteralValue) valueSpace;
+				return pattern.matcher(lvs.value).matches();
+			case PATTERN:
+				PatternValueSpace pvs = (PatternValueSpace) valueSpace;
+				return this.pattern.pattern().equals(pvs.pattern.pattern());
 			default:
 				return false;
 		}

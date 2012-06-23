@@ -20,22 +20,23 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.valuespaces;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
  * Value space that represent single numeric value. 
  * 
  * @author Pospishnyi Olexandr
  */
-public class UnipointValueSpace implements ValueSpace {
+public class NumericValue implements ValueSpace {
 
 	public Datatype datatype;
 	public Number value;
 
-	public UnipointValueSpace(Datatype datatype, Number value) {
+	public NumericValue(Datatype datatype, Number value) {
 		this.datatype = datatype;
 		this.value = value;
 	}
@@ -45,7 +46,7 @@ public class UnipointValueSpace implements ValueSpace {
 	}
 
 	public ValueSpaceType getType() {
-		return ValueSpaceType.UNIPOINT;
+		return ValueSpaceType.NUMERIC_VALUE;
 	}
 
 	public boolean isEmptyInterval() {
@@ -54,18 +55,18 @@ public class UnipointValueSpace implements ValueSpace {
 	}
 
 	/**
-	 * UnipointValueSpace could contain only another UnipointValueSpace if both
+	 * NumericValue could contain only another NumericValue if both
 	 * value spaces have equal values
 	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
 	public boolean contains(ValueSpace valueSpace) {
-		if (valueSpace.getType() != ValueSpaceType.UNIPOINT) {
+		if (valueSpace.getType() != ValueSpaceType.NUMERIC_VALUE) {
 			return false;
 		}
 		int compare = NumberComparator.INSTANCE.compare(value,
-				((UnipointValueSpace) valueSpace).value);
+				((NumericValue) valueSpace).value);
 		return compare == 0;
 	}
 }

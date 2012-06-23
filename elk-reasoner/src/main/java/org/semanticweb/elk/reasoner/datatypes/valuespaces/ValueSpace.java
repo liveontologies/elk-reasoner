@@ -31,9 +31,12 @@ import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
  */
 public interface ValueSpace {
 
+	/**
+	 * Value space type
+	 */
 	static enum ValueSpaceType {
 
-		EMPTY, ENTIRE, RESTRICTED, UNIPOINT, SIZED, PATTERN, LITERAL, BINARY
+		EMPTY, ENTIRE, NUMERIC_INTERVAL, DATETIME_INTERVAL, NUMERIC_VALUE, DATETIME_VALUE, LITERAL_VALUE, BINARY_VALUE, LENGTH_RESTRICTED, PATTERN,
 	};
 
 	/**

@@ -20,9 +20,10 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.valuespaces;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
@@ -30,21 +31,21 @@ import org.semanticweb.elk.util.collections.Pair;
  * 
  * @author Pospishnyi Olexandr
  */
-public class LiteralValueSpace implements ValueSpace {
+public class LiteralValue implements ValueSpace {
 
 	public String value;
 	public String language;
 	public Datatype datatype;
 	public Datatype effectiveDatatype;
 
-	public LiteralValueSpace(Pair<String, String> pair, Datatype datatype, Datatype effectiveDatatype) {
+	public LiteralValue(Pair<String, String> pair, Datatype datatype, Datatype effectiveDatatype) {
 		this.value = pair.getFirst();
 		this.language = pair.getSecond();
 		this.datatype = datatype;
 		this.effectiveDatatype = effectiveDatatype;
 	}
 
-	public LiteralValueSpace(String string, Datatype datatype, Datatype effectiveDatatype) {
+	public LiteralValue(String string, Datatype datatype, Datatype effectiveDatatype) {
 		this.value = string;
 		this.datatype = datatype;
 		this.effectiveDatatype = effectiveDatatype;
@@ -55,7 +56,7 @@ public class LiteralValueSpace implements ValueSpace {
 	}
 
 	public ValueSpaceType getType() {
-		return ValueSpaceType.LITERAL;
+		return ValueSpaceType.LITERAL_VALUE;
 	}
 
 	public boolean isEmptyInterval() {
@@ -74,8 +75,8 @@ public class LiteralValueSpace implements ValueSpace {
 	 */
 	public boolean contains(ValueSpace valueSpace) {
 		switch (valueSpace.getType()) {
-			case LITERAL:
-				LiteralValueSpace other = (LiteralValueSpace) valueSpace;
+			case LITERAL_VALUE:
+				LiteralValue other = (LiteralValue) valueSpace;
 				boolean result = true;
 				result &= this.value.equals(other.value);
 				result &= ((this.language == null && other.language == null)

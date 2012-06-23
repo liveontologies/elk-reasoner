@@ -20,9 +20,12 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.valuespaces;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 
 /**
  * Representation of any value that satisfies specified length 
@@ -46,7 +49,7 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	}
 
 	public ValueSpaceType getType() {
-		return ValueSpaceType.SIZED;
+		return ValueSpaceType.LENGTH_RESTRICTED;
 	}
 
 	public boolean isEmptyInterval() {
@@ -68,8 +71,8 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	/**
 	 * LengthRestrictedValueSpace could contain
 	 * - another LengthRestrictedValueSpace within this one 
-	 * - LiteralValueSpace that satisfies length restrictions
-	 * - BinaryValueSpace that satisfies length restrictions
+	 * - LiteralValue that satisfies length restrictions
+	 * - BinaryValue that satisfies length restrictions
 	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
@@ -80,16 +83,16 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 			return false;
 		}
 		switch (valueSpace.getType()) {
-			case SIZED:
+			case LENGTH_RESTRICTED:
 				LengthRestrictedValueSpace lrvs = (LengthRestrictedValueSpace) valueSpace;
 				return minLength.compareTo(lrvs.minLength) <= 0
 						&& maxLength.compareTo(lrvs.maxLength) >= 0;
-			case LITERAL:
-				LiteralValueSpace lvs = (LiteralValueSpace) valueSpace;
+			case LITERAL_VALUE:
+				LiteralValue lvs = (LiteralValue) valueSpace;
 				return minLength.compareTo(lvs.value.length()) <= 0
 						&& maxLength.compareTo(lvs.value.length()) >= 0;
-			case BINARY:
-				BinaryValueSpace bvs = (BinaryValueSpace) valueSpace;
+			case BINARY_VALUE:
+				BinaryValue bvs = (BinaryValue) valueSpace;
 				return minLength.compareTo(bvs.value.length) <= 0
 						&& maxLength.compareTo(bvs.value.length) >= 0;
 			default:

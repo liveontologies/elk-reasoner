@@ -36,7 +36,11 @@ import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_base64Bi
 import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_hexBinary;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.*;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.*;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
@@ -44,7 +48,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression
 /**
  * xsd:hexBinary and xsd:base64Binary datatype handler
  * <p>
- * uses {@link BinaryValueSpace} and {@link LengthRestrictedValueSpace} to
+ * uses {@link BinaryValue} and {@link LengthRestrictedValueSpace} to
  * represent datatype restrictions. Please note that value space of
  * xsd:hexBinary and xsd:base64Binary are disjoint.
  *
@@ -81,7 +85,7 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 		Datatype datatype = datatypeExpression.getDatatype();
 		byte[] value =  (byte[]) parse(datatypeExpression.getFiller().getLexicalForm(), datatype);
 		if (value != null) {
-			return new BinaryValueSpace(value, datatype);
+			return new BinaryValue(value, datatype);
 		} else {
 			return null;
 		}

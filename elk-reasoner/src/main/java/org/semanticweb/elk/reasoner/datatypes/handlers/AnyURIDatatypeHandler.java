@@ -36,7 +36,12 @@ import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_anyURI;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.*;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.*;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.PatternValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
@@ -81,7 +86,7 @@ public class AnyURIDatatypeHandler implements DatatypeHandler {
 		Datatype datatype = datatypeExpression.getDatatype();
 		URI value = (URI) parse(datatypeExpression.getFiller().getLexicalForm(), datatype);
 		if (value != null) {
-			return new LiteralValueSpace(value.toString(), datatype, datatype);
+			return new LiteralValue(value.toString(), datatype, datatype);
 		} else {
 			return null;
 		}

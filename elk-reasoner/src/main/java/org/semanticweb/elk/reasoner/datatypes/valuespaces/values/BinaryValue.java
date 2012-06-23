@@ -20,27 +20,25 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.valuespaces;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
-import java.util.regex.Pattern;
+import java.util.Arrays;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
- * Representation of any value that satisfies specified pattern
+ * Value space that represent single binary value. 
  * 
  * @author Pospishnyi Olexandr
  */
-public class PatternValueSpace implements ValueSpace {
+public class BinaryValue implements ValueSpace {
 
-	public Pattern pattern;
 	public Datatype datatype;
+	public byte[] value;
 
-	public PatternValueSpace(String regexp, Datatype datatype) {
-		try {
-			this.datatype = datatype;
-			this.pattern = Pattern.compile(regexp);
-		} catch (Throwable th) {
-		}
+	public BinaryValue(byte[] value, Datatype datatype) {
+		this.datatype = datatype;
+		this.value = value;
 	}
 
 	public Datatype getDatatype() {
@@ -48,18 +46,17 @@ public class PatternValueSpace implements ValueSpace {
 	}
 
 	public ValueSpaceType getType() {
-		return ValueSpaceType.PATTERN;
+		return ValueSpaceType.BINARY_VALUE;
 	}
 
 	public boolean isEmptyInterval() {
-		return pattern != null;
+		return value != null;
 	}
 
 	/**
-	 * PatternValueSpace could contain
-	 * - another PatternValueSpace if both are equal 
-	 * - LiteralValueSpace that satisfies pattern
-	 *
+	 * BinaryValue could contain only another BinaryValue
+	 * if both value spaces have equal values
+	 * 
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
@@ -69,12 +66,9 @@ public class PatternValueSpace implements ValueSpace {
 			return false;
 		}
 		switch (valueSpace.getType()) {
-			case LITERAL:
-				LiteralValueSpace lvs = (LiteralValueSpace) valueSpace;
-				return pattern.matcher(lvs.value).matches();
-			case PATTERN:
-				PatternValueSpace pvs = (PatternValueSpace) valueSpace;
-				return this.pattern.pattern().equals(pvs.pattern.pattern());
+			case BINARY_VALUE:
+				BinaryValue bvs = (BinaryValue) valueSpace;
+				return Arrays.equals(this.value, bvs.value);
 			default:
 				return false;
 		}

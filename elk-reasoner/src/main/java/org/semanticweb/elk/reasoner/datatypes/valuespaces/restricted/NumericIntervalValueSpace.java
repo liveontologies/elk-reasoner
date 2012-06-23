@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.valuespaces;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -29,6 +29,8 @@ import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NegativeInfinity;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.numbers.PositiveInfinity;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
 
 /**
  * Representation of numeric value interval with specified restrictions
@@ -36,7 +38,7 @@ import org.semanticweb.elk.reasoner.datatypes.numbers.PositiveInfinity;
  *
  * @author Pospishnyi Olexandr
  */
-public class RestrictedValueSpace implements ValueSpace {
+public class NumericIntervalValueSpace implements ValueSpace {
 
 	public Datatype datatype;
 	public Number lowerBound;
@@ -44,7 +46,7 @@ public class RestrictedValueSpace implements ValueSpace {
 	public Number upperBound;
 	public boolean upperInclusive;
 
-	public RestrictedValueSpace(Datatype datatype, Number lowerBound, boolean lowerInclusive, Number upperBound, boolean upperInclusive) {
+	public NumericIntervalValueSpace(Datatype datatype, Number lowerBound, boolean lowerInclusive, Number upperBound, boolean upperInclusive) {
 		if (datatype == Datatype.xsd_integer || datatype == Datatype.xsd_nonNegativeInteger) {
 			if (!lowerInclusive) {
 				lowerBound = advance(lowerBound, true);
@@ -175,21 +177,21 @@ public class RestrictedValueSpace implements ValueSpace {
 	}
 
 	public ValueSpaceType getType() {
-		return ValueSpaceType.RESTRICTED;
+		return ValueSpaceType.NUMERIC_INTERVAL;
 	}
 
 	/**
-	 * RestrictedValueSpace could contain
-	 * - another RestrictedValueSpace if this value space completely includes another 
-	 * - UnipointValueSpace that is included within specified bounds
+	 * NumericIntervalValueSpace could contain
+	 * - another NumericIntervalValueSpace if this value space completely includes another 
+	 * - NumericValue that is included within specified bounds
 	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
 	public boolean contains(ValueSpace valueSpace) {
 		switch (valueSpace.getType()) {
-			case UNIPOINT: {
-				UnipointValueSpace point = (UnipointValueSpace) valueSpace;
+			case NUMERIC_VALUE: {
+				NumericValue point = (NumericValue) valueSpace;
 				if (!point.datatype.isCompatibleWith(this.datatype)) {
 					return false;
 				}
@@ -197,8 +199,8 @@ public class RestrictedValueSpace implements ValueSpace {
 				int u = NumberComparator.INSTANCE.compare(point.value, this.upperBound);
 				return (lowerInclusive ? l >= 0 : l > 0) && (upperInclusive ? u <= 0 : u < 0);
 			}
-			case RESTRICTED: {
-				RestrictedValueSpace range = (RestrictedValueSpace) valueSpace;
+			case NUMERIC_INTERVAL: {
+				NumericIntervalValueSpace range = (NumericIntervalValueSpace) valueSpace;
 				if (!range.datatype.isCompatibleWith(this.datatype)) {
 					return false;
 				}

@@ -37,7 +37,11 @@ import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_dateTime
 import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_dateTimeStamp;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.*;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.*;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.DateTimeIntervalValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
@@ -49,7 +53,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression
  * as Long value (as UTC milliseconds from the epoch, see {@link Calendar#getTimeInMillis()
  * }).
  * <p>
- * Uses {@link RestrictedValueSpace} and {@link UnipointValueSpace} to represent
+ * Uses {@link DateTimeValue} and {@link DateTimeIntervalValueSpace} to represent
  * datatype restrictions
  *
  * @author Pospishnyi Olexandr
@@ -85,7 +89,7 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 		Datatype datatype = Datatype.getByIri(datatypeExpression.getFiller().getDatatype().getDatatypeIRI());
 		String lexicalForm = datatypeExpression.getFiller().getLexicalForm();
 		Calendar value = (Calendar) parse(lexicalForm, datatype);
-		return new UnipointValueSpace(datatype, value.getTimeInMillis());
+		return new DateTimeValue(value, datatype);
 	}
 
 	private ValueSpace createEntireValueSpace(ElkDatatype elkDatatype) {
@@ -93,8 +97,8 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 	}
 
 	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
-		Long lowerBound = Long.valueOf(0);
-		Long upperBound = Long.MAX_VALUE;
+		Calendar lowerBound = DateTimeIntervalValueSpace.START_OF_TIME;
+		Calendar upperBound = DateTimeIntervalValueSpace.END_OF_TIME;
 		boolean lowerInclusive = true, upperInclusive = true;
 
 		Datatype datatype = Datatype.getByIri(filler.getDatatype().getDatatypeIRI());
@@ -104,10 +108,8 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().asString());
 			Datatype restrictionDatatype = Datatype.getByIri(
 					facetRestriction.getRestrictionValue().getDatatype().getDatatypeIRI());
-			Calendar parsedValue = (Calendar) parse(
+			Calendar restrictionValue = (Calendar) parse(
 					facetRestriction.getRestrictionValue().getLexicalForm(), restrictionDatatype);
-			Long restrictionValue = Long.valueOf(parsedValue.getTimeInMillis());
-			
 			
 			switch (facet) {
 				case MIN_INCLUSIVE: // >=
@@ -137,13 +139,19 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 			}
 		}
 
-		RestrictedValueSpace valueSpace = new RestrictedValueSpace(
+		DateTimeIntervalValueSpace valueSpace = new DateTimeIntervalValueSpace(
 				datatype, lowerBound, lowerInclusive, upperBound, upperInclusive);
 
 		if (valueSpace.isEmptyInterval()) {
+			//specified restrictions implies empty value (owl:Nothing)
 			return EmptyValueSpace.INSTANCE;
 		} else {
-			return valueSpace;
+			if (valueSpace.isUnipointInterval()) {
+				//specified restriction implies single dateTime value
+				return new DateTimeValue(valueSpace.lowerBound, datatype);
+			} else {
+				return valueSpace;
+			}
 		}
 	}
 

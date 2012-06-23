@@ -34,7 +34,12 @@ import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.*;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.*;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.*;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.PatternValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
@@ -111,10 +116,10 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		if (value != null) {
 			if (language != null && !language.isEmpty()) {
 				//language lat is present
-				return new LiteralValueSpace(new Pair<String, String>(value, language), datatype, effectiveDatatype);
+				return new LiteralValue(new Pair<String, String>(value, language), datatype, effectiveDatatype);
 			} else {
 				//no language tag for this literal
-				return new LiteralValueSpace(value, datatype, effectiveDatatype);
+				return new LiteralValue(value, datatype, effectiveDatatype);
 			}
 		} else {
 			return null;

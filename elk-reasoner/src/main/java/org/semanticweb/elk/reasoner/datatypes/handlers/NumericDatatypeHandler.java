@@ -41,7 +41,11 @@ import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NegativeInfinity;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.numbers.PositiveInfinity;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.*;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.NumericIntervalValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
@@ -53,7 +57,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression
  * Datatype expressions are converted to interval presentation with 
  * lower and upper bounds or single numeric value.
  * <p>
- * Uses {@link RestrictedValueSpace} and {@link UnipointValueSpace}
+ * Uses {@link NumericIntervalValueSpace} and {@link NumericValue}
  * to represent datatype restrictions
  *
  * @author Pospishnyi Olexandr
@@ -94,12 +98,12 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	}
 	
 	/**
-	 * Create {@link UnipointValueSpace} to represent single numeric value
+	 * Create {@link NumericValue} to represent single numeric value
 	 */
 	private ValueSpace createUnipointValueSpace(IndexedDataHasValue datatypeExpression) {
 		Datatype datatype = datatypeExpression.getDatatype();
 		String lexicalForm = datatypeExpression.getFiller().getLexicalForm();
-		return new UnipointValueSpace(datatype, (Number) parse(lexicalForm, datatype));
+		return new NumericValue(datatype, (Number) parse(lexicalForm, datatype));
 	}
 
 	/**
@@ -111,8 +115,8 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 
 	/**
 	 * Build corresponding restricted value space. If facet restriction implies
-	 * single value then corresponding {@link UnipointValueSpace} will be
-	 * constructed. Otherwise {@link RestrictedValueSpace} will be built that
+	 * single value then corresponding {@link NumericValue} will be
+	 * constructed. Otherwise {@link NumericIntervalValueSpace} will be built that
 	 * will represent specified facet restriction as an interval on numerical
 	 * axis.
 	 */
@@ -182,7 +186,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		}
 		
 		//build representing interval
-		RestrictedValueSpace valueSpace = new RestrictedValueSpace(
+		NumericIntervalValueSpace valueSpace = new NumericIntervalValueSpace(
 				datatype, lowerBound, lowerInclusive, upperBound, upperInclusive);
 		
 		if (valueSpace.isEmptyInterval()) {
@@ -191,7 +195,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		} else {
 			if (valueSpace.isUnipointInterval()) {
 				//specified restriction implies single numeric value
-				return new UnipointValueSpace(datatype, valueSpace.lowerBound);
+				return new NumericValue(datatype, valueSpace.lowerBound);
 			} else {
 				return valueSpace;
 			}
