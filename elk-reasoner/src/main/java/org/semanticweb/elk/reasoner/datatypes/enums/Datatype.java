@@ -25,7 +25,9 @@ package org.semanticweb.elk.reasoner.datatypes.enums;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 
@@ -118,6 +120,18 @@ public enum Datatype {
 			dt = dt.parent;
 		}
 		return dt;
+	}
+	
+	/**
+	 * Get all disjoint root datatypes (ones that define some family of
+	 * datatypes, such as literals, numbers, dateTime, etc.)
+	 *
+	 * @see #getRootValueSpaceDatatype
+	 * @return list of all root datatypes
+	 */
+	public static Set<Datatype> getRootDatatypes() {
+		return EnumSet.of(xsd_dateTime, xsd_base64Binary, xsd_hexBinary, xsd_anyURI,
+				owl_real, rdf_PlainLiteral, rdf_XMLiteral, rdfs_Literal);
 	}
 	
 	/**

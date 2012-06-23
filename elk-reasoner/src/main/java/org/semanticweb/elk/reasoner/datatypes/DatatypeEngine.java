@@ -89,8 +89,21 @@ public class DatatypeEngine {
 		DatatypeHandler handler = getDatatypeHandler(datatypeExpression.getDatatype());
 		ValueSpace valueSpace = handler.convert(datatypeExpression);
 		if (valueSpace != null) {
-			propertyStore.add(valueSpace.getDatatype().getRootValueSpaceDatatype(),
-					new Pair(valueSpace, datatypeExpression));
+			if (valueSpace.getDatatype() == Datatype.rdfs_Literal) {
+				/*
+				 * This is a very rare and special case when rdfs:Literal is
+				 * occurring negatively. Such axiom subsumes all other axioms.
+				 * Due to specific organization of propertyStore and datatype
+				 * processing we must assign this information to every root
+				 * datatype.
+				 */
+				for (Datatype datatype : Datatype.getRootDatatypes()) {
+					propertyStore.add(datatype, new Pair(valueSpace, datatypeExpression));
+				}
+			} else {
+				propertyStore.add(valueSpace.getDatatype().getRootValueSpaceDatatype(),
+						new Pair(valueSpace, datatypeExpression));
+			}
 		}
 	}
 
