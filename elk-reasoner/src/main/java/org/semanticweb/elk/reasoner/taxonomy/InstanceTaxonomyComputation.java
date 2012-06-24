@@ -25,32 +25,32 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 // TODO: documentation
 
 /**
- * Computing taxonomy relations between atomic classes of the ontology.
+ * Computing taxonomy relations between named individuals and atomic classes of the ontology.
  * 
  * @author Frantisek Simancik
  * @author Yevgeny Kazakov
  * 
  */
-public class TaxonomyComputation
+public class InstanceTaxonomyComputation
 		extends
-		ReasonerComputation<IndexedClassEntity, TaxonomyComputationFactory.Engine, TaxonomyComputationFactory> {
+		ReasonerComputation<IndexedIndividual, InstanceTaxonomyComputationFactory.Engine, InstanceTaxonomyComputationFactory> {
 
-	public TaxonomyComputation(Iterable<? extends IndexedClassEntity> inputs,
+	public InstanceTaxonomyComputation(Iterable<IndexedIndividual> inputs,
 			int inputsSize, ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
 			IndividualClassTaxonomy partialTaxonomy) {
-		super(inputs, inputsSize, new TaxonomyComputationFactory(ontologyIndex,
+		super(inputs, inputsSize, new InstanceTaxonomyComputationFactory(ontologyIndex,
 				maxWorkers, partialTaxonomy), executor, maxWorkers,
 				progressMonitor);
 	}
 
-	public TaxonomyComputation(Iterable<? extends IndexedClassEntity> inputs,
+	public InstanceTaxonomyComputation(Iterable<IndexedIndividual> inputs,
 			int inputsSize, ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		this(inputs, inputsSize, executor, maxWorkers, progressMonitor,

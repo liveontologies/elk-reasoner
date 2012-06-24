@@ -40,19 +40,13 @@ public class ObjectPropertyHierarchyComputation
 		extends
 		ReasonerComputation<IndexedPropertyChain, ObjectPropertyHierarchyComputationFactory.Engine, ObjectPropertyHierarchyComputationFactory> {
 
-	/**
-	 * the index of the ontology used for computation
-	 */
-	protected final OntologyIndex ontologyIndex;
-
-	public ObjectPropertyHierarchyComputation(
+	protected ObjectPropertyHierarchyComputation(
 			ObjectPropertyHierarchyComputationFactory inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
-				.getIndexedObjectPropertyCount(), inputProcessorFactory,
+				.getIndexedPropertyChainCount(), inputProcessorFactory,
 				executor, maxWorkers, progressMonitor);
-		this.ontologyIndex = ontologyIndex;
 	}
 
 	public ObjectPropertyHierarchyComputation(ComputationExecutor executor,

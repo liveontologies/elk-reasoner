@@ -53,16 +53,11 @@ public class HashConfigurationUtils {
 																	"expected.hash",
 																	new TestManifestCreator<URLTestIO, HashTestOutput, AO>() {
 			@Override
-			public TestManifest<URLTestIO, HashTestOutput, AO> create(URL input, URL output) {
+			public TestManifest<URLTestIO, HashTestOutput, AO> create(URL input, URL output) throws IOException {
 				//input is an OWL ontology, expected output is a hash code
-				try {
-					int hash = IOUtils.readInteger(output, 10);
+				int hash = IOUtils.readInteger(output, 10);
 					
-					return new HashTaxonomyTestManifest<AO>(input, new HashTestOutput(hash));
-				} catch (IOException e) {
-					// TODO Log it
-					return null;
-				} 
+				return new HashTaxonomyTestManifest<AO>(input, new HashTestOutput(hash));
 			}
 		});
 	}
