@@ -55,7 +55,8 @@ public class IndexedDataHasValueEntry<T, K extends IndexedDataHasValue> extends 
 		if (other instanceof IndexedDataHasValueEntry<?, ?>) {
 			IndexedDataHasValueEntry<?, ?> otherEntry = (IndexedDataHasValueEntry<?, ?>) other;
 			return this.key.getProperty().getIri().equals(otherEntry.key.getProperty().getIri())
-					&& this.key.getFiller().getLexicalForm().equals(otherEntry.key.getFiller().getLexicalForm());
+					&& this.key.getFiller().equals(otherEntry.key.getFiller())
+					&& this.key.getDatatype().equals(otherEntry.key.getDatatype());
 		}
 		return false;
 	}

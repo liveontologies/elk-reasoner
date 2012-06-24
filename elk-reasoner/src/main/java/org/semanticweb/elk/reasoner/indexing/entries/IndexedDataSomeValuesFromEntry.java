@@ -50,7 +50,8 @@ public class IndexedDataSomeValuesFromEntry<T, K extends IndexedDataSomeValuesFr
 		if (other instanceof IndexedDataSomeValuesFromEntry<?, ?>) {
 			IndexedDataSomeValuesFromEntry<?, ?> otherView = (IndexedDataSomeValuesFromEntry<?, ?>) other;
 			return this.key.getProperty().equals(otherView.key.getProperty())
-					&& this.key.getFiller().equals(otherView.key.getFiller());
+					&& this.key.getFiller().equals(otherView.key.getFiller())
+					&& this.key.getDatatype().equals(otherView.key.getDatatype());
 		}
 		return false;
 	}
