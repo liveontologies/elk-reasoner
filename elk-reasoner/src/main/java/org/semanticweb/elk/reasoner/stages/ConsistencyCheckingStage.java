@@ -99,7 +99,8 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		computation.printStatistics();
+		if (computation != null)
+			computation.printStatistics();
 	}
 
 }
