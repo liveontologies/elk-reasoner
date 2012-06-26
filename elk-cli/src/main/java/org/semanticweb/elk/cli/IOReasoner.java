@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.util.logging.Statistics;
 
 public class IOReasoner extends Reasoner {
@@ -90,7 +90,7 @@ public class IOReasoner extends Reasoner {
 			LOGGER_.info("Writing taxonomy to " + file);
 		}
 		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
-		ClassTaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
+		TaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
 				file.getPath(), true);
 		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
 	}

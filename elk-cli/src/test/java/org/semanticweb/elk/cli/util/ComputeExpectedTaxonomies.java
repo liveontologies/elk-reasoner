@@ -39,7 +39,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.InconsistentTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 
@@ -99,7 +99,7 @@ public class ComputeExpectedTaxonomies  {
 				OutputStreamWriter writer = new OutputStreamWriter(
 						new FileOutputStream(out));
 				
-				ClassTaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+				TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
 				
 				writer.flush();
 				writer.close();				

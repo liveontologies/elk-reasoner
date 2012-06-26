@@ -31,7 +31,7 @@ import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyLoader;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyLoader;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
@@ -70,7 +70,7 @@ public abstract class DiffClassificationCorrectnessTest extends
 						InputStream stream = null;
 						
 						try {
-							Taxonomy<ElkClass> expectedTaxonomy = ClassTaxonomyLoader.load(new Owl2FunctionalStyleParser(stream = output.openStream()));
+							Taxonomy<ElkClass> expectedTaxonomy = TaxonomyLoader.load(new Owl2FunctionalStyleParser(stream = output.openStream()));
 							
 							return new TaxonomyDiffManifest<ClassTaxonomyTestOutput>(input, new ClassTaxonomyTestOutput(expectedTaxonomy));
 							
