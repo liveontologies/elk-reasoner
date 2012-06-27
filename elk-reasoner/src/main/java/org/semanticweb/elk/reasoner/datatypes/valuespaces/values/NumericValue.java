@@ -34,15 +34,17 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 public class NumericValue implements ValueSpace {
 
 	public Datatype datatype;
+	public Datatype effectiveDatatype;
 	public Number value;
 
 	public NumericValue(Datatype datatype, Number value) {
-		this.datatype = datatype;
 		this.value = value;
+		this.datatype = datatype;
+		this.effectiveDatatype = Datatype.getCorrespondingDatatype(value);
 	}
 
 	public Datatype getDatatype() {
-		return datatype;
+		return effectiveDatatype;
 	}
 
 	public ValueSpaceType getType() {
@@ -50,8 +52,7 @@ public class NumericValue implements ValueSpace {
 	}
 
 	public boolean isEmptyInterval() {
-		Datatype mostSpecificDatatype = Datatype.getCorrespondingDatatype(value);
-		return !mostSpecificDatatype.isCompatibleWith(datatype);
+		return !effectiveDatatype.isCompatibleWith(datatype);
 	}
 
 	/**

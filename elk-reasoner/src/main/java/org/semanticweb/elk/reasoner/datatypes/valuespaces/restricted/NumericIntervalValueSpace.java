@@ -41,12 +41,15 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
 public class NumericIntervalValueSpace implements ValueSpace {
 
 	public Datatype datatype;
+	public Datatype effectiveDatatype;
 	public Number lowerBound;
 	public boolean lowerInclusive;
 	public Number upperBound;
 	public boolean upperInclusive;
 
 	public NumericIntervalValueSpace(Datatype datatype, Number lowerBound, boolean lowerInclusive, Number upperBound, boolean upperInclusive) {
+		this.datatype = datatype;
+		this.effectiveDatatype = datatype;
 		if (datatype == Datatype.xsd_integer || datatype == Datatype.xsd_nonNegativeInteger) {
 			if (!lowerInclusive) {
 				lowerBound = advance(lowerBound, true);
@@ -56,8 +59,11 @@ public class NumericIntervalValueSpace implements ValueSpace {
 				upperBound = advance(upperBound, false);
 				upperInclusive = true;
 			}
+			if (datatype == Datatype.xsd_integer
+					&& NumberComparator.INSTANCE.compare(lowerBound, Integer.valueOf(0)) >= 0) {
+				effectiveDatatype = Datatype.xsd_nonNegativeInteger;
+			}
 		}
-		this.datatype = datatype;
 		this.lowerBound = lowerBound;
 		this.lowerInclusive = lowerInclusive;
 		this.upperBound = upperBound;
@@ -173,7 +179,7 @@ public class NumericIntervalValueSpace implements ValueSpace {
 	}
 
 	public Datatype getDatatype() {
-		return datatype;
+		return effectiveDatatype;
 	}
 
 	public ValueSpaceType getType() {
@@ -192,7 +198,7 @@ public class NumericIntervalValueSpace implements ValueSpace {
 		switch (valueSpace.getType()) {
 			case NUMERIC_VALUE: {
 				NumericValue point = (NumericValue) valueSpace;
-				if (!point.datatype.isCompatibleWith(this.datatype)) {
+				if (!point.getDatatype().isCompatibleWith(this.datatype)) {
 					return false;
 				}
 				int l = NumberComparator.INSTANCE.compare(point.value, this.lowerBound);
@@ -201,7 +207,7 @@ public class NumericIntervalValueSpace implements ValueSpace {
 			}
 			case NUMERIC_INTERVAL: {
 				NumericIntervalValueSpace range = (NumericIntervalValueSpace) valueSpace;
-				if (!range.datatype.isCompatibleWith(this.datatype)) {
+				if (!range.getDatatype().isCompatibleWith(this.datatype)) {
 					return false;
 				}
 				int l = NumberComparator.INSTANCE.compare(this.lowerBound, range.lowerBound);

@@ -34,12 +34,12 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 public class DateTimeValue implements ValueSpace {
 
 	public Calendar value;
-	public Datatype toldDatatype;
+	public Datatype datatype;
 	public Datatype effectiveDatatype;
 
 	public DateTimeValue(Calendar value, Datatype datatype) {
 		this.value = value;
-		this.toldDatatype = datatype;
+		this.datatype = datatype;
 		if (value.getTimeZone().getID().startsWith("GMT")) {
 			effectiveDatatype = Datatype.xsd_dateTimeStamp;
 		} else {

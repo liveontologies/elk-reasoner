@@ -1,0 +1,24 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/TestELK.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(<http://www.semanticweb.org/TestELK.owl>
+
+Declaration(Class(:A))
+Declaration(Class(:B))
+Declaration(Class(:C))
+Declaration(Class(:D))
+Declaration(Class(:E))
+
+SubClassOf(<http://www.semanticweb.org/TestELK.owl#C> owl:Thing)
+SubClassOf(<http://www.semanticweb.org/TestELK.owl#A> <http://www.semanticweb.org/TestELK.owl#D>)
+SubClassOf(<http://www.semanticweb.org/TestELK.owl#B> <http://www.semanticweb.org/TestELK.owl#D>)
+SubClassOf(<http://www.semanticweb.org/TestELK.owl#D> <http://www.semanticweb.org/TestELK.owl#C>)
+SubClassOf(<http://www.semanticweb.org/TestELK.owl#E> <http://www.semanticweb.org/TestELK.owl#C>)
+
+Declaration(DataProperty(:prop))
+)
