@@ -22,9 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
-import java.util.Calendar;
-import java.util.Date;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.reasoner.datatypes.handlers.DateTimeDatatypeHandler;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
 
@@ -36,21 +36,13 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
  */
 public class DateTimeIntervalValueSpace implements ValueSpace {
 
-	public static final Calendar START_OF_TIME = Calendar.getInstance();
-	public static final Calendar END_OF_TIME = Calendar.getInstance();
-	
-	static {
-		START_OF_TIME.setTime(new Date(Long.MIN_VALUE));
-		END_OF_TIME.setTime(new Date(Long.MAX_VALUE));
-	}
-	
 	public Datatype datatype;
-	public Calendar lowerBound;
+	public XMLGregorianCalendar lowerBound;
 	public boolean lowerInclusive;
-	public Calendar upperBound;
+	public XMLGregorianCalendar upperBound;
 	public boolean upperInclusive;
 
-	public DateTimeIntervalValueSpace(Datatype datatype, Calendar lowerBound, boolean lowerInclusive, Calendar upperBound, boolean upperInclusive) {
+	public DateTimeIntervalValueSpace(Datatype datatype, XMLGregorianCalendar lowerBound, boolean lowerInclusive, XMLGregorianCalendar upperBound, boolean upperInclusive) {
 		this.datatype = datatype;
 		this.lowerBound = lowerBound;
 		this.lowerInclusive = lowerInclusive;
@@ -58,15 +50,14 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 		this.upperInclusive = upperInclusive;
 	}
 
-
 	public boolean isEmptyInterval() {
-		int boundComparison = lowerBound.compareTo(upperBound);
+		int boundComparison = lowerBound.compare(upperBound);
 		if (boundComparison > 0) {
 			return true;
 		} else if (boundComparison == 0) {
 			if (!lowerInclusive || !upperInclusive
-					|| lowerBound == START_OF_TIME
-					|| upperBound == END_OF_TIME) {
+					|| lowerBound == DateTimeDatatypeHandler.START_OF_TIME
+					|| upperBound == DateTimeDatatypeHandler.END_OF_TIME) {
 				return true;
 			}
 			return false;
@@ -76,7 +67,7 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 	}
 
 	public boolean isUnipointInterval() {
-		return lowerBound.compareTo(upperBound) == 0;
+		return lowerBound.compare(upperBound) == 0;
 	}
 
 	public Datatype getDatatype() {
@@ -102,8 +93,8 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 				if (!point.getDatatype().isCompatibleWith(this.datatype)) {
 					return false;
 				}
-				int l = point.value.compareTo(this.lowerBound);
-				int u = point.value.compareTo(this.upperBound);
+				int l = point.value.compare(this.lowerBound);
+				int u = point.value.compare(this.upperBound);
 				return (lowerInclusive ? l >= 0 : l > 0) && (upperInclusive ? u <= 0 : u < 0);
 			}
 			case DATETIME_INTERVAL: {
@@ -111,8 +102,8 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 				if (!range.datatype.isCompatibleWith(this.datatype)) {
 					return false;
 				}
-				int l = this.lowerBound.compareTo(range.lowerBound);
-				int u = this.upperBound.compareTo(range.upperBound);
+				int l = this.lowerBound.compare(range.lowerBound);
+				int u = this.upperBound.compare(range.upperBound);
 				boolean result = true;
 
 				if (!this.lowerInclusive && range.lowerInclusive) {

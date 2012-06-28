@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
-import java.util.Calendar;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
@@ -33,14 +34,14 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
  */
 public class DateTimeValue implements ValueSpace {
 
-	public Calendar value;
+	public XMLGregorianCalendar value;
 	public Datatype datatype;
 	public Datatype effectiveDatatype;
 
-	public DateTimeValue(Calendar value, Datatype datatype) {
+	public DateTimeValue(XMLGregorianCalendar value, Datatype datatype) {
 		this.value = value;
 		this.datatype = datatype;
-		if (value.getTimeZone().getID().startsWith("GMT")) {
+		if (value.getTimezone() != DatatypeConstants.FIELD_UNDEFINED) {
 			effectiveDatatype = Datatype.xsd_dateTimeStamp;
 		} else {
 			effectiveDatatype = Datatype.xsd_dateTime;
@@ -72,7 +73,8 @@ public class DateTimeValue implements ValueSpace {
 		switch (valueSpace.getType()) {
 			case DATETIME_VALUE:
 				DateTimeValue vs = (DateTimeValue) valueSpace;
-				return this.value.equals(vs.value);
+				return this.value.compare(vs.value) == 0
+						&& this.value.getTimezone() == vs.value.getTimezone();
 			default:
 				return false;
 		}
