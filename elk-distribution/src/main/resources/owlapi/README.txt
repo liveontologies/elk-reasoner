@@ -29,6 +29,8 @@ REQUIREMENTS:
 ELK OWL API bindings are tested to work with OWL API ${owlapi.version}. It may work 
 with other versions of OWL API.
 
+Java ${java.required.version} or higher.
+
 INSTALLATION:
 
 To use the library make sure that Java finds ${elk-owlapi.base}.jar, and
