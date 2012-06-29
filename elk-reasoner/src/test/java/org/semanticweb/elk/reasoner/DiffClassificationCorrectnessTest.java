@@ -72,7 +72,7 @@ public abstract class DiffClassificationCorrectnessTest extends
 						try {
 							Taxonomy<ElkClass> expectedTaxonomy = TaxonomyLoader.load(new Owl2FunctionalStyleParser(stream = output.openStream()));
 							
-							return new TaxonomyDiffManifest<ClassTaxonomyTestOutput>(input, new ClassTaxonomyTestOutput(expectedTaxonomy));
+							return new TaxonomyDiffManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>(input, new ClassTaxonomyTestOutput(expectedTaxonomy));
 							
 						} catch (Owl2ParseException e) {
 							throw new IOException(e);

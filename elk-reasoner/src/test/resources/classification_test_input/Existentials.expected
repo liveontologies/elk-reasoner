@@ -1,9 +1,9 @@
 Ontology(
-Declaration(Class(<http://example.org/A>))
-Declaration(Class(<http://example.org/D>))
 Declaration(Class(<http://example.org/B>))
 Declaration(Class(<http://example.org/C>))
 Declaration(Class(<http://example.org/E>))
+Declaration(Class(<http://example.org/A>))
+Declaration(Class(<http://example.org/D>))
 EquivalentClasses(<http://example.org/B> <http://example.org/C>)
 SubClassOf(<http://example.org/A> <http://example.org/D>)
 SubClassOf(<http://example.org/A> <http://example.org/E>)

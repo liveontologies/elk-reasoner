@@ -122,7 +122,7 @@ public class TaxonomyPrinter {
 		writer.write(")");
 		
 		if (addHash) {
-			writer.write("\n\n# Hash code: " + getHashString(taxonomy)
+			writer.write("\n\n# Hash code: " + getInstanceHashString(taxonomy)
 					+ "\n");
 		}
 	}	
@@ -140,7 +140,7 @@ public class TaxonomyPrinter {
 		return Integer.toHexString(TaxonomyHasher.hash(taxonomy));
 	}
 	
-	public static String getHashString(InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
+	public static String getInstanceHashString(InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
 		return Integer.toHexString(InstanceTaxonomyHasher.hash(taxonomy));
 	}	
 

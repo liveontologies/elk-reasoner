@@ -30,10 +30,8 @@ import static org.junit.Assert.assertSame;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.concurrent.Executors;
 
 import org.junit.Test;
@@ -48,6 +46,7 @@ import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 
 /**
@@ -61,15 +60,32 @@ import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 public class TaxonomyIOTest {
 
 	@Test
-	public void roundtrip() throws IOException, Owl2ParseException,
+	public void classTaxonomyRoundtrip() throws IOException, Owl2ParseException,
 			InconsistentOntologyException {
-		InstanceTaxonomy<ElkClass, ElkNamedIndividual> original = loadAndClassify("io/taxonomy.owl");
+		Taxonomy<ElkClass> original = loadAndClassify("io/taxonomy.owl");
+		StringWriter writer = new StringWriter();
+
+		TaxonomyPrinter.dumpClassTaxomomy(original, writer, false);
+
+		StringReader reader = new StringReader(writer.getBuffer().toString());
+		Owl2Parser parser = new Owl2FunctionalStyleParser(reader);
+		Taxonomy<ElkClass> loaded = TaxonomyLoader.load(parser);
+		
+		// compare
+		assertEquals(TaxonomyHasher.hash(original),
+				TaxonomyHasher.hash(loaded));
+	}
+	
+	@Test
+	public void instanceTaxonomyRoundtrip() throws IOException, Owl2ParseException,
+			InconsistentOntologyException {
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> original = loadAndClassify("io/instance_taxonomy.owl");
 		StringWriter writer = new StringWriter();
 
 		
-		Writer outWriter = new OutputStreamWriter(System.out);
-		TaxonomyPrinter.dumpInstanceTaxomomy(original, outWriter, true);
-		outWriter.flush();
+		/*Writer outWriter = new OutputStreamWriter(System.out);
+		TaxonomyPrinter.dumpInstanceTaxomomy(original, outWriter, false);
+		outWriter.flush();*/
 		 
 
 		TaxonomyPrinter.dumpInstanceTaxomomy(original, writer, false);
@@ -78,15 +94,15 @@ public class TaxonomyIOTest {
 		Owl2Parser parser = new Owl2FunctionalStyleParser(reader);
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> loaded = TaxonomyLoader.load(parser);
 		
-		System.out.println("=================================");
+		/*System.out.println("=================================");
 		outWriter = new OutputStreamWriter(System.out);
-		TaxonomyPrinter.dumpInstanceTaxomomy(loaded, outWriter, true);
-		outWriter.flush();
+		TaxonomyPrinter.dumpInstanceTaxomomy(loaded, outWriter, false);
+		outWriter.flush();*/
 		
 		// compare
-		assertEquals(TaxonomyHasher.hash(original),
-				TaxonomyHasher.hash(loaded));
-	}
+		assertEquals(InstanceTaxonomyHasher.hash(original),
+				InstanceTaxonomyHasher.hash(loaded));
+	}	
 
 	/*
 	 * Test that reordering classes in EquivalentClasses axioms and replacing a
