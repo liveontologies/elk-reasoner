@@ -84,12 +84,14 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 
 	private ValueSpace createLiteralValueSpace(IndexedDataHasValue datatypeExpression) {
 		Datatype datatype = datatypeExpression.getDatatype();
-		String language = datatypeExpression.getFiller().getLanguage();
-		String lexicalForm = datatypeExpression.getFiller().getLexicalForm();
-
-		String value = (String) parse(lexicalForm, datatype);
 		Datatype effectiveDatatype = datatype;
 		
+		String lexicalForm = datatypeExpression.getFiller().getLexicalForm();
+
+		String[] pair = (String[]) parse(lexicalForm, datatype);
+		String value = pair[0];
+		String language = pair[1] != null ? pair[1] : datatypeExpression.getFiller().getLanguage();
+
 		//determine most specific datatype for this literal
 		switch (datatype) {
 			case rdf_PlainLiteral:
@@ -115,7 +117,7 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		
 		if (value != null) {
 			if (language != null && !language.isEmpty()) {
-				//language lat is present
+				//language tag is present
 				return new LiteralValue(new Pair<String, String>(value, language), datatype, effectiveDatatype);
 			} else {
 				//no language tag for this literal
@@ -135,7 +137,9 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		outerloop:
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
 			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().asString());
-			String value = facetRestriction.getRestrictionValue().getLexicalForm();
+			String lexicalForm = facetRestriction.getRestrictionValue().getLexicalForm();
+			String[] pair = (String[]) parse(lexicalForm, datatype);
+			String value = pair[0];
 
 			switch (facet) {
 				case LENGTH:
@@ -164,8 +168,15 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
-	public Object parse(String literal, Datatype datatype) {
-		return literal;
+	public Object parse(String lexicalForm, Datatype datatype) {
+		int lastAt = lexicalForm.lastIndexOf('@');
+		if (lastAt != -1) {
+			String string = lexicalForm.substring(0, lastAt);
+			String languageTag = lexicalForm.substring(lastAt + 1);
+			return new String[]{string, languageTag};
+		} else {
+			return new String[]{lexicalForm, null};
+		}
 	}
 	/*
 	 * Constants

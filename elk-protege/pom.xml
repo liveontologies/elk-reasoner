@@ -54,6 +54,11 @@
 			<artifactId>elk-reasoner</artifactId>
 			<version>0.2.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>dk.brics.automaton</groupId>
+			<artifactId>automaton</artifactId>
+			<version>1.11-8</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -92,6 +97,7 @@
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
 						<Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package>
 						<Private-Package>org.semanticweb.elk.*;-split-package:=merge-first</Private-Package>
+						<Embed-Dependency>automaton</Embed-Dependency>
 						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>

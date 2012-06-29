@@ -1,0 +1,37 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+Declaration(Class(:DA))
+Declaration(Class(:DB))
+Declaration(Class(:DC))
+Declaration(Class(:DD))
+Declaration(Class(:DE))
+Declaration(Class(:DF))
+Declaration(Class(:DG))
+Declaration(Class(:DH))
+Declaration(Class(:DI))
+Declaration(Class(:DJ))
+Declaration(Class(:DK))
+
+EquivalentClasses(:DA DataHasValue(:prop "Foo"@us))
+EquivalentClasses(:DB DataHasValue(:prop "Foo"^^xsd:string))
+EquivalentClasses(:DC DataHasValue(:prop "foooooo"^^xsd:normalizedString))
+EquivalentClasses(:DD DataSomeValuesFrom(:prop DatatypeRestriction(xsd:string xsd:length "3"^^xsd:integer)))
+EquivalentClasses(:DE DataSomeValuesFrom(:prop DatatypeRestriction(xsd:string xsd:minLength "3"^^xsd:integer xsd:maxLength "10"^^xsd:integer)))
+EquivalentClasses(:DF DataSomeValuesFrom(:prop DatatypeRestriction(xsd:string xsd:maxLength "5"^^xsd:integer)))
+EquivalentClasses(:DG DataSomeValuesFrom(:prop DatatypeRestriction(xsd:string xsd:pattern "[a-z]+")))
+EquivalentClasses(:DH DataSomeValuesFrom(:prop DatatypeRestriction(rdf:PlainLiteral xsd:minLength "3"^^xsd:integer xsd:maxLength "3"^^xsd:integer)))
+EquivalentClasses(:DI DataSomeValuesFrom(:prop DatatypeRestriction(xsd:string xsd:pattern "[A-Z]oo")))
+EquivalentClasses(:DJ DataSomeValuesFrom(:prop DatatypeRestriction(xsd:string xsd:minLength "1"^^xsd:integer)))
+EquivalentClasses(:DK DataSomeValuesFrom(:prop DatatypeRestriction(xsd:token xsd:minLength "11"^^xsd:integer xsd:maxLength "10"^^xsd:integer)))
+
+Declaration(DataProperty(:prop))
+Declaration(DataProperty(:prop2))
+)

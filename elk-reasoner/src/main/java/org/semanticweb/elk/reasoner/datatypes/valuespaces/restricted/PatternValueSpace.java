@@ -22,7 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
-import java.util.regex.Pattern;
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.BasicOperations;
+import dk.brics.automaton.RegExp;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
@@ -34,13 +36,13 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
  */
 public class PatternValueSpace implements ValueSpace {
 
-	public Pattern pattern;
+	public Automaton automaton;
 	public Datatype datatype;
 
 	public PatternValueSpace(String regexp, Datatype datatype) {
 		try {
 			this.datatype = datatype;
-			this.pattern = Pattern.compile(regexp);
+			this.automaton = new RegExp(regexp).toAutomaton();
 		} catch (Throwable th) {
 		}
 	}
@@ -54,16 +56,21 @@ public class PatternValueSpace implements ValueSpace {
 	}
 
 	public boolean isEmptyInterval() {
-		return pattern != null;
+		return automaton == null || automaton.isEmpty();
 	}
-
+	
 	/**
 	 * PatternValueSpace could contain
-	 * - another PatternValueSpace if both are equal 
+	 * - another PatternValueSpace if one is a subset of another
+	 * - LengthRestrictedValueSpace that will satisfy this pattern 
 	 * - LiteralValue that matches pattern
 	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
+	 * 
+	 * Note: BasicOperations.subsetOf() appears to be not thread safe.
+	 * Cloning initial automatons to avoid ConcurrentModificationException.
+	 * Todo: synchronize this block is performance well be an issues
 	 */
 	public boolean contains(ValueSpace valueSpace) {
 		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.datatype);
@@ -73,10 +80,13 @@ public class PatternValueSpace implements ValueSpace {
 		switch (valueSpace.getType()) {
 			case LITERAL_VALUE:
 				LiteralValue lvs = (LiteralValue) valueSpace;
-				return pattern.matcher(lvs.value).matches();
+				return automaton.run(lvs.value);
 			case PATTERN:
 				PatternValueSpace pvs = (PatternValueSpace) valueSpace;
-				return this.pattern.pattern().equals(pvs.pattern.pattern());
+				return BasicOperations.subsetOf(pvs.automaton.clone(), this.automaton.clone());
+			case LENGTH_RESTRICTED:
+				LengthRestrictedValueSpace lrvs = (LengthRestrictedValueSpace) valueSpace;
+				return BasicOperations.subsetOf(lrvs.asAutomaton().clone(), this.automaton.clone());
 			default:
 				return false;
 		}

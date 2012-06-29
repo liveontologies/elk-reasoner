@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.BasicOperations;
+import dk.brics.automaton.Datatypes;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
@@ -37,11 +40,22 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	private Integer minLength;
 	private Integer maxLength;
 	private Datatype datatype;
+	private Automaton automaton;
 
 	public LengthRestrictedValueSpace(Datatype datatype, Integer minLength, Integer maxLength) {
 		this.minLength = minLength;
 		this.maxLength = maxLength;
 		this.datatype = datatype;
+		Automaton anyCharAutomaton = Datatypes.get("Char");
+		if (maxLength == Integer.MAX_VALUE) {
+			if (minLength == 0) {
+				automaton = anyCharAutomaton.repeat();
+			} else {
+				automaton = BasicOperations.repeat(anyCharAutomaton, minLength);
+			}
+		} else {
+			automaton = BasicOperations.repeat(anyCharAutomaton, minLength, maxLength);
+		}
 	}
 
 	public Datatype getDatatype() {
@@ -67,11 +81,21 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 		}
 		return false;
 	}
+	
+	/**
+	 * Finite-state automaton that represents literal length restriction.
+	 * Used to deduce subsumption between LengthRestrictedValueSpace and PatternValueSpace
+	 * @return Automaton
+	 */
+	public Automaton asAutomaton() {
+		return automaton;
+	}
 
 	/**
 	 * LengthRestrictedValueSpace could contain
 	 * - another LengthRestrictedValueSpace within this one 
 	 * - LiteralValue that satisfies length restrictions
+	 * - PatternValueSpace that will satisfy length restrictions
 	 * - BinaryValue that satisfies length restrictions
 	 *
 	 * @param valueSpace
@@ -91,6 +115,9 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 				LiteralValue lvs = (LiteralValue) valueSpace;
 				return minLength.compareTo(lvs.value.length()) <= 0
 						&& maxLength.compareTo(lvs.value.length()) >= 0;
+			case PATTERN:
+				PatternValueSpace pvs = (PatternValueSpace) valueSpace;
+				return BasicOperations.subsetOf(pvs.automaton.clone(), this.asAutomaton().clone());
 			case BINARY_VALUE:
 				BinaryValue bvs = (BinaryValue) valueSpace;
 				return minLength.compareTo(bvs.value.length) <= 0
