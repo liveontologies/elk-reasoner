@@ -40,31 +40,33 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 /**
- * Illustrates classification and realization (computing instances for each
- * class) of an ontology
+ * This examples illustrates how to retrieve instances for each
+ * class in an ontology.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ClassificationAndRealization {
+public class RetrievingInstances {
 
 	/**
 	 * @param args
 	 * @throws OWLOntologyCreationException
 	 */
 	public static void main(String[] args) throws OWLOntologyCreationException {
-		// Create an ELK reasoner factory.
-		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
-
 		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+
 		// Load your ontology.
 		OWLOntology ont = man
 				.loadOntologyFromOntologyDocument(new File(args[0]));
+		
 		// Create an ELK reasoner.
+		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
 		OWLReasoner reasoner = reasonerFactory.createReasoner(ont);
-		// Classify the ontology.
-		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		
+		// Precompute instances for each named class in the ontology
+		reasoner.precomputeInferences(InferenceType.CLASS_ASSERTIONS);
+
 		// List representative instances for each class.
 		for (OWLClass clazz : ont.getClassesInSignature()) {
 			for (Node<OWLNamedIndividual> individual : reasoner.getInstances(
@@ -72,9 +74,9 @@ public class ClassificationAndRealization {
 				System.out.println(clazz + "("
 						+ individual.getRepresentativeElement() + ")");
 			}
-			//System.out.println(reasoner.getInstances(clazz, true).getNodes().size());
 		}
-		
+
+		// Terminate the worker threads used by the reasoner.
 		reasoner.dispose();
 	}
 
