@@ -109,8 +109,10 @@ public class ElkReasoner implements OWLReasoner {
 	protected final boolean isBufferingMode;
 	/** listener to implement addition and removal of axioms */
 	protected final OntologyChangeListener ontologyChangeListener;
-	/** the object using which one can load the ontology and its changes */
-	private final OntologyProvider ontologyProvider;
+	/** the object using which one can load the ontology */
+	private final OwlOntologyProvider ontologyProvider;
+	/** the object using which one can load the ontology changes */
+	private final OwlOntologyChangesProvider ontologyChangesProvider;
 	/** ELK object factory used to create any ElkObjects */
 	protected final ElkObjectFactory objectFactory;
 	/** Converter from OWL API to ELK OWL */
@@ -136,10 +138,13 @@ public class ElkReasoner implements OWLReasoner {
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
 		this.elkProgressMonitor = elkConfig.getProgressMonitor() == null ? new DummyProgressMonitor()
 				: new ElkReasonerProgressMonitor(elkConfig.getProgressMonitor());
-		this.ontologyProvider = new OntologyProvider(ontology,
+		this.ontologyProvider = new OwlOntologyProvider(ontology,
+				this.elkProgressMonitor);
+		this.ontologyChangesProvider = new OwlOntologyChangesProvider(
 				this.elkProgressMonitor);
 		this.reasoner = new ReasonerFactory().createReasoner(ontologyProvider,
-				stageExecutor, elkConfig.getElkConfiguration());
+				ontologyChangesProvider, stageExecutor,
+				elkConfig.getElkConfiguration());
 		this.reasoner
 				.setAllowFreshEntities(elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW);
 		this.reasoner.setProgressMonitor(this.elkProgressMonitor);
@@ -444,17 +449,17 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public Set<OWLAxiom> getPendingAxiomAdditions() {
-		return ontologyProvider.getPendingAxiomAdditions();
+		return ontologyChangesProvider.getPendingAxiomAdditions();
 	}
 
 	@Override
 	public Set<OWLAxiom> getPendingAxiomRemovals() {
-		return ontologyProvider.getPendingAxiomRemovals();
+		return ontologyChangesProvider.getPendingAxiomRemovals();
 	}
 
 	@Override
 	public List<OWLOntologyChange> getPendingChanges() {
-		return ontologyProvider.getPendingChanges();
+		return ontologyChangesProvider.getPendingChanges();
 	}
 
 	@Override
@@ -677,7 +682,7 @@ public class ElkReasoner implements OWLReasoner {
 			return reasoner.doneTaxonomy();
 		if (inferenceType.equals(InferenceType.CLASS_ASSERTIONS))
 			return reasoner.doneInstanceTaxonomy();
-		
+
 		return false;
 	}
 
@@ -733,7 +738,7 @@ public class ElkReasoner implements OWLReasoner {
 				throws OWLException {
 			for (OWLOntologyChange change : changes) {
 				if (change.isAxiomChange()) {
-					ontologyProvider.registerChange(change);
+					ontologyChangesProvider.registerChange(change);
 				} else if (change.isImportChange())
 					isSynced = false;
 			}

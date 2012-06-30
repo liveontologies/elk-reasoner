@@ -32,6 +32,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.semanticweb.elk.io.FileUtils;
+import org.semanticweb.elk.loading.EmptyOntologyChangesProvider;
 import org.semanticweb.elk.loading.OntologyStreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -139,6 +140,7 @@ public class ComputeExpectedTaxonomies {
 			Reasoner reasoner = reasonerFactory.createReasoner(
 					new OntologyStreamLoader(
 							new Owl2FunctionalStyleParserFactory(), ontFile),
+					new EmptyOntologyChangesProvider(),
 					new TestStageExecutor(), configuraion);
 
 			Taxonomy<ElkClass> taxonomy = gt.getTaxonomy(reasoner);

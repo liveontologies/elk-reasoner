@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
 /**
- * The reasoner stage, during which the instance taxonomy of the current
+ * A {@link ReasonerStage} during which the instance taxonomy of the current
  * ontology is computed
  * 
  * @author "Yevgeny Kazakov"

@@ -26,7 +26,7 @@
 package org.semanticweb.elk.owl.parsing;
 
 import org.semanticweb.elk.owl.iris.ElkPrefix;
-import org.semanticweb.elk.owl.visitors.ElkOntologyProvider;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
  * The base interface for OWL 2 parsers
@@ -35,8 +35,11 @@ import org.semanticweb.elk.owl.visitors.ElkOntologyProvider;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface Owl2Parser extends ElkOntologyProvider<Owl2ParseException> {
+public interface Owl2Parser {
 
 	public void declarePrefix(ElkPrefix elkPrefix);
+
+	public void accept(ElkAxiomProcessor axiomProcessor)
+			throws Owl2ParseException;
 
 }

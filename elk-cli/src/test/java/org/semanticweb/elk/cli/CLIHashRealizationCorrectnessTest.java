@@ -28,6 +28,7 @@ package org.semanticweb.elk.cli;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.semanticweb.elk.loading.EmptyOntologyChangesProvider;
 import org.semanticweb.elk.loading.OntologyStreamLoader;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
@@ -60,6 +61,7 @@ public class CLIHashRealizationCorrectnessTest extends
 		Reasoner reasoner = new ReasonerFactory().createReasoner(
 				new OntologyStreamLoader(
 						new Owl2FunctionalStyleParserFactory(), input),
+				new EmptyOntologyChangesProvider(),
 				new RestartingTestStageExecutor());
 		return reasoner;
 	}

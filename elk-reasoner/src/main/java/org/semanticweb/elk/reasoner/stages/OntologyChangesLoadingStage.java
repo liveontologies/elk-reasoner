@@ -22,48 +22,52 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 import org.semanticweb.elk.loading.LoadingException;
-import org.semanticweb.elk.loading.OntologyProvider;
+import org.semanticweb.elk.loading.OntologyChangesProvider;
 
 /**
- * A {@link ReasonerStage} during which the input ontology is loaded into the
+ * A {@link ReasonerStage} during which ontology changes are applied to the
  * reasoner.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class OntologyLoadingStage extends AbstractReasonerStage {
+public class OntologyChangesLoadingStage extends AbstractReasonerStage {
 
-	public OntologyLoadingStage(AbstractReasonerState reasoner) {
+	public OntologyChangesLoadingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
 	@Override
 	public String getName() {
-		return "Loading of Axioms";
+		return "Loading Changes";
 	}
 
 	@Override
 	public boolean done() {
-		return reasoner.doneLoading;
+		return reasoner.doneChangeLoading;
 	}
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Collections.emptyList();
+		return Arrays
+				.asList((ReasonerStage) new OntologyLoadingStage(reasoner));
 	}
 
 	@Override
 	public void execute() {
 		initComputation();
-		OntologyProvider ontologyProvider = reasoner.getOntologyProvider();
+		OntologyChangesProvider ontologyChangesProvider = reasoner
+				.getOntologyChangesProvider();
 		try {
-			ontologyProvider.accept(reasoner.ontologyIndex.getInserter());
+			ontologyChangesProvider.accept(
+					reasoner.ontologyIndex.getInserter(),
+					reasoner.ontologyIndex.getDeleter());
 			if (isInterrupted())
 				return;
-			reasoner.doneLoading = true;
+			reasoner.doneChangeLoading = true;
 		} catch (LoadingException e) {
 			// TODO: Do something about it
 			e.printStackTrace();
@@ -73,4 +77,5 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	@Override
 	public void printInfo() {
 	}
+
 }

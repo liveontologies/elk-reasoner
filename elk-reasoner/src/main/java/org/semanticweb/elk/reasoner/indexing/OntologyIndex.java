@@ -29,7 +29,7 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
@@ -69,9 +69,9 @@ public interface OntologyIndex {
 
 	Collection<IndexedObjectProperty> getReflexiveObjectProperties();
 
-	ElkOntologyVisitor getInserter();
+	ElkAxiomProcessor getInserter();
 
-	ElkOntologyVisitor getDeleter();
+	ElkAxiomProcessor getDeleter();
 
 	void clear();
 }

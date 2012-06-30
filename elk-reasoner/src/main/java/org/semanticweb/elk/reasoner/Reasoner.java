@@ -28,7 +28,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.IncrementalOntologyProvider;
+import org.semanticweb.elk.loading.OntologyChangesProvider;
+import org.semanticweb.elk.loading.OntologyProvider;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -64,9 +65,13 @@ public class Reasoner extends AbstractReasonerState {
 	private static final Logger LOGGER_ = Logger.getLogger(Reasoner.class);
 
 	/**
-	 * The listener for the changes in the ontology
+	 * The source where the input ontology can be loaded
 	 */
-	private final IncrementalOntologyProvider ontologyProvider;
+	private final OntologyProvider ontologyProvider;
+	/**
+	 * The source where changes in ontology can be loaded
+	 */
+	private final OntologyChangesProvider ontologyChangesProvider;
 	/**
 	 * The progress monitor that is used for reporting progress.
 	 */
@@ -95,10 +100,12 @@ public class Reasoner extends AbstractReasonerState {
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
 	 * */
-	protected Reasoner(IncrementalOntologyProvider ontologyProvider,
+	protected Reasoner(OntologyProvider ontologyProvider,
+			OntologyChangesProvider ontologyChangesProvider,
 			ReasonerStageExecutor stageExecutor, ExecutorService executor,
 			int workerNo) {
 		this.ontologyProvider = ontologyProvider;
+		this.ontologyChangesProvider = ontologyChangesProvider;
 		this.stageExecutor = stageExecutor;
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
@@ -140,8 +147,13 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	@Override
-	protected IncrementalOntologyProvider getOntologyProvider() {
+	protected OntologyProvider getOntologyProvider() {
 		return ontologyProvider;
+	}
+
+	@Override
+	protected OntologyChangesProvider getOntologyChangesProvider() {
+		return ontologyChangesProvider;
 	}
 
 	@Override

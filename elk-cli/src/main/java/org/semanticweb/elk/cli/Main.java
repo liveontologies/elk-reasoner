@@ -34,6 +34,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
+import org.semanticweb.elk.loading.EmptyOntologyChangesProvider;
 import org.semanticweb.elk.loading.OntologyStreamLoader;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
@@ -101,6 +102,7 @@ public class Main {
 			Reasoner reasoner = reasoningFactory.createReasoner(
 					new OntologyStreamLoader(parserFactory, options
 							.valueOf(inputOntologyFile)),
+					new EmptyOntologyChangesProvider(),
 					new LoggingStageExecutor());
 			if (options.has(classify))
 				reasoner.getTaxonomy();

@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 
 /**
- * The reasoner stage, during which the class taxonomy of the current ontology
- * is computed
+ * A {@link ReasonerStage} during which the class taxonomy of the current
+ * ontology is computed
  * 
  * @author "Yevgeny Kazakov"
  * 

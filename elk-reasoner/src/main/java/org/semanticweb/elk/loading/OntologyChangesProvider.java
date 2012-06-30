@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK OWL Object Interfaces
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,18 +20,20 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.visitors;
+package org.semanticweb.elk.loading;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * Visitor pattern for ELK ontologies
+ * A common interface for sources of changes that can be applied to the ontology
+ * loaded into reasoners
  * 
  * @author "Yevgeny Kazakov"
- * @see {@link ElkOntologyProvider}
+ * 
  */
-public interface ElkOntologyVisitor {
+public interface OntologyChangesProvider {
 
-	public void visit(ElkAxiom elkAxiom);
+	public void accept(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws LoadingException;
 
 }

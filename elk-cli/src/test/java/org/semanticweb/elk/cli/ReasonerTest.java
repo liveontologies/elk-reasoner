@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
+import org.semanticweb.elk.loading.EmptyOntologyChangesProvider;
 import org.semanticweb.elk.loading.OntologyStreamLoader;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -80,7 +81,7 @@ public class ReasonerTest {
 						+ "SubObjectPropertyOf(:R :S)"//
 						+ "ObjectPropertyDomain(:S :E)"//
 						+ ")"//
-				), new TestStageExecutor());
+				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/A"));
@@ -122,7 +123,9 @@ public class ReasonerTest {
 										+ "SubClassOf(:A :C)"
 										+ "SubClassOf(:A :D)"
 										+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)"
-										+ ")"), new TestStageExecutor());
+										+ ")"),
+						new EmptyOntologyChangesProvider(),
+						new TestStageExecutor());
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/A"));
@@ -187,7 +190,8 @@ public class ReasonerTest {
 										+ "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
 										+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
 										+ ")"//
-						), new TestStageExecutor());
+						), new EmptyOntologyChangesProvider(),
+						new TestStageExecutor());
 
 		reasoner.getTaxonomy();
 
@@ -216,7 +220,7 @@ public class ReasonerTest {
 						+ "SubClassOf(:C ObjectSomeValuesFrom(:S :A))"//
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ ")"//
-				), new TestStageExecutor());
+				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
 
 		reasoner.getTaxonomy();
 
@@ -248,7 +252,7 @@ public class ReasonerTest {
 						+ "SubClassOf(:B :C)"//
 						+ "DisjointClasses(:A :B :C)"//
 						+ ")"//
-				), new TestStageExecutor());
+				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
 
 		reasoner.getTaxonomy();
 
@@ -278,7 +282,7 @@ public class ReasonerTest {
 						+ "DisjointClasses(:A :B :A)"//
 						+ "DisjointClasses(:C :C)"//
 						+ ")"//
-				), new TestStageExecutor());
+				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/A"));
@@ -308,7 +312,7 @@ public class ReasonerTest {
 						+ "EquivalentClasses(:D ObjectSomeValuesFrom(:S :C))"//
 						+ "SubObjectPropertyOf(ObjectPropertyChain(:R :R) :S)"//
 						+ ")"//
-				), new TestStageExecutor());
+				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/A"));
@@ -339,7 +343,7 @@ public class ReasonerTest {
 						"Prefix( : = <http://example.org/> )" + "Ontology("
 								+ "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
 								+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))"),
-				new TestStageExecutor());
+				new EmptyOntologyChangesProvider(), new TestStageExecutor());
 
 		reasoner.getTaxonomy();
 
@@ -406,7 +410,8 @@ public class ReasonerTest {
 						+ "Ontology("//
 						+ "SubClassOf(:A :B)"//
 						+ "SubClassOf(owl:Thing :C)"//
-						+ ")"), new TestStageExecutor());
+						+ ")"), new EmptyOntologyChangesProvider(),
+				new TestStageExecutor());
 
 		reasoner.getTaxonomy();
 
@@ -500,7 +505,7 @@ public class ReasonerTest {
 						+ "SubObjectPropertyOf(:R :S)"
 						+ "SubClassOf(:C ObjectSomeValuesFrom(:T :B))"
 						+ "ObjectPropertyDomain(:T owl:Nothing)" + ")"),
-				new TestStageExecutor());
+				new EmptyOntologyChangesProvider(), new TestStageExecutor());
 
 		boolean consistent = reasoner.isConsistent();
 

@@ -30,6 +30,7 @@ import java.io.IOException;
 import org.junit.Test;
 import org.semanticweb.elk.config.ConfigurationException;
 import org.semanticweb.elk.config.ConfigurationFactory;
+import org.semanticweb.elk.loading.EmptyOntologyChangesProvider;
 import org.semanticweb.elk.loading.EmptyOntologyProvider;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
@@ -47,7 +48,8 @@ public class ReasonerFactoryTest {
 	@Test
 	public void createReasonerDefaultConfig() {
 		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new EmptyOntologyProvider(), new TestStageExecutor());
+				new EmptyOntologyProvider(),
+				new EmptyOntologyChangesProvider(), new TestStageExecutor());
 
 		assertEquals(Runtime.getRuntime().availableProcessors(),
 				reasoner.getNumberOfWorkers());
@@ -57,7 +59,8 @@ public class ReasonerFactoryTest {
 	public void createReasonerCustomConfig() throws ConfigurationException,
 			IOException {
 		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new EmptyOntologyProvider(), new TestStageExecutor(),
+				new EmptyOntologyProvider(),
+				new EmptyOntologyChangesProvider(), new TestStageExecutor(),
 				(ReasonerConfiguration) new ConfigurationFactory()
 						.getConfiguration(getClass().getClassLoader()
 								.getResourceAsStream("elk_test.properties"),

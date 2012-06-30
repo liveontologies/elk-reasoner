@@ -22,16 +22,16 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /**
- * A common interface for sources that can provide ontologies, for example,
- * ontology parsers.
+ * Objects that can process ELK axioms
  * 
  * @author "Yevgeny Kazakov"
- * @see {@link ElkOntologyVisitor}
  * 
  */
-public interface ElkOntologyProvider<E extends Exception> {
+public interface ElkAxiomProcessor {
 
-	public void accept(ElkOntologyVisitor ontologyVisitor) throws E;
+	public void visit(ElkAxiom elkAxiom);
 
 }

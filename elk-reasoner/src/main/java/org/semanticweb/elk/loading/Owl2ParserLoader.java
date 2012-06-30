@@ -29,16 +29,16 @@ import java.util.concurrent.BlockingQueue;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * An {@link IncrementalOntologyProvider} that loads an ontology using an
+ * An {@link OntologyProvider} that loads an ontology using a provided
  * {@link Owl2Parser}.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class OntologyLoader implements IncrementalOntologyProvider {
+public class Owl2ParserLoader implements OntologyProvider {
 
 	/**
 	 * the parser used to load the ontology
@@ -76,8 +76,8 @@ public class OntologyLoader implements IncrementalOntologyProvider {
 	protected volatile LoadingException exception;
 
 	/**
-	 * Creating an {@link OntologyLoader} for a given {@link Owl2Parser} to load
-	 * axioms and the given limit on the size of the buffer to hold loaded
+	 * Creating an {@link Owl2ParserLoader} for a given {@link Owl2Parser} to
+	 * load axioms and the given limit on the size of the buffer to hold loaded
 	 * axioms
 	 * 
 	 * @param owlParser
@@ -85,7 +85,7 @@ public class OntologyLoader implements IncrementalOntologyProvider {
 	 * @param bufferSize
 	 *            the size of the bounded buffer for loaded axioms
 	 */
-	public OntologyLoader(Owl2Parser owlParser, int bufferSize) {
+	public Owl2ParserLoader(Owl2Parser owlParser, int bufferSize) {
 		this.parser = owlParser;
 		this.axiomBuffer = new ArrayBlockingQueue<ElkAxiom>(bufferSize);
 		this.finished = false;
@@ -107,18 +107,18 @@ public class OntologyLoader implements IncrementalOntologyProvider {
 	}
 
 	/**
-	 * Creating an {@link OntologyLoader} for a given {@link Owl2Parser} to load
-	 * axioms
+	 * Creating an {@link Owl2ParserLoader} for a given {@link Owl2Parser} to
+	 * load axioms
 	 * 
 	 * @param owlParser
 	 *            the parser used to load the ontology
 	 */
-	public OntologyLoader(Owl2Parser owlParser) {
+	public Owl2ParserLoader(Owl2Parser owlParser) {
 		this(owlParser, 256);
 	}
 
 	@Override
-	public synchronized void accept(ElkOntologyVisitor ontologyVisitor)
+	public synchronized void accept(ElkAxiomProcessor axiomLoader)
 			throws LoadingException {
 		controlThread = Thread.currentThread();
 		if (!started) {
@@ -150,16 +150,9 @@ public class OntologyLoader implements IncrementalOntologyProvider {
 			}
 			if (axiom == null)
 				break;
-			ontologyVisitor.visit(axiom);
+			axiomLoader.visit(axiom);
 		}
 		finish();
-	}
-
-	@Override
-	public void accept(ElkOntologyVisitor adder, ElkOntologyVisitor remover)
-			throws LoadingException {
-		// nothing to do so far
-
 	}
 
 	/**
@@ -171,13 +164,13 @@ public class OntologyLoader implements IncrementalOntologyProvider {
 	}
 
 	/**
-	 * A simple {@link ElkOntologyVisitor} that insert the parsed axioms into
-	 * the given queue
+	 * A simple {@link ElkAxiomProcessor} that insert the parsed axioms into the
+	 * given queue
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private static class AxiomInserter implements ElkOntologyVisitor {
+	private static class AxiomInserter implements ElkAxiomProcessor {
 
 		final Queue<ElkAxiom> axiomBuffer;
 

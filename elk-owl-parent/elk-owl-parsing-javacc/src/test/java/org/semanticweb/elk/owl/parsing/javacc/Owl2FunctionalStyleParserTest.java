@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.parsing.AbstractOwl2FunctionalSyntaxParseTest;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.predefined.PredefinedElkPrefix;
-import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
  * @author Yevgeny Kazakov
@@ -53,7 +53,7 @@ import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
 public class Owl2FunctionalStyleParserTest extends
 		AbstractOwl2FunctionalSyntaxParseTest {
 
-	class DummyElkOntologyVisitor implements ElkOntologyVisitor {
+	class DummyElkOntologyVisitor implements ElkAxiomProcessor {
 		public final List<ElkAxiom> axiomList = new ArrayList<ElkAxiom>();
 
 		@Override

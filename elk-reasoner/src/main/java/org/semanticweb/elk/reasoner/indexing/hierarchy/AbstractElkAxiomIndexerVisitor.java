@@ -55,7 +55,7 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
-import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
@@ -68,7 +68,7 @@ import org.semanticweb.elk.util.logging.ElkMessage;
  * 
  */
 public abstract class AbstractElkAxiomIndexerVisitor extends
-		AbstractElkAxiomVisitor<Void> implements ElkOntologyVisitor {
+		AbstractElkAxiomVisitor<Void> implements ElkAxiomProcessor {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger

@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.loading.IncrementalOntologyProvider;
+import org.semanticweb.elk.loading.OntologyChangesProvider;
+import org.semanticweb.elk.loading.OntologyProvider;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
@@ -124,9 +125,14 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * @return the object through which the ontology can be loaded
+	 * @return the source where the input ontology can be loaded
 	 */
-	protected abstract IncrementalOntologyProvider getOntologyProvider();
+	protected abstract OntologyProvider getOntologyProvider();
+
+	/**
+	 * @return the source where changes in ontology can be loaded
+	 */
+	protected abstract OntologyChangesProvider getOntologyChangesProvider();
 
 	/**
 	 * @return the maximal number of workers that can be used for running
@@ -171,7 +177,7 @@ public abstract class AbstractReasonerState {
 		getStageExecutor().complete(new ConsistencyCheckingStage(this));
 		return consistentOntology;
 	}
-	
+
 	/**
 	 * @return <tt>true</tt> if the ontology has been checked for consistency.
 	 */
@@ -193,7 +199,7 @@ public abstract class AbstractReasonerState {
 		getStageExecutor().complete(new ClassTaxonomyComputationStage(this));
 		return taxonomy;
 	}
-	
+
 	/**
 	 * @return <tt>true</tt> if the class taxonomy has been computed
 	 */
@@ -215,7 +221,7 @@ public abstract class AbstractReasonerState {
 		getStageExecutor().complete(new InstanceTaxonomyComputationStage(this));
 		return taxonomy;
 	}
-	
+
 	/**
 	 * @return <tt>true</tt> if the instance taxonomy has been computed
 	 */

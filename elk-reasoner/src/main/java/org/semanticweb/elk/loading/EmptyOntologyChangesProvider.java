@@ -22,13 +22,21 @@
  */
 package org.semanticweb.elk.loading;
 
-import org.semanticweb.elk.owl.visitors.ElkOntologyProvider;
-import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
-public interface IncrementalOntologyProvider extends
-		ElkOntologyProvider<LoadingException> {
+/**
+ * An {@link OntologyChangesProvider} that always behave as if not changes have
+ * been done
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public class EmptyOntologyChangesProvider implements OntologyChangesProvider {
 
-	public void accept(ElkOntologyVisitor adder, ElkOntologyVisitor remover)
-			throws LoadingException;
+	@Override
+	public void accept(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws LoadingException {
+		// nothing to do since there are no changes
+	}
 
 }

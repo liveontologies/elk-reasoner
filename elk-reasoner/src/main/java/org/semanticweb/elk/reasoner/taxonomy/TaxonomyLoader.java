@@ -47,7 +47,7 @@ import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
-import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
  * A simple class to load class taxonomy using a prepared parser. To be used
@@ -110,7 +110,7 @@ public class TaxonomyLoader {
 	}
 
 	static class TaxonomyInserter extends AbstractElkAxiomVisitor<Void>
-			implements ElkOntologyVisitor {
+			implements ElkAxiomProcessor {
 
 		boolean createNodes = false;
 		final ConcurrentTaxonomy taxonomy;

@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 
 public class IndexConstructionTest extends TestCase {
@@ -51,8 +51,8 @@ public class IndexConstructionTest extends TestCase {
 				"R"));
 
 		OntologyIndex index = new OntologyIndexImpl();
-		ElkOntologyVisitor inserter = index.getInserter();
-		ElkOntologyVisitor deleter = index.getDeleter();
+		ElkAxiomProcessor inserter = index.getInserter();
+		ElkAxiomProcessor deleter = index.getDeleter();
 
 		inserter.visit(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectIntersectionOf(a, b), d));
@@ -99,8 +99,8 @@ public class IndexConstructionTest extends TestCase {
 				a, b, c, b);
 
 		OntologyIndex index = new OntologyIndexImpl();
-		ElkOntologyVisitor inserter = index.getInserter();
-		ElkOntologyVisitor deleter = index.getDeleter();
+		ElkAxiomProcessor inserter = index.getInserter();
+		ElkAxiomProcessor deleter = index.getDeleter();
 
 		inserter.visit(axiom);
 
@@ -139,7 +139,7 @@ public class IndexConstructionTest extends TestCase {
 				objectFactory.getObjectIntersectionOf(b, a), c);
 
 		OntologyIndex index = new OntologyIndexImpl();
-		ElkOntologyVisitor inserter = index.getInserter();
+		ElkAxiomProcessor inserter = index.getInserter();
 
 		inserter.visit(objectFactory.getSubClassOfAxiom(x, d));
 		inserter.visit(objectFactory.getSubClassOfAxiom(y, d));

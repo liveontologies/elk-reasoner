@@ -31,7 +31,7 @@ import java.io.InputStream;
 
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 
-public class OntologyStreamLoader extends OntologyLoader {
+public class OntologyStreamLoader extends Owl2ParserLoader {
 
 	final InputStream stream;
 	final Owl2ParserFactory parserFactory;

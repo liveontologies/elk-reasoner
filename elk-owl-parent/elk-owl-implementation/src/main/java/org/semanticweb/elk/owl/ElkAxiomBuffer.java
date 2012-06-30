@@ -26,10 +26,10 @@ package org.semanticweb.elk.owl;
 import java.util.ArrayList;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * Simple {@link ElkOntologyVisitor} that merely buffers axioms to send them to
+ * Simple {@link ElkAxiomProcessor} that merely buffers axioms to send them to
  * another processor later on. This is useful for performance measurements, in
  * particular for decoupling parsing time from indexing time. It can also be
  * used for re-using the same set of axioms in more than one place without
@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
  * 
  * @author Markus Kroetzsch
  */
-public class ElkAxiomBuffer implements ElkOntologyVisitor {
+public class ElkAxiomBuffer implements ElkAxiomProcessor {
 
 	final protected ArrayList<ElkAxiom> axioms = new ArrayList<ElkAxiom>();
 
@@ -52,7 +52,7 @@ public class ElkAxiomBuffer implements ElkOntologyVisitor {
 	 * 
 	 * @param elkAxiomProcessor
 	 */
-	public void sendAxiomsToProcessor(ElkOntologyVisitor elkAxiomProcessor) {
+	public void sendAxiomsToProcessor(ElkAxiomProcessor elkAxiomProcessor) {
 		for (ElkAxiom elkAxiom : axioms) {
 			elkAxiomProcessor.visit(elkAxiom);
 		}

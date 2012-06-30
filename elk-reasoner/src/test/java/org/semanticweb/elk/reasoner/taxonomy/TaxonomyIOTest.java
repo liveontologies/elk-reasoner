@@ -36,6 +36,7 @@ import java.util.concurrent.Executors;
 
 import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
+import org.semanticweb.elk.loading.EmptyOntologyChangesProvider;
 import org.semanticweb.elk.loading.OntologyStreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -169,7 +170,8 @@ class TestReasoner extends Reasoner {
 	protected TestReasoner(InputStream stream,
 			ReasonerStageExecutor stageExecutor) {
 		super(new OntologyStreamLoader(new Owl2FunctionalStyleParserFactory(),
-				stream), stageExecutor, Executors.newSingleThreadExecutor(), 1);
+				stream), new EmptyOntologyChangesProvider(), stageExecutor,
+				Executors.newSingleThreadExecutor(), 1);
 	}
 
 }

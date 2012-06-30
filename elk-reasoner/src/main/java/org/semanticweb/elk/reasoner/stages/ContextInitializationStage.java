@@ -32,8 +32,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 // TODO: add progress monitor, make concurrent if possible
 
 /**
- * The reasoner stage, which purpose is to ensure that no context is assigned to
- * {@link IndexedClassExpression}s of the current ontology
+ * A {@link ReasonerStage} which purpose is to ensure that no context is
+ * assigned to {@link IndexedClassExpression}s of the current ontology
  * 
  * @author "Yevgeny Kazakov"
  * 

@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputation;
 
 /**
- * The reasoner stage, which purpose is to compute the object property hierarchy
- * of the given ontology
+ * A {@link ReasonerStage}, which purpose is to compute the object property
+ * hierarchy of the given ontology
  * 
  * @author "Yevgeny Kazakov"
  * 

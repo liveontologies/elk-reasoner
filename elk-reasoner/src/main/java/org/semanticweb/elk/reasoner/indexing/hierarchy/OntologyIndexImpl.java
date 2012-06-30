@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.util.collections.Operations;
 
@@ -153,12 +153,12 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	}
 
 	@Override
-	public ElkOntologyVisitor getInserter() {
+	public ElkAxiomProcessor getInserter() {
 		return axiomInserter;
 	}
 
 	@Override
-	public ElkOntologyVisitor getDeleter() {
+	public ElkAxiomProcessor getDeleter() {
 		return axiomDeleter;
 	}
 
