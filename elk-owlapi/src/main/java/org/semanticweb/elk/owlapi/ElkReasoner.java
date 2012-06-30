@@ -674,10 +674,11 @@ public class ElkReasoner implements OWLReasoner {
 	@Override
 	public boolean isPrecomputed(InferenceType inferenceType) {
 		if (inferenceType.equals(InferenceType.CLASS_HIERARCHY))
-			// TODO: Needs another method in the Reasoner.
-			return false;
-		else
-			return false;
+			return reasoner.doneTaxonomy();
+		if (inferenceType.equals(InferenceType.CLASS_ASSERTIONS))
+			return reasoner.doneInstanceTaxonomy();
+		
+		return false;
 	}
 
 	@Override
@@ -704,7 +705,16 @@ public class ElkReasoner implements OWLReasoner {
 			throws ReasonerInterruptedException, TimeOutException,
 			InconsistentOntologyException {
 
-		// first check if we need to compute InstanceTaxonomy
+		for (InferenceType inferenceType : inferenceTypes) {
+			if (inferenceType.equals(InferenceType.CLASS_HIERARCHY)) {
+				try {
+					reasoner.getTaxonomy();
+				} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
+					throw convertInconsistentOntologyException(e);
+				}
+			}
+		}
+
 		for (InferenceType inferenceType : inferenceTypes) {
 			if (inferenceType.equals(InferenceType.CLASS_ASSERTIONS)) {
 				try {
@@ -715,16 +725,6 @@ public class ElkReasoner implements OWLReasoner {
 			}
 		}
 
-		// second check if we need to compute Taxonomy
-		for (InferenceType inferenceType : inferenceTypes) {
-			if (inferenceType.equals(InferenceType.CLASS_HIERARCHY)) {
-				try {
-					reasoner.getTaxonomy();
-				} catch (org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
-					throw convertInconsistentOntologyException(e);
-				}
-			}
-		}
 	}
 
 	protected class OntologyChangeListener implements OWLOntologyChangeListener {

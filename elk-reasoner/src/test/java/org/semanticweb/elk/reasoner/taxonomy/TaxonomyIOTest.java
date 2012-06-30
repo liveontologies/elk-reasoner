@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.loading.OntologyStreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
@@ -46,39 +47,66 @@ import org.semanticweb.elk.reasoner.InconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 
 /**
- * Tests loading/dumping of class taxonomies
+ * Tests loading/dumping of taxonomies
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  */
-public class ClassTaxonomyIOTest {
+public class TaxonomyIOTest {
 
 	private final Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
 
 	@Test
-	public void roundtrip() throws IOException, Owl2ParseException,
-			InconsistentOntologyException {
+	public void classTaxonomyRoundtrip() throws IOException,
+			Owl2ParseException, InconsistentOntologyException {
 		Taxonomy<ElkClass> original = loadAndClassify("io/taxonomy.owl");
+		StringWriter writer = new StringWriter();
+
+		TaxonomyPrinter.dumpClassTaxomomy(original, writer, false);
+
+		StringReader reader = new StringReader(writer.getBuffer().toString());
+		Owl2Parser parser = parserFactory.getParser(reader);
+		Taxonomy<ElkClass> loaded = TaxonomyLoader.load(parser);
+
+		// compare
+		assertEquals(TaxonomyHasher.hash(original), TaxonomyHasher.hash(loaded));
+	}
+
+	@Test
+	public void instanceTaxonomyRoundtrip() throws IOException,
+			Owl2ParseException, InconsistentOntologyException {
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> original = loadAndClassify("io/instance_taxonomy.owl");
 		StringWriter writer = new StringWriter();
 
 		/*
 		 * Writer outWriter = new OutputStreamWriter(System.out);
-		 * ClassTaxonomyPrinter.dumpClassTaxomomy(original, outWriter, false);
+		 * TaxonomyPrinter.dumpInstanceTaxomomy(original, outWriter, false);
 		 * outWriter.flush();
 		 */
 
-		ClassTaxonomyPrinter.dumpClassTaxomomy(original, writer, false);
+		TaxonomyPrinter.dumpInstanceTaxomomy(original, writer, false);
 
 		StringReader reader = new StringReader(writer.getBuffer().toString());
 		Owl2Parser parser = parserFactory.getParser(reader);
-		Taxonomy<ElkClass> loaded = ClassTaxonomyLoader.load(parser);
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> loaded = TaxonomyLoader
+				.load(parser);
+
+		/*
+		 * System.out.println("================================="); outWriter =
+		 * new OutputStreamWriter(System.out);
+		 * TaxonomyPrinter.dumpInstanceTaxomomy(loaded, outWriter, false);
+		 * outWriter.flush();
+		 */
+
 		// compare
-		assertEquals(ClassTaxonomyPrinter.getHashString(original),
-				ClassTaxonomyPrinter.getHashString(loaded));
+		assertEquals(InstanceTaxonomyHasher.hash(original),
+				InstanceTaxonomyHasher.hash(loaded));
 	}
 
 	/*
@@ -92,8 +120,8 @@ public class ClassTaxonomyIOTest {
 		Taxonomy<ElkClass> taxonomy1 = load("io/taxonomy_eq_1.owl");
 		Taxonomy<ElkClass> taxonomy2 = load("io/taxonomy_eq_2.owl");
 
-		assertEquals(ClassTaxonomyPrinter.getHashString(taxonomy1),
-				ClassTaxonomyPrinter.getHashString(taxonomy2));
+		assertEquals(TaxonomyPrinter.getHashString(taxonomy1),
+				TaxonomyPrinter.getHashString(taxonomy2));
 	}
 
 	@Test
@@ -105,14 +133,21 @@ public class ClassTaxonomyIOTest {
 		assertSame(taxonomy.getTopNode(), taxonomy.getBottomNode());
 	}
 
-	private Taxonomy<ElkClass> loadAndClassify(String resource)
-			throws IOException, Owl2ParseException,
+	private InstanceTaxonomy<ElkClass, ElkNamedIndividual> loadAndClassify(
+			String resource) throws IOException, Owl2ParseException,
 			InconsistentOntologyException {
-		InputStream stream = getClass().getClassLoader().getResourceAsStream(
-				resource);
-		TestReasoner reasoner = new TestReasoner(stream,
-				new TestStageExecutor());
-		return reasoner.getTaxonomy();
+
+		InputStream stream = null;
+
+		try {
+			stream = getClass().getClassLoader().getResourceAsStream(resource);
+			TestReasoner reasoner = new TestReasoner(stream,
+					new TestStageExecutor());
+
+			return reasoner.getInstanceTaxonomy();
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
 	}
 
 	private Taxonomy<ElkClass> load(String resource) throws IOException,
@@ -122,7 +157,7 @@ public class ClassTaxonomyIOTest {
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(resource);
 
-			return ClassTaxonomyLoader.load(parserFactory.getParser(stream));
+			return TaxonomyLoader.load(parserFactory.getParser(stream));
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}

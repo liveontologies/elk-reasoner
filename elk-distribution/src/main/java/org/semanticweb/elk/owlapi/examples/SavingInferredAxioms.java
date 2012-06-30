@@ -43,49 +43,51 @@ import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
 
 /**
+ * This example shows how to classify an ontology and save the resulting
+ * taxonomy into a new file. The example is based on the example from the OWL
+ * API documentation.
  * 
+ * 
+ * @author Frantisek Simancik
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
  */
 public class SavingInferredAxioms {
 
-	public static void main(String[] args) {
-		try {
-			// Create an ELK reasoner factory.
-			OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
+	public static void main(String[] args) throws OWLOntologyStorageException,
+			OWLOntologyCreationException {
+		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
 
-			OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		// Load your ontology.
+		OWLOntology ont = man.loadOntologyFromOntologyDocument(new File(
+				"c:/ontologies/ontology.owl"));
 
-			// Load your ontology.
-			OWLOntology ont = man.loadOntologyFromOntologyDocument(new File(
-					"c:/ontologies/ontology.owl"));
+		// Create an ELK reasoner.
+		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createReasoner(ont);
 
-			// Create an ELK reasoner.
-			OWLReasoner reasoner = reasonerFactory.createReasoner(ont);
+		// Classify the ontology.
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 
-			// Classify the ontology.
-			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		// To generate an inferred ontology we use implementations of
+		// inferred axiom generators
+		List<InferredAxiomGenerator<? extends OWLAxiom>> gens = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
+		gens.add(new InferredSubClassAxiomGenerator());
+		gens.add(new InferredEquivalentClassAxiomGenerator());
 
-			// To generate an inferred ontology we use implementations of
-			// inferred axiom generators
-			List<InferredAxiomGenerator<? extends OWLAxiom>> gens = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
-			gens.add(new InferredSubClassAxiomGenerator());
-			gens.add(new InferredEquivalentClassAxiomGenerator());
+		// Put the inferred axioms into a fresh empty ontology.
+		OWLOntology infOnt = man.createOntology();
+		InferredOntologyGenerator iog = new InferredOntologyGenerator(reasoner,
+				gens);
+		iog.fillOntology(man, infOnt);
 
-			// Put the inferred axioms into a fresh empty ontology.
-			OWLOntology infOnt = man.createOntology();
-			InferredOntologyGenerator iog = new InferredOntologyGenerator(
-					reasoner, gens);
-			iog.fillOntology(man, infOnt);
+		// Save the inferred ontology.
+		man.saveOntology(infOnt,
+				IRI.create((new File("c:/ontologies/result.owl").toURI())));
 
-			// Save the inferred ontology.
-			man.saveOntology(infOnt,
-					IRI.create((new File("c:/ontologies/result.owl").toURI())));
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
-		} catch (OWLOntologyStorageException e) {
-			e.printStackTrace();
-		}
+		// Terminate the worker threads used by the reasoner.
+		reasoner.dispose();
 	}
 }

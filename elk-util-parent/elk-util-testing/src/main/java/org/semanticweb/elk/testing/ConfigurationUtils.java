@@ -51,9 +51,6 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  */
 public class ConfigurationUtils {
 
-	// final static Logger LOGGER_ = Logger.getLogger(ConfigurationUtils.class);
-	// final static String EXPECTED_SUFFIX = ".expected";
-
 	/**
 	 * Loads configuration from a set of files by passing both input and
 	 * expected output URLs to the test manifest creator

@@ -171,6 +171,13 @@ public abstract class AbstractReasonerState {
 		getStageExecutor().complete(new ConsistencyCheckingStage(this));
 		return consistentOntology;
 	}
+	
+	/**
+	 * @return <tt>true</tt> if the ontology has been checked for consistency.
+	 */
+	public boolean doneConsistencyCheck() {
+		return doneConsistencyCheck;
+	}
 
 	/**
 	 * Compute the inferred taxonomy of the named classes for the given ontology
@@ -186,6 +193,13 @@ public abstract class AbstractReasonerState {
 		getStageExecutor().complete(new ClassTaxonomyComputationStage(this));
 		return taxonomy;
 	}
+	
+	/**
+	 * @return <tt>true</tt> if the class taxonomy has been computed
+	 */
+	public boolean doneTaxonomy() {
+		return doneClassTaxonomy;
+	}
 
 	/**
 	 * Compute the inferred taxonomy of the named classes with instances if this
@@ -200,6 +214,13 @@ public abstract class AbstractReasonerState {
 
 		getStageExecutor().complete(new InstanceTaxonomyComputationStage(this));
 		return taxonomy;
+	}
+	
+	/**
+	 * @return <tt>true</tt> if the instance taxonomy has been computed
+	 */
+	public boolean doneInstanceTaxonomy() {
+		return doneInstanceTaxonomy;
 	}
 
 	/**

@@ -35,42 +35,40 @@ import java.util.Set;
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
 
 /**
  * A simple class to load class taxonomy using a prepared parser. To be used
  * mostly for testing.
  * 
- * WARNING: currently this class can only load taxonomies dumped by
- * {@link ClassTaxonomyPrinter}
+ * TODO Seriously consider adding a simple impl of Taxonomy/InstanceTaxonomy for
+ * loading purposes TODO Support SameIndividual axioms
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  * 
  */
-public class ClassTaxonomyLoader {
+public class TaxonomyLoader {
 
-	public static Taxonomy<ElkClass> load(Owl2Parser parser)
-			throws IOException, Owl2ParseException {
+	public static InstanceTaxonomy<ElkClass, ElkNamedIndividual> load(
+			Owl2Parser parser) throws IOException, Owl2ParseException {
 		final ConcurrentTaxonomy taxonomy = new ConcurrentTaxonomy();
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);
 
 		parser.accept(listener);
-		listener.createNodes = true;
-		// process the remaining axioms
-		for (ElkAxiom remaining : listener.nonProcessedAxioms) {
-			remaining.accept(listener);
-		}
 		// add owl:Thing if needed
 		ElkClass thing = PredefinedElkClass.OWL_THING;
 		// unless it's inconsistent
@@ -80,6 +78,13 @@ public class ClassTaxonomyLoader {
 
 		NonBottomClassNode topNode = taxonomy.getCreateClassNode(Collections
 				.singleton(thing));
+
+		listener.createNodes = true;
+		// process the remaining axioms, the order is important
+		process(listener, listener.classDeclarations);
+		process(listener, listener.subClassOfAxioms);
+		process(listener, listener.individualDeclarations);
+
 		TaxonomyNode<ElkClass> botNode = taxonomy
 				.getNode(PredefinedElkClass.OWL_NOTHING);
 
@@ -98,12 +103,20 @@ public class ClassTaxonomyLoader {
 		return taxonomy;
 	}
 
+	private static void process(TaxonomyInserter inserter, List<ElkAxiom> axioms) {
+		for (ElkAxiom decl : axioms) {
+			decl.accept(inserter);
+		}
+	}
+
 	static class TaxonomyInserter extends AbstractElkAxiomVisitor<Void>
 			implements ElkOntologyVisitor {
 
 		boolean createNodes = false;
 		final ConcurrentTaxonomy taxonomy;
-		final List<ElkAxiom> nonProcessedAxioms = new ArrayList<ElkAxiom>();
+		final List<ElkAxiom> subClassOfAxioms = new ArrayList<ElkAxiom>();
+		final List<ElkAxiom> classDeclarations = new ArrayList<ElkAxiom>();
+		final List<ElkAxiom> individualDeclarations = new ArrayList<ElkAxiom>();
 
 		TaxonomyInserter(final ConcurrentTaxonomy taxonomy) {
 			this.taxonomy = taxonomy;
@@ -157,7 +170,7 @@ public class ClassTaxonomyLoader {
 
 				if ((subNode == null || superNode == null) && !createNodes) {
 					// wait, maybe we'll create these nodes later
-					nonProcessedAxioms.add(elkSubClassOfAxiom);
+					subClassOfAxioms.add(elkSubClassOfAxiom);
 				} else {
 					subNonBot = (NonBottomClassNode) (subNode == null ? taxonomy
 							.getCreateClassNode(Collections.singleton(subClass))
@@ -175,18 +188,81 @@ public class ClassTaxonomyLoader {
 		}
 
 		@Override
-		public Void visit(ElkDeclarationAxiom elkDeclarationAxiom) {
-			if (createNodes) {
-				ElkEntity entity = elkDeclarationAxiom.getEntity();
+		public Void visit(final ElkDeclarationAxiom elkDeclarationAxiom) {
+			ElkEntity entity = elkDeclarationAxiom.getEntity();
+			// support two sorts of declarations: classes and named
+			// individuals
+			entity.accept(new AbstractElkEntityVisitor<Object>() {
 
-				if (entity instanceof ElkClass) {
-					if (taxonomy.getNode((ElkClass) entity) == null) {
-						taxonomy.getCreateClassNode(Collections
-								.singleton((ElkClass) entity));
+				@Override
+				public Object visit(ElkClass elkClass) {
+					if (createNodes) {
+						if (taxonomy.getNode(elkClass) == null) {
+							taxonomy.getCreateClassNode(Collections
+									.singleton(elkClass));
+						}
+					} else {
+						classDeclarations.add(elkDeclarationAxiom);
+					}
+
+					return null;
+				}
+
+				@Override
+				public Object visit(ElkNamedIndividual elkNamedIndividual) {
+					if (createNodes) {
+						if (taxonomy.getInstanceNode(elkNamedIndividual) == null) {
+							NonBottomClassNode top = (NonBottomClassNode) taxonomy
+									.getTopNode();
+							IndividualNode indNode = (IndividualNode) taxonomy
+									.getCreateIndividualNode(Collections
+											.singleton(elkNamedIndividual));
+							indNode.addDirectTypeNode(top);
+							top.addDirectInstanceNode(indNode);
+						}
+					} else {
+						individualDeclarations.add(elkDeclarationAxiom);
+					}
+
+					return null;
+
+				}
+			});
+
+			return null;
+		}
+
+		@Override
+		public Void visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
+			if (elkClassAssertionAxiom.getClassExpression() instanceof ElkClass
+					&& elkClassAssertionAxiom.getIndividual() instanceof ElkNamedIndividual) {
+				ElkClass type = (ElkClass) elkClassAssertionAxiom
+						.getClassExpression();
+				ElkNamedIndividual individual = (ElkNamedIndividual) elkClassAssertionAxiom
+						.getIndividual();
+
+				TaxonomyNode<ElkClass> typeNode = taxonomy.getNode(type);
+
+				if (typeNode == null && !createNodes) {
+					// wait
+					subClassOfAxioms.add(elkClassAssertionAxiom);
+				} else {
+					IndividualNode indNode = (IndividualNode) taxonomy
+							.getInstanceNode(individual);
+
+					if (indNode == null) {
+						indNode = taxonomy.getCreateIndividualNode(Collections
+								.singleton(individual));
+					}
+
+					if (typeNode instanceof NonBottomClassNode) {
+						((NonBottomClassNode) typeNode)
+								.addDirectInstanceNode(indNode);
+						indNode.addDirectTypeNode((NonBottomClassNode) typeNode);
+					} else {
+						// TODO Shouldn't happen, log it?
 					}
 				}
-			} else {
-				nonProcessedAxioms.add(elkDeclarationAxiom);
 			}
 
 			return null;

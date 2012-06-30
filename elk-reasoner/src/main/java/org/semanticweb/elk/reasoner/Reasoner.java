@@ -37,13 +37,13 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.FreshInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -406,7 +406,7 @@ public class Reasoner extends AbstractReasonerState {
 			LOGGER_.info("Writing taxonomy to " + file);
 		}
 		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
-		ClassTaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
+		TaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
 				file.getPath(), true);
 		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
 	}

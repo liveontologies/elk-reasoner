@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK OWL API Binding
+ * ELK Command Line Interface
  * 
  * $Id$
  * $HeadURL$
@@ -23,38 +23,42 @@
 /**
  * 
  */
-package org.semanticweb.elk.owlapi;
+package org.semanticweb.elk.cli;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.runner.RunWith;
+import org.semanticweb.elk.loading.OntologyStreamLoader;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.HashRealizationCorrectnessTest;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.reasoner.DiffRealizationCorrectnessTest;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.testing.HashTestOutput;
-import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.reasoner.stages.RestartingTestStageExecutor;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-@RunWith(PolySuite.class)
-public class OWLAPIHashRealizationCorrectnessTest extends
-		HashRealizationCorrectnessTest {
+public class CLIDiffRealizationCorrectnessTest extends
+		DiffRealizationCorrectnessTest {
 
-	public OWLAPIHashRealizationCorrectnessTest(
-			final ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput> testManifest) {
+	public CLIDiffRealizationCorrectnessTest(
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
 
 	@Override
-	protected Reasoner createReasoner(InputStream input) throws IOException,
-			Owl2ParseException {
-		return OWLAPITestUtils.createReasoner(input)
-				.getInternalReasoner();
+	protected Reasoner createReasoner(final InputStream input)
+			throws Owl2ParseException, IOException {
+		Reasoner reasoner = new ReasonerFactory().createReasoner(
+				new OntologyStreamLoader(
+						new Owl2FunctionalStyleParserFactory(), input),
+				new RestartingTestStageExecutor());
+
+		return reasoner;
 	}
 }
