@@ -87,7 +87,6 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		this.computation = new ClassTaxonomyComputation(
 				reasoner.ontologyIndex.getIndexedClasses(),
-				reasoner.ontologyIndex.getIndexedClassCount(),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
 				reasoner.ontologyIndex);
 	}

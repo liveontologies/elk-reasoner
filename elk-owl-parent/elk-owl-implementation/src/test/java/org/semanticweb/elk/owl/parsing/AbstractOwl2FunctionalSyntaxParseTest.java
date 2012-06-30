@@ -75,141 +75,153 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
-import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
+import org.semanticweb.elk.owl.predefined.PredefinedElkPrefix;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
 /**
  * Abstract tests for Elk functional syntax parsers
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 
 	/*-----------------
 	 * Utility methods
 	 ------------------*/
-	
+
 	protected InputStream getInputOntology(String fileName) {
 		return getClass().getClassLoader().getResourceAsStream(fileName);
 	}
-	
-	protected ElkTestAxiomProcessor parseOntology(InputStream input) throws Owl2ParseException {
+
+	protected ElkTestAxiomProcessor parseOntology(InputStream input)
+			throws Owl2ParseException {
 		Owl2Parser parser = instantiateParser(input);
 		ElkTestAxiomProcessor axiomCounter = new ElkTestAxiomProcessor();
-		
-		parser.parseOntology(axiomCounter);
-		
+
+		parser.accept(axiomCounter);
+
 		return axiomCounter;
 	}
-	
-	protected ElkTestAxiomProcessor parseOntology(String input) throws Owl2ParseException {
+
+	protected ElkTestAxiomProcessor parseOntology(String input)
+			throws Owl2ParseException {
 		Owl2Parser parser = instantiateParser(new StringReader(input));
 		ElkTestAxiomProcessor axiomCounter = new ElkTestAxiomProcessor();
-		
-		parser.parseOntology(axiomCounter);
-		
+
+		parser.accept(axiomCounter);
+
 		return axiomCounter;
 	}
-	
+
 	protected static void setDefaultPrefixes(Owl2Parser parser) {
-		ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
-		
-		prefixDeclarations.addOwlDefaultPrefixes();
-		parser.setPrefixDeclarations(prefixDeclarations);
+		for (PredefinedElkPrefix prefix : PredefinedElkPrefix.values())
+			parser.declarePrefix(prefix.get());
 	}
 
 	/**
-	 * This method checks that the parser created the correct number of axioms of each type 
-	 * (identified by the corresponding Java class name)
+	 * This method checks that the parser created the correct number of axioms
+	 * of each type (identified by the corresponding Java class name)
 	 * 
 	 * @param input
 	 * @param axiomTypeCounts
-	 * @param checkAll 	If set to true, the check will fail if the parser created axioms of other types, in addition to those
-	 * 					specified in the count map
-	 * @throws IOException 
+	 * @param checkAll
+	 *            If set to true, the check will fail if the parser created
+	 *            axioms of other types, in addition to those specified in the
+	 *            count map
+	 * @throws IOException
 	 * @throws Exception
 	 */
-	protected static void checkAxiomTypeCounts(ElkTestAxiomProcessor processor, Map<Class<?>, Integer> axiomTypeCounts, boolean checkAll) throws IOException {
+	protected static void checkAxiomTypeCounts(ElkTestAxiomProcessor processor,
+			Map<Class<?>, Integer> axiomTypeCounts, boolean checkAll)
+			throws IOException {
 		boolean error = false;
-		//parsed without errors, check the output
-		for (Iterator<Entry<Class<?>, Set<ElkAxiom>>> actualEntryIter = processor.getAxiomMapEntries().iterator(); actualEntryIter.hasNext();) {
-			Map.Entry<Class<?>, Set<ElkAxiom>> actualEntry = actualEntryIter.next(); 
-			//check that the parser created the right number of axioms of each type
-			Integer expectedCount = getExpectedCount(axiomTypeCounts, actualEntry.getKey());
-			
+		// parsed without errors, check the output
+		for (Iterator<Entry<Class<?>, Set<ElkAxiom>>> actualEntryIter = processor
+				.getAxiomMapEntries().iterator(); actualEntryIter.hasNext();) {
+			Map.Entry<Class<?>, Set<ElkAxiom>> actualEntry = actualEntryIter
+					.next();
+			// check that the parser created the right number of axioms of each
+			// type
+			Integer expectedCount = getExpectedCount(axiomTypeCounts,
+					actualEntry.getKey());
+
 			if (expectedCount == null) {
 				if (checkAll) {
 					error = true;
 					dumpAxioms(actualEntry.getValue());
 					System.err.println("Unexpectedly parsed axioms");
 				}
-			}
-			else if (expectedCount.intValue() != actualEntry.getValue().size()) {
+			} else if (expectedCount.intValue() != actualEntry.getValue()
+					.size()) {
 				error = true;
 				dumpAxioms(actualEntry.getValue());
-				System.err.println("Wrong number of axioms parsed. Expected " + expectedCount + ", actual " + actualEntry.getValue().size());
+				System.err.println("Wrong number of axioms parsed. Expected "
+						+ expectedCount + ", actual "
+						+ actualEntry.getValue().size());
 			}
-			
+
 			axiomTypeCounts.remove(actualEntry.getKey());
 		}
-		
-		/*for (Map.Entry<Class<?>, Integer> expectedEntry : axiomTypeCounts.entrySet()) {			
-			System.err.println(expectedEntry.getValue() + " axiom(s) of the type " + expectedEntry.getKey() + " were not parsed");
-			error = true;
-		}*/
-		
+
+		/*
+		 * for (Map.Entry<Class<?>, Integer> expectedEntry :
+		 * axiomTypeCounts.entrySet()) {
+		 * System.err.println(expectedEntry.getValue() +
+		 * " axiom(s) of the type " + expectedEntry.getKey() +
+		 * " were not parsed"); error = true; }
+		 */
+
 		assertFalse("Parsing errors detected (see the output above)", error);
 	}
-	
-	private static int getExpectedCount(
-			Map<Class<?>, Integer> axiomTypeCounts, Class<?> actualType) {
+
+	private static int getExpectedCount(Map<Class<?>, Integer> axiomTypeCounts,
+			Class<?> actualType) {
 		int count = 0;
-		//TODO A bit slow, something like Trie would help here but who cares, it's just a test
+		// TODO A bit slow, something like Trie would help here but who cares,
+		// it's just a test
 		for (Map.Entry<Class<?>, Integer> entry : axiomTypeCounts.entrySet()) {
 			if (entry.getKey().isAssignableFrom(actualType)) {
 				count += entry.getValue();
 			}
 		}
-		
+
 		return count;
 	}
 
 	private static void dumpAxioms(Set<ElkAxiom> axioms) throws IOException {
 		StringBuilder builder = new StringBuilder();
-		
+
 		for (ElkAxiom axiom : axioms) {
 			OwlFunctionalStylePrinter.append(builder, axiom);
 			builder.append("\n");
 		}
-	
+
 		System.err.println(builder.toString());
 	}
 
-	
 	protected abstract Owl2Parser instantiateParser(InputStream stream);
+
 	protected abstract Owl2Parser instantiateParser(Reader reader);
-	
-	
+
 	/*-------------------------
 	 * TESTS
 	 -------------------------*/
-	
+
 	/*
 	 * See if we can parse the OWL2 primer sample ontology
 	 */
 	@Test
 	public void testOWL2Primer() throws Exception {
 		InputStream input = getInputOntology("owl2primer.owl");
-		
+
 		assertNotNull(input);
-		
+
 		ElkTestAxiomProcessor counter = parseOntology(input);
 		Map<Class<?>, Integer> expectedCountMap = new HashMap<Class<?>, Integer>();
-		
+
 		expectedCountMap.put(ElkSubClassOfAxiom.class, 8);
 		expectedCountMap.put(ElkEquivalentClassesAxiom.class, 11);
 		expectedCountMap.put(ElkDisjointClassesAxiom.class, 2);
@@ -222,56 +234,55 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		expectedCountMap.put(ElkObjectPropertyRangeAxiom.class, 1);
 		expectedCountMap.put(ElkDataPropertyDomainAxiom.class, 1);
 		expectedCountMap.put(ElkDataPropertyRangeAxiom.class, 1);
-		
+
 		expectedCountMap.put(ElkAnnotationAssertionAxiom.class, 1);
-		
+
 		expectedCountMap.put(ElkSymmetricObjectPropertyAxiom.class, 1);
 		expectedCountMap.put(ElkAsymmetricObjectPropertyAxiom.class, 1);
 		expectedCountMap.put(ElkReflexiveObjectPropertyAxiom.class, 1);
 		expectedCountMap.put(ElkIrreflexiveObjectPropertyAxiom.class, 1);
-		
+
 		expectedCountMap.put(ElkFunctionalObjectPropertyAxiom.class, 1);
 		expectedCountMap.put(ElkIrreflexiveObjectPropertyAxiom.class, 1);
 		expectedCountMap.put(ElkInverseFunctionalObjectPropertyAxiom.class, 1);
 		expectedCountMap.put(ElkTransitiveObjectPropertyAxiom.class, 1);
 		expectedCountMap.put(ElkFunctionalDataPropertyAxiom.class, 1);
-		
+
 		expectedCountMap.put(ElkHasKeyAxiom.class, 1);
 		expectedCountMap.put(ElkDatatypeDefinitionAxiom.class, 3);
-		
+
 		expectedCountMap.put(ElkClassAssertionAxiom.class, 9);
 		expectedCountMap.put(ElkObjectPropertyAssertionAxiom.class, 1);
 		expectedCountMap.put(ElkNegativeObjectPropertyAssertionAxiom.class, 2);
 		expectedCountMap.put(ElkDataPropertyAssertionAxiom.class, 1);
 		expectedCountMap.put(ElkNegativeDataPropertyAssertionAxiom.class, 1);
-		
+
 		expectedCountMap.put(ElkSameIndividualAxiom.class, 3);
 		expectedCountMap.put(ElkDifferentIndividualsAxiom.class, 1);
-		
+
 		expectedCountMap.put(ElkDeclarationAxiom.class, 43);
-		
+
 		checkAxiomTypeCounts(counter, expectedCountMap, false);
 		assertEquals(108L, counter.getTotalAxiomCount());
 	}
-	
-	
+
 	@Test(expected = Owl2ParseException.class)
 	public void testPrefixDeclarations() throws Owl2ParseException {
 		String testString = "Ontology( <http://www.my.example.com/example>"
 				+ "Declaration( Class( :Person ) )"
 				+ "SubClassOf( :Person owl:Thing )" + ") ";
-		
+
 		parseOntology(testString);
 		fail("Should have thrown Owl2ParseException");
 	}
-	
+
 	@Test
 	public void testObjectOneOf() throws Owl2ParseException {
 		String testString = "Ontology(SubClassOf( <A> ObjectOneOf(<i>)))";
-		
+
 		parseOntology(testString);
 	}
-	
+
 	@Test
 	public void testLiteralParsing() throws Owl2ParseException, IOException {
 		String input = "Prefix ( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )\n"
@@ -286,7 +297,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 
 		parseOntology(input);
 	}
-	
+
 	/*
 	 * Testing if DataSomeValuesFrom parsing could be ambiguous
 	 */
@@ -296,47 +307,43 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 				+ "Prefix ( a: = <http://www.example.org#> )\n"
 				+ "Prefix ( xsd: = <http://www.w3.org/2001/XMLSchema#> )\n"
 				+ "Ontology(<http://www.example.org/>\n"
-				 + "SubClassOf(a:2DFigure \n"
-				 + "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)\n"
-				 + ")\n"
-				 + "SubClassOf(a:2DFigure \n"
-				 + "   DataAllValuesFrom(a:hasWidth a:hasLength xsd:integer)\n"
-				 + ")\n"				 
-				+ ")";
+				+ "SubClassOf(a:2DFigure \n"
+				+ "   DataSomeValuesFrom(a:hasWidth a:hasLength xsd:integer)\n"
+				+ ")\n"
+				+ "SubClassOf(a:2DFigure \n"
+				+ "   DataAllValuesFrom(a:hasWidth a:hasLength xsd:integer)\n"
+				+ ")\n" + ")";
 
 		ElkTestAxiomProcessor counter = parseOntology(input);
-		Set<ElkAxiom> axioms = counter.getAxiomsForType(ElkSubClassOfAxiom.class);
-		
+		Set<ElkAxiom> axioms = counter
+				.getAxiomsForType(ElkSubClassOfAxiom.class);
+
 		assertEquals(2, axioms.size());
-		
+
 		for (ElkAxiom axiom : axioms) {
 			ElkSubClassOfAxiom sbAxiom = (ElkSubClassOfAxiom) axiom;
-			
+
 			assertTrue(sbAxiom.getSuperClassExpression() instanceof ElkDataPropertyListRestrictionQualifiedImpl);
-			
-			ElkDataPropertyListRestrictionQualifiedImpl superCE =
-					(ElkDataPropertyListRestrictionQualifiedImpl) sbAxiom.getSuperClassExpression();
-			
+
+			ElkDataPropertyListRestrictionQualifiedImpl superCE = (ElkDataPropertyListRestrictionQualifiedImpl) sbAxiom
+					.getSuperClassExpression();
+
 			assertEquals(2, superCE.getDataPropertyExpressions().size());
 		}
-	}	
-	
+	}
+
 	@Test
 	public void testEmptyPrefix() throws Owl2ParseException {
-		String testString = "Prefix(:=<>)" +
-		"Ontology("
-		+ "Declaration(Class(:A))"
-		+ ")";
-		
+		String testString = "Prefix(:=<>)" + "Ontology("
+				+ "Declaration(Class(:A))" + ")";
+
 		parseOntology(testString);
 	}
-	
+
 	@Test
 	public void testQualifiedNamesInIris() throws Owl2ParseException {
-		String testString = "Prefix(p: = <>)" +
-				"Ontology("
-				+ "SubClassOf(p:Class p:Ontology)"
-				+ ")";
+		String testString = "Prefix(p: = <>)" + "Ontology("
+				+ "SubClassOf(p:Class p:Ontology)" + ")";
 
 		parseOntology(testString);
 	}

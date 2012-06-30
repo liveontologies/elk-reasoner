@@ -1,12 +1,11 @@
-package org.semanticweb.elk.owl;
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +20,17 @@ package org.semanticweb.elk.owl;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.loading;
 
+public class LoadingException extends Exception {
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-
-/**
- * This simple interface describes any class that can process ElkAxioms.
- * 
- * @author Markus Kroetzsch
- */
-public interface ElkAxiomProcessor {
 	/**
-	 * Process the given axiom.
 	 * 
-	 * @param elkAxiom
 	 */
-	public void process(ElkAxiom elkAxiom);
+	private static final long serialVersionUID = -272682717729938704L;
+
+	public LoadingException(String message) {
+		super(message);
+	}
+
 }

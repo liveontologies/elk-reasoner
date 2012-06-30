@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -56,6 +55,7 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
@@ -68,7 +68,7 @@ import org.semanticweb.elk.util.logging.ElkMessage;
  * 
  */
 public abstract class AbstractElkAxiomIndexerVisitor extends
-		AbstractElkAxiomVisitor<Void> implements ElkAxiomProcessor {
+		AbstractElkAxiomVisitor<Void> implements ElkOntologyVisitor {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -107,7 +107,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	private final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
 	@Override
-	public void process(ElkAxiom elkAxiom) {
+	public void visit(ElkAxiom elkAxiom) {
 		try {
 			elkAxiom.accept(this);
 		} catch (IndexingException e) {

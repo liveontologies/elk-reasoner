@@ -369,7 +369,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 		write("DataSomeValuesFrom(");
 		write(elkDataSomeValuesFrom.getDataPropertyExpressions());
 		write(' ');
-		write(elkDataSomeValuesFrom.getDataRange());		
+		write(elkDataSomeValuesFrom.getDataRange());
 		write(')');
 		return null;
 	}
@@ -538,18 +538,20 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 		write("\"");
 		write(elkLiteral.getLexicalForm());
 		write("\"");
-		
+
 		if (!isPlain(elkLiteral)) {
 			write("^^");
 			write(elkLiteral.getDatatype());
 		}
-		
+
 		return null;
 	}
 
 	private static boolean isPlain(ElkLiteral elkLiteral) {
 
-		return elkLiteral.getDatatype() == null || PredefinedElkIri.RDF_PLAIN_LITERAL.equals(elkLiteral.getDatatype().getIri());
+		return elkLiteral.getDatatype() == null
+				|| PredefinedElkIri.RDF_PLAIN_LITERAL.get().equals(
+						elkLiteral.getDatatype().getIri());
 	}
 
 	@Override
@@ -802,7 +804,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 		write(')');
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(ElkHasKeyAxiom elkHasKey) {
 		write("HasKey( ");
@@ -814,7 +816,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 		write(" )) ");
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(ElkDatatypeDefinitionAxiom elkDatatypeDefn) {
 		write("DatatypeDefinition( ");
@@ -823,7 +825,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 		write(elkDatatypeDefn.getDataRange());
 		write(" )");
 		return null;
-	}	
+	}
 
 	protected final void write(char ch) {
 		try {

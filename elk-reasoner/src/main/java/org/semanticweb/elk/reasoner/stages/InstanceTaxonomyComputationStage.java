@@ -87,7 +87,6 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		if (reasoner.doneClassTaxonomy)
 			this.computation = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
-					reasoner.ontologyIndex.getIndexedIndividualCount(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.ontologyIndex, reasoner.taxonomy);
 		if (LOGGER_.isInfoEnabled())
@@ -96,7 +95,8 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		computation.printStatistics();
+		if (computation != null)
+			computation.printStatistics();
 	}
 
 }

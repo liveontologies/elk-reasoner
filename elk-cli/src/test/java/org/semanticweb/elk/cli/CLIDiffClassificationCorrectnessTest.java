@@ -28,10 +28,13 @@ package org.semanticweb.elk.cli;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.semanticweb.elk.loading.OntologyStreamLoader;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.DiffClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.stages.RestartingTestStageExecutor;
 
@@ -51,10 +54,10 @@ public class CLIDiffClassificationCorrectnessTest extends
 	@Override
 	protected Reasoner createReasoner(final InputStream input)
 			throws Owl2ParseException, IOException {
-		IOReasoner reasoner = new IOReasonerFactory()
-				.createReasoner(new RestartingTestStageExecutor());
-
-		reasoner.loadOntologyFromStream(input);
+		Reasoner reasoner = new ReasonerFactory().createReasoner(
+				new OntologyStreamLoader(
+						new Owl2FunctionalStyleParserFactory(), input),
+				new RestartingTestStageExecutor());
 
 		return reasoner;
 	}

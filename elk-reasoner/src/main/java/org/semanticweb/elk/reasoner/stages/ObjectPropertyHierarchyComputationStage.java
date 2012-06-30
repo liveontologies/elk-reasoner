@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -70,7 +70,8 @@ public class ObjectPropertyHierarchyComputationStage extends
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Collections.emptyList();
+		return Arrays
+				.asList((ReasonerStage) new OntologyLoadingStage(reasoner));
 	}
 
 	@Override

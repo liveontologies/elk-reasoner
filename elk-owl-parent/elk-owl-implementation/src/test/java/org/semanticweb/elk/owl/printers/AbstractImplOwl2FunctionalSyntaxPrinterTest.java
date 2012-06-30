@@ -31,60 +31,61 @@ import java.io.StringReader;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
-import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.parsing.ElkTestAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
+import org.semanticweb.elk.owl.predefined.PredefinedElkPrefix;
 
 /**
- * Test for the printer which uses this concrete implementation of the OWL model.
- * Unfortunately, it's still abstract because we also need some implementation of the parser
- * which live in other modules
+ * Test for the printer which uses this concrete implementation of the OWL
+ * model. Unfortunately, it's still abstract because we also need some
+ * implementation of the parser which live in other modules
  * 
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
-public abstract class AbstractImplOwl2FunctionalSyntaxPrinterTest extends ModelOwl2FunctionalSyntaxPrinterTest {
+public abstract class AbstractImplOwl2FunctionalSyntaxPrinterTest extends
+		ModelOwl2FunctionalSyntaxPrinterTest {
 
 	@Override
 	protected Set<? extends ElkObject> getOriginalElkObjects() {
-		InputStream input = getClass().getClassLoader().getResourceAsStream("owl2primer.owl");
-		
+		InputStream input = getClass().getClassLoader().getResourceAsStream(
+				"owl2primer.owl");
+
 		assertNotNull(input);
-		
+
 		return parseAxioms(new InputStreamReader(input), false);
 	}
 
 	@Override
 	protected Set<? extends ElkObject> loadPrintedElkObjects(String input) {
-		String ontology = " Ontology(<http://example.com/owl/> \n" + input + "\n)"; 
-		
+		String ontology = " Ontology(<http://example.com/owl/> \n" + input
+				+ "\n)";
+
 		return parseAxioms(new StringReader(ontology), true);
 	}
-	
-	protected Set<? extends ElkObject> parseAxioms(Reader reader, boolean addDefaultDecl) {
+
+	protected Set<? extends ElkObject> parseAxioms(Reader reader,
+			boolean addDefaultDecl) {
 		Owl2Parser parser = instantiateParser(reader);
 		ElkTestAxiomProcessor counter = new ElkTestAxiomProcessor();
-		
-		if (addDefaultDecl) {
-			ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
 
-			prefixDeclarations.addOwlDefaultPrefixes();
-			parser.setPrefixDeclarations(prefixDeclarations);
+		if (addDefaultDecl) {
+			for (PredefinedElkPrefix prefix : PredefinedElkPrefix.values())
+				parser.declarePrefix(prefix.get());
 		}
-		
+
 		try {
-			parser.parseOntology(counter);
+			parser.accept(counter);
 		} catch (Owl2ParseException e) {
-			throw new RuntimeException("Failed to load axioms for testing", e); 
+			throw new RuntimeException("Failed to load axioms for testing", e);
 		}
-		
+
 		return counter.getAllAxioms();
 	}
-	
+
 	protected abstract Owl2Parser instantiateParser(Reader reader);
 }

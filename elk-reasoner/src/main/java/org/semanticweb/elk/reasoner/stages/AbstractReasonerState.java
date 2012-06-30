@@ -22,8 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.loading.IncrementalOntologyProvider;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
@@ -45,6 +44,14 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  * 
  */
 public abstract class AbstractReasonerState {
+	/**
+	 * <tt>true</tt> if the ontology is loaded
+	 */
+	boolean doneLoading = false;
+	/**
+	 * <tt>true</tt> if the ontology changes are loaded
+	 */
+	boolean doneChangeLoading = false;
 	/**
 	 * <tt>true</tt> if the object property hierarchy has been computed
 	 */
@@ -77,7 +84,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * the index representing the current ontology
 	 */
-	OntologyIndex ontologyIndex;
+	final OntologyIndex ontologyIndex;
 	/**
 	 * <tt>true</tt> if the current ontology is consistent
 	 */
@@ -86,6 +93,10 @@ public abstract class AbstractReasonerState {
 	 * Taxonomy that stores (partial) reasoning results.
 	 */
 	IndividualClassTaxonomy taxonomy = null;
+
+	protected AbstractReasonerState() {
+		this.ontologyIndex = new OntologyIndexImpl();
+	}
 
 	/**
 	 * Invalidates all previously computed reasoning results. By calling this
@@ -100,6 +111,8 @@ public abstract class AbstractReasonerState {
 	 */
 	protected void resetStages() {
 		if (!doneReset) {
+			doneLoading = false;
+			doneChangeLoading = false;
 			doneObjectPropertyHierarchyComputation = false;
 			doneObjectPropertyCompositionsPrecomputation = false;
 			doneContextReset = false;
@@ -109,6 +122,11 @@ public abstract class AbstractReasonerState {
 			doneReset = true;
 		}
 	}
+
+	/**
+	 * @return the object through which the ontology can be loaded
+	 */
+	protected abstract IncrementalOntologyProvider getOntologyProvider();
 
 	/**
 	 * @return the maximal number of workers that can be used for running
@@ -139,64 +157,8 @@ public abstract class AbstractReasonerState {
 	 * ontology.
 	 */
 	public void reset() {
-		ontologyIndex = new OntologyIndexImpl();
+		ontologyIndex.clear();
 		resetStages();
-	}
-
-	/**
-	 * Add an axiom to the ontology. This method updates the
-	 * {@link OntologyIndex} according to the added axiom. The previously
-	 * computed reasoner results (e.g., taxonomies) will become invalid when new
-	 * axioms are added.
-	 * 
-	 * TODO Clarify what happens if an axiom is added twice.
-	 * 
-	 * @param axiom
-	 */
-	public void addAxiom(ElkAxiom axiom) {
-		ontologyIndex.getAxiomInserter().process(axiom);
-		resetStages();
-	}
-
-	/**
-	 * Remove an axiom from the ontology.This method updates the
-	 * {@link OntologyIndex} according to the deleted axiom. The previously
-	 * computed reasoner results (e.g., taxonomies) will become invalid when new
-	 * axioms are added.
-	 * 
-	 * TODO Clarify what happens when deleting axioms that were not added.
-	 * 
-	 * @param axiom
-	 */
-	public void removeAxiom(ElkAxiom axiom) {
-		ontologyIndex.getAxiomDeleter().process(axiom);
-		resetStages();
-	}
-
-	/**
-	 * @return an {@link ElkAxiomProcessor} that adds axioms to the current
-	 *         ontology
-	 */
-	protected ElkAxiomProcessor getAxiomInserter() {
-		return new ElkAxiomProcessor() {
-			@Override
-			public void process(ElkAxiom elkAxiom) {
-				addAxiom(elkAxiom);
-			}
-		};
-	}
-
-	/**
-	 * @return an {@link ElkAxiomProcessor} that removes axioms from the current
-	 *         ontology
-	 */
-	protected ElkAxiomProcessor getAxiomDeleter() {
-		return new ElkAxiomProcessor() {
-			@Override
-			public void process(ElkAxiom elkAxiom) {
-				removeAxiom(elkAxiom);
-			}
-		};
 	}
 
 	/**
@@ -240,8 +202,14 @@ public abstract class AbstractReasonerState {
 		return taxonomy;
 	}
 
-	// used only in tests
-	protected OntologyIndex getOntologyIndex() {
+	/**
+	 * Compute the index representation of the given ontology if it has not been
+	 * done yet.
+	 * 
+	 * @return the index representation of the given ontology
+	 */
+	public OntologyIndex getOntologyIndex() {
+		getStageExecutor().complete(new OntologyLoadingStage(this));
 		return ontologyIndex;
 	}
 

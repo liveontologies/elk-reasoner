@@ -44,8 +44,7 @@ public class ObjectPropertyCompositionsPrecomputation
 			ObjectPropertyCompositionsPrecomputationFactory inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		super(ontologyIndex.getIndexedPropertyChains(), ontologyIndex
-				.getIndexedPropertyChainCount(), inputProcessorFactory,
+		super(ontologyIndex.getIndexedPropertyChains(), inputProcessorFactory,
 				executor, maxWorkers, progressMonitor);
 	}
 

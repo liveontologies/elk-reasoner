@@ -25,22 +25,19 @@ package org.semanticweb.elk.owl.iris;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.semanticweb.elk.owl.predefined.PredefinedElkPrefix;
-
 /**
  * @author Frantisek Simancik
- *
+ * 
  */
 public class ElkPrefixDeclarationsImpl implements ElkPrefixDeclarations {
-	
-	protected final Map<String, ElkPrefix> prefixLookup =
-		new HashMap<String, ElkPrefix> ();
+
+	protected final Map<String, ElkPrefix> prefixLookup = new HashMap<String, ElkPrefix>();
 
 	@Override
 	public boolean addPrefix(ElkPrefix prefix) {
 		if (prefixLookup.containsKey(prefix.getName()))
 			return false;
-		
+
 		prefixLookup.put(prefix.getName(), prefix);
 		return true;
 	}
@@ -48,14 +45,6 @@ public class ElkPrefixDeclarationsImpl implements ElkPrefixDeclarations {
 	@Override
 	public ElkPrefix getPrefix(String prefixName) {
 		return prefixLookup.get(prefixName);
-	}
-	
-	@Override
-	public void addOwlDefaultPrefixes() {
-         addPrefix(PredefinedElkPrefix.OWL);
-         addPrefix(PredefinedElkPrefix.RDF);
-         addPrefix(PredefinedElkPrefix.RDFS);
-         addPrefix(PredefinedElkPrefix.XSD);
 	}
 
 }

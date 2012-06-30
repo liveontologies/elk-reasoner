@@ -36,46 +36,45 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
-import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 import org.semanticweb.elk.owl.parsing.AbstractOwl2FunctionalSyntaxParseTest;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
+import org.semanticweb.elk.owl.predefined.PredefinedElkPrefix;
+import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
 
 /**
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class Owl2FunctionalStyleParserTest extends AbstractOwl2FunctionalSyntaxParseTest {
+public class Owl2FunctionalStyleParserTest extends
+		AbstractOwl2FunctionalSyntaxParseTest {
 
-	class DummyElkAxiomProcessor implements ElkAxiomProcessor {
+	class DummyElkOntologyVisitor implements ElkOntologyVisitor {
 		public final List<ElkAxiom> axiomList = new ArrayList<ElkAxiom>();
 
 		@Override
-		public void process(ElkAxiom axiom) {
+		public void visit(ElkAxiom axiom) {
 			axiomList.add(axiom);
 		}
 	}
 
-	protected static Owl2FunctionalStyleParser getParserForString(String testString,
-			boolean defaultPrefixes) {
+	protected static Owl2FunctionalStyleParser getParserForString(
+			String testString, boolean defaultPrefixes) {
 		InputStream stream = new ByteArrayInputStream(testString.getBytes());
 		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
-		if (defaultPrefixes) {
-			ElkPrefixDeclarations prefixDeclarations = new ElkPrefixDeclarationsImpl();
-			prefixDeclarations.addOwlDefaultPrefixes();
-			parser.setPrefixDeclarations(prefixDeclarations);
-		}
+		;
+		if (defaultPrefixes)
+			for (PredefinedElkPrefix prefix : PredefinedElkPrefix.values())
+				parser.declarePrefix(prefix.get());
 		return parser;
 	}
 
-	protected static ElkClass parseElkClass(String testString) throws ParseException,
-			InterruptedException, ExecutionException {
+	protected static ElkClass parseElkClass(String testString)
+			throws ParseException, InterruptedException, ExecutionException {
 		return getParserForString(testString, true).clazz();
 	}
 
@@ -111,16 +110,16 @@ public class Owl2FunctionalStyleParserTest extends AbstractOwl2FunctionalSyntaxP
 				"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 		assertEquals(literal2.getDatatype().getIri().asString(),
 				"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
-		assertEquals(literal1.getDatatype().getIri(), literal2.getDatatype().getIri());
+		assertEquals(literal1.getDatatype().getIri(), literal2.getDatatype()
+				.getIri());
 		// assertEquals(literal1, literal2);
 	}
 
-	
 	@Override
 	protected Owl2Parser instantiateParser(InputStream stream) {
 		return new Owl2FunctionalStyleParser(stream);
 	}
-	
+
 	@Override
 	protected Owl2Parser instantiateParser(Reader reader) {
 		return new Owl2FunctionalStyleParser(reader);

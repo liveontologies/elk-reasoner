@@ -29,19 +29,23 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.concurrent.Executors;
 
-import org.semanticweb.elk.cli.IOReasoner;
 import org.semanticweb.elk.io.FileUtils;
+import org.semanticweb.elk.loading.OntologyStreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.InconsistentOntologyException;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+
 /**
  * Computes correct class taxonomy hash codes for a set of ontologies
  * 
@@ -61,50 +65,60 @@ public class ComputeTaxonomyHashCodes {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		
+
 		generateHashCodes(CLASSIFICATION_PATH, new TestHasher() {
 
 			@Override
-			public int hash(IOReasoner reasoner) {
+			public int hash(Reasoner reasoner) {
 				Taxonomy<ElkClass> taxonomy = null;
-				
+
 				try {
 					taxonomy = reasoner.getTaxonomy();
 				} catch (InconsistentOntologyException e) {
 					return 0;
 				}
-				
+
 				return TaxonomyHasher.hash(taxonomy);
-			}});
-		
+			}
+		});
+
 		generateHashCodes(REALIZATION_PATH, new TestHasher() {
 
 			@Override
-			public int hash(IOReasoner reasoner) {
+			public int hash(Reasoner reasoner) {
 				InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
-				
+
 				try {
 					taxonomy = reasoner.getInstanceTaxonomy();
 				} catch (InconsistentOntologyException e) {
 					return 0;
 				}
-				
+
 				return InstanceTaxonomyHasher.hash(taxonomy);
-			}});		
+			}
+		});
 	}
-	
-	static void generateHashCodes(String path, TestHasher hasher) throws IOException, Owl2ParseException {
+
+	static void generateHashCodes(String path, TestHasher hasher)
+			throws IOException, Owl2ParseException {
 		File srcDir = new File(path);
-		// use just one worker to minimize the risk of errors:
-		IOReasoner reasoner = new IOReasoner(new TestStageExecutor(),
-				Executors.newCachedThreadPool(), 1);
+
+		ReasonerFactory reasonerFactory = new ReasonerFactory();
+		ReasonerConfiguration configuraion = ReasonerConfiguration
+				.getConfiguration();
+		// use just one worker to minimize the risk of errors
+		configuraion.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
+				"1");
 
 		for (File ontFile : srcDir.listFiles(FileUtils
 				.getExtBasedFilenameFilter("owl"))) {
 
 			System.err.println(ontFile.getName());
 
-			reasoner.loadOntologyFromFile(ontFile);
+			Reasoner reasoner = reasonerFactory.createReasoner(
+					new OntologyStreamLoader(
+							new Owl2FunctionalStyleParserFactory(), ontFile),
+					new TestStageExecutor(), configuraion);
 
 			int hash = hasher.hash(reasoner);
 			// create the expected result file
@@ -117,12 +131,12 @@ public class ComputeTaxonomyHashCodes {
 			writer.write(Integer.valueOf(hash).toString());
 			writer.flush();
 			writer.close();
-		}
 
-		reasoner.shutdown();		
+			reasoner.shutdown();
+		}
 	}
-	
+
 	interface TestHasher {
-		int hash(IOReasoner reasoner);
+		int hash(Reasoner reasoner);
 	}
 }

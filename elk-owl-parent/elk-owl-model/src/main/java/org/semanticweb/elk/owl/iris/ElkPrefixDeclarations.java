@@ -24,29 +24,22 @@ package org.semanticweb.elk.owl.iris;
 
 /**
  * @author Frantisek Simancik
- *
+ * 
  */
 public interface ElkPrefixDeclarations {
 	/**
-	 * Prefix declaration. Rejects if a prefix with the same name
-	 * has already been declared.  
+	 * Prefix declaration. Rejects if a prefix with the same name has already
+	 * been declared.
 	 * 
 	 * @param prefix
 	 * @return true is successful
 	 */
 	public boolean addPrefix(ElkPrefix prefix);
-	
+
 	/**
 	 * @param prefixName
 	 * @return The ElkPrefix associated with the prefixName or null if none.
 	 */
 	public ElkPrefix getPrefix(String prefixName);
-	
-	/** Convenience method to use the default prefix declarations that are
-	 * used in the OWL specification. Adds the default prefix declarations
-	 * for owl:, rdf:, rdfs: and xsd: This should be used only when parsing
-	 * syntactic fragments of OWL ontologies. Complete ontology documents
-	 * must always declare all prefixes explicitly.
-	 */
-	public void addOwlDefaultPrefixes();
+
 }

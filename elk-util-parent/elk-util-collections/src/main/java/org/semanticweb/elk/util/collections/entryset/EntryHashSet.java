@@ -22,20 +22,19 @@
  */
 package org.semanticweb.elk.util.collections.entryset;
 
+import java.util.AbstractCollection;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * A set of entries that maintains uniqueness of entries in the set modulo the
- * {@code equals()} method defined for the entry. The main method is merging a
- * entry into the set, which returns an equal entry from the set, if there is
- * one, or, otherwise, inserts the input entry into the set returning itself.
- * Other methods include finding an entry in the set that is equal to the given
- * one, deleting such an entry from the set, if found, and iterating over the
- * entries. This is an abstract helper class; it is not supposed to be directly
- * extended.
+ * A duplicate-free collection of entries {@code E#equals(Object)}. The main
+ * method is merging a entry into the collection, which returns an equal entry
+ * from the collection, if there is one, or, otherwise, inserts the input entry
+ * into the collection returning itself. Other methods include finding an entry
+ * in the collection that is equal to the given one, deleting such an entry from
+ * the collection, if found, and iterating over the entries.
  * 
  * The implementation is largely based on the implementation of
  * {@linkplain HashSet} from the standard Java collection library.
@@ -44,9 +43,9 @@ import java.util.NoSuchElementException;
  * 
  * 
  * @param <E>
- *            the type of entries in the set
+ *            the type of entries in the collection
  */
-abstract class AbstractEntryHashSet<E extends Entry<E>> {
+public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 
 	/**
 	 * The default initial capacity - MUST be a power of two.
@@ -119,17 +118,16 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 	final float underloadFactor;
 
 	/**
-	 * The number of times this {@link AbstractEntryHashSet} has been modified.
-	 * This field is used to make iterators on Collection-views of the HashMap
+	 * The number of times this {@link EntryHashSet} has been modified. This
+	 * field is used to make iterators on Collection-views of the HashMap
 	 * fail-fast. (See ConcurrentModificationException).
 	 */
 	transient volatile int modCount;
 
 	/**
-	 * Constructs an empty {@link AbstractEntryHashSet} with the specified
-	 * initial capacity, under-load factor, and over-load factor. The over-load
-	 * factor needs to be larger than twice the under-load factor (ideally even
-	 * more).
+	 * Constructs an empty {@link EntryHashSet} with the specified initial
+	 * capacity, under-load factor, and over-load factor. The over-load factor
+	 * needs to be larger than twice the under-load factor (ideally even more).
 	 * 
 	 * @param initialCapacity
 	 *            the initial capacity
@@ -142,7 +140,7 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 	 *             non-positive
 	 */
 	@SuppressWarnings("unchecked")
-	public AbstractEntryHashSet(int initialCapacity, float underloadFactor,
+	public EntryHashSet(int initialCapacity, float underloadFactor,
 			float overloadFactor) {
 		if (initialCapacity < 0)
 			throw new IllegalArgumentException("Illegal initial capacity: "
@@ -168,26 +166,26 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 	}
 
 	/**
-	 * Constructs an empty {@link AbstractEntryHashSet} with the specified
-	 * initial capacity, the default under-load factor (0.15), and the default
-	 * over-load factor (0.75).
+	 * Constructs an empty {@link EntryHashSet} with the specified initial
+	 * capacity, the default under-load factor (0.15), and the default over-load
+	 * factor (0.75).
 	 * 
 	 * @param initialCapacity
 	 *            the initial capacity.
 	 * @throws IllegalArgumentException
 	 *             if the initial capacity is negative.
 	 */
-	public AbstractEntryHashSet(int initialCapacity) {
+	public EntryHashSet(int initialCapacity) {
 		this(initialCapacity, DEFAULT_UNDERLOAD_FACTOR, DEFAULT_OVERLOAD_FACTOR);
 	}
 
 	/**
-	 * Constructs an empty {@link AbstractEntryHashSet} with the default initial
+	 * Constructs an empty {@link EntryHashSet} with the default initial
 	 * capacity (16), the default under-load factor (0.15), and the default
 	 * over-load factor (0.75).
 	 */
 	@SuppressWarnings("unchecked")
-	public AbstractEntryHashSet() {
+	public EntryHashSet() {
 		this.underloadFactor = DEFAULT_UNDERLOAD_FACTOR;
 		this.overloadFactor = DEFAULT_OVERLOAD_FACTOR;
 		undersize = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_UNDERLOAD_FACTOR);
@@ -211,7 +209,7 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 	/**
 	 * Applies a supplemental hash function to a given hashCode, which defends
 	 * against poor quality hash functions. This is critical because
-	 * {@link AbstractEntryHashSet} uses power-of-two length buckets array, that
+	 * {@link EntryHashSet} uses power-of-two length buckets array, that
 	 * otherwise encounter collisions for hashCodes that do not differ in lower
 	 * bits.
 	 */
@@ -235,17 +233,9 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 	 * 
 	 * @return the number of entries in this set
 	 */
+	@Override
 	public int size() {
 		return size;
-	}
-
-	/**
-	 * Returns <tt>true</tt> if this set contains no entries.
-	 * 
-	 * @return <tt>true</tt> if this set contains no entries
-	 */
-	public boolean isEmpty() {
-		return size == 0;
 	}
 
 	/**
@@ -399,6 +389,7 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 	 * Removes all entries from this set. The set will be empty after this call
 	 * returns.
 	 */
+	@Override
 	public void clear() {
 		modCount++;
 		E[] tab = buckets;
@@ -411,8 +402,13 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 		return new EntryIterator();
 	}
 
+	@Override
+	public Iterator<E> iterator() {
+		return new EntryIterator();
+	}
+
 	/**
-	 * The iterator over the entries in the set.
+	 * The iterator over the entries in the collection.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
@@ -460,7 +456,7 @@ abstract class AbstractEntryHashSet<E extends Entry<E>> {
 				throw new IllegalStateException();
 			if (modCount != expectedModCount)
 				throw new ConcurrentModificationException();
-			AbstractEntryHashSet.this.removeEntry(current);
+			EntryHashSet.this.removeEntry(current);
 			current = null;
 			expectedModCount = modCount;
 		}

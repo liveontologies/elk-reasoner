@@ -42,11 +42,10 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * 
  */
 public class OWLAPITestUtils {
 
-	public static ElkReasoner loadOntologyIntoReasoner(InputStream stream)
+	public static ElkReasoner createReasoner(InputStream stream)
 			throws IOException, Owl2ParseException {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology ontology = null;
@@ -59,11 +58,7 @@ public class OWLAPITestUtils {
 			throw new Owl2ParseException(e);
 		}
 
-		ElkReasoner reasoner = new ElkReasoner(ontology, false,
+		return new ElkReasoner(ontology, false,
 				new RestartingTestStageExecutor());
-
-		reasoner.syncOntology();
-
-		return reasoner;
 	}
 }

@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +35,6 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -46,9 +44,7 @@ import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.util.collections.ArraySet;
 import org.semanticweb.elk.util.logging.ElkMessage;
-import org.semanticweb.elk.util.logging.Statistics;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -65,7 +61,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.reasoner.AxiomNotInProfileException;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.ClassExpressionNotInProfileException;
@@ -114,8 +109,8 @@ public class ElkReasoner implements OWLReasoner {
 	protected final boolean isBufferingMode;
 	/** listener to implement addition and removal of axioms */
 	protected final OntologyChangeListener ontologyChangeListener;
-	/** list to accumulate the unprocessed changes to the ontology */
-	protected final List<OWLOntologyChange> pendingChanges;
+	/** the object using which one can load the ontology and its changes */
+	private final OntologyProvider ontologyProvider;
 	/** ELK object factory used to create any ElkObjects */
 	protected final ElkObjectFactory objectFactory;
 	/** Converter from OWL API to ELK OWL */
@@ -139,17 +134,18 @@ public class ElkReasoner implements OWLReasoner {
 		this.owlOntology = ontology;
 		this.manager = ontology.getOWLOntologyManager();
 		this.owlDataFactory = OWLManager.getOWLDataFactory();
-		this.reasoner = new ReasonerFactory().createReasoner(stageExecutor,
-				elkConfig.getElkConfiguration());
-		this.reasoner
-				.setAllowFreshEntities(elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW);
 		this.elkProgressMonitor = elkConfig.getProgressMonitor() == null ? new DummyProgressMonitor()
 				: new ElkReasonerProgressMonitor(elkConfig.getProgressMonitor());
+		this.ontologyProvider = new OntologyProvider(ontology,
+				this.elkProgressMonitor);
+		this.reasoner = new ReasonerFactory().createReasoner(ontologyProvider,
+				stageExecutor, elkConfig.getElkConfiguration());
+		this.reasoner
+				.setAllowFreshEntities(elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW);
 		this.reasoner.setProgressMonitor(this.elkProgressMonitor);
 		this.ontologyChangeListener = new OntologyChangeListener();
 		this.isBufferingMode = isBufferingMode;
 		this.manager.addOntologyChangeListener(ontologyChangeListener);
-		this.pendingChanges = new ArrayList<OWLOntologyChange>();
 		this.objectFactory = new ElkObjectFactoryImpl();
 		this.owlConverter = OwlConverter.getInstance();
 		this.elkConverter = ElkConverter.getInstance();
@@ -186,75 +182,7 @@ public class ElkReasoner implements OWLReasoner {
 		return reasoner;
 	}
 
-	protected void addAxiom(OWLAxiom ax) {
-		reasoner.addAxiom(owlConverter.convert(ax));
-	}
-
-	protected void removeAxiom(OWLAxiom ax) {
-		reasoner.removeAxiom(owlConverter.convert(ax));
-	}
-
-	protected void syncOntology() {
-		if (!isSynced) {
-			reasoner.reset();
-			try {
-				Set<OWLOntology> importsClosure = owlOntology
-						.getImportsClosure();
-				int ontCount = importsClosure.size();
-				int currentOntology = 0;
-				for (OWLOntology ont : importsClosure) {
-					currentOntology++;
-					String status;
-					if (ontCount == 1)
-						status = ReasonerProgressMonitor.LOADING;
-					else
-						status = ReasonerProgressMonitor.LOADING + " "
-								+ currentOntology + " of " + ontCount;
-					Statistics.logOperationStart(status, LOGGER_);
-					elkProgressMonitor.start(status);
-					Set<OWLAxiom> axioms = ont.getAxioms();
-					int axiomCount = axioms.size();
-					int currentAxiom = 0;
-					for (OWLAxiom ax : axioms) {
-						currentAxiom++;
-						if (ax.isLogicalAxiom()
-								|| ax.isOfType(AxiomType.DECLARATION))
-							addAxiom(ax);
-						elkProgressMonitor.report(currentAxiom, axiomCount);
-					}
-					elkProgressMonitor.finish();
-					Statistics.logOperationFinish(status, LOGGER_);
-				}
-			} catch (ReasonerInterruptedException e) {
-			}
-			isSynced = true;
-			pendingChanges.clear();
-		}
-	}
-
-	protected void reloadChanges() {
-		if (!pendingChanges.isEmpty()) {
-			String status = ReasonerProgressMonitor.LOADING;
-			Statistics.logOperationStart(status, LOGGER_);
-			elkProgressMonitor.start(status);
-			int axiomCount = pendingChanges.size();
-			int currentAxiom = 0;
-			for (OWLOntologyChange change : pendingChanges) {
-				if (change instanceof AddAxiom)
-					addAxiom(change.getAxiom());
-				if (change instanceof RemoveAxiom) {
-					removeAxiom(change.getAxiom());
-				}
-				currentAxiom++;
-				elkProgressMonitor.report(currentAxiom, axiomCount);
-			}
-			elkProgressMonitor.finish();
-			Statistics.logOperationFinish(status, LOGGER_);
-			pendingChanges.clear();
-		}
-	}
-
-	protected FreshEntitiesException convertFreshEntitiesException(
+	protected static FreshEntitiesException convertFreshEntitiesException(
 			org.semanticweb.elk.reasoner.FreshEntitiesException e) {
 		HashSet<OWLEntity> owlEntities = new HashSet<OWLEntity>();
 		for (ElkEntity elkEntity : e.getEntities()) {
@@ -263,7 +191,7 @@ public class ElkReasoner implements OWLReasoner {
 		return new FreshEntitiesException(owlEntities);
 	}
 
-	protected InconsistentOntologyException convertInconsistentOntologyException(
+	protected static InconsistentOntologyException convertInconsistentOntologyException(
 			org.semanticweb.elk.reasoner.InconsistentOntologyException e) {
 		return new InconsistentOntologyException();
 	}
@@ -279,7 +207,8 @@ public class ElkReasoner implements OWLReasoner {
 	 * @param operation
 	 * @param method
 	 */
-	protected void logUnsupportedOperation(String operation, String method) {
+	protected static void logUnsupportedOperation(String operation,
+			String method) {
 		LOGGER_.warn(new ElkMessage("ELK does not support " + operation + ".",
 				"owlapi.unsupportedOperation"));
 	}
@@ -302,19 +231,18 @@ public class ElkReasoner implements OWLReasoner {
 	public void dispose() {
 		owlOntology.getOWLOntologyManager().removeOntologyChangeListener(
 				ontologyChangeListener);
-		pendingChanges.clear();
+		reasoner.reset();
 		reasoner.shutdown();
 	}
 
 	@Override
 	public void flush() {
-		syncOntology();
-		reloadChanges();
+		reasoner.reset();
 	}
 
 	@Override
 	public Node<OWLClass> getBottomClassNode() {
-		return getClassNode(PredefinedElkClass.OWL_NOTHING);
+		return getClassNode(objectFactory.getOwlNothing());
 	}
 
 	@Override
@@ -516,29 +444,17 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public Set<OWLAxiom> getPendingAxiomAdditions() {
-		Set<OWLAxiom> added = new HashSet<OWLAxiom>();
-		for (OWLOntologyChange change : pendingChanges) {
-			if (change instanceof AddAxiom) {
-				added.add(change.getAxiom());
-			}
-		}
-		return added;
+		return ontologyProvider.getPendingAxiomAdditions();
 	}
 
 	@Override
 	public Set<OWLAxiom> getPendingAxiomRemovals() {
-		Set<OWLAxiom> removed = new HashSet<OWLAxiom>();
-		for (OWLOntologyChange change : pendingChanges) {
-			if (change instanceof RemoveAxiom) {
-				removed.add(change.getAxiom());
-			}
-		}
-		return removed;
+		return ontologyProvider.getPendingAxiomRemovals();
 	}
 
 	@Override
 	public List<OWLOntologyChange> getPendingChanges() {
-		return pendingChanges;
+		return ontologyProvider.getPendingChanges();
 	}
 
 	@Override
@@ -676,7 +592,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	@Override
 	public Node<OWLClass> getTopClassNode() {
-		return getClassNode(PredefinedElkClass.OWL_THING);
+		return getClassNode(objectFactory.getOwlThing());
 	}
 
 	@Override
@@ -713,12 +629,13 @@ public class ElkReasoner implements OWLReasoner {
 	public Node<OWLClass> getUnsatisfiableClasses()
 			throws ReasonerInterruptedException, TimeOutException,
 			InconsistentOntologyException {
-		return getClassNode(PredefinedElkClass.OWL_NOTHING);
+		return getClassNode(objectFactory.getOwlNothing());
 	}
 
 	@Override
 	public void interrupt() {
 		stageExecutor.interrupt();
+		reasoner.shutdown();
 	}
 
 	@Override
@@ -816,14 +733,10 @@ public class ElkReasoner implements OWLReasoner {
 				throws OWLException {
 			for (OWLOntologyChange change : changes) {
 				if (change.isAxiomChange()) {
-					OWLAxiom axiom = change.getAxiom();
-					if (axiom.isLogicalAxiom()
-							|| axiom.isOfType(AxiomType.DECLARATION))
-						pendingChanges.add(change);
+					ontologyProvider.registerChange(change);
 				} else if (change.isImportChange())
 					isSynced = false;
 			}
-
 			if (!isBufferingMode)
 				flush();
 		}

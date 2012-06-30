@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 /**
- * An basic computation unit that can be executed by a reasoner. A
+ * A basic computation unit that can be executed by a reasoner. A
  * {@link ReasonerStage} can specify other {@link ReasonerStage}s as
  * dependencies. Thus, several stages can be chained within a reasoning process.
  * 

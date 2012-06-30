@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -45,6 +44,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
 
 /**
  * A simple class to load class taxonomy using a prepared parser. To be used
@@ -65,7 +65,7 @@ public class ClassTaxonomyLoader {
 		final ConcurrentTaxonomy taxonomy = new ConcurrentTaxonomy();
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);
 
-		parser.parseOntology(listener);
+		parser.accept(listener);
 		listener.createNodes = true;
 		// process the remaining axioms
 		for (ElkAxiom remaining : listener.nonProcessedAxioms) {
@@ -99,7 +99,7 @@ public class ClassTaxonomyLoader {
 	}
 
 	static class TaxonomyInserter extends AbstractElkAxiomVisitor<Void>
-			implements ElkAxiomProcessor {
+			implements ElkOntologyVisitor {
 
 		boolean createNodes = false;
 		final ConcurrentTaxonomy taxonomy;
@@ -120,7 +120,8 @@ public class ClassTaxonomyLoader {
 				if (ce instanceof ElkClass) {
 					ElkClass clazz = (ElkClass) ce;
 
-					if (clazz.getIri().equals(PredefinedElkIri.OWL_NOTHING)) {
+					if (clazz.getIri().equals(
+							PredefinedElkIri.OWL_NOTHING.get())) {
 						nothing = true;
 					} else {
 						classes.add(clazz);
@@ -184,8 +185,7 @@ public class ClassTaxonomyLoader {
 								.singleton((ElkClass) entity));
 					}
 				}
-			}
-			else {
+			} else {
 				nonProcessedAxioms.add(elkDeclarationAxiom);
 			}
 
@@ -193,7 +193,7 @@ public class ClassTaxonomyLoader {
 		}
 
 		@Override
-		public void process(ElkAxiom elkAxiom) {
+		public void visit(ElkAxiom elkAxiom) {
 			elkAxiom.accept(this);
 		}
 	}

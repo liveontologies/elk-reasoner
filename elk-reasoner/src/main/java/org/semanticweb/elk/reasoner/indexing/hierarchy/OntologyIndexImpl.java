@@ -22,22 +22,24 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.AbstractCollection;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.visitors.ElkOntologyVisitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.util.collections.Operations;
 
 public class OntologyIndexImpl extends IndexedObjectCache implements
 		OntologyIndex {
 
-	private final IndexedClass indexedOwlThing;
-	private final IndexedClass indexedOwlNothing;
-	
+	private IndexedClass indexedOwlThing;
+	private IndexedClass indexedOwlNothing;
+
 	private final ElkObjectIndexerVisitor elkObjectIndexer;
 	private final ElkAxiomIndexerVisitor axiomInserter;
 	private final ElkAxiomIndexerVisitor axiomDeleter;
@@ -48,10 +50,25 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 		this.elkObjectIndexer = new ElkObjectIndexerVisitor(this);
 		this.axiomInserter = new ElkAxiomIndexerVisitor(this, true);
 		this.axiomDeleter = new ElkAxiomIndexerVisitor(this, false);
+		indexPredefined();
+	}
+
+	@Override
+	public void clear() {
+		super.clear();
+		indexPredefined();
+	}
+
+	/**
+	 * Process predefine declarations of OWL ontologies
+	 */
+	private void indexPredefined() {
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
-		this.indexedOwlThing = axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_THING);
-		this.indexedOwlNothing = axiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
+		this.indexedOwlThing = axiomInserter
+				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
+		this.indexedOwlNothing = axiomInserter
+				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	@Override
@@ -75,70 +92,78 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	}
 
 	@Override
-	public Iterable<IndexedClassExpression> getIndexedClassExpressions() {
+	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
 		return indexedClassExpressionLookup;
 	}
-	
-	@Override 
-	public int getIndexedClassExpressionCount() {
-		return indexedClassExpressionLookup.size();
+
+	@Override
+	public Collection<IndexedClass> getIndexedClasses() {
+		return new AbstractCollection<IndexedClass>() {
+			@Override
+			public Iterator<IndexedClass> iterator() {
+				return Operations.filter(getIndexedClassExpressions(),
+						IndexedClass.class).iterator();
+			}
+
+			@Override
+			public int size() {
+				return indexedClassCount;
+			}
+		};
 	}
 
 	@Override
-	public Iterable<IndexedClass> getIndexedClasses() {
-		return Operations.filter(getIndexedClassExpressions(),
-				IndexedClass.class);
+	public Collection<IndexedIndividual> getIndexedIndividuals() {
+		return new AbstractCollection<IndexedIndividual>() {
+
+			@Override
+			public Iterator<IndexedIndividual> iterator() {
+				return Operations.filter(getIndexedClassExpressions(),
+						IndexedIndividual.class).iterator();
+			}
+
+			@Override
+			public int size() {
+				return indexedIndividualCount;
+			}
+
+		};
 	}
 
 	@Override
-	public int getIndexedClassCount() {
-		return indexedClassCount;
-	}
-	
-	@Override
-	public Iterable<IndexedIndividual> getIndexedIndividuals() {
-		return Operations.filter(getIndexedClassExpressions(),
-				IndexedIndividual.class);
-	}
-
-	@Override
-	public int getIndexedIndividualCount() {
-		return indexedIndividualCount;
-	}
-
-	@Override
-	public Iterable<IndexedPropertyChain> getIndexedPropertyChains() {
+	public Collection<IndexedPropertyChain> getIndexedPropertyChains() {
 		return indexedPropertyChainLookup;
 	}
-	
-	@Override 
-	public int getIndexedPropertyChainCount() {
-		return indexedPropertyChainLookup.size();
+
+	@Override
+	public Collection<IndexedObjectProperty> getIndexedObjectProperties() {
+		return new AbstractCollection<IndexedObjectProperty>() {
+
+			@Override
+			public Iterator<IndexedObjectProperty> iterator() {
+				return Operations.filter(getIndexedPropertyChains(),
+						IndexedObjectProperty.class).iterator();
+			}
+
+			@Override
+			public int size() {
+				return indexedObjectPropertyCount;
+			}
+		};
 	}
 
 	@Override
-	public Iterable<IndexedObjectProperty> getIndexedObjectProperties() {
-		return Operations.filter(getIndexedPropertyChains(),
-				IndexedObjectProperty.class);
-	}
-
-	@Override
-	public int getIndexedObjectPropertyCount() {
-		return indexedObjectPropertyCount;
-	}
-
-	@Override
-	public ElkAxiomProcessor getAxiomInserter() {
+	public ElkOntologyVisitor getInserter() {
 		return axiomInserter;
 	}
 
 	@Override
-	public ElkAxiomProcessor getAxiomDeleter() {
+	public ElkOntologyVisitor getDeleter() {
 		return axiomDeleter;
 	}
 
 	@Override
-	public Iterable<IndexedObjectProperty> getReflexiveObjectProperties() {
+	public Collection<IndexedObjectProperty> getReflexiveObjectProperties() {
 		return reflexiveObjectProperties;
 	}
 
@@ -151,7 +176,8 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 
 	protected boolean removeReflexiveObjectProperty(
 			IndexedObjectProperty reflexiveObjectProperty) {
-		boolean success = reflexiveObjectProperties.remove(reflexiveObjectProperty);
+		boolean success = reflexiveObjectProperties
+				.remove(reflexiveObjectProperty);
 		if (reflexiveObjectProperties.isEmpty())
 			reflexiveObjectProperties = null;
 		return success;

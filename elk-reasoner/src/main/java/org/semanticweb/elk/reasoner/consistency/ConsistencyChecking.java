@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.consistency;
 
+import java.util.AbstractCollection;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -62,8 +64,6 @@ public class ConsistencyChecking
 	 * 
 	 * @param inputJobs
 	 *            the saturation jobs to be executed
-	 * @param inputsSize
-	 *            the number of the saturation jobs
 	 * @param consistencyMonitor
 	 *            the monitor for the consistency status
 	 * @param saturationFactory
@@ -77,13 +77,12 @@ public class ConsistencyChecking
 	 *            the monitor for reporting the progress of the computation
 	 */
 	ConsistencyChecking(
-			Iterator<SaturationJob<IndexedClassEntity>> inputJobs,
-			int inputsSize,
+			Collection<SaturationJob<IndexedClassEntity>> inputJobs,
 			ConsistencyMonitor consistencyMonitor,
 			ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>> saturationFactory,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		super(inputJobs, inputsSize, saturationFactory, executor, maxWorkers,
+		super(inputJobs, saturationFactory, executor, maxWorkers,
 				progressMonitor);
 		this.consistencyMonitor = consistencyMonitor;
 	}
@@ -94,8 +93,6 @@ public class ConsistencyChecking
 	 * 
 	 * @param inputEntities
 	 *            the entities to check for consistency
-	 * @param inputsSize
-	 *            the number of input entities
 	 * @param consistencyMonitor
 	 *            the monitor for the consistency status
 	 * @param ontologyIndex
@@ -108,13 +105,12 @@ public class ConsistencyChecking
 	 * @param progressMonitor
 	 *            the monitor for reporting the progress of the computation
 	 */
-	public ConsistencyChecking(Iterator<IndexedClassEntity> inputEntities,
-			int inputsSize, ConsistencyMonitor consistencyMonitor,
-			OntologyIndex ontologyIndex, ComputationExecutor executor,
-			int maxWorkers, ProgressMonitor progressMonitor) {
+	public ConsistencyChecking(Collection<IndexedClassEntity> inputEntities,
+			ConsistencyMonitor consistencyMonitor, OntologyIndex ontologyIndex,
+			ComputationExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor) {
 		this(
-				new JobIterator(inputEntities, consistencyMonitor),
-				inputsSize,
+				new TodoJobs(inputEntities, consistencyMonitor),
 				consistencyMonitor,
 				new ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>(
 						ontologyIndex, maxWorkers,
@@ -130,36 +126,35 @@ public class ConsistencyChecking
 	 * @return the entities such that the ontology is consistent if and only if
 	 *         all of these entities are consistent
 	 */
-	public static Iterable<IndexedClassEntity> getTestEntities(
-			OntologyIndex ontologyIndex) {
+	public static Collection<IndexedClassEntity> getTestEntities(
+			final OntologyIndex ontologyIndex) {
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
 			/*
 			 * if the ontology does not have any positive occurrence of bottom,
 			 * everything is always consistent
 			 */
-			return Collections.emptyList();
+			return Collections.emptySet();
 		} else {
 			/*
 			 * first consistency is checked for <tt>owl:Thing</tt>, then for the
 			 * individuals in the ontology
 			 */
-			return Operations.concat(
-					Operations.singleton(ontologyIndex.getIndexedOwlThing()),
-					ontologyIndex.getIndexedIndividuals());
-		}
-	}
+			return new AbstractCollection<IndexedClassEntity>() {
 
-	/**
-	 * @param ontologyIndex
-	 *            the representation of the ontology
-	 * @return the number of entities returned by the function
-	 *         {@link #getTestEntities(OntologyIndex)}
-	 */
-	public static int getNoTestEntities(OntologyIndex ontologyIndex) {
-		if (!ontologyIndex.getIndexedOwlNothing().occursPositively())
-			return 0;
-		else
-			return ontologyIndex.getIndexedIndividualCount() + 1;
+				@Override
+				public Iterator<IndexedClassEntity> iterator() {
+					return Operations.concat(
+							Operations.singleton(ontologyIndex
+									.getIndexedOwlThing()),
+							ontologyIndex.getIndexedIndividuals()).iterator();
+				}
+
+				@Override
+				public int size() {
+					return ontologyIndex.getIndexedIndividuals().size() + 1;
+				}
+			};
+		}
 	}
 
 	/**
@@ -177,8 +172,7 @@ public class ConsistencyChecking
 	 */
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(getTestEntities(ontologyIndex).iterator(),
-				getNoTestEntities(ontologyIndex), new ConsistencyMonitor(),
+		this(getTestEntities(ontologyIndex), new ConsistencyMonitor(),
 				ontologyIndex, executor, maxWorkers, progressMonitor);
 	}
 
@@ -259,46 +253,63 @@ public class ConsistencyChecking
 	}
 
 	/**
-	 * Iterator over consistency checking jobs that correspond to the given
-	 * input of entities. If ontology becomes inconsistent as reported by the
-	 * provided consistency monitor, iteration stops.
+	 * Dynamic collection view for consistency checking jobs that correspond to
+	 * the given input of entities. If ontology becomes inconsistent as reported
+	 * by the provided consistency monitor, collection becomes empty.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	static class JobIterator implements
-			Iterator<SaturationJob<IndexedClassEntity>> {
+	static class TodoJobs extends
+			AbstractCollection<SaturationJob<IndexedClassEntity>> implements
+			Collection<SaturationJob<IndexedClassEntity>> {
 
-		private final Iterator<IndexedClassEntity> inputs;
+		private final Collection<IndexedClassEntity> inputs;
 		private final ConsistencyMonitor consistencyMonitor;
 
-		JobIterator(Iterator<IndexedClassEntity> inputs,
+		TodoJobs(Collection<IndexedClassEntity> inputs,
 				ConsistencyMonitor consistenceMonitor) {
 			this.inputs = inputs;
 			this.consistencyMonitor = consistenceMonitor;
 		}
 
 		@Override
-		public boolean hasNext() {
-			if (consistencyMonitor.isInconsistent())
-				return false;
-			else
-				return inputs.hasNext();
+		public int size() {
+			return inputs.size();
 		}
 
 		@Override
-		public SaturationJob<IndexedClassEntity> next() {
-			if (consistencyMonitor.isInconsistent())
-				throw new NoSuchElementException();
-			else
-				return new SaturationJob<IndexedClassEntity>(inputs.next());
-		}
+		public Iterator<SaturationJob<IndexedClassEntity>> iterator() {
+			return new Iterator<SaturationJob<IndexedClassEntity>>() {
 
-		@Override
-		public void remove() {
-			inputs.remove();
-		}
+				final Iterator<IndexedClassEntity> inputsIterator = inputs
+						.iterator();
 
+				@Override
+				public boolean hasNext() {
+					if (consistencyMonitor.isInconsistent())
+						return false;
+					else
+						return inputsIterator.hasNext();
+				}
+
+				@Override
+				public SaturationJob<IndexedClassEntity> next() {
+					if (consistencyMonitor.isInconsistent())
+						throw new NoSuchElementException();
+					else
+						return new SaturationJob<IndexedClassEntity>(
+								inputsIterator.next());
+				}
+
+				@Override
+				public void remove() {
+					inputsIterator.remove();
+				}
+
+			};
+
+		}
 	}
 
 }

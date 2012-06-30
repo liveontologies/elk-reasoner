@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.IncrementalOntologyProvider;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
@@ -52,8 +53,10 @@ public class ReasonerFactory {
 	 * @param stageExecutor
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor) {
-		return createReasoner(stageExecutor,
+	public Reasoner createReasoner(
+			IncrementalOntologyProvider ontologyProvider,
+			ReasonerStageExecutor stageExecutor) {
+		return createReasoner(ontologyProvider, stageExecutor,
 				ReasonerConfiguration.getConfiguration());
 	}
 
@@ -64,9 +67,12 @@ public class ReasonerFactory {
 	 * @param config
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor,
-			ReasonerConfiguration config) {
+	@SuppressWarnings("static-method")
+	public Reasoner createReasoner(
+			IncrementalOntologyProvider ontologyProvider,
+			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
 		return new Reasoner(
+				ontologyProvider,
 				stageExecutor,
 				Executors.newCachedThreadPool(),
 				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));

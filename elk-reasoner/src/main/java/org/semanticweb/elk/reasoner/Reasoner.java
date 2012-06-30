@@ -22,9 +22,13 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.IncrementalOntologyProvider;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -33,6 +37,7 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.FreshInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTypeNode;
@@ -41,6 +46,7 @@ import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.logging.Statistics;
 
 /**
  * The class for querying the results of the reasoning tasks for a given
@@ -53,6 +59,14 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  * Reasoners are created (and pre-configured) by the {@link ReasonerFactory}.
  */
 public class Reasoner extends AbstractReasonerState {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger.getLogger(Reasoner.class);
+
+	/**
+	 * The listener for the changes in the ontology
+	 */
+	private final IncrementalOntologyProvider ontologyProvider;
 	/**
 	 * The progress monitor that is used for reporting progress.
 	 */
@@ -64,7 +78,7 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * the executor used for concurrent tasks
 	 */
-	protected final ComputationExecutor executor;
+	protected ComputationExecutor executor;
 	/**
 	 * Number of workers for concurrent jobs.
 	 */
@@ -81,10 +95,11 @@ public class Reasoner extends AbstractReasonerState {
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
 	 * */
-	protected Reasoner(ReasonerStageExecutor stageExecutor,
-			ExecutorService executor, int workerNo) {
+	protected Reasoner(IncrementalOntologyProvider ontologyProvider,
+			ReasonerStageExecutor stageExecutor, ExecutorService executor,
+			int workerNo) {
+		this.ontologyProvider = ontologyProvider;
 		this.stageExecutor = stageExecutor;
-		this.executor = new ComputationExecutor(workerNo, "elk-reasoner");
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
@@ -125,13 +140,20 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	@Override
+	protected IncrementalOntologyProvider getOntologyProvider() {
+		return ontologyProvider;
+	}
+
+	@Override
 	protected int getNumberOfWorkers() {
 		return workerNo;
 	}
 
 	@Override
 	protected ComputationExecutor getProcessExecutor() {
-		return this.executor;
+		if (executor == null)
+			executor = new ComputationExecutor(workerNo, "elk-reasoner");
+		return executor;
 	}
 
 	@Override
@@ -145,7 +167,10 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	public void shutdown() {
+		if (executor == null)
+			return;
 		executor.shutdown();
+		executor = null;
 	}
 
 	/**
@@ -375,9 +400,21 @@ public class Reasoner extends AbstractReasonerState {
 		}
 	}
 
+	public void writeTaxonomyToFile(File file) throws IOException,
+			InconsistentOntologyException {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Writing taxonomy to " + file);
+		}
+		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
+		ClassTaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
+				file.getPath(), true);
+		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
+	}
+
+	// TODO: get rid of this
 	// used only in tests
 	@Override
-	protected OntologyIndex getOntologyIndex() {
+	public OntologyIndex getOntologyIndex() {
 		return super.getOntologyIndex();
 	}
 

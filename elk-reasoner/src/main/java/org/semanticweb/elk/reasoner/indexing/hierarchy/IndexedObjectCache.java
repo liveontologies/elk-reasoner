@@ -31,7 +31,7 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntry;
  * A cache of all indexed objects in the ontology backed by a KeyEntryHashSet.
  * It uses indexed Entries to compare object with respect to structural
  * equality. Supports (non-recursive) addition, removal, and retrieval of single
- * indexed objects. The recursion for indexing subobjects is in the 
+ * indexed objects. The recursion for indexing subobjects is in the
  * ElkObjectIndexerVisitor.
  * 
  * @author Frantisek Simancik
@@ -52,15 +52,14 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				indexedPropertyChainViewFactory, 128);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFilter#filter
-	 * (org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression)
-	 * 
-	 * Returns the indexed canonical representative of the argument.
-	 */
+	protected void clear() {
+		indexedClassExpressionLookup.clear();
+		indexedPropertyChainLookup.clear();
+		indexedClassCount = 0;
+		indexedIndividualCount = 0;
+		indexedObjectPropertyCount = 0;
+	}
+
 	@Override
 	public IndexedClassExpression filter(IndexedClassExpression ice) {
 		IndexedClassExpression result = indexedClassExpressionLookup.get(ice);
@@ -70,15 +69,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFilter#filter
-	 * (org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain)
-	 * 
-	 * Returns the indexed canonical representative of the argument.
-	 */
 	@Override
 	public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
 		IndexedPropertyChain result = indexedPropertyChainLookup.get(ipc);
@@ -103,7 +93,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	protected void remove(IndexedClassExpression ice) {
-		indexedClassExpressionLookup.remove(ice);
+		indexedClassExpressionLookup.removeEntry(ice);
 		if (ice instanceof IndexedClass)
 			indexedClassCount--;
 		else if (ice instanceof IndexedIndividual)
@@ -111,7 +101,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	protected void remove(IndexedPropertyChain ipc) {
-		indexedPropertyChainLookup.remove(ipc);
+		indexedPropertyChainLookup.removeEntry(ipc);
 		if (ipc instanceof IndexedObjectProperty)
 			indexedObjectPropertyCount--;
 	}

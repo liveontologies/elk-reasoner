@@ -29,13 +29,18 @@ import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Executors;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
+import org.semanticweb.elk.loading.OntologyStreamLoader;
+import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 
 /**
@@ -69,8 +74,7 @@ public class Main {
 		OptionSpec<Integer> nWorkers = parser
 				.acceptsAll(asList("w", "concurrent-workers"),
 						"number of concurrent classification workers")
-				.withOptionalArg().ofType(Integer.class)
-				.defaultsTo(Runtime.getRuntime().availableProcessors());
+				.withOptionalArg().ofType(Integer.class);
 		OptionSpec<Void> version = parser.acceptsAll(asList("version", "v"),
 				"print version information");
 		OptionSpec<Void> help = parser.acceptsAll(asList("h", "help", "?"),
@@ -86,13 +90,23 @@ public class Main {
 		else if (!options.has(inputOntologyFile))
 			parser.printHelpOn(System.out);
 		else {
-			IOReasoner reasoner = new IOReasoner(new LoggingStageExecutor(),
-					Executors.newCachedThreadPool(), nWorkers.value(options));
-			reasoner.loadOntologyFromFile(inputOntologyFile.value(options));
+			ReasonerFactory reasoningFactory = new ReasonerFactory();
+			ReasonerConfiguration configuraion = ReasonerConfiguration
+					.getConfiguration();
+			if (options.has(nWorkers) && options.hasArgument(nWorkers))
+				configuraion.setParameter(
+						ReasonerConfiguration.NUM_OF_WORKING_THREADS, options
+								.valueOf(nWorkers).toString());
+			Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
+			Reasoner reasoner = reasoningFactory.createReasoner(
+					new OntologyStreamLoader(parserFactory, options
+							.valueOf(inputOntologyFile)),
+					new LoggingStageExecutor());
 			if (options.has(classify))
 				reasoner.getTaxonomy();
 			if (options.hasArgument(outputTaxonomyFile))
-				reasoner.writeTaxonomyToFile(outputTaxonomyFile.value(options));
+				reasoner.writeTaxonomyToFile(options
+						.valueOf(outputTaxonomyFile));
 			reasoner.shutdown();
 		}
 	}
