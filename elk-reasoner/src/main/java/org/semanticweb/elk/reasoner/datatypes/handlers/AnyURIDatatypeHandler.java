@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.RegExp;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.EnumSet;
@@ -115,7 +117,13 @@ public class AnyURIDatatypeHandler implements DatatypeHandler {
 					maxLength = Integer.valueOf(value);
 					break;
 				case PATTERN:
-					return new PatternValueSpace(value, datatype);
+					Automaton pattern = new RegExp(value).toAutomaton();
+					PatternValueSpace vs = new PatternValueSpace(pattern, datatype, datatype);
+					if (vs.isEmptyInterval()) {
+						return EmptyValueSpace.INSTANCE;
+					} else {
+						return vs;
+					}
 				default:
 					LOGGER_.warn("Unsupported facet: " + facet.iri);
 					return null;

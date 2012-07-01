@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
-import dk.brics.automaton.RegExp;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
@@ -38,17 +37,19 @@ public class PatternValueSpace implements ValueSpace {
 
 	public Automaton automaton;
 	public Datatype datatype;
+	public Datatype effectiveDatatype;
 
-	public PatternValueSpace(String regexp, Datatype datatype) {
+	public PatternValueSpace(Automaton automaton, Datatype datatype, Datatype effectiveDatatype) {
 		try {
 			this.datatype = datatype;
-			this.automaton = new RegExp(regexp).toAutomaton();
+			this.automaton = automaton;
+			this.effectiveDatatype = effectiveDatatype;
 		} catch (Throwable th) {
 		}
 	}
 
 	public Datatype getDatatype() {
-		return datatype;
+		return effectiveDatatype;
 	}
 
 	public ValueSpaceType getType() {
@@ -56,7 +57,7 @@ public class PatternValueSpace implements ValueSpace {
 	}
 
 	public boolean isEmptyInterval() {
-		return automaton == null || automaton.isEmpty();
+		return automaton.isEmpty() || !effectiveDatatype.isCompatibleWith(datatype);
 	}
 	
 	/**
@@ -73,7 +74,7 @@ public class PatternValueSpace implements ValueSpace {
 	 * Todo: synchronize this block is performance well be an issues
 	 */
 	public boolean contains(ValueSpace valueSpace) {
-		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.datatype);
+		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.effectiveDatatype);
 		if (typechek != true) {
 			return false;
 		}
