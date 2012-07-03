@@ -46,4 +46,4 @@ through OWL API for ontology classification, can be found here:
 Several example programs on how to classify an ontology and how to query the
 reasoner with unnamed class expressions are included here in the folder:
 
-	src/main/java/org/semanticweb/elk/owlapi/examples
+	examples/main/java/org/semanticweb/elk/owlapi/examples
