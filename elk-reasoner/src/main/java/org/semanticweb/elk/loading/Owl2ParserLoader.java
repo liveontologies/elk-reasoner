@@ -68,6 +68,11 @@ abstract class Owl2ParserLoader implements Loader {
 	 */
 	private volatile boolean finished_;
 	/**
+	 * {@code true} if the master thread expects new axioms from the parser
+	 * thread
+	 */
+	private volatile boolean waiting_;
+	/**
 	 * the exception created if something goes wrong
 	 */
 	protected volatile ElkLoadingException exception;
@@ -97,10 +102,9 @@ abstract class Owl2ParserLoader implements Loader {
 				try {
 					parser_.accept(new AxiomInserter(axiomBuffer_));
 					finished_ = true;
-					try {
-						controlThread_.interrupt();
-					} catch (NullPointerException e) {
-						// in case controlThread_ == null, don't do anything
+					synchronized (axiomBuffer_) {
+						if (waiting_)
+							controlThread_.interrupt();
 					}
 				} catch (Exception e) {
 					exception = new ElkLoadingException(e);
@@ -111,7 +115,6 @@ abstract class Owl2ParserLoader implements Loader {
 
 		});
 		this.started_ = false;
-		this.controlThread_ = null;
 		this.exception = null;
 	}
 
@@ -136,8 +139,11 @@ abstract class Owl2ParserLoader implements Loader {
 			started_ = true;
 		}
 		ElkAxiom axiom = null;
+		waiting_ = true;
 		try {
 			for (;;) {
+				if (Thread.currentThread().isInterrupted())
+					break;
 				if (finished_) {
 					axiom = axiomBuffer_.poll();
 				} else {
@@ -148,7 +154,7 @@ abstract class Owl2ParserLoader implements Loader {
 							throw exception;
 						/*
 						 * we don't know for sure why the thread was
-						 * interrupted, so we need to obey the master will
+						 * interrupted, so we need to obey the master; it will
 						 * restart the process if necessary; we need to restore
 						 * the interrupt status of the thread in this case
 						 */
@@ -161,7 +167,9 @@ abstract class Owl2ParserLoader implements Loader {
 				axiomLoader_.visit(axiom);
 			}
 		} finally {
-			controlThread_ = null;
+			synchronized (axiomBuffer_) {
+				waiting_ = false;
+			}
 		}
 	}
 
