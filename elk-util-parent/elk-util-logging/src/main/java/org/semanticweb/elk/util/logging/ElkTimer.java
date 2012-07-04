@@ -111,6 +111,10 @@ public class ElkTimer {
 		return totalCpuTime;
 	}
 
+	public long getAvgCpuTime() {
+		return totalCpuTime > 0 && measurements > 0 ? totalCpuTime / measurements : -1;
+	}
+	
 	/**
 	 * Get the string name of the timer.
 	 * 
@@ -137,6 +141,10 @@ public class ElkTimer {
 	public long getTotalWallTime() {
 		return totalWallTime;
 	}
+	
+	public long getAvgWallTime() {
+		return totalWallTime > 0 && measurements > 0 ? totalWallTime / measurements : -1;
+	}	
 
 	/**
 	 * Return true if the timer is running.

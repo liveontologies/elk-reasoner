@@ -107,12 +107,14 @@ public class BaseConfiguration {
 		return Integer.valueOf(paramMap.get(name));
 	}
 
-	public void setParameter(String name, String value) {
+	public BaseConfiguration setParameter(String name, String value) {
 		if (!validate(name, value))
 			throw new ConfigurationException("Wrong value " + value
 					+ " for parameter " + name);
 
 		paramMap.put(name, value);
+		
+		return this;
 	}
 
 	private boolean validate(String name, String value) {

@@ -12,6 +12,7 @@
 		<fileSet>
 			<!-- Example sources -->
 			<directory>src/main/java</directory>
+			<outputDirectory>examples</outputDirectory>
 		</fileSet>
 	</fileSets>
 	<files>

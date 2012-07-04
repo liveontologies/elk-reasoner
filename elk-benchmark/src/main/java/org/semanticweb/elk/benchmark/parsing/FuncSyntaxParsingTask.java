@@ -29,13 +29,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
+import org.semanticweb.elk.benchmark.Result;
+import org.semanticweb.elk.benchmark.Task;
+import org.semanticweb.elk.benchmark.TaskException;
+import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
-import org.semanticweb.elk.testing.io.IOUtils;
-import org.semanticweb.elk.util.logging.Statistics;
 
 
 /**
@@ -46,48 +47,47 @@ import org.semanticweb.elk.util.logging.Statistics;
  * pavel.klinov@uni-ulm.de
  *
  */
-public class FuncSyntaxPerformanceEval {
+public class FuncSyntaxParsingTask implements Task {
 	
-	final static Logger LOGGER_ = Logger.getLogger(FuncSyntaxPerformanceEval.class);
+	private File file = null;
 
-	public static void main(String...args) throws Exception {
-		if (args.length == 0) {
-			System.err.println("Usage java FuncSyntaxPerformanceEval <path to test ontology>");
-			
-			System.exit(1);
-		}
-		
-		File file = new File(args[0]);
+	private static Owl2Parser createParser(InputStream stream) {
+		return new Owl2FunctionalStyleParser(stream);
+	}
+
+	@Override
+	public Result run() throws TaskException {
 		InputStream stream = null; 
-				
-		
-		if (!file.exists() || !file.isFile()) {
-			System.err.println("Wrong file");
-			
-			System.exit(1);
-		}
 		
 		try {
 			stream = new FileInputStream(file);
 			Owl2Parser parser = createParser(stream);
-			
-			Statistics.logOperationStart("loading", LOGGER_);
 			
 			parser.parseOntology(new ElkAxiomProcessor() {
 				@Override
 				public void process(ElkAxiom elkAxiom) {}
 			});
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new TaskException(e);
 		}
 		finally {
 			IOUtils.closeQuietly(stream);
 		}
 		
-		Statistics.logOperationFinish("loading", LOGGER_);
+		return null;
 	}
 
-	private static Owl2Parser createParser(InputStream stream) {
-		return new Owl2FunctionalStyleParser(stream);
+	@Override
+	public String getName() {
+		return "FuncSyntaxParsing";
+	}
+
+	@Override
+	public void prepare(String... args) throws TaskException {
+		file = new File(args[0]);
+				
+		if (!file.exists() || !file.isFile()) {
+			throw new TaskException("Wrong file: " + args[0]);
+		}
 	}
 }
