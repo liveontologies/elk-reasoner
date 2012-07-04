@@ -29,6 +29,7 @@ import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -38,7 +39,6 @@ import org.semanticweb.elk.loading.EmptyChangesLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.owl.parsing.javacc.ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;

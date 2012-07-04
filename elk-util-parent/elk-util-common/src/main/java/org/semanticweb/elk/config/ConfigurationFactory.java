@@ -62,6 +62,7 @@ public class ConfigurationFactory {
 	 * @param configClass
 	 * @return
 	 */
+	@SuppressWarnings("static-method")
 	public BaseConfiguration getConfiguration(String prefix,
 			Class<? extends BaseConfiguration> configClass)
 			throws ConfigurationException {
@@ -87,6 +88,7 @@ public class ConfigurationFactory {
 		return config;
 	}
 
+	@SuppressWarnings("static-method")
 	public BaseConfiguration getConfiguration(InputStream source,
 			String prefix, Class<? extends BaseConfiguration> configClass)
 			throws ConfigurationException, IOException {
@@ -136,7 +138,7 @@ public class ConfigurationFactory {
 		saveProperties(diskProps, configOnDisk);
 	}
 
-	private void saveProperties(Properties diskProps, File configOnDisk) {
+	private static void saveProperties(Properties diskProps, File configOnDisk) {
 		OutputStream stream = null;
 
 		try {
@@ -159,13 +161,14 @@ public class ConfigurationFactory {
 		}
 	}
 
-	private void copyParameters(BaseConfiguration config, Properties diskProps) {
+	private static void copyParameters(BaseConfiguration config,
+			Properties diskProps) {
 		for (String key : config.getParameterNames()) {
 			diskProps.setProperty(key, config.getParameter(key));
 		}
 	}
 
-	private void copyParameters(String prefix, BaseConfiguration config,
+	private static void copyParameters(String prefix, BaseConfiguration config,
 			ResourceBundle bundle) {
 		for (String key : bundle.keySet()) {
 			if (key.startsWith(prefix)) {
@@ -174,7 +177,7 @@ public class ConfigurationFactory {
 		}
 	}
 
-	private BaseConfiguration instantiate(
+	private static BaseConfiguration instantiate(
 			Class<? extends BaseConfiguration> configClass)
 			throws ConfigurationException {
 		BaseConfiguration config = null;

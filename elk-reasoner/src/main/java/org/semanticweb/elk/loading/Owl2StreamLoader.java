@@ -63,15 +63,16 @@ public class Owl2StreamLoader implements OntologyLoader {
 		return new Owl2ParserLoader(owlParserFactory.getParser(stream_),
 				axiomLoader) {
 			@Override
-			protected void finish() {
-				super.finish();
+			protected void closeParsingResources() {
+				// TODO: what if this function is never called, i.e., the parser
+				// is interrupted?
 				try {
 					stream_.close();
 				} catch (IOException e) {
 					exception = new ElkLoadingException(e.toString());
 				}
+
 			}
 		};
-
 	}
 }

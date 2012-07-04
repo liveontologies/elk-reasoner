@@ -27,7 +27,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
@@ -37,7 +36,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * @author "Yevgeny Kazakov"
  * 
  */
-class Owl2ParserLoader implements Loader {
+abstract class Owl2ParserLoader implements Loader {
 
 	/**
 	 * the parser used to provide the axioms
@@ -97,12 +96,17 @@ class Owl2ParserLoader implements Loader {
 			public void run() {
 				try {
 					parser_.accept(new AxiomInserter(axiomBuffer_));
-				} catch (Owl2ParseException e) {
+					finished_ = true;
+					try {
+						controlThread_.interrupt();
+					} catch (NullPointerException e) {
+						// in case controlThread_ == null, don't do anything
+					}
+				} catch (Exception e) {
 					exception = new ElkLoadingException(e);
+				} finally {
+					closeParsingResources();
 				}
-				if (controlThread_ != null)
-					controlThread_.interrupt();
-				finished_ = true;
 			}
 
 		});
@@ -132,41 +136,40 @@ class Owl2ParserLoader implements Loader {
 			started_ = true;
 		}
 		ElkAxiom axiom = null;
-		for (;;) {
-			if (finished_) {
-				axiom = axiomBuffer_.poll();
-			} else {
-				try {
-					axiom = axiomBuffer_.take();
-				} catch (InterruptedException e) {
-					if (exception != null) {
-						finish();
-						throw exception;
-					} else if (!finished_) {
-						// there was some other reason to interrupt the thread;
-						// restore the interrupt status and exit
+		try {
+			for (;;) {
+				if (finished_) {
+					axiom = axiomBuffer_.poll();
+				} else {
+					try {
+						axiom = axiomBuffer_.take();
+					} catch (InterruptedException e) {
+						if (exception != null)
+							throw exception;
+						/*
+						 * we don't know for sure why the thread was
+						 * interrupted, so we need to obey the master will
+						 * restart the process if necessary; we need to restore
+						 * the interrupt status of the thread in this case
+						 */
 						Thread.currentThread().interrupt();
 						break;
 					}
 				}
+				if (axiom == null)
+					break;
+				axiomLoader_.visit(axiom);
 			}
-			if (axiom == null)
-				break;
-			axiomLoader_.visit(axiom);
+		} finally {
+			controlThread_ = null;
 		}
-		finish();
 	}
 
 	/**
-	 * the post-processing hook to run methods after a parser has been used;
-	 * e.g., to free any resources used by the parser
+	 * the hook to close the parsing resources, e.g., streams after the parser
+	 * is finished, to be implemented in subclasses
 	 */
-	protected void finish() {
-		controlThread_ = null;
-		if (finished_)
-			// clear the interrupt status
-			Thread.interrupted();
-	}
+	protected abstract void closeParsingResources();
 
 	/**
 	 * A simple {@link ElkAxiomProcessor} that insert the parsed axioms into the
