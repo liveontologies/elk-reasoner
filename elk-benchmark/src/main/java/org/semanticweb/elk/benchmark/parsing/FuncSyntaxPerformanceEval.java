@@ -30,11 +30,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
-import org.semanticweb.elk.testing.io.IOUtils;
 import org.semanticweb.elk.util.logging.Statistics;
 
 
