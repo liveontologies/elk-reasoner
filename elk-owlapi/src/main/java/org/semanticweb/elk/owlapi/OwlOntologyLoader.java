@@ -132,7 +132,7 @@ public class OwlOntologyLoader implements OntologyLoader {
 		if (importsClosureIterator.hasNext())
 			initAxioms(importsClosureIterator.next());
 		else
-			axiomsIterator = Collections.emptyIterator();
+			axiomsIterator = Collections.<OWLAxiom>emptySet().iterator();
 	}
 
 	private void initAxioms(OWLOntology ontology) {
