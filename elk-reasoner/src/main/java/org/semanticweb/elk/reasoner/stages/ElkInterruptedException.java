@@ -20,23 +20,48 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.loading;
+package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 
 /**
- * An {@link OntologyChangesProvider} that always behave as if not changes have
- * been done
+ * Thrown when the reasoner process has been interrupted
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class EmptyOntologyChangesProvider implements OntologyChangesProvider {
+public class ElkInterruptedException extends ElkException {
 
-	@Override
-	public void accept(ElkAxiomProcessor axiomInserter,
-			ElkAxiomProcessor axiomDeleter) throws LoadingException {
-		// nothing to do since there are no changes
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7774912476379495291L;
+
+	/**
+	 * 
+	 */
+	public ElkInterruptedException() {
+		super();
+	}
+
+	/**
+	 */
+	public ElkInterruptedException(String message) {
+		super(message);
+	}
+
+	/**
+	 * 
+	 */
+	public ElkInterruptedException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	/**
+	 * 
+	 */
+	public ElkInterruptedException(Throwable cause) {
+		super(cause);
 	}
 
 }

@@ -20,20 +20,46 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.loading;
-
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+package org.semanticweb.elk.owl.exceptions;
 
 /**
- * A common interface for sources of changes that can be applied to the ontology
- * loaded into reasoners
+ * The top level ELK exception
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface OntologyChangesProvider {
+public abstract class ElkException extends Exception {
 
-	public void accept(ElkAxiomProcessor axiomInserter,
-			ElkAxiomProcessor axiomDeleter) throws LoadingException;
+	/**
+	 *  
+	 */
+	private static final long serialVersionUID = -8363638439300197568L;
+
+	/**
+	 * 
+	 */
+	public ElkException() {
+		super();
+	}
+
+	/**
+	 */
+	public ElkException(String message) {
+		super(message);
+	}
+
+	/**
+	 * 
+	 */
+	public ElkException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	/**
+	 * 
+	 */
+	public ElkException(Throwable cause) {
+		super(cause);
+	}
 
 }

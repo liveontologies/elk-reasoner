@@ -153,12 +153,12 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	}
 
 	@Override
-	public ElkAxiomProcessor getInserter() {
+	public ElkAxiomProcessor getAxiomInserter() {
 		return axiomInserter;
 	}
 
 	@Override
-	public ElkAxiomProcessor getDeleter() {
+	public ElkAxiomProcessor getAxiomDeleter() {
 		return axiomDeleter;
 	}
 

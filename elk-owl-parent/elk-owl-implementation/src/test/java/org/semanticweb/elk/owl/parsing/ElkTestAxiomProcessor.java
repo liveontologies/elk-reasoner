@@ -70,6 +70,7 @@ public class ElkTestAxiomProcessor implements ElkAxiomProcessor {
 	 * Returns the most specific interface in the org.semanticweb.elk.interfaces
 	 * package
 	 */
+	@SuppressWarnings("static-method")
 	private Class<?> getElkAxiomType(Class<? extends ElkAxiom> elkAxiomClass) {
 		Package elkOwlPackage = ElkAxiom.class.getPackage();
 

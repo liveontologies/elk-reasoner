@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
+
 /**
  * A basic computation unit that can be executed by a reasoner. A
  * {@link ReasonerStage} can specify other {@link ReasonerStage}s as
@@ -58,16 +60,15 @@ public interface ReasonerStage {
 	 * results for this stage should be computed and the function
 	 * {@link #done()} should return <tt>true</tt>.
 	 */
-	public void execute();
+	public void execute() throws ElkException;
 
 	/**
-	 * @return <tt>true</tt> if the execution for this stage has been
-	 *         interrupted
+	 * @return <tt>true</tt> if the reasoner was interrupted
 	 */
 	public boolean isInterrupted();
 
 	/**
-	 * Clears the interrupt status: the stage is no longer interrupted
+	 * Clears the interrupt status of the reasoner
 	 */
 	public void clearInterrupt();
 

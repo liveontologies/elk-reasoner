@@ -30,36 +30,48 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
-public class OntologyStreamLoader extends Owl2ParserLoader {
+/**
+ * A {@link OntologyLoader} which loads ontology from streams (e.g., backed by
+ * files or strings) using a given {@link Owl2ParserFactory}
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public class Owl2StreamLoader implements OntologyLoader {
 
-	final InputStream stream;
-	final Owl2ParserFactory parserFactory;
+	private final Owl2ParserFactory owlParserFactory;
+	private final InputStream stream_;
 
-	public OntologyStreamLoader(Owl2ParserFactory parserFactory,
-			InputStream stream) {
-		super(parserFactory.getParser(stream));
-		this.stream = stream;
-		this.parserFactory = parserFactory;
+	public Owl2StreamLoader(Owl2ParserFactory parserFactory, InputStream stream) {
+		this.owlParserFactory = parserFactory;
+		this.stream_ = stream;
 	}
 
-	public OntologyStreamLoader(Owl2ParserFactory parserFactory, File file)
+	public Owl2StreamLoader(Owl2ParserFactory parserFactory, File file)
 			throws FileNotFoundException {
 		this(parserFactory, new FileInputStream(file));
 	}
 
-	public OntologyStreamLoader(Owl2ParserFactory parserFactory, String text) {
+	public Owl2StreamLoader(Owl2ParserFactory parserFactory, String text) {
 		this(parserFactory, new ByteArrayInputStream(text.getBytes()));
 	}
 
 	@Override
-	protected void finish() {
-		super.finish();
-		try {
-			stream.close();
-		} catch (IOException e) {
-			exception = new LoadingException(e.toString());
-		}
-	}
+	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
+		return new Owl2ParserLoader(owlParserFactory.getParser(stream_),
+				axiomLoader) {
+			@Override
+			protected void finish() {
+				super.finish();
+				try {
+					stream_.close();
+				} catch (IOException e) {
+					exception = new ElkLoadingException(e.toString());
+				}
+			}
+		};
 
+	}
 }

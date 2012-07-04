@@ -25,14 +25,15 @@ package org.semanticweb.elk.loading;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * A common interface for sources of ontologies that can be used for loading
- * ontologies into reasoners
+ * An {@link OntologyLoader} for the empty ontology
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface OntologyProvider {
+public class EmptyOntologyLoader implements OntologyLoader {
 
-	public void accept(ElkAxiomProcessor axiomLoader) throws LoadingException;
-
+	@Override
+	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
+		return new EmptyLoader();
+	}
 }

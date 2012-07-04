@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -51,6 +52,10 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 public class ConsistencyChecking
 		extends
 		ReasonerComputation<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>.Engine, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ConsistencyChecking.class);
 
 	/**
 	 * The object for setting and monitoring the consistency status of the
@@ -136,7 +141,7 @@ public class ConsistencyChecking
 			return Collections.emptySet();
 		} else {
 			/*
-			 * first consistency is checked for <tt>owl:Thing</tt>, then for the
+			 * first consistency is checked for {@code owl:Thing}, then for the
 			 * individuals in the ontology
 			 */
 			return new AbstractCollection<IndexedClassEntity>() {
@@ -178,10 +183,9 @@ public class ConsistencyChecking
 
 	@Override
 	public void process() {
+		consistencyMonitor.registerCurrentThreadToInterrupt();
 		super.process();
-		if (consistencyMonitor.isInconsistent())
-			// then thread was interrupted, reset the interrupted status
-			Thread.interrupted();
+		consistencyMonitor.clearThreadToInterrupt();
 	}
 
 	/**
@@ -221,10 +225,15 @@ public class ConsistencyChecking
 		}
 
 		@Override
-		public void notifyFinished(SaturationJob<IndexedClassEntity> job)
-				throws InterruptedException {
+		public void notifyFinished(SaturationJob<IndexedClassEntity> job) {
 			if (!((ContextClassSaturation) job.getOutput()).isSatisfiable())
 				consistenceMonitor.setInconsistent();
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace(job.getInput()
+						+ ": consistency checking finished: "
+						+ (((ContextClassSaturation) job.getOutput())
+								.isSatisfiable() ? "satisfiable"
+								: "unsatisfiable"));
 		}
 
 	}
@@ -238,7 +247,19 @@ public class ConsistencyChecking
 	 */
 	static class ConsistencyMonitor {
 		private volatile boolean inconsistent = false;
-		private final Thread mainThread = Thread.currentThread();
+		private volatile Thread controlThread;
+
+		public void registerThreadToInterrupt(Thread controlThread) {
+			this.controlThread = controlThread;
+		}
+
+		public void registerCurrentThreadToInterrupt() {
+			registerThreadToInterrupt(Thread.currentThread());
+		}
+
+		public void clearThreadToInterrupt() {
+			this.controlThread = null;
+		}
 
 		public boolean isInconsistent() {
 			return inconsistent;
@@ -247,7 +268,8 @@ public class ConsistencyChecking
 		public void setInconsistent() {
 			inconsistent = true;
 			// interrupt the reasoner
-			mainThread.interrupt();
+			if (controlThread != null)
+				controlThread.interrupt();
 		}
 
 	}
@@ -297,9 +319,14 @@ public class ConsistencyChecking
 				public SaturationJob<IndexedClassEntity> next() {
 					if (consistencyMonitor.isInconsistent())
 						throw new NoSuchElementException();
-					else
-						return new SaturationJob<IndexedClassEntity>(
+					else {
+						SaturationJob<IndexedClassEntity> job = new SaturationJob<IndexedClassEntity>(
 								inputsIterator.next());
+						if (LOGGER_.isTraceEnabled())
+							LOGGER_.trace(job.getInput()
+									+ ": consistency checking submitted");
+						return job;
+					}
 				}
 
 				@Override

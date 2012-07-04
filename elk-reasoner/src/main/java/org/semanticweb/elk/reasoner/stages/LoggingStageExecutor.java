@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.semanticweb.elk.util.logging.Statistics;
 
@@ -42,26 +43,36 @@ public class LoggingStageExecutor extends SimpleInterrupter implements
 			.getLogger(LoggingStageExecutor.class);
 
 	@Override
-	public void complete(ReasonerStage stage) {
+	public void complete(ReasonerStage stage) throws ElkException {
 		if (!stage.done()) {
-			LOGGER_.debug(stage.getName() + " stage:");
-			registerCurrentThreadToInterrupt();
-			for (ReasonerStage dependentStage : stage.getDependencies()) {
-				complete(dependentStage);
-				if (dependentStage.isInterrupted()) {
-					return;
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace(stage.getName() + " stage:");
+			try {
+				for (ReasonerStage dependentStage : stage.getDependencies()) {
+					complete(dependentStage);
 				}
+			} catch (ElkException e) {
+				LOGGER_.info(stage.getName() + ":" + e.getMessage());
+				throw e;
 			}
 			Statistics.logOperationStart(stage.getName(), LOGGER_);
-			stage.execute();
-			if (stage.isInterrupted()) {
-				LOGGER_.warn(stage.getName()
-						+ " is interrupted! The reasoning results might be incomplete!");
+			registerCurrentThreadToInterrupt();
+			try {
+				stage.execute();
+			} catch (ElkException e) {
+				if (e instanceof ElkInterruptedException)
+					if (LOGGER_.isInfoEnabled())
+						LOGGER_.info(e.getMessage());
+					else
+						LOGGER_.debug(e.getMessage());
+				throw new ElkInterruptedException(e);
+			} finally {
+				clearThreadToInterrupt();
+				Statistics.logOperationFinish(stage.getName(), LOGGER_);
+				Statistics.logMemoryUsage(LOGGER_);
+				stage.printInfo();
+				LOGGER_.debug(stage.getName() + " done.");
 			}
-			Statistics.logOperationFinish(stage.getName(), LOGGER_);
-			Statistics.logMemoryUsage(LOGGER_);
-			stage.printInfo();
-			LOGGER_.debug(stage.getName() + " done.");
 		}
 	}
 }

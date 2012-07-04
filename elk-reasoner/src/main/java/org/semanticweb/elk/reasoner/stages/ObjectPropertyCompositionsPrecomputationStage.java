@@ -72,14 +72,18 @@ public class ObjectPropertyCompositionsPrecomputationStage extends
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws ElkInterruptedException {
 		if (computation == null)
 			initComputation();
-		computation.process();
-		if (isInterrupted())
-			return;
+		try {
+			for (;;) {
+				computation.process();
+				if (!interrupted())
+					break;
+			}
+		} finally {
+		}
 		reasoner.doneObjectPropertyCompositionsPrecomputation = true;
-		reasoner.doneReset = false;
 	}
 
 	@Override

@@ -22,19 +22,21 @@
  */
 package org.semanticweb.elk.loading;
 
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-
 /**
- * A provider for the ontology containing no axioms.
+ * A common interface for loading processes
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class EmptyOntologyProvider implements OntologyProvider {
+public interface Loader {
 
-	@Override
-	public void accept(ElkAxiomProcessor axiomLoader) throws LoadingException {
-		// no axioms therefore nothing to do
-	}
+	/**
+	 * Runs the loading process. If loading process is interrupted, it can be
+	 * continued by calling this method again.
+	 * 
+	 * @throws ElkLoadingException
+	 *             if loading cannot be completed successfully
+	 */
+	public void load() throws ElkLoadingException;
 
 }

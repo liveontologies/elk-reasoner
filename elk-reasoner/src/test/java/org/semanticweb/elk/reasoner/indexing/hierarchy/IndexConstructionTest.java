@@ -51,8 +51,8 @@ public class IndexConstructionTest extends TestCase {
 				"R"));
 
 		OntologyIndex index = new OntologyIndexImpl();
-		ElkAxiomProcessor inserter = index.getInserter();
-		ElkAxiomProcessor deleter = index.getDeleter();
+		ElkAxiomProcessor inserter = index.getAxiomInserter();
+		ElkAxiomProcessor deleter = index.getAxiomDeleter();
 
 		inserter.visit(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectIntersectionOf(a, b), d));
@@ -99,8 +99,8 @@ public class IndexConstructionTest extends TestCase {
 				a, b, c, b);
 
 		OntologyIndex index = new OntologyIndexImpl();
-		ElkAxiomProcessor inserter = index.getInserter();
-		ElkAxiomProcessor deleter = index.getDeleter();
+		ElkAxiomProcessor inserter = index.getAxiomInserter();
+		ElkAxiomProcessor deleter = index.getAxiomDeleter();
 
 		inserter.visit(axiom);
 
@@ -139,7 +139,7 @@ public class IndexConstructionTest extends TestCase {
 				objectFactory.getObjectIntersectionOf(b, a), c);
 
 		OntologyIndex index = new OntologyIndexImpl();
-		ElkAxiomProcessor inserter = index.getInserter();
+		ElkAxiomProcessor inserter = index.getAxiomInserter();
 
 		inserter.visit(objectFactory.getSubClassOfAxiom(x, d));
 		inserter.visit(objectFactory.getSubClassOfAxiom(y, d));

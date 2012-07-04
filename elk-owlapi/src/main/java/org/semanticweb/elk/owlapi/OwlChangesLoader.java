@@ -22,14 +22,16 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.LoadingException;
-import org.semanticweb.elk.loading.OntologyChangesProvider;
+import org.semanticweb.elk.loading.ChangesLoader;
+import org.semanticweb.elk.loading.Loader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -41,18 +43,17 @@ import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 
 /**
- * An {@link OntologyChangesProvider} that accumulates the
- * {@link OWLOntologyChange} and provides them by converting through
- * {@link OwlConverter}
+ * An {@link ChangesLoader} that accumulates the {@link OWLOntologyChange} and
+ * provides them by converting through {@link OwlConverter}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class OwlOntologyChangesProvider implements OntologyChangesProvider {
+public class OwlChangesLoader implements ChangesLoader {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-			.getLogger(OwlOntologyChangesProvider.class);
+			.getLogger(OwlChangesLoader.class);
 
 	private static final OwlConverter OWL_CONVERTER_ = OwlConverter
 			.getInstance();
@@ -60,43 +61,52 @@ public class OwlOntologyChangesProvider implements OntologyChangesProvider {
 	private final ProgressMonitor progressMonitor;
 
 	/** list to accumulate the unprocessed changes to the ontology */
-	protected final List<OWLOntologyChange> pendingChanges;
+	protected final LinkedList<OWLOntologyChange> pendingChanges;
 
-	OwlOntologyChangesProvider(ProgressMonitor progressMonitor) {
+	OwlChangesLoader(ProgressMonitor progressMonitor) {
 		this.progressMonitor = progressMonitor;
-		this.pendingChanges = new ArrayList<OWLOntologyChange>();
+		this.pendingChanges = new LinkedList<OWLOntologyChange>();
 	}
 
 	@Override
-	public void accept(ElkAxiomProcessor axiomInserter,
-			ElkAxiomProcessor axiomDeleter) throws LoadingException {
-		if (!pendingChanges.isEmpty()) {
-			String status = ReasonerProgressMonitor.LOADING;
-			Statistics.logOperationStart(status, LOGGER_);
-			progressMonitor.start(status);
-			int axiomCount = pendingChanges.size();
-			int currentAxiom = 0;
-			for (OWLOntologyChange change : pendingChanges) {
-				if (change instanceof AddAxiom)
-					axiomInserter.visit(OWL_CONVERTER_.convert(change
-							.getAxiom()));
-				else if (change instanceof RemoveAxiom) {
-					axiomDeleter
-							.visit(OWL_CONVERTER_.convert(change.getAxiom()));
+	public Loader getLoader(final ElkAxiomProcessor axiomInserter,
+			final ElkAxiomProcessor axiomDeleter) {
+		return new Loader() {
+			@Override
+			public void load() throws ElkLoadingException {
+				if (!pendingChanges.isEmpty()) {
+					String status = ReasonerProgressMonitor.LOADING;
+					Statistics.logOperationStart(status, LOGGER_);
+					progressMonitor.start(status);
+					int axiomCount = pendingChanges.size();
+					int currentAxiom = 0;
+					for (;;) {
+						if (Thread.currentThread().isInterrupted())
+							break;
+						OWLOntologyChange change = ((Queue<OWLOntologyChange>) pendingChanges)
+								.poll();
+						if (change == null)
+							break;
+						if (change instanceof AddAxiom)
+							axiomInserter.visit(OWL_CONVERTER_.convert(change
+									.getAxiom()));
+						else if (change instanceof RemoveAxiom) {
+							axiomDeleter.visit(OWL_CONVERTER_.convert(change
+									.getAxiom()));
+						}
+						currentAxiom++;
+						progressMonitor.report(currentAxiom, axiomCount);
+					}
+					progressMonitor.finish();
+					Statistics.logOperationFinish(status, LOGGER_);
 				}
-				currentAxiom++;
-				progressMonitor.report(currentAxiom, axiomCount);
 			}
-			progressMonitor.finish();
-			Statistics.logOperationFinish(status, LOGGER_);
-			pendingChanges.clear();
-		}
-
+		};
 	}
 
 	void registerChange(OWLOntologyChange change) {
 		OWLAxiom axiom = change.getAxiom();
-		if (OwlAxiomConverter.isRelevantAxiom(axiom))
+		if (OWL_CONVERTER_.isRelevantAxiom(axiom))
 			pendingChanges.add(change);
 	}
 

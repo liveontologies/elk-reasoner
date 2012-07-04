@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK OWL Model Implementation
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,34 +20,19 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.owl.parsing;
-
-import org.semanticweb.elk.owl.iris.ElkPrefix;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+package org.semanticweb.elk.loading;
 
 /**
- * The base interface for OWL 2 parsers
+ * An {@link Loader} that does nothing
  * 
- * @author Pavel Klinov
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface Owl2Parser {
+public class EmptyLoader implements Loader {
 
-	/**
-	 * Registers an additional prefix declaration for this parser, which can be
-	 * used to resolve IRIs. Normally, prefix declarations should be parsed from
-	 * OWL 2 files, but some prefix declarations, e.g., the OWL 2 predefined
-	 * prefixes can be supplied separately.
-	 * 
-	 * @param elkPrefix
-	 */
-	public void declarePrefix(ElkPrefix elkPrefix);
-
-	public void accept(ElkAxiomProcessor axiomProcessor)
-			throws Owl2ParseException;
+	@Override
+	public void load() throws ElkLoadingException {
+		// nothing to do since there are no changes
+	}
 
 }

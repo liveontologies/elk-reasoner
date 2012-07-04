@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collections;
 
-import org.semanticweb.elk.loading.LoadingException;
-import org.semanticweb.elk.loading.OntologyProvider;
+import org.semanticweb.elk.loading.Loader;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 
 /**
  * A {@link ReasonerStage} during which the input ontology is loaded into the
@@ -56,18 +56,19 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws ElkException {
 		initComputation();
-		OntologyProvider ontologyProvider = reasoner.getOntologyProvider();
+		Loader ontologyLoader = reasoner.getOntologyLoader();
 		try {
-			ontologyProvider.accept(reasoner.ontologyIndex.getInserter());
-			if (isInterrupted())
-				return;
-			reasoner.doneLoading = true;
-		} catch (LoadingException e) {
-			// TODO: Do something about it
-			e.printStackTrace();
+			for (;;) {
+				ontologyLoader.load();
+				if (!interrupted())
+					break;
+			}
+		} finally {
+
 		}
+		reasoner.doneLoading = true;
 	}
 
 	@Override

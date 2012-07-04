@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
 
-import org.semanticweb.elk.loading.LoadingException;
-import org.semanticweb.elk.loading.OntologyChangesProvider;
+import org.semanticweb.elk.loading.Loader;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 
 /**
  * A {@link ReasonerStage} during which ontology changes are applied to the
@@ -34,9 +34,9 @@ import org.semanticweb.elk.loading.OntologyChangesProvider;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class OntologyChangesLoadingStage extends AbstractReasonerStage {
+public class ChangesLoadingStage extends AbstractReasonerStage {
 
-	public OntologyChangesLoadingStage(AbstractReasonerState reasoner) {
+	public ChangesLoadingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -57,20 +57,17 @@ public class OntologyChangesLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws ElkException {
 		initComputation();
-		OntologyChangesProvider ontologyChangesProvider = reasoner
-				.getOntologyChangesProvider();
+		Loader changesLoader = reasoner.getChangesLoader();
 		try {
-			ontologyChangesProvider.accept(
-					reasoner.ontologyIndex.getInserter(),
-					reasoner.ontologyIndex.getDeleter());
-			if (isInterrupted())
-				return;
+			for (;;) {
+				changesLoader.load();
+				if (!interrupted())
+					break;
+			}
 			reasoner.doneChangeLoading = true;
-		} catch (LoadingException e) {
-			// TODO: Do something about it
-			e.printStackTrace();
+		} finally {
 		}
 	}
 

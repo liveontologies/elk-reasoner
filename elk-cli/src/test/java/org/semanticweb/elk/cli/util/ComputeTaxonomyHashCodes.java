@@ -31,13 +31,14 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import org.semanticweb.elk.io.FileUtils;
-import org.semanticweb.elk.loading.EmptyOntologyChangesProvider;
-import org.semanticweb.elk.loading.OntologyStreamLoader;
+import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.Owl2StreamLoader;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.reasoner.InconsistentOntologyException;
+import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -75,8 +76,11 @@ public class ComputeTaxonomyHashCodes {
 
 				try {
 					taxonomy = reasoner.getTaxonomy();
-				} catch (InconsistentOntologyException e) {
+				} catch (ElkInconsistentOntologyException e) {
 					return 0;
+				} catch (ElkException e) {
+					// TODO: what to do?
+					throw new RuntimeException(e);
 				}
 
 				return TaxonomyHasher.hash(taxonomy);
@@ -91,8 +95,11 @@ public class ComputeTaxonomyHashCodes {
 
 				try {
 					taxonomy = reasoner.getInstanceTaxonomy();
-				} catch (InconsistentOntologyException e) {
+				} catch (ElkInconsistentOntologyException e) {
 					return 0;
+				} catch (ElkException e) {
+					// TODO: what to do?
+					throw new RuntimeException(e);
 				}
 
 				return InstanceTaxonomyHasher.hash(taxonomy);
@@ -101,7 +108,7 @@ public class ComputeTaxonomyHashCodes {
 	}
 
 	static void generateHashCodes(String path, TestHasher hasher)
-			throws IOException, Owl2ParseException {
+			throws IOException, Owl2ParseException, InterruptedException {
 		File srcDir = new File(path);
 
 		ReasonerFactory reasonerFactory = new ReasonerFactory();
@@ -117,10 +124,10 @@ public class ComputeTaxonomyHashCodes {
 			System.err.println(ontFile.getName());
 
 			Reasoner reasoner = reasonerFactory.createReasoner(
-					new OntologyStreamLoader(
-							new Owl2FunctionalStyleParserFactory(), ontFile),
-					new EmptyOntologyChangesProvider(),
 					new TestStageExecutor(), configuraion);
+			reasoner.registerOntologyLoader(new Owl2StreamLoader(
+					new Owl2FunctionalStyleParserFactory(), ontFile));
+			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			int hash = hasher.hash(reasoner);
 			// create the expected result file

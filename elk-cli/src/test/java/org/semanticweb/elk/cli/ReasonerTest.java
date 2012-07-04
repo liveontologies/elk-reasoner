@@ -33,8 +33,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
-import org.semanticweb.elk.loading.EmptyOntologyChangesProvider;
-import org.semanticweb.elk.loading.OntologyStreamLoader;
+import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.Owl2StreamLoader;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
@@ -47,8 +48,8 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.reasoner.FreshEntitiesException;
-import org.semanticweb.elk.reasoner.InconsistentOntologyException;
+import org.semanticweb.elk.reasoner.ElkFreshEntitiesException;
+import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -64,24 +65,34 @@ import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
 
 public class ReasonerTest {
 
-	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-	final Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
+	final static ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+	final static Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
 
+	private static Reasoner createReasoner(String text) {
+		Reasoner reasoner = new ReasonerFactory()
+				.createReasoner(new TestStageExecutor());
+		reasoner.registerOntologyLoader(new Owl2StreamLoader(parserFactory,
+				text));
+		reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
+		return reasoner;
+	}
+
+	@SuppressWarnings("static-method")
 	@Test
 	public void testExistentials() throws Owl2ParseException, IOException,
-			InconsistentOntologyException {
+			ElkInconsistentOntologyException, ElkException,
+			InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new OntologyStreamLoader(parserFactory, ""//
-						+ "Prefix( : = <http://example.org/> )"//
-						+ "Ontology("//
-						+ "EquivalentClasses(:B :C)"//
-						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
-						+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"//
-						+ "SubObjectPropertyOf(:R :S)"//
-						+ "ObjectPropertyDomain(:S :E)"//
-						+ ")"//
-				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
+		Reasoner reasoner = createReasoner(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Ontology("//
+				+ "EquivalentClasses(:B :C)"//
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+				+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"//
+				+ "SubObjectPropertyOf(:R :S)"//
+				+ "ObjectPropertyDomain(:S :E)"//
+				+ ")"//
+		);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/A"));
@@ -107,25 +118,22 @@ public class ReasonerTest {
 				.contains(taxonomy.getNode(d)));
 		assertTrue("A contains E", taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(e)));
+
+		reasoner.shutdown();
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testConjunctions() throws Owl2ParseException, IOException,
-			FreshEntitiesException, InconsistentOntologyException {
+			ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException, InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory()
-				.createReasoner(
-						new OntologyStreamLoader(
-								parserFactory,
-								"Prefix( : = <http://example.org/> )"
-										+ "Ontology("
-										+ "SubClassOf(:A :B)"
-										+ "SubClassOf(:A :C)"
-										+ "SubClassOf(:A :D)"
-										+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)"
-										+ ")"),
-						new EmptyOntologyChangesProvider(),
-						new TestStageExecutor());
+		Reasoner reasoner = createReasoner("Prefix( : = <http://example.org/> )"
+				+ "Ontology("
+				+ "SubClassOf(:A :B)"
+				+ "SubClassOf(:A :C)"
+				+ "SubClassOf(:A :D)"
+				+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :E)" + ")");
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/A"));
@@ -168,30 +176,29 @@ public class ReasonerTest {
 				superClassesOfA.contains(reasoner.getClassNode(d)));
 		assertTrue("A contains E",
 				superClassesOfA.contains(reasoner.getClassNode(e)));
+
+		reasoner.shutdown();
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testPropertyChains() throws Owl2ParseException, IOException,
-			FreshEntitiesException, InconsistentOntologyException {
+			ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException, InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory()
-				.createReasoner(
-						new OntologyStreamLoader(
-								parserFactory,
-								""//
-										+ "Prefix( : = <http://example.org/> )"//
-										+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-										+ "Ontology("//
-										+ "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
-										+ "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
-										+ "SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))"//
-										+ "SubClassOf(:D ObjectSomeValuesFrom(:R4 :E))"//
-										+ "SubClassOf(ObjectIntersectionOf(owl:Thing ObjectSomeValuesFrom(:T owl:Thing)) :X)"//
-										+ "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
-										+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
-										+ ")"//
-						), new EmptyOntologyChangesProvider(),
-						new TestStageExecutor());
+		Reasoner reasoner = createReasoner(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
+				+ "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
+				+ "SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))"//
+				+ "SubClassOf(:D ObjectSomeValuesFrom(:R4 :E))"//
+				+ "SubClassOf(ObjectIntersectionOf(owl:Thing ObjectSomeValuesFrom(:T owl:Thing)) :X)"//
+				+ "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
+				+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
+				+ ")"//
+		);
 
 		reasoner.getTaxonomy();
 
@@ -205,22 +212,25 @@ public class ReasonerTest {
 
 		assertTrue("A SubClassOf X",
 				superClassesOfA.contains(reasoner.getClassNode(x)));
+
+		reasoner.shutdown();
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testBottom() throws Owl2ParseException, IOException,
-			InconsistentOntologyException {
+			ElkInconsistentOntologyException, ElkException,
+			InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new OntologyStreamLoader(parserFactory, ""//
-						+ "Prefix( : = <http://example.org/> )"//
-						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-						+ "Ontology("//
-						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
-						+ "SubClassOf(:C ObjectSomeValuesFrom(:S :A))"//
-						+ "SubClassOf(:B owl:Nothing)"//
-						+ ")"//
-				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
+		Reasoner reasoner = createReasoner(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+				+ "SubClassOf(:C ObjectSomeValuesFrom(:S :A))"//
+				+ "SubClassOf(:B owl:Nothing)"//
+				+ ")"//
+		);
 
 		reasoner.getTaxonomy();
 
@@ -237,22 +247,25 @@ public class ReasonerTest {
 		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
 		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
 		assertSame("C unsatisfiable", bottom, taxonomy.getNode(c));
+
+		reasoner.shutdown();
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testDisjoint() throws Owl2ParseException, IOException,
-			InconsistentOntologyException {
+			ElkInconsistentOntologyException, ElkException,
+			InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new OntologyStreamLoader(parserFactory, ""//
-						+ "Prefix( : = <http://example.org/> )"//
-						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-						+ "Ontology("//
-						+ "SubClassOf(:A :C)"//
-						+ "SubClassOf(:B :C)"//
-						+ "DisjointClasses(:A :B :C)"//
-						+ ")"//
-				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
+		Reasoner reasoner = createReasoner(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "SubClassOf(:A :C)"//
+				+ "SubClassOf(:B :C)"//
+				+ "DisjointClasses(:A :B :C)"//
+				+ ")"//
+		);
 
 		reasoner.getTaxonomy();
 
@@ -269,20 +282,23 @@ public class ReasonerTest {
 		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
 		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
 		assertNotSame("C satisfiable", bottom, taxonomy.getNode(c));
+
+		reasoner.shutdown();
 	}
 
+	@SuppressWarnings("static-method")
 	public void testDisjointSelf() throws Owl2ParseException, IOException,
-			InconsistentOntologyException {
+			ElkInconsistentOntologyException, ElkException,
+			InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new OntologyStreamLoader(parserFactory, ""//
-						+ "Prefix( : = <http://example.org/> )"//
-						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-						+ "Ontology("//
-						+ "DisjointClasses(:A :B :A)"//
-						+ "DisjointClasses(:C :C)"//
-						+ ")"//
-				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
+		Reasoner reasoner = createReasoner(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "DisjointClasses(:A :B :A)"//
+				+ "DisjointClasses(:C :C)"//
+				+ ")"//
+		);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/A"));
@@ -297,22 +313,27 @@ public class ReasonerTest {
 		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
 		assertNotSame("B satisfiable", bottom, taxonomy.getNode(b));
 		assertSame("C unsatisfiable", bottom, taxonomy.getNode(c));
+
+		reasoner.shutdown();
 	}
 
+	@SuppressWarnings("static-method")
 	public void testReflexiveRole() throws Owl2ParseException, IOException,
-			FreshEntitiesException, InconsistentOntologyException {
+			ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException, InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new OntologyStreamLoader(parserFactory, ""//
-						+ "Prefix( : = <http://example.org/> )"//
-						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-						+ "Ontology("//
-						+ "ReflexiveObjectProperty(:R)"//
-						+ "EquivalentClasses(:B ObjectSomeValuesFrom(:R :A))"//
-						+ "EquivalentClasses(:D ObjectSomeValuesFrom(:S :C))"//
-						+ "SubObjectPropertyOf(ObjectPropertyChain(:R :R) :S)"//
-						+ ")"//
-				), new EmptyOntologyChangesProvider(), new TestStageExecutor());
+		Reasoner reasoner = createReasoner(""//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+				+ "Ontology("//
+				+ "ReflexiveObjectProperty(:R)"//
+				+ "EquivalentClasses(:B ObjectSomeValuesFrom(:R :A))"//
+				+ "EquivalentClasses(:D ObjectSomeValuesFrom(:S :C))"//
+				+ "SubObjectPropertyOf(ObjectPropertyChain(:R :R) :S)"//
+				+ ")"//
+		);
+
+		reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/A"));
@@ -332,18 +353,21 @@ public class ReasonerTest {
 				superClassesOfA.contains(reasoner.getClassNode(b)));
 		assertTrue("SubClassOf(C D)",
 				superClassesOfC.contains(reasoner.getClassNode(d)));
+
+		reasoner.shutdown();
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testAncestors() throws Owl2ParseException, IOException,
-			InconsistentOntologyException, FreshEntitiesException {
+			ElkInconsistentOntologyException, ElkFreshEntitiesException,
+			ElkException, InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new OntologyStreamLoader(parserFactory,
-						"Prefix( : = <http://example.org/> )" + "Ontology("
-								+ "SubClassOf(:A :B)" + "SubClassOf(:A :C)"
-								+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))"),
-				new EmptyOntologyChangesProvider(), new TestStageExecutor());
+		Reasoner reasoner = createReasoner("Prefix( : = <http://example.org/> )"
+				+ "Ontology("
+				+ "SubClassOf(:A :B)"
+				+ "SubClassOf(:A :C)"
+				+ "SubClassOf(:B :D)" + "SubClassOf(:C :D))");
 
 		reasoner.getTaxonomy();
 
@@ -397,21 +421,22 @@ public class ReasonerTest {
 				directSuperClassesOfA.size());
 		assertEquals("A has exactly four super-classes: B, C, D and owl:Thing",
 				4, indirectSuperClassesOfA.size());
+
+		reasoner.shutdown();
 	}
 
 	@Test
 	public void testTop() throws ExecutionException, Owl2ParseException,
-			IOException, InconsistentOntologyException {
+			IOException, ElkInconsistentOntologyException, ElkException,
+			InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new OntologyStreamLoader(parserFactory, ""//
-						+ "Prefix( owl:= <http://www.w3.org/2002/07/owl#> )"//
-						+ "Prefix( : = <http://example.org/> )"//
-						+ "Ontology("//
-						+ "SubClassOf(:A :B)"//
-						+ "SubClassOf(owl:Thing :C)"//
-						+ ")"), new EmptyOntologyChangesProvider(),
-				new TestStageExecutor());
+		Reasoner reasoner = createReasoner(""//
+				+ "Prefix( owl:= <http://www.w3.org/2002/07/owl#> )"//
+				+ "Prefix( : = <http://example.org/> )"//
+				+ "Ontology("//
+				+ "SubClassOf(:A :B)"//
+				+ "SubClassOf(owl:Thing :C)"//
+				+ ")");
 
 		reasoner.getTaxonomy();
 
@@ -432,8 +457,8 @@ public class ReasonerTest {
 
 		assertEquals("C and owl:Ting belong to the same node", cNode, topNode);
 
-		assertEquals("Nodes: [bot], [A], [B], [top,C]", taxonomy.getNodes()
-				.size(), 4);
+		assertEquals("Nodes: [bot], [A], [B], [top,C]", 4, taxonomy.getNodes()
+				.size());
 
 		assertTrue("[owl:Nothing] is a node in the taxonomy", taxonomy
 				.getNodes().contains(botNode));
@@ -444,17 +469,17 @@ public class ReasonerTest {
 
 		assertTrue("[A] is a node in the taxonomy", taxonomy.getNodes()
 				.contains(aNode));
-		assertEquals("[A] has 1 elemenent", aNode.getMembers().size(), 1);
+		assertEquals("[A] has 1 elemenent", 1, aNode.getMembers().size());
 		assertTrue("[A] contains A", aNode.getMembers().contains(a));
 
 		assertTrue("[B] is a node in the taxonomy", taxonomy.getNodes()
 				.contains(bNode));
-		assertEquals("[B] has 1 elemenent", bNode.getMembers().size(), 1);
+		assertEquals("[B] has 1 elemenent", 1, bNode.getMembers().size());
 		assertTrue("[B] contains B", bNode.getMembers().contains(b));
 
 		assertTrue("[C] is a node in the taxonomy", taxonomy.getNodes()
 				.contains(cNode));
-		assertEquals("[C] has 2 elemenent", cNode.getMembers().size(), 2);
+		assertEquals("[C] has 2 elemenent", 2, cNode.getMembers().size());
 		assertTrue("[C] contains C", cNode.getMembers().contains(c));
 		assertTrue("[C] contains owl:Thing", cNode.getMembers().contains(top));
 
@@ -489,25 +514,28 @@ public class ReasonerTest {
 		assertTrue("[B] -> [owl:Thing, C]",
 				cNode.getDirectSubNodes().contains(bNode));
 
+		reasoner.shutdown();
+
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testInconsistent() throws ExecutionException,
-			Owl2ParseException, IOException {
+			Owl2ParseException, IOException, ElkException, InterruptedException {
 
-		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new OntologyStreamLoader(parserFactory, ""
-						+ "Prefix( : = <http://example.org/> )"
-						+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"
-						+ "Ontology(" + "EquivalentClasses(:A :C)"
-						+ "SubClassOf(owl:Thing ObjectSomeValuesFrom(:R :B))"
-						+ "SubClassOf(ObjectSomeValuesFrom(:S :B) :A)"
-						+ "SubObjectPropertyOf(:R :S)"
-						+ "SubClassOf(:C ObjectSomeValuesFrom(:T :B))"
-						+ "ObjectPropertyDomain(:T owl:Nothing)" + ")"),
-				new EmptyOntologyChangesProvider(), new TestStageExecutor());
+		Reasoner reasoner = createReasoner(""
+				+ "Prefix( : = <http://example.org/> )"
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"
+				+ "Ontology(" + "EquivalentClasses(:A :C)"
+				+ "SubClassOf(owl:Thing ObjectSomeValuesFrom(:R :B))"
+				+ "SubClassOf(ObjectSomeValuesFrom(:S :B) :A)"
+				+ "SubObjectPropertyOf(:R :S)"
+				+ "SubClassOf(:C ObjectSomeValuesFrom(:T :B))"
+				+ "ObjectPropertyDomain(:T owl:Nothing)" + ")");
 
 		boolean consistent = reasoner.isConsistent();
+
+		reasoner.shutdown();
 
 		assertFalse(consistent);
 	}

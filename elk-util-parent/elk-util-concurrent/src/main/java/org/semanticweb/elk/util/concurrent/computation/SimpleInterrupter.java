@@ -60,6 +60,14 @@ public class SimpleInterrupter implements Interrupter {
 		registerThreadToInterrupt(Thread.currentThread());
 	}
 
+	/**
+	 * De-registers a thread to be interrupted (so that no thread is interrupted
+	 * accidently)
+	 */
+	public void clearThreadToInterrupt() {
+		this.toInterrupt = null;
+	}
+
 	@Override
 	public void interrupt() {
 		interrupted = true;

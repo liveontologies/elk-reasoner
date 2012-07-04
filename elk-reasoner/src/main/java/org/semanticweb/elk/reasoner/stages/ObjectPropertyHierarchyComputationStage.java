@@ -70,19 +70,24 @@ public class ObjectPropertyHierarchyComputationStage extends
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new OntologyLoadingStage(reasoner));
+		return Arrays.asList(
+				(ReasonerStage) new OntologyLoadingStage(reasoner),
+				(ReasonerStage) new ChangesLoadingStage(reasoner));
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws ElkInterruptedException {
 		if (computation == null)
 			initComputation();
-		computation.process();
-		if (isInterrupted())
-			return;
+		try {
+			for (;;) {
+				computation.process();
+				if (!interrupted())
+					break;
+			}
+		} finally {
+		}
 		reasoner.doneObjectPropertyHierarchyComputation = true;
-		reasoner.doneReset = false;
 	}
 
 	@Override

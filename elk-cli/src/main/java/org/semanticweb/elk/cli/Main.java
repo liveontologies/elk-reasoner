@@ -34,8 +34,8 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.semanticweb.elk.loading.EmptyOntologyChangesProvider;
-import org.semanticweb.elk.loading.OntologyStreamLoader;
+import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.ParseException;
@@ -99,11 +99,12 @@ public class Main {
 						ReasonerConfiguration.NUM_OF_WORKING_THREADS, options
 								.valueOf(nWorkers).toString());
 			Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-			Reasoner reasoner = reasoningFactory.createReasoner(
-					new OntologyStreamLoader(parserFactory, options
-							.valueOf(inputOntologyFile)),
-					new EmptyOntologyChangesProvider(),
-					new LoggingStageExecutor());
+			Reasoner reasoner = reasoningFactory
+					.createReasoner(new LoggingStageExecutor());
+			reasoner.registerOntologyLoader(new Owl2StreamLoader(parserFactory,
+					options.valueOf(inputOntologyFile)));
+			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
+
 			if (options.has(classify))
 				reasoner.getTaxonomy();
 			if (options.hasArgument(outputTaxonomyFile))

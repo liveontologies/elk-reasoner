@@ -20,29 +20,32 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.stages;
+package org.semanticweb.elk.loading;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * An abstract interface for defining how reasoner stages are executed by the
- * reasoner. For example, a reasoner may issue log messages before and after
- * execution, measure benchmarking information, or restart the stage in case it
- * has been interrupted.
+ * A factory for creating loaders for ontology changes
+ * 
+ * @see Loader
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ReasonerStageExecutor extends Interrupter {
+public interface ChangesLoader {
 
 	/**
-	 * Makes sure that the given stage is completed; it might not necessarily
-	 * execute this stage if the results are already computed
-	 * 
-	 * @param stage
-	 *            the reasoner stage to be completed
+	 * @param axiomInserter
+	 *            an {@link ElkAxiomProcessor} that inserts the axioms that were
+	 *            added
+	 * @param axiomDeleter
+	 *            an {@link ElkAxiomProcessor} that deletes the axioms that were
+	 *            removed
+	 * @return a loader which process the inserted axioms using the given
+	 *         {@code  axiomInserter} and deleted axioms using the given
+	 *         {@code axiomDeleter}
 	 */
-	public void complete(ReasonerStage stage) throws ElkException;
+	public Loader getLoader(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter);
 
 }

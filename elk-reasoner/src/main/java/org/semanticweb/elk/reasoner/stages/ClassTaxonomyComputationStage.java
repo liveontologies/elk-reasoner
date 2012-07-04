@@ -67,17 +67,21 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws ElkInterruptedException {
 		if (computation == null)
 			initComputation();
 		progressMonitor.start(getName());
-		computation.process();
-		progressMonitor.finish();
-		if (isInterrupted())
-			return;
+		try {
+			for (;;) {
+				computation.process();
+				if (!interrupted())
+					break;
+			}
+		} finally {
+			progressMonitor.finish();
+		}
 		reasoner.taxonomy = computation.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
-		reasoner.doneReset = false;
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK OWL Model Implementation
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
@@ -20,56 +20,49 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.owl.parsing;
+package org.semanticweb.elk.reasoner;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 
 /**
- * Base exception class for parsing exceptions
+ * Thrown when irrelevant reasoning methods are called for an ontology that is
+ * inconsistent. Most reasoning tasks also have well-defined results for
+ * inconsistent ontologies, so it is not required that this exception is used in
+ * all cases. Callers should not rely on this exception being thrown as a method
+ * for checking inconsistency; there are dedicated methods for this purpose.
  * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
+ * 
  */
-public class Owl2ParseException extends ElkException {
+public class ElkInconsistentOntologyException extends ElkException {
+
+	private static final long serialVersionUID = -8696304480425201859L;
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -230059408691666695L;
-
-	public Owl2ParseException(final Exception cause) {
-		super(cause);
-	}
-
-	/**
-	 * 
-	 */
-	public Owl2ParseException() {
+	public ElkInconsistentOntologyException() {
 		super();
 	}
 
 	/**
 	 */
-	public Owl2ParseException(String message) {
+	public ElkInconsistentOntologyException(String message) {
 		super(message);
 	}
 
 	/**
 	 * 
 	 */
-	public Owl2ParseException(String message, Throwable cause) {
+	public ElkInconsistentOntologyException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
 	/**
 	 * 
 	 */
-	public Owl2ParseException(Throwable cause) {
+	public ElkInconsistentOntologyException(Throwable cause) {
 		super(cause);
 	}
 

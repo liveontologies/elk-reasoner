@@ -69,9 +69,9 @@ public interface OntologyIndex {
 
 	Collection<IndexedObjectProperty> getReflexiveObjectProperties();
 
-	ElkAxiomProcessor getInserter();
+	ElkAxiomProcessor getAxiomInserter();
 
-	ElkAxiomProcessor getDeleter();
+	ElkAxiomProcessor getAxiomDeleter();
 
 	void clear();
 }

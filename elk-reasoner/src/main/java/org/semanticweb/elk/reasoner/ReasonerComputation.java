@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -44,6 +45,10 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  */
 public class ReasonerComputation<I, P extends InputProcessor<I>, F extends InputProcessorFactory<I, P>>
 		extends ConcurrentComputation<I, P, F> {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ReasonerComputation.class);
 
 	/**
 	 * the progress monitor used to report the progress of this computation
@@ -84,7 +89,8 @@ public class ReasonerComputation<I, P extends InputProcessor<I>, F extends Input
 	 */
 	public void process() {
 
-		start();
+		if (!start())
+			LOGGER_.error("Could not start workers");
 
 		try {
 			// submit the leftover from the previous run
@@ -117,6 +123,7 @@ public class ReasonerComputation<I, P extends InputProcessor<I>, F extends Input
 
 	private boolean processNextInput() throws InterruptedException {
 		submit(nextInput);
+		nextInput = null;
 		if (Thread.currentThread().isInterrupted()) {
 			interrupt();
 			return false;

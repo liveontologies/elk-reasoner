@@ -28,8 +28,6 @@ package org.semanticweb.elk.reasoner;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.OntologyChangesProvider;
-import org.semanticweb.elk.loading.OntologyProvider;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
@@ -54,11 +52,9 @@ public class ReasonerFactory {
 	 * @param stageExecutor
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(OntologyProvider ontologyProvider,
-			OntologyChangesProvider ontologyChangesProvider,
-			ReasonerStageExecutor stageExecutor) {
-		return createReasoner(ontologyProvider, ontologyChangesProvider,
-				stageExecutor, ReasonerConfiguration.getConfiguration());
+	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor) {
+		return createReasoner(stageExecutor,
+				ReasonerConfiguration.getConfiguration());
 	}
 
 	/**
@@ -69,12 +65,9 @@ public class ReasonerFactory {
 	 * @return ELK reasoner
 	 */
 	@SuppressWarnings("static-method")
-	public Reasoner createReasoner(OntologyProvider ontologyProvider,
-			OntologyChangesProvider ontologyChangesProvider,
-			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
+	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor,
+			ReasonerConfiguration config) {
 		return new Reasoner(
-				ontologyProvider,
-				ontologyChangesProvider,
 				stageExecutor,
 				Executors.newCachedThreadPool(),
 				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));

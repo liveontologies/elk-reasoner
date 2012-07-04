@@ -35,12 +35,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLAsymmetricObjectPropertyAxiom;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLAxiomVisitorEx;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -388,15 +386,6 @@ public class OwlAxiomConverter implements OWLAxiomVisitorEx<ElkAxiom> {
 		// TODO Support this axiom type
 		throw new ConverterException(rule.getAxiomType().getName()
 				+ " not supported");
-	}
-
-	/**
-	 * @param axiom
-	 *            the owl axiom to test
-	 * @return <tt>true</tt> if the axiom is relevant for reasoning in ELK
-	 */
-	public static boolean isRelevantAxiom(OWLAxiom axiom) {
-		return axiom.isLogicalAxiom() || axiom.isOfType(AxiomType.DECLARATION);
 	}
 
 }
