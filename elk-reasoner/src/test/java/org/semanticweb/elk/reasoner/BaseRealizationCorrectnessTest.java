@@ -65,8 +65,6 @@ public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput> exte
 	 */
 	@Test
 	public void realize() throws TestResultComparisonException {
-		System.err.println(manifest.toString());
-
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy;
 		try {
 			taxonomy = reasoner.getInstanceTaxonomy();		

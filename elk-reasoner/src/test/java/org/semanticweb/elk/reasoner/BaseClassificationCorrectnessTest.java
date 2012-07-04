@@ -89,8 +89,6 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 	@Test
 	public void classifyWithInterruptions()
 			throws TestResultComparisonException {
-		System.err.println(manifest.toString());
-
 		ReasoningProcess reasoningProcess = new ReasoningProcess();
 		Thread reasonerThread = new Thread(reasoningProcess);
 		reasonerThread.start();
