@@ -25,12 +25,16 @@
  */
 package org.semanticweb.elk.benchmark.reasoning;
 
+import java.io.File;
+
 import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
-import org.semanticweb.elk.cli.IOReasoner;
-import org.semanticweb.elk.cli.IOReasonerFactory;
-import org.semanticweb.elk.reasoner.InconsistentOntologyException;
+import org.semanticweb.elk.loading.Owl2StreamLoader;
+import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 
@@ -43,7 +47,7 @@ import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
  */
 public class ClassificationTask implements Task {
 
-	private IOReasoner reasoner;
+	private Reasoner reasoner;
 	
 	@Override
 	public String getName() {
@@ -55,8 +59,9 @@ public class ClassificationTask implements Task {
 		try {
 			ReasonerConfiguration config = getConfig(args);
 			
-			reasoner = new IOReasonerFactory().createReasoner(new LoggingStageExecutor(), config);
-			reasoner.loadOntologyFromFile(args[0]);
+			reasoner = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), config);
+			reasoner.registerOntologyLoader(new Owl2StreamLoader(
+				new Owl2FunctionalStyleParserFactory(), new File(args[0])));
 		} catch (Exception e) {
 			throw new TaskException(e);
 		}
@@ -76,7 +81,7 @@ public class ClassificationTask implements Task {
 	public Result run() throws TaskException {
 		try {
 			reasoner.getTaxonomy();
-		} catch (InconsistentOntologyException e) {
+		} catch (ElkException e) {
 			throw new TaskException(e);
 		}
 		

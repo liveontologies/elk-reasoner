@@ -33,10 +33,10 @@ import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 
 /**
@@ -52,7 +52,7 @@ public class FuncSyntaxParsingTask implements Task {
 	private File file = null;
 
 	private static Owl2Parser createParser(InputStream stream) {
-		return new Owl2FunctionalStyleParser(stream);
+		return new Owl2FunctionalStyleParserFactory().getParser(stream);
 	}
 
 	@Override
@@ -63,9 +63,9 @@ public class FuncSyntaxParsingTask implements Task {
 			stream = new FileInputStream(file);
 			Owl2Parser parser = createParser(stream);
 			
-			parser.parseOntology(new ElkAxiomProcessor() {
+			parser.accept(new ElkAxiomProcessor() {
 				@Override
-				public void process(ElkAxiom elkAxiom) {}
+				public void visit(ElkAxiom elkAxiom) {}
 			});
 		} catch (Exception e) {
 			throw new TaskException(e);
