@@ -31,7 +31,7 @@ import java.io.Reader;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -67,7 +67,8 @@ public class OWLAPIFunctionalSyntaxParser implements Owl2Parser {
 	}
 
 	@Override
-	public void accept(ElkAxiomProcessor visitor) throws Owl2ParseException {
+	public void accept(Owl2ParserAxiomProcessor visitor)
+			throws Owl2ParseException {
 		// First, parse the ontology
 		OWLOntology ontology = loadViaOWLAPI();
 		// Second, convert it

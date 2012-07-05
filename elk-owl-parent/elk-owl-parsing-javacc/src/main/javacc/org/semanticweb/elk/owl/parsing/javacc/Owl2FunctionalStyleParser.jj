@@ -141,7 +141,7 @@ import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 
 public abstract class AbstractOwl2FunctionalStyleParser implements Owl2Parser {
 
@@ -161,7 +161,7 @@ public abstract class AbstractOwl2FunctionalStyleParser implements Owl2Parser {
 	}
 
 	@Override
-	public void accept(ElkAxiomProcessor axiomProcessor)
+	public void accept(Owl2ParserAxiomProcessor axiomProcessor)
 			throws Owl2ParseException {
 		try {
 			ontologyDocument(axiomProcessor);
@@ -525,7 +525,7 @@ void ontologyAnnotations():
 }
 
 /* 3.7 Functional-Style Syntax */
-void ontologyDocument(ElkAxiomProcessor axiomProcessor):
+void ontologyDocument(Owl2ParserAxiomProcessor axiomProcessor) throws Owl2ParseException:
 {}{
 	( prefixDeclaration() )* ontology(axiomProcessor)
 }
@@ -546,7 +546,7 @@ void prefixDeclaration():
 	}
 }
 
-void ontology(ElkAxiomProcessor axiomProcessor):
+void ontology(Owl2ParserAxiomProcessor axiomProcessor) throws Owl2ParseException:
 {}{
 	<ONTOLOGY> <OPEN_BRACKET> ( ontologyIri() ( versionIri() )? )?
 		directlyImportsDocuments()
@@ -574,7 +574,7 @@ void directlyImportsDocuments():
 	( <IMPORT> <OPEN_BRACKET> iri() <CLOSE_BRACKET> )*
 }
 
-void axioms(ElkAxiomProcessor axiomProcessor):
+void axioms(Owl2ParserAxiomProcessor axiomProcessor) throws Owl2ParseException:
 {
 	ElkAxiom x;
 }{
