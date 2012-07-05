@@ -30,6 +30,7 @@ import java.io.File;
 import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
+import org.semanticweb.elk.loading.EmptyChangesLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
@@ -62,6 +63,7 @@ public class ClassificationTask implements Task {
 			reasoner = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), config);
 			reasoner.registerOntologyLoader(new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(), new File(args[0])));
+			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 		} catch (Exception e) {
 			throw new TaskException(e);
 		}
