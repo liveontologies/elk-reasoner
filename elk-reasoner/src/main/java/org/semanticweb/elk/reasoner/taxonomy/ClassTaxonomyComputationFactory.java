@@ -265,11 +265,6 @@ public class ClassTaxonomyComputationFactory implements
 		}
 
 		@Override
-		public boolean canProcess() {
-			return transitiveReductionEngine.canProcess();
-		}
-
-		@Override
 		public void finish() {
 			transitiveReductionEngine.finish();
 		}

@@ -210,11 +210,6 @@ public class RuleApplicationFactory implements
 		}
 
 		@Override
-		public boolean canProcess() {
-			return !activeContextsEmpty.get();
-		}
-
-		@Override
 		public void finish() {
 			approximateContextNumber.addAndGet(localContextNumber);
 			localContextNumber = 0;

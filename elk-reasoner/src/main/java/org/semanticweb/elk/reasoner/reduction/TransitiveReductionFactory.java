@@ -407,11 +407,6 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		}
 
 		@Override
-		public boolean canProcess() {
-			return !auxJobQueue.isEmpty() || saturationEngine.canProcess();
-		}
-
-		@Override
 		public void finish() {
 			saturationEngine.finish();
 		}
