@@ -34,21 +34,21 @@ import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
+import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-
 
 /**
  * A simple utility to eval loading performance
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 public class FuncSyntaxParsingTask implements Task {
-	
+
 	private File file = null;
 
 	private static Owl2Parser createParser(InputStream stream) {
@@ -57,23 +57,23 @@ public class FuncSyntaxParsingTask implements Task {
 
 	@Override
 	public Result run() throws TaskException {
-		InputStream stream = null; 
-		
+		InputStream stream = null;
+
 		try {
 			stream = new FileInputStream(file);
 			Owl2Parser parser = createParser(stream);
-			
-			parser.accept(new ElkAxiomProcessor() {
+
+			parser.accept(new Owl2ParserAxiomProcessor() {
 				@Override
-				public void visit(ElkAxiom elkAxiom) {}
+				public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
+				}
 			});
 		} catch (Exception e) {
 			throw new TaskException(e);
-		}
-		finally {
+		} finally {
 			IOUtils.closeQuietly(stream);
 		}
-		
+
 		return null;
 	}
 
@@ -85,7 +85,7 @@ public class FuncSyntaxParsingTask implements Task {
 	@Override
 	public void prepare(String... args) throws TaskException {
 		file = new File(args[0]);
-				
+
 		if (!file.exists() || !file.isFile()) {
 			throw new TaskException("Wrong file: " + args[0]);
 		}
