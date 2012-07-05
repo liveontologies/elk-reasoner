@@ -38,6 +38,7 @@ import org.semanticweb.elk.config.ConfigurationException;
  */
 public class ReasoningConfigurationTest {
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void defaultConfig() {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
@@ -54,6 +55,7 @@ public class ReasoningConfigurationTest {
 				config.getParameter(ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT));
 	}
 
+	@SuppressWarnings("static-method")
 	@Test(expected = ConfigurationException.class)
 	public void wrongIntParameterValue() {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
@@ -63,6 +65,7 @@ public class ReasoningConfigurationTest {
 				"something unsupported here");
 	}
 
+	@SuppressWarnings("static-method")
 	@Test(expected = ConfigurationException.class)
 	public void wrongEnumParameterValue() {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();

@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /**
@@ -36,16 +37,32 @@ public class RestartingTestStageExecutor extends SimpleInterrupter implements
 		ReasonerStageExecutor {
 
 	@Override
-	public void complete(ReasonerStage stage) {
+	public void complete(ReasonerStage stage) throws ElkException {
 		if (!stage.done()) {
+
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);
 			}
-			do {
-				stage.clearInterrupt();
-				Thread.interrupted();
-				stage.execute();
-			} while (stage.isInterrupted());
+			registerCurrentThreadToInterrupt();
+			for (;;) {
+				try {
+					stage.execute();
+					break;
+				} catch (ElkException e) {
+					if (e instanceof ElkInterruptedException) {
+						stage.clearInterrupt();
+						continue;
+					} else
+						throw e;
+				} finally {
+					finish(stage);
+				}
+			}
+			finish(stage);
 		}
+	}
+
+	private void finish(ReasonerStage stage) {
+		clearThreadToInterrupt();
 	}
 }

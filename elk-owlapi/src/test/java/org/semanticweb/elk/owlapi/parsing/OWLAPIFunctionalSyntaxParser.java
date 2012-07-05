@@ -28,10 +28,10 @@ package org.semanticweb.elk.owlapi.parsing;
 import java.io.InputStream;
 import java.io.Reader;
 
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
-import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
+import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -57,25 +57,24 @@ public class OWLAPIFunctionalSyntaxParser implements Owl2Parser {
 	OWLAPIFunctionalSyntaxParser(InputStream source) {
 		mOntoSource = new StreamDocumentSource(source);
 	}
-	
+
 	OWLAPIFunctionalSyntaxParser(Reader source) {
 		mOntoSource = new ReaderDocumentSource(source);
 	}
 
 	@Override
-	public void setPrefixDeclarations(ElkPrefixDeclarations prefDecls) {
+	public void declarePrefix(ElkPrefix elkPrefix) {
 	}
 
 	@Override
-	public void parseOntology(ElkAxiomProcessor processor)
-			throws Owl2ParseException {
+	public void accept(ElkAxiomProcessor visitor) throws Owl2ParseException {
 		// First, parse the ontology
 		OWLOntology ontology = loadViaOWLAPI();
-		// Second, convert it 
+		// Second, convert it
 		OwlConverter converter = OwlConverter.getInstance();
-		
+
 		for (OWLAxiom axiom : ontology.getAxioms()) {
-			processor.process(converter.convert(axiom));
+			visitor.visit(converter.convert(axiom));
 		}
 	}
 
@@ -83,7 +82,7 @@ public class OWLAPIFunctionalSyntaxParser implements Owl2Parser {
 		try {
 			return OWLManager.createOWLOntologyManager()
 					.loadOntologyFromOntologyDocument(mOntoSource);
-			
+
 		} catch (OWLOntologyCreationException e) {
 			throw new Owl2ParseException(e);
 		} catch (OWLRuntimeException re) {

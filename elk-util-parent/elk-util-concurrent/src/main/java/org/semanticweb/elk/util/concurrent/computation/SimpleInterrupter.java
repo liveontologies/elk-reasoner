@@ -23,18 +23,56 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * A simple interrupter, which just saves the interrupt status and returns it
+ * A simple interrupter, which just stores the flag about the interrupt status
+ * and interrupts the thread that is assigned to this interrupter
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public class SimpleInterrupter implements Interrupter {
 
+	/**
+	 * the thread which will be interrupted when {@link #interrupt()} is called
+	 */
+	private volatile Thread toInterrupt;
+
+	/**
+	 * the interrupt status of this interrupter
+	 */
 	volatile boolean interrupted = false;
+
+	/**
+	 * Make sure the given thread is interrupted when {@link #interrupt()} is
+	 * called
+	 * 
+	 * @param toInterrupt
+	 *            the thread which will be interrupted
+	 */
+	public void registerThreadToInterrupt(Thread toInterrupt) {
+		this.toInterrupt = toInterrupt;
+	}
+
+	/**
+	 * Assign the current thread is interrupted when {@link #interrupt()} is
+	 * called
+	 */
+	public void registerCurrentThreadToInterrupt() {
+		registerThreadToInterrupt(Thread.currentThread());
+	}
+
+	/**
+	 * De-registers a thread to be interrupted (so that no thread is interrupted
+	 * accidently)
+	 */
+	public void clearThreadToInterrupt() {
+		this.toInterrupt = null;
+	}
 
 	@Override
 	public void interrupt() {
 		interrupted = true;
+		if (toInterrupt != null)
+			toInterrupt.interrupt();
 	}
 
 	@Override
@@ -46,5 +84,4 @@ public class SimpleInterrupter implements Interrupter {
 	public void clearInterrupt() {
 		interrupted = false;
 	}
-
 }

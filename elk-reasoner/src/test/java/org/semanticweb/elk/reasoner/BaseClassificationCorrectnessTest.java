@@ -26,6 +26,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.InconsistentTaxonomy;
@@ -62,16 +63,16 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 	 * 
 	 * @throws TestResultComparisonException
 	 *             in case the comparison fails
+	 * @throws ElkException
 	 */
 	@Test
-	public void classify() throws TestResultComparisonException {
-		System.err.println(manifest.toString());
-
+	public void classify() throws TestResultComparisonException, ElkException {
 		Taxonomy<ElkClass> taxonomy;
+		
 		try {
 			taxonomy = reasoner.getTaxonomy();
 			manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
-		} catch (InconsistentOntologyException e) {
+		} catch (ElkInconsistentOntologyException e) {
 			manifest.compare(new ClassTaxonomyTestOutput(
 					new InconsistentTaxonomy<ElkClass>(
 							PredefinedElkClass.OWL_THING,
@@ -85,17 +86,18 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 	 * 
 	 * @throws TestResultComparisonException
 	 *             in case the comparison fails
+	 * @throws ElkException
 	 */
 	@Test
 	public void classifyWithInterruptions()
-			throws TestResultComparisonException {
+			throws TestResultComparisonException, ElkException {
 		ReasoningProcess reasoningProcess = new ReasoningProcess();
 		Thread reasonerThread = new Thread(reasoningProcess);
 		reasonerThread.start();
 
 		while (reasonerThread.isAlive()) {
 			// interrupt every millisecond
-			reasonerThread.interrupt();
+			reasoner.interrupt();
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
@@ -103,6 +105,8 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 			}
 		}
 
+		if (reasoningProcess.exception != null)
+			throw reasoningProcess.exception;
 		if (reasoningProcess.consistent) {
 			manifest.compare(new ClassTaxonomyTestOutput(reasoningProcess
 					.getTaxonomy()));
@@ -126,13 +130,16 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 
 		Taxonomy<ElkClass> taxonomy = null;
 		boolean consistent = true;
+		ElkException exception = null;
 
 		@Override
 		public void run() {
 			try {
 				taxonomy = reasoner.getTaxonomy();
-			} catch (InconsistentOntologyException e) {
+			} catch (ElkInconsistentOntologyException e) {
 				consistent = false;
+			} catch (ElkException e) {
+				exception = e;
 			}
 		}
 

@@ -28,17 +28,21 @@ package org.semanticweb.elk.cli;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.HashRealizationCorrectnessTest;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.stages.RestartingTestStageExecutor;
 import org.semanticweb.elk.testing.HashTestOutput;
 
 /**
- *  Loads test ontologies using Elk's native OWL 2 functional syntax parser
- *  
+ * Loads test ontologies using Elk's native OWL 2 functional syntax parser
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
@@ -54,11 +58,11 @@ public class CLIHashRealizationCorrectnessTest extends
 	@Override
 	protected Reasoner createReasoner(final InputStream input)
 			throws Owl2ParseException, IOException {
-		IOReasoner reasoner = new IOReasonerFactory()
+		Reasoner reasoner = new ReasonerFactory()
 				.createReasoner(new RestartingTestStageExecutor());
-
-		reasoner.loadOntologyFromStream(input);
-
+		reasoner.registerOntologyLoader(new Owl2StreamLoader(
+				new Owl2FunctionalStyleParserFactory(), input));
+		reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 		return reasoner;
 	}
 }

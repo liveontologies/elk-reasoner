@@ -26,12 +26,12 @@ import java.util.concurrent.ExecutionException;
 
 import junit.framework.TestCase;
 
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -63,12 +63,12 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
 
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
-		inserter.process(objectFactory.getEquivalentClassesAxiom(b, c));
-		inserter.process(objectFactory.getSubClassOfAxiom(a,
+		inserter.visit(objectFactory.getEquivalentClassesAxiom(b, c));
+		inserter.visit(objectFactory.getSubClassOfAxiom(a,
 				objectFactory.getObjectSomeValuesFrom(r, b)));
-		inserter.process(objectFactory.getSubClassOfAxiom(
+		inserter.visit(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectSomeValuesFrom(s, c), d));
-		inserter.process(objectFactory.getSubObjectPropertyOfAxiom(r, s));
+		inserter.visit(objectFactory.getSubObjectPropertyOfAxiom(r, s));
 
 		IndexedClassExpression A = ontologyIndex.getIndexed(a);
 		IndexedClassExpression D = ontologyIndex.getIndexed(d);
@@ -103,9 +103,9 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 
-		inserter.process(objectFactory.getSubClassOfAxiom(a, b));
-		inserter.process(objectFactory.getSubClassOfAxiom(a, c));
-		inserter.process(objectFactory.getSubClassOfAxiom(
+		inserter.visit(objectFactory.getSubClassOfAxiom(a, b));
+		inserter.visit(objectFactory.getSubClassOfAxiom(a, c));
+		inserter.visit(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectIntersectionOf(b, c), d));
 
 		IndexedClassExpression A = ontologyIndex.getIndexed(a);

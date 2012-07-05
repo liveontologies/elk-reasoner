@@ -64,6 +64,7 @@ public class ReasonerFactory {
 	 * @param config
 	 * @return ELK reasoner
 	 */
+	@SuppressWarnings("static-method")
 	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor,
 			ReasonerConfiguration config) {
 		return new Reasoner(

@@ -22,11 +22,14 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.ChangesLoader;
+import org.semanticweb.elk.loading.Loader;
+import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.InconsistentOntologyException;
+import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
@@ -37,7 +40,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
  * The execution state of the reasoner containing information about which
- * reasoning stages that have been completed and holding the results of these
+ * reasoning stages have been completed and holding the results of these
  * reasoning stages, such as the consistency status of the ontology, class, or
  * instance taxonomy.
  * 
@@ -45,41 +48,54 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  * 
  */
 public abstract class AbstractReasonerState {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(AbstractReasonerState.class);
+
 	/**
-	 * <tt>true</tt> if the object property hierarchy has been computed
+	 * {@code true} if the ontology is loaded
+	 */
+	boolean doneLoading = false;
+	/**
+	 * {@code true} if the ontology changes are loaded
+	 */
+	boolean doneChangeLoading = false;
+	/**
+	 * {@code true} if the object property hierarchy has been computed
 	 */
 	boolean doneObjectPropertyHierarchyComputation = false;
 	/**
-	 * <tt>true</tt> if the object property compositions have been precomputed
+	 * {@code true} if the object property compositions have been precomputed
 	 */
 	boolean doneObjectPropertyCompositionsPrecomputation = false;
 	/**
-	 * <tt>true</tt> if the assignment of contexts to class expressions has been
+	 * {@code true} if the assignment of contexts to class expressions has been
 	 * reset
 	 */
 	boolean doneContextReset = true;
 	/**
-	 * <tt>true</tt> if the ontology has been checked for consistency.
+	 * {@code true} if the ontology has been checked for consistency.
 	 */
 	boolean doneConsistencyCheck = false;
 	/**
-	 * <tt>true</tt> if the class taxonomy has been computed
+	 * {@code true} if the class taxonomy has been computed
 	 */
 	boolean doneClassTaxonomy = false;
 	/**
-	 * <tt>true</tt> if the instance taxonomy has been computed
+	 * {@code true} if the instance taxonomy has been computed
 	 */
 	boolean doneInstanceTaxonomy = false;
 	/**
-	 * <tt>true</tt> if all stages have been reseted after changes
+	 * {@code true} if the reasoner is interrupted
 	 */
-	boolean doneReset = true;
+	volatile boolean isInterrupted = false;
 	/**
-	 * the index representing the current ontology
+	 * {@code true} if all stages have been reseted after changes
 	 */
-	OntologyIndex ontologyIndex;
+	final OntologyIndex ontologyIndex;
 	/**
-	 * <tt>true</tt> if the current ontology is consistent
+	 * {@code true} if the current ontology is consistent
 	 */
 	boolean consistentOntology = true;
 	/**
@@ -88,26 +104,69 @@ public abstract class AbstractReasonerState {
 	IndividualClassTaxonomy taxonomy = null;
 
 	/**
-	 * Invalidates all previously computed reasoning results. By calling this
-	 * method it is indicated that the input ontology might have been changed
-	 * and so, some reasoning stages need to be executed again.
-	 * 
-	 * 
-	 * This does not mean that the deductions that have been made are deleted.
-	 * Rather, this method would be called if the deductions (and the index in
-	 * general) have changed, and the Reasoner should not rely on its records of
-	 * earlier deductions any longer.
+	 * The source where the input ontology can be loaded
 	 */
-	protected void resetStages() {
-		if (!doneReset) {
+	private Loader ontologyLoader;
+	/**
+	 * The source where changes in ontology can be loaded
+	 */
+	private Loader changesLoader;
+
+	protected AbstractReasonerState() {
+		this.ontologyIndex = new OntologyIndexImpl();
+	}
+
+	/**
+	 * Reset the loading stage and all subsequent stages
+	 */
+	private void resetLoading() {
+		if (doneLoading) {
+			doneLoading = false;
+			ontologyIndex.clear();
+			resetChangesLoading();
+		}
+	}
+
+	/**
+	 * Reset the changes loading stage and all subsequent stages
+	 */
+	private void resetChangesLoading() {
+		if (doneChangeLoading) {
+			doneChangeLoading = false;
 			doneObjectPropertyHierarchyComputation = false;
 			doneObjectPropertyCompositionsPrecomputation = false;
 			doneContextReset = false;
 			doneConsistencyCheck = false;
 			doneClassTaxonomy = false;
 			doneInstanceTaxonomy = false;
-			doneReset = true;
 		}
+	}
+
+	public void registerOntologyLoader(OntologyLoader ontologyLoader) {
+		this.ontologyLoader = ontologyLoader.getLoader(ontologyIndex
+				.getAxiomInserter());
+		resetLoading();
+	}
+
+	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
+		this.changesLoader = changesLoader.getLoader(
+				ontologyIndex.getAxiomInserter(),
+				ontologyIndex.getAxiomDeleter());
+		resetChangesLoading();
+	}
+
+	/**
+	 * @return the source where the input ontology can be loaded
+	 */
+	Loader getOntologyLoader() {
+		return ontologyLoader;
+	}
+
+	/**
+	 * @return the source where changes in ontology can be loaded
+	 */
+	Loader getChangesLoader() {
+		return changesLoader;
 	}
 
 	/**
@@ -139,82 +198,58 @@ public abstract class AbstractReasonerState {
 	 * ontology.
 	 */
 	public void reset() {
-		ontologyIndex = new OntologyIndexImpl();
-		resetStages();
+		resetLoading();
 	}
 
 	/**
-	 * Add an axiom to the ontology. This method updates the
-	 * {@link OntologyIndex} according to the added axiom. The previously
-	 * computed reasoner results (e.g., taxonomies) will become invalid when new
-	 * axioms are added.
-	 * 
-	 * TODO Clarify what happens if an axiom is added twice.
-	 * 
-	 * @param axiom
+	 * interrupts running reasoning stages
 	 */
-	public void addAxiom(ElkAxiom axiom) {
-		ontologyIndex.getAxiomInserter().process(axiom);
-		resetStages();
-	}
-
-	/**
-	 * Remove an axiom from the ontology.This method updates the
-	 * {@link OntologyIndex} according to the deleted axiom. The previously
-	 * computed reasoner results (e.g., taxonomies) will become invalid when new
-	 * axioms are added.
-	 * 
-	 * TODO Clarify what happens when deleting axioms that were not added.
-	 * 
-	 * @param axiom
-	 */
-	public void removeAxiom(ElkAxiom axiom) {
-		ontologyIndex.getAxiomDeleter().process(axiom);
-		resetStages();
-	}
-
-	/**
-	 * @return an {@link ElkAxiomProcessor} that adds axioms to the current
-	 *         ontology
-	 */
-	protected ElkAxiomProcessor getAxiomInserter() {
-		return new ElkAxiomProcessor() {
-			@Override
-			public void process(ElkAxiom elkAxiom) {
-				addAxiom(elkAxiom);
-			}
-		};
-	}
-
-	/**
-	 * @return an {@link ElkAxiomProcessor} that removes axioms from the current
-	 *         ontology
-	 */
-	protected ElkAxiomProcessor getAxiomDeleter() {
-		return new ElkAxiomProcessor() {
-			@Override
-			public void process(ElkAxiom elkAxiom) {
-				removeAxiom(elkAxiom);
-			}
-		};
+	public void interrupt() {
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info("Interrupt requested");
+		isInterrupted = true;
+		ReasonerStageExecutor stageExecutor = getStageExecutor();
+		if (stageExecutor != null)
+			stageExecutor.interrupt();
 	}
 
 	/**
 	 * Check consistency of the current ontology, if this has not been done yet.
 	 * 
-	 * @return <tt>true</tt> if the ontology is consistent, that is,
-	 *         satisfiable.
+	 * @return {@code true} if the ontology is consistent, that is, satisfiable.
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
 	 */
-	public boolean isConsistent() {
+	public boolean isConsistent() throws ElkException {
 		getStageExecutor().complete(new ConsistencyCheckingStage(this));
 		return consistentOntology;
 	}
-	
+
 	/**
-	 * @return <tt>true</tt> if the ontology has been checked for consistency.
+	 * @return {@code true} if the ontology has been checked for consistency.
 	 */
 	public boolean doneConsistencyCheck() {
 		return doneConsistencyCheck;
+	}
+
+	/**
+	 * Forces the reasoner to load ontology
+	 * 
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	public void loadOntology() throws ElkException {
+		getStageExecutor().complete(new OntologyLoadingStage(this));
+	}
+
+	/**
+	 * Forces the reasoner to reload ontology changes
+	 * 
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	public void loadChanges() throws ElkException {
+		getStageExecutor().complete(new ChangesLoadingStage(this));
 	}
 
 	/**
@@ -222,18 +257,20 @@ public abstract class AbstractReasonerState {
 	 * if it has not been done yet.
 	 * 
 	 * @return the class taxonomy implied by the current ontology
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
 	 */
 	public Taxonomy<ElkClass> getTaxonomy()
-			throws InconsistentOntologyException {
+			throws ElkInconsistentOntologyException, ElkException {
 		if (!isConsistent())
-			throw new InconsistentOntologyException();
+			throw new ElkInconsistentOntologyException();
 
 		getStageExecutor().complete(new ClassTaxonomyComputationStage(this));
 		return taxonomy;
 	}
-	
+
 	/**
-	 * @return <tt>true</tt> if the class taxonomy has been computed
+	 * @return {@code true} if the class taxonomy has been computed
 	 */
 	public boolean doneTaxonomy() {
 		return doneClassTaxonomy;
@@ -244,25 +281,35 @@ public abstract class AbstractReasonerState {
 	 * has not been done yet.
 	 * 
 	 * @return the instance taxonomy implied by the current ontology
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
 	 */
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
-			throws InconsistentOntologyException {
+			throws ElkInconsistentOntologyException, ElkException {
 		if (!isConsistent())
-			throw new InconsistentOntologyException();
+			throw new ElkInconsistentOntologyException();
 
 		getStageExecutor().complete(new InstanceTaxonomyComputationStage(this));
 		return taxonomy;
 	}
-	
+
 	/**
-	 * @return <tt>true</tt> if the instance taxonomy has been computed
+	 * @return {@code true} if the instance taxonomy has been computed
 	 */
 	public boolean doneInstanceTaxonomy() {
 		return doneInstanceTaxonomy;
 	}
 
-	// used only in tests
-	protected OntologyIndex getOntologyIndex() {
+	/**
+	 * Compute the index representation of the given ontology if it has not been
+	 * done yet.
+	 * 
+	 * @return the index representation of the given ontology
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected OntologyIndex getOntologyIndex() throws ElkException {
+		getStageExecutor().complete(new OntologyLoadingStage(this));
 		return ontologyIndex;
 	}
 

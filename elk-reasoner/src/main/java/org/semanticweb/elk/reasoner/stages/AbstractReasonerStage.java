@@ -56,12 +56,31 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 
 	@Override
 	public boolean isInterrupted() {
-		return Thread.currentThread().isInterrupted();
+		return reasoner.isInterrupted;
 	}
 
 	@Override
 	public void clearInterrupt() {
-		Thread.interrupted();
+		reasoner.isInterrupted = false;
+	}
+
+	/**
+	 * Check if the reasoner was interrupted and clears the interrupt status
+	 * 
+	 * @return {@code true} if the current thread was interrupted but the
+	 *         reasoner was not interrupted (e.g., spurious interrupt)
+	 * @throws ElkInterruptedException
+	 *             if the reasoner was interrupted
+	 */
+	public boolean interrupted() throws ElkInterruptedException {
+		boolean result = false;
+		if (Thread.interrupted())
+			result = true;
+		if (isInterrupted()) {
+			clearInterrupt();
+			throw new ElkInterruptedException(getName() + " interrupted");
+		}
+		return result;
 	}
 
 	/**

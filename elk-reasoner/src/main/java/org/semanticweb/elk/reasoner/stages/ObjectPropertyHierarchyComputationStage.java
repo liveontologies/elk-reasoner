@@ -22,15 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputation;
 
 /**
- * The reasoner stage, which purpose is to compute the object property hierarchy
- * of the given ontology
+ * A {@link ReasonerStage}, which purpose is to compute the object property
+ * hierarchy of the given ontology
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -70,18 +70,24 @@ public class ObjectPropertyHierarchyComputationStage extends
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Collections.emptyList();
+		return Arrays.asList(
+				(ReasonerStage) new OntologyLoadingStage(reasoner),
+				(ReasonerStage) new ChangesLoadingStage(reasoner));
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws ElkInterruptedException {
 		if (computation == null)
 			initComputation();
-		computation.process();
-		if (isInterrupted())
-			return;
+		try {
+			for (;;) {
+				computation.process();
+				if (!interrupted())
+					break;
+			}
+		} finally {
+		}
 		reasoner.doneObjectPropertyHierarchyComputation = true;
-		reasoner.doneReset = false;
 	}
 
 	@Override

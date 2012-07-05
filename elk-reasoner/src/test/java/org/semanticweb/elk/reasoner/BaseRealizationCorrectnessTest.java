@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
@@ -40,15 +41,15 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  * Runs ABox realization tests for all test input in the test directory
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
-public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput> extends
-		BaseReasoningCorrectnessTest<EO, InstanceTaxonomyTestOutput> {
+public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput>
+		extends BaseReasoningCorrectnessTest<EO, InstanceTaxonomyTestOutput> {
 
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
-	
+
 	public BaseRealizationCorrectnessTest(
 			ReasoningTestManifest<EO, InstanceTaxonomyTestOutput> testManifest) {
 		super(testManifest);
@@ -62,15 +63,19 @@ public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput> exte
 	 * 
 	 * @throws TestResultComparisonException
 	 *             in case the comparison fails
+	 * @throws ElkException
 	 */
 	@Test
-	public void realize() throws TestResultComparisonException {
+	public void realize() throws TestResultComparisonException, ElkException {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy;
 		try {
-			taxonomy = reasoner.getInstanceTaxonomy();		
+			taxonomy = reasoner.getInstanceTaxonomy();
 			manifest.compare(new InstanceTaxonomyTestOutput(taxonomy));
-		} catch (InconsistentOntologyException e) {
-			manifest.compare(new InstanceTaxonomyTestOutput(new InconsistentInstanceTaxonomy<ElkClass, ElkNamedIndividual>(PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING)));
+		} catch (ElkInconsistentOntologyException e) {
+			manifest.compare(new InstanceTaxonomyTestOutput(
+					new InconsistentInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
+							PredefinedElkClass.OWL_THING,
+							PredefinedElkClass.OWL_NOTHING)));
 		}
-	}	
+	}
 }

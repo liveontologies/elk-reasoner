@@ -1,12 +1,11 @@
-package org.semanticweb.elk.owl;
 /*
  * #%L
- * elk-reasoner
+ * ELK Reasoner
  * 
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +20,23 @@ package org.semanticweb.elk.owl;
  * limitations under the License.
  * #L%
  */
-
-
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+package org.semanticweb.elk.loading;
 
 /**
- * This simple interface describes any class that can process ElkAxioms.
+ * A common interface for loading processes
  * 
- * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public interface ElkAxiomProcessor {
+public interface Loader {
+
 	/**
-	 * Process the given axiom.
+	 * Runs the loading process. If loading process is interrupted, it can be
+	 * continued by calling this method again.
 	 * 
-	 * @param elkAxiom
+	 * @throws ElkLoadingException
+	 *             if loading cannot be completed successfully
 	 */
-	public void process(ElkAxiom elkAxiom);
+	public void load() throws ElkLoadingException;
+
 }

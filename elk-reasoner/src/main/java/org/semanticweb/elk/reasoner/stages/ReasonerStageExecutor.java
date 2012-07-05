@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
@@ -42,6 +43,6 @@ public interface ReasonerStageExecutor extends Interrupter {
 	 * @param stage
 	 *            the reasoner stage to be completed
 	 */
-	public void complete(ReasonerStage stage);
+	public void complete(ReasonerStage stage) throws ElkException;
 
 }

@@ -53,7 +53,7 @@ public class OWLAPIDiffRealizationCorrectnessTest extends
 	@Override
 	protected Reasoner createReasoner(InputStream input) throws IOException,
 			Owl2ParseException {
-		return OWLAPITestUtils.loadOntologyIntoReasoner(input)
+		return OWLAPITestUtils.createReasoner(input)
 				.getInternalReasoner();
 	}
 }

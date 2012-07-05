@@ -30,16 +30,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.concurrent.Executors;
 
-import org.semanticweb.elk.cli.IOReasoner;
 import org.semanticweb.elk.io.FileUtils;
+import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.Owl2StreamLoader;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.InconsistentOntologyException;
+import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.InconsistentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.InconsistentTaxonomy;
@@ -61,6 +66,8 @@ public class ComputeExpectedTaxonomies {
 	static final InconsistentInstanceTaxonomy<ElkClass, ElkNamedIndividual> INCONSISTENT_INSTANCE_TAXONOMY = new InconsistentInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 			PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING);
 
+	static final ReasonerFactory reasonerFactory = new ReasonerFactory();
+
 	/**
 	 * args[0]: path to the dir with source ontologies
 	 * 
@@ -72,19 +79,22 @@ public class ComputeExpectedTaxonomies {
 				new GetTaxonomy<ElkClass>() {
 
 					@Override
-					public Taxonomy<ElkClass> getTaxonomy(IOReasoner reasoner) {
+					public Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner)
+							throws ElkException {
 						try {
 							return reasoner.getTaxonomy();
-						} catch (InconsistentOntologyException e) {
+						} catch (ElkInconsistentOntologyException e) {
 							System.err.println("Inconsistent!");
 
 							return INCONSISTENT_CLASS_TAXONOMY;
 						}
 					}
-					
+
 					@Override
-					public void dumpTaxonomy(Taxonomy<ElkClass> taxonomy, Writer writer) throws IOException {
-						TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+					public void dumpTaxonomy(Taxonomy<ElkClass> taxonomy,
+							Writer writer) throws IOException {
+						TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer,
+								false);
 					}
 				});
 
@@ -92,10 +102,10 @@ public class ComputeExpectedTaxonomies {
 
 			@Override
 			public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy(
-					IOReasoner reasoner) {
+					Reasoner reasoner) throws ElkException {
 				try {
 					return reasoner.getInstanceTaxonomy();
-				} catch (InconsistentOntologyException e) {
+				} catch (ElkInconsistentOntologyException e) {
 					System.err.println("Inconsistent!");
 
 					return INCONSISTENT_INSTANCE_TAXONOMY;
@@ -104,25 +114,36 @@ public class ComputeExpectedTaxonomies {
 
 			@SuppressWarnings("unchecked")
 			@Override
-			public void dumpTaxonomy(Taxonomy<ElkClass> taxonomy, Writer writer) throws IOException {
-				TaxonomyPrinter.dumpInstanceTaxomomy((InstanceTaxonomy<ElkClass, ElkNamedIndividual>)taxonomy, writer, false);
+			public void dumpTaxonomy(Taxonomy<ElkClass> taxonomy, Writer writer)
+					throws IOException {
+				TaxonomyPrinter
+						.dumpInstanceTaxomomy(
+								(InstanceTaxonomy<ElkClass, ElkNamedIndividual>) taxonomy,
+								writer, false);
 			}
 		});
 	}
 
 	static void generateExpectedTaxonomy(String path, GetTaxonomy<ElkClass> gt)
-			throws IOException, Owl2ParseException {
+			throws IOException, Owl2ParseException, ElkException, InterruptedException {
 		File srcDir = new File(path);
-		// use just one worker to minimize the risk of errors:
-		IOReasoner reasoner = new IOReasoner(new TestStageExecutor(),
-				Executors.newCachedThreadPool(), 1);
+
+		ReasonerConfiguration configuraion = ReasonerConfiguration
+				.getConfiguration();
+		// use just one worker to minimize the risk of errors
+		configuraion.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
+				"1");
 
 		for (File ontFile : srcDir.listFiles(FileUtils
 				.getExtBasedFilenameFilter("owl"))) {
 
 			System.err.println(ontFile.getName());
 
-			reasoner.loadOntologyFromFile(ontFile);
+			Reasoner reasoner = reasonerFactory.createReasoner(
+					new TestStageExecutor(), configuraion);
+			reasoner.registerOntologyLoader(new Owl2StreamLoader(
+					new Owl2FunctionalStyleParserFactory(), ontFile));
+			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			Taxonomy<ElkClass> taxonomy = gt.getTaxonomy(reasoner);
 			// create the expected result file
@@ -135,15 +156,15 @@ public class ComputeExpectedTaxonomies {
 
 			writer.flush();
 			writer.close();
+			reasoner.shutdown();
 		}
 
-		reasoner.shutdown();
 	}
 
-
-
 	interface GetTaxonomy<T extends ElkObject> {
-		Taxonomy<T> getTaxonomy(IOReasoner reasoner);
-		void dumpTaxonomy(Taxonomy<T> taxonomy, Writer writer) throws IOException;
+		Taxonomy<T> getTaxonomy(Reasoner reasoner) throws ElkException;
+
+		void dumpTaxonomy(Taxonomy<T> taxonomy, Writer writer)
+				throws IOException;
 	}
 }

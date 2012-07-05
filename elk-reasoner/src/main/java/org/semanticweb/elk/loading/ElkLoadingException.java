@@ -20,24 +20,31 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.loading;
 
-/**
- * Thrown when irrelevant reasoning methods are called for an ontology that is
- * inconsistent. Most reasoning tasks also have well-defined results for
- * inconsistent ontologies, so it is not required that this exception is used in
- * all cases. Callers should not rely on this exception being thrown as a method
- * for checking inconsistency; there are dedicated methods for this purpose.
- * 
- * @author Markus Kroetzsch
- * 
- */
-public class InconsistentOntologyException extends Exception {
+import org.semanticweb.elk.owl.exceptions.ElkException;
 
-	private static final long serialVersionUID = -8696304480425201859L;
+public class ElkLoadingException extends ElkException {
 
-	public InconsistentOntologyException() {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -272682717729938704L;
+
+	public ElkLoadingException() {
 		super();
+	}
+
+	public ElkLoadingException(String message) {
+		super(message);
+	}
+
+	public ElkLoadingException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public ElkLoadingException(Throwable cause) {
+		super(cause);
 	}
 
 }

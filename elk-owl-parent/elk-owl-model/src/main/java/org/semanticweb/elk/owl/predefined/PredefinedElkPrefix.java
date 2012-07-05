@@ -25,18 +25,28 @@ package org.semanticweb.elk.owl.predefined;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 
-public class PredefinedElkPrefix {
-	
-	public static final ElkPrefix OWL = new ElkPrefix("owl:", 
-   		 new ElkFullIri("http://www.w3.org/2002/07/owl#"));
-	
-	public static final ElkPrefix RDF = new ElkPrefix("rdf:", 
-   		 new ElkFullIri("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
-	
-	public static final ElkPrefix RDFS = new ElkPrefix("rdfs:", 
-        		 new ElkFullIri("http://www.w3.org/2000/01/rdf-schema#"));
-	
-	public static final ElkPrefix XSD = new ElkPrefix("xsd:",
-        		 new ElkFullIri("http://www.w3.org/2001/XMLSchema#"));
-	
+public enum PredefinedElkPrefix {
+
+	OWL(new ElkPrefix("owl:", new ElkFullIri("http://www.w3.org/2002/07/owl#"))), //
+
+	RDF(new ElkPrefix("rdf:", new ElkFullIri(
+			"http://www.w3.org/1999/02/22-rdf-syntax-ns#"))), //
+
+	RDFS(new ElkPrefix("rdfs:", new ElkFullIri(
+			"http://www.w3.org/2000/01/rdf-schema#"))), //
+
+	XSD(new ElkPrefix("xsd:", new ElkFullIri(
+			"http://www.w3.org/2001/XMLSchema#")))//
+	;
+
+	private final ElkPrefix prefix;
+
+	private PredefinedElkPrefix(ElkPrefix prefix) {
+		this.prefix = prefix;
+	}
+
+	public ElkPrefix get() {
+		return this.prefix;
+	}
+
 }

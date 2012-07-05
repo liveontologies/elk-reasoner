@@ -123,10 +123,10 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 	/**
 	 * Starts the workers to process the input.
 	 */
-	public synchronized void start() {
+	public synchronized boolean start() {
 		finishRequested = false;
 		interrupted = false;
-		executor.start(worker, maxWorkers);
+		return executor.start(worker, maxWorkers);
 	}
 
 	/**
@@ -150,6 +150,14 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 		return true;
 	}
 
+	/**
+	 * Request all currently running workers to stop; no input can be submitted
+	 * after calling this method. When this method returns, no worker should be
+	 * running.
+	 * 
+	 * @return the submitted inputs that were not processed by the workers
+	 * @throws InterruptedException
+	 */
 	public synchronized Iterable<I> interrupt() throws InterruptedException {
 		if (!interrupted) {
 			interrupted = true;
@@ -164,11 +172,8 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 	 * currently submitted input has been processed. After calling this method,
 	 * no new input can be submitted anymore, i.e., calling {@link #submit(I)}
 	 * will always return <tt>false</tt>. The method blocks until all workers
-	 * have been stopped. If the computation of workers has been interrupted,
-	 * the method will return the submitted input elements that have not been
-	 * yet submitted to the {@link InputProcessor}. If interrupted while
-	 * blocked, this method should be called again in order to complete the
-	 * termination request.
+	 * have been stopped. If interrupted while blocked, this method can be
+	 * called again in order to complete the termination request.
 	 * 
 	 * @return the submitted input elements that have not been yet submitted to
 	 *         the supplied {@link InputProcessor}
@@ -203,7 +208,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 						nextInput = buffer.poll();
 						if (nextInput == null) {
 							// make sure nothing is left unprocessed
-							inputProcessor.process();
+							inputProcessor.process(); // can be interrupted
 							if (!interrupted && Thread.interrupted())
 								continue;
 							break;

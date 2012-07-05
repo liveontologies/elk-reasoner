@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
@@ -48,6 +47,7 @@ import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
  * A simple class to load class taxonomy using a prepared parser. To be used
@@ -68,7 +68,7 @@ public class TaxonomyLoader {
 		final ConcurrentTaxonomy taxonomy = new ConcurrentTaxonomy();
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);
 
-		parser.parseOntology(listener);
+		parser.accept(listener);
 		// add owl:Thing if needed
 		ElkClass thing = PredefinedElkClass.OWL_THING;
 		// unless it's inconsistent
@@ -133,7 +133,8 @@ public class TaxonomyLoader {
 				if (ce instanceof ElkClass) {
 					ElkClass clazz = (ElkClass) ce;
 
-					if (clazz.getIri().equals(PredefinedElkIri.OWL_NOTHING)) {
+					if (clazz.getIri().equals(
+							PredefinedElkIri.OWL_NOTHING.get())) {
 						nothing = true;
 					} else {
 						classes.add(clazz);
@@ -258,9 +259,8 @@ public class TaxonomyLoader {
 						((NonBottomClassNode) typeNode)
 								.addDirectInstanceNode(indNode);
 						indNode.addDirectTypeNode((NonBottomClassNode) typeNode);
-					}
-					else {
-						//TODO Shouldn't happen, log it?
+					} else {
+						// TODO Shouldn't happen, log it?
 					}
 				}
 			}
@@ -269,7 +269,7 @@ public class TaxonomyLoader {
 		}
 
 		@Override
-		public void process(ElkAxiom elkAxiom) {
+		public void visit(ElkAxiom elkAxiom) {
 			elkAxiom.accept(this);
 		}
 	}

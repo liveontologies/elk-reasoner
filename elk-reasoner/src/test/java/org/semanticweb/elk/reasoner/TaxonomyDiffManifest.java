@@ -26,19 +26,26 @@ import java.net.URL;
 
 import org.semanticweb.elk.testing.TestResultComparisonException;
 
-public class TaxonomyDiffManifest<EO extends ClassTaxonomyTestOutput, AO extends ClassTaxonomyTestOutput> extends ReasoningTestManifest<EO, AO> {
+public class TaxonomyDiffManifest<EO extends ClassTaxonomyTestOutput, AO extends ClassTaxonomyTestOutput>
+		extends ReasoningTestManifest<EO, AO> {
 
 	public TaxonomyDiffManifest(URL input, EO expOutput) {
 		super(input, expOutput);
 	}
 
 	@Override
-	public void compare(AO actualOutput)
-			throws TestResultComparisonException {
-		
-		//FIXME Implement taxonomy comparison and diff
+	public void compare(AO actualOutput) throws TestResultComparisonException {
+
+		// FIXME Implement taxonomy comparison and diff
 		if (getExpectedOutput().getHashCode() != (actualOutput.getHashCode())) {
-			throw new TestResultComparisonException("Expected taxonomy hashcode not equal to the actual hashcode", getExpectedOutput(), actualOutput);
+			// FIXME: where do I see the expected and actual values (if I do not
+			// print them myself as below)?
+			throw new TestResultComparisonException(
+					"Expected taxonomy hashcode "
+							+ getExpectedOutput().getHashCode()
+							+ " not equal to the actual hashcode"
+							+ actualOutput.getHashCode(), getExpectedOutput(),
+					actualOutput);
 		}
 	}
 }
