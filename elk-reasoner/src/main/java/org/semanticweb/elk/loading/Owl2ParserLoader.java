@@ -22,12 +22,13 @@
  */
 package org.semanticweb.elk.loading;
 
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
+import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
@@ -96,24 +97,7 @@ abstract class Owl2ParserLoader implements Loader {
 		this.axiomLoader_ = axiomLoader;
 		this.axiomBuffer_ = new ArrayBlockingQueue<ElkAxiom>(bufferSize);
 		this.finished_ = false;
-		this.parserThread_ = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					parser_.accept(new AxiomInserter(axiomBuffer_));
-					finished_ = true;
-					synchronized (axiomBuffer_) {
-						if (waiting_)
-							controlThread_.interrupt();
-					}
-				} catch (Exception e) {
-					exception = new ElkLoadingException(e);
-				} finally {
-					closeParsingResources();
-				}
-			}
-
-		});
+		this.parserThread_ = new Thread(new Parser(), "elk-parser-thread");
 		this.started_ = false;
 		this.exception = null;
 	}
@@ -150,8 +134,6 @@ abstract class Owl2ParserLoader implements Loader {
 					try {
 						axiom = axiomBuffer_.take();
 					} catch (InterruptedException e) {
-						if (exception != null)
-							throw exception;
 						/*
 						 * we don't know for sure why the thread was
 						 * interrupted, so we need to obey the master; it will
@@ -167,9 +149,14 @@ abstract class Owl2ParserLoader implements Loader {
 				axiomLoader_.visit(axiom);
 			}
 		} finally {
+			/*
+			 * should be executed in any case
+			 */
 			synchronized (axiomBuffer_) {
 				waiting_ = false;
 			}
+			if (exception != null)
+				throw exception;
 		}
 	}
 
@@ -180,23 +167,63 @@ abstract class Owl2ParserLoader implements Loader {
 	protected abstract void closeParsingResources();
 
 	/**
+	 * The parser worker used to parse the ontology
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	private class Parser implements Runnable {
+		@Override
+		public void run() {
+			try {
+				parser_.accept(new AxiomInserter(axiomBuffer_));
+			} catch (Exception e) {
+				exception = new ElkLoadingException("Cannot load the ontology",
+						e);
+			} finally {
+				try {
+					/*
+					 * just don't want something like this to fail but not sure
+					 * where one can save the exception
+					 */
+					closeParsingResources();
+				} finally {
+					/*
+					 * should be executed in any case
+					 */
+					finished_ = true;
+					synchronized (axiomBuffer_) {
+						if (waiting_)
+							controlThread_.interrupt();
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * A simple {@link ElkAxiomProcessor} that insert the parsed axioms into the
 	 * given queue
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private static class AxiomInserter implements ElkAxiomProcessor {
+	private static class AxiomInserter implements Owl2ParserAxiomProcessor {
 
-		final Queue<ElkAxiom> axiomBuffer;
+		final BlockingQueue<ElkAxiom> axiomBuffer;
 
-		AxiomInserter(Queue<ElkAxiom> axiomBuffer) {
+		AxiomInserter(BlockingQueue<ElkAxiom> axiomBuffer) {
 			this.axiomBuffer = axiomBuffer;
 		}
 
 		@Override
-		public void visit(ElkAxiom elkAxiom) {
-			axiomBuffer.add(elkAxiom);
+		public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
+			try {
+				axiomBuffer.put(elkAxiom);
+			} catch (InterruptedException e) {
+				throw new Owl2ParseException("ELK Parser was interrupted", e);
+			}
+
 		}
 	}
 

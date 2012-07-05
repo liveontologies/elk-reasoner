@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
  * Used to test parsers
@@ -42,7 +41,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  *         pavel.klinov@uni-ulm.de
  * 
  */
-public class ElkTestAxiomProcessor implements ElkAxiomProcessor {
+public class ElkTestAxiomProcessor implements Owl2ParserAxiomProcessor {
 
 	private Map<Class<?>, Set<ElkAxiom>> axiomMap = new HashMap<Class<?>, Set<ElkAxiom>>();
 
