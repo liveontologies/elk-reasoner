@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 
@@ -35,6 +36,10 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
  * 
  */
 public class ChangesLoadingStage extends AbstractReasonerStage {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ChangesLoadingStage.class);
 
 	public ChangesLoadingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -60,6 +65,8 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	public void execute() throws ElkException {
 		initComputation();
 		Loader changesLoader = reasoner.getChangesLoader();
+		if (changesLoader == null)
+			LOGGER_.warn("Ontology changes loader is not registered. No changes will be loaded!");
 		try {
 			for (;;) {
 				changesLoader.load();

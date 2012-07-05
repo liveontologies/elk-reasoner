@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.stages;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 
 /**
- * A common implementation {@link ReasonerStage}s for a given reasoner.
+ * A common implementation of {@link ReasonerStage}s for a given reasoner.
  * 
  * @author "Yevgeny Kazakov"
  * 
