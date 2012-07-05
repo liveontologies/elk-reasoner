@@ -67,14 +67,10 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 		if (ontologyLoader == null)
 			LOGGER_.warn("Ontology loader is not registered. No axioms will be loaded!");
 		else
-			try {
-				for (;;) {
-					ontologyLoader.load();
-					if (!interrupted())
-						break;
-				}
-			} finally {
-
+			for (;;) {
+				ontologyLoader.load();
+				if (!interrupted())
+					break;
 			}
 		reasoner.doneLoading = true;
 	}

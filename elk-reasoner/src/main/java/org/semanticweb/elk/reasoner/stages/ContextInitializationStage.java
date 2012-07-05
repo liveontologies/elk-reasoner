@@ -90,8 +90,8 @@ class ContextInitializationStage extends AbstractReasonerStage {
 				ice.resetContext();
 				deletedContexts++;
 				progressMonitor.report(deletedContexts, maxContexts);
-				if (!interrupted())
-					break;
+				if (interrupted())
+					continue;
 			}
 		} finally {
 			progressMonitor.finish();

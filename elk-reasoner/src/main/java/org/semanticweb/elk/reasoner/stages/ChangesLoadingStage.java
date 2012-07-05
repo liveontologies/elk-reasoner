@@ -68,13 +68,10 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 		if (changesLoader == null)
 			LOGGER_.warn("Ontology changes loader is not registered. No changes will be loaded!");
 		else
-			try {
-				for (;;) {
-					changesLoader.load();
-					if (!interrupted())
-						break;
-				}
-			} finally {
+			for (;;) {
+				changesLoader.load();
+				if (!interrupted())
+					break;
 			}
 		reasoner.doneChangeLoading = true;
 	}

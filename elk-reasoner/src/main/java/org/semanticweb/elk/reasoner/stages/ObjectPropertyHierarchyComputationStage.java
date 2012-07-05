@@ -79,13 +79,10 @@ public class ObjectPropertyHierarchyComputationStage extends
 	public void execute() throws ElkInterruptedException {
 		if (computation == null)
 			initComputation();
-		try {
-			for (;;) {
-				computation.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
+		for (;;) {
+			computation.process();
+			if (!interrupted())
+				break;
 		}
 		reasoner.doneObjectPropertyHierarchyComputation = true;
 	}
