@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collections;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 
@@ -35,6 +36,10 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
  * 
  */
 public class OntologyLoadingStage extends AbstractReasonerStage {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(OntologyLoadingStage.class);
 
 	public OntologyLoadingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -59,15 +64,18 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	public void execute() throws ElkException {
 		initComputation();
 		Loader ontologyLoader = reasoner.getOntologyLoader();
-		try {
-			for (;;) {
-				ontologyLoader.load();
-				if (!interrupted())
-					break;
-			}
-		} finally {
+		if (ontologyLoader == null)
+			LOGGER_.warn("Ontology loader is not registered. No axioms will be loaded!");
+		else
+			try {
+				for (;;) {
+					ontologyLoader.load();
+					if (!interrupted())
+						break;
+				}
+			} finally {
 
-		}
+			}
 		reasoner.doneLoading = true;
 	}
 

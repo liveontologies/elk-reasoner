@@ -293,34 +293,48 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		@Override
 		public void process() throws InterruptedException {
 			/*
-			 * if the number of unprocessed contexts exceeds the threshold,
-			 * suspend the computation; whenever workers wake up, try to process
-			 * the jobs
+			 * This works as follows. We apply inference rules to the contexts
+			 * created so far in batches: when the number of unprocessed
+			 * contexts is below a certain threshold, we add a new saturation
+			 * job and process the contexts. How do we know when contexts are
+			 * completely processed, i.e., there will be nothing more derived in
+			 * a context? This is very difficult to know. We apply the following
+			 * strategy: we know that all contexts are processed when (1) no
+			 * worker is creating or processing contexts and (2) after every
+			 * worker that was interrupted while processing contexts there was a
+			 * worker that has started processing contexts. To check this
+			 * condition, we use two counters: first counter is incremented
+			 * before a worker starts processing contexts, the second counter is
+			 * incremented after a worker finishes processing contexts.
+			 * Therefore, at the moment when the values of both counters
+			 * coincide, we know that condition (1) is fulfilled. Now, to check
+			 * condition (2) we use a variable, where store the identifier of
+			 * the last started worker that was interrupted and compare if this
+			 * identifier is smaller than the identifier for the last finished
+			 * worker (which should be equal to the identifier of the last
+			 * started worker in case (1) is satisfied). To avoid deadlock, it
+			 * is essential that whenever conditions (1) and (2) are satisfied,
+			 * we can update the number of processed contexts, i.e., the
+			 * computation was not interrupted in between processing of contexts
+			 * and updating this counter.
 			 */
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					return;
-				/*
-				 * try to process the submitted jobs; there are two counters to
-				 * keep track of how many workers have been started and
-				 * finished: if their values coincide, then there is no worker
-				 * in the block between them. In addition, there is a variable
-				 * to save the identifier of the last started worker which has
-				 * been interrupted; this is used to check if the computation
-				 * has been finished uninterruptedly by some worker.
-				 */
-				int snapshotFinishedWorkers;
 				startedWorkers.incrementAndGet();
 				ruleApplicationEngine.process();
 				if (Thread.currentThread().isInterrupted())
 					updateIfSmaller(lastInterruptedWorker, startedWorkers.get());
-				snapshotFinishedWorkers = finishedWorkers.incrementAndGet();
-				updateProcessedCounters(snapshotFinishedWorkers);
-				processFinishedJobs();
+				updateProcessedCounters(finishedWorkers.incrementAndGet());
+				processFinishedJobs(); // can be interrupted!
+				int snapshotCountContextsProcessed = countContextsProcessed
+						.get();
 				if (ruleApplicationFactory.getApproximateContextNumber()
-						- countContextsProcessed.get() > threshold) {
+						- snapshotCountContextsProcessed > threshold) {
 					synchronized (countContextsProcessed) {
-						if (canProcess())
+						if (countContextsProcessed.get() > snapshotCountContextsProcessed)
+							// new contexts were processed -- we need to check
+							// again if we can process new jobs
 							continue;
 						workersWaiting = true;
 						countContextsProcessed.wait();
@@ -339,7 +353,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				if (rootContext != null
 						&& ((ContextClassSaturation) rootContext).isSaturated()) {
 					nextJob.setOutput(rootContext);
-					listener.notifyFinished(nextJob);
+					listener.notifyFinished(nextJob); // can be interrupted!
 					continue;
 				}
 				if (LOGGER_.isTraceEnabled()) {
@@ -355,17 +369,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				ruleApplicationEngine.process();
 				if (Thread.currentThread().isInterrupted())
 					updateIfSmaller(lastInterruptedWorker, startedWorkers.get());
-				snapshotFinishedWorkers = finishedWorkers.incrementAndGet();
-				updateProcessedCounters(snapshotFinishedWorkers);
-				processFinishedJobs();
+				updateProcessedCounters(finishedWorkers.incrementAndGet());
+				processFinishedJobs(); // can be interrupted!
 			}
 
-		}
-
-		@Override
-		public boolean canProcess() {
-			return ruleApplicationEngine.canProcess()
-					|| countJobsFinished.get() > countJobsProcessed.get();
 		}
 
 		@Override

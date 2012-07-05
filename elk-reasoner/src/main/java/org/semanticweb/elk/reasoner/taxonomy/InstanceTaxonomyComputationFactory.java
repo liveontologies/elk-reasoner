@@ -44,10 +44,10 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  */
 
 /**
- * The factory for engines that concurrently construct an {@link InstanceTaxonomy}. The
- * jobs are submitted using the method {@link #submit(IndexedIndividual)}, which
- * require the computation of the {@link Node} for the input
- * {@link IndexedIndividual}.
+ * The factory for engines that concurrently construct an
+ * {@link InstanceTaxonomy}. The jobs are submitted using the method
+ * {@link #submit(IndexedIndividual)}, which require the computation of the
+ * {@link Node} for the input {@link IndexedIndividual}.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
@@ -112,8 +112,7 @@ public class InstanceTaxonomyComputationFactory implements
 		}
 
 		@Override
-		public void notifyFinished(
-				TransitiveReductionJob<IndexedIndividual> job)
+		public void notifyFinished(TransitiveReductionJob<IndexedIndividual> job)
 				throws InterruptedException {
 			job.getOutput().accept(outputProcessor);
 		}
@@ -134,7 +133,7 @@ public class InstanceTaxonomyComputationFactory implements
 		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedIndividual> output) {
-			
+
 			// only supports singleton individuals
 			IndividualNode node = taxonomy.getCreateIndividualNode(Collections
 					.singleton(output.getRoot().getElkNamedIndividual()));
@@ -230,11 +229,6 @@ public class InstanceTaxonomyComputationFactory implements
 		@Override
 		public final void process() throws InterruptedException {
 			transitiveReductionEngine.process();
-		}
-
-		@Override
-		public boolean canProcess() {
-			return transitiveReductionEngine.canProcess();
 		}
 
 		@Override

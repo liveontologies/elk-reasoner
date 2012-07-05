@@ -200,33 +200,36 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 			I nextInput;
 			// we use one engine per worker run
 			P inputProcessor = inputProcessorFactory.getEngine();
-			for (;;) {
-				if (interrupted)
-					break;
-				try {
-					if (finishRequested) {
-						nextInput = buffer.poll();
-						if (nextInput == null) {
-							// make sure nothing is left unprocessed
-							inputProcessor.process(); // can be interrupted
-							if (!interrupted && Thread.interrupted())
-								continue;
+			try {
+				for (;;) {
+					if (interrupted)
+						break;
+					try {
+						if (finishRequested) {
+							nextInput = buffer.poll();
+							if (nextInput == null) {
+								// make sure nothing is left unprocessed
+								inputProcessor.process(); // can be interrupted
+								if (!interrupted && Thread.interrupted())
+									continue;
+								break;
+							}
+						} else {
+							nextInput = buffer.take();
+						}
+						inputProcessor.submit(nextInput); // should never fail
+						inputProcessor.process(); // can be interrupted
+					} catch (InterruptedException e) {
+						if (interrupted) {
+							// restore the interrupt status and exit
+							Thread.currentThread().interrupt();
 							break;
 						}
-					} else {
-						nextInput = buffer.take();
-					}
-					inputProcessor.submit(nextInput); // should never fail
-					inputProcessor.process(); // can be interrupted
-				} catch (InterruptedException e) {
-					if (interrupted) {
-						// restore the interrupt status and exit
-						Thread.currentThread().interrupt();
-						break;
 					}
 				}
+			} finally {
+				inputProcessor.finish();
 			}
-			inputProcessor.finish();
 		}
 	}
 }

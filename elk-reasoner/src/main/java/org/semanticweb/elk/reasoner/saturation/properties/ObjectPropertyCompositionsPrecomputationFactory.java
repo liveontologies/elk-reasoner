@@ -164,11 +164,6 @@ public class ObjectPropertyCompositionsPrecomputationFactory implements
 			// submission
 		}
 
-		@Override
-		public boolean canProcess() {
-			return false;
-		}
-
 		/**
 		 * Add (S, chain) to
 		 * rightPropertySaturated.compositionsByLeftSubProperty for each

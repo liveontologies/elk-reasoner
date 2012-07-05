@@ -68,7 +68,7 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 	@Test
 	public void classify() throws TestResultComparisonException, ElkException {
 		Taxonomy<ElkClass> taxonomy;
-		
+
 		try {
 			taxonomy = reasoner.getTaxonomy();
 			manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
@@ -92,7 +92,8 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 	public void classifyWithInterruptions()
 			throws TestResultComparisonException, ElkException {
 		ReasoningProcess reasoningProcess = new ReasoningProcess();
-		Thread reasonerThread = new Thread(reasoningProcess);
+		Thread reasonerThread = new Thread(reasoningProcess,
+				"test-elk-reasoner-thread");
 		reasonerThread.start();
 
 		while (reasonerThread.isAlive()) {
