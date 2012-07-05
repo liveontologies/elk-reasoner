@@ -64,6 +64,7 @@ public class ClassificationTask implements Task {
 			reasoner.registerOntologyLoader(new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(), new File(args[0])));
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
+			reasoner.loadOntology();
 		} catch (Exception e) {
 			throw new TaskException(e);
 		}
@@ -85,6 +86,11 @@ public class ClassificationTask implements Task {
 			reasoner.getTaxonomy();
 		} catch (ElkException e) {
 			throw new TaskException(e);
+		}
+		finally {
+			try {
+				reasoner.shutdown();
+			} catch (InterruptedException e) {}
 		}
 		
 		return null;
