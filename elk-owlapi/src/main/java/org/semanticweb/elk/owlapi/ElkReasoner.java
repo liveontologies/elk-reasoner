@@ -152,14 +152,30 @@ public class ElkReasoner implements OWLReasoner {
 		this.elkConverter = ElkConverter.getInstance();
 		this.stageExecutor = stageExecutor;
 
-		reasoner.registerOntologyLoader(new OwlOntologyLoader(owlOntology,
-				this.elkProgressMonitor));
 		this.ontologyChangesLoader = new OwlChangesLoader(
 				this.elkProgressMonitor);
-		reasoner.registerOntologyChangesLoader(ontologyChangesLoader);
-		this.ontologyReloadRequired = true;
 
-		// flush();
+		reasoner.registerOntologyLoader(new OwlOntologyLoader(owlOntology,
+				this.elkProgressMonitor));
+		reasoner.registerOntologyChangesLoader(ontologyChangesLoader);
+
+		if (isBufferingMode) {
+			/*
+			 * for buffering node we need to load the ontology in order to
+			 * correctly answer queries if no changes are flushed
+			 */
+			try {
+				reasoner.loadOntology();
+			} catch (ElkException e) {
+				throw elkConverter.convert(e);
+			}
+			this.ontologyReloadRequired = false;
+		} else
+			/*
+			 * if it is not a buffering node, we can load the ontology lazily
+			 * when the query is asked
+			 */
+			this.ontologyReloadRequired = true;
 	}
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
@@ -239,16 +255,17 @@ public class ElkReasoner implements OWLReasoner {
 	public void flush() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("flush()");
-		if (ontologyReloadRequired) {
-			reasoner.registerOntologyLoader(new OwlOntologyLoader(owlOntology,
-					this.elkProgressMonitor));
-			this.ontologyChangesLoader = new OwlChangesLoader(
-					this.elkProgressMonitor);
-			ontologyReloadRequired = false;
-		}
-		// this causes the reasoner to reset the changes stage
-		reasoner.registerOntologyChangesLoader(ontologyChangesLoader);
 		try {
+			if (ontologyReloadRequired) {
+				reasoner.registerOntologyLoader(new OwlOntologyLoader(
+						owlOntology, this.elkProgressMonitor));
+				this.ontologyChangesLoader = new OwlChangesLoader(
+						this.elkProgressMonitor);
+				reasoner.loadOntology();
+				ontologyReloadRequired = false;
+			}
+			// this causes the reasoner to update the changes from the listener
+			reasoner.registerOntologyChangesLoader(ontologyChangesLoader);
 			reasoner.loadChanges();
 		} catch (ElkException e) {
 			throw elkConverter.convert(e);
