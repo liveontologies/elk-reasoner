@@ -25,21 +25,16 @@
  */
 package org.semanticweb.elk.benchmark;
 
-
 /**
- * A simple command line tool which instantiates a task and passes it to the
- * task runner.
- * 
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public class CLIDriver {
+public class Constants {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) throws Exception {
-		BenchmarkUtils.run();
-	}
+	public static final String TASK_CLASS_NAME = "task.classname";
+	public static final String WARM_UPS = "task.warm-ups";
+	public static final String RUNS = "task.runs";
+	public static final String TASK_PARAMS = "task.parameters";	
+	
 }

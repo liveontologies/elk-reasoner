@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 
 /**
  * A task to classify an ontology
@@ -60,7 +60,7 @@ public class ClassificationTask implements Task {
 		try {
 			ReasonerConfiguration config = getConfig(args);
 			
-			reasoner = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), config);
+			reasoner = new ReasonerFactory().createReasoner(new SimpleStageExecutor(), config);
 			reasoner.registerOntologyLoader(new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(), new File(args[0])));
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
