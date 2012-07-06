@@ -32,8 +32,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 // TODO: add progress monitor, make concurrent if possible
 
 /**
- * The reasoner stage, which purpose is to ensure that no context is assigned to
- * {@link IndexedClassExpression}s of the current ontology
+ * A {@link ReasonerStage} which purpose is to ensure that no context is
+ * assigned to {@link IndexedClassExpression}s of the current ontology
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -47,7 +47,11 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The counter for deleted contexts
 	 */
-	private int deletedContexts = 0;
+	private int deletedContexts;
+	/**
+	 * The number of contexts
+	 */
+	private int maxContexts;
 
 	/**
 	 * The state of the iterator of the input to be processed
@@ -74,24 +78,34 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws ElkInterruptedException {
 		if (todo == null)
 			initComputation();
-		while (todo.hasNext()) {
-			if (isInterrupted())
-				return;
-			IndexedClassExpression ice = todo.next();
-			ice.resetContext();
-			deletedContexts++;
+		try {
+			progressMonitor.start(getName());
+			for (;;) {
+				if (!todo.hasNext())
+					break;
+				IndexedClassExpression ice = todo.next();
+				ice.resetContext();
+				deletedContexts++;
+				progressMonitor.report(deletedContexts, maxContexts);
+				if (interrupted())
+					continue;
+			}
+		} finally {
+			progressMonitor.finish();
 		}
 		reasoner.doneContextReset = true;
-		reasoner.doneReset = false;
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
 		todo = reasoner.ontologyIndex.getIndexedClassExpressions().iterator();
+		maxContexts = reasoner.ontologyIndex.getIndexedClassExpressions()
+				.size();
+		deletedContexts = 0;
 	}
 
 	@Override

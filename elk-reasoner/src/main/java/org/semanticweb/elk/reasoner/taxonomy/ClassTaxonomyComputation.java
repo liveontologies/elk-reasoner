@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.Collection;
+
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -41,20 +43,20 @@ public class ClassTaxonomyComputation
 		extends
 		ReasonerComputation<IndexedClass, ClassTaxonomyComputationFactory.Engine, ClassTaxonomyComputationFactory> {
 
-	public ClassTaxonomyComputation(Iterable<IndexedClass> inputs,
-			int inputsSize, ComputationExecutor executor, int maxWorkers,
+	public ClassTaxonomyComputation(Collection<IndexedClass> inputs,
+			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
 			IndividualClassTaxonomy partialTaxonomy) {
-		super(inputs, inputsSize, new ClassTaxonomyComputationFactory(ontologyIndex,
+		super(inputs, new ClassTaxonomyComputationFactory(ontologyIndex,
 				maxWorkers, partialTaxonomy), executor, maxWorkers,
 				progressMonitor);
 	}
 
-	public ClassTaxonomyComputation(Iterable<IndexedClass> inputs,
-			int inputsSize, ComputationExecutor executor, int maxWorkers,
+	public ClassTaxonomyComputation(Collection<IndexedClass> inputs,
+			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(inputs, inputsSize, executor, maxWorkers, progressMonitor,
-				ontologyIndex, new ConcurrentTaxonomy());
+		this(inputs, executor, maxWorkers, progressMonitor, ontologyIndex,
+				new ConcurrentTaxonomy());
 	}
 
 	/**

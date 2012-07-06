@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
 /**
- * The reasoner stage, during which consistency of the current ontology is
+ * A {@link ReasonerStage} during which consistency of the current ontology is
  * checked
  * 
  * @author "Yevgeny Kazakov"
@@ -69,22 +69,21 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() {
-		if (reasoner.getOntologyIndex().getIndexedOwlNothing()
-				.occursPositively()) {
-			if (computation == null)
-				initComputation();
-			progressMonitor.start(getName());
-			computation.process();
+	public void execute() throws ElkInterruptedException {
+		if (computation == null)
+			initComputation();
+		progressMonitor.start(getName());
+		try {
+			for (;;) {
+				computation.process();
+				if (!interrupted())
+					break;
+			}
+		} finally {
 			progressMonitor.finish();
-			if (isInterrupted())
-				return;
-			reasoner.consistentOntology = computation.isConsistent();
-		} else
-			reasoner.consistentOntology = true;
-		
+		}
+		reasoner.consistentOntology = computation.isConsistent();
 		reasoner.doneConsistencyCheck = true;
-		reasoner.doneReset = false;
 	}
 
 	@Override

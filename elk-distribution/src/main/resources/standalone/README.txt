@@ -23,7 +23,7 @@ command-line interface.
 
 REQUIREMENTS:
 
-Java 1.5 or higher.
+Java ${java.required.version} or higher.
 
 USAGE:
 

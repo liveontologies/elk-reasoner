@@ -44,7 +44,7 @@ public class InconsistentTaxonomy<T extends ElkEntity> implements Taxonomy<T> {
 	public InconsistentTaxonomy(T top, T bot) {
 		bottom = new Bottom(top, bot);
 	}
-
+	
 	@Override
 	public TaxonomyNode<T> getNode(T elkObject) {
 		return bottom.members.contains(elkObject) ? bottom : null;
@@ -68,12 +68,14 @@ public class InconsistentTaxonomy<T extends ElkEntity> implements Taxonomy<T> {
 	class Bottom implements TaxonomyNode<T> {
 
 		final Set<T> members;
-		final T bottom;
+		final T bot;
+		final T top;
 
 		@SuppressWarnings("unchecked")
-		Bottom(T top, T bot) {
-			members = new HashSet<T>(Arrays.asList(top, bot));
-			bottom = bot;
+		Bottom(T top_, T bot_) {
+			members = new HashSet<T>(Arrays.asList(top_, bot_));
+			bot = bot_;
+			top = top_;
 		}
 
 		@Override
@@ -83,7 +85,7 @@ public class InconsistentTaxonomy<T extends ElkEntity> implements Taxonomy<T> {
 
 		@Override
 		public T getCanonicalMember() {
-			return bottom;
+			return bot;
 		}
 
 		@Override

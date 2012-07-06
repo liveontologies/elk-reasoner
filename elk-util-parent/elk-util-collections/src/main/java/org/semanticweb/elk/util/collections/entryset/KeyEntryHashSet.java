@@ -22,22 +22,23 @@
  */
 package org.semanticweb.elk.util.collections.entryset;
 
+import java.util.AbstractCollection;
 import java.util.Iterator;
 
 /**
- * A hash set containing elements modulo equality. The comparison of elements is
- * performed by wrapping them into {@link KeyEntry} objects where the key is a
- * specified input element. For this purpose, these objects should redefine the
- * {@link equals()} and {@link hashCode()} methods accordingly. A factory for
- * producing {@link KeyEntry} objects from the elements should be provided so
- * that elements can be wrapped.
+ * A collection containing elements modulo equality. The comparison of elements
+ * is performed by wrapping them into {@link KeyEntry} objects where the key is
+ * a specified input element. For this purpose, these objects should redefine
+ * the {@link equals()} and {@link hashCode()} methods accordingly. A factory
+ * for producing {@link KeyEntry} objects from the elements should be provided
+ * during construction of this collection.
  * 
- * The main method provided is merging a entry into the set, which returns an
- * equal element from the set, if there is one (according to the specified way
- * to compare elements), or, otherwise, inserts the input element into the set
- * returning itself. Other methods include finding an element in the set that is
- * equal to the given one, deleting such an element from the set, if found, and
- * iterating over the entries.
+ * The main method provided is merging a entry into collection, which returns an
+ * equal element from the collection, if there is one (according to the
+ * specified way to compare elements), or, otherwise, inserts the input element
+ * into the collection returning itself. Other methods include finding an
+ * element in the collection that is equal to the given one, deleting such an
+ * element from the collection, if found, and iterating over the entries.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -45,10 +46,17 @@ import java.util.Iterator;
  * 
  *            the type of elements in the set
  */
-public class KeyEntryHashSet<T> extends
-		AbstractEntryHashSet<KeyEntry<T, ? extends T>> implements Iterable<T> {
+public class KeyEntryHashSet<T> extends AbstractCollection<T> {
 
+	/**
+	 * The factory used for wrapping keys into entries
+	 */
 	protected final KeyEntryFactory<T> keyEntryFactory;
+
+	/**
+	 * The underlying entry collection used to back this collection
+	 */
+	protected final EntryHashSet<KeyEntry<T, ? extends T>> entryHashSet;
 
 	/**
 	 * Create an empty set associated with a given factory for creating
@@ -63,8 +71,9 @@ public class KeyEntryHashSet<T> extends
 	 */
 	public KeyEntryHashSet(KeyEntryFactory<T> keyEntryFactory,
 			int initialCapacity) {
-		super(initialCapacity);
 		this.keyEntryFactory = keyEntryFactory;
+		this.entryHashSet = new EntryHashSet<KeyEntry<T, ? extends T>>(
+				initialCapacity);
 	}
 
 	/**
@@ -74,8 +83,8 @@ public class KeyEntryHashSet<T> extends
 	 * @param keyEntryFactory
 	 */
 	public KeyEntryHashSet(KeyEntryFactory<T> keyEntryFactory) {
-		super();
 		this.keyEntryFactory = keyEntryFactory;
+		this.entryHashSet = new EntryHashSet<KeyEntry<T, ? extends T>>();
 	}
 
 	/**
@@ -94,7 +103,8 @@ public class KeyEntryHashSet<T> extends
 	 */
 	public T merge(T key) {
 
-		return mergeEntry(keyEntryFactory.createEntry(key)).getKey();
+		return entryHashSet.mergeEntry(keyEntryFactory.createEntry(key))
+				.getKey();
 
 	}
 
@@ -111,7 +121,7 @@ public class KeyEntryHashSet<T> extends
 	 */
 	public T get(T key) {
 
-		KeyEntry<T, ? extends T> entry = getEntry(keyEntryFactory
+		KeyEntry<T, ? extends T> entry = entryHashSet.getEntry(keyEntryFactory
 				.createEntry(key));
 		if (entry == null)
 			return null;
@@ -128,13 +138,13 @@ public class KeyEntryHashSet<T> extends
 	 * 
 	 * @param key
 	 *            the element that is used for finding the element to remove
-	 * @return the removed element, or null if no element that is equal to the
-	 *         given one is found
+	 * @return the removed element, or <tt>null</tt> if no element that is equal
+	 *         to the given one is found
 	 */
-	public T remove(T key) {
+	public T removeEntry(T key) {
 
-		KeyEntry<T, ? extends T> entry = removeEntry(keyEntryFactory
-				.createEntry(key));
+		KeyEntry<T, ? extends T> entry = entryHashSet
+				.removeEntry(keyEntryFactory.createEntry(key));
 
 		if (entry == null)
 			return null;
@@ -143,16 +153,21 @@ public class KeyEntryHashSet<T> extends
 
 	}
 
-	/**
-	 * Creates an iterator over the elements in the set.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
+	@Override
+	public void clear() {
+		entryHashSet.clear();
+	}
+
+	@Override
+	public int size() {
+		return entryHashSet.size();
+	}
+
 	@Override
 	public Iterator<T> iterator() {
 		return new Iterator<T>() {
-			final Iterator<KeyEntry<T, ? extends T>> recordIterator = entryIterator();
+			final Iterator<KeyEntry<T, ? extends T>> recordIterator = entryHashSet
+					.entryIterator();
 
 			@Override
 			public boolean hasNext() {
@@ -170,4 +185,5 @@ public class KeyEntryHashSet<T> extends
 			}
 		};
 	}
+
 }

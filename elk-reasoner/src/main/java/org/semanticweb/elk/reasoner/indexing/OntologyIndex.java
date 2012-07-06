@@ -25,9 +25,11 @@
  */
 package org.semanticweb.elk.reasoner.indexing;
 
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
+import java.util.Collection;
+
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
@@ -43,37 +45,33 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  */
 public interface OntologyIndex {
 
-	IndexedClassExpression getIndexed(
-			ElkClassExpression elkClassExpression);
+	IndexedClassExpression getIndexed(ElkClassExpression elkClassExpression);
 
 	IndexedPropertyChain getIndexed(
 			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression);
-	
+
 	IndexedClass getIndexedOwlThing();
+
 	IndexedClass getIndexedOwlNothing();
 
 	/**
-	 * Should always contain owl:Thing and owl:Nothing 
+	 * Should always contain owl:Thing and owl:Nothing
 	 */
-	Iterable<IndexedClassExpression> getIndexedClassExpressions();
-	int getIndexedClassExpressionCount();
-	
-	Iterable<IndexedClass> getIndexedClasses();
-	int getIndexedClassCount();
-	
-	Iterable<IndexedIndividual> getIndexedIndividuals();
-	int getIndexedIndividualCount();
-	
+	Collection<IndexedClassExpression> getIndexedClassExpressions();
 
-	Iterable<IndexedPropertyChain> getIndexedPropertyChains();
-	int getIndexedPropertyChainCount();
-	
-	Iterable<IndexedObjectProperty> getIndexedObjectProperties();
-	int getIndexedObjectPropertyCount();
-	
-	Iterable<IndexedObjectProperty> getReflexiveObjectProperties();
-	
+	Collection<IndexedClass> getIndexedClasses();
+
+	Collection<IndexedIndividual> getIndexedIndividuals();
+
+	Collection<IndexedPropertyChain> getIndexedPropertyChains();
+
+	Collection<IndexedObjectProperty> getIndexedObjectProperties();
+
+	Collection<IndexedObjectProperty> getReflexiveObjectProperties();
+
 	ElkAxiomProcessor getAxiomInserter();
 
 	ElkAxiomProcessor getAxiomDeleter();
+
+	void clear();
 }

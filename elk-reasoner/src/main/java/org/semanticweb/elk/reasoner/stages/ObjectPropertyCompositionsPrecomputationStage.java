@@ -31,8 +31,8 @@ import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyComposit
 
 //TODO: Concurrent?
 /**
- * The reasoner stage whose purpose is to set up multimaps for fast look-up of
- * object property compositions to be used in {@link RuleRoleComposition}.
+ * A {@link ReasonerStage} whose purpose is to set up multimaps for fast look-up
+ * of object property compositions to be used in {@link RuleRoleComposition}.
  * 
  * @author Frantisek Simancik
  * 
@@ -43,7 +43,7 @@ public class ObjectPropertyCompositionsPrecomputationStage extends
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ObjectPropertyCompositionsPrecomputationStage.class);
-	
+
 	/**
 	 * the computation used for this stage
 	 */
@@ -72,14 +72,15 @@ public class ObjectPropertyCompositionsPrecomputationStage extends
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws ElkInterruptedException {
 		if (computation == null)
 			initComputation();
-		computation.process();
-		if (isInterrupted())
-			return;
+		for (;;) {
+			computation.process();
+			if (!interrupted())
+				break;
+		}
 		reasoner.doneObjectPropertyCompositionsPrecomputation = true;
-		reasoner.doneReset = false;
 	}
 
 	@Override

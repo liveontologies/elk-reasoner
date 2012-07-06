@@ -114,7 +114,7 @@ public class OWLAPIExamplesTest {
 		// unpack elk-owlapi (which is, in fact, elk-owlapi-standalone)
 		// and prepare the classpath
 		String elkOwlApiZipPath = System.getProperty("elk-owlapi-path");
-		
+
 		if (elkOwlApiZipPath != null) {
 			extract(new File(elkOwlApiZipPath), LIB_DIR);
 		}
@@ -184,6 +184,7 @@ public class OWLAPIExamplesTest {
 		}
 	}
 
+	@SuppressWarnings("static-method")
 	@After
 	public void after() {
 		for (File srcLibFile : SRC_DIR.listFiles()) {
@@ -234,7 +235,7 @@ public class OWLAPIExamplesTest {
 
 		boolean result = task.call();
 
-		//System.out.println("CLASSPATH " + classpath);
+		// System.out.println("CLASSPATH " + classpath);
 
 		assertTrue(result);
 	}

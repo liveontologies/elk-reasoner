@@ -28,11 +28,13 @@ package org.semanticweb.elk.owlapi;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNodeSet;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
@@ -55,31 +57,21 @@ public class ElkConverter {
 		return INSTANCE_;
 	}
 
-	static protected ElkEntityConverter ELK_ENTITY_CONVERTER = ElkEntityConverter
+	protected static ElkEntityConverter ELK_ENTITY_CONVERTER = ElkEntityConverter
 			.getInstance();
 
-	// static protected ElkClassExpressionConverter
-	// ELK_CLASS_EXPRESSION_CONVERTER =
-	// ElkClassExpressionConverter.getInstance();
+	protected static ElkExceptionConverter ELK_EXCEPTION_CONVERTER = ElkExceptionConverter
+			.getInstance();
 
+	@SuppressWarnings("static-method")
 	public OWLClass convert(ElkClass cls) {
 		return ELK_ENTITY_CONVERTER.visit(cls);
 	}
 
+	@SuppressWarnings("static-method")
 	public OWLNamedIndividual convert(ElkNamedIndividual ind) {
 		return ELK_ENTITY_CONVERTER.visit(ind);
 	}
-
-	/*
-	 * public OWLObjectIntersectionOf convert(ElkObjectIntersectionOf ce) {
-	 * return ELK_CLASS_EXPRESSION_CONVERTER.visit(ce); }
-	 * 
-	 * public OWLObjectSomeValuesFrom convert(ElkObjectSomeValuesFrom ce) {
-	 * return ELK_CLASS_EXPRESSION_CONVERTER.visit(ce); }
-	 * 
-	 * public OWLClassExpression convert(ElkClassExpression ce) { return
-	 * ce.accept(ELK_CLASS_EXPRESSION_CONVERTER); }
-	 */
 
 	public OWLClassNode convertClassNode(Node<ElkClass> node) {
 		Set<OWLClass> owlClasses = new HashSet<OWLClass>();
@@ -114,6 +106,11 @@ public class ElkConverter {
 			owlNodes.add(convertIndividualNode(node));
 		}
 		return new OWLNamedIndividualNodeSet(owlNodes);
+	}
+
+	@SuppressWarnings("static-method")
+	public OWLRuntimeException convert(ElkException e) {
+		return ELK_EXCEPTION_CONVERTER.convert(e);
 	}
 
 }

@@ -39,73 +39,88 @@ import org.semanticweb.elk.testing.TestUtils;
 /**
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class ConfigurationFactoryTest {
 
+	@SuppressWarnings("static-method")
 	@Before
 	public void setUp() {
 		TestUtils.createTestEnvironment(new File(""));
 	}
-	
+
+	@SuppressWarnings("static-method")
 	@After
 	public void cleanUp() {
 		TestUtils.cleanUp(new File(""));
 	}
-	
+
+	@SuppressWarnings("static-method")
 	@Test
 	public void getDefaultConfiguration() {
-		BaseConfiguration defaultConfig = new ConfigurationFactory().getConfiguration("", BaseConfiguration.class);
-		
+		BaseConfiguration defaultConfig = new ConfigurationFactory()
+				.getConfiguration("", BaseConfiguration.class);
+
 		assertEquals(3, defaultConfig.getParameterNames().size());
 	}
-	
+
+	@SuppressWarnings("static-method")
 	@Test
 	public void getDefaultConfigurationWithPrefix() {
-		BaseConfiguration defaultConfig = new ConfigurationFactory().getConfiguration("elk.reasoner", BaseConfiguration.class);
-		
+		BaseConfiguration defaultConfig = new ConfigurationFactory()
+				.getConfiguration("elk.reasoner", BaseConfiguration.class);
+
 		assertEquals(2, defaultConfig.getParameterNames().size());
-		
-		defaultConfig = new ConfigurationFactory().getConfiguration("elk.parser", BaseConfiguration.class);
-		
+
+		defaultConfig = new ConfigurationFactory().getConfiguration(
+				"elk.parser", BaseConfiguration.class);
+
 		assertEquals(1, defaultConfig.getParameterNames().size());
 	}
 
 	@Test
-	public void getConfigurationFromStream() throws ConfigurationException, IOException {
+	public void getConfigurationFromStream() throws ConfigurationException,
+			IOException {
 		InputStream stream = null;
-		
+
 		try {
-			stream = this.getClass().getClassLoader().getResourceAsStream("elk.properties");
-			
-			BaseConfiguration config = new ConfigurationFactory().getConfiguration(stream, "", BaseConfiguration.class);
-			
+			stream = this.getClass().getClassLoader()
+					.getResourceAsStream("elk.properties");
+
+			BaseConfiguration config = new ConfigurationFactory()
+					.getConfiguration(stream, "", BaseConfiguration.class);
+
 			assertEquals(3, config.getParameterNames().size());
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void roundtrip() throws ConfigurationException, IOException {
 		ConfigurationFactory factory = new ConfigurationFactory();
-		BaseConfiguration defaultConfig = factory.getConfiguration("", BaseConfiguration.class);
+		BaseConfiguration defaultConfig = factory.getConfiguration("",
+				BaseConfiguration.class);
 		InputStream stream = null;
 		File testFile = new File(TestUtils.TEST_ROOT + "/test.properties");
-		
+
 		factory.saveConfiguration(testFile, defaultConfig);
-		
+
 		try {
 			stream = new FileInputStream(testFile);
-			
-			BaseConfiguration loaded = factory.getConfiguration(stream, "", BaseConfiguration.class);
-			
+
+			BaseConfiguration loaded = factory.getConfiguration(stream, "",
+					BaseConfiguration.class);
+
 			assertNotNull(loaded);
-			assertEquals(defaultConfig.getParameterNames().size(), loaded.getParameterNames().size());
-			
+			assertEquals(defaultConfig.getParameterNames().size(), loaded
+					.getParameterNames().size());
+
 			for (String key : defaultConfig.getParameterNames()) {
-				assertEquals(defaultConfig.getParameter(key), loaded.getParameter(key));
+				assertEquals(defaultConfig.getParameter(key),
+						loaded.getParameter(key));
 			}
 		} finally {
 			IOUtils.closeQuietly(stream);

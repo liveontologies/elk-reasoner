@@ -41,8 +41,8 @@ import org.semanticweb.elk.testing.TestOutput;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
 public abstract class BaseReasoningCorrectnessTest<EO extends TestOutput, AO extends TestOutput> {
@@ -69,11 +69,12 @@ public abstract class BaseReasoningCorrectnessTest<EO extends TestOutput, AO ext
 		IOUtils.closeQuietly(inputStream);
 	}
 
+	@SuppressWarnings("static-method")
 	protected boolean ignore(TestInput input) {
 		return false;
 	}
-	
+
 	protected abstract Reasoner createReasoner(final InputStream input)
 			throws IOException, Owl2ParseException;
-	
+
 }

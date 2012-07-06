@@ -103,6 +103,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
@@ -669,6 +670,15 @@ public class OwlConverter {
 
 	public ElkIri convert(IRI iri) {
 		return new ElkFullIri(iri.toString());
+	}
+
+	/**
+	 * @param axiom
+	 *            the owl axiom to test
+	 * @return <tt>true</tt> if the owl axiom can be converted to ELK axiom
+	 */
+	public boolean isRelevantAxiom(OWLAxiom axiom) {
+		return axiom.isLogicalAxiom() || axiom.isOfType(AxiomType.DECLARATION);
 	}
 
 }

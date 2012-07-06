@@ -51,14 +51,14 @@
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
 			<version>${owlapi.version}</version>
-			<classifier>bin</classifier>			
+			<classifier>bin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-testing</artifactId>
 			<version>0.2.1-SNAPSHOT</version>
 			<scope>test</scope>
-		</dependency>				
+		</dependency>
 	</dependencies>
 
 	<properties>
@@ -102,8 +102,8 @@
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
 				<executions>
-				<!-- Copy Java sources to the output directory so that it's available 
-					in the classpath (the tests could compile it) -->				
+					<!-- Copy Java sources to the output directory so that it's available 
+						in the classpath (the tests could compile it) -->
 					<execution>
 						<id>copy-examples-to-resources</id>
 						<phase>process-resources</phase>
@@ -119,8 +119,8 @@
 								</resource>
 							</resources>
 						</configuration>
-					</execution>				
-				
+					</execution>
+
 					<execution>
 						<id>copy-resources</id>
 						<phase>validate</phase>
@@ -154,11 +154,10 @@
 				</executions>
 			</plugin>
 			<!-- A plugin to expose paths to some dependency jars as properties (they 
-			will be propagated to tests) -->
+				will be propagated to tests) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.3</version>
 				<executions>
 					<execution>
 						<goals>
@@ -166,8 +165,8 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>			
-					
+			</plugin>
+
 			<plugin>
 				<!-- Propagating some necessary information, mostly paths to jars/zip 
 					archives, to the tests -->
@@ -189,8 +188,8 @@
 						</property>
 					</systemProperties>
 				</configuration>
-			</plugin>			
-			
+			</plugin>
+
 			<plugin>
 				<!-- the plugin to generate changelog and release announcements -->
 				<groupId>org.apache.maven.plugins</groupId>

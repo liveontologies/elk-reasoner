@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
  */
 public class ReasonerFactoryTest {
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void createReasonerDefaultConfig() {
 		Reasoner reasoner = new ReasonerFactory()
@@ -65,4 +66,5 @@ public class ReasonerFactoryTest {
 		assertNotNull(reasoner);
 		assertEquals(10, reasoner.getNumberOfWorkers());
 	}
+
 }

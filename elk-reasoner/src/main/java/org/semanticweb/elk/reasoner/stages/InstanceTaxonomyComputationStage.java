@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
 /**
- * The reasoner stage, during which the instance taxonomy of the current
+ * A {@link ReasonerStage} during which the instance taxonomy of the current
  * ontology is computed
  * 
  * @author "Yevgeny Kazakov"
@@ -67,18 +67,21 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws ElkInterruptedException {
 		if (computation == null)
 			initComputation();
 		progressMonitor.start(getName());
-		computation.process();
-		progressMonitor.finish();
-		if (isInterrupted())
-			return;
+		try {
+			for (;;) {
+				computation.process();
+				if (!interrupted())
+					break;
+			}
+		} finally {
+			progressMonitor.finish();
+		}
 		reasoner.taxonomy = computation.getTaxonomy();
-		reasoner.doneClassTaxonomy = true;
 		reasoner.doneInstanceTaxonomy = true;
-		reasoner.doneReset = false;
 	}
 
 	@Override
@@ -87,7 +90,6 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		if (reasoner.doneClassTaxonomy)
 			this.computation = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
-					reasoner.ontologyIndex.getIndexedIndividualCount(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.ontologyIndex, reasoner.taxonomy);
 		if (LOGGER_.isInfoEnabled())
@@ -96,7 +98,8 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		computation.printStatistics();
+		if (computation != null)
+			computation.printStatistics();
 	}
 
 }

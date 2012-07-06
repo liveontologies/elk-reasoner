@@ -31,86 +31,88 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 /**
  * Used to test parsers
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
-public class ElkTestAxiomProcessor implements ElkAxiomProcessor {
+public class ElkTestAxiomProcessor implements Owl2ParserAxiomProcessor {
 
 	private Map<Class<?>, Set<ElkAxiom>> axiomMap = new HashMap<Class<?>, Set<ElkAxiom>>();
-	
+
 	@Override
-	public void process(ElkAxiom elkAxiom) {
+	public void visit(ElkAxiom elkAxiom) {
 		if (elkAxiom == null) {
 			return;
 		}
-		
+
 		assert elkAxiom != null : "The parser failed to parse an axiom";
-		
+
 		Class<?> axiomType = getElkAxiomType(elkAxiom.getClass());
-		
+
 		assert axiomType != null : "Couldn't determine a suitable Elk OWL interface for the axiom: "
 				+ elkAxiom;
-		
+
 		Set<ElkAxiom> axioms = axiomMap.get(axiomType);
-		
+
 		axioms = axioms == null ? new HashSet<ElkAxiom>() : axioms;
 		axioms.add(elkAxiom);
 		axiomMap.put(axiomType, axioms);
 	}
 
 	/*
-	 * Returns the most specific interface in the org.semanticweb.elk.interfaces package
+	 * Returns the most specific interface in the org.semanticweb.elk.interfaces
+	 * package
 	 */
+	@SuppressWarnings("static-method")
 	private Class<?> getElkAxiomType(Class<? extends ElkAxiom> elkAxiomClass) {
 		Package elkOwlPackage = ElkAxiom.class.getPackage();
-		
-		if (elkAxiomClass.isInterface() && elkAxiomClass.getPackage().equals(elkOwlPackage)) {
+
+		if (elkAxiomClass.isInterface()
+				&& elkAxiomClass.getPackage().equals(elkOwlPackage)) {
 			return elkAxiomClass;
 		}
-		
+
 		for (Class<?> interface_ : elkAxiomClass.getInterfaces()) {
 			if (interface_.getPackage().equals(elkOwlPackage)) {
 				return interface_;
 			}
 		}
-			
+
 		return null;
 	}
 
 	public int getAxiomCountForType(Class<? extends ElkAxiom> axiomClass) {
 		Set<ElkAxiom> axioms = axiomMap.get(getElkAxiomType(axiomClass));
-		
+
 		return axioms == null ? 0 : axioms.size();
 	}
-	
+
 	public Set<ElkAxiom> getAxiomsForType(Class<? extends ElkAxiom> axiomClass) {
 		Set<ElkAxiom> axioms = axiomMap.get(getElkAxiomType(axiomClass));
-		
-		return axioms == null ? Collections.<ElkAxiom>emptySet() : axioms;
+
+		return axioms == null ? Collections.<ElkAxiom> emptySet() : axioms;
 	}
-	
+
 	public Set<Map.Entry<Class<?>, Set<ElkAxiom>>> getAxiomMapEntries() {
 		return axiomMap.entrySet();
 	}
-	
+
 	public Set<ElkAxiom> getAllAxioms() {
 		Set<ElkAxiom> axioms = new HashSet<ElkAxiom>();
-		
+
 		for (Map.Entry<Class<?>, Set<ElkAxiom>> entry : getAxiomMapEntries()) {
 			axioms.addAll(entry.getValue());
 		}
-		
+
 		return axioms;
 	}
-	
+
 	long getTotalAxiomCount() {
 		return getAllAxioms().size();
 	}

@@ -30,9 +30,9 @@ import java.net.URL;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParser;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyLoader;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyLoader;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite.Config;
@@ -60,27 +60,35 @@ public abstract class DiffClassificationCorrectnessTest extends
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {
-		return ConfigurationUtils.loadFileBasedTestConfiguration(INPUT_DATA_LOCATION,
-				DiffClassificationCorrectnessTest.class, "owl",
-				"expected",
-				new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>() {
-					@Override
-					public TestManifest<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> create(URL input, URL output) throws IOException {
-						// input and expected output are OWL ontologies
-						InputStream stream = null;
-						
-						try {
-							Taxonomy<ElkClass> expectedTaxonomy = ClassTaxonomyLoader.load(new Owl2FunctionalStyleParser(stream = output.openStream()));
-							
-							return new TaxonomyDiffManifest<ClassTaxonomyTestOutput>(input, new ClassTaxonomyTestOutput(expectedTaxonomy));
-							
-						} catch (Owl2ParseException e) {
-							throw new IOException(e);
-						}
-						finally {
-							IOUtils.closeQuietly(stream);
-						}
-					}
-				});
+		return ConfigurationUtils
+				.loadFileBasedTestConfiguration(
+						INPUT_DATA_LOCATION,
+						DiffClassificationCorrectnessTest.class,
+						"owl",
+						"expected",
+						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>() {
+							@Override
+							public TestManifest<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> create(
+									URL input, URL output) throws IOException {
+								// input and expected output are OWL ontologies
+								InputStream stream = null;
+
+								try {
+									Taxonomy<ElkClass> expectedTaxonomy = TaxonomyLoader
+											.load(new Owl2FunctionalStyleParserFactory()
+													.getParser(stream = output
+															.openStream()));
+
+									return new TaxonomyDiffManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>(
+											input, new ClassTaxonomyTestOutput(
+													expectedTaxonomy));
+
+								} catch (Owl2ParseException e) {
+									throw new IOException(e);
+								} finally {
+									IOUtils.closeQuietly(stream);
+								}
+							}
+						});
 	}
 }

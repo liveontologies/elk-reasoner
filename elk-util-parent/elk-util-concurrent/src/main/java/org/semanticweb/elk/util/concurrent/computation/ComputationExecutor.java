@@ -24,7 +24,6 @@ package org.semanticweb.elk.util.concurrent.computation;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -38,12 +37,16 @@ import java.util.concurrent.TimeUnit;
  * @author "Yevgeny Kazakov"
  * 
  */
+/**
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class ComputationExecutor extends ThreadPoolExecutor {
 
 	/**
 	 * the thread group used for executor
 	 */
-	private final ThreadGroup threadGroup;
+	private final ComputationThreadGroup threadGroup;
 
 	/**
 	 * the latch indicating that all jobs are done
@@ -57,28 +60,32 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	volatile boolean canStart = true;
 
 	/**
+	 * To report uncaught exceptions thrown by the workers
+	 */
+	ComputationRuntimeException exception;
+
+	/**
 	 * Create a {@link ComputationExecutor} with a given maximal number of
 	 * threads and the given thread group
 	 * 
 	 * @param threadCount
 	 * @param threadGroup
 	 */
-	public ComputationExecutor(int threadCount, final ThreadGroup threadGroup) {
+	public ComputationExecutor(int threadCount,
+			final ComputationThreadGroup threadGroup) {
 		super(threadCount, threadCount, 0, TimeUnit.SECONDS,
 				new ArrayBlockingQueue<Runnable>(threadCount),
 				new ThreadFactory() {
-					int threadCount = 0;
-
 					@Override
 					public Thread newThread(Runnable r) {
 						Thread result = new Thread(threadGroup, r,
 								threadGroup.getName() + "-thread-"
-										+ ++threadCount);
-						result.setPriority(Thread.NORM_PRIORITY);
+										+ threadGroup.getNextThreadId());
 						return result;
 					}
 				});
 		this.threadGroup = threadGroup;
+		this.exception = null;
 	}
 
 	/**
@@ -89,7 +96,7 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	 * @param name
 	 */
 	public ComputationExecutor(int threadCount, String name) {
-		this(threadCount, new ThreadGroup(name));
+		this(threadCount, new ComputationThreadGroup(name));
 	}
 
 	/**
@@ -104,11 +111,12 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 		if (!canStart)
 			return false;
 		this.done = new CountDownLatch(noCopies);
-		Worker worker = new Worker(job, done);
+		Worker worker = new Worker(job, done, Thread.currentThread());
 		for (int i = 0; i < noCopies; i++) {
 			execute(worker);
 		}
 		canStart = false;
+		checkException();
 		return true;
 	}
 
@@ -117,6 +125,7 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	 * threads if something needs to be notified)
 	 */
 	public void interrupt() {
+		checkException();
 		threadGroup.interrupt();
 	}
 
@@ -127,8 +136,25 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	 *             if was interrupted while waiting
 	 */
 	public synchronized void waitDone() throws InterruptedException {
-		done.await();
+		try {
+			done.await();
+		} catch (InterruptedException e) {
+			checkException();
+			throw e;
+		}
 		canStart = true;
+	}
+
+	/**
+	 * Check if there was some exception in a worker thread and throw this
+	 * exception
+	 * 
+	 * @throws ComputationRuntimeException
+	 *             if there was an exception in some of the worker thread
+	 */
+	private void checkException() throws ComputationRuntimeException {
+		if (exception != null)
+			throw exception;
 	}
 
 	/**
@@ -142,21 +168,31 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 
 		protected final Runnable job;
 		protected final CountDownLatch done;
+		protected final Thread executorThread;
 
-		Worker(Runnable job, CountDownLatch done) {
+		Worker(Runnable job, CountDownLatch done, Thread executorThread) {
 			this.job = job;
 			this.done = done;
+			this.executorThread = executorThread;
 		}
 
 		@Override
 		public void run() {
-			job.run();
-			done.countDown();
-			// clear the interrupt status so that this thread can be reused for
-			// other jobs
-			Thread.interrupted();
+			try {
+				job.run();
+			} catch (Exception e) {
+				exception = new ComputationRuntimeException(
+						"Uncought exception in a worker thread:", e);
+				executorThread.interrupt();
+			} finally {
+				done.countDown();
+				/*
+				 * clear the interrupt status so that this thread can be reused
+				 * for other jobs
+				 */
+				Thread.interrupted();
+			}
 		}
-
 	}
 
 }

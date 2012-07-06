@@ -22,9 +22,14 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -39,8 +44,10 @@ import org.semanticweb.elk.reasoner.taxonomy.FreshTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.logging.Statistics;
 
 /**
  * The class for querying the results of the reasoning tasks for a given
@@ -53,6 +60,10 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  * Reasoners are created (and pre-configured) by the {@link ReasonerFactory}.
  */
 public class Reasoner extends AbstractReasonerState {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger.getLogger(Reasoner.class);
+
 	/**
 	 * The progress monitor that is used for reporting progress.
 	 */
@@ -64,7 +75,7 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * the executor used for concurrent tasks
 	 */
-	protected final ComputationExecutor executor;
+	protected volatile ComputationExecutor executor;
 	/**
 	 * Number of workers for concurrent jobs.
 	 */
@@ -84,7 +95,6 @@ public class Reasoner extends AbstractReasonerState {
 	protected Reasoner(ReasonerStageExecutor stageExecutor,
 			ExecutorService executor, int workerNo) {
 		this.stageExecutor = stageExecutor;
-		this.executor = new ComputationExecutor(workerNo, "elk-reasoner");
 		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
@@ -104,7 +114,7 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * Set if fresh entities should be allowed. Fresh entities are entities that
 	 * occur as parameters of reasoner queries without occurring in the loaded
-	 * ontology. If false, a {@link FreshEntitiesException} will be thrown in
+	 * ontology. If false, a {@link ElkFreshEntitiesException} will be thrown in
 	 * such cases. If true, the reasoner will answer as if the entity had been
 	 * declared (but not used in any axiom).
 	 * 
@@ -131,7 +141,9 @@ public class Reasoner extends AbstractReasonerState {
 
 	@Override
 	protected ComputationExecutor getProcessExecutor() {
-		return this.executor;
+		if (executor == null)
+			executor = new ComputationExecutor(workerNo, "elk-reasoner");
+		return executor;
 	}
 
 	@Override
@@ -144,8 +156,15 @@ public class Reasoner extends AbstractReasonerState {
 		return progressMonitor;
 	}
 
-	public void shutdown() {
+	public void shutdown() throws InterruptedException {
+		if (executor == null)
+			return;
 		executor.shutdown();
+		do {
+		} while (!executor.awaitTermination(1, TimeUnit.MICROSECONDS));
+		executor = null;
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info("Reasoner shutdown");
 	}
 
 	/**
@@ -153,19 +172,21 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param elkClass
 	 * @return
-	 * @throws FreshEntitiesException
+	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkClass} does not occur in the ontology
-	 * @throws InconsistentOntologyException
+	 * @throws ElkInconsistentOntologyException
 	 *             if the ontology is inconsistent
+	 * @throws ElkException
 	 */
 	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
-			throws FreshEntitiesException, InconsistentOntologyException {
+			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException {
 		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
 		if (node == null) {
 			if (allowFreshEntities) {
 				node = new FreshTaxonomyNode<ElkClass>(elkClass, getTaxonomy());
 			} else {
-				throw new FreshEntitiesException(elkClass);
+				throw new ElkFreshEntitiesException(elkClass);
 			}
 		}
 		return node;
@@ -176,15 +197,17 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param elkNamedIndividual
 	 * @return
-	 * @throws FreshEntitiesException
+	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkNamedIndividual} does not occur in the
 	 *             ontology
-	 * @throws InconsistentOntologyException
+	 * @throws ElkInconsistentOntologyException
 	 *             if the ontology is inconsistent
+	 * @throws ElkException
 	 */
 	protected InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
 			ElkNamedIndividual elkNamedIndividual)
-			throws FreshEntitiesException, InconsistentOntologyException {
+			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getInstanceNode(elkNamedIndividual);
 		if (node == null) {
@@ -192,7 +215,7 @@ public class Reasoner extends AbstractReasonerState {
 				node = new FreshInstanceNode<ElkClass, ElkNamedIndividual>(
 						elkNamedIndividual, getInstanceTaxonomy());
 			} else {
-				throw new FreshEntitiesException(elkNamedIndividual);
+				throw new ElkFreshEntitiesException(elkNamedIndividual);
 			}
 		}
 		return node;
@@ -203,14 +226,15 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param elkClass
 	 * @return
-	 * @throws FreshEntitiesException
+	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkClass} does not occur in the ontology
-	 * @throws InconsistentOntologyException
+	 * @throws ElkInconsistentOntologyException
 	 *             if the ontology is inconsistent
+	 * @throws ElkException
 	 */
 	protected TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(
-			ElkClass elkClass) throws FreshEntitiesException,
-			InconsistentOntologyException {
+			ElkClass elkClass) throws ElkFreshEntitiesException,
+			ElkInconsistentOntologyException, ElkException {
 		TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getTypeNode(elkClass);
 		if (node == null) {
@@ -218,7 +242,7 @@ public class Reasoner extends AbstractReasonerState {
 				node = new FreshTypeNode<ElkClass, ElkNamedIndividual>(
 						elkClass, getInstanceTaxonomy());
 			} else {
-				throw new FreshEntitiesException(elkClass);
+				throw new ElkFreshEntitiesException(elkClass);
 			}
 		}
 		return node;
@@ -232,13 +256,15 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param elkClass
 	 * @return
-	 * @throws FreshEntitiesException
+	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkClass} does not occur in the ontology
-	 * @throws InconsistentOntologyException
+	 * @throws ElkInconsistentOntologyException
 	 *             if the ontology is inconsistent
+	 * @throws ElkException
 	 */
 	public Node<ElkClass> getClassNode(ElkClass elkClass)
-			throws FreshEntitiesException, InconsistentOntologyException {
+			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException {
 		return getTaxonomyNode(elkClass);
 	}
 
@@ -253,15 +279,17 @@ public class Reasoner extends AbstractReasonerState {
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
 	 *            if <tt>true</tt>, only direct subclasses are returned
-	 * @throws FreshEntitiesException
+	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkClassExpression} contains entities
 	 *             that do not occur in the ontology
-	 * @throws InconsistentOntologyException
+	 * @throws ElkInconsistentOntologyException
 	 *             if the ontology is inconsistent
+	 * @throws ElkException
 	 */
 	public Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
-			throws FreshEntitiesException, InconsistentOntologyException {
+			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException {
 		if (classExpression instanceof ElkClass) {
 			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
 			return (direct) ? node.getDirectSubNodes() : node.getAllSubNodes();
@@ -282,15 +310,17 @@ public class Reasoner extends AbstractReasonerState {
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
 	 *            if <tt>true</tt>, only direct superclasses are returned
-	 * @throws FreshEntitiesException
+	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkClassExpression} contains entities
 	 *             that do not occur in the ontology
-	 * @throws InconsistentOntologyException
+	 * @throws ElkInconsistentOntologyException
 	 *             if the ontology is inconsistent
+	 * @throws ElkException
 	 */
 	public Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
-			throws FreshEntitiesException, InconsistentOntologyException {
+			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException {
 		if (classExpression instanceof ElkClass) {
 			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
 			return (direct) ? node.getDirectSuperNodes() : node
@@ -313,15 +343,17 @@ public class Reasoner extends AbstractReasonerState {
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
 	 *            if <tt>true</tt>, only direct subclasses are returned
-	 * @throws FreshEntitiesException
+	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkClassExpression} contains entities
 	 *             that do not occur in the ontology
-	 * @throws InconsistentOntologyException
+	 * @throws ElkInconsistentOntologyException
 	 *             if the ontology is inconsistent
+	 * @throws ElkException
 	 */
 	public Set<? extends Node<ElkNamedIndividual>> getInstances(
 			ElkClassExpression classExpression, boolean direct)
-			throws FreshEntitiesException, InconsistentOntologyException {
+			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException {
 		if (classExpression instanceof ElkClass) {
 			TypeNode<ElkClass, ElkNamedIndividual> node = getTypeNode((ElkClass) classExpression);
 			return direct ? node.getDirectInstanceNodes() : node
@@ -342,12 +374,14 @@ public class Reasoner extends AbstractReasonerState {
 	 * @param elkNamedIndividual
 	 * @param direct
 	 *            if true, only direct types are returned
-	 * @throws FreshEntitiesException
-	 * @throws InconsistentOntologyException
+	 * @throws ElkFreshEntitiesException
+	 * @throws ElkInconsistentOntologyException
+	 * @throws ElkException
 	 */
 	public Set<? extends Node<ElkClass>> getTypes(
 			ElkNamedIndividual elkNamedIndividual, boolean direct)
-			throws FreshEntitiesException, InconsistentOntologyException {
+			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceNode(elkNamedIndividual);
 		return direct ? node.getDirectTypeNodes() : node.getAllTypeNodes();
 	}
@@ -361,10 +395,12 @@ public class Reasoner extends AbstractReasonerState {
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
 	 * @return
-	 * @throws FreshEntitiesException
+	 * @throws ElkFreshEntitiesException
+	 * @throws ElkException
 	 */
 	public boolean isSatisfiable(ElkClassExpression classExpression)
-			throws FreshEntitiesException, InconsistentOntologyException {
+			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
+			ElkException {
 		if (classExpression instanceof ElkClass) {
 			Node<ElkClass> classNode = getClassNode((ElkClass) classExpression);
 			return (!classNode.getMembers().contains(
@@ -375,9 +411,21 @@ public class Reasoner extends AbstractReasonerState {
 		}
 	}
 
+	public void writeTaxonomyToFile(File file) throws IOException,
+			ElkInconsistentOntologyException, ElkException {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Writing taxonomy to " + file);
+		}
+		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
+		TaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
+				file.getPath(), true);
+		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
+	}
+
+	// TODO: get rid of this
 	// used only in tests
 	@Override
-	protected OntologyIndex getOntologyIndex() {
+	public OntologyIndex getOntologyIndex() throws ElkException {
 		return super.getOntologyIndex();
 	}
 

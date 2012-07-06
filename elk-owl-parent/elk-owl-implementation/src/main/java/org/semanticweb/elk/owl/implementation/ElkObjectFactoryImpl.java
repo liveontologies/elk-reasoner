@@ -126,25 +126,25 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	protected static final ElkClass ELK_OWL_THING = new ElkClassImpl(
-			PredefinedElkIri.OWL_THING);
+			PredefinedElkIri.OWL_THING.get());
 
 	protected static final ElkClass ELK_OWL_NOTHING = new ElkClassImpl(
-			PredefinedElkIri.OWL_NOTHING);
+			PredefinedElkIri.OWL_NOTHING.get());
 
 	protected static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			PredefinedElkIri.OWL_TOP_OBJECT_PROPERTY);
+			PredefinedElkIri.OWL_TOP_OBJECT_PROPERTY.get());
 
 	protected static final ElkObjectProperty ELK_OWL_BOTTOM_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			PredefinedElkIri.OWL_BOTTOM_OBJECT_PROPERTY);
+			PredefinedElkIri.OWL_BOTTOM_OBJECT_PROPERTY.get());
 
 	protected static final ElkDataProperty ELK_OWL_TOP_DATA_PROPERTY = new ElkDataPropertyImpl(
-			PredefinedElkIri.OWL_TOP_DATA_PROPERTY);
+			PredefinedElkIri.OWL_TOP_DATA_PROPERTY.get());
 
 	protected static final ElkDataProperty ELK_OWL_BOTTOM_DATA_PROPERTY = new ElkDataPropertyImpl(
-			PredefinedElkIri.OWL_BOTTOM_DATA_PROPERTY);
+			PredefinedElkIri.OWL_BOTTOM_DATA_PROPERTY.get());
 
 	protected static final ElkDatatype ELK_RDF_PLAIN_LITERAL = new ElkDatatypeImpl(
-			PredefinedElkIri.RDF_PLAIN_LITERAL);
+			PredefinedElkIri.RDF_PLAIN_LITERAL.get());
 
 	protected final ElkObjectManager objectManager;
 

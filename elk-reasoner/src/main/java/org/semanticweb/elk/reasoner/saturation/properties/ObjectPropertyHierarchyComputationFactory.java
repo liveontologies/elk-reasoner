@@ -103,11 +103,6 @@ public class ObjectPropertyHierarchyComputationFactory implements
 		}
 
 		@Override
-		public boolean canProcess() {
-			return false;
-		}
-
-		@Override
 		public void finish() {
 		}
 	}

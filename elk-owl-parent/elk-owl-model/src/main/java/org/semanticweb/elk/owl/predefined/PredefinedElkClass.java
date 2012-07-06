@@ -36,20 +36,18 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public final class PredefinedElkClass implements ElkClass {
+public enum PredefinedElkClass implements ElkClass {
 
-	protected final ElkIri iri;
+	OWL_THING(PredefinedElkIri.OWL_THING.get()), //
 
-	// do not allow construction of other instances of this class
+	OWL_NOTHING(PredefinedElkIri.OWL_NOTHING.get())//
+	;
+
+	private final ElkIri iri;
+
 	private PredefinedElkClass(ElkIri iri) {
 		this.iri = iri;
 	}
-
-	public static final PredefinedElkClass OWL_THING = new PredefinedElkClass(
-			PredefinedElkIri.OWL_THING);
-
-	public static final PredefinedElkClass OWL_NOTHING = new PredefinedElkClass(
-			PredefinedElkIri.OWL_NOTHING);
 
 	@Override
 	public ElkIri getIri() {
@@ -69,11 +67,6 @@ public final class PredefinedElkClass implements ElkClass {
 	@Override
 	public <O> O accept(ElkEntityVisitor<O> visitor) {
 		return visitor.visit(this);
-	}
-
-	@Override
-	public String toString() {
-		return iri.asString();
 	}
 
 }

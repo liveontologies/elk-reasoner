@@ -22,8 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.reasoner.stages.ReasonerStage;
-import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.util.concurrent.computation.FailingInterrupter;
 
 /**
@@ -38,7 +37,7 @@ public class TestStageExecutor extends FailingInterrupter implements
 		ReasonerStageExecutor {
 
 	@Override
-	public void complete(ReasonerStage stage) {
+	public void complete(ReasonerStage stage) throws ElkException {
 		if (!stage.done()) {
 			for (ReasonerStage dependentStage : stage.getDependencies()) {
 				complete(dependentStage);

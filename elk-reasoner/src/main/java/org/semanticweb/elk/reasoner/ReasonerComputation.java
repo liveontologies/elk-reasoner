@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -44,6 +45,10 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  */
 public class ReasonerComputation<I, P extends InputProcessor<I>, F extends InputProcessorFactory<I, P>>
 		extends ConcurrentComputation<I, P, F> {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ReasonerComputation.class);
 
 	/**
 	 * the progress monitor used to report the progress of this computation
@@ -77,17 +82,6 @@ public class ReasonerComputation<I, P extends InputProcessor<I>, F extends Input
 		this.nextInput = null;
 	}
 
-	public ReasonerComputation(Iterable<? extends I> inputs, int inputsSize,
-			F inputProcessorFactory, ComputationExecutor executor,
-			int maxWorkers, ProgressMonitor progressMonitor) {
-		super(inputProcessorFactory, executor, maxWorkers);
-		this.progressMonitor = progressMonitor;
-		this.todo = inputs.iterator();
-		this.maxProgress = inputsSize;
-		this.progress = 0;
-		this.nextInput = null;
-	}
-
 	/**
 	 * Process the given input concurrently using the provided input processor.
 	 * If the process has been interrupted, this method can be called again to
@@ -95,7 +89,8 @@ public class ReasonerComputation<I, P extends InputProcessor<I>, F extends Input
 	 */
 	public void process() {
 
-		start();
+		if (!start())
+			LOGGER_.error("Could not start workers");
 
 		try {
 			// submit the leftover from the previous run
@@ -128,6 +123,7 @@ public class ReasonerComputation<I, P extends InputProcessor<I>, F extends Input
 
 	private boolean processNextInput() throws InterruptedException {
 		submit(nextInput);
+		nextInput = null;
 		if (Thread.currentThread().isInterrupted()) {
 			interrupt();
 			return false;

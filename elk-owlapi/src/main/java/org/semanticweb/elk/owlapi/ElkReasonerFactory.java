@@ -68,6 +68,7 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 		return createElkReasoner(ontology, true, config);
 	}
 
+	@SuppressWarnings("static-method")
 	ElkReasoner createElkReasoner(OWLOntology ontology,
 			boolean isBufferingMode, OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {

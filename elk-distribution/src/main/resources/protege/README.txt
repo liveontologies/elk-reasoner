@@ -25,6 +25,8 @@ REQUIREMENTS:
 ELK plug-in is tested to work with Protege ${protege.version}. It may work with other 
 versions of Protege.
 
+Java ${java.required.version} or higher.
+
 INSTALLATION:
 
 To install, place the file ${elk-protege.base}.jar to the plugins folder
