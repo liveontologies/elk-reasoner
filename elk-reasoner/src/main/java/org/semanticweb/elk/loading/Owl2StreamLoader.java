@@ -41,11 +41,11 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  */
 public class Owl2StreamLoader implements OntologyLoader {
 
-	private final Owl2ParserFactory owlParserFactory;
+	private final Owl2ParserFactory owlParserFactory_;
 	private final InputStream stream_;
 
 	public Owl2StreamLoader(Owl2ParserFactory parserFactory, InputStream stream) {
-		this.owlParserFactory = parserFactory;
+		this.owlParserFactory_ = parserFactory;
 		this.stream_ = stream;
 	}
 
@@ -60,7 +60,7 @@ public class Owl2StreamLoader implements OntologyLoader {
 
 	@Override
 	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
-		return new Owl2ParserLoader(owlParserFactory.getParser(stream_),
+		return new Owl2ParserLoader(owlParserFactory_.getParser(stream_),
 				axiomLoader) {
 			@Override
 			protected void closeParsingResources() {

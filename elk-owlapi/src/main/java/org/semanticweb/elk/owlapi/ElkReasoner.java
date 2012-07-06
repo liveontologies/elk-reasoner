@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
@@ -71,6 +72,7 @@ import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.ReasonerInternalException;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 import org.semanticweb.owlapi.reasoner.TimeOutException;
@@ -161,7 +163,7 @@ public class ElkReasoner implements OWLReasoner {
 
 		if (isBufferingMode) {
 			/*
-			 * for buffering node we need to load the ontology in order to
+			 * for buffering mode we need to load the ontology now in order to
 			 * correctly answer queries if no changes are flushed
 			 */
 			try {
@@ -172,8 +174,8 @@ public class ElkReasoner implements OWLReasoner {
 			this.ontologyReloadRequired = false;
 		} else
 			/*
-			 * if it is not a buffering node, we can load the ontology lazily
-			 * when the query is asked
+			 * for non-buffering mode, we can load the ontology lazily when the
+			 * first query is asked
 			 */
 			this.ontologyReloadRequired = true;
 	}
@@ -241,13 +243,20 @@ public class ElkReasoner implements OWLReasoner {
 			LOGGER_.trace("dispose()");
 		owlOntology.getOWLOntologyManager().removeOntologyChangeListener(
 				ontologyChangeListener);
-		reasoner.reset();
-		for (;;) {
-			try {
-				reasoner.shutdown();
-			} catch (InterruptedException e) {
-				continue;
+		try {
+			reasoner.reset();
+			for (;;) {
+				try {
+					if (!reasoner.shutdown())
+						throw new ReasonerInternalException(
+								"Failed to shut down ELK!");
+					break;
+				} catch (InterruptedException e) {
+					continue;
+				}
 			}
+		} catch (ElkRuntimeException e) {
+			throw elkConverter.convert(e);
 		}
 	}
 
@@ -269,6 +278,8 @@ public class ElkReasoner implements OWLReasoner {
 			reasoner.loadChanges();
 		} catch (ElkException e) {
 			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
+			throw elkConverter.convert(e);
 		}
 	}
 
@@ -279,6 +290,8 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			return getClassNode(objectFactory.getOwlNothing());
 		} catch (ElkException e) {
+			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
 			throw elkConverter.convert(e);
 		}
 	}
@@ -460,6 +473,8 @@ public class ElkReasoner implements OWLReasoner {
 			return elkConverter.convertIndividualNodes(reasoner.getInstances(
 					owlConverter.convert(ce), direct));
 		} catch (ElkException e) {
+			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
 			throw elkConverter.convert(e);
 		}
 	}
@@ -645,6 +660,8 @@ public class ElkReasoner implements OWLReasoner {
 					owlConverter.convert(ce), direct));
 		} catch (ElkException e) {
 			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
+			throw elkConverter.convert(e);
 		}
 	}
 
@@ -690,6 +707,8 @@ public class ElkReasoner implements OWLReasoner {
 			return getClassNode(objectFactory.getOwlThing());
 		} catch (ElkException e) {
 			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
+			throw elkConverter.convert(e);
 		}
 	}
 
@@ -724,6 +743,8 @@ public class ElkReasoner implements OWLReasoner {
 					owlConverter.convert(ind), direct));
 		} catch (ElkException e) {
 			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
+			throw elkConverter.convert(e);
 		}
 	}
 
@@ -736,6 +757,8 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			return getClassNode(objectFactory.getOwlNothing());
 		} catch (ElkException e) {
+			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
 			throw elkConverter.convert(e);
 		}
 
@@ -756,6 +779,8 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			return reasoner.isConsistent();
 		} catch (ElkException e) {
+			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
 			throw elkConverter.convert(e);
 		}
 	}
@@ -817,6 +842,8 @@ public class ElkReasoner implements OWLReasoner {
 					.isSatisfiable(owlConverter.convert(classExpression));
 		} catch (ElkException e) {
 			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
+			throw elkConverter.convert(e);
 		}
 	}
 
@@ -834,6 +861,8 @@ public class ElkReasoner implements OWLReasoner {
 					reasoner.getInstanceTaxonomy();
 			}
 		} catch (ElkException e) {
+			throw elkConverter.convert(e);
+		} catch (ElkRuntimeException e) {
 			throw elkConverter.convert(e);
 		}
 

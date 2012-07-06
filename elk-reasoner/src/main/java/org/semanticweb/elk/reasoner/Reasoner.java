@@ -99,6 +99,8 @@ public class Reasoner extends AbstractReasonerState {
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
 		reset();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info("ELK reasoner was created");
 	}
 
 	/**
@@ -156,15 +158,44 @@ public class Reasoner extends AbstractReasonerState {
 		return progressMonitor;
 	}
 
-	public void shutdown() throws InterruptedException {
+	/**
+	 * Tries to shut down the reasoner within the specified time
+	 * 
+	 * @param timeout
+	 *            the maximum time to wait
+	 * @param unit
+	 *            the time unit of the timeout argument
+	 * @return {@code true} if the operation was successful
+	 * @throws InterruptedException
+	 *             if the current thread was interrupted
+	 */
+	public boolean shutdown(long timeout, TimeUnit unit)
+			throws InterruptedException {
 		if (executor == null)
-			return;
+			return true;
 		executor.shutdown();
-		do {
-		} while (!executor.awaitTermination(1, TimeUnit.MICROSECONDS));
+		executor.awaitTermination(timeout, unit);
+		boolean success = executor.isShutdown();
 		executor = null;
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Reasoner shutdown");
+		if (success) {
+			if (LOGGER_.isInfoEnabled())
+				LOGGER_.info("ELK reasoner has shut down");
+		} else {
+			LOGGER_.error("ELK reasoner failed to shut down!");
+		}
+		return success;
+
+	}
+
+	/**
+	 * Tries to shut down the reasoner within 1 minute
+	 * 
+	 * @return {@code true} if the operation was successful
+	 * @throws InterruptedException
+	 *             if the current thread was interrupted
+	 */
+	public boolean shutdown() throws InterruptedException {
+		return shutdown(1, TimeUnit.MINUTES);
 	}
 
 	/**

@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.Node;
@@ -110,6 +111,11 @@ public class ElkConverter {
 
 	@SuppressWarnings("static-method")
 	public OWLRuntimeException convert(ElkException e) {
+		return ELK_EXCEPTION_CONVERTER.convert(e);
+	}
+
+	@SuppressWarnings("static-method")
+	public OWLRuntimeException convert(ElkRuntimeException e) {
 		return ELK_EXCEPTION_CONVERTER.convert(e);
 	}
 

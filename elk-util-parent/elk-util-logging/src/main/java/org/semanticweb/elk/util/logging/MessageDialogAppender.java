@@ -58,8 +58,19 @@ import org.apache.log4j.spi.LoggingEvent;
  * 
  * @author Markus Kroetzsch
  * 
+ *         This is now a singleton class to avoid problems with Protege creating
+ *         multiple instances, which results in many popup windows
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
  */
 public class MessageDialogAppender extends AppenderSkeleton implements Runnable {
+
+	private static MessageDialogAppender INSTANCE_ = new MessageDialogAppender();
+
+	public static MessageDialogAppender getInstance() {
+		return INSTANCE_;
+	}
 
 	protected final ConcurrentLinkedQueue<LoggingEvent> eventBuffer = new ConcurrentLinkedQueue<LoggingEvent>();
 
@@ -68,7 +79,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 	protected final Set<String> ignoredMessageTypes = new HashSet<String>();
 
-	public MessageDialogAppender() {
+	private MessageDialogAppender() {
 		super();
 		initConfiguration();
 	}
@@ -155,7 +166,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 		String displayLabel = event.getRenderedMessage();
-		// A simple heuristic to force linebreaks into very long messages:
+		// A simple heuristic to force line breaks into very long messages:
 		if (displayLabel.length() > 80) {
 			displayLabel = String.format(
 					"<html><div style=\"width:%dpx;\">%s</div></html>", 500,
@@ -164,7 +175,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		panel.add(new JLabel(displayLabel));
 
 		JCheckBox ignoreMessageButton = new JCheckBox(
-				"Do not show further messages of this kind");
+				"Do not show further messages of this kind in this session");
 		if (messageType != null) {
 			panel.add(Box.createRigidArea(new Dimension(0, 10)));
 			panel.add(ignoreMessageButton);

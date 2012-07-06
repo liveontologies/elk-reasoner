@@ -178,7 +178,7 @@ abstract class Owl2ParserLoader implements Loader {
 			try {
 				parser_.accept(new AxiomInserter(axiomBuffer_));
 			} catch (Exception e) {
-				exception = new ElkLoadingException("Cannot load the ontology",
+				exception = new ElkLoadingException("Cannot load the ontology!",
 						e);
 			} finally {
 				try {

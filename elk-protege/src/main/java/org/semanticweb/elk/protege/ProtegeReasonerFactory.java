@@ -47,10 +47,12 @@ import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	protected final OWLReasonerFactory factory = new ElkReasonerFactory();
+
 	protected final ReasonerConfiguration elkConfig = ReasonerConfiguration
 			.getConfiguration();
 
-	protected final MessageDialogAppender messageDialogAppender = new MessageDialogAppender();
+	protected final MessageDialogAppender messageDialogAppender = MessageDialogAppender
+			.getInstance();
 
 	@Override
 	public BufferingMode getRecommendedBuffering() {
