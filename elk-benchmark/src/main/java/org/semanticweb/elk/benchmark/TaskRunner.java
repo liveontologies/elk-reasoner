@@ -55,6 +55,8 @@ public class TaskRunner {
 			task.run();
 		}
 		
+		long wallTimeElapsed = 0;
+		
 		for (int i = 0; i < runs; i++) {
 			System.out.print("Actual run #" + i + "... ");
 			task.prepare(args);
@@ -62,9 +64,13 @@ public class TaskRunner {
 			timer.start();
 			task.run();
 			
-			long ts = timer.stop();
+			timer.stop();
 			
-			System.out.println(" finished in " + (ts/1000000) + " ms");
+			long wallRuntime = (timer.getTotalWallTime() - wallTimeElapsed)/1000000;
+			
+			System.out.println("... finished in " + wallRuntime  + " ms");
+			
+			wallTimeElapsed = timer.getTotalWallTime();
 		}
 		
 		System.out.println("Average running time: " + timer.getAvgWallTime() / 1000000 + " ms");
