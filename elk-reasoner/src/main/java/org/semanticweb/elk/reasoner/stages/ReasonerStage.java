@@ -40,7 +40,7 @@ public interface ReasonerStage {
 	public String getName();
 
 	/**
-	 * @return <tt>true</tt> if the results for this stage have been already
+	 * @return {@code true} if the results for this stage have been already
 	 *         computed; this does not necessarily mean that this stage was
 	 *         executed: the results of the computation could have been computed
 	 *         by other stages
@@ -58,17 +58,17 @@ public interface ReasonerStage {
 	 * the execution, it is necessary that all staged from the dependencies are
 	 * done. If the execution of this stage has not been interrupted, the
 	 * results for this stage should be computed and the function
-	 * {@link #done()} should return <tt>true</tt>.
+	 * {@link #done()} should return {@code true}.
 	 */
 	public void execute() throws ElkException;
 
 	/**
-	 * @return <tt>true</tt> if the reasoner was interrupted
+	 * @return {@code true} if this executor was interrupted
 	 */
 	public boolean isInterrupted();
 
 	/**
-	 * Clears the interrupt status of the reasoner
+	 * Clears the interrupt status of this executor
 	 */
 	public void clearInterrupt();
 

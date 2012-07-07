@@ -65,8 +65,6 @@ public class RestartingStageExecutor extends SimpleInterrupter implements
 					finish(stage);
 				}
 			}
-			finish(stage);
-
 		}
 	}
 

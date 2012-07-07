@@ -89,7 +89,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * {@code true} if the reasoner is interrupted
 	 */
-	volatile boolean isInterrupted = false;
+	private volatile boolean isInterrupted_ = false;
 	/**
 	 * {@code true} if all stages have been reseted after changes
 	 */
@@ -207,10 +207,25 @@ public abstract class AbstractReasonerState {
 	public void interrupt() {
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("Interrupt requested");
-		isInterrupted = true;
+		isInterrupted_ = true;
 		ReasonerStageExecutor stageExecutor = getStageExecutor();
 		if (stageExecutor != null)
 			stageExecutor.interrupt();
+	}
+
+	/**
+	 * @return {@code true} if the reasoner has been interrupted and the
+	 *         interrupt status of the reasoner has not been cleared yet
+	 */
+	public boolean isInterrupted() {
+		return isInterrupted_;
+	}
+
+	/**
+	 * clears the interrupt status of the reasoner
+	 */
+	public void clearInterrupt() {
+		isInterrupted_ = false;
 	}
 
 	/**

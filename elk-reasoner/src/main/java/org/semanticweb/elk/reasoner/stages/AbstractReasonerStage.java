@@ -56,12 +56,12 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 
 	@Override
 	public boolean isInterrupted() {
-		return reasoner.isInterrupted;
+		return reasoner.isInterrupted();
 	}
 
 	@Override
 	public void clearInterrupt() {
-		reasoner.isInterrupted = false;
+		reasoner.clearInterrupt();
 	}
 
 	/**

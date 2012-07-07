@@ -309,7 +309,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
-	 *            if <tt>true</tt>, only direct subclasses are returned
+	 *            if {@code true}, only direct subclasses are returned
 	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkClassExpression} contains entities
 	 *             that do not occur in the ontology
@@ -340,7 +340,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
-	 *            if <tt>true</tt>, only direct superclasses are returned
+	 *            if {@code true}, only direct superclasses are returned
 	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkClassExpression} contains entities
 	 *             that do not occur in the ontology
@@ -373,7 +373,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @param classExpression
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
-	 *            if <tt>true</tt>, only direct subclasses are returned
+	 *            if {@code true}, only direct subclasses are returned
 	 * @throws ElkFreshEntitiesException
 	 *             if the given {@link ElkClassExpression} contains entities
 	 *             that do not occur in the ontology
