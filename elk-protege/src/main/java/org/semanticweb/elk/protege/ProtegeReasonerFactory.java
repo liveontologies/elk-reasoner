@@ -48,8 +48,7 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	protected final OWLReasonerFactory factory = new ElkReasonerFactory();
 
-	protected final ReasonerConfiguration elkConfig = ReasonerConfiguration
-			.getConfiguration();
+	protected final ReasonerConfiguration elkConfig = ElkProtegeConfigurationUtils.loadConfiguration();
 
 	protected final MessageDialogAppender messageDialogAppender = MessageDialogAppender
 			.getInstance();
