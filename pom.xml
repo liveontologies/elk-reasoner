@@ -19,7 +19,7 @@
 	</modules>
 
 	<name>ELK</name>
-	<description>A Java-based OWL EL reasoner.</description>
+	<description>A Java-based OWL EL reasoner</description>
 	<url>http://code.google.com/p/elk-reasoner/</url>
 
 	<scm>
@@ -141,6 +141,8 @@
 		<owlapi.version>3.3</owlapi.version>
 		<protege.version>4.1.0</protege.version>
 		<java.required.version>1.6</java.required.version>
+		<!-- TODO: get current year automatically -->
+		<currentYear>2012</currentYear>
 	</properties>
 
 	<repositories>
@@ -186,6 +188,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>2.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-changes-plugin</artifactId>
+					<version>2.7.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>

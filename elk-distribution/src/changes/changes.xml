@@ -15,7 +15,16 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-		<release version="${release.version}" date="${buildDate}" description="Current version">
+		<release version="${release.version}" date="${buildDate}" description="Current version">			
+			<action dev="frantisek" type="fix" issue="6">
+				Fixed NullPointerException when loading ontologies with ObjectMinCardinality and ObjectExactCardinality constructors that have empty fillers.
+			</action>
+			<action dev="frantisek" type="fix" issue="1">
+				Fixed NullPointerException when querying the reasoner for a class not occurring in the signature of the ontology.
+			</action>
+			<action dev="markus" type="add">
+				Reporting of reasoner warnings in Protege user interface.
+			</action>			
 			<action dev="frantisek" type="add">
 				Support for owl:Nothing and DisjointClasses axioms.
 			</action>
@@ -28,8 +37,17 @@ will appear in the produced result.
 			<action dev="frantisek" type="add">
 				Support for consistency checking and instance retrieval queries for named classes.
 			</action>
-			<action dev="pavel" type="update">
-				A new, principled infrastructure for automated testing of ELK's reasoning services. 
+			<action dev="pavel" type="add">
+				A new infrastructure for automated testing of ontology loading, printing, generation of taxonomies, and realization. 
+			</action>
+			<action dev="markus" type="update">
+				A generic infrastructure for specification and registration of reasoning rules.
+			</action>
+			<action dev="yevgeny" type="add">
+				A mechanism for interruption and restarting of reasoning tasks.
+			</action>
+			<action dev="yevgeny" type="update">
+				A reorganized infrastructure for reasoning tasks, reasoning stages, and reasoning engines.
 			</action>			
 		</release>
 		<release version="0.2.0" date="2011-10-25" description="Second public release">
