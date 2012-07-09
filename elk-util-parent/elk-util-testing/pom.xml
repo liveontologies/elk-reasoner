@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.semanticweb.elk</groupId>
 		<artifactId>elk-util-parent</artifactId>
-		<version>0.2.1-SNAPSHOT</version>
+		<version>0.3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-util-testing</artifactId>
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-io</artifactId>
-			<version>0.2.1-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
