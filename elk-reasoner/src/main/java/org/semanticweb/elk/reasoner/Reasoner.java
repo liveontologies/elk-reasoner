@@ -310,23 +310,17 @@ public class Reasoner extends AbstractReasonerState {
 	 *            currently, only objects of type ElkClass are supported
 	 * @param direct
 	 *            if {@code true}, only direct subclasses are returned
-	 * @throws ElkFreshEntitiesException
-	 *             if the given {@link ElkClassExpression} contains entities
-	 *             that do not occur in the ontology
-	 * @throws ElkInconsistentOntologyException
-	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 */
 	public Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
 			return (direct) ? node.getDirectSubNodes() : node.getAllSubNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new ElkUnsupportedOperationException(
-					"ELK does not support retrieval of subclasses for unnamed class expressions.");
+			throw new UnsupportedOperationException(
+					"ELK does not support computation of sub classes for complex class expressions.");
 		}
 	}
 
@@ -357,8 +351,8 @@ public class Reasoner extends AbstractReasonerState {
 			return (direct) ? node.getDirectSuperNodes() : node
 					.getAllSuperNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new ElkUnsupportedOperationException(
-					"ELK does not support retrieval of superclasses for unnamed class expressions.");
+			throw new UnsupportedOperationException(
+					"ELK does not support computation of super classes for complex class expressions.");
 		}
 	}
 
@@ -390,7 +384,7 @@ public class Reasoner extends AbstractReasonerState {
 			return direct ? node.getDirectInstanceNodes() : node
 					.getAllInstanceNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new ElkUnsupportedOperationException(
+			throw new UnsupportedOperationException(
 					"ELK does not support retrieval of instances for unnamed class expressions.");
 		}
 	}
@@ -437,7 +431,7 @@ public class Reasoner extends AbstractReasonerState {
 			return (!classNode.getMembers().contains(
 					PredefinedElkClass.OWL_NOTHING));
 		} else { // TODO: complex class expressions currently not supported
-			throw new ElkUnsupportedOperationException(
+			throw new UnsupportedOperationException(
 					"ELK does not support satisfiability checking for unnamed class expressions");
 		}
 	}
