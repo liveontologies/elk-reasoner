@@ -325,8 +325,8 @@ public class Reasoner extends AbstractReasonerState {
 			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
 			return (direct) ? node.getDirectSubNodes() : node.getAllSubNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
-					"ELK does not support retrieval of superclasses for unnamed class expressions.");
+			throw new ElkUnsupportedOperationException(
+					"ELK does not support retrieval of subclasses for unnamed class expressions.");
 		}
 	}
 
@@ -357,7 +357,7 @@ public class Reasoner extends AbstractReasonerState {
 			return (direct) ? node.getDirectSuperNodes() : node
 					.getAllSuperNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
+			throw new ElkUnsupportedOperationException(
 					"ELK does not support retrieval of superclasses for unnamed class expressions.");
 		}
 	}
@@ -390,7 +390,7 @@ public class Reasoner extends AbstractReasonerState {
 			return direct ? node.getDirectInstanceNodes() : node
 					.getAllInstanceNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
+			throw new ElkUnsupportedOperationException(
 					"ELK does not support retrieval of instances for unnamed class expressions.");
 		}
 	}
@@ -437,7 +437,7 @@ public class Reasoner extends AbstractReasonerState {
 			return (!classNode.getMembers().contains(
 					PredefinedElkClass.OWL_NOTHING));
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
+			throw new ElkUnsupportedOperationException(
 					"ELK does not support satisfiability checking for unnamed class expressions");
 		}
 	}

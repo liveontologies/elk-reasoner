@@ -432,6 +432,8 @@ public class ElkReasoner implements OWLReasoner {
 				return getClassNode(owlConverter_.convert(ce.asOWLClass()));
 			} catch (ElkException e) {
 				throw elkConverter_.convert(e);
+			} catch (ElkRuntimeException e) {
+				throw elkConverter_.convert(e);
 			}
 		}
 	}
@@ -642,6 +644,8 @@ public class ElkReasoner implements OWLReasoner {
 			return elkConverter_.convertClassNodes(reasoner_.getSubClasses(
 					owlConverter_.convert(ce), direct));
 		} catch (ElkException e) {
+			throw elkConverter_.convert(e);
+		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
 		}
 	}
