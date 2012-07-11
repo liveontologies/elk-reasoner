@@ -25,12 +25,10 @@
  */
 package org.semanticweb.elk.protege;
 
-import org.apache.log4j.Logger;
 import org.protege.editor.owl.model.inference.AbstractProtegeOWLReasonerInfo;
 import org.semanticweb.elk.owlapi.ElkReasonerConfiguration;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.util.logging.MessageDialogAppender;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -49,9 +47,6 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 	protected final OWLReasonerFactory factory = new ElkReasonerFactory();
 
 	protected final ReasonerConfiguration elkConfig = ElkProtegeConfigurationUtils.loadConfiguration();
-
-	protected final MessageDialogAppender messageDialogAppender = MessageDialogAppender
-			.getInstance();
 
 	@Override
 	public BufferingMode getRecommendedBuffering() {
@@ -73,10 +68,6 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	@Override
 	public void initialise() throws Exception {
-		// No matter how often this is called, Log4J will register this object
-		// only once:
-		Logger.getLogger("org.semanticweb.elk").addAppender(
-				messageDialogAppender);
 	}
 
 	@Override

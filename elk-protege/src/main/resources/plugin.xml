@@ -11,5 +11,10 @@
 	<label value="ELK"/>
 	<class value="org.semanticweb.elk.protege.ui.ElkPreferencesPanel"/>
 </extension>
+
+<extension id="elk.init" point="org.protege.editor.core.application.EditorKitHook">
+	<class value="org.semanticweb.elk.protege.ElkProtegePluginInstance"/>
+	<editorKitId value="OWLEditorKit"/>
+</extension>
     
 </plugin>
