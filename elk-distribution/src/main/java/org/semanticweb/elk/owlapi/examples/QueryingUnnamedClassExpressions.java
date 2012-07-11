@@ -65,7 +65,7 @@ public class QueryingUnnamedClassExpressions {
 		OWLReasoner reasoner = reasonerFactory.createReasoner(ont);
 
 		// Create your desired query class expression. In this example we
-		// will query ObjectIntersectionOf(A ObjectSomeValuesFrom(R, B)).
+		// will query ObjectIntersectionOf(A ObjectSomeValuesFrom(R B)).
 		PrefixManager pm = new DefaultPrefixManager("http://example.org/");
 		OWLClass A = dataFactory.getOWLClass(":A", pm);
 		OWLObjectProperty R = dataFactory.getOWLObjectProperty(":R", pm);

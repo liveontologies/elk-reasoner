@@ -22,7 +22,9 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -436,6 +438,19 @@ public class Reasoner extends AbstractReasonerState {
 		}
 	}
 
+	public void writeConsistencyToFile(File file) throws IOException,
+			ElkException {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Writing consistency to " + file);
+		}
+		FileWriter fstream = new FileWriter(file);
+		BufferedWriter writer = new BufferedWriter(fstream);
+		Boolean consistent = this.isConsistent();
+		writer.write(consistent.toString() + "\n");
+		writer.write("The ontology is " + (consistent ? "consistent" : "inconsistent") + ".\n");
+		writer.close();
+	}
+
 	public void writeTaxonomyToFile(File file) throws IOException,
 			ElkInconsistentOntologyException, ElkException {
 		if (LOGGER_.isInfoEnabled()) {
@@ -445,6 +460,19 @@ public class Reasoner extends AbstractReasonerState {
 		TaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
 				file.getPath(), true);
 		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
+	}
+
+	public void writeInstanceTaxonomyToFile(File file) throws IOException,
+			ElkInconsistentOntologyException, ElkException {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Writing taxonomy with instances to " + file);
+		}
+		Statistics
+				.logOperationStart("Writing taxonomy with instances", LOGGER_);
+		TaxonomyPrinter.dumpInstanceTaxomomyToFile(this.getInstanceTaxonomy(),
+				file.getPath(), true);
+		Statistics.logOperationFinish("Writing taxonomy with instances",
+				LOGGER_);
 	}
 
 	// TODO: get rid of this

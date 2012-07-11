@@ -62,8 +62,7 @@ public class TaxonomyPrinter {
 	 * Convenience method for printing a Taxonomy<ElkClass> to a file at the
 	 * given location.
 	 * 
-	 * @see org.semanticweb.elk.reasoner.taxonomy.Taxonomy
-	 *      <ElkClass>Printer#dumpClassTaxomomy
+	 * @see org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter#dumpClassTaxomomy
 	 * 
 	 * @param taxonomy
 	 * @param fileName
@@ -82,8 +81,8 @@ public class TaxonomyPrinter {
 
 	/**
 	 * Print the contents of the given Taxonomy<ElkClass> to the specified
-	 * Writer. Class expressions are ordered for generating the output, ensuring
-	 * that the output is deterministic.
+	 * Writer. Expressions are ordered for generating the output, ensuring that
+	 * the output is deterministic.
 	 * 
 	 * @param taxonomy
 	 * @param writer
@@ -95,17 +94,39 @@ public class TaxonomyPrinter {
 			Writer writer, boolean addHash) throws IOException {
 		writer.write("Ontology(\n");
 		processTaxomomy(taxonomy, writer);
-		writer.write(")");
+		writer.write(")\n");
 
 		if (addHash) {
-			writer.write("\n\n# Hash code: " + getHashString(taxonomy) + "\n");
+			writer.write("\n# Hash code: " + getHashString(taxonomy) + "\n");
 		}
 	}
 
 	/**
-	 * Print the contents of the given Taxonomy<ElkClass> to the specified
-	 * Writer. Class expressions are ordered for generating the output, ensuring
-	 * that the output is deterministic.
+	 * Convenience method for printing an InstanceTaxonomy<ElkClass,
+	 * ElkNamedIndividual> to a file at the given location.
+	 * 
+	 * @see org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter#dumpInstanceTaxomomy
+	 * 
+	 * @param taxonomy
+	 * @param fileName
+	 * @param addHash
+	 *            if true, a hash string will be added at the end of the output
+	 *            using comment syntax of OWL 2 Functional Style
+	 */
+	public static void dumpInstanceTaxomomyToFile(
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
+			String fileName, boolean addHash) throws IOException {
+		FileWriter fstream = new FileWriter(fileName);
+		BufferedWriter writer = new BufferedWriter(fstream);
+
+		dumpInstanceTaxomomy(taxonomy, writer, addHash);
+		writer.close();
+	}
+
+	/**
+	 * Print the contents of the given InstanceTaxonomy<ElkClass,
+	 * ElkNamedIndividual> to the specified Writer. Expressions are ordered for
+	 * generating the output, ensuring that the output is deterministic.
 	 * 
 	 * @param taxonomy
 	 * @param writer
@@ -118,10 +139,10 @@ public class TaxonomyPrinter {
 			Writer writer, boolean addHash) throws IOException {
 		writer.write("Ontology(\n");
 		processInstanceTaxomomy(taxonomy, writer);
-		writer.write(")");
+		writer.write(")\n");
 
 		if (addHash) {
-			writer.write("\n\n# Hash code: " + getInstanceHashString(taxonomy)
+			writer.write("\n# Hash code: " + getInstanceHashString(taxonomy)
 					+ "\n");
 		}
 	}
