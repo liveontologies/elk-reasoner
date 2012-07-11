@@ -79,8 +79,8 @@ public class Main {
 		// reasoning tasks
 		OptionSpec<Void> classify = parser.acceptsAll(asList("classify", "c"),
 				"classify the ontology");
-		OptionSpec<Void> materialize = parser.acceptsAll(
-				asList("materialize", "m"), "materialize the ontology");
+		OptionSpec<Void> realize = parser.acceptsAll(
+				asList("realize", "r"), "realize the ontology");
 		OptionSpec<Void> satisfiable = parser.acceptsAll(
 				asList("consistent", "satisfiable", "s"),
 				"check consistency of the ontology");
@@ -123,7 +123,7 @@ public class Main {
 
 				reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
-				if (options.has(materialize)) {
+				if (options.has(realize)) {
 					reasoner.getInstanceTaxonomy();
 					if (options.hasArgument(outputFile))
 						reasoner.writeInstanceTaxonomyToFile(options
