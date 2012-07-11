@@ -136,13 +136,13 @@ public class Main {
 		if (!options.has(inputFile)
 				|| countOptions(options, satisfiable, classify, realize) != 1) {
 			System.err
-					.println("Specify an input ontology and exactly one reasoning task.");
+					.println("An input ontology and exactly one reasoning task are required!");
 			return;
 		}
 		
 		// logging 
 		if (countOptions(options, logging, verbose, Verbose, quiet) > 1) {
-			System.err.println("Specify at most one logging level.");
+			System.err.println("Cannot set more than one logging level!");
 			return;
 		}
 		Logger allLoggers = Logger.getLogger("org.semanticweb.elk");
