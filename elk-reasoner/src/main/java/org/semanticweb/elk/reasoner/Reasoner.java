@@ -22,10 +22,6 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,16 +36,14 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.FreshInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.FreshTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.Node;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
-import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.FreshInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.FreshTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.FreshTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
-import org.semanticweb.elk.util.logging.Statistics;
 
 /**
  * The class for querying the results of the reasoning tasks for a given
@@ -436,43 +430,6 @@ public class Reasoner extends AbstractReasonerState {
 			throw new UnsupportedOperationException(
 					"ELK does not support satisfiability checking for unnamed class expressions");
 		}
-	}
-
-	public void writeConsistencyToFile(File file) throws IOException,
-			ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing consistency to " + file);
-		}
-		FileWriter fstream = new FileWriter(file);
-		BufferedWriter writer = new BufferedWriter(fstream);
-		Boolean consistent = this.isConsistent();
-		writer.write(consistent.toString() + "\n");
-		writer.write("The ontology is " + (consistent ? "consistent" : "inconsistent") + ".\n");
-		writer.close();
-	}
-
-	public void writeTaxonomyToFile(File file) throws IOException,
-			ElkInconsistentOntologyException, ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing taxonomy to " + file);
-		}
-		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
-		TaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
-				file.getPath(), true);
-		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
-	}
-
-	public void writeInstanceTaxonomyToFile(File file) throws IOException,
-			ElkInconsistentOntologyException, ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing taxonomy with instances to " + file);
-		}
-		Statistics
-				.logOperationStart("Writing taxonomy with instances", LOGGER_);
-		TaxonomyPrinter.dumpInstanceTaxomomyToFile(this.getInstanceTaxonomy(),
-				file.getPath(), true);
-		Statistics.logOperationFinish("Writing taxonomy with instances",
-				LOGGER_);
 	}
 
 	// TODO: get rid of this

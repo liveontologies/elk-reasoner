@@ -28,9 +28,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.InconsistentTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.inconsistent.PredefinedTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
@@ -74,9 +73,7 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 			manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
 		} catch (ElkInconsistentOntologyException e) {
 			manifest.compare(new ClassTaxonomyTestOutput(
-					new InconsistentTaxonomy<ElkClass>(
-							PredefinedElkClass.OWL_THING,
-							PredefinedElkClass.OWL_NOTHING)));
+					PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY));
 		}
 	}
 
@@ -113,9 +110,7 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 					.getTaxonomy()));
 		} else {
 			manifest.compare(new ClassTaxonomyTestOutput(
-					new InconsistentTaxonomy<ElkClass>(
-							PredefinedElkClass.OWL_THING,
-							PredefinedElkClass.OWL_NOTHING)));
+					PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY));
 		}
 
 	}

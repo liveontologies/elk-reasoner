@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 
 /**
  * Abstract taxonomy for classes and their instances (individuals). The main

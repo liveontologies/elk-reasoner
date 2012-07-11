@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Collections;
 import java.util.Set;
@@ -28,45 +28,55 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * A fresh TaxonomyNode containing an object that does not occur in a taxonomy.
- * Such nodes are returned to queries when FreshEntityPolicy is set to ALLOW.
+ * A fresh TypeNode containing an object that does not occur in a taxonomy. Such
+ * nodes are returned to queries when FreshEntityPolicy is set to ALLOW.
  * 
  * @author Frantisek Simancik
  * 
  */
-public class FreshTaxonomyNode<T extends ElkObject> extends FreshNode<T>
-		implements TaxonomyNode<T> {
+public class FreshTypeNode<T extends ElkObject, I extends ElkObject> extends
+		FreshNode<T> implements TypeNode<T, I> {
 
-	protected final Taxonomy<T> taxonomy;
+	protected InstanceTaxonomy<T, I> taxonomy;
 
-	public FreshTaxonomyNode(T member, Taxonomy<T> taxonomy) {
+	public FreshTypeNode(T member, InstanceTaxonomy<T, I> taxonomy) {
 		super(member);
 		this.taxonomy = taxonomy;
 	}
 
 	@Override
-	public Taxonomy<T> getTaxonomy() {
+	public InstanceTaxonomy<T, I> getTaxonomy() {
 		return taxonomy;
 	}
 
 	@Override
-	public Set<? extends TaxonomyNode<T>> getDirectSuperNodes() {
+	public Set<TypeNode<T, I>> getDirectSuperNodes() {
 		return Collections.singleton(taxonomy.getTopNode());
 	}
 
 	@Override
-	public Set<? extends TaxonomyNode<T>> getAllSuperNodes() {
+	public Set<TypeNode<T, I>> getAllSuperNodes() {
 		return Collections.singleton(taxonomy.getTopNode());
 	}
 
 	@Override
-	public Set<? extends TaxonomyNode<T>> getDirectSubNodes() {
+	public Set<TypeNode<T, I>> getDirectSubNodes() {
 		return Collections.singleton(taxonomy.getBottomNode());
 	}
 
 	@Override
-	public Set<? extends TaxonomyNode<T>> getAllSubNodes() {
+	public Set<TypeNode<T, I>> getAllSubNodes() {
 		return Collections.singleton(taxonomy.getBottomNode());
+	}
+
+	@Override
+	public Set<? extends InstanceNode<T, I>> getDirectInstanceNodes() {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public Set<? extends InstanceNode<T, I>> getAllInstanceNodes() {
+		return Collections.emptySet();
 	}
 
 }

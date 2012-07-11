@@ -35,6 +35,8 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalen
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputationFactory.Engine;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 

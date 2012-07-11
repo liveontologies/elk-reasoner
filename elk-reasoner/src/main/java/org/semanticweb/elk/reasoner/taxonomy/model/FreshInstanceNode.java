@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Collections;
 import java.util.Set;
@@ -28,18 +28,18 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * A fresh TypeNode containing an object that does not occur in a taxonomy. Such
- * nodes are returned to queries when FreshEntityPolicy is set to ALLOW.
+ * A fresh InstanceNode containing an object that does not occur in a taxonomy.
+ * Such nodes are returned to queries when FreshEntityPolicy is set to ALLOW.
  * 
  * @author Frantisek Simancik
  * 
  */
-public class FreshTypeNode<T extends ElkObject, I extends ElkObject> extends
-		FreshNode<T> implements TypeNode<T, I> {
+public class FreshInstanceNode<T extends ElkObject, I extends ElkObject>
+		extends FreshNode<I> implements InstanceNode<T, I> {
 
 	protected InstanceTaxonomy<T, I> taxonomy;
 
-	public FreshTypeNode(T member, InstanceTaxonomy<T, I> taxonomy) {
+	public FreshInstanceNode(I member, InstanceTaxonomy<T, I> taxonomy) {
 		super(member);
 		this.taxonomy = taxonomy;
 	}
@@ -50,33 +50,13 @@ public class FreshTypeNode<T extends ElkObject, I extends ElkObject> extends
 	}
 
 	@Override
-	public Set<TypeNode<T, I>> getDirectSuperNodes() {
+	public Set<? extends TypeNode<T, I>> getDirectTypeNodes() {
 		return Collections.singleton(taxonomy.getTopNode());
 	}
 
 	@Override
-	public Set<TypeNode<T, I>> getAllSuperNodes() {
+	public Set<? extends TypeNode<T, I>> getAllTypeNodes() {
 		return Collections.singleton(taxonomy.getTopNode());
-	}
-
-	@Override
-	public Set<TypeNode<T, I>> getDirectSubNodes() {
-		return Collections.singleton(taxonomy.getBottomNode());
-	}
-
-	@Override
-	public Set<TypeNode<T, I>> getAllSubNodes() {
-		return Collections.singleton(taxonomy.getBottomNode());
-	}
-
-	@Override
-	public Set<? extends InstanceNode<T, I>> getDirectInstanceNodes() {
-		return Collections.emptySet();
-	}
-
-	@Override
-	public Set<? extends InstanceNode<T, I>> getAllInstanceNodes() {
-		return Collections.emptySet();
 	}
 
 }

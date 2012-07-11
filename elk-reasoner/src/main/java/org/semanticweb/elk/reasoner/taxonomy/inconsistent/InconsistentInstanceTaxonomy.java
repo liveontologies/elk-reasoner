@@ -23,43 +23,52 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.inconsistent;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.util.collections.ArraySet;
 
 /**
+ * @author Frantisek Simancik
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class InconsistentInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity> extends InconsistentTaxonomy<T> implements InstanceTaxonomy<T, I>{
+public class InconsistentInstanceTaxonomy<T extends ElkObject, I extends ElkObject> implements InstanceTaxonomy<T, I>{
 
+	protected final Bottom bottom;
+	
 	public InconsistentInstanceTaxonomy(T top, T bot) {
-		super(top, bot);
+		bottom = new Bottom(top, bot);
 	}	
 	
 	@Override
 	public TypeNode<T, I> getTopNode() {
-		return new Bottom(bottom.top, bottom.bot);
+		return bottom;
 	}
 
 	@Override
 	public TypeNode<T, I> getBottomNode() {
-		return new Bottom(bottom.top, bottom.bot);
+		return bottom;
 	}
 
 
 	@Override
 	public TypeNode<T, I> getTypeNode(T elkObject) {
-		return bottom.members.contains(elkObject) ? getBottomNode() : null;
+		return bottom.members.contains(elkObject) ? bottom : null;
 	}
 
 	@Override
 	public Set<? extends TypeNode<T, I>> getTypeNodes() {
-		return Collections.singleton(getBottomNode());
+		return Collections.singleton(bottom);
 	}
 
 	@Override
@@ -72,11 +81,34 @@ public class InconsistentInstanceTaxonomy<T extends ElkEntity, I extends ElkEnti
 	public Set<? extends InstanceNode<T, I>> getInstanceNodes() {
 		return Collections.emptySet();
 	}
+	
+	@Override
+	public TaxonomyNode<T> getNode(T elkObject) {
+		return getTypeNode(elkObject);
+	}
 
-	class Bottom extends InconsistentTaxonomy<T>.Bottom implements TypeNode<T,I> {
+	@Override
+	public Set<? extends TaxonomyNode<T>> getNodes() {
+		return getTypeNodes();
+	}
 
+	class Bottom implements TypeNode<T,I> {
+
+		final ArraySet<T> members;
+		
+		@SuppressWarnings("unchecked")
 		Bottom(T top, T bot) {
-			super(top, bot);
+			members = new ArraySet<T>(Arrays.asList(bot, top));
+		}
+		
+		@Override
+		public Set<T> getMembers() {
+			return Collections.unmodifiableSet(members);
+		}
+
+		@Override
+		public T getCanonicalMember() {
+			return members.get(0);
 		}
 
 		@Override

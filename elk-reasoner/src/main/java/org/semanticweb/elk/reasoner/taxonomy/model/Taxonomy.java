@@ -23,7 +23,7 @@
 /**
  * @author Yevgeny Kazakov, May 15, 2011
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 

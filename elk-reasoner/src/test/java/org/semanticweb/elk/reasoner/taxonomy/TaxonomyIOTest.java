@@ -51,6 +51,8 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * Tests loading/dumping of taxonomies

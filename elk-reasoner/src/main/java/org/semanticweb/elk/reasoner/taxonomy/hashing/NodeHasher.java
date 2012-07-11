@@ -26,7 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
@@ -38,7 +38,7 @@ import org.semanticweb.elk.util.hashing.Hasher;
  * @author Frantisek Simancik
  * 
  */
-class NodeHasher implements Hasher<Node<? extends ElkEntity>> {
+public class NodeHasher implements Hasher<Node<? extends ElkEntity>> {
 
 	/**
 	 * We use one static instance for hashing (and caching!) all nodes.

@@ -20,36 +20,20 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
-
-import java.util.Collections;
-import java.util.Set;
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.taxonomy.inconsistent;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * A fresh Node containing an object that does not occur in a taxonomy. Such nodes
- * are returned to queries when FreshEntityPolicy is set to ALLOW.
- * 
  * @author Frantisek Simancik
- * 
  */
-public class FreshNode<T extends ElkObject> implements Node<T> {
+public class InconsistentTaxonomy<T extends ElkObject> extends InconsistentInstanceTaxonomy<T, ElkObject> {
 
-	protected final T member;
-
-	public FreshNode(T member) {
-		this.member = member;
+	public InconsistentTaxonomy(T top, T bot) {
+		super(top, bot);
 	}
-
-	@Override
-	public Set<T> getMembers() {
-		return Collections.singleton(member);
-	}
-
-	@Override
-	public T getCanonicalMember() {
-		return member;
-	}
-
+	
 }

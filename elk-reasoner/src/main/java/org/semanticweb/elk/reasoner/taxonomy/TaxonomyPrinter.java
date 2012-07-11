@@ -46,6 +46,10 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is

@@ -27,7 +27,9 @@ package org.semanticweb.elk.cli;
 
 import static java.util.Arrays.asList;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -38,6 +40,9 @@ import joptsimple.OptionSpec;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
+import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
@@ -45,6 +50,11 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
+import org.semanticweb.elk.reasoner.taxonomy.inconsistent.PredefinedTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.util.logging.Statistics;
 
 /**
  * 
@@ -65,7 +75,6 @@ public class Main {
 	 */
 	public static void main(String[] args) throws Exception {
 
-
 		OptionParser parser = new OptionParser();
 
 		// input and output files
@@ -79,8 +88,8 @@ public class Main {
 		// reasoning tasks
 		OptionSpec<Void> classify = parser.acceptsAll(asList("classify", "c"),
 				"classify the ontology");
-		OptionSpec<Void> realize = parser.acceptsAll(
-				asList("realize", "r"), "realize the ontology");
+		OptionSpec<Void> realize = parser.acceptsAll(asList("realize", "r"),
+				"realize the ontology");
 		OptionSpec<Void> satisfiable = parser.acceptsAll(
 				asList("consistent", "satisfiable", "s"),
 				"check consistency of the ontology");
@@ -99,52 +108,124 @@ public class Main {
 
 		OptionSet options = parser.parse(args);
 
-		if (options.has(version))
+		if (!options.hasOptions() || options.has(help)) {
+			parser.printHelpOn(System.out);
+			return;
+		}
+
+		if (options.has(version)) {
 			System.out.println(Main.class.getPackage().getImplementationTitle()
 					+ " " + Main.class.getPackage().getImplementationVersion());
-		else if (options.has(help) || !options.has(inputFile))
-			parser.printHelpOn(System.out);
-		else {
-			ReasonerConfiguration configuration = ReasonerConfiguration
-					.getConfiguration();
-			if (options.has(nWorkers))
-				configuration.setParameter(
-						ReasonerConfiguration.NUM_OF_WORKING_THREADS, options
-								.valueOf(nWorkers).toString());
-
-			ReasonerFactory reasoningFactory = new ReasonerFactory();
-			Reasoner reasoner = reasoningFactory.createReasoner(
-					new LoggingStageExecutor(), configuration);
-
-			try {
-				Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-				reasoner.registerOntologyLoader(new Owl2StreamLoader(
-						parserFactory, options.valueOf(inputFile)));
-
-				reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
-
-				if (options.has(realize)) {
-					reasoner.getInstanceTaxonomy();
-					if (options.hasArgument(outputFile))
-						reasoner.writeInstanceTaxonomyToFile(options
-								.valueOf(outputFile));
-				} else if (options.has(classify)) {
-					reasoner.getTaxonomy();
-					if (options.hasArgument(outputFile))
-						reasoner.writeTaxonomyToFile(options
-								.valueOf(outputFile));
-				} else if (options.has(satisfiable)) {
-					reasoner.isConsistent();
-					if (options.hasArgument(outputFile)) {
-						reasoner.writeConsistencyToFile(options
-								.valueOf(outputFile));
-					}
-				}
-			} catch (ElkInconsistentOntologyException e) {
-				LOGGER_.error("The ontology is inconsistent. No taxonomy was produced.");
-			} finally {
-				reasoner.shutdown();
-			}
+			return;
 		}
+
+		int countTasks = 0;
+		if (options.has(satisfiable))
+			countTasks++;
+		if (options.has(classify))
+			countTasks++;
+		if (options.has(realize))
+			countTasks++;
+		if (!options.has(inputFile) || countTasks != 1) {
+			System.err
+					.println("Specify an input ontology and exactly one reasoning task.");
+			return;
+		}
+
+		ReasonerConfiguration configuration = ReasonerConfiguration
+				.getConfiguration();
+		if (options.has(nWorkers))
+			configuration.setParameter(
+					ReasonerConfiguration.NUM_OF_WORKING_THREADS, options
+							.valueOf(nWorkers).toString());
+
+		ReasonerFactory reasoningFactory = new ReasonerFactory();
+		Reasoner reasoner = reasoningFactory.createReasoner(
+				new LoggingStageExecutor(), configuration);
+
+		try {
+			Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
+			reasoner.registerOntologyLoader(new Owl2StreamLoader(parserFactory,
+					options.valueOf(inputFile)));
+
+			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
+
+			if (options.has(satisfiable)) {
+				boolean consistent = reasoner.isConsistent();
+				if (options.hasArgument(outputFile)) {
+					writeConsistencyToFile(options.valueOf(outputFile),
+							consistent);
+				}
+			}
+
+			if (options.has(classify)) {
+				Taxonomy<ElkClass> taxonomy = null;
+				try {
+					taxonomy = reasoner.getTaxonomy();
+				} catch (ElkInconsistentOntologyException e) {
+					taxonomy = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
+				}
+				if (options.hasArgument(outputFile))
+					writeClassTaxonomyToFile(options.valueOf(outputFile),
+							taxonomy);
+			}
+
+			if (options.has(realize)) {
+				InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
+				try {
+					taxonomy = reasoner.getInstanceTaxonomy();
+				} catch (ElkInconsistentOntologyException e) {
+					taxonomy = PredefinedTaxonomy.INCONSISTENT_INDIVIDUAL_TAXONOMY;
+				}
+				if (options.hasArgument(outputFile))
+					writeInstanceTaxonomyToFile(options.valueOf(outputFile),
+							taxonomy);
+			}
+
+		} finally {
+			reasoner.shutdown();
+		}
+
+		if (!options.has(outputFile)) {
+			System.out
+					.println("No output was produced because the output file was not specified.");
+		}
+	}
+
+	static void writeConsistencyToFile(File file, Boolean consistent)
+			throws IOException, ElkException {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Writing consistency to " + file);
+		}
+		FileWriter fstream = new FileWriter(file);
+		BufferedWriter writer = new BufferedWriter(fstream);
+		writer.write(consistent.toString() + "\n");
+		writer.write("# The ontology is "
+				+ (consistent ? "consistent" : "inconsistent") + ".\n");
+		writer.close();
+	}
+
+	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy)
+			throws IOException, ElkInconsistentOntologyException, ElkException {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Writing taxonomy to " + file);
+		}
+		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
+		TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, file.getPath(), true);
+		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
+	}
+
+	static void writeInstanceTaxonomyToFile(File file,
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy)
+			throws IOException, ElkInconsistentOntologyException, ElkException {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Writing taxonomy with instances to " + file);
+		}
+		Statistics
+				.logOperationStart("Writing taxonomy with instances", LOGGER_);
+		TaxonomyPrinter.dumpInstanceTaxomomyToFile(taxonomy, file.getPath(),
+				true);
+		Statistics.logOperationFinish("Writing taxonomy with instances",
+				LOGGER_);
 	}
 }

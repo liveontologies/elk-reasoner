@@ -23,8 +23,8 @@
 package org.semanticweb.elk.reasoner.taxonomy.hashing;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.Node;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
@@ -35,7 +35,7 @@ import org.semanticweb.elk.util.hashing.Hasher;
  * @author Frantisek Simancik
  * 
  */
-class TaxonomyNodeHasher implements Hasher<TaxonomyNode<? extends ElkEntity>> {
+public class TaxonomyNodeHasher implements Hasher<TaxonomyNode<? extends ElkEntity>> {
 
 	/**
 	 * We use one static instance for hashing all nodes.

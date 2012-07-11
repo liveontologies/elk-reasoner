@@ -27,36 +27,28 @@ package org.semanticweb.elk.reasoner;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class InstanceTaxonomyTestOutput extends ClassTaxonomyTestOutput {
 
-	InstanceTaxonomyTestOutput() {
-		super();
-	}
-	
-	InstanceTaxonomyTestOutput(InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
+	InstanceTaxonomyTestOutput(
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
 		super(taxonomy);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
 		return (InstanceTaxonomy<ElkClass, ElkNamedIndividual>) taxonomy;
 	}
-	
+
 	@Override
 	int getHashCode() {
-		if (consistent) {
-			return InstanceTaxonomyHasher.hash(getTaxonomy());
-		}
-		else {
-			return 0;
-		}
+		return InstanceTaxonomyHasher.hash(getTaxonomy());
 	}
 }

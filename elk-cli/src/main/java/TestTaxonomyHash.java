@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK Command Line Interface
  * 
  * $Id$
  * $HeadURL$
@@ -20,28 +20,15 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.NodeHasher;
+import org.semanticweb.elk.reasoner.taxonomy.inconsistent.PredefinedTaxonomy;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.testing.TestOutput;
 
-public class ClassTaxonomyTestOutput implements TestOutput {
-
-	protected final Taxonomy<ElkClass> taxonomy;
-
-	ClassTaxonomyTestOutput(Taxonomy<ElkClass> taxonomy) {
-		this.taxonomy = taxonomy;
-	}
-
-	int getHashCode() {
-		return TaxonomyHasher.hash(taxonomy);
-	}
-
-	@Override
-	public String toString() {
-		return String.valueOf(getHashCode());
+public class TestTaxonomyHash {
+	
+	public static void main(String[] argv) {
+		System.out.println(NodeHasher.INSTANCE.hash(PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY.getBottomNode()));
+//		System.out.println(TaxonomyHasher.hash(PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY));
 	}
 
 }

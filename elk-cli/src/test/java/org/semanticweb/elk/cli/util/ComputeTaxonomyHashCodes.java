@@ -43,10 +43,10 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * Computes correct class taxonomy hash codes for a set of ontologies

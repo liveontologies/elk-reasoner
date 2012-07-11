@@ -56,9 +56,9 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.Node;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 //TODO This test won't be necessary as soon as we can specify the expected class taxonomy
 //for our main classification tests, see BaseClassificationCorrectnessTest

@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 

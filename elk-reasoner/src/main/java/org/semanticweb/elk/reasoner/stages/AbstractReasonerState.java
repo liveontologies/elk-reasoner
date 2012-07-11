@@ -34,8 +34,8 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**

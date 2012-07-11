@@ -20,28 +20,36 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.testing.TestOutput;
+import java.util.Collections;
+import java.util.Set;
 
-public class ClassTaxonomyTestOutput implements TestOutput {
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
-	protected final Taxonomy<ElkClass> taxonomy;
+/**
+ * A fresh Node containing an object that does not occur in a taxonomy. Such nodes
+ * are returned to queries when FreshEntityPolicy is set to ALLOW.
+ * 
+ * @author Frantisek Simancik
+ * 
+ */
+public class FreshNode<T extends ElkObject> implements Node<T> {
 
-	ClassTaxonomyTestOutput(Taxonomy<ElkClass> taxonomy) {
-		this.taxonomy = taxonomy;
-	}
+	protected final T member;
 
-	int getHashCode() {
-		return TaxonomyHasher.hash(taxonomy);
+	public FreshNode(T member) {
+		this.member = member;
 	}
 
 	@Override
-	public String toString() {
-		return String.valueOf(getHashCode());
+	public Set<T> getMembers() {
+		return Collections.singleton(member);
+	}
+
+	@Override
+	public T getCanonicalMember() {
+		return member;
 	}
 
 }
