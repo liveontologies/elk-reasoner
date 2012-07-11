@@ -388,7 +388,8 @@ TOKEN :
 SKIP : 
 { 
   "<" : FullIri
-| "\"" : QuotedString 
+| "\"" : QuotedString
+| "#" : Comment
 }
 
 <FullIri> TOKEN : 
@@ -421,6 +422,18 @@ SKIP :
 {
   "\"" : DEFAULT
 }
+
+<Comment> SKIP :
+{
+  "\n": DEFAULT
+| "\r": DEFAULT
+}
+
+<Comment> SKIP :
+{
+  < ~[] >	
+}
+
 
 /*------------------------------------------------------------------
  * PARSER RULES
