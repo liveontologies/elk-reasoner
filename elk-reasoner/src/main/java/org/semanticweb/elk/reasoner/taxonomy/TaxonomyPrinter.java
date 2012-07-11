@@ -63,8 +63,8 @@ public class TaxonomyPrinter {
 	protected static Comparator<ElkNamedIndividual> INDIVIDUAL_COMPARATOR = Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR;
 
 	/**
-	 * Convenience method for printing a Taxonomy<ElkClass> to a file at the
-	 * given location.
+	 * Convenience method for printing a {@link Taxonomy<ElkClass>} to a file at
+	 * the given location.
 	 * 
 	 * @see org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter#dumpClassTaxomomy
 	 * 
@@ -84,9 +84,9 @@ public class TaxonomyPrinter {
 	}
 
 	/**
-	 * Print the contents of the given Taxonomy<ElkClass> to the specified
-	 * Writer. Expressions are ordered for generating the output, ensuring that
-	 * the output is deterministic.
+	 * Print the contents of the given {@link Taxonomy<ElkClass>} to the
+	 * specified Writer. Expressions are ordered for generating the output,
+	 * ensuring that the output is deterministic.
 	 * 
 	 * @param taxonomy
 	 * @param writer
@@ -106,8 +106,8 @@ public class TaxonomyPrinter {
 	}
 
 	/**
-	 * Convenience method for printing an InstanceTaxonomy<ElkClass,
-	 * ElkNamedIndividual> to a file at the given location.
+	 * Convenience method for printing an {@link InstanceTaxonomy<ElkClass,
+	 * ElkNamedIndividual>} to a file at the given location.
 	 * 
 	 * @see org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter#dumpInstanceTaxomomy
 	 * 
@@ -128,8 +128,8 @@ public class TaxonomyPrinter {
 	}
 
 	/**
-	 * Print the contents of the given InstanceTaxonomy<ElkClass,
-	 * ElkNamedIndividual> to the specified Writer. Expressions are ordered for
+	 * Print the contents of the given {@link InstanceTaxonomy<ElkClass,
+	 * ElkNamedIndividual>} to the specified Writer. Expressions are ordered for
 	 * generating the output, ensuring that the output is deterministic.
 	 * 
 	 * @param taxonomy
@@ -152,10 +152,10 @@ public class TaxonomyPrinter {
 	}
 
 	/**
-	 * Get a has string for the given Taxonomy<ElkClass>. Besides possible hash
-	 * collisions (which have very low probability) the hash string is the same
-	 * for two inputs if and only if the inputs describe the same taxonomy. So
-	 * it can be used to compare classification results.
+	 * Get a has string for the given {@link Taxonomy<ElkClass>}. Besides
+	 * possible hash collisions (which have very low probability) the hash
+	 * string is the same for two inputs if and only if the inputs describe the
+	 * same taxonomy. So it can be used to compare classification results.
 	 * 
 	 * @param taxonomy
 	 * @return hash string
@@ -245,9 +245,10 @@ public class TaxonomyPrinter {
 	}
 
 	/**
-	 * Process axioms related to one ElkClass, where the relevant related
-	 * classes are given in two ordered collections of equivalent classes and
-	 * subclasses, respectively. The method serializes the axioms to the Writer.
+	 * Process axioms related to one {@link ElkClass}, where the relevant
+	 * related classes are given in two ordered collections of equivalent
+	 * classes and subclasses, respectively. The method serializes the axioms to
+	 * the Writer.
 	 * 
 	 * @param elkClass
 	 * @param orderedEquivalentClasses

@@ -60,21 +60,21 @@ public class InstanceTaxonomyComputationFactory implements
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
-	private final IndividualClassTaxonomy taxonomy;
+	private final IndividualClassTaxonomy taxonomy_;
 	/**
 	 * The transitive reduction shared structures used in the taxonomy
 	 * construction
 	 */
-	private final TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>> transitiveReductionShared;
+	private final TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>> transitiveReductionShared_;
 	/**
 	 * The objects creating or update the nodes from the result of the
 	 * transitive reduction
 	 */
-	private final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
+	private final TransitiveReductionOutputProcessor outputProcessor_;
 	/**
 	 * The reference to cache the value of the top node for frequent use
 	 */
-	private final NonBottomClassNode topNode;
+	private final NonBottomClassNode topNode_;
 
 	/**
 	 * Create a shared engine for the input ontology index and a partially
@@ -92,11 +92,12 @@ public class InstanceTaxonomyComputationFactory implements
 	 */
 	public InstanceTaxonomyComputationFactory(OntologyIndex ontologyIndex,
 			int maxWorkers, IndividualClassTaxonomy partialTaxonomy) {
-		this.taxonomy = partialTaxonomy;
-		this.transitiveReductionShared = new TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>(
+		this.taxonomy_ = partialTaxonomy;
+		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>(
 				ontologyIndex, maxWorkers,
 				new ThisTransitiveReductionListener());
-		this.topNode = (NonBottomClassNode) partialTaxonomy.getTopNode();
+		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
+		this.topNode_ = (NonBottomClassNode) partialTaxonomy.getTopNode();
 	}
 
 	/**
@@ -116,7 +117,7 @@ public class InstanceTaxonomyComputationFactory implements
 		@Override
 		public void notifyFinished(TransitiveReductionJob<IndexedIndividual> job)
 				throws InterruptedException {
-			job.getOutput().accept(outputProcessor);
+			job.getOutput().accept(outputProcessor_);
 		}
 
 	}
@@ -137,12 +138,12 @@ public class InstanceTaxonomyComputationFactory implements
 				TransitiveReductionOutputEquivalentDirect<IndexedIndividual> output) {
 
 			// only supports singleton individuals
-			IndividualNode node = taxonomy.getCreateIndividualNode(Collections
+			IndividualNode node = taxonomy_.getCreateIndividualNode(Collections
 					.singleton(output.getRoot().getElkNamedIndividual()));
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSuperClasses()) {
-				NonBottomClassNode superNode = taxonomy
+				NonBottomClassNode superNode = taxonomy_
 						.getCreateClassNode(directSuperEquivalent
 								.getEquivalent());
 				assignDirectTypeNode(node, superNode);
@@ -150,7 +151,7 @@ public class InstanceTaxonomyComputationFactory implements
 			// if there are no direct type nodes, then the top node is the
 			// only direct type node
 			if (node.getDirectTypeNodes().isEmpty()) {
-				assignDirectTypeNode(node, topNode);
+				assignDirectTypeNode(node, topNode_);
 			}
 		}
 
@@ -200,14 +201,14 @@ public class InstanceTaxonomyComputationFactory implements
 	 * @return the taxonomy constructed by this engine
 	 */
 	public IndividualClassTaxonomy getTaxonomy() {
-		return this.taxonomy;
+		return this.taxonomy_;
 	}
 
 	/**
 	 * Print statistics about taxonomy construction
 	 */
 	public void printStatistics() {
-		transitiveReductionShared.printStatistics();
+		transitiveReductionShared_.printStatistics();
 	}
 
 	public class Engine implements InputProcessor<IndexedIndividual> {
@@ -215,7 +216,7 @@ public class InstanceTaxonomyComputationFactory implements
 		/**
 		 * The transitive reduction engine used in the taxonomy construction
 		 */
-		protected final TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>.Engine transitiveReductionEngine = transitiveReductionShared
+		protected final TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>.Engine transitiveReductionEngine = transitiveReductionShared_
 				.getEngine();
 
 		// don't allow creating of engines directly; only through the factory

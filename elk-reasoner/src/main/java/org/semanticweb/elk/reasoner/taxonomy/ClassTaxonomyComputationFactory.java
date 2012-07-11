@@ -57,21 +57,21 @@ public class ClassTaxonomyComputationFactory implements
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
-	private final IndividualClassTaxonomy taxonomy;
+	private final IndividualClassTaxonomy taxonomy_;
 	/**
 	 * The transitive reduction shared structures used in the taxonomy
 	 * construction
 	 */
-	private final TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>> transitiveReductionShared;
+	private final TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>> transitiveReductionShared_;
 	/**
 	 * The objects creating or update the nodes from the result of the
 	 * transitive reduction
 	 */
-	private final TransitiveReductionOutputProcessor outputProcessor = new TransitiveReductionOutputProcessor();
+	private final TransitiveReductionOutputProcessor outputProcessor_;
 	/**
 	 * The reference to cache the value of the top node for frequent use
 	 */
-	private final AtomicReference<NonBottomClassNode> topNodeRef = new AtomicReference<NonBottomClassNode>();
+	private final AtomicReference<NonBottomClassNode> topNodeRef_;
 
 	/**
 	 * Create a shared engine for the input ontology index and a partially
@@ -89,10 +89,12 @@ public class ClassTaxonomyComputationFactory implements
 	 */
 	public ClassTaxonomyComputationFactory(OntologyIndex ontologyIndex,
 			int maxWorkers, IndividualClassTaxonomy partialTaxonomy) {
-		this.taxonomy = partialTaxonomy;
-		this.transitiveReductionShared = new TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>(
+		this.taxonomy_ = partialTaxonomy;
+		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>(
 				ontologyIndex, maxWorkers,
 				new ThisTransitiveReductionListener());
+		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
+		this.topNodeRef_ = new AtomicReference<NonBottomClassNode>();
 	}
 
 	/**
@@ -125,7 +127,7 @@ public class ClassTaxonomyComputationFactory implements
 		@Override
 		public void notifyFinished(TransitiveReductionJob<IndexedClass> job)
 				throws InterruptedException {
-			job.getOutput().accept(outputProcessor);
+			job.getOutput().accept(outputProcessor_);
 		}
 
 	}
@@ -145,19 +147,19 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 
-			NonBottomClassNode node = taxonomy.getCreateClassNode(output
+			NonBottomClassNode node = taxonomy_.getCreateClassNode(output
 					.getEquivalent());
 
 			// FIXME this sort of equality check is not guaranteed to work
 			// for ElkClasses
 			if (node.getMembers().contains(PredefinedElkClass.OWL_THING)) {
-				topNodeRef.compareAndSet(null, node);
+				topNodeRef_.compareAndSet(null, node);
 				return;
 			}
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSuperClasses()) {
-				NonBottomClassNode superNode = taxonomy
+				NonBottomClassNode superNode = taxonomy_
 						.getCreateClassNode(directSuperEquivalent
 								.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);
@@ -174,7 +176,7 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 
-			taxonomy.addUnsatisfiableClass(output.getRoot().getElkClass());
+			taxonomy_.addUnsatisfiableClass(output.getRoot().getElkClass());
 		}
 
 		@Override
@@ -196,13 +198,13 @@ public class ClassTaxonomyComputationFactory implements
 	 * 
 	 */
 	NonBottomClassNode getCreateTopNode() {
-		if (topNodeRef.get() == null) {
-			NonBottomClassNode topNode = taxonomy
+		if (topNodeRef_.get() == null) {
+			NonBottomClassNode topNode = taxonomy_
 					.getCreateClassNode(Collections
 							.<ElkClass> singleton(PredefinedElkClass.OWL_THING));
-			topNodeRef.compareAndSet(null, topNode);
+			topNodeRef_.compareAndSet(null, topNode);
 		}
-		return topNodeRef.get();
+		return topNodeRef_.get();
 	}
 
 	/**
@@ -233,14 +235,14 @@ public class ClassTaxonomyComputationFactory implements
 	 * @return the taxonomy constructed by this engine
 	 */
 	public IndividualClassTaxonomy getTaxonomy() {
-		return this.taxonomy;
+		return this.taxonomy_;
 	}
 
 	/**
 	 * Print statistics about taxonomy construction
 	 */
 	public void printStatistics() {
-		transitiveReductionShared.printStatistics();
+		transitiveReductionShared_.printStatistics();
 	}
 
 	public class Engine implements InputProcessor<IndexedClass> {
@@ -248,7 +250,7 @@ public class ClassTaxonomyComputationFactory implements
 		/**
 		 * The transitive reduction engine used in the taxonomy construction
 		 */
-		protected final TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>.Engine transitiveReductionEngine = transitiveReductionShared
+		protected final TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>.Engine transitiveReductionEngine = transitiveReductionShared_
 				.getEngine();
 
 		// don't allow creating of engines directly; only through the factory

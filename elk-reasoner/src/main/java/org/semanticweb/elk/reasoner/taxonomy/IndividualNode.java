@@ -47,10 +47,10 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Class for storing information about a class in the context of classification.
- * It is the main data container for ClassTaxonomy objects. Like most such data
- * containers in ELK, it is read-only for public access but provides
- * package-private ways of modifying it. Modifications of this class happen in
- * implementations of ClassTaxonomy only.
+ * It is the main data container for {@link IndividualClassTaxonomy} objects.
+ * Like most such data containers in ELK, it is read-only for public access but
+ * provides package-private ways of modifying it. Modifications of this class
+ * happen in implementations of {@link IndividualClassTaxonomy} only.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
@@ -65,17 +65,17 @@ public class IndividualNode implements
 	/**
 	 * The link to the taxonomy to which this node belongs
 	 */
-	final ConcurrentTaxonomy taxonomy;
+	private final ConcurrentTaxonomy taxonomy_;
 
 	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
 	 */
-	private final List<ElkNamedIndividual> members;
+	private final List<ElkNamedIndividual> members_;
 	/**
 	 * ElkClass nodes whose members are direct types of the members of this
 	 * node.
 	 */
-	private final Set<TypeNode<ElkClass, ElkNamedIndividual>> directTypeNodes;
+	private final Set<TypeNode<ElkClass, ElkNamedIndividual>> directTypeNodes_;
 
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
@@ -88,10 +88,10 @@ public class IndividualNode implements
 	 */
 	protected IndividualNode(ConcurrentTaxonomy taxonomy,
 			Collection<ElkNamedIndividual> members) {
-		this.taxonomy = taxonomy;
-		this.members = new ArrayList<ElkNamedIndividual>(members);
-		this.directTypeNodes = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>();
-		Collections.sort(this.members,
+		this.taxonomy_ = taxonomy;
+		this.members_ = new ArrayList<ElkNamedIndividual>(members);
+		this.directTypeNodes_ = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>();
+		Collections.sort(this.members_,
 				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
 	}
 
@@ -104,7 +104,7 @@ public class IndividualNode implements
 	void addDirectTypeNode(NonBottomClassNode typeNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct type-node " + typeNode);
-		directTypeNodes.add(typeNode);
+		directTypeNodes_.add(typeNode);
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class IndividualNode implements
 			@Override
 			public boolean contains(Object arg) {
 				if (arg instanceof ElkNamedIndividual)
-					return (Collections.binarySearch(members,
+					return (Collections.binarySearch(members_,
 							(ElkNamedIndividual) arg,
 							Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR) >= 0);
 				return false;
@@ -124,17 +124,17 @@ public class IndividualNode implements
 
 			@Override
 			public boolean isEmpty() {
-				return members.isEmpty();
+				return members_.isEmpty();
 			}
 
 			@Override
 			public Iterator<ElkNamedIndividual> iterator() {
-				return members.iterator();
+				return members_.iterator();
 			}
 
 			@Override
 			public int size() {
-				return members.size();
+				return members_.size();
 			}
 
 		};
@@ -142,21 +142,21 @@ public class IndividualNode implements
 
 	@Override
 	public ElkNamedIndividual getCanonicalMember() {
-		return members.get(0);
+		return members_.get(0);
 	}
 
 	@Override
 	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectTypeNodes() {
-		return Collections.unmodifiableSet(directTypeNodes);
+		return Collections.unmodifiableSet(directTypeNodes_);
 	}
 
 	@Override
 	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllTypeNodes() {
 		Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
-				directTypeNodes.size());
+				directTypeNodes_.size());
 
 		Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
-		todo.addAll(directTypeNodes);
+		todo.addAll(directTypeNodes_);
 		while (!todo.isEmpty()) {
 			TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
 			if (result.add(next)) {
@@ -177,7 +177,7 @@ public class IndividualNode implements
 
 	@Override
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
-		return this.taxonomy;
+		return this.taxonomy_;
 	}
 
 	@Override
