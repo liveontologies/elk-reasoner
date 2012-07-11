@@ -37,6 +37,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
@@ -62,6 +63,7 @@ import org.semanticweb.elk.util.logging.Statistics;
  * stand-alone executables.
  * 
  * @author Yevgeny Kazakov
+ * @author Frantisek Simancik
  * 
  */
 public class Main {
@@ -99,39 +101,62 @@ public class Main {
 				.acceptsAll(asList("workers", "w"),
 						"number of concurrent worker threads")
 				.withRequiredArg().ofType(Integer.class);
+		OptionSpec<String> logging = parser
+				.acceptsAll(asList("logging", "l"), "logging level for log4j; default INFO")
+				.withRequiredArg().ofType(String.class).describedAs("level");
+		OptionSpec<Void> verbose = parser.acceptsAll(asList("verbose", "v"),
+				"equivalent to --logging=DEBUG");
+		OptionSpec<Void> Verbose = parser.acceptsAll(asList("Verbose", "V"),
+				"equivalent to --logging=TRACE");
+		OptionSpec<Void> quiet = parser.acceptsAll(asList("quiet", "q"),
+				"equivalent to --logging=ERROR");
 
 		// information
-		OptionSpec<Void> version = parser.acceptsAll(asList("version", "v"),
+		OptionSpec<Void> version = parser.acceptsAll(asList("version"),
 				"print version information");
 		OptionSpec<Void> help = parser.acceptsAll(asList("help", "h", "?"),
 				"show help");
 
 		OptionSet options = parser.parse(args);
 
+		// help
 		if (!options.hasOptions() || options.has(help)) {
 			parser.printHelpOn(System.out);
 			return;
 		}
 
+		// version
 		if (options.has(version)) {
 			System.out.println(Main.class.getPackage().getImplementationTitle()
 					+ " " + Main.class.getPackage().getImplementationVersion());
 			return;
 		}
 
-		int countTasks = 0;
-		if (options.has(satisfiable))
-			countTasks++;
-		if (options.has(classify))
-			countTasks++;
-		if (options.has(realize))
-			countTasks++;
-		if (!options.has(inputFile) || countTasks != 1) {
+		// input and reasoning tasks
+		if (!options.has(inputFile)
+				|| countOptions(options, satisfiable, classify, realize) != 1) {
 			System.err
 					.println("Specify an input ontology and exactly one reasoning task.");
 			return;
 		}
+		
+		// logging 
+		if (countOptions(options, logging, verbose, Verbose, quiet) > 1) {
+			System.err.println("Specify at most one logging level.");
+			return;
+		}
+		Logger allLoggers = Logger.getLogger("org.semanticweb.elk");
+		if (options.has(logging))
+			allLoggers.setLevel(Level.toLevel(options.valueOf(logging), Level.INFO));
+		if (options.has(verbose))
+			allLoggers.setLevel(Level.DEBUG);
+		if (options.has(Verbose))
+			allLoggers.setLevel(Level.TRACE);
+		if (options.has(quiet))
+			allLoggers.setLevel(Level.ERROR);
 
+
+		// number of workers
 		ReasonerConfiguration configuration = ReasonerConfiguration
 				.getConfiguration();
 		if (options.has(nWorkers))
@@ -139,6 +164,7 @@ public class Main {
 					ReasonerConfiguration.NUM_OF_WORKING_THREADS, options
 							.valueOf(nWorkers).toString());
 
+		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
 		Reasoner reasoner = reasoningFactory.createReasoner(
 				new LoggingStageExecutor(), configuration);
@@ -185,11 +211,6 @@ public class Main {
 		} finally {
 			reasoner.shutdown();
 		}
-
-		if (!options.has(outputFile)) {
-			System.out
-					.println("No output was produced because the output file was not specified.");
-		}
 	}
 
 	static void writeConsistencyToFile(File file, Boolean consistent)
@@ -227,5 +248,13 @@ public class Main {
 				true);
 		Statistics.logOperationFinish("Writing taxonomy with instances",
 				LOGGER_);
+	}
+
+	static int countOptions(OptionSet options, OptionSpec<?>... specs) {
+		int count = 0;
+		for (OptionSpec<?> s : specs)
+			if (options.has(s))
+				count++;
+		return count;
 	}
 }

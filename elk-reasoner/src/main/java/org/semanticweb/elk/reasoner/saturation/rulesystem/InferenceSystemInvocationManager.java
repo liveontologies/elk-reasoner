@@ -220,8 +220,8 @@ public class InferenceSystemInvocationManager {
 			throws IllegalInferenceMethodException, NoSuchMethodException {
 		Class<?> ruleClass = inferenceRule.getClass();
 
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Registering inference rule: " + ruleClass.toString());
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Registering inference rule: " + ruleClass.toString());
 		}
 
 		Method[] methods = ruleClass.getMethods();
@@ -397,8 +397,8 @@ public class InferenceSystemInvocationManager {
 	 */
 	protected RuleMethodList addRuleMethod(InferenceRule<?> inferenceRule,
 			Method ruleMethod, RuleMethodList ruleMethodList) {
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Registering rule method " + ruleMethod.toString());
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Registering rule method " + ruleMethod.toString());
 		}
 		return new RuleMethodList(inferenceRule, ruleMethod, ruleMethodList);
 	}
@@ -413,8 +413,8 @@ public class InferenceSystemInvocationManager {
 	 */
 	protected void addInitMethod(InferenceRule<?> inferenceRule,
 			Method initMethod) {
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Registering init method " + initMethod.toString());
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Registering init method " + initMethod.toString());
 		}
 		initMethods = new InitMethodList(inferenceRule, initMethod, initMethods);
 	}
@@ -434,8 +434,8 @@ public class InferenceSystemInvocationManager {
 		if (methodsForQueueable.containsKey(clazz))
 			return; // someone else did it while we waited for the
 					// synchronization
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Late initialization of methods for class: "
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Late initialization of methods for class: "
 					+ clazz.toString());
 		}
 		try {
