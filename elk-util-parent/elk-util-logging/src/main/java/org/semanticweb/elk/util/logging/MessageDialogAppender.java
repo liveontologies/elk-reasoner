@@ -57,20 +57,10 @@ import org.apache.log4j.spi.LoggingEvent;
  * type.
  * 
  * @author Markus Kroetzsch
- * 
- *         This is now a singleton class to avoid problems with Protege creating
- *         multiple instances, which results in many popup windows
- * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public class MessageDialogAppender extends AppenderSkeleton implements Runnable {
-
-	private static MessageDialogAppender INSTANCE_ = new MessageDialogAppender();
-
-	public static MessageDialogAppender getInstance() {
-		return INSTANCE_;
-	}
 
 	protected final ConcurrentLinkedQueue<LoggingEvent> eventBuffer = new ConcurrentLinkedQueue<LoggingEvent>();
 
@@ -79,7 +69,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 	protected final Set<String> ignoredMessageTypes = new HashSet<String>();
 
-	private MessageDialogAppender() {
+	public MessageDialogAppender() {
 		super();
 		initConfiguration();
 	}
@@ -151,10 +141,10 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 			messageLevel = JOptionPane.INFORMATION_MESSAGE;
 		}
 
-		Object Message = event.getMessage();
+		Object message = event.getMessage();
 		String messageType;
-		if (Message instanceof ElkMessage) {
-			messageType = ((ElkMessage) Message).getMessageType();
+		if (message instanceof ElkMessage) {
+			messageType = ((ElkMessage) message).getMessageType();
 			if (ignoredMessageTypes.contains(messageType)) {
 				return;
 			}
@@ -182,7 +172,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		}
 
 		// // Later, it could be possible to abort the reasoner here:
-		// Object[] options = { "Continue", "Abort Reaoner" };
+		// Object[] options = { "Continue", "Abort Reasoner" };
 		// int result = JOptionPane.showOptionDialog(null, radioPanel,
 		// messageTitle,
 		// JOptionPane.DEFAULT_OPTION, messageLevel, null, options,
@@ -193,6 +183,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		if (ignoreMessageButton.isSelected()) {
 			ignoredMessageTypes.add(messageType);
 		}
+
 	}
 
 	/**

@@ -27,7 +27,6 @@ package org.semanticweb.elk.protege;
 
 import org.apache.log4j.Logger;
 import org.protege.editor.core.editorkit.plugin.EditorKitHook;
-import org.semanticweb.elk.util.logging.MessageDialogAppender;
 
 /**
  * Carries out some initialization, e.g. Log4j, which we don't want to put into
@@ -47,6 +46,6 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 	@Override
 	public void initialise() throws Exception {
 		Logger.getLogger("org.semanticweb.elk").addAppender(
-				MessageDialogAppender.getInstance());
+				ProtegeMassageAppender.getInstance());
 	}
 }
