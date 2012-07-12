@@ -46,6 +46,6 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 	@Override
 	public void initialise() throws Exception {
 		Logger.getLogger("org.semanticweb.elk").addAppender(
-				ProtegeMassageAppender.getInstance());
+				ProtegeMessageAppender.getInstance());
 	}
 }

@@ -123,11 +123,25 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	}
 
 	/**
+	 * Generate the additional check box message specific to the given event
+	 * 
+	 * @param event
+	 *            the event for which the check box message should be generated
+	 * @return the generated check box message
+	 */
+	@SuppressWarnings("static-method")
+	protected String getCheckboxMessage(LoggingEvent event) {
+		return "Do not show further messages of this kind";
+	}
+
+	/**
 	 * Display a dialog window to inform the user about one message event.
 	 * 
 	 * @param event
+	 *            the event for which to display the message
+	 * @return {@code true} if the message has been shown
 	 */
-	protected void showMessage(LoggingEvent event) {
+	protected boolean showMessage(LoggingEvent event) {
 		String messageTitle;
 		int messageLevel;
 		if (event.getLevel().isGreaterOrEqual(Level.ERROR)) {
@@ -146,7 +160,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		if (message instanceof ElkMessage) {
 			messageType = ((ElkMessage) message).getMessageType();
 			if (ignoredMessageTypes.contains(messageType)) {
-				return;
+				return false;
 			}
 		} else {
 			messageType = null;
@@ -164,8 +178,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		}
 		panel.add(new JLabel(displayLabel));
 
-		JCheckBox ignoreMessageButton = new JCheckBox(
-				"Do not show further messages of this kind in this session");
+		JCheckBox ignoreMessageButton = new JCheckBox(getCheckboxMessage(event));
 		if (messageType != null) {
 			panel.add(Box.createRigidArea(new Dimension(0, 10)));
 			panel.add(ignoreMessageButton);
@@ -183,6 +196,8 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		if (ignoreMessageButton.isSelected()) {
 			ignoredMessageTypes.add(messageType);
 		}
+
+		return true;
 
 	}
 

@@ -46,11 +46,11 @@ import org.semanticweb.elk.util.logging.MessageDialogAppender;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ProtegeMassageAppender extends MessageDialogAppender {
+public class ProtegeMessageAppender extends MessageDialogAppender {
 
-	private static ProtegeMassageAppender INSTANCE_ = new ProtegeMassageAppender();
+	private static ProtegeMessageAppender INSTANCE_ = new ProtegeMessageAppender();
 
-	public static ProtegeMassageAppender getInstance() {
+	public static ProtegeMessageAppender getInstance() {
 		return INSTANCE_;
 	}
 
@@ -60,13 +60,30 @@ public class ProtegeMassageAppender extends MessageDialogAppender {
 	 */
 	private boolean showUnsupportedOwlApiMethodInfo = true;
 
-	private ProtegeMassageAppender() {
+	private ProtegeMessageAppender() {
 		super();
 	}
 
+	/**
+	 * Generate the additional check box message specific to the given event
+	 * 
+	 * @param event
+	 *            the event for which the check box message should be generated
+	 * @return the generated check box message
+	 */
 	@Override
-	protected void showMessage(LoggingEvent event) {
-		super.showMessage(event);
+	protected String getCheckboxMessage(LoggingEvent event) {
+		return String
+				.format("<html><div style=\"width:%dpx;\">"
+						+ "<p>Do not show further messages of this kind in this session</p>"
+						+ "<p>(the messages can still be seen in the console if Prot&eacute;g&eacute; was started from the command line)</p>"
+						+ "</div></html>", 450);
+	}
+
+	@Override
+	protected boolean showMessage(LoggingEvent event) {
+		if (!super.showMessage(event))
+			return false;
 		if (showUnsupportedOwlApiMethodInfo
 				&& event.getLevel().isGreaterOrEqual(Level.WARN)
 				&& event.getLoggerName().equals(
@@ -78,8 +95,8 @@ public class ProtegeMassageAppender extends MessageDialogAppender {
 			String displayLabel = String
 					.format("<html><div style=\"width:%dpx;\">"
 							+ "<p>"
-							+ "Prot&eacute;g&eacute; has just called an OWL API method that ELK currently does not support. "
-							+ "In order to minimize the amount of error messages, it is recommended to switch off some of the inference types."
+							+ "Prot&eacute;g&eacute; has just called an OWL API method that ELK currently does not fully support. "
+							+ "In order to minimize the number of error messages, it is recommended to switch off some of the inference types."
 							+ "</p>"
 							+ "<p>"
 							+ "Please go to <b>Reasoner -> Configure -> Displayed Inferences</b> and uncheck:"
@@ -88,7 +105,7 @@ public class ProtegeMassageAppender extends MessageDialogAppender {
 							+ "<li>All <b>Displayed Object Property Inferences</b>"
 							+ "<li>All <b>Displayed Data Property Inferences</b>"
 							+ "<li><b>Data Property Assertions</b> and <b>Same Individuals</b> in <b>Displayed Individual Inferences</b>"
-							+ "</ul></p>", 500);
+							+ "</ul></p>" + "</div></html>", 500);
 
 			panel.add(new JLabel(displayLabel));
 
@@ -106,6 +123,8 @@ public class ProtegeMassageAppender extends MessageDialogAppender {
 			}
 
 		}
+
+		return true;
 
 	}
 }
