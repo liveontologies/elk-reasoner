@@ -31,21 +31,26 @@ Invoking the client without any parameters displays the supported options:
   
     java -jar ${elk-standalone.base}.jar
 
-To load the ontology from the file ontology.fss, compute its classification
-and store the result in classification.fss, run ELK as follows: 
+To load the ontology from the file ontology.owl, compute its classification
+and store the result in taxonomy.owl, run ELK as follows: 
 
-    java -jar ${elk-standalone.base}.jar -i ontology.fss -c -o classification.fss
+    java -jar ${elk-standalone.base}.jar -i ontology.owl -c -o taxonomy.owl
 	
-You may want to specify further Java parameters for increasing available
-memory for classifying larger ontologies, e.g. by setting
+Without the output parameter ELK will still compute the result but it will
+neither store nor display the result anywhere; this can be used for performance
+experiments.
 
-    java -Xms256M -Xmx1G -jar ${elk-standalone.base}.jar
+You may want to specify further Java parameters for increasing available memory
+for classifying larger ontologies, e.g. by setting
+
+    java -Xms256M -Xmx3G -jar ${elk-standalone.base}.jar
     
 or    
 
     java -XX:+AggressiveHeap -jar ${elk-standalone.base}.jar	
 
-Currently ELK can only read ontologies in OWL 2 Functional-Style Syntax.
+If ELK cannot parse your ontology, this is probably because it is in the
+RDF/XML syntax. ELK can only parse ontologies in OWL 2 Functional-Style Syntax.
 OWL ontologies in other formats can be converted into Functional-Style Syntax
-using Protege version 4.1 or higher. To convert a file, open it in Protege
-and save using the menu: File > Save as... > OWL Functional Syntax
+using Protege version 4.1 or higher. To convert a file, open it in Protege and
+save using the menu: File > Save as... > OWL Functional Syntax
