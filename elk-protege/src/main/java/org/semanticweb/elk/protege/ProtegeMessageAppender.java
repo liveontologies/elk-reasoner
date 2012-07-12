@@ -104,7 +104,7 @@ public class ProtegeMessageAppender extends MessageDialogAppender {
 							+ "<li><b>Disjoint Classes</b> in <b>Displayed Class Inferences</b>"
 							+ "<li>All <b>Displayed Object Property Inferences</b>"
 							+ "<li>All <b>Displayed Data Property Inferences</b>"
-							+ "<li><b>Data Property Assertions</b> and <b>Same Individuals</b> in <b>Displayed Individual Inferences</b>"
+							+ "<li>Everything except<b>Types</b> in <b>Displayed Individual Inferences</b>"
 							+ "</ul></p>" + "</div></html>", 500);
 
 			panel.add(new JLabel(displayLabel));
