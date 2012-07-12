@@ -422,11 +422,4 @@ public class Reasoner extends AbstractReasonerState {
 		}
 	}
 
-	// TODO: get rid of this
-	// used only in tests
-	@Override
-	public OntologyIndex getOntologyIndex() throws ElkException {
-		return super.getOntologyIndex();
-	}
-
 }
