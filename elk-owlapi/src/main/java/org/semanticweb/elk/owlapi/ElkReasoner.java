@@ -38,6 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
+import org.semanticweb.elk.reasoner.ElkUnsupportedReasoningTaskException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
@@ -186,6 +187,9 @@ public class ElkReasoner implements OWLReasoner {
 				new LoggingStageExecutor());
 	}
 
+	/**
+	 * Exposes the ELK reasoner used internally in this OWL API wrapper.
+	 */
 	protected Reasoner getInternalReasoner() {
 		return reasoner_;
 	}
@@ -307,13 +311,13 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 			return getClassNode(objectFactory_.getOwlNothing());
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod("getBottomClassNode()",
+					e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod("getBottomClassNode()",
-					e.getMessage());
 		}
 	}
 
@@ -430,6 +434,10 @@ public class ElkReasoner implements OWLReasoner {
 		} else {
 			try {
 				return getClassNode(owlConverter_.convert(ce.asOWLClass()));
+			} catch (ElkUnsupportedReasoningTaskException e) {
+				throw unsupportedOwlApiMethod(
+						"getEquivalentClasses(OWLClassExpression)",
+						e.getMessage());
 			} catch (ElkException e) {
 				throw elkConverter_.convert(e);
 			} catch (ElkRuntimeException e) {
@@ -488,13 +496,13 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			return elkConverter_.convertIndividualNodes(reasoner_.getInstances(
 					owlConverter_.convert(ce), direct));
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod(
+					"getInstances(OWLClassExpression, boolean)", e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod(
-					"getInstances(OWLClassExpression, boolean)", e.getMessage());
 		}
 	}
 
@@ -634,14 +642,14 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			return elkConverter_.convertClassNodes(reasoner_.getSubClasses(
 					owlConverter_.convert(ce), direct));
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod(
+					"getSubClasses(OWLClassExpression, boolean)",
+					e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod(
-					"getSubClasses(OWLClassExpression, boolean)",
-					e.getMessage());
 		}
 	}
 
@@ -680,14 +688,14 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			return elkConverter_.convertClassNodes(reasoner_.getSuperClasses(
 					owlConverter_.convert(ce), direct));
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod(
+					"getSuperClasses(OWLClassExpression, boolean)",
+					e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod(
-					"getSuperClasses(OWLClassExpression, boolean)",
-					e.getMessage());
 		}
 	}
 
@@ -730,12 +738,12 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 			return getClassNode(objectFactory_.getOwlThing());
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod("getTopClassNode()", e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod("getTopClassNode()", e.getMessage());
 		}
 	}
 
@@ -767,13 +775,13 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			return elkConverter_.convertClassNodes(reasoner_.getTypes(
 					owlConverter_.convert(ind), direct));
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod(
+					"getTypes(OWLNamedIndividual, boolean)", e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod(
-					"getTypes(OWLNamedIndividual, boolean)", e.getMessage());
 		}
 	}
 
@@ -786,13 +794,13 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 			return getClassNode(objectFactory_.getOwlNothing());
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod("getUnsatisfiableClasses()",
+					e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod("getUnsatisfiableClasses()",
-					e.getMessage());
 		}
 
 	}
@@ -811,12 +819,12 @@ public class ElkReasoner implements OWLReasoner {
 			LOGGER_.trace("isConsistent()");
 		try {
 			return reasoner_.isConsistent();
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod("isConsistent()", e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod("isConsistent()", e.getMessage());
 		}
 	}
 
@@ -876,13 +884,13 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			return reasoner_.isSatisfiable(owlConverter_
 					.convert(classExpression));
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod("isSatisfiable(classExpression)",
+					e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod("isSatisfiable(classExpression)",
-					e.getMessage());
 		}
 	}
 
@@ -900,13 +908,13 @@ public class ElkReasoner implements OWLReasoner {
 				else if (inferenceType.equals(InferenceType.CLASS_ASSERTIONS))
 					reasoner_.getInstanceTaxonomy();
 			}
+		} catch (ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod(
+					"precomputeInferences(inferenceTypes)", e.getMessage());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
-		} catch (UnsupportedOperationException e) {
-			throw unsupportedOwlApiMethod(
-					"precomputeInferences(inferenceTypes)", e.getMessage());
 		}
 
 	}

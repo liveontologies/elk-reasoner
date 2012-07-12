@@ -206,8 +206,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 */
 	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
 		if (node == null) {
 			if (allowFreshEntities) {
@@ -232,9 +231,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 */
 	protected InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
-			ElkNamedIndividual elkNamedIndividual)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			ElkNamedIndividual elkNamedIndividual) throws ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getInstanceNode(elkNamedIndividual);
 		if (node == null) {
@@ -260,8 +257,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 */
 	protected TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(
-			ElkClass elkClass) throws ElkFreshEntitiesException,
-			ElkInconsistentOntologyException, ElkException {
+			ElkClass elkClass) throws ElkException {
 		TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getTypeNode(elkClass);
 		if (node == null) {
@@ -289,9 +285,7 @@ public class Reasoner extends AbstractReasonerState {
 	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 */
-	public Node<ElkClass> getClassNode(ElkClass elkClass)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+	public Node<ElkClass> getClassNode(ElkClass elkClass) throws ElkException {
 		return getTaxonomyNode(elkClass);
 	}
 
@@ -315,8 +309,8 @@ public class Reasoner extends AbstractReasonerState {
 			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
 			return (direct) ? node.getDirectSubNodes() : node.getAllSubNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
-					"ELK does not support computation of sub classes for complex class expressions.");
+			throw new ElkUnsupportedReasoningTaskException(
+					"ELK does not support computation of subclasses for complex class expressions.");
 		}
 	}
 
@@ -340,15 +334,14 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
 			return (direct) ? node.getDirectSuperNodes() : node
 					.getAllSuperNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
-					"ELK does not support computation of super classes for complex class expressions.");
+			throw new ElkUnsupportedReasoningTaskException(
+					"ELK does not support computation of superclasses for complex class expressions.");
 		}
 	}
 
@@ -373,14 +366,13 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public Set<? extends Node<ElkNamedIndividual>> getInstances(
 			ElkClassExpression classExpression, boolean direct)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			TypeNode<ElkClass, ElkNamedIndividual> node = getTypeNode((ElkClass) classExpression);
 			return direct ? node.getDirectInstanceNodes() : node
 					.getAllInstanceNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
+			throw new ElkUnsupportedReasoningTaskException(
 					"ELK does not support retrieval of instances for unnamed class expressions.");
 		}
 	}
@@ -401,8 +393,7 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public Set<? extends Node<ElkClass>> getTypes(
 			ElkNamedIndividual elkNamedIndividual, boolean direct)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceNode(elkNamedIndividual);
 		return direct ? node.getDirectTypeNodes() : node.getAllTypeNodes();
 	}
@@ -420,14 +411,13 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 */
 	public boolean isSatisfiable(ElkClassExpression classExpression)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			Node<ElkClass> classNode = getClassNode((ElkClass) classExpression);
 			return (!classNode.getMembers().contains(
 					PredefinedElkClass.OWL_NOTHING));
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
+			throw new ElkUnsupportedReasoningTaskException(
 					"ELK does not support satisfiability checking for unnamed class expressions");
 		}
 	}
