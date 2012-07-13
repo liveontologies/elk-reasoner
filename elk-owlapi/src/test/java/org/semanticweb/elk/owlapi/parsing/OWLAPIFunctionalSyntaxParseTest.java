@@ -51,10 +51,12 @@ public class OWLAPIFunctionalSyntaxParseTest extends
 	}
 
 	@Override
-	@Ignore
-	//Ignored because the OWL API cannot parse such axioms
+	@Ignore("Ignored because the OWL API cannot parse such axioms")
 	public void testNaryDataSomeValuesFrom() throws Owl2ParseException {
 	}
 	
-	
+	@Override
+	@Ignore("The OWL API can't skip over FSS comments")
+	public void testComments() throws Owl2ParseException {
+	}	
 }

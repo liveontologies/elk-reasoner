@@ -266,6 +266,18 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		assertEquals(108L, counter.getTotalAxiomCount());
 	}
 
+	@Test
+	public void testComments() throws Owl2ParseException {
+		String testString = "Prefix ( : = <http://www.example.org#> )\n"
+				+ "Ontology( <http://www.my.example.com/example> \n"
+				+ "Declaration( Class( :Person ) ) \n"
+				+ "# This is a comment \n" 
+				+ "SubClassOf( :Person :Human) #This is another comment\n"
+				+ ")";
+
+		parseOntology(testString);
+	}	
+	
 	@Test(expected = Owl2ParseException.class)
 	public void testPrefixDeclarations() throws Owl2ParseException {
 		String testString = "Ontology( <http://www.my.example.com/example>"
