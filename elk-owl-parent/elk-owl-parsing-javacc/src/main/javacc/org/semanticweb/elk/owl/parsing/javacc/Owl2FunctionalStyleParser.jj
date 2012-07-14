@@ -166,7 +166,7 @@ public abstract class AbstractOwl2FunctionalStyleParser implements Owl2Parser {
 		try {
 			ontologyDocument(axiomProcessor);
 		} catch (ParseException e) {
-			throw new Owl2ParseException(e);
+			throw new Owl2ParseException("Cannot parse the ontology!", e);
 		}
 	}
 

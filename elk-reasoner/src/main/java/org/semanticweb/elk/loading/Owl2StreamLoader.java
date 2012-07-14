@@ -60,7 +60,7 @@ public class Owl2StreamLoader implements OntologyLoader {
 
 	@Override
 	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
-		return new Owl2ParserLoader(owlParserFactory_.getParser(stream_),
+		return new AbstractOwl2ParserLoader(owlParserFactory_.getParser(stream_),
 				axiomLoader) {
 			@Override
 			protected void closeParsingResources() {
