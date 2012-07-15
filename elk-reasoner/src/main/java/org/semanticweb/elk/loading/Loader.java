@@ -39,4 +39,9 @@ public interface Loader {
 	 */
 	public void load() throws ElkLoadingException;
 
+	/**
+	 * Close resources used by this {@link Loader}
+	 */
+	public void dispose();
+
 }

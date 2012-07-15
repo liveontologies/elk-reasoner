@@ -120,17 +120,25 @@ public abstract class AbstractReasonerState {
 	 * Reset the loading stage and all subsequent stages
 	 */
 	private void resetLoading() {
+		if (this.ontologyLoader != null) {
+			this.ontologyLoader.dispose();
+			this.ontologyLoader = null;
+		}
 		if (doneLoading) {
 			doneLoading = false;
 			ontologyIndex.clear();
-			resetChangesLoading();
 		}
+		resetChangesLoading();
 	}
 
 	/**
 	 * Reset the changes loading stage and all subsequent stages
 	 */
 	private void resetChangesLoading() {
+		if (this.changesLoader != null) {
+			this.changesLoader.dispose();
+			this.changesLoader = null;
+		}
 		if (doneChangeLoading) {
 			doneChangeLoading = false;
 			doneObjectPropertyHierarchyComputation = false;
@@ -143,16 +151,16 @@ public abstract class AbstractReasonerState {
 	}
 
 	public void registerOntologyLoader(OntologyLoader ontologyLoader) {
+		resetLoading();
 		this.ontologyLoader = ontologyLoader.getLoader(ontologyIndex
 				.getAxiomInserter());
-		resetLoading();
 	}
 
 	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
+		resetChangesLoading();
 		this.changesLoader = changesLoader.getLoader(
 				ontologyIndex.getAxiomInserter(),
 				ontologyIndex.getAxiomDeleter());
-		resetChangesLoading();
 	}
 
 	/**

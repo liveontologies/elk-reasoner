@@ -101,6 +101,11 @@ public class OwlChangesLoader implements ChangesLoader {
 					Statistics.logOperationFinish(status, LOGGER_);
 				}
 			}
+
+			@Override
+			public void dispose() {
+				pendingChanges.clear();
+			}
 		};
 	}
 

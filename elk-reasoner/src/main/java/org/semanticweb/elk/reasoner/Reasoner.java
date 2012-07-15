@@ -167,6 +167,7 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public boolean shutdown(long timeout, TimeUnit unit)
 			throws InterruptedException {
+		reset();
 		if (executor == null)
 			return true;
 		executor.shutdown();

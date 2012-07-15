@@ -120,6 +120,11 @@ public class OwlOntologyLoader implements OntologyLoader {
 				}
 				progressMonitor.finish();
 			}
+
+			@Override
+			public void dispose() {
+				OwlOntologyLoader.this.dispose();
+			}
 		};
 	}
 
@@ -132,7 +137,7 @@ public class OwlOntologyLoader implements OntologyLoader {
 		if (importsClosureIterator.hasNext())
 			initAxioms(importsClosureIterator.next());
 		else
-			axiomsIterator = Collections.<OWLAxiom>emptySet().iterator();
+			axiomsIterator = Collections.<OWLAxiom> emptySet().iterator();
 	}
 
 	private void initAxioms(OWLOntology ontology) {
@@ -149,6 +154,13 @@ public class OwlOntologyLoader implements OntologyLoader {
 			status = ReasonerProgressMonitor.LOADING + " "
 					+ (importsClosureProcessed + 1) + " of "
 					+ importsClosureCount;
+	}
+
+	private void dispose() {
+		importsClosureIterator = null;
+		importsClosureProcessed = 0;
+		axiomsIterator = null;
+		axiomsProcessed = 0;
 	}
 
 }

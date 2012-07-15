@@ -60,18 +60,17 @@ public class Owl2StreamLoader implements OntologyLoader {
 
 	@Override
 	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
-		return new AbstractOwl2ParserLoader(owlParserFactory_.getParser(stream_),
+		return new Owl2ParserLoader(owlParserFactory_.getParser(stream_),
 				axiomLoader) {
 			@Override
-			protected void closeParsingResources() {
-				// TODO: what if this function is never called, i.e., the parser
-				// is interrupted?
+			public void disposeParserResources() {
+				super.disposeParserResources();
 				try {
 					stream_.close();
 				} catch (IOException e) {
-					exception = new ElkLoadingException(e.toString());
+					exception = new ElkLoadingException(
+							"Cannot close the input stream!", e);
 				}
-
 			}
 		};
 	}
