@@ -33,9 +33,12 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
 /**
  * Visitor pattern interface for instances of {@link ElkClassAxiom}.
- *
+ * 
  * @author Yevgeny Kazakov
- * @author Markus Kroetzsch 
+ * @author Markus Kroetzsch
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkClassAxiomVisitor<O> {
 

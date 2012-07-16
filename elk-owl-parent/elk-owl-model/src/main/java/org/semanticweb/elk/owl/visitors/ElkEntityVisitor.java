@@ -36,21 +36,23 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 /**
  * Visitor pattern interface for instances of {@link ElkEntity}.
  * 
- * @author Yevgeny Kazakov
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkEntityVisitor<O> {
-	
-	O visit (ElkAnnotationProperty elkAnnotationProperty);
-	
+
+	O visit(ElkAnnotationProperty elkAnnotationProperty);
+
 	O visit(ElkClass elkClass);
-	
+
 	O visit(ElkDataProperty elkDataProperty);
 
 	O visit(ElkDatatype elkDatatype);
-	
+
 	O visit(ElkNamedIndividual elkNamedIndividual);
-	
+
 	O visit(ElkObjectProperty elkObjectProperty);
 
 }

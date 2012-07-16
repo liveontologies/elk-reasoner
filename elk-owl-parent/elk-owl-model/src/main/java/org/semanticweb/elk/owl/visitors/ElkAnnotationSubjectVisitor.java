@@ -30,13 +30,18 @@ import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.iris.ElkIri;
 
 /**
- * Visitor interface for {@link ElkAnnotationSubject}. 
+ * Visitor interface for {@link ElkAnnotationSubject}.
  * 
  * @author Frantisek Simancik
- *
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkAnnotationSubjectVisitor<O> {
 
 	O visit(ElkIri iri);
+
 	O visit(ElkAnonymousIndividual anon);
 }

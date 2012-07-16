@@ -36,18 +36,18 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
  * @author Markus Kroetzsch
  */
 public interface ElkEntity extends ElkObject {
-	
+
 	/**
 	 * @return The IRI of this entity.
 	 */
 	public ElkIri getIri();
 
-
 	/**
-	 * Accept an ElkEntityVisitor.
+	 * Accept an {@link ElkEntityVisitor}.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkEntityVisitor<O> visitor);
 

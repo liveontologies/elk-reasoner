@@ -37,10 +37,11 @@ import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 public interface ElkAssertionAxiom extends ElkAxiom {
 
 	/**
-	 * Accept an ElkAssertionAxiomVisitor.
+	 * Accept an {@link ElkAssertionAxiomVisitor}.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkAssertionAxiomVisitor<O> visitor);
 

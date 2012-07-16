@@ -64,10 +64,11 @@ public interface ElkLiteral extends ElkObject, ElkAnnotationValue {
 	public ElkDatatype getDatatype();
 
 	/**
-	 * Accept an ElkLiteralVisitor.
+	 * Accept an {@link ElkLiteralVisitor}.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkLiteralVisitor<O> visitor);
 

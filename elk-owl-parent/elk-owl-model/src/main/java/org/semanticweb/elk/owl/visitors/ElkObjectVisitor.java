@@ -33,19 +33,14 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
- *
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
-public interface ElkObjectVisitor<O> extends 
-		ElkAxiomVisitor<O>,
-		ElkClassExpressionVisitor<O>,
-		ElkSubObjectPropertyExpressionVisitor<O>,
-		ElkDataPropertyExpressionVisitor<O>,
-		ElkIndividualVisitor<O>,
-		ElkLiteralVisitor<O>,
-		ElkEntityVisitor<O>,
-		ElkDataRangeVisitor<O>,
-		ElkFacetRestrictionVisitor<O>,
-		ElkAnnotationVisitor<O>,
-		ElkAnnotationSubjectVisitor<O>,
-		ElkAnnotationValueVisitor<O> {
+public interface ElkObjectVisitor<O> extends ElkAxiomVisitor<O>,
+		ElkClassExpressionVisitor<O>, ElkSubObjectPropertyExpressionVisitor<O>,
+		ElkDataPropertyExpressionVisitor<O>, ElkIndividualVisitor<O>,
+		ElkLiteralVisitor<O>, ElkEntityVisitor<O>, ElkDataRangeVisitor<O>,
+		ElkFacetRestrictionVisitor<O>, ElkAnnotationVisitor<O>,
+		ElkAnnotationSubjectVisitor<O>, ElkAnnotationValueVisitor<O> {
 }

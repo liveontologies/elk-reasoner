@@ -26,21 +26,20 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
-
-
 /**
- * This class represents an IRI. It redefines hash and equality so that two
- * IRIs are considered equal iff their string representations are equal.  
+ * This class represents an IRI. It redefines hash and equality so that two IRIs
+ * are considered equal iff their string representations are equal.
  * 
  * @author Frantisek Simancik
  * 
  */
-public abstract class ElkIri implements Comparable<ElkIri>, ElkAnnotationSubject, ElkAnnotationValue {
+public abstract class ElkIri implements Comparable<ElkIri>,
+		ElkAnnotationSubject, ElkAnnotationValue {
 
 	protected final int hashCode;
 
 	/**
-	 * Returns the full IRI as a string;
+	 * @return the full IRI as a string
 	 */
 	public abstract String asString();
 
@@ -59,7 +58,8 @@ public abstract class ElkIri implements Comparable<ElkIri>, ElkAnnotationSubject
 			return true;
 
 		if (obj instanceof ElkIri)
-			return this.hashCode == ((ElkIri) obj).hashCode && this.compareTo((ElkIri) obj) == 0;
+			return this.hashCode == ((ElkIri) obj).hashCode
+					&& this.compareTo((ElkIri) obj) == 0;
 
 		return false;
 	}
@@ -77,7 +77,7 @@ public abstract class ElkIri implements Comparable<ElkIri>, ElkAnnotationSubject
 	public int compareTo(ElkIri arg) {
 		return this.asString().compareTo(arg.asString());
 	}
-	
+
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return visitor.visit(this);

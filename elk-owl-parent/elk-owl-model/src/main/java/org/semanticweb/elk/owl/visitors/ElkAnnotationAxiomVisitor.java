@@ -32,17 +32,23 @@ import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkAnnotationAxiomVisitor<O> {
 
 	O visit(ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOfAxiom);
+
 	O visit(ElkAnnotationPropertyDomainAxiom annotationPropertyDomainAxiom);
+
 	O visit(ElkAnnotationPropertyRangeAxiom annotationPropertyRangeAxiom);
+
 	O visit(ElkAnnotationAssertionAxiom annotationAssertionAxiom);
 
 }

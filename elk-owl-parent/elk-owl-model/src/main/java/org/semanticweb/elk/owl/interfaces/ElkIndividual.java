@@ -37,10 +37,11 @@ import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 public interface ElkIndividual extends ElkObject {
 
 	/**
-	 * Accept an ElkIndividualVisitor.
+	 * Accept an {@link ElkIndividualVisitor}.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkIndividualVisitor<O> visitor);
 

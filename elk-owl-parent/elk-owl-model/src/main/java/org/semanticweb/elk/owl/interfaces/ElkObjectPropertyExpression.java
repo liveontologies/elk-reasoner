@@ -38,10 +38,11 @@ public interface ElkObjectPropertyExpression extends
 		ElkSubObjectPropertyExpression, ElkObject {
 
 	/**
-	 * Accept an ElkObjectPropertyExpressionVisitor.
+	 * Accept an {@link ElkObjectPropertyExpressionVisitor}.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor);
 

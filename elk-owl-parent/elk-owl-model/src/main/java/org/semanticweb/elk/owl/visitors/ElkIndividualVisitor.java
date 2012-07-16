@@ -26,9 +26,14 @@ import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 
 /**
- * Visitor interface for ELKIndividual. 
+ * Visitor interface for ELKIndividual.
  * 
  * @author Markus Kroetzsch
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkIndividualVisitor<O> {
 

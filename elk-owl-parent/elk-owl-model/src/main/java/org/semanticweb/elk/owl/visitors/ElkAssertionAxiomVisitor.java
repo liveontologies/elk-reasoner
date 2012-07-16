@@ -33,23 +33,27 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 
 /**
  * Visitor pattern interface for instances of {@link ElkAssertionAxiom}.
- *
- * @author Markus Kroetzsch 
+ * 
+ * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkAssertionAxiomVisitor<O> {
-	
+
 	O visit(ElkClassAssertionAxiom elkClassAssertionAxiom);
-	
+
 	O visit(ElkDataPropertyAssertionAxiom elkDataPropertyAssertionAxiom);
-	
+
 	O visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom);
-	
+
 	O visit(ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion);
-	
+
 	O visit(ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion);
-	
+
 	O visit(ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom);
-	
+
 	O visit(ElkSameIndividualAxiom elkSameIndividualAxiom);
 
 }

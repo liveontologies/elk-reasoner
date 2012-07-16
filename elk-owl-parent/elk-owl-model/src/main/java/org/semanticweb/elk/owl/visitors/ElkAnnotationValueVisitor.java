@@ -31,16 +31,22 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.iris.ElkIri;
 
 /**
- * Visitor interface for {@link ElkAnnotationValue}. 
+ * Visitor interface for {@link ElkAnnotationValue}.
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkAnnotationValueVisitor<O> {
 
 	O visit(ElkIri iri);
+
 	O visit(ElkLiteral literal);
+
 	O visit(ElkAnonymousIndividual anon);
 }

@@ -34,133 +34,192 @@ import org.semanticweb.elk.owl.iris.ElkIri;
  * Interface that provides methods for creating instances of ElkObjects.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
 public interface ElkObjectFactory {
 
 	/**
-	 * Create an {@link ElkAnnotation}}
+	 * Create an {@link ElkAnnotation}
 	 * 
-	 * @return
+	 * @param property
+	 *            the {@link ElkAnnotationProperty} for which the object should
+	 *            be created
+	 * @param value
+	 *            the {@link ElkAnnotationValue} for which the object should be
+	 *            created
+	 * @return an {@link ElkAnnotation} corresponding to the input
 	 */
-	public ElkAnnotation getAnnotation(ElkAnnotationProperty property, ElkAnnotationValue value);
-	
+	public ElkAnnotation getAnnotation(ElkAnnotationProperty property,
+			ElkAnnotationValue value);
+
 	/**
 	 * Create an {@link ElkAnnotationProperty}.
 	 * 
 	 * @param iri
-	 * @return
+	 *            the {@link ElkIri} for which the object should be created
+	 * @return an {@link ElkAnnotation} corresponding to the input
 	 */
-	public  ElkAnnotationProperty getAnnotationProperty(ElkIri iri);
-	
+	public ElkAnnotationProperty getAnnotationProperty(ElkIri iri);
+
 	/**
-	 * Create an {@link ElkAnnotationAssertionAxiom}}
+	 * Create an {@link ElkAnnotationAssertionAxiom}
 	 * 
-	 * @return
+	 * @param property
+	 *            the {@link ElkAnnotationProperty} for which the axiom should
+	 *            be created
+	 * @param subject
+	 *            the {@link ElkAnnotationSubject} for which the axiom should be
+	 *            created
+	 * @param value
+	 *            the {@link ElkAnnotationValue} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkAnnotationAssertionAxiom} corresponding to the input
 	 */
-	public ElkAnnotationAssertionAxiom getAnnotationAssertionAxiom(ElkAnnotationProperty property, ElkAnnotationSubject subject, ElkAnnotationValue value);
-	
+	public ElkAnnotationAssertionAxiom getAnnotationAssertionAxiom(
+			ElkAnnotationProperty property, ElkAnnotationSubject subject,
+			ElkAnnotationValue value);
+
 	/**
 	 * Create an {@link ElkAnnotationPropertyDomainAxiom}
-	 *
+	 * 
 	 * @param property
+	 *            the {@link ElkAnnotationProperty} for which the axiom should
+	 *            be created
 	 * @param domain
-	 * @return
+	 *            the {@link ElkIri} for which the axiom should be created
+	 * @return an {@link ElkAnnotationPropertyDomainAxiom} corresponding to the
+	 *         input
 	 */
 	public ElkAnnotationPropertyDomainAxiom getAnnotationPropertyDomainAxiom(
 			ElkAnnotationProperty property, ElkIri domain);
-	
+
 	/**
 	 * Create an {@link ElkAnnotationPropertyRangeAxiom}
 	 * 
 	 * @param property
+	 *            the {@link ElkAnnotationProperty} for which the axiom should
+	 *            be created
 	 * @param range
-	 * @return
+	 *            the {@link ElkIri} for which the object axiom be created
+	 * @return an {@link ElkAnnotationPropertyRangeAxiom} corresponding to the
+	 *         input
 	 */
 	public ElkAnnotationPropertyRangeAxiom getAnnotationPropertyRangeAxiom(
 			ElkAnnotationProperty property, ElkIri range);
-	
-	
-	
+
 	/**
 	 * Create an {@link ElkAnonymousIndividual}.
 	 * 
 	 * @param nodeId
-	 * @return
+	 *            the {@link String} for which the object should be created
+	 * @return an {@link ElkAnonymousIndividual} corresponding to the input
 	 */
-	public  ElkAnonymousIndividual getAnonymousIndividual(String nodeId);
+	public ElkAnonymousIndividual getAnonymousIndividual(String nodeId);
 
 	/**
 	 * Create an {@link ElkAsymmetricObjectPropertyAxiom}.
 	 * 
 	 * @param objectPropertyExpression
-	 * @return
+	 *            the {@link ElkObjectPropertyExpression} for which the axiom
+	 *            should be created
+	 * @return an {@link ElkAsymmetricObjectPropertyAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkAsymmetricObjectPropertyAxiom getAsymmetricObjectPropertyAxiom(
+	public ElkAsymmetricObjectPropertyAxiom getAsymmetricObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
 	 * Create an {@link ElkClass}.
 	 * 
 	 * @param iri
-	 * @return
+	 *            the {@link ElkIri} for which the object should be created
+	 * @return an {@link ElkClass} corresponding to the input
 	 */
-	public  ElkClass getClass(ElkIri iri);
+	public ElkClass getClass(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkClassAssertionAxiom}.
 	 * 
 	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which the axiom should be
+	 *            created
 	 * @param individual
-	 * @return
+	 *            the {@link ElkIndividual} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkClassAssertionAxiom} corresponding to the input
 	 */
-	public  ElkClassAssertionAxiom getClassAssertionAxiom(
+	public ElkClassAssertionAxiom getClassAssertionAxiom(
 			ElkClassExpression classExpression, ElkIndividual individual);
 
 	/**
 	 * Create an {@link ElkDataAllValuesFrom}.
 	 * 
 	 * @param dataRange
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
 	 * @param dpe1
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param dpe
-	 * @return
+	 *            the {@link ElkDataPropertyExpression}s for which the object
+	 *            should be created
+	 * @return an {@link ElkDataAllValuesFrom} corresponding to the input
 	 */
-	public  ElkDataAllValuesFrom getDataAllValuesFrom(
-			ElkDataRange dataRange,
-			ElkDataPropertyExpression dpe1,
-			ElkDataPropertyExpression... dpe);
-	
-	public  ElkDataAllValuesFrom getDataAllValuesFrom(
-			ElkDataRange dataRange,
-			List<? extends ElkDataPropertyExpression> dpList);	
+	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
+			ElkDataPropertyExpression dpe1, ElkDataPropertyExpression... dpe);
+
+	/**
+	 * Create an {@link ElkDataAllValuesFrom}.
+	 * 
+	 * @param dataRange
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
+	 * @param dpList
+	 *            the {@link ElkDataPropertyExpression}s for which the object
+	 *            should be created
+	 * @return an {@link ElkDataAllValuesFrom} corresponding to the input
+	 */
+	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
+			List<? extends ElkDataPropertyExpression> dpList);
 
 	/**
 	 * Create an {@link ElkDataComplementOf}.
 	 * 
 	 * @param dataRange
-	 * @return
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
+	 * @return an {@link ElkDataComplementOf} corresponding to the input
 	 */
-	public  ElkDataComplementOf getDataComplementOf(
-			ElkDataRange dataRange);
+	public ElkDataComplementOf getDataComplementOf(ElkDataRange dataRange);
 
 	/**
 	 * Create an {@link ElkDataExactCardinality}.
 	 * 
 	 * @param dataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
-	 * @return
+	 *            the cardinality for which the object should be created
+	 * @return an {@link ElkDataExactCardinality} corresponding to the input
 	 */
-	public  ElkDataExactCardinality getDataExactCardinality(
+	public ElkDataExactCardinality getDataExactCardinality(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
 
 	/**
 	 * Create an {@link ElkDataExactCardinalityQualified}.
 	 * 
 	 * @param dataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
+	 *            the cardinality for which the object should be created
 	 * @param dataRange
-	 * @return
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
+	 * @return an {@link ElkDataExactCardinalityQualified} corresponding to the
+	 *         input
 	 */
-	public  ElkDataExactCardinalityQualified getDataExactCardinalityQualified(
+	public ElkDataExactCardinalityQualified getDataExactCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange);
 
@@ -168,21 +227,30 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDataHasValue}.
 	 * 
 	 * @param dataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param literal
-	 * @return
+	 *            the {@link ElkLiteral} for which the object should be created
+	 * @return an {@link ElkDataHasValue} corresponding to the input
 	 */
-	public  ElkDataHasValue getDataHasValue(
+	public ElkDataHasValue getDataHasValue(
 			ElkDataPropertyExpression dataPropertyExpression, ElkLiteral literal);
 
 	/**
 	 * Create an {@link ElkDataIntersectionOf}.
 	 * 
 	 * @param firstDataRange
+	 *            the first {@link ElkDataRange} for which the object should be
+	 *            created
 	 * @param secondDataRange
+	 *            the second {@link ElkDataRange} for which the object should be
+	 *            created
 	 * @param otherDataRanges
-	 * @return
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
+	 * @return an {@link ElkDataIntersectionOf} corresponding to the input
 	 */
-	public  ElkDataIntersectionOf getDataIntersectionOf(
+	public ElkDataIntersectionOf getDataIntersectionOf(
 			ElkDataRange firstDataRange, ElkDataRange secondDataRange,
 			ElkDataRange... otherDataRanges);
 
@@ -190,30 +258,41 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDataIntersectionOf}.
 	 * 
 	 * @param dataRanges
-	 * @return
+	 *            the {@link ElkDataRange}s for which the object should be
+	 *            created
+	 * @return an {@link ElkDataIntersectionOf} corresponding to the input
 	 */
-	public  ElkDataIntersectionOf getDataIntersectionOf(
+	public ElkDataIntersectionOf getDataIntersectionOf(
 			List<? extends ElkDataRange> dataRanges);
 
 	/**
 	 * Create an {@link ElkDataMaxCardinality}.
 	 * 
 	 * @param dataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
-	 * @return
+	 *            the cardinality for which the object should be created
+	 * @return an {@link ElkDataMaxCardinality} corresponding to the input
 	 */
-	public  ElkDataMaxCardinality getDataMaxCardinality(
+	public ElkDataMaxCardinality getDataMaxCardinality(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
 
 	/**
 	 * Create an {@link ElkDataMaxCardinalityQualified}.
 	 * 
 	 * @param dataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
+	 *            the cardinality for which the object should be created
 	 * @param dataRange
-	 * @return
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
+	 * @return an {@link ElkDataMaxCardinalityQualified} corresponding to the
+	 *         input
 	 */
-	public  ElkDataMaxCardinalityQualified getDataMaxCardinalityQualified(
+	public ElkDataMaxCardinalityQualified getDataMaxCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange);
 
@@ -221,60 +300,79 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDataMinCardinality}.
 	 * 
 	 * @param dataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
-	 * @return
+	 *            the cardinality for which the object should be created
+	 * @return an {@link ElkDataMinCardinality} corresponding to the input
 	 */
-	public  ElkDataMinCardinality getDataMinCardinality(
+	public ElkDataMinCardinality getDataMinCardinality(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
 
 	/**
 	 * Create an {@link ElkDataMinCardinalityQualified}.
 	 * 
 	 * @param dataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
+	 *            the cardinality for which the object should be created
 	 * @param dataRange
-	 * @return
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
+	 * @return an {@link ElkDataMinCardinalityQualified} corresponding to the
+	 *         input
 	 */
-	public  ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
+	public ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange);
 
 	/**
 	 * Create an {@link ElkDataOneOf}.
 	 * 
-	 * @param firstIndividual
-	 * @param otherIndividuals
-	 * @return
+	 * @param firstLiteral
+	 *            the {@link ElkLiteral} for which the object should be created
+	 * @param otherLiterals
+	 *            other {@link ElkLiteral}s for which the object should be
+	 *            created
+	 * @return an {@link ElkDataOneOf} corresponding to the input
 	 */
-	public  ElkDataOneOf getDataOneOf(ElkLiteral firstLiteral,
+	public ElkDataOneOf getDataOneOf(ElkLiteral firstLiteral,
 			ElkLiteral... otherLiterals);
 
 	/**
 	 * Create an {@link ElkDataOneOf}.
 	 * 
 	 * @param literals
-	 * @return
+	 *            the {@link ElkLiteral}s for which the object should be created
+	 * @return an {@link ElkDataOneOf} corresponding to the input
 	 */
-	public  ElkDataOneOf getDataOneOf(
-			List<? extends ElkLiteral> literals);
+	public ElkDataOneOf getDataOneOf(List<? extends ElkLiteral> literals);
 
 	/**
 	 * Create an {@link ElkDataProperty}.
 	 * 
-	 * @param dataPropertyIri
-	 * @return
+	 * @param iri
+	 *            the {@link ElkIri} for which the object should be created
+	 * @return an {@link ElkDataProperty} corresponding to the input
 	 */
-	public  ElkDataProperty getDataProperty(ElkIri iri);
+	public ElkDataProperty getDataProperty(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkDataPropertyAssertionAxiom}.
 	 * 
 	 * @param dataPropertyExpression
-	 * @param firstIndividual
-	 * @param secondIndividual
-	 * @return
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
+	 * @param individual
+	 *            the {@link ElkIndividual} for which the object should be
+	 *            created
+	 * @param literal
+	 *            the {@link ElkLiteral} for which the object should be created
+	 * @return an {@link ElkDataPropertyAssertionAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
+	public ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkIndividual individual, ElkLiteral literal);
 
@@ -282,10 +380,14 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDataPropertyDomainAxiom}.
 	 * 
 	 * @param dataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param classExpression
-	 * @return
+	 *            the {@link ElkClassExpression} for which the object should be
+	 *            created
+	 * @return an {@link ElkDataPropertyDomainAxiom} corresponding to the input
 	 */
-	public  ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
+	public ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -293,10 +395,14 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDataPropertyRangeAxiom}.
 	 * 
 	 * @param dataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the object
+	 *            should be created
 	 * @param dataRange
-	 * @return
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
+	 * @return an {@link ElkDataPropertyRangeAxiom} corresponding to the input
 	 */
-	public  ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
+	public ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkDataRange dataRange);
 
@@ -304,81 +410,114 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDataSomeValuesFrom}
 	 * 
 	 * @param dataRange
-	 * @param dpe1
-	 * @param dpe
-	 * @return
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
+	 * @param firstDataPropertyExpression
+	 *            the first {@link ElkDataPropertyExpression} for which the
+	 *            object should be created
+	 * @param otherDataPropertyExpressions
+	 *            other {@link ElkDataPropertyExpression}s for which the object
+	 *            should be created
+	 * @return an {@link ElkDataSomeValuesFrom} corresponding to the input
 	 */
-	public  ElkDataSomeValuesFrom getDataSomeValuesFrom(
-			ElkDataRange dataRange,
-			ElkDataPropertyExpression dpe1,
-			ElkDataPropertyExpression... dpe);
-	
-	public  ElkDataSomeValuesFrom getDataSomeValuesFrom(
-			ElkDataRange dataRange,
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
+			ElkDataPropertyExpression firstDataPropertyExpression,
+			ElkDataPropertyExpression... otherDataPropertyExpressions);
+
+	/**
+	 * Create an {@link ElkDataSomeValuesFrom}
+	 * 
+	 * @param dataRange
+	 *            the {@link ElkDataRange} for which the object should be
+	 *            created
+	 * @param dpList
+	 *            the {@link ElkDataPropertyExpression}s for which the object
+	 *            should be created
+	 * @return an {@link ElkDataSomeValuesFrom} corresponding to the input
+	 */
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
 			List<? extends ElkDataPropertyExpression> dpList);
 
 	/**
 	 * Create an {@link ElkDatatype}.
 	 * 
 	 * @param iri
-	 * @return
+	 *            the {@link ElkIri} for which the object should be created
+	 * @return an {@link ElkDatatype} corresponding to the input
 	 */
-	public  ElkDatatype getDatatype(ElkIri iri);
+	public ElkDatatype getDatatype(ElkIri iri);
 
 	/**
 	 * Create the ElkDatatype for rdf:PlainLiteral}.
 	 * 
-	 * @return
+	 * @return an {@link ElkDatatype} corresponding to the input
 	 */
-	public  ElkDatatype getDatatypeRdfPlainLiteral();
+	public ElkDatatype getDatatypeRdfPlainLiteral();
 
 	/**
 	 * Create an {@link ElkDatatypeRestriction}.
 	 * 
 	 * @param datatype
+	 *            the {@link ElkDatatype} for which the object should be created
 	 * @param facetRestrictions
-	 * @return
+	 *            the {@link ElkFacetRestriction}s for which the object should
+	 *            be created
+	 * @return an {@link ElkDatatypeRestriction} corresponding to the input
 	 */
-	public  ElkDatatypeRestriction getDatatypeRestriction(
-			ElkDatatype datatype, List<ElkFacetRestriction> facetRestrictions);
+	public ElkDatatypeRestriction getDatatypeRestriction(ElkDatatype datatype,
+			List<ElkFacetRestriction> facetRestrictions);
 
 	/**
 	 * Create an {@link ElkDataUnionOf}.
 	 * 
 	 * @param firstDataRange
+	 *            the first {@link ElkDataRange} for which the object should be
+	 *            created
 	 * @param secondDataRange
+	 *            the second {@link ElkDataRange} for which the object should be
+	 *            created
 	 * @param otherDataRanges
-	 * @return
+	 *            other {@link ElkDataRange}s for which the object should be
+	 *            created
+	 * @return an {@link ElkDataUnionOf} corresponding to the input
 	 */
-	public  ElkDataUnionOf getDataUnionOf(ElkDataRange firstDataRange,
+	public ElkDataUnionOf getDataUnionOf(ElkDataRange firstDataRange,
 			ElkDataRange secondDataRange, ElkDataRange... otherDataRanges);
 
 	/**
 	 * Create an {@link ElkDataUnionOf}.
 	 * 
 	 * @param dataRanges
-	 * @return
+	 *            the {@link ElkDataRange}s for which the object should be
+	 *            created
+	 * @return an {@link ElkDataUnionOf} corresponding to the input
 	 */
-	public  ElkDataUnionOf getDataUnionOf(
-			List<? extends ElkDataRange> dataRanges);
+	public ElkDataUnionOf getDataUnionOf(List<? extends ElkDataRange> dataRanges);
 
 	/**
 	 * Create an {@link ElkDeclarationAxiom}.
 	 * 
 	 * @param entity
-	 * @return
+	 *            the {@link ElkEntity} for which the axiom should be created
+	 * @return an {@link ElkDeclarationAxiom} corresponding to the input
 	 */
-	public  ElkDeclarationAxiom getDeclarationAxiom(ElkEntity entity);
+	public ElkDeclarationAxiom getDeclarationAxiom(ElkEntity entity);
 
 	/**
 	 * Create an {@link ElkDifferentIndividualsAxiom}.
 	 * 
 	 * @param firstIndividual
+	 *            the first {@link ElkIndividual} for which the axiom should be
+	 *            created
 	 * @param secondIndividual
+	 *            the second {@link ElkIndividual} for which the axiom should be
+	 *            created
 	 * @param otherIndividuals
-	 * @return
+	 *            other {@link ElkIndividual} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkAnnotation} corresponding to the input
 	 */
-	public  ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
+	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
 			ElkIndividual... otherIndividuals);
 
@@ -386,20 +525,29 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDifferentIndividualsAxiom}.
 	 * 
 	 * @param individuals
-	 * @return
+	 *            the {@link ElkIndividual}s for which the axiom should be
+	 *            created
+	 * @return an {@link ElkDifferentIndividualsAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
+	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
 			List<? extends ElkIndividual> individuals);
 
 	/**
 	 * Create an {@link ElkDisjointClassesAxiom}.
 	 * 
 	 * @param firstClassExpression
+	 *            the first {@link ElkClassExpression} for which the axiom
+	 *            should be created
 	 * @param secondClassExpression
+	 *            the second {@link ElkClassExpression} for which the axiom
+	 *            should be created
 	 * @param otherClassExpressions
-	 * @return
+	 *            other {@link ElkClassExpression} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkDisjointClassesAxiom} corresponding to the input
 	 */
-	public  ElkDisjointClassesAxiom getDisjointClassesAxiom(
+	public ElkDisjointClassesAxiom getDisjointClassesAxiom(
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
@@ -408,20 +556,29 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDisjointClassesAxiom}.
 	 * 
 	 * @param disjointClassExpressions
-	 * @return
+	 *            the {@link ElkClassExpression}s for which the axiom should be
+	 *            created
+	 * @return an {@link ElkDisjointClassesAxiom} corresponding to the input
 	 */
-	public  ElkDisjointClassesAxiom getDisjointClassesAxiom(
+	public ElkDisjointClassesAxiom getDisjointClassesAxiom(
 			List<? extends ElkClassExpression> disjointClassExpressions);
 
 	/**
 	 * Create an {@link ElkDisjointDataPropertiesAxiom}.
 	 * 
 	 * @param firstDataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the axiom
+	 *            should be created
 	 * @param secondDataPropertyExpression
+	 *            the {@link ElkDataPropertyExpression} for which the axiom
+	 *            should be created
 	 * @param otherDataPropertyExpressions
-	 * @return
+	 *            the {@link ElkDataPropertyExpression} for which the axiom
+	 *            should be created
+	 * @return an {@link ElkDisjointDataPropertiesAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
+	public ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
 			ElkDataPropertyExpression firstDataPropertyExpression,
 			ElkDataPropertyExpression secondDataPropertyExpression,
 			ElkDataPropertyExpression... otherDataPropertyExpressions);
@@ -430,20 +587,30 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDisjointDataPropertiesAxiom}.
 	 * 
 	 * @param disjointDataPropertyExpressions
-	 * @return
+	 *            the {@link ElkDataPropertyExpression}s for which the axiom
+	 *            should be created
+	 * @return an {@link ElkDisjointDataPropertiesAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
+	public ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
 			List<? extends ElkDataPropertyExpression> disjointDataPropertyExpressions);
 
 	/**
 	 * Create an {@link ElkDisjointObjectPropertiesAxiom}.
 	 * 
 	 * @param firstObjectPropertyExpression
+	 *            the first {@link ElkObjectPropertyExpression} for which the
+	 *            axiom should be created
 	 * @param secondObjectPropertyExpression
+	 *            the second {@link ElkObjectPropertyExpression} for which the
+	 *            axiom should be created
 	 * @param otherObjectPropertyExpressions
-	 * @return
+	 *            other {@link ElkObjectPropertyExpression}s for which the axiom
+	 *            should be created
+	 * @return an {@link ElkDisjointObjectPropertiesAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
+	public ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression,
 			ElkObjectPropertyExpression... otherObjectPropertyExpressions);
@@ -452,43 +619,65 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkDisjointObjectPropertiesAxiom}.
 	 * 
 	 * @param disjointObjectPropertyExpressions
-	 * @return
+	 *            the {@link ElkObjectPropertyExpression}s for which the axiom
+	 *            should be created
+	 * @return an {@link ElkDisjointObjectPropertiesAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
+	public ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
 			List<? extends ElkObjectPropertyExpression> disjointObjectPropertyExpressions);
 
 	/**
 	 * Create an {@link ElkDisjointUnionAxiom}.
 	 * 
+	 * @param definedClass
+	 *            the defined {@link ElkClassExpression} for which the axiom
+	 *            should be created
 	 * @param firstClassExpression
+	 *            the first disjoint {@link ElkClassExpression} for which the
+	 *            axiom should be created
 	 * @param secondClassExpression
+	 *            the second disjoint {@link ElkClassExpression} for which the
+	 *            axiom should be created
 	 * @param otherClassExpressions
-	 * @return
+	 *            other disjoint {@link ElkClassExpression}s for which the axiom
+	 *            should be created
+	 * @return an {@link ElkDisjointUnionAxiom} corresponding to the input
 	 */
-	public  ElkDisjointUnionAxiom getDisjointUnionAxiom(
-			ElkClass definedClass, ElkClassExpression firstClassExpression,
+	public ElkDisjointUnionAxiom getDisjointUnionAxiom(ElkClass definedClass,
+			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
 
 	/**
 	 * Create an {@link ElkDisjointUnionAxiom}.
 	 * 
+	 * @param definedClass
+	 *            the defined {@link ElkClassExpression} for which the axiom
+	 *            should be created
 	 * @param disjointClassExpressions
-	 * @return
+	 *            the disjoint {@link ElkClassExpression}s for which the axiom
+	 *            should be created
+	 * @return an {@link ElkDisjointUnionAxiom} corresponding to the input
 	 */
-	public  ElkDisjointUnionAxiom getDisjointUnionAxiom(
-			ElkClass definedClass,
+	public ElkDisjointUnionAxiom getDisjointUnionAxiom(ElkClass definedClass,
 			List<? extends ElkClassExpression> disjointClassExpressions);
 
 	/**
 	 * Create an {@link ElkEquivalentClassesAxiom}.
 	 * 
 	 * @param firstClassExpression
+	 *            the first equivalent {@link ElkClassExpression} for which the
+	 *            axiom should be created
 	 * @param secondClassExpression
+	 *            the second equivalent {@link ElkClassExpression} for which the
+	 *            axiom should be created
 	 * @param otherClassExpressions
-	 * @return
+	 *            other equivalent {@link ElkClassExpression}s for which the
+	 *            axiom should be created
+	 * @return an {@link ElkEquivalentClassesAxiom} corresponding to the input
 	 */
-	public  ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
+	public ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
@@ -497,20 +686,29 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkEquivalentClassesAxiom}.
 	 * 
 	 * @param equivalentClassExpressions
-	 * @return
+	 *            the equivalent {@link ElkClassExpression}s for which the axiom
+	 *            should be created
+	 * @return an {@link ElkEquivalentClassesAxiom} corresponding to the input
 	 */
-	public  ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
+	public ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
 			List<? extends ElkClassExpression> equivalentClassExpressions);
 
 	/**
 	 * Create an {@link ElkEquivalentDataPropertiesAxiom}.
 	 * 
 	 * @param firstDataPropertyExpression
+	 *            the fist equivalent {@link ElkDataPropertyExpression} for
+	 *            which the axiom should be created
 	 * @param secondDataPropertyExpression
+	 *            the second equivalent {@link ElkDataPropertyExpression} for
+	 *            which the axiom should be created
 	 * @param otherDataPropertyExpressions
-	 * @return
+	 *            other equivalent {@link ElkDataPropertyExpression}s for which
+	 *            the axiom should be created
+	 * @return an {@link ElkEquivalentDataPropertiesAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+	public ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
 			ElkDataPropertyExpression firstDataPropertyExpression,
 			ElkDataPropertyExpression secondDataPropertyExpression,
 			ElkDataPropertyExpression... otherDataPropertyExpressions);
@@ -519,20 +717,30 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkEquivalentDataPropertiesAxiom}.
 	 * 
 	 * @param equivalentDataPropertyExpressions
-	 * @return
+	 *            the equivalent {@link ElkDataPropertyExpression}s for which
+	 *            the axiom should be created
+	 * @return an {@link ElkEquivalentDataPropertiesAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+	public ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
 			List<? extends ElkDataPropertyExpression> equivalentDataPropertyExpressions);
 
 	/**
 	 * Create an {@link ElkEquivalentObjectPropertiesAxiom}.
 	 * 
 	 * @param firstObjectPropertyExpression
+	 *            the first equivalent {@link ElkObjectPropertyExpression} for
+	 *            which the axiom should be created
 	 * @param secondObjectPropertyExpression
+	 *            the second equivalent {@link ElkObjectPropertyExpression} for
+	 *            which the axiom should be created
 	 * @param otherObjectPropertyExpressions
-	 * @return
+	 *            other equivalent {@link ElkObjectPropertyExpression}s for
+	 *            which the axiom should be created
+	 * @return an {@link ElkEquivalentObjectPropertiesAxiom} corresponding to
+	 *         the input
 	 */
-	public  ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
+	public ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression,
 			ElkObjectPropertyExpression... otherObjectPropertyExpressions);
@@ -541,46 +749,65 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkEquivalentObjectPropertiesAxiom}.
 	 * 
 	 * @param equivalentObjectPropertyExpressions
-	 * @return
+	 *            the equivalent {@link ElkObjectPropertyExpression}s for which
+	 *            the axiom should be created
+	 * @return an {@link ElkEquivalentObjectPropertiesAxiom} corresponding to
+	 *         the input
 	 */
-	public  ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
+	public ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
 			List<? extends ElkObjectPropertyExpression> equivalentObjectPropertyExpressions);
 
 	/**
 	 * Create an {@link ElkFunctionalDataPropertyAxiom}.
 	 * 
 	 * @param dataPropertyExpression
-	 * @return
+	 *            the functional {@link ElkDataPropertyExpression} for which the
+	 *            axiom should be created
+	 * @return an {@link ElkFunctionalDataPropertyAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkFunctionalDataPropertyAxiom getFunctionalDataPropertyAxiom(
+	public ElkFunctionalDataPropertyAxiom getFunctionalDataPropertyAxiom(
 			ElkDataPropertyExpression dataPropertyExpression);
 
 	/**
 	 * Create an {@link ElkFunctionalObjectPropertyAxiom}.
 	 * 
 	 * @param objectPropertyExpression
-	 * @return
+	 *            the functional {@link ElkObjectPropertyExpression} for which
+	 *            the axiom should be created
+	 * @return an {@link ElkFunctionalObjectPropertyAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkFunctionalObjectPropertyAxiom getFunctionalObjectPropertyAxiom(
+	public ElkFunctionalObjectPropertyAxiom getFunctionalObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
 	 * Create an {@link ElkInverseFunctionalObjectPropertyAxiom}.
 	 * 
 	 * @param objectPropertyExpression
-	 * @return
+	 *            the inverse functional {@link ElkObjectPropertyExpression} for
+	 *            which the axiom should be created
+	 * @return an {@link ElkInverseFunctionalObjectPropertyAxiom} corresponding
+	 *         to the input
 	 */
-	public  ElkInverseFunctionalObjectPropertyAxiom getInverseFunctionalObjectPropertyAxiom(
+	public ElkInverseFunctionalObjectPropertyAxiom getInverseFunctionalObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
 	 * Create an {@link ElkInverseObjectPropertiesAxiom}.
 	 * 
 	 * @param firstObjectPropertyExpression
+	 *            the first {@link ElkObjectPropertyExpression} that should be
+	 *            the inverse of the second one for which the axiom should be
+	 *            created
 	 * @param secondObjectPropertyExpression
-	 * @return
+	 *            the second {@link ElkObjectPropertyExpression} that should be
+	 *            the inverse of the first one for which the axiom should be
+	 *            created
+	 * @return an {@link ElkInverseObjectPropertiesAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkInverseObjectPropertiesAxiom getInverseObjectPropertiesAxiom(
+	public ElkInverseObjectPropertiesAxiom getInverseObjectPropertiesAxiom(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression);
 
@@ -588,38 +815,49 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkIrreflexiveObjectPropertyAxiom}.
 	 * 
 	 * @param objectPropertyExpression
-	 * @return
+	 *            the irreflexive {@link ElkObjectPropertyExpression} for which
+	 *            the axiom should be created
+	 * @return an {@link ElkIrreflexiveObjectPropertyAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
+	public ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
 	 * Create an {@link ElkLiteral}.
 	 * 
 	 * @param lexicalForm
+	 *            the {@link String} for which the object should be created
 	 * @param datatype
-	 * @return
+	 *            the {@link ElkDatatype} for which the object should be created
+	 * @return an {@link ElkLiteral} corresponding to the input
 	 */
-	public  ElkLiteral getLiteral(String lexicalForm,
-			ElkDatatype datatype);
+	public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype);
 
 	/**
 	 * Create an {@link ElkNamedIndividual}.
 	 * 
 	 * @param iri
-	 * @return
+	 *            the {@link ElkIri} for which the object should be created
+	 * @return an {@link ElkNamedIndividual} corresponding to the input
 	 */
-	public  ElkNamedIndividual getNamedIndividual(ElkIri iri);
+	public ElkNamedIndividual getNamedIndividual(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkNegativeDataPropertyAssertionAxiom}.
 	 * 
 	 * @param dataPropertyExpression
-	 * @param firstIndividual
-	 * @param secondIndividual
-	 * @return
+	 *            the {@link ElkDataPropertyExpression} for which the axiom
+	 *            should be created
+	 * @param individual
+	 *            the {@link ElkIndividual} for which the axiom should be
+	 *            created
+	 * @param literal
+	 *            the {@link ElkLiteral} for which the axiom should be created
+	 * @return an {@link ElkNegativeDataPropertyAssertionAxiom} corresponding to
+	 *         the input
 	 */
-	public  ElkNegativeDataPropertyAssertionAxiom getNegativeDataPropertyAssertionAxiom(
+	public ElkNegativeDataPropertyAssertionAxiom getNegativeDataPropertyAssertionAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkIndividual individual, ElkLiteral literal);
 
@@ -627,11 +865,18 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkNegativeObjectPropertyAssertionAxiom}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the axiom
+	 *            should be created
 	 * @param firstIndividual
+	 *            the {@link ElkIndividual} for which the axiom should be
+	 *            created
 	 * @param secondIndividual
-	 * @return
+	 *            the {@link ElkIndividual} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkNegativeObjectPropertyAssertionAxiom} corresponding
+	 *         to the input
 	 */
-	public  ElkNegativeObjectPropertyAssertionAxiom getNegativeObjectPropertyAssertionAxiom(
+	public ElkNegativeObjectPropertyAssertionAxiom getNegativeObjectPropertyAssertionAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual);
 
@@ -639,10 +884,14 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectAllValuesFrom}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the axiom
+	 *            should be created
 	 * @param classExpression
-	 * @return
+	 *            the {@link ElkClassExpression} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkObjectAllValuesFrom} corresponding to the input
 	 */
-	public  ElkObjectAllValuesFrom getObjectAllValuesFrom(
+	public ElkObjectAllValuesFrom getObjectAllValuesFrom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -650,19 +899,22 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectComplementOf}.
 	 * 
 	 * @param classExpression
-	 * @return
+	 * @return an {@link ElkObjectComplementOf} corresponding to the input
 	 */
-	public  ElkObjectComplementOf getObjectComplementOf(
+	public ElkObjectComplementOf getObjectComplementOf(
 			ElkClassExpression classExpression);
 
 	/**
 	 * Create an {@link ElkObjectExactCardinality}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
-	 * @return
+	 *            the cardinality for which the object should be created
+	 * @return an {@link ElkObjectExactCardinality} corresponding to the input
 	 */
-	public  ElkObjectExactCardinality getObjectExactCardinality(
+	public ElkObjectExactCardinality getObjectExactCardinality(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality);
 
@@ -670,11 +922,17 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectExactCardinalityQualified}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
+	 *            the cardinality for which the object should be created
 	 * @param classExpression
-	 * @return
+	 *            the {@link ElkClassExpression} for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectExactCardinalityQualified} corresponding to
+	 *         the input
 	 */
-	public  ElkObjectExactCardinalityQualified getObjectExactCardinalityQualified(
+	public ElkObjectExactCardinalityQualified getObjectExactCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression);
 
@@ -682,19 +940,25 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectHasSelf}.
 	 * 
 	 * @param objectPropertyExpression
-	 * @return
+	 *            the {@link ElkObjectPropertyExpression} for which the object
+	 *            should be created
+	 * @return an {@link ElkObjectHasSelf} corresponding to the input
 	 */
-	public  ElkObjectHasSelf getObjectHasSelf(
+	public ElkObjectHasSelf getObjectHasSelf(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
 	 * Create an {@link ElkObjectHasValue}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the object
+	 *            should be created
 	 * @param individual
-	 * @return
+	 *            the {@link ElkIndividual} for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectHasValue} corresponding to the input
 	 */
-	public  ElkObjectHasValue getObjectHasValue(
+	public ElkObjectHasValue getObjectHasValue(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual individual);
 
@@ -702,11 +966,17 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectIntersectionOf}.
 	 * 
 	 * @param firstClassExpression
+	 *            the first {@link ElkClassExpression} for which the object
+	 *            should be created
 	 * @param secondClassExpression
+	 *            the second {@link ElkClassExpression} for which the object
+	 *            should be created
 	 * @param otherClassExpressions
-	 * @return
+	 *            other {@link ElkClassExpression}s for which the object should
+	 *            be created
+	 * @return an {@link ElkObjectIntersectionOf} corresponding to the input
 	 */
-	public  ElkObjectIntersectionOf getObjectIntersectionOf(
+	public ElkObjectIntersectionOf getObjectIntersectionOf(
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
@@ -715,28 +985,35 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectIntersectionOf}.
 	 * 
 	 * @param classExpressions
-	 * @return
+	 *            the {@link ElkClassExpression}s for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectIntersectionOf} corresponding to the input
 	 */
-	public  ElkObjectIntersectionOf getObjectIntersectionOf(
+	public ElkObjectIntersectionOf getObjectIntersectionOf(
 			List<? extends ElkClassExpression> classExpressions);
 
 	/**
 	 * Create an {@link ElkObjectInverseOf}.
 	 * 
 	 * @param objectProperty
-	 * @return
+	 *            the {@link ElkObjectProperty} for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectInverseOf} corresponding to the input
 	 */
-	public  ElkObjectInverseOf getObjectInverseOf(
+	public ElkObjectInverseOf getObjectInverseOf(
 			ElkObjectProperty objectProperty);
 
 	/**
 	 * Create an {@link ElkObjectMaxCardinality}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
-	 * @return
+	 *            the cardinality for which the object should be created
+	 * @return an {@link ElkObjectMaxCardinality} corresponding to the input
 	 */
-	public  ElkObjectMaxCardinality getObjectMaxCardinality(
+	public ElkObjectMaxCardinality getObjectMaxCardinality(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality);
 
@@ -744,11 +1021,17 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectMaxCardinalityQualified}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
+	 *            the cardinality for which the object should be created
 	 * @param classExpression
-	 * @return
+	 *            the {@link ElkClassExpression} for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectMaxCardinalityQualified} corresponding to the
+	 *         input
 	 */
-	public  ElkObjectMaxCardinalityQualified getObjectMaxCardinalityQualified(
+	public ElkObjectMaxCardinalityQualified getObjectMaxCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression);
 
@@ -756,10 +1039,13 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectMinCardinality}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
-	 * @return
+	 *            the cardinality for which the object should be created
+	 * @return an {@link ElkObjectMinCardinality} corresponding to the input
 	 */
-	public  ElkObjectMinCardinality getObjectMinCardinality(
+	public ElkObjectMinCardinality getObjectMinCardinality(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality);
 
@@ -767,11 +1053,17 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectMinCardinalityQualified}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the object
+	 *            should be created
 	 * @param cardinality
+	 *            the cardinality for which the object should be created
 	 * @param classExpression
-	 * @return
+	 *            the {@link ElkClassExpression} for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectMinCardinalityQualified} corresponding to the
+	 *         input
 	 */
-	public  ElkObjectMinCardinalityQualified getObjectMinCardinalityQualified(
+	public ElkObjectMinCardinalityQualified getObjectMinCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression);
 
@@ -779,38 +1071,52 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectOneOf}.
 	 * 
 	 * @param firstIndividual
+	 *            the first {@link ElkIndividual} for which the object should be
+	 *            created
 	 * @param otherIndividuals
-	 * @return
+	 *            other {@link ElkIndividual}s for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectOneOf} corresponding to the input
 	 */
-	public  ElkObjectOneOf getObjectOneOf(
-			ElkIndividual firstIndividual, ElkIndividual... otherIndividuals);
+	public ElkObjectOneOf getObjectOneOf(ElkIndividual firstIndividual,
+			ElkIndividual... otherIndividuals);
 
 	/**
 	 * Create an {@link ElkObjectOneOf}.
 	 * 
 	 * @param individuals
-	 * @return
+	 *            the {@link ElkIndividual}s for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectOneOf} corresponding to the input
 	 */
-	public  ElkObjectOneOf getObjectOneOf(
+	public ElkObjectOneOf getObjectOneOf(
 			List<? extends ElkIndividual> individuals);
 
 	/**
 	 * Create an {@link ElkObjectProperty}.
 	 * 
-	 * @param objectPropertyIri
-	 * @return
+	 * @param iri
+	 *            the {@link ElkIri} for which the object should be created
+	 * @return an {@link ElkObjectProperty} corresponding to the input
 	 */
-	public  ElkObjectProperty getObjectProperty(ElkIri iri);
+	public ElkObjectProperty getObjectProperty(ElkIri iri);
 
 	/**
 	 * Create an {@link ElkObjectPropertyAssertionAxiom}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the axiom
+	 *            should be created
 	 * @param firstIndividual
+	 *            the first {@link ElkIndividual} for which the axiom should be
+	 *            created
 	 * @param secondIndividual
-	 * @return
+	 *            the second {@link ElkIndividual} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkObjectPropertyAssertionAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkObjectPropertyAssertionAxiom getObjectPropertyAssertionAxiom(
+	public ElkObjectPropertyAssertionAxiom getObjectPropertyAssertionAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual);
 
@@ -818,19 +1124,26 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectPropertyChain}.
 	 * 
 	 * @param objectPropertyExpressions
-	 * @return
+	 *            the {@link ElkObjectPropertyExpression}s for which the object
+	 *            should be created
+	 * @return an {@link ElkObjectPropertyChain} corresponding to the input
 	 */
-	public  ElkObjectPropertyChain getObjectPropertyChain(
+	public ElkObjectPropertyChain getObjectPropertyChain(
 			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions);
 
 	/**
 	 * Create an {@link ElkObjectPropertyDomainAxiom}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the axiom
+	 *            should be created
 	 * @param classExpression
-	 * @return
+	 *            the {@link ElkClassExpression} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkObjectPropertyDomainAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(
+	public ElkObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -838,10 +1151,14 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectPropertyRangeAxiom}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the axiom
+	 *            should be created
 	 * @param classExpression
-	 * @return
+	 *            the {@link ElkClassExpression} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkObjectPropertyRangeAxiom} corresponding to the input
 	 */
-	public  ElkObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(
+	public ElkObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -849,10 +1166,14 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectSomeValuesFrom}.
 	 * 
 	 * @param objectPropertyExpression
+	 *            the {@link ElkObjectPropertyExpression} for which the object
+	 *            should be created
 	 * @param classExpression
-	 * @return
+	 *            the {@link ElkClassExpression} for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectSomeValuesFrom} corresponding to the input
 	 */
-	public  ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
+	public ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression);
 
@@ -860,11 +1181,17 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectUnionOf}.
 	 * 
 	 * @param firstClassExpression
+	 *            the first {@link ElkClassExpression} of the union for which
+	 *            the object should be created
 	 * @param secondClassExpression
+	 *            the second {@link ElkClassExpression} of the union for which
+	 *            the object should be created
 	 * @param otherClassExpressions
-	 * @return
+	 *            other {@link ElkClassExpression}s of the union for which the
+	 *            object should be created
+	 * @return an {@link ElkObjectUnionOf} corresponding to the input
 	 */
-	public  ElkObjectUnionOf getObjectUnionOf(
+	public ElkObjectUnionOf getObjectUnionOf(
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions);
@@ -873,71 +1200,84 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkObjectUnionOf}.
 	 * 
 	 * @param classExpressions
-	 * @return
+	 *            the {@link ElkClassExpression}s for which the object should be
+	 *            created
+	 * @return an {@link ElkObjectUnionOf} corresponding to the input
 	 */
-	public  ElkObjectUnionOf getObjectUnionOf(
+	public ElkObjectUnionOf getObjectUnionOf(
 			List<? extends ElkClassExpression> classExpressions);
 
 	/**
-	 * Create the ElkDataProperty representing owl:BottomDataProperty}.
+	 * Create the {@link ElkDataProperty} representing owl:BottomDataProperty}.
 	 * 
-	 * @return
+	 * @return an {@link ElkDataProperty} corresponding to the input
 	 */
-	public  ElkDataProperty getOwlBottomDataProperty();
+	public ElkDataProperty getOwlBottomDataProperty();
 
 	/**
-	 * Create the ElkObjectProperty representing owl:BottomObjectProperty}.
+	 * Create the {@link ElkObjectProperty} representing
+	 * owl:BottomObjectProperty}.
 	 * 
-	 * @return
+	 * @return an {@link ElkObjectProperty} corresponding to the input
 	 */
-	public  ElkObjectProperty getOwlBottomObjectProperty();
+	public ElkObjectProperty getOwlBottomObjectProperty();
 
 	/**
-	 * Create the ElkClass representing owl:Nothing}.
+	 * Create the {@link ElkClass} representing {@code owl:Nothing}.
 	 * 
-	 * @return
+	 * @return an {@link ElkClass} corresponding to the input
 	 */
-	public  ElkClass getOwlNothing();
+	public ElkClass getOwlNothing();
 
 	/**
-	 * Create the ElkClass representing owl:Thing}.
+	 * Create the {@link ElkClass} representing {@code owl:Thing}.
 	 * 
-	 * @return
+	 * @return an {@link ElkClass} corresponding to the input
 	 */
-	public  ElkClass getOwlThing();
+	public ElkClass getOwlThing();
 
 	/**
-	 * Create the ElkDataProperty representing owl:TopDataProperty}.
+	 * Create the {@link ElkDataProperty} representing
+	 * {@code owl:TopDataProperty}.
 	 * 
-	 * @return
+	 * @return an {@link ElkDataProperty} corresponding to the input
 	 */
-	public  ElkDataProperty getOwlTopDataProperty();
+	public ElkDataProperty getOwlTopDataProperty();
 
 	/**
-	 * Create the ElkObjectProperty representing owl:TopObjectProperty}.
+	 * Create the {@link ElkObjectProperty} representing
+	 * {@code owl:TopObjectProperty}.
 	 * 
-	 * @return
+	 * @return an {@link ElkObjectProperty} corresponding to the input
 	 */
-	public  ElkObjectProperty getOwlTopObjectProperty();
+	public ElkObjectProperty getOwlTopObjectProperty();
 
 	/**
 	 * Create an {@link ElkReflexiveObjectPropertyAxiom}.
 	 * 
 	 * @param objectPropertyExpression
-	 * @return
+	 *            the {@link ElkIri} for which the axiom should be created
+	 * @return an {@link ElkReflexiveObjectPropertyAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkReflexiveObjectPropertyAxiom getReflexiveObjectPropertyAxiom(
+	public ElkReflexiveObjectPropertyAxiom getReflexiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
 	 * Create an {@link ElkSameIndividualAxiom}.
 	 * 
 	 * @param firstIndividual
+	 *            the first equivalent {@link ElkIndividual} for which the axiom
+	 *            should be created
 	 * @param secondIndividual
+	 *            the second equivalent {@link ElkIndividual} for which the
+	 *            axiom should be created
 	 * @param otherIndividuals
-	 * @return
+	 *            other equivalent {@link ElkIndividual} for which the axiom
+	 *            should be created
+	 * @return an {@link ElkSameIndividualAxiom} corresponding to the input
 	 */
-	public  ElkSameIndividualAxiom getSameIndividualAxiom(
+	public ElkSameIndividualAxiom getSameIndividualAxiom(
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
 			ElkIndividual... otherIndividuals);
 
@@ -945,17 +1285,24 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkSameIndividualAxiom}.
 	 * 
 	 * @param individuals
-	 * @return
+	 *            the equivalent {@link ElkIndividual} for which the axiom
+	 *            should be created
+	 * @return an {@link ElkSameIndividualAxiom} corresponding to the input
 	 */
-	public  ElkSameIndividualAxiom getSameIndividualAxiom(
+	public ElkSameIndividualAxiom getSameIndividualAxiom(
 			List<? extends ElkIndividual> individuals);
-	
+
 	/**
 	 * Create an {@link ElkSubAnnotationPropertyOfAxiom}
 	 * 
 	 * @param subAnnotationProperty
+	 *            the sub-{@link ElkAnnotationProperty} for which the object
+	 *            should be created
 	 * @param superAnnotationProperty
-	 * @return
+	 *            the super-{@link ElkAnnotationProperty} for which the object
+	 *            should be created
+	 * @return an {@link ElkSubAnnotationPropertyOfAxiom} corresponding to the
+	 *         input
 	 */
 	public ElkSubAnnotationPropertyOfAxiom getSubAnnotationPropertyOfAxiom(
 			ElkAnnotationProperty subAnnotationProperty,
@@ -965,10 +1312,14 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkSubClassOfAxiom}.
 	 * 
 	 * @param subClassExpression
+	 *            the {@link ElkClassExpression} for which the axiom should be
+	 *            created
 	 * @param superClassExpression
-	 * @return
+	 *            the {@link ElkClassExpression} for which the axiom should be
+	 *            created
+	 * @return an {@link ElkSubClassOfAxiom} corresponding to the input
 	 */
-	public  ElkSubClassOfAxiom getSubClassOfAxiom(
+	public ElkSubClassOfAxiom getSubClassOfAxiom(
 			ElkClassExpression subClassExpression,
 			ElkClassExpression superClassExpression);
 
@@ -976,10 +1327,14 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkSubDataPropertyOfAxiom}.
 	 * 
 	 * @param subDataPropertyExpression
+	 *            the sub-{@link ElkDataPropertyExpression} for which the axiom
+	 *            should be created
 	 * @param superDataPropertyExpression
-	 * @return
+	 *            the super-{@link ElkDataPropertyExpression} for which the
+	 *            axiom should be created
+	 * @return an {@link ElkSubDataPropertyOfAxiom} corresponding to the input
 	 */
-	public  ElkSubDataPropertyOfAxiom getSubDataPropertyOfAxiom(
+	public ElkSubDataPropertyOfAxiom getSubDataPropertyOfAxiom(
 			ElkDataPropertyExpression subDataPropertyExpression,
 			ElkDataPropertyExpression superDataPropertyExpression);
 
@@ -987,10 +1342,14 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkSubObjectPropertyOfAxiom}.
 	 * 
 	 * @param subObjectPropertyExpression
+	 *            the {@link ElkSubObjectPropertyExpression} for which the axiom
+	 *            should be created
 	 * @param superObjectPropertyExpression
-	 * @return
+	 *            the super-{@link ElkObjectPropertyExpression} for which the
+	 *            axiom should be created
+	 * @return an {@link ElkSubObjectPropertyOfAxiom} corresponding to the input
 	 */
-	public  ElkSubObjectPropertyOfAxiom getSubObjectPropertyOfAxiom(
+	public ElkSubObjectPropertyOfAxiom getSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression);
 
@@ -998,42 +1357,63 @@ public interface ElkObjectFactory {
 	 * Create an {@link ElkSymmetricObjectPropertyAxiom}.
 	 * 
 	 * @param objectPropertyExpression
-	 * @return
+	 *            the {@link ElkIri} for which the axiom should be created
+	 * @return an {@link ElkAnnotation} corresponding to the input
 	 */
-	public  ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
+	public ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
 
 	/**
 	 * Create an {@link ElkTransitiveObjectPropertyAxiom}.
 	 * 
 	 * @param objectPropertyExpression
-	 * @return
+	 *            the {@link ElkObjectPropertyExpression} for which the axiom
+	 *            should be created
+	 * @return an {@link ElkTransitiveObjectPropertyAxiom} corresponding to the
+	 *         input
 	 */
-	public  ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
+	public ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression);
-	
+
 	/**
 	 * Create an {@link ElkHasKeyAxiom}
 	 * 
 	 * @param classExpr
+	 *            the {@link ElkClassExpression} for which the axiom should be
+	 *            created
 	 * @param objectPEs
+	 *            the {@link ElkObjectPropertyExpression}s for which the axiom
+	 *            should be created
 	 * @param dataPEs
-	 * @return
+	 *            the {@link ElkDataPropertyExpression}s for which the axiom
+	 *            should be created
+	 * @return an {@link ElkHasKeyAxiom} corresponding to the input
 	 */
-	public ElkHasKeyAxiom getHasKeyAxiom(	ElkClassExpression classExpr,
-											Set<ElkObjectPropertyExpression> objectPEs,
-											Set<ElkDataPropertyExpression> dataPEs);
-	
+	public ElkHasKeyAxiom getHasKeyAxiom(ElkClassExpression classExpr,
+			Set<ElkObjectPropertyExpression> objectPEs,
+			Set<ElkDataPropertyExpression> dataPEs);
+
 	/**
 	 * Create an {@link ElkDatatypeDefinitionAxiom}
 	 * 
 	 * @param datatype
+	 *            the {@link ElkDatatype} for which the axiom should be created
 	 * @param dataRange
-	 * @return
+	 *            the {@link ElkDataRange} for which the axiom should be created
+	 * @return an {@link ElkDatatypeDefinitionAxiom} corresponding to the input
 	 */
-	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom( ElkDatatype datatype, ElkDataRange dataRange);
-	
-	
+	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom(
+			ElkDatatype datatype, ElkDataRange dataRange);
 
-	public ElkFacetRestriction getFacetRestriction( ElkIri iri, ElkLiteral literal);
+	/**
+	 * Create an {@link ElkFacetRestriction}
+	 * 
+	 * @param iri
+	 *            the {@link ElkIri} for which the object should be created
+	 * @param literal
+	 *            the {@link ElkLiteral} for which the object should be created
+	 * @return an {@link ElkFacetRestriction} corresponding to the input
+	 */
+	public ElkFacetRestriction getFacetRestriction(ElkIri iri,
+			ElkLiteral literal);
 }

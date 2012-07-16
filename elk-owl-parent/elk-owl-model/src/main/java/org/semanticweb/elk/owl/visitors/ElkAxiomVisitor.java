@@ -24,21 +24,19 @@ package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
-
 /**
  * Super interface of all visitors for {@link ElkAxiom}
  * 
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
-public interface ElkAxiomVisitor<O> extends
-		ElkDeclarationAxiomVisitor<O>,
-		ElkClassAxiomVisitor<O>,
-		ElkObjectPropertyAxiomVisitor<O>,
-		ElkDataPropertyAxiomVisitor<O>,
-		ElkDatatypeDefinitionVisitor<O>,
-		ElkHasKeyAxiomVisitor<O>,
-		ElkAssertionAxiomVisitor<O>,
+public interface ElkAxiomVisitor<O> extends ElkDeclarationAxiomVisitor<O>,
+		ElkClassAxiomVisitor<O>, ElkObjectPropertyAxiomVisitor<O>,
+		ElkDataPropertyAxiomVisitor<O>, ElkDatatypeDefinitionVisitor<O>,
+		ElkHasKeyAxiomVisitor<O>, ElkAssertionAxiomVisitor<O>,
 		ElkAnnotationAxiomVisitor<O> {
 }

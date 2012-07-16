@@ -28,9 +28,13 @@ import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
  * Visitor pattern interface for instances of {@link ElkHasKeyAxiom}.
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkHasKeyAxiomVisitor<O> {
 

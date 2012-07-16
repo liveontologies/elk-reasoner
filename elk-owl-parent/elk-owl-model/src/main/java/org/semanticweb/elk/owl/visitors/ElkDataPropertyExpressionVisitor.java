@@ -23,13 +23,16 @@
 package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 
 /**
- * Visitor pattern interface for instances of
- * {@link ElkDataPropertyExpression}.
+ * Visitor pattern interface for instances of {@link ElkDataPropertyExpression}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkDataPropertyExpressionVisitor<O> {
 

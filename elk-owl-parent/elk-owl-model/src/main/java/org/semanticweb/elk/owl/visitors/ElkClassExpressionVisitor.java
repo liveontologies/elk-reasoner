@@ -57,6 +57,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkClassExpressionVisitor<O> {
 
