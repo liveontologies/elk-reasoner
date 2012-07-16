@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.util.logging;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,9 +32,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -129,7 +130,6 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	 *            the event for which the check box message should be generated
 	 * @return the generated check box message
 	 */
-	@SuppressWarnings("static-method")
 	protected String getCheckboxMessage(LoggingEvent event) {
 		return "Do not show further messages of this kind";
 	}
@@ -170,16 +170,15 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 		String displayLabel = event.getRenderedMessage();
-		// A simple heuristic to force line breaks into very long messages:
-		if (displayLabel.length() > 80) {
-			displayLabel = String.format(
-					"<html><div style=\"width:%dpx;\">%s</div></html>", 500,
-					displayLabel);
-		}
-		panel.add(new JLabel(displayLabel));
+		WrappingLabel label = new WrappingLabel(displayLabel, 40/*40 characters should be a decent length*/);
+		
+		label.setAlignmentX(Component.LEFT_ALIGNMENT);
+		panel.add(label);
 
 		JCheckBox ignoreMessageButton = new JCheckBox(getCheckboxMessage(event));
+		
 		if (messageType != null) {
+			ignoreMessageButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 			panel.add(Box.createRigidArea(new Dimension(0, 10)));
 			panel.add(ignoreMessageButton);
 		}
@@ -190,7 +189,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		// messageTitle,
 		// JOptionPane.DEFAULT_OPTION, messageLevel, null, options,
 		// options[0]);
-
+		
 		JOptionPane.showMessageDialog(null, panel, messageTitle, messageLevel);
 
 		if (ignoreMessageButton.isSelected()) {
@@ -220,4 +219,23 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		}
 	}
 
+}
+
+
+class WrappingLabel extends JTextArea {
+	
+	private static final long serialVersionUID = 1L;
+
+	public WrappingLabel(String text, int width) {
+        super(text);
+        
+        setBackground(null);
+        setEditable(false);
+        setBorder(null);
+        setLineWrap(true);
+        setWrapStyleWord(true);
+        setFocusable(false);
+        setColumns(width);
+        setRows(text.length() / width);
+    }	
 }
