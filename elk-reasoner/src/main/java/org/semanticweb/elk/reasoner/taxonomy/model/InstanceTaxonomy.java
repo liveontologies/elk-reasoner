@@ -27,7 +27,7 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * Extended {@link: Taxonomy} that also provides instances for each of its
+ * Extended {@link Taxonomy} that also provides instances for each of its
  * members.
  * 
  * @author Markus Kroetzsch

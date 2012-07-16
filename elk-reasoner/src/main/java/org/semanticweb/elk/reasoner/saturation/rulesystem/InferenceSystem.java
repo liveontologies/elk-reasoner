@@ -76,8 +76,8 @@ public abstract class InferenceSystem<C extends Context> {
 	 * they do not depend on C but currently store contexts; this will be fixed
 	 * by storing contexts elsewhere.
 	 * 
-	 * @note This method will vanish soon. Do not use it unless you really,
-	 *       really must.
+	 * @deprecated This method will vanish soon. Do not use it unless you
+	 *             really, really must.
 	 * @param context
 	 * @return the context casted to the given type
 	 */

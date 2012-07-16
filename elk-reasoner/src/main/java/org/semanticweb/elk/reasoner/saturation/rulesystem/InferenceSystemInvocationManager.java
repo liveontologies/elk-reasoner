@@ -183,10 +183,10 @@ public class InferenceSystemInvocationManager {
 	 * applying rules (based on the name of the method) does not have the
 	 * correct declaration to be used as intended.
 	 * 
-	 * @note There is only one public method for registering rules to ensure
-	 *       that all rules use a compatible generic type of context, without
-	 *       requiring this class to check it. Note that method invocation via
-	 *       Java Reflexion does not need to know the type of context either.
+	 * There is only one public method for registering rules to ensure that all
+	 * rules use a compatible generic type of context, without requiring this
+	 * class to check it. Note that method invocation via Java Reflexion does
+	 * not need to know the type of context either.
 	 * 
 	 * @param inferenceSystem
 	 * @throws IllegalInferenceMethodException
@@ -550,8 +550,6 @@ public class InferenceSystemInvocationManager {
 	/**
 	 * handle for applying other methods to the item in subclasses of this
 	 * invocation manager without using reflection
-	 * 
-	 * @author Frantisek Simancik
 	 */
 	protected void applyAdditionalMethodsToItem(Queueable<?> queueable,
 			Context context, RuleApplicationFactory.Engine engine) {
