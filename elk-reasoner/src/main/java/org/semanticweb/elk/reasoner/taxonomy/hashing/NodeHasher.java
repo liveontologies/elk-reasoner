@@ -93,7 +93,7 @@ public class NodeHasher implements Hasher<Node<? extends ElkEntity>> {
 	 * due to modelling errors.
 	 * 
 	 * @param node
-	 * @return
+	 * @return the has for the given entity node
 	 */
 	@Override
 	public int hash(Node<? extends ElkEntity> node) {

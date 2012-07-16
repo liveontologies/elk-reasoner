@@ -22,15 +22,16 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.util.OwlObjectNameVisitor;
 
 /**
  * @author Frantisek Simancik
- *
+ * 
  */
-public class IndexingException extends RuntimeException {
-	
+public class IndexingException extends ElkRuntimeException {
+
 	private static final long serialVersionUID = -8678875783274619601L;
 
 	protected IndexingException() {
@@ -47,9 +48,10 @@ public class IndexingException extends RuntimeException {
 	public IndexingException(Throwable cause) {
 		super(cause);
 	}
-	
+
 	protected IndexingException(ElkObject elkObject) {
-		this("ELK does not support " + OwlObjectNameVisitor.getName(elkObject) + ".");
+		this("ELK does not support " + OwlObjectNameVisitor.getName(elkObject)
+				+ ".");
 	}
 
 }

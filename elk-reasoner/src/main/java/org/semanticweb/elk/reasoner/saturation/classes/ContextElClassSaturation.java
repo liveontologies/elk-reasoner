@@ -45,15 +45,15 @@ import org.semanticweb.elk.util.collections.Multimap;
 public class ContextElClassSaturation extends AbstractContext implements
 		ContextClassSaturation {
 
-	public final Set<IndexedClassExpression> superClassExpressions;
+	final Set<IndexedClassExpression> superClassExpressions;
 
-	public Multimap<IndexedPropertyChain, ContextElClassSaturation> backwardLinksByObjectProperty;
+	Multimap<IndexedPropertyChain, ContextElClassSaturation> backwardLinksByObjectProperty;
 
-	public Multimap<IndexedPropertyChain, ContextElClassSaturation> forwardLinksByObjectProperty;
-	
-	protected Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> propagationsByObjectProperty;
-	
-	protected Set<IndexedDisjointnessAxiom> disjointnessAxioms;
+	Multimap<IndexedPropertyChain, ContextElClassSaturation> forwardLinksByObjectProperty;
+
+	Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> propagationsByObjectProperty;
+
+	Set<IndexedDisjointnessAxiom> disjointnessAxioms;
 
 	/**
 	 * A context is saturated if all superclass expressions of the root
@@ -85,43 +85,27 @@ public class ContextElClassSaturation extends AbstractContext implements
 				13);
 	}
 
-	/**
-	 * Get the set of super class expressions that have been derived for this
-	 * context so far.
-	 * 
-	 * @return the set of derived indexed class expressions
-	 */
 	@Override
 	public Set<IndexedClassExpression> getSuperClassExpressions() {
 		return superClassExpressions;
 	}
 
-	/**
-	 * Return true if this context is set to isSatisfiable. A value of true
-	 * means that owl:Nothing was stored as a superclass in this context.
-	 * 
-	 * @return
-	 */
 	@Override
 	public boolean isSatisfiable() {
 		return isSatisfiable;
 	}
 
-	/**
-	 * Set the satisfiability of this context. A value of true means that
-	 * owl:Nothing was stored as a superclass in this context.
-	 * 
-	 * @param satisfiable
-	 */
 	@Override
 	public void setSatisfiable(boolean satisfiable) {
 		isSatisfiable = satisfiable;
 	}
 
 	/**
-	 * If set to true, then composition rules will be applied to derive all
-	 * incoming links. This is usually needed only when at least one propagation
-	 * has been derived at this object.
+	 * Determines if composition rules should be applied to derive all incoming
+	 * links.
+	 * 
+	 * @return {@code true} if composition rules should be applied to derive all
+	 *         incoming link.
 	 */
 	public boolean getDeriveBackwardLinks() {
 		return composeBackwardLinks;
@@ -154,6 +138,12 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * If set to true, then propagations will be derived in this context. This
 	 * is needed only when there is at least one backward link.
 	 */
+
+	/**
+	 * Determines if propagations should be derived in this context.
+	 * 
+	 * @return {@code true} if propagations should be derived in this context
+	 */
 	public boolean getDerivePropagations() {
 		return derivePropagations;
 	}
@@ -172,11 +162,12 @@ public class ContextElClassSaturation extends AbstractContext implements
 	public void initPropagationsByProperty() {
 		propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>>();
 	}
-	
-	public boolean addDisjointessAxiom(IndexedDisjointnessAxiom disjointnessAxiom) {
+
+	public boolean addDisjointessAxiom(
+			IndexedDisjointnessAxiom disjointnessAxiom) {
 		if (disjointnessAxioms == null)
 			disjointnessAxioms = new ArrayHashSet<IndexedDisjointnessAxiom>();
-		
+
 		return disjointnessAxioms.add(disjointnessAxiom);
 	}
 

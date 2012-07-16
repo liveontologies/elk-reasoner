@@ -30,19 +30,19 @@ public class IndexedIndividual extends IndexedClassEntity {
 	/**
 	 * The ElkNamedIndividual that is the sole instance of this nominal
 	 */
-	protected final ElkNamedIndividual elkNamedIndividual;
-	
-	protected int occurrenceNo = 0;
+	private final ElkNamedIndividual elkNamedIndividual_;
 
-	protected IndexedIndividual(ElkNamedIndividual elkNamedIndividual) {
-		this.elkNamedIndividual = elkNamedIndividual;
+	private int occurrenceNo_ = 0;
+
+	IndexedIndividual(ElkNamedIndividual elkNamedIndividual) {
+		this.elkNamedIndividual_ = elkNamedIndividual;
 	}
 
 	/**
 	 * @return The represented ElkNamedIndividual.
 	 */
 	public ElkNamedIndividual getElkNamedIndividual() {
-		return elkNamedIndividual;
+		return elkNamedIndividual_;
 	}
 
 	public <O> O accept(IndexedIndividualVisitor<O> visitor) {
@@ -57,19 +57,19 @@ public class IndexedIndividual extends IndexedClassEntity {
 	@Override
 	protected void updateOccurrenceNumbers(int increment,
 			int positiveIncrement, int negativeIncrement) {
-		occurrenceNo += increment;
+		occurrenceNo_ += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 	}
-	
+
 	@Override
 	public boolean occurs() {
-		return occurrenceNo > 0;
+		return occurrenceNo_ > 0;
 	}
 
 	@Override
 	public String toString() {
-		return "ObjectOneOf(<"+elkNamedIndividual.getIri().asString()+">)";
+		return "ObjectOneOf(<" + elkNamedIndividual_.getIri().asString() + ">)";
 	}
 
 }

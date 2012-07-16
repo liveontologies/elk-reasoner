@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -40,6 +41,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @param <K>
  *            the type of the wrapped indexed object used as the key of the
  *            entry
+ * @see KeyEntryHashSet
  */
 public abstract class IndexedPropertyChainEntry<T, K extends IndexedPropertyChain>
 		extends StrongKeyEntry<T, K> {

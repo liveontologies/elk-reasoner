@@ -23,17 +23,22 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyCanProcess;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyFinishedJob;
 
 /**
- * A listener to be used with {@link ClassExpressionSaturationEngine}. The
+ * A listener to be used with {@link ClassExpressionSaturationFactory}. The
  * listener defines functions are triggered during saturation.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <J>
- *            the type of the jobs of {@link ClassExpressionSaturationEngine}
+ *            the type of the input jobs of
+ *            {@link ClassExpressionSaturationFactory}
+ * @param <P>
+ *            the type of the {@link InputProcessor} for the input jobs
+ * 
  */
 public interface ClassExpressionSaturationListener<J extends SaturationJob<? extends IndexedClassExpression>, P extends ClassExpressionSaturationFactory<J>.Engine>
 		extends InputProcessorListenerNotifyCanProcess<P>,

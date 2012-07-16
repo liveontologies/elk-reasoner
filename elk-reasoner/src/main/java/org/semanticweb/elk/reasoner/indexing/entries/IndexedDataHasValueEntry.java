@@ -25,12 +25,13 @@ package org.semanticweb.elk.reasoner.indexing.entries;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 
 /**
- * Implements an equality view for instances of {@link IndexedClassDataHasValue}
+ * Implements an equality view for instances of {@link IndexedDataHasValue}
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            The type of the elements in the set where this entry is used
+ *            The common type of the elements in the set where this entry is
+ *            used
  * 
  * @param <K>
  *            the type of the wrapped indexed object used as the key of the
@@ -58,7 +59,9 @@ public class IndexedDataHasValueEntry<T, K extends IndexedDataHasValue> extends
 			IndexedDataHasValueEntry<?, ?> otherEntry = (IndexedDataHasValueEntry<?, ?>) other;
 			return this.key.getRelation().getIri()
 					.equals(otherEntry.key.getRelation().getIri())
-					&& this.key.getFiller().getLexicalForm()
+					&& this.key
+							.getFiller()
+							.getLexicalForm()
 							.equals(otherEntry.key.getFiller().getLexicalForm());
 		}
 		return false;

@@ -26,18 +26,18 @@ import java.util.List;
 
 /**
  * @author Frantisek Simancik
- *
+ * 
  */
-public class IndexedDisjointnessAxiom  {
+public class IndexedDisjointnessAxiom {
 
-	protected final List<IndexedClassExpression> members; 
-	
-	public IndexedDisjointnessAxiom(List<IndexedClassExpression> members) {
-		this.members = members;
+	private final List<IndexedClassExpression> members_;
+
+	IndexedDisjointnessAxiom(List<IndexedClassExpression> members) {
+		this.members_ = members;
 	}
-	
-	public List<IndexedClassExpression> getMembers(){
-		return members;
+
+	public List<IndexedClassExpression> getMembers() {
+		return members_;
 	}
 
 }

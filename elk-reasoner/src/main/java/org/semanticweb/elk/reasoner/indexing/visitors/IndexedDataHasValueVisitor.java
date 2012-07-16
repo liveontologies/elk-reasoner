@@ -26,8 +26,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 
 /**
  * Visitor pattern interface for instances of {@link IndexedDataHasValue}.
+ * 
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public interface IndexedDataHasValueVisitor<O> {
 	O visit(IndexedDataHasValue element);

@@ -29,11 +29,16 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of objects in the nodes of this taxonomy
  */
-public class InconsistentTaxonomy<T extends ElkObject> extends InconsistentInstanceTaxonomy<T, ElkObject> {
+public class InconsistentTaxonomy<T extends ElkObject> extends
+		InconsistentInstanceTaxonomy<T, ElkObject> {
 
 	public InconsistentTaxonomy(T top, T bot) {
 		super(top, bot);
 	}
-	
+
 }

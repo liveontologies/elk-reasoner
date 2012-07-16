@@ -23,12 +23,19 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 
 /**
- * Kind of SuperClassExpression to which decomposition rules need to be applied.
+ * A {@link SuperClassExpression} to which decomposition rules need to be
+ * applied.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <C>
+ *            the type of the {@link Context} with which this {@link Queueable}
+ *            can be used
  */
 public class PositiveSuperClassExpression<C extends ContextElClassSaturation>
 		extends SuperClassExpression<C> {

@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @author Frantisek Simancik
  * 
  * @param <T>
- *            the type of types of objects in this node
+ *            the type of objects in this node
  * @param <I>
  *            the type of instances in this node
  * 

@@ -34,13 +34,19 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
+import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 
 /**
- * A visitor for IndexedClassExpression and IndexedPropertyChains that wraps 
- * the visited objects in the corresponding Entry wrapper to redefine equality.  
+ * A visitor for {@link IndexedClassExpression}s and
+ * {@link IndexedPropertyChain}s that wraps the visited objects in the
+ * corresponding Entry wrapper to redefine equality.
  * 
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of the elements for which the wrapped entries can be used
+ * @see KeyEntryHashSet
  */
 public class IndexedEntryConverter<T>
 		implements
@@ -89,7 +95,7 @@ public class IndexedEntryConverter<T>
 	@Override
 	public IndexedIndividualEntry<T, IndexedIndividual> visit(
 			IndexedIndividual element) {
-		return new IndexedIndividualEntry<T, IndexedIndividual> (element);
+		return new IndexedIndividualEntry<T, IndexedIndividual>(element);
 	}
 
 }

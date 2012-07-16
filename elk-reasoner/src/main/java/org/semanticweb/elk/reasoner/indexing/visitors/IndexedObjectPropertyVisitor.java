@@ -28,6 +28,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
  * Visitor pattern interface for instances of {@link IndexedObjectProperty}.
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public interface IndexedObjectPropertyVisitor<O> {
 

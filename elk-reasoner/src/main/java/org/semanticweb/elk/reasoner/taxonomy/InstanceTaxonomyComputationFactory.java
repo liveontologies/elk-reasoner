@@ -48,8 +48,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 /**
  * The factory for engines that concurrently construct an
  * {@link InstanceTaxonomy}. The jobs are submitted using the method
- * {@link #submit(IndexedIndividual)}, which require the computation of the
- * {@link Node} for the input {@link IndexedIndividual}.
+ * {@link Engine#submit(IndexedIndividual)}, which require the computation of
+ * the {@link Node} for the input {@link IndexedIndividual}.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
@@ -125,7 +125,7 @@ public class InstanceTaxonomyComputationFactory implements
 	/**
 	 * The class for processing the finished transitive reduction jobs. It
 	 * implements the visitor pattern for
-	 * {@link TransitiveReductionOutputVisitor<IndexedIndividual>}.
+	 * {@link TransitiveReductionOutputVisitor}.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 

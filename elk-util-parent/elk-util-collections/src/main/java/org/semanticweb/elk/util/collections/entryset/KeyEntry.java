@@ -24,8 +24,8 @@ package org.semanticweb.elk.util.collections.entryset;
 
 /**
  * An interface for entries with key values. An implementation of this interface
- * should redefine {@link equals()} and {@link hashCode()} methods to compare
- * the keys.
+ * should redefine {@link #equals(Object)} and {@link #hashCode()} methods to
+ * compare the keys.
  * 
  * @author "Yevgeny Kazakov"
  * 

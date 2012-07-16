@@ -405,11 +405,10 @@ public class InferenceSystemInvocationManager {
 
 	/**
 	 * Add a new method at the beginning of the list and return the resulting
-	 * linked list. The input list can be null (if empty).
+	 * linked list. The input list can be {@code null} (if empty).
 	 * 
 	 * @param inferenceRule
 	 * @param initMethod
-	 * @return
 	 */
 	protected void addInitMethod(InferenceRule<?> inferenceRule,
 			Method initMethod) {

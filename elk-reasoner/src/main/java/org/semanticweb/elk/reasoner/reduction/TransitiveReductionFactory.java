@@ -41,15 +41,19 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
  * The factory for engines that concurrently perform the transitive reduction of
- * the derived subsumption hierarchy between classes. The engines can only
- * process instances of {@link SaturationJobForTransitiveReduction}. There are
- * two types of the jobs. The instances of {@link SaturationJobRoot} are
- * saturation jobs for the indexed class expression, for which a transitive
- * reduction is required to be computed. The transitive reduction is computed by
- * iterating over the derived super classes and computing saturation for them in
- * order to filter out non-direct super classes. For this purpose, the second
- * kind of jobs, which are instances of {@link SaturationJobSuperClass} are
- * used.
+ * the derived subsumption hierarchy between classes. The engines accept
+ * instances of {@link TransitiveReductionJob} with the specified root
+ * {@link IndexedClassExpression}. Upon successful completion of the job, one of
+ * the two types of the {@link TransitiveReductionOutput} can be assigned:
+ * either {@link TransitiveReductionOutputUnsatisfiable}, which means that the
+ * given root {@link IndexedClassExpression} is unsatisfiable, or
+ * {@link TransitiveReductionOutputEquivalentDirect}, which contains information
+ * about equivalent classes of the given root {@link IndexedClassExpression} and
+ * its direct super-classes.
+ * 
+ * As usual, to this engine factory it is possible to attach a
+ * {@link TransitiveReductionListener} using which one can monitor the
+ * processing of jobs and perform actions accordingly.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -60,6 +64,10 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  *            the type of the jobs that can be processed by this transitive
  *            reduction engine
  * 
+ * @see TransitiveReductionOutput
+ * @see TransitiveReductionOutputUnsatisfiable
+ * @see TransitiveReductionOutputEquivalentDirect
+ * @see TransitiveReductionListener
  */
 public class TransitiveReductionFactory<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
 		implements

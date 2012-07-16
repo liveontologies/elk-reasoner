@@ -42,7 +42,10 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of the wrapped {@link OWLHasKeyAxiom}
  */
 public class ElkHasKeyAxiomWrap<T extends OWLHasKeyAxiom> extends
 		ElkAxiomWrap<T> implements ElkHasKeyAxiom {

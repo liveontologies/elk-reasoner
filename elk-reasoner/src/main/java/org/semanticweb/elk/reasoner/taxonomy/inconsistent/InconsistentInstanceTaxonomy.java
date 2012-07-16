@@ -39,17 +39,24 @@ import org.semanticweb.elk.util.collections.ArraySet;
 /**
  * @author Frantisek Simancik
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of objects in the nodes of this taxonomy
+ * @param <I>
+ *            the type of instances of nodes of this taxonomy
  */
-public class InconsistentInstanceTaxonomy<T extends ElkObject, I extends ElkObject> implements InstanceTaxonomy<T, I>{
+public class InconsistentInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
+		implements InstanceTaxonomy<T, I> {
 
 	protected final Bottom bottom;
-	
+
 	public InconsistentInstanceTaxonomy(T top, T bot) {
 		bottom = new Bottom(top, bot);
-	}	
-	
+	}
+
 	@Override
 	public TypeNode<T, I> getTopNode() {
 		return bottom;
@@ -59,7 +66,6 @@ public class InconsistentInstanceTaxonomy<T extends ElkObject, I extends ElkObje
 	public TypeNode<T, I> getBottomNode() {
 		return bottom;
 	}
-
 
 	@Override
 	public TypeNode<T, I> getTypeNode(T elkObject) {
@@ -72,8 +78,7 @@ public class InconsistentInstanceTaxonomy<T extends ElkObject, I extends ElkObje
 	}
 
 	@Override
-	public InstanceNode<T, I> getInstanceNode(
-			I elkObject) {
+	public InstanceNode<T, I> getInstanceNode(I elkObject) {
 		return null;
 	}
 
@@ -81,7 +86,7 @@ public class InconsistentInstanceTaxonomy<T extends ElkObject, I extends ElkObje
 	public Set<? extends InstanceNode<T, I>> getInstanceNodes() {
 		return Collections.emptySet();
 	}
-	
+
 	@Override
 	public TaxonomyNode<T> getNode(T elkObject) {
 		return getTypeNode(elkObject);
@@ -92,15 +97,15 @@ public class InconsistentInstanceTaxonomy<T extends ElkObject, I extends ElkObje
 		return getTypeNodes();
 	}
 
-	class Bottom implements TypeNode<T,I> {
+	class Bottom implements TypeNode<T, I> {
 
 		final ArraySet<T> members;
-		
+
 		@SuppressWarnings("unchecked")
 		Bottom(T top, T bot) {
 			members = new ArraySet<T>(Arrays.asList(bot, top));
 		}
-		
+
 		@Override
 		public Set<T> getMembers() {
 			return Collections.unmodifiableSet(members);

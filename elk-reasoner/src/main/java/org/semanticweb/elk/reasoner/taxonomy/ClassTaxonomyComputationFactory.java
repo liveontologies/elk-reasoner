@@ -44,8 +44,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
  * The factory for engines that concurrently construct a {@link Taxonomy}. The
- * jobs are submitted using the method {@link #submit(IndexedClass)}, which
- * require the computation of the {@link Node} for the input
+ * jobs are submitted using the method {@link Engine#submit(IndexedClass)},
+ * which require the computation of the {@link Node} for the input
  * {@link IndexedClass}.
  * 
  * @author Yevgeny Kazakov
@@ -135,7 +135,7 @@ public class ClassTaxonomyComputationFactory implements
 	/**
 	 * The class for processing the finished transitive reduction jobs. It
 	 * implements the visitor pattern for
-	 * {@link TransitiveReductionOutputVisitor<IndexedClass>}.
+	 * {@link TransitiveReductionOutputVisitor}.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 

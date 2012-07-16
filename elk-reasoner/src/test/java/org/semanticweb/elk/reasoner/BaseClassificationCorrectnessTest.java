@@ -40,6 +40,7 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @param <EO> 
  * 
  */
 @RunWith(PolySuite.class)

@@ -52,25 +52,23 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-/**
- * @author Frantisek Simancik
- * 
- */
 abstract public class IndexedClassExpression {
 
 	/**
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
 	 * is a List.
 	 */
-	protected List<IndexedClassExpression> toldSuperClassExpressions;
+	private List<IndexedClassExpression> toldSuperClassExpressions_;
 
-	protected Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct;
-	protected Collection<IndexedObjectSomeValuesFrom> negExistentials;
+	private Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct_;
+
+	private Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
 	/**
-	 * ICEs that appear in binary disjointess axioms with this object.
+	 * {@link IndexedClassExpression} that appear in binary disjointess axioms
+	 * with this object.
 	 */
-	protected Set<IndexedClassExpression> disjointClasses;
+	private Set<IndexedClassExpression> disjointClasses_;
 
 	/**
 	 * List of all larger (non-binary) disjointness axioms in which this object
@@ -84,14 +82,14 @@ abstract public class IndexedClassExpression {
 	 * operations are only needed when encountering objects positively for the
 	 * first time.
 	 */
-	protected int positiveOccurrenceNo = 0;
+	int positiveOccurrenceNo = 0;
 
 	/**
 	 * This counts how often this object occurred negatively. Some indexing
 	 * operations are only needed when encountering objects negatively for the
 	 * first time.
 	 */
-	protected int negativeOccurrenceNo = 0;
+	int negativeOccurrenceNo = 0;
 
 	/**
 	 * This method should always return true apart from intermediate steps
@@ -104,16 +102,16 @@ abstract public class IndexedClassExpression {
 	}
 
 	/**
-	 * @return true if the represented class expression occurs negatively in the
-	 *         ontology
+	 * @return {@code true} if the represented class expression occurs
+	 *         negatively in the ontology
 	 */
 	public boolean occursNegatively() {
 		return negativeOccurrenceNo > 0;
 	}
 
 	/**
-	 * @return true if the represented class expression occurs positively in the
-	 *         ontologu
+	 * @return {@code true} if the represented class expression occurs
+	 *         positively in the ontology
 	 */
 	public boolean occursPositively() {
 		return positiveOccurrenceNo > 0;
@@ -122,44 +120,48 @@ abstract public class IndexedClassExpression {
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	protected abstract void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement);
+	abstract void updateOccurrenceNumbers(int increment, int positiveIncrement,
+			int negativeIncrement);
 
 	/**
 	 * @return All told super class expressions of this class expression,
 	 *         possibly null.
 	 */
 	public List<IndexedClassExpression> getToldSuperClassExpressions() {
-		return toldSuperClassExpressions;
+		return toldSuperClassExpressions_;
 	}
 
 	/**
-	 * @return Indexed conjunctions that occur negatively and contain this class
-	 *         expression, indexed by the second conjunct, possibly null.
+	 * @return the {@link IndexedObjectIntersectionOf} objects that occur
+	 *         negatively and contain this {@link IndexedClassExpression},
+	 *         indexed by the other {@link IndexedClassExpression} in the
+	 *         conjunction, or {@code null} if none is assigned
 	 */
 	public Map<IndexedClassExpression, IndexedObjectIntersectionOf> getNegConjunctionsByConjunct() {
-		return negConjunctionsByConjunct;
+		return negConjunctionsByConjunct_;
 	}
 
 	/**
-	 * @return Indexed existentials that occur negatively and have this class
-	 *         expression as the filler, possibly null.
+	 * @return the {@link IndexedObjectSomeValuesFrom} objects that occur
+	 *         negatively and have this {@link IndexedClassExpression} as the
+	 *         filler, or {@code null} if none is assigned
 	 */
 	public Collection<IndexedObjectSomeValuesFrom> getNegExistentials() {
-		return negExistentials;
+		return negExistentials_;
 	}
 
 	/**
-	 * @return Indexed Class Expression that occur with this object in binary
-	 *         disjointness axioms, possibly null.
+	 * @return the {@IndexedClassExpression} objects
+	 *         that occur with this object in binary disjointness axioms, or
+	 *         {@code null} if none is assigned
 	 */
 	public Set<IndexedClassExpression> getDisjointClasses() {
-		return disjointClasses;
+		return disjointClasses_;
 	}
 
 	/**
-	 * @return Collection of all larger (non-binary) disjointness axioms in
-	 *         which this object appears, possibly null.
+	 * @return Collection of all (non-binary) {@link IndexedDisjointnessAxiom}s
+	 *         in which this object appears, or {@code null} if none is assigned
 	 */
 	public List<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
 		return disjointnessAxioms;
@@ -167,9 +169,10 @@ abstract public class IndexedClassExpression {
 
 	protected void addToldSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
-		if (toldSuperClassExpressions == null)
-			toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(1);
-		toldSuperClassExpressions.add(superClassExpression);
+		if (toldSuperClassExpressions_ == null)
+			toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
+					1);
+		toldSuperClassExpressions_.add(superClassExpression);
 	}
 
 	/**
@@ -179,10 +182,10 @@ abstract public class IndexedClassExpression {
 	protected boolean removeToldSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		boolean success = false;
-		if (toldSuperClassExpressions != null) {
-			success = toldSuperClassExpressions.remove(superClassExpression);
-			if (toldSuperClassExpressions.isEmpty())
-				toldSuperClassExpressions = null;
+		if (toldSuperClassExpressions_ != null) {
+			success = toldSuperClassExpressions_.remove(superClassExpression);
+			if (toldSuperClassExpressions_.isEmpty())
+				toldSuperClassExpressions_ = null;
 		}
 		return success;
 	}
@@ -191,12 +194,12 @@ abstract public class IndexedClassExpression {
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
 
-		if (negConjunctionsByConjunct == null)
+		if (negConjunctionsByConjunct_ == null)
 			// TODO possibly replace by ArrayHashMap when it supports removal
-			negConjunctionsByConjunct = new HashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
+			negConjunctionsByConjunct_ = new HashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);
 
-		if (negConjunctionsByConjunct.put(conjunct, conjunction) != null) {
+		if (negConjunctionsByConjunct_.put(conjunct, conjunction) != null) {
 			// Can be caused e.g. when ElkObjectIndexerVisitor indexed conjuncts
 			// with equals hashCodes.
 			throw new RuntimeException(
@@ -214,18 +217,18 @@ abstract public class IndexedClassExpression {
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
 		boolean success = false;
-		if (negConjunctionsByConjunct != null) {
-			success = (negConjunctionsByConjunct.remove(conjunct) != null);
-			if (negConjunctionsByConjunct.isEmpty())
-				negConjunctionsByConjunct = null;
+		if (negConjunctionsByConjunct_ != null) {
+			success = (negConjunctionsByConjunct_.remove(conjunct) != null);
+			if (negConjunctionsByConjunct_.isEmpty())
+				negConjunctionsByConjunct_ = null;
 		}
 		return success;
 	}
 
 	protected void addNegExistential(IndexedObjectSomeValuesFrom existential) {
-		if (negExistentials == null)
-			negExistentials = new ArrayList<IndexedObjectSomeValuesFrom>(1);
-		negExistentials.add(existential);
+		if (negExistentials_ == null)
+			negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(1);
+		negExistentials_.add(existential);
 	}
 
 	/**
@@ -235,18 +238,18 @@ abstract public class IndexedClassExpression {
 	protected boolean removeNegExistential(
 			IndexedObjectSomeValuesFrom existential) {
 		boolean success = false;
-		if (negExistentials != null) {
-			success = negExistentials.remove(existential);
-			if (negExistentials.isEmpty())
-				negExistentials = null;
+		if (negExistentials_ != null) {
+			success = negExistentials_.remove(existential);
+			if (negExistentials_.isEmpty())
+				negExistentials_ = null;
 		}
 		return success;
 	}
 
 	protected void addDisjointClass(IndexedClassExpression disjointClass) {
-		if (disjointClasses == null)
-			disjointClasses = new ArrayHashSet<IndexedClassExpression>();
-		disjointClasses.add(disjointClass);
+		if (disjointClasses_ == null)
+			disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
+		disjointClasses_.add(disjointClass);
 	}
 
 	/**
@@ -255,10 +258,10 @@ abstract public class IndexedClassExpression {
 	 */
 	protected boolean removeDisjointClass(IndexedClassExpression disjointClass) {
 		boolean success = false;
-		if (disjointClasses != null) {
-			success = disjointClasses.remove(disjointClass);
-			if (disjointClasses.isEmpty())
-				disjointClasses = null;
+		if (disjointClasses_ != null) {
+			success = disjointClasses_.remove(disjointClass);
+			if (disjointClasses_.isEmpty())
+				disjointClasses_ = null;
 		}
 		return success;
 	}
@@ -312,7 +315,11 @@ abstract public class IndexedClassExpression {
 	/**
 	 * Sets the corresponding context if none was yet assigned.
 	 * 
-	 * @return True if the operation succeeded.
+	 * @param context
+	 *            the {@link Context} which will be assigned to this
+	 *            {@link IndexedClassExpression}
+	 * 
+	 * @return {@code true} if the operation succeeded.
 	 */
 	public boolean setContext(Context context) {
 		return this.context.compareAndSet(null, context);

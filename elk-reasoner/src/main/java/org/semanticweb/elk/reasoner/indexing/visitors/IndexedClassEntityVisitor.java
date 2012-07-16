@@ -28,9 +28,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
  * Visitor pattern interface for instances of {@link IndexedClassEntity}.
  * 
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
-public interface IndexedClassEntityVisitor<O> extends
-		IndexedClassVisitor<O>, 
+public interface IndexedClassEntityVisitor<O> extends IndexedClassVisitor<O>,
 		IndexedIndividualVisitor<O> {
 }

@@ -78,9 +78,9 @@ public abstract class StrongKeyEntry<T, K> implements KeyEntry<T, K> {
 
 	/**
 	 * Compute the value which will be used as a final hash code for this
-	 * object. Must be compatible with the {@link equals()} method usual.
+	 * object. Must be compatible with the {@link #equals(Object)} method usual.
 	 * 
-	 * @return
+	 * @return the value which will be used as a hash code for this object
 	 */
 	public abstract int computeHashCode();
 

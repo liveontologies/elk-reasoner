@@ -28,11 +28,14 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * A fresh Node containing an object that does not occur in a taxonomy. Such nodes
- * are returned to queries when FreshEntityPolicy is set to ALLOW.
+ * A fresh Node containing an object that does not occur in a taxonomy. Such
+ * nodes are returned to queries when FreshEntityPolicy is set to ALLOW.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the type of objects in this node
  */
 public class FreshNode<T extends ElkObject> implements Node<T> {
 

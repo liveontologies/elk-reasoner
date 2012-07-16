@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * members.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  * @param <T>
  *            the type of objects in the nodes of this taxonomy
@@ -41,8 +42,12 @@ public interface InstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 		extends Taxonomy<T> {
 
 	/**
-	 * Returns the TypeNode containing the given elkObject as a member. Null if
-	 * elkObject does not occur in the taxonomy.
+	 * @param elkObject
+	 *            {@link ElkObject} for which the {@link TypeNode} to be
+	 *            computed
+	 * @return the {@link TypeNode} containing the given {@link ElkObject} as a
+	 *         member, or {@code null} if the input does not occur in the
+	 *         taxonomy
 	 */
 	public TypeNode<T, I> getTypeNode(T elkObject);
 
@@ -54,8 +59,12 @@ public interface InstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 	public Set<? extends TypeNode<T, I>> getTypeNodes();
 
 	/**
-	 * Returns the InstanceNode containing the given elkObject as a member. Null
-	 * if elkObject does not occur in the taxonomy.
+	 * @param elkObject
+	 *            {@link ElkObject} for which the {@link InstanceNode} to be
+	 *            computed
+	 * @return the {@link InstanceNode} containing the given {@link ElkObject}
+	 *         as a member, or {@code null} if the input does not occur in the
+	 *         taxonomy
 	 */
 	public InstanceNode<T, I> getInstanceNode(I elkObject);
 

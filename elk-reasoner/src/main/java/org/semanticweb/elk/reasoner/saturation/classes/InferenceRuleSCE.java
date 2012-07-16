@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
@@ -30,7 +31,10 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory
  * Inference rule with a {@link SuperClassExpression} as an argument.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <C>
+ *            the type of the {@link Context} with which this rule can be used
  */
 public interface InferenceRuleSCE<C extends ContextElClassSaturation> extends
 		InferenceRule<C> {

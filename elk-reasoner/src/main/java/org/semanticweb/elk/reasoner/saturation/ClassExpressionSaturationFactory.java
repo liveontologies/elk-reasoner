@@ -32,7 +32,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationListener;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -159,8 +158,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		this.listener_ = listener;
 		this.jobsToDo_ = new ConcurrentLinkedQueue<J>();
 		this.jobsInProgress_ = new ConcurrentLinkedQueue<J>();
-		this.ruleApplicationFactory_ = new RuleApplicationFactory(
-				ontologyIndex, new ThisRuleApplicationListener());
+		this.ruleApplicationFactory_ = new RuleApplicationFactory(ontologyIndex);
 	}
 
 	/**
@@ -230,32 +228,6 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 */
 	public void printStatistics() {
 		ruleApplicationFactory_.printStatistics();
-	}
-
-	/**
-	 * The listener class used for the rule application engine, which is used
-	 * within this saturation engine
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
-	private class ThisRuleApplicationListener implements
-			RuleApplicationListener {
-
-		@Override
-		public void notifyCanProcess() {
-			/*
-			 * the rule application engine can process; wake up all sleeping
-			 * workers
-			 */
-			if (workersWaiting_)
-				synchronized (countContextsProcessed_) {
-					workersWaiting_ = false;
-					countContextsProcessed_.notifyAll();
-				}
-			/* tell also that the saturation engine can process */
-			listener_.notifyCanProcess();
-		}
 	}
 
 	/**

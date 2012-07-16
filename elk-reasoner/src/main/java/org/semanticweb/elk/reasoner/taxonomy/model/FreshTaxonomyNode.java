@@ -32,7 +32,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * Such nodes are returned to queries when FreshEntityPolicy is set to ALLOW.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
  */
 public class FreshTaxonomyNode<T extends ElkObject> extends FreshNode<T>
 		implements TaxonomyNode<T> {

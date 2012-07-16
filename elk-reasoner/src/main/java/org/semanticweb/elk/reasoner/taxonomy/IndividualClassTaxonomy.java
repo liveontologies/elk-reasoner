@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
  * Abstract taxonomy for classes and their instances (individuals). The main
  * purpose of this is to provide an "interface" that is specific enough for
  * engines to modify the data without needing to refer to a particular
- * implementation, such as {@link ConcurrentTaxonomy}.
+ * implementation.
  * 
  * @author Markus Kroetzsch
  * 
@@ -41,8 +41,9 @@ public abstract class IndividualClassTaxonomy implements
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> {
 
 	abstract NonBottomClassNode getCreateClassNode(Collection<ElkClass> members);
-	
-	abstract IndividualNode getCreateIndividualNode(Collection<ElkNamedIndividual> members);
+
+	abstract IndividualNode getCreateIndividualNode(
+			Collection<ElkNamedIndividual> members);
 
 	abstract void addUnsatisfiableClass(ElkClass elkClass);
 }

@@ -283,8 +283,7 @@ public abstract class AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public Taxonomy<ElkClass> getTaxonomy()
-			throws ElkInconsistentOntologyException, ElkException {
+	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
 		if (!isConsistent())
 			throw new ElkInconsistentOntologyException();
 
@@ -308,7 +307,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
-			throws ElkInconsistentOntologyException, ElkException {
+			throws ElkException {
 		if (!isConsistent())
 			throw new ElkInconsistentOntologyException();
 

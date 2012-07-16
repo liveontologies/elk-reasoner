@@ -54,19 +54,19 @@ public abstract class InferenceSystem<C extends Context> {
 	}
 
 	/**
-	 * Get the list of inference rules of this inference system.
-	 * 
-	 * @return
+	 * @return the list of inference rules of this inference system.
 	 */
 	public List<InferenceRule<C>> getInferenceRules() {
 		return inferenceRules;
 	}
 
 	/**
-	 * Create a new context for the given root expression.
+	 * Create a new context for the given {@link IndexedClassExpression}.
 	 * 
 	 * @param root
-	 * @return
+	 *            an {@link IndexedClassExpression} for which the context should
+	 *            be constructed
+	 * @return a new context for the given {@link IndexedClassExpression}.
 	 */
 	public abstract C createContext(IndexedClassExpression root);
 
@@ -79,7 +79,7 @@ public abstract class InferenceSystem<C extends Context> {
 	 * @note This method will vanish soon. Do not use it unless you really,
 	 *       really must.
 	 * @param context
-	 * @return
+	 * @return the context casted to the given type
 	 */
 	@SuppressWarnings("unchecked")
 	@Deprecated

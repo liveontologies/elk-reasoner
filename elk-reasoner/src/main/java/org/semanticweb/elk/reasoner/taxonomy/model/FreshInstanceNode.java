@@ -32,7 +32,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * Such nodes are returned to queries when FreshEntityPolicy is set to ALLOW.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <T>
+ *            the types of objects in this node
+ * @param <I>
+ *            the type of instances in this node
  */
 public class FreshInstanceNode<T extends ElkObject, I extends ElkObject>
 		extends FreshNode<I> implements InstanceNode<T, I> {

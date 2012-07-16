@@ -28,12 +28,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * Represents all occurrences of an ElkSubObjectPropertyExpression in an
+ * Represents all occurrences of an {@link ElkSubObjectPropertyExpression} in an
  * ontology. To this end, objects of this class keeps a list of sub and super
  * property expressions. The data structures are optimized for quickly
  * retrieving the relevant relationships during inferencing.
@@ -44,83 +45,110 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
  */
-
 public abstract class IndexedPropertyChain {
 
 	/**
-	 * Correctness of axioms deletions requires that toldSuperProperties is a
-	 * List.
+	 * All told super object properties of this
+	 * {@link IndexedBinaryPropertyChain}. Should be a List for correctness of
+	 * axioms deletions (duplicates matter).
 	 */
-	protected List<IndexedObjectProperty> toldSuperProperties;
+	private List<IndexedObjectProperty> toldSuperProperties_;
 
 	/**
-	 * Collections of all binary role chains in which this object property
-	 * occurs on the right.
+	 * Collections of all binary role chains in which this
+	 * {@link IndexedBinaryPropertyChain} occurs on the right.
 	 */
-	protected Collection<IndexedBinaryPropertyChain> rightChains;
+	private Collection<IndexedBinaryPropertyChain> rightChains_;
 
 	/**
-	 * @return All told super object properties of this object property,
-	 *         possibly null.
+	 * @return All told super object properties of this
+	 *         {@link IndexedBinaryPropertyChain}, or {@code null} if none is
+	 *         assigned
 	 */
 	public List<IndexedObjectProperty> getToldSuperProperties() {
-		return toldSuperProperties;
+		return toldSuperProperties_;
 	}
 
 	/**
-	 * @return All told sub object properties of this object property, possibly
-	 *         null.
+	 * @return All told sub object properties of this
+	 *         {@link IndexedBinaryPropertyChain}, or {@code null} if none is
+	 *         assigned
 	 */
 	public abstract List<IndexedPropertyChain> getToldSubProperties();
 
 	/**
-	 * @return All chains in which this object property occurs on right, possibly null.
+	 * @return All {@link IndexedBinaryPropertyChain}s in which this
+	 *         {@link IndexedBinaryPropertyChain} occurs on right, or
+	 *         {@code null} if none is assigned
 	 */
 	public Collection<IndexedBinaryPropertyChain> getRightChains() {
-		return rightChains;
-	}
-
-	protected void addToldSuperObjectProperty(
-			IndexedObjectProperty superObjectProperty) {
-		if (toldSuperProperties == null)
-			toldSuperProperties = new ArrayList<IndexedObjectProperty>(1);
-		toldSuperProperties.add(superObjectProperty);
+		return rightChains_;
 	}
 
 	/**
+	 * Adds the given {@link IndexedObjectProperty} as a super-role of this
+	 * {@link IndexedPropertyChain}
+	 * 
 	 * @param superObjectProperty
-	 * @return true if successfully removed
+	 *            the {@link IndexedObjectProperty} to be added
+	 */
+	void addToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
+		if (toldSuperProperties_ == null)
+			toldSuperProperties_ = new ArrayList<IndexedObjectProperty>(1);
+		toldSuperProperties_.add(superObjectProperty);
+	}
+
+	/**
+	 * Removes the given {@link IndexedObjectProperty} ones from the list of
+	 * super-roles of this {@link IndexedPropertyChain}
+	 * 
+	 * @param superObjectProperty
+	 *            the {@link IndexedObjectProperty} to be removed
+	 * @return {@code true} if successfully removed
 	 */
 	protected boolean removeToldSuperObjectProperty(
 			IndexedObjectProperty superObjectProperty) {
 		boolean success = false;
-		if (toldSuperProperties != null) {
-			success = toldSuperProperties.remove(superObjectProperty);
-			if (toldSuperProperties.isEmpty())
-				toldSuperProperties = null;
+		if (toldSuperProperties_ != null) {
+			success = toldSuperProperties_.remove(superObjectProperty);
+			if (toldSuperProperties_.isEmpty())
+				toldSuperProperties_ = null;
 		}
 		return success;
 	}
-	
-	protected void addRightChain(
-			IndexedBinaryPropertyChain chain) {
-		if (rightChains == null)
-			rightChains = new ArrayList<IndexedBinaryPropertyChain>(1);
-		rightChains.add(chain);
+
+	/**
+	 * Adds the given {@link IndexedBinaryPropertyChain} to the list of
+	 * {@link IndexedBinaryPropertyChain} that contains this
+	 * {@link IndexedPropertyChain} in the right-hand-side
+	 * 
+	 * @param superObjectProperty
+	 *            the {@link IndexedBinaryPropertyChain} to be added
+	 */
+	protected void addRightChain(IndexedBinaryPropertyChain chain) {
+		if (rightChains_ == null)
+			rightChains_ = new ArrayList<IndexedBinaryPropertyChain>(1);
+		rightChains_.add(chain);
 	}
 
 	/**
+	 * Adds the given {@link IndexedBinaryPropertyChain} from the list of
+	 * {@link IndexedBinaryPropertyChain} that contain this
+	 * {@link IndexedPropertyChain} in the right-hand-side
+	 * 
 	 * @param superObjectProperty
-	 * @return true if successfully removed
+	 *            the {@link IndexedBinaryPropertyChain} to be removed
+	 * @return {@code true} if successfully removed
 	 */
-	protected boolean removeRightChain(
-			IndexedBinaryPropertyChain chain) {
+	protected boolean removeRightChain(IndexedBinaryPropertyChain chain) {
 		boolean success = false;
-		if (rightChains != null) {
-			success = rightChains.remove(chain);
-			if (rightChains.isEmpty())
-				rightChains = null;
+		if (rightChains_ != null) {
+			success = rightChains_.remove(chain);
+			if (rightChains_.isEmpty())
+				rightChains_ = null;
 		}
 		return success;
 	}
@@ -128,21 +156,30 @@ public abstract class IndexedPropertyChain {
 	/**
 	 * This counts how often this object occurred in the ontology.
 	 */
-	protected int occurrenceNo = 0;
+	int occurrenceNo = 0;
 
-	protected final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
+	/**
+	 * the reference to a {@link SaturatedPropertyChain} assigned to this
+	 * {@link IndexedPropertyChain}
+	 */
+	private final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	protected abstract void updateOccurrenceNumber(int increment);
+	abstract void updateOccurrenceNumber(int increment);
 
+	/**
+	 * @return {@code true} if this {@link IndexedPropertyChain} occur in the
+	 *         ontology index
+	 */
 	public boolean occurs() {
 		return occurrenceNo > 0;
 	}
 
 	/**
-	 * @return The corresponding SaturatedObjecProperty, null if none was
+	 * @return The corresponding {@code SaturatedObjecProperty} assigned to this
+	 *         {@link IndexedPropertyChain}, or {@code null} if none was
 	 *         assigned.
 	 */
 	public SaturatedPropertyChain getSaturated() {
@@ -150,16 +187,21 @@ public abstract class IndexedPropertyChain {
 	}
 
 	/**
-	 * Sets the corresponding SaturatedObjectProperty if none was yet assigned.
+	 * Sets the corresponding {@code SaturatedObjecProperty} of this
+	 * {@link IndexedPropertyChain} if none was yet assigned.
 	 * 
-	 * @return True if the operation succeeded.
+	 * @param saturatedObjectProperty
+	 *            assign the given {@link SaturatedPropertyChain} to this
+	 *            {@link IndexedClassExpression}
+	 * 
+	 * @return {@code true} if the operation succeeded.
 	 */
 	public boolean setSaturated(SaturatedPropertyChain saturatedObjectProperty) {
 		return saturated.compareAndSet(null, saturatedObjectProperty);
 	}
 
 	/**
-	 * Resets the corresponding SaturatedObjectProperty to null.
+	 * Resets the corresponding {@code SaturatedObjecProperty} to {@code null}.
 	 */
 	public void resetSaturated() {
 		saturated.set(null);

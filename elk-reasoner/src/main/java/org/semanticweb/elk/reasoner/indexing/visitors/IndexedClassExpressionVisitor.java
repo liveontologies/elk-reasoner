@@ -29,11 +29,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * 
  * @author "Yevgeny Kazakov"
  * @author Frantisek Simancik
- *
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public interface IndexedClassExpressionVisitor<O> extends
-		IndexedClassEntityVisitor<O>, 
-		IndexedObjectIntersectionOfVisitor<O>,
-		IndexedObjectSomeValuesFromVisitor<O>, 
-		IndexedDataHasValueVisitor<O> { 
+		IndexedClassEntityVisitor<O>, IndexedObjectIntersectionOfVisitor<O>,
+		IndexedObjectSomeValuesFromVisitor<O>, IndexedDataHasValueVisitor<O> {
 }

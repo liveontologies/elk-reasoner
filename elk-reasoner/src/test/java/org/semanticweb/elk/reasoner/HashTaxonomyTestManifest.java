@@ -34,6 +34,7 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @param <AO> 
  */
 public class HashTaxonomyTestManifest<AO extends ClassTaxonomyTestOutput> extends ReasoningTestManifest<HashTestOutput, AO> {
 

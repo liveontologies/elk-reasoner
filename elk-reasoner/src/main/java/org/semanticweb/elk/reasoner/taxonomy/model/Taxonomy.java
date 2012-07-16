@@ -31,18 +31,25 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
  * A hierarchy of certain ElkObjects. For each such object, the taxonomy holds a
- * TaxonomyNode object from which direct sub- and supernodes can be retrieved.
+ * TaxonomyNode object from which direct sub- and super- nodes can be retrieved.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
- * 
+ * @param <T>
+ *            the type of the {@link ElkObject}s stored in this taxonomy
  */
 public interface Taxonomy<T extends ElkObject> {
 
 	/**
-	 * Returns the TaxonomyNode containing the given elkObject as a member. Null
-	 * if elkObject does not occur in the taxonomy.
+	 * Returns the {@link TaxonomyNode} containing the given {@link ElkObject}
+	 * as a member or {@code null} if the input does not occur in the taxonomy.
+	 * 
+	 * @param elkObject
+	 *            the {@link ElkObject} for which to return the
+	 *            {@link TaxonomyNode}
+	 * @return the {@link TaxonomyNode} for the specified input
+	 *         {@link ElkObject}
 	 */
 	public TaxonomyNode<T> getNode(T elkObject);
 
@@ -52,14 +59,16 @@ public interface Taxonomy<T extends ElkObject> {
 	 * @return an unmodifiable Collection
 	 */
 	public Set<? extends TaxonomyNode<T>> getNodes();
-	
+
 	/**
-	 * Returns the top node of the taxonomy.
+	 * 
+	 * @return the node of this taxonomy that has no parent nodes
 	 */
 	public TaxonomyNode<T> getTopNode();
-	
+
 	/**
-	 * Returns the bottom node of the taxonomy.
+	 * 
+	 * @return the node of this taxonomy that has no child nodes
 	 */
 	public TaxonomyNode<T> getBottomNode();
 

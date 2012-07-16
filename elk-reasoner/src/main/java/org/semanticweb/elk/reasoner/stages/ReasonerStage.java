@@ -59,6 +59,9 @@ public interface ReasonerStage {
 	 * done. If the execution of this stage has not been interrupted, the
 	 * results for this stage should be computed and the function
 	 * {@link #done()} should return {@code true}.
+	 * 
+	 * @throws ElkException
+	 *             if execution was not successful
 	 */
 	public void execute() throws ElkException;
 
