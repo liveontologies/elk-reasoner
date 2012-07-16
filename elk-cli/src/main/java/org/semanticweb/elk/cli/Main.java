@@ -31,7 +31,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.ParseException;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -72,8 +71,7 @@ public class Main {
 
 	/**
 	 * @param args
-	 * @throws IOException
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 
@@ -102,7 +100,8 @@ public class Main {
 						"number of concurrent worker threads")
 				.withRequiredArg().ofType(Integer.class);
 		OptionSpec<String> logging = parser
-				.acceptsAll(asList("logging", "l"), "logging level for log4j; default INFO")
+				.acceptsAll(asList("logging", "l"),
+						"logging level for log4j; default INFO")
 				.withRequiredArg().ofType(String.class).describedAs("level");
 		OptionSpec<Void> verbose = parser.acceptsAll(asList("verbose", "v"),
 				"equivalent to --logging=DEBUG");
@@ -139,22 +138,22 @@ public class Main {
 					.println("An input ontology and exactly one reasoning task are required!");
 			return;
 		}
-		
-		// logging 
+
+		// logging
 		if (countOptions(options, logging, verbose, Verbose, quiet) > 1) {
 			System.err.println("Cannot set more than one logging level!");
 			return;
 		}
 		Logger allLoggers = Logger.getLogger("org.semanticweb.elk");
 		if (options.has(logging))
-			allLoggers.setLevel(Level.toLevel(options.valueOf(logging), Level.INFO));
+			allLoggers.setLevel(Level.toLevel(options.valueOf(logging),
+					Level.INFO));
 		if (options.has(verbose))
 			allLoggers.setLevel(Level.DEBUG);
 		if (options.has(Verbose))
 			allLoggers.setLevel(Level.TRACE);
 		if (options.has(quiet))
 			allLoggers.setLevel(Level.ERROR);
-
 
 		// number of workers
 		ReasonerConfiguration configuration = ReasonerConfiguration

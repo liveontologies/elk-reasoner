@@ -42,7 +42,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
  * A {@link ReasonerComputation} for checking consistency of the ontology. This
- * is done by checking consistency of <tt>owl:Thing</tt> and of all individuals
+ * is done by checking consistency of {@code owl:Thing} and of all individuals
  * occurring in the ontology.
  * 
  * @author Frantisek Simancik
@@ -189,7 +189,7 @@ public class ConsistencyChecking
 	}
 
 	/**
-	 * @return <tt>true</tt> if the ontology is consistent; should be called
+	 * @return {@code true} if the ontology is consistent; should be called
 	 *         after the consistency checking is performed using the method
 	 *         {@link #process()}
 	 */
@@ -218,10 +218,6 @@ public class ConsistencyChecking
 		ThisClassExpressionSaturationListener(
 				ConsistencyMonitor consistenceMonitor) {
 			this.consistenceMonitor = consistenceMonitor;
-		}
-
-		@Override
-		public void notifyCanProcess() {
 		}
 
 		@Override

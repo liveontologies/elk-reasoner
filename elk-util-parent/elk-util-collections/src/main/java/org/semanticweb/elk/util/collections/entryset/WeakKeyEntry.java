@@ -108,9 +108,9 @@ public abstract class WeakKeyEntry<K, T> extends WeakReference<K> implements
 
 	/**
 	 * Compute the value which will be used as a final hash code for this
-	 * object. Must be compatible with the {@link equals()} method usual.
+	 * object. Must be compatible with the {@link #equals(Object)} method usual.
 	 * 
-	 * @return
+	 * @return the value to be used as a hash code for this object
 	 */
 	public abstract int computeHashCode();
 

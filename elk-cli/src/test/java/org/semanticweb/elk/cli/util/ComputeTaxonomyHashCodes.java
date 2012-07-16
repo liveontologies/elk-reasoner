@@ -65,6 +65,7 @@ public class ComputeTaxonomyHashCodes {
 	 * args[0]: path to the dir with source ontologies
 	 * 
 	 * @param args
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 

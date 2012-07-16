@@ -27,7 +27,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 
 /**
- * Implementation of {@link ObjectHasSelf}
+ * Implementation of {@link ElkObjectHasSelf}
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"

@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
- * The rule for propagating of inconsistencies (<tt>owl:Nothing</tt>) in
+ * The rule for propagating of inconsistencies ({@code owl:Nothing}) in
  * contexts
  * 
  * @author Frantisek Simancik

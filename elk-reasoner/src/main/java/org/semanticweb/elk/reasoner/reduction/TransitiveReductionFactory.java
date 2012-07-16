@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -95,12 +94,6 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private final Queue<SaturationJobSuperClass<R, J>> auxJobQueue;
 
 	/**
-	 * <tt>true</tt> if the {@link #auxJobQueue} queue is empty. This flag is
-	 * used for notification that new jobs can be processed.
-	 */
-	private final AtomicBoolean jobQueueEmpty;
-
-	/**
 	 * The saturation factory used for computing saturations for relevant
 	 * indexed class expressions
 	 */
@@ -122,19 +115,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			int maxWorkers, TransitiveReductionListener<J, Engine> listener) {
 		this.listener = listener;
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
-		this.jobQueueEmpty = new AtomicBoolean(true);
 		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
 				ontologyIndex, maxWorkers,
 				new ThisClassExpressionSaturationListener());
-	}
-
-	/**
-	 * executes the notification function of the listenerq the first time the
-	 * job queue becomes non-empty
-	 */
-	private void tryNotifyCanProcess() {
-		if (jobQueueEmpty.compareAndSet(true, false))
-			listener.notifyCanProcess();
 	}
 
 	/**
@@ -154,11 +137,6 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private class ThisClassExpressionSaturationListener
 			implements
 			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>, ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>.Engine> {
-
-		@Override
-		public void notifyCanProcess() {
-			listener.notifyCanProcess();
-		}
 
 		@Override
 		public void notifyFinished(
@@ -269,7 +247,6 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 								.isSaturated()) {
 					auxJobQueue.add(new SaturationJobSuperClass<R, J>(
 							candidate, state));
-					tryNotifyCanProcess();
 					return;
 				}
 				/*
@@ -402,14 +379,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				saturationEngine.process();
 				SaturationJobForTransitiveReduction<R, ?, J> nextJob = auxJobQueue
 						.poll();
-				if (nextJob == null) {
-					if (!jobQueueEmpty.compareAndSet(false, true))
-						break;
-					nextJob = auxJobQueue.poll();
-					if (nextJob == null)
-						break;
-					tryNotifyCanProcess();
-				}
+				if (nextJob == null)
+					break;
 				saturationEngine.submit(nextJob);
 			}
 		}

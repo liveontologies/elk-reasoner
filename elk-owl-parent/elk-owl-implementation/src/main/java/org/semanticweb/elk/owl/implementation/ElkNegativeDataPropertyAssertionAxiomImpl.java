@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 
 /**
- * Implementation of {@link ElkNegativeDataPropertyAssertion}.
+ * Implementation of {@link ElkNegativeDataPropertyAssertionAxiom}.
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
@@ -42,8 +42,8 @@ public class ElkNegativeDataPropertyAssertionAxiomImpl
 		implements ElkNegativeDataPropertyAssertionAxiom {
 
 	ElkNegativeDataPropertyAssertionAxiomImpl(
-			ElkDataPropertyExpression property,
-			ElkIndividual subject, ElkLiteral object) {
+			ElkDataPropertyExpression property, ElkIndividual subject,
+			ElkLiteral object) {
 		super(property, subject, object);
 	}
 

@@ -241,7 +241,7 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 	/**
 	 * Get the entry in set that is equal to the input entry if there is one, or
 	 * otherwise insert the given entry into the set and return itself. Equality
-	 * of entries is decided using to the {@link equals()} method.
+	 * of entries is decided using to the {@link #equals(Object)} method.
 	 * 
 	 * @param entry
 	 *            the entry to be merged into the set
@@ -278,7 +278,7 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 	/**
 	 * Retrieves the entry in the set that is equal to the given object, if it
 	 * exists, or returns null otherwise. Equality of entries is decided using
-	 * to the {@link equals()} method.
+	 * to the {@link #equals(Object)} method.
 	 * 
 	 * @param o
 	 *            the object that is used for finding the entry
@@ -299,7 +299,7 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 	/**
 	 * Removes and returns the entry in the set that is equal to the specified
 	 * object. Returns null if the set contains no such entry. Equality of
-	 * entries is decided using to the {@link equals()} method.
+	 * entries is decided using to the {@link #equals(Object)} method.
 	 * 
 	 * @param o
 	 *            the object that is used for finding the entry to remove

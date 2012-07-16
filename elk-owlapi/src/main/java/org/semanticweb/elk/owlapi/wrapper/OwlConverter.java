@@ -754,7 +754,7 @@ public class OwlConverter {
 	/**
 	 * @param axiom
 	 *            the owl axiom to test
-	 * @return <tt>true</tt> if the owl axiom can be converted to ELK axiom
+	 * @return {@code true} if the owl axiom can be converted to ELK axiom
 	 */
 	@SuppressWarnings("static-method")
 	public boolean isRelevantAxiom(OWLAxiom axiom) {

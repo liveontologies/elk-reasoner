@@ -111,10 +111,6 @@ public class InstanceTaxonomyComputationFactory implements
 			TransitiveReductionListener<TransitiveReductionJob<IndexedIndividual>, TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>.Engine> {
 
 		@Override
-		public void notifyCanProcess() {
-		}
-
-		@Override
 		public void notifyFinished(TransitiveReductionJob<IndexedIndividual> job)
 				throws InterruptedException {
 			job.getOutput().accept(outputProcessor_);

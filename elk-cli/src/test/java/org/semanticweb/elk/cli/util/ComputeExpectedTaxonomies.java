@@ -59,7 +59,6 @@ public class ComputeExpectedTaxonomies {
 
 	static final String CLASSIFICATION_PATH = "../elk-reasoner/src/test/resources/classification_test_input";
 	static final String REALIZATION_PATH = "../elk-reasoner/src/test/resources/realization_test_input";
-	
 
 	static final ReasonerFactory reasonerFactory = new ReasonerFactory();
 
@@ -67,6 +66,7 @@ public class ComputeExpectedTaxonomies {
 	 * args[0]: path to the dir with source ontologies
 	 * 
 	 * @param args
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 
@@ -120,7 +120,8 @@ public class ComputeExpectedTaxonomies {
 	}
 
 	static void generateExpectedTaxonomy(String path, GetTaxonomy<ElkClass> gt)
-			throws IOException, Owl2ParseException, ElkException, InterruptedException {
+			throws IOException, Owl2ParseException, ElkException,
+			InterruptedException {
 		File srcDir = new File(path);
 
 		ReasonerConfiguration configuraion = ReasonerConfiguration

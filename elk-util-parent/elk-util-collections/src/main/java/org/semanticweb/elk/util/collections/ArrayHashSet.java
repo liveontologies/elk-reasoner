@@ -39,6 +39,8 @@ import java.util.Set;
  * Searching, Second Edition
  * 
  * @author Yevgeny Kazakov
+ * @param <E>
+ *            the type of the elements in this set
  * 
  */
 public class ArrayHashSet<E> implements Set<E> {

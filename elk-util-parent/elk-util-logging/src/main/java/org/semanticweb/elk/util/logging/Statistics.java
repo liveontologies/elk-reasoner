@@ -118,6 +118,7 @@ public class Statistics {
 	 * Log the current total memory usage with the specified priority.
 	 * 
 	 * @param logger
+	 * @param priority 
 	 */
 	public static void logMemoryUsage(Logger logger, Priority priority) {
 		if (logger.isEnabledFor(priority)) {

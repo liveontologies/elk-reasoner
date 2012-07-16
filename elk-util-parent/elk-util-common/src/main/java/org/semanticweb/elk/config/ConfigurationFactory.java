@@ -43,6 +43,7 @@ import java.util.ResourceBundle;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.io.IOUtils;
 
+//TODO: Documentation
 /**
  * The base class responsible for loading configurations
  * 
@@ -60,7 +61,8 @@ public class ConfigurationFactory {
 	 * 
 	 * @param prefix
 	 * @param configClass
-	 * @return
+	 * @return the {@link BaseConfiguration} for the specified parameters
+	 * @throws ConfigurationException
 	 */
 	@SuppressWarnings("static-method")
 	public BaseConfiguration getConfiguration(String prefix,

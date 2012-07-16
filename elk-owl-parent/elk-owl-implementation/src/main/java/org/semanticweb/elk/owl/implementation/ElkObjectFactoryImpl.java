@@ -689,7 +689,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	 * Obtain access to the classes object manager. Can be used to share the
 	 * same object manager among multiple factories.
 	 * 
-	 * @return
+	 * @return the {@link ElkObjectManager} used in this factory
 	 */
 	public ElkObjectManager getObjectManager() {
 		return objectManager;

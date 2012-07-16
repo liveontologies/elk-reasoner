@@ -55,7 +55,14 @@ public class ConfigurationUtils {
 	 * Loads configuration from a set of files by passing both input and
 	 * expected output URLs to the test manifest creator
 	 * 
-	 * @return
+	 * @param path
+	 * @param srcClass
+	 * @param inputFileExt
+	 * @param outputFileExt
+	 * @param creator
+	 * 
+	 * @return the loaded configuration
+	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
@@ -131,7 +138,13 @@ public class ConfigurationUtils {
 	/**
 	 * In case there're no expected results
 	 * 
-	 * @return
+	 * @param path
+	 * @param srcClass
+	 * @param inputFileExt
+	 * @param creator
+	 * 
+	 * @return the loaded test cofiguration
+	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
@@ -172,6 +185,9 @@ public class ConfigurationUtils {
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
+	 * @param <I> 
+	 * @param <EO> 
+	 * @param <AO> 
 	 * 
 	 */
 	public interface TestManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {

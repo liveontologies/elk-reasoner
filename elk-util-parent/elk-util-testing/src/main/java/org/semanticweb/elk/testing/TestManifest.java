@@ -34,6 +34,9 @@ package org.semanticweb.elk.testing;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @param <I> 
+ * @param <EO> 
+ * @param <AO> 
  *
  */
 public interface TestManifest<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {

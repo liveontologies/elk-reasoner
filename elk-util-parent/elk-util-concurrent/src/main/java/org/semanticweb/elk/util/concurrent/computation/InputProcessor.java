@@ -53,19 +53,6 @@ public interface InputProcessor<J> {
 	 */
 	public void process() throws InterruptedException;
 
-//	/**
-//	 * Returns <tt>true</tt> if new computational power can be used for
-//	 * processing jobs. This means that running the {@link #process()} method
-//	 * can perform some computations. The method typically returns <tt>true</tt>
-//	 * after a job has been submitted but not started to be processed from some
-//	 * thread, but it can also return <tt>true</tt> when the job that is being
-//	 * processed creates (spawns) some other sub-jobs.
-//	 * 
-//	 * @return <tt>true</tt> if the method {@link #process()} can be called to
-//	 *         process submitted jobs.
-//	 */
-//	public boolean canProcess();
-
 	/**
 	 * Indicate that processing of the input is finished. This method should be
 	 * eventually called after every call of {@link #process()} (but it is not

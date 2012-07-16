@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 public class MessageDialogAppenderTest {
 
 	//TODO Turn into a test
+	@SuppressWarnings("static-method")
 	public void testDialog() {
 		MessageDialogAppender appender = new MessageDialogAppender();
 		Logger logger = Logger.getLogger(MessageDialogAppenderTest.class);

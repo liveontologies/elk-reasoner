@@ -185,7 +185,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * expressions of the root expression have been computed. This needs to be
 	 * set explicitly by some processor.
 	 * 
-	 * @return <tt>true</tt> if this context is saturated and <tt>false</tt>
+	 * @return {@code true} if this context is saturated and {@code false}
 	 *         otherwise
 	 */
 	@Override

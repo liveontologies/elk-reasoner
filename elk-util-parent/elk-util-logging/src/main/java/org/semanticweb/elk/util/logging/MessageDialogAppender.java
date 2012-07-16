@@ -130,6 +130,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	 *            the event for which the check box message should be generated
 	 * @return the generated check box message
 	 */
+	@SuppressWarnings("static-method")
 	protected String getCheckboxMessage(LoggingEvent event) {
 		return "Do not show further messages of this kind";
 	}
@@ -170,13 +171,17 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 		String displayLabel = event.getRenderedMessage();
-		WrappingLabel label = new WrappingLabel(displayLabel, 40/*40 characters should be a decent length*/);
-		
+		WrappingLabel label = new WrappingLabel(displayLabel, 40/*
+																 * 40 characters
+																 * should be a
+																 * decent length
+																 */);
+
 		label.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(label);
 
 		JCheckBox ignoreMessageButton = new JCheckBox(getCheckboxMessage(event));
-		
+
 		if (messageType != null) {
 			ignoreMessageButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 			panel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -189,7 +194,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		// messageTitle,
 		// JOptionPane.DEFAULT_OPTION, messageLevel, null, options,
 		// options[0]);
-		
+
 		JOptionPane.showMessageDialog(null, panel, messageTitle, messageLevel);
 
 		if (ignoreMessageButton.isSelected()) {
@@ -221,21 +226,20 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 }
 
-
 class WrappingLabel extends JTextArea {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public WrappingLabel(String text, int width) {
-        super(text);
-        
-        setBackground(null);
-        setEditable(false);
-        setBorder(null);
-        setLineWrap(true);
-        setWrapStyleWord(true);
-        setFocusable(false);
-        setColumns(width);
-        setRows(text.length() / width);
-    }	
+		super(text);
+
+		setBackground(null);
+		setEditable(false);
+		setBorder(null);
+		setLineWrap(true);
+		setWrapStyleWord(true);
+		setFocusable(false);
+		setColumns(width);
+		setRows(text.length() / width);
+	}
 }

@@ -176,10 +176,6 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				new ClassExpressionSaturationListener<J, Engine>() {
 
 					@Override
-					public void notifyCanProcess() {
-					}
-
-					@Override
 					public void notifyFinished(J job)
 							throws InterruptedException {
 					}
@@ -407,7 +403,6 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 					workersWaiting_ = false;
 					countContextsProcessed_.notifyAll();
 				}
-				listener_.notifyCanProcess();
 			}
 		}
 

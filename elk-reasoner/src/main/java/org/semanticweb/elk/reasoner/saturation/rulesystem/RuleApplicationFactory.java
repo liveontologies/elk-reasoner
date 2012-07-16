@@ -198,14 +198,14 @@ public class RuleApplicationFactory implements
 		}
 
 		/**
-		 * @return the <tt>owl:Thing</tt> object in this ontology
+		 * @return the {@code owl:Thing} object in this ontology
 		 */
 		public IndexedClassExpression getOwlNothing() {
 			return owlNothing;
 		}
 
 		/**
-		 * @return the <tt>owl:Nothing</tt> object in this ontology
+		 * @return the {@code owl:Nothing} object in this ontology
 		 */
 		public IndexedClassExpression getOwlThing() {
 			return owlThing;
