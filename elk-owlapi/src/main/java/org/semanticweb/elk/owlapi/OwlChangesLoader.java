@@ -30,8 +30,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.ChangesLoader;
-import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.loading.ElkLoadingException;
+import org.semanticweb.elk.loading.Loader;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -87,13 +89,15 @@ public class OwlChangesLoader implements ChangesLoader {
 								.poll();
 						if (change == null)
 							break;
-						if (change instanceof AddAxiom)
-							axiomInserter.visit(OWL_CONVERTER_.convert(change
-									.getAxiom()));
-						else if (change instanceof RemoveAxiom) {
-							axiomDeleter.visit(OWL_CONVERTER_.convert(change
-									.getAxiom()));
-						}
+						ElkAxiom axiom = OWL_CONVERTER_.convert(change
+								.getAxiom());
+						if (change instanceof AddAxiom) {
+							axiomInserter.visit(axiom);
+						} else if (change instanceof RemoveAxiom) {
+							axiomDeleter.visit(axiom);
+						} else
+							throw new ElkLoadingException(
+									"Change type is not supported!");
 						currentAxiom++;
 						progressMonitor.report(currentAxiom, axiomCount);
 					}
@@ -104,13 +108,20 @@ public class OwlChangesLoader implements ChangesLoader {
 
 			@Override
 			public void dispose() {
-				pendingChanges.clear();
+				// nothing was allocated by this loader
 			}
 		};
 	}
 
 	void registerChange(OWLOntologyChange change) {
+		if (!change.isAxiomChange())
+			throw new UnsupportedOperationException("Not an axiom change!");
 		OWLAxiom axiom = change.getAxiom();
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("registering "
+					+ ((change instanceof AddAxiom) ? "addition" : "removal")
+					+ " of " + axiom.toString());
+		}
 		if (OWL_CONVERTER_.isRelevantAxiom(axiom))
 			pendingChanges.add(change);
 	}

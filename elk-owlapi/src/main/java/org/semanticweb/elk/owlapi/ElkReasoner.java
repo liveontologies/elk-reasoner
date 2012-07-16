@@ -864,7 +864,7 @@ public class ElkReasoner implements OWLReasoner {
 	@Override
 	public boolean isPrecomputed(InferenceType inferenceType) {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("isPrecomputed(inferenceType)");
+			LOGGER_.trace("isPrecomputed(InferenceType)");
 		if (inferenceType.equals(InferenceType.CLASS_HIERARCHY))
 			return reasoner_.doneTaxonomy();
 		if (inferenceType.equals(InferenceType.CLASS_ASSERTIONS))
@@ -879,7 +879,7 @@ public class ElkReasoner implements OWLReasoner {
 			ClassExpressionNotInProfileException, FreshEntitiesException,
 			InconsistentOntologyException {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("isSatisfiable(classExpression)");
+			LOGGER_.trace("isSatisfiable(OWLClassExpression)");
 		checkInterrupted();
 		try {
 			return reasoner_.isSatisfiable(owlConverter_
@@ -899,7 +899,7 @@ public class ElkReasoner implements OWLReasoner {
 			throws ReasonerInterruptedException, TimeOutException,
 			InconsistentOntologyException {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("precomputeInferences(inferenceTypes)");
+			LOGGER_.trace("precomputeInferences(InferenceType...)");
 		checkInterrupted();
 		try {
 			for (InferenceType inferenceType : inferenceTypes) {

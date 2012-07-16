@@ -25,6 +25,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
@@ -32,15 +35,21 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
- * An object that indexes axioms into a given ontology index. Each instance
- * can either only add or only remove axioms.
+ * An object that indexes axioms into a given ontology index. Each instance can
+ * either only add or only remove axioms.
  * 
  * @author Frantisek Simancik
  * 
  */
 public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ElkAxiomIndexerVisitor.class);
 
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
@@ -64,7 +73,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 * @param insert
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
-	public ElkAxiomIndexerVisitor(OntologyIndexImpl ontologyIndex, boolean insert) {
+	public ElkAxiomIndexerVisitor(OntologyIndexImpl ontologyIndex,
+			boolean insert) {
 		this.ontologyIndex = ontologyIndex;
 		this.multiplicity = insert ? 1 : -1;
 		this.neutralIndexer = new ElkObjectIndexerVisitor(
@@ -91,7 +101,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			subIndexedClass.removeToldSuperClassExpression(superIndexedClass);
 		}
 	}
-	
+
 	@Override
 	public void indexClassAssertion(ElkIndividual individual,
 			ElkClassExpression type) {
@@ -99,8 +109,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedClassExpression indexedIndividual = individual
 				.accept(negativeIndexer);
 
-		IndexedClassExpression indexedType = type
-				.accept(positiveIndexer);
+		IndexedClassExpression indexedType = type.accept(positiveIndexer);
 
 		if (multiplicity == 1) {
 			indexedIndividual.addToldSuperClassExpression(indexedType);
@@ -134,10 +143,11 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	@Override
 	public void indexDisjointClassExpressions(
 			List<? extends ElkClassExpression> disjointClasses) {
-		
+
 		// treat this as a positive occurrence of owl:Nothing
-		ontologyIndex.getIndexedOwlNothing().updateOccurrenceNumbers(multiplicity, multiplicity, 0);
-		
+		ontologyIndex.getIndexedOwlNothing().updateOccurrenceNumbers(
+				multiplicity, multiplicity, 0);
+
 		if (disjointClasses.size() == 2) {
 			IndexedClassExpression ice0 = disjointClasses.get(0).accept(
 					negativeIndexer);
@@ -152,13 +162,15 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 				ice1.removeDisjointClass(ice0);
 			}
 		}
-		
+
 		else { // disjointClasses.size() > 2
-			List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression> (disjointClasses.size());
+			List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
+					disjointClasses.size());
 			for (ElkClassExpression c : disjointClasses)
 				indexed.add(c.accept(negativeIndexer));
-			
-			IndexedDisjointnessAxiom indexedDisjointnessAxiom = new IndexedDisjointnessAxiom(indexed);
+
+			IndexedDisjointnessAxiom indexedDisjointnessAxiom = new IndexedDisjointnessAxiom(
+					indexed);
 
 			for (IndexedClassExpression ice : indexed) {
 				if (multiplicity == 1)
@@ -168,19 +180,19 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			}
 		}
 	}
-	
-	
+
 	@Override
 	public void indexReflexiveObjectProperty(
 			ElkObjectPropertyExpression reflexiveProperty) {
 
 		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
 				.accept(positiveIndexer);
-		
+
 		if (multiplicity == 1)
 			ontologyIndex.addReflexiveObjectProperty(indexedReflexiveProperty);
 		else
-			ontologyIndex.removeReflexiveObjectProperty(indexedReflexiveProperty);
+			ontologyIndex
+					.removeReflexiveObjectProperty(indexedReflexiveProperty);
 	}
 
 	@Override
@@ -189,13 +201,32 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	}
 
 	@Override
-	public IndexedObjectProperty indexObjectPropertyDeclaration(ElkObjectProperty ep) {
+	public IndexedObjectProperty indexObjectPropertyDeclaration(
+			ElkObjectProperty ep) {
 		return (IndexedObjectProperty) ep.accept(neutralIndexer);
 	}
 
 	@Override
-	public IndexedIndividual indexNamedIndividualDeclaration(ElkNamedIndividual eni) {
+	public IndexedIndividual indexNamedIndividualDeclaration(
+			ElkNamedIndividual eni) {
 		return eni.accept(neutralIndexer);
+	}
+
+	@Override
+	public void visit(ElkAxiom elkAxiom) {
+		try {
+			elkAxiom.accept(this);
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("indexing "
+						+ OwlFunctionalStylePrinter.toString(elkAxiom)
+						+ " with multiplicity = " + multiplicity);
+		} catch (IndexingException e) {
+			if (LOGGER_.isEnabledFor(Level.WARN))
+				LOGGER_.warn(new ElkMessage(e.getMessage()
+						+ " Axiom ignored:\n"
+						+ OwlFunctionalStylePrinter.toString(elkAxiom),
+						"reasoner.indexing.axiomIgnored"));
+		}
 	}
 
 	/**
