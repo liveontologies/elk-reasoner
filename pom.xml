@@ -121,6 +121,10 @@
 		</plugins>
 	</reporting>
 
+	<distributionManagement>
+		<downloadUrl>http://code.google.com/p/elk-reasoner/downloads/list</downloadUrl>
+	</distributionManagement>
+
 	<issueManagement>
 		<system>GoogleCode</system>
 		<url>http://code.google.com/p/elk-reasoner/issues/</url>
@@ -154,17 +158,6 @@
 	</properties>
 
 	<repositories>
-		<!-- we only need a local ELK repository for Protege jar artifacts org.protege.editor.core.application.jar 
-			and org.protege.editor.owl.jar. Remove these lines once these artifacts are 
-			available on Maven central -->
-		<repository>
-			<id>elk-reasoner-snapshots</id>
-			<url>http://elk-reasoner.googlecode.com/svn/m2/snapshots</url>
-		</repository>
-		<repository>
-			<id>elk-reasoner-releases</id>
-			<url>http://elk-reasoner.googlecode.com/svn/m2/releases</url>
-		</repository>
 		<!-- adding a Sonatype repository for official owlapi releases; remove 
 			once it is synced with Maven central -->
 		<repository>
@@ -209,7 +202,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>license-maven-plugin</artifactId>
-					<version>1.0-beta-3</version>
+					<version>1.2</version>
 					<configuration>
 						<verbose>false</verbose>
 						<addSvnKeyWords>true</addSvnKeyWords>
@@ -278,7 +271,7 @@
 									<pluginExecutionFilter>
 										<groupId>org.codehaus.mojo</groupId>
 										<artifactId>license-maven-plugin</artifactId>
-										<versionRange>[1.0-beta-3,)</versionRange>
+										<versionRange>[1.2,)</versionRange>
 										<goals>
 											<goal>update-project-license</goal>
 											<goal>update-file-header</goal>
@@ -434,9 +427,5 @@
 			</build>
 		</profile>
 	</profiles>
-
-	<distributionManagement>
-		<downloadUrl>http://code.google.com/p/elk-reasoner/downloads/list</downloadUrl>
-	</distributionManagement>
 
 </project>
