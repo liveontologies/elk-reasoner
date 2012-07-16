@@ -393,7 +393,7 @@ public class InferenceSystemInvocationManager {
 	 * 
 	 * @param inferenceRule
 	 * @param ruleMethod
-	 * @return
+	 * @return the resulting linked list
 	 */
 	protected RuleMethodList addRuleMethod(InferenceRule<?> inferenceRule,
 			Method ruleMethod, RuleMethodList ruleMethodList) {

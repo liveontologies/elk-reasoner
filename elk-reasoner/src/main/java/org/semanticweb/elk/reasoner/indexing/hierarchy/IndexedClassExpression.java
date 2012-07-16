@@ -151,9 +151,9 @@ abstract public class IndexedClassExpression {
 	}
 
 	/**
-	 * @return the {@IndexedClassExpression} objects
-	 *         that occur with this object in binary disjointness axioms, or
-	 *         {@code null} if none is assigned
+	 * @return the {@link IndexedClassExpression} objects that occur with this
+	 *         object in binary disjointness axioms, or {@code null} if none is
+	 *         assigned
 	 */
 	public Set<IndexedClassExpression> getDisjointClasses() {
 		return disjointClasses_;

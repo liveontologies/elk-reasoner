@@ -98,7 +98,7 @@ public class IndividualNode implements
 	/**
 	 * Add a direct super-class node. This method is not thread safe.
 	 * 
-	 * @param superNode
+	 * @param typeNode
 	 *            node to add
 	 */
 	void addDirectTypeNode(NonBottomClassNode typeNode) {

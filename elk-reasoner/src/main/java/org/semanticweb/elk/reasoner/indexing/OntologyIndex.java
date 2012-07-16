@@ -55,7 +55,7 @@ public interface OntologyIndex {
 	 * @param elkClassExpression
 	 *            an input {@link ElkClassExpression}
 	 * @return the {@link IndexedClassExpression} corresponding to the input if
-	 *         it occurs in the indexed ontology, or {@link null} if the input
+	 *         it occurs in the indexed ontology, or {@code null} if the input
 	 *         is not contained in the indexed ontology
 	 */
 	IndexedClassExpression getIndexed(ElkClassExpression elkClassExpression);
@@ -67,7 +67,7 @@ public interface OntologyIndex {
 	 * @param elkSubObjectPropertyExpression
 	 *            an input {@link ElkSubObjectPropertyExpression}
 	 * @return the {@link IndexedPropertyChain} corresponding to the input if it
-	 *         occurs in the indexed ontology, or {@link null} if the input is
+	 *         occurs in the indexed ontology, or {@code null} if the input is
 	 *         not contained in the indexed ontology
 	 */
 	IndexedPropertyChain getIndexed(

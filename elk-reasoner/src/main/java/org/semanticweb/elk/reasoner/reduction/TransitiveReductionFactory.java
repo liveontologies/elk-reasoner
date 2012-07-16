@@ -89,7 +89,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * submitted to this engine. In order to avoid stack overflow due to the
 	 * potentially unbounded recursion, we do not submit the jobs immediately,
 	 * but use a queue to buffer such created jobs. This queue will be emptied
-	 * every time the {@link #process()} method is called.
+	 * every time the {@link Engine#process()} method is called.
 	 */
 	private final Queue<SaturationJobSuperClass<R, J>> auxJobQueue;
 

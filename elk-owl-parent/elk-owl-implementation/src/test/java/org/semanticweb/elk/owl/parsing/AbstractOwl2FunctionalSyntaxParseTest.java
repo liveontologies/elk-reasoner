@@ -125,14 +125,12 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 	 * This method checks that the parser created the correct number of axioms
 	 * of each type (identified by the corresponding Java class name)
 	 * 
-	 * @param input
 	 * @param axiomTypeCounts
 	 * @param checkAll
 	 *            If set to true, the check will fail if the parser created
 	 *            axioms of other types, in addition to those specified in the
 	 *            count map
 	 * @throws IOException
-	 * @throws Exception
 	 */
 	protected static void checkAxiomTypeCounts(ElkTestAxiomProcessor processor,
 			Map<Class<?>, Integer> axiomTypeCounts, boolean checkAll)

@@ -78,19 +78,20 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	private final RuleApplicationFactory ruleApplicationFactory_;
 	/**
 	 * The buffer for jobs that need to be processed, i.e., those for which the
-	 * method {@link #submit(J)} was executed but processing of jobs has not
-	 * been started yet.
+	 * method {@link Engine#submit(SaturationJob)} was executed but processing
+	 * of jobs has not been started yet.
 	 */
 	private final Queue<J> jobsToDo_;
 	/**
 	 * The buffer for jobs in progress, i.e., those for which processing has
-	 * started but the method {@link #listener.notifyFinished(J)} was not
+	 * started but the method
+	 * {@link ClassExpressionSaturationListener#notifyFinished(Object)} was not
 	 * executed yet.
 	 */
 	private final Queue<J> jobsInProgress_;
 	/**
 	 * This number of submitted jobs, i.e., those for which the method
-	 * {@link #submit(J)} was executed.
+	 * {@link Engine#submit(SaturationJob)} was executed.
 	 */
 	private final AtomicInteger countJobsSubmitted_ = new AtomicInteger(0);
 	/**
@@ -99,7 +100,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	private final AtomicInteger countJobsProcessed_ = new AtomicInteger(0);
 	/**
 	 * The number of finished jobs, i.e., those for which
-	 * {@link #listener.notifyFinished(J)} is executed.
+	 * {@link ClassExpressionSaturationListener#notifyFinished(Object)} is
+	 * executed.
 	 */
 	private final AtomicInteger countJobsFinished_ = new AtomicInteger(0);
 	/**

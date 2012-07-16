@@ -125,7 +125,7 @@ public abstract class IndexedPropertyChain {
 	 * {@link IndexedBinaryPropertyChain} that contains this
 	 * {@link IndexedPropertyChain} in the right-hand-side
 	 * 
-	 * @param superObjectProperty
+	 * @param chain
 	 *            the {@link IndexedBinaryPropertyChain} to be added
 	 */
 	protected void addRightChain(IndexedBinaryPropertyChain chain) {
@@ -139,7 +139,7 @@ public abstract class IndexedPropertyChain {
 	 * {@link IndexedBinaryPropertyChain} that contain this
 	 * {@link IndexedPropertyChain} in the right-hand-side
 	 * 
-	 * @param superObjectProperty
+	 * @param chain
 	 *            the {@link IndexedBinaryPropertyChain} to be removed
 	 * @return {@code true} if successfully removed
 	 */

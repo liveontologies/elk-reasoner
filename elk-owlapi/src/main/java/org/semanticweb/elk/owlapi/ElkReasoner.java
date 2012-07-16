@@ -97,7 +97,7 @@ public class ElkReasoner implements OWLReasoner {
 	private final ProgressMonitor elkProgressMonitor_;
 	/**
 	 * {@code true} iff the buffering mode for reasoner is
-	 * {@link BufferingMode.BUFFERING}
+	 * {@link BufferingMode#BUFFERING}
 	 */
 	private final boolean isBufferingMode_;
 	/** listener to implement addition and removal of axioms */
