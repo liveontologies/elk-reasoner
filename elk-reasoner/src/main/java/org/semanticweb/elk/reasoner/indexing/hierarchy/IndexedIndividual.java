@@ -69,7 +69,7 @@ public class IndexedIndividual extends IndexedClassEntity {
 
 	@Override
 	public String toString() {
-		return "ObjectOneOf(<" + elkNamedIndividual_.getIri().asString() + ">)";
+		return "ObjectOneOf(<" + elkNamedIndividual_.getIri().getFullIriAsString() + ">)";
 	}
 
 }

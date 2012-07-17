@@ -232,7 +232,7 @@ public class TaxonomyPrinter {
 								PredefinedElkIri.OWL_NOTHING.get())) {
 					ElkDeclarationAxiom decl = objectFactory
 							.getDeclarationAxiom(clazz);
-					OwlFunctionalStylePrinter.append(writer, decl);
+					OwlFunctionalStylePrinter.append(writer, decl, true);
 					writer.append('\n');
 				}
 			}
@@ -246,7 +246,7 @@ public class TaxonomyPrinter {
 			for (ElkNamedIndividual individual : individualNode.getMembers()) {
 				ElkDeclarationAxiom decl = objectFactory
 						.getDeclarationAxiom(individual);
-				OwlFunctionalStylePrinter.append(writer, decl);
+				OwlFunctionalStylePrinter.append(writer, decl, true);
 				writer.append('\n');
 			}
 		}
@@ -274,7 +274,7 @@ public class TaxonomyPrinter {
 		if (orderedEquivalentClasses.size() > 1) {
 			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = objectFactory
 					.getEquivalentClassesAxiom(orderedEquivalentClasses);
-			OwlFunctionalStylePrinter.append(writer, elkEquivalentClassesAxiom);
+			OwlFunctionalStylePrinter.append(writer, elkEquivalentClassesAxiom, true);
 			writer.append('\n');
 		}
 
@@ -284,7 +284,7 @@ public class TaxonomyPrinter {
 						PredefinedElkIri.OWL_NOTHING.get())) {
 					ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
 							.getSubClassOfAxiom(elkSubClass, elkClass);
-					OwlFunctionalStylePrinter.append(writer, elkSubClassAxiom);
+					OwlFunctionalStylePrinter.append(writer, elkSubClassAxiom, true);
 					writer.append('\n');
 				}
 	}
@@ -298,7 +298,7 @@ public class TaxonomyPrinter {
 			ElkSameIndividualAxiom axiom = objectFactory
 					.getSameIndividualAxiom(orderedSameIndividuals);
 
-			OwlFunctionalStylePrinter.append(writer, axiom);
+			OwlFunctionalStylePrinter.append(writer, axiom, true);
 			writer.append('\n');
 		}
 
@@ -307,7 +307,7 @@ public class TaxonomyPrinter {
 				ElkClassAssertionAxiom axiom = objectFactory
 						.getClassAssertionAxiom(clazz, individual);
 
-				OwlFunctionalStylePrinter.append(writer, axiom);
+				OwlFunctionalStylePrinter.append(writer, axiom, true);
 				writer.append('\n');
 			}
 		}

@@ -191,16 +191,27 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	protected final Appendable writer;
 
 	protected final EntityPrinter entityPrinter;
+	protected boolean expandAbbreviatedIris = false;
 
 	/**
 	 * Create a printer using a writer which can append strings.
 	 * 
 	 * @param writer
 	 *            the string appender used for printing
+	 * @param expandAbbreviatedIris
+	 *            if true, the printer will print abbreviated IRIs as full IRIs
+	 *            (in "<>")
+	 * 
 	 */
-	OwlFunctionalStylePrinterVisitor(Appendable writer) {
+	OwlFunctionalStylePrinterVisitor(Appendable writer,
+			boolean expandAbbreviatedIris) {
 		this.writer = writer;
 		this.entityPrinter = new EntityPrinter();
+		this.expandAbbreviatedIris = expandAbbreviatedIris;
+	}
+
+	OwlFunctionalStylePrinterVisitor(Appendable writer) {
+		this(writer, false);
 	}
 
 	@Override
@@ -478,7 +489,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 
 	@Override
 	public Void visit(ElkFacetRestriction elkFacetRestriction) {
-		write("<" + elkFacetRestriction.getConstrainingFacet() + ">");
+		write(elkFacetRestriction.getConstrainingFacet());
 		write(' ');
 		write(elkFacetRestriction.getRestrictionValue());
 		return null;
@@ -938,7 +949,8 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 
 	@Override
 	public Void visit(ElkIri iri) {
-		write("<" + iri.asString() + ">");
+		write(expandAbbreviatedIris ? "<" + iri.getFullIriAsString() + ">"
+				: iri.toString());
 		return null;
 	}
 

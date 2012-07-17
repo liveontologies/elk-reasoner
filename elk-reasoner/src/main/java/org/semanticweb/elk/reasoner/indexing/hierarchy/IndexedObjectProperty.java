@@ -114,7 +114,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 */
 	@Override
 	public String toString() {
-		return '<' + getElkObjectProperty().getIri().asString() + '>';
+		return '<' + getElkObjectProperty().getIri().getFullIriAsString() + '>';
 	}
 
 }

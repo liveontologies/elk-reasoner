@@ -182,7 +182,7 @@ public class IndividualNode implements
 
 	@Override
 	public String toString() {
-		return getCanonicalMember().getIri().asString();
+		return getCanonicalMember().getIri().getFullIriAsString();
 	}
 
 }

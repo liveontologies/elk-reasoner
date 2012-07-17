@@ -66,7 +66,7 @@ public final class ElkEntityConverter implements
 
 	@Override
 	public OWLClass visit(ElkClass elkClass) {
-		String iri = elkClass.getIri().asString();
+		String iri = elkClass.getIri().getFullIriAsString();
 		return owlDataFactory.getOWLClass(IRI.create(iri));
 	}
 
@@ -84,13 +84,13 @@ public final class ElkEntityConverter implements
 
 	@Override
 	public OWLNamedIndividual visit(ElkNamedIndividual elkNamedIndividual) {
-		String iri = elkNamedIndividual.getIri().asString();
+		String iri = elkNamedIndividual.getIri().getFullIriAsString();
 		return owlDataFactory.getOWLNamedIndividual(IRI.create(iri));
 	}
 
 	@Override
 	public OWLObjectProperty visit(ElkObjectProperty elkObjectProperty) {
-		String iri = elkObjectProperty.getIri().asString();
+		String iri = elkObjectProperty.getIri().getFullIriAsString();
 		return owlDataFactory.getOWLObjectProperty(IRI.create(iri));
 	}
 

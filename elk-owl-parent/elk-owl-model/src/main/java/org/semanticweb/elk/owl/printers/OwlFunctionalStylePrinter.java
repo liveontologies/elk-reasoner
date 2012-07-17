@@ -42,12 +42,16 @@ public class OwlFunctionalStylePrinter {
 	 * @return the string representation of the ELK object
 	 */
 	public static String toString(ElkObject elkObject) {
+		return toString(elkObject, false);
+	}
+	
+	public static String toString(ElkObject elkObject, boolean expandAbbreviatedIris) {
 		StringBuilder writer = new StringBuilder();
 		OwlFunctionalStylePrinterVisitor printer = new OwlFunctionalStylePrinterVisitor(
-				writer);
+				writer, expandAbbreviatedIris);
 		elkObject.accept(printer);
 		return writer.toString();
-	}
+	}	
 
 	/**
 	 * Printing an ELK Object through an appender.
@@ -61,14 +65,19 @@ public class OwlFunctionalStylePrinter {
 	 */
 	public static void append(Appendable appender, ElkObject elkObject)
 			throws IOException {
+		append(appender, elkObject, false);
+	}
+	
+	public static void append(Appendable appender, ElkObject elkObject, boolean expandAbbreviatedIris)
+			throws IOException {
 		OwlFunctionalStylePrinterVisitor printer = new OwlFunctionalStylePrinterVisitor(
-				appender);
+				appender, expandAbbreviatedIris);
 		try {
 			elkObject.accept(printer);
 		} catch (PrintingException e) {
 			throw new IOException(e.getMessage(), e.getCause());
 		}
 
-	}
+	}	
 
 }

@@ -25,13 +25,16 @@
  */
 package org.semanticweb.elk.owl.parsing;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.iris.ElkPrefix;
 
 /**
  * Used to test parsers
@@ -44,6 +47,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 public class ElkTestAxiomProcessor implements Owl2ParserAxiomProcessor {
 
 	private Map<Class<?>, Set<ElkAxiom>> axiomMap = new HashMap<Class<?>, Set<ElkAxiom>>();
+	private List<ElkPrefix> elkPrefixes = new ArrayList<ElkPrefix>();
 
 	@Override
 	public void visit(ElkAxiom elkAxiom) {
@@ -115,5 +119,14 @@ public class ElkTestAxiomProcessor implements Owl2ParserAxiomProcessor {
 
 	long getTotalAxiomCount() {
 		return getAllAxioms().size();
+	}
+	
+	public List<ElkPrefix> getDeclaredPrefixes() {
+		return elkPrefixes;
+	}
+
+	@Override
+	public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+		elkPrefixes.add(elkPrefix);
 	}
 }

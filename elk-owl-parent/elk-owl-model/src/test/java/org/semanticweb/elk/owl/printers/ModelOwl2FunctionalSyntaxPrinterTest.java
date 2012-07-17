@@ -25,10 +25,13 @@ package org.semanticweb.elk.owl.printers;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.iris.ElkPrefix;
 
 /**
  * The abstract test for ELK functional syntax printer
@@ -42,7 +45,8 @@ public abstract class ModelOwl2FunctionalSyntaxPrinterTest {
 
 	@Test
 	public void testRoundtrip() throws IOException {
-		Set<? extends ElkObject> elkObjects = getOriginalElkObjects();
+		List<ElkPrefix> prefixes = new ArrayList<ElkPrefix>();
+		Set<? extends ElkObject> elkObjects = getOriginalElkObjects(prefixes);
 		//serialize into a string
 		StringBuilder builder = new StringBuilder();
 		
@@ -51,13 +55,14 @@ public abstract class ModelOwl2FunctionalSyntaxPrinterTest {
 			builder.append(System.getProperty("line.separator"));
 		}
 		
-		Set<? extends ElkObject> loadedElkObjects = loadPrintedElkObjects(builder.toString());
+		System.out.println(builder.toString());
+		
+		Set<? extends ElkObject> loadedElkObjects = loadPrintedElkObjects(builder.toString(), prefixes);
 		//TODO A diff here?
 		
 		assertEquals(elkObjects.size(), loadedElkObjects.size());
 	}
 
-	protected abstract Set<? extends ElkObject> getOriginalElkObjects();
-	protected abstract Set<? extends ElkObject> loadPrintedElkObjects(String serialized);
-
+	protected abstract Set<? extends ElkObject> getOriginalElkObjects(List<ElkPrefix> prefixes);
+	protected abstract Set<? extends ElkObject> loadPrintedElkObjects(String serialized, List<ElkPrefix> prefixes);
 }

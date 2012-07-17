@@ -26,6 +26,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
@@ -212,6 +213,10 @@ public class Owl2ParserLoader implements Loader {
 				throw new Owl2ParseException("ELK Parser was interrupted", e);
 			}
 
+		}
+
+		@Override
+		public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
 		}
 	}
 

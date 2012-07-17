@@ -64,8 +64,8 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 
 	@Override
 	public String toString() {
-		return "DataHasValue(" + '<' + this.property.getIri().asString()
+		return "DataHasValue(" + '<' + this.property.getIri().getFullIriAsString()
 				+ "> \"" + this.filler.getLexicalForm() + "\"^^<"
-				+ this.filler.getDatatype().getIri().asString() + ">)";
+				+ this.filler.getDatatype().getIri().getFullIriAsString() + ">)";
 	}
 }

@@ -106,9 +106,9 @@ public class Owl2FunctionalStyleParserTest extends
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 		assertEquals(literal1.getDatatype(),
 				objectFactory.getDatatypeRdfPlainLiteral());
-		assertEquals(literal1.getDatatype().getIri().asString(),
+		assertEquals(literal1.getDatatype().getIri().getFullIriAsString(),
 				"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
-		assertEquals(literal2.getDatatype().getIri().asString(),
+		assertEquals(literal2.getDatatype().getIri().getFullIriAsString(),
 				"http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
 		assertEquals(literal1.getDatatype().getIri(), literal2.getDatatype()
 				.getIri());

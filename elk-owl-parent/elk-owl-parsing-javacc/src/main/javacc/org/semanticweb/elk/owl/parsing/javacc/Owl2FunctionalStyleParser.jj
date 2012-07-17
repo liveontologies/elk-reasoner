@@ -540,10 +540,10 @@ void ontologyAnnotations():
 /* 3.7 Functional-Style Syntax */
 void ontologyDocument(Owl2ParserAxiomProcessor axiomProcessor) throws Owl2ParseException:
 {}{
-	( prefixDeclaration() )* ontology(axiomProcessor)
+	( prefixDeclaration(axiomProcessor) )* ontology(axiomProcessor)
 }
 
-void prefixDeclaration():
+void prefixDeclaration(Owl2ParserAxiomProcessor axiomProcessor) throws Owl2ParseException:
 {
 	String name;
 	ElkFullIri iri;
@@ -553,9 +553,13 @@ void prefixDeclaration():
 		<EQUALS>
 		iri = fullIri()
 	<CLOSE_BRACKET> {
-		if ( !getElkPrefixDeclarations().addPrefix( new ElkPrefix(name, iri)) ) {
+		ElkPrefix prefix = new ElkPrefix(name, iri);
+	
+		if ( !getElkPrefixDeclarations().addPrefix( prefix ) ) {
 			throw new ParseException("Duplicate declaration of prefix " + name + ".");
 		}
+		
+		axiomProcessor.visit(prefix);
 	}
 }
 

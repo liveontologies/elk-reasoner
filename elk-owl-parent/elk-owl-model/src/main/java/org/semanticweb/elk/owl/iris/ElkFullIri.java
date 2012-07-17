@@ -38,12 +38,18 @@ public class ElkFullIri extends ElkIri {
 	}
 
 	public ElkFullIri(ElkPrefix prefix, String localName) {
-		this(prefix.getIri().asString() + localName);
+		this(prefix.getIri().getFullIriAsString() + localName);
 	}
 
 	@Override
-	public String asString() {
+	public String getFullIriAsString() {
 		return iri;
 	}
 
+	@Override
+	public String toString() {
+		return "<" + getFullIriAsString() + ">";
+	}
+
+	
 }

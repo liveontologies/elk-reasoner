@@ -36,7 +36,7 @@ public class ElkAbbreviatedIri extends ElkIri {
 	protected final String localName;
 	
 	public ElkAbbreviatedIri(ElkPrefix prefix, String localName) {
-		super (concatHashCode(prefix.getIri().asString(), localName));
+		super (concatHashCode(prefix.getIri().getFullIriAsString(), localName));
 		this.prefix = prefix;
 		this.localName = localName;
 	}
@@ -50,8 +50,8 @@ public class ElkAbbreviatedIri extends ElkIri {
 	}
 	
 	@Override
-	public String asString() {
-		return prefix.getIri().asString() + localName;
+	public String getFullIriAsString() {
+		return prefix.getIri().getFullIriAsString() + localName;
 	}
 
 	@Override
@@ -70,6 +70,11 @@ public class ElkAbbreviatedIri extends ElkIri {
 		for (int i = 0; i < b.length(); i++)
 			hash = 31*hash + b.charAt(i);
 		return hash;
+	}
+	
+	@Override
+	public String toString() {
+		return prefix.getName() + localName;
 	}
 	
 }
