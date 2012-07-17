@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -89,8 +90,11 @@ public class ReasonerComputation<I, P extends InputProcessor<I>, F extends Input
 	 */
 	public void process() {
 
-		if (!start())
-			LOGGER_.error("Could not start workers");
+		if (!start()) {
+			String message = "Could not start workers required for reasoner computation!";
+			LOGGER_.error(message);
+			throw new ElkRuntimeException(message);
+		}
 
 		try {
 			// submit the leftover from the previous run

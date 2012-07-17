@@ -27,11 +27,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitorEx;
 
 /**
  * A visitor class for converting instances of
- * {@link OwlObjectPropertyExpression} to the corresponding instances of
+ * {@link OWLObjectPropertyExpression} to the corresponding instances of
  * {@link ElkObjectPropertyExpression}.
  * 
  * @author "Yevgeny Kazakov"

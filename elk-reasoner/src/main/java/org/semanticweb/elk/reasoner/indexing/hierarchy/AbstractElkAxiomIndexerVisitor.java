@@ -25,8 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
@@ -53,10 +51,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.util.logging.ElkMessage;
+import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 /**
  * An abstract class for indexing axioms. Its purpose is to reduce many
@@ -69,10 +65,6 @@ import org.semanticweb.elk.util.logging.ElkMessage;
  */
 public abstract class AbstractElkAxiomIndexerVisitor extends
 		AbstractElkAxiomVisitor<Void> implements ElkAxiomProcessor {
-
-	// logger for events
-	private static final Logger LOGGER_ = Logger
-			.getLogger(AbstractElkAxiomIndexerVisitor.class);
 
 	public abstract void indexSubClassOfAxiom(ElkClassExpression subClass,
 			ElkClassExpression superClass);
@@ -105,19 +97,6 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	 * use any factory implementation here.
 	 */
 	private final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-
-	@Override
-	public void visit(ElkAxiom elkAxiom) {
-		try {
-			elkAxiom.accept(this);
-		} catch (IndexingException e) {
-			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn(new ElkMessage(e.getMessage()
-						+ " Axiom ignored:\n"
-						+ OwlFunctionalStylePrinter.toString(elkAxiom),
-						"reasoner.indexing.axiomIgnored"));
-		}
-	}
 
 	@Override
 	protected Void defaultLogicalVisit(ElkAxiom axiom) {

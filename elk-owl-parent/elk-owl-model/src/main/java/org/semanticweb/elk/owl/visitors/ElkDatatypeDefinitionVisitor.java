@@ -29,9 +29,12 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkDatatypeDefinitionVisitor<O> {
 

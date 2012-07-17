@@ -28,9 +28,13 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * Implementation for ElkObjects that maintain a list of other ElkObjects.
+ * Implementation for {@link ElkObject}s that maintain a list of other
+ * ElkObjects.
  * 
  * @author Markus Kroetzsch
+ * @param <O>
+ *            the type of {@link ElkObject}s in the list
+ * 
  */
 public abstract class ElkObjectListObject<O extends ElkObject> extends
 		ElkObjectImpl {

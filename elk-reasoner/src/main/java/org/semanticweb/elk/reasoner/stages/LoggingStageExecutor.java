@@ -45,34 +45,26 @@ public class LoggingStageExecutor extends SimpleInterrupter implements
 	@Override
 	public void complete(ReasonerStage stage) throws ElkException {
 		if (!stage.done()) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(stage.getName() + " stage:");
-			try {
-				for (ReasonerStage dependentStage : stage.getDependencies()) {
-					complete(dependentStage);
-				}
-			} catch (ElkException e) {
-				LOGGER_.info(stage.getName() + ":" + e.getMessage());
-				throw e;
+			if (LOGGER_.isDebugEnabled())
+				LOGGER_.debug(stage.getName() + " stage:");
+			for (ReasonerStage dependentStage : stage.getDependencies()) {
+				complete(dependentStage);
 			}
 			Statistics.logOperationStart(stage.getName(), LOGGER_);
 			registerCurrentThreadToInterrupt();
 			try {
 				stage.execute();
-			} catch (ElkException e) {
-				if (e instanceof ElkInterruptedException)
-					if (LOGGER_.isInfoEnabled())
-						LOGGER_.info(e.getMessage());
-					else
-						LOGGER_.debug(e.getMessage());
-				throw new ElkInterruptedException(e);
+			} catch (ElkInterruptedException e) {
+				LOGGER_.debug(stage.getName() + " was interrupted.");
+				throw e;
 			} finally {
 				clearThreadToInterrupt();
 				Statistics.logOperationFinish(stage.getName(), LOGGER_);
 				Statistics.logMemoryUsage(LOGGER_);
 				stage.printInfo();
-				LOGGER_.debug(stage.getName() + " done.");
 			}
+			if (LOGGER_.isDebugEnabled())
+				LOGGER_.debug(stage.getName() + " done.");
 		}
 	}
 }

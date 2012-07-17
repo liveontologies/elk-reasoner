@@ -44,7 +44,10 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
  * Visitor pattern interface for instances of {@link ElkObjectPropertyAxiom}.
  * 
  * @author Yevgeny Kazakov
- * @author Markus Kroetzsch 
+ * @author Markus Kroetzsch
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkObjectPropertyAxiomVisitor<O> {
 
@@ -69,7 +72,7 @@ public interface ElkObjectPropertyAxiomVisitor<O> {
 	O visit(ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom);
 
 	O visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom);
-	
+
 	O visit(ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom);
 
 	O visit(ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom);

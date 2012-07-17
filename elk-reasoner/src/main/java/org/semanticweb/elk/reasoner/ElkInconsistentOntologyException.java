@@ -39,29 +39,18 @@ public class ElkInconsistentOntologyException extends ElkException {
 
 	private static final long serialVersionUID = -8696304480425201859L;
 
-	/**
-	 * 
-	 */
 	public ElkInconsistentOntologyException() {
 		super();
 	}
 
-	/**
-	 */
 	public ElkInconsistentOntologyException(String message) {
 		super(message);
 	}
 
-	/**
-	 * 
-	 */
 	public ElkInconsistentOntologyException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	/**
-	 * 
-	 */
 	public ElkInconsistentOntologyException(Throwable cause) {
 		super(cause);
 	}

@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 
 /**
- * Implementation of {@link ElkDataPropertyAssertion}.
+ * Implementation of {@link ElkDataPropertyAssertionAxiom}.
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"

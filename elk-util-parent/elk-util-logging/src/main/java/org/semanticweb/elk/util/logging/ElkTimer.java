@@ -92,11 +92,10 @@ public class ElkTimer {
 	}
 
 	/**
-	 * Create a new Timer for the current thread.
 	 * 
 	 * @param name
 	 * @param todoFlags
-	 * @return
+	 * @return a new {@link ElkTimer} for the current thread
 	 */
 	static public ElkTimer getTimerForCurrentThread(String name, int todoFlags) {
 		return new ElkTimer(name, todoFlags, Thread.currentThread().getId());
@@ -112,9 +111,10 @@ public class ElkTimer {
 	}
 
 	public long getAvgCpuTime() {
-		return totalCpuTime > 0 && measurements > 0 ? totalCpuTime / measurements : -1;
+		return totalCpuTime > 0 && measurements > 0 ? totalCpuTime
+				/ measurements : -1;
 	}
-	
+
 	/**
 	 * Get the string name of the timer.
 	 * 
@@ -141,10 +141,11 @@ public class ElkTimer {
 	public long getTotalWallTime() {
 		return totalWallTime;
 	}
-	
+
 	public long getAvgWallTime() {
-		return totalWallTime > 0 && measurements > 0 ? totalWallTime / measurements : -1;
-	}	
+		return totalWallTime > 0 && measurements > 0 ? totalWallTime
+				/ measurements : -1;
+	}
 
 	/**
 	 * Return true if the timer is running.
@@ -187,8 +188,6 @@ public class ElkTimer {
 	 * been started. The total time (both system and CPU) of all start-stop
 	 * cycles is recorded with the timer.
 	 * 
-	 * @param timerName
-	 * @param threadId
 	 * @return CPU time that the timer was running, or -1 if timer not running
 	 *         or CPU time unavailable for other reasons
 	 */
@@ -320,6 +319,7 @@ public class ElkTimer {
 	 * 
 	 * @param timerName
 	 *            the name of the timer
+	 * @param todoFlags
 	 */
 	public static void startNamedTimer(String timerName, int todoFlags) {
 		getNamedTimer(timerName, todoFlags).start();
@@ -422,6 +422,7 @@ public class ElkTimer {
 	 * 
 	 * @param timerName
 	 *            the name of the timer
+	 * @param todoFlags
 	 * @param threadId
 	 *            of the thread to track, or 0 if only system clock should be
 	 *            tracked
@@ -465,6 +466,7 @@ public class ElkTimer {
 	 * 
 	 * @param timerName
 	 *            the name of the timer
+	 * @param todoFlags
 	 * @param threadId
 	 *            of the thread to track, or 0 if only system clock should be
 	 *            tracked

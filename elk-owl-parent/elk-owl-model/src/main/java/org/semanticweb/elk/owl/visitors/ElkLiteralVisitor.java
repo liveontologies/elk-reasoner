@@ -25,9 +25,13 @@ package org.semanticweb.elk.owl.visitors;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 
 /**
- * Visitor interface for {@link ElkLiteral}. 
+ * Visitor interface for {@link ElkLiteral}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkLiteralVisitor<O> {
 

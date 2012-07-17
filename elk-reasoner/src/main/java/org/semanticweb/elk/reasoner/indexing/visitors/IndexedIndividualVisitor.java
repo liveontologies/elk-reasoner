@@ -28,6 +28,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
  * Visitor pattern interface for instances of {@link IndexedIndividual}.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public interface IndexedIndividualVisitor<O> {
 

@@ -31,11 +31,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface TransitiveReductionOutputVisitor<I extends IndexedClassExpression> {
+/**
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <R>
+ *            the type of the input of the {@link TransitiveReductionJob}s for
+ *            which the output can be accepted by this visitor
+ */
+public interface TransitiveReductionOutputVisitor<R extends IndexedClassExpression> {
 
-	public void visit(TransitiveReductionOutputEquivalentDirect<I> output);
+	public void visit(TransitiveReductionOutputEquivalentDirect<R> output);
 
-	public void visit(TransitiveReductionOutputEquivalent<I> output);
+	public void visit(TransitiveReductionOutputEquivalent<R> output);
 
-	public void visit(TransitiveReductionOutputUnsatisfiable<I> output);
+	public void visit(TransitiveReductionOutputUnsatisfiable<R> output);
 }

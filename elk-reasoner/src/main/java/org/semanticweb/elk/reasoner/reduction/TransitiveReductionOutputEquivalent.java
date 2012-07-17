@@ -32,15 +32,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * The result of the transitive reduction for satisfiable indexed class
  * expression; it contains information about equivalent classes.
  * 
- * @param <I>
- *            the type of the indexed class expression representing this class
+ * @param <R>
+ *            the type of the root {@link IndexedClassExpression}s of the
+ *            {@link TransitiveReductionJob}s for which this output is computed
+ * 
+ * @see TransitiveReductionJob
  */
-public class TransitiveReductionOutputEquivalent<I extends IndexedClassExpression>
-		extends TransitiveReductionOutput<I> {
+public class TransitiveReductionOutputEquivalent<R extends IndexedClassExpression>
+		extends TransitiveReductionOutput<R> {
 
 	final List<ElkClass> equivalent;
 
-	TransitiveReductionOutputEquivalent(I root) {
+	TransitiveReductionOutputEquivalent(R root) {
 		super(root);
 		this.equivalent = new ArrayList<ElkClass>(1);
 	}
@@ -50,7 +53,7 @@ public class TransitiveReductionOutputEquivalent<I extends IndexedClassExpressio
 	}
 
 	@Override
-	public void accept(TransitiveReductionOutputVisitor<I> visitor) {
+	public void accept(TransitiveReductionOutputVisitor<R> visitor) {
 		visitor.visit(this);
 	}
 }

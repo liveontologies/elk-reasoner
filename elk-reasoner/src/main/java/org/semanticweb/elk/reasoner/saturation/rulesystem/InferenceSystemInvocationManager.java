@@ -183,10 +183,10 @@ public class InferenceSystemInvocationManager {
 	 * applying rules (based on the name of the method) does not have the
 	 * correct declaration to be used as intended.
 	 * 
-	 * @note There is only one public method for registering rules to ensure
-	 *       that all rules use a compatible generic type of context, without
-	 *       requiring this class to check it. Note that method invocation via
-	 *       Java Reflexion does not need to know the type of context either.
+	 * There is only one public method for registering rules to ensure that all
+	 * rules use a compatible generic type of context, without requiring this
+	 * class to check it. Note that method invocation via Java Reflexion does
+	 * not need to know the type of context either.
 	 * 
 	 * @param inferenceSystem
 	 * @throws IllegalInferenceMethodException
@@ -220,8 +220,8 @@ public class InferenceSystemInvocationManager {
 			throws IllegalInferenceMethodException, NoSuchMethodException {
 		Class<?> ruleClass = inferenceRule.getClass();
 
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Registering inference rule: " + ruleClass.toString());
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Registering inference rule: " + ruleClass.toString());
 		}
 
 		Method[] methods = ruleClass.getMethods();
@@ -393,28 +393,27 @@ public class InferenceSystemInvocationManager {
 	 * 
 	 * @param inferenceRule
 	 * @param ruleMethod
-	 * @return
+	 * @return the resulting linked list
 	 */
 	protected RuleMethodList addRuleMethod(InferenceRule<?> inferenceRule,
 			Method ruleMethod, RuleMethodList ruleMethodList) {
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Registering rule method " + ruleMethod.toString());
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Registering rule method " + ruleMethod.toString());
 		}
 		return new RuleMethodList(inferenceRule, ruleMethod, ruleMethodList);
 	}
 
 	/**
 	 * Add a new method at the beginning of the list and return the resulting
-	 * linked list. The input list can be null (if empty).
+	 * linked list. The input list can be {@code null} (if empty).
 	 * 
 	 * @param inferenceRule
 	 * @param initMethod
-	 * @return
 	 */
 	protected void addInitMethod(InferenceRule<?> inferenceRule,
 			Method initMethod) {
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Registering init method " + initMethod.toString());
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Registering init method " + initMethod.toString());
 		}
 		initMethods = new InitMethodList(inferenceRule, initMethod, initMethods);
 	}
@@ -434,8 +433,8 @@ public class InferenceSystemInvocationManager {
 		if (methodsForQueueable.containsKey(clazz))
 			return; // someone else did it while we waited for the
 					// synchronization
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Late initialization of methods for class: "
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Late initialization of methods for class: "
 					+ clazz.toString());
 		}
 		try {
@@ -551,8 +550,6 @@ public class InferenceSystemInvocationManager {
 	/**
 	 * handle for applying other methods to the item in subclasses of this
 	 * invocation manager without using reflection
-	 * 
-	 * @author Frantisek Simancik
 	 */
 	protected void applyAdditionalMethodsToItem(Queueable<?> queueable,
 			Context context, RuleApplicationFactory.Engine engine) {

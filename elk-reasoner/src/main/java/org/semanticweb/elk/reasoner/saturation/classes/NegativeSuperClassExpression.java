@@ -23,16 +23,23 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 
 /**
- * King of SuperClassExpression that was obtained by composition rules. 
- * Decomposition rules do not need to by applied to this.
+ * A {@link SuperClassExpression} to which composition rules should be applied.
+ * Decomposition rules do not need to by applied to this object.
  * 
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <C>
+ *            the type of the {@link Context} with which this {@link Queueable}
+ *            can be used
  */
-public class NegativeSuperClassExpression<C extends ContextElClassSaturation> extends SuperClassExpression<C>  {
-	
+public class NegativeSuperClassExpression<C extends ContextElClassSaturation>
+		extends SuperClassExpression<C> {
+
 	public NegativeSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		super(superClassExpression);

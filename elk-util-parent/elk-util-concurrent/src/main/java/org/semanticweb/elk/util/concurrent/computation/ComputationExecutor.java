@@ -54,7 +54,7 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	CountDownLatch done;
 
 	/**
-	 * <tt>true</tt> if new tasks can be started to be executed; this can happen
+	 * {@code true} if new tasks can be started to be executed; this can happen
 	 * only if no tasks are running in this executor
 	 */
 	volatile boolean canStart = true;
@@ -105,7 +105,7 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	 * 
 	 * @param job
 	 * @param noCopies
-	 * @return <tt>true</tt> if the jobs have been started
+	 * @return {@code true} if the jobs have been started
 	 */
 	public synchronized boolean start(Runnable job, int noCopies) {
 		if (!canStart)

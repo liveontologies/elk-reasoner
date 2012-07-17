@@ -46,8 +46,6 @@ public class SimpleStageExecutor extends SimpleInterrupter implements
 			registerCurrentThreadToInterrupt();
 			try {
 				stage.execute();
-			} catch (ElkException e) {
-				throw e;
 			} finally {
 				clearThreadToInterrupt();
 			}

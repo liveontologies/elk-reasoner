@@ -25,9 +25,13 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
 /**
- * Visitor pattern interface for instances of {@link IndexedObjectSomeValuesFrom}.
- *
+ * Visitor pattern interface for instances of
+ * {@link IndexedObjectSomeValuesFrom}.
+ * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public interface IndexedObjectSomeValuesFromVisitor<O> {
 

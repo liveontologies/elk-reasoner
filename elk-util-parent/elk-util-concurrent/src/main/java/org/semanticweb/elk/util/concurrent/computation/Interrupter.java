@@ -38,6 +38,8 @@ public interface Interrupter {
 
 	/**
 	 * Checks if the computation was requested to be interrupted
+	 * 
+	 * @return {@code true} if the computation was requested to be interrupted
 	 */
 	public boolean isInterrupted();
 

@@ -43,6 +43,8 @@ import org.semanticweb.elk.testing.TestOutput;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @param <EO> 
+ * @param <AO> 
  */
 @RunWith(PolySuite.class)
 public abstract class BaseReasoningCorrectnessTest<EO extends TestOutput, AO extends TestOutput> {

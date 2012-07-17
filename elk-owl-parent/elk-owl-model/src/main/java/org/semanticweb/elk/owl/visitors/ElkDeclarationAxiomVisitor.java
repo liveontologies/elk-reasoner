@@ -29,6 +29,10 @@ import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
  * 
  * @author Frantisek Simancik
  * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkDeclarationAxiomVisitor<O> {
 

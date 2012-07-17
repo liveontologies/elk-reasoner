@@ -199,8 +199,8 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 	/**
 	 * Initialization hook for subclasses. This method is called in all
 	 * constructors and pseudo-constructors (clone, readObject) after
-	 * {@link RecordSet} has been initialized but before any entries have been
-	 * inserted. (In the absence of this method, readObject would require
+	 * {@link EntryHashSet} has been initialized but before any entries have
+	 * been inserted. (In the absence of this method, readObject would require
 	 * explicit knowledge of subclasses.)
 	 */
 	void init() {
@@ -241,7 +241,7 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 	/**
 	 * Get the entry in set that is equal to the input entry if there is one, or
 	 * otherwise insert the given entry into the set and return itself. Equality
-	 * of entries is decided using to the {@link equals()} method.
+	 * of entries is decided using to the {@link #equals(Object)} method.
 	 * 
 	 * @param entry
 	 *            the entry to be merged into the set
@@ -278,7 +278,7 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 	/**
 	 * Retrieves the entry in the set that is equal to the given object, if it
 	 * exists, or returns null otherwise. Equality of entries is decided using
-	 * to the {@link equals()} method.
+	 * to the {@link #equals(Object)} method.
 	 * 
 	 * @param o
 	 *            the object that is used for finding the entry
@@ -299,7 +299,7 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 	/**
 	 * Removes and returns the entry in the set that is equal to the specified
 	 * object. Returns null if the set contains no such entry. Equality of
-	 * entries is decided using to the {@link equals()} method.
+	 * entries is decided using to the {@link #equals(Object)} method.
 	 * 
 	 * @param o
 	 *            the object that is used for finding the entry to remove
@@ -334,7 +334,7 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 	/**
 	 * Rehashes the contents of this map into a new array with a new capacity.
 	 * This method is called automatically when the number of entries in this
-	 * set becomes below the {@link undersize} or above the {@link oversize}.
+	 * set becomes below the {@link #undersize} or above the {@link #oversize}.
 	 * 
 	 * If current capacity is MAXIMUM_CAPACITY, this method does not resize the
 	 * map, but sets threshold to Integer.MAX_VALUE. This has the effect of

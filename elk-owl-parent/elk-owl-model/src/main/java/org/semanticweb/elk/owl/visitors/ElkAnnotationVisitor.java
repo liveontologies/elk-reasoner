@@ -25,10 +25,13 @@ package org.semanticweb.elk.owl.visitors;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 
 /**
- * Visitor interface for {@link ElkAnnotation}. 
+ * Visitor interface for {@link ElkAnnotation}.
  * 
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkAnnotationVisitor<O> {
 

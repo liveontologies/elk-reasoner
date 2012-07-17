@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.taxonomy.hashing;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**

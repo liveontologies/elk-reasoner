@@ -95,9 +95,9 @@ public class AbstractContext implements Context {
 
 	/**
 	 * Ensure that the context is active. This method is thread safe: for two
-	 * concurrent executions only one returns <tt>true</tt>.
+	 * concurrent executions only one returns {@code true}.
 	 * 
-	 * @return <tt>true</tt> if the active status of the contexts is changed
+	 * @return {@code true} if the active status of the contexts is changed
 	 */
 	@Override
 	public boolean tryActivate() {
@@ -109,9 +109,9 @@ public class AbstractContext implements Context {
 
 	/**
 	 * Ensure that the context is not active. This method is thread safe: for
-	 * two concurrent executions only one returns <tt>true</tt>.
+	 * two concurrent executions only one returns {@code true}.
 	 * 
-	 * @return <tt>true</tt> if the active status of the contexts is changed
+	 * @return {@code true} if the active status of the contexts is changed
 	 * 
 	 */
 	@Override

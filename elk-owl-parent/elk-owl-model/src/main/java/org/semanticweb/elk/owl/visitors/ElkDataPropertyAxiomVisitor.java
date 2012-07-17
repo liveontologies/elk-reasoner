@@ -22,17 +22,22 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 
 /**
  * Visitor pattern interface for instances of {@link ElkDataPropertyAxiom}.
  * 
- * @author Markus Kroetzsch 
+ * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkDataPropertyAxiomVisitor<O> {
 

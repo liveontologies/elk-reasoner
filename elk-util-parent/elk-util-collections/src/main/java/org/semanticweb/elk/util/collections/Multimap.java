@@ -25,22 +25,24 @@ package org.semanticweb.elk.util.collections;
 import java.util.Collection;
 import java.util.Set;
 
-
 /**
- * Multimap from Keys to Collection of Values 
+ * Multimap from Keys to Collection of Values
  * 
  * @author Frantisek Simancik
- *
- * @param <Key>import java.util.Set;
+ * 
+ * @param <Key>
+ *            the keys of the multimap
  * @param <Value>
+ *            the values of the multimap
  */
-
-// TODO use Multimap from google.common instead
-
 public interface Multimap<Key, Value> {
 	boolean add(Key key, Value value);
+
 	boolean contains(Key key, Value value);
+
 	Collection<Value> get(Key key);
+
 	boolean isEmpty();
+
 	Set<Key> keySet();
 }

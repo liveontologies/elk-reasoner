@@ -32,8 +32,8 @@ import java.util.concurrent.BlockingQueue;
  * {@link InputProcessorFactory}. The implementation is loosely based on a
  * producer-consumer framework with one producer and many consumers. The
  * processing of the input should start by calling the {@link #start()} method,
- * following by {@link #submit(I)} method for submitting input to be processed.
- * The workers will always wait for new input, unless interrupted or
+ * following by {@link #submit(Object)} method for submitting input to be
+ * processed. The workers will always wait for new input, unless interrupted or
  * {@link #finish()} method is called. If {@link #finish()} is called then no
  * further input can be submitted and the workers will terminate when all input
  * has been processed or they are interrupted earlier, whichever is earlier.
@@ -65,12 +65,12 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 	 */
 	protected final BlockingQueue<I> buffer;
 	/**
-	 * <tt>true</tt> if the finish of computation was requested using the
+	 * {@code true} if the finish of computation was requested using the
 	 * function {@link #finish()}
 	 */
 	protected volatile boolean finishRequested;
 	/**
-	 * <tt>true</tt> if the computation has been interrupted
+	 * {@code true} if the computation has been interrupted
 	 */
 	protected volatile boolean interrupted;
 	/**
@@ -110,8 +110,6 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 	 *            the factory for input processors
 	 * @param executor
 	 *            the executor used internally to run the jobs
-	 * @param interrupter
-	 *            the interrupter to interrupt and monitor task interruption
 	 * @param maxWorkers
 	 *            the maximal number of concurrent workers processing the jobs
 	 */
@@ -122,6 +120,8 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 
 	/**
 	 * Starts the workers to process the input.
+	 * 
+	 * @return {@code true} if the operation was successfull
 	 */
 	public synchronized boolean start() {
 		finishRequested = false;
@@ -136,7 +136,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 	 * 
 	 * @param input
 	 *            the input to be processed
-	 * @return <tt>true</tt> if the input has been successfully submitted for
+	 * @return {@code true} if the input has been successfully submitted for
 	 *         computation; the input cannot be submitted, e.g., if
 	 *         {@link #finish()} has been called
 	 * @throws InterruptedException
@@ -170,13 +170,12 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 	/**
 	 * Marks the end of the input and requests all workers to terminate when all
 	 * currently submitted input has been processed. After calling this method,
-	 * no new input can be submitted anymore, i.e., calling {@link #submit(I)}
-	 * will always return <tt>false</tt>. The method blocks until all workers
-	 * have been stopped. If interrupted while blocked, this method can be
-	 * called again in order to complete the termination request.
+	 * no new input can be submitted anymore, i.e., calling
+	 * {@link #submit(Object)} will always return {@code false}. The method
+	 * blocks until all workers have been stopped. If interrupted while blocked,
+	 * this method can be called again in order to complete the termination
+	 * request.
 	 * 
-	 * @return the submitted input elements that have not been yet submitted to
-	 *         the supplied {@link InputProcessor}
 	 * @throws InterruptedException
 	 *             if interrupted during waiting for finish request
 	 */

@@ -35,4 +35,8 @@ public class EmptyLoader implements Loader {
 		// nothing to do since there are no changes
 	}
 
+	@Override
+	public void dispose() {
+	}
+
 }

@@ -72,6 +72,8 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @param <O>
+ *            the type of the visitor output
  */
 public abstract class AbstractElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 
@@ -81,7 +83,7 @@ public abstract class AbstractElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 	protected O defaultLogicalVisit(ElkAxiom axiom) {
 		return null;
 	}
-	
+
 	/**
 	 * Invoked to visit every non-logical (annotation) axiom
 	 */
@@ -128,7 +130,7 @@ public abstract class AbstractElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 	@Override
 	public O visit(
 			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
-		
+
 		return defaultLogicalVisit(elkDisjointObjectPropertiesAxiom);
 	}
 
@@ -175,139 +177,139 @@ public abstract class AbstractElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 	@Override
 	public O visit(
 			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
-		
+
 		return defaultLogicalVisit(elkReflexiveObjectPropertyAxiom);
 	}
 
 	@Override
 	public O visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom) {
-		
+
 		return defaultLogicalVisit(elkSubObjectPropertyOfAxiom);
 	}
 
 	@Override
 	public O visit(
 			ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom) {
-		
+
 		return defaultLogicalVisit(elkSymmetricObjectPropertyAxiom);
 	}
 
 	@Override
 	public O visit(
 			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
-		
+
 		return defaultLogicalVisit(elkTransitiveObjectPropertyAxiom);
 	}
 
 	@Override
 	public O visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom) {
-		
+
 		return defaultLogicalVisit(elkDataPropertyDomainAxiom);
 	}
 
 	@Override
 	public O visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom) {
-		
+
 		return defaultLogicalVisit(elkDataPropertyRangeAxiom);
 	}
 
 	@Override
 	public O visit(ElkDisjointDataPropertiesAxiom elkDisjointDataPropertiesAxiom) {
-		
+
 		return defaultLogicalVisit(elkDisjointDataPropertiesAxiom);
 	}
 
 	@Override
 	public O visit(ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties) {
-		
+
 		return defaultLogicalVisit(elkEquivalentDataProperties);
 	}
 
 	@Override
 	public O visit(ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom) {
-		
+
 		return defaultLogicalVisit(elkFunctionalDataPropertyAxiom);
 	}
 
 	@Override
 	public O visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom) {
-		
+
 		return defaultLogicalVisit(elkSubDataPropertyOfAxiom);
 	}
 
 	@Override
 	public O visit(ElkAnnotationAssertionAxiom elkAnnotationAssertionAxiom) {
-		
+
 		return defaultNonLogicalVisit(elkAnnotationAssertionAxiom);
 	}
 
 	@Override
 	public O visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
-		
+
 		return defaultLogicalVisit(elkClassAssertionAxiom);
 	}
 
 	@Override
 	public O visit(ElkDataPropertyAssertionAxiom elkDataPropertyAssertionAxiom) {
-		
+
 		return defaultLogicalVisit(elkDataPropertyAssertionAxiom);
 	}
 
 	@Override
 	public O visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom) {
-		
+
 		return defaultLogicalVisit(elkDifferentIndividualsAxiom);
 	}
 
 	@Override
 	public O visit(
 			ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion) {
-		
+
 		return defaultLogicalVisit(elkNegativeDataPropertyAssertion);
 	}
 
 	@Override
 	public O visit(
 			ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion) {
-		
+
 		return defaultLogicalVisit(elkNegativeObjectPropertyAssertion);
 	}
 
 	@Override
 	public O visit(
 			ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom) {
-		
+
 		return defaultLogicalVisit(elkObjectPropertyAssertionAxiom);
 	}
 
 	@Override
 	public O visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
-		
+
 		return defaultLogicalVisit(elkSameIndividualAxiom);
 	}
 
 	@Override
 	public O visit(ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOfAxiom) {
-		
+
 		return defaultNonLogicalVisit(subAnnotationPropertyOfAxiom);
 	}
 
 	@Override
 	public O visit(
 			ElkAnnotationPropertyDomainAxiom annotationPropertyDomainAxiom) {
-		
+
 		return defaultNonLogicalVisit(annotationPropertyDomainAxiom);
 	}
 
 	@Override
 	public O visit(ElkAnnotationPropertyRangeAxiom annotationPropertyRangeAxiom) {
-		
+
 		return defaultNonLogicalVisit(annotationPropertyRangeAxiom);
 	}
 
 	@Override
 	public O visit(ElkDeclarationAxiom elkDeclarationAxiom) {
-		
+
 		return defaultLogicalVisit(elkDeclarationAxiom);
 	}
 

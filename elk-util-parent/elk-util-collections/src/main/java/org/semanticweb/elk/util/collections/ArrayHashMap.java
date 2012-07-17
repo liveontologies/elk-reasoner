@@ -42,6 +42,10 @@ import java.util.Set;
  * Searching, Second Edition
  * 
  * @author Yevgeny Kazakov
+ * @param <K>
+ *            the type of the keys
+ * @param <V>
+ *            the type of the values
  * 
  */
 public class ArrayHashMap<K, V> implements Map<K, V> {

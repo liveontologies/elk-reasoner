@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * @author "Yevgeny Kazakov"
  * 
  */
-abstract class Owl2ParserLoader implements Loader {
+public class Owl2ParserLoader implements Loader {
 
 	/**
 	 * the parser used to provide the axioms
@@ -136,9 +136,10 @@ abstract class Owl2ParserLoader implements Loader {
 					} catch (InterruptedException e) {
 						/*
 						 * we don't know for sure why the thread was
-						 * interrupted, so we need to obey the master; it will
-						 * restart the process if necessary; we need to restore
-						 * the interrupt status of the thread in this case
+						 * interrupted, so we need to obey; if interrupt was not
+						 * relevant, the process will restart; we need to
+						 * restore the interrupt status so that the called
+						 * methods know that there was an interrupt
 						 */
 						Thread.currentThread().interrupt();
 						break;
@@ -161,12 +162,6 @@ abstract class Owl2ParserLoader implements Loader {
 	}
 
 	/**
-	 * the hook to close the parsing resources, e.g., streams after the parser
-	 * is finished, to be implemented in subclasses
-	 */
-	protected abstract void closeParsingResources();
-
-	/**
 	 * The parser worker used to parse the ontology
 	 * 
 	 * @author "Yevgeny Kazakov"
@@ -178,25 +173,18 @@ abstract class Owl2ParserLoader implements Loader {
 			try {
 				parser_.accept(new AxiomInserter(axiomBuffer_));
 			} catch (Exception e) {
-				exception = new ElkLoadingException("Cannot load the ontology",
-						e);
+				exception = new ElkLoadingException(
+						"Cannot load the ontology!", e);
 			} finally {
-				try {
-					/*
-					 * just don't want something like this to fail but not sure
-					 * where one can save the exception
-					 */
-					closeParsingResources();
-				} finally {
-					/*
-					 * should be executed in any case
-					 */
-					finished_ = true;
-					synchronized (axiomBuffer_) {
-						if (waiting_)
-							controlThread_.interrupt();
-					}
+				/*
+				 * this should be executed in any case
+				 */
+				finished_ = true;
+				synchronized (axiomBuffer_) {
+					if (waiting_)
+						controlThread_.interrupt();
 				}
+				disposeParserResources();
 			}
 		}
 	}
@@ -210,16 +198,16 @@ abstract class Owl2ParserLoader implements Loader {
 	 */
 	private static class AxiomInserter implements Owl2ParserAxiomProcessor {
 
-		final BlockingQueue<ElkAxiom> axiomBuffer;
+		final private BlockingQueue<ElkAxiom> axiomBuffer_;
 
 		AxiomInserter(BlockingQueue<ElkAxiom> axiomBuffer) {
-			this.axiomBuffer = axiomBuffer;
+			this.axiomBuffer_ = axiomBuffer;
 		}
 
 		@Override
 		public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
 			try {
-				axiomBuffer.put(elkAxiom);
+				axiomBuffer_.put(elkAxiom);
 			} catch (InterruptedException e) {
 				throw new Owl2ParseException("ELK Parser was interrupted", e);
 			}
@@ -227,4 +215,19 @@ abstract class Owl2ParserLoader implements Loader {
 		}
 	}
 
+	/**
+	 * A hook to free resources used by the parser
+	 */
+	protected void disposeParserResources() {
+
+	}
+
+	@Override
+	public void dispose() {
+		if (!finished_)
+			parserThread_.interrupt();
+		disposeParserResources();
+		this.axiomBuffer_.clear();
+		this.exception = null;
+	}
 }

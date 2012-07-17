@@ -58,15 +58,25 @@ public enum PredefinedElkIri {
 	}
 
 	/**
-	 * Defines an ordering on IRIs starting with OWL_NOTHING, OWL_THING,
-	 * followed by the remaining IRIs in alphabetical order.
+	 * Defines an ordering on IRIs starting with {@link #OWL_NOTHING},
+	 * {@link #OWL_THING}, followed by the remaining IRIs in alphabetical order.
+	 * 
+	 * @param firstIri
+	 *            the fist {@link ElkIri} to compare with the second
+	 * @param secondIri
+	 *            the second {@link ElkIri} to compare with the first
+	 * @return a negative integer, zero, or a positive integer as the first IRI
+	 *         is less, equal, or greater than the second IRI in the specified
+	 *         order
 	 */
-	public static int compare(ElkIri arg0, ElkIri arg1) {
-		boolean isOwl0 = arg0.equals(OWL_THING) || arg0.equals(OWL_NOTHING);
-		boolean isOwl1 = arg1.equals(OWL_THING) || arg1.equals(OWL_NOTHING);
+	public static int compare(ElkIri firstIri, ElkIri secondIri) {
+		boolean isOwl0 = firstIri.equals(OWL_THING)
+				|| firstIri.equals(OWL_NOTHING);
+		boolean isOwl1 = secondIri.equals(OWL_THING)
+				|| secondIri.equals(OWL_NOTHING);
 
 		if (isOwl0 == isOwl1)
-			return arg0.compareTo(arg1);
+			return firstIri.compareTo(secondIri);
 		else
 			return isOwl0 ? -1 : 1;
 	}

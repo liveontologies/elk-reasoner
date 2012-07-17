@@ -40,17 +40,15 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.InconsistentInstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.InconsistentTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
+import org.semanticweb.elk.reasoner.taxonomy.inconsistent.PredefinedTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * @author Pavel Klinov
@@ -61,10 +59,6 @@ public class ComputeExpectedTaxonomies {
 
 	static final String CLASSIFICATION_PATH = "../elk-reasoner/src/test/resources/classification_test_input";
 	static final String REALIZATION_PATH = "../elk-reasoner/src/test/resources/realization_test_input";
-	static final Taxonomy<ElkClass> INCONSISTENT_CLASS_TAXONOMY = new InconsistentTaxonomy<ElkClass>(
-			PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING);
-	static final InconsistentInstanceTaxonomy<ElkClass, ElkNamedIndividual> INCONSISTENT_INSTANCE_TAXONOMY = new InconsistentInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
-			PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING);
 
 	static final ReasonerFactory reasonerFactory = new ReasonerFactory();
 
@@ -72,6 +66,7 @@ public class ComputeExpectedTaxonomies {
 	 * args[0]: path to the dir with source ontologies
 	 * 
 	 * @param args
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 
@@ -86,7 +81,7 @@ public class ComputeExpectedTaxonomies {
 						} catch (ElkInconsistentOntologyException e) {
 							System.err.println("Inconsistent!");
 
-							return INCONSISTENT_CLASS_TAXONOMY;
+							return PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
 						}
 					}
 
@@ -108,7 +103,7 @@ public class ComputeExpectedTaxonomies {
 				} catch (ElkInconsistentOntologyException e) {
 					System.err.println("Inconsistent!");
 
-					return INCONSISTENT_INSTANCE_TAXONOMY;
+					return PredefinedTaxonomy.INCONSISTENT_INDIVIDUAL_TAXONOMY;
 				}
 			}
 
@@ -125,7 +120,8 @@ public class ComputeExpectedTaxonomies {
 	}
 
 	static void generateExpectedTaxonomy(String path, GetTaxonomy<ElkClass> gt)
-			throws IOException, Owl2ParseException, ElkException, InterruptedException {
+			throws IOException, Owl2ParseException, ElkException,
+			InterruptedException {
 		File srcDir = new File(path);
 
 		ReasonerConfiguration configuraion = ReasonerConfiguration

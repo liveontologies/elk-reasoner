@@ -37,6 +37,8 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @param <EO> 
+ * @param <AO> 
  *
  */
 public class ReasoningTestManifest<EO extends TestOutput, AO extends TestOutput> extends BasicTestManifest<URLTestIO, EO, AO> {

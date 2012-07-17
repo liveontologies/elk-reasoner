@@ -30,34 +30,20 @@ package org.semanticweb.elk.owl.exceptions;
  */
 public class ElkRuntimeException extends RuntimeException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3395450547234499302L;
 
-	/**
-	 * 
-	 */
 	public ElkRuntimeException() {
 		super();
 	}
 
-	/**
-	 */
 	public ElkRuntimeException(String message) {
 		super(message);
 	}
 
-	/**
-	 * 
-	 */
 	public ElkRuntimeException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	/**
-	 * 
-	 */
 	public ElkRuntimeException(Throwable cause) {
 		super(cause);
 	}

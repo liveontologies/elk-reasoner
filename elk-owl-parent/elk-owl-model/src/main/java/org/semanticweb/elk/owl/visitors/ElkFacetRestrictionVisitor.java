@@ -28,7 +28,10 @@ import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
  * Visitor interface for {@link ElkFacetRestriction}
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkFacetRestrictionVisitor<O> {
 

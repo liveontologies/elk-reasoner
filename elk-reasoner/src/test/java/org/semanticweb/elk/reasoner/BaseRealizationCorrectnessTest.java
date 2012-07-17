@@ -30,9 +30,8 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.InconsistentInstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.inconsistent.PredefinedTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
@@ -43,6 +42,7 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @param <EO> 
  */
 @RunWith(PolySuite.class)
 public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput>
@@ -73,9 +73,7 @@ public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput>
 			manifest.compare(new InstanceTaxonomyTestOutput(taxonomy));
 		} catch (ElkInconsistentOntologyException e) {
 			manifest.compare(new InstanceTaxonomyTestOutput(
-					new InconsistentInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
-							PredefinedElkClass.OWL_THING,
-							PredefinedElkClass.OWL_NOTHING)));
+					PredefinedTaxonomy.INCONSISTENT_INDIVIDUAL_TAXONOMY));
 		}
 	}
 }

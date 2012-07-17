@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 

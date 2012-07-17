@@ -20,42 +20,39 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * A node of instances in an InstanceTaxonomy.
+ * A fresh Node containing an object that does not occur in a taxonomy. Such
+ * nodes are returned to queries when FreshEntityPolicy is set to ALLOW.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the type of types of objects in this node
- * @param <I>
- *            the type of instances in this node
- * 
- * 
+ *            the type of objects in this node
  */
-public interface InstanceNode<T extends ElkObject, I extends ElkObject> extends
-		Node<I> {
-	/**
-	 * Get an unmodifiable set of nodes for ElkObjects that are direct types of
-	 * this Node.
-	 * 
-	 * @return list of nodes for direct types of this node's members
-	 */
-	public Set<? extends TypeNode<T, I>> getDirectTypeNodes();
+public class FreshNode<T extends ElkObject> implements Node<T> {
 
-	/**
-	 * Get an unmodifiable set of nodes for ElkObjects that are (possibly
-	 * indirect) types of this Node.
-	 * 
-	 * @return list of nodes for instances of this node's members
-	 */
-	public Set<? extends TypeNode<T, I>> getAllTypeNodes();
+	protected final T member;
 
-	public InstanceTaxonomy<T, I> getTaxonomy();
+	public FreshNode(T member) {
+		this.member = member;
+	}
+
+	@Override
+	public Set<T> getMembers() {
+		return Collections.singleton(member);
+	}
+
+	@Override
+	public T getCanonicalMember() {
+		return member;
+	}
 
 }

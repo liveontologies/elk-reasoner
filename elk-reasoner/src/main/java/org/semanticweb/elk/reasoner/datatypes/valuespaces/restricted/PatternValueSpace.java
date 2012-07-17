@@ -40,12 +40,9 @@ public class PatternValueSpace implements ValueSpace {
 	public Datatype effectiveDatatype;
 
 	public PatternValueSpace(Automaton automaton, Datatype datatype, Datatype effectiveDatatype) {
-		try {
-			this.datatype = datatype;
-			this.automaton = automaton;
-			this.effectiveDatatype = effectiveDatatype;
-		} catch (Throwable th) {
-		}
+		this.datatype = datatype;
+		this.automaton = automaton;
+		this.effectiveDatatype = effectiveDatatype;
 	}
 
 	public Datatype getDatatype() {

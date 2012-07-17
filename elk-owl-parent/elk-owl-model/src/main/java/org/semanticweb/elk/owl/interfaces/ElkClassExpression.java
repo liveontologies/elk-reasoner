@@ -38,10 +38,11 @@ import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 public interface ElkClassExpression extends ElkObject {
 
 	/**
-	 * Accept an ElkClassExpressionVisitor. 
+	 * Accept an {@link ElkClassExpressionVisitor}.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkClassExpressionVisitor<O> visitor);
 

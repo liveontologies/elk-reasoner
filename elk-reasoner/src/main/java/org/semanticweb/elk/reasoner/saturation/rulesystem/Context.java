@@ -29,9 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 public interface Context {
 
 	/**
-	 * Get the root expression of that context.
-	 * 
-	 * @return
+	 * @return the root expression of this context
 	 */
 	public IndexedClassExpression getRoot();
 

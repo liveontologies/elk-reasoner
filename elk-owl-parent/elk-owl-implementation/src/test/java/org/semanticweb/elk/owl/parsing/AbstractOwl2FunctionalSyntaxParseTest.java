@@ -125,14 +125,12 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 	 * This method checks that the parser created the correct number of axioms
 	 * of each type (identified by the corresponding Java class name)
 	 * 
-	 * @param input
 	 * @param axiomTypeCounts
 	 * @param checkAll
 	 *            If set to true, the check will fail if the parser created
 	 *            axioms of other types, in addition to those specified in the
 	 *            count map
 	 * @throws IOException
-	 * @throws Exception
 	 */
 	protected static void checkAxiomTypeCounts(ElkTestAxiomProcessor processor,
 			Map<Class<?>, Integer> axiomTypeCounts, boolean checkAll)
@@ -264,6 +262,28 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 
 		checkAxiomTypeCounts(counter, expectedCountMap, false);
 		assertEquals(108L, counter.getTotalAxiomCount());
+	}
+
+	@Test
+	public void testComments() throws Owl2ParseException {
+		String testString = "#comment at the beginning\r"
+				+ "Prefix #comments are allowed here\n"
+				+ "(#and here\r :#and here\n = #and here\r"
+				+ "<http://www.example.org#>#the last # in <> is not a comment\n"
+				+ " )#comment after axiom\n"
+				+ "Prefix(rdfs:#comment\n#commbent\r=#comment#\n"
+				+ "<http://www.w3.org/2000/01/rdf-schema#>#comment\n)"
+				+ "Ontology(#comment\n <http://www.my.example.com/example># comment \n"
+				+ "Declaration(#comment\n Class#comment\n(##\n#\n :Person ) ) \n"
+				+ "AnnotationAssertion( rdfs:comment :Person\n"
+				+ "\"Represents the set of#not a comment\n"
+				+ "all \\\"people#not a comment\\\".\"#comment\r)\n"
+				+ "# This is a comment \n"
+				+ "SubClassOf( :Person # another comment: #this doesn't count: SubClassOf( :Person\n"
+				+ ":Human) #This is another comment\n"
+				+ ")# comment at the end";
+
+		parseOntology(testString);
 	}
 
 	@Test(expected = Owl2ParseException.class)

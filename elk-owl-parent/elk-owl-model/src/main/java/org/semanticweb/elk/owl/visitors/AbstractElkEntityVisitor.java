@@ -36,10 +36,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
  * The default visitor, does nothing
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
-public abstract class AbstractElkEntityVisitor<O> implements ElkEntityVisitor<O> {
+public abstract class AbstractElkEntityVisitor<O> implements
+		ElkEntityVisitor<O> {
 
 	@Override
 	public O visit(ElkAnnotationProperty elkAnnotationProperty) {

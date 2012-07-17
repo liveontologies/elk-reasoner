@@ -1,4 +1,5 @@
 package org.semanticweb.elk.owl.managers;
+
 /*
  * #%L
  * elk-reasoner
@@ -22,7 +23,6 @@ package org.semanticweb.elk.owl.managers;
  * #L%
  */
 
-
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
@@ -40,7 +40,8 @@ public interface ElkObjectManager {
 	 * cases where it already knows about an ElkObject that is structurally
 	 * equivalent to the given one.
 	 * 
-	 * @param the object to get a substitute for
+	 * @param object
+	 *            the object to get a substitute for
 	 * @return an object that is structurally equivalent to the given one
 	 */
 	public ElkObject getCanonicalElkObject(ElkObject object);

@@ -25,6 +25,7 @@ package org.semanticweb.elk.owlapi;
 import java.util.HashSet;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.ElkFreshEntitiesException;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
@@ -33,6 +34,7 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
 import org.semanticweb.owlapi.reasoner.FreshEntitiesException;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
+import org.semanticweb.owlapi.reasoner.ReasonerInternalException;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 /**
@@ -71,6 +73,11 @@ public class ElkExceptionConverter {
 	@SuppressWarnings("static-method")
 	public ReasonerInterruptedException convert(ElkInterruptedException e) {
 		return new ReasonerInterruptedException((ElkInterruptedException) e);
+	}
+
+	@SuppressWarnings("static-method")
+	public OWLRuntimeException convert(ElkRuntimeException e) {
+		return new ReasonerInternalException(e);
 	}
 
 	// TODO: perhaps convert using some visitor

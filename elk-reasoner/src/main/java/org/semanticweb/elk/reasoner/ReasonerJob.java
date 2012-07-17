@@ -60,7 +60,7 @@ public class ReasonerJob<I, O> {
 	}
 
 	/**
-	 * Returns the output of this job, or <tt>null</tt> if the job has not been
+	 * Returns the output of this job, or {@code null} if the job has not been
 	 * processed yet.
 	 * 
 	 * @return the output of this job

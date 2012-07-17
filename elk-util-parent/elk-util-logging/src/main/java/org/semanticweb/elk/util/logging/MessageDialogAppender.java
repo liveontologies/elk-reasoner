@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.util.logging;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,9 +32,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -57,6 +58,7 @@ import org.apache.log4j.spi.LoggingEvent;
  * type.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class MessageDialogAppender extends AppenderSkeleton implements Runnable {
@@ -122,11 +124,25 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	}
 
 	/**
+	 * Generate the additional check box message specific to the given event
+	 * 
+	 * @param event
+	 *            the event for which the check box message should be generated
+	 * @return the generated check box message
+	 */
+	@SuppressWarnings("static-method")
+	protected String getCheckboxMessage(LoggingEvent event) {
+		return "Do not show further messages of this kind";
+	}
+
+	/**
 	 * Display a dialog window to inform the user about one message event.
 	 * 
 	 * @param event
+	 *            the event for which to display the message
+	 * @return {@code true} if the message has been shown
 	 */
-	protected void showMessage(LoggingEvent event) {
+	protected boolean showMessage(LoggingEvent event) {
 		String messageTitle;
 		int messageLevel;
 		if (event.getLevel().isGreaterOrEqual(Level.ERROR)) {
@@ -140,12 +156,12 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 			messageLevel = JOptionPane.INFORMATION_MESSAGE;
 		}
 
-		Object Message = event.getMessage();
+		Object message = event.getMessage();
 		String messageType;
-		if (Message instanceof ElkMessage) {
-			messageType = ((ElkMessage) Message).getMessageType();
+		if (message instanceof ElkMessage) {
+			messageType = ((ElkMessage) message).getMessageType();
 			if (ignoredMessageTypes.contains(messageType)) {
-				return;
+				return false;
 			}
 		} else {
 			messageType = null;
@@ -155,23 +171,25 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 		String displayLabel = event.getRenderedMessage();
-		// A simple heuristic to force linebreaks into very long messages:
-		if (displayLabel.length() > 80) {
-			displayLabel = String.format(
-					"<html><div style=\"width:%dpx;\">%s</div></html>", 500,
-					displayLabel);
-		}
-		panel.add(new JLabel(displayLabel));
+		WrappingLabel label = new WrappingLabel(displayLabel, 40/*
+																 * 40 characters
+																 * should be a
+																 * decent length
+																 */);
 
-		JCheckBox ignoreMessageButton = new JCheckBox(
-				"Do not show further messages of this kind");
+		label.setAlignmentX(Component.LEFT_ALIGNMENT);
+		panel.add(label);
+
+		JCheckBox ignoreMessageButton = new JCheckBox(getCheckboxMessage(event));
+
 		if (messageType != null) {
+			ignoreMessageButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 			panel.add(Box.createRigidArea(new Dimension(0, 10)));
 			panel.add(ignoreMessageButton);
 		}
 
 		// // Later, it could be possible to abort the reasoner here:
-		// Object[] options = { "Continue", "Abort Reaoner" };
+		// Object[] options = { "Continue", "Abort Reasoner" };
 		// int result = JOptionPane.showOptionDialog(null, radioPanel,
 		// messageTitle,
 		// JOptionPane.DEFAULT_OPTION, messageLevel, null, options,
@@ -182,6 +200,9 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		if (ignoreMessageButton.isSelected()) {
 			ignoredMessageTypes.add(messageType);
 		}
+
+		return true;
+
 	}
 
 	/**
@@ -203,4 +224,22 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		}
 	}
 
+}
+
+class WrappingLabel extends JTextArea {
+
+	private static final long serialVersionUID = 1L;
+
+	public WrappingLabel(String text, int width) {
+		super(text);
+
+		setBackground(null);
+		setEditable(false);
+		setBorder(null);
+		setLineWrap(true);
+		setWrapStyleWord(true);
+		setFocusable(false);
+		setColumns(width);
+		setRows(text.length() / width);
+	}
 }

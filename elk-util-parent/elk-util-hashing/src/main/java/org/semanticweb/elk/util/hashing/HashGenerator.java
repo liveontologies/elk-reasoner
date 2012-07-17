@@ -35,7 +35,7 @@ import java.util.List;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
- *
+ * 
  */
 public class HashGenerator {
 
@@ -64,11 +64,11 @@ public class HashGenerator {
 		h ^= (h >>> 20) ^ (h >>> 12);
 		return h ^ (h >>> 7) ^ (h >>> 4);
 	}
-	
+
 	/**
-	 * Compute the combined hash code of several objects using their {@link
-	 * hashCode()} functions. The combined hash code depends on the order in
-	 * which the objects are listed.
+	 * Compute the combined hash code of several objects using their
+	 * {@link #hashCode()} functions. The combined hash code depends on the
+	 * order in which the objects are listed.
 	 * 
 	 * The current implementation is based on the Jenkins One-at-a-Time hash,
 	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
@@ -95,9 +95,9 @@ public class HashGenerator {
 	}
 
 	/**
-	 * Compute the combined hash code of several objects using their {@link
-	 * hashCode()} functions. The combined hash code depends on the order in
-	 * which the objects are listed.
+	 * Compute the combined hash code of several objects using their
+	 * {@link #hashCode()} functions. The combined hash code depends on the
+	 * order in which the objects are listed.
 	 * 
 	 * The current implementation is based on the Jenkins One-at-a-Time hash,
 	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
@@ -140,7 +140,7 @@ public class HashGenerator {
 	 * 
 	 * @param finalize
 	 * @param hashes
-	 * @return
+	 * @return the combined hash code
 	 */
 	public static int combineMultisetHash(boolean finalize, int... hashes) {
 		int hash = 0;
@@ -170,7 +170,8 @@ public class HashGenerator {
 	 * 
 	 * @param finalize
 	 * @param hashObjects
-	 * @return
+	 * @param hasher
+	 * @return the combined hash code
 	 */
 	public static <T> int combineMultisetHash(boolean finalize,
 			Iterable<? extends T> hashObjects, Hasher<T> hasher) {
@@ -195,8 +196,9 @@ public class HashGenerator {
 	 * @param <T>
 	 * 
 	 * @param finalize
-	 * @param hashObjects
-	 * @return
+	 * @param hashObjectIterator
+	 * @param hasher
+	 * @return the combined hash code
 	 */
 	public static <T> int combineMultisetHash(boolean finalize,
 			Iterator<? extends T> hashObjectIterator, Hasher<T> hasher) {
@@ -218,7 +220,7 @@ public class HashGenerator {
 	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
 	 * 
 	 * @param hashes
-	 * @return
+	 * @return the combined hash code
 	 */
 	public static int combineListHash(int... hashes) {
 		int hash = 0;
@@ -234,34 +236,34 @@ public class HashGenerator {
 		return hash;
 	}
 
-
-
 	/**
-	 * Combine the hash codes of a collection of objects into
-	 * one in a way that depends on their order.
+	 * Combine the hash codes of a collection of objects into one in a way that
+	 * depends on their order.
 	 * 
 	 * The current implementation is based on the Jenkins One-at-a-Time hash,
 	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
 	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
 	 * 
 	 * @param hashObjects
-	 * @return
+	 * @param hasher
+	 * @return the combined hash code
 	 */
-	public static <T> int combineListHash(
-			List<? extends T> hashObjects, Hasher<T> hasher) {
+	public static <T> int combineListHash(List<? extends T> hashObjects,
+			Hasher<T> hasher) {
 		return combineListHash(hashObjects.iterator(), hasher);
 	}
 
 	/**
-	 * Combine the hash codes of a collection of objects into
-	 * one in a way that depends on their order.
+	 * Combine the hash codes of a collection of objects into one in a way that
+	 * depends on their order.
 	 * 
 	 * The current implementation is based on the Jenkins One-at-a-Time hash,
 	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
 	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
 	 * 
-	 * @param hashObjects
-	 * @return
+	 * @param hashObjectIterator
+	 * @param hasher
+	 * @return the combined hash code
 	 */
 	public static <T> int combineListHash(
 			Iterator<? extends T> hashObjectIterator, Hasher<T> hasher) {

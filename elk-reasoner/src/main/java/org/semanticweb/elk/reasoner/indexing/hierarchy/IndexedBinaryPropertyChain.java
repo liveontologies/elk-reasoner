@@ -40,8 +40,8 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
 
 public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 
-	protected final IndexedObjectProperty leftProperty;
-	protected final IndexedPropertyChain rightProperty;
+	private final IndexedObjectProperty leftProperty_;
+	private final IndexedPropertyChain rightProperty_;
 
 	/**
 	 * Used for creating auxiliary inclusions during binarization.
@@ -49,11 +49,11 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	 * @param leftProperty
 	 * @param rightProperty
 	 */
-	protected IndexedBinaryPropertyChain(IndexedObjectProperty leftProperty,
+	IndexedBinaryPropertyChain(IndexedObjectProperty leftProperty,
 			IndexedPropertyChain rightProperty) {
 
-		this.leftProperty = leftProperty;
-		this.rightProperty = rightProperty;
+		this.leftProperty_ = leftProperty;
+		this.rightProperty_ = rightProperty;
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	 *         axiom.
 	 */
 	public IndexedObjectProperty getLeftProperty() {
-		return leftProperty;
+		return leftProperty_;
 	}
 
 	/**
@@ -69,22 +69,22 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	 *         axiom.
 	 */
 	public IndexedPropertyChain getRightProperty() {
-		return rightProperty;
+		return rightProperty_;
 	}
 
 	@Override
-	protected void updateOccurrenceNumber(int increment) {
+	void updateOccurrenceNumber(int increment) {
 
 		if (occurrenceNo == 0 && increment > 0) {
 			// first occurrence of this expression
-			rightProperty.addRightChain(this);
+			rightProperty_.addRightChain(this);
 		}
 
 		occurrenceNo += increment;
 
 		if (occurrenceNo == 0 && increment < 0) {
 			// no occurrences of this conjunction left
-			rightProperty.removeRightChain(this);
+			rightProperty_.removeRightChain(this);
 		}
 
 	}
@@ -105,7 +105,7 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 
 	@Override
 	public String toString() {
-		return "ObjectPropertyChain(" + this.leftProperty + ' '
-				+ this.rightProperty + ')';
+		return "ObjectPropertyChain(" + this.leftProperty_ + ' '
+				+ this.rightProperty_ + ')';
 	}
 }

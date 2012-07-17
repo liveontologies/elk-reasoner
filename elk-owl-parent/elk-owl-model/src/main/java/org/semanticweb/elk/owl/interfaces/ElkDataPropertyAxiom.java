@@ -40,7 +40,8 @@ public interface ElkDataPropertyAxiom extends ElkAxiom {
 	 * Accept an ElkDataPropertyAxiomVisitor.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor);
 

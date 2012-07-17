@@ -36,12 +36,13 @@ import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
  * 
  */
 public interface ElkAnnotationAxiom extends ElkAxiom {
-	
+
 	/**
-	 * Accept an ElkAnnotationAxiomVisitor. 
+	 * Accept an {@link ElkAnnotationAxiomVisitor}.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor);
 }

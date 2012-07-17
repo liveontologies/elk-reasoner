@@ -37,10 +37,11 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 public interface ElkSubObjectPropertyExpression extends ElkObject {
 
 	/**
-	 * Accept an ElkSubObjectPropertyExpressionVisitor.
+	 * Accept an {@link ElkSubObjectPropertyExpressionVisitor}.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(
 			ElkSubObjectPropertyExpressionVisitor<O> visitor);

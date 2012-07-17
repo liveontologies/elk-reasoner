@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,16 +36,14 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.FreshInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.FreshTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.Node;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
-import org.semanticweb.elk.reasoner.taxonomy.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.FreshInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.FreshTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.FreshTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
-import org.semanticweb.elk.util.logging.Statistics;
 
 /**
  * The class for querying the results of the reasoning tasks for a given
@@ -83,8 +79,8 @@ public class Reasoner extends AbstractReasonerState {
 
 	/**
 	 * Should fresh entities in reasoner queries be accepted (configuration
-	 * setting). If false, a {@link FreshEntityException} will be thrown when
-	 * encountering entities that did not occur in the ontology.
+	 * setting). If false, a {@link ElkFreshEntitiesException} will be thrown
+	 * when encountering entities that did not occur in the ontology.
 	 */
 	protected boolean allowFreshEntities;
 
@@ -99,6 +95,8 @@ public class Reasoner extends AbstractReasonerState {
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
 		reset();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info("ELK reasoner was created");
 	}
 
 	/**
@@ -125,10 +123,10 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
-	 * Get whether fresh entities are allowed. See setAllowFreshEntities() for
-	 * details.
+	 * Get whether fresh entities are allowed. See
+	 * {@link #setAllowFreshEntities(boolean)} for details.
 	 * 
-	 * @return
+	 * @return {@code true} if fresh entities are allowed
 	 */
 	public boolean getAllowFreshEntities() {
 		return allowFreshEntities;
@@ -156,31 +154,57 @@ public class Reasoner extends AbstractReasonerState {
 		return progressMonitor;
 	}
 
-	public void shutdown() throws InterruptedException {
+	/**
+	 * Tries to shut down the reasoner within the specified time
+	 * 
+	 * @param timeout
+	 *            the maximum time to wait
+	 * @param unit
+	 *            the time unit of the timeout argument
+	 * @return {@code true} if the operation was successful
+	 * @throws InterruptedException
+	 *             if the current thread was interrupted
+	 */
+	public boolean shutdown(long timeout, TimeUnit unit)
+			throws InterruptedException {
+		reset();
 		if (executor == null)
-			return;
+			return true;
 		executor.shutdown();
-		do {
-		} while (!executor.awaitTermination(1, TimeUnit.MICROSECONDS));
+		executor.awaitTermination(timeout, unit);
+		boolean success = executor.isShutdown();
 		executor = null;
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Reasoner shutdown");
+		if (success) {
+			if (LOGGER_.isInfoEnabled())
+				LOGGER_.info("ELK reasoner has shut down");
+		} else {
+			LOGGER_.error("ELK reasoner failed to shut down!");
+		}
+		return success;
+
 	}
 
 	/**
-	 * Helper method to get a taxonomy node node from the taxonomy.
+	 * Tries to shut down the reasoner within 1 minute
+	 * 
+	 * @return {@code true} if the operation was successful
+	 * @throws InterruptedException
+	 *             if the current thread was interrupted
+	 */
+	public boolean shutdown() throws InterruptedException {
+		return shutdown(1, TimeUnit.MINUTES);
+	}
+
+	/**
+	 * Helper method to get a {@link TaxonomyNode} from the taxonomy.
 	 * 
 	 * @param elkClass
-	 * @return
-	 * @throws ElkFreshEntitiesException
-	 *             if the given {@link ElkClass} does not occur in the ontology
-	 * @throws ElkInconsistentOntologyException
-	 *             if the ontology is inconsistent
-	 * @throws ElkException
+	 *            an {@link ElkClass} for which to find a {@link TaxonomyNode}
+	 * @return the {@link TaxonomyNode} for the given {@link ElkClass}
+	 * 
 	 */
 	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
 		if (node == null) {
 			if (allowFreshEntities) {
@@ -193,21 +217,15 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
-	 * Helper method to get an instance node node from the taxonomy.
+	 * Helper method to get an {@link InstanceNode} from the taxonomy.
 	 * 
 	 * @param elkNamedIndividual
-	 * @return
-	 * @throws ElkFreshEntitiesException
-	 *             if the given {@link ElkNamedIndividual} does not occur in the
-	 *             ontology
-	 * @throws ElkInconsistentOntologyException
-	 *             if the ontology is inconsistent
+	 * @return the {@link InstanceNode} for the given {@link ElkNamedIndividual}
 	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
 	protected InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
-			ElkNamedIndividual elkNamedIndividual)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			ElkNamedIndividual elkNamedIndividual) throws ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getInstanceNode(elkNamedIndividual);
 		if (node == null) {
@@ -222,19 +240,15 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
-	 * Helper method to get a type node node from the taxonomy.
+	 * Helper method to get a {@link TypeNode} from the taxonomy.
 	 * 
 	 * @param elkClass
-	 * @return
-	 * @throws ElkFreshEntitiesException
-	 *             if the given {@link ElkClass} does not occur in the ontology
-	 * @throws ElkInconsistentOntologyException
-	 *             if the ontology is inconsistent
+	 * @return the {@link TypeNode} for the given {@link ElkClass}
 	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
 	protected TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(
-			ElkClass elkClass) throws ElkFreshEntitiesException,
-			ElkInconsistentOntologyException, ElkException {
+			ElkClass elkClass) throws ElkException {
 		TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getTypeNode(elkClass);
 		if (node == null) {
@@ -249,184 +263,172 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
-	 * Get the class node for one named class. This provides information about
-	 * all equivalent classes. In theory, this does not demand that a full
-	 * taxonomy is built, and the result does not provide access to such an
-	 * object (or to sub- or superclasses).
+	 * Get the {@link Node} for the given {@link ElkClass}. Calling of this
+	 * method may trigger the computation of the taxonomy, if it has not been
+	 * done yet. If the given {@link ElkClass} does not occur in the ontology
+	 * and fresh entities are not allowed, a {@link ElkFreshEntitiesException}
+	 * will be thrown.
 	 * 
 	 * @param elkClass
-	 * @return
-	 * @throws ElkFreshEntitiesException
-	 *             if the given {@link ElkClass} does not occur in the ontology
-	 * @throws ElkInconsistentOntologyException
-	 *             if the ontology is inconsistent
+	 *            the {@link ElkClass} for which to return the {@link Node}
+	 * @return the class node for the given {@link ElkClass}
 	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
-	public Node<ElkClass> getClassNode(ElkClass elkClass)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+	public Node<ElkClass> getClassNode(ElkClass elkClass) throws ElkException {
 		return getTaxonomyNode(elkClass);
 	}
 
 	/**
 	 * Return the (direct or indirect) subclasses of the given
-	 * {@link ElkClassExpression}. The method returns a set of Node<ElkClass>,
-	 * each of which might represent multiple equivalent classes. In theory,
-	 * this method does not require the whole taxonomy to be constructed, and
-	 * the result does not provide (indirect) access to a taxonomy object.
+	 * {@link ElkClassExpression} as specified by the parameter. Currently, only
+	 * instances of {@link ElkClass} are supported. If called with other
+	 * objects, an {@link ElkUnsupportedReasoningTaskException} will be thrown.
+	 * The method returns a set of {@link Node}s, each of which representing an
+	 * equivalent class of subclasses. Calling of this method may trigger the
+	 * computation of the taxonomy, if it has not been done yet.
 	 * 
 	 * @param classExpression
-	 *            currently, only objects of type ElkClass are supported
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            subclass {@link Node}s
 	 * @param direct
-	 *            if <tt>true</tt>, only direct subclasses are returned
-	 * @throws ElkFreshEntitiesException
-	 *             if the given {@link ElkClassExpression} contains entities
-	 *             that do not occur in the ontology
-	 * @throws ElkInconsistentOntologyException
-	 *             if the ontology is inconsistent
+	 *            if {@code true}, only direct subclasses should be returned
+	 * @return the set of {@link Node}s for direct or indirect subclasses of the
+	 *         given {@link ElkClassExpression} according to the specified
+	 *         parameter
 	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
 	public Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
 			return (direct) ? node.getDirectSubNodes() : node.getAllSubNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
-					"ELK does not support retrieval of superclasses for unnamed class expressions.");
+			throw new ElkUnsupportedReasoningTaskException(
+					"ELK does not support computation of subclasses for complex class expressions.");
 		}
 	}
 
 	/**
 	 * Return the (direct or indirect) superclasses of the given
-	 * {@link ElkClassExpression}. The method returns a set of Node<ElkClass>,
-	 * each of which might represent multiple equivalent classes. In theory,
-	 * this method does not require the whole taxonomy to be constructed, and
-	 * the result does not provide (indirect) access to a taxonomy object.
+	 * {@link ElkClassExpression} as specified by the parameter. Currently, only
+	 * instances of {@link ElkClass} are supported. If called with other
+	 * objects, an {@link ElkUnsupportedReasoningTaskException} will be thrown.
+	 * The method returns a set of {@link Node}s, each of which representing an
+	 * equivalent class of superclasses. Calling of this method may trigger the
+	 * computation of the taxonomy, if it has not been done yet.
 	 * 
 	 * @param classExpression
-	 *            currently, only objects of type ElkClass are supported
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            superclass {@link Node}s
 	 * @param direct
-	 *            if <tt>true</tt>, only direct superclasses are returned
-	 * @throws ElkFreshEntitiesException
-	 *             if the given {@link ElkClassExpression} contains entities
-	 *             that do not occur in the ontology
-	 * @throws ElkInconsistentOntologyException
-	 *             if the ontology is inconsistent
+	 *            if {@code true}, only direct superclasses are returned
+	 * @return the set of {@link Node}s for direct or indirect superclasses of
+	 *         the given {@link ElkClassExpression} according to the specified
+	 *         parameter
 	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
 	public Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
 			return (direct) ? node.getDirectSuperNodes() : node
 					.getAllSuperNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
-					"ELK does not support retrieval of superclasses for unnamed class expressions.");
+			throw new ElkUnsupportedReasoningTaskException(
+					"ELK does not support computation of superclasses for complex class expressions.");
 		}
 	}
 
 	/**
 	 * Return the (direct or indirect) instances of the given
-	 * {@link ElkClassExpression}. The method returns a set of
-	 * Node<ElkNamedIndividual>, each of which might represent multiple
-	 * equivalent classes. In theory, this method does not require the whole
-	 * taxonomy to be constructed, and the result does not provide (indirect)
-	 * access to a taxonomy object.
+	 * {@link ElkClassExpression} as specified by the parameter. Currently, only
+	 * instances of {@link ElkClass} are supported. If called with other
+	 * objects, an {@link ElkUnsupportedReasoningTaskException} will be thrown.
+	 * The method returns a set of {@link Node}s, each of which representing an
+	 * equivalent class of instances. Calling of this method may trigger the
+	 * computation of the realization, if it has not been done yet.
 	 * 
 	 * @param classExpression
-	 *            currently, only objects of type ElkClass are supported
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            instances {@link Node}s
 	 * @param direct
-	 *            if <tt>true</tt>, only direct subclasses are returned
-	 * @throws ElkFreshEntitiesException
-	 *             if the given {@link ElkClassExpression} contains entities
-	 *             that do not occur in the ontology
-	 * @throws ElkInconsistentOntologyException
-	 *             if the ontology is inconsistent
+	 *            if {@code true}, only direct instances are returned
+	 * @return the set of {@link Node}s for direct or indirect instances of the
+	 *         given {@link ElkClassExpression} according to the specified
+	 *         parameter
 	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
 	public Set<? extends Node<ElkNamedIndividual>> getInstances(
 			ElkClassExpression classExpression, boolean direct)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			TypeNode<ElkClass, ElkNamedIndividual> node = getTypeNode((ElkClass) classExpression);
 			return direct ? node.getDirectInstanceNodes() : node
 					.getAllInstanceNodes();
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
+			throw new ElkUnsupportedReasoningTaskException(
 					"ELK does not support retrieval of instances for unnamed class expressions.");
 		}
 	}
 
 	/**
 	 * Return the (direct or indirect) types of the given
-	 * {@link ElkNamedIndividual}. The method returns a set of Node<ElkClass>,
-	 * each of which might represent multiple equivalent classes. In theory,
-	 * this method does not require the whole taxonomy to be constructed, and
-	 * the result does not provide (indirect) access to a taxonomy object.
+	 * {@link ElkNamedIndividual}. The method returns a set of {@link Node}s,
+	 * each of which representing an equivalent class of types. Calling of this
+	 * method may trigger the computation of the realization, if it has not been
+	 * done yet.
 	 * 
 	 * @param elkNamedIndividual
+	 *            the {@link ElkNamedIndividual} for which to return the types
+	 *            {@link Node}s
 	 * @param direct
-	 *            if true, only direct types are returned
-	 * @throws ElkFreshEntitiesException
-	 * @throws ElkInconsistentOntologyException
+	 *            if {@code true}, only direct types are returned
+	 * @return the set of {@link Node}s for the direct or indirect types of the
+	 *         given {@link ElkNamedIndividual} according to the specified
+	 *         parameter
 	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
 	public Set<? extends Node<ElkClass>> getTypes(
 			ElkNamedIndividual elkNamedIndividual, boolean direct)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceNode(elkNamedIndividual);
 		return direct ? node.getDirectTypeNodes() : node.getAllTypeNodes();
 	}
 
 	/**
-	 * Check if the given class expression is satisfiable, that is, if it can
-	 * possibly have instances. Classes that are not satisfiable if they are
-	 * equivalent to owl:Nothing. A satisfiable class is also called consistent
-	 * or coherent.
+	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
+	 * it can possibly have instances. Currently, only instances of
+	 * {@link ElkClass} are supported. If called with other objects, an
+	 * {@link ElkUnsupportedReasoningTaskException} will be thrown.
+	 * {@link ElkClassExpression}s are not satisfiable if they are equivalent to
+	 * {@code owl:Nothing}. A satisfiable {@link ElkClassExpression} is also
+	 * called consistent or coherent. Calling of this method may trigger the
+	 * computation of the taxonomy, if it has not been done yet.
 	 * 
 	 * @param classExpression
-	 *            currently, only objects of type ElkClass are supported
-	 * @return
-	 * @throws ElkFreshEntitiesException
+	 *            the {@link ElkClassExpression} for which to check
+	 *            satisfiability
+	 * @return {@code true} if the given input is satisfiable
 	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
 	public boolean isSatisfiable(ElkClassExpression classExpression)
-			throws ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException {
+			throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			Node<ElkClass> classNode = getClassNode((ElkClass) classExpression);
 			return (!classNode.getMembers().contains(
 					PredefinedElkClass.OWL_NOTHING));
 		} else { // TODO: complex class expressions currently not supported
-			throw new UnsupportedOperationException(
+			throw new ElkUnsupportedReasoningTaskException(
 					"ELK does not support satisfiability checking for unnamed class expressions");
 		}
-	}
-
-	public void writeTaxonomyToFile(File file) throws IOException,
-			ElkInconsistentOntologyException, ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing taxonomy to " + file);
-		}
-		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
-		TaxonomyPrinter.dumpClassTaxomomyToFile(this.getTaxonomy(),
-				file.getPath(), true);
-		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
-	}
-
-	// TODO: get rid of this
-	// used only in tests
-	@Override
-	public OntologyIndex getOntologyIndex() throws ElkException {
-		return super.getOntologyIndex();
 	}
 
 }

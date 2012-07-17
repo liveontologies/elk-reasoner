@@ -32,13 +32,14 @@ import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
  * @author Markus Kroetzsch
  */
 public interface ElkDataRange extends ElkObject {
-	
+
 	/**
-	 * Accept an ElkDataRangeVisitor. 
+	 * Accept an {@link ElkDataRangeVisitor}.
 	 * 
 	 * @param visitor
-	 * @return
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkDataRangeVisitor<O> visitor);
-	
+
 }

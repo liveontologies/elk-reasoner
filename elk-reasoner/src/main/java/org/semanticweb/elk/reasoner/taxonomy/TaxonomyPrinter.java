@@ -46,6 +46,10 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
@@ -59,17 +63,18 @@ public class TaxonomyPrinter {
 	protected static Comparator<ElkNamedIndividual> INDIVIDUAL_COMPARATOR = Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR;
 
 	/**
-	 * Convenience method for printing a Taxonomy<ElkClass> to a file at the
-	 * given location.
+	 * Convenience method for printing a {@link Taxonomy} to a file at the given
+	 * location.
 	 * 
-	 * @see org.semanticweb.elk.reasoner.taxonomy.Taxonomy
-	 *      <ElkClass>Printer#dumpClassTaxomomy
+	 * @see org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter#dumpClassTaxomomy
 	 * 
 	 * @param taxonomy
 	 * @param fileName
 	 * @param addHash
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
+	 * @throws IOException
+	 *             If an I/O error occurs
 	 */
 	public static void dumpClassTaxomomyToFile(Taxonomy<ElkClass> taxonomy,
 			String fileName, boolean addHash) throws IOException {
@@ -81,53 +86,81 @@ public class TaxonomyPrinter {
 	}
 
 	/**
-	 * Print the contents of the given Taxonomy<ElkClass> to the specified
-	 * Writer. Class expressions are ordered for generating the output, ensuring
-	 * that the output is deterministic.
+	 * Print the contents of the given {@link Taxonomy} to the specified Writer.
+	 * Expressions are ordered for generating the output, ensuring that the
+	 * output is deterministic.
 	 * 
 	 * @param taxonomy
 	 * @param writer
 	 * @param addHash
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
+	 * @throws IOException
+	 *             If an I/O error occurs
 	 */
 	public static void dumpClassTaxomomy(Taxonomy<ElkClass> taxonomy,
 			Writer writer, boolean addHash) throws IOException {
 		writer.write("Ontology(\n");
 		processTaxomomy(taxonomy, writer);
-		writer.write(")");
+		writer.write(")\n");
 
 		if (addHash) {
-			writer.write("\n\n# Hash code: " + getHashString(taxonomy) + "\n");
+			writer.write("\n# Hash code: " + getHashString(taxonomy) + "\n");
 		}
 	}
 
 	/**
-	 * Print the contents of the given Taxonomy<ElkClass> to the specified
-	 * Writer. Class expressions are ordered for generating the output, ensuring
-	 * that the output is deterministic.
+	 * Convenience method for printing an {@link InstanceTaxonomy} to a file at
+	 * the given location.
+	 * 
+	 * @see org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter#dumpInstanceTaxomomy
+	 * 
+	 * @param taxonomy
+	 * @param fileName
+	 * @param addHash
+	 *            if true, a hash string will be added at the end of the output
+	 *            using comment syntax of OWL 2 Functional Style
+	 * @throws IOException
+	 *             If an I/O error occurs
+	 */
+	public static void dumpInstanceTaxomomyToFile(
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
+			String fileName, boolean addHash) throws IOException {
+		FileWriter fstream = new FileWriter(fileName);
+		BufferedWriter writer = new BufferedWriter(fstream);
+
+		dumpInstanceTaxomomy(taxonomy, writer, addHash);
+		writer.close();
+	}
+
+	/**
+	 * Print the contents of the given {@link InstanceTaxonomy} to the specified
+	 * Writer. Expressions are ordered for generating the output, ensuring that
+	 * the output is deterministic.
 	 * 
 	 * @param taxonomy
 	 * @param writer
 	 * @param addHash
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
+	 * @throws IOException
+	 *             If an I/O error occurs
 	 */
 	public static void dumpInstanceTaxomomy(
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
 			Writer writer, boolean addHash) throws IOException {
 		writer.write("Ontology(\n");
 		processInstanceTaxomomy(taxonomy, writer);
-		writer.write(")");
+		writer.write(")\n");
 
 		if (addHash) {
-			writer.write("\n\n# Hash code: " + getInstanceHashString(taxonomy)
+			writer.write("\n# Hash code: " + getInstanceHashString(taxonomy)
 					+ "\n");
 		}
 	}
 
 	/**
-	 * Get a has string for the given Taxonomy<ElkClass>. Besides possible hash
+	 * Get a has string for the given {@link Taxonomy}. Besides possible hash
 	 * collisions (which have very low probability) the hash string is the same
 	 * for two inputs if and only if the inputs describe the same taxonomy. So
 	 * it can be used to compare classification results.
@@ -220,9 +253,10 @@ public class TaxonomyPrinter {
 	}
 
 	/**
-	 * Process axioms related to one ElkClass, where the relevant related
-	 * classes are given in two ordered collections of equivalent classes and
-	 * subclasses, respectively. The method serializes the axioms to the Writer.
+	 * Process axioms related to one {@link ElkClass}, where the relevant
+	 * related classes are given in two ordered collections of equivalent
+	 * classes and subclasses, respectively. The method serializes the axioms to
+	 * the Writer.
 	 * 
 	 * @param elkClass
 	 * @param orderedEquivalentClasses

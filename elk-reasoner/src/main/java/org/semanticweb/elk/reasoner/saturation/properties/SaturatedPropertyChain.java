@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.stages.ObjectPropertyCompositionsPrecomputationStage;
 import org.semanticweb.elk.reasoner.stages.ObjectPropertyHierarchyComputationStage;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -59,38 +60,38 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * All subproperties of the root property including root itself. Computed in
-	 * the {@link ObjectPropertyHierarchyComputationStage}.
+	 * @return All subproperties of the root property including root itself.
+	 *         Computed in the {@link ObjectPropertyHierarchyComputationStage}.
 	 */
 	public Set<IndexedPropertyChain> getSubProperties() {
 		return derivedSubProperties;
 	}
 
 	/**
-	 * All superproperties of the root property including root itself. Computed
-	 * in the {@link ObjectPropertyHierarchyComputationStage}.
+	 * @return All superproperties of the root property including root itself.
+	 *         Computed in the {@link ObjectPropertyHierarchyComputationStage}.
 	 */
 	public Set<IndexedPropertyChain> getSuperProperties() {
 		return derivedSuperProperties;
 	}
 
 	/**
-	 * A multimap from R to S such that ObjectPropertyChain(R, root) implies S,
-	 * null if empty. Computed in the
-	 * {@link ObjectPropertyCompositionsPrecomputationStage} which already
-	 * expands premises of complex property inclusions under property
-	 * hierarchies
+	 * @return A multimap from R to S such that ObjectPropertyChain(R, root)
+	 *         implies S, null if empty. Computed in the
+	 *         {@link ObjectPropertyCompositionsPrecomputationStage} which
+	 *         already expands premises of complex property inclusions under
+	 *         property hierarchies
 	 */
 	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByLeftSubProperty() {
 		return compositionsByLeftSubProperty;
 	}
 
 	/**
-	 * A multimap from R to S such that ObjectPropertyChain(root, R) implies S,
-	 * null if empty. Computed in the
-	 * {@link ObjectPropertyCompositionsPrecomputationStage} which already
-	 * expands premises of complex property inclusions under property
-	 * hierarchies
+	 * @return A multimap from R to S such that ObjectPropertyChain(root, R)
+	 *         implies S, null if empty. Computed in the
+	 *         {@link ObjectPropertyCompositionsPrecomputationStage} which
+	 *         already expands premises of complex property inclusions under
+	 *         property hierarchies
 	 */
 	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByRightSubProperty() {
 		return compositionsByRightSubProperty;

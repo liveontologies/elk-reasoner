@@ -22,27 +22,31 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 
 /**
  * Visitor pattern interface for instances of {@link ElkDataRange}.
- *
- * @author Markus Kroetzsch
  * 
+ * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkDataRangeVisitor<O> {
 
 	O visit(ElkDataComplementOf elkDataComplementOf);
-	
+
 	O visit(ElkDataIntersectionOf elkDataIntersectionOf);
 
 	O visit(ElkDataOneOf elkDataOneOf);
-	
+
 	O visit(ElkDatatype elkDatatype);
 
 	O visit(ElkDatatypeRestriction elkDatatypeRestriction);

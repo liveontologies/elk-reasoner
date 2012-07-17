@@ -42,6 +42,8 @@ public interface ReasonerStageExecutor extends Interrupter {
 	 * 
 	 * @param stage
 	 *            the reasoner stage to be completed
+	 * @throws ElkException
+	 *             if the stage cannot be competed successfully
 	 */
 	public void complete(ReasonerStage stage) throws ElkException;
 

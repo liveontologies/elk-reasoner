@@ -52,26 +52,21 @@ public interface ContextClassSaturation extends Context {
 	public void setSaturated();
 
 	/**
-	 * Return if context is saturated. A context is saturated if all superclass
-	 * expressions of the root expression have been computed. This needs to be
-	 * set explicitly by some processor.
+	 * Returns {@code true} if context is saturated. A context is saturated if
+	 * all superclass expressions of the root expression have been computed.
+	 * This needs to be set explicitly by some processor.
 	 * 
-	 * @return <tt>true</tt> if this context is saturated and <tt>false</tt>
-	 *         otherwise
+	 * @return {@code true} if this context is saturated
 	 */
 	public boolean isSaturated();
-	
+
 	/**
-	 * Return true if this context is set to isSatisfiable. A value of true
-	 * means that owl:Nothing was stored as a superclass in this context.
-	 * 
-	 * @return
+	 * @return {@code true} if this context is known to be satisfiable
 	 */
 	public boolean isSatisfiable();
 
 	/**
-	 * Set the satisfiability of this context. A value of true means that
-	 * owl:Nothing was stored as a superclass in this context.
+	 * Set the satisfiability flag of this context.
 	 * 
 	 * @param satisfiable
 	 */

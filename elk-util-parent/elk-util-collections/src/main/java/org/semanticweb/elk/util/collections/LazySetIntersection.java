@@ -38,8 +38,8 @@ import java.util.Set;
  * explicitly. Iteration over the intersection is organized by iterating over
  * the elements in the smallest set and checking if the elements are present in
  * the other set. An element is contained in the intersection as reported by
- * <tt>contains</tt> if it is contained in all input sets. The size of the
- * intersection reported by <tt>size</tt> is the minimum of the sizes for the
+ * {@code contains} if it is contained in all input sets. The size of the
+ * intersection reported by {@code size} is the minimum of the sizes for the
  * sets. This way it is possible to use the result to form intersection with
  * instances of this class. If any of the sets is modified while an iteration
  * over the intersection is in progress, the results of the iteration are
@@ -49,6 +49,8 @@ import java.util.Set;
  * 
  * 
  * @author Yevgeny Kazakov
+ * @param <E>
+ *            the type of the elements in this set
  * 
  */
 public class LazySetIntersection<E> extends AbstractSet<E> {

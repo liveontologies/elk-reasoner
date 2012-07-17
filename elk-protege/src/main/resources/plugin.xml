@@ -1,15 +1,20 @@
 <?xml version="1.0"?>
 <plugin>
 
-<extension id="ELK.reasoner.factory" point="org.protege.editor.owl.inference_reasonerfactory">
+<extension id="elk.reasoner.factory" point="org.protege.editor.owl.inference_reasonerfactory">
     <name value="ELK ${project.version}"/>
     <label value="ELK ${project.version}"/>
 	<class value="org.semanticweb.elk.protege.ProtegeReasonerFactory"/>
 </extension>
 
-<extension id="elk.reasoner.configuration" point="org.protege.editor.core.application.preferencespanel">
+<extension id="elk.reasoner.configuration" point="org.protege.editor.owl.inference_preferences">
 	<label value="ELK"/>
 	<class value="org.semanticweb.elk.protege.ui.ElkPreferencesPanel"/>
+</extension>
+
+<extension id="elk.init" point="org.protege.editor.core.application.EditorKitHook">
+	<class value="org.semanticweb.elk.protege.ElkProtegePluginInstance"/>
+	<editorKitId value="OWLEditorKit"/>
 </extension>
     
 </plugin>

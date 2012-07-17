@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -102,28 +101,16 @@ public class RuleApplicationFactory implements
 	private final int contextUpdateInterval = 32;
 
 	/**
-	 * <tt>true</tt> if the {@link #activeContexts} queue is empty
-	 */
-	private final AtomicBoolean activeContextsEmpty;
-	/**
-	 * The listener for rule application callbacks
-	 */
-	private final RuleApplicationListener listener;
-
-	/**
 	 * The aggregated statistics of all workers
 	 */
 	private final RuleStatistics aggregatedStatistics;
 
-	public RuleApplicationFactory(OntologyIndex ontologyIndex,
-			RuleApplicationListener listener) {
+	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
 		// TODO: provide an option for specifying the invocation manager
 		this.inferenceSystem = new InferenceSystemElClassSaturation();
 		this.inferenceSystemInvocationManager = new InferenceSystemInvocationManagerSCE<ContextElClassSaturation>();
 		this.ontologyIndex = ontologyIndex;
-		this.listener = listener;
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
-		this.activeContextsEmpty = new AtomicBoolean(true);
 		this.aggregatedStatistics = new RuleStatistics();
 
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
@@ -197,14 +184,8 @@ public class RuleApplicationFactory implements
 				if (Thread.currentThread().isInterrupted())
 					break;
 				Context nextContext = activeContexts.poll();
-				if (nextContext == null) {
-					if (!activeContextsEmpty.compareAndSet(false, true))
-						break;
-					nextContext = activeContexts.poll();
-					if (nextContext == null)
-						break;
-					tryNotifyCanProcess();
-				}
+				if (nextContext == null)
+					break;
 				process(nextContext);
 			}
 		}
@@ -217,14 +198,14 @@ public class RuleApplicationFactory implements
 		}
 
 		/**
-		 * @return the <tt>owl:Thing</tt> object in this ontology
+		 * @return the {@code owl:Thing} object in this ontology
 		 */
 		public IndexedClassExpression getOwlNothing() {
 			return owlNothing;
 		}
 
 		/**
-		 * @return the <tt>owl:Nothing</tt> object in this ontology
+		 * @return the {@code owl:Nothing} object in this ontology
 		 */
 		public IndexedClassExpression getOwlThing() {
 			return owlThing;
@@ -306,15 +287,9 @@ public class RuleApplicationFactory implements
 			deactivateContext(context);
 		}
 
-		private void tryNotifyCanProcess() {
-			if (activeContextsEmpty.compareAndSet(true, false))
-				listener.notifyCanProcess();
-		}
-
 		private void activateContext(Context context) {
 			if (context.tryActivate()) {
 				activeContexts.add(context);
-				tryNotifyCanProcess();
 			}
 		}
 

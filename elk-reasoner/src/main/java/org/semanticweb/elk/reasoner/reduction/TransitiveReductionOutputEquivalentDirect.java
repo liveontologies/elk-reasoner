@@ -35,16 +35,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I>
- *            the type of the input for which the output equivalent and direct
- *            super classes are computed
+ * @param <R>
+ *            the type of the root {@link IndexedClassExpression}s of the
+ *            {@link TransitiveReductionJob}s for which this output is computed
+ * 
+ * @see TransitiveReductionJob
  */
-public class TransitiveReductionOutputEquivalentDirect<I extends IndexedClassExpression>
-		extends TransitiveReductionOutputEquivalent<I> {
+public class TransitiveReductionOutputEquivalentDirect<R extends IndexedClassExpression>
+		extends TransitiveReductionOutputEquivalent<R> {
 
 	final List<TransitiveReductionOutputEquivalent<IndexedClass>> directSuperClasses;
 
-	public TransitiveReductionOutputEquivalentDirect(I root) {
+	public TransitiveReductionOutputEquivalentDirect(R root) {
 		super(root);
 		this.directSuperClasses = new LinkedList<TransitiveReductionOutputEquivalent<IndexedClass>>();
 	}
@@ -62,7 +64,7 @@ public class TransitiveReductionOutputEquivalentDirect<I extends IndexedClassExp
 	}
 
 	@Override
-	public void accept(TransitiveReductionOutputVisitor<I> visitor) {
+	public void accept(TransitiveReductionOutputVisitor<R> visitor) {
 		visitor.visit(this);
 	}
 

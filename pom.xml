@@ -2,9 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.semanticweb.elk</groupId>
-	<version>0.2.1-SNAPSHOT</version>
 	<artifactId>elk-parent</artifactId>
+	<version>0.3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<name>ELK</name>
+	<description>A Java-based OWL EL reasoner</description>
+	<url>http://elk.semanticweb.org/</url>
 
 	<modules>
 		<module>elk-owl-parent</module>
@@ -18,14 +28,10 @@
 		<module>elk-owlapi-standalone</module>
 	</modules>
 
-	<name>ELK</name>
-	<description>A Java-based OWL EL reasoner.</description>
-	<url>http://code.google.com/p/elk-reasoner/</url>
-
 	<scm>
-		<connection>scm:svn:http://elk-reasoner.googlecode.com/svn/trunk</connection>
-		<developerConnection>scm:svn:https://elk-reasoner.googlecode.com/svn/trunk</developerConnection>
-		<url>http://code.google.com/p/elk-reasoner/source/browse</url>
+		<connection>scm:svn:http://elk-reasoner.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://elk-reasoner.googlecode.com/svn/trunk/</developerConnection>
+		<url>http://elk-reasoner.googlecode.com/svn/trunk/</url>
 	</scm>
 
 	<licenses>
@@ -48,8 +54,7 @@
 			<id>yevgeny</id>
 			<name>Yevgeny Kazakov</name>
 			<email>yevgeny.kazakov@uni-ulm.de</email>
-			<organization>Institute of Artificial Intelligence, University of Ulm
-            </organization>
+			<organization>Institute of Artificial Intelligence, University of Ulm</organization>
 			<organizationUrl>http://www.uni-ulm.de/en/in/ki.html</organizationUrl>
 			<roles>
 				<role>developer</role>
@@ -60,8 +65,7 @@
 			<id>markus</id>
 			<name>Markus Kroetzsch</name>
 			<email>markus.kroetzsch@cs.ox.ac.uk</email>
-			<organization>Department of Computer Science, University of Oxford
-            </organization>
+			<organization>Department of Computer Science, University of Oxford</organization>
 			<organizationUrl>http://www.cs.ox.ac.uk</organizationUrl>
 			<roles>
 				<role>developer</role>
@@ -72,8 +76,7 @@
 			<id>frantisek</id>
 			<name>Frantisek Simancik</name>
 			<email>frantisek.simancik@cs.ox.ac.uk</email>
-			<organization>Department of Computer Science, University of Oxford
-            </organization>
+			<organization>Department of Computer Science, University of Oxford</organization>
 			<organizationUrl>http://www.cs.ox.ac.uk</organizationUrl>
 			<roles>
 				<role>developer</role>
@@ -118,6 +121,10 @@
 		</plugins>
 	</reporting>
 
+	<distributionManagement>
+		<downloadUrl>http://code.google.com/p/elk-reasoner/downloads/list</downloadUrl>
+	</distributionManagement>
+
 	<issueManagement>
 		<system>GoogleCode</system>
 		<url>http://code.google.com/p/elk-reasoner/issues/</url>
@@ -130,9 +137,14 @@
 			<archive>http://groups.google.com/group/elk-reasoner-users</archive>
 		</mailingList>
 		<mailingList>
-			<name>ELK-reasoner announcements</name>
+			<name>ELK-reasoner discussion</name>
 			<subscribe>elk-reasoner-discussion+subscribe@googlegroups.com</subscribe>
 			<archive>http://groups.google.com/group/elk-reasoner-discussion</archive>
+		</mailingList>
+		<mailingList>
+			<name>ELK-reasoner activities</name>
+			<subscribe>elk-reasoner-activities+subscribe@googlegroups.com</subscribe>
+			<archive>http://groups.google.com/group/elk-reasoner-activities</archive>
 		</mailingList>
 	</mailingLists>
 
@@ -141,25 +153,20 @@
 		<owlapi.version>3.3</owlapi.version>
 		<protege.version>4.1.0</protege.version>
 		<java.required.version>1.6</java.required.version>
+		<!-- TODO: get current year automatically -->
+		<currentYear>2012</currentYear>
 	</properties>
 
 	<repositories>
-		<repository>
-			<id>elk-reasoner-snapshots</id>
-			<url>http://elk-reasoner.googlecode.com/svn/m2/snapshots</url>
-		</repository>
-		<repository>
-			<id>elk-reasoner-releases</id>
-			<url>http://elk-reasoner.googlecode.com/svn/m2/releases</url>
-		</repository>
-		<!-- adding a repository for official owlapi; remove once it is synced 
-			with Maven central -->
+		<!-- adding a Sonatype repository for official owlapi releases; remove 
+			once it is synced with Maven central -->
 		<repository>
 			<id>Sonatype repository</id>
 			<name>Sonatype's Maven repository</name>
 			<url>https://oss.sonatype.org/content/repositories/releases/</url>
 		</repository>
 	</repositories>
+
 
 	<build>
 		<pluginManagement>
@@ -188,9 +195,14 @@
 					<version>2.4</version>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-changes-plugin</artifactId>
+					<version>2.7.1</version>
+				</plugin>
+				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>license-maven-plugin</artifactId>
-					<version>1.0-beta-3</version>
+					<version>1.2</version>
 					<configuration>
 						<verbose>false</verbose>
 						<addSvnKeyWords>true</addSvnKeyWords>
@@ -259,7 +271,7 @@
 									<pluginExecutionFilter>
 										<groupId>org.codehaus.mojo</groupId>
 										<artifactId>license-maven-plugin</artifactId>
-										<versionRange>[1.0-beta-3,)</versionRange>
+										<versionRange>[1.2,)</versionRange>
 										<goals>
 											<goal>update-project-license</goal>
 											<goal>update-file-header</goal>
@@ -327,7 +339,8 @@
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 				</configuration>
 			</plugin>
-			<!-- making sure that the sources are always installed -->
+			<!-- making sure that the sources are always installed so that sources 
+				are included in elk-distribution -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -342,12 +355,13 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- ensure the required java version is used -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>${java.required.version}</source>
+					<target>${java.required.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -368,20 +382,50 @@
 		</plugins>
 	</build>
 
-	<distributionManagement>
-		<downloadUrl>http://code.google.com/p/elk-reasoner/downloads/list</downloadUrl>
-		<repository>
-			<id>elk-reasoner.googlecode.com</id>
-			<url>svn:https://elk-reasoner.googlecode.com/svn/m2/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>elk-reasoner.googlecode.com</id>
-			<url>svn:https://elk-reasoner.googlecode.com/svn/m2/snapshots</url>
-		</snapshotRepository>
-		<site>
-			<id>elk-reasoner.googlecode.com</id>
-			<url>svn:https://elk-reasoner.googlecode.com/svn/m2/site</url>
-		</site>
-	</distributionManagement>
+	<profiles>
+		<!-- these actions will be activated only when staging a release -->
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<!-- sign released artifacts using PGP, required by maven central -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- generate javadocs, required by maven central -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.8.1</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

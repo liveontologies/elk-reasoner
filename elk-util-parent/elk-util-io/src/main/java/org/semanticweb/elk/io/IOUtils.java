@@ -42,34 +42,40 @@ import java.util.zip.ZipInputStream;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 public class IOUtils {
 
 	private static final int BUFFER_SIZE = 1024 * 2;
-	
+
 	public static void closeQuietly(InputStream stream) {
 		if (stream != null) {
 			try {
 				stream.close();
-			} catch (IOException e) {}
+			} catch (IOException e) {
+			}
 		}
 	}
-	
+
 	public static void closeQuietly(OutputStream stream) {
 		if (stream != null) {
 			try {
 				stream.close();
-			} catch (IOException e) {}
+			} catch (IOException e) {
+			}
 		}
 	}
-	
+
 	/**
 	 * Copies bytes from the input stream to the output stream
 	 * 
+	 * @param input
+	 * @param output
+	 * 
 	 * @return The number of bytes copied
+	 * @throws IOException
 	 */
 	public static int copy(InputStream input, OutputStream output)
 			throws IOException {
@@ -91,73 +97,79 @@ public class IOUtils {
 		}
 
 		return count;
-	}	
-	
-	
-	public static List<String> getResourceNamesFromDir(File dir, String extension) {
+	}
+
+	public static List<String> getResourceNamesFromDir(File dir,
+			String extension) {
 		List<String> testResources = new ArrayList<String>();
-		
-		for (String fileName : dir.list(FileUtils.getExtBasedFilenameFilter(extension))) {
+
+		for (String fileName : dir.list(FileUtils
+				.getExtBasedFilenameFilter(extension))) {
 			testResources.add(dir.getName() + "/" + fileName);
 		}
-		
+
 		return testResources;
 	}
 
 	/**
-	 * Retrieves a set of resource names from a JAR file (the code source for the given Java class)
+	 * Retrieves a set of resource names from a JAR file (the code source for
+	 * the given Java class)
 	 * 
-	 * @param inputURI
+	 * @param path
+	 * 
 	 * @param extension
 	 * @param clazz
-	 * @return
+	 * @return the list of resource names from a JAR file
 	 * @throws IOException
 	 */
-	public static List<String> getResourceNamesFromJAR(String path, String extension, Class<?> clazz) throws IOException {
+	public static List<String> getResourceNamesFromJAR(String path,
+			String extension, Class<?> clazz) throws IOException {
 		CodeSource src = clazz.getProtectionDomain().getCodeSource();
 		List<String> testResources = new ArrayList<String>();
 		ZipInputStream zip = null;
 
-		if( src != null ) {
-		    URL jar = src.getLocation();
-		    ZipEntry ze = null;
-		    
-		    try {
-				zip = new ZipInputStream( jar.openStream());
-				
-				while( ( ze = zip.getNextEntry() ) != null ) {
-				    String entryName = ze.getName();
-				    
-				    if( entryName.startsWith(path) && entryName.endsWith("." + extension) ) {
-				    	testResources.add( entryName );
-				    }
+		if (src != null) {
+			URL jar = src.getLocation();
+			ZipEntry ze = null;
+
+			try {
+				zip = new ZipInputStream(jar.openStream());
+
+				while ((ze = zip.getNextEntry()) != null) {
+					String entryName = ze.getName();
+
+					if (entryName.startsWith(path)
+							&& entryName.endsWith("." + extension)) {
+						testResources.add(entryName);
+					}
 				}
 			} finally {
 				closeQuietly(zip);
 			}
-		 }
-		else {
-			throw new IOException("Unable to get code source for " + clazz.getSimpleName());
+		} else {
+			throw new IOException("Unable to get code source for "
+					+ clazz.getSimpleName());
 		}
-		
+
 		return testResources;
-	}	
-	
+	}
+
 	public static int readInteger(URL src, int radix) throws IOException {
 		String line = null;
-		InputStream stream = null; 
-				
+		InputStream stream = null;
+
 		try {
 			stream = src.openStream();
-			
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-			
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					stream));
+
 			line = reader.readLine();
-			
+
 		} finally {
 			closeQuietly(stream);
 		}
-		
+
 		return Integer.parseInt(line, radix);
 	}
 }

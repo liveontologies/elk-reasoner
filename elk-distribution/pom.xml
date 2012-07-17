@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.2.1-SNAPSHOT</version>
+		<version>0.3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-distribution</artifactId>
@@ -17,33 +17,33 @@
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-standalone</artifactId>
-			<version>0.2.1-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-protege</artifactId>
-			<version>0.2.1-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owlapi-standalone</artifactId>
-			<version>0.2.1-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 			<type>jar</type>
 			<classifier>bin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owlapi-standalone</artifactId>
-			<version>0.2.1-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 			<type>jar</type>
 			<classifier>src</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owlapi-standalone</artifactId>
-			<version>0.2.1-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 			<type>jar</type>
 			<classifier>lib</classifier>
 		</dependency>
@@ -56,7 +56,7 @@
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-testing</artifactId>
-			<version>0.2.1-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -194,7 +194,6 @@
 				<!-- the plugin to generate changelog and release announcements -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-changes-plugin</artifactId>
-				<version>2.7</version>
 				<configuration>
 					<!-- the changes filtered source changes file -->
 					<xmlPath>${basedir}/target/changes.xml</xmlPath>
@@ -302,95 +301,112 @@
 					</execution>
 				</executions>
 			</plugin>
+		</plugins>
+	</build>
 
-			<plugin>
-				<!-- the plugin used to upload the release files to googlecode -->
-				<groupId>com.googlecode.maven-gcu-plugin</groupId>
-				<artifactId>maven-gcu-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<phase>deploy</phase>
-						<goals>
-							<goal>upload</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<!-- the server and access credentials should be defined in the maven 
-						user configuration file (usually ~/.m2/settings.xml) -->
-					<serverId>elk-reasoner.googlecode.com</serverId>
-					<failsOnError>true</failsOnError>
-					<projectName>elk-reasoner</projectName>
-					<uploads>
-						<upload>
-							<file>${project.build.directory}/${elk-standalone.file}.zip</file>
-							<summary>ELK reasoner standalone executable version
-								${project.version}</summary>
-							<labels>
-								<label>Featured</label>
-								<label>OpSys-All</label>
-								<label>Type-Archive</label>
-							</labels>
-						</upload>
-						<upload>
-							<file>${project.build.directory}/${elk-protege.file}.zip</file>
-							<summary>ELK reasoner Protege plugin version ${project.version}</summary>
-							<labels>
-								<label>Featured</label>
-								<label>OpSys-All</label>
-								<label>Type-Archive</label>
-							</labels>
-						</upload>
-						<upload>
-							<file>${project.build.directory}/${elk-owlapi.file}.zip</file>
-							<summary>ELK reasoner library for OWL API version
-								${project.version}</summary>
-							<labels>
-								<label>Featured</label>
-								<label>OpSys-All</label>
-								<label>Type-Archive</label>
-							</labels>
-						</upload>
-					</uploads>
-				</configuration>
-			</plugin>
-			<plugin>
-				<!-- the plugin for manipulating with Source Control Management (SCM) 
-					systems -->
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>wagon-maven-plugin</artifactId>
-				<version>1.0-beta-3</version>
-				<dependencies>
-					<dependency>
-						<!-- the subversion SCM plugin -->
-						<groupId>com.google.code.maven-svn-wagon</groupId>
-						<artifactId>maven-svn-wagon</artifactId>
-						<version>1.4</version>
-					</dependency>
-				</dependencies>
-				<executions>
-					<execution>
-						<!-- uploading the following files during the project deployment phase -->
-						<phase>deploy</phase>
-						<goals>
-							<goal>upload</goal>
-						</goals>
+	<profiles>
+		<!-- these actions will be activated only when staging a release -->
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- the plugin used to upload the release files to googlecode -->
+						<groupId>com.googlecode.maven-gcu-plugin</groupId>
+						<artifactId>maven-gcu-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+							<execution>
+								<phase>deploy</phase>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+							</execution>
+						</executions>
 						<configuration>
 							<!-- the server and access credentials should be defined in the maven 
 								user configuration file (usually ~/.m2/settings.xml) -->
 							<serverId>elk-reasoner.googlecode.com</serverId>
-							<fromDir>${basedir}/target</fromDir>
-							<includes>update.properties,version-info.txt</includes>
-							<!-- uploading the update.properties and version-info.txt files to 
-								the resources folder of the googlecode svn -->
-							<url>svn:https://elk-reasoner.googlecode.com/svn/resources/elk-reasoner</url>
+							<failsOnError>true</failsOnError>
+							<projectName>elk-reasoner</projectName>
+							<uploads>
+								<upload>
+									<file>${project.build.directory}/${elk-standalone.file}.zip</file>
+									<summary>ELK reasoner standalone executable version
+										${project.version}</summary>
+									<labels>
+										<label>Featured</label>
+										<label>OpSys-All</label>
+										<label>Type-Archive</label>
+									</labels>
+								</upload>
+								<upload>
+									<file>${project.build.directory}/${elk-protege.file}.zip</file>
+									<summary>ELK reasoner Protege plugin version ${project.version}</summary>
+									<labels>
+										<label>Featured</label>
+										<label>OpSys-All</label>
+										<label>Type-Archive</label>
+									</labels>
+								</upload>
+								<upload>
+									<file>${project.build.directory}/${elk-owlapi.file}.zip</file>
+									<summary>ELK reasoner library for OWL API version
+										${project.version}</summary>
+									<labels>
+										<label>Featured</label>
+										<label>OpSys-All</label>
+										<label>Type-Archive</label>
+									</labels>
+								</upload>
+							</uploads>
 						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+					</plugin>
+					<plugin>
+						<!-- the plugin for manipulating with Source Control Management (SCM) 
+							systems -->
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>wagon-maven-plugin</artifactId>
+						<version>1.0-beta-3</version>
+						<dependencies>
+							<dependency>
+								<!-- the subversion SCM plugin -->
+								<groupId>com.google.code.maven-svn-wagon</groupId>
+								<artifactId>maven-svn-wagon</artifactId>
+								<version>1.4</version>
+							</dependency>
+						</dependencies>
+						<executions>
+							<execution>
+								<!-- uploading the following files during the project deployment 
+									phase -->
+								<phase>deploy</phase>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+								<configuration>
+									<!-- the server and access credentials should be defined in the 
+										maven user configuration file (usually ~/.m2/settings.xml) -->
+									<serverId>elk-reasoner.googlecode.com</serverId>
+									<fromDir>${basedir}/target</fromDir>
+									<includes>update.properties,version-info.txt</includes>
+									<!-- uploading the update.properties and version-info.txt files 
+										to the resources folder of the googlecode svn -->
+									<url>svn:https://elk-reasoner.googlecode.com/svn/resources/elk-reasoner</url>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<reporting>
 		<plugins>
@@ -398,7 +414,7 @@
 				<!-- the plugin to generate changes log and release announcements -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-changes-plugin</artifactId>
-				<version>2.7</version>
+				<version>2.7.1</version>
 				<configuration>
 					<!-- the changes filtered source changes file -->
 					<xmlPath>${basedir}/target/changes.xml</xmlPath>

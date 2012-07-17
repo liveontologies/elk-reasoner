@@ -39,7 +39,7 @@ public interface KeyEntryFactory<T> {
 	 * stored.
 	 * 
 	 * @param key
-	 * @return
+	 * @return the key entry of the given type for the given key
 	 */
 	KeyEntry<T, ? extends T> createEntry(T key);
 

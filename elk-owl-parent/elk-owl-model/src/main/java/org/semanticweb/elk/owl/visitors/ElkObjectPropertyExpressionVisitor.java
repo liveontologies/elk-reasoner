@@ -33,8 +33,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
  * Visitor pattern interface for instances of
  * {@link ElkObjectPropertyExpression}.
  * 
- * @author Yevgeny Kazakov
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the output type of the visitor
  */
 public interface ElkObjectPropertyExpressionVisitor<O> {
 

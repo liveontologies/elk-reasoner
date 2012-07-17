@@ -26,13 +26,18 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /**
- * Visitor pattern interface for instances of {@link ElkSubObjectPropertyExpression}.
+ * Visitor pattern interface for instances of
+ * {@link ElkSubObjectPropertyExpression}.
+ * 
  * @author Frantisek
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the output type of the visitor
  */
-public interface ElkSubObjectPropertyExpressionVisitor<O> 
-		extends ElkObjectPropertyExpressionVisitor<O> {
-	
+public interface ElkSubObjectPropertyExpressionVisitor<O> extends
+		ElkObjectPropertyExpressionVisitor<O> {
+
 	O visit(ElkObjectPropertyChain elkObjectPropertyChain);
 
 }

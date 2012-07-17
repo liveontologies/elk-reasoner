@@ -35,11 +35,16 @@ import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of the wrapped {@link OWLAnnotationAssertionAxiom}
  */
-public class ElkAnnotationAssertionAxiomWrap<T extends OWLAnnotationAssertionAxiom> extends ElkAxiomWrap<T> implements ElkAnnotationAssertionAxiom {
+public class ElkAnnotationAssertionAxiomWrap<T extends OWLAnnotationAssertionAxiom>
+		extends ElkAxiomWrap<T> implements ElkAnnotationAssertionAxiom {
 
 	public ElkAnnotationAssertionAxiomWrap(T owlAxiom) {
 		super(owlAxiom);
@@ -49,7 +54,7 @@ public class ElkAnnotationAssertionAxiomWrap<T extends OWLAnnotationAssertionAxi
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
@@ -69,8 +74,5 @@ public class ElkAnnotationAssertionAxiomWrap<T extends OWLAnnotationAssertionAxi
 	public ElkAnnotationValue getValue() {
 		return converter.convert(owlObject.getValue());
 	}
-
-
-	
 
 }

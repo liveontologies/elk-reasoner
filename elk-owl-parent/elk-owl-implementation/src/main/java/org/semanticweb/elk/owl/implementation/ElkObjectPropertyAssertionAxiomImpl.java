@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 
 /**
- * Implementation of {@link ElkObjectPropertyAssertion}.
+ * Implementation of {@link ElkObjectPropertyAssertionAxiom}.
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"

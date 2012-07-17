@@ -32,7 +32,7 @@ package org.semanticweb.elk.owl.interfaces;
 public interface ElkCardinalityRestriction<P> extends ElkPropertyRestriction<P> {
 
 	/**
-	 * Get the cardinality that this expression refers to.
+	 * @return the cardinality that this expression refers to.
 	 */
 	int getCardinality();
 

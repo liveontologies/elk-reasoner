@@ -65,7 +65,7 @@ public class QueryingUnnamedClassExpressions {
 		OWLReasoner reasoner = reasonerFactory.createReasoner(ont);
 
 		// Create your desired query class expression. In this example we
-		// will query ObjectIntersectionOf(A ObjectSomeValuesFrom(R, B)).
+		// will query ObjectIntersectionOf(A ObjectSomeValuesFrom(R B)).
 		PrefixManager pm = new DefaultPrefixManager("http://example.org/");
 		OWLClass A = dataFactory.getOWLClass(":A", pm);
 		OWLObjectProperty R = dataFactory.getOWLObjectProperty(":R", pm);
@@ -95,7 +95,13 @@ public class QueryingUnnamedClassExpressions {
 		reasoner.getSuperClasses(newName, true);
 		reasoner.getInstances(newName, false);
 
-		// Terminate the worker threads used by the reasoner.
+		// After you are done with the query, you should remove the definition
+		man.removeAxiom(ont, definition);
+
+		// You can now add new definitions for new queries in the same way
+
+		// After you are done with all queries, do not forget to free the
+		// resources occupied by the reasoner
 		reasoner.dispose();
 	}
 }

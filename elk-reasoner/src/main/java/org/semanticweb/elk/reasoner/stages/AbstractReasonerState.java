@@ -34,8 +34,8 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -89,7 +89,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * {@code true} if the reasoner is interrupted
 	 */
-	volatile boolean isInterrupted = false;
+	private volatile boolean isInterrupted_ = false;
 	/**
 	 * {@code true} if all stages have been reseted after changes
 	 */
@@ -120,17 +120,25 @@ public abstract class AbstractReasonerState {
 	 * Reset the loading stage and all subsequent stages
 	 */
 	private void resetLoading() {
+		if (this.ontologyLoader != null) {
+			this.ontologyLoader.dispose();
+			this.ontologyLoader = null;
+		}
 		if (doneLoading) {
 			doneLoading = false;
 			ontologyIndex.clear();
-			resetChangesLoading();
 		}
+		resetChangesLoading();
 	}
 
 	/**
 	 * Reset the changes loading stage and all subsequent stages
 	 */
 	private void resetChangesLoading() {
+		if (this.changesLoader != null) {
+			this.changesLoader.dispose();
+			this.changesLoader = null;
+		}
 		if (doneChangeLoading) {
 			doneChangeLoading = false;
 			doneObjectPropertyHierarchyComputation = false;
@@ -143,16 +151,16 @@ public abstract class AbstractReasonerState {
 	}
 
 	public void registerOntologyLoader(OntologyLoader ontologyLoader) {
+		resetLoading();
 		this.ontologyLoader = ontologyLoader.getLoader(ontologyIndex
 				.getAxiomInserter());
-		resetLoading();
 	}
 
 	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
+		resetChangesLoading();
 		this.changesLoader = changesLoader.getLoader(
 				ontologyIndex.getAxiomInserter(),
 				ontologyIndex.getAxiomDeleter());
-		resetChangesLoading();
 	}
 
 	/**
@@ -207,10 +215,25 @@ public abstract class AbstractReasonerState {
 	public void interrupt() {
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("Interrupt requested");
-		isInterrupted = true;
+		isInterrupted_ = true;
 		ReasonerStageExecutor stageExecutor = getStageExecutor();
 		if (stageExecutor != null)
 			stageExecutor.interrupt();
+	}
+
+	/**
+	 * @return {@code true} if the reasoner has been interrupted and the
+	 *         interrupt status of the reasoner has not been cleared yet
+	 */
+	public boolean isInterrupted() {
+		return isInterrupted_;
+	}
+
+	/**
+	 * clears the interrupt status of the reasoner
+	 */
+	public void clearInterrupt() {
+		isInterrupted_ = false;
 	}
 
 	/**
@@ -260,8 +283,7 @@ public abstract class AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public Taxonomy<ElkClass> getTaxonomy()
-			throws ElkInconsistentOntologyException, ElkException {
+	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
 		if (!isConsistent())
 			throw new ElkInconsistentOntologyException();
 
@@ -285,7 +307,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
-			throws ElkInconsistentOntologyException, ElkException {
+			throws ElkException {
 		if (!isConsistent())
 			throw new ElkInconsistentOntologyException();
 

@@ -23,36 +23,25 @@
 package org.semanticweb.elk.reasoner;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.TestOutput;
 
 public class ClassTaxonomyTestOutput implements TestOutput {
 
-	protected final boolean consistent;
 	protected final Taxonomy<ElkClass> taxonomy;
 
 	ClassTaxonomyTestOutput(Taxonomy<ElkClass> taxonomy) {
-		this.consistent = true;
 		this.taxonomy = taxonomy;
 	}
 
-	public ClassTaxonomyTestOutput() {
-		this.consistent = false;
-		this.taxonomy = null;
-	}
-
 	int getHashCode() {
-		if (consistent)
-			return TaxonomyHasher.hash(taxonomy);
-		else
-			return 0;
+		return TaxonomyHasher.hash(taxonomy);
 	}
 
 	@Override
 	public String toString() {
 		return String.valueOf(getHashCode());
 	}
-	
-	
+
 }

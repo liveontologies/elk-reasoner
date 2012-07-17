@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
@@ -58,9 +59,10 @@ public class OwlObjectInverseOfConverterVisitor implements
 
 	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectInverseOf property) {
-		//return property.accept(OWL_OBJECT_INVERSE_OF_CONVERTER);
-		//Isn't the following sufficient?
-		return new ElkObjectInverseOfWrap<OWLObjectProperty>(property.getNamedProperty());
+		// return property.accept(OWL_OBJECT_INVERSE_OF_CONVERTER);
+		// Isn't the following sufficient?
+		return new ElkObjectInverseOfWrap<OWLObjectProperty>(
+				property.getNamedProperty());
 	}
 
 	@Override

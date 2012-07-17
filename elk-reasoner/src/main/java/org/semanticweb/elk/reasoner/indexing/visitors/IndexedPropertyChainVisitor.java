@@ -28,7 +28,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  * Visitor pattern interface for instances of {@link IndexedPropertyChain}.
  * 
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public interface IndexedPropertyChainVisitor<O> extends
 		IndexedObjectPropertyVisitor<O>, IndexedBinaryPropertyChainVisitor<O> {

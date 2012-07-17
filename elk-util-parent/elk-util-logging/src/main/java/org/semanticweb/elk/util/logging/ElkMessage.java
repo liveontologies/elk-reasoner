@@ -38,9 +38,9 @@ public class ElkMessage {
 
 	/**
 	 * Create a new message. The message can be an arbitrary string, possibly
-	 * with linebreaks (this is encouraged for very long messages). The
+	 * with line breaks (this is encouraged for very long messages). The
 	 * messageType should be a global identifier for the kind of message,
-	 * preferably human-readable and starting lowercase, such as
+	 * preferably human-readable and starting lower case, such as
 	 * "unsupportedFeature". Dots could be used to relate a message type to a
 	 * Java package/class, but mentioning ELK is not useful (start only after
 	 * "org.semantiweb.elk").

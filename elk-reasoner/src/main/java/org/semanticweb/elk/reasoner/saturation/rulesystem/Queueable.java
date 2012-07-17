@@ -28,11 +28,11 @@ package org.semanticweb.elk.reasoner.saturation.rulesystem;
  * derivation, so they should be lightweight data containers. Queueables are
  * affiliated with a {@link Context} during processing, and together with the
  * information in the context the derivation is uniquely determined. For
- * example, if it is derived that class <tt>A</tt> is a subclass of class
- * <tt>B</tt>, then a Queueable that is related to the context of <tt>A</tt>
- * only needs to store <tt>B</tt>. When a queued item is processed, it is stored
- * in its context. Therefore, it may require certain context implementations to
- * be used.
+ * example, if it is derived that class {@code A} is a subclass of class
+ * {@code B}, then a Queueable that is related to the context of {@code A} only
+ * needs to store {@code B}. When a queued item is processed, it is stored in
+ * its context. Therefore, it may require certain context implementations to be
+ * used.
  * 
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
@@ -48,7 +48,10 @@ public interface Queueable<C extends Context> {
 	 * performed by the supplied rule application engine.
 	 * 
 	 * @param context
-	 * @return <tt>true</tt> if context has been modified by this action
+	 *            the context in which this {@link Queueable} should be stored
+	 * @param engine
+	 *            the engine which is used for storing this {@link Queueable}
+	 * @return {@code true} if context has been modified by this action
 	 */
 	public boolean storeInContext(C context,
 			RuleApplicationFactory.Engine engine);

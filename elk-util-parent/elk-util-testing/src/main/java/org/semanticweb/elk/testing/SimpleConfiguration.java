@@ -34,6 +34,9 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @param <I> 
+ * @param <EO> 
+ * @param <AO> 
  */
 public class SimpleConfiguration<I extends TestInput, EO extends TestOutput, AO extends TestOutput> implements Configuration {
 

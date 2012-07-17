@@ -32,34 +32,20 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
  */
 public class ElkInterruptedException extends ElkException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7774912476379495291L;
 
-	/**
-	 * 
-	 */
 	public ElkInterruptedException() {
 		super();
 	}
 
-	/**
-	 */
 	public ElkInterruptedException(String message) {
 		super(message);
 	}
 
-	/**
-	 * 
-	 */
 	public ElkInterruptedException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	/**
-	 * 
-	 */
 	public ElkInterruptedException(Throwable cause) {
 		super(cause);
 	}

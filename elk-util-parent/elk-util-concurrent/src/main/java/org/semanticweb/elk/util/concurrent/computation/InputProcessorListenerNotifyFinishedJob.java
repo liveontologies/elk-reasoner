@@ -23,8 +23,8 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * A listener to be used with {@link InputProcessor<J>} that can be used to
- * perform actions when a job is processed.
+ * A listener to be used with {@link InputProcessor} that can be used to perform
+ * actions when a job is processed.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -40,9 +40,10 @@ public interface InputProcessorListenerNotifyFinishedJob<J, P extends InputProce
 	 * This function is called after the input processor detects when the job is
 	 * fully processed. When the submitted job is processed, this method will be
 	 * guaranteed to be called with this job as an argument. If
-	 * {@link P#submit(job)} is called followed with {@link P#process()}, it is
-	 * guaranteed that {@link P#notifyFinished(job)} will be called (perhaps
-	 * from some other thread) before no instance of {@link P#process()} is
+	 * {@link InputProcessor#submit(Object)} is called followed with
+	 * {@link InputProcessor#process()}, it is guaranteed that
+	 * {@link #notifyFinished(Object)} will be called (perhaps from some other
+	 * thread) before no instance of {@link InputProcessor#process()} is
 	 * running.
 	 * 
 	 * @param job

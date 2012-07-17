@@ -104,33 +104,36 @@ import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Visitor for ElkObject that returns the standard OWL2 of each constructor. 
+ * Visitor for {@link ElkObject} that returns the standard OWL2 name of each
+ * constructor.
  * 
  * @author Frantisek Simancik
  * 
  */
 public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
-	
+
 	private static OwlObjectNameVisitor _INSTANCE = new OwlObjectNameVisitor();
-	
+
 	/**
 	 * Returns the standard OWL2 name of the given ELK object.
 	 * 
 	 * @param elkObject
+	 *            the object for which to return the OWL2 name
+	 * @return the name of the top object' constructor
 	 */
 	public static String getName(ElkObject elkObject) {
 		return elkObject.accept(_INSTANCE);
 	}
-	
-/*  Declaration Axioms */
-	
+
+	/* Declaration Axioms */
+
 	@Override
 	public String visit(ElkDeclarationAxiom elkDeclarationAxiom) {
 		return "Declaration";
 	}
 
-/*  Class Axioms */	
-	
+	/* Class Axioms */
+
 	@Override
 	public String visit(ElkDisjointClassesAxiom elkDisjointClasses) {
 		return "DisjointClasses";
@@ -151,8 +154,8 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 		return "SubClassOf";
 	}
 
-/*	Object Property Axioms */	
-	
+	/* Object Property Axioms */
+
 	@Override
 	public String visit(
 			ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom) {
@@ -228,8 +231,8 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
 		return "TransitiveObjectProperty";
 	}
-	
-/*	Data Property Axioms */
+
+	/* Data Property Axioms */
 
 	@Override
 	public String visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom) {
@@ -263,23 +266,23 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	public String visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom) {
 		return "SubDataPropertyOf";
 	}
-	
-/*	Datatype Definition Axioms */	
-	
+
+	/* Datatype Definition Axioms */
+
 	@Override
 	public String visit(ElkDatatypeDefinitionAxiom datatypeDefn) {
 		return "DatatypeDefinition";
 	}
-	
-/*	Key Axioms */
+
+	/* Key Axioms */
 
 	@Override
 	public String visit(ElkHasKeyAxiom elkHasKey) {
 		return "HasKey";
 	}
-	
-/*	Assertion Axioms */	
-	
+
+	/* Assertion Axioms */
+
 	@Override
 	public String visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
 		return "ClassAssertion";
@@ -320,8 +323,8 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 		return "SameIndividual";
 	}
 
-/*	Annotation Axioms */	
-	
+	/* Annotation Axioms */
+
 	@Override
 	public String visit(
 			ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOfAxiom) {
@@ -339,22 +342,21 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 			ElkAnnotationPropertyRangeAxiom annotationPropertyRangeAxiom) {
 		return "AnnotationPropertyRange";
 	}
-	
+
 	@Override
 	public String visit(ElkAnnotationAssertionAxiom elkAnnotationAssertionAxiom) {
 		return "AnnotationAssertion";
 	}
-	
-/*  Class Expressions */
-	
+
+	/* Class Expressions */
+
 	@Override
 	public String visit(ElkClass elkClass) {
 		return "Class";
 	}
 
 	@Override
-	public String visit(
-			ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
+	public String visit(ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
 		return "ObjectAllValuesFrom";
 	}
 
@@ -364,13 +366,13 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(
-			ElkObjectExactCardinality elkObjectExactCardinality) {
+	public String visit(ElkObjectExactCardinality elkObjectExactCardinality) {
 		return "ObjectExactCardinality";
 	}
 
 	@Override
-	public String visit(ElkObjectExactCardinalityQualified elkObjectExactCardinalityQualified) {
+	public String visit(
+			ElkObjectExactCardinalityQualified elkObjectExactCardinalityQualified) {
 		return "ObjectExactCardinality";
 	}
 
@@ -395,7 +397,8 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkObjectMaxCardinalityQualified elkObjectMaxCardinalityQualified) {
+	public String visit(
+			ElkObjectMaxCardinalityQualified elkObjectMaxCardinalityQualified) {
 		return "ObjectMaxCardinality";
 	}
 
@@ -405,7 +408,8 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkObjectMinCardinalityQualified elkObjectMinCardinalityQualified) {
+	public String visit(
+			ElkObjectMinCardinalityQualified elkObjectMinCardinalityQualified) {
 		return "ObjectMinCardinality";
 	}
 
@@ -435,7 +439,8 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkDataMaxCardinalityQualified elkDataMaxCardinalityQualified) {
+	public String visit(
+			ElkDataMaxCardinalityQualified elkDataMaxCardinalityQualified) {
 		return "DataMaxCardinality ";
 	}
 
@@ -445,7 +450,8 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkDataMinCardinalityQualified elkDataMinCardinalityQualified) {
+	public String visit(
+			ElkDataMinCardinalityQualified elkDataMinCardinalityQualified) {
 		return "DataMinCardinality";
 	}
 
@@ -455,7 +461,8 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkDataExactCardinalityQualified elkDataExactCardinalityQualified) {
+	public String visit(
+			ElkDataExactCardinalityQualified elkDataExactCardinalityQualified) {
 		return "DataMinCardinality";
 	}
 
@@ -469,45 +476,44 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 		return "DataAllValues";
 	}
 
-/*	Object Property Expressions */
+	/* Object Property Expressions */
 
 	@Override
 	public String visit(ElkObjectProperty elkObjectProperty) {
 		return "ObjectProperty";
 	}
-	
+
 	@Override
 	public String visit(ElkObjectInverseOf elkObjectInverseOf) {
 		return "ObjectInverseOf";
 	}
 
-
 	@Override
 	public String visit(ElkObjectPropertyChain elkObjectPropertyChain) {
 		return "ObjectPropertyChain";
 	}
-	
-/*	Data Property Expressions */
-	
+
+	/* Data Property Expressions */
+
 	@Override
 	public String visit(ElkDataProperty elkDataProperty) {
 		return "DataProperty";
 	}
 
-/*  Individuals */	
-	
+	/* Individuals */
+
 	@Override
 	public String visit(ElkAnonymousIndividual elkAnonymousIndividual) {
 		return "AnonymousIndividual";
 	}
-	
+
 	@Override
 	public String visit(ElkNamedIndividual elkNamedIndividual) {
 		return "NamedIndividual";
 	}
-	
-/*  Data Ranges */
-	
+
+	/* Data Ranges */
+
 	@Override
 	public String visit(ElkDataComplementOf elkDataComplementOf) {
 		return "DataComplementOf";
@@ -532,9 +538,9 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	public String visit(ElkDataUnionOf elkDataUnionOf) {
 		return "DataUnionOf";
 	}
-	
-	/*  Other */
-	
+
+	/* Other */
+
 	@Override
 	public String visit(ElkAnnotation elkAnnotation) {
 		return "Annotation";
@@ -550,8 +556,12 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 		return "IRI";
 	}
 
-	/* (non-Javadoc)
-	 * @see org.semanticweb.elk.owl.visitors.ElkFacetRestrictionVisitor#visit(org.semanticweb.elk.owl.interfaces.ElkFacetRestriction)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.visitors.ElkFacetRestrictionVisitor#visit(org
+	 * .semanticweb.elk.owl.interfaces.ElkFacetRestriction)
 	 * 
 	 * This object does not exist in the standard OWL2 syntax.
 	 */
@@ -569,5 +579,5 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	public String visit(ElkLiteral elkLiteral) {
 		return "Literal";
 	}
-	
+
 }
