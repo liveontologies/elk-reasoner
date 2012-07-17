@@ -99,7 +99,6 @@ public class ProtegeMessageAppender extends MessageDialogAppender {
 							+ "</p>"
 							+ "<p>"
 							+ "Please go to <b>Reasoner -> Configure -> Displayed Inferences</b> and uncheck:"
-							+ "<ul type=\"square\">"
 							+ "<li><b>Disjoint Classes</b> in <b>Displayed Class Inferences</b>"
 							+ "<li>All <b>Displayed Object Property Inferences</b>"
 							+ "<li>All <b>Displayed Data Property Inferences</b>"
