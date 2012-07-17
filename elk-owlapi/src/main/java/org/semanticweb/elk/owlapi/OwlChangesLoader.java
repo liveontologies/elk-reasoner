@@ -33,11 +33,9 @@ import org.semanticweb.elk.loading.ChangesLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.util.logging.Statistics;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
@@ -78,7 +76,6 @@ public class OwlChangesLoader implements ChangesLoader {
 			public void load() throws ElkLoadingException {
 				if (!pendingChanges.isEmpty()) {
 					String status = ReasonerProgressMonitor.LOADING;
-					Statistics.logOperationStart(status, LOGGER_);
 					progressMonitor.start(status);
 					int axiomCount = pendingChanges.size();
 					int currentAxiom = 0;
@@ -102,7 +99,6 @@ public class OwlChangesLoader implements ChangesLoader {
 						progressMonitor.report(currentAxiom, axiomCount);
 					}
 					progressMonitor.finish();
-					Statistics.logOperationFinish(status, LOGGER_);
 				}
 			}
 
