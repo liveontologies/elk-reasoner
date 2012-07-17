@@ -170,8 +170,11 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-		String displayLabel = event.getRenderedMessage();
-		WrappingLabel label = new WrappingLabel(displayLabel, 600);
+		String messageText = event.getRenderedMessage();
+		// truncating too long message text
+		if (messageText.length() > 520)
+			messageText = messageText.substring(0, 500) + "...";
+		WrappingLabel label = new WrappingLabel(messageText, 600);
 
 		label.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(label);
