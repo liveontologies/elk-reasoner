@@ -73,11 +73,10 @@ public class ProtegeMessageAppender extends MessageDialogAppender {
 	 */
 	@Override
 	protected String getCheckboxMessage(LoggingEvent event) {
-		return String
-				.format("<html><div style=\"width:%dpx;\">"
-						+ "<p>Do not show further messages of this kind in this session</p>"
-						+ "<p>(the messages can still be seen in the console if Prot&eacute;g&eacute; was started from the command line)</p>"
-						+ "</div></html>", 450);
+		return "<html><div style=\"width:%dpx;\">"
+				+ "<p>Do not show further messages of this kind in this session</p>"
+				+ "<p>(the messages can still be seen in the console if Prot&eacute;g&eacute; was started from the command line)</p>"
+				+ "</div></html>";
 	}
 
 	@Override

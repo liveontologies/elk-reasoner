@@ -171,16 +171,14 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 		String displayLabel = event.getRenderedMessage();
-		WrappingLabel label = new WrappingLabel(displayLabel, 40/*
-																 * 40 characters
-																 * should be a
-																 * decent length
-																 */);
+		WrappingLabel label = new WrappingLabel(displayLabel, 600);
 
 		label.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(label);
 
-		JCheckBox ignoreMessageButton = new JCheckBox(getCheckboxMessage(event));
+		// it is important that the checkbox message is not too wide
+		JCheckBox ignoreMessageButton = new JCheckBox(String.format(
+				getCheckboxMessage(event), 450));
 
 		if (messageType != null) {
 			ignoreMessageButton.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -228,7 +226,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 class WrappingLabel extends JTextArea {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -1028283148775499046L;
 
 	public WrappingLabel(String text, int width) {
 		super(text);
@@ -236,10 +234,13 @@ class WrappingLabel extends JTextArea {
 		setBackground(null);
 		setEditable(false);
 		setBorder(null);
+		setFocusable(false);
+
 		setLineWrap(true);
 		setWrapStyleWord(true);
-		setFocusable(false);
-		setColumns(width);
-		setRows(text.length() / width);
+		setText(text);
+		setSize(width, 1);
+		setSize(getPreferredSize());
+
 	}
 }
