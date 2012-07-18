@@ -924,11 +924,16 @@ public class ElkReasoner implements OWLReasoner {
 		public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
 				throws OWLException {
 			for (OWLOntologyChange change : changes) {
-				ontologyChangesLoader_.registerChange(change);
-				if (!change.isAxiomChange())
+				if (!change.isAxiomChange()) {
 					// currently we cannot handle non-axiom changes
 					// incrementally
+					if (LOGGER_.isTraceEnabled()) {
+						LOGGER_.trace("registering non-axiom change");
+					}
 					ontologyReloadRequired_ = true;
+					break;
+				}
+				ontologyChangesLoader_.registerChange(change);
 			}
 			if (!isBufferingMode_)
 				flush();
