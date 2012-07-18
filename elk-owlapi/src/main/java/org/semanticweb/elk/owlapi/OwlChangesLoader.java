@@ -40,7 +40,6 @@ import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.RemoveAxiom;
-import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 
 /**
  * An {@link ChangesLoader} that accumulates the {@link OWLOntologyChange} and
@@ -75,9 +74,11 @@ public class OwlChangesLoader implements ChangesLoader {
 			@Override
 			public void load() throws ElkLoadingException {
 				if (!pendingChanges.isEmpty()) {
-					String status = ReasonerProgressMonitor.LOADING;
+					String status = "Loading of Changes";
 					progressMonitor.start(status);
-					int axiomCount = pendingChanges.size();
+					int changesCount = pendingChanges.size();
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace(status + ": " + changesCount);
 					int currentAxiom = 0;
 					for (;;) {
 						if (Thread.currentThread().isInterrupted())
@@ -86,17 +87,21 @@ public class OwlChangesLoader implements ChangesLoader {
 								.poll();
 						if (change == null)
 							break;
-						ElkAxiom axiom = OWL_CONVERTER_.convert(change
-								.getAxiom());
+						OWLAxiom owlAxiom = change.getAxiom();
+						ElkAxiom elkAxiom = OWL_CONVERTER_.convert(owlAxiom);
 						if (change instanceof AddAxiom) {
-							axiomInserter.visit(axiom);
+							axiomInserter.visit(elkAxiom);
+							if (LOGGER_.isTraceEnabled())
+								LOGGER_.trace("adding " + owlAxiom);
 						} else if (change instanceof RemoveAxiom) {
-							axiomDeleter.visit(axiom);
+							axiomDeleter.visit(elkAxiom);
+							if (LOGGER_.isTraceEnabled())
+								LOGGER_.trace("removing " + owlAxiom);
 						} else
 							throw new ElkLoadingException(
 									"Change type is not supported!");
 						currentAxiom++;
-						progressMonitor.report(currentAxiom, axiomCount);
+						progressMonitor.report(currentAxiom, changesCount);
 					}
 					progressMonitor.finish();
 				}
