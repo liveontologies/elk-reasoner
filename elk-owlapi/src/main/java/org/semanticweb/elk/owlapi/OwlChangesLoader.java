@@ -87,6 +87,12 @@ public class OwlChangesLoader implements ChangesLoader {
 								.poll();
 						if (change == null)
 							break;
+						if (!change.isAxiomChange()) {
+							ElkLoadingException exception = new ElkLoadingException(
+									"Cannot apply non-axiom change!");
+							LOGGER_.error(exception);
+							throw exception;
+						}
 						OWLAxiom owlAxiom = change.getAxiom();
 						ElkAxiom elkAxiom = OWL_CONVERTER_.convert(owlAxiom);
 						if (change instanceof AddAxiom) {
@@ -115,16 +121,7 @@ public class OwlChangesLoader implements ChangesLoader {
 	}
 
 	void registerChange(OWLOntologyChange change) {
-		if (!change.isAxiomChange())
-			throw new UnsupportedOperationException("Not an axiom change!");
-		OWLAxiom axiom = change.getAxiom();
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("registering "
-					+ ((change instanceof AddAxiom) ? "addition" : "removal")
-					+ " of " + axiom.toString());
-		}
-		if (OWL_CONVERTER_.isRelevantAxiom(axiom))
-			pendingChanges.add(change);
+		pendingChanges.add(change);
 	}
 
 	Set<OWLAxiom> getPendingAxiomAdditions() {
