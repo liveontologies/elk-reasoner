@@ -15,9 +15,7 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-		<release version="${release.version}" date="${buildDate}" description="Current version">
-		</release>
-		<release version="0.3.0" date="2012-07-19" description="Third public release">			
+		<release version="${release.version}" date="${buildDate}" description="Current version">			
 			<action dev="frantisek" type="fix" issue="6">
 				Fixed NullPointerException when loading ontologies with ObjectMinCardinality and ObjectExactCardinality constructors that have empty fillers.
 			</action>
