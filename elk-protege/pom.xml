@@ -31,10 +31,6 @@
 			<version>0.3.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-common</artifactId>
 			<version>0.3.0-SNAPSHOT</version>
@@ -53,6 +49,10 @@
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-reasoner</artifactId>
 			<version>0.3.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
 		</dependency>
 	</dependencies>
 

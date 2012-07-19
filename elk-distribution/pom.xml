@@ -49,9 +49,19 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
+			<artifactId>owlapi-api</artifactId>
+			<version>${owlapi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
 			<version>${owlapi.version}</version>
 			<classifier>bin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
@@ -120,7 +130,6 @@
 							</resources>
 						</configuration>
 					</execution>
-
 					<execution>
 						<id>copy-resources</id>
 						<phase>validate</phase>
