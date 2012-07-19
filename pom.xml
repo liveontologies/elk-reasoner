@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.semanticweb.elk</groupId>
 	<artifactId>elk-parent</artifactId>
-	<version>0.3.0</version>
+	<version>0.3.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -32,9 +32,9 @@
 	</modules>
 
 	<scm>
-		<connection>scm:svn:http://elk-reasoner.googlecode.com/svn/tags/elk-parent-0.3.0</connection>
-		<developerConnection>scm:svn:https://elk-reasoner.googlecode.com/svn/tags/elk-parent-0.3.0</developerConnection>
-		<url>http://elk-reasoner.googlecode.com/svn/tags/elk-parent-0.3.0</url>
+		<connection>scm:svn:http://elk-reasoner.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://elk-reasoner.googlecode.com/svn/trunk/</developerConnection>
+		<url>http://elk-reasoner.googlecode.com/svn/trunk/</url>
 	</scm>
 
 	<licenses>
