@@ -317,7 +317,7 @@
 	<profiles>
 		<!-- these actions will be activated only when staging a release -->
 		<profile>
-			<id>release-sign-artifacts</id>
+			<id>upload-files</id>
 			<activation>
 				<property>
 					<name>performRelease</name>
