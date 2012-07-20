@@ -85,7 +85,7 @@ public class BaseConfiguration {
 					paramValue = validator.create(annotation.value())
 							.toString();
 
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					throw new ConfigurationException(
 							"Perhaps incorrect declaration of the configuration parameter "
 									+ field.getName(), e);
@@ -123,7 +123,7 @@ public class BaseConfiguration {
 		try {
 			if (validator != null)
 				validator.create(value);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			return false;
 		}
 

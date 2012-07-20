@@ -74,7 +74,7 @@ public class FuncSyntaxParsingTask implements Task {
 						throws Owl2ParseException {
 				}
 			});
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			throw new TaskException(e);
 		} finally {
 			IOUtils.closeQuietly(stream);

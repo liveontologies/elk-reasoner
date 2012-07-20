@@ -129,7 +129,7 @@ public class ConfigurationFactory {
 			loadedConfig = getConfiguration(stream, "", config.getClass());
 			// copy parameters
 			copyParameters(loadedConfig, diskProps);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			LOGGER_.info("Overwriting configuration since it can't be loaded (perhaps doesn't exist?)");
 		} finally {
 			IOUtils.closeQuietly(stream);
@@ -191,7 +191,7 @@ public class ConfigurationFactory {
 
 			return config;
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			throw new ConfigurationException(
 					"Failed to instantiate the configuration class "
 							+ configClass);
