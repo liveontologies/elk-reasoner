@@ -130,77 +130,30 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  */
 class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 
-	/**
-	 * An auxiliary visitor class to print declarations.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
-	class EntityPrinter implements ElkEntityVisitor<Void> {
+	private final Appendable writer;
 
-		@Override
-		public Void visit(ElkAnnotationProperty elkAnnotationProperty) {
-			write("AnnotationProperty(");
-			write(elkAnnotationProperty);
-			write(')');
-			return null;
-		}
-
-		@Override
-		public Void visit(ElkClass elkClass) {
-			write("Class(");
-			write(elkClass);
-			write(')');
-			return null;
-		}
-
-		@Override
-		public Void visit(ElkDataProperty elkDataProperty) {
-			write("DataProperty(");
-			write(elkDataProperty);
-			write(')');
-			return null;
-		}
-
-		@Override
-		public Void visit(ElkDatatype elkDatatype) {
-			write("Datatype(");
-			write(elkDatatype);
-			write(')');
-			return null;
-		}
-
-		@Override
-		public Void visit(ElkNamedIndividual elkNamedIndividual) {
-			write("NamedIndividual(");
-			write(elkNamedIndividual);
-			write(')');
-			return null;
-		}
-
-		@Override
-		public Void visit(ElkObjectProperty elkObjectProperty) {
-			write("ObjectProperty(");
-			write(elkObjectProperty);
-			write(')');
-			return null;
-		}
-
-	}
-
-	protected final Appendable writer;
-
-	protected final EntityPrinter entityPrinter;
+	private final EntityPrinter entityPrinter;
+	private boolean expandAbbreviatedIris = false;
 
 	/**
 	 * Create a printer using a writer which can append strings.
 	 * 
 	 * @param writer
 	 *            the string appender used for printing
+	 * @param expandAbbreviatedIris
+	 *            if true, the printer will print abbreviated IRIs as full IRIs
+	 *            (in "<>")
+	 * 
 	 */
-	OwlFunctionalStylePrinterVisitor(Appendable writer) {
+	OwlFunctionalStylePrinterVisitor(Appendable writer,
+			boolean expandAbbreviatedIris) {
 		this.writer = writer;
 		this.entityPrinter = new EntityPrinter();
+		this.expandAbbreviatedIris = expandAbbreviatedIris;
+	}
+
+	OwlFunctionalStylePrinterVisitor(Appendable writer) {
+		this(writer, false);
 	}
 
 	@Override
@@ -478,7 +431,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 
 	@Override
 	public Void visit(ElkFacetRestriction elkFacetRestriction) {
-		write("<" + elkFacetRestriction.getConstrainingFacet() + ">");
+		write(elkFacetRestriction.getConstrainingFacet());
 		write(' ');
 		write(elkFacetRestriction.getRestrictionValue());
 		return null;
@@ -827,103 +780,6 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 		return null;
 	}
 
-	protected final void write(char ch) {
-		try {
-			writer.append(ch);
-		} catch (IOException e) {
-			throw new PrintingException(e.getMessage(), e.getCause());
-		}
-	}
-
-	protected final void write(ElkEntity elkEntity) {
-		write(elkEntity.getIri());
-	}
-
-	protected final void write(ElkObject elkObject) {
-		elkObject.accept(this);
-	}
-
-	protected final void write(Integer n) {
-		try {
-			writer.append(n.toString());
-		} catch (IOException e) {
-			throw new PrintingException(e.getMessage(), e.getCause());
-		}
-	}
-
-	protected final void write(Iterable<? extends ElkObject> elkObjects) {
-		boolean first = true;
-		for (ElkObject elkObject : elkObjects) {
-			if (!first)
-				write(' ');
-			else
-				first = false;
-			write(elkObject);
-		}
-	}
-
-	protected final void write(String string) {
-		try {
-			writer.append(string);
-		} catch (IOException e) {
-			throw new PrintingException(e.getMessage(), e.getCause());
-		}
-	}
-
-	protected final <P extends ElkObject> void write(
-			ElkPropertyRestriction<P> elkPropertyRestriction) {
-		write(elkPropertyRestriction.getProperty());
-	}
-
-	protected final <P extends ElkObject> void write(
-			ElkPropertyAxiom<P> elkPropertyAxiom) {
-		write(elkPropertyAxiom.getProperty());
-	}
-
-	protected final <P extends ElkObject, F extends ElkObject> void write(
-			ElkPropertyRestrictionQualified<P, F> elkQualifiedPropertyRestriction) {
-		write((ElkPropertyRestriction<P>) elkQualifiedPropertyRestriction);
-		write(' ');
-		write(elkQualifiedPropertyRestriction.getFiller());
-	}
-
-	protected final <P extends ElkObject> void write(
-			ElkCardinalityRestriction<P> elkCardinalityRestriction) {
-		write(elkCardinalityRestriction.getCardinality());
-		write(' ');
-		write((ElkPropertyRestriction<P>) elkCardinalityRestriction);
-	}
-
-	protected final <P extends ElkObject, F extends ElkObject> void write(
-			ElkCardinalityRestrictionQualified<P, F> elkQualifiedCardinalityRestriction) {
-		write((ElkCardinalityRestriction<P>) elkQualifiedCardinalityRestriction);
-		write(' ');
-		write(elkQualifiedCardinalityRestriction.getFiller());
-	}
-
-	protected final <P extends ElkObject, O extends ElkObject, R extends ElkObject> void write(
-			ElkPropertyAssertionAxiom<P, O, R> elkPropertyAssertionAxiom) {
-		write((ElkPropertyAxiom<P>) elkPropertyAssertionAxiom);
-		write(' ');
-		write(elkPropertyAssertionAxiom.getSubject());
-		write(' ');
-		write(elkPropertyAssertionAxiom.getObject());
-	}
-
-	protected final <P extends ElkObject, D extends ElkObject> void write(
-			ElkPropertyDomainAxiom<P, D> elkPropertyDomainAxiom) {
-		write((ElkPropertyAxiom<P>) elkPropertyDomainAxiom);
-		write(' ');
-		write(elkPropertyDomainAxiom.getDomain());
-	}
-
-	protected final <P extends ElkObject, R extends ElkObject> void write(
-			ElkPropertyRangeAxiom<P, R> elkPropertyRangeAxiom) {
-		write((ElkPropertyAxiom<P>) elkPropertyRangeAxiom);
-		write(' ');
-		write(elkPropertyRangeAxiom.getRange());
-	}
-
 	@Override
 	public Void visit(ElkAnnotationAssertionAxiom annAssertionAxiom) {
 		write("AnnotationAssertion( ");
@@ -938,7 +794,8 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 
 	@Override
 	public Void visit(ElkIri iri) {
-		write("<" + iri.asString() + ">");
+		write(expandAbbreviatedIris ? "<" + iri.getFullIriAsString() + ">"
+				: iri.toString());
 		return null;
 	}
 
@@ -983,6 +840,161 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 		write(elkAnnotation.getValue());
 		write(')');
 		return null;
+	}
+
+	private final void write(char ch) {
+		try {
+			writer.append(ch);
+		} catch (IOException e) {
+			throw new PrintingException(e.getMessage(), e.getCause());
+		}
+	}
+
+	private final void write(ElkEntity elkEntity) {
+		write(elkEntity.getIri());
+	}
+
+	private final void write(ElkObject elkObject) {
+		elkObject.accept(this);
+	}
+
+	private final void write(Integer n) {
+		try {
+			writer.append(n.toString());
+		} catch (IOException e) {
+			throw new PrintingException(e.getMessage(), e.getCause());
+		}
+	}
+
+	private final void write(Iterable<? extends ElkObject> elkObjects) {
+		boolean first = true;
+		for (ElkObject elkObject : elkObjects) {
+			if (!first)
+				write(' ');
+			else
+				first = false;
+			write(elkObject);
+		}
+	}
+
+	private final void write(String string) {
+		try {
+			writer.append(string);
+		} catch (IOException e) {
+			throw new PrintingException(e.getMessage(), e.getCause());
+		}
+	}
+
+	private final <P extends ElkObject> void write(
+			ElkPropertyRestriction<P> elkPropertyRestriction) {
+		write(elkPropertyRestriction.getProperty());
+	}
+
+	private final <P extends ElkObject> void write(
+			ElkPropertyAxiom<P> elkPropertyAxiom) {
+		write(elkPropertyAxiom.getProperty());
+	}
+
+	private final <P extends ElkObject, F extends ElkObject> void write(
+			ElkPropertyRestrictionQualified<P, F> elkQualifiedPropertyRestriction) {
+		write((ElkPropertyRestriction<P>) elkQualifiedPropertyRestriction);
+		write(' ');
+		write(elkQualifiedPropertyRestriction.getFiller());
+	}
+
+	private final <P extends ElkObject> void write(
+			ElkCardinalityRestriction<P> elkCardinalityRestriction) {
+		write(elkCardinalityRestriction.getCardinality());
+		write(' ');
+		write((ElkPropertyRestriction<P>) elkCardinalityRestriction);
+	}
+
+	private final <P extends ElkObject, F extends ElkObject> void write(
+			ElkCardinalityRestrictionQualified<P, F> elkQualifiedCardinalityRestriction) {
+		write((ElkCardinalityRestriction<P>) elkQualifiedCardinalityRestriction);
+		write(' ');
+		write(elkQualifiedCardinalityRestriction.getFiller());
+	}
+
+	private final <P extends ElkObject, O extends ElkObject, R extends ElkObject> void write(
+			ElkPropertyAssertionAxiom<P, O, R> elkPropertyAssertionAxiom) {
+		write((ElkPropertyAxiom<P>) elkPropertyAssertionAxiom);
+		write(' ');
+		write(elkPropertyAssertionAxiom.getSubject());
+		write(' ');
+		write(elkPropertyAssertionAxiom.getObject());
+	}
+
+	private final <P extends ElkObject, D extends ElkObject> void write(
+			ElkPropertyDomainAxiom<P, D> elkPropertyDomainAxiom) {
+		write((ElkPropertyAxiom<P>) elkPropertyDomainAxiom);
+		write(' ');
+		write(elkPropertyDomainAxiom.getDomain());
+	}
+
+	private final <P extends ElkObject, R extends ElkObject> void write(
+			ElkPropertyRangeAxiom<P, R> elkPropertyRangeAxiom) {
+		write((ElkPropertyAxiom<P>) elkPropertyRangeAxiom);
+		write(' ');
+		write(elkPropertyRangeAxiom.getRange());
+	}
+
+	/**
+	 * An auxiliary visitor class to print declarations.
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	class EntityPrinter implements ElkEntityVisitor<Void> {
+
+		@Override
+		public Void visit(ElkAnnotationProperty elkAnnotationProperty) {
+			write("AnnotationProperty(");
+			write(elkAnnotationProperty);
+			write(')');
+			return null;
+		}
+
+		@Override
+		public Void visit(ElkClass elkClass) {
+			write("Class(");
+			write(elkClass);
+			write(')');
+			return null;
+		}
+
+		@Override
+		public Void visit(ElkDataProperty elkDataProperty) {
+			write("DataProperty(");
+			write(elkDataProperty);
+			write(')');
+			return null;
+		}
+
+		@Override
+		public Void visit(ElkDatatype elkDatatype) {
+			write("Datatype(");
+			write(elkDatatype);
+			write(')');
+			return null;
+		}
+
+		@Override
+		public Void visit(ElkNamedIndividual elkNamedIndividual) {
+			write("NamedIndividual(");
+			write(elkNamedIndividual);
+			write(')');
+			return null;
+		}
+
+		@Override
+		public Void visit(ElkObjectProperty elkObjectProperty) {
+			write("ObjectProperty(");
+			write(elkObjectProperty);
+			write(')');
+			return null;
+		}
+
 	}
 
 }

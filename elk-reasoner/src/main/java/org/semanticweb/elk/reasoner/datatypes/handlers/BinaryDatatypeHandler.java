@@ -99,7 +99,7 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 		List<? extends ElkFacetRestriction> facetRestrictions = filler.getFacetRestrictions();
 		outerloop:
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().asString());
+			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().getFullIriAsString());
 			String value = facetRestriction.getRestrictionValue().getLexicalForm();
 
 			switch (facet) {

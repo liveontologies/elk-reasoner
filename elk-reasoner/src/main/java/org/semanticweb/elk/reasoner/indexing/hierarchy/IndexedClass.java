@@ -91,6 +91,6 @@ public class IndexedClass extends IndexedClassEntity {
 	 */
 	@Override
 	public String toString() {
-		return '<' + getElkClass().getIri().asString() + '>';
+		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
 	}
 }

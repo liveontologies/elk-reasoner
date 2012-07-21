@@ -34,6 +34,7 @@ import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
@@ -67,8 +68,13 @@ public class FuncSyntaxParsingTask implements Task {
 				@Override
 				public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
 				}
+
+				@Override
+				public void visit(ElkPrefix elkPrefix)
+						throws Owl2ParseException {
+				}
 			});
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			throw new TaskException(e);
 		} finally {
 			IOUtils.closeQuietly(stream);

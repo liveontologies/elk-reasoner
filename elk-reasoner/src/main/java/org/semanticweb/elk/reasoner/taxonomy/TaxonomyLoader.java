@@ -42,6 +42,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
@@ -273,6 +274,10 @@ public class TaxonomyLoader {
 		@Override
 		public void visit(ElkAxiom elkAxiom) {
 			elkAxiom.accept(this);
+		}
+
+		@Override
+		public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
 		}
 	}
 }

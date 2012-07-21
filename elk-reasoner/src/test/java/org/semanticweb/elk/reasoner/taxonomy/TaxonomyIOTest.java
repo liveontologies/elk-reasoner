@@ -73,7 +73,7 @@ public class TaxonomyIOTest {
 		StringWriter writer = new StringWriter();
 
 		TaxonomyPrinter.dumpClassTaxomomy(original, writer, false);
-
+		
 		StringReader reader = new StringReader(writer.getBuffer().toString());
 		Owl2Parser parser = parserFactory.getParser(reader);
 		Taxonomy<ElkClass> loaded = TaxonomyLoader.load(parser);

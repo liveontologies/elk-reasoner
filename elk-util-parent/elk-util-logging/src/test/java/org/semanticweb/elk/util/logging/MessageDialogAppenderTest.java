@@ -27,6 +27,8 @@ package org.semanticweb.elk.util.logging;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Not a JUnit test yet, but it will be at some point
@@ -39,6 +41,8 @@ public class MessageDialogAppenderTest {
 
 	//TODO Turn into a test
 	@SuppressWarnings("static-method")
+	@Test
+	@Ignore
 	public void testDialog() {
 		MessageDialogAppender appender = new MessageDialogAppender();
 		Logger logger = Logger.getLogger(MessageDialogAppenderTest.class);

@@ -151,7 +151,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		//process all facet restrictions
 		List<? extends ElkFacetRestriction> facetRestrictions = filler.getFacetRestrictions();
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().asString());
+			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().getFullIriAsString());
 			Datatype restrictionDatatype = Datatype.getByIri(
 					facetRestriction.getRestrictionValue().getDatatype().getDatatypeIRI());
 			Number restrictionValue = (Number) parse(

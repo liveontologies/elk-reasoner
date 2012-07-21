@@ -180,7 +180,7 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 		public void run() {
 			try {
 				job.run();
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				exception = new ComputationRuntimeException(
 						"Uncought exception in a worker thread:", e);
 				executorThread.interrupt();

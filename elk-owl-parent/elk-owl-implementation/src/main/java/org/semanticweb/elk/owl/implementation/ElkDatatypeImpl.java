@@ -57,10 +57,10 @@ public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
 	}
 
 	public String getDatatypeShortname() {
-		return iri.asString().split("#")[1];
+		return iri.getFullIriAsString().split("#")[1];
 	}
 
 	public String getDatatypeIRI() {
-		return iri.asString();
+		return iri.getFullIriAsString();
 	}
 }

@@ -47,7 +47,7 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 
 	@Override
 	public String getName() {
-		return "Loading Changes";
+		return "Loading of Changes";
 	}
 
 	@Override

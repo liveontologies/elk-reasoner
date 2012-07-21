@@ -41,7 +41,7 @@ public abstract class ElkIri implements Comparable<ElkIri>,
 	/**
 	 * @return the full IRI as a string
 	 */
-	public abstract String asString();
+	public abstract String getFullIriAsString();
 
 	protected ElkIri(int hashCode) {
 		this.hashCode = hashCode;
@@ -75,7 +75,7 @@ public abstract class ElkIri implements Comparable<ElkIri>,
 	 */
 	@Override
 	public int compareTo(ElkIri arg) {
-		return this.asString().compareTo(arg.asString());
+		return this.getFullIriAsString().compareTo(arg.getFullIriAsString());
 	}
 
 	@Override

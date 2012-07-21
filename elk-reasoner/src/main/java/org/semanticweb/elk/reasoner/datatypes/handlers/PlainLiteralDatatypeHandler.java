@@ -193,7 +193,7 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		List<? extends ElkFacetRestriction> facetRestrictions = filler.getFacetRestrictions();
 		outerloop:
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().asString());
+			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().getFullIriAsString());
 			String lexicalForm = facetRestriction.getRestrictionValue().getLexicalForm();
 			String[] pair = (String[]) parse(lexicalForm, datatype);
 			String value = pair[0];

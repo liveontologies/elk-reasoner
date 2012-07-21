@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
@@ -43,6 +44,10 @@ import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
  * 
  */
 public class OwlOntologyLoader implements OntologyLoader {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(OwlOntologyLoader.class);
 
 	/**
 	 * the converter used to convert OWL axioms into ELK axioms
@@ -101,18 +106,25 @@ public class OwlOntologyLoader implements OntologyLoader {
 			@Override
 			public void load() {
 				progressMonitor.start(status);
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace(status);
 				for (;;) {
 					if (Thread.currentThread().isInterrupted())
 						break;
 					if (!axiomsIterator.hasNext()) {
+						importsClosureProcessed++;
 						if (!importsClosureIterator.hasNext())
 							break;
 						progressMonitor.finish();
 						updateStatus();
 						progressMonitor.start(status);
+						if (LOGGER_.isTraceEnabled())
+							LOGGER_.trace(status);
 						initAxioms(importsClosureIterator.next());
 					}
 					OWLAxiom axiom = axiomsIterator.next();
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace("loading " + axiom);
 					if (OWL_CONVERTER_.isRelevantAxiom(axiom))
 						axiomLoader.visit(OWL_CONVERTER_.convert(axiom));
 					axiomsProcessed++;

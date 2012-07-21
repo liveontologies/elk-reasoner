@@ -33,16 +33,13 @@ import org.semanticweb.elk.loading.ChangesLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.util.logging.Statistics;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.RemoveAxiom;
-import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 
 /**
  * An {@link ChangesLoader} that accumulates the {@link OWLOntologyChange} and
@@ -77,10 +74,11 @@ public class OwlChangesLoader implements ChangesLoader {
 			@Override
 			public void load() throws ElkLoadingException {
 				if (!pendingChanges.isEmpty()) {
-					String status = ReasonerProgressMonitor.LOADING;
-					Statistics.logOperationStart(status, LOGGER_);
+					String status = "Loading of Changes";
 					progressMonitor.start(status);
-					int axiomCount = pendingChanges.size();
+					int changesCount = pendingChanges.size();
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace(status + ": " + changesCount);
 					int currentAxiom = 0;
 					for (;;) {
 						if (Thread.currentThread().isInterrupted())
@@ -89,20 +87,29 @@ public class OwlChangesLoader implements ChangesLoader {
 								.poll();
 						if (change == null)
 							break;
-						ElkAxiom axiom = OWL_CONVERTER_.convert(change
-								.getAxiom());
+						if (!change.isAxiomChange()) {
+							ElkLoadingException exception = new ElkLoadingException(
+									"Cannot apply non-axiom change!");
+							LOGGER_.error(exception);
+							throw exception;
+						}
+						OWLAxiom owlAxiom = change.getAxiom();
+						ElkAxiom elkAxiom = OWL_CONVERTER_.convert(owlAxiom);
 						if (change instanceof AddAxiom) {
-							axiomInserter.visit(axiom);
+							axiomInserter.visit(elkAxiom);
+							if (LOGGER_.isTraceEnabled())
+								LOGGER_.trace("adding " + owlAxiom);
 						} else if (change instanceof RemoveAxiom) {
-							axiomDeleter.visit(axiom);
+							axiomDeleter.visit(elkAxiom);
+							if (LOGGER_.isTraceEnabled())
+								LOGGER_.trace("removing " + owlAxiom);
 						} else
 							throw new ElkLoadingException(
 									"Change type is not supported!");
 						currentAxiom++;
-						progressMonitor.report(currentAxiom, axiomCount);
+						progressMonitor.report(currentAxiom, changesCount);
 					}
 					progressMonitor.finish();
-					Statistics.logOperationFinish(status, LOGGER_);
 				}
 			}
 
@@ -114,16 +121,7 @@ public class OwlChangesLoader implements ChangesLoader {
 	}
 
 	void registerChange(OWLOntologyChange change) {
-		if (!change.isAxiomChange())
-			throw new UnsupportedOperationException("Not an axiom change!");
-		OWLAxiom axiom = change.getAxiom();
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("registering "
-					+ ((change instanceof AddAxiom) ? "addition" : "removal")
-					+ " of " + axiom.toString());
-		}
-		if (OWL_CONVERTER_.isRelevantAxiom(axiom))
-			pendingChanges.add(change);
+		pendingChanges.add(change);
 	}
 
 	Set<OWLAxiom> getPendingAxiomAdditions() {

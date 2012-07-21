@@ -121,7 +121,7 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 		
 		List<? extends ElkFacetRestriction> facetRestrictions = filler.getFacetRestrictions();
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().asString());
+			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().getFullIriAsString());
 			Datatype restrictionDatatype = Datatype.getByIri(
 					facetRestriction.getRestrictionValue().getDatatype().getDatatypeIRI());
 			XMLGregorianCalendar restrictionValue = (XMLGregorianCalendar) parse(

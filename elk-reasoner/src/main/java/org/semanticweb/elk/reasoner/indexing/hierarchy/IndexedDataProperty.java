@@ -68,7 +68,7 @@ public class IndexedDataProperty {
 
 	@Override
 	public String toString() {
-		return '<' + property.getIri().asString() + '>';
+		return '<' + property.getIri().getFullIriAsString() + '>';
 	}
 	/**
 	 * Hash code for this object.

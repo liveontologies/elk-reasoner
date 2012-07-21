@@ -26,6 +26,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
@@ -118,12 +119,15 @@ public class Owl2ParserLoader implements Loader {
 	@Override
 	public synchronized void load() throws ElkLoadingException {
 		controlThread_ = Thread.currentThread();
+		waiting_ = true;
+
 		if (!started_) {
 			parserThread_.start();
 			started_ = true;
 		}
+
 		ElkAxiom axiom = null;
-		waiting_ = true;
+
 		try {
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
@@ -156,8 +160,9 @@ public class Owl2ParserLoader implements Loader {
 			synchronized (axiomBuffer_) {
 				waiting_ = false;
 			}
-			if (exception != null)
+			if (exception != null) {
 				throw exception;
+			}
 		}
 	}
 
@@ -172,7 +177,7 @@ public class Owl2ParserLoader implements Loader {
 		public void run() {
 			try {
 				parser_.accept(new AxiomInserter(axiomBuffer_));
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				exception = new ElkLoadingException(
 						"Cannot load the ontology!", e);
 			} finally {
@@ -213,6 +218,10 @@ public class Owl2ParserLoader implements Loader {
 			}
 
 		}
+
+		@Override
+		public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+		}
 	}
 
 	/**
@@ -228,6 +237,6 @@ public class Owl2ParserLoader implements Loader {
 			parserThread_.interrupt();
 		disposeParserResources();
 		this.axiomBuffer_.clear();
-		this.exception = null;
+		// this.exception = null;
 	}
 }

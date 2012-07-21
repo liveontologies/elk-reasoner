@@ -86,6 +86,6 @@ public class IndexedDataSomeValuesFrom extends IndexedDatatypeExpression {
 
 	@Override
 	public String toString() {
-		return "DataSomeValuesFrom(<" + this.property.getIri().asString() + "> " + filler.toString() + ")";
+		return "DataSomeValuesFrom(<" + this.property.getIri().getFullIriAsString() + "> " + filler.toString() + ")";
 	}
 }
