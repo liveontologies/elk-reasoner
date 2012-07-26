@@ -58,14 +58,17 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 		}
 	}
 
+	@Override
 	public Datatype getDatatype() {
 		return datatype;
 	}
 
+	@Override
 	public ValueSpaceType getType() {
 		return ValueSpaceType.LENGTH_RESTRICTED;
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		if (minLength == null && maxLength == null) {
 			return true;
@@ -101,6 +104,7 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.datatype);
 		if (typechek != true) {

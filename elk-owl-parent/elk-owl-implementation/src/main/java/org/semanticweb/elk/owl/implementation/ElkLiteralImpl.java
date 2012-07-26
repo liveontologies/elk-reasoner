@@ -47,10 +47,12 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 		return lexicalForm;
 	}
 
+	@Override
 	public String getLanguage() {
 		return null;
 	}
 
+	@Override
 	public ElkDatatype getDatatype() {
 		return datatype;
 	}

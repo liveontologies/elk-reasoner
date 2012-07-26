@@ -58,14 +58,17 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 
 	static final Logger LOGGER_ = Logger.getLogger(BinaryDatatypeHandler.class);
 
+	@Override
 	public Set<Datatype> getSupportedDatatypes() {
 		return EnumSet.of(xsd_hexBinary, xsd_base64Binary);
 	}
 
+	@Override
 	public Set<Facet> getSupportedFacets() {
 		return EnumSet.of(LENGTH, MIN_LENGTH, MAX_LENGTH);
 	}
 
+	@Override
 	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression) {
 		if (datatypeExpression instanceof IndexedDataHasValue) {
 			return createLiteralValueSpace((IndexedDataHasValue) datatypeExpression);
@@ -91,6 +94,7 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
+	@SuppressWarnings("static-method")
 	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
@@ -127,6 +131,7 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
+	@Override
 	public Object parse(String literal, Datatype datatype) {
 		switch (datatype) {
 			case xsd_base64Binary:

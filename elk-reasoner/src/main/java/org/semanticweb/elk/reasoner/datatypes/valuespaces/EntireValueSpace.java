@@ -37,14 +37,17 @@ public class EntireValueSpace implements ValueSpace {
 		this.datatype = datatype;
 	}
 
+	@Override
 	public Datatype getDatatype() {
 		return datatype;
 	}
 
+	@Override
 	public ValueSpaceType getType() {
 		return ValueSpaceType.ENTIRE;
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		return false;
 	}
@@ -56,6 +59,7 @@ public class EntireValueSpace implements ValueSpace {
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		return valueSpace.getDatatype().isCompatibleWith(this.datatype);
 	}

@@ -78,14 +78,17 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 		END_OF_TIME = datatypeFactory.newXMLGregorianCalendar(Integer.MAX_VALUE, 12, 31, 23, 59, 59, 0, 0);
 	}
 	
+	@Override
 	public Set<Datatype> getSupportedDatatypes() {
 		return EnumSet.of(xsd_dateTime, xsd_dateTimeStamp);
 	}
 
+	@Override
 	public Set<Facet> getSupportedFacets() {
 		return EnumSet.of(MIN_INCLUSIVE, MAX_INCLUSIVE, MIN_EXCLUSIVE, MAX_EXCLUSIVE);
 	}
 
+	@Override
 	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression) {
 		if (datatypeExpression instanceof IndexedDataHasValue) {
 			return createUnipointValueSpace((IndexedDataHasValue) datatypeExpression);
@@ -108,6 +111,7 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 		return new DateTimeValue(value, datatype);
 	}
 
+	@SuppressWarnings("static-method")
 	private ValueSpace createEntireValueSpace(ElkDatatype elkDatatype) {
 		return new EntireValueSpace(Datatype.getByIri(elkDatatype.getDatatypeIRI()));
 	}
@@ -171,6 +175,7 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
+	@Override
 	public Object parse(String literal, Datatype datatype) {
 		switch (datatype) {
 			case xsd_dateTime:

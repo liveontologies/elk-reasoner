@@ -128,6 +128,7 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 		return objectFilter.filter(new IndexedDataHasValue(idp, elkDataHasValue.getFiller()));
 	}
 
+	@Override
 	public IndexedClassExpression visit(
 			ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
 		List<? extends ElkDataPropertyExpression> exps = elkDataSomeValuesFrom.getDataPropertyExpressions();
@@ -146,6 +147,7 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 				.filter(new IndexedObjectProperty(elkObjectProperty));
 	}
         
+	@Override
 	public IndexedDataProperty visit(ElkDataProperty elkDataProperty) {
 		return objectFilter.filter(new IndexedDataProperty(elkDataProperty));
 	}

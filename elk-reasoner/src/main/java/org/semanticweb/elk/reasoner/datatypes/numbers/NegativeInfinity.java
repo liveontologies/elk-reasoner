@@ -29,27 +29,33 @@ package org.semanticweb.elk.reasoner.datatypes.numbers;
  */
 public final class NegativeInfinity extends Number {
 
+	private static final long serialVersionUID = 3491860110251869551L;
 	public static final NegativeInfinity INSTANCE = new NegativeInfinity();
 
 	private NegativeInfinity() {
 	}
 
+	@Override
 	public double doubleValue() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public float floatValue() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public int intValue() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public long longValue() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public String toString() {
 		return "-INF";
 	}

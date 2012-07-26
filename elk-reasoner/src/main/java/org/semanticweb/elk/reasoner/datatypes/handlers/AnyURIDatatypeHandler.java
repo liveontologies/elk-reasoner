@@ -61,14 +61,17 @@ public class AnyURIDatatypeHandler implements DatatypeHandler {
 
 	static final Logger LOGGER_ = Logger.getLogger(AnyURIDatatypeHandler.class);
 
+	@Override
 	public Set<Datatype> getSupportedDatatypes() {
 		return EnumSet.of(xsd_anyURI);
 	}
 
+	@Override
 	public Set<Facet> getSupportedFacets() {
 		return EnumSet.of(LENGTH, MIN_LENGTH, MAX_LENGTH, PATTERN);
 	}
 
+	@Override
 	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression) {
 		if (datatypeExpression instanceof IndexedDataHasValue) {
 			return createLiteralValueSpace((IndexedDataHasValue) datatypeExpression);
@@ -94,6 +97,7 @@ public class AnyURIDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
+	@SuppressWarnings("static-method")
 	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
@@ -138,6 +142,7 @@ public class AnyURIDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
+	@Override
 	public Object parse(String literal, Datatype datatype) {
 		try {
 			return new URI(literal);

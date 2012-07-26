@@ -45,14 +45,17 @@ public class PatternValueSpace implements ValueSpace {
 		this.effectiveDatatype = effectiveDatatype;
 	}
 
+	@Override
 	public Datatype getDatatype() {
 		return effectiveDatatype;
 	}
 
+	@Override
 	public ValueSpaceType getType() {
 		return ValueSpaceType.PATTERN;
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		return automaton.isEmpty() || !effectiveDatatype.isCompatibleWith(datatype);
 	}
@@ -70,6 +73,7 @@ public class PatternValueSpace implements ValueSpace {
 	 * Cloning initial automatons to avoid ConcurrentModificationException.
 	 * Todo: synchronize this block is performance well be an issues
 	 */
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.effectiveDatatype);
 		if (typechek != true) {

@@ -43,14 +43,17 @@ public class NumericValue implements ValueSpace {
 		this.effectiveDatatype = Datatype.getCorrespondingDatatype(value);
 	}
 
+	@Override
 	public Datatype getDatatype() {
 		return effectiveDatatype;
 	}
 
+	@Override
 	public ValueSpaceType getType() {
 		return ValueSpaceType.NUMERIC_VALUE;
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		return !effectiveDatatype.isCompatibleWith(datatype);
 	}
@@ -62,6 +65,7 @@ public class NumericValue implements ValueSpace {
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		if (valueSpace.getType() != ValueSpaceType.NUMERIC_VALUE) {
 			return false;

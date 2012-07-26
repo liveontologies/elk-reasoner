@@ -49,10 +49,12 @@ public class ElkLiteralWrap<T extends OWLLiteral> extends ElkObjectWrap<T>
 		return this.owlObject.getLiteral();
 	}
 
+	@Override
 	public String getLanguage() {
 		return this.owlObject.getLang();
 	}
 
+	@Override
 	public ElkDatatype getDatatype() {
 		return converter.convert(this.owlObject.getDatatype());
 	}

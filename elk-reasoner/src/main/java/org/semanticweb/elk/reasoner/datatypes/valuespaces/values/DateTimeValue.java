@@ -48,14 +48,17 @@ public class DateTimeValue implements ValueSpace {
 		}
 	}
 
+	@Override
 	public Datatype getDatatype() {
 		return effectiveDatatype;
 	}
 
+	@Override
 	public ValueSpaceType getType() {
 		return ValueSpaceType.DATETIME_VALUE;
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		return value != null;
 	}
@@ -69,6 +72,7 @@ public class DateTimeValue implements ValueSpace {
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		switch (valueSpace.getType()) {
 			case DATETIME_VALUE:

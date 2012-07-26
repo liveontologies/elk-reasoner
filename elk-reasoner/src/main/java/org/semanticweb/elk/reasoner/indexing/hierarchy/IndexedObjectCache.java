@@ -82,6 +82,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			return result;
 	}
     
+	@Override
 	public IndexedDataProperty filter(IndexedDataProperty idp) {
 		IndexedDataProperty result = indexedDataPropertiesLookup.get(idp);
 		if (result == null) {
@@ -177,6 +178,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		final IndexedEntryConverter<IndexedDataProperty> converter = new IndexedEntryConverter<IndexedDataProperty>();
 
+		@Override
 		public KeyEntry<IndexedDataProperty, ? extends IndexedDataProperty> createEntry(
 				IndexedDataProperty key) {
 			return key.accept(converter);

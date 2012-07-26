@@ -50,6 +50,7 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 		this.upperInclusive = upperInclusive;
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		int boundComparison = lowerBound.compare(upperBound);
 		if (boundComparison > 0) {
@@ -70,10 +71,12 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 		return lowerBound.compare(upperBound) == 0;
 	}
 
+	@Override
 	public Datatype getDatatype() {
 		return datatype;
 	}
 
+	@Override
 	public ValueSpace.ValueSpaceType getType() {
 		return ValueSpace.ValueSpaceType.DATETIME_INTERVAL;
 	}
@@ -86,6 +89,7 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		switch (valueSpace.getType()) {
 			case DATETIME_VALUE: {

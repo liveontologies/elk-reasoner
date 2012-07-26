@@ -51,14 +51,17 @@ public class LiteralDatatypeHandler implements DatatypeHandler {
 
 	static final Logger LOGGER_ = Logger.getLogger(LiteralDatatypeHandler.class);
 
+	@Override
 	public Set<Datatype> getSupportedDatatypes() {
 		return EnumSet.of(rdfs_Literal);
 	}
 
+	@Override
 	public Set<Facet> getSupportedFacets() {
 		return Collections.emptySet();
 	}
 
+	@Override
 	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression) {
 		if (datatypeExpression instanceof IndexedDataSomeValuesFrom) {
 			ElkDataRange filler = ((IndexedDataSomeValuesFrom) datatypeExpression).getFiller();
@@ -70,6 +73,7 @@ public class LiteralDatatypeHandler implements DatatypeHandler {
 		return null;
 	}
 
+	@Override
 	public Object parse(String literal, Datatype datatype) {
 		throw new UnsupportedOperationException("Not supported");
 	}

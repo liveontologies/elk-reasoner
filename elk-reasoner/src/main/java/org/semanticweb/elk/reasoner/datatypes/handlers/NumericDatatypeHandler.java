@@ -73,15 +73,18 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	
 	private final NumberComparator comparator = NumberComparator.INSTANCE;
 
+	@Override
 	public Set<Datatype> getSupportedDatatypes() {
 		return EnumSet.of(owl_real, owl_rational,
 				xsd_decimal, xsd_integer, xsd_nonNegativeInteger);
 	}
 
+	@Override
 	public Set<Facet> getSupportedFacets() {
 		return EnumSet.of(MIN_INCLUSIVE, MAX_INCLUSIVE, MIN_EXCLUSIVE, MAX_EXCLUSIVE);
 	}
 
+	@Override
 	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression) {
 		if (datatypeExpression instanceof IndexedDataHasValue) {
 			return createUnipointValueSpace((IndexedDataHasValue) datatypeExpression);
@@ -109,6 +112,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	/**
 	 * Create {@link EntireValueSpace} to represent complete datatype value space
 	 */
+	@SuppressWarnings("static-method")
 	private ValueSpace createEntireValueSpace(ElkDatatype elkDatatype) {
 		return new EntireValueSpace(Datatype.getByIri(elkDatatype.getDatatypeIRI()));
 	}
@@ -202,6 +206,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		}
 	}
 	
+	@Override
 	public Object parse(String literal, Datatype datatype) {
 		switch (datatype) {
 			case owl_real:
@@ -226,6 +231,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	 * Attempt to identify most specific numeric type 
 	 * (int - long - BigInteger - BigDecimal - BigRational)
 	 */
+	@SuppressWarnings("static-method")
 	private Number parseRational(String literal) {
 		int divisorIndx = literal.indexOf('/');
 		if (divisorIndx == -1) {
@@ -255,6 +261,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	 * Parse xsd:decimal literal. 
 	 * Attempt to identify most specific numeric type (int-long-BigInteger-BigDecimal)
 	 */
+	@SuppressWarnings("static-method")
 	private Number parseDecimal(String literal) {
 		BigDecimal value = DatatypeConverter.parseDecimal(literal);
 		try {return value.intValueExact();} catch (ArithmeticException e) {}
@@ -267,6 +274,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	 * Parse xsd:decimal literal. 
 	 * Attempt to identify most specific numeric type (int-long-BigInteger)
 	 */
+	@SuppressWarnings("static-method")
 	private Number parseInteger(String literal) {
 		BigInteger value = DatatypeConverter.parseInteger(literal);
 		if (value.compareTo(BI_MIN_INTEGER) >= 0 && value.compareTo(BI_MAX_INTEGER) <= 0) {

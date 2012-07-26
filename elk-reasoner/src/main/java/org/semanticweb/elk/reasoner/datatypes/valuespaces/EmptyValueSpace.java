@@ -33,18 +33,22 @@ public class EmptyValueSpace implements ValueSpace {
 
 	public static final EmptyValueSpace INSTANCE = new EmptyValueSpace();
 
+	@Override
 	public Datatype getDatatype() {
 		return Datatype.rdfs_Literal;
 	}
 
+	@Override
 	public ValueSpaceType getType() {
 		return ValueSpaceType.EMPTY;
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		return true;
 	}
 
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		return false;
 	}

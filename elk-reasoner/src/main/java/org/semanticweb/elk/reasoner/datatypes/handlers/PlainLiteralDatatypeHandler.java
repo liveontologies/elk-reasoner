@@ -136,15 +136,18 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		NMTokenAutomaton = new RegExp("<NameChar>+").toAutomaton(autoMap);
 	}
 	
+	@Override
 	public Set<Datatype> getSupportedDatatypes() {
 		return EnumSet.of(rdf_PlainLiteral, xsd_string, xsd_normalizedString,
 				xsd_token, xsd_Name, xsd_NCName, xsd_NMTOCKEN);
 	}
 
+	@Override
 	public Set<Facet> getSupportedFacets() {
 		return EnumSet.of(LENGTH, MIN_LENGTH, MAX_LENGTH, PATTERN);
 	}
 
+	@Override
 	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression) {
 		if (datatypeExpression instanceof IndexedDataHasValue) {
 			return createLiteralValueSpace((IndexedDataHasValue) datatypeExpression);
@@ -232,6 +235,7 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
+	@Override
 	public Object parse(String lexicalForm, Datatype datatype) {
 		int lastAt = lexicalForm.lastIndexOf('@');
 		if (lastAt != -1) {

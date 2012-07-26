@@ -34,22 +34,27 @@ public final class PositiveInfinity extends Number {
 	private PositiveInfinity() {
 	}
 
+	@Override
 	public double doubleValue() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public float floatValue() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public int intValue() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public long longValue() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public String toString() {
 		return "+INF";
 	}

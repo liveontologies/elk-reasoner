@@ -64,10 +64,10 @@ public abstract class ElkObjectWrap<T extends OWLObject> implements ElkObject {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (!(obj instanceof ElkObjectWrap<?>)) {
 			return false;
 		}
-		final ElkObjectWrap<T> other = (ElkObjectWrap<T>) obj;
+		final ElkObjectWrap<?> other = (ElkObjectWrap<?>) obj;
 		if (!this.owlObject.equals(other.owlObject)) {
 			return false;
 		}

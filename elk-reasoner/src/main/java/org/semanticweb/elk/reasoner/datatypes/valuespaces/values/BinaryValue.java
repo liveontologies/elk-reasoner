@@ -41,14 +41,17 @@ public class BinaryValue implements ValueSpace {
 		this.value = value;
 	}
 
+	@Override
 	public Datatype getDatatype() {
 		return datatype;
 	}
 
+	@Override
 	public ValueSpaceType getType() {
 		return ValueSpaceType.BINARY_VALUE;
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		return value != null;
 	}
@@ -60,6 +63,7 @@ public class BinaryValue implements ValueSpace {
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.datatype);
 		if (typechek != true) {

@@ -35,6 +35,7 @@ public class NumberComparator implements Comparator<Number> {
 
 	public static final NumberComparator INSTANCE = new NumberComparator();
 	
+	@Override
 	public int compare(Number num1, Number num2) {
 		if (num1.equals(num2)) {
 			return 0;

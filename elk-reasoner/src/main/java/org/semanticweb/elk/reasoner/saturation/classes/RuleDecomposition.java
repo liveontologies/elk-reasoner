@@ -89,6 +89,7 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements
 			return null;
 		}
 
+		@Override
 		public Void visit(IndexedDataSomeValuesFrom element) {
 			List<IndexedDatatypeExpression> satisfyingNegExistentials = 
 					DatatypeEngine.getSatisfyingNegExistentials(element.getProperty(), element);

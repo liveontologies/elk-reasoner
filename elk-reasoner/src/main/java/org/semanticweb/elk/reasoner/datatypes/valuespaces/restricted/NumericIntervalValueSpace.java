@@ -70,6 +70,7 @@ public class NumericIntervalValueSpace implements ValueSpace {
 		this.upperInclusive = upperInclusive;
 	}
 
+	@SuppressWarnings("static-method")
 	private Number advance(Number num, boolean increment) {
 
 		if (num instanceof Integer) {
@@ -157,6 +158,7 @@ public class NumericIntervalValueSpace implements ValueSpace {
 		}
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		int boundComparison = NumberComparator.INSTANCE.compare(lowerBound, upperBound);
 		if (boundComparison > 0) {
@@ -178,10 +180,12 @@ public class NumericIntervalValueSpace implements ValueSpace {
 		return NumberComparator.INSTANCE.compare(lowerBound, upperBound) == 0;
 	}
 
+	@Override
 	public Datatype getDatatype() {
 		return effectiveDatatype;
 	}
 
+	@Override
 	public ValueSpaceType getType() {
 		return ValueSpaceType.NUMERIC_INTERVAL;
 	}
@@ -194,6 +198,7 @@ public class NumericIntervalValueSpace implements ValueSpace {
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		switch (valueSpace.getType()) {
 			case NUMERIC_VALUE: {

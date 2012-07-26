@@ -30,7 +30,8 @@ import java.math.BigInteger;
  * @author Pospishnyi Olexandr
  */
 public class BigRational extends Number implements Comparable<BigRational> {
-
+	
+	private static final long serialVersionUID = -5066448780442264195L;
 	private final BigInteger numerator;
 	private final BigInteger denominator;
 
@@ -47,35 +48,43 @@ public class BigRational extends Number implements Comparable<BigRational> {
 		return denominator;
 	}
 
+	@Override
 	public double doubleValue() {
 		return numerator.divide(denominator).doubleValue();
 	}
 
+	@Override
 	public float floatValue() {
 		return numerator.divide(denominator).floatValue();
 	}
 
+	@Override
 	public int intValue() {
 		return numerator.divide(denominator).intValue();
 	}
 
+	@Override
 	public long longValue() {
 		return numerator.divide(denominator).longValue();
 	}
 
+	@Override
 	public int compareTo(BigRational that) {
 		return numerator.multiply(that.denominator).compareTo(
 				denominator.multiply(that.numerator));
 	}
 
+	@Override
 	public int hashCode() {
 		return ((numerator.hashCode() + 1) * (denominator.hashCode() + 2));
 	}
 
+	@Override
 	public String toString() {
 		return numerator.toString() + "/" + denominator.toString();
 	}
 
+	@Override
 	public boolean equals(Object that) {
 		if (that == this) {
 			return true;

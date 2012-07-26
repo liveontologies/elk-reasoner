@@ -51,14 +51,17 @@ public class LiteralValue implements ValueSpace {
 		this.effectiveDatatype = effectiveDatatype;
 	}
 
+	@Override
 	public Datatype getDatatype() {
 		return effectiveDatatype;
 	}
 
+	@Override
 	public ValueSpaceType getType() {
 		return ValueSpaceType.LITERAL_VALUE;
 	}
 
+	@Override
 	public boolean isEmptyInterval() {
 		return !effectiveDatatype.isCompatibleWith(datatype);
 	}
@@ -73,6 +76,7 @@ public class LiteralValue implements ValueSpace {
 	 * character.
 	 *
 	 */
+	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		switch (valueSpace.getType()) {
 			case LITERAL_VALUE:
