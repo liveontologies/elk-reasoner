@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
@@ -57,10 +56,6 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
  * 
  */
 public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
-
-	// logger for events
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ElkObjectIndexerVisitor.class);
 
 	protected IndexedObjectFilter objectFilter;
 

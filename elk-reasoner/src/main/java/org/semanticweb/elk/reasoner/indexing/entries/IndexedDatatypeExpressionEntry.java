@@ -28,6 +28,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression
  * 
  * @author Pospishyi Olexandr
  * @author "Yevgeny Kazakov"
+ * @param <T>
+ *            The type of the elements in the set where this entry is used
+ * 
+ * @param <K>
+ *            the type of the wrapped indexed object used as the key of the
+ *            entry
  */
 public class IndexedDatatypeExpressionEntry<T, K extends IndexedDatatypeExpression>
 		extends IndexedClassExpressionEntry<T, K> {

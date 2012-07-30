@@ -153,6 +153,11 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	}
 
 	@Override
+	public Collection<IndexedDataProperty> getIndexedDataProperties() {
+		return indexedDataPropertiesLookup;
+	}
+
+	@Override
 	public ElkAxiomProcessor getAxiomInserter() {
 		return axiomInserter;
 	}

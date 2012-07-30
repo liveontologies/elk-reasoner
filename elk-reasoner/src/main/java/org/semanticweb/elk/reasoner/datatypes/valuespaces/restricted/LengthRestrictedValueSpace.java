@@ -133,6 +133,6 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	
 	@Override
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
-		return valueSpace.contains(valueSpace);
+		return valueSpace.contains(this);
 	}
 }

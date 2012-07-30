@@ -70,6 +70,10 @@ public abstract class AbstractReasonerState {
 	 */
 	boolean doneObjectPropertyCompositionsPrecomputation = false;
 	/**
+	 * {@code true} if the data property hierarchy has been computed
+	 */
+	boolean doneDataPropertyHierarchyComputation = false;
+	/**
 	 * {@code true} if the assignment of contexts to class expressions has been
 	 * reset
 	 */
@@ -143,6 +147,7 @@ public abstract class AbstractReasonerState {
 			doneChangeLoading = false;
 			doneObjectPropertyHierarchyComputation = false;
 			doneObjectPropertyCompositionsPrecomputation = false;
+			doneDataPropertyHierarchyComputation = false;
 			doneContextReset = false;
 			doneConsistencyCheck = false;
 			doneClassTaxonomy = false;

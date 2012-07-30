@@ -27,11 +27,18 @@ import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- *
+ * 
  * @author Pospishnyi Olexandr
+ * 
+ * @param <T>
+ *            The type of the elements in the set where this entry is used
+ * 
+ * @param <K>
+ *            the type of the wrapped indexed object used as the key of the
+ *            entry
  */
-public class IndexedDataPropertyEntry<T, K extends IndexedDataProperty>
-		extends StrongKeyEntry<T, K> {
+public class IndexedDataPropertyEntry<T, K extends IndexedDataProperty> extends
+		StrongKeyEntry<T, K> {
 
 	public IndexedDataPropertyEntry(K representative) {
 		super(representative);
@@ -50,7 +57,8 @@ public class IndexedDataPropertyEntry<T, K extends IndexedDataProperty>
 		}
 		if (other instanceof IndexedDataPropertyEntry<?, ?>) {
 			IndexedDataPropertyEntry<?, ?> otherEntry = (IndexedDataPropertyEntry<?, ?>) other;
-			return this.key.getProperty().getIri().equals(otherEntry.key.getProperty().getIri());
+			return this.key.getProperty().getIri()
+					.equals(otherEntry.key.getProperty().getIri());
 		}
 		return false;
 	}

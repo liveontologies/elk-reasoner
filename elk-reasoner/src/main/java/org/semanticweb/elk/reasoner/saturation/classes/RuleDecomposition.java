@@ -22,10 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
-import java.util.List;
-
-import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -79,27 +79,36 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements
 		}
 
 		@Override
-		public Void visit(IndexedDatatypeExpression element) {
-			//TODO: obtain matching negative existentials by retrieving all value spaces for the
-			// data property of this element and finding those value spaces among them that subsume
-			// the value space of this element
+		public Void visit(IndexedDatatypeExpression ide) {
+			IndexedDataProperty idp = ide.getProperty();
+			ValueSpace vs = ide.getValueSpace();
+			if (vs == EmptyValueSpace.INSTANCE) {
+				// this means that value space is inconsistent; in this
+				// case we are done
+				engine.enqueue(context, new PositiveSuperClassExpression<C>(
+						engine.getOwlNothing()));
+				return null;
+			}
+			for (IndexedDataProperty superProperty : idp.getSaturated()
+					.getSuperProperties()) {
+				Iterable<IndexedDatatypeExpression> negativeDatatypeExpressions = superProperty
+						.getNegativeDatatypeExpressions();
+				if (negativeDatatypeExpressions == null)
+					continue;
+				for (IndexedDatatypeExpression candidate : negativeDatatypeExpressions) {
+					if (candidate == ide)
+						// already derived
+						continue;
+					// check if the candidate value space subsumes the current
+					// value space
+					if (vs.isSubsumedBy(candidate.getValueSpace())) {
+						engine.enqueue(context,
+						// no decomposition rule should be applied to the result
+								new NegativeSuperClassExpression<C>(candidate));
+					}
+				}
+			}
 			return null;
-//			List<IndexedDatatypeExpression> satisfyingNegExistentials = DatatypeEngine
-//					.getSatisfyingNegExistentials(element.getProperty(),
-//							element);
-//			if (satisfyingNegExistentials == null) {
-//				engine.enqueue(context, new PositiveSuperClassExpression<C>(
-//						engine.getOwlNothing()));
-//			} else {
-//				for (IndexedDatatypeExpression negDatatypeExpr : satisfyingNegExistentials) {
-//					if (element != negDatatypeExpr) {
-//						engine.enqueue(context,
-//								new PositiveSuperClassExpression<C>(
-//										negDatatypeExpr));
-//					}
-//				}
-//			}
-//			return null;
 		}
 
 		@Override

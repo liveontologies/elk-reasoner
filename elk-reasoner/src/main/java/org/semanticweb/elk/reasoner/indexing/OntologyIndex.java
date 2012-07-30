@@ -30,12 +30,14 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -123,6 +125,12 @@ public interface OntologyIndex {
 	 *         {@link ElkObjectProperty}s occurring in the ontology.
 	 */
 	Collection<IndexedObjectProperty> getIndexedObjectProperties();
+
+	/**
+	 * @return the {@link IndexedDataProperty}s for all {@link ElkDataProperty}s
+	 *         occurring in the ontology.
+	 */
+	Collection<IndexedDataProperty> getIndexedDataProperties();
 
 	/**
 	 * @return the {@link IndexedObjectProperty}s for all reflexive

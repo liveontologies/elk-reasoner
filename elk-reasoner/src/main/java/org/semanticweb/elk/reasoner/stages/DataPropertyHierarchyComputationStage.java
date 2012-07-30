@@ -1,9 +1,9 @@
+package org.semanticweb.elk.reasoner.stages;
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,88 +20,82 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
+import org.semanticweb.elk.reasoner.saturation.properties.DataPropertyHierarchyComputation;
 
 /**
- * A {@link ReasonerStage} during which consistency of the current ontology is
- * checked
+ * A {@link ReasonerStage}, which purpose is to compute the data property
+ * hierarchy of the given ontology
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-class ConsistencyCheckingStage extends AbstractReasonerStage {
+public class DataPropertyHierarchyComputationStage extends
+		AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-			.getLogger(ConsistencyCheckingStage.class);
+			.getLogger(DataPropertyHierarchyComputationStage.class);
 
 	/**
 	 * the computation used for this stage
 	 */
-	private ConsistencyChecking computation = null;
+	private DataPropertyHierarchyComputation computation_;
+	/**
+	 * the number of workers used in the computation for this stage
+	 */
+	private final int workerNo;
 
-	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
+	public DataPropertyHierarchyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
+		this.workerNo = reasoner.getNumberOfWorkers();
+		this.progressMonitor = reasoner.getProgressMonitor();
 	}
 
 	@Override
 	public String getName() {
-		return "Consistency Checking";
+		return "Data Property Hierarchy Computation";
 	}
 
 	@Override
 	public boolean done() {
-		return reasoner.doneConsistencyCheck;
+		return reasoner.doneDataPropertyHierarchyComputation;
 	}
 
 	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new ObjectPropertyCompositionsPrecomputationStage(
-						reasoner),
-						(ReasonerStage) new DataPropertyHierarchyComputationStage(
-								reasoner),
-						(ReasonerStage) new ContextInitializationStage(reasoner));
+	public List<? extends ReasonerStage> getDependencies() {
+		return Arrays.asList(new OntologyLoadingStage(reasoner),
+				new ChangesLoadingStage(reasoner));
 	}
 
 	@Override
 	public void execute() throws ElkInterruptedException {
-		if (computation == null)
+		if (computation_ == null)
 			initComputation();
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
+		for (;;) {
+			computation_.process();
+			if (!interrupted())
+				break;
 		}
-		reasoner.consistentOntology = computation.isConsistent();
-		reasoner.doneConsistencyCheck = true;
+		reasoner.doneDataPropertyHierarchyComputation = true;
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		this.computation = new ConsistencyChecking(
-				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
+		this.computation_ = new DataPropertyHierarchyComputation(
+				reasoner.getProcessExecutor(), workerNo, progressMonitor,
+				reasoner.ontologyIndex);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
 
 	@Override
 	public void printInfo() {
-		if (computation != null)
-			computation.printStatistics();
 	}
 
 }
