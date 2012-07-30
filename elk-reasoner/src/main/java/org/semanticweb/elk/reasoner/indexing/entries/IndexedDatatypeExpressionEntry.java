@@ -22,24 +22,24 @@
  */
 package org.semanticweb.elk.reasoner.indexing.entries;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
- *
+ * 
  * @author Pospishyi Olexandr
+ * @author "Yevgeny Kazakov"
  */
-public class IndexedDataSomeValuesFromEntry<T, K extends IndexedDataSomeValuesFrom>
+public class IndexedDatatypeExpressionEntry<T, K extends IndexedDatatypeExpression>
 		extends IndexedClassExpressionEntry<T, K> {
 
-	public IndexedDataSomeValuesFromEntry(K representative) {
+	public IndexedDatatypeExpressionEntry(K representative) {
 		super(representative);
 	}
 
 	@Override
 	public int computeHashCode() {
-		return combinedHashCode(IndexedDataSomeValuesFromEntry.class,
-				this.key.getProperty().getIri(),
-				this.key.getFiller());
+		return combinedHashCode(IndexedDatatypeExpressionEntry.class, this.key
+				.getProperty().getIri(), this.key.getValueSpace());
 	}
 
 	@Override
@@ -47,11 +47,11 @@ public class IndexedDataSomeValuesFromEntry<T, K extends IndexedDataSomeValuesFr
 		if (this == other) {
 			return true;
 		}
-		if (other instanceof IndexedDataSomeValuesFromEntry<?, ?>) {
-			IndexedDataSomeValuesFromEntry<?, ?> otherView = (IndexedDataSomeValuesFromEntry<?, ?>) other;
+		if (other instanceof IndexedDatatypeExpressionEntry<?, ?>) {
+			IndexedDatatypeExpressionEntry<?, ?> otherView = (IndexedDatatypeExpressionEntry<?, ?>) other;
 			return this.key.getProperty().equals(otherView.key.getProperty())
-					&& this.key.getFiller().equals(otherView.key.getFiller())
-					&& this.key.getDatatype().equals(otherView.key.getDatatype());
+					&& this.key.getValueSpace().equals(
+							otherView.key.getValueSpace());
 		}
 		return false;
 	}

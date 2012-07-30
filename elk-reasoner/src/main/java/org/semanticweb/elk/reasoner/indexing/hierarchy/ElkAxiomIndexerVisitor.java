@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -120,23 +121,39 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 	@Override
 	public void indexSubObjectPropertyOfAxiom(
-			ElkSubObjectPropertyExpression subElkProperty,
-			ElkObjectPropertyExpression superElkProperty) {
+			ElkSubObjectPropertyExpression subProperty,
+			ElkObjectPropertyExpression superProperty) {
 
-		IndexedPropertyChain subIndexedProperty = subElkProperty
+		IndexedPropertyChain indexedSubProperty = subProperty
 				.accept(negativeIndexer);
 
-		IndexedObjectProperty superIndexedProperty = (IndexedObjectProperty) superElkProperty
+		IndexedObjectProperty indexedSuperProperty = (IndexedObjectProperty) superProperty
 				.accept(positiveIndexer);
 
 		if (multiplicity == 1) {
-			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
-			superIndexedProperty.addToldSubObjectProperty(subIndexedProperty);
+			indexedSubProperty.addToldSuperProperty(indexedSuperProperty);
+			indexedSuperProperty.addToldSubProperty(indexedSubProperty);
 		} else {
-			subIndexedProperty
-					.removeToldSuperObjectProperty(superIndexedProperty);
-			superIndexedProperty
-					.removeToldSubObjectProperty(subIndexedProperty);
+			indexedSubProperty.removeToldSuperProperty(indexedSuperProperty);
+			indexedSuperProperty.removeToldSubProperty(indexedSubProperty);
+		}
+	}
+
+	@Override
+	public void indexSubDataPropertyOfAxiom(
+			ElkDataPropertyExpression subProperty,
+			ElkDataPropertyExpression superProperty) {
+
+		IndexedDataProperty indexedSubProperty = subProperty
+				.accept(negativeIndexer);
+
+		IndexedDataProperty indexedSuperProperty = superProperty
+				.accept(positiveIndexer);
+
+		if (multiplicity == 1) {
+			indexedSubProperty.addToldSuperProperty(indexedSuperProperty);
+		} else {
+			indexedSubProperty.removeToldSuperProperty(indexedSuperProperty);
 		}
 	}
 

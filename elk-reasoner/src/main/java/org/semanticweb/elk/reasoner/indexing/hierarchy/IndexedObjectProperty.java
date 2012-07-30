@@ -69,8 +69,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		return toldSubProperties;
 	}
 
-	protected void addToldSubObjectProperty(
-			IndexedPropertyChain subObjectProperty) {
+	protected void addToldSubProperty(IndexedPropertyChain subObjectProperty) {
 		if (toldSubProperties == null)
 			toldSubProperties = new ArrayList<IndexedPropertyChain>(1);
 		toldSubProperties.add(subObjectProperty);
@@ -80,7 +79,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 * @param subObjectProperty
 	 * @return true if succesfully removed
 	 */
-	protected boolean removeToldSubObjectProperty(
+	protected boolean removeToldSubProperty(
 			IndexedPropertyChain subObjectProperty) {
 		boolean success = false;
 		if (toldSubProperties != null) {
@@ -90,7 +89,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		}
 		return success;
 	}
-	
+
 	@Override
 	protected void updateOccurrenceNumber(int increment) {
 		occurrenceNo += increment;

@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,17 @@
  */
 package org.semanticweb.elk.reasoner.indexing.visitors;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
- * Visitor pattern interface for instances of {@link IndexedDataHasValue}.
  * 
- * @author Frantisek Simancik
+ * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
  *            the type of the output of this visitor
  */
-public interface IndexedDataHasValueVisitor<O> {
-	O visit(IndexedDataHasValue element);
+public interface IndexedDatatypeExpressionVisitor<O> {
+
+	O visit(IndexedDatatypeExpression element);
 }

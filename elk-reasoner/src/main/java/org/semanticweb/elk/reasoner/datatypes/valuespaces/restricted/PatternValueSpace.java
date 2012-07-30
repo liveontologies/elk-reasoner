@@ -93,4 +93,9 @@ public class PatternValueSpace implements ValueSpace {
 				return false;
 		}
 	}
+	
+	@Override
+	public boolean isSubsumedBy(ValueSpace valueSpace) {
+		return valueSpace.contains(valueSpace);
+	}
 }

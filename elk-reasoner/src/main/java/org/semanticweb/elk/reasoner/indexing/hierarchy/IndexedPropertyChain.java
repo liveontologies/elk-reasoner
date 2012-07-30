@@ -95,7 +95,7 @@ public abstract class IndexedPropertyChain {
 	 * @param superObjectProperty
 	 *            the {@link IndexedObjectProperty} to be added
 	 */
-	void addToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
+	void addToldSuperProperty(IndexedObjectProperty superObjectProperty) {
 		if (toldSuperProperties_ == null)
 			toldSuperProperties_ = new ArrayList<IndexedObjectProperty>(1);
 		toldSuperProperties_.add(superObjectProperty);
@@ -109,7 +109,7 @@ public abstract class IndexedPropertyChain {
 	 *            the {@link IndexedObjectProperty} to be removed
 	 * @return {@code true} if successfully removed
 	 */
-	protected boolean removeToldSuperObjectProperty(
+	protected boolean removeToldSuperProperty(
 			IndexedObjectProperty superObjectProperty) {
 		boolean success = false;
 		if (toldSuperProperties_ != null) {

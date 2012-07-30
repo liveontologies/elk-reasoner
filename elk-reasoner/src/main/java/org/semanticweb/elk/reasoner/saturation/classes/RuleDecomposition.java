@@ -23,8 +23,13 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.List;
+
 import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.*;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
@@ -74,41 +79,34 @@ public class RuleDecomposition<C extends ContextElClassSaturation> implements
 		}
 
 		@Override
-		public Void visit(IndexedDataHasValue element) {
-			List<IndexedDatatypeExpression> satisfyingNegExistentials = 
-					DatatypeEngine.getSatisfyingNegExistentials(element.getProperty(), element);
-			if (satisfyingNegExistentials == null) {
-				engine.enqueue(context, new PositiveSuperClassExpression<C>(engine.getOwlNothing()));
-			} else {
-				for (IndexedDatatypeExpression negDatatypeExpr : satisfyingNegExistentials) {
-					if (element != negDatatypeExpr) {
-						engine.enqueue(context, new PositiveSuperClassExpression<C>(negDatatypeExpr));
-					}
-				}
-			}
+		public Void visit(IndexedDatatypeExpression element) {
+			//TODO: obtain matching negative existentials by retrieving all value spaces for the
+			// data property of this element and finding those value spaces among them that subsume
+			// the value space of this element
 			return null;
-		}
-
-		@Override
-		public Void visit(IndexedDataSomeValuesFrom element) {
-			List<IndexedDatatypeExpression> satisfyingNegExistentials = 
-					DatatypeEngine.getSatisfyingNegExistentials(element.getProperty(), element);
-			if (satisfyingNegExistentials == null) {
-				engine.enqueue(context, new PositiveSuperClassExpression<C>(engine.getOwlNothing()));
-			} else {
-				for (IndexedDatatypeExpression negDatatypeExpr : satisfyingNegExistentials) {
-					if (element != negDatatypeExpr) {
-						engine.enqueue(context, new PositiveSuperClassExpression<C>(negDatatypeExpr));
-					}
-				}
-			}
-			return null;
+//			List<IndexedDatatypeExpression> satisfyingNegExistentials = DatatypeEngine
+//					.getSatisfyingNegExistentials(element.getProperty(),
+//							element);
+//			if (satisfyingNegExistentials == null) {
+//				engine.enqueue(context, new PositiveSuperClassExpression<C>(
+//						engine.getOwlNothing()));
+//			} else {
+//				for (IndexedDatatypeExpression negDatatypeExpr : satisfyingNegExistentials) {
+//					if (element != negDatatypeExpr) {
+//						engine.enqueue(context,
+//								new PositiveSuperClassExpression<C>(
+//										negDatatypeExpr));
+//					}
+//				}
+//			}
+//			return null;
 		}
 
 		@Override
 		public Void visit(IndexedIndividual element) {
 			return null;
 		}
+
 	};
 
 	@Override

@@ -77,4 +77,9 @@ public class BinaryValue implements ValueSpace {
 				return false;
 		}
 	}
+	
+	@Override
+	public boolean isSubsumedBy(ValueSpace valueSpace) {
+		return valueSpace.contains(valueSpace);
+	}
 }

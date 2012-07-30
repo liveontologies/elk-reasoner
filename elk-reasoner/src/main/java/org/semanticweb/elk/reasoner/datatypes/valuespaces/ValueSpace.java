@@ -23,13 +23,16 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.util.collections.Subsumable;
 
+
+// TODO remove contains(); use isSubsumedBy() from Subsumable
 /**
  * Representation of values set within datatype value space.
  *
  * @author Pospishnyi Oleksandr
  */
-public interface ValueSpace {
+public interface ValueSpace extends Subsumable<ValueSpace> {
 
 	/**
 	 * Value space type

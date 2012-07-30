@@ -22,19 +22,21 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.rdf_XMLiteral;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.rdf_XMLiteral;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
  * rdfs:XMLLiteral datatype handler.
@@ -44,12 +46,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression
  * expressions.
  * <p>
  * Uses {@link EntireValueSpace} value space restriction only.
- *
+ * 
  * @author Pospishnyi Olexandr
+ * @author "Yevgeny Kazakov"
  */
 public class XMLLiteralDatatypeHandler implements DatatypeHandler {
 
-	static final Logger LOGGER_ = Logger.getLogger(XMLLiteralDatatypeHandler.class);
+	static final Logger LOGGER_ = Logger
+			.getLogger(XMLLiteralDatatypeHandler.class);
 
 	@Override
 	public Set<Datatype> getSupportedDatatypes() {
@@ -62,14 +66,19 @@ public class XMLLiteralDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression) {
-		if (datatypeExpression instanceof IndexedDataSomeValuesFrom) {
-			ElkDataRange filler = ((IndexedDataSomeValuesFrom) datatypeExpression).getFiller();
-			if (filler instanceof ElkDatatype) {
-				return new EntireValueSpace(datatypeExpression.getDatatype());
-			}
+	public ValueSpace getValueSpace(ElkLiteral literal, Datatype datatype) {
+		LOGGER_.warn("Unsupported datatype expression: "
+				+ OwlFunctionalStylePrinter.toString(literal));
+		return null;
+	}
+
+	@Override
+	public ValueSpace getValueSpace(ElkDataRange dataRange, Datatype datatype) {
+		if (dataRange instanceof ElkDatatype) {
+			return new EntireValueSpace(datatype);
 		}
-		LOGGER_.warn("Unsupported datatype expression: " + datatypeExpression.getClass().getName());
+		LOGGER_.warn("Unsupported datatype expression: "
+				+ OwlFunctionalStylePrinter.toString(dataRange));
 		return null;
 	}
 

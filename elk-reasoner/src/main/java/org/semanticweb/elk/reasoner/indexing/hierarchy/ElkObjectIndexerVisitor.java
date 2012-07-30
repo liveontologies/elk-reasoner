@@ -24,8 +24,29 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.List;
 import java.util.ListIterator;
+
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.*;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
+import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.reasoner.datatypes.handlers.DatatypeHandler;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
  * Visitor for Elk classes, properties, and individuals that returns the
@@ -124,20 +145,47 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 
 	@Override
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
-		IndexedDataProperty idp = (IndexedDataProperty) elkDataHasValue.getProperty().accept(this);
-		return objectFilter.filter(new IndexedDataHasValue(idp, elkDataHasValue.getFiller()));
+		IndexedDataProperty idp = (IndexedDataProperty) elkDataHasValue
+				.getProperty().accept(this);
+
+		ElkLiteral filler = elkDataHasValue.getFiller();
+		Datatype datatype = Datatype.getByIri(filler.getDatatype()
+				.getDatatypeIRI());
+		DatatypeHandler handler = DatatypeEngine.getDatatypeHandler(datatype);
+		ValueSpace valueSpace = handler.getValueSpace(filler, datatype);
+		return objectFilter.filter(new IndexedDatatypeExpression(idp,
+				valueSpace));
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
-		List<? extends ElkDataPropertyExpression> exps = elkDataSomeValuesFrom.getDataPropertyExpressions();
+		List<? extends ElkDataPropertyExpression> exps = elkDataSomeValuesFrom
+				.getDataPropertyExpressions();
 		if (exps != null && exps.size() == 1) {
-			IndexedDataProperty idp = (IndexedDataProperty) exps.get(0).accept(this);
-			return objectFilter.filter(new IndexedDataSomeValuesFrom(idp, elkDataSomeValuesFrom.getDataRange()));
+			IndexedDataProperty idp = (IndexedDataProperty) exps.get(0).accept(
+					this);
+			ElkDataRange dataRange = elkDataSomeValuesFrom.getDataRange();
+			Datatype datatype;
+
+			if (dataRange instanceof ElkDatatype) {
+				datatype = Datatype.getByIri(((ElkDatatype) dataRange)
+						.getDatatypeIRI());
+			} else {
+				datatype = Datatype
+						.getByIri(((ElkDatatypeRestriction) dataRange)
+								.getDatatype().getDatatypeIRI());
+			}
+			DatatypeHandler handler = DatatypeEngine
+					.getDatatypeHandler(datatype);
+			ValueSpace valueSpace = handler.getValueSpace(dataRange, datatype);
+
+			return objectFilter.filter(new IndexedDatatypeExpression(idp,
+					valueSpace));
 		} else {
-			throw new IndexingException(ElkDataSomeValuesFrom.class.getSimpleName() 
-					+ "with multiple properties not supported");
+			throw new IndexingException(
+					ElkDataSomeValuesFrom.class.getSimpleName()
+							+ "with multiple properties not supported");
 		}
 	}
 
@@ -146,7 +194,7 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 		return objectFilter
 				.filter(new IndexedObjectProperty(elkObjectProperty));
 	}
-        
+
 	@Override
 	public IndexedDataProperty visit(ElkDataProperty elkDataProperty) {
 		return objectFilter.filter(new IndexedDataProperty(elkDataProperty));

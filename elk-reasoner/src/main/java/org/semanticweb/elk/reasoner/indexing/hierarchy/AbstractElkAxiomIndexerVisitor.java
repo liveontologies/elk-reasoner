@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
@@ -72,6 +73,10 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	public abstract void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
+
+	public abstract void indexSubDataPropertyOfAxiom(
+			ElkDataPropertyExpression subProperty,
+			ElkDataPropertyExpression superProperty);
 
 	public abstract void indexClassAssertion(ElkIndividual individual,
 			ElkClassExpression type);

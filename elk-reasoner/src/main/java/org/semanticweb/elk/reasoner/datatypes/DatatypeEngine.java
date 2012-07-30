@@ -87,7 +87,7 @@ public class DatatypeEngine {
 			registry.put(property, propertyStore);
 		}
 		DatatypeHandler handler = getDatatypeHandler(datatypeExpression.getDatatype());
-		ValueSpace valueSpace = handler.convert(datatypeExpression);
+		ValueSpace valueSpace = handler.getValueSpace(datatypeExpression);
 		if (valueSpace != null) {
 			if (valueSpace.getDatatype() == Datatype.rdfs_Literal) {
 				/*
@@ -143,7 +143,7 @@ public class DatatypeEngine {
 		Multimap<Datatype, Pair<ValueSpace, IndexedDatatypeExpression>> propertyStore = registry.get(property);
 		if (propertyStore != null) {
 			DatatypeHandler handler = getDatatypeHandler(datatypeExpression.getDatatype());
-			ValueSpace valueSpace = handler.convert(datatypeExpression);
+			ValueSpace valueSpace = handler.getValueSpace(datatypeExpression);
 			if (valueSpace == EmptyValueSpace.INSTANCE) {
 				return null;
 			}

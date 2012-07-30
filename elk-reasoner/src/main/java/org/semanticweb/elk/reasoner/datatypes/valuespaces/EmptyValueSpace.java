@@ -52,4 +52,9 @@ public class EmptyValueSpace implements ValueSpace {
 	public boolean contains(ValueSpace valueSpace) {
 		return false;
 	}
+
+	@Override
+	public boolean isSubsumedBy(ValueSpace valueSpace) {
+		return valueSpace.contains(valueSpace);
+	}
 }

@@ -55,12 +55,17 @@ public class EntireValueSpace implements ValueSpace {
 	/**
 	 * EntireValueSpace contains any other value space or value that has
 	 * compatible datatype
-	 *
+	 * 
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
 	@Override
 	public boolean contains(ValueSpace valueSpace) {
 		return valueSpace.getDatatype().isCompatibleWith(this.datatype);
+	}
+
+	@Override
+	public boolean isSubsumedBy(ValueSpace valueSpace) {
+		return valueSpace.contains(valueSpace);
 	}
 }

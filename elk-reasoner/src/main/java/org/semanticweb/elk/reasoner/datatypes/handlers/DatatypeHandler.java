@@ -23,15 +23,18 @@
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
 import java.util.Set;
+
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
  * Datatype handler interface
  * 
  * @author Pospishnyi Oleksandr
+ * @author "Yevgeny Kazakov"
  */
 public interface DatatypeHandler {
 
@@ -45,23 +48,28 @@ public interface DatatypeHandler {
 	 * supported datatype family
 	 */
 	public Set<Facet> getSupportedFacets();
-	
+
 	/**
 	 * Convert specified datatype expression to internal representation being a
 	 * subset of values defined by this expression
-	 *
-	 * @param datatypeExpression indexed datatype expression to convert
+	 * 
+	 * @param datatypeExpression
+	 *            indexed datatype expression to convert
 	 * @return specific {@link ValueSpace} implementation to represent all
-	 * values within a restricted value space
+	 *         values within a restricted value space
 	 */
-	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression);
+	public ValueSpace getValueSpace(ElkDataRange dataRange, Datatype datatype);
+
+	public ValueSpace getValueSpace(ElkLiteral literal, Datatype datatype);
 
 	/**
 	 * Parse string literal to it's representing object (Number,Date,byte[],
 	 * etc.) with respect to specified datatype
-	 *
-	 * @param literal lexical form
-	 * @param datatype exact literal datatype
+	 * 
+	 * @param literal
+	 *            lexical form
+	 * @param datatype
+	 *            exact literal datatype
 	 * @return typed internal representation of this literal
 	 */
 	public Object parse(String literal, Datatype datatype);

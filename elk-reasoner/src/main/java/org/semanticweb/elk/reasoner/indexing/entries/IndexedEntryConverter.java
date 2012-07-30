@@ -25,14 +25,13 @@ package org.semanticweb.elk.reasoner.indexing.entries;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -71,19 +70,15 @@ public class IndexedEntryConverter<T>
 	}
 
 	@Override
-	public IndexedClassExpressionEntry<T, IndexedDataHasValue> visit(
-			IndexedDataHasValue element) {
-		return new IndexedDataHasValueEntry<T, IndexedDataHasValue>(element);
+	public IndexedClassExpressionEntry<T, IndexedDatatypeExpression> visit(
+			IndexedDatatypeExpression element) {
+		return new IndexedDatatypeExpressionEntry<T, IndexedDatatypeExpression>(
+				element);
 	}
 
 	@Override
-	public IndexedClassExpressionEntry<T, IndexedDataSomeValuesFrom> visit(
-			IndexedDataSomeValuesFrom element) {
-		return new IndexedDataSomeValuesFromEntry<T, IndexedDataSomeValuesFrom>(element);
-	}
-
-	@Override
-	public KeyEntry<T, ? extends IndexedDataProperty> visit(IndexedDataProperty element) {
+	public KeyEntry<T, ? extends IndexedDataProperty> visit(
+			IndexedDataProperty element) {
 		return new IndexedDataPropertyEntry<T, IndexedDataProperty>(element);
 	}
 

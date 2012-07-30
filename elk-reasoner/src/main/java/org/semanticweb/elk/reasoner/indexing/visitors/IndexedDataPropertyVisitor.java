@@ -40,8 +40,11 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 
 /**
- *
+ * 
  * @author Pospishnyi Olexandr
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public interface IndexedDataPropertyVisitor<O> {
 

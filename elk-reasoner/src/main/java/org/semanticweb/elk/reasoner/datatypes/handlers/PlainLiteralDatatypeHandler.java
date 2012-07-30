@@ -22,46 +22,58 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import dk.brics.automaton.Automaton;
-import dk.brics.automaton.Datatypes;
-import dk.brics.automaton.RegExp;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.rdf_PlainLiteral;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_NCName;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_NMTOCKEN;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_Name;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_normalizedString;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_string;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_token;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.LENGTH;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_LENGTH;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_LENGTH;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.PATTERN;
+
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.*;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.*;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.PatternValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.util.collections.Pair;
 
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.Datatypes;
+import dk.brics.automaton.RegExp;
+
 /**
- * rdf:PlainLiteral, xsd:string, xsd:normalizedString, xsd:token,
- * xsd:Name, xsd:NCName, xsd:NMTOKEN datatype handler
+ * rdf:PlainLiteral, xsd:string, xsd:normalizedString, xsd:token, xsd:Name,
+ * xsd:NCName, xsd:NMTOKEN datatype handler
  * <p>
- * uses {@link LengthRestrictedValueSpace} and {@link PatternValueSpace} 
- * to represent datatype restrictions
+ * uses {@link LengthRestrictedValueSpace} and {@link PatternValueSpace} to
+ * represent datatype restrictions
  * 
  * @author Pospishnyi Olexandr
+ * @author "Yevgeny Kazakov"
  */
 public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 
-	static final Logger LOGGER_ = Logger.getLogger(PlainLiteralDatatypeHandler.class);
-	
+	static final Logger LOGGER_ = Logger
+			.getLogger(PlainLiteralDatatypeHandler.class);
+
 	private final Automaton stringAutomaton;
 	private final Automaton normalizedStringAutomaton;
 	private final Automaton tokenAutomaton;
@@ -70,27 +82,37 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 	private final Automaton NMTokenAutomaton;
 
 	public PlainLiteralDatatypeHandler() {
-		//building automaton cache for construction of our automatons
+		// building automaton cache for construction of our automatons
 		HashMap<String, Automaton> autoMap = new HashMap<String, Automaton>();
 		autoMap.put("NameChar", Datatypes.get("NameChar"));
 		autoMap.put("Letter", Datatypes.get("Letter"));
-		
+
 		/*
-		 * Valid XML character is any Unicode character, excluding the surrogate blocks
+		 * Valid XML character is any Unicode character, excluding the surrogate
+		 * blocks
 		 * 
-		 * Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+		 * Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] |
+		 * [#x10000-#x10FFFF]
 		 */
-		autoMap.put("XmlChar", new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]|[\uD800-\uDBFF][\uDC00-\uDFFF]").toAutomaton());
-		
+		autoMap.put(
+				"XmlChar",
+				new RegExp(
+						"[\t\n\r\u0020-\uD7FF\ue000-\ufffd]|[\uD800-\uDBFF][\uDC00-\uDFFF]")
+						.toAutomaton());
+
 		/*
 		 * NormalChar is the XmlChar without \t \n and \r characters
 		 */
-		autoMap.put("NormalChar", new RegExp("[\u0020-\uD7FF\ue000-\ufffd]|[\uD800-\uDBFF][\uDC00-\uDFFF]").toAutomaton());
-		
+		autoMap.put("NormalChar", new RegExp(
+				"[\u0020-\uD7FF\ue000-\ufffd]|[\uD800-\uDBFF][\uDC00-\uDFFF]")
+				.toAutomaton());
+
 		/*
 		 * NoWhitespace is the NormalChar without whitespace character
 		 */
-		autoMap.put("NoWhitespace", new RegExp("[\u0021-\uD7FF\ue000-\ufffd]|[\uD800-\uDBFF][\uDC00-\uDFFF]").toAutomaton());
+		autoMap.put("NoWhitespace", new RegExp(
+				"[\u0021-\uD7FF\ue000-\ufffd]|[\uD800-\uDBFF][\uDC00-\uDFFF]")
+				.toAutomaton());
 
 		/*
 		 * xsd:string is the set of finite-length sequences of valid XML
@@ -102,7 +124,8 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		 * xsd:normalizedString is the set of strings that do not contain the
 		 * carriage return (#xD), line feed (#xA) nor tab (#x9) characters
 		 */
-		normalizedStringAutomaton = new RegExp("<NormalChar>*").toAutomaton(autoMap);
+		normalizedStringAutomaton = new RegExp("<NormalChar>*")
+				.toAutomaton(autoMap);
 
 		/*
 		 * xsd:token is the set of strings that do not contain the carriage
@@ -110,32 +133,33 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		 * leading or trailing spaces (#x20) and that have no internal sequences
 		 * of two or more spaces.
 		 */
-		tokenAutomaton = new RegExp("(<NoWhitespace>+(\u0020<NoWhitespace>+)*)?").toAutomaton(autoMap);
+		tokenAutomaton = new RegExp(
+				"(<NoWhitespace>+(\u0020<NoWhitespace>+)*)?")
+				.toAutomaton(autoMap);
 
 		/*
 		 * xsd:Name is the set of all strings which match the Name production
-		 * NameChar ::=	 Letter | Digit | '.' | '-' | '_' | ':' | CombiningChar | Extender
-		 * Name		::=	 (Letter | '_' | ':') ( NameChar)*
+		 * NameChar ::= Letter | Digit | '.' | '-' | '_' | ':' | CombiningChar |
+		 * Extender Name ::= (Letter | '_' | ':') ( NameChar)*
 		 */
-		NameAutomaton = new RegExp("(<Letter>|[_:])<NameChar>*").toAutomaton(autoMap);
+		NameAutomaton = new RegExp("(<Letter>|[_:])<NameChar>*")
+				.toAutomaton(autoMap);
 
 		/*
 		 * xsd:NCName is the set of all strings which match the NCName
-		 * production
-		 * NCNameChar ::= Letter | Digit | '.' | '-' | '_' | CombiningChar | Extender
-		 * NCName	  ::= (Letter | '_') (NCNameChar)*
+		 * production NCNameChar ::= Letter | Digit | '.' | '-' | '_' |
+		 * CombiningChar | Extender NCName ::= (Letter | '_') (NCNameChar)*
 		 */
 		NCNameAutomaton = Datatypes.get("NCName");
 
 		/*
 		 * xsd:NMToken is the set of all strings which match the NMToken
-		 * production
-		 * NameChar ::=	 Letter | Digit | '.' | '-' | '_' | ':' | CombiningChar | Extender
-		 * Nmtoken	::=	 (NameChar)+
+		 * production NameChar ::= Letter | Digit | '.' | '-' | '_' | ':' |
+		 * CombiningChar | Extender Nmtoken ::= (NameChar)+
 		 */
 		NMTokenAutomaton = new RegExp("<NameChar>+").toAutomaton(autoMap);
 	}
-	
+
 	@Override
 	public Set<Datatype> getSupportedDatatypes() {
 		return EnumSet.of(rdf_PlainLiteral, xsd_string, xsd_normalizedString,
@@ -148,86 +172,85 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression) {
-		if (datatypeExpression instanceof IndexedDataHasValue) {
-			return createLiteralValueSpace((IndexedDataHasValue) datatypeExpression);
-		} else if (datatypeExpression instanceof IndexedDataSomeValuesFrom) {
-			ElkDataRange filler = ((IndexedDataSomeValuesFrom) datatypeExpression).getFiller();
-			if (filler instanceof ElkDatatype) {
-				return new EntireValueSpace(datatypeExpression.getDatatype());
-			} else {
-				return createRestrictedValueSpace((ElkDatatypeRestriction) filler);
-			}
-		}
-		LOGGER_.warn("Unsupported datatype expression: " + datatypeExpression.getClass().getName());
-		return null;
-	}
-
-	private ValueSpace createLiteralValueSpace(IndexedDataHasValue datatypeExpression) {
-		Datatype datatype = datatypeExpression.getDatatype();
+	public ValueSpace getValueSpace(ElkLiteral literal, Datatype datatype) {
 		Datatype effectiveDatatype = datatype;
-		
-		String lexicalForm = datatypeExpression.getFiller().getLexicalForm();
+
+		String lexicalForm = literal.getLexicalForm();
 
 		String[] pair = (String[]) parse(lexicalForm, datatype);
 		String value = pair[0];
-		String language = pair[1] != null ? pair[1] : datatypeExpression.getFiller().getLanguage();
+		String language = pair[1] != null ? pair[1] : literal.getLanguage();
 
 		effectiveDatatype = determineDatatype(value);
-		
+
 		if (value != null) {
 			if (language != null && !language.isEmpty()) {
-				//language tag is present
-				return new LiteralValue(new Pair<String, String>(value, language), datatype, effectiveDatatype);
+				// language tag is present
+				return new LiteralValue(new Pair<String, String>(value,
+						language), datatype, effectiveDatatype);
 			} else {
-				//no language tag for this literal
+				// no language tag for this literal
 				return new LiteralValue(value, datatype, effectiveDatatype);
 			}
 		} else {
 			return null;
 		}
 	}
-	
+
+	@Override
+	public ValueSpace getValueSpace(ElkDataRange dataRange, Datatype datatype) {
+		if (dataRange instanceof ElkDatatype) {
+			return new EntireValueSpace(datatype);
+		} else {
+			return createRestrictedValueSpace((ElkDatatypeRestriction) dataRange);
+		}
+	}
+
 	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-		Datatype datatype = Datatype.getByIri(filler.getDatatype().getDatatypeIRI());
-		
-		List<? extends ElkFacetRestriction> facetRestrictions = filler.getFacetRestrictions();
-		outerloop:
-		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().getFullIriAsString());
-			String lexicalForm = facetRestriction.getRestrictionValue().getLexicalForm();
+		Datatype datatype = Datatype.getByIri(filler.getDatatype()
+				.getDatatypeIRI());
+
+		List<? extends ElkFacetRestriction> facetRestrictions = filler
+				.getFacetRestrictions();
+		outerloop: for (ElkFacetRestriction facetRestriction : facetRestrictions) {
+			Facet facet = Facet.getByIri(facetRestriction
+					.getConstrainingFacet().getFullIriAsString());
+			String lexicalForm = facetRestriction.getRestrictionValue()
+					.getLexicalForm();
 			String[] pair = (String[]) parse(lexicalForm, datatype);
 			String value = pair[0];
 
 			switch (facet) {
-				case LENGTH:
-					minLength = Integer.valueOf(value);
-					maxLength = minLength;
-					break outerloop;
-				case MIN_LENGTH:
-					minLength = Integer.valueOf(value);
-					break;
-				case MAX_LENGTH:
-					maxLength = Integer.valueOf(value);
-					break;
-				case PATTERN:
-					Automaton pattern = new RegExp(value).toAutomaton();
-					Datatype effectiveDatatype = determineDatatype(pattern);
-					PatternValueSpace vs = new PatternValueSpace(pattern, datatype, effectiveDatatype);
-					if (vs.isEmptyInterval()) {
-						return EmptyValueSpace.INSTANCE;
-					} else {
-						return vs;
-					}
-				default:
-					LOGGER_.warn("Unsupported facet: " + facet.iri);
-					return null;
+			case LENGTH:
+				minLength = Integer.valueOf(value);
+				maxLength = minLength;
+				break outerloop;
+			case MIN_LENGTH:
+				minLength = Integer.valueOf(value);
+				break;
+			case MAX_LENGTH:
+				maxLength = Integer.valueOf(value);
+				break;
+			case PATTERN:
+				Automaton pattern = new RegExp(value).toAutomaton();
+				Datatype effectiveDatatype = determineDatatype(pattern);
+				PatternValueSpace vs = new PatternValueSpace(pattern, datatype,
+						effectiveDatatype);
+				if (vs.isEmptyInterval()) {
+					return EmptyValueSpace.INSTANCE;
+				} else {
+					return vs;
+				}
+			default:
+				LOGGER_.warn("Unsupported facet: " + facet.iri);
+				return null;
 			}
 		}
-		
-		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(datatype, minLength, maxLength);
+
+		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(
+				datatype, minLength, maxLength);
 		if (vs.isEmptyInterval()) {
 			return EmptyValueSpace.INSTANCE;
 		} else {
@@ -241,15 +264,17 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		if (lastAt != -1) {
 			String string = lexicalForm.substring(0, lastAt);
 			String languageTag = lexicalForm.substring(lastAt + 1);
-			return new String[]{string, languageTag};
+			return new String[] { string, languageTag };
 		} else {
-			return new String[]{lexicalForm, null};
+			return new String[] { lexicalForm, null };
 		}
 	}
-	
+
 	/**
 	 * Determine most specific datatype for input string
-	 * @param string input
+	 * 
+	 * @param string
+	 *            input
 	 * @return most specific {@link Datatype}
 	 */
 	public Datatype determineDatatype(String string) {
@@ -289,7 +314,9 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 
 	/**
 	 * Determine most specific datatype for input pattern
-	 * @param pattern regular expression automaton
+	 * 
+	 * @param pattern
+	 *            regular expression automaton
 	 * @return most specific {@link Datatype}
 	 */
 	public Datatype determineDatatype(Automaton pattern) {
@@ -326,5 +353,5 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		}
 		return retType;
 	}
-	
+
 }

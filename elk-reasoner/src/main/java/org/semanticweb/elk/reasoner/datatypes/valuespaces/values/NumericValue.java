@@ -74,4 +74,9 @@ public class NumericValue implements ValueSpace {
 				((NumericValue) valueSpace).value);
 		return compare == 0;
 	}
+	
+	@Override
+	public boolean isSubsumedBy(ValueSpace valueSpace) {
+		return valueSpace.contains(valueSpace);
+	}
 }

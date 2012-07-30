@@ -22,37 +22,41 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_base64Binary;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_hexBinary;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.LENGTH;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_LENGTH;
+import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_LENGTH;
+
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.xml.bind.DatatypeConverter;
+
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_base64Binary;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_hexBinary;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.*;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
  * xsd:hexBinary and xsd:base64Binary datatype handler
  * <p>
- * uses {@link BinaryValue} and {@link LengthRestrictedValueSpace} to
- * represent datatype restrictions. Please note that value space of
- * xsd:hexBinary and xsd:base64Binary are disjoint.
- *
+ * uses {@link BinaryValue} and {@link LengthRestrictedValueSpace} to represent
+ * datatype restrictions. Please note that value space of xsd:hexBinary and
+ * xsd:base64Binary are disjoint.
+ * 
  * @author Pospishnyi Olexandr
+ * @author "Yevgeny Kazakov"
  */
 public class BinaryDatatypeHandler implements DatatypeHandler {
 
@@ -69,24 +73,8 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace convert(IndexedDatatypeExpression datatypeExpression) {
-		if (datatypeExpression instanceof IndexedDataHasValue) {
-			return createLiteralValueSpace((IndexedDataHasValue) datatypeExpression);
-		} else if (datatypeExpression instanceof IndexedDataSomeValuesFrom) {
-			ElkDataRange filler = ((IndexedDataSomeValuesFrom) datatypeExpression).getFiller();
-			if (filler instanceof ElkDatatype) {
-				return new EntireValueSpace(datatypeExpression.getDatatype());
-			} else {
-				return createRestrictedValueSpace((ElkDatatypeRestriction) filler);
-			}
-		}
-		LOGGER_.warn("Unsupported datatype expression: " + datatypeExpression.getClass().getName());
-		return null;
-	}
-	
-	private ValueSpace createLiteralValueSpace(IndexedDataHasValue datatypeExpression) {
-		Datatype datatype = datatypeExpression.getDatatype();
-		byte[] value =  (byte[]) parse(datatypeExpression.getFiller().getLexicalForm(), datatype);
+	public ValueSpace getValueSpace(ElkLiteral literal, Datatype datatype) {
+		byte[] value = (byte[]) parse(literal.getLexicalForm(), datatype);
 		if (value != null) {
 			return new BinaryValue(value, datatype);
 		} else {
@@ -94,36 +82,49 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
+	@Override
+	public ValueSpace getValueSpace(ElkDataRange dataRange, Datatype datatype) {
+		if (dataRange instanceof ElkDatatype) {
+			return new EntireValueSpace(datatype);
+		} else {
+			return createRestrictedValueSpace((ElkDatatypeRestriction) dataRange);
+		}
+	}
+
 	@SuppressWarnings("static-method")
 	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-		Datatype datatype = Datatype.getByIri(filler.getDatatype().getDatatypeIRI());
+		Datatype datatype = Datatype.getByIri(filler.getDatatype()
+				.getDatatypeIRI());
 
-		List<? extends ElkFacetRestriction> facetRestrictions = filler.getFacetRestrictions();
-		outerloop:
-		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction.getConstrainingFacet().getFullIriAsString());
-			String value = facetRestriction.getRestrictionValue().getLexicalForm();
+		List<? extends ElkFacetRestriction> facetRestrictions = filler
+				.getFacetRestrictions();
+		outerloop: for (ElkFacetRestriction facetRestriction : facetRestrictions) {
+			Facet facet = Facet.getByIri(facetRestriction
+					.getConstrainingFacet().getFullIriAsString());
+			String value = facetRestriction.getRestrictionValue()
+					.getLexicalForm();
 
 			switch (facet) {
-				case LENGTH:
-					minLength = Integer.valueOf(value);
-					maxLength = minLength;
-					break outerloop;
-				case MIN_LENGTH:
-					minLength = Integer.valueOf(value);
-					break;
-				case MAX_LENGTH:
-					maxLength = Integer.valueOf(value);
-					break;
-				default:
-					LOGGER_.warn("Unsupported facet: " + facet.iri);
-					return null;
+			case LENGTH:
+				minLength = Integer.valueOf(value);
+				maxLength = minLength;
+				break outerloop;
+			case MIN_LENGTH:
+				minLength = Integer.valueOf(value);
+				break;
+			case MAX_LENGTH:
+				maxLength = Integer.valueOf(value);
+				break;
+			default:
+				LOGGER_.warn("Unsupported facet: " + facet.iri);
+				return null;
 			}
 
 		}
-		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(datatype, minLength, maxLength);
+		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(
+				datatype, minLength, maxLength);
 		if (vs.isEmptyInterval()) {
 			return EmptyValueSpace.INSTANCE;
 		} else {
@@ -134,12 +135,12 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 	@Override
 	public Object parse(String literal, Datatype datatype) {
 		switch (datatype) {
-			case xsd_base64Binary:
-				return DatatypeConverter.parseBase64Binary(literal);
-			case xsd_hexBinary:
-				return DatatypeConverter.parseHexBinary(literal);
-			default:
-				return null;
+		case xsd_base64Binary:
+			return DatatypeConverter.parseBase64Binary(literal);
+		case xsd_hexBinary:
+			return DatatypeConverter.parseHexBinary(literal);
+		default:
+			return null;
 		}
 	}
 }

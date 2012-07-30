@@ -22,23 +22,68 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDatatypeExpressionVisitor;
 
 /**
- *
+ * 
  * @author Pospishnyi Olexandr
+ * @author "Yevgeny Kazakov"
  */
-public abstract class IndexedDatatypeExpression extends IndexedClassExpression {
+public class IndexedDatatypeExpression extends IndexedClassExpression {
 
 	protected final IndexedDataProperty property;
 
-	public IndexedDatatypeExpression(IndexedDataProperty property) {
+	protected final ValueSpace valueSpace;
+
+	public IndexedDatatypeExpression(IndexedDataProperty property,
+			ValueSpace valueSpace) {
 		this.property = property;
+		this.valueSpace = valueSpace;
 	}
 
 	public IndexedDataProperty getProperty() {
-		return property;
+		return this.property;
 	}
 
-	abstract public Datatype getDatatype();
+	public ValueSpace getValueSpace() {
+		return this.valueSpace;
+	}
+
+	@Override
+	protected void updateOccurrenceNumbers(int increment,
+			int positiveIncrement, int negativeIncrement) {
+		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+			// first negative occurrence of this expression
+			DatatypeEngine.register(property, this); // TODO: do we need that?
+			property.addNegativeDatatypeExpression(this);
+		}
+
+		positiveOccurrenceNo += positiveIncrement;
+		negativeOccurrenceNo += negativeIncrement;
+
+		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
+			// no negative occurrences of this expression left
+			DatatypeEngine.unregister(property, this); // TODO: do we need that?
+			property.removeNegativeDatatypeExpression(this);
+		}
+	}
+
+	public <O> O accept(IndexedDatatypeExpressionVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+		return accept((IndexedDatatypeExpressionVisitor<O>) visitor);
+	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
