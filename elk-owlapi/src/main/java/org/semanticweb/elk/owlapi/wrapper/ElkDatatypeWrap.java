@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK OWL API Binding
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -30,17 +30,20 @@ import org.semanticweb.owlapi.model.OWLDatatype;
 /**
  * Implements the {@link ElkDatatype} interface by wrapping instances of
  * {@link OWLDatatype}
- * 
+ *
  * @author "Yevgeny Kazakov"
- * 
+ *
  * @param <T>
  *            the type of the wrapped object
  */
 public class ElkDatatypeWrap<T extends OWLDatatype> extends ElkEntityWrap<T>
 		implements ElkDatatype {
 
+	protected ELDatatype elDatatype;
+
 	public ElkDatatypeWrap(T owlDatatype) {
 		super(owlDatatype);
+		elDatatype = ELDatatype.getByIri(owlDatatype.getIRI().toString());
 	}
 
 	@Override
@@ -66,5 +69,10 @@ public class ElkDatatypeWrap<T extends OWLDatatype> extends ElkEntityWrap<T>
 	@Override
 	public String getDatatypeIRI() {
 		return this.owlObject.getIRI().toString();
+	}
+
+	@Override
+	public ELDatatype asELDatatype() {
+		return elDatatype;
 	}
 }

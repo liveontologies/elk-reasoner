@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK OWL Model Implementation
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -31,14 +31,17 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
  * ELK implementation of ElkDatatype.
- * 
+ *
  * @author Markus Kroetzsch
  */
 public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
 		ElkDatatype {
 
+	protected ELDatatype elDatatype;
+
 	ElkDatatypeImpl(ElkIri iri) {
 		super(iri);
+		elDatatype = ELDatatype.getByIri(iri.getFullIriAsString());
 	}
 
 	@Override
@@ -64,5 +67,10 @@ public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
 	@Override
 	public String getDatatypeIRI() {
 		return iri.getFullIriAsString();
+	}
+
+	@Override
+	public ELDatatype asELDatatype() {
+		return elDatatype;
 	}
 }

@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -30,11 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
@@ -42,30 +38,30 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
-import org.semanticweb.elk.reasoner.datatypes.handlers.DatatypeHandler;
+import org.semanticweb.elk.reasoner.datatypes.handlers.ElkDatatypeHandler;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
  * Visitor for Elk classes, properties, and individuals that returns the
  * corresponding indexed objects, already filtered through the
  * IndexedObjectFilter provided in the constructor.
- * 
+ *
  * @author Frantisek Simancik
- * 
+ *
  */
 public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 
 	protected IndexedObjectFilter objectFilter;
+	protected ElkDatatypeHandler datatypeHandler;
 
 	/**
 	 * @param objectFilter
 	 *            filter that is applied to the indexed objects after
 	 *            construction
 	 */
-	public ElkObjectIndexerVisitor(IndexedObjectFilter objectFilter) {
+	public ElkObjectIndexerVisitor(IndexedObjectFilter objectFilter, ElkDatatypeHandler datatypeHandler) {
 		this.objectFilter = objectFilter;
+		this.datatypeHandler = datatypeHandler;
 	}
 
 	@Override
@@ -83,11 +79,11 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor#visit(org.
 	 * semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf)
-	 * 
+	 *
 	 * Binarization of conjunctions. To be able to use a map instead of a
 	 * multimap in IndexedClassExpression.negConjunctionsByConjunct It is
 	 * important to ensure that we never create both (A & B) and (B & A). This
@@ -142,14 +138,8 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
 		IndexedDataProperty idp = (IndexedDataProperty) elkDataHasValue
 				.getProperty().accept(this);
-
-		ElkLiteral filler = elkDataHasValue.getFiller();
-		Datatype datatype = Datatype.getByIri(filler.getDatatype()
-				.getDatatypeIRI());
-		DatatypeHandler handler = DatatypeEngine.getDatatypeHandler(datatype);
-		ValueSpace valueSpace = handler.getValueSpace(filler, datatype);
-		return objectFilter.filter(new IndexedDatatypeExpression(idp,
-				valueSpace));
+		ValueSpace vs = elkDataHasValue.getFiller().accept(datatypeHandler);
+		return objectFilter.filter(new IndexedDatatypeExpression(idp, vs));
 	}
 
 	@Override
@@ -158,25 +148,9 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 		List<? extends ElkDataPropertyExpression> exps = elkDataSomeValuesFrom
 				.getDataPropertyExpressions();
 		if (exps != null && exps.size() == 1) {
-			IndexedDataProperty idp = (IndexedDataProperty) exps.get(0).accept(
-					this);
-			ElkDataRange dataRange = elkDataSomeValuesFrom.getDataRange();
-			Datatype datatype;
-
-			if (dataRange instanceof ElkDatatype) {
-				datatype = Datatype.getByIri(((ElkDatatype) dataRange)
-						.getDatatypeIRI());
-			} else {
-				datatype = Datatype
-						.getByIri(((ElkDatatypeRestriction) dataRange)
-								.getDatatype().getDatatypeIRI());
-			}
-			DatatypeHandler handler = DatatypeEngine
-					.getDatatypeHandler(datatype);
-			ValueSpace valueSpace = handler.getValueSpace(dataRange, datatype);
-
-			return objectFilter.filter(new IndexedDatatypeExpression(idp,
-					valueSpace));
+			IndexedDataProperty idp = (IndexedDataProperty) exps.get(0).accept(this);
+			ValueSpace vs = elkDataSomeValuesFrom.getDataRange().accept(datatypeHandler);
+			return objectFilter.filter(new IndexedDatatypeExpression(idp, vs));
 		} else {
 			throw new IndexingException(
 					ElkDataSomeValuesFrom.class.getSimpleName()
@@ -197,11 +171,11 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor
 	 * #visit(org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain)
-	 * 
+	 *
 	 * Binarization of role chains. Order must be preserved.
 	 */
 	@Override

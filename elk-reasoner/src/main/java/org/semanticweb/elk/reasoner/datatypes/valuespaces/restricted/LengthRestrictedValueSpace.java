@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -25,24 +25,24 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
 import dk.brics.automaton.Datatypes;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 
 /**
- * Representation of any value that satisfies specified length 
- * 
+ * Representation of any value that satisfies specified length
+ *
  * @author Pospishnyi Olexandr
  */
 public class LengthRestrictedValueSpace implements ValueSpace {
 
 	private Integer minLength;
 	private Integer maxLength;
-	private Datatype datatype;
+	private ELDatatype datatype;
 	private Automaton automaton;
 
-	public LengthRestrictedValueSpace(Datatype datatype, Integer minLength, Integer maxLength) {
+	public LengthRestrictedValueSpace(ELDatatype datatype, Integer minLength, Integer maxLength) {
 		this.minLength = minLength;
 		this.maxLength = maxLength;
 		this.datatype = datatype;
@@ -59,7 +59,7 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	}
 
 	@Override
-	public Datatype getDatatype() {
+	public ELDatatype getDatatype() {
 		return datatype;
 	}
 
@@ -84,7 +84,7 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Finite-state automaton that represents literal length restriction.
 	 * Used to deduce subsumption between LengthRestrictedValueSpace and PatternValueSpace
@@ -96,7 +96,7 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 
 	/**
 	 * LengthRestrictedValueSpace could contain
-	 * - another LengthRestrictedValueSpace within this one 
+	 * - another LengthRestrictedValueSpace within this one
 	 * - LiteralValue that satisfies length restrictions
 	 * - PatternValueSpace that will satisfy length restrictions
 	 * - BinaryValue that satisfies length restrictions
@@ -130,7 +130,7 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 				return false;
 		}
 	}
-	
+
 	@Override
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);

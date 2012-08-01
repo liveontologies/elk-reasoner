@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,11 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.owl_rational;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.owl_real;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_decimal;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_integer;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_nonNegativeInteger;
+import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype.*;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_EXCLUSIVE;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_INCLUSIVE;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_EXCLUSIVE;
@@ -41,19 +37,16 @@ import java.util.Set;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NegativeInfinity;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.numbers.PositiveInfinity;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.NumericIntervalValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
@@ -67,11 +60,11 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
  * <p>
  * Uses {@link NumericIntervalValueSpace} and {@link NumericValue} to represent
  * datatype restrictions
- * 
+ *
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
-public class NumericDatatypeHandler implements DatatypeHandler {
+public class NumericDatatypeHandler extends ElkDatatypeHandler {
 
 	static final Logger LOGGER_ = Logger
 			.getLogger(NumericDatatypeHandler.class);
@@ -88,7 +81,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	private final NumberComparator comparator = NumberComparator.INSTANCE;
 
 	@Override
-	public Set<Datatype> getSupportedDatatypes() {
+	public Set<ELDatatype> getSupportedDatatypes() {
 		return EnumSet.of(owl_real, owl_rational, xsd_decimal, xsd_integer,
 				xsd_nonNegativeInteger);
 	}
@@ -100,42 +93,19 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkLiteral literal, Datatype datatype) {
-		String lexicalForm = literal.getLexicalForm();
-		return new NumericValue(datatype, (Number) parse(lexicalForm, datatype));
+	public ValueSpace visit(ElkLiteral elkLiteral) {
+		String lexicalForm = elkLiteral.getLexicalForm();
+		ELDatatype datatype = elkLiteral.getDatatype().asELDatatype();
+		return new NumericValue(datatype, parse(lexicalForm, datatype));
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkDataRange dataRange, Datatype datatype) {
-		if (dataRange instanceof ElkDatatype) {
-			return createEntireValueSpace((ElkDatatype) dataRange);
-		} else {
-			return createRestrictedValueSpace((ElkDatatypeRestriction) dataRange);
-		}
-	}
-
-	/**
-	 * Create {@link EntireValueSpace} to represent complete datatype value
-	 * space
-	 */
-	@SuppressWarnings("static-method")
-	private ValueSpace createEntireValueSpace(ElkDatatype elkDatatype) {
-		return new EntireValueSpace(Datatype.getByIri(elkDatatype
-				.getDatatypeIRI()));
-	}
-
-	/**
-	 * Build corresponding restricted value space. If facet restriction implies
-	 * single value then corresponding {@link NumericValue} will be constructed.
-	 * Otherwise {@link NumericIntervalValueSpace} will be built that will
-	 * represent specified facet restriction as an interval on numerical axis.
-	 */
-	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
+	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
 		Number lowerBound, upperBound;
 		boolean lowerInclusive, upperInclusive;
 
-		Datatype datatype = Datatype.getByIri(filler.getDatatype()
-				.getDatatypeIRI());
+		ELDatatype datatype = elkDatatypeRestriction.getDatatype().asELDatatype();
+
 		switch (datatype) {
 		case owl_real:
 		case owl_rational:
@@ -160,14 +130,13 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		}
 
 		// process all facet restrictions
-		List<? extends ElkFacetRestriction> facetRestrictions = filler
+		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
 				.getFacetRestrictions();
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
 			Facet facet = Facet.getByIri(facetRestriction
 					.getConstrainingFacet().getFullIriAsString());
-			Datatype restrictionDatatype = Datatype.getByIri(facetRestriction
-					.getRestrictionValue().getDatatype().getDatatypeIRI());
-			Number restrictionValue = (Number) parse(facetRestriction
+			ELDatatype restrictionDatatype = facetRestriction.getRestrictionValue().getDatatype().asELDatatype();
+			Number restrictionValue = parse(facetRestriction
 					.getRestrictionValue().getLexicalForm(),
 					restrictionDatatype);
 
@@ -217,8 +186,7 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
-	@Override
-	public Object parse(String literal, Datatype datatype) {
+	private Number parse(String literal, ELDatatype datatype) {
 		switch (datatype) {
 		case owl_real:
 			LOGGER_.warn("The owl:real datatype does not directly provide "
@@ -241,7 +209,6 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	 * Parse xsd:decimal literal. Attempt to identify most specific numeric type
 	 * (int - long - BigInteger - BigDecimal - BigRational)
 	 */
-	@SuppressWarnings("static-method")
 	private Number parseRational(String literal) {
 		int divisorIndx = literal.indexOf('/');
 		if (divisorIndx == -1) {
@@ -278,7 +245,6 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	 * Parse xsd:decimal literal. Attempt to identify most specific numeric type
 	 * (int-long-BigInteger-BigDecimal)
 	 */
-	@SuppressWarnings("static-method")
 	private Number parseDecimal(String literal) {
 		BigDecimal value = DatatypeConverter.parseDecimal(literal);
 		try {
@@ -300,7 +266,6 @@ public class NumericDatatypeHandler implements DatatypeHandler {
 	 * Parse xsd:decimal literal. Attempt to identify most specific numeric type
 	 * (int-long-BigInteger)
 	 */
-	@SuppressWarnings("static-method")
 	private Number parseInteger(String literal) {
 		BigInteger value = DatatypeConverter.parseInteger(literal);
 		if (value.compareTo(BI_MIN_INTEGER) >= 0

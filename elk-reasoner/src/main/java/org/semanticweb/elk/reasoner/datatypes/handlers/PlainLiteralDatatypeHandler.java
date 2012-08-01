@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,13 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.rdf_PlainLiteral;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_NCName;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_NMTOCKEN;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_Name;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_normalizedString;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_string;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_token;
+import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype.*;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.LENGTH;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_LENGTH;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_LENGTH;
@@ -40,15 +34,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.PatternValueSpace;
@@ -65,11 +56,11 @@ import dk.brics.automaton.RegExp;
  * <p>
  * uses {@link LengthRestrictedValueSpace} and {@link PatternValueSpace} to
  * represent datatype restrictions
- * 
+ *
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
-public class PlainLiteralDatatypeHandler implements DatatypeHandler {
+public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
 
 	static final Logger LOGGER_ = Logger
 			.getLogger(PlainLiteralDatatypeHandler.class);
@@ -90,15 +81,15 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		/*
 		 * Valid XML character is any Unicode character, excluding the surrogate
 		 * blocks
-		 * 
+		 *
 		 * Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] |
 		 * [#x10000-#x10FFFF]
 		 */
 		autoMap.put(
-				"XmlChar",
-				new RegExp(
-						"[\t\n\r\u0020-\uD7FF\ue000-\ufffd]|[\uD800-\uDBFF][\uDC00-\uDFFF]")
-						.toAutomaton());
+			"XmlChar",
+			new RegExp(
+			"[\t\n\r\u0020-\uD7FF\ue000-\ufffd]|[\uD800-\uDBFF][\uDC00-\uDFFF]")
+			.toAutomaton());
 
 		/*
 		 * NormalChar is the XmlChar without \t \n and \r characters
@@ -161,7 +152,7 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public Set<Datatype> getSupportedDatatypes() {
+	public Set<ELDatatype> getSupportedDatatypes() {
 		return EnumSet.of(rdf_PlainLiteral, xsd_string, xsd_normalizedString,
 				xsd_token, xsd_Name, xsd_NCName, xsd_NMTOCKEN);
 	}
@@ -172,12 +163,13 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkLiteral literal, Datatype datatype) {
-		Datatype effectiveDatatype = datatype;
+	public ValueSpace visit(ElkLiteral literal) {
+		ELDatatype datatype = literal.getDatatype().asELDatatype();
+		ELDatatype effectiveDatatype = datatype;
 
 		String lexicalForm = literal.getLexicalForm();
 
-		String[] pair = (String[]) parse(lexicalForm, datatype);
+		String[] pair = parse(lexicalForm);
 		String value = pair[0];
 		String language = pair[1] != null ? pair[1] : literal.getLanguage();
 
@@ -198,28 +190,20 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkDataRange dataRange, Datatype datatype) {
-		if (dataRange instanceof ElkDatatype) {
-			return new EntireValueSpace(datatype);
-		} else {
-			return createRestrictedValueSpace((ElkDatatypeRestriction) dataRange);
-		}
-	}
-
-	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
+	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-		Datatype datatype = Datatype.getByIri(filler.getDatatype()
-				.getDatatypeIRI());
 
-		List<? extends ElkFacetRestriction> facetRestrictions = filler
+		ELDatatype datatype = elkDatatypeRestriction.getDatatype().asELDatatype();
+
+		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
 				.getFacetRestrictions();
 		outerloop: for (ElkFacetRestriction facetRestriction : facetRestrictions) {
 			Facet facet = Facet.getByIri(facetRestriction
 					.getConstrainingFacet().getFullIriAsString());
 			String lexicalForm = facetRestriction.getRestrictionValue()
 					.getLexicalForm();
-			String[] pair = (String[]) parse(lexicalForm, datatype);
+			String[] pair = parse(lexicalForm);
 			String value = pair[0];
 
 			switch (facet) {
@@ -235,7 +219,7 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 				break;
 			case PATTERN:
 				Automaton pattern = new RegExp(value).toAutomaton();
-				Datatype effectiveDatatype = determineDatatype(pattern);
+				ELDatatype effectiveDatatype = determineDatatype(pattern);
 				PatternValueSpace vs = new PatternValueSpace(pattern, datatype,
 						effectiveDatatype);
 				if (vs.isEmptyInterval()) {
@@ -258,8 +242,7 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
-	@Override
-	public Object parse(String lexicalForm, Datatype datatype) {
+	private String[] parse(String lexicalForm) {
 		int lastAt = lexicalForm.lastIndexOf('@');
 		if (lastAt != -1) {
 			String string = lexicalForm.substring(0, lastAt);
@@ -272,13 +255,13 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 
 	/**
 	 * Determine most specific datatype for input string
-	 * 
+	 *
 	 * @param string
 	 *            input
 	 * @return most specific {@link Datatype}
 	 */
-	public Datatype determineDatatype(String string) {
-		Datatype retType = Datatype.rdf_PlainLiteral;
+	public ELDatatype determineDatatype(String string) {
+		ELDatatype retType = ELDatatype.rdf_PlainLiteral;
 		if (stringAutomaton.run(string)) {
 			retType = xsd_string;
 		} else {
@@ -314,13 +297,13 @@ public class PlainLiteralDatatypeHandler implements DatatypeHandler {
 
 	/**
 	 * Determine most specific datatype for input pattern
-	 * 
+	 *
 	 * @param pattern
 	 *            regular expression automaton
 	 * @return most specific {@link Datatype}
 	 */
-	public Datatype determineDatatype(Automaton pattern) {
-		Datatype retType = Datatype.rdf_PlainLiteral;
+	public ELDatatype determineDatatype(Automaton pattern) {
+		ELDatatype retType = ELDatatype.rdf_PlainLiteral;
 		if (!stringAutomaton.intersection(pattern).isEmpty()) {
 			retType = xsd_string;
 		} else {

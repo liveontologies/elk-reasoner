@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.util.collections.Subsumable;
 
 
@@ -45,7 +45,7 @@ public interface ValueSpace extends Subsumable<ValueSpace> {
 	/**
 	 * @return Value space datatype
 	 */
-	public Datatype getDatatype();
+	public ELDatatype getDatatype();
 
 	/**
 	 * @return Value space type

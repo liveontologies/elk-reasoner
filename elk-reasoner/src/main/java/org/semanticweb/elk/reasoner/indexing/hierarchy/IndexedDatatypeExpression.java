@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,13 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.reasoner.datatypes.DatatypeEngine;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDatatypeExpressionVisitor;
 
 /**
- * 
+ *
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
@@ -57,7 +56,6 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 			int positiveIncrement, int negativeIncrement) {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			DatatypeEngine.register(property, this); // TODO: do we need that?
 			property.addNegativeDatatypeExpression(this);
 		}
 
@@ -66,7 +64,6 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			DatatypeEngine.unregister(property, this); // TODO: do we need that?
 			property.removeNegativeDatatypeExpression(this);
 		}
 	}

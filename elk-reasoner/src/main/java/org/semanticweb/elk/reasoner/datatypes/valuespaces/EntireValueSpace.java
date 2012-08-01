@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,23 +22,23 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 
 /**
  * Representation of entire datatype value space
- * 
+ *
  * @author Pospishnyi Olexandr
  */
 public class EntireValueSpace implements ValueSpace {
 
-	private Datatype datatype;
+	private ELDatatype datatype;
 
-	public EntireValueSpace(Datatype datatype) {
+	public EntireValueSpace(ELDatatype datatype) {
 		this.datatype = datatype;
 	}
 
 	@Override
-	public Datatype getDatatype() {
+	public ELDatatype getDatatype() {
 		return datatype;
 	}
 
@@ -55,7 +55,7 @@ public class EntireValueSpace implements ValueSpace {
 	/**
 	 * EntireValueSpace contains any other value space or value that has
 	 * compatible datatype
-	 * 
+	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */

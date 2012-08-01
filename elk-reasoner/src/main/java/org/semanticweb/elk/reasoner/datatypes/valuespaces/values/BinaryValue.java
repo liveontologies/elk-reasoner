@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -23,26 +23,26 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
 import java.util.Arrays;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
- * Value space that represent single binary value. 
- * 
+ * Value space that represent single binary value.
+ *
  * @author Pospishnyi Olexandr
  */
 public class BinaryValue implements ValueSpace {
 
-	public Datatype datatype;
+	public ELDatatype datatype;
 	public byte[] value;
 
-	public BinaryValue(byte[] value, Datatype datatype) {
+	public BinaryValue(byte[] value, ELDatatype datatype) {
 		this.datatype = datatype;
 		this.value = value;
 	}
 
 	@Override
-	public Datatype getDatatype() {
+	public ELDatatype getDatatype() {
 		return datatype;
 	}
 
@@ -59,7 +59,7 @@ public class BinaryValue implements ValueSpace {
 	/**
 	 * BinaryValue could contain only another BinaryValue
 	 * if both value spaces have equal values
-	 * 
+	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
@@ -77,7 +77,7 @@ public class BinaryValue implements ValueSpace {
 				return false;
 		}
 	}
-	
+
 	@Override
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);

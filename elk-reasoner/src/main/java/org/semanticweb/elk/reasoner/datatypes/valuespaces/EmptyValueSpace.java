@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,11 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+
 
 /**
  * Representation of empty value space
- * 
+ *
  * @author Pospishnyi Olexandr
  */
 public class EmptyValueSpace implements ValueSpace {
@@ -34,8 +35,8 @@ public class EmptyValueSpace implements ValueSpace {
 	public static final EmptyValueSpace INSTANCE = new EmptyValueSpace();
 
 	@Override
-	public Datatype getDatatype() {
-		return Datatype.rdfs_Literal;
+	public ELDatatype getDatatype() {
+		return ELDatatype.rdfs_Literal;
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,8 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_base64Binary;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_hexBinary;
+import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype.*;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.LENGTH;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_LENGTH;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_LENGTH;
@@ -35,15 +34,12 @@ import java.util.Set;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
@@ -54,16 +50,16 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
  * uses {@link BinaryValue} and {@link LengthRestrictedValueSpace} to represent
  * datatype restrictions. Please note that value space of xsd:hexBinary and
  * xsd:base64Binary are disjoint.
- * 
+ *
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
-public class BinaryDatatypeHandler implements DatatypeHandler {
+public class BinaryDatatypeHandler extends ElkDatatypeHandler {
 
 	static final Logger LOGGER_ = Logger.getLogger(BinaryDatatypeHandler.class);
 
 	@Override
-	public Set<Datatype> getSupportedDatatypes() {
+	public Set<ELDatatype> getSupportedDatatypes() {
 		return EnumSet.of(xsd_hexBinary, xsd_base64Binary);
 	}
 
@@ -73,8 +69,9 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkLiteral literal, Datatype datatype) {
-		byte[] value = (byte[]) parse(literal.getLexicalForm(), datatype);
+	public ValueSpace visit(ElkLiteral elkLiteral) {
+		ELDatatype datatype = elkLiteral.getDatatype().asELDatatype();
+		byte[] value = parse(elkLiteral.getLexicalForm(), datatype);
 		if (value != null) {
 			return new BinaryValue(value, datatype);
 		} else {
@@ -83,22 +80,12 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkDataRange dataRange, Datatype datatype) {
-		if (dataRange instanceof ElkDatatype) {
-			return new EntireValueSpace(datatype);
-		} else {
-			return createRestrictedValueSpace((ElkDatatypeRestriction) dataRange);
-		}
-	}
-
-	@SuppressWarnings("static-method")
-	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
+	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-		Datatype datatype = Datatype.getByIri(filler.getDatatype()
-				.getDatatypeIRI());
+		ELDatatype datatype = elkDatatypeRestriction.getDatatype().asELDatatype();
 
-		List<? extends ElkFacetRestriction> facetRestrictions = filler
+		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
 				.getFacetRestrictions();
 		outerloop: for (ElkFacetRestriction facetRestriction : facetRestrictions) {
 			Facet facet = Facet.getByIri(facetRestriction
@@ -132,8 +119,7 @@ public class BinaryDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
-	@Override
-	public Object parse(String literal, Datatype datatype) {
+	private byte[] parse(String literal, ELDatatype datatype) {
 		switch (datatype) {
 		case xsd_base64Binary:
 			return DatatypeConverter.parseBase64Binary(literal);

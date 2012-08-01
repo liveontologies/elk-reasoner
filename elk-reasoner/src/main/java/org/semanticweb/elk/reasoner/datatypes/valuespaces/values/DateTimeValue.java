@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
@@ -35,21 +35,21 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 public class DateTimeValue implements ValueSpace {
 
 	public XMLGregorianCalendar value;
-	public Datatype datatype;
-	public Datatype effectiveDatatype;
+	public ELDatatype datatype;
+	public ELDatatype effectiveDatatype;
 
-	public DateTimeValue(XMLGregorianCalendar value, Datatype datatype) {
+	public DateTimeValue(XMLGregorianCalendar value, ELDatatype datatype) {
 		this.value = value;
 		this.datatype = datatype;
 		if (value.getTimezone() != DatatypeConstants.FIELD_UNDEFINED) {
-			effectiveDatatype = Datatype.xsd_dateTimeStamp;
+			effectiveDatatype = ELDatatype.xsd_dateTimeStamp;
 		} else {
-			effectiveDatatype = Datatype.xsd_dateTime;
+			effectiveDatatype = ELDatatype.xsd_dateTime;
 		}
 	}
 
 	@Override
-	public Datatype getDatatype() {
+	public ELDatatype getDatatype() {
 		return effectiveDatatype;
 	}
 
@@ -83,7 +83,7 @@ public class DateTimeValue implements ValueSpace {
 				return false;
 		}
 	}
-	
+
 	@Override
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);

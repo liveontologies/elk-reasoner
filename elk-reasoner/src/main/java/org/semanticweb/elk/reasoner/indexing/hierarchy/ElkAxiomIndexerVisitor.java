@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -37,14 +37,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.reasoner.datatypes.handlers.ElkDatatypeHandler;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
  * An object that indexes axioms into a given ontology index. Each instance can
  * either only add or only remove axioms.
- * 
+ *
  * @author Frantisek Simancik
- * 
+ *
  */
 public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
@@ -75,15 +76,16 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
 	public ElkAxiomIndexerVisitor(OntologyIndexImpl ontologyIndex,
+			ElkDatatypeHandler datatypeHandler,
 			boolean insert) {
 		this.ontologyIndex = ontologyIndex;
 		this.multiplicity = insert ? 1 : -1;
 		this.neutralIndexer = new ElkObjectIndexerVisitor(
-				new UpdateCacheFilter(multiplicity, 0, 0));
+				new UpdateCacheFilter(multiplicity, 0, 0), datatypeHandler);
 		this.positiveIndexer = new ElkObjectIndexerVisitor(
-				new UpdateCacheFilter(multiplicity, multiplicity, 0));
+				new UpdateCacheFilter(multiplicity, multiplicity, 0), datatypeHandler);
 		this.negativeIndexer = new ElkObjectIndexerVisitor(
-				new UpdateCacheFilter(multiplicity, 0, multiplicity));
+				new UpdateCacheFilter(multiplicity, 0, multiplicity), datatypeHandler);
 	}
 
 	@Override
@@ -251,10 +253,10 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 * retrieved from the cache. It is used to update the occurrence counts of
 	 * the indexed object, add it to the cache in case of first occurrence, and
 	 * remove it from the cache in case of last occurrence.
-	 * 
-	 * 
+	 *
+	 *
 	 * @author Frantisek Simancik
-	 * 
+	 *
 	 */
 	private class UpdateCacheFilter implements IndexedObjectFilter {
 

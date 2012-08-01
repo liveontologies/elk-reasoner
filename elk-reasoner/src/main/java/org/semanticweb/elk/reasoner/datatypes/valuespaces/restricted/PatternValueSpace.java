@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -24,29 +24,29 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 
 /**
  * Representation of any value that satisfies specified regular expression
- * 
+ *
  * @author Pospishnyi Olexandr
  */
 public class PatternValueSpace implements ValueSpace {
 
 	public Automaton automaton;
-	public Datatype datatype;
-	public Datatype effectiveDatatype;
+	public ELDatatype datatype;
+	public ELDatatype effectiveDatatype;
 
-	public PatternValueSpace(Automaton automaton, Datatype datatype, Datatype effectiveDatatype) {
+	public PatternValueSpace(Automaton automaton, ELDatatype datatype, ELDatatype effectiveDatatype) {
 		this.datatype = datatype;
 		this.automaton = automaton;
 		this.effectiveDatatype = effectiveDatatype;
 	}
 
 	@Override
-	public Datatype getDatatype() {
+	public ELDatatype getDatatype() {
 		return effectiveDatatype;
 	}
 
@@ -59,16 +59,16 @@ public class PatternValueSpace implements ValueSpace {
 	public boolean isEmptyInterval() {
 		return automaton.isEmpty() || !effectiveDatatype.isCompatibleWith(datatype);
 	}
-	
+
 	/**
 	 * PatternValueSpace could contain
 	 * - another PatternValueSpace if one is a subset of another
-	 * - LengthRestrictedValueSpace that will satisfy this pattern 
+	 * - LengthRestrictedValueSpace that will satisfy this pattern
 	 * - LiteralValue that matches pattern
 	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
-	 * 
+	 *
 	 * Note: BasicOperations.subsetOf() appears to be not thread safe.
 	 * Cloning initial automatons to avoid ConcurrentModificationException.
 	 * Todo: synchronize this block is performance well be an issues
@@ -93,7 +93,7 @@ public class PatternValueSpace implements ValueSpace {
 				return false;
 		}
 	}
-	
+
 	@Override
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);

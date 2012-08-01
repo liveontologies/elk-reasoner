@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,29 +22,32 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
- * Value space that represent single numeric value. 
- * 
+ * Value space that represent single numeric value.
+ *
  * @author Pospishnyi Olexandr
  */
 public class NumericValue implements ValueSpace {
 
-	public Datatype datatype;
-	public Datatype effectiveDatatype;
+	public ELDatatype datatype;
+	public ELDatatype effectiveDatatype;
 	public Number value;
 
-	public NumericValue(Datatype datatype, Number value) {
+	public NumericValue(ELDatatype datatype, Number value) {
 		this.value = value;
 		this.datatype = datatype;
-		this.effectiveDatatype = Datatype.getCorrespondingDatatype(value);
+		this.effectiveDatatype = getCorrespondingDatatype(value);
 	}
 
 	@Override
-	public Datatype getDatatype() {
+	public ELDatatype getDatatype() {
 		return effectiveDatatype;
 	}
 
@@ -56,6 +59,22 @@ public class NumericValue implements ValueSpace {
 	@Override
 	public boolean isEmptyInterval() {
 		return !effectiveDatatype.isCompatibleWith(datatype);
+	}
+
+	private ELDatatype getCorrespondingDatatype(Number number) {
+		if (number instanceof Integer || number instanceof Long || number instanceof BigInteger) {
+			if (NumberComparator.INSTANCE.compare(number, Integer.valueOf(0)) >= 0) {
+				return ELDatatype.xsd_nonNegativeInteger;
+			} else {
+				return ELDatatype.xsd_integer;
+			}
+		} else if (number instanceof BigDecimal) {
+			return ELDatatype.xsd_decimal;
+		} else if (number instanceof BigRational) {
+			return ELDatatype.owl_rational;
+		} else {
+			return ELDatatype.owl_real;
+		}
 	}
 
 	/**
@@ -74,7 +93,7 @@ public class NumericValue implements ValueSpace {
 				((NumericValue) valueSpace).value);
 		return compare == 0;
 	}
-	
+
 	@Override
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);

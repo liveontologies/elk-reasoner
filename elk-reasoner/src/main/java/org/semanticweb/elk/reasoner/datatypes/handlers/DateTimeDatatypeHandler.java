@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,8 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_dateTime;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_dateTimeStamp;
+import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype.*;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_EXCLUSIVE;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_INCLUSIVE;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_EXCLUSIVE;
@@ -38,15 +37,12 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.DateTimeIntervalValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
@@ -59,10 +55,10 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
  * <p>
  * Uses {@link DateTimeValue} and {@link DateTimeIntervalValueSpace} to
  * represent datatype restrictions
- * 
+ *
  * @author Pospishnyi Olexandr
  */
-public class DateTimeDatatypeHandler implements DatatypeHandler {
+public class DateTimeDatatypeHandler extends ElkDatatypeHandler {
 
 	static final Logger LOGGER_ = Logger
 			.getLogger(DateTimeDatatypeHandler.class);
@@ -86,7 +82,7 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public Set<Datatype> getSupportedDatatypes() {
+	public Set<ELDatatype> getSupportedDatatypes() {
 		return EnumSet.of(xsd_dateTime, xsd_dateTimeStamp);
 	}
 
@@ -97,43 +93,28 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkLiteral literal, Datatype datatype) {
-		String lexicalForm = literal.getLexicalForm();
-		XMLGregorianCalendar value = (XMLGregorianCalendar) parse(lexicalForm,
-				datatype);
+	public ValueSpace visit(ElkLiteral elkLiteral) {
+		String lexicalForm = elkLiteral.getLexicalForm();
+		ELDatatype datatype = elkLiteral.getDatatype().asELDatatype();
+		XMLGregorianCalendar value = parse(lexicalForm, datatype);
 		return new DateTimeValue(value, datatype);
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkDataRange dataRange, Datatype datatype) {
-		if (dataRange instanceof ElkDatatype) {
-			return createEntireValueSpace((ElkDatatype) dataRange);
-		} else {
-			return createRestrictedValueSpace((ElkDatatypeRestriction) dataRange);
-		}
-	}
-
-	@SuppressWarnings("static-method")
-	private ValueSpace createEntireValueSpace(ElkDatatype elkDatatype) {
-		return new EntireValueSpace(Datatype.getByIri(elkDatatype
-				.getDatatypeIRI()));
-	}
-
-	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
+	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
 		XMLGregorianCalendar lowerBound = DateTimeDatatypeHandler.START_OF_TIME;
 		XMLGregorianCalendar upperBound = DateTimeDatatypeHandler.END_OF_TIME;
 		boolean lowerInclusive = true, upperInclusive = true;
 
-		Datatype datatype = Datatype.getByIri(filler.getDatatype()
-				.getDatatypeIRI());
+		ELDatatype datatype = elkDatatypeRestriction.getDatatype().asELDatatype();
 
-		List<? extends ElkFacetRestriction> facetRestrictions = filler
+		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
 				.getFacetRestrictions();
 		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
 			Facet facet = Facet.getByIri(facetRestriction
 					.getConstrainingFacet().getFullIriAsString());
-			Datatype restrictionDatatype = Datatype.getByIri(facetRestriction
-					.getRestrictionValue().getDatatype().getDatatypeIRI());
+			ELDatatype restrictionDatatype = facetRestriction
+					.getRestrictionValue().getDatatype().asELDatatype();
 			XMLGregorianCalendar restrictionValue = (XMLGregorianCalendar) parse(
 					facetRestriction.getRestrictionValue().getLexicalForm(),
 					restrictionDatatype);
@@ -183,8 +164,7 @@ public class DateTimeDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
-	@Override
-	public Object parse(String literal, Datatype datatype) {
+	private XMLGregorianCalendar parse(String literal, ELDatatype datatype) {
 		switch (datatype) {
 		case xsd_dateTime:
 		case xsd_dateTimeStamp:

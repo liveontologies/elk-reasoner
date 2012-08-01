@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import static org.semanticweb.elk.reasoner.datatypes.enums.Datatype.xsd_anyURI;
+import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype.*;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.LENGTH;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_LENGTH;
 import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_LENGTH;
@@ -35,15 +35,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.PatternValueSpace;
@@ -58,16 +55,16 @@ import dk.brics.automaton.RegExp;
  * Very similar to {@link PlainLiteralDatatypeHandler} and uses same ValueSpace
  * objects for representation. Value space of anyURI is disjoint with all other
  * datatypes.
- * 
+ *
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
-public class AnyURIDatatypeHandler implements DatatypeHandler {
+public class AnyURIDatatypeHandler extends ElkDatatypeHandler {
 
 	static final Logger LOGGER_ = Logger.getLogger(AnyURIDatatypeHandler.class);
 
 	@Override
-	public Set<Datatype> getSupportedDatatypes() {
+	public Set<ELDatatype> getSupportedDatatypes() {
 		return EnumSet.of(xsd_anyURI);
 	}
 
@@ -77,8 +74,9 @@ public class AnyURIDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkLiteral literal, Datatype datatype) {
-		URI value = (URI) parse(literal.getLexicalForm(), datatype);
+	public ValueSpace visit(ElkLiteral elkLiteral) {
+		ELDatatype datatype = elkLiteral.getDatatype().asELDatatype();
+		URI value = parse(elkLiteral.getLexicalForm());
 		if (value != null) {
 			return new LiteralValue(value.toString(), datatype, datatype);
 		} else {
@@ -87,22 +85,12 @@ public class AnyURIDatatypeHandler implements DatatypeHandler {
 	}
 
 	@Override
-	public ValueSpace getValueSpace(ElkDataRange dataRange, Datatype datatype) {
-		if (dataRange instanceof ElkDatatype) {
-			return new EntireValueSpace(datatype);
-		} else {
-			return createRestrictedValueSpace((ElkDatatypeRestriction) dataRange);
-		}
-	}
-
-	@SuppressWarnings("static-method")
-	private ValueSpace createRestrictedValueSpace(ElkDatatypeRestriction filler) {
+	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-		Datatype datatype = Datatype.getByIri(filler.getDatatype()
-				.getDatatypeIRI());
+		ELDatatype datatype = elkDatatypeRestriction.getDatatype().asELDatatype();
 
-		List<? extends ElkFacetRestriction> facetRestrictions = filler
+		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
 				.getFacetRestrictions();
 		outerloop: for (ElkFacetRestriction facetRestriction : facetRestrictions) {
 			Facet facet = Facet.getByIri(facetRestriction
@@ -145,8 +133,7 @@ public class AnyURIDatatypeHandler implements DatatypeHandler {
 		}
 	}
 
-	@Override
-	public Object parse(String literal, Datatype datatype) {
+	private URI parse(String literal) {
 		try {
 			return new URI(literal);
 		} catch (URISyntaxException ex) {

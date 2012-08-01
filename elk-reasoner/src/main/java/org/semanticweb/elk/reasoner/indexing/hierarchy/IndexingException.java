@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.util.OwlObjectNameVisitor;
 
 /**
  * @author Frantisek Simancik
- * 
+ *
  */
 public class IndexingException extends ElkRuntimeException {
 
@@ -49,7 +49,7 @@ public class IndexingException extends ElkRuntimeException {
 		super(cause);
 	}
 
-	protected IndexingException(ElkObject elkObject) {
+	public IndexingException(ElkObject elkObject) {
 		this("ELK does not support " + OwlObjectNameVisitor.getName(elkObject)
 				+ ".");
 	}

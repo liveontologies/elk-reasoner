@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -23,26 +23,26 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.semanticweb.elk.reasoner.datatypes.enums.Datatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.handlers.DateTimeDatatypeHandler;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
 
 /**
- * Representation of dateTime interval with specified restrictions 
+ * Representation of dateTime interval with specified restrictions
  * (lower and upper bound)
  *
  * @author Pospishnyi Olexandr
  */
 public class DateTimeIntervalValueSpace implements ValueSpace {
 
-	public Datatype datatype;
+	public ELDatatype datatype;
 	public XMLGregorianCalendar lowerBound;
 	public boolean lowerInclusive;
 	public XMLGregorianCalendar upperBound;
 	public boolean upperInclusive;
 
-	public DateTimeIntervalValueSpace(Datatype datatype, XMLGregorianCalendar lowerBound, boolean lowerInclusive, XMLGregorianCalendar upperBound, boolean upperInclusive) {
+	public DateTimeIntervalValueSpace(ELDatatype datatype, XMLGregorianCalendar lowerBound, boolean lowerInclusive, XMLGregorianCalendar upperBound, boolean upperInclusive) {
 		this.datatype = datatype;
 		this.lowerBound = lowerBound;
 		this.lowerInclusive = lowerInclusive;
@@ -72,7 +72,7 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 	}
 
 	@Override
-	public Datatype getDatatype() {
+	public ELDatatype getDatatype() {
 		return datatype;
 	}
 
@@ -82,7 +82,7 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 	}
 
 	/**
-	 * DateTimeIntervalValueSpace could contain 
+	 * DateTimeIntervalValueSpace could contain
 	 * - DateTimeIntervalValueSpace if this value space completely includes another
 	 * - DateTimeValue that is included within specified bounds
 	 *
@@ -128,7 +128,7 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 				return false;
 		}
 	}
-	
+
 	@Override
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);

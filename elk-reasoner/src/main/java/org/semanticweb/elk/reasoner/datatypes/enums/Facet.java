@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -36,9 +36,9 @@ public enum Facet {
 	MAX_EXCLUSIVE ("http://www.w3.org/2001/XMLSchema#maxExclusive", "<"),
 	MIN_LENGTH    ("http://www.w3.org/2001/XMLSchema#minLength",	"l>"),
 	MAX_LENGTH    ("http://www.w3.org/2001/XMLSchema#maxLength",	"l<"),
-	LENGTH        ("http://www.w3.org/2001/XMLSchema#length",		"l="),
-	PATTERN       ("http://www.w3.org/2001/XMLSchema#pattern",		"regex:");
-	
+	LENGTH        ("http://www.w3.org/2001/XMLSchema#length",	"l="),
+	PATTERN       ("http://www.w3.org/2001/XMLSchema#pattern",	"regex:");
+
 	public final String iri;
 	public final String symbol;
 

@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.datatypes.handlers.ElkDatatypeHandler;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.util.collections.Operations;
 
@@ -44,12 +45,15 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	private final ElkAxiomIndexerVisitor axiomInserter;
 	private final ElkAxiomIndexerVisitor axiomDeleter;
 
+	private final ElkDatatypeHandler datatypeHandler;
+
 	protected Collection<IndexedObjectProperty> reflexiveObjectProperties;
 
 	public OntologyIndexImpl() {
-		this.elkObjectIndexer = new ElkObjectIndexerVisitor(this);
-		this.axiomInserter = new ElkAxiomIndexerVisitor(this, true);
-		this.axiomDeleter = new ElkAxiomIndexerVisitor(this, false);
+		this.datatypeHandler = new ElkDatatypeHandler();
+		this.elkObjectIndexer = new ElkObjectIndexerVisitor(this, datatypeHandler);
+		this.axiomInserter = new ElkAxiomIndexerVisitor(this, datatypeHandler, true);
+		this.axiomDeleter = new ElkAxiomIndexerVisitor(this, datatypeHandler, false);
 		indexPredefined();
 	}
 
