@@ -97,4 +97,22 @@ public class LiteralValue implements ValueSpace {
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other instanceof LiteralValue) {
+			LiteralValue otherEntry = (LiteralValue) other;
+			return this.datatype.equals(otherEntry.datatype)
+				&& this.effectiveDatatype.equals(otherEntry.effectiveDatatype)
+				&& this.value.equals(otherEntry.value)
+				&& ((this.language == null && otherEntry.language == null)
+					|| (this.language != null && otherEntry.language != null
+					&& this.language.equals(otherEntry.language)));
+
+		}
+		return false;
+	}
 }

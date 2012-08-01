@@ -133,4 +133,20 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other instanceof DateTimeIntervalValueSpace) {
+			DateTimeIntervalValueSpace otherEntry = (DateTimeIntervalValueSpace) other;
+			return this.datatype.equals(otherEntry.datatype)
+				&& this.lowerBound.equals(otherEntry.lowerBound)
+				&& this.lowerInclusive == otherEntry.lowerInclusive
+				&& this.upperBound.equals(otherEntry.upperBound)
+				&& this.upperInclusive == otherEntry.upperInclusive;
+		}
+		return false;
+	}
 }

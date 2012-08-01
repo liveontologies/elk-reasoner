@@ -58,4 +58,12 @@ public class EmptyValueSpace implements ValueSpace {
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		return false;
+	}
 }

@@ -98,4 +98,19 @@ public class NumericValue implements ValueSpace {
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other instanceof NumericValue) {
+			NumericValue otherEntry = (NumericValue) other;
+			return this.datatype.equals(otherEntry.datatype)
+				&& this.effectiveDatatype.equals(otherEntry.effectiveDatatype)
+				&& this.value.equals(otherEntry.value);
+
+		}
+		return false;
+	}
 }
