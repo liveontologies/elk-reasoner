@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Representation of entire datatype value space
@@ -80,5 +81,13 @@ public class EntireValueSpace implements ValueSpace {
 
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combinedHashCode(
+			EntireValueSpace.class,
+			this.datatype
+			);
 	}
 }

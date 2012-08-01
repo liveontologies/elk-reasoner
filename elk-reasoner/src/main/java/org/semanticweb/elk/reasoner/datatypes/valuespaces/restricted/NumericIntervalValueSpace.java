@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.numbers.PositiveInfinity;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Representation of numeric value interval with specified restrictions
@@ -273,5 +274,17 @@ public class NumericIntervalValueSpace implements ValueSpace {
 				&& this.upperInclusive == otherEntry.upperInclusive;
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combinedHashCode(
+			NumericIntervalValueSpace.class,
+			this.datatype,
+			this.lowerBound,
+			this.lowerInclusive,
+			this.upperBound,
+			this.upperInclusive
+			);
 	}
 }

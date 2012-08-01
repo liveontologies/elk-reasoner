@@ -26,6 +26,7 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Value space that represent single dateTime value.
@@ -102,5 +103,15 @@ public class DateTimeValue implements ValueSpace {
 
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combinedHashCode(
+			DateTimeValue.class,
+			this.datatype,
+			this.value,
+			this.value.getTimezone()
+			);
 	}
 }

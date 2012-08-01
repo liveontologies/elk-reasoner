@@ -28,6 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Value space that represent single numeric value.
@@ -112,5 +113,14 @@ public class NumericValue implements ValueSpace {
 
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combinedHashCode(
+			NumericValue.class,
+			this.datatype,
+			this.effectiveDatatype,
+			this.value);
 	}
 }

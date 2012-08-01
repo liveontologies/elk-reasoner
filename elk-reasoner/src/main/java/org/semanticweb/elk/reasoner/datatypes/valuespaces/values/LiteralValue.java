@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.collections.Pair;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Value space that represent single literal value.
@@ -114,5 +115,16 @@ public class LiteralValue implements ValueSpace {
 
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combinedHashCode(
+			LiteralValue.class,
+			this.datatype,
+			this.effectiveDatatype,
+			this.value,
+			this.language != null ? this.language : 0
+			);
 	}
 }

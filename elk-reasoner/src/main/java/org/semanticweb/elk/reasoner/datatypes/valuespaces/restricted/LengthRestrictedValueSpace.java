@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Representation of any value that satisfies specified length
@@ -148,5 +149,15 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 				&& this.maxLength.equals(otherEntry.maxLength);
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combinedHashCode(
+			LengthRestrictedValueSpace.class,
+			this.datatype,
+			this.minLength,
+			this.maxLength
+			);
 	}
 }

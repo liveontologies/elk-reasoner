@@ -27,6 +27,7 @@ import dk.brics.automaton.BasicOperations;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Representation of any value that satisfies specified regular expression
@@ -111,5 +112,15 @@ public class PatternValueSpace implements ValueSpace {
 				&& this.automaton.equals(otherEntry.automaton);
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combinedHashCode(
+			PatternValueSpace.class,
+			this.datatype,
+			this.effectiveDatatype,
+			this.automaton
+			);
 	}
 }
