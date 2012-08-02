@@ -79,22 +79,41 @@ public class ElkDatatypeHandler implements DatatypeHandler, ElkDataValueSpaceVis
 	}
 
 	private static ElkDatatypeHandler getDatatypeHandler(ElkDatatype datatype) {
-		return datatypeHandlers.get(datatype.asELDatatype());
+		ElkDatatypeHandler dh = datatypeHandlers.get(datatype.asELDatatype());
+		if (dh != null) {
+			return dh;
+		} else {
+			throw new IndexingException(datatype);
+		}
 	}
 
 	@Override
 	public ValueSpace visit(ElkLiteral elkLiteral) {
-		return getDatatypeHandler(elkLiteral.getDatatype()).visit(elkLiteral);
+		ValueSpace vs = getDatatypeHandler(elkLiteral.getDatatype()).visit(elkLiteral);
+		if (vs != null) {
+			return vs;
+		} else {
+			throw new IndexingException(elkLiteral);
+		}
 	}
 
 	@Override
 	public ValueSpace visit(ElkDatatype elkDatatype) {
-		return new EntireValueSpace(elkDatatype.asELDatatype());
+		if (elkDatatype.asELDatatype() != null) {
+			return new EntireValueSpace(elkDatatype.asELDatatype());
+		} else {
+			throw new IndexingException(elkDatatype);
+		}
 	}
 
 	@Override
 	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
-		return getDatatypeHandler(elkDatatypeRestriction.getDatatype()).visit(elkDatatypeRestriction);
+		ValueSpace vs = getDatatypeHandler(elkDatatypeRestriction.getDatatype()).visit(elkDatatypeRestriction);
+		if (vs != null) {
+			return vs;
+		} else {
+			throw new IndexingException(elkDatatypeRestriction);
+		}
 	}
 
 	@Override
