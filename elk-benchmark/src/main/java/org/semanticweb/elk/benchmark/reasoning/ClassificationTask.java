@@ -27,6 +27,7 @@ package org.semanticweb.elk.benchmark.reasoning;
 
 import java.io.File;
 
+import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
@@ -59,10 +60,11 @@ public class ClassificationTask implements Task {
 	public void prepare(String... args) throws TaskException {
 		try {
 			ReasonerConfiguration config = getConfig(args);
+			File ontologyFile = BenchmarkUtils.getFile(args[0]);
 			
 			reasoner = new ReasonerFactory().createReasoner(new SimpleStageExecutor(), config);
 			reasoner.registerOntologyLoader(new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), new File(args[0])));
+				new Owl2FunctionalStyleParserFactory(), ontologyFile));
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 			reasoner.loadOntology();
 		} catch (Exception e) {
