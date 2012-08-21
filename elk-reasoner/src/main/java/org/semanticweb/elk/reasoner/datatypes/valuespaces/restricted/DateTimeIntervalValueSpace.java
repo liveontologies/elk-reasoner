@@ -162,4 +162,11 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 			this.upperInclusive
 			);
 	}
+
+	@Override
+	public String toString() {
+		return (lowerInclusive ? "[" : "(") + lowerBound.toString() + ","
+			+ upperBound.toString() + (upperInclusive ? "]" : ")")
+			+ "^^" + datatype;
+	}
 }

@@ -123,4 +123,9 @@ public class NumericValue implements ValueSpace {
 			this.effectiveDatatype,
 			this.value);
 	}
+
+	@Override
+	public String toString() {
+		return value.toString() + "^^" + datatype;
+	}
 }

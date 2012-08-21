@@ -79,8 +79,22 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
+		switch (valueSpace.getType()) {
+			case BINARY_VALUE:
+			case DATETIME_VALUE:
+			case LITERAL_VALUE:
+			case NUMERIC_VALUE:
+				return "DataHasValue(" + valueSpace.toString() + ")";
+			case DATETIME_INTERVAL:
+			case LENGTH_RESTRICTED:
+			case NUMERIC_INTERVAL:
+			case PATTERN:
+			case ENTIRE:
+			case EMPTY:
+				return "DataSomeValuesFrom(" + valueSpace.toString() + ")";
+			default:
+				return null;
+		}
 	}
 
 }

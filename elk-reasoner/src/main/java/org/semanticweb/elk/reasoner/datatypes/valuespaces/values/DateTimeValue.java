@@ -114,4 +114,9 @@ public class DateTimeValue implements ValueSpace {
 			this.value.getTimezone()
 			);
 	}
+
+	@Override
+	public String toString() {
+		return value.toString() + "^^" + datatype;
+	}
 }

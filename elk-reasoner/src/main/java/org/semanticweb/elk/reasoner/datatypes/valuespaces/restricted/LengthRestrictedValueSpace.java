@@ -160,4 +160,9 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 			this.maxLength
 			);
 	}
+
+	@Override
+	public String toString() {
+		return datatype.toString() + " length: >=" + minLength + " <=" + maxLength;
+	}
 }

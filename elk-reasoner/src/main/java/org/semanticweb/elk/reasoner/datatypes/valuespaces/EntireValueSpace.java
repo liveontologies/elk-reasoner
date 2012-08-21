@@ -90,4 +90,9 @@ public class EntireValueSpace implements ValueSpace {
 			this.datatype
 			);
 	}
+
+	@Override
+	public String toString() {
+		return datatype.toString();
+	}
 }

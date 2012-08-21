@@ -105,4 +105,10 @@ public class BinaryValue implements ValueSpace {
 			this.value
 			);
 	}
+
+	@Override
+	public String toString() {
+		return new String(value) + "^^" + this.datatype;
+	}
+
 }

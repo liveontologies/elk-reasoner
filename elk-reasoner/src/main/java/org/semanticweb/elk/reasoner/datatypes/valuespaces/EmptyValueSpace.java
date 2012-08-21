@@ -66,4 +66,9 @@ public class EmptyValueSpace implements ValueSpace {
 		}
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return "Ø";
+	}
 }

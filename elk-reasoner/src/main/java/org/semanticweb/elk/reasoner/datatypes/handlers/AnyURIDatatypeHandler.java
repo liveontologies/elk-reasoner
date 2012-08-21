@@ -111,6 +111,7 @@ public class AnyURIDatatypeHandler extends ElkDatatypeHandler {
 				break;
 			case PATTERN:
 				Automaton pattern = new RegExp(value).toAutomaton();
+				pattern.setInfo(value);
 				PatternValueSpace vs = new PatternValueSpace(pattern, datatype,
 						datatype);
 				if (vs.isEmptyInterval()) {

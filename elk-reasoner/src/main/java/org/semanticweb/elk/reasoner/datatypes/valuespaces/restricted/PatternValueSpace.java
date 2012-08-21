@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
+import dk.brics.automaton.RegExp;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
@@ -122,5 +123,10 @@ public class PatternValueSpace implements ValueSpace {
 			this.effectiveDatatype,
 			this.automaton
 			);
+	}
+
+	@Override
+	public String toString() {
+		return datatype.toString() + " pattern: \"" + automaton.getInfo() + "\"";
 	}
 }

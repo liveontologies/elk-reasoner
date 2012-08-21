@@ -127,4 +127,9 @@ public class LiteralValue implements ValueSpace {
 			this.language != null ? this.language : 0
 			);
 	}
+
+	@Override
+	public String toString() {
+		return "\"" + this.value + "@" + (language != null ? language : "") + "\"^^" + datatype;
+	}
 }

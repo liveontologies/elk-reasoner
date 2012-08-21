@@ -219,6 +219,7 @@ public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
 				break;
 			case PATTERN:
 				Automaton pattern = new RegExp(value).toAutomaton();
+				pattern.setInfo(value);
 				ELDatatype effectiveDatatype = determineDatatype(pattern);
 				PatternValueSpace vs = new PatternValueSpace(pattern, datatype,
 						effectiveDatatype);
