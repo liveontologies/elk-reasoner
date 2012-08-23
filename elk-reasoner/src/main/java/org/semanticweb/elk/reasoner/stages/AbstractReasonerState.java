@@ -334,5 +334,12 @@ public abstract class AbstractReasonerState {
 		getStageExecutor().complete(new OntologyLoadingStage(this));
 		return ontologyIndex;
 	}
+	
+	public void experiment() throws ElkException {
+		if (!isConsistent())
+			throw new ElkInconsistentOntologyException();
+
+		getStageExecutor().complete(new TransitiveReductionExperimentStage(this));
+	}
 
 }
