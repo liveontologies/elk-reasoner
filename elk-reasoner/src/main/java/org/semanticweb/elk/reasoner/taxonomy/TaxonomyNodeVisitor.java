@@ -1,9 +1,12 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.taxonomy;
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,25 +23,19 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.taxonomy.inconsistent;
+
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+
 
 /**
- * @author Frantisek Simancik
- * @author "Yevgeny Kazakov"
- * 
- * @param <T>
- *            the type of objects in the nodes of this taxonomy
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public class InconsistentTaxonomy<T extends ElkObject> extends
-		InconsistentInstanceTaxonomy<T, ElkObject> {
+public interface TaxonomyNodeVisitor<T extends ElkObject> {
 
-	public InconsistentTaxonomy(T top, T bot) {
-		super(top, bot);
-	}
-
+	public void visit(TaxonomyNode<T> node, List<TaxonomyNode<T>> pathFromStart);
 }
