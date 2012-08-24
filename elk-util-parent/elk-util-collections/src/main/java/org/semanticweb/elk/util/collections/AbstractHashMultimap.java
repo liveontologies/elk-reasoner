@@ -34,10 +34,9 @@ import java.util.Collection;
  * @param <Value>
  */
 
+public abstract class AbstractHashMultimap<Key, Value> extends
+		ArrayHashMap<Key, Collection<Value>> implements Multimap<Key, Value> {
 
-public abstract class AbstractHashMultimap<Key, Value> extends ArrayHashMap<Key, Collection<Value>>
-	implements Multimap<Key, Value> {
-	
 	protected abstract Collection<Value> newRecord();
 
 	public AbstractHashMultimap() {
@@ -67,8 +66,17 @@ public abstract class AbstractHashMultimap<Key, Value> extends ArrayHashMap<Key,
 		return record.add(value);
 	}
 
+
 	@Override
 	public Collection<Value> get(Object key) {
 		return super.get(key);
+	}
+
+	@Override
+	public boolean remove(Object key, Object value) {
+		Collection<Value> record = get(key);
+		if (record == null)
+			return false;
+		return record.remove(value);
 	}
 }

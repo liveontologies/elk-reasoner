@@ -44,54 +44,91 @@ public class ArrayHashSetTest extends TestCase {
 		super(testName);
 	}
 
-	@SuppressWarnings("static-method")
-	public void testAddContains() {
-		
+	/**
+	 * Checking if two sets are equal
+	 * 
+	 * @param referenceSet
+	 * @param testSet
+	 */
+	<E> void testSetEquality(Set<E> referenceSet, Set<E> testSet) {
+		int i = 0;
+		for (E e : referenceSet) {
+			assertTrue(testSet.contains(e));
+			i++;
+		}
+		assertEquals(i, testSet.size());
+		i = 0;
+		for (E e : testSet) {
+			assertTrue(referenceSet.contains(e));
+			i++;
+		}
+		assertEquals(referenceSet.size(), i);
+	}
+
+	public void testAddRemoveContains() {
 		// random number generator for elements
 		Random generator = new Random(123);
-		// number of iterations of filling in elements
-		final int noIterations = 100;
-		// number of elements to generate in each iteration
-		final int noElements = 10000;
-		
+		// number of test iterations
+		final int noIterations = 55;
+		// number of elements to generate in each iteration; will vary
+		int noElements = 10;
+
+		boolean expected, actual;
+
 		int i;
 
 		for (int j = 0; j < noIterations; j++) {
+			// doubling the number of elements every 4 iteration
+			if ((j & 3) == 3)
+				noElements <<= 1;
 
 			int initialSize = generator.nextInt(noElements);
 
-			Set<Integer> set = new ArrayHashSet<Integer>(initialSize);
+			Set<Integer> testSet = new ArrayHashSet<Integer>(initialSize);
 			Set<Integer> referenceSet = new HashSet<Integer>(noElements);
 
+			// adding random elements
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
-				boolean isAdded = referenceSet.add(element);
-				if (isAdded)
-					assertTrue(set.add(element));
-				else
-					assertFalse(set.add(element));
-				assertEquals(set.size(), referenceSet.size());
+				expected = referenceSet.add(element);
+				assertEquals(expected, !testSet.contains(element));
+				actual = testSet.add(element);
+				assertEquals(expected, actual);
+				assertEquals(referenceSet.size(), testSet.size());
 			}
+			testSetEquality(referenceSet, testSet);
 
-			i = 0;
-			for (int element : set) {
-				assertTrue(referenceSet.contains(element));
-				i++;
+			// removing random elements
+			for (i = 0; i < noElements; i++) {
+				int element = generator.nextInt(noElements / 2);
+				expected = referenceSet.remove(element);
+				assertEquals(expected, testSet.contains(element));
+				actual = testSet.remove(element);
+				assertEquals(expected, actual);
+				assertEquals(referenceSet.size(), testSet.size());
 			}
+			testSetEquality(referenceSet, testSet);
 
-			assertEquals(i, referenceSet.size());
-
-			i = 0;
-			for (int element : referenceSet) {
-				assertTrue(set.contains(element));
-				i++;
+			// randomly adding and removing
+			for (i = 0; i < noElements; i++) {
+				int element = generator.nextInt(noElements / 2);
+				if (generator.nextBoolean()) {
+					expected = referenceSet.add(element);
+					assertEquals(expected, !testSet.contains(element));
+					actual = testSet.add(element);
+				} else {
+					expected = referenceSet.remove(element);
+					assertEquals(expected, testSet.contains(element));
+					actual = testSet.remove(element);
+				}
+				assertEquals(expected, actual);
+				assertEquals(referenceSet.size(), testSet.size());
 			}
-			assertEquals(i, referenceSet.size());
+			testSetEquality(referenceSet, testSet);
 
-			set.clear();
+			testSet.clear();
 			referenceSet.clear();
-			assertEquals(set.size(), referenceSet.size());
-
+			testSetEquality(referenceSet, testSet);
 		}
 
 	}
