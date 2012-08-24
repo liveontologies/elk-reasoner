@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -194,10 +194,10 @@ abstract public class IndexedClassExpression {
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
 
-		if (negConjunctionsByConjunct_ == null)
-			// TODO possibly replace by ArrayHashMap when it supports removal
-			negConjunctionsByConjunct_ = new HashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
+		if (negConjunctionsByConjunct_ == null) {
+			negConjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);
+		}
 
 		if (negConjunctionsByConjunct_.put(conjunct, conjunction) != null) {
 			// Can be caused e.g. when ElkObjectIndexerVisitor indexed conjuncts
