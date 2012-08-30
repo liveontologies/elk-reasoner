@@ -17,6 +17,14 @@ will appear in the produced result.
 	<body>
 		<release version="${release.version}" date="${buildDate}" description="Current version">
 		</release>
+		<release version="0.3.1" date="2012-08-30" description="A bug fix release following 0.3">
+			<action dev="yevgeny" type="fix" issue="">
+			
+			</action>
+			<action dev="pavel" type="update">
+				An improved testing of class and instance taxonomies via mock taxonomy objects and specific validators (e.g., for acyclicity and transitive reduction).
+			</action>
+		</release>
 		<release version="0.3.0" date="2012-07-19" description="Third public release">			
 			<action dev="frantisek" type="fix" issue="6">
 				Fixed NullPointerException when loading ontologies with ObjectMinCardinality and ObjectExactCardinality constructors that have empty fillers.
