@@ -13,12 +13,7 @@
 	<name>ELK OWL API Binding</name>
 	<description>ELK bindings for OWL API</description>
 
-	<dependencies>
-		<dependency>
-			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-reasoner</artifactId>
-			<version>${owlapi.version}</version>
-		</dependency>
+	<dependencies>		
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-apibinding</artifactId>
