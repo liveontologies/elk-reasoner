@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.3.1</version>
+		<version>0.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-owlapi-standalone</artifactId>
@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owlapi</artifactId>
-			<version>0.3.1</version>
+			<version>0.3.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
