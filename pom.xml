@@ -140,7 +140,7 @@
 		<downloadUrl>http://code.google.com/p/elk-reasoner/downloads/list</downloadUrl>
 		<site>
 			<id>elk.semanticweb.org</id>
-			<url>scp://elk.semanticweb.org/home/elkuser/elk_semanticweb_org/www/maven/daily</url>
+			<url>scp://elk.semanticweb.org/home/elkuser/elk_semanticweb_org/www/maven/${project.version}</url>
 		</site>
 	</distributionManagement>
 
