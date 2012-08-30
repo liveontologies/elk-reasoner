@@ -15,14 +15,15 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-		<release version="${release.version}" date="${buildDate}" description="Current version">
-		</release>
-		<release version="0.3.1" date="2012-08-30" description="A bug fix release following 0.3">
-			<action dev="yevgeny" type="fix" issue="">
-			
+		<release version="${release.version}" date="${buildDate}" description="First maintenance relase after the third public release">				    
+			<action dev="yevgeny" type="fix" issue="7">
+			    Fixed NoSuchElementException when loading imported ontologies through OWLAPI that have no axioms. 
 			</action>
 			<action dev="pavel" type="update">
 				An improved testing of class and instance taxonomies via mock taxonomy objects and specific validators (e.g., for acyclicity and transitive reduction).
+			</action>
+			<action dev="yevgeny" type="update">
+				Updated project configurations to comply with Maven Central requirements.
 			</action>
 		</release>
 		<release version="0.3.0" date="2012-07-19" description="Third public release">			
