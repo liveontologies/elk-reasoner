@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.3.1-SNAPSHOT</version>
+		<version>0.3.1</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -19,51 +18,51 @@
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-logging</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-io</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owl-model</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owl-implementation</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owl-parsing-javacc</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-reasoner</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-reasoner</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.1</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-testing</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-concurrent</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.1</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
