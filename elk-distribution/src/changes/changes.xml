@@ -19,6 +19,9 @@ will appear in the produced result.
 			<action dev="yevgeny" type="fix" issue="7">
 			    Fixed NoSuchElementException when loading imported ontologies through OWLAPI that have no axioms. 
 			</action>
+			<action dev="pavel" type="fix">
+				Fixed a bug with incorrect handling of lexical errors during parsing of OWL2 FSS files with the native ELK's parser.
+			</action>			
 			<action dev="pavel" type="update">
 				An improved testing of class and instance taxonomies via mock taxonomy objects and specific validators (e.g., for acyclicity and transitive reduction).
 			</action>
