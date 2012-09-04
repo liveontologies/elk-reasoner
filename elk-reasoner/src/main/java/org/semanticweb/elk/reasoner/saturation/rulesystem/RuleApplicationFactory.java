@@ -22,7 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
+import java.util.Collection;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,6 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemElClassSat
 import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemInvocationManagerSCE;
 import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory.Engine;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -66,16 +69,15 @@ public class RuleApplicationFactory implements
 	 */
 	private final InferenceSystemInvocationManager inferenceSystemInvocationManager;
 
-	// TODO Try to get rid of the ontology index, if possible.
-	/**
-	 * The index used for executing the rules
-	 */
-	private final OntologyIndex ontologyIndex;
-
 	/**
 	 * Cached constants
 	 */
 	private final IndexedClassExpression owlThing, owlNothing;
+
+	/**
+	 * The set of reflexive properties of the ontology
+	 */
+	private final Set<IndexedObjectProperty> reflexiveProperties_;
 
 	/**
 	 * The queue containing all activated contexts. Every activated context
@@ -109,9 +111,13 @@ public class RuleApplicationFactory implements
 		// TODO: provide an option for specifying the invocation manager
 		this.inferenceSystem = new InferenceSystemElClassSaturation();
 		this.inferenceSystemInvocationManager = new InferenceSystemInvocationManagerSCE<ContextElClassSaturation>();
-		this.ontologyIndex = ontologyIndex;
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
 		this.aggregatedStatistics = new RuleStatistics();
+		this.reflexiveProperties_ = new ArrayHashSet<IndexedObjectProperty>();
+		Collection<IndexedObjectProperty> reflexiveObjectProperties = ontologyIndex
+				.getReflexiveObjectProperties();
+		if (reflexiveObjectProperties != null)
+			reflexiveProperties_.addAll(reflexiveObjectProperties);
 
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
@@ -214,8 +220,8 @@ public class RuleApplicationFactory implements
 		/**
 		 * @return the reflexive object properties in this ontology
 		 */
-		public Iterable<IndexedObjectProperty> getReflexiveObjectProperties() {
-			return ontologyIndex.getReflexiveObjectProperties();
+		public Set<IndexedObjectProperty> getReflexiveObjectProperties() {
+			return reflexiveProperties_;
 		}
 
 		/**

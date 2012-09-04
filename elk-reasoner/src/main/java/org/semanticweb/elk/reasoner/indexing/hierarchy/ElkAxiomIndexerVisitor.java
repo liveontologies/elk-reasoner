@@ -188,9 +188,14 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
 				.accept(positiveIndexer);
 
-		if (multiplicity == 1)
+		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
+				&& multiplicity > 0)
 			ontologyIndex.addReflexiveObjectProperty(indexedReflexiveProperty);
-		else
+
+		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity;
+
+		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
+				&& multiplicity < 0)
 			ontologyIndex
 					.removeReflexiveObjectProperty(indexedReflexiveProperty);
 	}

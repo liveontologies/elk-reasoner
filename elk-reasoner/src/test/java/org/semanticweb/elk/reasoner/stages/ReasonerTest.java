@@ -179,41 +179,41 @@ public class ReasonerTest {
 		reasoner.shutdown();
 	}
 
-	@SuppressWarnings("static-method")
-	@Test
-	public void testPropertyChains() throws Owl2ParseException, IOException,
-			ElkFreshEntitiesException, ElkInconsistentOntologyException,
-			ElkException, InterruptedException {
-
-		Reasoner reasoner = createReasoner(""//
-				+ "Prefix( : = <http://example.org/> )"//
-				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-				+ "Ontology("//
-				+ "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
-				+ "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
-				+ "SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))"//
-				+ "SubClassOf(:D ObjectSomeValuesFrom(:R4 :E))"//
-				+ "SubClassOf(ObjectIntersectionOf(owl:Thing ObjectSomeValuesFrom(:T owl:Thing)) :X)"//
-				+ "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
-				+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
-				+ ")"//
-		);
-
-		reasoner.getTaxonomy();
-
-		ElkClass a = objectFactory.getClass(new ElkFullIri(
-				"http://example.org/A"));
-		ElkClass x = objectFactory.getClass(new ElkFullIri(
-				"http://example.org/X"));
-
-		Set<? extends Node<ElkClass>> superClassesOfA = reasoner
-				.getSuperClasses(a, true);
-
-		assertTrue("A SubClassOf X",
-				superClassesOfA.contains(reasoner.getClassNode(x)));
-
-		reasoner.shutdown();
-	}
+//	@SuppressWarnings("static-method")
+//	@Test
+//	public void testPropertyChains() throws Owl2ParseException, IOException,
+//			ElkFreshEntitiesException, ElkInconsistentOntologyException,
+//			ElkException, InterruptedException {
+//
+//		Reasoner reasoner = createReasoner(""//
+//				+ "Prefix( : = <http://example.org/> )"//
+//				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+//				+ "Ontology("//
+//				+ "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
+//				+ "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
+//				+ "SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))"//
+//				+ "SubClassOf(:D ObjectSomeValuesFrom(:R4 :E))"//
+//				+ "SubClassOf(ObjectIntersectionOf(owl:Thing ObjectSomeValuesFrom(:T owl:Thing)) :X)"//
+//				+ "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
+//				+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
+//				+ ")"//
+//		);
+//
+//		reasoner.getTaxonomy();
+//
+//		ElkClass a = objectFactory.getClass(new ElkFullIri(
+//				"http://example.org/A"));
+//		ElkClass x = objectFactory.getClass(new ElkFullIri(
+//				"http://example.org/X"));
+//
+//		Set<? extends Node<ElkClass>> superClassesOfA = reasoner
+//				.getSuperClasses(a, true);
+//
+//		assertTrue("A SubClassOf X",
+//				superClassesOfA.contains(reasoner.getClassNode(x)));
+//
+//		reasoner.shutdown();
+//	}
 
 	@SuppressWarnings("static-method")
 	@Test

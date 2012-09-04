@@ -15,7 +15,9 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-		<release version="${release.version}" date="${buildDate}" description="First maintenance relase after the third public release">				    
+	    <release version="${release.version}" date="${buildDate}" description="Current version">
+	    </release>
+		<release version="0.3.1" date="2012-08-30" description="First maintenance relase after the third public release">				    
 			<action dev="yevgeny" type="fix" issue="7">
 			    Fixed NoSuchElementException when loading imported ontologies through OWLAPI that have no axioms. 
 			</action>

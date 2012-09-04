@@ -76,12 +76,22 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			filler.addNegExistential(this);
 		}
 
+		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
+			// first positive occurrence of this expression
+			filler.addPosPropertyInExistential(property);			
+		}
+
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
 			filler.removeNegExistential(this);
+		}
+
+		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
+			// no positive occurrences of this expression left
+			filler.removePosPropertyInExistential(property);
 		}
 	}
 

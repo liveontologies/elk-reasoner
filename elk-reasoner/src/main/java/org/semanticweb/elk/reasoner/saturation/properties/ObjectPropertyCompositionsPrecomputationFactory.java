@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyCompositionsPrecomputationFactory.Engine;
@@ -41,6 +40,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * {@link SaturatedPropertyChain} that are used in {@link RuleRoleComposition}.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  */
 public class ObjectPropertyCompositionsPrecomputationFactory implements
 		InputProcessorFactory<IndexedPropertyChain, Engine> {
@@ -91,7 +91,8 @@ public class ObjectPropertyCompositionsPrecomputationFactory implements
 		 * R1 and R2 derives directly R skipping the auxiliary binary chain
 		 * representing [R1 R2].
 		 */
-		private static final boolean REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES = true;
+		// private static final boolean REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
+		// = true;
 
 		/**
 		 * If set to true, then compositions between each pair of R1 and R2 are
@@ -184,15 +185,15 @@ public class ObjectPropertyCompositionsPrecomputationFactory implements
 				 * If the chain does not occur negatively, then replace it by
 				 * its told super properties.
 				 */
-				if (REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
-						&& chain.getRightChains() == null) {
-					for (IndexedObjectProperty superChain : chain
-							.getToldSuperProperties())
-						rightPropertySaturated.compositionsByLeftSubProperty
-								.add(leftProperty, superChain);
-				} else
-					rightPropertySaturated.compositionsByLeftSubProperty.add(
-							leftProperty, chain);
+				// if (REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
+				// && chain.getRightChains() == null) {
+				// for (IndexedObjectProperty superChain : chain
+				// .getToldSuperProperties())
+				// rightPropertySaturated.compositionsByLeftSubProperty
+				// .add(leftProperty, superChain);
+				// } else
+				rightPropertySaturated.compositionsByLeftSubProperty.add(
+						leftProperty, chain);
 			}
 		}
 

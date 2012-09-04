@@ -23,10 +23,11 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.Collection;
+import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
@@ -37,24 +38,18 @@ import org.semanticweb.elk.util.collections.Multimap;
  * TODO: documentation
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  * @param <C>
  *            the type of contexts that can be used with this inference rule
  */
-public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
-		RuleWithBackwardLinks<C> implements InferenceRuleSCE<C> {
+public class RuleExistentialPlus<C extends ContextElClassSaturation> implements
+		InferenceRuleSCE<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
 			RuleApplicationFactory.Engine engine) {
 		final IndexedPropertyChain linkRelation = argument.getRelation();
 		final Context target = argument.getTarget();
-
-		// start deriving propagations
-		if (!context.derivePropagations) {
-			initializePropagations(context, engine);
-			// the above already applies all propagations, can return
-			return;
-		}
 
 		// apply all propagations over the link
 		final Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> props = context
@@ -62,38 +57,58 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 		if (props == null)
 			return;
 
-		for (IndexedPropertyChain propRelation : new LazySetIntersection<IndexedPropertyChain>(
-				linkRelation.getSaturated().getSuperProperties(),
-				props.keySet()))
+		Collection<Queueable<? extends ContextElClassSaturation>> carrys = props
+				.get(linkRelation);
 
-			for (Queueable<?> carry : props.get(propRelation))
-				engine.enqueue(target, carry);
+		if (carrys == null)
+			return;
+
+		for (Queueable<?> carry : carrys)
+			engine.enqueue(target, carry);
 	}
 
-	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
 			RuleApplicationFactory.Engine engine) {
 		final Collection<IndexedObjectSomeValuesFrom> exists = argument
 				.getExpression().getNegExistentials();
 
-		if (!context.derivePropagations || exists == null)
+		final Set<IndexedPropertyChain> candidatePropagationProperties = context
+				.getRoot().getPosPropertiesInExistentials();
+
+		if (exists == null || candidatePropagationProperties == null)
 			return;
 
-		for (IndexedObjectSomeValuesFrom e : exists)
-			addPropagation(e.getRelation(),
-					new NegativeSuperClassExpression<C>(e), context, engine);
-	}
+		for (IndexedObjectSomeValuesFrom e : exists) {
+			IndexedPropertyChain relation = e.getRelation();
+			// creating propagations for relevant sub-properties of the relation
+			for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
+					candidatePropagationProperties, relation.getSaturated()
+							.getSubProperties())) {
+				addPropagation(property,
+						new NegativeSuperClassExpression<C>(e), context, engine);
+			}
 
-	private void initializePropagations(C context,
-			RuleApplicationFactory.Engine engine) {
-		context.setDerivePropagations(true);
-
-		for (IndexedClassExpression ice : context.superClassExpressions)
-			if (ice.getNegExistentials() != null)
-				for (IndexedObjectSomeValuesFrom e : ice.getNegExistentials())
-					addPropagation(e.getRelation(),
+			// creating propagations for relevant sub-compositions of the
+			// relation
+			for (IndexedPropertyChain property : relation.getSaturated()
+					.getSubCompositions()) {
+				SaturatedPropertyChain propertySaturation = property
+						.getSaturated();
+				if (!new LazySetIntersection<IndexedPropertyChain>(
+						candidatePropagationProperties,
+						propertySaturation.getRightSubProperties()).isEmpty()
+						|| propertySaturation.hasReflexiveRightSubProperty()) {
+					addPropagation(property,
 							new NegativeSuperClassExpression<C>(e), context,
 							engine);
+				}
+			}
+
+			// propagating to the this context if relation is relflexive
+			if (relation.getSaturated().isReflexive())
+				engine.enqueue(context, new NegativeSuperClassExpression<C>(e));
+		}
+
 	}
 
 	private void addPropagation(IndexedPropertyChain propRelation,
@@ -101,7 +116,6 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 
 		if (context.propagationsByObjectProperty == null) {
 			context.initPropagationsByProperty();
-			initializeCompositionOfBackwardLinks(context, engine);
 		}
 
 		if (context.propagationsByObjectProperty.add(propRelation, carry)) {
@@ -113,12 +127,14 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 			if (backLinks == null) // this should never happen
 				return;
 
-			for (IndexedPropertyChain linkRelation : new LazySetIntersection<IndexedPropertyChain>(
-					propRelation.getSaturated().getSubProperties(),
-					backLinks.keySet()))
+			Collection<ContextElClassSaturation> targets = backLinks
+					.get(propRelation);
 
-				for (Context target : backLinks.get(linkRelation))
-					engine.enqueue(target, carry);
+			if (targets == null)
+				return;
+
+			for (Context target : targets)
+				engine.enqueue(target, carry);
 		}
 	}
 

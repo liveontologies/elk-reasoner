@@ -64,6 +64,8 @@ abstract public class IndexedClassExpression {
 
 	private Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
+	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
+
 	/**
 	 * {@link IndexedClassExpression} that appear in binary disjointess axioms
 	 * with this object.
@@ -148,6 +150,16 @@ abstract public class IndexedClassExpression {
 	 */
 	public Collection<IndexedObjectSomeValuesFrom> getNegExistentials() {
 		return negExistentials_;
+	}
+
+	/**
+	 * @return the {@link IndexedObjectProperty} objects that occur in positive
+	 *         {@link IndexedObjectSomeValuesFrom} that have this
+	 *         {@link IndexedClassExpression} as the filler, or {@code null} if
+	 *         none is assigned
+	 */
+	public Set<IndexedPropertyChain> getPosPropertiesInExistentials() {
+		return posPropertiesInExistentials_;
 	}
 
 	/**
@@ -242,6 +254,24 @@ abstract public class IndexedClassExpression {
 			success = negExistentials_.remove(existential);
 			if (negExistentials_.isEmpty())
 				negExistentials_ = null;
+		}
+		return success;
+	}
+
+	protected void addPosPropertyInExistential(IndexedPropertyChain property) {
+		if (posPropertiesInExistentials_ == null)
+			posPropertiesInExistentials_ = new ArrayHashSet<IndexedPropertyChain>(
+					1);
+		posPropertiesInExistentials_.add(property);
+	}
+
+	protected boolean removePosPropertyInExistential(
+			IndexedPropertyChain property) {
+		boolean success = false;
+		if (posPropertiesInExistentials_ != null) {
+			success = posPropertiesInExistentials_.remove(property);
+			if (posPropertiesInExistentials_.isEmpty())
+				posPropertiesInExistentials_ = null;
 		}
 		return success;
 	}

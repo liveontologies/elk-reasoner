@@ -81,8 +81,8 @@ public abstract class IndexedPropertyChain {
 
 	/**
 	 * @return All {@link IndexedBinaryPropertyChain}s in which this
-	 *         {@link IndexedBinaryPropertyChain} occurs on right, or
-	 *         {@code null} if none is assigned
+	 *         {@link IndexedPropertyChain} occurs on right, or {@code null} if
+	 *         none is assigned
 	 */
 	public Collection<IndexedBinaryPropertyChain> getRightChains() {
 		return rightChains_;

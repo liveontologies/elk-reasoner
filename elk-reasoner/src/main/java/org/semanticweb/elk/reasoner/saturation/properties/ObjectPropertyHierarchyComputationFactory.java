@@ -24,6 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.ArrayDeque;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -72,26 +74,81 @@ public class ObjectPropertyHierarchyComputationFactory implements
 
 			// compute all transitively closed subproperties
 			ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
-			saturated.derivedSubProperties.add(ipc);
-			queue.addLast(ipc);
-			while (!queue.isEmpty()) {
-				IndexedPropertyChain r = queue.removeLast();
-				if (r.getToldSubProperties() != null)
-					for (IndexedPropertyChain s : r.getToldSubProperties())
-						if (saturated.derivedSubProperties.add(s))
-							queue.addLast(s);
+			queue.add(ipc);
+			for (;;) {
+				IndexedPropertyChain r = queue.poll();
+				if (r == null)
+					break;
+				if (saturated.derivedSubProperties.add(r)) {
+					if (r instanceof IndexedBinaryPropertyChain)
+						saturated.derivedSubCompositions
+								.add((IndexedBinaryPropertyChain) r);
+					if (r instanceof IndexedObjectProperty
+							&& ((IndexedObjectProperty) r).isToldReflexive())
+						saturated.isReflexive = true;
+					if (r.getToldSubProperties() != null)
+						for (IndexedPropertyChain s : r.getToldSubProperties())
+							queue.add(s);
+				}
 			}
 
 			// compute all transitively closed superproperties
-			queue.clear();
-			saturated.derivedSuperProperties.add(ipc);
-			queue.addLast(ipc);
-			while (!queue.isEmpty()) {
-				IndexedPropertyChain r = queue.removeLast();
-				if (r.getToldSuperProperties() != null)
+			queue.add(ipc);
+			for (;;) {
+				IndexedPropertyChain r = queue.poll();
+				if (r == null)
+					break;
+				if (saturated.derivedSuperProperties.add(r)
+						&& r.getToldSuperProperties() != null)
 					for (IndexedPropertyChain s : r.getToldSuperProperties())
-						if (saturated.derivedSuperProperties.add(s))
-							queue.addLast(s);
+						queue.add(s);
+			}
+
+			// compute all transitively closed right subproperties
+			queue.add(ipc);
+			for (;;) {
+				IndexedPropertyChain r = queue.poll();
+				if (r == null)
+					break;
+				if (saturated.derivedRightSubProperties.add(r)) {
+					if (r instanceof IndexedObjectProperty
+							&& ((IndexedObjectProperty) r).isToldReflexive())
+						saturated.hasReflexiveRightSubProperty = true;
+					if (r.getToldSubProperties() != null)
+						for (IndexedPropertyChain s : r.getToldSubProperties())
+							queue.add(s);
+					if (r instanceof IndexedBinaryPropertyChain) {
+						IndexedPropertyChain s = ((IndexedBinaryPropertyChain) r)
+								.getRightProperty();
+						queue.add(s);
+					}
+				}
+			}
+
+			// compute all left-composible properties
+			for (IndexedPropertyChain r : saturated.derivedSuperProperties) {
+				if (r.getRightChains() != null) {
+					for (IndexedBinaryPropertyChain chain : r.getRightChains())
+						queue.add(chain.getLeftProperty());
+				}
+			}
+			for (;;) {
+				IndexedPropertyChain r = queue.poll();
+				if (r == null)
+					break;
+				if (saturated.leftComposableProperties.add(r)) {
+					if (r instanceof IndexedObjectProperty
+							&& ((IndexedObjectProperty) r).isToldReflexive())
+						saturated.hasReflexiveLeftComposableProperty = true;
+					if (r.getToldSubProperties() != null)
+						for (IndexedPropertyChain s : r.getToldSubProperties())
+							queue.add(s);
+					if (r instanceof IndexedBinaryPropertyChain) {
+						IndexedPropertyChain s = ((IndexedBinaryPropertyChain) r)
+								.getRightProperty();
+						queue.add(s);
+					}
+				}
 			}
 
 		}

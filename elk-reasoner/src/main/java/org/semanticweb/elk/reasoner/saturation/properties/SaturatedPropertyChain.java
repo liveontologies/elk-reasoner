@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.stages.ObjectPropertyCompositionsPrecomputationStage;
 import org.semanticweb.elk.reasoner.stages.ObjectPropertyHierarchyComputationStage;
@@ -38,21 +39,33 @@ import org.semanticweb.elk.util.collections.Multimap;
  * compositions which are needed during saturation of class expressions.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class SaturatedPropertyChain {
-	protected final IndexedPropertyChain root;
+	final IndexedPropertyChain root;
 
-	protected final Set<IndexedPropertyChain> derivedSubProperties;
-	protected final Set<IndexedPropertyChain> derivedSuperProperties;
+	final Set<IndexedPropertyChain> derivedSubProperties;
+	final Set<IndexedPropertyChain> derivedSuperProperties;
 
-	protected AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeftSubProperty;
-	protected AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRightSubProperty;
+	final Set<IndexedBinaryPropertyChain> derivedSubCompositions;
+	final Set<IndexedPropertyChain> derivedRightSubProperties;
+	final Set<IndexedPropertyChain> leftComposableProperties;
+
+	boolean isReflexive = false;
+	boolean hasReflexiveRightSubProperty = false;
+	boolean hasReflexiveLeftComposableProperty = false;
+
+	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeftSubProperty;
+	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRightSubProperty;
 
 	public SaturatedPropertyChain(IndexedPropertyChain iop) {
 		this.root = iop;
 		this.derivedSuperProperties = new ArrayHashSet<IndexedPropertyChain>();
 		this.derivedSubProperties = new ArrayHashSet<IndexedPropertyChain>();
+		this.derivedSubCompositions = new ArrayHashSet<IndexedBinaryPropertyChain>();
+		this.derivedRightSubProperties = new ArrayHashSet<IndexedPropertyChain>();
+		this.leftComposableProperties = new ArrayHashSet<IndexedPropertyChain>();
 	}
 
 	public IndexedPropertyChain getRoot() {
@@ -60,11 +73,63 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * @return All subproperties of the root property including root itself.
-	 *         Computed in the {@link ObjectPropertyHierarchyComputationStage}.
+	 * @return All sub-properties R of root including root itself. Computed in
+	 *         the {@link ObjectPropertyHierarchyComputationStage}.
 	 */
 	public Set<IndexedPropertyChain> getSubProperties() {
 		return derivedSubProperties;
+	}
+
+	/**
+	 * @return All sub-properties R of root that are instances of
+	 *         {@link IndexedBinaryPropertyChain}. Computed in the
+	 *         {@link ObjectPropertyHierarchyComputationStage}.
+	 */
+	public Set<IndexedBinaryPropertyChain> getSubCompositions() {
+		return derivedSubCompositions;
+	}
+
+	/**
+	 * @return {@code true} if this property has a reflexive sub-property.
+	 */
+	public boolean isReflexive() {
+		return isReflexive;
+	}
+
+	/**
+	 * @return All properties R such that there exists properties S1,...,Sn
+	 *         (n>=0) for which S1 o ... o Sn o R => root follows from the role
+	 *         inclusion axioms.
+	 */
+	public Set<IndexedPropertyChain> getRightSubProperties() {
+		return derivedRightSubProperties;
+	}
+
+	/**
+	 * @return {@code true} if there eixsts a refiexive property R and
+	 *         properties S1,...,Sn (n>=0) for which S1 o ... o Sn o R => root
+	 *         follows from the role inclusion axioms.
+	 */
+	public boolean hasReflexiveRightSubProperty() {
+		return hasReflexiveRightSubProperty;
+	}
+
+	/**
+	 * @return All properties R such that there exists properties S1,...,Sn
+	 *         (n>=0) and T for which S1 o ... o Sn o R o root => T follows from
+	 *         the role inclusion axioms.
+	 */
+	public Set<IndexedPropertyChain> getLeftComposableProperties() {
+		return leftComposableProperties;
+	}
+
+	/**
+	 * @return {@code true} if there exists a reflexive property R such that
+	 *         there exists properties S1,...,Sn (n>=0) and T for which S1 o ...
+	 *         o Sn o R o root => T follows from the role inclusion axioms.
+	 */
+	public boolean hasReflexiveLeftComposableProperty() {
+		return hasReflexiveLeftComposableProperty;
 	}
 
 	/**

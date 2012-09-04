@@ -1,11 +1,11 @@
+package org.semanticweb.elk.util.collections;
 /*
  * #%L
- * elk-reasoner
- * 
- * $Id$
- * $HeadURL$
+ * ELK Utilities Collections
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 Oxford University Computing Laboratory
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,33 +20,23 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, May 26, 2011
- */
-package org.semanticweb.elk.util.collections;
 
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.semanticweb.elk.util.collections.LazySetIntersection;
-
 import junit.framework.TestCase;
 
-/**
- * @author Yevgeny Kazakov
- * 
- */
-public class LazySetIntersectionTest extends TestCase {
+public class LazySetUnionTest extends TestCase {
 
-	public LazySetIntersectionTest(String testName) {
+	public LazySetUnionTest(String testName) {
 		super(testName);
 	}
 
 	@SuppressWarnings("static-method")
-	public void testLazySetIntersection() {
+	public void testLazySetUnion() {
 		// random number generator for elements
-		Random generator = new Random(456);
+		Random generator = new Random(123);
 		// number of iterations of filling in elements
 		final int noIterations = 100;
 		// number of elements to generate in each set
@@ -64,26 +54,24 @@ public class LazySetIntersectionTest extends TestCase {
 				firstSet.add(generator.nextInt(noEntries));
 
 			// computing the faithful intersection
-			Set<Integer> referenceIntersection = new HashSet<Integer>(firstSet);
-			referenceIntersection.retainAll(secondSet);
+			Set<Integer> referenceUnion = new HashSet<Integer>(firstSet);
+			referenceUnion.addAll(secondSet);
 
-			Set<Integer> lazyIntersection = new LazySetIntersection<Integer>(
-					firstSet, secondSet);
+			Set<Integer> lazyUnion = new LazySetUnion<Integer>(firstSet,
+					secondSet);
 
 			// checking emptiness
-			assertEquals(lazyIntersection.isEmpty(),
-					referenceIntersection.isEmpty());
+			assertEquals(lazyUnion.isEmpty(), referenceUnion.isEmpty());
 
 			// checking membership
 			for (int k = 0; k < noEntries; k++)
-				assertEquals(referenceIntersection.contains(k),
-						lazyIntersection.contains(k));
+				assertEquals(referenceUnion.contains(k), lazyUnion.contains(k));
 
-			// checking the lazy intersection
-			for (Integer element : lazyIntersection) {
-				assertTrue(referenceIntersection.remove(element));
+			// checking the lazy union
+			for (Integer element : lazyUnion) {
+				assertTrue(referenceUnion.remove(element));
 			}
-			assertTrue(referenceIntersection.isEmpty());
+			assertTrue(referenceUnion.isEmpty());
 		}
 
 	}

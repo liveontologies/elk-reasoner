@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
@@ -34,12 +35,13 @@ import org.semanticweb.elk.util.collections.Multimap;
  * TODO: documentation
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  * @param <C>
  *            the type of contexts that can be used with this inference rule
  */
-public class RuleRoleComposition<C extends ContextElClassSaturation> extends
-		RuleWithBackwardLinks<C> implements InferenceRule<C> {
+public class RuleRoleComposition<C extends ContextElClassSaturation> implements
+		InferenceRule<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
 			RuleApplicationFactory.Engine engine) {
@@ -48,13 +50,19 @@ public class RuleRoleComposition<C extends ContextElClassSaturation> extends
 		final C target = argument.getTarget();
 
 		/*
-		 * if composeBackwardLinks, then add a forward copy of the link to
-		 * consider the link in property compositions
+		 * convert backward link to a forward link if it can potentially be
+		 * composed
 		 */
-		if (context.composeBackwardLinks
-				&& linkRelation.getSaturated()
-						.getCompositionsByLeftSubProperty() != null)
+		Set<IndexedPropertyChain> toldProperties = target.getRoot()
+				.getPosPropertiesInExistentials();
+		if (toldProperties != null
+				&& !new LazySetIntersection<IndexedPropertyChain>(
+						toldProperties, linkRelation.getSaturated()
+								.getLeftComposableProperties()).isEmpty()
+				|| linkRelation.getSaturated()
+						.hasReflexiveLeftComposableProperty()) {
 			engine.enqueue(target, new ForwardLink<C>(linkRelation, context));
+		}
 
 		/* compose the link with all forward links */
 		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = linkRelation
@@ -82,9 +90,6 @@ public class RuleRoleComposition<C extends ContextElClassSaturation> extends
 	public void apply(ForwardLink<C> argument, C context,
 			RuleApplicationFactory.Engine engine) {
 
-		// start deriving backward links for composition
-		initializeCompositionOfBackwardLinks(context, engine);
-
 		final IndexedPropertyChain linkRelation = argument.getRelation();
 		final C target = argument.getTarget();
 
@@ -104,10 +109,11 @@ public class RuleRoleComposition<C extends ContextElClassSaturation> extends
 						.get(backwardRelation);
 
 				for (IndexedPropertyChain composition : compositions)
-					for (ContextElClassSaturation backwardTarget : backwardTargets)
+					for (ContextElClassSaturation backwardTarget : backwardTargets) {
 						engine.enqueue(target,
 								new BackwardLink<ContextElClassSaturation>(
 										composition, backwardTarget));
+					}
 			}
 		}
 	}

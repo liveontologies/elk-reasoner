@@ -47,6 +47,11 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	protected List<IndexedPropertyChain> toldSubProperties;
 
 	/**
+	 * Number of occurrence in reflexivity axioms
+	 */
+	int reflexiveAxiomOccurrenceNo = 0;
+
+	/**
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
 	protected IndexedObjectProperty(ElkObjectProperty elkObjectProperty) {
@@ -62,11 +67,18 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 
 	/**
 	 * @return All told sub object properties of this object property, possibly
-	 *         null.
+	 *         {@code null}.
 	 */
 	@Override
 	public List<IndexedPropertyChain> getToldSubProperties() {
 		return toldSubProperties;
+	}
+
+	/**
+	 * @return {@code true} if this object property occurs in a reflexivity axiom.
+	 */
+	public boolean isToldReflexive() {
+		return reflexiveAxiomOccurrenceNo > 0;
 	}
 
 	protected void addToldSubObjectProperty(
@@ -90,7 +102,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		}
 		return success;
 	}
-	
+
 	@Override
 	protected void updateOccurrenceNumber(int increment) {
 		occurrenceNo += increment;
