@@ -40,17 +40,18 @@ import java.util.Set;
  * the other set. An element is contained in the intersection as reported by
  * {@code contains} if it is contained in all input sets. The size of the
  * intersection reported by {@code size} is the minimum of the sizes for the
- * sets. This way it is possible to use the result to form intersection with
- * instances of this class. If any of the sets is modified while an iteration
- * over the intersection is in progress, the results of the iteration are
- * undefined. The set intersection does not support additions or removal of
- * elements; if attempted, an {@link UnsupportedOperationException} will be
- * thrown.
+ * sets. This way it is possible to use the result to build other
+ * {@link LazySetIntersection} and {@link LazySetUnion} objects. If any of the
+ * sets is modified while an iteration over the intersection is in progress, the
+ * results of the iteration are undefined. The set intersection does not support
+ * additions or removal of elements; if attempted, an
+ * {@link UnsupportedOperationException} will be thrown.
  * 
  * 
  * @author Yevgeny Kazakov
  * @param <E>
  *            the type of the elements in this set
+ * @see LazySetUnion
  * 
  */
 public class LazySetIntersection<E> extends AbstractSet<E> {
@@ -94,6 +95,11 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 	@Override
 	public int size() {
 		return Math.min(firstSet.size(), secondSet.size());
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return !iterator().hasNext();
 	}
 
 	static class SetIntersectionIterator<E> implements Iterator<E> {

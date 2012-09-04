@@ -46,7 +46,7 @@ public class LazySetIntersectionTest extends TestCase {
 	@SuppressWarnings("static-method")
 	public void testLazySetIntersection() {
 		// random number generator for elements
-		Random generator = new Random(123);
+		Random generator = new Random(456);
 		// number of iterations of filling in elements
 		final int noIterations = 100;
 		// number of elements to generate in each set
@@ -67,14 +67,24 @@ public class LazySetIntersectionTest extends TestCase {
 			Set<Integer> referenceIntersection = new HashSet<Integer>(firstSet);
 			referenceIntersection.retainAll(secondSet);
 
+			Set<Integer> lazyIntersection = new LazySetIntersection<Integer>(
+					firstSet, secondSet);
+
+			// checking emptiness
+			assertEquals(lazyIntersection.isEmpty(),
+					referenceIntersection.isEmpty());
+
+			// checking membership
+			for (int k = 0; k < noEntries; k++)
+				assertEquals(referenceIntersection.contains(k),
+						lazyIntersection.contains(k));
+
 			// checking the lazy intersection
-			for (Integer element : new LazySetIntersection<Integer>(firstSet,
-					secondSet)) {
+			for (Integer element : lazyIntersection) {
 				assertTrue(referenceIntersection.remove(element));
 			}
 			assertTrue(referenceIntersection.isEmpty());
 		}
 
 	}
-
 }
