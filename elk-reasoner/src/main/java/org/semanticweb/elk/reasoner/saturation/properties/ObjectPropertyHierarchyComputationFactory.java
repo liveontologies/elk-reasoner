@@ -195,6 +195,8 @@ public class ObjectPropertyHierarchyComputationFactory implements
 class FindReflexivePropertiesVisitor<O> implements IndexedPropertyChainVisitor<O> {
 
 	boolean reflexive = false;
+	//used to prevent infinite recursion in case of cyclic told hierarchies
+	//TODO can be avoided if properties are partially saturated in this visitor
 	final Set<IndexedPropertyChain> visited_ = new ArrayHashSet<IndexedPropertyChain>();
 	
 	@Override
