@@ -26,7 +26,6 @@ import junit.framework.TestCase;
 
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
@@ -127,25 +126,25 @@ public class IndexConstructionTest extends TestCase {
 		assertNull(index.getIndexed(c));
 	}
 
-	public void testConjunctionSharing() {
-		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));
-		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
-		ElkClass c = objectFactory.getClass(new ElkFullIri("C"));
-		ElkClass d = objectFactory.getClass(new ElkFullIri("D"));
-
-		ElkClassExpression x = objectFactory.getObjectIntersectionOf(a, b, c);
-		ElkClassExpression y = objectFactory.getObjectIntersectionOf(
-				objectFactory.getObjectIntersectionOf(b, a), c);
-
-		OntologyIndex index = new OntologyIndexImpl();
-		ElkAxiomProcessor inserter = index.getAxiomInserter();
-
-		inserter.visit(objectFactory.getSubClassOfAxiom(x, d));
-		inserter.visit(objectFactory.getSubClassOfAxiom(y, d));
-
-		assertSame(index.getIndexed(x), index.getIndexed(y));
-		assertEquals(2, index.getIndexed(x).getToldSuperClassExpressions()
-				.size());
-	}
+//	public void testConjunctionSharing() {
+//		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));
+//		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
+//		ElkClass c = objectFactory.getClass(new ElkFullIri("C"));
+//		ElkClass d = objectFactory.getClass(new ElkFullIri("D"));
+//
+//		ElkClassExpression x = objectFactory.getObjectIntersectionOf(a, b, c);
+//		ElkClassExpression y = objectFactory.getObjectIntersectionOf(
+//				objectFactory.getObjectIntersectionOf(b, a), c);
+//
+//		OntologyIndex index = new OntologyIndexImpl();
+//		ElkAxiomProcessor inserter = index.getAxiomInserter();
+//
+//		inserter.visit(objectFactory.getSubClassOfAxiom(x, d));
+//		inserter.visit(objectFactory.getSubClassOfAxiom(y, d));
+//
+//		assertSame(index.getIndexed(x), index.getIndexed(y));
+//		assertEquals(2, index.getIndexed(x).getToldSuperClassExpressions()
+//				.size());
+//	}
 
 }

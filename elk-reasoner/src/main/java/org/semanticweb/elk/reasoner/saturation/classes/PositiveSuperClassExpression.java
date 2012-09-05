@@ -55,10 +55,9 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 		// apply decomposition rules
 		expression.applyDecomposition(ruleEngine, context);
 
-		// applying composition rules
+		// applying all composition rules
 		CompositionRules rules = expression.getNext();
 
-		// applying all composition rules
 		for (;;) {
 			if (rules == null)
 				return;

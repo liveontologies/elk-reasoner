@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,13 +52,8 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression extends ChainImpl<CompositionRules> {
-
-	/**
-	 * Correctness of axioms deletions requires that toldSuperClassExpressions
-	 * is a List.
-	 */
-	private List<IndexedClassExpression> toldSuperClassExpressions_;
+abstract public class IndexedClassExpression extends
+		ChainImpl<CompositionRules> {
 
 	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
 
@@ -122,16 +116,8 @@ abstract public class IndexedClassExpression extends ChainImpl<CompositionRules>
 	abstract void updateOccurrenceNumbers(int increment, int positiveIncrement,
 			int negativeIncrement);
 
-	
-	public abstract void applyDecomposition(RuleEngine ruleEngine, NewContext context);
-	
-	/**
-	 * @return All told super class expressions of this class expression,
-	 *         possibly null.
-	 */
-	public List<IndexedClassExpression> getToldSuperClassExpressions() {
-		return toldSuperClassExpressions_;
-	}
+	public abstract void applyDecomposition(RuleEngine ruleEngine,
+			NewContext context);
 
 	/**
 	 * @return the {@link IndexedObjectProperty} objects that occur in positive
@@ -158,29 +144,6 @@ abstract public class IndexedClassExpression extends ChainImpl<CompositionRules>
 	 */
 	public List<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
 		return disjointnessAxioms;
-	}
-
-	protected void addToldSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
-		if (toldSuperClassExpressions_ == null)
-			toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
-					1);
-		toldSuperClassExpressions_.add(superClassExpression);
-	}
-
-	/**
-	 * @param superClassExpression
-	 * @return true if successfully removed
-	 */
-	protected boolean removeToldSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
-		boolean success = false;
-		if (toldSuperClassExpressions_ != null) {
-			success = toldSuperClassExpressions_.remove(superClassExpression);
-			if (toldSuperClassExpressions_.isEmpty())
-				toldSuperClassExpressions_ = null;
-		}
-		return success;
 	}
 
 	protected void addPosPropertyInExistential(IndexedPropertyChain property) {

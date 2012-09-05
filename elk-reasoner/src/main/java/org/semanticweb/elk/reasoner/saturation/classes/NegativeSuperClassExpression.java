@@ -52,10 +52,9 @@ public class NegativeSuperClassExpression extends SuperClassExpression {
 		if (!storeInContext(context, ruleEngine))
 			return;
 
-		// applying composition rules
-		CompositionRules rules = expression.getNext();
-
 		// applying all composition rules
+		CompositionRules rules = expression.getNext();
+		
 		for (;;) {
 			if (rules == null)
 				return;

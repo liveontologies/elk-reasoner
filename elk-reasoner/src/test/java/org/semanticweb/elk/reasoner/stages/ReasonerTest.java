@@ -53,7 +53,6 @@ import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -147,22 +146,22 @@ public class ReasonerTest {
 
 		reasoner.getTaxonomy();
 
-		OntologyIndex index = reasoner.getOntologyIndex();
-
-		IndexedClassExpression A = index.getIndexed(a);
-		IndexedClassExpression B = index.getIndexed(b);
-		IndexedClassExpression C = index.getIndexed(c);
-		IndexedClassExpression D = index.getIndexed(d);
-		IndexedClassExpression E = index.getIndexed(e);
-
-		assertTrue("A SubClassOf B",
-				A.getToldSuperClassExpressions().contains(B));
-		assertTrue("A SubClassOf C",
-				A.getToldSuperClassExpressions().contains(C));
-		assertTrue("A SubClassOf D",
-				A.getToldSuperClassExpressions().contains(D));
-		assertFalse("A SubClassOf E", A.getToldSuperClassExpressions()
-				.contains(E));
+		// OntologyIndex index = reasoner.getOntologyIndex();
+		//
+		// IndexedClassExpression A = index.getIndexed(a);
+		// IndexedClassExpression B = index.getIndexed(b);
+		// IndexedClassExpression C = index.getIndexed(c);
+		// IndexedClassExpression D = index.getIndexed(d);
+		// IndexedClassExpression E = index.getIndexed(e);
+		//
+		// assertTrue("A SubClassOf B",
+		// A.getToldSuperClassExpressions().contains(B));
+		// assertTrue("A SubClassOf C",
+		// A.getToldSuperClassExpressions().contains(C));
+		// assertTrue("A SubClassOf D",
+		// A.getToldSuperClassExpressions().contains(D));
+		// assertFalse("A SubClassOf E", A.getToldSuperClassExpressions()
+		// .contains(E));
 
 		Set<? extends Node<ElkClass>> superClassesOfA = reasoner
 				.getSuperClasses(a, true);
@@ -179,41 +178,42 @@ public class ReasonerTest {
 		reasoner.shutdown();
 	}
 
-//	@SuppressWarnings("static-method")
-//	@Test
-//	public void testPropertyChains() throws Owl2ParseException, IOException,
-//			ElkFreshEntitiesException, ElkInconsistentOntologyException,
-//			ElkException, InterruptedException {
-//
-//		Reasoner reasoner = createReasoner(""//
-//				+ "Prefix( : = <http://example.org/> )"//
-//				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-//				+ "Ontology("//
-//				+ "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
-//				+ "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
-//				+ "SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))"//
-//				+ "SubClassOf(:D ObjectSomeValuesFrom(:R4 :E))"//
-//				+ "SubClassOf(ObjectIntersectionOf(owl:Thing ObjectSomeValuesFrom(:T owl:Thing)) :X)"//
-//				+ "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
-//				+ "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
-//				+ ")"//
-//		);
-//
-//		reasoner.getTaxonomy();
-//
-//		ElkClass a = objectFactory.getClass(new ElkFullIri(
-//				"http://example.org/A"));
-//		ElkClass x = objectFactory.getClass(new ElkFullIri(
-//				"http://example.org/X"));
-//
-//		Set<? extends Node<ElkClass>> superClassesOfA = reasoner
-//				.getSuperClasses(a, true);
-//
-//		assertTrue("A SubClassOf X",
-//				superClassesOfA.contains(reasoner.getClassNode(x)));
-//
-//		reasoner.shutdown();
-//	}
+	// @SuppressWarnings("static-method")
+	// @Test
+	// public void testPropertyChains() throws Owl2ParseException, IOException,
+	// ElkFreshEntitiesException, ElkInconsistentOntologyException,
+	// ElkException, InterruptedException {
+	//
+	// Reasoner reasoner = createReasoner(""//
+	// + "Prefix( : = <http://example.org/> )"//
+	// + "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+	// + "Ontology("//
+	// + "SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))"//
+	// + "SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))"//
+	// + "SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))"//
+	// + "SubClassOf(:D ObjectSomeValuesFrom(:R4 :E))"//
+	// +
+	// "SubClassOf(ObjectIntersectionOf(owl:Thing ObjectSomeValuesFrom(:T owl:Thing)) :X)"//
+	// + "SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)"//
+	// + "SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2 :S) :T)"//
+	// + ")"//
+	// );
+	//
+	// reasoner.getTaxonomy();
+	//
+	// ElkClass a = objectFactory.getClass(new ElkFullIri(
+	// "http://example.org/A"));
+	// ElkClass x = objectFactory.getClass(new ElkFullIri(
+	// "http://example.org/X"));
+	//
+	// Set<? extends Node<ElkClass>> superClassesOfA = reasoner
+	// .getSuperClasses(a, true);
+	//
+	// assertTrue("A SubClassOf X",
+	// superClassesOfA.contains(reasoner.getClassNode(x)));
+	//
+	// reasoner.shutdown();
+	// }
 
 	@SuppressWarnings("static-method")
 	@Test
@@ -379,21 +379,21 @@ public class ReasonerTest {
 		ElkClass d = objectFactory.getClass(new ElkFullIri(
 				"http://example.org/D"));
 
-		OntologyIndex index = reasoner.getOntologyIndex();
-
-		IndexedClassExpression A = index.getIndexed(a);
-		IndexedClassExpression B = index.getIndexed(b);
-		IndexedClassExpression C = index.getIndexed(c);
-		IndexedClassExpression D = index.getIndexed(d);
-
-		assertTrue("A SubClassOf B",
-				A.getToldSuperClassExpressions().contains(B));
-		assertTrue("A SubClassOf C",
-				A.getToldSuperClassExpressions().contains(C));
-		assertTrue("C SubClassOf D",
-				C.getToldSuperClassExpressions().contains(D));
-		assertTrue("B SubClassOf D",
-				B.getToldSuperClassExpressions().contains(D));
+		// OntologyIndex index = reasoner.getOntologyIndex();
+		//
+		// IndexedClassExpression A = index.getIndexed(a);
+		// IndexedClassExpression B = index.getIndexed(b);
+		// IndexedClassExpression C = index.getIndexed(c);
+		// IndexedClassExpression D = index.getIndexed(d);
+		//
+		// assertTrue("A SubClassOf B",
+		// A.getToldSuperClassExpressions().contains(B));
+		// assertTrue("A SubClassOf C",
+		// A.getToldSuperClassExpressions().contains(C));
+		// assertTrue("C SubClassOf D",
+		// C.getToldSuperClassExpressions().contains(D));
+		// assertTrue("B SubClassOf D",
+		// B.getToldSuperClassExpressions().contains(D));
 
 		Node<ElkClass> bNode = reasoner.getClassNode(b);
 		Node<ElkClass> cNode = reasoner.getClassNode(c);
