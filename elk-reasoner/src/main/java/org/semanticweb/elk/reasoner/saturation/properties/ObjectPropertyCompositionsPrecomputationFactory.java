@@ -55,7 +55,7 @@ public class ObjectPropertyCompositionsPrecomputationFactory implements
 	}
 
 	/**
-	 * If R and S are in the vector and R is a subproperty of S, then S is
+	 * If R and S are in the vector and R is a sub-property of S, then S is
 	 * removed from the vector.
 	 */
 	private static void eliminateImpliedCompositions(

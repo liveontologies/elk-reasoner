@@ -106,7 +106,7 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * @return {@code true} if there eixsts a refiexive property R and
+	 * @return {@code true} if there exists a reflexive property R and
 	 *         properties S1,...,Sn (n>=0) for which S1 o ... o Sn o R => root
 	 *         follows from the role inclusion axioms.
 	 */
@@ -115,7 +115,7 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * @return All properties R such that there exists properties S1,...,Sn
+	 * @return All properties R such that there exist properties S1,...,Sn
 	 *         (n>=0) and T for which S1 o ... o Sn o R o root => T follows from
 	 *         the role inclusion axioms.
 	 */
@@ -125,7 +125,7 @@ public class SaturatedPropertyChain {
 
 	/**
 	 * @return {@code true} if there exists a reflexive property R such that
-	 *         there exists properties S1,...,Sn (n>=0) and T for which S1 o ...
+	 *         there exist properties S1,...,Sn (n>=0) and T for which S1 o ...
 	 *         o Sn o R o root => T follows from the role inclusion axioms.
 	 */
 	public boolean hasReflexiveLeftComposableProperty() {
@@ -133,7 +133,7 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * @return All superproperties of the root property including root itself.
+	 * @return All super-properties of the root property including root itself.
 	 *         Computed in the {@link ObjectPropertyHierarchyComputationStage}.
 	 */
 	public Set<IndexedPropertyChain> getSuperProperties() {

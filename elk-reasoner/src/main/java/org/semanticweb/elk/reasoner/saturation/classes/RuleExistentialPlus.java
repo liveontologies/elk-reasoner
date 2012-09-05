@@ -67,6 +67,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> implements
 			engine.enqueue(target, carry);
 	}
 
+	@Override
 	public void applySCE(SuperClassExpression<C> argument, C context,
 			RuleApplicationFactory.Engine engine) {
 		final Collection<IndexedObjectSomeValuesFrom> exists = argument
@@ -104,7 +105,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> implements
 				}
 			}
 
-			// propagating to the this context if relation is relflexive
+			// propagating to the this context if relation is reflexive
 			if (relation.getSaturated().isReflexive())
 				engine.enqueue(context, new NegativeSuperClassExpression<C>(e));
 		}

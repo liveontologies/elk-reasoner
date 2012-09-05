@@ -23,17 +23,20 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.ArrayDeque;
+import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputationFactory.Engine;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
  * The factory for engines that reset and compute the transitive closure of the
- * suproperties and superproperties relations for each submitted
+ * sub-properties and super-properties relations for each submitted
  * {@link IndexedPropertyChain}. The engines are not thread safe at the moment
  * (only one engine can be used at a time).
  * 
@@ -54,7 +57,7 @@ public class ObjectPropertyHierarchyComputationFactory implements
 
 	/**
 	 * The engine for resetting the saturation and computing the transitively
-	 * closed suproperties and superproperties of each submitted property chain.
+	 * closed sub-properties and super-properties of each submitted property chain.
 	 * 
 	 * @author Frantisek Simancik
 	 * @author "Yevgeny Kazakov"
@@ -72,7 +75,9 @@ public class ObjectPropertyHierarchyComputationFactory implements
 			SaturatedPropertyChain saturated = new SaturatedPropertyChain(ipc);
 			ipc.setSaturated(saturated);
 
-			// compute all transitively closed subproperties
+			// compute all transitively closed sub-properties
+			// and mark the chain as reflexive if one of its sub-properties
+			// is reflexive
 			ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
 			queue.add(ipc);
 			for (;;) {
@@ -92,7 +97,7 @@ public class ObjectPropertyHierarchyComputationFactory implements
 				}
 			}
 
-			// compute all transitively closed superproperties
+			// compute all transitively closed super-properties
 			queue.add(ipc);
 			for (;;) {
 				IndexedPropertyChain r = queue.poll();
@@ -104,7 +109,8 @@ public class ObjectPropertyHierarchyComputationFactory implements
 						queue.add(s);
 			}
 
-			// compute all transitively closed right subproperties
+			// compute all transitively closed right sub-properties
+			// i.e. such R that S1,...,Sn (n>=0) for which S1 o ... o Sn o R => root
 			queue.add(ipc);
 			for (;;) {
 				IndexedPropertyChain r = queue.poll();
@@ -125,13 +131,18 @@ public class ObjectPropertyHierarchyComputationFactory implements
 				}
 			}
 
-			// compute all left-composible properties
+			// compute all left-composable properties
+			// i.e. such R that exist S1,..., Sn  (n>=0) and T for which S1 o ... o Sn o R o root => T
 			for (IndexedPropertyChain r : saturated.derivedSuperProperties) {
+				// walking through the super-properties of root to find all
+				// composable R' o root' (that means root is composable w/ R '
+				// and all its sub-properties)
 				if (r.getRightChains() != null) {
 					for (IndexedBinaryPropertyChain chain : r.getRightChains())
 						queue.add(chain.getLeftProperty());
 				}
 			}
+
 			for (;;) {
 				IndexedPropertyChain r = queue.poll();
 				if (r == null)
@@ -167,5 +178,64 @@ public class ObjectPropertyHierarchyComputationFactory implements
 	@Override
 	public Engine getEngine() {
 		return this.engine;
+	}
+}
+
+/**
+ * Figures out whether each submitted indexed property is reflexive or not.
+ * A property R is reflexive if
+ * i) it is a named property and is told reflexive
+ * ii) S -> R and S is reflexive
+ * iii) it is a chain S o H and both S and H are reflexive
+ * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
+class FindReflexivePropertiesVisitor<O> implements IndexedPropertyChainVisitor<O> {
+
+	boolean reflexive = false;
+	final Set<IndexedPropertyChain> visited_ = new ArrayHashSet<IndexedPropertyChain>();
+	
+	@Override
+	public O visit(IndexedObjectProperty property) {
+		reflexive = property.isToldReflexive();
+		
+		if (!reflexive) {
+			defaultVisit(property);
+		}
+		
+		return null;
+	}
+
+
+	@Override
+	public O visit(IndexedBinaryPropertyChain binaryChain) {
+		reflexive = isReflexive(binaryChain.getLeftProperty())
+				&& isReflexive(binaryChain.getRightProperty());
+
+		return null;
+	}
+	
+	boolean isReflexive(final IndexedPropertyChain propChain) {
+		visited_.add(propChain);
+		propChain.accept(this);
+		
+		return reflexive;
+	}
+
+	private void defaultVisit(IndexedPropertyChain propChain) {
+		// go through sub-properties to see if some is reflexive
+		// stop if so
+		if (propChain.getToldSubProperties() != null) {
+			for (IndexedPropertyChain subChain : propChain
+					.getToldSubProperties()) {
+				if (!visited_.contains(subChain)) {
+					if (reflexive = isReflexive(subChain)) {
+						break;
+					}
+				}
+			}
+		}
 	}
 }

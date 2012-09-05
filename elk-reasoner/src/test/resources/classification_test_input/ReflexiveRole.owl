@@ -2,7 +2,10 @@ Prefix( : = <http://example.org/> )
 Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
 Ontology(
 ReflexiveObjectProperty(:R)
+ReflexiveObjectProperty(:H)
+
 EquivalentClasses(:B ObjectSomeValuesFrom(:R :A))
 EquivalentClasses(:D ObjectSomeValuesFrom(:S :C))
-SubObjectPropertyOf(ObjectPropertyChain(:R :R) :S)
+SubObjectPropertyOf(:H :H1)
+SubObjectPropertyOf(ObjectPropertyChain(:R :H1) :S) #S is implicitly reflexive since H1 is
 )
