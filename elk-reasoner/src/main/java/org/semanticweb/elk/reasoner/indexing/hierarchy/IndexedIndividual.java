@@ -23,6 +23,8 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
 
@@ -69,7 +71,12 @@ public class IndexedIndividual extends IndexedClassEntity {
 
 	@Override
 	public String toString() {
-		return "ObjectOneOf(<" + elkNamedIndividual_.getIri().getFullIriAsString() + ">)";
+		return "ObjectOneOf(<"
+				+ elkNamedIndividual_.getIri().getFullIriAsString() + ">)";
 	}
 
+	@Override
+	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+		// nothing so far
+	}
 }

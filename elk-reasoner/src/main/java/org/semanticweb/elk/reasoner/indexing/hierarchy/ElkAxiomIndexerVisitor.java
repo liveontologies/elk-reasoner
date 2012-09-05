@@ -95,11 +95,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedClassExpression superIndexedClass = superElkClass
 				.accept(positiveIndexer);
 
-		if (multiplicity == 1) {
-			subIndexedClass.addToldSuperClassExpression(superIndexedClass);
-		} else {
-			subIndexedClass.removeToldSuperClassExpression(superIndexedClass);
-		}
+		(new IndexedSubClassOfAxiom(subIndexedClass, superIndexedClass))
+				.updateOccurrenceNumbers(multiplicity);
 	}
 
 	@Override

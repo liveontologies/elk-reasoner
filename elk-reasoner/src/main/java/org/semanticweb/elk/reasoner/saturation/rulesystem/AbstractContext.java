@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
 
 /**
  * Abstract base class for representing contexts. Contexts are used to store
@@ -52,7 +53,7 @@ public class AbstractContext implements Context {
 	/**
 	 * The queue of items for that context that still need to be processed.
 	 */
-	private final Queue<Queueable<?>> toDo;
+	private final Queue<Conclusion> toDo;
 
 	/**
 	 * A context is active if its {@link #toDo} queue is not empty or it is
@@ -68,7 +69,7 @@ public class AbstractContext implements Context {
 	 */
 	public AbstractContext(IndexedClassExpression root) {
 		this.root = root;
-		this.toDo = new ConcurrentLinkedQueue<Queueable<?>>();
+		this.toDo = new ConcurrentLinkedQueue<Conclusion>();
 		this.isActive = new AtomicBoolean(false);
 	}
 
@@ -89,7 +90,7 @@ public class AbstractContext implements Context {
 	 * @return queue
 	 */
 	@Override
-	public final Queue<Queueable<?>> getToDo() {
+	public final Queue<Conclusion> getToDo() {
 		return toDo;
 	}
 

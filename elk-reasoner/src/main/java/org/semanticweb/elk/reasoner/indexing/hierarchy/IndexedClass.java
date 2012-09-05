@@ -23,6 +23,8 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 
@@ -63,7 +65,7 @@ public class IndexedClass extends IndexedClassEntity {
 	public <O> O accept(IndexedClassVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
 		return visitor.visit(this);
@@ -82,6 +84,12 @@ public class IndexedClass extends IndexedClassEntity {
 		return occurrenceNo > 0;
 	}
 
+	@Override
+	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+		if (ruleEngine.getOwlNothing().equals(this))
+			context.setSatisfiable(false);
+	}
+
 	/**
 	 * Represent the object's ElkClass as a string. This implementation reflects
 	 * the fact that we generally consider only one IndexedClass for each
@@ -93,4 +101,5 @@ public class IndexedClass extends IndexedClassEntity {
 	public String toString() {
 		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
 	}
+
 }

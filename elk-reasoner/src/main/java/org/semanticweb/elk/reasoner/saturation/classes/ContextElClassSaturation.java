@@ -24,11 +24,12 @@ package org.semanticweb.elk.reasoner.saturation.classes;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.AbstractContext;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -43,15 +44,15 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 
  */
 public class ContextElClassSaturation extends AbstractContext implements
-		ContextClassSaturation {
+		NewContext {
 
 	final Set<IndexedClassExpression> superClassExpressions;
 
-	Multimap<IndexedPropertyChain, ContextElClassSaturation> backwardLinksByObjectProperty;
+	Multimap<IndexedPropertyChain, NewContext> backwardLinksByObjectProperty;
 
-	Multimap<IndexedPropertyChain, ContextElClassSaturation> forwardLinksByObjectProperty;
+	Multimap<IndexedPropertyChain, NewContext> forwardLinksByObjectProperty;
 
-	Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> propagationsByObjectProperty;
+	Multimap<IndexedPropertyChain, Conclusion> propagationsByObjectProperty;
 
 	Set<IndexedDisjointnessAxiom> disjointnessAxioms;
 
@@ -115,7 +116,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 		this.composeBackwardLinks = deriveBackwardLinks;
 	}
 
-	public Multimap<IndexedPropertyChain, ContextElClassSaturation> getBackwardLinksByObjectProperty() {
+	public Multimap<IndexedPropertyChain, NewContext> getBackwardLinksByObjectProperty() {
 		return backwardLinksByObjectProperty;
 	}
 
@@ -123,15 +124,15 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * Initialize the set of propagations with the empty set
 	 */
 	public void initBackwardLinksByProperty() {
-		backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, ContextElClassSaturation>();
+		backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, NewContext>();
 	}
 
-	public Multimap<IndexedPropertyChain, ContextElClassSaturation> getForwardLinksByObjectProperty() {
+	public Multimap<IndexedPropertyChain, NewContext> getForwardLinksByObjectProperty() {
 		return forwardLinksByObjectProperty;
 	}
 
 	public void initForwardLinksByProperty() {
-		forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, ContextElClassSaturation>();
+		forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, NewContext>();
 	}
 
 	/**
@@ -152,7 +153,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 		this.derivePropagations = derivePropagations;
 	}
 
-	public Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> getPropagationsByObjectProperty() {
+	public Multimap<IndexedPropertyChain, Conclusion> getPropagationsByObjectProperty() {
 		return propagationsByObjectProperty;
 	}
 
@@ -160,7 +161,7 @@ public class ContextElClassSaturation extends AbstractContext implements
 	 * Initialize the set of propagations with the empty set
 	 */
 	public void initPropagationsByProperty() {
-		propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>>();
+		propagationsByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Conclusion>();
 	}
 
 	public boolean addDisjointessAxiom(
@@ -191,6 +192,27 @@ public class ContextElClassSaturation extends AbstractContext implements
 	@Override
 	public boolean isSaturated() {
 		return isSaturated;
+	}
+
+	@Override
+	public boolean addPropagationByObjectProperty(
+			IndexedPropertyChain propRelation, Conclusion conclusion) {
+		if (propagationsByObjectProperty == null)
+			initPropagationsByProperty();
+		return propagationsByObjectProperty.add(propRelation, conclusion);
+	}
+
+	@Override
+	public boolean addBackwardLinkByObjectProperty(IndexedPropertyChain first,
+			NewContext second) {
+		if (backwardLinksByObjectProperty == null)
+			initBackwardLinksByProperty();
+		return backwardLinksByObjectProperty.add(first, second);
+	}
+
+	@Override
+	public boolean addSuperClassExpressions(IndexedClassExpression expression) {
+		return superClassExpressions.add(expression);
 	}
 
 }

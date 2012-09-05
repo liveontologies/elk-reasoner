@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
 
@@ -67,5 +69,11 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 		return "DataHasValue(" + '<' + this.property.getIri().getFullIriAsString()
 				+ "> \"" + this.filler.getLexicalForm() + "\"^^<"
 				+ this.filler.getDatatype().getIri().getFullIriAsString() + ">)";
+	}
+
+	@Override
+	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+		// TODO Auto-generated method stub
+		
 	}
 }

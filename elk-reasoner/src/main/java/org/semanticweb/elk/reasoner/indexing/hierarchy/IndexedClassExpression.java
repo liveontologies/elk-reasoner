@@ -23,17 +23,18 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
+import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -52,17 +53,13 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression {
+abstract public class IndexedClassExpression extends ChainImpl<CompositionRules> {
 
 	/**
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
 	 * is a List.
 	 */
 	private List<IndexedClassExpression> toldSuperClassExpressions_;
-
-	private Map<IndexedClassExpression, IndexedObjectIntersectionOf> negConjunctionsByConjunct_;
-
-	private Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
 	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
 
@@ -125,31 +122,15 @@ abstract public class IndexedClassExpression {
 	abstract void updateOccurrenceNumbers(int increment, int positiveIncrement,
 			int negativeIncrement);
 
+	
+	public abstract void applyDecomposition(RuleEngine ruleEngine, NewContext context);
+	
 	/**
 	 * @return All told super class expressions of this class expression,
 	 *         possibly null.
 	 */
 	public List<IndexedClassExpression> getToldSuperClassExpressions() {
 		return toldSuperClassExpressions_;
-	}
-
-	/**
-	 * @return the {@link IndexedObjectIntersectionOf} objects that occur
-	 *         negatively and contain this {@link IndexedClassExpression},
-	 *         indexed by the other {@link IndexedClassExpression} in the
-	 *         conjunction, or {@code null} if none is assigned
-	 */
-	public Map<IndexedClassExpression, IndexedObjectIntersectionOf> getNegConjunctionsByConjunct() {
-		return negConjunctionsByConjunct_;
-	}
-
-	/**
-	 * @return the {@link IndexedObjectSomeValuesFrom} objects that occur
-	 *         negatively and have this {@link IndexedClassExpression} as the
-	 *         filler, or {@code null} if none is assigned
-	 */
-	public Collection<IndexedObjectSomeValuesFrom> getNegExistentials() {
-		return negExistentials_;
 	}
 
 	/**
@@ -198,62 +179,6 @@ abstract public class IndexedClassExpression {
 			success = toldSuperClassExpressions_.remove(superClassExpression);
 			if (toldSuperClassExpressions_.isEmpty())
 				toldSuperClassExpressions_ = null;
-		}
-		return success;
-	}
-
-	protected void addNegConjunctionByConjunct(
-			IndexedObjectIntersectionOf conjunction,
-			IndexedClassExpression conjunct) {
-
-		if (negConjunctionsByConjunct_ == null) {
-			negConjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
-					4);
-		}
-
-		if (negConjunctionsByConjunct_.put(conjunct, conjunction) != null) {
-			// Can be caused e.g. when ElkObjectIndexerVisitor indexed conjuncts
-			// with equals hashCodes.
-			throw new RuntimeException(
-					"Internal error: duplicate indexing in IndexedClassExpression.addNegConjunctionByConjunct.");
-		}
-
-	}
-
-	/**
-	 * @param conjunction
-	 * @param conjunct
-	 * @return true if successfully removed
-	 */
-	protected boolean removeNegConjunctionByConjunct(
-			IndexedObjectIntersectionOf conjunction,
-			IndexedClassExpression conjunct) {
-		boolean success = false;
-		if (negConjunctionsByConjunct_ != null) {
-			success = (negConjunctionsByConjunct_.remove(conjunct) != null);
-			if (negConjunctionsByConjunct_.isEmpty())
-				negConjunctionsByConjunct_ = null;
-		}
-		return success;
-	}
-
-	protected void addNegExistential(IndexedObjectSomeValuesFrom existential) {
-		if (negExistentials_ == null)
-			negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(1);
-		negExistentials_.add(existential);
-	}
-
-	/**
-	 * @param existential
-	 * @return true if successfully removed
-	 */
-	protected boolean removeNegExistential(
-			IndexedObjectSomeValuesFrom existential) {
-		boolean success = false;
-		if (negExistentials_ != null) {
-			success = negExistentials_.remove(existential);
-			if (negExistentials_.isEmpty())
-				negExistentials_ = null;
 		}
 		return success;
 	}
@@ -333,12 +258,12 @@ abstract public class IndexedClassExpression {
 	 * Used for efficient retrieval of the Context corresponding to this class
 	 * expression.
 	 */
-	protected final AtomicReference<Context> context = new AtomicReference<Context>();
+	protected final AtomicReference<NewContext> context = new AtomicReference<NewContext>();
 
 	/**
 	 * @return The corresponding context, null if none was assigned.
 	 */
-	public Context getContext() {
+	public NewContext getContext() {
 		return context.get();
 	}
 
@@ -351,7 +276,7 @@ abstract public class IndexedClassExpression {
 	 * 
 	 * @return {@code true} if the operation succeeded.
 	 */
-	public boolean setContext(Context context) {
+	public boolean setContext(NewContext context) {
 		return this.context.compareAndSet(null, context);
 	}
 

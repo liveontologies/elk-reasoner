@@ -22,8 +22,19 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.Map;
+
+import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
+import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
+import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
+import org.semanticweb.elk.reasoner.saturation.classes.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.classes.PositiveSuperClassExpression;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
  * Represents all occurrences of an ElkObjectIntersectionOf in an ontology.
@@ -68,8 +79,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			firstConjunct.addNegConjunctionByConjunct(this, secondConjunct);
-			secondConjunct.addNegConjunctionByConjunct(this, firstConjunct);
+			registerCompositionRules();
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -77,8 +87,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
-			firstConjunct.removeNegConjunctionByConjunct(this, secondConjunct);
-			secondConjunct.removeNegConjunctionByConjunct(this, firstConjunct);
+			deregisterCompositionRules();
 		}
 
 	}
@@ -87,6 +96,99 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	public String toString() {
 		return "ObjectIntersectionOf(" + this.firstConjunct + ' '
 				+ this.secondConjunct + ')';
+	}
+
+	@Override
+	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+		ruleEngine.derive(context, new PositiveSuperClassExpression(
+				firstConjunct));
+		ruleEngine.derive(context, new PositiveSuperClassExpression(
+				secondConjunct));
+	}
+
+	public void registerCompositionRules() {
+		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
+		firstConjunct.getCreate(matcher).addConjunctionByConjunct(this,
+				secondConjunct);
+		secondConjunct.getCreate(matcher).addConjunctionByConjunct(this,
+				firstConjunct);
+	}
+
+	public void deregisterCompositionRules() {
+		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
+		deregister(matcher, firstConjunct, secondConjunct);
+		deregister(matcher, secondConjunct, firstConjunct);
+	}
+
+	@SuppressWarnings("static-method")
+	private void deregister(CompositionRuleMatcher matcher,
+			IndexedClassExpression conjunctOne,
+			IndexedClassExpression conjunctTwo) {
+		ThisCompositionRule rule = conjunctOne.find(matcher);
+		if (rule != null) {
+			rule.removeConjunctionByConjunct(conjunctTwo);
+			if (rule.isEmpty())
+				conjunctOne.remove(matcher);
+		} else {
+			// TODO: throw/log something, this should never happen
+		}
+	}
+
+	private class ThisCompositionRule extends ChainImpl<CompositionRules>
+			implements CompositionRules {
+
+		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
+
+		ThisCompositionRule(CompositionRules tail) {
+			super(tail);
+			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
+					4);
+		}
+
+		private void addConjunctionByConjunct(
+				IndexedObjectIntersectionOf conjunction,
+				IndexedClassExpression conjunct) {
+			conjunctionsByConjunct_.put(conjunct, conjunction);
+		}
+
+		private void removeConjunctionByConjunct(IndexedClassExpression conjunct) {
+			conjunctionsByConjunct_.remove(conjunct);
+		}
+
+		/**
+		 * @return {@code true} if this rule never does anything
+		 */
+		private boolean isEmpty() {
+			return conjunctionsByConjunct_.isEmpty();
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, NewContext context) {
+			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+					conjunctionsByConjunct_.keySet(),
+					context.getSuperClassExpressions()))
+				ruleEngine.derive(context, new NegativeSuperClassExpression(
+						conjunctionsByConjunct_.get(common)));
+		}
+
+	}
+
+	private class CompositionRuleMatcher implements
+			ChainMatcher<CompositionRules, ThisCompositionRule> {
+
+		@Override
+		public ThisCompositionRule createNew(CompositionRules tail) {
+			return new ThisCompositionRule(tail);
+		}
+
+		@Override
+		public ThisCompositionRule match(CompositionRules chain) {
+			if (chain instanceof ThisCompositionRule)
+				return (ThisCompositionRule) chain;
+			else
+				return null;
+		}
+
 	}
 
 }

@@ -22,46 +22,69 @@
  */
 package org.semanticweb.elk.reasoner.saturation.classes;
 
+import java.util.Collection;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
-import org.semanticweb.elk.util.collections.Pair;
+import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * @author Frantisek Simancik
  * 
- * @param <C>
- *            the type of contexts that can be used with this {@link Queueable}
  */
-public class BackwardLink<C extends ContextElClassSaturation> extends
-		Pair<IndexedPropertyChain, C> implements Queueable<C> {
+public class BackwardLink implements Conclusion {
 
-	public BackwardLink(IndexedPropertyChain relation, C target) {
-		super(relation, target);
+	private final IndexedPropertyChain relation_;
+
+	private final NewContext target_;
+
+	public BackwardLink(IndexedPropertyChain relation, NewContext target) {
+		this.relation_ = relation;
+		this.target_ = target;
 	}
 
 	public IndexedPropertyChain getRelation() {
-		return first;
+		return relation_;
 	}
 
-	public C getTarget() {
-		return second;
+	public NewContext getTarget() {
+		return target_;
 	}
 
 	@Override
-	public boolean storeInContext(C context,
-			RuleApplicationFactory.Engine engine) {
-		RuleStatistics statistics = engine.getRuleStatistics();
+	public void applyInContext(NewContext context, RuleEngine ruleEngine) {
+		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.backLinkInfNo++;
 
-		if (context.backwardLinksByObjectProperty == null)
-			context.initBackwardLinksByProperty();
+		if (!context.addBackwardLinkByObjectProperty(relation_, target_))
+			return;
 
-		if (context.backwardLinksByObjectProperty.add(first, second)) {
-			statistics.backLinkNo++;
-			return true;
-		}
-		return false;
+		statistics.backLinkNo++;
+
+		final IndexedPropertyChain linkRelation = getRelation();
+		final NewContext target = getTarget();
+
+		// apply all propagations over the link
+		final Multimap<IndexedPropertyChain, Conclusion> props = context
+				.getPropagationsByObjectProperty();
+
+		if (props == null)
+			return;
+
+		Collection<Conclusion> carrys = props.get(linkRelation);
+
+		if (carrys == null)
+			return;
+
+		for (Conclusion carry : carrys)
+			ruleEngine.derive(target, carry);
+
+	}
+
+	public String toString() {
+		return (relation_ + "<-" + target_.getRoot());
 	}
 
 }

@@ -23,6 +23,9 @@
 package org.semanticweb.elk.reasoner.saturation.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 
@@ -37,12 +40,28 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
  *            the type of the {@link Context} with which this {@link Queueable}
  *            can be used
  */
-public class NegativeSuperClassExpression<C extends ContextElClassSaturation>
-		extends SuperClassExpression<C> {
+public class NegativeSuperClassExpression extends SuperClassExpression {
 
 	public NegativeSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
 	}
 
+	@Override
+	public void applyInContext(NewContext context, RuleEngine ruleEngine) {
+		if (!storeInContext(context, ruleEngine))
+			return;
+
+		// applying composition rules
+		CompositionRules rules = expression.getNext();
+
+		// applying all composition rules
+		for (;;) {
+			if (rules == null)
+				return;
+			rules.apply(ruleEngine, context);
+			rules = rules.getNext();
+		}
+
+	}
 }

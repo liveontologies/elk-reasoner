@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
-import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputation;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -87,8 +87,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		classExpressionSaturation.finish();
 
-		assertTrue("A contains D", ((ContextClassSaturation) A.getContext())
-				.getSuperClassExpressions().contains(D));
+		assertTrue("A contains D", A.getContext().getSuperClassExpressions()
+				.contains(D));
 
 	}
 
@@ -131,8 +131,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		classExpressionSaturation
 				.submit(new SaturationJob<IndexedClassExpression>(A));
 		classExpressionSaturation.finish();
-		ContextClassSaturation context = (ContextClassSaturation) A
-				.getContext();
+		NewContext context = A.getContext();
 
 		assertTrue("A contains A",
 				context.getSuperClassExpressions().contains(A));

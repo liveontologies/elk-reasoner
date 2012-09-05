@@ -29,7 +29,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -42,53 +41,53 @@ public class IndexConstructionTest extends TestCase {
 		super(testName);
 	}
 
-	public void testIndexer() {
-		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));
-		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
-		ElkClass c = objectFactory.getClass(new ElkFullIri("C"));
-		ElkClass d = objectFactory.getClass(new ElkFullIri("D"));
-		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
-				"R"));
-
-		OntologyIndex index = new OntologyIndexImpl();
-		ElkAxiomProcessor inserter = index.getAxiomInserter();
-		ElkAxiomProcessor deleter = index.getAxiomDeleter();
-
-		inserter.visit(objectFactory.getSubClassOfAxiom(
-				objectFactory.getObjectIntersectionOf(a, b), d));
-		inserter.visit(objectFactory.getEquivalentClassesAxiom(
-				objectFactory.getObjectSomeValuesFrom(r, c), a));
-
-		IndexedClassExpression A = index.getIndexed(a);
-		IndexedClassExpression B = index.getIndexed(b);
-		IndexedClassExpression C = index.getIndexed(c);
-		IndexedPropertyChain R = index.getIndexed(r);
-		assertEquals(2, A.negativeOccurrenceNo);
-		assertEquals(1, A.positiveOccurrenceNo);
-		assertEquals(1, B.negativeOccurrenceNo);
-		assertEquals(0, B.positiveOccurrenceNo);
-		assertEquals(1, C.negativeOccurrenceNo);
-		assertEquals(1, C.positiveOccurrenceNo);
-		assertEquals(2, R.occurrenceNo);
-		assertTrue(A.getNegConjunctionsByConjunct().containsKey(B));
-		assertSame(C.getNegExistentials().iterator().next().getRelation(), R);
-
-		deleter.visit(objectFactory.getEquivalentClassesAxiom(
-				objectFactory.getObjectSomeValuesFrom(r, c), a));
-
-		assertEquals(1, A.negativeOccurrenceNo);
-		assertEquals(0, A.positiveOccurrenceNo);
-		assertEquals(0, R.occurrenceNo);
-		assertNull(C.getNegExistentials());
-		assertNull(index.getIndexed(c));
-		assertNull(index.getIndexed(r));
-
-		deleter.visit(objectFactory.getSubClassOfAxiom(
-				objectFactory.getObjectIntersectionOf(a, b), d));
-		assertEquals(0, A.negativeOccurrenceNo);
-		assertNull(A.getNegConjunctionsByConjunct());
-		assertNull(index.getIndexed(a));
-	}
+//	public void testIndexer() {
+//		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));
+//		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
+//		ElkClass c = objectFactory.getClass(new ElkFullIri("C"));
+//		ElkClass d = objectFactory.getClass(new ElkFullIri("D"));
+//		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
+//				"R"));
+//
+//		OntologyIndex index = new OntologyIndexImpl();
+//		ElkAxiomProcessor inserter = index.getAxiomInserter();
+//		ElkAxiomProcessor deleter = index.getAxiomDeleter();
+//
+//		inserter.visit(objectFactory.getSubClassOfAxiom(
+//				objectFactory.getObjectIntersectionOf(a, b), d));
+//		inserter.visit(objectFactory.getEquivalentClassesAxiom(
+//				objectFactory.getObjectSomeValuesFrom(r, c), a));
+//
+//		IndexedClassExpression A = index.getIndexed(a);
+//		IndexedClassExpression B = index.getIndexed(b);
+//		IndexedClassExpression C = index.getIndexed(c);
+//		IndexedPropertyChain R = index.getIndexed(r);
+//		assertEquals(2, A.negativeOccurrenceNo);
+//		assertEquals(1, A.positiveOccurrenceNo);
+//		assertEquals(1, B.negativeOccurrenceNo);
+//		assertEquals(0, B.positiveOccurrenceNo);
+//		assertEquals(1, C.negativeOccurrenceNo);
+//		assertEquals(1, C.positiveOccurrenceNo);
+//		assertEquals(2, R.occurrenceNo);
+//		assertTrue(A.getNegConjunctionsByConjunct().containsKey(B));
+//		assertSame(C.getNegExistentials().iterator().next().getRelation(), R);
+//
+//		deleter.visit(objectFactory.getEquivalentClassesAxiom(
+//				objectFactory.getObjectSomeValuesFrom(r, c), a));
+//
+//		assertEquals(1, A.negativeOccurrenceNo);
+//		assertEquals(0, A.positiveOccurrenceNo);
+//		assertEquals(0, R.occurrenceNo);
+//		assertNull(C.getNegExistentials());
+//		assertNull(index.getIndexed(c));
+//		assertNull(index.getIndexed(r));
+//
+//		deleter.visit(objectFactory.getSubClassOfAxiom(
+//				objectFactory.getObjectIntersectionOf(a, b), d));
+//		assertEquals(0, A.negativeOccurrenceNo);
+//		assertNull(A.getNegConjunctionsByConjunct());
+//		assertNull(index.getIndexed(a));
+//	}
 
 	public void testDisjoints() {
 		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));

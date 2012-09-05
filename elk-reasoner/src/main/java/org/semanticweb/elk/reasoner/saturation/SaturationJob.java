@@ -24,17 +24,17 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import org.semanticweb.elk.reasoner.ReasonerJob;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 
 public class SaturationJob<I extends IndexedClassExpression> extends
-		ReasonerJob<I, Context> {
+		ReasonerJob<I, NewContext> {
 
 	public SaturationJob(I input) {
 		super(input);
 	}
 
 	@Override
-	protected void setOutput(Context output) {
+	protected void setOutput(NewContext output) {
 		super.setOutput(output);
 	}
 

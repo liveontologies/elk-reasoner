@@ -22,8 +22,24 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
+import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
+import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
+import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
+import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
+import org.semanticweb.elk.reasoner.saturation.classes.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.classes.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * Represents all occurrences of an ElkObjectSomeValuesFrom in an ontology.
@@ -32,6 +48,10 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFro
  * 
  */
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IndexedObjectSomeValuesFrom.class);
 
 	protected final IndexedObjectProperty property;
 
@@ -73,12 +93,12 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			filler.addNegExistential(this);
+			registerCompositionRule();
 		}
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
 			// first positive occurrence of this expression
-			filler.addPosPropertyInExistential(property);			
+			filler.addPosPropertyInExistential(property);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -86,7 +106,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			filler.removeNegExistential(this);
+			deregisterCompositionRule();
 		}
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
@@ -95,10 +115,153 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 	}
 
+	public void registerCompositionRule() {
+		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
+		filler.getCreate(matcher).addNegExistential(this);
+	}
+
+	public void deregisterCompositionRule() {
+		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
+		ThisCompositionRule rule = filler.find(matcher);
+		if (rule != null) {
+			rule.removeNegExistential(this);
+			if (rule.isEmpty())
+				filler.remove(matcher);
+		} else {
+			// TODO: throw/log something, this should never happen
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "ObjectSomeValuesFrom(" + this.property + ' ' + this.filler
 				+ ')';
+	}
+
+	@Override
+	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+		ruleEngine.derive(ruleEngine.getCreateContext(filler),
+				new BackwardLink(property, context));
+	}
+
+	private class ThisCompositionRule extends ChainImpl<CompositionRules>
+			implements CompositionRules {
+
+		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
+
+		ThisCompositionRule(CompositionRules tail) {
+			super(tail);
+			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(
+					1);
+		}
+
+		private void addNegExistential(IndexedObjectSomeValuesFrom existential) {
+			negExistentials_.add(existential);
+		}
+
+		private void removeNegExistential(
+				IndexedObjectSomeValuesFrom existential) {
+			negExistentials_.remove(existential);
+		}
+
+		/**
+		 * @return {@code true} if this rule never does anything
+		 */
+		private boolean isEmpty() {
+			return negExistentials_.isEmpty();
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, NewContext context) {
+
+			final Set<IndexedPropertyChain> candidatePropagationProperties = context
+					.getRoot().getPosPropertiesInExistentials();
+
+			if (candidatePropagationProperties == null)
+				return;
+
+			for (IndexedObjectSomeValuesFrom e : negExistentials_) {
+				IndexedPropertyChain relation = e.getRelation();
+				// creating propagations for relevant sub-properties of the
+				// relation
+				for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
+						candidatePropagationProperties, relation.getSaturated()
+								.getSubProperties())) {
+					addPropagation(property,
+							new NegativeSuperClassExpression(e), context,
+							ruleEngine);
+				}
+
+				// creating propagations for relevant sub-compositions of the
+				// relation
+				for (IndexedPropertyChain property : relation.getSaturated()
+						.getSubCompositions()) {
+					SaturatedPropertyChain propertySaturation = property
+							.getSaturated();
+					if (!new LazySetIntersection<IndexedPropertyChain>(
+							candidatePropagationProperties,
+							propertySaturation.getRightSubProperties())
+							.isEmpty()
+							|| propertySaturation
+									.hasReflexiveRightSubProperty()) {
+						addPropagation(property,
+								new NegativeSuperClassExpression(e), context,
+								ruleEngine);
+					}
+				}
+
+				// propagating to the this context if relation is relflexive
+				if (relation.getSaturated().isReflexive())
+					ruleEngine.derive(context,
+							new NegativeSuperClassExpression(e));
+			}
+
+		}
+
+		private void addPropagation(IndexedPropertyChain propRelation,
+				Conclusion carry, NewContext context, RuleEngine ruleEngine) {
+
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace(context.getRoot() + ": new propagation "
+						+ propRelation + "->" + carry);
+
+			if (context.addPropagationByObjectProperty(propRelation, carry)) {
+
+				// propagate over all backward links
+				final Multimap<IndexedPropertyChain, NewContext> backLinks = context
+						.getBackwardLinksByObjectProperty();
+
+				if (backLinks == null)
+					return;
+
+				Collection<NewContext> targets = backLinks.get(propRelation);
+
+				if (targets == null)
+					return;
+
+				for (NewContext target : targets)
+					ruleEngine.derive(target, carry);
+			}
+		}
+
+	}
+
+	private class CompositionRuleMatcher implements
+			ChainMatcher<CompositionRules, ThisCompositionRule> {
+
+		@Override
+		public ThisCompositionRule createNew(CompositionRules tail) {
+			return new ThisCompositionRule(tail);
+		}
+
+		@Override
+		public ThisCompositionRule match(CompositionRules chain) {
+			if (chain instanceof ThisCompositionRule)
+				return (ThisCompositionRule) chain;
+			else
+				return null;
+		}
+
 	}
 
 }

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rulesystem;
 import java.util.Queue;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
 
 public interface Context {
 
@@ -38,7 +39,7 @@ public interface Context {
 	 * 
 	 * @return queue
 	 */
-	public Queue<Queueable<?>> getToDo();
+	public Queue<Conclusion> getToDo();
 
 	/**
 	 * Ensure that the context is active, and return true if the activation

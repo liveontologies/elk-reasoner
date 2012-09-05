@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyCompositionsPrecomputation;
 
 //TODO: Concurrent?
