@@ -68,7 +68,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 	}
 
-	private class ThisCompositionRule extends ChainImpl<CompositionRules>
+	private static class ThisCompositionRule extends ChainImpl<CompositionRules>
 			implements CompositionRules {
 
 		/**

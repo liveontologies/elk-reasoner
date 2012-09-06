@@ -134,7 +134,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 	}
 
-	private class ThisCompositionRule extends ChainImpl<CompositionRules>
+	private static class ThisCompositionRule extends ChainImpl<CompositionRules>
 			implements CompositionRules {
 
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;

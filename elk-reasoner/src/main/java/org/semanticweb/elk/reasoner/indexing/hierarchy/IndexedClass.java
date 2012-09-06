@@ -22,11 +22,16 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.Collection;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
 import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
+import org.semanticweb.elk.reasoner.saturation.classes.PositiveSuperClassExpression;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -86,8 +91,29 @@ public class IndexedClass extends IndexedClassEntity {
 
 	@Override
 	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
-		if (ruleEngine.getOwlNothing().equals(this))
+		if (ruleEngine.getOwlNothing() == this) {
 			context.setSatisfiable(false);
+			
+			// propagating bottom to the predecessors
+			final Multimap<IndexedPropertyChain, NewContext> backLinks = context
+					.getBackwardLinksByObjectProperty();
+
+			if (backLinks == null)
+				return;
+
+			Conclusion carry = new PositiveSuperClassExpression(this);
+
+			for (IndexedPropertyChain propRelation : backLinks.keySet()) {
+
+				Collection<NewContext> targets = backLinks.get(propRelation);
+
+				if (targets == null)
+					continue;
+
+				for (NewContext target : targets)
+					ruleEngine.derive(target, carry);
+			}
+		}
 	}
 
 	/**

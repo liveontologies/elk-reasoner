@@ -25,12 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import junit.framework.TestCase;
 
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 
 public class IndexConstructionTest extends TestCase {
 
@@ -40,6 +35,11 @@ public class IndexConstructionTest extends TestCase {
 		super(testName);
 	}
 
+	// TODO: remove once there is at least one real test
+	public void testNothing() {
+		
+	}
+	
 //	public void testIndexer() {
 //		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));
 //		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
@@ -88,43 +88,43 @@ public class IndexConstructionTest extends TestCase {
 //		assertNull(index.getIndexed(a));
 //	}
 
-	public void testDisjoints() {
-		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));
-		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
-		ElkClass c = objectFactory.getClass(new ElkFullIri("C"));
-
-		ElkDisjointClassesAxiom axiom = objectFactory.getDisjointClassesAxiom(
-				a, b, c, b);
-
-		OntologyIndex index = new OntologyIndexImpl();
-		ElkAxiomProcessor inserter = index.getAxiomInserter();
-		ElkAxiomProcessor deleter = index.getAxiomDeleter();
-
-		inserter.visit(axiom);
-
-		IndexedClassExpression A = index.getIndexed(a);
-		IndexedClassExpression B = index.getIndexed(b);
-		IndexedClassExpression C = index.getIndexed(c);
-
-		assertEquals(1, A.getDisjointnessAxioms().size());
-		assertEquals(2, B.getDisjointnessAxioms().size());
-		assertEquals(1, C.getDisjointnessAxioms().size());
-
-		IndexedDisjointnessAxiom disAxiom = A.getDisjointnessAxioms().get(0);
-		assertSame(disAxiom, B.getDisjointnessAxioms().get(0));
-		assertSame(disAxiom, B.getDisjointnessAxioms().get(1));
-		assertSame(disAxiom, C.getDisjointnessAxioms().get(0));
-
-		deleter.visit(axiom);
-
-		assertNull(A.getDisjointnessAxioms());
-		assertNull(B.getDisjointnessAxioms());
-		assertNull(C.getDisjointnessAxioms());
-
-		assertNull(index.getIndexed(a));
-		assertNull(index.getIndexed(b));
-		assertNull(index.getIndexed(c));
-	}
+//	public void testDisjoints() {
+//		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));
+//		ElkClass b = objectFactory.getClass(new ElkFullIri("B"));
+//		ElkClass c = objectFactory.getClass(new ElkFullIri("C"));
+//
+//		ElkDisjointClassesAxiom axiom = objectFactory.getDisjointClassesAxiom(
+//				a, b, c, b);
+//
+//		OntologyIndex index = new OntologyIndexImpl();
+//		ElkAxiomProcessor inserter = index.getAxiomInserter();
+//		ElkAxiomProcessor deleter = index.getAxiomDeleter();
+//
+//		inserter.visit(axiom);
+//
+//		IndexedClassExpression A = index.getIndexed(a);
+//		IndexedClassExpression B = index.getIndexed(b);
+//		IndexedClassExpression C = index.getIndexed(c);
+//
+//		assertEquals(1, A.getDisjointnessAxioms().size());
+//		assertEquals(2, B.getDisjointnessAxioms().size());
+//		assertEquals(1, C.getDisjointnessAxioms().size());
+//
+//		IndexedDisjointnessAxiom disAxiom = A.getDisjointnessAxioms().get(0);
+//		assertSame(disAxiom, B.getDisjointnessAxioms().get(0));
+//		assertSame(disAxiom, B.getDisjointnessAxioms().get(1));
+//		assertSame(disAxiom, C.getDisjointnessAxioms().get(0));
+//
+//		deleter.visit(axiom);
+//
+//		assertNull(A.getDisjointnessAxioms());
+//		assertNull(B.getDisjointnessAxioms());
+//		assertNull(C.getDisjointnessAxioms());
+//
+//		assertNull(index.getIndexed(a));
+//		assertNull(index.getIndexed(b));
+//		assertNull(index.getIndexed(c));
+//	}
 
 //	public void testConjunctionSharing() {
 //		ElkClass a = objectFactory.getClass(new ElkFullIri("A"));

@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -61,14 +58,14 @@ abstract public class IndexedClassExpression extends
 	 * {@link IndexedClassExpression} that appear in binary disjointess axioms
 	 * with this object.
 	 */
-	private Set<IndexedClassExpression> disjointClasses_;
+//	private Set<IndexedClassExpression> disjointClasses_;
 
 	/**
 	 * List of all larger (non-binary) disjointness axioms in which this object
 	 * appears.
 	 * 
 	 */
-	protected List<IndexedDisjointnessAxiom> disjointnessAxioms;
+//	protected List<IndexedDisjointnessAxiom> disjointnessAxioms;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -134,17 +131,17 @@ abstract public class IndexedClassExpression extends
 	 *         object in binary disjointness axioms, or {@code null} if none is
 	 *         assigned
 	 */
-	public Set<IndexedClassExpression> getDisjointClasses() {
-		return disjointClasses_;
-	}
+//	public Set<IndexedClassExpression> getDisjointClasses() {
+//		return disjointClasses_;
+//	}
 
 	/**
 	 * @return Collection of all (non-binary) {@link IndexedDisjointnessAxiom}s
 	 *         in which this object appears, or {@code null} if none is assigned
 	 */
-	public List<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
-		return disjointnessAxioms;
-	}
+//	public List<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
+//		return disjointnessAxioms;
+//	}
 
 	protected void addPosPropertyInExistential(IndexedPropertyChain property) {
 		if (posPropertiesInExistentials_ == null)
@@ -164,56 +161,56 @@ abstract public class IndexedClassExpression extends
 		return success;
 	}
 
-	protected void addDisjointClass(IndexedClassExpression disjointClass) {
-		if (disjointClasses_ == null)
-			disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
-		disjointClasses_.add(disjointClass);
-	}
-
-	/**
-	 * @param disjointClass
-	 * @return true if successfully removed
-	 */
-	protected boolean removeDisjointClass(IndexedClassExpression disjointClass) {
-		boolean success = false;
-		if (disjointClasses_ != null) {
-			success = disjointClasses_.remove(disjointClass);
-			if (disjointClasses_.isEmpty())
-				disjointClasses_ = null;
-		}
-		return success;
-	}
-
-	protected void addDisjointnessAxiom(
-			IndexedDisjointnessAxiom disjointnessAxiom) {
-		if (disjointnessAxioms == null)
-			disjointnessAxioms = new LinkedList<IndexedDisjointnessAxiom>();
-		disjointnessAxioms.add(disjointnessAxiom);
-	}
-
-	/**
-	 * @param disjointnessAxiom
-	 * @return true if successfully removed
-	 */
-	protected boolean removeDisjointnessAxiom(
-			IndexedDisjointnessAxiom disjointnessAxiom) {
-		boolean success = false;
-
-		if (disjointnessAxioms != null) {
-			Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms
-					.iterator();
-			while (i.hasNext())
-				if (i.next().getMembers()
-						.equals(disjointnessAxiom.getMembers())) {
-					i.remove();
-					break;
-				}
-
-			if (disjointnessAxioms.isEmpty())
-				disjointnessAxioms = null;
-		}
-		return success;
-	}
+//	protected void addDisjointClass(IndexedClassExpression disjointClass) {
+//		if (disjointClasses_ == null)
+//			disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
+//		disjointClasses_.add(disjointClass);
+//	}
+//
+//	/**
+//	 * @param disjointClass
+//	 * @return true if successfully removed
+//	 */
+//	protected boolean removeDisjointClass(IndexedClassExpression disjointClass) {
+//		boolean success = false;
+//		if (disjointClasses_ != null) {
+//			success = disjointClasses_.remove(disjointClass);
+//			if (disjointClasses_.isEmpty())
+//				disjointClasses_ = null;
+//		}
+//		return success;
+//	}
+//
+//	protected void addDisjointnessAxiom(
+//			IndexedDisjointnessAxiom disjointnessAxiom) {
+//		if (disjointnessAxioms == null)
+//			disjointnessAxioms = new LinkedList<IndexedDisjointnessAxiom>();
+//		disjointnessAxioms.add(disjointnessAxiom);
+//	}
+//
+//	/**
+//	 * @param disjointnessAxiom
+//	 * @return true if successfully removed
+//	 */
+//	protected boolean removeDisjointnessAxiom(
+//			IndexedDisjointnessAxiom disjointnessAxiom) {
+//		boolean success = false;
+//
+//		if (disjointnessAxioms != null) {
+//			Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms
+//					.iterator();
+//			while (i.hasNext())
+//				if (i.next().getMembers()
+//						.equals(disjointnessAxiom.getMembers())) {
+//					i.remove();
+//					break;
+//				}
+//
+//			if (disjointnessAxioms.isEmpty())
+//				disjointnessAxioms = null;
+//		}
+//		return success;
+//	}
 
 	// TODO: replace pointers to contexts by a mapping
 

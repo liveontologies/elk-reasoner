@@ -144,7 +144,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				new BackwardLink(property, context));
 	}
 
-	private class ThisCompositionRule extends ChainImpl<CompositionRules>
+	private static class ThisCompositionRule extends ChainImpl<CompositionRules>
 			implements CompositionRules {
 
 		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;

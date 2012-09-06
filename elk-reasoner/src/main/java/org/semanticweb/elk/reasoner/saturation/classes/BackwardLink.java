@@ -70,16 +70,19 @@ public class BackwardLink implements Conclusion {
 		final Multimap<IndexedPropertyChain, Conclusion> props = context
 				.getPropagationsByObjectProperty();
 
-		if (props == null)
-			return;
+		if (props != null) {
 
-		Collection<Conclusion> carrys = props.get(linkRelation);
+			Collection<Conclusion> carrys = props.get(linkRelation);
 
-		if (carrys == null)
-			return;
+			if (carrys != null)
+				for (Conclusion carry : carrys)
+					ruleEngine.derive(target, carry);
+		}
 
-		for (Conclusion carry : carrys)
-			ruleEngine.derive(target, carry);
+		// propagate unsatisfiability over the link
+		if (!context.isSatisfiable())
+			ruleEngine.derive(target, new PositiveSuperClassExpression(
+					ruleEngine.getOwlNothing()));
 
 	}
 
