@@ -2,6 +2,27 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.properties;
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,7 +35,6 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -26,10 +46,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class FindReflexivePropertiesVisitorTest {
+public class ReflexivityCheckingTest {
 
 	/**
-	 * Test method for {@link FindReflexivePropertiesVisitor#isReflexive()}.
+	 * Test method for {@link ReflexivityChecker#isReflexive()}.
 	 */
 	@Test
 	public void testIsReflexive() {
@@ -52,11 +72,16 @@ public class FindReflexivePropertiesVisitorTest {
 		IndexedObjectProperty s = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/S")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{}, false);
 		// r o h1 -> s, both are implicitly reflexive, thus s must be reflexive
 		IndexedPropertyChain rh1 = IndexedObjectsCreator.createIndexedChain(r, h1, new IndexedObjectProperty[]{s});
+		//finally, add some loops
+		IndexedObjectProperty v1 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/V1")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{}, false);
+		IndexedObjectProperty v2 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/V2")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{}, false);
+		IndexedPropertyChain v1v1 = IndexedObjectsCreator.createIndexedChain(v1, v1, new IndexedObjectProperty[]{v2});
+		IndexedPropertyChain v2v2 = IndexedObjectsCreator.createIndexedChain(v2, v2, new IndexedObjectProperty[]{v1});
 		
-		chains.addAll(Arrays.asList(new IndexedPropertyChain[]{t, r1, r, r1r1, rt, u, h, h1, s, rh1}));
+		chains.addAll(Arrays.asList(new IndexedPropertyChain[]{t, r1, r, r1r1, rt, u, h, h1, s, rh1, v1, v2, v1v1, v2v2}));
 		
 		Set<IndexedPropertyChain> correctReflexive = new HashSet<IndexedPropertyChain>(Arrays.asList(new IndexedPropertyChain[]{r, h, h1, r1, r1r1, rh1, s}));
-		Set<IndexedPropertyChain> correctNonreflexive = new HashSet<IndexedPropertyChain>(Arrays.asList(new IndexedPropertyChain[]{t, u, rt}));
+		Set<IndexedPropertyChain> correctNonreflexive = new HashSet<IndexedPropertyChain>(Arrays.asList(new IndexedPropertyChain[]{t, u, rt, v1, v2, v1v1, v2v2}));
 		
 		for (int i = 0; i < 100; i++) {
 			//emulate arbitrary order of indexing properties
@@ -66,7 +91,7 @@ public class FindReflexivePropertiesVisitorTest {
 			Set<IndexedPropertyChain> nonreflexive = new HashSet<IndexedPropertyChain>();			
 			
 			for (IndexedPropertyChain chain : chains) {
-				if (new FindReflexivePropertiesVisitor<ElkObject>().isReflexive(chain)) {
+				if (new ReflexivityChecker().isReflexive(chain)) {
 					reflexive.add(chain);
 				}
 				else {

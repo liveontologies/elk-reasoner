@@ -62,6 +62,12 @@ public abstract class IndexedPropertyChain {
 	 * {@link IndexedBinaryPropertyChain} occurs on the right.
 	 */
 	private Collection<IndexedBinaryPropertyChain> rightChains_;
+	
+	/**
+	 * Collections of all binary role chains in which this
+	 * {@link IndexedBinaryPropertyChain} occurs on the left.
+	 */
+	private Collection<IndexedBinaryPropertyChain> leftChains_;	
 
 	/**
 	 * @return All told super object properties of this
@@ -87,6 +93,15 @@ public abstract class IndexedPropertyChain {
 	public Collection<IndexedBinaryPropertyChain> getRightChains() {
 		return rightChains_;
 	}
+	
+	/**
+	 * @return All {@link IndexedBinaryPropertyChain}s in which this
+	 *         {@link IndexedPropertyChain} occurs on the left, or {@code null} if
+	 *         none is assigned
+	 */
+	public Collection<IndexedBinaryPropertyChain> getLeftChains() {
+		return leftChains_;
+	}	
 
 	/**
 	 * Adds the given {@link IndexedObjectProperty} as a super-role of this
@@ -153,6 +168,39 @@ public abstract class IndexedPropertyChain {
 		return success;
 	}
 
+	/**
+	 * Adds the given {@link IndexedBinaryPropertyChain} to the list of
+	 * {@link IndexedBinaryPropertyChain} that contains this
+	 * {@link IndexedPropertyChain} in the left-hand-side
+	 * 
+	 * @param chain
+	 *            the {@link IndexedBinaryPropertyChain} to be added
+	 */
+	protected void addLeftChain(IndexedBinaryPropertyChain chain) {
+		if (leftChains_ == null)
+			leftChains_ = new ArrayList<IndexedBinaryPropertyChain>(1);
+		leftChains_.add(chain);
+	}
+
+	/**
+	 * Adds the given {@link IndexedBinaryPropertyChain} from the list of
+	 * {@link IndexedBinaryPropertyChain} that contain this
+	 * {@link IndexedPropertyChain} in the left-hand-side
+	 * 
+	 * @param chain
+	 *            the {@link IndexedBinaryPropertyChain} to be removed
+	 * @return {@code true} if successfully removed
+	 */
+	protected boolean removeLeftChain(IndexedBinaryPropertyChain chain) {
+		boolean success = false;
+		if (leftChains_ != null) {
+			success = leftChains_.remove(chain);
+			if (leftChains_.isEmpty())
+				leftChains_ = null;
+		}
+		return success;
+	}	
+	
 	/**
 	 * This counts how often this object occurred in the ontology.
 	 */

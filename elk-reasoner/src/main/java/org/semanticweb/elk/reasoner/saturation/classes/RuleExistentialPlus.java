@@ -98,14 +98,14 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> implements
 				if (!new LazySetIntersection<IndexedPropertyChain>(
 						candidatePropagationProperties,
 						propertySaturation.getRightSubProperties()).isEmpty()
-						|| propertySaturation.hasReflexiveRightSubProperty()) {
+						/*|| propertySaturation.hasReflexiveRightSubProperty()*/) {
 					addPropagation(property,
 							new NegativeSuperClassExpression<C>(e), context,
 							engine);
 				}
 			}
 
-			// propagating to the this context if relation is reflexive
+			// propagating to this context if relation is reflexive
 			if (relation.getSaturated().isReflexive())
 				engine.enqueue(context, new NegativeSuperClassExpression<C>(e));
 		}

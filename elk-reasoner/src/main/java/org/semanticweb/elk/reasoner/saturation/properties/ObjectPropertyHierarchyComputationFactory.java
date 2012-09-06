@@ -23,14 +23,21 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputationFactory.Engine;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain.REFLEXIVITY;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -55,9 +62,29 @@ public class ObjectPropertyHierarchyComputationFactory implements
 		this.engine = new Engine();
 	}
 
+	static SaturatedPropertyChain getCreateSaturated(IndexedPropertyChain ipc) {
+		// synch required, otherwise may have two saturation objects for the
+		// same property
+		synchronized (ipc) {
+			SaturatedPropertyChain saturated = ipc.getSaturated();
+
+			if (saturated == null) {
+				saturated = new SaturatedPropertyChain(ipc);
+				ipc.setSaturated(saturated);
+			}
+
+			return saturated;
+		}
+	}
+
+	private static <T> Collection<T> emptyIfNull(Collection<T> collection) {
+		return collection == null ? Collections.<T> emptyList() : collection;
+	}
+
 	/**
 	 * The engine for resetting the saturation and computing the transitively
-	 * closed sub-properties and super-properties of each submitted property chain.
+	 * closed sub-properties and super-properties of each submitted property
+	 * chain.
 	 * 
 	 * @author Frantisek Simancik
 	 * @author "Yevgeny Kazakov"
@@ -68,13 +95,43 @@ public class ObjectPropertyHierarchyComputationFactory implements
 		private Engine() {
 		}
 
+		private boolean isReflexive(IndexedPropertyChain ipc) {
+			if (ipc.getSaturated() == null
+					|| !ipc.getSaturated().reflexvityDetermined()) {
+				// TODO perhaps we don't need to create an object every time?
+				new ReflexivityChecker().isReflexive(ipc);
+			}
+
+			return ipc.getSaturated().isReflexive();
+		}
+
+		// Returns told super-properties and also
+		// {R | S o ipc -> R or ipc o S -> R, S is reflexive}
+		private Iterable<IndexedPropertyChain> getDirectSuperProperties(
+				IndexedPropertyChain ipc) {
+			List<IndexedPropertyChain> superProps = new LinkedList<IndexedPropertyChain>();
+
+			for (IndexedPropertyChain chain : Operations.concat(
+					emptyIfNull(ipc.getLeftChains()),
+					emptyIfNull(ipc.getRightChains()))) {
+				IndexedPropertyChain composable = ((IndexedBinaryPropertyChain) chain)
+						.getComposable(ipc);
+
+				if (isReflexive(composable)) {
+					superProps.addAll(emptyIfNull(chain
+							.getToldSuperProperties()));
+				}
+			}
+
+			return ipc.getToldSuperProperties() != null ? Operations.concat(
+					ipc.getToldSuperProperties(), superProps) : superProps;
+		}
+
 		@Override
 		public void submit(IndexedPropertyChain ipc) {
-			// reset the saturation of this property chain
-			ipc.resetSaturated();
-			SaturatedPropertyChain saturated = new SaturatedPropertyChain(ipc);
-			ipc.setSaturated(saturated);
+			SaturatedPropertyChain saturated = getCreateSaturated(ipc);
 
+			isReflexive(ipc);
 			// compute all transitively closed sub-properties
 			// and mark the chain as reflexive if one of its sub-properties
 			// is reflexive
@@ -85,61 +142,80 @@ public class ObjectPropertyHierarchyComputationFactory implements
 				if (r == null)
 					break;
 				if (saturated.derivedSubProperties.add(r)) {
-					if (r instanceof IndexedBinaryPropertyChain)
+					if (r instanceof IndexedBinaryPropertyChain) {
+						IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) r;
+						// ////
+						if (isReflexive(chain.getLeftProperty())) {
+							queue.add(chain.getRightProperty());
+						}
+
+						if (isReflexive(chain.getRightProperty())) {
+							queue.add(chain.getLeftProperty());
+						}
+						// ////
 						saturated.derivedSubCompositions
 								.add((IndexedBinaryPropertyChain) r);
-					if (r instanceof IndexedObjectProperty
-							&& ((IndexedObjectProperty) r).isToldReflexive())
-						saturated.isReflexive = true;
+					}
 					if (r.getToldSubProperties() != null)
-						for (IndexedPropertyChain s : r.getToldSubProperties())
+						for (IndexedPropertyChain s : r.getToldSubProperties()) {
 							queue.add(s);
+						}
 				}
 			}
 
 			// compute all transitively closed super-properties
 			queue.add(ipc);
-			for (;;) {
-				IndexedPropertyChain r = queue.poll();
-				if (r == null)
-					break;
-				if (saturated.derivedSuperProperties.add(r)
-						&& r.getToldSuperProperties() != null)
-					for (IndexedPropertyChain s : r.getToldSuperProperties())
-						queue.add(s);
-			}
 
-			// compute all transitively closed right sub-properties
-			// i.e. such R that S1,...,Sn (n>=0) for which S1 o ... o Sn o R => root
-			queue.add(ipc);
 			for (;;) {
 				IndexedPropertyChain r = queue.poll();
 				if (r == null)
 					break;
-				if (saturated.derivedRightSubProperties.add(r)) {
-					if (r instanceof IndexedObjectProperty
-							&& ((IndexedObjectProperty) r).isToldReflexive())
-						saturated.hasReflexiveRightSubProperty = true;
-					if (r.getToldSubProperties() != null)
-						for (IndexedPropertyChain s : r.getToldSubProperties())
-							queue.add(s);
-					if (r instanceof IndexedBinaryPropertyChain) {
-						IndexedPropertyChain s = ((IndexedBinaryPropertyChain) r)
-								.getRightProperty();
+				if (saturated.derivedSuperProperties.add(r)) {
+					for (IndexedPropertyChain s : getDirectSuperProperties(r)) {
 						queue.add(s);
 					}
 				}
 			}
 
+			// compute all transitively closed right sub-properties
+			// i.e. such R that S1,...,Sn (n>=0) for which S1 o ... o Sn o R =>
+			// root
+			queue.add(ipc);
+
+			for (;;) {
+				IndexedPropertyChain r = queue.poll();
+				if (r == null)
+					break;
+				if (saturated.derivedRightSubProperties.add(r)) {
+					if (r.getToldSubProperties() != null) {
+						for (IndexedPropertyChain s : r.getToldSubProperties()) {
+							queue.add(s);
+						}
+					}
+					if (r instanceof IndexedBinaryPropertyChain) {
+						IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) r;
+						IndexedPropertyChain s = chain.getRightProperty();
+
+						queue.add(s);
+
+						if (isReflexive(s)) {
+							queue.add(chain.getLeftProperty());
+						}
+					}
+				}
+			}
+
 			// compute all left-composable properties
-			// i.e. such R that exist S1,..., Sn  (n>=0) and T for which S1 o ... o Sn o R o root => T
+			// i.e. such R that exist S1,..., Sn (n>=0) and T for which S1 o ...
+			// o Sn o R o root => T
 			for (IndexedPropertyChain r : saturated.derivedSuperProperties) {
 				// walking through the super-properties of root to find all
 				// composable R' o root' (that means root is composable w/ R '
 				// and all its sub-properties)
 				if (r.getRightChains() != null) {
-					for (IndexedBinaryPropertyChain chain : r.getRightChains())
+					for (IndexedBinaryPropertyChain chain : r.getRightChains()) {
 						queue.add(chain.getLeftProperty());
+					}
 				}
 			}
 
@@ -148,16 +224,17 @@ public class ObjectPropertyHierarchyComputationFactory implements
 				if (r == null)
 					break;
 				if (saturated.leftComposableProperties.add(r)) {
-					if (r instanceof IndexedObjectProperty
-							&& ((IndexedObjectProperty) r).isToldReflexive())
-						saturated.hasReflexiveLeftComposableProperty = true;
-					if (r.getToldSubProperties() != null)
-						for (IndexedPropertyChain s : r.getToldSubProperties())
-							queue.add(s);
+					queue.addAll(emptyIfNull(r.getToldSubProperties()));
+
 					if (r instanceof IndexedBinaryPropertyChain) {
-						IndexedPropertyChain s = ((IndexedBinaryPropertyChain) r)
-								.getRightProperty();
+						IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) r;
+						IndexedPropertyChain s = chain.getRightProperty();
+
 						queue.add(s);
+
+						if (isReflexive(chain.getRightProperty())) {
+							queue.add(chain.getLeftProperty());
+						}
 					}
 				}
 			}
@@ -182,48 +259,54 @@ public class ObjectPropertyHierarchyComputationFactory implements
 }
 
 /**
- * Figures out whether each submitted indexed property is reflexive or not.
- * A property R is reflexive if
- * i) it is a named property and is told reflexive
- * ii) S -> R and S is reflexive
- * iii) it is a chain S o H and both S and H are reflexive
+ * Figures out whether each submitted indexed property is reflexive or not. A
+ * property R is reflexive if i) it is a named property and is told reflexive
+ * ii) S -> R and S is reflexive iii) it is a chain S o H and both S and H are
+ * reflexive
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-class FindReflexivePropertiesVisitor<O> implements IndexedPropertyChainVisitor<O> {
+class ReflexivityChecker implements IndexedPropertyChainVisitor<ElkObject> {
 
 	boolean reflexive = false;
-	//used to prevent infinite recursion in case of cyclic told hierarchies
-	//TODO can be avoided if properties are partially saturated in this visitor
 	final Set<IndexedPropertyChain> visited_ = new ArrayHashSet<IndexedPropertyChain>();
-	
+
 	@Override
-	public O visit(IndexedObjectProperty property) {
+	public ElkObject visit(IndexedObjectProperty property) {
 		reflexive = property.isToldReflexive();
-		
+
 		if (!reflexive) {
 			defaultVisit(property);
 		}
-		
+
 		return null;
 	}
 
-
 	@Override
-	public O visit(IndexedBinaryPropertyChain binaryChain) {
+	public ElkObject visit(IndexedBinaryPropertyChain binaryChain) {
 		reflexive = isReflexive(binaryChain.getLeftProperty())
 				&& isReflexive(binaryChain.getRightProperty());
 
 		return null;
 	}
-	
+
 	boolean isReflexive(final IndexedPropertyChain propChain) {
-		visited_.add(propChain);
-		propChain.accept(this);
-		
-		return reflexive;
+		SaturatedPropertyChain saturated = ObjectPropertyHierarchyComputationFactory
+				.getCreateSaturated(propChain);
+
+		if (visited_.contains(propChain)) {
+			return reflexive = saturated.isReflexive();
+		} else {
+			visited_.add(propChain);
+			propChain.accept(this);
+			saturated.isReflexive.set(reflexive ? REFLEXIVITY.TRUE
+					: REFLEXIVITY.FALSE);
+			visited_.remove(propChain);
+
+			return reflexive;
+		}
 	}
 
 	private void defaultVisit(IndexedPropertyChain propChain) {
@@ -232,10 +315,9 @@ class FindReflexivePropertiesVisitor<O> implements IndexedPropertyChainVisitor<O
 		if (propChain.getToldSubProperties() != null) {
 			for (IndexedPropertyChain subChain : propChain
 					.getToldSubProperties()) {
-				if (!visited_.contains(subChain)) {
-					if (reflexive = isReflexive(subChain)) {
-						break;
-					}
+				if (isReflexive(subChain)) {
+					// TODO optimisation: mark all super-roles as reflexive
+					break;
 				}
 			}
 		}

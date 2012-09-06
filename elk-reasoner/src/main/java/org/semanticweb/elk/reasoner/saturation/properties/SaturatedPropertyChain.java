@@ -24,6 +24,7 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -43,6 +44,9 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 
  */
 public class SaturatedPropertyChain {
+	
+	enum REFLEXIVITY {TRUE, FALSE, UNKNOWN};
+	
 	final IndexedPropertyChain root;
 
 	final Set<IndexedPropertyChain> derivedSubProperties;
@@ -51,10 +55,12 @@ public class SaturatedPropertyChain {
 	final Set<IndexedBinaryPropertyChain> derivedSubCompositions;
 	final Set<IndexedPropertyChain> derivedRightSubProperties;
 	final Set<IndexedPropertyChain> leftComposableProperties;
-
-	boolean isReflexive = false;
-	boolean hasReflexiveRightSubProperty = false;
-	boolean hasReflexiveLeftComposableProperty = false;
+	/**
+	 * the enum used to distinguish non-reflexive properties from those whose reflexivity isn't yet known
+	 */
+	AtomicReference<REFLEXIVITY> isReflexive = new AtomicReference<REFLEXIVITY>(REFLEXIVITY.UNKNOWN);
+	//boolean hasReflexiveRightSubProperty = false;
+	//boolean hasReflexiveLeftComposableProperty = false;
 
 	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeftSubProperty;
 	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRightSubProperty;
@@ -93,7 +99,7 @@ public class SaturatedPropertyChain {
 	 * @return {@code true} if this property has a reflexive sub-property.
 	 */
 	public boolean isReflexive() {
-		return isReflexive;
+		return isReflexive.get() == REFLEXIVITY.TRUE;
 	}
 
 	/**
@@ -110,9 +116,9 @@ public class SaturatedPropertyChain {
 	 *         properties S1,...,Sn (n>=0) for which S1 o ... o Sn o R => root
 	 *         follows from the role inclusion axioms.
 	 */
-	public boolean hasReflexiveRightSubProperty() {
+	/*public boolean hasReflexiveRightSubProperty() {
 		return hasReflexiveRightSubProperty;
-	}
+	}*/
 
 	/**
 	 * @return All properties R such that there exist properties S1,...,Sn
@@ -128,9 +134,9 @@ public class SaturatedPropertyChain {
 	 *         there exist properties S1,...,Sn (n>=0) and T for which S1 o ...
 	 *         o Sn o R o root => T follows from the role inclusion axioms.
 	 */
-	public boolean hasReflexiveLeftComposableProperty() {
+	/*public boolean hasReflexiveLeftComposableProperty() {
 		return hasReflexiveLeftComposableProperty;
-	}
+	}*/
 
 	/**
 	 * @return All super-properties of the root property including root itself.
@@ -162,4 +168,7 @@ public class SaturatedPropertyChain {
 		return compositionsByRightSubProperty;
 	}
 
+	boolean reflexvityDetermined() {
+		return isReflexive.get() != REFLEXIVITY.UNKNOWN;
+	}
 }
