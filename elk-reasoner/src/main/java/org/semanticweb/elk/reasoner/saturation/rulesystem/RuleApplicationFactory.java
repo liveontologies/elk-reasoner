@@ -33,12 +33,12 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
-import org.semanticweb.elk.reasoner.saturation.classes.ContextElClassSaturation;
-import org.semanticweb.elk.reasoner.saturation.classes.PositiveSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -75,7 +75,7 @@ public class RuleApplicationFactory implements
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
-	private final Queue<NewContext> activeContexts;
+	private final Queue<Context> activeContexts;
 
 	/**
 	 * The approximate number of contexts ever created by this engine. This
@@ -100,7 +100,7 @@ public class RuleApplicationFactory implements
 	private final RuleStatistics aggregatedStatistics;
 
 	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
-		this.activeContexts = new ConcurrentLinkedQueue<NewContext>();
+		this.activeContexts = new ConcurrentLinkedQueue<Context>();
 		this.aggregatedStatistics = new RuleStatistics();
 		this.reflexiveProperties_ = new ArrayHashSet<IndexedObjectProperty>();
 		Collection<IndexedObjectProperty> reflexiveObjectProperties = ontologyIndex
@@ -169,7 +169,7 @@ public class RuleApplicationFactory implements
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
-				NewContext nextContext = activeContexts.poll();
+				Context nextContext = activeContexts.poll();
 				if (nextContext == null)
 					break;
 				process(nextContext);
@@ -224,9 +224,9 @@ public class RuleApplicationFactory implements
 		 * @return context which root is the input indexed class expression.
 		 * 
 		 */
-		public NewContext getCreateContext(IndexedClassExpression root) {
+		public Context getCreateContext(IndexedClassExpression root) {
 			if (root.getContext() == null) {
-				NewContext context = new ContextElClassSaturation(root);
+				Context context = new ContextImpl(root);
 				if (root.setContext(context)) {
 					if (++localContextNumber == contextUpdateInterval) {
 						approximateContextNumber.addAndGet(localContextNumber);
@@ -249,7 +249,7 @@ public class RuleApplicationFactory implements
 		 * @param item
 		 *            the item to be processed in the given context
 		 */
-		public void enqueue(NewContext context, Conclusion item) {
+		public void enqueue(Context context, Conclusion item) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
 			context.getToDo().add(item);
@@ -262,37 +262,37 @@ public class RuleApplicationFactory implements
 		 * @param context
 		 *            the context in which to process the scheduled items
 		 */
-		protected void process(NewContext context) {
+		protected void process(Context context) {
 			for (;;) {
 				Conclusion item = context.getToDo().poll();
 				if (item == null)
 					break;
 
-				item.applyInContext(context, this);
+				item.process(context, this);
 			}
 
 			deactivateContext(context);
 		}
 
-		private void activateContext(NewContext context) {
+		private void activateContext(Context context) {
 			if (context.tryActivate()) {
 				activeContexts.add(context);
 			}
 		}
 
-		private void deactivateContext(NewContext context) {
+		private void deactivateContext(Context context) {
 			if (context.tryDeactivate())
 				if (!context.getToDo().isEmpty())
 					activateContext(context);
 		}
 
 		@Override
-		public void derive(NewContext context, Conclusion conclusion) {
+		public void derive(Context context, Conclusion conclusion) {
 			enqueue(context, conclusion);
 		}
 
 		@Override
-		public void initContext(NewContext context) {
+		public void initContext(Context context) {
 			// TODO: generalize this
 			enqueue(context,
 					new PositiveSuperClassExpression(context.getRoot()));

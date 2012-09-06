@@ -23,6 +23,7 @@
 package org.semanticweb.elk.util.collections;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * 
@@ -49,7 +50,7 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 
 	@Override
 	public boolean contains(Key key, Value value) {
-		Collection<Value> record = get(key);
+		Collection<Value> record = super.get(key);
 		if (record == null)
 			return false;
 		else
@@ -58,7 +59,7 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 
 	@Override
 	public boolean add(Key key, Value value) {
-		Collection<Value> record = get(key);
+		Collection<Value> record = super.get(key);
 		if (record == null) {
 			record = newRecord();
 			put(key, record);
@@ -66,15 +67,17 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 		return record.add(value);
 	}
 
-
 	@Override
 	public Collection<Value> get(Object key) {
-		return super.get(key);
+		Collection<Value> result = super.get(key);
+		if (result == null)
+			return Collections.emptyList();
+		return result;
 	}
 
 	@Override
 	public boolean remove(Object key, Object value) {
-		Collection<Value> record = get(key);
+		Collection<Value> record = super.get(key);
 		if (record == null)
 			return false;
 		return record.remove(value);

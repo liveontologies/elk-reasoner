@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
-import org.semanticweb.elk.reasoner.saturation.classes.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
@@ -90,27 +90,21 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		if (ruleEngine.getOwlNothing() == this) {
 			context.setSatisfiable(false);
-			
-			// propagating bottom to the predecessors
-			final Multimap<IndexedPropertyChain, NewContext> backLinks = context
-					.getBackwardLinksByObjectProperty();
 
-			if (backLinks == null)
-				return;
+			// propagating bottom to the predecessors
+			final Multimap<IndexedPropertyChain, Context> backLinks = context
+					.getBackwardLinksByObjectProperty();
 
 			Conclusion carry = new PositiveSuperClassExpression(this);
 
 			for (IndexedPropertyChain propRelation : backLinks.keySet()) {
 
-				Collection<NewContext> targets = backLinks.get(propRelation);
+				Collection<Context> targets = backLinks.get(propRelation);
 
-				if (targets == null)
-					continue;
-
-				for (NewContext target : targets)
+				for (Context target : targets)
 					ruleEngine.derive(target, carry);
 			}
 		}

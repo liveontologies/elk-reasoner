@@ -25,10 +25,10 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 public class IndexedDataHasValue extends IndexedClassExpression {
 
@@ -72,7 +72,7 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		// TODO Auto-generated method stub
 		
 	}

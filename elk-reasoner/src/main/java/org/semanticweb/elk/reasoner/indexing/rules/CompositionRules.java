@@ -1,4 +1,6 @@
 package org.semanticweb.elk.reasoner.indexing.rules;
+
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.rules;
 
 public interface CompositionRules extends Chain<CompositionRules> {
 
-	public void apply(RuleEngine ruleEngine, NewContext context);
+	public void apply(RuleEngine ruleEngine, Context context);
 
 }

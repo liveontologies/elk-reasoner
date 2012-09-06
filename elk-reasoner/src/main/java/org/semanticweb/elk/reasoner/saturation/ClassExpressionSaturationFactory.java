@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -210,7 +210,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 */
 				J nextJob = jobsInProgress_.poll();
 				IndexedClassExpression root = nextJob.getInput();
-				NewContext rootSaturation = root.getContext();
+				Context rootSaturation = root.getContext();
 				rootSaturation.setSaturated();
 				nextJob.setOutput(rootSaturation);
 				if (LOGGER_.isTraceEnabled())
@@ -326,7 +326,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 * if the context is already assigned and saturated, this job is
 				 * already complete
 				 */
-				NewContext rootContext = root.getContext();
+				Context rootContext = root.getContext();
 				if (rootContext != null && rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);
 					listener_.notifyFinished(nextJob); // can throw

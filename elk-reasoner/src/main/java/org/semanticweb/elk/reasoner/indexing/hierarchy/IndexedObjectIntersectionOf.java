@@ -27,12 +27,12 @@ import java.util.Map;
 import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
 import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
 import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.classes.NegativeSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.classes.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
@@ -99,7 +99,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		ruleEngine.derive(context, new PositiveSuperClassExpression(
 				firstConjunct));
 		ruleEngine.derive(context, new PositiveSuperClassExpression(
@@ -163,7 +163,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, NewContext context) {
+		public void apply(RuleEngine ruleEngine, Context context) {
 			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 					conjunctionsByConjunct_.keySet(),
 					context.getSuperClassExpressions()))

@@ -24,11 +24,56 @@ package org.semanticweb.elk.util.collections;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class Operations {
+
+	public static final Multimap<?, ?> EMPTY_MULTIMAP = new Multimap<Object, Object>() {
+
+		@Override
+		public boolean contains(Object key, Object value) {
+			return false;
+		}
+
+		@Override
+		public boolean add(Object key, Object value) {
+			throw new UnsupportedOperationException(
+					"The Empty multimap cannot be modified!");
+		}
+
+		@Override
+		public Collection<Object> get(Object key) {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public boolean remove(Object key, Object value) {
+			return false;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return true;
+		}
+
+		@Override
+		public Set<Object> keySet() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public void clear() {
+		}
+
+	};
+
+	@SuppressWarnings("unchecked")
+	public static <S, T> Multimap<S, T> emptyMultimap() {
+		return (Multimap<S, T>) EMPTY_MULTIMAP;
+	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> Iterable<T> concat(final Iterable<? extends T> a,

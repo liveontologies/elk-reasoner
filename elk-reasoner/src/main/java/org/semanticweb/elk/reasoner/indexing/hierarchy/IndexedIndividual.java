@@ -23,10 +23,10 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 public class IndexedIndividual extends IndexedClassEntity {
 	/**
@@ -76,7 +76,7 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		// nothing so far
 	}
 }

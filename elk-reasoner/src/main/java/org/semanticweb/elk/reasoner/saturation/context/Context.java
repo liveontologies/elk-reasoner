@@ -1,9 +1,10 @@
+package org.semanticweb.elk.reasoner.saturation.context;
+
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,12 +21,16 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rulesystem;
 
 import java.util.Queue;
+import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.indexing.rules.Chain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.util.collections.Multimap;
 
 public interface Context {
 
@@ -58,4 +63,27 @@ public interface Context {
 	 * @return true if the context was active; returns false otherwise
 	 */
 	public boolean tryDeactivate();
+
+	public boolean isSatisfiable();
+
+	public boolean isSaturated();
+
+	public Set<IndexedClassExpression> getSuperClassExpressions();
+
+	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty();
+
+	public Chain<BackwardLinkRules> getBackwardLinkRules();
+
+	public boolean addBackwardLinkByObjectProperty(
+			IndexedPropertyChain relation, Context target);
+
+	public boolean addForwardLinkByObjectProperty(
+			IndexedPropertyChain relation, Context target);
+
+	public boolean addSuperClassExpression(IndexedClassExpression expression);
+
+	public void setSatisfiable(boolean b);
+
+	public void setSaturated();
+
 }

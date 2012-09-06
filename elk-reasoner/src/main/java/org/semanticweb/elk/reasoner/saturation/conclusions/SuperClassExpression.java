@@ -20,19 +20,15 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
+package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Frantisek Simancik
- * 
- * @param <C>
- *            the type of contexts that can be used with this {@link Queueable}
+ * @author "Yevgeny Kazakov"
  * 
  */
 public abstract class SuperClassExpression implements Conclusion {
@@ -47,10 +43,10 @@ public abstract class SuperClassExpression implements Conclusion {
 		return expression;
 	}
 
-	public boolean storeInContext(NewContext context, RuleEngine ruleEngine) {
+	public boolean storeInContext(Context context, RuleEngine ruleEngine) {
 		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.superClassExpressionInfNo++;
-		if (context.addSuperClassExpressions(expression)) {
+		if (context.addSuperClassExpression(expression)) {
 			statistics.superClassExpressionNo++;
 			return true;
 		}

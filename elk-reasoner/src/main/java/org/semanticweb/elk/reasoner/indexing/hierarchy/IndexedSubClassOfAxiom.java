@@ -27,9 +27,9 @@ import java.util.List;
 import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
 import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
 import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
-import org.semanticweb.elk.reasoner.saturation.classes.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -105,7 +105,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, NewContext context) {
+		public void apply(RuleEngine ruleEngine, Context context) {
 
 			for (IndexedClassExpression implied : toldSuperClassExpressions_)
 				ruleEngine.derive(context, new PositiveSuperClassExpression(

@@ -20,40 +20,32 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
+package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A {@link SuperClassExpression} to which decomposition rules need to be
- * applied.
+ * A {@link SuperClassExpression} to which composition rules should be applied.
+ * Decomposition rules do not need to by applied to this object.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
- * @param <C>
- *            the type of the {@link Context} with which this {@link Queueable}
- *            can be used
  */
-public class PositiveSuperClassExpression extends SuperClassExpression {
+public class NegativeSuperClassExpression extends SuperClassExpression {
 
-	public PositiveSuperClassExpression(
+	public NegativeSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
 	}
 
 	@Override
-	public void applyInContext(NewContext context, RuleEngine ruleEngine) {
+	public void process(Context context, RuleEngine ruleEngine) {
 		if (!storeInContext(context, ruleEngine))
 			return;
-
-		// apply decomposition rules
-		expression.applyDecomposition(ruleEngine, context);
 
 		// applying all composition rules
 		CompositionRules rules = expression.getNext();
@@ -66,5 +58,4 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 		}
 
 	}
-
 }

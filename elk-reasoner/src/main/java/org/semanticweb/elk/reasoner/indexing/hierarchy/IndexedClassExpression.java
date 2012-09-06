@@ -27,10 +27,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
 import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -58,14 +57,14 @@ abstract public class IndexedClassExpression extends
 	 * {@link IndexedClassExpression} that appear in binary disjointess axioms
 	 * with this object.
 	 */
-//	private Set<IndexedClassExpression> disjointClasses_;
+	// private Set<IndexedClassExpression> disjointClasses_;
 
 	/**
 	 * List of all larger (non-binary) disjointness axioms in which this object
 	 * appears.
 	 * 
 	 */
-//	protected List<IndexedDisjointnessAxiom> disjointnessAxioms;
+	// protected List<IndexedDisjointnessAxiom> disjointnessAxioms;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -113,8 +112,8 @@ abstract public class IndexedClassExpression extends
 	abstract void updateOccurrenceNumbers(int increment, int positiveIncrement,
 			int negativeIncrement);
 
-	public abstract void applyDecomposition(RuleEngine ruleEngine,
-			NewContext context);
+	public abstract void applyDecompositionRule(RuleEngine ruleEngine,
+			Context context);
 
 	/**
 	 * @return the {@link IndexedObjectProperty} objects that occur in positive
@@ -131,17 +130,17 @@ abstract public class IndexedClassExpression extends
 	 *         object in binary disjointness axioms, or {@code null} if none is
 	 *         assigned
 	 */
-//	public Set<IndexedClassExpression> getDisjointClasses() {
-//		return disjointClasses_;
-//	}
+	// public Set<IndexedClassExpression> getDisjointClasses() {
+	// return disjointClasses_;
+	// }
 
 	/**
 	 * @return Collection of all (non-binary) {@link IndexedDisjointnessAxiom}s
 	 *         in which this object appears, or {@code null} if none is assigned
 	 */
-//	public List<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
-//		return disjointnessAxioms;
-//	}
+	// public List<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
+	// return disjointnessAxioms;
+	// }
 
 	protected void addPosPropertyInExistential(IndexedPropertyChain property) {
 		if (posPropertiesInExistentials_ == null)
@@ -161,56 +160,57 @@ abstract public class IndexedClassExpression extends
 		return success;
 	}
 
-//	protected void addDisjointClass(IndexedClassExpression disjointClass) {
-//		if (disjointClasses_ == null)
-//			disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
-//		disjointClasses_.add(disjointClass);
-//	}
-//
-//	/**
-//	 * @param disjointClass
-//	 * @return true if successfully removed
-//	 */
-//	protected boolean removeDisjointClass(IndexedClassExpression disjointClass) {
-//		boolean success = false;
-//		if (disjointClasses_ != null) {
-//			success = disjointClasses_.remove(disjointClass);
-//			if (disjointClasses_.isEmpty())
-//				disjointClasses_ = null;
-//		}
-//		return success;
-//	}
-//
-//	protected void addDisjointnessAxiom(
-//			IndexedDisjointnessAxiom disjointnessAxiom) {
-//		if (disjointnessAxioms == null)
-//			disjointnessAxioms = new LinkedList<IndexedDisjointnessAxiom>();
-//		disjointnessAxioms.add(disjointnessAxiom);
-//	}
-//
-//	/**
-//	 * @param disjointnessAxiom
-//	 * @return true if successfully removed
-//	 */
-//	protected boolean removeDisjointnessAxiom(
-//			IndexedDisjointnessAxiom disjointnessAxiom) {
-//		boolean success = false;
-//
-//		if (disjointnessAxioms != null) {
-//			Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms
-//					.iterator();
-//			while (i.hasNext())
-//				if (i.next().getMembers()
-//						.equals(disjointnessAxiom.getMembers())) {
-//					i.remove();
-//					break;
-//				}
-//
-//			if (disjointnessAxioms.isEmpty())
-//				disjointnessAxioms = null;
-//		}
-//		return success;
-//	}
+	// protected void addDisjointClass(IndexedClassExpression disjointClass) {
+	// if (disjointClasses_ == null)
+	// disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
+	// disjointClasses_.add(disjointClass);
+	// }
+	//
+	// /**
+	// * @param disjointClass
+	// * @return true if successfully removed
+	// */
+	// protected boolean removeDisjointClass(IndexedClassExpression
+	// disjointClass) {
+	// boolean success = false;
+	// if (disjointClasses_ != null) {
+	// success = disjointClasses_.remove(disjointClass);
+	// if (disjointClasses_.isEmpty())
+	// disjointClasses_ = null;
+	// }
+	// return success;
+	// }
+	//
+	// protected void addDisjointnessAxiom(
+	// IndexedDisjointnessAxiom disjointnessAxiom) {
+	// if (disjointnessAxioms == null)
+	// disjointnessAxioms = new LinkedList<IndexedDisjointnessAxiom>();
+	// disjointnessAxioms.add(disjointnessAxiom);
+	// }
+	//
+	// /**
+	// * @param disjointnessAxiom
+	// * @return true if successfully removed
+	// */
+	// protected boolean removeDisjointnessAxiom(
+	// IndexedDisjointnessAxiom disjointnessAxiom) {
+	// boolean success = false;
+	//
+	// if (disjointnessAxioms != null) {
+	// Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms
+	// .iterator();
+	// while (i.hasNext())
+	// if (i.next().getMembers()
+	// .equals(disjointnessAxiom.getMembers())) {
+	// i.remove();
+	// break;
+	// }
+	//
+	// if (disjointnessAxioms.isEmpty())
+	// disjointnessAxioms = null;
+	// }
+	// return success;
+	// }
 
 	// TODO: replace pointers to contexts by a mapping
 
@@ -218,12 +218,12 @@ abstract public class IndexedClassExpression extends
 	 * Used for efficient retrieval of the Context corresponding to this class
 	 * expression.
 	 */
-	protected final AtomicReference<NewContext> context = new AtomicReference<NewContext>();
+	protected final AtomicReference<Context> context = new AtomicReference<Context>();
 
 	/**
 	 * @return The corresponding context, null if none was assigned.
 	 */
-	public NewContext getContext() {
+	public Context getContext() {
 		return context.get();
 	}
 
@@ -236,7 +236,7 @@ abstract public class IndexedClassExpression extends
 	 * 
 	 * @return {@code true} if the operation succeeded.
 	 */
-	public boolean setContext(NewContext context) {
+	public boolean setContext(Context context) {
 		return this.context.compareAndSet(null, context);
 	}
 

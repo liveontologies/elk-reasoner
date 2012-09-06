@@ -27,17 +27,19 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
 import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
 import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
 import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
-import org.semanticweb.elk.reasoner.saturation.classes.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.classes.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -116,12 +118,12 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	public void registerCompositionRule() {
-		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
+		ThisCompositionRule.Matcher matcher = new ThisCompositionRule.Matcher();
 		filler.getCreate(matcher).addNegExistential(this);
 	}
 
 	public void deregisterCompositionRule() {
-		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
+		ThisCompositionRule.Matcher matcher = new ThisCompositionRule.Matcher();
 		ThisCompositionRule rule = filler.find(matcher);
 		if (rule != null) {
 			rule.removeNegExistential(this);
@@ -139,13 +141,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecomposition(RuleEngine ruleEngine, NewContext context) {
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		ruleEngine.derive(ruleEngine.getCreateContext(filler),
 				new BackwardLink(property, context));
 	}
 
-	private static class ThisCompositionRule extends ChainImpl<CompositionRules>
-			implements CompositionRules {
+	private static class ThisCompositionRule extends
+			ChainImpl<CompositionRules> implements CompositionRules {
 
 		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
@@ -172,7 +174,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, NewContext context) {
+		public void apply(RuleEngine ruleEngine, Context context) {
 
 			final Set<IndexedPropertyChain> candidatePropagationProperties = context
 					.getRoot().getPosPropertiesInExistentials();
@@ -219,47 +221,87 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		private void addPropagation(IndexedPropertyChain propRelation,
-				Conclusion carry, NewContext context, RuleEngine ruleEngine) {
+				Conclusion carry, Context context, RuleEngine ruleEngine) {
 
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new propagation "
 						+ propRelation + "->" + carry);
 
-			if (context.addPropagationByObjectProperty(propRelation, carry)) {
-
+			ThisBackwardLinkRule.Matcher matcher = new ThisBackwardLinkRule.Matcher();
+			if (context.getBackwardLinkRules().getCreate(matcher)
+					.addPropagationByObjectProperty(propRelation, carry)) {
 				// propagate over all backward links
-				final Multimap<IndexedPropertyChain, NewContext> backLinks = context
+				final Multimap<IndexedPropertyChain, Context> backLinks = context
 						.getBackwardLinksByObjectProperty();
 
-				if (backLinks == null)
-					return;
+				Collection<Context> targets = backLinks.get(propRelation);
 
-				Collection<NewContext> targets = backLinks.get(propRelation);
-
-				if (targets == null)
-					return;
-
-				for (NewContext target : targets)
+				for (Context target : targets)
 					ruleEngine.derive(target, carry);
 			}
+
+		}
+
+		private static class Matcher implements
+				ChainMatcher<CompositionRules, ThisCompositionRule> {
+
+			@Override
+			public ThisCompositionRule createNew(CompositionRules tail) {
+				return new ThisCompositionRule(tail);
+			}
+
+			@Override
+			public ThisCompositionRule match(CompositionRules chain) {
+				if (chain instanceof ThisCompositionRule)
+					return (ThisCompositionRule) chain;
+				else
+					return null;
+			}
+
 		}
 
 	}
 
-	private class CompositionRuleMatcher implements
-			ChainMatcher<CompositionRules, ThisCompositionRule> {
+	private static class ThisBackwardLinkRule extends
+			ChainImpl<BackwardLinkRules> implements BackwardLinkRules {
 
-		@Override
-		public ThisCompositionRule createNew(CompositionRules tail) {
-			return new ThisCompositionRule(tail);
+		private final Multimap<IndexedPropertyChain, Conclusion> propagationsByObjectProperty_;
+
+		ThisBackwardLinkRule(BackwardLinkRules tail) {
+			super(tail);
+			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Conclusion>(
+					3);
+		}
+
+		private boolean addPropagationByObjectProperty(
+				IndexedPropertyChain propRelation, Conclusion conclusion) {
+			return propagationsByObjectProperty_.add(propRelation, conclusion);
 		}
 
 		@Override
-		public ThisCompositionRule match(CompositionRules chain) {
-			if (chain instanceof ThisCompositionRule)
-				return (ThisCompositionRule) chain;
-			else
-				return null;
+		public void apply(RuleEngine ruleEngine, Context context,
+				BackwardLink link) {
+			for (Conclusion carry : propagationsByObjectProperty_.get(link
+					.getReltaion()))
+				ruleEngine.derive(link.getTarget(), carry);
+		}
+
+		private static class Matcher implements
+				ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule> {
+
+			@Override
+			public ThisBackwardLinkRule createNew(BackwardLinkRules tail) {
+				return new ThisBackwardLinkRule(tail);
+			}
+
+			@Override
+			public ThisBackwardLinkRule match(BackwardLinkRules chain) {
+				if (chain instanceof ThisBackwardLinkRule)
+					return (ThisBackwardLinkRule) chain;
+				else
+					return null;
+			}
+
 		}
 
 	}

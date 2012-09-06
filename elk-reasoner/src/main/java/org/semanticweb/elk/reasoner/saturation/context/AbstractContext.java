@@ -20,14 +20,16 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rulesystem;
+package org.semanticweb.elk.reasoner.saturation.context;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
+import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 
 /**
  * Abstract base class for representing contexts. Contexts are used to store
@@ -43,7 +45,7 @@ import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-public class AbstractContext implements Context {
+public class AbstractContext extends ChainImpl<BackwardLinkRules> {
 
 	/**
 	 * The root expression that this context relates to.
@@ -78,7 +80,6 @@ public class AbstractContext implements Context {
 	 * 
 	 * @return root expression
 	 */
-	@Override
 	public IndexedClassExpression getRoot() {
 		return root;
 	}
@@ -89,7 +90,6 @@ public class AbstractContext implements Context {
 	 * 
 	 * @return queue
 	 */
-	@Override
 	public final Queue<Conclusion> getToDo() {
 		return toDo;
 	}
@@ -100,7 +100,6 @@ public class AbstractContext implements Context {
 	 * 
 	 * @return {@code true} if the active status of the contexts is changed
 	 */
-	@Override
 	public boolean tryActivate() {
 		if (isActive.get()) {
 			return false;
@@ -115,7 +114,6 @@ public class AbstractContext implements Context {
 	 * @return {@code true} if the active status of the contexts is changed
 	 * 
 	 */
-	@Override
 	public boolean tryDeactivate() {
 		if (!isActive.get()) {
 			return false;

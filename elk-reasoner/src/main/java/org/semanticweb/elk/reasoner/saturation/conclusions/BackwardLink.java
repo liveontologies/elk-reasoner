@@ -20,41 +20,40 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
-
-import java.util.Collection;
+package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.rules.Conclusion;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
+import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
-import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class BackwardLink implements Conclusion {
 
 	private final IndexedPropertyChain relation_;
 
-	private final NewContext target_;
+	private final Context target_;
 
-	public BackwardLink(IndexedPropertyChain relation, NewContext target) {
+	public BackwardLink(IndexedPropertyChain relation, Context target) {
 		this.relation_ = relation;
 		this.target_ = target;
 	}
 
-	public IndexedPropertyChain getRelation() {
+	public IndexedPropertyChain getReltaion() {
 		return relation_;
 	}
 
-	public NewContext getTarget() {
+	public Context getTarget() {
 		return target_;
 	}
 
 	@Override
-	public void applyInContext(NewContext context, RuleEngine ruleEngine) {
+	public void process(Context context, RuleEngine ruleEngine) {
+
 		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.backLinkInfNo++;
 
@@ -63,21 +62,20 @@ public class BackwardLink implements Conclusion {
 
 		statistics.backLinkNo++;
 
-		final IndexedPropertyChain linkRelation = getRelation();
-		final NewContext target = getTarget();
+//		final IndexedPropertyChain linkRelation = relation_;
+		final Context target = target_;
 
-		// apply all propagations over the link
-		final Multimap<IndexedPropertyChain, Conclusion> props = context
-				.getPropagationsByObjectProperty();
+		// apply all backward link rules of the context
+		BackwardLinkRules rules = context.getBackwardLinkRules().getNext();
 
-		if (props != null) {
-
-			Collection<Conclusion> carrys = props.get(linkRelation);
-
-			if (carrys != null)
-				for (Conclusion carry : carrys)
-					ruleEngine.derive(target, carry);
+		while (rules != null) {
+			rules.apply(ruleEngine, context, this);
+			rules = rules.getNext();
 		}
+
+//		for (Conclusion carry : context.getPropagationsByObjectProperty().get(
+//				linkRelation))
+//			ruleEngine.derive(target, carry);
 
 		// propagate unsatisfiability over the link
 		if (!context.isSatisfiable())

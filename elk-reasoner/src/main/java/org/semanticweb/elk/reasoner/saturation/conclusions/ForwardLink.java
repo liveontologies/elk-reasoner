@@ -20,22 +20,37 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import org.semanticweb.elk.reasoner.ReasonerJob;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
-public class SaturationJob<I extends IndexedClassExpression> extends
-		ReasonerJob<I, Context> {
+/**
+ * @author Frantisek Simancik
+ * 
+ */
+public class ForwardLink implements Conclusion {
 
-	public SaturationJob(I input) {
-		super(input);
+	private final IndexedPropertyChain relation_;
+
+	private final Context target_;
+
+	public ForwardLink(IndexedPropertyChain relation, Context target) {
+		this.relation_ = relation;
+		this.target_ = target;
 	}
 
 	@Override
-	protected void setOutput(Context output) {
-		super.setOutput(output);
+	public void process(Context context, RuleEngine ruleEngine) {
+
+		RuleStatistics statistics = ruleEngine.getRuleStatistics();
+		statistics.forwLinkInfNo++;
+
+		if (!context.addForwardLinkByObjectProperty(relation_, target_))
+			return;
+
+		statistics.forwLinkNo++;
 	}
 
 }

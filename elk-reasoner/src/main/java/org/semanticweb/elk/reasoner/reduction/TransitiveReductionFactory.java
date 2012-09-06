@@ -31,9 +31,9 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.rules.NewContext;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -164,7 +164,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 */
 			J initiatorJob = saturationJob.initiatorJob;
 			R root = initiatorJob.getInput();
-			NewContext saturation = root.getContext();
+			Context saturation = root.getContext();
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
@@ -235,7 +235,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				if (!(next instanceof IndexedClass))
 					continue;
 				IndexedClass candidate = (IndexedClass) next;
-				NewContext candidateSaturation = candidate.getContext();
+				Context candidateSaturation = candidate.getContext();
 				/*
 				 * If the saturation for the candidate is not yet computed,
 				 * create a corresponding saturation job and suspend processing
@@ -281,7 +281,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		 */
 		private void updateTransitiveReductionOutput(
 				TransitiveReductionOutputEquivalentDirect<R> output,
-				IndexedClass candidate, NewContext candidateSaturation) {
+				IndexedClass candidate, Context candidateSaturation) {
 			R root = output.root;
 			if (candidate == root) {
 				output.equivalent.add(candidate.getElkClass());

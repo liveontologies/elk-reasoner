@@ -23,10 +23,9 @@
 package org.semanticweb.elk.util.collections.entryset;
 
 /**
- * A common interface for implementing entries of an
- * {@link EntryHashSet}. Entries should be connected to each other, so
- * basic operations include setting and getting and setting a reference to the
- * next element.
+ * A common interface for implementing entries of an {@link EntryHashSet}.
+ * Entries should be connected to each other, so basic operations include
+ * setting and getting a reference to the next element.
  * 
  * @author "Yevgeny Kazakov"
  * 
