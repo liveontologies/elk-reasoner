@@ -25,9 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
@@ -36,7 +35,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyHierarchyComputationFactory.Engine;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain.REFLEXIVITY;
+import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -81,6 +82,9 @@ public class ObjectPropertyHierarchyComputationFactory implements
 		return collection == null ? Collections.<T> emptyList() : collection;
 	}
 
+	
+	enum SIDE {LEFT, RIGHT};
+	
 	/**
 	 * The engine for resetting the saturation and computing the transitively
 	 * closed sub-properties and super-properties of each submitted property
@@ -107,75 +111,128 @@ public class ObjectPropertyHierarchyComputationFactory implements
 
 		// Returns told super-properties and also
 		// {R | S o ipc -> R or ipc o S -> R, S is reflexive}
-		private Iterable<IndexedPropertyChain> getDirectSuperProperties(
-				IndexedPropertyChain ipc) {
-			List<IndexedPropertyChain> superProps = new LinkedList<IndexedPropertyChain>();
+		private void addDirectSuperProperties(
+				final IndexedPropertyChain ipc, final Collection<IndexedPropertyChain> props) {
 
-			for (IndexedPropertyChain chain : Operations.concat(
+			for (IndexedBinaryPropertyChain chain : Operations.concat(
 					emptyIfNull(ipc.getLeftChains()),
 					emptyIfNull(ipc.getRightChains()))) {
-				IndexedPropertyChain composable = ((IndexedBinaryPropertyChain) chain)
-						.getComposable(ipc);
+				IndexedPropertyChain composable = chain.getComposable(ipc);
 
-				if (isReflexive(composable)) {
-					superProps.addAll(emptyIfNull(chain
-							.getToldSuperProperties()));
+				if (chain.getToldSubProperties() != null && isReflexive(composable)) {
+					props.addAll(chain.getToldSuperProperties());
 				}
 			}
 
-			return ipc.getToldSuperProperties() != null ? Operations.concat(
-					ipc.getToldSuperProperties(), superProps) : superProps;
+			props.addAll(emptyIfNull(ipc.getToldSuperProperties()));
+		}
+		
+		/*
+		 * Adds told sub-properties (for named properties) and derived through reflexivity sub-propertied (for chains) to the supplied collection.
+		 * Also, if saturated is provided, it registers derived sub-compositions in it
+		 */
+		private void addDirectSubProperties(final IndexedPropertyChain ipc, final Collection<IndexedPropertyChain> props, final SaturatedPropertyChain saturated) {		
+			ipc.accept(new IndexedPropertyChainVisitor<ElkObject>() {
+				
+				@Override
+				public ElkObject visit(IndexedObjectProperty prop) {
+					props.addAll(emptyIfNull(prop.getToldSubProperties()));
+					return null;
+				}
+
+				@Override
+				public ElkObject visit(IndexedBinaryPropertyChain chain) {
+					if (isReflexive(chain.getLeftProperty())) {
+						props.add(chain.getRightProperty());
+					}
+
+					if (isReflexive(chain.getRightProperty())) {
+						props.add(chain.getLeftProperty());
+					}
+					
+					if (saturated != null) {
+						saturated.derivedSubCompositions.add(chain);
+					}
+					
+					return null;
+				}
+			});
 		}
 
+		/**
+		 * Add (S, chain) to the multimap (compositionsByLeftSubProperty or compositionsByRightSubProperty)
+		 * for each sub-property of the chain.
+		 */
+		private void registerComposition(IndexedBinaryPropertyChain chain,
+				Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionMultimap, SIDE side) {
+
+			ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
+			IndexedPropertyChain next = null;
+			
+			queue.add(side == SIDE.LEFT ? chain.getLeftProperty() : chain.getRightProperty());
+			
+			while ((next = queue.poll()) != null) {
+				
+				if (compositionMultimap.add(next, chain)) {
+					
+					/*if (side == SIDE.LEFT && chain.getRightChains() == null) {
+					
+						for (IndexedPropertyChain superChain : chain.getToldSuperProperties()) {
+							compositionMultimap.add(next, superChain);
+						}
+						
+						compositionMultimap.remove(next, chain);
+					}*/					
+					
+					addDirectSubProperties(next, queue, null);		
+				}
+			}
+		}		
+		
+		
 		@Override
 		public void submit(IndexedPropertyChain ipc) {
 			SaturatedPropertyChain saturated = getCreateSaturated(ipc);
+			final ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
+			IndexedPropertyChain next = null;			
 
 			isReflexive(ipc);
-			// compute all transitively closed sub-properties
-			// and mark the chain as reflexive if one of its sub-properties
-			// is reflexive
-			ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
-			
-			queue.add(ipc);
-			
-			for (;;) {
-				IndexedPropertyChain r = queue.poll();
-				if (r == null)
-					break;
-				if (saturated.derivedSubProperties.add(r)) {
-					if (r instanceof IndexedBinaryPropertyChain) {
-						IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) r;
-						// ////
-						if (isReflexive(chain.getLeftProperty())) {
-							queue.add(chain.getRightProperty());
-						}
-
-						if (isReflexive(chain.getRightProperty())) {
-							queue.add(chain.getLeftProperty());
-						}
-						// ////
-						saturated.derivedSubCompositions
-								.add((IndexedBinaryPropertyChain) r);
-					}
-					if (r.getToldSubProperties() != null)
-						for (IndexedPropertyChain s : r.getToldSubProperties()) {
-							queue.add(s);
-						}
-				}
-			}
-
 			// compute all transitively closed super-properties
 			queue.add(ipc);
 
-			for (;;) {
-				IndexedPropertyChain r = queue.poll();
-				if (r == null)
-					break;
-				if (saturated.derivedSuperProperties.add(r)) {
-					for (IndexedPropertyChain s : getDirectSuperProperties(r)) {
-						queue.add(s);
+			while ((next = queue.poll()) != null) {
+				if (saturated.derivedSuperProperties.add(next)) {
+					/*
+					 * The next two blocks is what previously was in the composition computation stage
+					 */
+					for (IndexedBinaryPropertyChain chain : emptyIfNull(next.getRightChains())) {
+						if (saturated.compositionsByLeftSubProperty == null) {
+							saturated.compositionsByLeftSubProperty = new CompositionMultimap();
+						}
+						
+						registerComposition(chain, saturated.compositionsByLeftSubProperty, SIDE.LEFT);
 					}
+					
+					for (IndexedBinaryPropertyChain chain : emptyIfNull(next.getLeftChains())) {
+						if (saturated.compositionsByRightSubProperty == null) {
+							saturated.compositionsByRightSubProperty = new CompositionMultimap();
+						}
+						
+						registerComposition(chain, saturated.compositionsByRightSubProperty, SIDE.RIGHT);
+					}
+					
+					addDirectSuperProperties(next, queue);
+				}
+			}			
+			
+			// compute all transitively closed sub-properties
+			// and mark the chain as reflexive if one of its sub-properties
+			// is reflexive			
+			queue.add(ipc);
+			
+			while ((next = queue.poll()) != null) {
+				if (saturated.derivedSubProperties.add(next)) {
+					addDirectSubProperties(next, queue, saturated);
 				}
 			}
 
@@ -184,18 +241,15 @@ public class ObjectPropertyHierarchyComputationFactory implements
 			// root
 			queue.add(ipc);
 
-			for (;;) {
-				IndexedPropertyChain r = queue.poll();
-				if (r == null)
-					break;
-				if (saturated.derivedRightSubProperties.add(r)) {
-					if (r.getToldSubProperties() != null) {
-						for (IndexedPropertyChain s : r.getToldSubProperties()) {
+			while ((next = queue.poll()) != null) {
+				if (saturated.derivedRightSubProperties.add(next)) {
+					if (next.getToldSubProperties() != null) {
+						for (IndexedPropertyChain s : next.getToldSubProperties()) {
 							queue.add(s);
 						}
 					}
-					if (r instanceof IndexedBinaryPropertyChain) {
-						IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) r;
+					if (next instanceof IndexedBinaryPropertyChain) {
+						IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) next;
 						IndexedPropertyChain s = chain.getRightProperty();
 
 						queue.add(s);
@@ -210,26 +264,23 @@ public class ObjectPropertyHierarchyComputationFactory implements
 			// compute all left-composable properties
 			// i.e. such R that exist S1,..., Sn (n>=0) and T for which S1 o ...
 			// o Sn o R o root => T
-			for (IndexedPropertyChain r : saturated.derivedSuperProperties) {
+			for (IndexedPropertyChain s : saturated.derivedSuperProperties) {
 				// walking through the super-properties of root to find all
 				// composable R' o root' (that means root is composable w/ R '
 				// and all its sub-properties)
-				if (r.getRightChains() != null) {
-					for (IndexedBinaryPropertyChain chain : r.getRightChains()) {
+				if (s.getRightChains() != null) {
+					for (IndexedBinaryPropertyChain chain : s.getRightChains()) {
 						queue.add(chain.getLeftProperty());
 					}
 				}
 			}
 
-			for (;;) {
-				IndexedPropertyChain r = queue.poll();
-				if (r == null)
-					break;
-				if (saturated.leftComposableProperties.add(r)) {
-					queue.addAll(emptyIfNull(r.getToldSubProperties()));
+			while ((next = queue.poll()) != null) {
+				if (saturated.leftComposableProperties.add(next)) {
+					queue.addAll(emptyIfNull(next.getToldSubProperties()));
 
-					if (r instanceof IndexedBinaryPropertyChain) {
-						IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) r;
+					if (next instanceof IndexedBinaryPropertyChain) {
+						IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) next;
 						IndexedPropertyChain s = chain.getRightProperty();
 
 						queue.add(s);
@@ -251,7 +302,7 @@ public class ObjectPropertyHierarchyComputationFactory implements
 
 		@Override
 		public void finish() {
-		}
+		}		
 	}
 
 	@Override
@@ -318,10 +369,19 @@ class ReflexivityChecker implements IndexedPropertyChainVisitor<ElkObject> {
 			for (IndexedPropertyChain subChain : propChain
 					.getToldSubProperties()) {
 				if (isReflexive(subChain)) {
-					// TODO optimisation: mark all super-roles as reflexive
+					// TODO optimisation: mark all super-roles as reflexive?
 					break;
 				}
 			}
 		}
+	}
+}
+
+class CompositionMultimap extends
+		AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> {
+
+	@Override
+	protected Vector<IndexedPropertyChain> newRecord() {
+		return new Vector<IndexedPropertyChain>();
 	}
 }

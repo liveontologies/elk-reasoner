@@ -91,8 +91,7 @@ public class ObjectPropertyCompositionsPrecomputationFactory implements
 		 * R1 and R2 derives directly R skipping the auxiliary binary chain
 		 * representing [R1 R2].
 		 */
-		// private static final boolean REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
-		// = true;
+		private static final boolean REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES = true;
 
 		/**
 		 * If set to true, then compositions between each pair of R1 and R2 are
@@ -106,24 +105,18 @@ public class ObjectPropertyCompositionsPrecomputationFactory implements
 		 * this only makes sense if REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES is
 		 * also on.
 		 */
-		private static final boolean ELIMINATE_IMPLIED_COMPOSITIONS = true;
+		private static final boolean ELIMINATE_IMPLIED_COMPOSITIONS = false;
 
 		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.semanticweb.elk.util.concurrent.computation.InputProcessor#submit
-		 * (java.lang.Object)
-		 * 
 		 * Computes all compositions with the submitted property on the right.
 		 */
 		@Override
 		public void submit(IndexedPropertyChain rightProperty) {
-
+			
 			SaturatedPropertyChain rightPropertySaturated = rightProperty
 					.getSaturated();
 
-			// find all chains that have some superproperty of
+			// find all chains that have some super-property of
 			// rightProperty on the right and register them for the
 			// rightProperty
 			for (IndexedPropertyChain rightSuperProperty : rightProperty
@@ -185,15 +178,12 @@ public class ObjectPropertyCompositionsPrecomputationFactory implements
 				 * If the chain does not occur negatively, then replace it by
 				 * its told super properties.
 				 */
-				// if (REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
-				// && chain.getRightChains() == null) {
-				// for (IndexedObjectProperty superChain : chain
-				// .getToldSuperProperties())
-				// rightPropertySaturated.compositionsByLeftSubProperty
-				// .add(leftProperty, superChain);
-				// } else
-				rightPropertySaturated.compositionsByLeftSubProperty.add(
-						leftProperty, chain);
+				if (REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
+						&& chain.getRightChains() == null) {
+					for (IndexedPropertyChain superChain : chain.getToldSuperProperties())
+						rightPropertySaturated.compositionsByLeftSubProperty.add(leftProperty, superChain);
+				} else
+					rightPropertySaturated.compositionsByLeftSubProperty.add(leftProperty, chain);
 			}
 		}
 
