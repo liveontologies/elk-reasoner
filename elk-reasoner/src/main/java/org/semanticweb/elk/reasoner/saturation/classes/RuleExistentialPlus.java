@@ -97,8 +97,7 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> implements
 						.getSaturated();
 				if (!new LazySetIntersection<IndexedPropertyChain>(
 						candidatePropagationProperties,
-						propertySaturation.getRightSubProperties()).isEmpty()
-						/*|| propertySaturation.hasReflexiveRightSubProperty()*/) {
+						propertySaturation.getRightSubProperties()).isEmpty()) {
 					addPropagation(property,
 							new NegativeSuperClassExpression<C>(e), context,
 							engine);

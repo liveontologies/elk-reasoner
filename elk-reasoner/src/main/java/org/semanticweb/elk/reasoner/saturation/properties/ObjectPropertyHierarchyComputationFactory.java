@@ -136,7 +136,9 @@ public class ObjectPropertyHierarchyComputationFactory implements
 			// and mark the chain as reflexive if one of its sub-properties
 			// is reflexive
 			ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
+			
 			queue.add(ipc);
+			
 			for (;;) {
 				IndexedPropertyChain r = queue.poll();
 				if (r == null)

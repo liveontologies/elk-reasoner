@@ -58,9 +58,7 @@ public class RuleRoleComposition<C extends ContextElClassSaturation> implements
 		if (toldProperties != null
 				&& !new LazySetIntersection<IndexedPropertyChain>(
 						toldProperties, linkRelation.getSaturated()
-								.getLeftComposableProperties()).isEmpty()
-				/*|| linkRelation.getSaturated()
-						.hasReflexiveLeftComposableProperty()*/) {
+								.getLeftComposableProperties()).isEmpty()) {
 			engine.enqueue(target, new ForwardLink<C>(linkRelation, context));
 		}
 

@@ -59,9 +59,6 @@ public class SaturatedPropertyChain {
 	 * the enum used to distinguish non-reflexive properties from those whose reflexivity isn't yet known
 	 */
 	AtomicReference<REFLEXIVITY> isReflexive = new AtomicReference<REFLEXIVITY>(REFLEXIVITY.UNKNOWN);
-	//boolean hasReflexiveRightSubProperty = false;
-	//boolean hasReflexiveLeftComposableProperty = false;
-
 	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeftSubProperty;
 	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRightSubProperty;
 
@@ -112,15 +109,6 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * @return {@code true} if there exists a reflexive property R and
-	 *         properties S1,...,Sn (n>=0) for which S1 o ... o Sn o R => root
-	 *         follows from the role inclusion axioms.
-	 */
-	/*public boolean hasReflexiveRightSubProperty() {
-		return hasReflexiveRightSubProperty;
-	}*/
-
-	/**
 	 * @return All properties R such that there exist properties S1,...,Sn
 	 *         (n>=0) and T for which S1 o ... o Sn o R o root => T follows from
 	 *         the role inclusion axioms.
@@ -128,15 +116,6 @@ public class SaturatedPropertyChain {
 	public Set<IndexedPropertyChain> getLeftComposableProperties() {
 		return leftComposableProperties;
 	}
-
-	/**
-	 * @return {@code true} if there exists a reflexive property R such that
-	 *         there exist properties S1,...,Sn (n>=0) and T for which S1 o ...
-	 *         o Sn o R o root => T follows from the role inclusion axioms.
-	 */
-	/*public boolean hasReflexiveLeftComposableProperty() {
-		return hasReflexiveLeftComposableProperty;
-	}*/
 
 	/**
 	 * @return All super-properties of the root property including root itself.
