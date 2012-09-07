@@ -1,4 +1,6 @@
-package org.semanticweb.elk.reasoner.indexing.rules;
+package org.semanticweb.elk.reasoner.saturation.rules;
+
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /*
  * #%L
@@ -22,21 +24,12 @@ package org.semanticweb.elk.reasoner.indexing.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.RuleStatistics;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+public abstract class ContextRules extends ChainImpl<ContextRules> {
 
-public interface RuleEngine {
+	public ContextRules(ContextRules tail) {
+		super(tail);
+	}
 
-	public Context getCreateContext(IndexedClassExpression root);
-
-	public void derive(Context context, Conclusion conclusion);
-
-	public RuleStatistics getRuleStatistics();
-
-	public void initContext(Context context);
-
-	public IndexedClassExpression getOwlNothing();
+	public abstract void apply(RuleEngine ruleEngine, Context context);
 
 }

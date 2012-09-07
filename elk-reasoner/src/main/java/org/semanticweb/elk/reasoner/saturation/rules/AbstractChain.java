@@ -1,4 +1,5 @@
-package org.semanticweb.elk.reasoner.indexing.rules;
+package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,24 +22,16 @@ package org.semanticweb.elk.reasoner.indexing.rules;
  * #L%
  */
 
-public class ChainImpl<T extends Chain<T>> implements Chain<T> {
-
-	private T tail_ = null;
-
-	public ChainImpl() {		
-	}
-	
-	public ChainImpl(T tail) {
-		this.tail_ = tail;
-	}
+public abstract class AbstractChain<T extends Reference<T>> implements Chain<T> {
 
 	@Override
-	public T getNext() {
-		return tail_;
-	}
+	public abstract T getNext();
 
 	@Override
-	public <S extends T> S find(ChainMatcher<T, S> matcher) {
+	public abstract void setNext(T tail);
+
+	@Override
+	public <S extends T> S find(Matcher<T, S> matcher) {
 		T candidate = getNext();
 		for (;;) {
 			if (candidate == null)
@@ -50,28 +43,36 @@ public class ChainImpl<T extends Chain<T>> implements Chain<T> {
 		}
 	}
 
-	/** Warning: potentially unbounded recursion; use only with small chains! */
 	@Override
-	public <S extends T> S remove(ChainMatcher<T, S> matcher) {
-		T candidate = tail_;
-		if (candidate == null)
-			return null;
-		S match = matcher.match(candidate);
-		if (match != null) {
-			tail_ = candidate.getNext();
-			return match;
+	public <S extends T> S getCreate(Matcher<T, S> matcher) {
+		T candidate = getNext();
+		for (;;) {
+			if (candidate == null) {
+				S result = matcher.create(getNext());
+				setNext(result);
+				return result;
+			}
+			S match = matcher.match(candidate);
+			if (match != null)
+				return match;
+			candidate = candidate.getNext();
 		}
-		return candidate.remove(matcher);
 	}
 
 	@Override
-	public <S extends T> S getCreate(ChainMatcher<T, S> matcher) {
-		S result = find(matcher);
-		if (result != null)
-			return result;
-		result = matcher.createNew(tail_);
-		tail_ = result;
-		return result;
+	public <S extends T> S remove(Matcher<T, S> matcher) {
+		Reference<T> point = this;
+		for (;;) {
+			T next = point.getNext();
+			if (next == null)
+				return null;
+			S match = matcher.match(next);
+			if (match != null) {
+				point.setNext(next.getNext());
+				return match;
+			}
+			point = next;
+		}
 	}
 
 }

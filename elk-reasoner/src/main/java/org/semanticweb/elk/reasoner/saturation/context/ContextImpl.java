@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.indexing.rules.Chain;
+import org.semanticweb.elk.reasoner.saturation.rules.AbstractChain;
+import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -54,6 +54,8 @@ public class ContextImpl extends AbstractContext implements Context {
 	Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty;
 
 	Set<IndexedDisjointnessAxiom> disjointnessAxioms;
+
+	BackwardLinkRules backwardLinkRules;
 
 	/**
 	 * A context is saturated if all superclass expressions of the root
@@ -145,8 +147,23 @@ public class ContextImpl extends AbstractContext implements Context {
 	}
 
 	@Override
-	public Chain<BackwardLinkRules> getBackwardLinkRules() {
-		return this;
+	public AbstractChain<BackwardLinkRules> getChainBackwardLinkRules() {
+		return new AbstractChain<BackwardLinkRules>() {
+
+			@Override
+			public BackwardLinkRules getNext() {
+				return backwardLinkRules;
+			}
+
+			@Override
+			public void setNext(BackwardLinkRules tail) {
+				backwardLinkRules = tail;
+			}
+		};
 	}
 
+	@Override
+	public BackwardLinkRules getBackwardLinkRules() {
+		return backwardLinkRules;
+	}
 }

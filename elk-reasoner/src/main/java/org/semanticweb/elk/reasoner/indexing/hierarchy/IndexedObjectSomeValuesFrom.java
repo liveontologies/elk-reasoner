@@ -27,11 +27,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
-import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
-import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
@@ -39,6 +34,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.Chain;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.Matcher;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -118,15 +118,18 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	public void registerCompositionRule() {
-		filler.getCreate(ThisCompositionRule.MATCHER_).addNegExistential(this);
+		filler.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_)
+				.addNegExistential(this);
 	}
 
 	public void deregisterCompositionRule() {
-		ThisCompositionRule rule = filler.find(ThisCompositionRule.MATCHER_);
+		Chain<ContextRules> rules = filler.getChainCompositionRules();
+		ThisCompositionRule rule = rules.find(ThisCompositionRule.MATCHER_);
 		if (rule != null) {
 			rule.removeNegExistential(this);
 			if (rule.isEmpty())
-				filler.remove(ThisCompositionRule.MATCHER_);
+				rules.remove(ThisCompositionRule.MATCHER_);
 		} else {
 			// TODO: throw/log something, this should never happen
 		}
@@ -140,16 +143,15 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		ruleEngine.derive(ruleEngine.getCreateContext(filler),
+		ruleEngine.produce(ruleEngine.getCreateContext(filler),
 				new BackwardLink(property, context));
 	}
 
-	private static class ThisCompositionRule extends
-			ChainImpl<CompositionRules> implements CompositionRules {
+	private static class ThisCompositionRule extends ContextRules {
 
 		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
-		ThisCompositionRule(CompositionRules tail) {
+		ThisCompositionRule(ContextRules tail) {
 			super(tail);
 			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(
 					1);
@@ -212,7 +214,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 				// propagating to the this context if relation is relflexive
 				if (relation.getSaturated().isReflexive())
-					ruleEngine.derive(context,
+					ruleEngine.produce(context,
 							new NegativeSuperClassExpression(e));
 			}
 
@@ -225,7 +227,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				LOGGER_.trace(context.getRoot() + ": new propagation "
 						+ propRelation + "->" + carry);
 
-			if (context.getBackwardLinkRules()
+			if (context.getChainBackwardLinkRules()
 					.getCreate(ThisBackwardLinkRule.MATCHER_)
 					.addPropagationByObjectProperty(propRelation, carry)) {
 				// propagate over all backward links
@@ -235,20 +237,20 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				Collection<Context> targets = backLinks.get(propRelation);
 
 				for (Context target : targets)
-					ruleEngine.derive(target, carry);
+					ruleEngine.produce(target, carry);
 			}
 
 		}
 
-		private static ChainMatcher<CompositionRules, ThisCompositionRule> MATCHER_ = new ChainMatcher<CompositionRules, ThisCompositionRule>() {
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
 
 			@Override
-			public ThisCompositionRule createNew(CompositionRules tail) {
+			public ThisCompositionRule create(ContextRules tail) {
 				return new ThisCompositionRule(tail);
 			}
 
 			@Override
-			public ThisCompositionRule match(CompositionRules chain) {
+			public ThisCompositionRule match(ContextRules chain) {
 				if (chain instanceof ThisCompositionRule)
 					return (ThisCompositionRule) chain;
 				else
@@ -259,8 +261,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	}
 
-	private static class ThisBackwardLinkRule extends
-			ChainImpl<BackwardLinkRules> implements BackwardLinkRules {
+	private static class ThisBackwardLinkRule extends BackwardLinkRules {
 
 		private final Multimap<IndexedPropertyChain, Conclusion> propagationsByObjectProperty_;
 
@@ -279,13 +280,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
 			for (Conclusion carry : propagationsByObjectProperty_.get(link
 					.getReltaion()))
-				ruleEngine.derive(link.getTarget(), carry);
+				ruleEngine.produce(link.getTarget(), carry);
 		}
 
-		private static ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule>() {
+		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, ThisBackwardLinkRule>() {
 
 			@Override
-			public ThisBackwardLinkRule createNew(BackwardLinkRules tail) {
+			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
 				return new ThisBackwardLinkRule(tail);
 			}
 

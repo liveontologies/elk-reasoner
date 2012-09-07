@@ -25,11 +25,12 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
-import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.AbstractChain;
+import org.semanticweb.elk.reasoner.saturation.rules.Chain;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -48,8 +49,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  */
-abstract public class IndexedClassExpression extends
-		ChainImpl<CompositionRules> {
+abstract public class IndexedClassExpression {
 
 	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
 
@@ -65,6 +65,8 @@ abstract public class IndexedClassExpression extends
 	 * 
 	 */
 	// protected List<IndexedDisjointnessAxiom> disjointnessAxioms;
+
+	ContextRules compositionRules;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -261,6 +263,24 @@ abstract public class IndexedClassExpression extends
 	}
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
+
+	Chain<ContextRules> getChainCompositionRules() {
+		return new AbstractChain<ContextRules>() {
+			@Override
+			public ContextRules getNext() {
+				return compositionRules;
+			}
+
+			@Override
+			public void setNext(ContextRules tail) {
+				compositionRules = tail;
+			}
+		};
+	}
+
+	public ContextRules getCompositionRules() {
+		return compositionRules;
+	}
 
 	@Override
 	public abstract String toString();

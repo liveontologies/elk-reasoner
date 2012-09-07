@@ -27,8 +27,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 
 /**
@@ -45,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-public class AbstractContext extends ChainImpl<BackwardLinkRules> {
+public class AbstractContext {
 
 	/**
 	 * The root expression that this context relates to.

@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
-import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
-import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.Chain;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.Matcher;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -53,23 +53,22 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	}
 
 	public void registerCompositionRule() {
-		subClass.getCreate(ThisCompositionRule.MATCHER_)
+		subClass.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_)
 				.addToldSuperClassExpression(superClass);
 	}
 
 	public void deregisterCompositionRule() {
-		ThisCompositionRule rule = subClass.find(ThisCompositionRule.MATCHER_);
-		if (rule != null) {
-			rule.removeToldSuperClassExpression(superClass);
-			if (rule.isEmpty())
-				subClass.remove(ThisCompositionRule.MATCHER_);
-		} else {
-			// TODO: throw/log something, this should never happen
-		}
+		Chain<ContextRules> compositionRules = subClass
+				.getChainCompositionRules();
+		ThisCompositionRule rule = compositionRules
+				.find(ThisCompositionRule.MATCHER_);
+		rule.removeToldSuperClassExpression(superClass);
+		if (rule.isEmpty())
+			compositionRules.remove(ThisCompositionRule.MATCHER_);
 	}
 
-	private static class ThisCompositionRule extends
-			ChainImpl<CompositionRules> implements CompositionRules {
+	private static class ThisCompositionRule extends ContextRules {
 
 		/**
 		 * Correctness of axioms deletions requires that
@@ -77,7 +76,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		 */
 		private List<IndexedClassExpression> toldSuperClassExpressions_;
 
-		ThisCompositionRule(CompositionRules tail) {
+		ThisCompositionRule(ContextRules tail) {
 			super(tail);
 			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
 					1);
@@ -108,18 +107,18 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		public void apply(RuleEngine ruleEngine, Context context) {
 
 			for (IndexedClassExpression implied : toldSuperClassExpressions_)
-				ruleEngine.derive(context, new PositiveSuperClassExpression(
+				ruleEngine.produce(context, new PositiveSuperClassExpression(
 						implied));
 		}
 
-		private static ChainMatcher<CompositionRules, ThisCompositionRule> MATCHER_ = new ChainMatcher<CompositionRules, ThisCompositionRule>() {
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule createNew(CompositionRules tail) {
+			public ThisCompositionRule create(ContextRules tail) {
 				return new ThisCompositionRule(tail);
 			}
 
 			@Override
-			public ThisCompositionRule match(CompositionRules chain) {
+			public ThisCompositionRule match(ContextRules chain) {
 				if (chain instanceof ThisCompositionRule)
 					return (ThisCompositionRule) chain;
 				else

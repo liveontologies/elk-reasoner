@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.rules;
+package org.semanticweb.elk.reasoner.saturation.rules;
 /*
  * #%L
  * ELK Reasoner
@@ -21,14 +21,25 @@ package org.semanticweb.elk.reasoner.indexing.rules;
  * #L%
  */
 
-public interface Chain<T extends Chain<T>> {
+public class ChainImpl<T extends Reference<T>> extends AbstractChain<T> {
 
-	T getNext();
+	private T tail_ = null;
 
-	<S extends T> S find(ChainMatcher<T, S> matcher);
+	public ChainImpl() {
+	}
 
-	<S extends T> S remove(ChainMatcher<T, S> matcher);
+	public ChainImpl(T tail) {
+		this.tail_ = tail;
+	}
 
-	<S extends T> S getCreate(ChainMatcher<T, S> matcher);
+	@Override
+	public T getNext() {
+		return tail_;
+	}
+
+	@Override
+	public void setNext(T tail) {
+		tail_ = tail;
+	}
 
 }

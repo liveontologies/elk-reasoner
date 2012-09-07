@@ -23,9 +23,9 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
 /**
  * A {@link SuperClassExpression} to which composition rules should be applied.
@@ -48,13 +48,13 @@ public class NegativeSuperClassExpression extends SuperClassExpression {
 			return;
 
 		// applying all composition rules
-		CompositionRules rules = expression.getNext();
+		ContextRules compositionRule = expression.getCompositionRules();
 
 		for (;;) {
-			if (rules == null)
+			if (compositionRule == null)
 				return;
-			rules.apply(ruleEngine, context);
-			rules = rules.getNext();
+			compositionRule.apply(ruleEngine, context);
+			compositionRule = compositionRule.getNext();
 		}
 
 	}

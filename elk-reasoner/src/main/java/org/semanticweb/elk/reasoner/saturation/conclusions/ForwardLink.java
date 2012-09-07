@@ -25,11 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
-import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
-import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.Matcher;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -55,7 +54,7 @@ public class ForwardLink implements Conclusion {
 		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.forwLinkInfNo++;
 
-		if (!context.getBackwardLinkRules()
+		if (!context.getChainBackwardLinkRules()
 				.getCreate(ThisBackwardLinkRule.MATCHER_)
 				.addForwardLinkByObjectProperty(relation_, target_))
 			return;
@@ -78,14 +77,13 @@ public class ForwardLink implements Conclusion {
 
 			for (IndexedPropertyChain composition : compositions)
 				for (Context backwardTarget : backwardTargets) {
-					ruleEngine.derive(target_, new BackwardLink(composition,
+					ruleEngine.produce(target_, new BackwardLink(composition,
 							backwardTarget));
 				}
 		}
 	}
 
-	private static class ThisBackwardLinkRule extends
-			ChainImpl<BackwardLinkRules> implements BackwardLinkRules {
+	private static class ThisBackwardLinkRule extends BackwardLinkRules {
 
 		private final Multimap<IndexedPropertyChain, Context> forwardLinksByObjectProperty_;
 
@@ -120,15 +118,15 @@ public class ForwardLink implements Conclusion {
 
 				for (IndexedPropertyChain composition : compositions)
 					for (Context forwardTarget : forwardTargets)
-						ruleEngine.derive(forwardTarget, new BackwardLink(
+						ruleEngine.produce(forwardTarget, new BackwardLink(
 								composition, target));
 			}
 		}
 
-		private static ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule>() {
+		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, ThisBackwardLinkRule>() {
 
 			@Override
-			public ThisBackwardLinkRule createNew(BackwardLinkRules tail) {
+			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
 				return new ThisBackwardLinkRule(tail);
 			}
 

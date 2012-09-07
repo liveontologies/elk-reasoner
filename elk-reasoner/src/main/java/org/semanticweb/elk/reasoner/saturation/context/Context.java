@@ -27,9 +27,9 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.indexing.rules.Chain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.rules.AbstractChain;
+import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
 import org.semanticweb.elk.util.collections.Multimap;
 
 public interface Context {
@@ -72,7 +72,9 @@ public interface Context {
 
 	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty();
 
-	public Chain<BackwardLinkRules> getBackwardLinkRules();
+	public AbstractChain<BackwardLinkRules> getChainBackwardLinkRules();
+
+	public BackwardLinkRules getBackwardLinkRules();
 
 	public boolean addBackwardLinkByObjectProperty(
 			IndexedPropertyChain relation, Context target);

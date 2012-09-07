@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.rules;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
 /*
  * #%L
@@ -22,10 +22,24 @@ package org.semanticweb.elk.reasoner.indexing.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+/**
+ * A sequence of elements that can be accessed one after another and also can be
+ * searched, removed and added using an instance of {@link Matcher} for
+ * identifying elements. Essentially, this is just a link list with some
+ * enhancements.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the types of the elements in the sequence
+ * @see Matcher
+ */
+public interface Chain<T extends Reference<T>> extends Reference<T> {
 
-public interface BackwardLinkRules extends Chain<BackwardLinkRules> {
+	public <S extends T> S find(Matcher<T, S> matcher);
 
-	public void apply(RuleEngine ruleEngine, BackwardLink link);
+	public <S extends T> S getCreate(Matcher<T, S> matcher);
+
+	public <S extends T> S remove(Matcher<T, S> matcher);
 
 }

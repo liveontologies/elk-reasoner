@@ -1,7 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions;
-
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
 /*
  * #%L
@@ -25,8 +22,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
  * #L%
  */
 
-public interface Conclusion {
+public interface Matcher<C, T> {
 
-	public void process(Context context, RuleEngine ruleEngine);
+	T match(C chain);
+	
+	T create(C chain);
 
 }

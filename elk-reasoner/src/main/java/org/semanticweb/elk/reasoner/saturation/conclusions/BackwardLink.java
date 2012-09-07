@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
@@ -66,7 +66,7 @@ public class BackwardLink implements Conclusion {
 		statistics.backLinkNo++;
 
 		// apply all backward link rules of the context
-		BackwardLinkRules rules = context.getBackwardLinkRules().getNext();
+		BackwardLinkRules rules = context.getBackwardLinkRules();
 
 		while (rules != null) {
 			rules.apply(ruleEngine, this);
@@ -83,7 +83,7 @@ public class BackwardLink implements Conclusion {
 				&& !new LazySetIntersection<IndexedPropertyChain>(
 						toldProperties, relation_.getSaturated()
 								.getLeftComposableProperties()).isEmpty()) {
-			ruleEngine.derive(target_, new ForwardLink(relation_, context));
+			ruleEngine.produce(target_, new ForwardLink(relation_, context));
 		}
 
 	}

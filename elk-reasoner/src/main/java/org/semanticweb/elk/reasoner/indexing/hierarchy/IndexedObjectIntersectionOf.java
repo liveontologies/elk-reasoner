@@ -24,15 +24,15 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Map;
 
-import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
-import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
-import org.semanticweb.elk.reasoner.indexing.rules.CompositionRules;
-import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.Chain;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.Matcher;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
@@ -79,7 +79,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			registerCompositionRules();
+			registerContextRules();
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -87,7 +87,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
-			deregisterCompositionRules();
+			deregisterContextRules();
 		}
 
 	}
@@ -100,45 +100,46 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		ruleEngine.derive(context, new PositiveSuperClassExpression(
+		ruleEngine.produce(context, new PositiveSuperClassExpression(
 				firstConjunct));
-		ruleEngine.derive(context, new PositiveSuperClassExpression(
+		ruleEngine.produce(context, new PositiveSuperClassExpression(
 				secondConjunct));
 	}
 
-	public void registerCompositionRules() {
-		firstConjunct.getCreate(ThisCompositionRule.MATCHER_)
+	public void registerContextRules() {
+		firstConjunct.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_)
 				.addConjunctionByConjunct(this, secondConjunct);
-		secondConjunct.getCreate(ThisCompositionRule.MATCHER_)
+		secondConjunct.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_)
 				.addConjunctionByConjunct(this, firstConjunct);
 	}
 
-	public void deregisterCompositionRules() {
+	public void deregisterContextRules() {
 		deregister(ThisCompositionRule.MATCHER_, firstConjunct, secondConjunct);
 		deregister(ThisCompositionRule.MATCHER_, secondConjunct, firstConjunct);
 	}
 
 	@SuppressWarnings("static-method")
-	private void deregister(
-			ChainMatcher<CompositionRules, ThisCompositionRule> matcher,
+	private void deregister(Matcher<ContextRules, ThisCompositionRule> matcher,
 			IndexedClassExpression conjunctOne,
 			IndexedClassExpression conjunctTwo) {
-		ThisCompositionRule rule = conjunctOne.find(matcher);
+		Chain<ContextRules> rules = conjunctOne.getChainCompositionRules();
+		ThisCompositionRule rule = rules.find(matcher);
 		if (rule != null) {
 			rule.removeConjunctionByConjunct(conjunctTwo);
 			if (rule.isEmpty())
-				conjunctOne.remove(matcher);
+				rules.remove(matcher);
 		} else {
 			// TODO: throw/log something, this should never happen
 		}
 	}
 
-	private static class ThisCompositionRule extends
-			ChainImpl<CompositionRules> implements CompositionRules {
+	private static class ThisCompositionRule extends ContextRules {
 
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
-		ThisCompositionRule(CompositionRules tail) {
+		ThisCompositionRule(ContextRules tail) {
 			super(tail);
 			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);
@@ -166,18 +167,18 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 					conjunctionsByConjunct_.keySet(),
 					context.getSuperClassExpressions()))
-				ruleEngine.derive(context, new NegativeSuperClassExpression(
+				ruleEngine.produce(context, new NegativeSuperClassExpression(
 						conjunctionsByConjunct_.get(common)));
 		}
 
-		private static ChainMatcher<CompositionRules, ThisCompositionRule> MATCHER_ = new ChainMatcher<CompositionRules, ThisCompositionRule>() {
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule createNew(CompositionRules tail) {
+			public ThisCompositionRule create(ContextRules tail) {
 				return new ThisCompositionRule(tail);
 			}
 
 			@Override
-			public ThisCompositionRule match(CompositionRules chain) {
+			public ThisCompositionRule match(ContextRules chain) {
 				if (chain instanceof ThisCompositionRule)
 					return (ThisCompositionRule) chain;
 				else

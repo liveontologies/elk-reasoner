@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rulesystem;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
 import java.util.Collection;
 import java.util.Queue;
@@ -33,13 +33,12 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory.Engine;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -249,7 +248,8 @@ public class RuleApplicationFactory implements
 		 * @param item
 		 *            the item to be processed in the given context
 		 */
-		public void enqueue(Context context, Conclusion item) {
+		@Override
+		public void produce(Context context, Conclusion item) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
 			context.getToDo().add(item);
@@ -287,19 +287,14 @@ public class RuleApplicationFactory implements
 		}
 
 		@Override
-		public void derive(Context context, Conclusion conclusion) {
-			enqueue(context, conclusion);
-		}
-
-		@Override
 		public void initContext(Context context) {
-			// TODO: generalize this
-			enqueue(context,
+			produce(context,
 					new PositiveSuperClassExpression(context.getRoot()));
-
+			// TODO: register this as a ContextRule when owlThing occurs
+			// negative and apply all such context initialization rules here
 			IndexedClassExpression owlThing = getOwlThing();
 			if (owlThing.occursNegatively())
-				enqueue(context, new PositiveSuperClassExpression(owlThing));
+				produce(context, new PositiveSuperClassExpression(owlThing));
 		}
 
 	}

@@ -1,4 +1,5 @@
-package org.semanticweb.elk.reasoner.indexing.rules;
+package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,10 +22,14 @@ package org.semanticweb.elk.reasoner.indexing.rules;
  * #L%
  */
 
-public interface ChainMatcher<C, T> {
+public interface Reference<T> {
 
-	T createNew(C tail);
+	/**
+	 * @return the next element in the chain or {@code null} if there is no next
+	 *         element
+	 */
+	T getNext();
 
-	T match(C chain);
+	void setNext(T next);
 
 }
