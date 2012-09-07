@@ -22,9 +22,17 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import java.util.Collection;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
+import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.util.collections.HashSetMultimap;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * @author Frantisek Simancik
@@ -47,10 +55,93 @@ public class ForwardLink implements Conclusion {
 		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.forwLinkInfNo++;
 
-		if (!context.addForwardLinkByObjectProperty(relation_, target_))
+		if (!context.getBackwardLinkRules()
+				.getCreate(ThisBackwardLinkRule.MATCHER_)
+				.addForwardLinkByObjectProperty(relation_, target_))
 			return;
 
 		statistics.forwLinkNo++;
+
+		/* compose the link with all backward links */
+		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
+				.getSaturated().getCompositionsByLeftSubProperty();
+		final Multimap<IndexedPropertyChain, Context> backLinks = context
+				.getBackwardLinksByObjectProperty();
+
+		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+				comps.keySet(), backLinks.keySet())) {
+
+			Collection<IndexedPropertyChain> compositions = comps
+					.get(backwardRelation);
+			Collection<Context> backwardTargets = backLinks
+					.get(backwardRelation);
+
+			for (IndexedPropertyChain composition : compositions)
+				for (Context backwardTarget : backwardTargets) {
+					ruleEngine.derive(target_, new BackwardLink(composition,
+							backwardTarget));
+				}
+		}
+	}
+
+	private static class ThisBackwardLinkRule extends
+			ChainImpl<BackwardLinkRules> implements BackwardLinkRules {
+
+		private final Multimap<IndexedPropertyChain, Context> forwardLinksByObjectProperty_;
+
+		ThisBackwardLinkRule(BackwardLinkRules tail) {
+			super(tail);
+			this.forwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
+		}
+
+		private boolean addForwardLinkByObjectProperty(
+				IndexedPropertyChain propRelation, Context target) {
+			return forwardLinksByObjectProperty_.add(propRelation, target);
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, BackwardLink link) {
+			/* compose the link with all forward links */
+			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
+					.getReltaion().getSaturated()
+					.getCompositionsByRightSubProperty();
+			if (comps == null)
+				return;
+
+			Context target = link.getTarget();
+
+			for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+					comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
+
+				Collection<IndexedPropertyChain> compositions = comps
+						.get(forwardRelation);
+				Collection<Context> forwardTargets = forwardLinksByObjectProperty_
+						.get(forwardRelation);
+
+				for (IndexedPropertyChain composition : compositions)
+					for (Context forwardTarget : forwardTargets)
+						ruleEngine.derive(forwardTarget, new BackwardLink(
+								composition, target));
+			}
+		}
+
+		private static ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule>() {
+
+			@Override
+			public ThisBackwardLinkRule createNew(BackwardLinkRules tail) {
+				return new ThisBackwardLinkRule(tail);
+			}
+
+			@Override
+			public ThisBackwardLinkRule match(BackwardLinkRules chain) {
+				if (chain instanceof ThisBackwardLinkRule)
+					return (ThisBackwardLinkRule) chain;
+				else
+					return null;
+			}
+
+		};
+
 	}
 
 }

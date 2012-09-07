@@ -22,10 +22,13 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import java.util.Set;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
  * @author Frantisek Simancik
@@ -62,25 +65,26 @@ public class BackwardLink implements Conclusion {
 
 		statistics.backLinkNo++;
 
-//		final IndexedPropertyChain linkRelation = relation_;
-		final Context target = target_;
-
 		// apply all backward link rules of the context
 		BackwardLinkRules rules = context.getBackwardLinkRules().getNext();
 
 		while (rules != null) {
-			rules.apply(ruleEngine, context, this);
+			rules.apply(ruleEngine, this);
 			rules = rules.getNext();
 		}
 
-//		for (Conclusion carry : context.getPropagationsByObjectProperty().get(
-//				linkRelation))
-//			ruleEngine.derive(target, carry);
-
-		// propagate unsatisfiability over the link
-		if (!context.isSatisfiable())
-			ruleEngine.derive(target, new PositiveSuperClassExpression(
-					ruleEngine.getOwlNothing()));
+		/*
+		 * convert backward link to a forward link if it can potentially be
+		 * composed
+		 */
+		Set<IndexedPropertyChain> toldProperties = target_.getRoot()
+				.getPosPropertiesInExistentials();
+		if (toldProperties != null
+				&& !new LazySetIntersection<IndexedPropertyChain>(
+						toldProperties, relation_.getSaturated()
+								.getLeftComposableProperties()).isEmpty()) {
+			ruleEngine.derive(target_, new ForwardLink(relation_, context));
+		}
 
 	}
 

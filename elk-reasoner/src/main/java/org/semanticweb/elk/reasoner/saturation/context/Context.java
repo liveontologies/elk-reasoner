@@ -77,9 +77,6 @@ public interface Context {
 	public boolean addBackwardLinkByObjectProperty(
 			IndexedPropertyChain relation, Context target);
 
-	public boolean addForwardLinkByObjectProperty(
-			IndexedPropertyChain relation, Context target);
-
 	public boolean addSuperClassExpression(IndexedClassExpression expression);
 
 	public void setSatisfiable(boolean b);

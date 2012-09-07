@@ -50,7 +50,11 @@ public class CLIDiffRealizationCorrectnessTest extends
 		DiffRealizationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = { "BasicABox.owl", "Inconsistent.owl" };
-	
+
+	static {
+		Arrays.sort(IGNORE_LIST);
+	}
+
 	public CLIDiffRealizationCorrectnessTest(
 			final ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
 		super(testManifest);
@@ -66,7 +70,7 @@ public class CLIDiffRealizationCorrectnessTest extends
 		reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 		return reasoner;
 	}
-	
+
 	@Override
 	protected boolean ignore(TestInput input) {
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;

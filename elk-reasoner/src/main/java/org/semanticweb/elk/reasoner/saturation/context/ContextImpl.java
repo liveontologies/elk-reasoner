@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
 
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -45,11 +46,12 @@ import org.semanticweb.elk.util.collections.Operations;
  */
 public class ContextImpl extends AbstractContext implements Context {
 
+	// logger for this class
+	private static final Logger LOGGER_ = Logger.getLogger(ContextImpl.class);
+
 	final Set<IndexedClassExpression> superClassExpressions;
 
 	Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty;
-
-	Multimap<IndexedPropertyChain, Context> forwardLinksByObjectProperty;
 
 	Set<IndexedDisjointnessAxiom> disjointnessAxioms;
 
@@ -91,12 +93,6 @@ public class ContextImpl extends AbstractContext implements Context {
 		return backwardLinksByObjectProperty;
 	}
 
-	public Multimap<IndexedPropertyChain, Context> getForwardLinksByObjectProperty() {
-		if (forwardLinksByObjectProperty == null)
-			return Operations.emptyMultimap();
-		return forwardLinksByObjectProperty;
-	}
-
 	public boolean addDisjointessAxiom(
 			IndexedDisjointnessAxiom disjointnessAxiom) {
 		if (disjointnessAxioms == null)
@@ -130,21 +126,21 @@ public class ContextImpl extends AbstractContext implements Context {
 	@Override
 	public boolean addBackwardLinkByObjectProperty(
 			IndexedPropertyChain relation, Context target) {
+		if (target.isSaturated())
+			LOGGER_.error(getRoot()
+					+ ": adding a backward link to a saturated context: "
+					+ relation + "<-" + target.getRoot());
 		if (backwardLinksByObjectProperty == null)
 			backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Context>();
 		return backwardLinksByObjectProperty.add(relation, target);
 	}
 
 	@Override
-	public boolean addForwardLinkByObjectProperty(
-			IndexedPropertyChain relation, Context target) {
-		if (forwardLinksByObjectProperty == null)
-			forwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Context>();
-		return forwardLinksByObjectProperty.add(relation, target);
-	}
-
-	@Override
 	public boolean addSuperClassExpression(IndexedClassExpression expression) {
+		if (isSaturated)
+			LOGGER_.error(getRoot()
+					+ ": adding a superclass to a saturated context: "
+					+ expression);
 		return superClassExpressions.add(expression);
 	}
 

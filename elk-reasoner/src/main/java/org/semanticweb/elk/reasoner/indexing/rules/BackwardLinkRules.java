@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,10 +23,9 @@ package org.semanticweb.elk.reasoner.indexing.rules;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 public interface BackwardLinkRules extends Chain<BackwardLinkRules> {
 
-	public void apply(RuleEngine ruleEngine, Context context, BackwardLink link);
+	public void apply(RuleEngine ruleEngine, BackwardLink link);
 
 }

@@ -25,9 +25,13 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.indexing.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.indexing.rules.ChainImpl;
+import org.semanticweb.elk.reasoner.indexing.rules.ChainMatcher;
 import org.semanticweb.elk.reasoner.indexing.rules.RuleEngine;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -91,7 +95,7 @@ public class IndexedClass extends IndexedClassEntity {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		if (ruleEngine.getOwlNothing() == this) {
+		if (this.equals(ruleEngine.getOwlNothing())) {
 			context.setSatisfiable(false);
 
 			// propagating bottom to the predecessors
@@ -107,19 +111,49 @@ public class IndexedClass extends IndexedClassEntity {
 				for (Context target : targets)
 					ruleEngine.derive(target, carry);
 			}
+
+			// register the backward link rule for propagation of bottom
+			context.getBackwardLinkRules().getCreate(
+					BottomBackwardLinkRule.MATCHER_);
 		}
 	}
 
-	/**
-	 * Represent the object's ElkClass as a string. This implementation reflects
-	 * the fact that we generally consider only one IndexedClass for each
-	 * ElkClass.
-	 * 
-	 * @return String representation.
-	 */
 	@Override
 	public String toString() {
 		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
+	}
+
+	private static class BottomBackwardLinkRule extends
+			ChainImpl<BackwardLinkRules> implements BackwardLinkRules {
+
+		BottomBackwardLinkRule(BackwardLinkRules tail) {
+			super(tail);
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, BackwardLink link) {
+			ruleEngine
+					.derive(link.getTarget(), new PositiveSuperClassExpression(
+							ruleEngine.getOwlNothing()));
+		}
+
+		private static ChainMatcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new ChainMatcher<BackwardLinkRules, BottomBackwardLinkRule>() {
+
+			@Override
+			public BottomBackwardLinkRule createNew(BackwardLinkRules tail) {
+				return new BottomBackwardLinkRule(tail);
+			}
+
+			@Override
+			public BottomBackwardLinkRule match(BackwardLinkRules chain) {
+				if (chain instanceof BottomBackwardLinkRule)
+					return (BottomBackwardLinkRule) chain;
+				else
+					return null;
+			}
+
+		};
+
 	}
 
 }

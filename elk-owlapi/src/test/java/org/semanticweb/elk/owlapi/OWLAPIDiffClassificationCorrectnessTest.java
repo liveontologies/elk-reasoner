@@ -40,8 +40,7 @@ public class OWLAPIDiffClassificationCorrectnessTest extends
 		DiffClassificationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = { "DisjointSelf.owl",
-			"AssertionDisjoint.owl", "Disjoint.owl", "PropertyChains.owl",
-			"ReflexiveRole.owl", "endocarditis.owl", "forest.owl",
+			"AssertionDisjoint.owl", "Disjoint.owl", "ReflexiveRole.owl",
 			"kangaroo.owl" };
 
 	static {

@@ -118,17 +118,15 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	public void registerCompositionRule() {
-		ThisCompositionRule.Matcher matcher = new ThisCompositionRule.Matcher();
-		filler.getCreate(matcher).addNegExistential(this);
+		filler.getCreate(ThisCompositionRule.MATCHER_).addNegExistential(this);
 	}
 
 	public void deregisterCompositionRule() {
-		ThisCompositionRule.Matcher matcher = new ThisCompositionRule.Matcher();
-		ThisCompositionRule rule = filler.find(matcher);
+		ThisCompositionRule rule = filler.find(ThisCompositionRule.MATCHER_);
 		if (rule != null) {
 			rule.removeNegExistential(this);
 			if (rule.isEmpty())
-				filler.remove(matcher);
+				filler.remove(ThisCompositionRule.MATCHER_);
 		} else {
 			// TODO: throw/log something, this should never happen
 		}
@@ -227,8 +225,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				LOGGER_.trace(context.getRoot() + ": new propagation "
 						+ propRelation + "->" + carry);
 
-			ThisBackwardLinkRule.Matcher matcher = new ThisBackwardLinkRule.Matcher();
-			if (context.getBackwardLinkRules().getCreate(matcher)
+			if (context.getBackwardLinkRules()
+					.getCreate(ThisBackwardLinkRule.MATCHER_)
 					.addPropagationByObjectProperty(propRelation, carry)) {
 				// propagate over all backward links
 				final Multimap<IndexedPropertyChain, Context> backLinks = context
@@ -242,8 +240,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		}
 
-		private static class Matcher implements
-				ChainMatcher<CompositionRules, ThisCompositionRule> {
+		private static ChainMatcher<CompositionRules, ThisCompositionRule> MATCHER_ = new ChainMatcher<CompositionRules, ThisCompositionRule>() {
 
 			@Override
 			public ThisCompositionRule createNew(CompositionRules tail) {
@@ -258,7 +255,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					return null;
 			}
 
-		}
+		};
 
 	}
 
@@ -270,7 +267,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		ThisBackwardLinkRule(BackwardLinkRules tail) {
 			super(tail);
 			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Conclusion>(
-					3);
+					1);
 		}
 
 		private boolean addPropagationByObjectProperty(
@@ -279,15 +276,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context context,
-				BackwardLink link) {
+		public void apply(RuleEngine ruleEngine, BackwardLink link) {
 			for (Conclusion carry : propagationsByObjectProperty_.get(link
 					.getReltaion()))
 				ruleEngine.derive(link.getTarget(), carry);
 		}
 
-		private static class Matcher implements
-				ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule> {
+		private static ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new ChainMatcher<BackwardLinkRules, ThisBackwardLinkRule>() {
 
 			@Override
 			public ThisBackwardLinkRule createNew(BackwardLinkRules tail) {
@@ -302,7 +297,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					return null;
 			}
 
-		}
+		};
 
 	}
 

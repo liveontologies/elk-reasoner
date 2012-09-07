@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -52,24 +53,23 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	}
 
 	public void registerCompositionRule() {
-		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
-		subClass.getCreate(matcher).addToldSuperClassExpression(superClass);
+		subClass.getCreate(ThisCompositionRule.MATCHER_)
+				.addToldSuperClassExpression(superClass);
 	}
 
 	public void deregisterCompositionRule() {
-		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
-		ThisCompositionRule rule = subClass.find(matcher);
+		ThisCompositionRule rule = subClass.find(ThisCompositionRule.MATCHER_);
 		if (rule != null) {
 			rule.removeToldSuperClassExpression(superClass);
 			if (rule.isEmpty())
-				subClass.remove(matcher);
+				subClass.remove(ThisCompositionRule.MATCHER_);
 		} else {
 			// TODO: throw/log something, this should never happen
 		}
 	}
 
-	private static class ThisCompositionRule extends ChainImpl<CompositionRules>
-			implements CompositionRules {
+	private static class ThisCompositionRule extends
+			ChainImpl<CompositionRules> implements CompositionRules {
 
 		/**
 		 * Correctness of axioms deletions requires that
@@ -112,23 +112,20 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 						implied));
 		}
 
-	}
+		private static ChainMatcher<CompositionRules, ThisCompositionRule> MATCHER_ = new ChainMatcher<CompositionRules, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule createNew(CompositionRules tail) {
+				return new ThisCompositionRule(tail);
+			}
 
-	private class CompositionRuleMatcher implements
-			ChainMatcher<CompositionRules, ThisCompositionRule> {
-
-		@Override
-		public ThisCompositionRule createNew(CompositionRules tail) {
-			return new ThisCompositionRule(tail);
-		}
-
-		@Override
-		public ThisCompositionRule match(CompositionRules chain) {
-			if (chain instanceof ThisCompositionRule)
-				return (ThisCompositionRule) chain;
-			else
-				return null;
-		}
+			@Override
+			public ThisCompositionRule match(CompositionRules chain) {
+				if (chain instanceof ThisCompositionRule)
+					return (ThisCompositionRule) chain;
+				else
+					return null;
+			}
+		};
 
 	}
 

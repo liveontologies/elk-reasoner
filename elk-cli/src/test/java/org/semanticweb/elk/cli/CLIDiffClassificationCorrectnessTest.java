@@ -51,8 +51,11 @@ public class CLIDiffClassificationCorrectnessTest extends
 
 	static final String[] IGNORE_LIST = { "DisjointSelf.owl",
 			"AssertionDisjoint.owl", "Disjoint.owl", "DisjointSelf.owl",
-			"PropertyChains.owl", "ReflexiveRole.owl", "endocarditis.owl",
-			"forest.owl", "kangaroo.owl" };
+			"ReflexiveRole.owl", "kangaroo.owl" };
+
+	static {
+		Arrays.sort(IGNORE_LIST);
+	}
 
 	public CLIDiffClassificationCorrectnessTest(
 			final ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {

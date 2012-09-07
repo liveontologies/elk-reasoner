@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -242,7 +243,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				 * of the state until the job will be finished.
 				 */
 				if (candidateSaturation == null
-						|| candidateSaturation.isSaturated()) {
+						|| !candidateSaturation.isSaturated()) {
 					auxJobQueue.add(new SaturationJobSuperClass<R, J>(
 							candidate, state));
 					return;
@@ -261,9 +262,16 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			if (LOGGER_.isTraceEnabled()) {
 				R root = output.root;
 				LOGGER_.trace(root + ": transitive reduction finished");
+				for (ElkClass equivalent : output.equivalent) {
+					LOGGER_.trace(root + ": equivalent " + equivalent);
+				}
 				for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.directSuperClasses) {
-					LOGGER_.trace(root + ": direct super class "
-							+ direct.getRoot());
+					String message = root + ": direct super class ["
+							+ direct.getRoot();
+					for (ElkClass equivalent : direct.equivalent)
+						message = message + ", " + equivalent;
+					message = message + "]";
+					LOGGER_.trace(message);
 				}
 			}
 		}

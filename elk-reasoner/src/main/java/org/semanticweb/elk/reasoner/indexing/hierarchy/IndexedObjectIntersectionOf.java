@@ -107,21 +107,20 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	public void registerCompositionRules() {
-		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
-		firstConjunct.getCreate(matcher).addConjunctionByConjunct(this,
-				secondConjunct);
-		secondConjunct.getCreate(matcher).addConjunctionByConjunct(this,
-				firstConjunct);
+		firstConjunct.getCreate(ThisCompositionRule.MATCHER_)
+				.addConjunctionByConjunct(this, secondConjunct);
+		secondConjunct.getCreate(ThisCompositionRule.MATCHER_)
+				.addConjunctionByConjunct(this, firstConjunct);
 	}
 
 	public void deregisterCompositionRules() {
-		CompositionRuleMatcher matcher = new CompositionRuleMatcher();
-		deregister(matcher, firstConjunct, secondConjunct);
-		deregister(matcher, secondConjunct, firstConjunct);
+		deregister(ThisCompositionRule.MATCHER_, firstConjunct, secondConjunct);
+		deregister(ThisCompositionRule.MATCHER_, secondConjunct, firstConjunct);
 	}
 
 	@SuppressWarnings("static-method")
-	private void deregister(CompositionRuleMatcher matcher,
+	private void deregister(
+			ChainMatcher<CompositionRules, ThisCompositionRule> matcher,
 			IndexedClassExpression conjunctOne,
 			IndexedClassExpression conjunctTwo) {
 		ThisCompositionRule rule = conjunctOne.find(matcher);
@@ -134,8 +133,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 	}
 
-	private static class ThisCompositionRule extends ChainImpl<CompositionRules>
-			implements CompositionRules {
+	private static class ThisCompositionRule extends
+			ChainImpl<CompositionRules> implements CompositionRules {
 
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
@@ -171,24 +170,20 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 						conjunctionsByConjunct_.get(common)));
 		}
 
-	}
+		private static ChainMatcher<CompositionRules, ThisCompositionRule> MATCHER_ = new ChainMatcher<CompositionRules, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule createNew(CompositionRules tail) {
+				return new ThisCompositionRule(tail);
+			}
 
-	private class CompositionRuleMatcher implements
-			ChainMatcher<CompositionRules, ThisCompositionRule> {
-
-		@Override
-		public ThisCompositionRule createNew(CompositionRules tail) {
-			return new ThisCompositionRule(tail);
-		}
-
-		@Override
-		public ThisCompositionRule match(CompositionRules chain) {
-			if (chain instanceof ThisCompositionRule)
-				return (ThisCompositionRule) chain;
-			else
-				return null;
-		}
+			@Override
+			public ThisCompositionRule match(CompositionRules chain) {
+				if (chain instanceof ThisCompositionRule)
+					return (ThisCompositionRule) chain;
+				else
+					return null;
+			}
+		};
 
 	}
-
 }

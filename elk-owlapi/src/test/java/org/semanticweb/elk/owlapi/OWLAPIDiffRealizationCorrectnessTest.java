@@ -49,6 +49,10 @@ public class OWLAPIDiffRealizationCorrectnessTest extends
 
 	static final String[] IGNORE_LIST = { "BasicABox.owl", "Inconsistent.owl" };
 
+	static {
+		Arrays.sort(IGNORE_LIST);
+	}
+
 	public OWLAPIDiffRealizationCorrectnessTest(
 			final ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
 		super(testManifest);
@@ -59,7 +63,7 @@ public class OWLAPIDiffRealizationCorrectnessTest extends
 			Owl2ParseException {
 		return OWLAPITestUtils.createReasoner(input).getInternalReasoner();
 	}
-	
+
 	@Override
 	protected boolean ignore(TestInput input) {
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
