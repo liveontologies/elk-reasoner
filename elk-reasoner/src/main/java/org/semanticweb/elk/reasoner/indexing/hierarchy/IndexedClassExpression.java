@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -217,16 +216,16 @@ abstract public class IndexedClassExpression {
 	// TODO: replace pointers to contexts by a mapping
 
 	/**
-	 * Used for efficient retrieval of the Context corresponding to this class
-	 * expression.
+	 * /** the reference to a {@link Context} assigned to this
+	 * {@link IndexedClassExpression}
 	 */
-	protected final AtomicReference<Context> context = new AtomicReference<Context>();
+	private volatile Context context_ = null;
 
 	/**
 	 * @return The corresponding context, null if none was assigned.
 	 */
 	public Context getContext() {
-		return context.get();
+		return context_;
 	}
 
 	/**
@@ -239,14 +238,24 @@ abstract public class IndexedClassExpression {
 	 * @return {@code true} if the operation succeeded.
 	 */
 	public boolean setContext(Context context) {
-		return this.context.compareAndSet(null, context);
+		if (context_ != null)
+			return false;
+		synchronized (this) {
+			if (context_ != null)
+				return false;
+			context_ = context;
+		}
+		return true;
 	}
 
 	/**
 	 * Resets the corresponding context to null.
 	 */
 	public void resetContext() {
-		context.set(null);
+		if (context_ != null)
+			synchronized (this) {
+				context_ = null;
+			}
 	}
 
 	/** Hash code for this object. */

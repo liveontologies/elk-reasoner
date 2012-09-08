@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -162,7 +161,7 @@ public abstract class IndexedPropertyChain {
 	 * the reference to a {@link SaturatedPropertyChain} assigned to this
 	 * {@link IndexedPropertyChain}
 	 */
-	private final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
+	private volatile SaturatedPropertyChain saturated_ = null;
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
@@ -183,7 +182,7 @@ public abstract class IndexedPropertyChain {
 	 *         assigned.
 	 */
 	public SaturatedPropertyChain getSaturated() {
-		return saturated.get();
+		return saturated_;
 	}
 
 	/**
@@ -194,17 +193,29 @@ public abstract class IndexedPropertyChain {
 	 *            assign the given {@link SaturatedPropertyChain} to this
 	 *            {@link IndexedClassExpression}
 	 * 
-	 * @return {@code true} if the operation succeeded.
+	 * @return {@code true} if the operation succeeded. If this method is called
+	 *         for the same object from different threads with at the same time
+	 *         with non-null arguments, only one call returns {@code true}.
 	 */
 	public boolean setSaturated(SaturatedPropertyChain saturatedObjectProperty) {
-		return saturated.compareAndSet(null, saturatedObjectProperty);
+		if (saturated_ != null)
+			return false;
+		synchronized (this) {
+			if (saturated_ != null)
+				return false;
+			saturated_ = saturatedObjectProperty;
+		}
+		return true;
 	}
 
 	/**
 	 * Resets the corresponding {@code SaturatedObjecProperty} to {@code null}.
 	 */
 	public void resetSaturated() {
-		saturated.set(null);
+		if (saturated_ != null)
+			synchronized (this) {
+				saturated_ = null;
+			}
 	}
 
 	/** Hash code for this object. */
