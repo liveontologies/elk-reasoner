@@ -175,14 +175,14 @@ public class ObjectPropertyHierarchyComputationFactory implements
 				
 				if (compositionMultimap.add(next, chain)) {
 					
-					/*if (side == SIDE.LEFT && chain.getRightChains() == null) {
+					if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES && chain.getRightChains() == null) {
 					
 						for (IndexedPropertyChain superChain : chain.getToldSuperProperties()) {
 							compositionMultimap.add(next, superChain);
 						}
 						
 						compositionMultimap.remove(next, chain);
-					}*/					
+					}					
 					
 					addDirectSubProperties(next, queue, null);		
 				}

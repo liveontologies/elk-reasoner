@@ -98,9 +98,23 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> implements
 				if (!new LazySetIntersection<IndexedPropertyChain>(
 						candidatePropagationProperties,
 						propertySaturation.getRightSubProperties()).isEmpty()) {
-					addPropagation(property,
-							new NegativeSuperClassExpression<C>(e), context,
-							engine);
+					// create propagations for told super-properties of the chain
+					// instead of the chain itself if the optimization is on.
+					// otherwise a composed backward link will be created for a super-property
+					// while the propagation for the chain, so we can lose the entailment.
+					if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
+							&& property.getRightChains() == null) {
+						for (IndexedPropertyChain superChain : property
+								.getToldSuperProperties()) {
+							addPropagation(superChain,
+									new NegativeSuperClassExpression<C>(e),
+									context, engine);
+						}
+					} else {
+						addPropagation(property,
+								new NegativeSuperClassExpression<C>(e),
+								context, engine);
+					}
 				}
 			}
 

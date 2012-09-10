@@ -59,6 +59,9 @@ public class RuleRoleComposition<C extends ContextElClassSaturation> implements
 				&& !new LazySetIntersection<IndexedPropertyChain>(
 						toldProperties, linkRelation.getSaturated()
 								.getLeftComposableProperties()).isEmpty()) {
+			
+			//System.err.println("Forward link created at " + context.getRoot() + "\n" + target.getRoot() + " -> " + linkRelation + " -> " + context.getRoot());
+			
 			engine.enqueue(target, new ForwardLink<C>(linkRelation, context));
 		}
 
@@ -77,9 +80,14 @@ public class RuleRoleComposition<C extends ContextElClassSaturation> implements
 						.get(forwardRelation);
 
 				for (IndexedPropertyChain composition : compositions)
-					for (ContextElClassSaturation forwardTarget : forwardTargets)
+					for (ContextElClassSaturation forwardTarget : forwardTargets) {
+						
+						//System.err.println("F: Backward link composed at " + context.getRoot()  + "\n" + forwardTarget.getRoot() + " -> " + composition + " -> " + target.getRoot() + "\n" +
+						//composition.getToldSuperProperties());						
+						
 						engine.enqueue(forwardTarget, new BackwardLink<C>(
 								composition, target));
+					}
 			}
 		}
 
@@ -108,6 +116,9 @@ public class RuleRoleComposition<C extends ContextElClassSaturation> implements
 
 				for (IndexedPropertyChain composition : compositions)
 					for (ContextElClassSaturation backwardTarget : backwardTargets) {
+						
+						//System.err.println("B: Backward link composed at " + context.getRoot()  + "\n" + target.getRoot() + " -> " + composition + " -> " + backwardTarget.getRoot());
+						
 						engine.enqueue(target,
 								new BackwardLink<ContextElClassSaturation>(
 										composition, backwardTarget));

@@ -45,6 +45,16 @@ import org.semanticweb.elk.util.collections.Multimap;
  */
 public class SaturatedPropertyChain {
 	
+	/**
+	 * If set to true, then binary property chains that do not occur on the
+	 * right of another chain are skipped in the derivation and replaced
+	 * directly by all their told super-properties. For example, given an
+	 * inclusion SubObjectPropertyOf(ObjectPropertyChain(R1 R2) R), the
+	 * composition of R1 and R2 derives directly R skipping the auxiliary binary
+	 * chain representing [R1 R2].
+	 */
+	public static final boolean REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES = true;
+	
 	enum REFLEXIVITY {TRUE, FALSE, UNKNOWN};
 	
 	final IndexedPropertyChain root;
