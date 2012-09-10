@@ -77,13 +77,13 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 		try {
 			taxonomy = reasoner.getTaxonomy();
 			
-			try {
+			/*try {
 				Writer writer = new OutputStreamWriter(System.out);
 				TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
 				writer.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
+			}*/
 			
 			manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
 		} catch (ElkInconsistentOntologyException e) {
