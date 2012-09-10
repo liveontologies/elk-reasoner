@@ -27,10 +27,11 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.Chain;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.Matcher;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -54,7 +55,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 	public void registerCompositionRule() {
 		subClass.getChainCompositionRules()
-				.getCreate(ThisCompositionRule.MATCHER_)
+				.getCreate(ThisCompositionRule.MATCHER_,
+						ThisCompositionRule.FACTORY_)
 				.addToldSuperClassExpression(superClass);
 	}
 
@@ -113,16 +115,18 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ContextRules tail) {
-				return new ThisCompositionRule(tail);
-			}
-
-			@Override
 			public ThisCompositionRule match(ContextRules chain) {
 				if (chain instanceof ThisCompositionRule)
 					return (ThisCompositionRule) chain;
 				else
 					return null;
+			}
+		};
+
+		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule create(ContextRules tail) {
+				return new ThisCompositionRule(tail);
 			}
 		};
 

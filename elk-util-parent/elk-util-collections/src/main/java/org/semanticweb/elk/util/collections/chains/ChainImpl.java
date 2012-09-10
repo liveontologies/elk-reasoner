@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.util.collections.chains;
 
 /*
  * #%L
@@ -23,23 +23,37 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 /**
- * A sequence of elements that can be accessed one after another and also can be
- * searched, removed and added using an instance of {@link Matcher} for
- * identifying elements. Essentially, this is just a link list with some
- * enhancements.
+ * A simple implementation of the {@link Chain} interface. The methods are not
+ * thread safe.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            the types of the elements in the sequence
- * @see Matcher
+ *            The types of elements in the chain.
  */
-public interface Chain<T extends Reference<T>> extends Reference<T> {
+public class ChainImpl<T extends Reference<T>> extends AbstractChain<T>
+		implements Chain<T> {
 
-	public <S extends T> S find(Matcher<T, S> matcher);
+	/**
+	 * the field to store the tail of the chain
+	 */
+	private T tail_ = null;
 
-	public <S extends T> S getCreate(Matcher<T, S> matcher);
+	public ChainImpl() {
+	}
 
-	public <S extends T> S remove(Matcher<T, S> matcher);
+	public ChainImpl(T tail) {
+		this.tail_ = tail;
+	}
+
+	@Override
+	public T get() {
+		return tail_;
+	}
+
+	@Override
+	public void set(T tail) {
+		tail_ = tail;
+	}
 
 }

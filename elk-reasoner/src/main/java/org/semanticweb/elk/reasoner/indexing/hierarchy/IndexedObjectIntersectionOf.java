@@ -29,12 +29,13 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionO
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.Chain;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.Matcher;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 
 /**
  * Represents all occurrences of an ElkObjectIntersectionOf in an ontology.
@@ -107,11 +108,15 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	public void registerContextRules() {
-		firstConjunct.getChainCompositionRules()
-				.getCreate(ThisCompositionRule.MATCHER_)
+		firstConjunct
+				.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_,
+						ThisCompositionRule.FACTORY_)
 				.addConjunctionByConjunct(this, secondConjunct);
-		secondConjunct.getChainCompositionRules()
-				.getCreate(ThisCompositionRule.MATCHER_)
+		secondConjunct
+				.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_,
+						ThisCompositionRule.FACTORY_)
 				.addConjunctionByConjunct(this, firstConjunct);
 	}
 
@@ -172,10 +177,6 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule create(ContextRules tail) {
-				return new ThisCompositionRule(tail);
-			}
 
 			@Override
 			public ThisCompositionRule match(ContextRules chain) {
@@ -183,6 +184,13 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 					return (ThisCompositionRule) chain;
 				else
 					return null;
+			}
+		};
+
+		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule create(ContextRules tail) {
+				return new ThisCompositionRule(tail);
 			}
 		};
 

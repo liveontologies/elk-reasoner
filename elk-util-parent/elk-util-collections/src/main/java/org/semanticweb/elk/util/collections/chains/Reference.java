@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.util.collections.chains;
 
 /*
  * #%L
@@ -22,14 +22,29 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+/**
+ * An object holding a (possibly {@code null}) reference to other object.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of the object in the reference
+ */
 public interface Reference<T> {
 
 	/**
-	 * @return the next element in the chain or {@code null} if there is no next
-	 *         element
+	 * @return the object assigned in the reference or {@code null} if there is
+	 *         no object assigned
 	 */
-	T getNext();
+	T get();
 
-	void setNext(T next);
+	/**
+	 * Setting the reference to the given object. After that the {@link #get()}
+	 * method should return this reference.
+	 * 
+	 * @param object
+	 *            the object to which the reference is set
+	 */
+	void set(T object);
 
 }

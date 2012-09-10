@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.util.collections.chains.ChainImpl;
 
 public abstract class BackwardLinkRules extends ChainImpl<BackwardLinkRules> {
 

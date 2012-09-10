@@ -1,7 +1,7 @@
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.util.collections.chains;
 /*
  * #%L
- * ELK Reasoner
+ * ELK Utilities Collections
  * $Id:$
  * $HeadURL:$
  * %%
@@ -21,25 +21,24 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-public class ChainImpl<T extends Reference<T>> extends AbstractChain<T> {
+/**
+ * A factoring for creating references
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of elements to which a reference should be created
+ * @param <O>
+ *            the type of the output references
+ */
+public interface ReferenceFactory<T, O extends Reference<T>> {
 
-	private T tail_ = null;
-
-	public ChainImpl() {
-	}
-
-	public ChainImpl(T tail) {
-		this.tail_ = tail;
-	}
-
-	@Override
-	public T getNext() {
-		return tail_;
-	}
-
-	@Override
-	public void setNext(T tail) {
-		tail_ = tail;
-	}
+	/**
+	 * Creates a references to the given object
+	 * 
+	 * @param object
+	 * @return the reference to the given object
+	 */
+	O create(T object);
 
 }

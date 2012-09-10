@@ -28,9 +28,9 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.rules.AbstractChain;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.chains.AbstractChain;
 
 public interface Context {
 

@@ -1,6 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.util.collections.chains.ChainImpl;
 
 /*
  * #%L

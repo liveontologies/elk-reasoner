@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.AbstractChain;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.chains.AbstractChain;
 
 /**
  * Context implementation that is used for EL reasoning. It provides data
@@ -151,12 +151,12 @@ public class ContextImpl extends AbstractContext implements Context {
 		return new AbstractChain<BackwardLinkRules>() {
 
 			@Override
-			public BackwardLinkRules getNext() {
+			public BackwardLinkRules get() {
 				return backwardLinkRules;
 			}
 
 			@Override
-			public void setNext(BackwardLinkRules tail) {
+			public void set(BackwardLinkRules tail) {
 				backwardLinkRules = tail;
 			}
 		};

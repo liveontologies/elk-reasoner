@@ -27,11 +27,12 @@ import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.saturation.rules.Matcher;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 
 /**
  * @author Frantisek Simancik
@@ -54,8 +55,10 @@ public class ForwardLink implements Conclusion {
 		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.forwLinkInfNo++;
 
-		if (!context.getChainBackwardLinkRules()
-				.getCreate(ThisBackwardLinkRule.MATCHER_)
+		if (!context
+				.getChainBackwardLinkRules()
+				.getCreate(ThisBackwardLinkRule.MATCHER_,
+						ThisBackwardLinkRule.FACTORY_)
 				.addForwardLinkByObjectProperty(relation_, target_))
 			return;
 
@@ -124,12 +127,6 @@ public class ForwardLink implements Conclusion {
 		}
 
 		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, ThisBackwardLinkRule>() {
-
-			@Override
-			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
-				return new ThisBackwardLinkRule(tail);
-			}
-
 			@Override
 			public ThisBackwardLinkRule match(BackwardLinkRules chain) {
 				if (chain instanceof ThisBackwardLinkRule)
@@ -137,7 +134,13 @@ public class ForwardLink implements Conclusion {
 				else
 					return null;
 			}
+		};
 
+		private static ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule>() {
+			@Override
+			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
+				return new ThisBackwardLinkRule(tail);
+			}
 		};
 
 	}

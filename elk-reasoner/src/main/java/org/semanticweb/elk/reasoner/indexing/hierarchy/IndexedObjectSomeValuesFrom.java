@@ -35,13 +35,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExp
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.saturation.rules.Chain;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.Matcher;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 
 /**
  * Represents all occurrences of an ElkObjectSomeValuesFrom in an ontology.
@@ -119,8 +120,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	public void registerCompositionRule() {
 		filler.getChainCompositionRules()
-				.getCreate(ThisCompositionRule.MATCHER_)
-				.addNegExistential(this);
+				.getCreate(ThisCompositionRule.MATCHER_,
+						ThisCompositionRule.FACTORY_).addNegExistential(this);
 	}
 
 	public void deregisterCompositionRule() {
@@ -227,8 +228,10 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				LOGGER_.trace(context.getRoot() + ": new propagation "
 						+ propRelation + "->" + carry);
 
-			if (context.getChainBackwardLinkRules()
-					.getCreate(ThisBackwardLinkRule.MATCHER_)
+			if (context
+					.getChainBackwardLinkRules()
+					.getCreate(ThisBackwardLinkRule.MATCHER_,
+							ThisBackwardLinkRule.FACTORY_)
 					.addPropagationByObjectProperty(propRelation, carry)) {
 				// propagate over all backward links
 				final Multimap<IndexedPropertyChain, Context> backLinks = context
@@ -243,12 +246,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
-
-			@Override
-			public ThisCompositionRule create(ContextRules tail) {
-				return new ThisCompositionRule(tail);
-			}
-
 			@Override
 			public ThisCompositionRule match(ContextRules chain) {
 				if (chain instanceof ThisCompositionRule)
@@ -256,7 +253,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				else
 					return null;
 			}
+		};
 
+		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule create(ContextRules tail) {
+				return new ThisCompositionRule(tail);
+			}
 		};
 
 	}
@@ -286,16 +289,20 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, ThisBackwardLinkRule>() {
 
 			@Override
-			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
-				return new ThisBackwardLinkRule(tail);
-			}
-
-			@Override
 			public ThisBackwardLinkRule match(BackwardLinkRules chain) {
 				if (chain instanceof ThisBackwardLinkRule)
 					return (ThisBackwardLinkRule) chain;
 				else
 					return null;
+			}
+
+		};
+
+		private static ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule>() {
+
+			@Override
+			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
+				return new ThisBackwardLinkRule(tail);
 			}
 
 		};

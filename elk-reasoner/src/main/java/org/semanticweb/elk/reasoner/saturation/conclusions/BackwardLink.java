@@ -70,7 +70,7 @@ public class BackwardLink implements Conclusion {
 
 		while (rules != null) {
 			rules.apply(ruleEngine, this);
-			rules = rules.getNext();
+			rules = rules.get();
 		}
 
 		/*

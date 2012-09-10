@@ -57,7 +57,7 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 			if (compositionRule == null)
 				return;
 			compositionRule.apply(ruleEngine, context);
-			compositionRule = compositionRule.getNext();
+			compositionRule = compositionRule.get();
 		}
 
 	}

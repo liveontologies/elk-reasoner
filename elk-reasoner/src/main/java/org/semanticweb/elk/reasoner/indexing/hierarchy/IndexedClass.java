@@ -32,9 +32,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.saturation.rules.Matcher;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -113,7 +114,8 @@ public class IndexedClass extends IndexedClassEntity {
 
 			// register the backward link rule for propagation of bottom
 			context.getChainBackwardLinkRules().getCreate(
-					BottomBackwardLinkRule.MATCHER_);
+					BottomBackwardLinkRule.MATCHER_,
+					BottomBackwardLinkRule.FACTORY_);
 		}
 	}
 
@@ -138,10 +140,6 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, BottomBackwardLinkRule>() {
-			@Override
-			public BottomBackwardLinkRule create(BackwardLinkRules tail) {
-				return new BottomBackwardLinkRule(tail);
-			}
 
 			@Override
 			public BottomBackwardLinkRule match(BackwardLinkRules chain) {
@@ -149,6 +147,13 @@ public class IndexedClass extends IndexedClassEntity {
 					return (BottomBackwardLinkRule) chain;
 				else
 					return null;
+			}
+		};
+
+		private static ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule>() {
+			@Override
+			public BottomBackwardLinkRule create(BackwardLinkRules tail) {
+				return new BottomBackwardLinkRule(tail);
 			}
 		};
 

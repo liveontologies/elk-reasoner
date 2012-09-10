@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.util.collections.chains;
 
 /*
  * #%L
@@ -22,40 +22,51 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+/**
+ * This class provides a skeletal implementation of the {@link Chain} interface
+ * to minimize the effort required to implement this interface. Essentially, one
+ * has to provide only the implementation of the {@link Reference} interface.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            The type of elements in the chain.
+ */
 public abstract class AbstractChain<T extends Reference<T>> implements Chain<T> {
 
 	@Override
-	public abstract T getNext();
+	public abstract T get();
 
 	@Override
-	public abstract void setNext(T tail);
+	public abstract void set(T tail);
 
 	@Override
 	public <S extends T> S find(Matcher<T, S> matcher) {
-		T candidate = getNext();
+		T candidate = get();
 		for (;;) {
 			if (candidate == null)
 				return null;
 			S match = matcher.match(candidate);
 			if (match != null)
 				return match;
-			candidate = candidate.getNext();
+			candidate = candidate.get();
 		}
 	}
 
 	@Override
-	public <S extends T> S getCreate(Matcher<T, S> matcher) {
-		T candidate = getNext();
+	public <S extends T> S getCreate(Matcher<T, S> matcher,
+			ReferenceFactory<T, S> factory) {
+		T candidate = get();
 		for (;;) {
 			if (candidate == null) {
-				S result = matcher.create(getNext());
-				setNext(result);
+				S result = factory.create(get());
+				set(result);
 				return result;
 			}
 			S match = matcher.match(candidate);
 			if (match != null)
 				return match;
-			candidate = candidate.getNext();
+			candidate = candidate.get();
 		}
 	}
 
@@ -63,12 +74,12 @@ public abstract class AbstractChain<T extends Reference<T>> implements Chain<T> 
 	public <S extends T> S remove(Matcher<T, S> matcher) {
 		Reference<T> point = this;
 		for (;;) {
-			T next = point.getNext();
+			T next = point.get();
 			if (next == null)
 				return null;
 			S match = matcher.match(next);
 			if (match != null) {
-				point.setNext(next.getNext());
+				point.set(next.get());
 				return match;
 			}
 			point = next;

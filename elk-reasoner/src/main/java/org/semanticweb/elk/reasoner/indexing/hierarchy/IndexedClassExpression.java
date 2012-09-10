@@ -26,11 +26,11 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.AbstractChain;
-import org.semanticweb.elk.reasoner.saturation.rules.Chain;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.chains.AbstractChain;
+import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -276,12 +276,12 @@ abstract public class IndexedClassExpression {
 	Chain<ContextRules> getChainCompositionRules() {
 		return new AbstractChain<ContextRules>() {
 			@Override
-			public ContextRules getNext() {
+			public ContextRules get() {
 				return compositionRules;
 			}
 
 			@Override
-			public void setNext(ContextRules tail) {
+			public void set(ContextRules tail) {
 				compositionRules = tail;
 			}
 		};
