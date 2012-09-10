@@ -55,6 +55,21 @@ public class SaturatedPropertyChain {
 	 */
 	public static final boolean REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES = true;
 	
+	/**
+	 * If set to true, then compositions between each pair of R1 and R2 are
+	 * reduced under role hierarchies. For example, given
+	 * 
+	 * SubObjectPropertyOf(ObjectPropertyChain(R1 R2) S1),
+	 * SubObjectPropertyOf(ObjectPropertyChain(R1 R2) S2), and
+	 * SubObjectPropertyOf(S1 S2),
+	 * 
+	 * the composition of R1 and R2 derives only S1 and not S2. Note that
+	 * this only makes sense if REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES is
+	 * also on.
+	 */
+	public static final boolean ELIMINATE_IMPLIED_COMPOSITIONS = true;
+	
+	
 	enum REFLEXIVITY {TRUE, FALSE, UNKNOWN};
 	
 	final IndexedPropertyChain root;

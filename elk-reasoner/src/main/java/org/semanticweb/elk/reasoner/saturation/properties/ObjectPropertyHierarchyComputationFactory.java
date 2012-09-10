@@ -81,6 +81,37 @@ public class ObjectPropertyHierarchyComputationFactory implements
 	private static <T> Collection<T> emptyIfNull(Collection<T> collection) {
 		return collection == null ? Collections.<T> emptyList() : collection;
 	}
+	
+	/**
+	 * If R and S are in the vector and R is a sub-property of S, then S is
+	 * removed from the vector.
+	 */
+	private static void eliminateImpliedCompositions(
+			Vector<IndexedPropertyChain> v) {
+		// replace all redundant elements by null
+		for (int i = 0; i < v.size(); i++) {
+			IndexedPropertyChain ipc = v.get(i);
+			
+			if (ipc != null) {
+				SaturatedPropertyChain saturated = ipc.getSaturated();
+				Collection<? extends IndexedPropertyChain> superProperties = saturated != null ? saturated.getSuperProperties() : ipc.getToldSuperProperties();
+
+				for (int j = 0; j < v.size(); j++)
+					if (v.get(j) != null && j != i
+							&& superProperties.contains(v.get(j)))
+						v.set(j, null);
+			}
+		}
+
+		// shift all non-null elements to the begin and resize
+		int next = 0;
+		for (int i = 0; i < v.size(); i++)
+			if (v.get(i) != null) {
+				v.set(next++, v.get(i));
+			}
+		v.setSize(next);
+	}
+	
 
 	
 	enum SIDE {LEFT, RIGHT};
@@ -223,7 +254,21 @@ public class ObjectPropertyHierarchyComputationFactory implements
 					
 					addDirectSuperProperties(next, queue);
 				}
-			}			
+			}	
+			
+			if (SaturatedPropertyChain.ELIMINATE_IMPLIED_COMPOSITIONS) {
+				if (saturated.compositionsByLeftSubProperty != null) {
+				for (Collection<IndexedPropertyChain> compositions : saturated.compositionsByLeftSubProperty.values()) {
+					eliminateImpliedCompositions((Vector<IndexedPropertyChain>) compositions);
+				}
+			}
+				
+				if (saturated.compositionsByRightSubProperty != null) {
+				for (Collection<IndexedPropertyChain> compositions : saturated.compositionsByRightSubProperty.values()) {
+					eliminateImpliedCompositions((Vector<IndexedPropertyChain>) compositions);
+				}
+				}
+			}
 			
 			// compute all transitively closed sub-properties
 			// and mark the chain as reflexive if one of its sub-properties

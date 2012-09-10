@@ -24,16 +24,11 @@ package org.semanticweb.elk.reasoner;
 
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestOutput;
