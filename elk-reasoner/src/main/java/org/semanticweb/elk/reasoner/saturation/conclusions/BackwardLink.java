@@ -55,7 +55,7 @@ public class BackwardLink implements Conclusion {
 	}
 
 	@Override
-	public void process(Context context, RuleEngine ruleEngine) {
+	public void apply(RuleEngine ruleEngine, Context context) {
 
 		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.backLinkInfNo++;
@@ -70,7 +70,7 @@ public class BackwardLink implements Conclusion {
 
 		while (rules != null) {
 			rules.apply(ruleEngine, this);
-			rules = rules.get();
+			rules = rules.next();
 		}
 
 		/*

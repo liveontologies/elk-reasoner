@@ -36,15 +36,15 @@ public interface Reference<T> {
 	 * @return the object assigned in the reference or {@code null} if there is
 	 *         no object assigned
 	 */
-	T get();
+	T next();
 
 	/**
-	 * Setting the reference to the given object. After that the {@link #get()}
+	 * Setting the reference to the given object. After that the {@link #next()}
 	 * method should return this reference.
 	 * 
 	 * @param object
 	 *            the object to which the reference is set
 	 */
-	void set(T object);
+	void setNext(T object);
 
 }

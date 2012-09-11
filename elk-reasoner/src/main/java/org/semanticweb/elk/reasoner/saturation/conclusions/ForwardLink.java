@@ -50,7 +50,7 @@ public class ForwardLink implements Conclusion {
 	}
 
 	@Override
-	public void process(Context context, RuleEngine ruleEngine) {
+	public void apply(RuleEngine ruleEngine, Context context) {
 
 		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.forwLinkInfNo++;

@@ -27,7 +27,7 @@ import org.semanticweb.elk.util.collections.chains.ChainImpl;
  */
 
 /**
- * A skeleton class which for implementing rules that can be applied to
+ * A skeleton class for implementing rules that can be applied to
  * {@link Context}s.
  * 
  * @author "Yevgeny Kazakov"
@@ -37,9 +37,11 @@ public abstract class ContextRules extends ChainImpl<ContextRules> implements
 		Rule<Context>, Chain<ContextRules> {
 
 	/**
-	 * Creates a new chain of rules which appends the given chain of rules.
+	 * Creates a new chain of {@link ContextRules} by appending to the given
+	 * chain of {@link ContextRules}.
 	 * 
 	 * @param tail
+	 *            a chain of {@link ContextRules} to be appended to this rule
 	 */
 	public ContextRules(ContextRules tail) {
 		super(tail);

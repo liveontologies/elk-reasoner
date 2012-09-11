@@ -47,12 +47,12 @@ public class ChainImpl<T extends Reference<T>> extends AbstractChain<T>
 	}
 
 	@Override
-	public T get() {
+	public T next() {
 		return tail_;
 	}
 
 	@Override
-	public void set(T tail) {
+	public void setNext(T tail) {
 		tail_ = tail;
 	}
 

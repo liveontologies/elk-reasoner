@@ -35,38 +35,38 @@ package org.semanticweb.elk.util.collections.chains;
 public abstract class AbstractChain<T extends Reference<T>> implements Chain<T> {
 
 	@Override
-	public abstract T get();
+	public abstract T next();
 
 	@Override
-	public abstract void set(T tail);
+	public abstract void setNext(T tail);
 
 	@Override
 	public <S extends T> S find(Matcher<T, S> matcher) {
-		T candidate = get();
+		T candidate = next();
 		for (;;) {
 			if (candidate == null)
 				return null;
 			S match = matcher.match(candidate);
 			if (match != null)
 				return match;
-			candidate = candidate.get();
+			candidate = candidate.next();
 		}
 	}
 
 	@Override
 	public <S extends T> S getCreate(Matcher<T, S> matcher,
 			ReferenceFactory<T, S> factory) {
-		T candidate = get();
+		T candidate = next();
 		for (;;) {
 			if (candidate == null) {
-				S result = factory.create(get());
-				set(result);
+				S result = factory.create(next());
+				setNext(result);
 				return result;
 			}
 			S match = matcher.match(candidate);
 			if (match != null)
 				return match;
-			candidate = candidate.get();
+			candidate = candidate.next();
 		}
 	}
 
@@ -74,12 +74,12 @@ public abstract class AbstractChain<T extends Reference<T>> implements Chain<T> 
 	public <S extends T> S remove(Matcher<T, S> matcher) {
 		Reference<T> point = this;
 		for (;;) {
-			T next = point.get();
+			T next = point.next();
 			if (next == null)
 				return null;
 			S match = matcher.match(next);
 			if (match != null) {
-				point.set(next.get());
+				point.setNext(next.next());
 				return match;
 			}
 			point = next;

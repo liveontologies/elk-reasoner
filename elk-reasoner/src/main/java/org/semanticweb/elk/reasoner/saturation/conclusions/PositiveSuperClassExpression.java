@@ -43,7 +43,7 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 	}
 
 	@Override
-	public void process(Context context, RuleEngine ruleEngine) {
+	public void apply(RuleEngine ruleEngine, Context context) {
 		if (!storeInContext(context, ruleEngine))
 			return;
 
@@ -57,7 +57,7 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 			if (compositionRule == null)
 				return;
 			compositionRule.apply(ruleEngine, context);
-			compositionRule = compositionRule.get();
+			compositionRule = compositionRule.next();
 		}
 
 	}

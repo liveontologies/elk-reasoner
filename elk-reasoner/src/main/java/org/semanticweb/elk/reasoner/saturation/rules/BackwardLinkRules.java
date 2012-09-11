@@ -27,7 +27,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.ChainImpl;
 
 /**
- * A skeleton class which for implementing rules that can be applied to
+ * A skeleton class for implementing rules that can be applied to
  * {@link BackwardLink}s.
  * 
  * @author "Yevgeny Kazakov"
@@ -37,9 +37,12 @@ public abstract class BackwardLinkRules extends ChainImpl<BackwardLinkRules>
 		implements Rule<BackwardLink>, Chain<BackwardLinkRules> {
 
 	/**
-	 * Creates a new chain of rules which appends the given chain of rules.
+	 * Creates a new chain of {@link BackwardLinkRules} by appending to the
+	 * given chain of {@link BackwardLinkRules}.
 	 * 
 	 * @param tail
+	 *            a chain of {@link BackwardLinkRules} to be appended to this
+	 *            rule
 	 */
 	public BackwardLinkRules(BackwardLinkRules tail) {
 		super(tail);

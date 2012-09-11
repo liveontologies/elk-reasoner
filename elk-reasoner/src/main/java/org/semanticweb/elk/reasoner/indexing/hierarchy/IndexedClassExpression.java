@@ -276,12 +276,12 @@ abstract public class IndexedClassExpression {
 	Chain<ContextRules> getChainCompositionRules() {
 		return new AbstractChain<ContextRules>() {
 			@Override
-			public ContextRules get() {
+			public ContextRules next() {
 				return compositionRules;
 			}
 
 			@Override
-			public void set(ContextRules tail) {
+			public void setNext(ContextRules tail) {
 				compositionRules = tail;
 			}
 		};

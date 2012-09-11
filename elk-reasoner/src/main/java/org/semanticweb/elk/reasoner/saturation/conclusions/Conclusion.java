@@ -1,7 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /*
  * #%L
@@ -25,8 +25,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
  * #L%
  */
 
-public interface Conclusion {
-
-	public void process(Context context, RuleEngine ruleEngine);
+public interface Conclusion extends Rule<Context> {
 
 }

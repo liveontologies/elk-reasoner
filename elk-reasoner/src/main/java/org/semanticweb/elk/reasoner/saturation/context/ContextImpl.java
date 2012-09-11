@@ -191,12 +191,12 @@ public class ContextImpl implements Context {
 		return new AbstractChain<BackwardLinkRules>() {
 
 			@Override
-			public BackwardLinkRules get() {
+			public BackwardLinkRules next() {
 				return backwardLinkRules_;
 			}
 
 			@Override
-			public void set(BackwardLinkRules tail) {
+			public void setNext(BackwardLinkRules tail) {
 				backwardLinkRules_ = tail;
 			}
 		};
@@ -210,6 +210,9 @@ public class ContextImpl implements Context {
 	@Override
 	public boolean addToDo(Conclusion conclusion) {
 		toDo_.add(conclusion);
+		if (isActive_.get()) {
+			return false;
+		}
 		return isActive_.compareAndSet(false, true);
 	}
 
@@ -220,6 +223,9 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean deactivate() {
+		if (!isActive_.get()) {
+			return false;
+		}
 		if (isActive_.compareAndSet(true, false) && !toDo_.isEmpty())
 			return isActive_.compareAndSet(false, true);
 		return false;

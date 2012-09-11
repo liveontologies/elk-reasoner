@@ -240,6 +240,7 @@ public class RuleApplicationFactory implements
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
 			if (context.addToDo(item))
+				// context was activated
 				activeContexts.add(context);
 		}
 
@@ -253,25 +254,13 @@ public class RuleApplicationFactory implements
 			for (;;) {
 				Conclusion item = context.takeToDo();
 				if (item == null)
-					if (context.deactivate())
-						continue;
-					else
-						break;
-				item.process(context, this);
+					break;
+				item.apply(this, context);
 			}
+			if (context.deactivate())
+				// context was re-activated
+				activeContexts.add(context);
 		}
-
-		// private void activateContext(Context context) {
-		// if (context.tryActivate()) {
-		// activeContexts.add(context);
-		// }
-		// }
-		//
-		// private void deactivateContext(Context context) {
-		// if (context.tryDeactivate())
-		// if (!context.getToDo().isEmpty())
-		// activateContext(context);
-		// }
 
 		private void initContext(Context context) {
 			produce(context,

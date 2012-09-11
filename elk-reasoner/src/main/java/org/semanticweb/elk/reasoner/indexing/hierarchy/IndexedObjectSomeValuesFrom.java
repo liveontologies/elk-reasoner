@@ -221,7 +221,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		}
 
-		private void addPropagation(IndexedPropertyChain propRelation,
+		private static void addPropagation(IndexedPropertyChain propRelation,
 				Conclusion carry, Context context, RuleEngine ruleEngine) {
 
 			if (LOGGER_.isTraceEnabled())
