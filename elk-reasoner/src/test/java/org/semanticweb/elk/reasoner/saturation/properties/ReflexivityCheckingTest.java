@@ -91,7 +91,7 @@ public class ReflexivityCheckingTest {
 			Set<IndexedPropertyChain> nonreflexive = new HashSet<IndexedPropertyChain>();			
 			
 			for (IndexedPropertyChain chain : chains) {
-				if (new ReflexivityChecker().isReflexive(chain)) {
+				if (new ReflexivityCheckVisitor().isReflexive(chain)) {
 					reflexive.add(chain);
 				}
 				else {
