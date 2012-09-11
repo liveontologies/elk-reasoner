@@ -36,7 +36,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
-import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -222,14 +221,13 @@ public class ConsistencyChecking
 
 		@Override
 		public void notifyFinished(SaturationJob<IndexedClassEntity> job) {
-			if (!((ContextClassSaturation) job.getOutput()).isSatisfiable())
+			if (job.getOutput().isInconsistent())
 				consistenceMonitor.setInconsistent();
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(job.getInput()
 						+ ": consistency checking finished: "
-						+ (((ContextClassSaturation) job.getOutput())
-								.isSatisfiable() ? "satisfiable"
-								: "unsatisfiable"));
+						+ (job.getOutput().isInconsistent() ? "inconsistent"
+								: "satisfiable"));
 		}
 
 	}

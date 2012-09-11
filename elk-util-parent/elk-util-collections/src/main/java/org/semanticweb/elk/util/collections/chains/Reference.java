@@ -1,9 +1,10 @@
+package org.semanticweb.elk.util.collections.chains;
+
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,18 +21,30 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+/**
+ * An object holding a (possibly {@code null}) reference to other object.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of the object in the reference
+ */
+public interface Reference<T> {
 
-public abstract class IndexedClassEntity extends IndexedClassExpression {
+	/**
+	 * @return the object assigned in the reference or {@code null} if there is
+	 *         no object assigned
+	 */
+	T next();
 
-	abstract public <O> O accept(IndexedClassEntityVisitor<O> visitor);
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedClassEntityVisitor<O>) visitor);
-	}
+	/**
+	 * Setting the reference to the given object. After that the {@link #next()}
+	 * method should return this reference.
+	 * 
+	 * @param object
+	 *            the object to which the reference is set
+	 */
+	void setNext(T object);
 
 }

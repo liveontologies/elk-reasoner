@@ -20,29 +20,46 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
+package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
 /**
- * A {@link SuperClassExpression} to which composition rules should be applied.
- * Decomposition rules do not need to by applied to this object.
+ * A {@link SuperClassExpression} to which decomposition rules need to be
+ * applied.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
- * @param <C>
- *            the type of the {@link Context} with which this {@link Queueable}
- *            can be used
  */
-public class NegativeSuperClassExpression<C extends ContextElClassSaturation>
-		extends SuperClassExpression<C> {
+public class PositiveSuperClassExpression extends SuperClassExpression {
 
-	public NegativeSuperClassExpression(
+	public PositiveSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
+	}
+
+	@Override
+	public void apply(RuleEngine ruleEngine, Context context) {
+		if (!storeInContext(context, ruleEngine))
+			return;
+
+		// apply decomposition rules
+		expression.applyDecompositionRule(ruleEngine, context);
+
+		// applying all composition rules
+		ContextRules compositionRule = expression.getCompositionRules();
+
+		for (;;) {
+			if (compositionRule == null)
+				return;
+			compositionRule.apply(ruleEngine, context);
+			compositionRule = compositionRule.next();
+		}
+
 	}
 
 }

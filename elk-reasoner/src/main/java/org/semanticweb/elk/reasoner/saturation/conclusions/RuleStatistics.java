@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
+package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 public class RuleStatistics {
 

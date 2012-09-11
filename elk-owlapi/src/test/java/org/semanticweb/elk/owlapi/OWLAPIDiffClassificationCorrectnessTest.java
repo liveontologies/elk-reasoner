@@ -39,7 +39,9 @@ import org.semanticweb.elk.testing.TestInput;
 public class OWLAPIDiffClassificationCorrectnessTest extends
 		DiffClassificationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = { "DisjointSelf.owl", "ReflexiveRole.owl" };
+	static final String[] IGNORE_LIST = { "DisjointSelf.owl",
+			"AssertionDisjoint.owl", "Disjoint.owl", "ReflexiveRole.owl",
+			"kangaroo.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);
@@ -53,8 +55,7 @@ public class OWLAPIDiffClassificationCorrectnessTest extends
 	@Override
 	protected Reasoner createReasoner(InputStream input) throws IOException,
 			Owl2ParseException {
-		return OWLAPITestUtils.createReasoner(input)
-				.getInternalReasoner();
+		return OWLAPITestUtils.createReasoner(input).getInternalReasoner();
 	}
 
 	@Override

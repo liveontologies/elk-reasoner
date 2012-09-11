@@ -22,9 +22,20 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.Collection;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -63,7 +74,7 @@ public class IndexedClass extends IndexedClassEntity {
 	public <O> O accept(IndexedClassVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
 		return visitor.visit(this);
@@ -82,15 +93,70 @@ public class IndexedClass extends IndexedClassEntity {
 		return occurrenceNo > 0;
 	}
 
-	/**
-	 * Represent the object's ElkClass as a string. This implementation reflects
-	 * the fact that we generally consider only one IndexedClass for each
-	 * ElkClass.
-	 * 
-	 * @return String representation.
-	 */
+	@Override
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
+		if (this.equals(ruleEngine.getOwlNothing())) {
+			context.setInconsistent();
+
+			// propagating bottom to the predecessors
+			final Multimap<IndexedPropertyChain, Context> backLinks = context
+					.getBackwardLinksByObjectProperty();
+
+			Conclusion carry = new PositiveSuperClassExpression(this);
+
+			for (IndexedPropertyChain propRelation : backLinks.keySet()) {
+
+				Collection<Context> targets = backLinks.get(propRelation);
+
+				for (Context target : targets)
+					ruleEngine.produce(target, carry);
+			}
+
+			// register the backward link rule for propagation of bottom
+			context.getBackwardLinkRulesChain().getCreate(
+					BottomBackwardLinkRule.MATCHER_,
+					BottomBackwardLinkRule.FACTORY_);
+		}
+	}
+
 	@Override
 	public String toString() {
 		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
 	}
+
+	private static class BottomBackwardLinkRule extends BackwardLinkRules {
+
+		BottomBackwardLinkRule(BackwardLinkRules tail) {
+			super(tail);
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, BackwardLink link) {
+			ruleEngine
+					.produce(
+							link.getTarget(),
+							new PositiveSuperClassExpression(ruleEngine
+									.getOwlNothing()));
+		}
+
+		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, BottomBackwardLinkRule>() {
+
+			@Override
+			public BottomBackwardLinkRule match(BackwardLinkRules chain) {
+				if (chain instanceof BottomBackwardLinkRule)
+					return (BottomBackwardLinkRule) chain;
+				else
+					return null;
+			}
+		};
+
+		private static ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule>() {
+			@Override
+			public BottomBackwardLinkRule create(BackwardLinkRules tail) {
+				return new BottomBackwardLinkRule(tail);
+			}
+		};
+
+	}
+
 }

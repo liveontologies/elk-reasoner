@@ -20,21 +20,18 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
+package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
 /**
  * @author Frantisek Simancik
- * 
- * @param <C>
- *            the type of contexts that can be used with this {@link Queueable}
+ * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class SuperClassExpression<C extends ContextElClassSaturation>
-		implements Queueable<C> {
+public abstract class SuperClassExpression implements Conclusion {
 
 	protected final IndexedClassExpression expression;
 
@@ -46,15 +43,18 @@ public abstract class SuperClassExpression<C extends ContextElClassSaturation>
 		return expression;
 	}
 
-	@Override
-	public boolean storeInContext(C context,
-			RuleApplicationFactory.Engine engine) {
-		RuleStatistics statistics = engine.getRuleStatistics();
+	public boolean storeInContext(Context context, RuleEngine ruleEngine) {
+		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.superClassExpressionInfNo++;
-		if (context.superClassExpressions.add(expression)) {
+		if (context.addSuperClassExpression(this)) {
 			statistics.superClassExpressionNo++;
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return expression.toString();
 	}
 }

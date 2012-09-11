@@ -29,9 +29,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -212,7 +211,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				J nextJob = jobsInProgress_.poll();
 				IndexedClassExpression root = nextJob.getInput();
 				Context rootSaturation = root.getContext();
-				((ContextClassSaturation) rootSaturation).setSaturated();
+				rootSaturation.setSaturated();
 				nextJob.setOutput(rootSaturation);
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace(root + ": saturation finished");
@@ -328,8 +327,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 * already complete
 				 */
 				Context rootContext = root.getContext();
-				if (rootContext != null
-						&& ((ContextClassSaturation) rootContext).isSaturated()) {
+				if (rootContext != null && rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);
 					listener_.notifyFinished(nextJob); // can throw
 														// InterruptedException

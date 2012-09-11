@@ -1,9 +1,10 @@
+package org.semanticweb.elk.util.collections.chains;
+
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,25 +21,39 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.classes;
-
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceRule;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 
 /**
+ * A simple implementation of the {@link Chain} interface. The methods are not
+ * thread safe.
  * 
- * Inference rule with a {@link SuperClassExpression} as an argument.
- * 
- * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
- * @param <C>
- *            the type of the {@link Context} with which this rule can be used
+ * @param <T>
+ *            The types of elements in the chain.
  */
-public interface InferenceRuleSCE<C extends ContextElClassSaturation> extends
-		InferenceRule<C> {
+public class ChainImpl<T extends Reference<T>> extends AbstractChain<T>
+		implements Chain<T> {
 
-	void applySCE(SuperClassExpression<C> argument, C context,
-			RuleApplicationFactory.Engine engine);
+	/**
+	 * the field to store the tail of the chain
+	 */
+	private T tail_ = null;
+
+	public ChainImpl() {
+	}
+
+	public ChainImpl(T tail) {
+		this.tail_ = tail;
+	}
+
+	@Override
+	public T next() {
+		return tail_;
+	}
+
+	@Override
+	public void setNext(T tail) {
+		tail_ = tail;
+	}
+
 }

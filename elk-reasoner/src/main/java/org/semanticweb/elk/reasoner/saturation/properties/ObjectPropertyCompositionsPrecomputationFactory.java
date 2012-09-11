@@ -29,7 +29,6 @@ import java.util.Vector;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.classes.RuleRoleComposition;
 import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyCompositionsPrecomputationFactory.Engine;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;

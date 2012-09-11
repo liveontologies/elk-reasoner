@@ -211,7 +211,8 @@ public abstract class IndexedPropertyChain {
 	 * the reference to a {@link SaturatedPropertyChain} assigned to this
 	 * {@link IndexedPropertyChain}
 	 */
-	private final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
+	//private volatile SaturatedPropertyChain saturated_ = null;
+	private AtomicReference<SaturatedPropertyChain> saturated_ = new AtomicReference<SaturatedPropertyChain>();
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
@@ -244,7 +245,7 @@ public abstract class IndexedPropertyChain {
 	 * @return
 	 */
 	public SaturatedPropertyChain getSaturated(boolean saturate) {
-		return saturate && (saturated.get() == null || !saturated.get().isComputed()) ? saturate() : saturated.get();
+		return saturate && (saturated_.get() == null || !saturated_.get().isComputed()) ? saturate() : saturated_.get();
 	}
 
 	/**
@@ -255,17 +256,34 @@ public abstract class IndexedPropertyChain {
 	 *            assign the given {@link SaturatedPropertyChain} to this
 	 *            {@link IndexedClassExpression}
 	 * 
-	 * @return {@code true} if the operation succeeded.
+	 * @return {@code true} if the operation succeeded. If this method is called
+	 *         for the same object from different threads with at the same time
+	 *         with non-null arguments, only one call returns {@code true}.
 	 */
 	public boolean setSaturated(SaturatedPropertyChain saturatedObjectProperty) {
-		return saturated.compareAndSet(null, saturatedObjectProperty);
+		
+		saturated_.set(saturatedObjectProperty);
+		
+		return true;
+		
+/*		if (saturated_ != null)
+			return false;
+		synchronized (this) {
+			if (saturated_ != null)
+				return false;
+			saturated_ = saturatedObjectProperty;
+		}
+		return true;*/
 	}
 
 	/**
 	 * Resets the corresponding {@code SaturatedObjecProperty} to {@code null}.
 	 */
 	public void resetSaturated() {
-		saturated.set(null);
+		if (saturated_ != null)
+			synchronized (this) {
+				saturated_ = null;
+			}
 	}
 
 	/** Hash code for this object. */
@@ -282,11 +300,11 @@ public abstract class IndexedPropertyChain {
 	}
 
 	private SaturatedPropertyChain saturate() {
-		SaturatedPropertyChain saturated = IndexedPropertyChainSaturation.saturate(this); 
+		SaturatedPropertyChain saturated = IndexedPropertyChainSaturation.saturate(this);
 		
-		this.saturated.set(saturated);
+		setSaturated(saturated);
 		
-		return saturated;
+		return saturated; 
 	}	
 	
 	

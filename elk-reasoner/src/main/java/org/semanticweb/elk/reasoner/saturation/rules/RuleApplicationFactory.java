@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rulesystem;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
 import java.util.Collection;
 import java.util.Queue;
@@ -33,11 +33,12 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.classes.ContextElClassSaturation;
-import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemElClassSaturation;
-import org.semanticweb.elk.reasoner.saturation.classes.InferenceSystemInvocationManagerSCE;
-import org.semanticweb.elk.reasoner.saturation.classes.RuleStatistics;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory.Engine;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -58,16 +59,6 @@ public class RuleApplicationFactory implements
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
-
-	/**
-	 * The inference system used with this factory
-	 */
-	private final InferenceSystem<? extends Context> inferenceSystem;
-
-	/**
-	 * The manager for rule applications
-	 */
-	private final InferenceSystemInvocationManager inferenceSystemInvocationManager;
 
 	/**
 	 * Cached constants
@@ -108,9 +99,6 @@ public class RuleApplicationFactory implements
 	private final RuleStatistics aggregatedStatistics;
 
 	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
-		// TODO: provide an option for specifying the invocation manager
-		this.inferenceSystem = new InferenceSystemElClassSaturation();
-		this.inferenceSystemInvocationManager = new InferenceSystemInvocationManagerSCE<ContextElClassSaturation>();
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
 		this.aggregatedStatistics = new RuleStatistics();
 		this.reflexiveProperties_ = new ArrayHashSet<IndexedObjectProperty>();
@@ -122,16 +110,6 @@ public class RuleApplicationFactory implements
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 
-		try {
-			inferenceSystemInvocationManager
-					.addInferenceSystem(inferenceSystem);
-		} catch (IllegalInferenceMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -164,7 +142,8 @@ public class RuleApplicationFactory implements
 		}
 	}
 
-	public class Engine implements InputProcessor<IndexedClassExpression> {
+	public class Engine implements InputProcessor<IndexedClassExpression>,
+			RuleEngine {
 
 		/**
 		 * Local statistics created for every worker
@@ -206,6 +185,7 @@ public class RuleApplicationFactory implements
 		/**
 		 * @return the {@code owl:Thing} object in this ontology
 		 */
+		@Override
 		public IndexedClassExpression getOwlNothing() {
 			return owlNothing;
 		}
@@ -227,26 +207,15 @@ public class RuleApplicationFactory implements
 		/**
 		 * @return the object collecting statistics of rule applications
 		 */
+		@Override
 		public RuleStatistics getRuleStatistics() {
 			return this.statistics;
 		}
 
-		/**
-		 * Return the context which has the input indexed class expression as
-		 * the root. In case no such context exists, a new one is created with
-		 * the given root and is returned. It is ensured that no two different
-		 * contexts are created with the same root. In case a new context is
-		 * created, it is scheduled to be processed.
-		 * 
-		 * @param root
-		 *            the input indexed class expression for which to return the
-		 *            context having it as a root
-		 * @return context which root is the input indexed class expression.
-		 * 
-		 */
+		@Override
 		public Context getCreateContext(IndexedClassExpression root) {
 			if (root.getContext() == null) {
-				Context context = inferenceSystem.createContext(root);
+				Context context = new ContextImpl(root);
 				if (root.setContext(context)) {
 					if (++localContextNumber == contextUpdateInterval) {
 						approximateContextNumber.addAndGet(localContextNumber);
@@ -255,7 +224,7 @@ public class RuleApplicationFactory implements
 					if (LOGGER_.isTraceEnabled()) {
 						LOGGER_.trace(root + ": context created");
 					}
-					inferenceSystemInvocationManager.initContext(context, this);
+					initContext(context);
 				}
 			}
 			return root.getContext();
@@ -269,9 +238,13 @@ public class RuleApplicationFactory implements
 		 * @param item
 		 *            the item to be processed in the given context
 		 */
-		public void enqueue(Context context, Queueable<?> item) {
-			context.getToDo().add(item);
-			activateContext(context);
+		@Override
+		public void produce(Context context, Conclusion item) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
+			if (context.addToDo(item))
+				// context was activated
+				activeContexts.add(context);
 		}
 
 		/**
@@ -282,27 +255,24 @@ public class RuleApplicationFactory implements
 		 */
 		protected void process(Context context) {
 			for (;;) {
-				Queueable<?> item = context.getToDo().poll();
+				Conclusion item = context.takeToDo();
 				if (item == null)
 					break;
-
-				inferenceSystemInvocationManager.processItemInContext(item,
-						context, this);
+				item.apply(this, context);
 			}
-
-			deactivateContext(context);
-		}
-
-		private void activateContext(Context context) {
-			if (context.tryActivate()) {
+			if (context.deactivate())
+				// context was re-activated
 				activeContexts.add(context);
-			}
 		}
 
-		private void deactivateContext(Context context) {
-			if (context.tryDeactivate())
-				if (!context.getToDo().isEmpty())
-					activateContext(context);
+		private void initContext(Context context) {
+			produce(context,
+					new PositiveSuperClassExpression(context.getRoot()));
+			// TODO: register this as a ContextRule when owlThing occurs
+			// negative and apply all such context initialization rules here
+			IndexedClassExpression owlThing = getOwlThing();
+			if (owlThing.occursNegatively())
+				produce(context, new PositiveSuperClassExpression(owlThing));
 		}
 
 	}

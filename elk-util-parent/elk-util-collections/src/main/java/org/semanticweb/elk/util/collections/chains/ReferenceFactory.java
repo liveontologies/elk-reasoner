@@ -1,9 +1,9 @@
+package org.semanticweb.elk.util.collections.chains;
 /*
  * #%L
- * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * ELK Utilities Collections
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,18 +20,25 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+/**
+ * A factoring for creating references
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of elements to which a reference should be created
+ * @param <O>
+ *            the type of the output references
+ */
+public interface ReferenceFactory<T, O extends Reference<T>> {
 
-public abstract class IndexedClassEntity extends IndexedClassExpression {
-
-	abstract public <O> O accept(IndexedClassEntityVisitor<O> visitor);
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedClassEntityVisitor<O>) visitor);
-	}
+	/**
+	 * Creates a references to the given object
+	 * 
+	 * @param object
+	 * @return the reference to the given object
+	 */
+	O create(T object);
 
 }

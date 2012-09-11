@@ -1,9 +1,9 @@
+package org.semanticweb.elk.reasoner.saturation.rules;
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,18 +20,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+/**
+ * A rule that can be applied to elements of a particular type using a
+ * {@link RuleEngine}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <E>
+ *            the type of elements to which the rule can be applied
+ */
+public interface Rule<E> {
 
-public abstract class IndexedClassEntity extends IndexedClassExpression {
-
-	abstract public <O> O accept(IndexedClassEntityVisitor<O> visitor);
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedClassEntityVisitor<O>) visitor);
-	}
+	/**
+	 * Applying the rule to an element using a {@link RuleEngine}
+	 * 
+	 * @param ruleEngine
+	 *            a {@link RuleEngine} used for this rule application
+	 * @param element
+	 *            the element to which the rule is applied
+	 */
+	public void apply(RuleEngine ruleEngine, E element);
 
 }
