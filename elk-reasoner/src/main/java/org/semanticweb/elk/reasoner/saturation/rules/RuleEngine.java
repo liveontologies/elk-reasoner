@@ -27,16 +27,52 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
+/**
+ * A common interface for engines used in the saturation for
+ * {@link IndexedClassExpression}s.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public interface RuleEngine {
 
+	/**
+	 * @return the {@link IndexedClassExpression} corresponding to
+	 *         {@code owl:Nothing}.
+	 */
+	public IndexedClassExpression getOwlNothing();
+
+	/**
+	 * Return the {@link Context} which has the given
+	 * {@link IndexedClassExpression} as the root. In case no such context
+	 * exists, a new one is created with the given root and is returned. It is
+	 * ensured that no two different {@link Context}s are created with the same
+	 * root.
+	 * 
+	 * @param root
+	 *            the root of the {@link Context} that should be returned by
+	 *            this method
+	 * @return the {@link Context} with the given root
+	 * 
+	 */
 	public Context getCreateContext(IndexedClassExpression root);
 
+	/**
+	 * Produce a {@link Conclusion} in the given {@link Context}, which will be
+	 * further processed by this {@link RuleEngine}.
+	 * 
+	 * @param context
+	 *            the {@link Context} for which the {@link Conclusion} has been
+	 *            produced
+	 * @param conclusion
+	 *            the {@link Conclusion} produced in the {@link Context}
+	 * 
+	 */
 	public void produce(Context context, Conclusion conclusion);
 
+	/**
+	 * @return the {@link RuleStatistics} of this {@link RuleEngine}.
+	 */
 	public RuleStatistics getRuleStatistics();
-
-	public void initContext(Context context);
-
-	public IndexedClassExpression getOwlNothing();
 
 }

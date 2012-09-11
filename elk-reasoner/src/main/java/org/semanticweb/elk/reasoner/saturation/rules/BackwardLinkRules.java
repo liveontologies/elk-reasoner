@@ -23,14 +23,26 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.ChainImpl;
 
-public abstract class BackwardLinkRules extends ChainImpl<BackwardLinkRules> {
+/**
+ * A skeleton class which for implementing rules that can be applied to
+ * {@link BackwardLink}s.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public abstract class BackwardLinkRules extends ChainImpl<BackwardLinkRules>
+		implements Rule<BackwardLink>, Chain<BackwardLinkRules> {
 
+	/**
+	 * Creates a new chain of rules which appends the given chain of rules.
+	 * 
+	 * @param tail
+	 */
 	public BackwardLinkRules(BackwardLinkRules tail) {
 		super(tail);
 	}
-
-	public abstract void apply(RuleEngine ruleEngine, BackwardLink link);
 
 }

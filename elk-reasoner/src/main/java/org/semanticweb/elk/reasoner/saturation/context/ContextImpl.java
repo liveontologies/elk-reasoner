@@ -22,12 +22,17 @@
  */
 package org.semanticweb.elk.reasoner.saturation.context;
 
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -42,128 +47,182 @@ import org.semanticweb.elk.util.collections.chains.AbstractChain;
  * 
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
-public class ContextImpl extends AbstractContext implements Context {
+public class ContextImpl implements Context {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger.getLogger(ContextImpl.class);
 
-	final Set<IndexedClassExpression> superClassExpressions;
-
-	Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty;
-
-	Set<IndexedDisjointnessAxiom> disjointnessAxioms;
-
-	BackwardLinkRules backwardLinkRules;
+	/**
+	 * the root {@link IndexedClassExpression} for which the
+	 * {@link #superClassExpressions_} are computed
+	 * 
+	 */
+	private final IndexedClassExpression root_;
 
 	/**
-	 * A context is saturated if all superclass expressions of the root
-	 * expression have been computed.
+	 * the representation of all derived {@link SuperClassExpression}s computed
+	 * for this {@link Context}; these should be super-classes of {@link #root_}
+	 */
+	private final Set<IndexedClassExpression> superClassExpressions_;
+
+	/**
+	 * the indexed representation of all derived {@link BackwardLink}s computed
+	 * for this {@link Context}; can be {@code null}
+	 */
+	private Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty_ = null;
+
+	// Set<IndexedDisjointnessAxiom> disjointnessAxioms;
+
+	/**
+	 * the rules that should be applied to each derived {@link BackwardLink} in
+	 * this {@link Context}; can be {@code null}
+	 */
+	private BackwardLinkRules backwardLinkRules_ = null;
+
+	/**
+	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
+	 */
+	private final Queue<Conclusion> toDo_;
+
+	/**
+	 * the flag used to trigger activation and de-activation of contexts. If
+	 * this value is {@code false} then {@link #toDo_} queue should be empty
+	 */
+	private final AtomicBoolean isActive_;
+
+	/**
+	 * {@code true} if all derived {@link SuperClassExpression} of
+	 * {@link #root_} have been computed.
 	 */
 	protected volatile boolean isSaturated = false;
 
 	/**
-	 * False if owl:Nothing is stored as a superclass in this context.
+	 * {@code true} if {@code owl:Nothing} is stored in
+	 * {@link #superClassExpressions_}
 	 */
-	protected volatile boolean isSatisfiable = true;
+	protected volatile boolean isInconsistent = false;
 
+	/**
+	 * Construct a new {@link Context} for the given root
+	 * {@link IndexedClassExpression}. Initially, the context is not active.
+	 * 
+	 * @param root
+	 */
 	public ContextImpl(IndexedClassExpression root) {
-		super(root);
-		this.superClassExpressions = new ArrayHashSet<IndexedClassExpression>(
+		this.root_ = root;
+		this.toDo_ = new ConcurrentLinkedQueue<Conclusion>();
+		this.isActive_ = new AtomicBoolean(false);
+		this.superClassExpressions_ = new ArrayHashSet<IndexedClassExpression>(
 				13);
 	}
 
 	@Override
+	public IndexedClassExpression getRoot() {
+		return root_;
+	}
+
+	@Override
 	public Set<IndexedClassExpression> getSuperClassExpressions() {
-		return superClassExpressions;
+		return superClassExpressions_;
 	}
 
 	@Override
-	public boolean isSatisfiable() {
-		return isSatisfiable;
+	public boolean isInconsistent() {
+		return isInconsistent;
 	}
 
 	@Override
-	public void setSatisfiable(boolean satisfiable) {
-		isSatisfiable = satisfiable;
+	public void setInconsistent() {
+		isInconsistent = true;
 	}
 
+	@Override
 	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty() {
-		if (backwardLinksByObjectProperty == null)
+		if (backwardLinksByObjectProperty_ == null)
 			return Operations.emptyMultimap();
-		return backwardLinksByObjectProperty;
+		return backwardLinksByObjectProperty_;
 	}
 
-	public boolean addDisjointessAxiom(
-			IndexedDisjointnessAxiom disjointnessAxiom) {
-		if (disjointnessAxioms == null)
-			disjointnessAxioms = new ArrayHashSet<IndexedDisjointnessAxiom>();
+	// public boolean addDisjointessAxiom(
+	// IndexedDisjointnessAxiom disjointnessAxiom) {
+	// if (disjointnessAxioms == null)
+	// disjointnessAxioms = new ArrayHashSet<IndexedDisjointnessAxiom>();
+	//
+	// return disjointnessAxioms.add(disjointnessAxiom);
+	// }
 
-		return disjointnessAxioms.add(disjointnessAxiom);
-	}
-
-	/**
-	 * Mark context as saturated. A context is saturated if all superclass
-	 * expressions of the root expression have been computed.
-	 */
 	@Override
 	public void setSaturated() {
 		isSaturated = true;
 	}
 
-	/**
-	 * Return if context is saturated. A context is saturated if all superclass
-	 * expressions of the root expression have been computed. This needs to be
-	 * set explicitly by some processor.
-	 * 
-	 * @return {@code true} if this context is saturated and {@code false}
-	 *         otherwise
-	 */
 	@Override
 	public boolean isSaturated() {
 		return isSaturated;
 	}
 
 	@Override
-	public boolean addBackwardLinkByObjectProperty(
-			IndexedPropertyChain relation, Context target) {
+	public boolean addBackwardLink(BackwardLink link) {
+		Context target = link.getTarget();
+		IndexedPropertyChain relation = link.getReltaion();
 		if (target.isSaturated())
 			LOGGER_.error(getRoot()
 					+ ": adding a backward link to a saturated context: "
-					+ relation + "<-" + target.getRoot());
-		if (backwardLinksByObjectProperty == null)
-			backwardLinksByObjectProperty = new HashSetMultimap<IndexedPropertyChain, Context>();
-		return backwardLinksByObjectProperty.add(relation, target);
+					+ link);
+		if (backwardLinksByObjectProperty_ == null)
+			backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
+		return backwardLinksByObjectProperty_.add(relation, target);
 	}
 
 	@Override
-	public boolean addSuperClassExpression(IndexedClassExpression expression) {
+	public boolean addSuperClassExpression(SuperClassExpression expression) {
 		if (isSaturated)
 			LOGGER_.error(getRoot()
 					+ ": adding a superclass to a saturated context: "
 					+ expression);
-		return superClassExpressions.add(expression);
+		return superClassExpressions_.add(expression.getExpression());
 	}
 
 	@Override
-	public AbstractChain<BackwardLinkRules> getChainBackwardLinkRules() {
+	public AbstractChain<BackwardLinkRules> getBackwardLinkRulesChain() {
 		return new AbstractChain<BackwardLinkRules>() {
 
 			@Override
 			public BackwardLinkRules get() {
-				return backwardLinkRules;
+				return backwardLinkRules_;
 			}
 
 			@Override
 			public void set(BackwardLinkRules tail) {
-				backwardLinkRules = tail;
+				backwardLinkRules_ = tail;
 			}
 		};
 	}
 
 	@Override
 	public BackwardLinkRules getBackwardLinkRules() {
-		return backwardLinkRules;
+		return backwardLinkRules_;
 	}
+
+	@Override
+	public boolean addToDo(Conclusion conclusion) {
+		toDo_.add(conclusion);
+		return isActive_.compareAndSet(false, true);
+	}
+
+	@Override
+	public Conclusion takeToDo() {
+		return toDo_.poll();
+	}
+
+	@Override
+	public boolean deactivate() {
+		if (isActive_.compareAndSet(true, false) && !toDo_.isEmpty())
+			return isActive_.compareAndSet(false, true);
+		return false;
+	}
+
 }

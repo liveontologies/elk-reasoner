@@ -56,7 +56,7 @@ public class ForwardLink implements Conclusion {
 		statistics.forwLinkInfNo++;
 
 		if (!context
-				.getChainBackwardLinkRules()
+				.getBackwardLinkRulesChain()
 				.getCreate(ThisBackwardLinkRule.MATCHER_,
 						ThisBackwardLinkRule.FACTORY_)
 				.addForwardLinkByObjectProperty(relation_, target_))

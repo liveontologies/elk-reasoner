@@ -36,8 +36,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.RuleStatistics;
-import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -210,19 +210,6 @@ public class RuleApplicationFactory implements
 			return this.statistics;
 		}
 
-		/**
-		 * Return the context which has the input indexed class expression as
-		 * the root. In case no such context exists, a new one is created with
-		 * the given root and is returned. It is ensured that no two different
-		 * contexts are created with the same root. In case a new context is
-		 * created, it is scheduled to be processed.
-		 * 
-		 * @param root
-		 *            the input indexed class expression for which to return the
-		 *            context having it as a root
-		 * @return context which root is the input indexed class expression.
-		 * 
-		 */
 		public Context getCreateContext(IndexedClassExpression root) {
 			if (root.getContext() == null) {
 				Context context = new ContextImpl(root);
@@ -252,8 +239,8 @@ public class RuleApplicationFactory implements
 		public void produce(Context context, Conclusion item) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
-			context.getToDo().add(item);
-			activateContext(context);
+			if (context.addToDo(item))
+				activeContexts.add(context);
 		}
 
 		/**
@@ -264,30 +251,29 @@ public class RuleApplicationFactory implements
 		 */
 		protected void process(Context context) {
 			for (;;) {
-				Conclusion item = context.getToDo().poll();
+				Conclusion item = context.takeToDo();
 				if (item == null)
-					break;
-
+					if (context.deactivate())
+						continue;
+					else
+						break;
 				item.process(context, this);
 			}
-
-			deactivateContext(context);
 		}
 
-		private void activateContext(Context context) {
-			if (context.tryActivate()) {
-				activeContexts.add(context);
-			}
-		}
+		// private void activateContext(Context context) {
+		// if (context.tryActivate()) {
+		// activeContexts.add(context);
+		// }
+		// }
+		//
+		// private void deactivateContext(Context context) {
+		// if (context.tryDeactivate())
+		// if (!context.getToDo().isEmpty())
+		// activateContext(context);
+		// }
 
-		private void deactivateContext(Context context) {
-			if (context.tryDeactivate())
-				if (!context.getToDo().isEmpty())
-					activateContext(context);
-		}
-
-		@Override
-		public void initContext(Context context) {
+		private void initContext(Context context) {
 			produce(context,
 					new PositiveSuperClassExpression(context.getRoot()));
 			// TODO: register this as a ContextRule when owlThing occurs

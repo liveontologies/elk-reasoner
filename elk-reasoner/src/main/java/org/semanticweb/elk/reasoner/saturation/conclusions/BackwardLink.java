@@ -60,7 +60,7 @@ public class BackwardLink implements Conclusion {
 		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.backLinkInfNo++;
 
-		if (!context.addBackwardLinkByObjectProperty(relation_, target_))
+		if (!context.addBackwardLink(this))
 			return;
 
 		statistics.backLinkNo++;

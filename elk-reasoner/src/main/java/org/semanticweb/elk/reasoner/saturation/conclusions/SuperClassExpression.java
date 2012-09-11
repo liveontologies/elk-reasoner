@@ -46,7 +46,7 @@ public abstract class SuperClassExpression implements Conclusion {
 	public boolean storeInContext(Context context, RuleEngine ruleEngine) {
 		RuleStatistics statistics = ruleEngine.getRuleStatistics();
 		statistics.superClassExpressionInfNo++;
-		if (context.addSuperClassExpression(expression)) {
+		if (context.addSuperClassExpression(this)) {
 			statistics.superClassExpressionNo++;
 			return true;
 		}

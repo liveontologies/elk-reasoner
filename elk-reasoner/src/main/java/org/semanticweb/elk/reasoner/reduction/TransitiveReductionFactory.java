@@ -169,10 +169,10 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
-			if (!saturation.isSatisfiable()) {
+			if (saturation.isInconsistent()) {
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root
-							+ ": transitive reduction finished: unsatisfiable");
+							+ ": transitive reduction finished: inconsistent");
 				}
 				TransitiveReductionOutput<R> output = new TransitiveReductionOutputUnsatisfiable<R>(
 						root);

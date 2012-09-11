@@ -1,9 +1,4 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
-
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.collections.chains.ChainImpl;
-
 /*
  * #%L
  * ELK Reasoner
@@ -27,22 +22,24 @@ import org.semanticweb.elk.util.collections.chains.ChainImpl;
  */
 
 /**
- * A skeleton class which for implementing rules that can be applied to
- * {@link Context}s.
+ * A rule that can be applied to elements of a particular type using a
+ * {@link RuleEngine}.
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <E>
+ *            the type of elements to which the rule can be applied
  */
-public abstract class ContextRules extends ChainImpl<ContextRules> implements
-		Rule<Context>, Chain<ContextRules> {
+public interface Rule<E> {
 
 	/**
-	 * Creates a new chain of rules which appends the given chain of rules.
+	 * Applying the rule to an element using a {@link RuleEngine}
 	 * 
-	 * @param tail
+	 * @param ruleEngine
+	 *            a {@link RuleEngine} used for this rule application
+	 * @param element
+	 *            the element to which the rule is applied
 	 */
-	public ContextRules(ContextRules tail) {
-		super(tail);
-	}
+	public void apply(RuleEngine ruleEngine, E element);
 
 }

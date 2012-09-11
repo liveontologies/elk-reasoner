@@ -96,7 +96,7 @@ public class IndexedClass extends IndexedClassEntity {
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		if (this.equals(ruleEngine.getOwlNothing())) {
-			context.setSatisfiable(false);
+			context.setInconsistent();
 
 			// propagating bottom to the predecessors
 			final Multimap<IndexedPropertyChain, Context> backLinks = context
@@ -113,7 +113,7 @@ public class IndexedClass extends IndexedClassEntity {
 			}
 
 			// register the backward link rule for propagation of bottom
-			context.getChainBackwardLinkRules().getCreate(
+			context.getBackwardLinkRulesChain().getCreate(
 					BottomBackwardLinkRule.MATCHER_,
 					BottomBackwardLinkRule.FACTORY_);
 		}

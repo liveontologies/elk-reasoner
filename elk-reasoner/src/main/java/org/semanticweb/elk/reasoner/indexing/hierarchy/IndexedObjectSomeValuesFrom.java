@@ -229,7 +229,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 						+ propRelation + "->" + carry);
 
 			if (context
-					.getChainBackwardLinkRules()
+					.getBackwardLinkRulesChain()
 					.getCreate(ThisBackwardLinkRule.MATCHER_,
 							ThisBackwardLinkRule.FACTORY_)
 					.addPropagationByObjectProperty(propRelation, carry)) {
