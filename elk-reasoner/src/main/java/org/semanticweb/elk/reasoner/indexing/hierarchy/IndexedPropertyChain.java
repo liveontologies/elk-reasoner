@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.IndexedPropertyChainSaturation;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -231,7 +232,19 @@ public abstract class IndexedPropertyChain {
 	 *         assigned.
 	 */
 	public SaturatedPropertyChain getSaturated() {
-		return saturated.get();
+		return getSaturated(true);
+	}
+	
+	/**
+	 * If the parameter is set to false, the saturation object will be returned
+	 * "as is", i.e. possibly null or not yet populated.
+	 * Otherwise, saturation will be triggered automatically.
+	 * 
+	 * @param saturate
+	 * @return
+	 */
+	public SaturatedPropertyChain getSaturated(boolean saturate) {
+		return saturate && (saturated.get() == null || !saturated.get().isComputed()) ? saturate() : saturated.get();
 	}
 
 	/**
@@ -268,6 +281,15 @@ public abstract class IndexedPropertyChain {
 		return hashCode_;
 	}
 
+	private SaturatedPropertyChain saturate() {
+		SaturatedPropertyChain saturated = IndexedPropertyChainSaturation.saturate(this); 
+		
+		this.saturated.set(saturated);
+		
+		return saturated;
+	}	
+	
+	
 	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);
 
 	@Override

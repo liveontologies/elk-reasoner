@@ -86,6 +86,8 @@ public class SaturatedPropertyChain {
 	AtomicReference<REFLEXIVITY> isReflexive = new AtomicReference<REFLEXIVITY>(REFLEXIVITY.UNKNOWN);
 	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeftSubProperty;
 	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRightSubProperty;
+	
+	boolean computed = false;
 
 	public SaturatedPropertyChain(IndexedPropertyChain iop) {
 		this.root = iop;
@@ -95,7 +97,22 @@ public class SaturatedPropertyChain {
 		this.derivedRightSubProperties = new ArrayHashSet<IndexedPropertyChain>();
 		this.leftComposableProperties = new ArrayHashSet<IndexedPropertyChain>();
 	}
+	
+	public SaturatedPropertyChain(IndexedPropertyChain iop, boolean reflexive) {
+		this(iop);
+		this.isReflexive.set(reflexive ? REFLEXIVITY.TRUE : REFLEXIVITY.FALSE);
+	}	
+	
+	public SaturatedPropertyChain(SaturatedPropertyChain saturated) {
+		this(saturated.getRoot());
+		
+		isReflexive.set(saturated.isReflexive.get());
+	}	
 
+	public boolean isComputed() {
+		return computed;
+	}
+	
 	public IndexedPropertyChain getRoot() {
 		return root;
 	}
@@ -172,7 +189,7 @@ public class SaturatedPropertyChain {
 		return compositionsByRightSubProperty;
 	}
 
-	boolean reflexvityDetermined() {
+	boolean reflexivityDetermined() {
 		return isReflexive.get() != REFLEXIVITY.UNKNOWN;
 	}
 }

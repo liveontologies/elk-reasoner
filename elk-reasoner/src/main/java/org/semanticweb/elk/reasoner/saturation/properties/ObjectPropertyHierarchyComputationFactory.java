@@ -132,7 +132,7 @@ public class ObjectPropertyHierarchyComputationFactory implements
 
 		private boolean isReflexive(IndexedPropertyChain ipc) {
 			if (ipc.getSaturated() == null
-					|| !ipc.getSaturated().reflexvityDetermined()) {
+					|| !ipc.getSaturated().reflexivityDetermined()) {
 				// TODO perhaps we don't need to create an object every time?
 				new ReflexivityChecker().isReflexive(ipc);
 			}
