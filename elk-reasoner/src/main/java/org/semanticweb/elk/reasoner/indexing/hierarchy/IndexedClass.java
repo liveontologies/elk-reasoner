@@ -134,7 +134,7 @@ public class IndexedClass extends IndexedClassEntity {
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
 			ruleEngine
 					.produce(
-							link.getTarget(),
+							link.getSource(),
 							new PositiveSuperClassExpression(ruleEngine
 									.getOwlNothing()));
 		}

@@ -166,15 +166,15 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean addBackwardLink(BackwardLink link) {
-		Context target = link.getTarget();
+		Context source = link.getSource();
 		IndexedPropertyChain relation = link.getReltaion();
-		if (target.isSaturated())
+		if (source.isSaturated())
 			LOGGER_.error(getRoot()
 					+ ": adding a backward link to a saturated context: "
 					+ link);
 		if (backwardLinksByObjectProperty_ == null)
 			backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
-		return backwardLinksByObjectProperty_.add(relation, target);
+		return backwardLinksByObjectProperty_.add(relation, source);
 	}
 
 	@Override

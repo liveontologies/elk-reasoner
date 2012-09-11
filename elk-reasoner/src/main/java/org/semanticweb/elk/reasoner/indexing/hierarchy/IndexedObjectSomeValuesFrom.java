@@ -145,7 +145,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		ruleEngine.produce(ruleEngine.getCreateContext(filler),
-				new BackwardLink(property, context));
+				new BackwardLink(context, property));
 	}
 
 	private static class ThisCompositionRule extends ContextRules {
@@ -283,7 +283,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
 			for (Conclusion carry : propagationsByObjectProperty_.get(link
 					.getReltaion()))
-				ruleEngine.produce(link.getTarget(), carry);
+				ruleEngine.produce(link.getSource(), carry);
 		}
 
 		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, ThisBackwardLinkRule>() {

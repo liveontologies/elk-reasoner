@@ -31,33 +31,59 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
+ * A {@link Conclusion} representing derived existential restrictions from a
+ * source {@link Context} to this target {@link Context}. Intuitively, if a
+ * subclass axiom {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived
+ * by inference rules, then a {@link BackwardLink} with the source {@code :A}
+ * and the relation {@code :r} can be produced for the target context with root
+ * {@code :B}.
+ * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
 public class BackwardLink implements Conclusion {
 
+	/**
+	 * the source {@link Context} of this {@link BackwardLink}; the root of the
+	 * source implies this link.
+	 */
+	private final Context source_;
+
+	/**
+	 * the {@link IndexedPropertyChain} in the existential restriction
+	 * corresponding to this link
+	 */
 	private final IndexedPropertyChain relation_;
 
-	private final Context target_;
-
-	public BackwardLink(IndexedPropertyChain relation, Context target) {
+	public BackwardLink(Context source, IndexedPropertyChain relation) {
 		this.relation_ = relation;
-		this.target_ = target;
+		this.source_ = source;
 	}
 
+	/**
+	 * @return the source of this {@link BackwardLink}, that is, the
+	 *         {@link Context} from which the existential restriction
+	 *         corresponding to this {@link BackwardLink} follows
+	 */
+	public Context getSource() {
+		return source_;
+	}
+
+	/**
+	 * @return the {@link IndexedPropertyChain} of this {@link BackwardLink}
+	 *         which is used in the existential restriction corresponding to
+	 *         this {@link BackwardLink}
+	 * 
+	 */
 	public IndexedPropertyChain getReltaion() {
 		return relation_;
-	}
-
-	public Context getTarget() {
-		return target_;
 	}
 
 	@Override
 	public void apply(RuleEngine ruleEngine, Context context) {
 
-		RuleStatistics statistics = ruleEngine.getRuleStatistics();
+		ConclusionsCounter statistics = ruleEngine.getRuleStatistics();
 		statistics.backLinkInfNo++;
 
 		if (!context.addBackwardLink(this))
@@ -77,19 +103,20 @@ public class BackwardLink implements Conclusion {
 		 * convert backward link to a forward link if it can potentially be
 		 * composed
 		 */
-		Set<IndexedPropertyChain> toldProperties = target_.getRoot()
+		Set<IndexedPropertyChain> toldProperties = source_.getRoot()
 				.getPosPropertiesInExistentials();
 		if (toldProperties != null
 				&& !new LazySetIntersection<IndexedPropertyChain>(
 						toldProperties, relation_.getSaturated()
 								.getLeftComposableProperties()).isEmpty()) {
-			ruleEngine.produce(target_, new ForwardLink(relation_, context));
+			ruleEngine.produce(source_, new ForwardLink(relation_, context));
 		}
 
 	}
 
+	@Override
 	public String toString() {
-		return (relation_ + "<-" + target_.getRoot());
+		return (relation_ + "<-" + source_.getRoot());
 	}
 
 }

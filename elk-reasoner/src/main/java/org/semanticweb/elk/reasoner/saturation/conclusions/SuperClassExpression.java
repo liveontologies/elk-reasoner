@@ -24,27 +24,52 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
 /**
+ * A {@link Conclusion} representing an implied {@link IndexedClassExpression}
+ * of the root of the {@link Context} for which it is produced. Intuitively, if
+ * a subclass axiom {@code SubClassOf(:A :B)} is derived by inference rules,
+ * then a {@link SuperClassExpression} corresponding to {@code :B} can be
+ * produced for the context with root {@code :A}
+ * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
 public abstract class SuperClassExpression implements Conclusion {
 
+	/**
+	 * the implied {@code IndexedClassExpression} represented by this
+	 * {@link SuperClassExpression}
+	 */
 	protected final IndexedClassExpression expression;
 
 	public SuperClassExpression(IndexedClassExpression expression) {
 		this.expression = expression;
 	}
 
+	/**
+	 * @return the {@code IndexedClassExpression} represented by this
+	 *         {@link SuperClassExpression}
+	 */
 	public IndexedClassExpression getExpression() {
 		return expression;
 	}
 
-	public boolean storeInContext(Context context, RuleEngine ruleEngine) {
-		RuleStatistics statistics = ruleEngine.getRuleStatistics();
+	/**
+	 * saves this {@link SuperClassExpression} in the given {@link Context} and
+	 * updates the information in the provided {@link ConclusionsCounter}
+	 * 
+	 * @param context
+	 *            the {@link Context} in which the given
+	 *            {@link SuperClassExpression} is saved
+	 * @param statistics
+	 *            the object used to update the statistical information about
+	 *            {@link SuperClassExpression}s
+	 * @return
+	 */
+	public boolean storeInContext(Context context,
+			ConclusionsCounter statistics) {
 		statistics.superClassExpressionInfNo++;
 		if (context.addSuperClassExpression(this)) {
 			statistics.superClassExpressionNo++;
@@ -53,6 +78,7 @@ public abstract class SuperClassExpression implements Conclusion {
 		return false;
 	}
 
+	@Override
 	public String toString() {
 		return expression.toString();
 	}

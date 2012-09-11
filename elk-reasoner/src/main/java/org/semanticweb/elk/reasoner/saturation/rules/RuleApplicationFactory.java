@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
@@ -96,11 +96,11 @@ public class RuleApplicationFactory implements
 	/**
 	 * The aggregated statistics of all workers
 	 */
-	private final RuleStatistics aggregatedStatistics;
+	private final ConclusionsCounter aggregatedStatistics;
 
 	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
 		this.activeContexts = new ConcurrentLinkedQueue<Context>();
-		this.aggregatedStatistics = new RuleStatistics();
+		this.aggregatedStatistics = new ConclusionsCounter();
 		this.reflexiveProperties_ = new ArrayHashSet<IndexedObjectProperty>();
 		Collection<IndexedObjectProperty> reflexiveObjectProperties = ontologyIndex
 				.getReflexiveObjectProperties();
@@ -148,7 +148,7 @@ public class RuleApplicationFactory implements
 		/**
 		 * Local statistics created for every worker
 		 */
-		private final RuleStatistics statistics = new RuleStatistics();
+		private final ConclusionsCounter statistics = new ConclusionsCounter();
 		/**
 		 * Worker-local counter for the number of created contexts
 		 */
@@ -206,7 +206,7 @@ public class RuleApplicationFactory implements
 		/**
 		 * @return the object collecting statistics of rule applications
 		 */
-		public RuleStatistics getRuleStatistics() {
+		public ConclusionsCounter getRuleStatistics() {
 			return this.statistics;
 		}
 
