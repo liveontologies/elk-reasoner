@@ -86,10 +86,10 @@ class TransitiveReductionExperimentStage extends AbstractReasonerStage {
 	void initComputation() {
 		super.initComputation();
 		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
+			LOGGER_.info(getName() + " using " + 1 + " workers");
 		this.computation = new TransitiveReductionExperiment(
 				reasoner.ontologyIndex, reasoner.getProcessExecutor(),
-				workerNo, progressMonitor);
+				1, progressMonitor);
 	}
 
 	@Override

@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * Computing taxonomy relations between atomic classes of the ontology.
@@ -36,7 +37,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class TransitiveReductionExperiment
 		extends
-		ReasonerComputation<IndexedClass, TransitiveReductionExperimentFactory.Engine, TransitiveReductionExperimentFactory> {
+		ReasonerComputation<IndexedClass, InputProcessor<IndexedClass>, TransitiveReductionExperimentFactory> {
 
 	public TransitiveReductionExperiment(OntologyIndex ontologyIndex,
 			ComputationExecutor executor, int maxWorkers,
