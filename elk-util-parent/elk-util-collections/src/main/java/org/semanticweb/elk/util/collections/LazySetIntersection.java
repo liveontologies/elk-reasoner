@@ -54,6 +54,8 @@ import java.util.Set;
  * 
  */
 public class LazySetIntersection<E> extends AbstractSet<E> {
+	
+	static final boolean ITERATE_OVER_SMALLER = true;
 
 	final Set<E> firstSet;
 	final Set<E> secondSet;
@@ -73,12 +75,15 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 
 	@Override
 	public Iterator<E> iterator() {
-		if (firstSet.size() < secondSet.size())
-			// iterating over the fist set
+		if (ITERATE_OVER_SMALLER) {
+			if (firstSet.size() < secondSet.size())
+				// iterating over the fist set
+				return new SetIntersectionIterator<E>(firstSet, secondSet);
+			else
+				// iterating over the second set
+				return new SetIntersectionIterator<E>(secondSet, firstSet);
+		} else
 			return new SetIntersectionIterator<E>(firstSet, secondSet);
-		else
-			// iterating over the second set
-			return new SetIntersectionIterator<E>(secondSet, firstSet);
 	}
 
 	@Override

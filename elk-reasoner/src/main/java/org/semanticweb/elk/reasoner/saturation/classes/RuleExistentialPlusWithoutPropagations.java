@@ -41,33 +41,23 @@ import org.semanticweb.elk.util.collections.Multimap;
  * @param <C>
  *            the type of contexts that can be used with this inference rule
  */
-public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
-		RuleWithBackwardLinks<C> implements InferenceRuleSCE<C> {
+public class RuleExistentialPlusWithoutPropagations<C extends ContextElClassSaturation>
+		extends RuleWithBackwardLinks<C> implements InferenceRuleSCE<C> {
 
 	public void apply(BackwardLink<C> argument, C context,
 			RuleApplicationFactory.Engine engine) {
 		final IndexedPropertyChain linkRelation = argument.getRelation();
 		final Context target = argument.getTarget();
 
-		// start deriving propagations
-		if (!context.derivePropagations) {
-			initializePropagations(context, engine);
-			// the above already applies all propagations, can return
-			return;
-		}
-
-		// apply all propagations over the link
-		final Multimap<IndexedPropertyChain, Queueable<? extends ContextElClassSaturation>> props = context
-				.getPropagationsByObjectProperty();
-		if (props == null)
-			return;
-
-		for (IndexedPropertyChain propRelation : new LazySetIntersection<IndexedPropertyChain>(
-				linkRelation.getSaturated().getSuperProperties(),
-				props.keySet()))
-
-			for (Queueable<?> carry : props.get(propRelation))
-				engine.enqueue(target, carry);
+		for (IndexedClassExpression ice : context.superClassExpressions)
+			if (ice.getNegExistentials() != null)
+				for (IndexedObjectSomeValuesFrom e : ice.getNegExistentials())
+					if (linkRelation.getSaturated().getSuperProperties()
+							.contains(e.getRelation())) {
+						Queueable<C> carry = InferenceSystemElClassSaturation.OPTIMIZE_DECOMPOSITIONS ? new NegativeSuperClassExpression<C>(
+								e) : new PositiveSuperClassExpression<C>(e);
+						engine.enqueue(target, carry);
+					}
 	}
 
 	@Override
@@ -76,51 +66,29 @@ public class RuleExistentialPlus<C extends ContextElClassSaturation> extends
 		final Collection<IndexedObjectSomeValuesFrom> exists = argument
 				.getExpression().getNegExistentials();
 
-		if (!context.derivePropagations || exists == null)
+		if (exists == null)
 			return;
 
-		for (IndexedObjectSomeValuesFrom e : exists)
-			addPropagation(e.getRelation(), e, context, engine);
-	}
+		initializeCompositionOfBackwardLinks(context, engine);
 
-	private void initializePropagations(C context,
-			RuleApplicationFactory.Engine engine) {
-		context.setDerivePropagations(true);
+		final Multimap<IndexedPropertyChain, ContextElClassSaturation> backLinks = context
+				.getBackwardLinksByObjectProperty();
 
-		for (IndexedClassExpression ice : context.superClassExpressions)
-			if (ice.getNegExistentials() != null)
-				for (IndexedObjectSomeValuesFrom e : ice.getNegExistentials())
-					addPropagation(e.getRelation(), e, context, engine);
-	}
+		if (backLinks == null)
+			return;
 
-	private void addPropagation(IndexedPropertyChain propRelation,
-			IndexedObjectSomeValuesFrom exist, C context,
-			RuleApplicationFactory.Engine engine) {
-
-		Queueable<C> carry = InferenceSystemElClassSaturation.OPTIMIZE_DECOMPOSITIONS ? new NegativeSuperClassExpression<C>(
-				exist) : new PositiveSuperClassExpression<C>(exist);
-
-		if (context.propagationsByObjectProperty == null) {
-			context.initPropagationsByProperty();
-			initializeCompositionOfBackwardLinks(context, engine);
-		}
-
-		if (context.propagationsByObjectProperty.add(propRelation, carry)) {
-
-			// propagate over all backward links
-			final Multimap<IndexedPropertyChain, ContextElClassSaturation> backLinks = context
-					.getBackwardLinksByObjectProperty();
-
-			if (backLinks == null) // this should never happen
-				return;
+		for (IndexedObjectSomeValuesFrom e : exists) {
+			Queueable<C> carry = InferenceSystemElClassSaturation.OPTIMIZE_DECOMPOSITIONS ? new NegativeSuperClassExpression<C>(
+					e) : new PositiveSuperClassExpression<C>(e);
 
 			for (IndexedPropertyChain linkRelation : new LazySetIntersection<IndexedPropertyChain>(
-					propRelation.getSaturated().getSubProperties(),
+					e.getRelation().getSaturated().getSubProperties(),
 					backLinks.keySet()))
 
 				for (Context target : backLinks.get(linkRelation))
 					engine.enqueue(target, carry);
 		}
+
 	}
 
 }

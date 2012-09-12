@@ -46,7 +46,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 public class TransitiveReductionExperimentFactory implements
 		InputProcessorFactory<IndexedClass, InputProcessor<IndexedClass>> {
 	
-	private final static boolean NAIVE = false;
+	static final boolean NAIVE = false;
 	
 	int equivalentNo = 0;
 	int directNo = 0;

@@ -32,6 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.rulesystem.InferenceSystem;
  * 
  */
 public final class InferenceSystemElClassSaturation extends InferenceSystem<ContextElClassSaturation> {
+	
+	static final boolean OPTIMIZE_DECOMPOSITIONS = true;
 
 	public InferenceSystemElClassSaturation() {
 		
@@ -39,7 +41,8 @@ public final class InferenceSystemElClassSaturation extends InferenceSystem<Cont
 		add(new RuleSubsumption<ContextElClassSaturation>());
 		add(new RuleDecomposition<ContextElClassSaturation>());
 		add(new RuleConjunctionPlus<ContextElClassSaturation>());
-		add(new RuleExistentialPlus<ContextElClassSaturation>());
+//		add(new RuleExistentialPlus<ContextElClassSaturation>());
+		add(new RuleExistentialPlusWithoutPropagations<ContextElClassSaturation>());
 		add(new RuleRoleComposition<ContextElClassSaturation>());
 		add(new RuleBottom<ContextElClassSaturation>());
 		add(new RuleDisjoint<ContextElClassSaturation>());

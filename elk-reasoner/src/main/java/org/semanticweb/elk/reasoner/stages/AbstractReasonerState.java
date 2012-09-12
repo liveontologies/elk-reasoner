@@ -287,7 +287,9 @@ public abstract class AbstractReasonerState {
 		if (!isConsistent())
 			throw new ElkInconsistentOntologyException();
 
-		getStageExecutor().complete(new ClassTaxonomyComputationStage(this));
+		ReasonerStage stage = new ClassTaxonomyComputationStage(this);
+		getStageExecutor().complete(stage);
+		stage.printInfo();
 		return taxonomy;
 	}
 

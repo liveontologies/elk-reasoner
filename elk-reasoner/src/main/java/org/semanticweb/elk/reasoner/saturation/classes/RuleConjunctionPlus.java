@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.saturation.rulesystem.Queueable;
 import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
@@ -51,9 +52,11 @@ public class RuleConjunctionPlus<C extends ContextElClassSaturation> implements
 			return;
 
 		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-				conjs.keySet(), context.getSuperClassExpressions()))
-			engine.enqueue(context,
-					new NegativeSuperClassExpression<C>(conjs.get(common)));
+				conjs.keySet(), context.getSuperClassExpressions())) {
+			Queueable<C> conclusion = InferenceSystemElClassSaturation.OPTIMIZE_DECOMPOSITIONS ? new NegativeSuperClassExpression<C>(
+					conjs.get(common)) : new PositiveSuperClassExpression<C>(
+					conjs.get(common));
+			engine.enqueue(context, conclusion);
+		}
 	}
-
 }
