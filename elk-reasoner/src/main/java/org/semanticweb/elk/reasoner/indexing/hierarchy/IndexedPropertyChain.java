@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -208,11 +207,11 @@ public abstract class IndexedPropertyChain {
 	int occurrenceNo = 0;
 
 	/**
-	 * the reference to a {@link SaturatedPropertyChain} assigned to this
+	 * The {@link SaturatedPropertyChain} object assigned to this
 	 * {@link IndexedPropertyChain}
 	 */
-	//private volatile SaturatedPropertyChain saturated_ = null;
-	private AtomicReference<SaturatedPropertyChain> saturated_ = new AtomicReference<SaturatedPropertyChain>();
+	private volatile SaturatedPropertyChain saturated_ = null;
+	//private AtomicReference<SaturatedPropertyChain> saturated_ = new AtomicReference<SaturatedPropertyChain>();
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
@@ -245,7 +244,8 @@ public abstract class IndexedPropertyChain {
 	 * @return
 	 */
 	public SaturatedPropertyChain getSaturated(boolean saturate) {
-		return saturate && (saturated_.get() == null || !saturated_.get().isComputed()) ? saturate() : saturated_.get();
+		//return saturate && (saturated_.get() == null || !saturated_.get().isComputed()) ? saturate() : saturated_.get();
+		return saturate && (saturated_ == null || !saturated_.isComputed()) ? saturate() : saturated_;
 	}
 
 	/**
@@ -260,20 +260,8 @@ public abstract class IndexedPropertyChain {
 	 *         for the same object from different threads with at the same time
 	 *         with non-null arguments, only one call returns {@code true}.
 	 */
-	public boolean setSaturated(SaturatedPropertyChain saturatedObjectProperty) {
-		
-		saturated_.set(saturatedObjectProperty);
-		
-		return true;
-		
-/*		if (saturated_ != null)
-			return false;
-		synchronized (this) {
-			if (saturated_ != null)
-				return false;
-			saturated_ = saturatedObjectProperty;
-		}
-		return true;*/
+	public synchronized void setSaturated(SaturatedPropertyChain saturatedObjectProperty) {		
+		saturated_ = saturatedObjectProperty;
 	}
 
 	/**
