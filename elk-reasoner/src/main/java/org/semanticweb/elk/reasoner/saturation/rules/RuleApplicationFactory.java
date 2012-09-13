@@ -63,7 +63,7 @@ public class RuleApplicationFactory implements
 	/**
 	 * Cached constants
 	 */
-	private final IndexedClassExpression owlThing, owlNothing;
+	private final IndexedClassExpression owlThing_, owlNothing_;
 
 	/**
 	 * The set of reflexive properties of the ontology
@@ -74,7 +74,7 @@ public class RuleApplicationFactory implements
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
-	private final Queue<Context> activeContexts;
+	private final Queue<Context> activeContexts_;
 
 	/**
 	 * The approximate number of contexts ever created by this engine. This
@@ -83,33 +83,44 @@ public class RuleApplicationFactory implements
 	 * are too many unprocessed contexts, new saturation tasks are not
 	 * submitted.
 	 */
-	protected final AtomicInteger approximateContextNumber = new AtomicInteger(
+	protected final AtomicInteger approximateContextNumber_ = new AtomicInteger(
 			0);
 
 	/**
-	 * To reduce thread congestion, {@link #approximateContextNumber} is not
+	 * To reduce thread congestion, {@link #approximateContextNumber_} is not
 	 * updated immediately when contexts are created, but after a worker creates
-	 * {@link #contextUpdateInterval} new contexts.
+	 * {@link #contextUpdateInterval_} new contexts.
 	 */
-	private final int contextUpdateInterval = 32;
+	private final int contextUpdateInterval_ = 32;
 
 	/**
-	 * The aggregated statistics of all workers
+	 * The statistics about this factory aggregated from statistics for all
+	 * workers
 	 */
-	private final ConclusionsCounter aggregatedStatistics;
+	private final ConclusionsCounter aggregatedStatistics_;
 
 	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
-		this.activeContexts = new ConcurrentLinkedQueue<Context>();
-		this.aggregatedStatistics = new ConclusionsCounter();
+		this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
+		this.aggregatedStatistics_ = new ConclusionsCounter();
 		this.reflexiveProperties_ = new ArrayHashSet<IndexedObjectProperty>();
 		Collection<IndexedObjectProperty> reflexiveObjectProperties = ontologyIndex
 				.getReflexiveObjectProperties();
 		if (reflexiveObjectProperties != null)
 			reflexiveProperties_.addAll(reflexiveObjectProperties);
 
-		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
-		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
+		owlThing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
+		owlNothing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 
+	}
+
+	@Override
+	public Engine getEngine() {
+		return new Engine();
+	}
+
+	@Override
+	public void finish() {
+		checkStatistics();
 	}
 
 	/**
@@ -121,7 +132,7 @@ public class RuleApplicationFactory implements
 	 * @return the approximate number of created contexts
 	 */
 	public int getApproximateContextNumber() {
-		return approximateContextNumber.get();
+		return approximateContextNumber_.get();
 	}
 
 	/**
@@ -129,17 +140,35 @@ public class RuleApplicationFactory implements
 	 */
 	public void printStatistics() {
 		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Contexts created:" + approximateContextNumber);
-			LOGGER_.debug("Derived Produced/Unique:"
-					+ aggregatedStatistics.getSuperClassExpressionInfNo() + "/"
-					+ aggregatedStatistics.getSuperClassExpressionNo());
-			LOGGER_.debug("Backward Links Produced/Unique:"
-					+ aggregatedStatistics.getBackLinkInfNo() + "/"
-					+ aggregatedStatistics.getBackLinkNo());
-			LOGGER_.debug("Forward Links Produced/Unique:"
-					+ aggregatedStatistics.getForwLinkInfNo() + "/"
-					+ aggregatedStatistics.getForwLinkNo());
+			checkStatistics();
+			if (approximateContextNumber_.get() > 0)
+				LOGGER_.debug("Contexts created:" + approximateContextNumber_);
+			if (aggregatedStatistics_.getSuperClassExpressionInfNo() > 0)
+				LOGGER_.debug("Derived Produced/Unique:"
+						+ aggregatedStatistics_.getSuperClassExpressionInfNo()
+						+ "/"
+						+ aggregatedStatistics_.getSuperClassExpressionNo());
+			if (aggregatedStatistics_.getBackLinkInfNo() > 0)
+				LOGGER_.debug("Backward Links Produced/Unique:"
+						+ aggregatedStatistics_.getBackLinkInfNo() + "/"
+						+ aggregatedStatistics_.getBackLinkNo());
+			if (aggregatedStatistics_.getForwLinkInfNo() > 0)
+				LOGGER_.debug("Forward Links Produced/Unique:"
+						+ aggregatedStatistics_.getForwLinkInfNo() + "/"
+						+ aggregatedStatistics_.getForwLinkNo());
 		}
+	}
+
+	private void checkStatistics() {
+		if (aggregatedStatistics_.getSuperClassExpressionInfNo() < aggregatedStatistics_
+				.getSuperClassExpressionNo())
+			LOGGER_.error("More unique derived superclasses than produced!");
+		if (aggregatedStatistics_.getBackLinkInfNo() < aggregatedStatistics_
+				.getBackLinkNo())
+			LOGGER_.error("More unique backward links than produced!");
+		if (aggregatedStatistics_.getForwLinkInfNo() < aggregatedStatistics_
+				.getForwLinkNo())
+			LOGGER_.error("More unique forward links than produced!");
 	}
 
 	public class Engine implements InputProcessor<IndexedClassExpression>,
@@ -148,7 +177,7 @@ public class RuleApplicationFactory implements
 		/**
 		 * Local statistics created for every worker
 		 */
-		private final ConclusionsCounter statistics = new ConclusionsCounter();
+		private final ConclusionsCounter statistics_ = new ConclusionsCounter();
 		/**
 		 * Worker-local counter for the number of created contexts
 		 */
@@ -168,7 +197,7 @@ public class RuleApplicationFactory implements
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
-				Context nextContext = activeContexts.poll();
+				Context nextContext = activeContexts_.poll();
 				if (nextContext == null)
 					break;
 				process(nextContext);
@@ -177,23 +206,23 @@ public class RuleApplicationFactory implements
 
 		@Override
 		public void finish() {
-			approximateContextNumber.addAndGet(localContextNumber);
+			approximateContextNumber_.addAndGet(localContextNumber);
 			localContextNumber = 0;
-			aggregatedStatistics.merge(statistics);
+			aggregatedStatistics_.merge(statistics_);
 		}
 
 		/**
 		 * @return the {@code owl:Thing} object in this ontology
 		 */
 		public IndexedClassExpression getOwlNothing() {
-			return owlNothing;
+			return owlNothing_;
 		}
 
 		/**
 		 * @return the {@code owl:Nothing} object in this ontology
 		 */
 		public IndexedClassExpression getOwlThing() {
-			return owlThing;
+			return owlThing_;
 		}
 
 		/**
@@ -207,15 +236,15 @@ public class RuleApplicationFactory implements
 		 * @return the object collecting statistics of rule applications
 		 */
 		public ConclusionsCounter getRuleStatistics() {
-			return this.statistics;
+			return this.statistics_;
 		}
 
 		public Context getCreateContext(IndexedClassExpression root) {
 			if (root.getContext() == null) {
 				Context context = new ContextImpl(root);
 				if (root.setContext(context)) {
-					if (++localContextNumber == contextUpdateInterval) {
-						approximateContextNumber.addAndGet(localContextNumber);
+					if (++localContextNumber == contextUpdateInterval_) {
+						approximateContextNumber_.addAndGet(localContextNumber);
 						localContextNumber = 0;
 					}
 					if (LOGGER_.isTraceEnabled()) {
@@ -241,7 +270,7 @@ public class RuleApplicationFactory implements
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
 			if (context.addToDo(item))
 				// context was activated
-				activeContexts.add(context);
+				activeContexts_.add(context);
 		}
 
 		/**
@@ -259,7 +288,7 @@ public class RuleApplicationFactory implements
 			}
 			if (context.deactivate())
 				// context was re-activated
-				activeContexts.add(context);
+				activeContexts_.add(context);
 		}
 
 		private void initContext(Context context) {
@@ -274,8 +303,4 @@ public class RuleApplicationFactory implements
 
 	}
 
-	@Override
-	public Engine getEngine() {
-		return new Engine();
-	}
 }

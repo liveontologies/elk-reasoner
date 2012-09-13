@@ -105,7 +105,8 @@ public class ConclusionsCounter {
 	/**
 	 * Adds all counters of the argument to the corresponding counters of this
 	 * object. The counters should not be directly modified (other than using
-	 * this method) during this operation.
+	 * this method) during this operation. The counter in the argument will be
+	 * reseted after this operation.
 	 * 
 	 * @param statistics
 	 *            the object which counters should be added
@@ -117,6 +118,7 @@ public class ConclusionsCounter {
 		this.forwLinkNo += statistics.forwLinkNo;
 		this.superClassExpressionInfNo += statistics.superClassExpressionInfNo;
 		this.superClassExpressionNo += statistics.superClassExpressionNo;
+		statistics.reset();
 	}
 
 }

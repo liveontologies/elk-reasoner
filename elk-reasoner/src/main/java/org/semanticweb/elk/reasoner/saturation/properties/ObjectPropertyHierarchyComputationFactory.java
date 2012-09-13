@@ -52,6 +52,11 @@ public class ObjectPropertyHierarchyComputationFactory implements
 		this.engine = new Engine();
 	}
 
+	@Override
+	public void finish() {
+		// nothing to do so far
+	}
+
 	/**
 	 * The engine for resetting the saturation and computing the transitively
 	 * closed suproperties and superproperties of each submitted property chain.

@@ -120,6 +120,16 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				new ThisClassExpressionSaturationListener());
 	}
 
+	@Override
+	public Engine getEngine() {
+		return new Engine();
+	}
+
+	@Override
+	public void finish() {
+		saturationFactory.finish();
+	}
+
 	/**
 	 * Print statistics about the transitive reduction stage
 	 */
@@ -396,11 +406,6 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			saturationEngine.finish();
 		}
 
-	}
-
-	@Override
-	public Engine getEngine() {
-		return new Engine();
 	}
 
 }

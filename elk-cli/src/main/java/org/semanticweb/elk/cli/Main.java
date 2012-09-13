@@ -180,10 +180,10 @@ public class Main {
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			if (options.has(satisfiable)) {
-				boolean consistent = reasoner.isConsistent();
+				boolean inconsistent = reasoner.isInconsistent();
 				if (options.hasArgument(outputFile)) {
 					writeConsistencyToFile(options.valueOf(outputFile),
-							consistent);
+							!inconsistent);
 				}
 			}
 

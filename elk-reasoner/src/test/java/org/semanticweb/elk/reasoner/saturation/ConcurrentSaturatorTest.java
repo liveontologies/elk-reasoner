@@ -78,7 +78,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		objectPropertyHierarchyComputation.process();
 
-		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
+		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();
@@ -124,7 +124,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 //		assertTrue("I SubClassOf D",
 //				I.getToldSuperClassExpressions().contains(D));
 
-		final ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
+		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
 
 		classExpressionSaturation.start();

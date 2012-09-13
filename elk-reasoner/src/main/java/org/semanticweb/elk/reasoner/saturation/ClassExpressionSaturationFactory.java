@@ -135,6 +135,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			0);
 
 	/**
+	 * The statistics about this factory aggregated from statistics for all
+	 * workers
+	 */
+	private final Statistics aggregatedStatistics_;
+
+	/**
 	 * Creates a new saturation engine using the given ontology index, listener
 	 * for callback functions, and threshold for the number of unprocessed
 	 * contexts. The threshold has influence on the size of the batches of the
@@ -160,6 +166,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		this.jobsToDo_ = new ConcurrentLinkedQueue<J>();
 		this.jobsInProgress_ = new ConcurrentLinkedQueue<J>();
 		this.ruleApplicationFactory_ = new RuleApplicationFactory(ontologyIndex);
+		this.aggregatedStatistics_ = new Statistics();
 	}
 
 	/**
@@ -179,8 +186,44 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 					@Override
 					public void notifyFinished(J job)
 							throws InterruptedException {
+						// dummy listener does not do anything
 					}
 				});
+	}
+
+	@Override
+	public Engine getEngine() {
+		return new Engine();
+	}
+
+	/**
+	 * Print statistics about the saturation
+	 */
+	public void printStatistics() {
+		ruleApplicationFactory_.printStatistics();
+		checkStatistics();
+		if (LOGGER_.isDebugEnabled()) {
+			if (aggregatedStatistics_.jobsSubmittedNo > 0)
+				LOGGER_.debug("Saturation Jobs Submitted=Done+Processed:"
+						+ aggregatedStatistics_.jobsSubmittedNo + "="
+						+ aggregatedStatistics_.jobsAlreadyDoneNo + "+"
+						+ aggregatedStatistics_.jobsProcessedNo);
+		}
+	}
+
+	@Override
+	public void finish() {
+		checkStatistics();
+	}
+
+	/**
+	 * Checks if the statistical values make sense and issues error messages if
+	 * not
+	 */
+	private void checkStatistics() {
+		if (aggregatedStatistics_.jobsSubmittedNo != aggregatedStatistics_.jobsAlreadyDoneNo
+				+ +aggregatedStatistics_.jobsProcessedNo)
+			LOGGER_.error("Some submitted saturation jobs were not processed!");
 	}
 
 	/**
@@ -189,7 +232,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * 
 	 * @throws InterruptedException
 	 */
-	private void processFinishedJobs() throws InterruptedException {
+	private void processFinishedJobs(Statistics localStatistics)
+			throws InterruptedException {
 		for (;;) {
 			int shapshotJobsFinished = countJobsFinished_.get();
 			if (shapshotJobsFinished == countJobsProcessed_.get()) {
@@ -215,16 +259,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				nextJob.setOutput(rootSaturation);
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace(root + ": saturation finished");
+				localStatistics.jobsProcessedNo++;
 				listener_.notifyFinished(nextJob);
 			}
 		}
-	}
-
-	/**
-	 * Print statistics about the saturation
-	 */
-	public void printStatistics() {
-		ruleApplicationFactory_.printStatistics();
 	}
 
 	/**
@@ -254,6 +292,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		private final RuleApplicationFactory.Engine ruleApplicationEngine_ = ruleApplicationFactory_
 				.getEngine();
 
+		private final Statistics statistics_ = new Statistics();
+
 		// don't allow creating of engines directly; only through the factory
 		private Engine() {
 		}
@@ -261,6 +301,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		@Override
 		public void submit(J job) {
 			jobsToDo_.add(job);
+			statistics_.jobsSubmittedNo++;
 		}
 
 		@Override
@@ -298,7 +339,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 						countStartedWorkers_.get());
 			updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
-			processFinishedJobs(); // can throw InterruptedException
+			processFinishedJobs(statistics_); // can throw InterruptedException
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					return;
@@ -329,6 +370,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				Context rootContext = root.getContext();
 				if (rootContext != null && rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);
+					statistics_.jobsAlreadyDoneNo++;
 					listener_.notifyFinished(nextJob); // can throw
 														// InterruptedException
 					continue;
@@ -348,13 +390,15 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 					updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 							countStartedWorkers_.get());
 				updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
-				processFinishedJobs(); // can throw InterruptedException
+				processFinishedJobs(statistics_); // can throw
+													// InterruptedException
 			}
 		}
 
 		@Override
 		public void finish() {
 			ruleApplicationEngine_.finish();
+			aggregatedStatistics_.merge(statistics_);
 		}
 
 		/**
@@ -408,9 +452,41 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 	}
 
-	@Override
-	public Engine getEngine() {
-		return new Engine();
+	/**
+	 * Counters accomulating statistical information about this factory. The
+	 * counters are not thread safe, therefore each worker thread should use its
+	 * own instance of the counter.
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	public static class Statistics {
+		/**
+		 * the number of submitted jobs
+		 */
+		int jobsSubmittedNo;
+		/**
+		 * submitted jobs that were already done when they started to be
+		 * processed
+		 */
+		int jobsAlreadyDoneNo;
+		/**
+		 * submitted jobs that were finished by this engine
+		 */
+		int jobsProcessedNo;
+
+		public void reset() {
+			jobsSubmittedNo = 0;
+			jobsAlreadyDoneNo = 0;
+			jobsProcessedNo = 0;
+		}
+
+		public synchronized void merge(Statistics statistics) {
+			this.jobsSubmittedNo += statistics.jobsSubmittedNo;
+			this.jobsProcessedNo += statistics.jobsProcessedNo;
+			this.jobsAlreadyDoneNo += statistics.jobsAlreadyDoneNo;
+			statistics.reset();
+		}
 	}
 
 }

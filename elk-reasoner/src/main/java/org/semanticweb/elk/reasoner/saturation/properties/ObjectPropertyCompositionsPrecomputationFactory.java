@@ -53,6 +53,11 @@ public class ObjectPropertyCompositionsPrecomputationFactory implements
 		this.engine = new Engine();
 	}
 
+	@Override
+	public void finish() {
+		// nothing to do so far
+	}
+
 	/**
 	 * If R and S are in the vector and R is a subproperty of S, then S is
 	 * removed from the vector.
