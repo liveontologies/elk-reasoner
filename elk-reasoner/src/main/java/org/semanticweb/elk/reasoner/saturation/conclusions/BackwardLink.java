@@ -83,6 +83,9 @@ public class BackwardLink implements Conclusion {
 				&& !new LazySetIntersection<IndexedPropertyChain>(
 						toldProperties, relation_.getSaturated()
 								.getLeftComposableProperties()).isEmpty()) {
+			
+			//System.err.println("Forward link created at " + context.getRoot() + "\n" + target_.getRoot() + " -> " + relation_ + " -> " + context.getRoot());
+			
 			ruleEngine.produce(target_, new ForwardLink(relation_, context));
 		}
 

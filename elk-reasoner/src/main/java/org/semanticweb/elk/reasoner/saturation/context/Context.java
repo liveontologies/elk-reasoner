@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
@@ -59,6 +60,11 @@ public interface Context {
 	 *         {@link IndexedClassExpression}
 	 */
 	public Set<IndexedClassExpression> getSuperClassExpressions();
+	
+	
+	public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms();
+	
+	public boolean addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * @return the {@link Context}s from which there exists an (implied)

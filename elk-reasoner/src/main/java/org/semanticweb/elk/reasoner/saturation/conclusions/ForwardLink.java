@@ -80,6 +80,9 @@ public class ForwardLink implements Conclusion {
 
 			for (IndexedPropertyChain composition : compositions)
 				for (Context backwardTarget : backwardTargets) {
+					
+					//System.err.println("B: Backward link composed at " + context.getRoot()  + "\n" + target_.getRoot() + " -> " + composition + " -> " + backwardTarget.getRoot());
+					
 					ruleEngine.produce(target_, new BackwardLink(composition,
 							backwardTarget));
 				}
@@ -120,9 +123,14 @@ public class ForwardLink implements Conclusion {
 						.get(forwardRelation);
 
 				for (IndexedPropertyChain composition : compositions)
-					for (Context forwardTarget : forwardTargets)
+					for (Context forwardTarget : forwardTargets) {
+						
+						//System.err.println("F: Backward link composed \n" + forwardTarget.getRoot() + " -> " + composition + " -> " + target.getRoot() + "\n" +
+						//composition.getToldSuperProperties());						
+						
 						ruleEngine.produce(forwardTarget, new BackwardLink(
 								composition, target));
+					}
 			}
 		}
 

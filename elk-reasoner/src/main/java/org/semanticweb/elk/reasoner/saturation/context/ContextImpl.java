@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
@@ -74,7 +75,7 @@ public class ContextImpl implements Context {
 	 */
 	private Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty_ = null;
 
-	// Set<IndexedDisjointnessAxiom> disjointnessAxioms;
+	private Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
 	/**
 	 * the rules that should be applied to each derived {@link BackwardLink} in
@@ -146,13 +147,19 @@ public class ContextImpl implements Context {
 		return backwardLinksByObjectProperty_;
 	}
 
-	// public boolean addDisjointessAxiom(
-	// IndexedDisjointnessAxiom disjointnessAxiom) {
-	// if (disjointnessAxioms == null)
-	// disjointnessAxioms = new ArrayHashSet<IndexedDisjointnessAxiom>();
-	//
-	// return disjointnessAxioms.add(disjointnessAxiom);
-	// }
+	@Override
+	public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
+		return disjointnessAxioms_;
+	}
+	
+	@Override
+	public boolean addDisjointnessAxiom(
+			IndexedDisjointnessAxiom disjointnessAxiom) {
+		if (disjointnessAxioms_ == null)
+			disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointnessAxiom>();
+
+		return disjointnessAxioms_.add(disjointnessAxiom);
+	}
 
 	@Override
 	public void setSaturated() {

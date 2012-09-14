@@ -144,6 +144,9 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
+		
+		//System.err.println("Backward link created at " + context.getRoot() + " -> " + property + " -> " + filler);
+		
 		ruleEngine.produce(ruleEngine.getCreateContext(filler),
 				new BackwardLink(property, context));
 	}

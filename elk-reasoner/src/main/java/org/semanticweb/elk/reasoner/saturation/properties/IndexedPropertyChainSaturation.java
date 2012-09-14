@@ -87,6 +87,8 @@ public class IndexedPropertyChainSaturation {
 		// compute all transitively closed super-properties
 		queue.add(ipc);
 
+		//System.err.println(ipc);
+		
 		while ((next = queue.poll()) != null) {
 			if (saturated.derivedSuperProperties.add(next)) {
 				/*
@@ -113,17 +115,7 @@ public class IndexedPropertyChainSaturation {
 		}	
 		
 		if (SaturatedPropertyChain.ELIMINATE_IMPLIED_COMPOSITIONS) {
-			if (saturated.compositionsByLeftSubProperty != null) {
-			for (Collection<IndexedPropertyChain> compositions : saturated.compositionsByLeftSubProperty.values()) {
-				eliminateImpliedCompositions((Vector<IndexedPropertyChain>) compositions);
-			}
-		}
-			
-			if (saturated.compositionsByRightSubProperty != null) {
-			for (Collection<IndexedPropertyChain> compositions : saturated.compositionsByRightSubProperty.values()) {
-				eliminateImpliedCompositions((Vector<IndexedPropertyChain>) compositions);
-			}
-			}
+			eliminateImpliedCompositions(saturated);
 		}
 		
 		// compute all transitively closed sub-properties
@@ -144,6 +136,7 @@ public class IndexedPropertyChainSaturation {
 
 		while ((next = queue.poll()) != null) {
 			if (saturated.derivedRightSubProperties.add(next)) {
+				
 				if (next.getToldSubProperties() != null) {
 					for (IndexedPropertyChain s : next.getToldSubProperties()) {
 						queue.add(s);
@@ -177,6 +170,7 @@ public class IndexedPropertyChainSaturation {
 		}
 
 		while ((next = queue.poll()) != null) {
+			//TODO Not computed correctly for T2!!!!
 			if (saturated.leftComposableProperties.add(next)) {
 				queue.addAll(emptyIfNull(next.getToldSubProperties()));
 
@@ -201,6 +195,23 @@ public class IndexedPropertyChainSaturation {
 	private static <T> Collection<T> emptyIfNull(Collection<T> collection) {
 		return collection == null ? Collections.<T> emptyList() : collection;
 	}
+	
+	private static void eliminateImpliedCompositions(SaturatedPropertyChain saturated) {
+		if (saturated.compositionsByLeftSubProperty != null) {
+			for (Collection<IndexedPropertyChain> compositions : saturated.compositionsByLeftSubProperty
+					.values()) {
+				eliminateImpliedCompositions((Vector<IndexedPropertyChain>) compositions);
+			}
+		}
+
+		if (saturated.compositionsByRightSubProperty != null) {
+			for (Collection<IndexedPropertyChain> compositions : saturated.compositionsByRightSubProperty
+					.values()) {
+				eliminateImpliedCompositions((Vector<IndexedPropertyChain>) compositions);
+			}
+		}
+	}
+	
 	
 	/**
 	 * If R and S are in the vector and R is a sub-property of S, then S is
@@ -255,8 +266,9 @@ public class IndexedPropertyChainSaturation {
 				emptyIfNull(ipc.getRightChains()))) {
 			IndexedPropertyChain composable = chain.getComposable(ipc);
 
-			if (chain.getToldSubProperties() != null && isReflexive(composable)) {
-				props.addAll(chain.getToldSuperProperties());
+			if (isReflexive(composable)) {
+				props.addAll(emptyIfNull(chain.getToldSuperProperties()));
+				props.add(chain);
 			}
 		}
 
@@ -410,6 +422,12 @@ class ReflexivityCheckVisitor implements IndexedPropertyChainVisitor<ElkObject> 
 	}	
 }
 
+/**
+ * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
 class CompositionByPropertyMultimap extends
 		AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> {
 

@@ -22,13 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -56,14 +61,14 @@ abstract public class IndexedClassExpression {
 	 * {@link IndexedClassExpression} that appear in binary disjointess axioms
 	 * with this object.
 	 */
-	// private Set<IndexedClassExpression> disjointClasses_;
+	private Set<IndexedClassExpression> disjointClasses_;
 
 	/**
 	 * List of all larger (non-binary) disjointness axioms in which this object
 	 * appears.
 	 * 
 	 */
-	// protected List<IndexedDisjointnessAxiom> disjointnessAxioms;
+	private List<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
 	ContextRules compositionRules;
 
@@ -110,8 +115,16 @@ abstract public class IndexedClassExpression {
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	abstract void updateOccurrenceNumbers(int increment, int positiveIncrement,
-			int negativeIncrement);
+	abstract void updateOccurrenceNumbers(int increment,
+			int positiveIncrement, int negativeIncrement);
+
+	private void registerDisjointnessRule() {
+		compositionRules = new ThisCompositionRule(compositionRules);
+	}
+	
+	private void deregisterDisjointnessRule() {
+		compositionRules = compositionRules.next();
+	}	
 
 	public abstract void applyDecompositionRule(RuleEngine ruleEngine,
 			Context context);
@@ -126,22 +139,6 @@ abstract public class IndexedClassExpression {
 		return posPropertiesInExistentials_;
 	}
 
-	/**
-	 * @return the {@link IndexedClassExpression} objects that occur with this
-	 *         object in binary disjointness axioms, or {@code null} if none is
-	 *         assigned
-	 */
-	// public Set<IndexedClassExpression> getDisjointClasses() {
-	// return disjointClasses_;
-	// }
-
-	/**
-	 * @return Collection of all (non-binary) {@link IndexedDisjointnessAxiom}s
-	 *         in which this object appears, or {@code null} if none is assigned
-	 */
-	// public List<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
-	// return disjointnessAxioms;
-	// }
 
 	protected void addPosPropertyInExistential(IndexedPropertyChain property) {
 		if (posPropertiesInExistentials_ == null)
@@ -161,57 +158,64 @@ abstract public class IndexedClassExpression {
 		return success;
 	}
 
-	// protected void addDisjointClass(IndexedClassExpression disjointClass) {
-	// if (disjointClasses_ == null)
-	// disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
-	// disjointClasses_.add(disjointClass);
-	// }
-	//
-	// /**
-	// * @param disjointClass
-	// * @return true if successfully removed
-	// */
-	// protected boolean removeDisjointClass(IndexedClassExpression
-	// disjointClass) {
-	// boolean success = false;
-	// if (disjointClasses_ != null) {
-	// success = disjointClasses_.remove(disjointClass);
-	// if (disjointClasses_.isEmpty())
-	// disjointClasses_ = null;
-	// }
-	// return success;
-	// }
-	//
-	// protected void addDisjointnessAxiom(
-	// IndexedDisjointnessAxiom disjointnessAxiom) {
-	// if (disjointnessAxioms == null)
-	// disjointnessAxioms = new LinkedList<IndexedDisjointnessAxiom>();
-	// disjointnessAxioms.add(disjointnessAxiom);
-	// }
-	//
-	// /**
-	// * @param disjointnessAxiom
-	// * @return true if successfully removed
-	// */
-	// protected boolean removeDisjointnessAxiom(
-	// IndexedDisjointnessAxiom disjointnessAxiom) {
-	// boolean success = false;
-	//
-	// if (disjointnessAxioms != null) {
-	// Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms
-	// .iterator();
-	// while (i.hasNext())
-	// if (i.next().getMembers()
-	// .equals(disjointnessAxiom.getMembers())) {
-	// i.remove();
-	// break;
-	// }
-	//
-	// if (disjointnessAxioms.isEmpty())
-	// disjointnessAxioms = null;
-	// }
-	// return success;
-	// }
+	protected void addDisjointClass(IndexedClassExpression disjointClass) {
+		if (disjointClasses_ == null)
+			disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
+		if (disjointClasses_.add(disjointClass)) {
+			registerDisjointnessRule();
+		}
+	}
+
+	/**
+	 * @param disjointClass
+	 * @return true if successfully removed
+	 */
+	protected boolean removeDisjointClass(IndexedClassExpression disjointClass) {
+		boolean success = false;
+		if (disjointClasses_ != null) {
+			success = disjointClasses_.remove(disjointClass);
+			if (disjointClasses_.isEmpty()) {
+				disjointClasses_ = null;
+				deregisterDisjointnessRule();
+			}
+		}
+		return success;
+	}
+
+	protected void addDisjointnessAxiom(
+			IndexedDisjointnessAxiom disjointnessAxiom) {
+		if (disjointnessAxioms_ == null)
+			disjointnessAxioms_ = new LinkedList<IndexedDisjointnessAxiom>();
+		if (disjointnessAxioms_.add(disjointnessAxiom)) {
+			registerDisjointnessRule();
+		}
+	}
+
+	/**
+	 * @param disjointnessAxiom
+	 * @return true if successfully removed
+	 */
+	protected boolean removeDisjointnessAxiom(
+			IndexedDisjointnessAxiom disjointnessAxiom) {
+		boolean success = false;
+
+		if (disjointnessAxioms_ != null) {
+			Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms_
+					.iterator();
+			while (i.hasNext())
+				if (i.next().getMembers()
+						.equals(disjointnessAxiom.getMembers())) {
+					i.remove();
+					break;
+				}
+
+			if (disjointnessAxioms_.isEmpty()) {
+				disjointnessAxioms_ = null;
+				deregisterDisjointnessRule();
+			}
+		}
+		return success;
+	}
 
 	// TODO: replace pointers to contexts by a mapping
 
@@ -293,4 +297,44 @@ abstract public class IndexedClassExpression {
 
 	@Override
 	public abstract String toString();
+	
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private class ThisCompositionRule extends ContextRules {
+		
+		public ThisCompositionRule(ContextRules tail) {
+			super(tail);
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, Context context) {
+
+			//System.err.println("Disjointness rule: " + IndexedClassExpression.this + " -> " + context.getRoot());
+			
+			if (disjointClasses_ != null
+					&& !new LazySetIntersection<IndexedClassExpression>(
+							disjointClasses_,
+							context.getSuperClassExpressions()).isEmpty()) {
+				
+				ruleEngine.produce(context, new PositiveSuperClassExpression(
+						ruleEngine.getOwlNothing()));
+				return;
+			}
+
+			if (disjointnessAxioms_ != null)
+				for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
+					if (!context.addDisjointnessAxiom(disAxiom))
+						ruleEngine.produce(
+								context,
+								new PositiveSuperClassExpression(ruleEngine
+										.getOwlNothing()));
+			
+		}
+		
+	}
 }
