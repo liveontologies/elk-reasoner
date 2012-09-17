@@ -28,8 +28,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.stages.ObjectPropertyCompositionsPrecomputationStage;
-import org.semanticweb.elk.reasoner.stages.ObjectPropertyHierarchyComputationStage;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Multimap;
