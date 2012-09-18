@@ -95,27 +95,36 @@ public class IndexedClass extends IndexedClassEntity {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		if (this.equals(ruleEngine.getOwlNothing())) {
-			context.setInconsistent();
 
-			// propagating bottom to the predecessors
-			final Multimap<IndexedPropertyChain, Context> backLinks = context
-					.getBackwardLinksByObjectProperty();
+		RulesTimer timer = ruleEngine.getRulesTimer();
 
-			Conclusion carry = new PositiveSuperClassExpression(this);
+		timer.timeClassDecompositionRule -= System.currentTimeMillis();
 
-			for (IndexedPropertyChain propRelation : backLinks.keySet()) {
+		try {
+			if (this.equals(ruleEngine.getOwlNothing())) {
+				context.setInconsistent();
 
-				Collection<Context> targets = backLinks.get(propRelation);
+				// propagating bottom to the predecessors
+				final Multimap<IndexedPropertyChain, Context> backLinks = context
+						.getBackwardLinksByObjectProperty();
 
-				for (Context target : targets)
-					ruleEngine.produce(target, carry);
+				Conclusion carry = new PositiveSuperClassExpression(this);
+
+				for (IndexedPropertyChain propRelation : backLinks.keySet()) {
+
+					Collection<Context> targets = backLinks.get(propRelation);
+
+					for (Context target : targets)
+						ruleEngine.produce(target, carry);
+				}
+
+				// register the backward link rule for propagation of bottom
+				context.getBackwardLinkRulesChain().getCreate(
+						BottomBackwardLinkRule.MATCHER_,
+						BottomBackwardLinkRule.FACTORY_);
 			}
-
-			// register the backward link rule for propagation of bottom
-			context.getBackwardLinkRulesChain().getCreate(
-					BottomBackwardLinkRule.MATCHER_,
-					BottomBackwardLinkRule.FACTORY_);
+		} finally {
+			timer.timeClassDecompositionRule += System.currentTimeMillis();
 		}
 	}
 
@@ -132,11 +141,19 @@ public class IndexedClass extends IndexedClassEntity {
 
 		@Override
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
-			ruleEngine
-					.produce(
-							link.getSource(),
-							new PositiveSuperClassExpression(ruleEngine
-									.getOwlNothing()));
+			RulesTimer timer = ruleEngine.getRulesTimer();
+
+			timer.timeClassBottomBackwardLinkRule -= System.currentTimeMillis();
+
+			try {
+				ruleEngine.produce(
+						link.getSource(),
+						new PositiveSuperClassExpression(ruleEngine
+								.getOwlNothing()));
+			} finally {
+				timer.timeClassBottomBackwardLinkRule += System
+						.currentTimeMillis();
+			}
 		}
 
 		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, BottomBackwardLinkRule>() {

@@ -68,7 +68,7 @@ public class ForwardLink implements Conclusion {
 	@Override
 	public void apply(RuleEngine ruleEngine, Context context) {
 
-		ConclusionsCounter statistics = ruleEngine.getRuleStatistics();
+		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		statistics.forwLinkInfNo++;
 
 		if (!context
@@ -143,27 +143,39 @@ public class ForwardLink implements Conclusion {
 
 		@Override
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
-			/* compose the link with all forward links */
-			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
-					.getReltaion().getSaturated()
-					.getCompositionsByRightSubProperty();
-			if (comps == null)
-				return;
 
-			Context source = link.getSource();
+			RulesTimer timer = ruleEngine.getRulesTimer();
 
-			for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-					comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
+			timer.timeForwardLinkBackwardLinkRule -= System.currentTimeMillis();
 
-				Collection<IndexedPropertyChain> compositions = comps
-						.get(forwardRelation);
-				Collection<Context> forwardTargets = forwardLinksByObjectProperty_
-						.get(forwardRelation);
+			try {
 
-				for (IndexedPropertyChain composition : compositions)
-					for (Context forwardTarget : forwardTargets)
-						ruleEngine.produce(forwardTarget, new BackwardLink(
-								source, composition));
+				/* compose the link with all forward links */
+				final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
+						.getReltaion().getSaturated()
+						.getCompositionsByRightSubProperty();
+				if (comps == null)
+					return;
+
+				Context source = link.getSource();
+
+				for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+						comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
+
+					Collection<IndexedPropertyChain> compositions = comps
+							.get(forwardRelation);
+					Collection<Context> forwardTargets = forwardLinksByObjectProperty_
+							.get(forwardRelation);
+
+					for (IndexedPropertyChain composition : compositions)
+						for (Context forwardTarget : forwardTargets)
+							ruleEngine.produce(forwardTarget, new BackwardLink(
+									source, composition));
+				}
+
+			} finally {
+				timer.timeForwardLinkBackwardLinkRule += System
+						.currentTimeMillis();
 			}
 		}
 

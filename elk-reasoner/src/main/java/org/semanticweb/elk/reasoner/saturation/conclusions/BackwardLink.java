@@ -83,7 +83,7 @@ public class BackwardLink implements Conclusion {
 	@Override
 	public void apply(RuleEngine ruleEngine, Context context) {
 
-		ConclusionsCounter statistics = ruleEngine.getRuleStatistics();
+		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		statistics.backLinkInfNo++;
 
 		if (!context.addBackwardLink(this))

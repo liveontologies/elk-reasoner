@@ -33,9 +33,10 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.RulesTimer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
@@ -94,14 +95,19 @@ public class RuleApplicationFactory implements
 	private final int contextUpdateInterval_ = 32;
 
 	/**
-	 * The statistics about this factory aggregated from statistics for all
-	 * workers
+	 * The {@link ConclusionsCounter} aggregated for all workers
 	 */
-	private final ConclusionsCounter aggregatedStatistics_;
+	private final ConclusionsCounter aggregatedConclusionsCounter_;
+
+	/**
+	 * The {@link RulesTimer} aggregated for all workers
+	 */
+	private final RulesTimer aggregatedRulesTimer_;
 
 	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
 		this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
-		this.aggregatedStatistics_ = new ConclusionsCounter();
+		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
+		this.aggregatedRulesTimer_ = new RulesTimer();
 		this.reflexiveProperties_ = new ArrayHashSet<IndexedObjectProperty>();
 		Collection<IndexedObjectProperty> reflexiveObjectProperties = ontologyIndex
 				.getReflexiveObjectProperties();
@@ -143,30 +149,78 @@ public class RuleApplicationFactory implements
 			checkStatistics();
 			if (approximateContextNumber_.get() > 0)
 				LOGGER_.debug("Contexts created:" + approximateContextNumber_);
-			if (aggregatedStatistics_.getSuperClassExpressionInfNo() > 0)
+			if (aggregatedConclusionsCounter_.getSuperClassExpressionInfNo() > 0)
 				LOGGER_.debug("Derived Produced/Unique:"
-						+ aggregatedStatistics_.getSuperClassExpressionInfNo()
+						+ aggregatedConclusionsCounter_
+								.getSuperClassExpressionInfNo()
 						+ "/"
-						+ aggregatedStatistics_.getSuperClassExpressionNo());
-			if (aggregatedStatistics_.getBackLinkInfNo() > 0)
+						+ aggregatedConclusionsCounter_
+								.getSuperClassExpressionNo());
+			if (aggregatedConclusionsCounter_.getBackLinkInfNo() > 0)
 				LOGGER_.debug("Backward Links Produced/Unique:"
-						+ aggregatedStatistics_.getBackLinkInfNo() + "/"
-						+ aggregatedStatistics_.getBackLinkNo());
-			if (aggregatedStatistics_.getForwLinkInfNo() > 0)
+						+ aggregatedConclusionsCounter_.getBackLinkInfNo()
+						+ "/" + aggregatedConclusionsCounter_.getBackLinkNo());
+			if (aggregatedConclusionsCounter_.getForwLinkInfNo() > 0)
 				LOGGER_.debug("Forward Links Produced/Unique:"
-						+ aggregatedStatistics_.getForwLinkInfNo() + "/"
-						+ aggregatedStatistics_.getForwLinkNo());
+						+ aggregatedConclusionsCounter_.getForwLinkInfNo()
+						+ "/" + aggregatedConclusionsCounter_.getForwLinkNo());
+			if (aggregatedRulesTimer_
+					.getObjectSomeValuesFromCompositionRuleTime() > 0)
+				LOGGER_.debug("ObjectSomeValuesFrom composition time: "
+						+ aggregatedRulesTimer_
+								.getObjectSomeValuesFromCompositionRuleTime()
+						+ " ms.");
+			if (aggregatedRulesTimer_
+					.getObjectSomeValuesFromDecompositionRuleTime() > 0)
+				LOGGER_.debug("ObjectSomeValuesFrom decomposition time: "
+						+ aggregatedRulesTimer_
+								.getObjectSomeValuesFromDecompositionRuleTime()
+						+ " ms.");
+			if (aggregatedRulesTimer_
+					.getObjectSomeValuesFromBackwardLinkRuleTime() > 0)
+				LOGGER_.debug("ObjectSomeValuesFrom backward link time: "
+						+ aggregatedRulesTimer_
+								.getObjectSomeValuesFromBackwardLinkRuleTime()
+						+ " ms.");
+			if (aggregatedRulesTimer_
+					.getObjectIntersectionOfCompositionRuleTime() > 0)
+				LOGGER_.debug("ObjectIntersectionOf composition time: "
+						+ aggregatedRulesTimer_
+								.getObjectIntersectionOfCompositionRuleTime()
+						+ " ms.");
+			if (aggregatedRulesTimer_
+					.getObjectIntersectionOfDecompositionRuleTime() > 0)
+				LOGGER_.debug("ObjectIntersectionOf decomposition time: "
+						+ aggregatedRulesTimer_
+								.getObjectIntersectionOfDecompositionRuleTime()
+						+ " ms.");
+			if (aggregatedRulesTimer_.getForwardLinkBackwardLinkRuleTime() > 0)
+				LOGGER_.debug("ForwardLink backward link time: "
+						+ aggregatedRulesTimer_
+								.getForwardLinkBackwardLinkRuleTime() + " ms.");
+			if (aggregatedRulesTimer_.getClassDecompositionRuleTime() > 0)
+				LOGGER_.debug("Class decomposition time: "
+						+ aggregatedRulesTimer_.getClassDecompositionRuleTime()
+						+ " ms.");
+			if (aggregatedRulesTimer_.getClassBottomBackwardLinkRuleTime() > 0)
+				LOGGER_.debug("owl:Nothing backward link time: "
+						+ aggregatedRulesTimer_
+								.getClassBottomBackwardLinkRuleTime() + " ms.");
+			if (aggregatedRulesTimer_.getSubClassOfRuleTime() > 0)
+				LOGGER_.debug("SubClassOf expansion time: "
+						+ aggregatedRulesTimer_.getSubClassOfRuleTime()
+						+ " ms.");
 		}
 	}
 
 	private void checkStatistics() {
-		if (aggregatedStatistics_.getSuperClassExpressionInfNo() < aggregatedStatistics_
+		if (aggregatedConclusionsCounter_.getSuperClassExpressionInfNo() < aggregatedConclusionsCounter_
 				.getSuperClassExpressionNo())
 			LOGGER_.error("More unique derived superclasses than produced!");
-		if (aggregatedStatistics_.getBackLinkInfNo() < aggregatedStatistics_
+		if (aggregatedConclusionsCounter_.getBackLinkInfNo() < aggregatedConclusionsCounter_
 				.getBackLinkNo())
 			LOGGER_.error("More unique backward links than produced!");
-		if (aggregatedStatistics_.getForwLinkInfNo() < aggregatedStatistics_
+		if (aggregatedConclusionsCounter_.getForwLinkInfNo() < aggregatedConclusionsCounter_
 				.getForwLinkNo())
 			LOGGER_.error("More unique forward links than produced!");
 	}
@@ -175,9 +229,13 @@ public class RuleApplicationFactory implements
 			RuleEngine {
 
 		/**
-		 * Local statistics created for every worker
+		 * Local {@link ConclusionsCounter} created for every worker
 		 */
-		private final ConclusionsCounter statistics_ = new ConclusionsCounter();
+		private final ConclusionsCounter conclusionsCounter_ = new ConclusionsCounter();
+		/**
+		 * Local {@link RulesTimer} created for every worker
+		 */
+		private final RulesTimer rulesTimer_ = new RulesTimer();
 		/**
 		 * Worker-local counter for the number of created contexts
 		 */
@@ -208,12 +266,14 @@ public class RuleApplicationFactory implements
 		public void finish() {
 			approximateContextNumber_.addAndGet(localContextNumber);
 			localContextNumber = 0;
-			aggregatedStatistics_.merge(statistics_);
+			aggregatedConclusionsCounter_.merge(conclusionsCounter_);
+			aggregatedRulesTimer_.merge(rulesTimer_);
 		}
 
 		/**
 		 * @return the {@code owl:Thing} object in this ontology
 		 */
+		@Override
 		public IndexedClassExpression getOwlNothing() {
 			return owlNothing_;
 		}
@@ -235,8 +295,14 @@ public class RuleApplicationFactory implements
 		/**
 		 * @return the object collecting statistics of rule applications
 		 */
-		public ConclusionsCounter getRuleStatistics() {
-			return this.statistics_;
+		@Override
+		public ConclusionsCounter getConclusionsCounter() {
+			return this.conclusionsCounter_;
+		}
+
+		@Override
+		public RulesTimer getRulesTimer() {
+			return this.rulesTimer_;
 		}
 
 		public Context getCreateContext(IndexedClassExpression root) {

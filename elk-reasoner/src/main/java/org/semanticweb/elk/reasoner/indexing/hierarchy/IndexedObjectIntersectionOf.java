@@ -101,10 +101,20 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		ruleEngine.produce(context, new PositiveSuperClassExpression(
-				firstConjunct));
-		ruleEngine.produce(context, new PositiveSuperClassExpression(
-				secondConjunct));
+		RulesTimer timer = ruleEngine.getRulesTimer();
+
+		timer.timeObjectIntersectionOfDecompositionRule -= System
+				.currentTimeMillis();
+
+		try {
+			ruleEngine.produce(context, new PositiveSuperClassExpression(
+					firstConjunct));
+			ruleEngine.produce(context, new PositiveSuperClassExpression(
+					secondConjunct));
+		} finally {
+			timer.timeObjectIntersectionOfDecompositionRule += System
+					.currentTimeMillis();
+		}
 	}
 
 	public void registerContextRules() {
@@ -169,11 +179,25 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
-			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-					conjunctionsByConjunct_.keySet(),
-					context.getSuperClassExpressions()))
-				ruleEngine.produce(context, new NegativeSuperClassExpression(
-						conjunctionsByConjunct_.get(common)));
+
+			RulesTimer timer = ruleEngine.getRulesTimer();
+
+			timer.timeObjectIntersectionOfCompositionRule -= System
+					.currentTimeMillis();
+
+			try {
+
+				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+						conjunctionsByConjunct_.keySet(),
+						context.getSuperClassExpressions()))
+					ruleEngine.produce(context,
+							new NegativeSuperClassExpression(
+									conjunctionsByConjunct_.get(common)));
+			} finally {
+				timer.timeObjectIntersectionOfCompositionRule += System
+						.currentTimeMillis();
+			}
+
 		}
 
 		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {

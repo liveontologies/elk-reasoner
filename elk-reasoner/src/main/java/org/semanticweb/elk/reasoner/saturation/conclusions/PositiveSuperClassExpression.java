@@ -47,7 +47,7 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 
 	@Override
 	public void apply(RuleEngine ruleEngine, Context context) {
-		if (!storeInContext(context, ruleEngine.getRuleStatistics()))
+		if (!storeInContext(context, ruleEngine.getConclusionsCounter()))
 			return;
 
 		// apply decomposition rules

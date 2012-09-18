@@ -108,9 +108,18 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
 
-			for (IndexedClassExpression implied : toldSuperClassExpressions_)
-				ruleEngine.produce(context, new PositiveSuperClassExpression(
-						implied));
+			RulesTimer timer = ruleEngine.getRulesTimer();
+
+			timer.timeSubClassOfRule -= System.currentTimeMillis();
+
+			try {
+
+				for (IndexedClassExpression implied : toldSuperClassExpressions_)
+					ruleEngine.produce(context,
+							new PositiveSuperClassExpression(implied));
+			} finally {
+				timer.timeSubClassOfRule += System.currentTimeMillis();
+			}
 		}
 
 		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
