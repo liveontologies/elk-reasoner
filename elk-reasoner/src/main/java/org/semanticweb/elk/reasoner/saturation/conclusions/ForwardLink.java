@@ -33,6 +33,7 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * @author Frantisek Simancik
@@ -134,16 +135,8 @@ public class ForwardLink implements Conclusion {
 			}
 		}
 
-		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, ThisBackwardLinkRule>() {
-			@Override
-			public ThisBackwardLinkRule match(BackwardLinkRules chain) {
-				if (chain instanceof ThisBackwardLinkRule)
-					return (ThisBackwardLinkRule) chain;
-				else
-					return null;
-			}
-		};
-
+		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(ThisBackwardLinkRule.class);
+		
 		private static ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule>() {
 			@Override
 			public ThisBackwardLinkRule create(BackwardLinkRules tail) {

@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -113,16 +114,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 						implied));
 		}
 
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule match(ContextRules chain) {
-				if (chain instanceof ThisCompositionRule)
-					return (ThisCompositionRule) chain;
-				else
-					return null;
-			}
-		};
-
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(ThisCompositionRule.class);
+		
 		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
 			@Override
 			public ThisCompositionRule create(ContextRules tail) {
@@ -131,5 +124,4 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		};
 
 	}
-
 }

@@ -43,6 +43,7 @@ import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * Represents all occurrences of an ElkObjectSomeValuesFrom in an ontology.
@@ -228,7 +229,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					}
 				}
 
-				// propagating to the this context if relation is relflexive
+				// propagating to the this context if relation is reflexive
 				if (relation.getSaturated().isReflexive())
 					ruleEngine.produce(context,
 							new NegativeSuperClassExpression(e));
@@ -260,16 +261,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		}
 
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule match(ContextRules chain) {
-				if (chain instanceof ThisCompositionRule)
-					return (ThisCompositionRule) chain;
-				else
-					return null;
-			}
-		};
-
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(ThisCompositionRule.class);
+		
 		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
 			@Override
 			public ThisCompositionRule create(ContextRules tail) {
@@ -301,27 +294,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				ruleEngine.produce(link.getTarget(), carry);
 		}
 
-		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, ThisBackwardLinkRule>() {
-
-			@Override
-			public ThisBackwardLinkRule match(BackwardLinkRules chain) {
-				if (chain instanceof ThisBackwardLinkRule)
-					return (ThisBackwardLinkRule) chain;
-				else
-					return null;
-			}
-
-		};
-
+		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(ThisBackwardLinkRule.class);
+		
 		private static ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule>() {
 
 			@Override
 			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
 				return new ThisBackwardLinkRule(tail);
 			}
-
 		};
-
 	}
-
 }

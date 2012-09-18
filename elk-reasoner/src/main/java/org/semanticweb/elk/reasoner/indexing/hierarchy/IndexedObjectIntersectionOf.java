@@ -36,6 +36,7 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * Represents all occurrences of an ElkObjectIntersectionOf in an ontology.
@@ -176,23 +177,14 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 						conjunctionsByConjunct_.get(common)));
 		}
 
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new Matcher<ContextRules, ThisCompositionRule>() {
-
-			@Override
-			public ThisCompositionRule match(ContextRules chain) {
-				if (chain instanceof ThisCompositionRule)
-					return (ThisCompositionRule) chain;
-				else
-					return null;
-			}
-		};
-
+		
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(ThisCompositionRule.class);
+		
 		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
 			@Override
 			public ThisCompositionRule create(ContextRules tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};
-
 	}
 }

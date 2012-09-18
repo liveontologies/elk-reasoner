@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -139,17 +140,8 @@ public class IndexedClass extends IndexedClassEntity {
 									.getOwlNothing()));
 		}
 
-		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new Matcher<BackwardLinkRules, BottomBackwardLinkRule>() {
-
-			@Override
-			public BottomBackwardLinkRule match(BackwardLinkRules chain) {
-				if (chain instanceof BottomBackwardLinkRule)
-					return (BottomBackwardLinkRule) chain;
-				else
-					return null;
-			}
-		};
-
+		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, BottomBackwardLinkRule>(BottomBackwardLinkRule.class);
+		
 		private static ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule>() {
 			@Override
 			public BottomBackwardLinkRule create(BackwardLinkRules tail) {

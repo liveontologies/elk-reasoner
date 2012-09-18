@@ -38,6 +38,7 @@ import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -393,23 +394,13 @@ abstract public class IndexedClassExpression {
 			return success;
 		}		
 		
-		private static Matcher<ContextRules, DisjointnessRule> MATCHER_ = new Matcher<ContextRules, DisjointnessRule>() {
-
-			@Override
-			public DisjointnessRule match(ContextRules chain) {
-				if (chain instanceof DisjointnessRule)
-					return (DisjointnessRule) chain;
-				else
-					return null;
-			}
-		};
+		private static Matcher<ContextRules, DisjointnessRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, DisjointnessRule>(DisjointnessRule.class);
 
 		private static ReferenceFactory<ContextRules, DisjointnessRule> FACTORY_ = new ReferenceFactory<ContextRules, DisjointnessRule>() {
 			@Override
 			public DisjointnessRule create(ContextRules tail) {
 				return new DisjointnessRule(tail);
 			}
-		};		
-		
+		};				
 	}
 }
