@@ -36,6 +36,7 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkObjectIntersectionOf in an ontology.
@@ -103,7 +104,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		RulesTimer timer = ruleEngine.getRulesTimer();
 
-		timer.timeObjectIntersectionOfDecompositionRule -= System
+		timer.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread
 				.currentTimeMillis();
 
 		try {
@@ -112,7 +113,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			ruleEngine.produce(context, new PositiveSuperClassExpression(
 					secondConjunct));
 		} finally {
-			timer.timeObjectIntersectionOfDecompositionRule += System
+			timer.timeObjectIntersectionOfDecompositionRule += CachedTimeThread
 					.currentTimeMillis();
 		}
 	}
@@ -141,13 +142,9 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			IndexedClassExpression conjunctTwo) {
 		Chain<ContextRules> rules = conjunctOne.getChainCompositionRules();
 		ThisCompositionRule rule = rules.find(matcher);
-		if (rule != null) {
-			rule.removeConjunctionByConjunct(conjunctTwo);
-			if (rule.isEmpty())
-				rules.remove(matcher);
-		} else {
-			// TODO: throw/log something, this should never happen
-		}
+		rule.removeConjunctionByConjunct(conjunctTwo);
+		if (rule.isEmpty())
+			rules.remove(matcher);
 	}
 
 	private static class ThisCompositionRule extends ContextRules {
@@ -182,7 +179,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 			RulesTimer timer = ruleEngine.getRulesTimer();
 
-			timer.timeObjectIntersectionOfCompositionRule -= System
+			timer.timeObjectIntersectionOfCompositionRule -= CachedTimeThread
 					.currentTimeMillis();
 
 			try {
@@ -194,7 +191,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 							new NegativeSuperClassExpression(
 									conjunctionsByConjunct_.get(common)));
 			} finally {
-				timer.timeObjectIntersectionOfCompositionRule += System
+				timer.timeObjectIntersectionOfCompositionRule += CachedTimeThread
 						.currentTimeMillis();
 			}
 

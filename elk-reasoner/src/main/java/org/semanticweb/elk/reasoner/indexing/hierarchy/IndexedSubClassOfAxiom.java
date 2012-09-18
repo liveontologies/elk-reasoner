@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -110,7 +111,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 			RulesTimer timer = ruleEngine.getRulesTimer();
 
-			timer.timeSubClassOfRule -= System.currentTimeMillis();
+			timer.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis();
 
 			try {
 
@@ -118,7 +119,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 					ruleEngine.produce(context,
 							new PositiveSuperClassExpression(implied));
 			} finally {
-				timer.timeSubClassOfRule += System.currentTimeMillis();
+				timer.timeSubClassOfRule += CachedTimeThread
+						.currentTimeMillis();
 			}
 		}
 

@@ -33,6 +33,7 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from this
@@ -146,7 +147,8 @@ public class ForwardLink implements Conclusion {
 
 			RulesTimer timer = ruleEngine.getRulesTimer();
 
-			timer.timeForwardLinkBackwardLinkRule -= System.currentTimeMillis();
+			timer.timeForwardLinkBackwardLinkRule -= CachedTimeThread
+					.currentTimeMillis();
 
 			try {
 
@@ -174,7 +176,7 @@ public class ForwardLink implements Conclusion {
 				}
 
 			} finally {
-				timer.timeForwardLinkBackwardLinkRule += System
+				timer.timeForwardLinkBackwardLinkRule += CachedTimeThread
 						.currentTimeMillis();
 			}
 		}

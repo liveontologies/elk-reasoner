@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -98,7 +99,8 @@ public class IndexedClass extends IndexedClassEntity {
 
 		RulesTimer timer = ruleEngine.getRulesTimer();
 
-		timer.timeClassDecompositionRule -= System.currentTimeMillis();
+		timer.timeClassDecompositionRule -= CachedTimeThread
+				.currentTimeMillis();
 
 		try {
 			if (this.equals(ruleEngine.getOwlNothing())) {
@@ -124,7 +126,8 @@ public class IndexedClass extends IndexedClassEntity {
 						BottomBackwardLinkRule.FACTORY_);
 			}
 		} finally {
-			timer.timeClassDecompositionRule += System.currentTimeMillis();
+			timer.timeClassDecompositionRule += CachedTimeThread
+					.currentTimeMillis();
 		}
 	}
 
@@ -143,7 +146,8 @@ public class IndexedClass extends IndexedClassEntity {
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
 			RulesTimer timer = ruleEngine.getRulesTimer();
 
-			timer.timeClassBottomBackwardLinkRule -= System.currentTimeMillis();
+			timer.timeClassBottomBackwardLinkRule -= CachedTimeThread
+					.currentTimeMillis();
 
 			try {
 				ruleEngine.produce(
@@ -151,7 +155,7 @@ public class IndexedClass extends IndexedClassEntity {
 						new PositiveSuperClassExpression(ruleEngine
 								.getOwlNothing()));
 			} finally {
-				timer.timeClassBottomBackwardLinkRule += System
+				timer.timeClassBottomBackwardLinkRule += CachedTimeThread
 						.currentTimeMillis();
 			}
 		}

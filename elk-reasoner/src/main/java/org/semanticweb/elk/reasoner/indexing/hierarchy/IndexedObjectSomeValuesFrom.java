@@ -43,6 +43,7 @@ import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkObjectSomeValuesFrom in an ontology.
@@ -147,14 +148,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		RulesTimer timer = ruleEngine.getRulesTimer();
 
-		timer.timeObjectSomeValuesFromDecompositionRule -= System
+		timer.timeObjectSomeValuesFromDecompositionRule -= CachedTimeThread
 				.currentTimeMillis();
 
 		try {
 			ruleEngine.produce(ruleEngine.getCreateContext(filler),
 					new BackwardLink(context, property));
 		} finally {
-			timer.timeObjectSomeValuesFromDecompositionRule += System
+			timer.timeObjectSomeValuesFromDecompositionRule += CachedTimeThread
 					.currentTimeMillis();
 		}
 	}
@@ -190,7 +191,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 			RulesTimer timer = ruleEngine.getRulesTimer();
 
-			timer.timeObjectSomeValuesFromCompositionRule -= System
+			timer.timeObjectSomeValuesFromCompositionRule -= CachedTimeThread
 					.currentTimeMillis();
 
 			try {
@@ -236,7 +237,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 								new NegativeSuperClassExpression(e));
 				}
 			} finally {
-				timer.timeObjectSomeValuesFromCompositionRule += System
+				timer.timeObjectSomeValuesFromCompositionRule += CachedTimeThread
 						.currentTimeMillis();
 			}
 		}
@@ -305,7 +306,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 			RulesTimer timer = ruleEngine.getRulesTimer();
 
-			timer.timeObjectSomeValuesFromBackwardLinkRule -= System
+			timer.timeObjectSomeValuesFromBackwardLinkRule -= CachedTimeThread
 					.currentTimeMillis();
 
 			try {
@@ -314,7 +315,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 						.getReltaion()))
 					ruleEngine.produce(link.getSource(), carry);
 			} finally {
-				timer.timeObjectSomeValuesFromBackwardLinkRule += System
+				timer.timeObjectSomeValuesFromBackwardLinkRule += CachedTimeThread
 						.currentTimeMillis();
 			}
 		}
