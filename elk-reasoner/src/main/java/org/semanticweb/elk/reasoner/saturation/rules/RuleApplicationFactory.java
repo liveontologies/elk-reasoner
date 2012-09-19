@@ -227,7 +227,7 @@ public class RuleApplicationFactory implements
 						+ " ("
 						+ aggregatedRuleStats_
 								.getForwardLinkBackwardLinkRuleTime() + " ms)");
-			if (aggregatedRuleStats_.getClassDecompositionRuleTime() > 0)
+			if (aggregatedRuleStats_.getClassDecompositionRuleCount() > 0)
 				LOGGER_.debug("Class decomposition rules: "
 						+ aggregatedRuleStats_.getClassDecompositionRuleCount()
 						+ " ("

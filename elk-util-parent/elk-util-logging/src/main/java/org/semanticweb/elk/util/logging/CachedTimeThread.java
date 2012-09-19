@@ -31,46 +31,40 @@ package org.semanticweb.elk.util.logging;
 public class CachedTimeThread extends Thread {
 
 	/**
-	 * the frequency of update for the time snapshot values
+	 * the frequency of update for the time snapshot values in milliseconds
 	 */
-	private final static int UPDATE_FREQUENCY_ = 1024;
+	private static final int UPDATE_FREQUENCY_ = 10;
 
 	/**
 	 * the snapshot of the current time computed last time
 	 */
 	private static volatile long currentTimeMillis = System.currentTimeMillis();
 
-	private static volatile short increment = 0;
-
-	CachedTimeThread(int updateInterval) {
+	CachedTimeThread() {
 		setDaemon(true);
 	}
 
 	static {
-		new CachedTimeThread(1).start();
+		new CachedTimeThread().start();
 	}
 
-	private static void updateTimeSnapshot() {
-		currentTimeMillis = System.currentTimeMillis();
-		increment = 0;
-	}
-
+	/**
+	 * @return the current time in milliseconds delayed by at most 10
+	 *         milliseconds the value that would be returned by
+	 *         {@link System#currentTimeMillis()}
+	 */
 	public static long currentTimeMillis() {
-		if (increment > UPDATE_FREQUENCY_) {
-			updateTimeSnapshot();
-		}
-		return currentTimeMillis + increment;
+		return currentTimeMillis;
 	}
 
 	@Override
 	public void run() {
 		for (;;) {
-			if (increment++ == UPDATE_FREQUENCY_)
-				updateTimeSnapshot();
+			currentTimeMillis = System.currentTimeMillis();
 			try {
-				Thread.sleep(1);
+				Thread.sleep(UPDATE_FREQUENCY_);
 			} catch (InterruptedException e) {
-				return;
+				// will continue; the thread should die automatically
 			}
 		}
 	}
