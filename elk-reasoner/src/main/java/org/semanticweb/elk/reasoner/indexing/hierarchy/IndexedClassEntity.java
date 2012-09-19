@@ -26,11 +26,12 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 
 public abstract class IndexedClassEntity extends IndexedClassExpression {
-	
+
 	abstract public <O> O accept(IndexedClassEntityVisitor<O> visitor);
 
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return accept((IndexedClassEntityVisitor<O>) visitor);
 	}
+
 }

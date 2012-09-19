@@ -52,6 +52,8 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -84,6 +86,8 @@ public class Main {
 		OptionSpec<File> outputFile = parser
 				.acceptsAll(asList("output", "o"), "output taxonomy file")
 				.withRequiredArg().ofType(File.class).describedAs("taxonomy");
+		OptionSpec<Void> printHash = parser.acceptsAll(asList("print-hash"),
+				"print taxonomy hash to log");
 
 		// reasoning tasks
 		OptionSpec<Void> classify = parser.acceptsAll(asList("classify", "c"),
@@ -176,10 +180,10 @@ public class Main {
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			if (options.has(satisfiable)) {
-				boolean consistent = reasoner.isConsistent();
+				boolean inconsistent = reasoner.isInconsistent();
 				if (options.hasArgument(outputFile)) {
 					writeConsistencyToFile(options.valueOf(outputFile),
-							consistent);
+							!inconsistent);
 				}
 			}
 
@@ -193,6 +197,8 @@ public class Main {
 				if (options.hasArgument(outputFile))
 					writeClassTaxonomyToFile(options.valueOf(outputFile),
 							taxonomy);
+				if (options.has(printHash))
+					printTaxonomyHash(taxonomy);
 			}
 
 			if (options.has(realize)) {
@@ -205,6 +211,8 @@ public class Main {
 				if (options.hasArgument(outputFile))
 					writeInstanceTaxonomyToFile(options.valueOf(outputFile),
 							taxonomy);
+				if (options.has(printHash))
+					printTaxonomyHash(taxonomy);
 			}
 
 		} finally {
@@ -247,6 +255,21 @@ public class Main {
 				true);
 		Statistics.logOperationFinish("Writing taxonomy with instances",
 				LOGGER_);
+	}
+
+	static void printTaxonomyHash(Taxonomy<ElkClass> taxonomy) {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Taxonomy hash: "
+					+ Integer.toHexString(TaxonomyHasher.hash(taxonomy)));
+		}
+	}
+
+	static void printTaxonomyHash(
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Taxonomy hash: "
+					+ Integer.toHexString(InstanceTaxonomyHasher.hash(taxonomy)));
+		}
 	}
 
 	static int countOptions(OptionSet options, OptionSpec<?>... specs) {

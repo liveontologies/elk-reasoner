@@ -26,10 +26,10 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.IndexedPropertyChainSaturation;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -62,6 +62,12 @@ public abstract class IndexedPropertyChain {
 	 * {@link IndexedBinaryPropertyChain} occurs on the right.
 	 */
 	private Collection<IndexedBinaryPropertyChain> rightChains_;
+	
+	/**
+	 * Collections of all binary role chains in which this
+	 * {@link IndexedBinaryPropertyChain} occurs on the left.
+	 */
+	private Collection<IndexedBinaryPropertyChain> leftChains_;	
 
 	/**
 	 * @return All told super object properties of this
@@ -81,12 +87,21 @@ public abstract class IndexedPropertyChain {
 
 	/**
 	 * @return All {@link IndexedBinaryPropertyChain}s in which this
-	 *         {@link IndexedBinaryPropertyChain} occurs on right, or
-	 *         {@code null} if none is assigned
+	 *         {@link IndexedPropertyChain} occurs on right, or {@code null} if
+	 *         none is assigned
 	 */
 	public Collection<IndexedBinaryPropertyChain> getRightChains() {
 		return rightChains_;
 	}
+	
+	/**
+	 * @return All {@link IndexedBinaryPropertyChain}s in which this
+	 *         {@link IndexedPropertyChain} occurs on the left, or {@code null} if
+	 *         none is assigned
+	 */
+	public Collection<IndexedBinaryPropertyChain> getLeftChains() {
+		return leftChains_;
+	}	
 
 	/**
 	 * Adds the given {@link IndexedObjectProperty} as a super-role of this
@@ -154,15 +169,48 @@ public abstract class IndexedPropertyChain {
 	}
 
 	/**
+	 * Adds the given {@link IndexedBinaryPropertyChain} to the list of
+	 * {@link IndexedBinaryPropertyChain} that contains this
+	 * {@link IndexedPropertyChain} in the left-hand-side
+	 * 
+	 * @param chain
+	 *            the {@link IndexedBinaryPropertyChain} to be added
+	 */
+	protected void addLeftChain(IndexedBinaryPropertyChain chain) {
+		if (leftChains_ == null)
+			leftChains_ = new ArrayList<IndexedBinaryPropertyChain>(1);
+		leftChains_.add(chain);
+	}
+
+	/**
+	 * Adds the given {@link IndexedBinaryPropertyChain} from the list of
+	 * {@link IndexedBinaryPropertyChain} that contain this
+	 * {@link IndexedPropertyChain} in the left-hand-side
+	 * 
+	 * @param chain
+	 *            the {@link IndexedBinaryPropertyChain} to be removed
+	 * @return {@code true} if successfully removed
+	 */
+	protected boolean removeLeftChain(IndexedBinaryPropertyChain chain) {
+		boolean success = false;
+		if (leftChains_ != null) {
+			success = leftChains_.remove(chain);
+			if (leftChains_.isEmpty())
+				leftChains_ = null;
+		}
+		return success;
+	}	
+	
+	/**
 	 * This counts how often this object occurred in the ontology.
 	 */
 	int occurrenceNo = 0;
 
 	/**
-	 * the reference to a {@link SaturatedPropertyChain} assigned to this
+	 * The {@link SaturatedPropertyChain} object assigned to this
 	 * {@link IndexedPropertyChain}
 	 */
-	private final AtomicReference<SaturatedPropertyChain> saturated = new AtomicReference<SaturatedPropertyChain>();
+	private volatile SaturatedPropertyChain saturated_ = null;
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
@@ -183,7 +231,19 @@ public abstract class IndexedPropertyChain {
 	 *         assigned.
 	 */
 	public SaturatedPropertyChain getSaturated() {
-		return saturated.get();
+		return getSaturated(true);
+	}
+	
+	/**
+	 * If the parameter is set to false, the saturation object will be returned
+	 * "as is", i.e. possibly null or not yet populated.
+	 * Otherwise, saturation will be triggered automatically.
+	 * 
+	 * @param saturate
+	 * @return
+	 */
+	public SaturatedPropertyChain getSaturated(boolean saturate) {
+		return saturate && (saturated_ == null || !saturated_.isComputed()) ? saturate() : saturated_;
 	}
 
 	/**
@@ -194,17 +254,22 @@ public abstract class IndexedPropertyChain {
 	 *            assign the given {@link SaturatedPropertyChain} to this
 	 *            {@link IndexedClassExpression}
 	 * 
-	 * @return {@code true} if the operation succeeded.
+	 * @return {@code true} if the operation succeeded. If this method is called
+	 *         for the same object from different threads with at the same time
+	 *         with non-null arguments, only one call returns {@code true}.
 	 */
-	public boolean setSaturated(SaturatedPropertyChain saturatedObjectProperty) {
-		return saturated.compareAndSet(null, saturatedObjectProperty);
+	public synchronized void setSaturated(SaturatedPropertyChain saturatedObjectProperty) {		
+		saturated_ = saturatedObjectProperty;
 	}
 
 	/**
 	 * Resets the corresponding {@code SaturatedObjecProperty} to {@code null}.
 	 */
 	public void resetSaturated() {
-		saturated.set(null);
+		if (saturated_ != null)
+			synchronized (this) {
+				saturated_ = null;
+			}
 	}
 
 	/** Hash code for this object. */
@@ -220,6 +285,15 @@ public abstract class IndexedPropertyChain {
 		return hashCode_;
 	}
 
+	private SaturatedPropertyChain saturate() {
+		SaturatedPropertyChain saturated = IndexedPropertyChainSaturation.saturate(this);
+		
+		setSaturated(saturated);
+		
+		return saturated; 
+	}	
+	
+	
 	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);
 
 	@Override

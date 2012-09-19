@@ -78,6 +78,7 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 		if (occurrenceNo == 0 && increment > 0) {
 			// first occurrence of this expression
 			rightProperty_.addRightChain(this);
+			leftProperty_.addLeftChain(this);
 		}
 
 		occurrenceNo += increment;
@@ -85,6 +86,7 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 		if (occurrenceNo == 0 && increment < 0) {
 			// no occurrences of this conjunction left
 			rightProperty_.removeRightChain(this);
+			leftProperty_.removeLeftChain(this);
 		}
 
 	}
@@ -101,6 +103,16 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	@Override
 	public List<IndexedPropertyChain> getToldSubProperties() {
 		return null;
+	}
+	
+	/**
+	 * Returns the property which is composable with the given property in this chain 
+	 * 
+	 * @param ipc
+	 * @return
+	 */
+	public IndexedPropertyChain getComposable(IndexedPropertyChain ipc) {
+		return ipc == leftProperty_ ? rightProperty_ : (ipc == rightProperty_ ? leftProperty_ : null);
 	}
 
 	@Override

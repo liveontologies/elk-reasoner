@@ -95,11 +95,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedClassExpression superIndexedClass = superElkClass
 				.accept(positiveIndexer);
 
-		if (multiplicity == 1) {
-			subIndexedClass.addToldSuperClassExpression(superIndexedClass);
-		} else {
-			subIndexedClass.removeToldSuperClassExpression(superIndexedClass);
-		}
+		(new IndexedSubClassOfAxiom(subIndexedClass, superIndexedClass))
+				.updateOccurrenceNumbers(multiplicity);
 	}
 
 	@Override
@@ -111,11 +108,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		IndexedClassExpression indexedType = type.accept(positiveIndexer);
 
-		if (multiplicity == 1) {
-			indexedIndividual.addToldSuperClassExpression(indexedType);
-		} else {
-			indexedIndividual.removeToldSuperClassExpression(indexedType);
-		}
+		(new IndexedSubClassOfAxiom(indexedIndividual, indexedType))
+				.updateOccurrenceNumbers(multiplicity);
 	}
 
 	@Override
@@ -188,9 +182,14 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
 				.accept(positiveIndexer);
 
-		if (multiplicity == 1)
+		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
+				&& multiplicity > 0)
 			ontologyIndex.addReflexiveObjectProperty(indexedReflexiveProperty);
-		else
+
+		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity;
+
+		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
+				&& multiplicity < 0)
 			ontologyIndex
 					.removeReflexiveObjectProperty(indexedReflexiveProperty);
 	}

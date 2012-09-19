@@ -79,6 +79,10 @@ public abstract class AbstractReasonerState {
 	 */
 	boolean doneConsistencyCheck = false;
 	/**
+	 * {@code true} if saturation for every class of the ontology is computed
+	 */
+	boolean doneClassSaturation = false;
+	/**
 	 * {@code true} if the class taxonomy has been computed
 	 */
 	boolean doneClassTaxonomy = false;
@@ -95,9 +99,9 @@ public abstract class AbstractReasonerState {
 	 */
 	final OntologyIndex ontologyIndex;
 	/**
-	 * {@code true} if the current ontology is consistent
+	 * {@code true} if the current ontology is inconsistent
 	 */
-	boolean consistentOntology = true;
+	boolean inconsistentOntology = false;
 	/**
 	 * Taxonomy that stores (partial) reasoning results.
 	 */
@@ -145,6 +149,7 @@ public abstract class AbstractReasonerState {
 			doneObjectPropertyCompositionsPrecomputation = false;
 			doneContextReset = false;
 			doneConsistencyCheck = false;
+			doneClassSaturation = false;
 			doneClassTaxonomy = false;
 			doneInstanceTaxonomy = false;
 		}
@@ -239,13 +244,14 @@ public abstract class AbstractReasonerState {
 	/**
 	 * Check consistency of the current ontology, if this has not been done yet.
 	 * 
-	 * @return {@code true} if the ontology is consistent, that is, satisfiable.
+	 * @return {@code true} if the ontology is inconsistent, that is,
+	 *         unsatisfiable.
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public boolean isConsistent() throws ElkException {
+	public boolean isInconsistent() throws ElkException {
 		getStageExecutor().complete(new ConsistencyCheckingStage(this));
-		return consistentOntology;
+		return inconsistentOntology;
 	}
 
 	/**
@@ -284,7 +290,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
-		if (!isConsistent())
+		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
 		getStageExecutor().complete(new ClassTaxonomyComputationStage(this));
@@ -308,7 +314,7 @@ public abstract class AbstractReasonerState {
 	 */
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
 			throws ElkException {
-		if (!isConsistent())
+		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
 		getStageExecutor().complete(new InstanceTaxonomyComputationStage(this));

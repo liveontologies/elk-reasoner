@@ -29,9 +29,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.Context;
-import org.semanticweb.elk.reasoner.saturation.rulesystem.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -136,6 +135,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			0);
 
 	/**
+	 * The statistics about this factory aggregated from statistics for all
+	 * workers
+	 */
+	private final ThisStatistics aggregatedStats_;
+
+	/**
 	 * Creates a new saturation engine using the given ontology index, listener
 	 * for callback functions, and threshold for the number of unprocessed
 	 * contexts. The threshold has influence on the size of the batches of the
@@ -161,6 +166,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		this.jobsToDo_ = new ConcurrentLinkedQueue<J>();
 		this.jobsInProgress_ = new ConcurrentLinkedQueue<J>();
 		this.ruleApplicationFactory_ = new RuleApplicationFactory(ontologyIndex);
+		this.aggregatedStats_ = new ThisStatistics();
 	}
 
 	/**
@@ -180,8 +186,44 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 					@Override
 					public void notifyFinished(J job)
 							throws InterruptedException {
+						// dummy listener does not do anything
 					}
 				});
+	}
+
+	@Override
+	public Engine getEngine() {
+		return new Engine();
+	}
+
+	/**
+	 * Print statistics about the saturation
+	 */
+	public void printStatistics() {
+		ruleApplicationFactory_.printStatistics();
+		checkStatistics();
+		if (LOGGER_.isDebugEnabled()) {
+			if (aggregatedStats_.jobsSubmittedNo > 0)
+				LOGGER_.debug("Saturation Jobs Submitted=Done+Processed: "
+						+ aggregatedStats_.jobsSubmittedNo + "="
+						+ aggregatedStats_.jobsAlreadyDoneNo + "+"
+						+ aggregatedStats_.jobsProcessedNo);
+		}
+	}
+
+	@Override
+	public void finish() {
+		checkStatistics();
+	}
+
+	/**
+	 * Checks if the statistical values make sense and issues error messages if
+	 * not
+	 */
+	private void checkStatistics() {
+		if (aggregatedStats_.jobsSubmittedNo != aggregatedStats_.jobsAlreadyDoneNo
+				+ +aggregatedStats_.jobsProcessedNo)
+			LOGGER_.error("Some submitted saturation jobs were not processed!");
 	}
 
 	/**
@@ -190,7 +232,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * 
 	 * @throws InterruptedException
 	 */
-	private void processFinishedJobs() throws InterruptedException {
+	private void processFinishedJobs(ThisStatistics localStatistics)
+			throws InterruptedException {
 		for (;;) {
 			int shapshotJobsFinished = countJobsFinished_.get();
 			if (shapshotJobsFinished == countJobsProcessed_.get()) {
@@ -212,20 +255,14 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				J nextJob = jobsInProgress_.poll();
 				IndexedClassExpression root = nextJob.getInput();
 				Context rootSaturation = root.getContext();
-				((ContextClassSaturation) rootSaturation).setSaturated();
+				rootSaturation.setSaturated();
 				nextJob.setOutput(rootSaturation);
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace(root + ": saturation finished");
+				localStatistics.jobsProcessedNo++;
 				listener_.notifyFinished(nextJob);
 			}
 		}
-	}
-
-	/**
-	 * Print statistics about the saturation
-	 */
-	public void printStatistics() {
-		ruleApplicationFactory_.printStatistics();
 	}
 
 	/**
@@ -255,6 +292,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		private final RuleApplicationFactory.Engine ruleApplicationEngine_ = ruleApplicationFactory_
 				.getEngine();
 
+		private final ThisStatistics stats_ = new ThisStatistics();
+
 		// don't allow creating of engines directly; only through the factory
 		private Engine() {
 		}
@@ -262,6 +301,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		@Override
 		public void submit(J job) {
 			jobsToDo_.add(job);
+			stats_.jobsSubmittedNo++;
 		}
 
 		@Override
@@ -299,7 +339,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 						countStartedWorkers_.get());
 			updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
-			processFinishedJobs(); // can throw InterruptedException
+			processFinishedJobs(stats_); // can throw InterruptedException
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					return;
@@ -328,9 +368,9 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 * already complete
 				 */
 				Context rootContext = root.getContext();
-				if (rootContext != null
-						&& ((ContextClassSaturation) rootContext).isSaturated()) {
+				if (rootContext != null && rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);
+					stats_.jobsAlreadyDoneNo++;
 					listener_.notifyFinished(nextJob); // can throw
 														// InterruptedException
 					continue;
@@ -350,13 +390,15 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 					updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 							countStartedWorkers_.get());
 				updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
-				processFinishedJobs(); // can throw InterruptedException
+				processFinishedJobs(stats_); // can throw
+												// InterruptedException
 			}
 		}
 
 		@Override
 		public void finish() {
 			ruleApplicationEngine_.finish();
+			aggregatedStats_.merge(stats_);
 		}
 
 		/**
@@ -410,9 +452,32 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 	}
 
-	@Override
-	public Engine getEngine() {
-		return new Engine();
+	/**
+	 * Counters accumulating statistical information about this factory.
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	private static class ThisStatistics {
+		/**
+		 * the number of submitted jobs
+		 */
+		int jobsSubmittedNo;
+		/**
+		 * submitted jobs that were already done when they started to be
+		 * processed
+		 */
+		int jobsAlreadyDoneNo;
+		/**
+		 * submitted jobs that were finished by this engine
+		 */
+		int jobsProcessedNo;
+
+		public synchronized void merge(ThisStatistics statistics) {
+			this.jobsSubmittedNo += statistics.jobsSubmittedNo;
+			this.jobsProcessedNo += statistics.jobsProcessedNo;
+			this.jobsAlreadyDoneNo += statistics.jobsAlreadyDoneNo;
+		}
 	}
 
 }

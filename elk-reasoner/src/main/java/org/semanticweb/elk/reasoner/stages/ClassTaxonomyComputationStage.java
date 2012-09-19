@@ -44,7 +44,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private ClassTaxonomyComputation computation = null;
+	private ClassTaxonomyComputation computation_ = null;
 
 	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -64,23 +64,25 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	public List<ReasonerStage> getDependencies() {
 		return Arrays.asList((ReasonerStage) new ConsistencyCheckingStage(
 				reasoner));
+		// return Arrays
+		// .asList((ReasonerStage) new ClassSaturationStage(reasoner));
 	}
 
 	@Override
 	public void execute() throws ElkInterruptedException {
-		if (computation == null)
+		if (computation_ == null)
 			initComputation();
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
-				computation.process();
+				computation_.process();
 				if (!interrupted())
 					break;
 			}
 		} finally {
 			progressMonitor.finish();
 		}
-		reasoner.taxonomy = computation.getTaxonomy();
+		reasoner.taxonomy = computation_.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
 	}
 
@@ -89,7 +91,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		super.initComputation();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		this.computation = new ClassTaxonomyComputation(
+		this.computation_ = new ClassTaxonomyComputation(
 				reasoner.ontologyIndex.getIndexedClasses(),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
 				reasoner.ontologyIndex);
@@ -97,8 +99,8 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		if (computation != null)
-			computation.printStatistics();
+		if (computation_ != null)
+			computation_.printStatistics();
 	}
 
 }

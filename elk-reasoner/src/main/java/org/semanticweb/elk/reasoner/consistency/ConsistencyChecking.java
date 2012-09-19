@@ -36,7 +36,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
-import org.semanticweb.elk.reasoner.saturation.classes.ContextClassSaturation;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -62,7 +61,7 @@ public class ConsistencyChecking
 	 * ontology; Once ontology becomes inconsistent, the computation can be
 	 * interrupted.
 	 */
-	private final ConsistencyMonitor consistencyMonitor;
+	private final ConsistencyMonitor consistencyMonitor_;
 
 	/**
 	 * Auxiliary class constructor
@@ -89,7 +88,7 @@ public class ConsistencyChecking
 			ProgressMonitor progressMonitor) {
 		super(inputJobs, saturationFactory, executor, maxWorkers,
 				progressMonitor);
-		this.consistencyMonitor = consistencyMonitor;
+		this.consistencyMonitor_ = consistencyMonitor;
 	}
 
 	/**
@@ -183,18 +182,18 @@ public class ConsistencyChecking
 
 	@Override
 	public void process() {
-		consistencyMonitor.registerCurrentThreadToInterrupt();
+		consistencyMonitor_.registerCurrentThreadToInterrupt();
 		super.process();
-		consistencyMonitor.clearThreadToInterrupt();
+		consistencyMonitor_.clearThreadToInterrupt();
 	}
 
 	/**
-	 * @return {@code true} if the ontology is consistent; should be called
+	 * @return {@code true} if the ontology is inconsistent; should be called
 	 *         after the consistency checking is performed using the method
 	 *         {@link #process()}
 	 */
-	public boolean isConsistent() {
-		return !consistencyMonitor.isInconsistent();
+	public boolean isInconsistent() {
+		return consistencyMonitor_.isInconsistent();
 	}
 
 	/**
@@ -222,14 +221,13 @@ public class ConsistencyChecking
 
 		@Override
 		public void notifyFinished(SaturationJob<IndexedClassEntity> job) {
-			if (!((ContextClassSaturation) job.getOutput()).isSatisfiable())
+			if (job.getOutput().isInconsistent())
 				consistenceMonitor.setInconsistent();
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(job.getInput()
 						+ ": consistency checking finished: "
-						+ (((ContextClassSaturation) job.getOutput())
-								.isSatisfiable() ? "satisfiable"
-								: "unsatisfiable"));
+						+ (job.getOutput().isInconsistent() ? "inconsistent"
+								: "satisfiable"));
 		}
 
 	}
@@ -242,7 +240,7 @@ public class ConsistencyChecking
 	 * 
 	 */
 	static class ConsistencyMonitor {
-		private volatile boolean inconsistent = false;
+		private volatile boolean inconsistent_ = false;
 		private volatile Thread controlThread;
 
 		public void registerThreadToInterrupt(Thread controlThread) {
@@ -258,11 +256,11 @@ public class ConsistencyChecking
 		}
 
 		public boolean isInconsistent() {
-			return inconsistent;
+			return inconsistent_;
 		}
 
 		public void setInconsistent() {
-			inconsistent = true;
+			inconsistent_ = true;
 			// interrupt the reasoner
 			if (controlThread != null)
 				controlThread.interrupt();
