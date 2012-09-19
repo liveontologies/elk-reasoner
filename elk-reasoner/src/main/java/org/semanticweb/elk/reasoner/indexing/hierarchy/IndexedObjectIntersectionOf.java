@@ -103,10 +103,11 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		RulesTimer timer = ruleEngine.getRulesTimer();
+		RuleStatistics timer = ruleEngine.getRulesTimer();
 
 		timer.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread
 				.currentTimeMillis();
+		timer.countObjectIntersectionOfDecompositionRule++;
 
 		try {
 			ruleEngine.produce(context, new PositiveSuperClassExpression(
@@ -178,10 +179,11 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
 
-			RulesTimer timer = ruleEngine.getRulesTimer();
+			RuleStatistics timer = ruleEngine.getRulesTimer();
 
 			timer.timeObjectIntersectionOfCompositionRule -= CachedTimeThread
 					.currentTimeMillis();
+			timer.countObjectIntersectionOfCompositionRule++;
 
 			try {
 

@@ -98,10 +98,11 @@ public class IndexedClass extends IndexedClassEntity {
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 
-		RulesTimer timer = ruleEngine.getRulesTimer();
+		RuleStatistics timer = ruleEngine.getRulesTimer();
 
 		timer.timeClassDecompositionRule -= CachedTimeThread
 				.currentTimeMillis();
+		timer.countClassDecompositionRule++;
 
 		try {
 			if (this.equals(ruleEngine.getOwlNothing())) {
@@ -145,10 +146,11 @@ public class IndexedClass extends IndexedClassEntity {
 
 		@Override
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
-			RulesTimer timer = ruleEngine.getRulesTimer();
+			RuleStatistics timer = ruleEngine.getRulesTimer();
 
 			timer.timeClassBottomBackwardLinkRule -= CachedTimeThread
 					.currentTimeMillis();
+			timer.countClassBottomBackwardLinkRule++;
 
 			try {
 				ruleEngine.produce(

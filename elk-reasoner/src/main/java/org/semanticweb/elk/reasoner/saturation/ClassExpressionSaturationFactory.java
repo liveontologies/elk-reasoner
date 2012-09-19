@@ -138,7 +138,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * The statistics about this factory aggregated from statistics for all
 	 * workers
 	 */
-	private final Statistics aggregatedStatistics_;
+	private final ThisStatistics aggregatedStats_;
 
 	/**
 	 * Creates a new saturation engine using the given ontology index, listener
@@ -166,7 +166,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		this.jobsToDo_ = new ConcurrentLinkedQueue<J>();
 		this.jobsInProgress_ = new ConcurrentLinkedQueue<J>();
 		this.ruleApplicationFactory_ = new RuleApplicationFactory(ontologyIndex);
-		this.aggregatedStatistics_ = new Statistics();
+		this.aggregatedStats_ = new ThisStatistics();
 	}
 
 	/**
@@ -203,11 +203,11 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		ruleApplicationFactory_.printStatistics();
 		checkStatistics();
 		if (LOGGER_.isDebugEnabled()) {
-			if (aggregatedStatistics_.jobsSubmittedNo > 0)
-				LOGGER_.debug("Saturation Jobs Submitted=Done+Processed:"
-						+ aggregatedStatistics_.jobsSubmittedNo + "="
-						+ aggregatedStatistics_.jobsAlreadyDoneNo + "+"
-						+ aggregatedStatistics_.jobsProcessedNo);
+			if (aggregatedStats_.jobsSubmittedNo > 0)
+				LOGGER_.debug("Saturation Jobs Submitted=Done+Processed: "
+						+ aggregatedStats_.jobsSubmittedNo + "="
+						+ aggregatedStats_.jobsAlreadyDoneNo + "+"
+						+ aggregatedStats_.jobsProcessedNo);
 		}
 	}
 
@@ -221,8 +221,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * not
 	 */
 	private void checkStatistics() {
-		if (aggregatedStatistics_.jobsSubmittedNo != aggregatedStatistics_.jobsAlreadyDoneNo
-				+ +aggregatedStatistics_.jobsProcessedNo)
+		if (aggregatedStats_.jobsSubmittedNo != aggregatedStats_.jobsAlreadyDoneNo
+				+ +aggregatedStats_.jobsProcessedNo)
 			LOGGER_.error("Some submitted saturation jobs were not processed!");
 	}
 
@@ -232,7 +232,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * 
 	 * @throws InterruptedException
 	 */
-	private void processFinishedJobs(Statistics localStatistics)
+	private void processFinishedJobs(ThisStatistics localStatistics)
 			throws InterruptedException {
 		for (;;) {
 			int shapshotJobsFinished = countJobsFinished_.get();
@@ -292,7 +292,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		private final RuleApplicationFactory.Engine ruleApplicationEngine_ = ruleApplicationFactory_
 				.getEngine();
 
-		private final Statistics statistics_ = new Statistics();
+		private final ThisStatistics stats_ = new ThisStatistics();
 
 		// don't allow creating of engines directly; only through the factory
 		private Engine() {
@@ -301,7 +301,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		@Override
 		public void submit(J job) {
 			jobsToDo_.add(job);
-			statistics_.jobsSubmittedNo++;
+			stats_.jobsSubmittedNo++;
 		}
 
 		@Override
@@ -339,7 +339,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 						countStartedWorkers_.get());
 			updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
-			processFinishedJobs(statistics_); // can throw InterruptedException
+			processFinishedJobs(stats_); // can throw InterruptedException
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					return;
@@ -370,7 +370,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				Context rootContext = root.getContext();
 				if (rootContext != null && rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);
-					statistics_.jobsAlreadyDoneNo++;
+					stats_.jobsAlreadyDoneNo++;
 					listener_.notifyFinished(nextJob); // can throw
 														// InterruptedException
 					continue;
@@ -390,15 +390,15 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 					updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 							countStartedWorkers_.get());
 				updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
-				processFinishedJobs(statistics_); // can throw
-													// InterruptedException
+				processFinishedJobs(stats_); // can throw
+												// InterruptedException
 			}
 		}
 
 		@Override
 		public void finish() {
 			ruleApplicationEngine_.finish();
-			aggregatedStatistics_.merge(statistics_);
+			aggregatedStats_.merge(stats_);
 		}
 
 		/**
@@ -453,14 +453,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	}
 
 	/**
-	 * Counters accomulating statistical information about this factory. The
-	 * counters are not thread safe, therefore each worker thread should use its
-	 * own instance of the counter.
+	 * Counters accumulating statistical information about this factory.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	public static class Statistics {
+	private static class ThisStatistics {
 		/**
 		 * the number of submitted jobs
 		 */
@@ -475,17 +473,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		 */
 		int jobsProcessedNo;
 
-		public void reset() {
-			jobsSubmittedNo = 0;
-			jobsAlreadyDoneNo = 0;
-			jobsProcessedNo = 0;
-		}
-
-		public synchronized void merge(Statistics statistics) {
+		public synchronized void merge(ThisStatistics statistics) {
 			this.jobsSubmittedNo += statistics.jobsSubmittedNo;
 			this.jobsProcessedNo += statistics.jobsProcessedNo;
 			this.jobsAlreadyDoneNo += statistics.jobsAlreadyDoneNo;
-			statistics.reset();
 		}
 	}
 

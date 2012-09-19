@@ -146,10 +146,11 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		RulesTimer timer = ruleEngine.getRulesTimer();
+		RuleStatistics timer = ruleEngine.getRulesTimer();
 
 		timer.timeObjectSomeValuesFromDecompositionRule -= CachedTimeThread
 				.currentTimeMillis();
+		timer.countObjectSomeValuesFromDecompositionRule++;
 
 		try {
 			ruleEngine.produce(ruleEngine.getCreateContext(filler),
@@ -190,10 +191,11 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
 
-			RulesTimer timer = ruleEngine.getRulesTimer();
+			RuleStatistics timer = ruleEngine.getRulesTimer();
 
 			timer.timeObjectSomeValuesFromCompositionRule -= CachedTimeThread
 					.currentTimeMillis();
+			timer.countObjectSomeValuesFromCompositionRule++;
 
 			try {
 
@@ -310,10 +312,11 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
-			RulesTimer timer = ruleEngine.getRulesTimer();
+			RuleStatistics timer = ruleEngine.getRulesTimer();
 
 			timer.timeObjectSomeValuesFromBackwardLinkRule -= CachedTimeThread
 					.currentTimeMillis();
+			timer.countObjectSomeValuesFromBackwardLinkRule++;
 
 			try {
 

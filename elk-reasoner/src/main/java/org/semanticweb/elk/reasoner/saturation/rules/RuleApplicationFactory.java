@@ -33,7 +33,7 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.RulesTimer;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
@@ -100,14 +100,20 @@ public class RuleApplicationFactory implements
 	private final ConclusionsCounter aggregatedConclusionsCounter_;
 
 	/**
-	 * The {@link RulesTimer} aggregated for all workers
+	 * The {@link RuleStatistics} aggregated for all workers
 	 */
-	private final RulesTimer aggregatedRulesTimer_;
+	private final RuleStatistics aggregatedRuleStats_;
+
+	/**
+	 * The {@link ThisStatistics} aggregated for all workers
+	 */
+	private final ThisStatistics aggregatedFactoryStats_;
 
 	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
 		this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
-		this.aggregatedRulesTimer_ = new RulesTimer();
+		this.aggregatedRuleStats_ = new RuleStatistics();
+		this.aggregatedFactoryStats_ = new ThisStatistics();
 		this.reflexiveProperties_ = new ArrayHashSet<IndexedObjectProperty>();
 		Collection<IndexedObjectProperty> reflexiveObjectProperties = ontologyIndex
 				.getReflexiveObjectProperties();
@@ -147,73 +153,104 @@ public class RuleApplicationFactory implements
 	public void printStatistics() {
 		if (LOGGER_.isDebugEnabled()) {
 			checkStatistics();
+			// CONTEXT STATISTICS:
 			if (approximateContextNumber_.get() > 0)
-				LOGGER_.debug("Contexts created:" + approximateContextNumber_);
+				LOGGER_.debug("Contexts Created/Activations:"
+						+ approximateContextNumber_ + "/"
+						+ aggregatedFactoryStats_.contContextActivations);
+			// CONCLUSIONS STATISTICS:
 			if (aggregatedConclusionsCounter_.getSuperClassExpressionInfNo() > 0)
-				LOGGER_.debug("Derived Produced/Unique:"
+				LOGGER_.debug("Derived Produced/Unique: "
 						+ aggregatedConclusionsCounter_
 								.getSuperClassExpressionInfNo()
 						+ "/"
 						+ aggregatedConclusionsCounter_
 								.getSuperClassExpressionNo());
 			if (aggregatedConclusionsCounter_.getBackLinkInfNo() > 0)
-				LOGGER_.debug("Backward Links Produced/Unique:"
+				LOGGER_.debug("Backward Links Produced/Unique: "
 						+ aggregatedConclusionsCounter_.getBackLinkInfNo()
 						+ "/" + aggregatedConclusionsCounter_.getBackLinkNo());
 			if (aggregatedConclusionsCounter_.getForwLinkInfNo() > 0)
-				LOGGER_.debug("Forward Links Produced/Unique:"
+				LOGGER_.debug("Forward Links Produced/Unique: "
 						+ aggregatedConclusionsCounter_.getForwLinkInfNo()
 						+ "/" + aggregatedConclusionsCounter_.getForwLinkNo());
-			if (aggregatedRulesTimer_
-					.getObjectSomeValuesFromCompositionRuleTime() > 0)
-				LOGGER_.debug("ObjectSomeValuesFrom composition time: "
-						+ aggregatedRulesTimer_
+			// RULES STATISTICS:
+			if (aggregatedRuleStats_
+					.getObjectSomeValuesFromCompositionRuleCount() > 0)
+				LOGGER_.debug("ObjectSomeValuesFrom composition rules: "
+						+ aggregatedRuleStats_
+								.getObjectSomeValuesFromCompositionRuleCount()
+						+ " ("
+						+ aggregatedRuleStats_
 								.getObjectSomeValuesFromCompositionRuleTime()
-						+ " ms.");
-			if (aggregatedRulesTimer_
-					.getObjectSomeValuesFromDecompositionRuleTime() > 0)
-				LOGGER_.debug("ObjectSomeValuesFrom decomposition time: "
-						+ aggregatedRulesTimer_
+						+ " ms)");
+			if (aggregatedRuleStats_
+					.getObjectSomeValuesFromDecompositionRuleCount() > 0)
+				LOGGER_.debug("ObjectSomeValuesFrom decomposition rules: "
+						+ aggregatedRuleStats_
+								.getObjectSomeValuesFromDecompositionRuleCount()
+						+ " ("
+						+ aggregatedRuleStats_
 								.getObjectSomeValuesFromDecompositionRuleTime()
-						+ " ms.");
-			if (aggregatedRulesTimer_
-					.getObjectSomeValuesFromBackwardLinkRuleTime() > 0)
-				LOGGER_.debug("ObjectSomeValuesFrom backward link time: "
-						+ aggregatedRulesTimer_
+						+ " ms)");
+			if (aggregatedRuleStats_
+					.getObjectSomeValuesFromBackwardLinkRuleCount() > 0)
+				LOGGER_.debug("ObjectSomeValuesFrom backward link rules: "
+						+ aggregatedRuleStats_
+								.getObjectSomeValuesFromBackwardLinkRuleCount()
+						+ " ("
+						+ aggregatedRuleStats_
 								.getObjectSomeValuesFromBackwardLinkRuleTime()
-						+ " ms.");
-			if (aggregatedRulesTimer_
-					.getObjectIntersectionOfCompositionRuleTime() > 0)
-				LOGGER_.debug("ObjectIntersectionOf composition time: "
-						+ aggregatedRulesTimer_
+						+ " ms)");
+			if (aggregatedRuleStats_
+					.getObjectIntersectionOfCompositionRuleCount() > 0)
+				LOGGER_.debug("ObjectIntersectionOf composition rules: "
+						+ aggregatedRuleStats_
+								.getObjectIntersectionOfCompositionRuleCount()
+						+ " ("
+						+ aggregatedRuleStats_
 								.getObjectIntersectionOfCompositionRuleTime()
-						+ " ms.");
-			if (aggregatedRulesTimer_
-					.getObjectIntersectionOfDecompositionRuleTime() > 0)
-				LOGGER_.debug("ObjectIntersectionOf decomposition time: "
-						+ aggregatedRulesTimer_
+						+ " ms)");
+			if (aggregatedRuleStats_
+					.getObjectIntersectionOfDecompositionRuleCount() > 0)
+				LOGGER_.debug("ObjectIntersectionOf decomposition rules: "
+						+ aggregatedRuleStats_
+								.getObjectIntersectionOfDecompositionRuleCount()
+						+ " ("
+						+ aggregatedRuleStats_
 								.getObjectIntersectionOfDecompositionRuleTime()
-						+ " ms.");
-			if (aggregatedRulesTimer_.getForwardLinkBackwardLinkRuleTime() > 0)
-				LOGGER_.debug("ForwardLink backward link time: "
-						+ aggregatedRulesTimer_
-								.getForwardLinkBackwardLinkRuleTime() + " ms.");
-			if (aggregatedRulesTimer_.getClassDecompositionRuleTime() > 0)
-				LOGGER_.debug("Class decomposition time: "
-						+ aggregatedRulesTimer_.getClassDecompositionRuleTime()
-						+ " ms.");
-			if (aggregatedRulesTimer_.getClassBottomBackwardLinkRuleTime() > 0)
-				LOGGER_.debug("owl:Nothing backward link time: "
-						+ aggregatedRulesTimer_
-								.getClassBottomBackwardLinkRuleTime() + " ms.");
-			if (aggregatedRulesTimer_.getSubClassOfRuleTime() > 0)
-				LOGGER_.debug("SubClassOf expansion time: "
-						+ aggregatedRulesTimer_.getSubClassOfRuleTime()
-						+ " ms.");
+						+ " ms)");
+			if (aggregatedRuleStats_.getForwardLinkBackwardLinkRuleCount() > 0)
+				LOGGER_.debug("ForwardLink backward link rules: "
+						+ aggregatedRuleStats_
+								.getForwardLinkBackwardLinkRuleCount()
+						+ " ("
+						+ aggregatedRuleStats_
+								.getForwardLinkBackwardLinkRuleTime() + " ms)");
+			if (aggregatedRuleStats_.getClassDecompositionRuleTime() > 0)
+				LOGGER_.debug("Class decomposition rules: "
+						+ aggregatedRuleStats_.getClassDecompositionRuleCount()
+						+ " ("
+						+ aggregatedRuleStats_.getClassDecompositionRuleTime()
+						+ "ms)");
+			if (aggregatedRuleStats_.getClassBottomBackwardLinkRuleCount() > 0)
+				LOGGER_.debug("owl:Nothing backward link rules: "
+						+ aggregatedRuleStats_
+								.getClassBottomBackwardLinkRuleCount()
+						+ " ("
+						+ aggregatedRuleStats_
+								.getClassBottomBackwardLinkRuleTime() + " ms)");
+			if (aggregatedRuleStats_.getSubClassOfRuleCount() > 0)
+				LOGGER_.debug("SubClassOf expansion rules: "
+						+ aggregatedRuleStats_.getSubClassOfRuleCount() + " ("
+						+ aggregatedRuleStats_.getSubClassOfRuleTime() + " ms)");
 		}
 	}
 
 	private void checkStatistics() {
+		if (aggregatedFactoryStats_.contContextActivations < approximateContextNumber_
+				.get())
+			LOGGER_.error("More contexts than context activations!");
 		if (aggregatedConclusionsCounter_.getSuperClassExpressionInfNo() < aggregatedConclusionsCounter_
 				.getSuperClassExpressionNo())
 			LOGGER_.error("More unique derived superclasses than produced!");
@@ -233,9 +270,13 @@ public class RuleApplicationFactory implements
 		 */
 		private final ConclusionsCounter conclusionsCounter_ = new ConclusionsCounter();
 		/**
-		 * Local {@link RulesTimer} created for every worker
+		 * Local {@link RuleStatistics} created for every worker
 		 */
-		private final RulesTimer rulesTimer_ = new RulesTimer();
+		private final RuleStatistics ruleStats_ = new RuleStatistics();
+		/**
+		 * Local {@link ThisStatistics} created for every worker
+		 */
+		private final ThisStatistics factoryStats_ = new ThisStatistics();
 		/**
 		 * Worker-local counter for the number of created contexts
 		 */
@@ -267,7 +308,8 @@ public class RuleApplicationFactory implements
 			approximateContextNumber_.addAndGet(localContextNumber);
 			localContextNumber = 0;
 			aggregatedConclusionsCounter_.merge(conclusionsCounter_);
-			aggregatedRulesTimer_.merge(rulesTimer_);
+			aggregatedRuleStats_.merge(ruleStats_);
+			aggregatedFactoryStats_.merge(factoryStats_);
 		}
 
 		/**
@@ -295,20 +337,14 @@ public class RuleApplicationFactory implements
 		/**
 		 * @return the object collecting statistics of rule applications
 		 */
-/*<<<<<<< .working
-		@Override
-		public RuleStatistics getRuleStatistics() {
-			return this.statistics;
-=======*/
 		@Override
 		public ConclusionsCounter getConclusionsCounter() {
 			return this.conclusionsCounter_;
 		}
 
 		@Override
-		public RulesTimer getRulesTimer() {
-			return this.rulesTimer_;
-//>>>>>>> .merge-right.r1141
+		public RuleStatistics getRulesTimer() {
+			return this.ruleStats_;
 		}
 
 		@Override
@@ -341,9 +377,11 @@ public class RuleApplicationFactory implements
 		public void produce(Context context, Conclusion item) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
-			if (context.addToDo(item))
+			if (context.addToDo(item)) {
 				// context was activated
 				activeContexts_.add(context);
+				factoryStats_.contContextActivations++;
+			}
 		}
 
 		/**
@@ -359,9 +397,11 @@ public class RuleApplicationFactory implements
 					break;
 				item.apply(this, context);
 			}
-			if (context.deactivate())
+			if (context.deactivate()) {
 				// context was re-activated
 				activeContexts_.add(context);
+				factoryStats_.contContextActivations++;
+			}
 		}
 
 		private void initContext(Context context) {
@@ -374,6 +414,24 @@ public class RuleApplicationFactory implements
 				produce(context, new PositiveSuperClassExpression(owlThing));
 		}
 
+	}
+
+	/**
+	 * Counters accumulating statistical information about this factory.
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	private static class ThisStatistics {
+		/**
+		 * the number of times a context is inserted into
+		 * {@link #activeContexts_}, i.e., the number of context activations
+		 */
+		int contContextActivations;
+
+		public synchronized void merge(ThisStatistics statistics) {
+			this.contContextActivations += statistics.contContextActivations;
+		}
 	}
 
 }

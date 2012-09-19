@@ -146,7 +146,7 @@ public class ForwardLink implements Conclusion {
 		@Override
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
 
-			RulesTimer timer = ruleEngine.getRulesTimer();
+			RuleStatistics timer = ruleEngine.getRulesTimer();
 
 			timer.timeForwardLinkBackwardLinkRule -= CachedTimeThread
 					.currentTimeMillis();

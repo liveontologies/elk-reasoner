@@ -110,9 +110,10 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
 
-			RulesTimer timer = ruleEngine.getRulesTimer();
+			RuleStatistics timer = ruleEngine.getRulesTimer();
 
 			timer.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis();
+			timer.countSubClassOfRule++;
 
 			try {
 

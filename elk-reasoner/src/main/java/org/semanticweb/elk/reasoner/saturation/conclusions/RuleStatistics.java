@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,13 +24,31 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-public class RulesTimer {
+public class RuleStatistics {
 
 	/**
-	 * measures the time within the backward link rule of {@link ForwardLink}
+	 * the number of applications of the backward link rule in
+	 * {@link ForwardLink}
+	 */
+	int countForwardLinkBackwardLinkRule;
+
+	/**
+	 * the time spent within the backward link rule of {@link ForwardLink}
 	 */
 	long timeForwardLinkBackwardLinkRule;
 
+	/**
+	 * @return the number of applications of the backward link rule in
+	 *         {@link ForwardLink}
+	 */
+	public int getForwardLinkBackwardLinkRuleCount() {
+		return countForwardLinkBackwardLinkRule;
+	}
+
+	/**
+	 * @return the time spent within the backward link rule of
+	 *         {@link ForwardLink}
+	 */
 	public long getForwardLinkBackwardLinkRuleTime() {
 		return timeForwardLinkBackwardLinkRule;
 	}
@@ -37,11 +57,13 @@ public class RulesTimer {
 	 * Reset all timers to zero.
 	 */
 	public void reset() {
+		countForwardLinkBackwardLinkRule = 0;
 		timeForwardLinkBackwardLinkRule = 0;
 	}
 
-	public synchronized void merge(RulesTimer timer) {
-		this.timeForwardLinkBackwardLinkRule += timer.timeForwardLinkBackwardLinkRule;
+	public synchronized void merge(RuleStatistics stats) {
+		this.countForwardLinkBackwardLinkRule += stats.countForwardLinkBackwardLinkRule;
+		this.timeForwardLinkBackwardLinkRule += stats.timeForwardLinkBackwardLinkRule;
 	}
 
 }
