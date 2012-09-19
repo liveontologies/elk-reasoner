@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -43,23 +44,25 @@ import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
- * Saturates indexed property chains
- * (that is, populates the {@link SaturatedPropertyChain} object
- * for a given {@link IndexedPropertyChain}).
+ * Saturates indexed property chains (that is, populates the
+ * {@link SaturatedPropertyChain} object for a given
+ * {@link IndexedPropertyChain}).
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class IndexedPropertyChainSaturation {
 	/**
 	 * Used internally instead of boolean flags for clarity
 	 */
-	enum SIDE {LEFT, RIGHT};
-	
+	enum SIDE {
+		LEFT, RIGHT
+	};
+
 	private static final Logger LOGGER_ = Logger
-			.getLogger(IndexedPropertyChainSaturation.class);	
-	
+			.getLogger(IndexedPropertyChainSaturation.class);
+
 	/**
 	 * The main method which takes a chain and saturates it.
 	 * 
@@ -67,62 +70,66 @@ public class IndexedPropertyChainSaturation {
 	 * @return
 	 */
 	public static SaturatedPropertyChain saturate(final IndexedPropertyChain ipc) {
-		
+
 		SaturatedPropertyChain saturated = ipc.getSaturated(false);
-		
+
 		if (saturated != null && saturated.isComputed()) {
 			return saturated;
-		}
-		else {
+		} else {
 			saturated = new SaturatedPropertyChain(ipc, isReflexive(ipc));
 		}
-		
+
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Saturating property chain " + ipc);
 		}
-		
-		
+
 		final ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
-		IndexedPropertyChain next = null;			
+		IndexedPropertyChain next = null;
 		// compute all transitively closed super-properties
 		queue.add(ipc);
 
-		//System.err.println(ipc);
-		
+		// System.err.println(ipc);
+
 		while ((next = queue.poll()) != null) {
 			if (saturated.derivedSuperProperties.add(next)) {
 				/*
-				 * The next two blocks is what previously was in the composition computation stage
+				 * The next two blocks is what previously was in the composition
+				 * computation stage
 				 */
-				for (IndexedBinaryPropertyChain chain : emptyIfNull(next.getRightChains())) {
+				for (IndexedBinaryPropertyChain chain : emptyIfNull(next
+						.getRightChains())) {
 					if (saturated.compositionsByLeftSubProperty == null) {
 						saturated.compositionsByLeftSubProperty = new CompositionByPropertyMultimap();
 					}
-					
-					registerComposition(chain, saturated.compositionsByLeftSubProperty, SIDE.LEFT);
+
+					registerComposition(chain,
+							saturated.compositionsByLeftSubProperty, SIDE.LEFT);
 				}
-				
-				for (IndexedBinaryPropertyChain chain : emptyIfNull(next.getLeftChains())) {
+
+				for (IndexedBinaryPropertyChain chain : emptyIfNull(next
+						.getLeftChains())) {
 					if (saturated.compositionsByRightSubProperty == null) {
 						saturated.compositionsByRightSubProperty = new CompositionByPropertyMultimap();
 					}
-					
-					registerComposition(chain, saturated.compositionsByRightSubProperty, SIDE.RIGHT);
+
+					registerComposition(chain,
+							saturated.compositionsByRightSubProperty,
+							SIDE.RIGHT);
 				}
-				
+
 				addDirectSuperProperties(next, queue);
 			}
-		}	
-		
+		}
+
 		if (SaturatedPropertyChain.ELIMINATE_IMPLIED_COMPOSITIONS) {
 			eliminateImpliedCompositions(saturated);
 		}
-		
+
 		// compute all transitively closed sub-properties
 		// and mark the chain as reflexive if one of its sub-properties
-		// is reflexive			
+		// is reflexive
 		queue.add(ipc);
-		
+
 		while ((next = queue.poll()) != null) {
 			if (saturated.derivedSubProperties.add(next)) {
 				addDirectSubProperties(next, queue, saturated);
@@ -136,7 +143,7 @@ public class IndexedPropertyChainSaturation {
 
 		while ((next = queue.poll()) != null) {
 			if (saturated.derivedRightSubProperties.add(next)) {
-				
+
 				if (next.getToldSubProperties() != null) {
 					for (IndexedPropertyChain s : next.getToldSubProperties()) {
 						queue.add(s);
@@ -170,7 +177,7 @@ public class IndexedPropertyChainSaturation {
 		}
 
 		while ((next = queue.poll()) != null) {
-			//TODO Not computed correctly for T2!!!!
+			// TODO Not computed correctly for T2!!!!
 			if (saturated.leftComposableProperties.add(next)) {
 				queue.addAll(emptyIfNull(next.getToldSubProperties()));
 
@@ -185,18 +192,19 @@ public class IndexedPropertyChainSaturation {
 					}
 				}
 			}
-		}		
-		
+		}
+
 		saturated.computed = true;
-		
+
 		return saturated;
 	}
-	
+
 	private static <T> Collection<T> emptyIfNull(Collection<T> collection) {
 		return collection == null ? Collections.<T> emptyList() : collection;
 	}
-	
-	private static void eliminateImpliedCompositions(SaturatedPropertyChain saturated) {
+
+	private static void eliminateImpliedCompositions(
+			SaturatedPropertyChain saturated) {
 		if (saturated.compositionsByLeftSubProperty != null) {
 			for (Collection<IndexedPropertyChain> compositions : saturated.compositionsByLeftSubProperty
 					.values()) {
@@ -211,8 +219,7 @@ public class IndexedPropertyChainSaturation {
 			}
 		}
 	}
-	
-	
+
 	/**
 	 * If R and S are in the vector and R is a sub-property of S, then S is
 	 * removed from the vector.
@@ -222,10 +229,11 @@ public class IndexedPropertyChainSaturation {
 		// replace all redundant elements by null
 		for (int i = 0; i < v.size(); i++) {
 			IndexedPropertyChain ipc = v.get(i);
-			
+
 			if (ipc != null) {
 				SaturatedPropertyChain saturated = ipc.getSaturated(false);
-				Collection<? extends IndexedPropertyChain> superProperties = saturated != null ? saturated.getSuperProperties() : ipc.getToldSuperProperties();
+				Collection<? extends IndexedPropertyChain> superProperties = saturated != null ? saturated
+						.getSuperProperties() : ipc.getToldSuperProperties();
 
 				for (int j = 0; j < v.size(); j++)
 					if (v.get(j) != null && j != i
@@ -242,24 +250,23 @@ public class IndexedPropertyChainSaturation {
 			}
 		v.setSize(next);
 	}
-	
 
-	
 	private static boolean isReflexive(final IndexedPropertyChain ipc) {
 		SaturatedPropertyChain saturated = ipc.getSaturated(false);
-		
+
 		if (saturated == null || !saturated.reflexivityDetermined()) {
 			// TODO perhaps we don't need to create an object every time?
 			new ReflexivityCheckVisitor().isReflexive(ipc);
 		}
-		
+
 		return ipc.getSaturated(false).isReflexive();
 	}
 
 	// Returns told super-properties and also
 	// {R | S o ipc -> R or ipc o S -> R, S is reflexive}
 	private static void addDirectSuperProperties(
-			final IndexedPropertyChain ipc, final Collection<IndexedPropertyChain> props) {
+			final IndexedPropertyChain ipc,
+			final Collection<IndexedPropertyChain> props) {
 
 		for (IndexedBinaryPropertyChain chain : Operations.concat(
 				emptyIfNull(ipc.getLeftChains()),
@@ -274,14 +281,17 @@ public class IndexedPropertyChainSaturation {
 
 		props.addAll(emptyIfNull(ipc.getToldSuperProperties()));
 	}
-	
+
 	/*
-	 * Adds told sub-properties (for named properties) and derived through reflexivity sub-propertied (for chains) to the supplied collection.
-	 * Also, if saturated is provided, it registers derived sub-compositions in it
+	 * Adds told sub-properties (for named properties) and derived through
+	 * reflexivity sub-propertied (for chains) to the supplied collection. Also,
+	 * if saturated is provided, it registers derived sub-compositions in it
 	 */
-	private static void addDirectSubProperties(final IndexedPropertyChain ipc, final Collection<IndexedPropertyChain> props, final SaturatedPropertyChain saturated) {		
+	private static void addDirectSubProperties(final IndexedPropertyChain ipc,
+			final Collection<IndexedPropertyChain> props,
+			final SaturatedPropertyChain saturated) {
 		ipc.accept(new IndexedPropertyChainVisitor<ElkObject>() {
-			
+
 			@Override
 			public ElkObject visit(IndexedObjectProperty prop) {
 				props.addAll(emptyIfNull(prop.getToldSubProperties()));
@@ -297,55 +307,71 @@ public class IndexedPropertyChainSaturation {
 				if (isReflexive(chain.getRightProperty())) {
 					props.add(chain.getLeftProperty());
 				}
-				
+
 				if (saturated != null) {
 					saturated.derivedSubCompositions.add(chain);
 				}
-				
+
 				return null;
 			}
 		});
 	}
 
 	/**
-	 * Add (S, chain) to the multimap (compositionsByLeftSubProperty or compositionsByRightSubProperty)
-	 * for each sub-property of the chain.
+	 * Add (S, chain) to the multimap (compositionsByLeftSubProperty or
+	 * compositionsByRightSubProperty) for each sub-property of the chain.
 	 */
-	private static void registerComposition(IndexedBinaryPropertyChain chain,
-			Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionMultimap, SIDE side) {
+	private static void registerComposition(
+			IndexedBinaryPropertyChain chain,
+			Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionMultimap,
+			SIDE side) {
 
 		ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
 		IndexedPropertyChain next = null;
-		
-		queue.add(side == SIDE.LEFT ? chain.getLeftProperty() : chain.getRightProperty());
-		
+
+		queue.add(side == SIDE.LEFT ? chain.getLeftProperty() : chain
+				.getRightProperty());
+
 		while ((next = queue.poll()) != null) {
-			
+
 			if (compositionMultimap.add(next, chain)) {
-				
-				if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES && chain.getRightChains() == null) {
-				
-					for (IndexedPropertyChain superChain : chain.getToldSuperProperties()) {
-						compositionMultimap.add(next, superChain);
-					}
-					
+
+				if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
+						&& chain.getRightChains() == null) {
+
+					if (chain.getToldSuperProperties() != null)
+						for (IndexedPropertyChain superChain : chain
+								.getToldSuperProperties()) {
+							compositionMultimap.add(next, superChain);
+						}
+					else
+						/*
+						 * Orphan chains are chains that do not have any right
+						 * chain or told super properties. They can appear when
+						 * axioms are indexed partially due to unsupported
+						 * constructions, for example,
+						 * SubObjectPropertyOf(ObjectPropertyChain
+						 * (ObjectInverseOf(:T) :T :T) :T). Here, a binary
+						 * property chain for (:T :T) will be produced which
+						 * will not have any right chains or told super
+						 * properties.
+						 */
+						LOGGER_.warn("Orphan chain: " + chain);
+
 					compositionMultimap.remove(next, chain);
-				}					
-				
-				addDirectSubProperties(next, queue, null);		
+				}
+
+				addDirectSubProperties(next, queue, null);
 			}
 		}
-	}		
-	
+	}
 }
-
 
 /**
  * Figures out whether each submitted indexed property is reflexive or not. A
- * property R is reflexive if 
- * i) it is a named property and is told reflexive
- * ii) S -> R and S is reflexive 
- * iii) it is a chain S o H and both S and H are reflexive
+ * property R is reflexive if i) it is a named property and is told reflexive
+ * ii) S -> R and S is reflexive iii) it is a chain S o H and both S and H are
+ * reflexive
  * 
  * @author Pavel Klinov
  * 
@@ -404,13 +430,19 @@ class ReflexivityCheckVisitor implements IndexedPropertyChainVisitor<ElkObject> 
 			}
 		}
 	}
-	
-	
+
 	SaturatedPropertyChain getCreateSaturated(final IndexedPropertyChain ipc) {
 		// synch required, otherwise may have two saturation objects for the
 		// same property
 		synchronized (ipc) {
-			SaturatedPropertyChain saturated = ipc.getSaturated(false/*do not recompute here to avoid infinite recursion*/);
+			SaturatedPropertyChain saturated = ipc.getSaturated(false/*
+																	 * do not
+																	 * recompute
+																	 * here to
+																	 * avoid
+																	 * infinite
+																	 * recursion
+																	 */);
 
 			if (saturated == null) {
 				saturated = new SaturatedPropertyChain(ipc);
@@ -419,14 +451,14 @@ class ReflexivityCheckVisitor implements IndexedPropertyChainVisitor<ElkObject> 
 
 			return saturated;
 		}
-	}	
+	}
 }
 
 /**
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 class CompositionByPropertyMultimap extends
 		AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> {

@@ -1,0 +1,18 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Prefix( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )
+Ontology(
+
+Annotation( rdfs:label 
+ "The example to reproduce Issue 15: NullPointerException during classification when role chains axioms 
+  contain inverse roles.  
+ The cause of the problem is that the SubObjectPropertyOf axiom gets partially indexed, specifically 
+ the binary object property chain (:T :T) is created. The NPE happens during the object property saturation, 
+ when the optimization  REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES is triggered for the chain (:T :T). 
+ The reason is that (:T :T) does not occur in any role chain (hence it is eligible for the optimization), 
+ but does not have any told super properties. Hence is NPE in IndexedPropertyChainSaturation.java line 328, 
+ rev. 1150.")
+
+ SubObjectPropertyOf(ObjectPropertyChain(ObjectInverseOf(:T) :T :T) :T)
+ EquivalentClasses(:A ObjectSomeValuesFrom(:T :A))
+)

@@ -62,12 +62,14 @@ public abstract class IndexedPropertyChain {
 	 * {@link IndexedBinaryPropertyChain} occurs on the right.
 	 */
 	private Collection<IndexedBinaryPropertyChain> rightChains_;
-	
+
+	// TODO: this can be stored only for IndexedObjectProperty because only such
+	// can occur in the lhs of IndexedBinaryPropertyChains
 	/**
 	 * Collections of all binary role chains in which this
 	 * {@link IndexedBinaryPropertyChain} occurs on the left.
 	 */
-	private Collection<IndexedBinaryPropertyChain> leftChains_;	
+	private Collection<IndexedBinaryPropertyChain> leftChains_;
 
 	/**
 	 * @return All told super object properties of this
@@ -93,15 +95,15 @@ public abstract class IndexedPropertyChain {
 	public Collection<IndexedBinaryPropertyChain> getRightChains() {
 		return rightChains_;
 	}
-	
+
 	/**
 	 * @return All {@link IndexedBinaryPropertyChain}s in which this
-	 *         {@link IndexedPropertyChain} occurs on the left, or {@code null} if
-	 *         none is assigned
+	 *         {@link IndexedPropertyChain} occurs on the left, or {@code null}
+	 *         if none is assigned
 	 */
 	public Collection<IndexedBinaryPropertyChain> getLeftChains() {
 		return leftChains_;
-	}	
+	}
 
 	/**
 	 * Adds the given {@link IndexedObjectProperty} as a super-role of this
@@ -199,8 +201,8 @@ public abstract class IndexedPropertyChain {
 				leftChains_ = null;
 		}
 		return success;
-	}	
-	
+	}
+
 	/**
 	 * This counts how often this object occurred in the ontology.
 	 */
@@ -233,17 +235,18 @@ public abstract class IndexedPropertyChain {
 	public SaturatedPropertyChain getSaturated() {
 		return getSaturated(true);
 	}
-	
+
 	/**
 	 * If the parameter is set to false, the saturation object will be returned
-	 * "as is", i.e. possibly null or not yet populated.
-	 * Otherwise, saturation will be triggered automatically.
+	 * "as is", i.e. possibly null or not yet populated. Otherwise, saturation
+	 * will be triggered automatically.
 	 * 
 	 * @param saturate
 	 * @return
 	 */
 	public SaturatedPropertyChain getSaturated(boolean saturate) {
-		return saturate && (saturated_ == null || !saturated_.isComputed()) ? saturate() : saturated_;
+		return saturate && (saturated_ == null || !saturated_.isComputed()) ? saturate()
+				: saturated_;
 	}
 
 	/**
@@ -258,7 +261,8 @@ public abstract class IndexedPropertyChain {
 	 *         for the same object from different threads with at the same time
 	 *         with non-null arguments, only one call returns {@code true}.
 	 */
-	public synchronized void setSaturated(SaturatedPropertyChain saturatedObjectProperty) {		
+	public synchronized void setSaturated(
+			SaturatedPropertyChain saturatedObjectProperty) {
 		saturated_ = saturatedObjectProperty;
 	}
 
@@ -286,14 +290,14 @@ public abstract class IndexedPropertyChain {
 	}
 
 	private SaturatedPropertyChain saturate() {
-		SaturatedPropertyChain saturated = IndexedPropertyChainSaturation.saturate(this);
-		
+		SaturatedPropertyChain saturated = IndexedPropertyChainSaturation
+				.saturate(this);
+
 		setSaturated(saturated);
-		
-		return saturated; 
-	}	
-	
-	
+
+		return saturated;
+	}
+
 	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);
 
 	@Override
