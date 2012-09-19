@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
@@ -187,7 +186,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			return negExistentials_.isEmpty();
 		}
 
-
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
 
@@ -207,42 +205,46 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 				for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 					IndexedPropertyChain relation = e.getRelation();
-					// creating propagations for relevant sub-properties of the
-					// relation
+					/*
+					 * creating propagations for relevant sub-properties of the
+					 * relation
+					 */
 					for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
 							candidatePropagationProperties, relation
 									.getSaturated().getSubProperties())) {
-						addPropagation(ruleEngine, property,
-								new NegativeSuperClassExpression(e), context);
+						addPropagation(ruleEngine, property, e, context);
 					}
 
-					// creating propagations for relevant sub-compositions of the
-					// relation
-					for (IndexedPropertyChain property : relation.getSaturated()
-							.getSubCompositions()) {
+					/*
+					 * creating propagations for relevant sub-compositions of
+					 * the relation
+					 */
+					for (IndexedPropertyChain property : relation
+							.getSaturated().getSubCompositions()) {
 						SaturatedPropertyChain propertySaturation = property
 								.getSaturated();
 						if (!new LazySetIntersection<IndexedPropertyChain>(
 								candidatePropagationProperties,
 								propertySaturation.getRightSubProperties())
 								.isEmpty()) {
-							// create propagations for told super-properties of the chain
-							// instead of the chain itself if the optimization is on.
-							// otherwise a composed backward link will be created for a super-property
-							// while the propagation for the chain, so we can lose the entailment.
+							/*
+							 * create propagations for told super-properties of
+							 * the chain instead of the chain itself if the
+							 * optimization is on. otherwise a composed backward
+							 * link will be created for a super-property while
+							 * the propagation for the chain, so we can lose the
+							 * entailment.
+							 */
 							if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
 									&& property.getRightChains() == null) {
 								for (IndexedPropertyChain superChain : property
 										.getToldSuperProperties()) {
-									addPropagation(ruleEngine, superChain, 
-											new NegativeSuperClassExpression(e),
+									addPropagation(ruleEngine, superChain, e,
 											context);
 								}
 							} else {
-								addPropagation(ruleEngine, property,
-										new NegativeSuperClassExpression(e),
-										context);
-							}						
+								addPropagation(ruleEngine, property, e, context);
+							}
 						}
 					}
 
@@ -255,13 +257,11 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				timer.timeObjectSomeValuesFromCompositionRule += CachedTimeThread
 						.currentTimeMillis();
 			}
-		}		
-		
-		
+		}
 
 		private static void addPropagation(RuleEngine ruleEngine,
-				IndexedPropertyChain propRelation, Conclusion carry,
-				Context context) {
+				IndexedPropertyChain propRelation,
+				IndexedClassExpression carry, Context context) {
 
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new propagation "
@@ -279,13 +279,15 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				Collection<Context> targets = backLinks.get(propRelation);
 
 				for (Context target : targets)
-					ruleEngine.produce(target, carry);
+					ruleEngine.produce(target,
+							new NegativeSuperClassExpression(carry));
 			}
 
 		}
 
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(ThisCompositionRule.class);
-		
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+				ThisCompositionRule.class);
+
 		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
 			@Override
 			public ThisCompositionRule create(ContextRules tail) {
@@ -297,16 +299,17 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	private static class ThisBackwardLinkRule extends BackwardLinkRules {
 
-		private final Multimap<IndexedPropertyChain, Conclusion> propagationsByObjectProperty_;
+		private final Multimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty_;
 
 		ThisBackwardLinkRule(BackwardLinkRules tail) {
 			super(tail);
-			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Conclusion>(
+			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
 					1);
 		}
 
 		private boolean addPropagationByObjectProperty(
-				IndexedPropertyChain propRelation, Conclusion conclusion) {
+				IndexedPropertyChain propRelation,
+				IndexedClassExpression conclusion) {
 			return propagationsByObjectProperty_.add(propRelation, conclusion);
 		}
 
@@ -319,18 +322,19 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			timer.countObjectSomeValuesFromBackwardLinkRule++;
 
 			try {
-
-				for (Conclusion carry : propagationsByObjectProperty_.get(link
-						.getReltaion()))
-					ruleEngine.produce(link.getSource(), carry);
+				for (IndexedClassExpression carry : propagationsByObjectProperty_
+						.get(link.getReltaion()))
+					ruleEngine.produce(link.getSource(),
+							new NegativeSuperClassExpression(carry));
 			} finally {
 				timer.timeObjectSomeValuesFromBackwardLinkRule += CachedTimeThread
 						.currentTimeMillis();
 			}
 		}
 
-		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(ThisBackwardLinkRule.class);
-		
+		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(
+				ThisBackwardLinkRule.class);
+
 		private static ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule>() {
 
 			@Override
