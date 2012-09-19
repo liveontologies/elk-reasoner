@@ -234,6 +234,17 @@ public class ClassTaxonomyComputationFactory implements
 		return this.taxonomy_;
 	}
 
+	@Override
+	public Engine getEngine() {
+		return new Engine();
+
+	}
+
+	@Override
+	public void finish() {
+		transitiveReductionShared_.finish();
+	}
+
 	/**
 	 * Print statistics about taxonomy construction
 	 */
@@ -268,12 +279,6 @@ public class ClassTaxonomyComputationFactory implements
 		public void finish() {
 			transitiveReductionEngine.finish();
 		}
-
-	}
-
-	@Override
-	public Engine getEngine() {
-		return new Engine();
 
 	}
 

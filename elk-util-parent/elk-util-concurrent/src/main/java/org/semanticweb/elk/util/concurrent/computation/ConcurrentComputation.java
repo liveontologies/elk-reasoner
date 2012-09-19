@@ -185,6 +185,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 			executor.interrupt();
 		}
 		executor.waitDone();
+		inputProcessorFactory.finish();
 	}
 
 	/**

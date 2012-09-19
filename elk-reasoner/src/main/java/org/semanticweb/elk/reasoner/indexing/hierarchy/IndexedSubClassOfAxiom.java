@@ -33,6 +33,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -109,9 +110,19 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
 
-			for (IndexedClassExpression implied : toldSuperClassExpressions_)
-				ruleEngine.produce(context, new PositiveSuperClassExpression(
-						implied));
+			RulesTimer timer = ruleEngine.getRulesTimer();
+
+			timer.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis();
+
+			try {
+
+				for (IndexedClassExpression implied : toldSuperClassExpressions_)
+					ruleEngine.produce(context,
+							new PositiveSuperClassExpression(implied));
+			} finally {
+				timer.timeSubClassOfRule += CachedTimeThread
+						.currentTimeMillis();
+			}
 		}
 
 		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(ThisCompositionRule.class);

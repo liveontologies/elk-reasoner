@@ -47,11 +47,11 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The counter for deleted contexts
 	 */
-	private int deletedContexts;
+	private int deletedContexts_;
 	/**
 	 * The number of contexts
 	 */
-	private int maxContexts;
+	private int maxContexts_;
 
 	/**
 	 * The state of the iterator of the input to be processed
@@ -88,8 +88,8 @@ class ContextInitializationStage extends AbstractReasonerStage {
 					break;
 				IndexedClassExpression ice = todo.next();
 				ice.resetContext();
-				deletedContexts++;
-				progressMonitor.report(deletedContexts, maxContexts);
+				deletedContexts_++;
+				progressMonitor.report(deletedContexts_, maxContexts_);
 				if (interrupted())
 					continue;
 			}
@@ -103,15 +103,15 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	void initComputation() {
 		super.initComputation();
 		todo = reasoner.ontologyIndex.getIndexedClassExpressions().iterator();
-		maxContexts = reasoner.ontologyIndex.getIndexedClassExpressions()
+		maxContexts_ = reasoner.ontologyIndex.getIndexedClassExpressions()
 				.size();
-		deletedContexts = 0;
+		deletedContexts_ = 0;
 	}
 
 	@Override
 	public void printInfo() {
-		if (deletedContexts > 0 && LOGGER_.isDebugEnabled())
-			LOGGER_.debug("Contexts deleted:" + deletedContexts);
+		if (deletedContexts_ > 0 && LOGGER_.isDebugEnabled())
+			LOGGER_.debug("Contexts deleted:" + deletedContexts_);
 	}
 
 }

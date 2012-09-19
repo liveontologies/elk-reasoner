@@ -295,11 +295,11 @@ public class RuleApplicationFactory implements
 		/**
 		 * @return the object collecting statistics of rule applications
 		 */
-/*<<<<<<< .working
+<<<<<<< .working
 		@Override
 		public RuleStatistics getRuleStatistics() {
 			return this.statistics;
-=======*/
+=======
 		@Override
 		public ConclusionsCounter getConclusionsCounter() {
 			return this.conclusionsCounter_;
@@ -308,7 +308,7 @@ public class RuleApplicationFactory implements
 		@Override
 		public RulesTimer getRulesTimer() {
 			return this.rulesTimer_;
-//>>>>>>> .merge-right.r1141
+>>>>>>> .merge-right.r1141
 		}
 
 		@Override

@@ -211,7 +211,6 @@ public abstract class IndexedPropertyChain {
 	 * {@link IndexedPropertyChain}
 	 */
 	private volatile SaturatedPropertyChain saturated_ = null;
-	//private AtomicReference<SaturatedPropertyChain> saturated_ = new AtomicReference<SaturatedPropertyChain>();
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
@@ -244,7 +243,6 @@ public abstract class IndexedPropertyChain {
 	 * @return
 	 */
 	public SaturatedPropertyChain getSaturated(boolean saturate) {
-		//return saturate && (saturated_.get() == null || !saturated_.get().isComputed()) ? saturate() : saturated_.get();
 		return saturate && (saturated_ == null || !saturated_.isComputed()) ? saturate() : saturated_;
 	}
 

@@ -250,40 +250,40 @@ public class ReasonerTest {
 		reasoner.shutdown();
 	}
 
-//	@SuppressWarnings("static-method")
-//	@Test
-//	public void testDisjoint() throws Owl2ParseException, IOException,
-//			ElkInconsistentOntologyException, ElkException,
-//			InterruptedException {
-//
-//		Reasoner reasoner = createReasoner(""//
-//				+ "Prefix( : = <http://example.org/> )"//
-//				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
-//				+ "Ontology("//
-//				+ "SubClassOf(:A :C)"//
-//				+ "SubClassOf(:B :C)"//
-//				+ "DisjointClasses(:A :B :C)"//
-//				+ ")"//
-//		);
-//
-//		reasoner.getTaxonomy();
-//
-//		ElkClass a = objectFactory.getClass(new ElkFullIri(
-//				"http://example.org/A"));
-//		ElkClass b = objectFactory.getClass(new ElkFullIri(
-//				"http://example.org/B"));
-//		ElkClass c = objectFactory.getClass(new ElkFullIri(
-//				"http://example.org/C"));
-//
-//		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
-//		Node<ElkClass> bottom = taxonomy.getNode(objectFactory.getOwlNothing());
-//
-//		assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
-//		assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
-//		assertNotSame("C satisfiable", bottom, taxonomy.getNode(c));
-//
-//		reasoner.shutdown();
-//	}
+	// @SuppressWarnings("static-method")
+	// @Test
+	// public void testDisjoint() throws Owl2ParseException, IOException,
+	// ElkInconsistentOntologyException, ElkException,
+	// InterruptedException {
+	//
+	// Reasoner reasoner = createReasoner(""//
+	// + "Prefix( : = <http://example.org/> )"//
+	// + "Prefix( owl: = <http://www.w3.org/2002/07/owl#> )"//
+	// + "Ontology("//
+	// + "SubClassOf(:A :C)"//
+	// + "SubClassOf(:B :C)"//
+	// + "DisjointClasses(:A :B :C)"//
+	// + ")"//
+	// );
+	//
+	// reasoner.getTaxonomy();
+	//
+	// ElkClass a = objectFactory.getClass(new ElkFullIri(
+	// "http://example.org/A"));
+	// ElkClass b = objectFactory.getClass(new ElkFullIri(
+	// "http://example.org/B"));
+	// ElkClass c = objectFactory.getClass(new ElkFullIri(
+	// "http://example.org/C"));
+	//
+	// Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+	// Node<ElkClass> bottom = taxonomy.getNode(objectFactory.getOwlNothing());
+	//
+	// assertSame("A unsatisfiable", bottom, taxonomy.getNode(a));
+	// assertSame("B unsatisfiable", bottom, taxonomy.getNode(b));
+	// assertNotSame("C satisfiable", bottom, taxonomy.getNode(c));
+	//
+	// reasoner.shutdown();
+	// }
 
 	@SuppressWarnings("static-method")
 	public void testDisjointSelf() throws Owl2ParseException, IOException,
@@ -532,11 +532,11 @@ public class ReasonerTest {
 				+ "SubClassOf(:C ObjectSomeValuesFrom(:T :B))"
 				+ "ObjectPropertyDomain(:T owl:Nothing)" + ")");
 
-		boolean consistent = reasoner.isConsistent();
+		boolean inconsistent = reasoner.isInconsistent();
 
 		reasoner.shutdown();
 
-		assertFalse(consistent);
+		assertTrue(inconsistent);
 	}
 
 	class TestElkClass implements ElkClass {

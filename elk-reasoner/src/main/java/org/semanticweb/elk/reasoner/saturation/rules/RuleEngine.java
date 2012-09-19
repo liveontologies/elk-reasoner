@@ -23,8 +23,9 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.RulesTimer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -71,8 +72,13 @@ public interface RuleEngine {
 	public void produce(Context context, Conclusion conclusion);
 
 	/**
-	 * @return the {@link RuleStatistics} of this {@link RuleEngine}.
+	 * @return the {@link ConclusionsCounter} of this {@link RuleEngine}.
 	 */
-	public RuleStatistics getRuleStatistics();
+	public ConclusionsCounter getConclusionsCounter();
+
+	/**
+	 * @return the {@link ConclusionsCounter} of this {@link RuleEngine}.
+	 */
+	public RulesTimer getRulesTimer();
 
 }

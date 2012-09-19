@@ -37,6 +37,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkObjectIntersectionOf in an ontology.
@@ -102,10 +103,20 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		ruleEngine.produce(context, new PositiveSuperClassExpression(
-				firstConjunct));
-		ruleEngine.produce(context, new PositiveSuperClassExpression(
-				secondConjunct));
+		RulesTimer timer = ruleEngine.getRulesTimer();
+
+		timer.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread
+				.currentTimeMillis();
+
+		try {
+			ruleEngine.produce(context, new PositiveSuperClassExpression(
+					firstConjunct));
+			ruleEngine.produce(context, new PositiveSuperClassExpression(
+					secondConjunct));
+		} finally {
+			timer.timeObjectIntersectionOfDecompositionRule += CachedTimeThread
+					.currentTimeMillis();
+		}
 	}
 
 	public void registerContextRules() {
@@ -132,13 +143,9 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			IndexedClassExpression conjunctTwo) {
 		Chain<ContextRules> rules = conjunctOne.getChainCompositionRules();
 		ThisCompositionRule rule = rules.find(matcher);
-		if (rule != null) {
-			rule.removeConjunctionByConjunct(conjunctTwo);
-			if (rule.isEmpty())
-				rules.remove(matcher);
-		} else {
-			// TODO: throw/log something, this should never happen
-		}
+		rule.removeConjunctionByConjunct(conjunctTwo);
+		if (rule.isEmpty())
+			rules.remove(matcher);
 	}
 
 	private static class ThisCompositionRule extends ContextRules {
@@ -170,11 +177,25 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
-			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-					conjunctionsByConjunct_.keySet(),
-					context.getSuperClassExpressions()))
-				ruleEngine.produce(context, new NegativeSuperClassExpression(
-						conjunctionsByConjunct_.get(common)));
+
+			RulesTimer timer = ruleEngine.getRulesTimer();
+
+			timer.timeObjectIntersectionOfCompositionRule -= CachedTimeThread
+					.currentTimeMillis();
+
+			try {
+
+				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+						conjunctionsByConjunct_.keySet(),
+						context.getSuperClassExpressions()))
+					ruleEngine.produce(context,
+							new NegativeSuperClassExpression(
+									conjunctionsByConjunct_.get(common)));
+			} finally {
+				timer.timeObjectIntersectionOfCompositionRule += CachedTimeThread
+						.currentTimeMillis();
+			}
+
 		}
 
 		

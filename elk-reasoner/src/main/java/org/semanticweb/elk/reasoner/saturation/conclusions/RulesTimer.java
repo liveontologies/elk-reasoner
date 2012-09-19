@@ -1,8 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.Rule;
-
 /*
  * #%L
  * ELK Reasoner
@@ -25,19 +22,26 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  * #L%
  */
 
-/**
- * A general type of conclusions, produced by inference rules. This is the main
- * type of information that is exchanged between {@link Context}s. When a
- * {@link Conclusion} has been derived for a particular {@link Context}, it
- * should be processed within this context, therefore every {@link Conclusion}
- * should implement the {@link Rule} interface for argument {@link Context}.
- * 
- * @author "Yevgeny Kazakov"
- * 
- */
-public interface Conclusion extends Rule<Context> {
+public class RulesTimer {
 
-	// it is only require that a conclusion is able to be applied, that is,
-	// processed within a context
+	/**
+	 * measures the time within the backward link rule of {@link ForwardLink}
+	 */
+	long timeForwardLinkBackwardLinkRule;
+
+	public long getForwardLinkBackwardLinkRuleTime() {
+		return timeForwardLinkBackwardLinkRule;
+	}
+
+	/**
+	 * Reset all timers to zero.
+	 */
+	public void reset() {
+		timeForwardLinkBackwardLinkRule = 0;
+	}
+
+	public synchronized void merge(RulesTimer timer) {
+		this.timeForwardLinkBackwardLinkRule += timer.timeForwardLinkBackwardLinkRule;
+	}
 
 }

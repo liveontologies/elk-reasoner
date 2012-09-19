@@ -28,8 +28,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
 /**
- * A {@link SuperClassExpression} to which decomposition rules need to be
- * applied.
+ * A {@link SuperClassExpression}, for which the structure of the enclosed
+ * {@link IndexedClassExpression} should be taken into account. That is, in
+ * addition to composition rules stored with this {@link IndexedClassExpression}
+ * , the so-called decomposition rule, which takes into account the topmost
+ * constructor of this {@link IndexedClassExpression}, should be applied.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -44,7 +47,7 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 
 	@Override
 	public void apply(RuleEngine ruleEngine, Context context) {
-		if (!storeInContext(context, ruleEngine))
+		if (!storeInContext(context, ruleEngine.getConclusionsCounter()))
 			return;
 
 		// apply decomposition rules

@@ -65,7 +65,7 @@ public class SaturatedPropertyChain {
 	 * this only makes sense if REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES is
 	 * also on.
 	 */
-	public static final boolean ELIMINATE_IMPLIED_COMPOSITIONS = true;
+	public static final boolean ELIMINATE_IMPLIED_COMPOSITIONS = false;
 	
 	
 	enum REFLEXIVITY {TRUE, FALSE, UNKNOWN};

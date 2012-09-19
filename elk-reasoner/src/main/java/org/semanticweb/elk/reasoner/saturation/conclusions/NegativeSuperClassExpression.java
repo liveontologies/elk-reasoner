@@ -28,8 +28,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
 /**
- * A {@link SuperClassExpression} to which composition rules should be applied.
- * Decomposition rules do not need to by applied to this object.
+ * A {@link SuperClassExpression}, for which the structure of the enclosed
+ * {@link IndexedClassExpression} should not be taken into account when applying
+ * the rules within {@link Context}. That is, only composition rules stored with
+ * this {@link IndexedClassExpression} should be applied to
+ * {@link NegativeSuperClassExpression}s.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -44,7 +47,7 @@ public class NegativeSuperClassExpression extends SuperClassExpression {
 
 	@Override
 	public void apply(RuleEngine ruleEngine, Context context) {
-		if (!storeInContext(context, ruleEngine))
+		if (!storeInContext(context, ruleEngine.getConclusionsCounter()))
 			return;
 
 		// applying all composition rules

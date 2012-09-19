@@ -1,9 +1,9 @@
+package org.semanticweb.elk.reasoner.stages;
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,52 +20,49 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 
 /**
- * A {@link ReasonerStage} during which the class taxonomy of the current
- * ontology is computed
+ * A {@link ReasonerStage} which computes saturation for every class of the
+ * ontology
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
-class ClassTaxonomyComputationStage extends AbstractReasonerStage {
+public class ClassSaturationStage extends AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-			.getLogger(ClassTaxonomyComputationStage.class);
+			.getLogger(ClassSaturationStage.class);
 
 	/**
 	 * the computation used for this stage
 	 */
-	private ClassTaxonomyComputation computation_ = null;
+	private ClassExpressionSaturation<IndexedClass> computation_ = null;
 
-	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
+	public ClassSaturationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
 	@Override
 	public String getName() {
-		return "Class Taxonomy Computation";
+		return "Class Saturation";
 	}
 
 	@Override
 	public boolean done() {
-		return reasoner.doneClassTaxonomy;
+		return reasoner.doneClassSaturation;
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
 		return Arrays.asList((ReasonerStage) new ConsistencyCheckingStage(
 				reasoner));
-		// return Arrays
-		// .asList((ReasonerStage) new ClassSaturationStage(reasoner));
 	}
 
 	@Override
@@ -82,19 +79,19 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		reasoner.taxonomy = computation_.getTaxonomy();
-		reasoner.doneClassTaxonomy = true;
+		reasoner.doneClassSaturation = true;
+
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
+		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
+				reasoner.ontologyIndex.getIndexedClasses(),
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		this.computation_ = new ClassTaxonomyComputation(
-				reasoner.ontologyIndex.getIndexedClasses(),
-				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.ontologyIndex);
 	}
 
 	@Override

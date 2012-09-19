@@ -818,7 +818,7 @@ public class ElkReasoner implements OWLReasoner {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("isConsistent()");
 		try {
-			return reasoner_.isConsistent();
+			return !reasoner_.isInconsistent();
 		} catch (ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod("isConsistent()", e.getMessage());
 		} catch (ElkException e) {
