@@ -50,6 +50,7 @@ public class TransitiveReductionExperimentFactory implements
 	
 	int equivalentNo = 0;
 	int directNo = 0;
+	int iterationNo = 0;
 	
 
 	public TransitiveReductionExperimentFactory() {
@@ -59,8 +60,7 @@ public class TransitiveReductionExperimentFactory implements
 	 * Print statistics about taxonomy construction
 	 */
 	public void printStatistics() {
-		System.out.println("Equivalent sum: " + equivalentNo);
-		System.out.println("Direct sum: " + directNo);
+		System.out.println("Iterations: " + iterationNo);
 	}
 
 	public class NaiveEngine implements InputProcessor<IndexedClass> {
@@ -93,6 +93,7 @@ public class TransitiveReductionExperimentFactory implements
 				
 				for (IndexedClass b : Operations.filter(
 						rootContext.getSuperClassExpressions(), IndexedClass.class)) {
+					iterationNo++;
 					ContextClassSaturation bContext = (ContextClassSaturation) b.getContext();
 					if (b != sup && !bContext.getSuperClassExpressions().contains(root) && bContext.getSuperClassExpressions().contains(sup)) {
 						isDirect = false;
@@ -150,6 +151,7 @@ public class TransitiveReductionExperimentFactory implements
 
 				Iterator<ContextClassSaturation> i = directSups.iterator();
 				while (i.hasNext()) {
+					iterationNo++;
 					ContextClassSaturation dir = i.next();
 					if (dir.getSuperClassExpressions().contains(sup)) {
 						isDirect = false;
