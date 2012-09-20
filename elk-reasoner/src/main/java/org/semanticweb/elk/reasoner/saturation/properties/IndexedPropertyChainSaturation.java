@@ -26,10 +26,12 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  */
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Queue;
 import java.util.Set;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -70,7 +72,6 @@ public class IndexedPropertyChainSaturation {
 	 * @return
 	 */
 	public static SaturatedPropertyChain saturate(final IndexedPropertyChain ipc) {
-
 		SaturatedPropertyChain saturated = ipc.getSaturated(false);
 
 		if (saturated != null && saturated.isComputed()) {
@@ -84,11 +85,10 @@ public class IndexedPropertyChainSaturation {
 		}
 
 		final ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
+		final ArrayDeque<IndexedPropertyChain> leftComposable = new ArrayDeque<IndexedPropertyChain>();
 		IndexedPropertyChain next = null;
 		// compute all transitively closed super-properties
 		queue.add(ipc);
-
-		// System.err.println(ipc);
 
 		while ((next = queue.poll()) != null) {
 			if (saturated.derivedSuperProperties.add(next)) {
@@ -117,6 +117,15 @@ public class IndexedPropertyChainSaturation {
 							SIDE.RIGHT);
 				}
 
+				// precompute left-composable R' o root' (that means root is
+				// composable w/ R '
+				// and all its sub-properties). Sub-properties of R will be
+				// accounted for later.
+				for (IndexedBinaryPropertyChain chain : emptyIfNull(next
+						.getRightChains())) {
+					leftComposable.add(chain.getLeftProperty());
+				}
+
 				addDirectSuperProperties(next, queue);
 			}
 		}
@@ -137,66 +146,54 @@ public class IndexedPropertyChainSaturation {
 		}
 
 		// compute all transitively closed right sub-properties
-		// i.e. such R that S1,...,Sn (n>=0) for which S1 o ... o Sn o R =>
-		// root
+		// i.e. such R that S1,...,Sn (n>=0) for which S1 o ... o Sn o R => root
 		queue.add(ipc);
-
-		while ((next = queue.poll()) != null) {
-			if (saturated.derivedRightSubProperties.add(next)) {
-
-				if (next.getToldSubProperties() != null) {
-					for (IndexedPropertyChain s : next.getToldSubProperties()) {
-						queue.add(s);
-					}
-				}
-				if (next instanceof IndexedBinaryPropertyChain) {
-					IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) next;
-					IndexedPropertyChain s = chain.getRightProperty();
-
-					queue.add(s);
-
-					if (isReflexive(s)) {
-						queue.add(chain.getLeftProperty());
-					}
-				}
-			}
-		}
-
-		// compute all left-composable properties
-		// i.e. such R that exist S1,..., Sn (n>=0) and T for which S1 o ...
-		// o Sn o R o root => T
-		for (IndexedPropertyChain s : saturated.derivedSuperProperties) {
-			// walking through the super-properties of root to find all
-			// composable R' o root' (that means root is composable w/ R '
-			// and all its sub-properties)
-			if (s.getRightChains() != null) {
-				for (IndexedBinaryPropertyChain chain : s.getRightChains()) {
-					queue.add(chain.getLeftProperty());
-				}
-			}
-		}
-
-		while ((next = queue.poll()) != null) {
-			// TODO Not computed correctly for T2!!!!
-			if (saturated.leftComposableProperties.add(next)) {
-				queue.addAll(emptyIfNull(next.getToldSubProperties()));
-
-				if (next instanceof IndexedBinaryPropertyChain) {
-					IndexedBinaryPropertyChain chain = (IndexedBinaryPropertyChain) next;
-					IndexedPropertyChain s = chain.getRightProperty();
-
-					queue.add(s);
-
-					if (isReflexive(chain.getRightProperty())) {
-						queue.add(chain.getLeftProperty());
-					}
-				}
-			}
-		}
+		processRightSubProperties(saturated.derivedRightSubProperties, queue);
+		// compute all left-composable properties:
+		// S1 o ... o Sn o R o root => T
+		processRightSubProperties(saturated.leftComposableProperties,
+				leftComposable);
 
 		saturated.computed = true;
 
 		return saturated;
+	}
+
+	/*
+	 * Goes through sub-properties and right properties of binary chains and
+	 * populates the passed collection
+	 */
+	private static void processRightSubProperties(
+			final Collection<IndexedPropertyChain> toPopulate,
+			final Queue<IndexedPropertyChain> queue) {
+		IndexedPropertyChain next = null;
+
+		while ((next = queue.poll()) != null) {
+			if (toPopulate.add(next)) {
+				// TODO I want to find a way to reuse such visitors since they
+				// don't really maintain a state, just need a queue to update
+				next.accept(new IndexedPropertyChainVisitor<ElkObject>() {
+
+					@Override
+					public ElkObject visit(IndexedObjectProperty prop) {
+						queue.addAll(emptyIfNull(prop.getToldSubProperties()));
+
+						return null;
+					}
+
+					@Override
+					public ElkObject visit(IndexedBinaryPropertyChain chain) {
+						queue.add(chain.getRightProperty());
+
+						if (isReflexive(chain.getRightProperty())) {
+							queue.add(chain.getLeftProperty());
+						}
+
+						return null;
+					}
+				});
+			}
+		}
 	}
 
 	private static <T> Collection<T> emptyIfNull(Collection<T> collection) {
@@ -208,14 +205,14 @@ public class IndexedPropertyChainSaturation {
 		if (saturated.compositionsByLeftSubProperty != null) {
 			for (Collection<IndexedPropertyChain> compositions : saturated.compositionsByLeftSubProperty
 					.values()) {
-				eliminateImpliedCompositions((Vector<IndexedPropertyChain>) compositions);
+				eliminateImpliedCompositions(compositions);
 			}
 		}
 
 		if (saturated.compositionsByRightSubProperty != null) {
 			for (Collection<IndexedPropertyChain> compositions : saturated.compositionsByRightSubProperty
 					.values()) {
-				eliminateImpliedCompositions((Vector<IndexedPropertyChain>) compositions);
+				eliminateImpliedCompositions(compositions);
 			}
 		}
 	}
@@ -225,30 +222,28 @@ public class IndexedPropertyChainSaturation {
 	 * removed from the vector.
 	 */
 	private static void eliminateImpliedCompositions(
-			Vector<IndexedPropertyChain> v) {
-		// replace all redundant elements by null
-		for (int i = 0; i < v.size(); i++) {
-			IndexedPropertyChain ipc = v.get(i);
+			Collection<IndexedPropertyChain> v) {
+		List<IndexedPropertyChain> toDelete = null;
 
-			if (ipc != null) {
-				SaturatedPropertyChain saturated = ipc.getSaturated(false);
-				Collection<? extends IndexedPropertyChain> superProperties = saturated != null ? saturated
-						.getSuperProperties() : ipc.getToldSuperProperties();
+		for (IndexedPropertyChain ipc : v) {
+			SaturatedPropertyChain saturated = ipc.getSaturated(false);
+			Collection<? extends IndexedPropertyChain> superProperties = saturated != null ? saturated
+					.getSuperProperties() : emptyIfNull(ipc
+					.getToldSuperProperties());
 
-				for (int j = 0; j < v.size(); j++)
-					if (v.get(j) != null && j != i
-							&& superProperties.contains(v.get(j)))
-						v.set(j, null);
+			for (IndexedPropertyChain prop : v) {
+				if (ipc != prop && superProperties.contains(prop)) {
+					toDelete = toDelete == null ? new ArrayList<IndexedPropertyChain>()
+							: toDelete;
+					toDelete.add(prop);
+					break;
+				}
 			}
 		}
 
-		// shift all non-null elements to the begin and resize
-		int next = 0;
-		for (int i = 0; i < v.size(); i++)
-			if (v.get(i) != null) {
-				v.set(next++, v.get(i));
-			}
-		v.setSize(next);
+		if (toDelete != null) {
+			v.removeAll(toDelete);
+		}
 	}
 
 	private static boolean isReflexive(final IndexedPropertyChain ipc) {
@@ -295,6 +290,7 @@ public class IndexedPropertyChainSaturation {
 			@Override
 			public ElkObject visit(IndexedObjectProperty prop) {
 				props.addAll(emptyIfNull(prop.getToldSubProperties()));
+
 				return null;
 			}
 
@@ -333,34 +329,18 @@ public class IndexedPropertyChainSaturation {
 				.getRightProperty());
 
 		while ((next = queue.poll()) != null) {
+			boolean added = false;
 
-			if (compositionMultimap.add(next, chain)) {
-
-				if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
-						&& chain.getRightChains() == null) {
-
-					if (chain.getToldSuperProperties() != null)
-						for (IndexedPropertyChain superChain : chain
-								.getToldSuperProperties()) {
-							compositionMultimap.add(next, superChain);
-						}
-					else
-						/*
-						 * Orphan chains are chains that do not have any right
-						 * chain or told super properties. They can appear when
-						 * axioms are indexed partially due to unsupported
-						 * constructions, for example,
-						 * SubObjectPropertyOf(ObjectPropertyChain
-						 * (ObjectInverseOf(:T) :T :T) :T). Here, a binary
-						 * property chain for (:T :T) will be produced which
-						 * will not have any right chains or told super
-						 * properties.
-						 */
-						LOGGER_.warn("Orphan chain: " + chain);
-
-					compositionMultimap.remove(next, chain);
+			if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
+					&& chain.getRightChains() == null) {
+				for (IndexedPropertyChain superChain : emptyIfNull(chain.getToldSuperProperties())) {
+					added |= compositionMultimap.add(next, superChain);
 				}
+			} else {
+				added = compositionMultimap.add(next, chain);
+			}
 
+			if (added) {
 				addDirectSubProperties(next, queue, null);
 			}
 		}
@@ -369,55 +349,48 @@ public class IndexedPropertyChainSaturation {
 
 /**
  * Figures out whether each submitted indexed property is reflexive or not. A
- * property R is reflexive if i) it is a named property and is told reflexive
- * ii) S -> R and S is reflexive iii) it is a chain S o H and both S and H are
+ * property R is reflexive if 
+ * i) it is a named property and is told reflexive
+ * ii) S -> R and S is reflexive 
+ * iii) it is a chain S o H and both S and H are
  * reflexive
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class ReflexivityCheckVisitor implements IndexedPropertyChainVisitor<ElkObject> {
+class ReflexivityCheckVisitor implements IndexedPropertyChainVisitor<Boolean> {
 
-	boolean reflexive = false;
 	private final Set<IndexedPropertyChain> visited_ = new ArrayHashSet<IndexedPropertyChain>();
 
 	@Override
-	public ElkObject visit(IndexedObjectProperty property) {
-		reflexive = property.isToldReflexive();
-
-		if (!reflexive) {
-			defaultVisit(property);
-		}
-
-		return null;
+	public Boolean visit(IndexedObjectProperty property) {
+		return !property.isToldReflexive() ? defaultVisit(property) : true;
 	}
 
 	@Override
-	public ElkObject visit(IndexedBinaryPropertyChain binaryChain) {
-		reflexive = isReflexive(binaryChain.getLeftProperty())
+	public Boolean visit(IndexedBinaryPropertyChain binaryChain) {
+		return isReflexive(binaryChain.getLeftProperty())
 				&& isReflexive(binaryChain.getRightProperty());
-
-		return null;
 	}
 
 	boolean isReflexive(final IndexedPropertyChain propChain) {
 		SaturatedPropertyChain saturated = getCreateSaturated(propChain);
 
 		if (visited_.contains(propChain)) {
-			return reflexive = saturated.isReflexive();
+			return saturated.isReflexive();
 		} else {
 			visited_.add(propChain);
-			propChain.accept(this);
+			boolean reflexive = propChain.accept(this);
+
 			saturated.isReflexive.set(reflexive ? REFLEXIVITY.TRUE
 					: REFLEXIVITY.FALSE);
-			visited_.remove(propChain);
 
 			return reflexive;
 		}
 	}
 
-	private void defaultVisit(IndexedPropertyChain propChain) {
+	private boolean defaultVisit(IndexedPropertyChain propChain) {
 		// go through sub-properties to see if some is reflexive
 		// stop if so
 		if (propChain.getToldSubProperties() != null) {
@@ -425,24 +398,20 @@ class ReflexivityCheckVisitor implements IndexedPropertyChainVisitor<ElkObject> 
 					.getToldSubProperties()) {
 				if (isReflexive(subChain)) {
 					// TODO optimisation: mark all super-roles as reflexive?
-					break;
+					// break;
+					return true;
 				}
 			}
 		}
+
+		return false;
 	}
 
 	SaturatedPropertyChain getCreateSaturated(final IndexedPropertyChain ipc) {
 		// synch required, otherwise may have two saturation objects for the
 		// same property
 		synchronized (ipc) {
-			SaturatedPropertyChain saturated = ipc.getSaturated(false/*
-																	 * do not
-																	 * recompute
-																	 * here to
-																	 * avoid
-																	 * infinite
-																	 * recursion
-																	 */);
+			SaturatedPropertyChain saturated = ipc.getSaturated(false);
 
 			if (saturated == null) {
 				saturated = new SaturatedPropertyChain(ipc);
@@ -464,7 +433,7 @@ class CompositionByPropertyMultimap extends
 		AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> {
 
 	@Override
-	protected Vector<IndexedPropertyChain> newRecord() {
-		return new Vector<IndexedPropertyChain>();
+	protected Collection<IndexedPropertyChain> newRecord() {
+		return new ArrayHashSet<IndexedPropertyChain>(8);
 	}
 }

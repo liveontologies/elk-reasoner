@@ -62,13 +62,22 @@ public class IndexedObjectsCreator {
 			IndexedObjectProperty left, IndexedPropertyChain right,
 			IndexedObjectProperty[] toldSupers) {
 
-		IndexedPropertyChain chain = new IndexedBinaryPropertyChain(left, right);
+		IndexedBinaryPropertyChain chain = new IndexedBinaryPropertyChain(left, right);
 
 		for (IndexedObjectProperty sup : toldSupers) {
 			chain.addToldSuperObjectProperty(sup);
 			sup.addToldSubObjectProperty(chain);
 		}
+		
+		left.addLeftChain(chain);
+		right.addRightChain(chain);
 
 		return chain;
-	}	
+	}
+	
+	/*public static void addToldSuperProperties(IndexedPropertyChain chain, IndexedObjectProperty[] props) {
+		for (IndexedObjectProperty superProp : props) {
+			chain.addToldSuperObjectProperty(superProp);
+		}
+	}*/
 }

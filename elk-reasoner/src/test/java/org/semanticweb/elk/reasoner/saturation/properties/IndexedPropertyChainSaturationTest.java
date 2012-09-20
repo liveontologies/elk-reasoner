@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,12 +43,41 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectsCreator;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
 /**
+ * Tests for saturation of indexed property chains
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexivityCheckingTest {
+public class IndexedPropertyChainSaturationTest {
 
+	/**
+	 * R is composable with itself, this test checks that
+	 * computation of compositionsByLeftSubProperty and compositionsByRightSubProperty
+	 * work correctly and don't fall into an infinite cycle
+	 */
+	@Test
+	public void testCyclicCompositions() {
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		
+		IndexedObjectProperty H = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/H")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{}, false);		
+		IndexedObjectProperty S3 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/S3")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{}, false);
+		IndexedObjectProperty S2 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/S2")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{S3}, false);
+		IndexedObjectProperty S1 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/S1")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{S2}, false);
+		IndexedObjectProperty P3 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/P3")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{}, false);
+		IndexedObjectProperty P2 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/P2")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{P3}, false);
+		IndexedObjectProperty P1 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/P1")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{P2}, false);
+		//R is a super-property of S3, which creates a loop R -> S1 -> S2 -> S3 -> R
+		IndexedObjectProperty R = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/R")), new IndexedPropertyChain[]{S3}, new IndexedObjectProperty[]{S1, P1}, false);
+		
+		IndexedObjectsCreator.createIndexedChain(R, R, new IndexedObjectProperty[]{H});
+		
+		SaturatedPropertyChain saturated = IndexedPropertyChainSaturation.saturate(R);
+		
+		assertTrue(saturated.getCompositionsByLeftSubProperty().get(R).contains(H));
+		assertTrue(saturated.getCompositionsByRightSubProperty().get(R).contains(H));
+	}
+	
 	/**
 	 * Test method for {@link ReflexivityChecker#isReflexive()}.
 	 */
