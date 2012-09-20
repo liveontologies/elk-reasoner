@@ -151,6 +151,8 @@ public class ForwardLink implements Conclusion {
 			timer.timeForwardLinkBackwardLinkRule -= CachedTimeThread
 					.currentTimeMillis();
 
+			timer.countForwardLinkBackwardLinkRule++;
+
 			try {
 
 				/* compose the link with all forward links */
@@ -182,9 +184,8 @@ public class ForwardLink implements Conclusion {
 			}
 		}
 
-		
-		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(ThisBackwardLinkRule.class);
-	
+		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(
+				ThisBackwardLinkRule.class);
 
 		/**
 		 * The factory used for appending a new instance of this rule to a
