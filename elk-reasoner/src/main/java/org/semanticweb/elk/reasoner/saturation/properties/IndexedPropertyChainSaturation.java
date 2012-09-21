@@ -72,20 +72,23 @@ public class IndexedPropertyChainSaturation {
 	 * @return
 	 */
 	public static SaturatedPropertyChain saturate(final IndexedPropertyChain ipc) {
-		SaturatedPropertyChain saturated = ipc.getSaturated(false);
+		SaturatedPropertyChain saturated_ = ipc.getSaturated(false);
 
-		if (saturated != null && saturated.isComputed()) {
-			return saturated;
+		if (saturated_ != null && saturated_.isComputed()) {
+			return saturated_;
 		} else {
-			saturated = new SaturatedPropertyChain(ipc, isReflexive(ipc));
+			saturated_ = new SaturatedPropertyChain(ipc, isReflexive(ipc));
 		}
 
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Saturating property chain " + ipc);
 		}
 
+		//make vars final to access them in visitors
+		final SaturatedPropertyChain saturated = saturated_;
 		final ArrayDeque<IndexedPropertyChain> queue = new ArrayDeque<IndexedPropertyChain>();
 		final ArrayDeque<IndexedPropertyChain> leftComposable = new ArrayDeque<IndexedPropertyChain>();
+		
 		IndexedPropertyChain next = null;
 		// compute all transitively closed super-properties
 		queue.add(ipc);
@@ -93,29 +96,47 @@ public class IndexedPropertyChainSaturation {
 		while ((next = queue.poll()) != null) {
 			if (saturated.derivedSuperProperties.add(next)) {
 				/*
-				 * The next two blocks is what previously was in the composition
-				 * computation stage
+				 * This visitor is what previously was in the composition computation stage
 				 */
-				for (IndexedBinaryPropertyChain chain : emptyIfNull(next
-						.getRightChains())) {
-					if (saturated.compositionsByLeftSubProperty == null) {
-						saturated.compositionsByLeftSubProperty = new CompositionByPropertyMultimap();
+				next.accept(new IndexedPropertyChainVisitor<ElkObject>() {
+
+					@Override
+					public ElkObject visit(IndexedObjectProperty ipc) {
+						for (IndexedBinaryPropertyChain chain : emptyIfNull(ipc	.getLeftChains())) {
+							if (saturated.compositionsByRightSubProperty == null) {
+								saturated.compositionsByRightSubProperty = new CompositionByPropertyMultimap();
+							}
+
+							registerComposition(chain,
+									saturated.compositionsByRightSubProperty,
+									SIDE.RIGHT);
+						}
+						
+						return defaultVisit(ipc, saturated);
 					}
-
-					registerComposition(chain,
-							saturated.compositionsByLeftSubProperty, SIDE.LEFT);
-				}
-
-				for (IndexedBinaryPropertyChain chain : emptyIfNull(next
-						.getLeftChains())) {
-					if (saturated.compositionsByRightSubProperty == null) {
-						saturated.compositionsByRightSubProperty = new CompositionByPropertyMultimap();
+					
+					/*
+					 * Binary chains can't occur on the left side of another chain
+					 * so we only look where they appear on the right
+					 */
+					@Override
+					public ElkObject visit(IndexedBinaryPropertyChain ipc) {
+						return defaultVisit(ipc, saturated);
 					}
+					
+					private ElkObject defaultVisit(IndexedPropertyChain ipc, SaturatedPropertyChain saturated) {
+						for (IndexedBinaryPropertyChain chain : emptyIfNull(ipc.getRightChains())) {
+							if (saturated.compositionsByLeftSubProperty == null) {
+								saturated.compositionsByLeftSubProperty = new CompositionByPropertyMultimap();
+							}
 
-					registerComposition(chain,
-							saturated.compositionsByRightSubProperty,
-							SIDE.RIGHT);
-				}
+							registerComposition(chain,
+									saturated.compositionsByLeftSubProperty, SIDE.LEFT);
+						}
+						
+						return null;
+					}
+				});
 
 				// precompute left-composable R' o root' (that means root is
 				// composable w/ R '
@@ -170,8 +191,6 @@ public class IndexedPropertyChainSaturation {
 
 		while ((next = queue.poll()) != null) {
 			if (toPopulate.add(next)) {
-				// TODO I want to find a way to reuse such visitors since they
-				// don't really maintain a state, just need a queue to update
 				next.accept(new IndexedPropertyChainVisitor<ElkObject>() {
 
 					@Override
@@ -263,19 +282,47 @@ public class IndexedPropertyChainSaturation {
 			final IndexedPropertyChain ipc,
 			final Collection<IndexedPropertyChain> props) {
 
-		for (IndexedBinaryPropertyChain chain : Operations.concat(
-				emptyIfNull(ipc.getLeftChains()),
-				emptyIfNull(ipc.getRightChains()))) {
-			IndexedPropertyChain composable = chain.getComposable(ipc);
-
-			if (isReflexive(composable)) {
-				props.addAll(emptyIfNull(chain.getToldSuperProperties()));
-				props.add(chain);
+		ipc.accept(new IndexedPropertyChainVisitor<ElkObject>() {
+			
+			/*
+			 * For object properties we look at both right and left chains
+			 */
+			@Override
+			public ElkObject visit(IndexedObjectProperty prop) {
+				for (IndexedBinaryPropertyChain chain : Operations.concat(
+						emptyIfNull(prop.getLeftChains()),
+						emptyIfNull(prop.getRightChains()))) {
+					addSuperChain(chain, prop);
+				}
+				
+				props.addAll(emptyIfNull(ipc.getToldSuperProperties()));
+				
+				return null;
 			}
-		}
 
-		props.addAll(emptyIfNull(ipc.getToldSuperProperties()));
+			/*
+			 * For chains it's sufficient to only look at right chains
+			 */
+			@Override
+			public ElkObject visit(IndexedBinaryPropertyChain chain) {
+				for (IndexedBinaryPropertyChain right : emptyIfNull(ipc.getRightChains())) {
+					addSuperChain(right, chain);
+				}
+				
+				return null;
+			}
+			
+			private void addSuperChain(IndexedBinaryPropertyChain chain, IndexedPropertyChain ipc) {
+				IndexedPropertyChain composable = chain.getComposable(ipc);
+				
+				if (isReflexive(composable)) {
+					props.addAll(emptyIfNull(chain.getToldSuperProperties()));
+					props.add(chain);
+				}
+			}
+		});
 	}
+
 
 	/*
 	 * Adds told sub-properties (for named properties) and derived through
