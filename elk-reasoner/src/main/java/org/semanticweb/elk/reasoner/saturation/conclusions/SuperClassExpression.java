@@ -68,9 +68,7 @@ public abstract class SuperClassExpression implements Conclusion {
 	 *            {@link SuperClassExpression}s
 	 * @return
 	 */
-	public boolean storeInContext(Context context,
-			ConclusionsCounter statistics) {
-		statistics.superClassExpressionInfNo++;
+	public boolean storeInContext(Context context, ConclusionsCounter statistics) {
 		if (context.addSuperClassExpression(this)) {
 			statistics.superClassExpressionNo++;
 			return true;

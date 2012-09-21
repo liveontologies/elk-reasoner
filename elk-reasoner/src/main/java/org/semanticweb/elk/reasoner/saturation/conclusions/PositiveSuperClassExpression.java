@@ -62,7 +62,12 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 			compositionRule.apply(ruleEngine, context);
 			compositionRule = compositionRule.next();
 		}
+	}
 
+	@Override
+	public boolean storeInContext(Context context, ConclusionsCounter statistics) {
+		statistics.posSuperClassExpressionInfNo++;
+		return super.storeInContext(context, statistics);
 	}
 
 }

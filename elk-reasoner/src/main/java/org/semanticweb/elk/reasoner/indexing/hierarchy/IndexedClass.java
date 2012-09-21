@@ -146,11 +146,11 @@ public class IndexedClass extends IndexedClassEntity {
 
 		@Override
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
-			RuleStatistics timer = ruleEngine.getRulesTimer();
+			RuleStatistics stats = ruleEngine.getRulesTimer();
 
-			timer.timeClassBottomBackwardLinkRule -= CachedTimeThread
+			stats.timeClassBottomBackwardLinkRule -= CachedTimeThread
 					.currentTimeMillis();
-			timer.countClassBottomBackwardLinkRule++;
+			stats.countClassBottomBackwardLinkRule++;
 
 			try {
 				ruleEngine.produce(
@@ -158,13 +158,14 @@ public class IndexedClass extends IndexedClassEntity {
 						new PositiveSuperClassExpression(ruleEngine
 								.getOwlNothing()));
 			} finally {
-				timer.timeClassBottomBackwardLinkRule += CachedTimeThread
+				stats.timeClassBottomBackwardLinkRule += CachedTimeThread
 						.currentTimeMillis();
 			}
 		}
 
-		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, BottomBackwardLinkRule>(BottomBackwardLinkRule.class);
-		
+		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, BottomBackwardLinkRule>(
+				BottomBackwardLinkRule.class);
+
 		private static ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule>() {
 			@Override
 			public BottomBackwardLinkRule create(BackwardLinkRules tail) {

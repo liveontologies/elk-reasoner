@@ -59,6 +59,11 @@ public class NegativeSuperClassExpression extends SuperClassExpression {
 			compositionRule.apply(ruleEngine, context);
 			compositionRule = compositionRule.next();
 		}
+	}
 
+	@Override
+	public boolean storeInContext(Context context, ConclusionsCounter statistics) {
+		statistics.negSuperClassExpressionInfNo++;
+		return super.storeInContext(context, statistics);
 	}
 }

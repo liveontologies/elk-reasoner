@@ -42,7 +42,8 @@ public class ConclusionsCounter {
 	int backLinkNo;
 	int forwLinkInfNo;
 	int forwLinkNo;
-	int superClassExpressionInfNo;
+	int posSuperClassExpressionInfNo;
+	int negSuperClassExpressionInfNo;
 	int superClassExpressionNo;
 
 	/**
@@ -73,18 +74,25 @@ public class ConclusionsCounter {
 		return forwLinkNo;
 	}
 
-	// TODO: collect a finer statistics about positive and negative super class
-	// expressions
-
 	/**
-	 * @return the number of times a {@link BackwardLink} has been produced
+	 * @return the number of times a {@link PositiveSuperClassExpression} has
+	 *         been produced
 	 */
-	public int getSuperClassExpressionInfNo() {
-		return superClassExpressionInfNo;
+	public int getPositiveSuperClassExpressionInfNo() {
+		return posSuperClassExpressionInfNo;
 	}
 
 	/**
-	 * @return the number of different {@link ForwardLink}s produced and stored
+	 * @return the number of times a {@link NegativeSuperClassExpression} has
+	 *         been produced
+	 */
+	public int getNegativeSuperClassExpressionInfNo() {
+		return negSuperClassExpressionInfNo;
+	}
+
+	/**
+	 * @return the number of different {@link SuperClassExpression}s produced
+	 *         and stored
 	 */
 	public int getSuperClassExpressionNo() {
 		return superClassExpressionNo;
@@ -98,7 +106,8 @@ public class ConclusionsCounter {
 		backLinkNo = 0;
 		forwLinkInfNo = 0;
 		forwLinkNo = 0;
-		superClassExpressionInfNo = 0;
+		posSuperClassExpressionInfNo = 0;
+		negSuperClassExpressionInfNo = 0;
 		superClassExpressionNo = 0;
 	}
 
@@ -116,7 +125,8 @@ public class ConclusionsCounter {
 		this.backLinkNo += statistics.backLinkNo;
 		this.forwLinkInfNo += statistics.forwLinkInfNo;
 		this.forwLinkNo += statistics.forwLinkNo;
-		this.superClassExpressionInfNo += statistics.superClassExpressionInfNo;
+		this.posSuperClassExpressionInfNo += statistics.posSuperClassExpressionInfNo;
+		this.negSuperClassExpressionInfNo += statistics.negSuperClassExpressionInfNo;
 		this.superClassExpressionNo += statistics.superClassExpressionNo;
 		statistics.reset();
 	}

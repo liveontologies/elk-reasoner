@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engi
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * The factory for engines for concurrently computing the saturation of class
@@ -155,23 +156,31 @@ public class RuleApplicationFactory implements
 			checkStatistics();
 			// CONTEXT STATISTICS:
 			if (approximateContextNumber_.get() > 0)
-				LOGGER_.debug("Contexts Created/Activations:"
-						+ approximateContextNumber_ + "/"
-						+ aggregatedFactoryStats_.contContextActivations);
+				LOGGER_.debug("Contexts created: " + approximateContextNumber_);
+			if (approximateContextNumber_.get() > 0)
+				LOGGER_.debug("Contexts processsing: "
+						+ aggregatedFactoryStats_.contContextProcess + " ("
+						+ aggregatedFactoryStats_.timeContextProcess + " ms)");
 			// CONCLUSIONS STATISTICS:
-			if (aggregatedConclusionsCounter_.getSuperClassExpressionInfNo() > 0)
-				LOGGER_.debug("Derived Produced/Unique: "
+			if (aggregatedConclusionsCounter_
+					.getPositiveSuperClassExpressionInfNo()
+					+ aggregatedConclusionsCounter_
+							.getNegativeSuperClassExpressionInfNo() > 0)
+				LOGGER_.debug("Super classes positive/negative/unique: "
 						+ aggregatedConclusionsCounter_
-								.getSuperClassExpressionInfNo()
+								.getPositiveSuperClassExpressionInfNo()
+						+ "/"
+						+ aggregatedConclusionsCounter_
+								.getNegativeSuperClassExpressionInfNo()
 						+ "/"
 						+ aggregatedConclusionsCounter_
 								.getSuperClassExpressionNo());
 			if (aggregatedConclusionsCounter_.getBackLinkInfNo() > 0)
-				LOGGER_.debug("Backward Links Produced/Unique: "
+				LOGGER_.debug("Backward Links produced/unique: "
 						+ aggregatedConclusionsCounter_.getBackLinkInfNo()
 						+ "/" + aggregatedConclusionsCounter_.getBackLinkNo());
 			if (aggregatedConclusionsCounter_.getForwLinkInfNo() > 0)
-				LOGGER_.debug("Forward Links Produced/Unique: "
+				LOGGER_.debug("Forward Links produced/unique: "
 						+ aggregatedConclusionsCounter_.getForwLinkInfNo()
 						+ "/" + aggregatedConclusionsCounter_.getForwLinkNo());
 			// RULES STATISTICS:
@@ -248,11 +257,14 @@ public class RuleApplicationFactory implements
 	}
 
 	private void checkStatistics() {
-		if (aggregatedFactoryStats_.contContextActivations < approximateContextNumber_
+		if (aggregatedFactoryStats_.contContextProcess < approximateContextNumber_
 				.get())
 			LOGGER_.error("More contexts than context activations!");
-		if (aggregatedConclusionsCounter_.getSuperClassExpressionInfNo() < aggregatedConclusionsCounter_
-				.getSuperClassExpressionNo())
+		if (aggregatedConclusionsCounter_
+				.getPositiveSuperClassExpressionInfNo()
+				+ aggregatedConclusionsCounter_
+						.getNegativeSuperClassExpressionInfNo() < aggregatedConclusionsCounter_
+					.getSuperClassExpressionNo())
 			LOGGER_.error("More unique derived superclasses than produced!");
 		if (aggregatedConclusionsCounter_.getBackLinkInfNo() < aggregatedConclusionsCounter_
 				.getBackLinkNo())
@@ -293,6 +305,8 @@ public class RuleApplicationFactory implements
 
 		@Override
 		public void process() {
+			factoryStats_.timeContextProcess -= CachedTimeThread
+					.currentTimeMillis();
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
@@ -301,6 +315,8 @@ public class RuleApplicationFactory implements
 					break;
 				process(nextContext);
 			}
+			factoryStats_.timeContextProcess += CachedTimeThread
+					.currentTimeMillis();
 		}
 
 		@Override
@@ -377,11 +393,9 @@ public class RuleApplicationFactory implements
 		public void produce(Context context, Conclusion item) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
-			if (context.addToDo(item)) {
+			if (context.addToDo(item))
 				// context was activated
 				activeContexts_.add(context);
-				factoryStats_.contContextActivations++;
-			}
 		}
 
 		/**
@@ -391,17 +405,16 @@ public class RuleApplicationFactory implements
 		 *            the context in which to process the scheduled items
 		 */
 		protected void process(Context context) {
+			factoryStats_.contContextProcess++;
 			for (;;) {
 				Conclusion item = context.takeToDo();
 				if (item == null)
 					break;
 				item.apply(this, context);
 			}
-			if (context.deactivate()) {
+			if (context.deactivate())
 				// context was re-activated
 				activeContexts_.add(context);
-				factoryStats_.contContextActivations++;
-			}
 		}
 
 		private void initContext(Context context) {
@@ -424,13 +437,19 @@ public class RuleApplicationFactory implements
 	 */
 	private static class ThisStatistics {
 		/**
-		 * the number of times a context is inserted into
-		 * {@link #activeContexts_}, i.e., the number of context activations
+		 * the number of times a context has been processed using
+		 * {@link Engine#process(Context)}
 		 */
-		int contContextActivations;
+		int contContextProcess;
+
+		/**
+		 * the time spent within {@link Engine#process()}
+		 */
+		long timeContextProcess;
 
 		public synchronized void merge(ThisStatistics statistics) {
-			this.contContextActivations += statistics.contContextActivations;
+			this.contContextProcess += statistics.contContextProcess;
+			this.timeContextProcess += statistics.timeContextProcess;
 		}
 	}
 

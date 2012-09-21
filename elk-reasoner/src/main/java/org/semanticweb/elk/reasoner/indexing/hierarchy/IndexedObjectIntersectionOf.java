@@ -103,11 +103,11 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		RuleStatistics timer = ruleEngine.getRulesTimer();
+		RuleStatistics stats = ruleEngine.getRulesTimer();
 
-		timer.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread
+		stats.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread
 				.currentTimeMillis();
-		timer.countObjectIntersectionOfDecompositionRule++;
+		stats.countObjectIntersectionOfDecompositionRule++;
 
 		try {
 			ruleEngine.produce(context, new PositiveSuperClassExpression(
@@ -115,7 +115,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			ruleEngine.produce(context, new PositiveSuperClassExpression(
 					secondConjunct));
 		} finally {
-			timer.timeObjectIntersectionOfDecompositionRule += CachedTimeThread
+			stats.timeObjectIntersectionOfDecompositionRule += CachedTimeThread
 					.currentTimeMillis();
 		}
 	}
@@ -179,11 +179,11 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
 
-			RuleStatistics timer = ruleEngine.getRulesTimer();
+			RuleStatistics stats = ruleEngine.getRulesTimer();
 
-			timer.timeObjectIntersectionOfCompositionRule -= CachedTimeThread
+			stats.timeObjectIntersectionOfCompositionRule -= CachedTimeThread
 					.currentTimeMillis();
-			timer.countObjectIntersectionOfCompositionRule++;
+			stats.countObjectIntersectionOfCompositionRule++;
 
 			try {
 
@@ -194,15 +194,15 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 							new NegativeSuperClassExpression(
 									conjunctionsByConjunct_.get(common)));
 			} finally {
-				timer.timeObjectIntersectionOfCompositionRule += CachedTimeThread
+				stats.timeObjectIntersectionOfCompositionRule += CachedTimeThread
 						.currentTimeMillis();
 			}
 
 		}
 
-		
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(ThisCompositionRule.class);
-		
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+				ThisCompositionRule.class);
+
 		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
 			@Override
 			public ThisCompositionRule create(ContextRules tail) {

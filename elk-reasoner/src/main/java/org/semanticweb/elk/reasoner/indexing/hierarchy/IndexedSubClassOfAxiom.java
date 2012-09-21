@@ -110,10 +110,10 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
 
-			RuleStatistics timer = ruleEngine.getRulesTimer();
+			RuleStatistics stats = ruleEngine.getRulesTimer();
 
-			timer.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis();
-			timer.countSubClassOfRule++;
+			stats.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis();
+			stats.countSubClassOfRule++;
 
 			try {
 
@@ -121,13 +121,14 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 					ruleEngine.produce(context,
 							new PositiveSuperClassExpression(implied));
 			} finally {
-				timer.timeSubClassOfRule += CachedTimeThread
+				stats.timeSubClassOfRule += CachedTimeThread
 						.currentTimeMillis();
 			}
 		}
 
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(ThisCompositionRule.class);
-		
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+				ThisCompositionRule.class);
+
 		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
 			@Override
 			public ThisCompositionRule create(ContextRules tail) {
