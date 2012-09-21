@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.properties.IndexedPropertyChainSaturation;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -249,6 +250,8 @@ public abstract class IndexedPropertyChain {
 	}
 
 	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);
+	
+	public abstract <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor, P parameter);
 
 	@Override
 	public abstract String toString();

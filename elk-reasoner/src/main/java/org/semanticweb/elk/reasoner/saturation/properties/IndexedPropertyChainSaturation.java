@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain.REFLEXIVITY;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -64,6 +65,11 @@ public class IndexedPropertyChainSaturation {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IndexedPropertyChainSaturation.class);
+	
+	/*
+	 * A stateless and thread-safe visitor to check reflexivity of property chains
+	 */
+	private static final ReflexivityCheckVisitor REFLEXIVITY_VISITOR = new ReflexivityCheckVisitor();
 
 	/**
 	 * The main method which takes a chain and saturates it.
@@ -269,8 +275,7 @@ public class IndexedPropertyChainSaturation {
 		SaturatedPropertyChain saturated = ipc.getSaturated(false);
 
 		if (saturated == null || !saturated.reflexivityDetermined()) {
-			// TODO perhaps we don't need to create an object every time?
-			new ReflexivityCheckVisitor().isReflexive(ipc);
+			REFLEXIVITY_VISITOR.isReflexive(ipc);
 		}
 
 		return ipc.getSaturated(false).isReflexive();
@@ -406,29 +411,31 @@ public class IndexedPropertyChainSaturation {
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class ReflexivityCheckVisitor implements IndexedPropertyChainVisitor<Boolean> {
-
-	private final Set<IndexedPropertyChain> visited_ = new ArrayHashSet<IndexedPropertyChain>();
+class ReflexivityCheckVisitor implements IndexedPropertyChainVisitorEx<Boolean, Set<IndexedPropertyChain>> {
 
 	@Override
-	public Boolean visit(IndexedObjectProperty property) {
-		return !property.isToldReflexive() ? defaultVisit(property) : true;
+	public Boolean visit(IndexedObjectProperty property, Set<IndexedPropertyChain> visited) {
+		return !property.isToldReflexive() ? defaultVisit(property, visited) : true;
 	}
 
 	@Override
-	public Boolean visit(IndexedBinaryPropertyChain binaryChain) {
-		return isReflexive(binaryChain.getLeftProperty())
-				&& isReflexive(binaryChain.getRightProperty());
+	public Boolean visit(IndexedBinaryPropertyChain binaryChain, Set<IndexedPropertyChain> visited) {
+		return isReflexive(binaryChain.getLeftProperty(), visited)
+				&& isReflexive(binaryChain.getRightProperty(), visited);
 	}
 
 	boolean isReflexive(final IndexedPropertyChain propChain) {
+		return isReflexive(propChain, new ArrayHashSet<IndexedPropertyChain>());
+	}
+	
+	boolean isReflexive(final IndexedPropertyChain propChain, final Set<IndexedPropertyChain> visited) {
 		SaturatedPropertyChain saturated = getCreateSaturated(propChain);
 
-		if (visited_.contains(propChain)) {
+		if (visited.contains(propChain)) {
 			return saturated.isReflexive();
 		} else {
-			visited_.add(propChain);
-			boolean reflexive = propChain.accept(this);
+			visited.add(propChain);
+			boolean reflexive = propChain.accept(this, visited);
 
 			saturated.isReflexive.set(reflexive ? REFLEXIVITY.TRUE
 					: REFLEXIVITY.FALSE);
@@ -437,13 +444,13 @@ class ReflexivityCheckVisitor implements IndexedPropertyChainVisitor<Boolean> {
 		}
 	}
 
-	private boolean defaultVisit(IndexedPropertyChain propChain) {
+	private boolean defaultVisit(final IndexedPropertyChain propChain, final Set<IndexedPropertyChain> visited) {
 		// go through sub-properties to see if some is reflexive
 		// stop if so
 		if (propChain.getToldSubProperties() != null) {
 			for (IndexedPropertyChain subChain : propChain
 					.getToldSubProperties()) {
-				if (isReflexive(subChain)) {
+				if (isReflexive(subChain, visited)) {
 					// TODO optimisation: mark all super-roles as reflexive?
 					// break;
 					return true;

@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 
 /**
  * Represents a complex ElkSubObjectPropertyOfAxiom. The chain consists of two
@@ -99,6 +100,12 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	public <O> O accept(IndexedBinaryPropertyChainVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+	
+	@Override
+	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor, P parameter) {
+		return visitor.visit(this, parameter);
+	}
+	
 
 	@Override
 	public List<IndexedPropertyChain> getToldSubProperties() {

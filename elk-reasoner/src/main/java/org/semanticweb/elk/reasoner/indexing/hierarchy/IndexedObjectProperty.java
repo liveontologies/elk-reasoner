@@ -30,6 +30,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 
 /**
  * Represents all occurrences of an ElkObjectProperty in an ontology.
@@ -179,4 +180,8 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		return '<' + getElkObjectProperty().getIri().getFullIriAsString() + '>';
 	}
 
+	@Override
+	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor, P parameter) {
+		return visitor.visit(this, parameter);
+	}
 }
