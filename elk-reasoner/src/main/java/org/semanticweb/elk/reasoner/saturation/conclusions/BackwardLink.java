@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
@@ -64,6 +65,7 @@ public class BackwardLink implements Conclusion {
 	public IndexedPropertyChain getRelation() {
 		return relation_;
 	}
+
 	/**
 	 * @return the source of this {@link BackwardLink}, that is, the
 	 *         {@link Context} from which the existential restriction
@@ -71,7 +73,6 @@ public class BackwardLink implements Conclusion {
 	 */
 	public Context getSource() {
 		return source_;
-//>>>>>>> .merge-right.r1141
 	}
 
 	/**
@@ -88,32 +89,38 @@ public class BackwardLink implements Conclusion {
 	public void apply(RuleEngine ruleEngine, Context context) {
 
 		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		statistics.backLinkInfNo++;
+		statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
+		try {
+			statistics.backLinkInfNo++;
 
-		if (!context.addBackwardLink(this))
-			return;
+			if (!context.addBackwardLink(this))
+				return;
 
-		statistics.backLinkNo++;
+			statistics.backLinkNo++;
 
-		// apply all backward link rules of the context
-		BackwardLinkRules rules = context.getBackwardLinkRules();
+			// apply all backward link rules of the context
+			BackwardLinkRules rules = context.getBackwardLinkRules();
 
-		while (rules != null) {
-			rules.apply(ruleEngine, this);
-			rules = rules.next();
-		}
+			while (rules != null) {
+				rules.apply(ruleEngine, this);
+				rules = rules.next();
+			}
 
-		/*
-		 * convert backward link to a forward link if it can potentially be
-		 * composed
-		 */
-		Set<IndexedPropertyChain> toldProperties = source_.getRoot()
-				.getPosPropertiesInExistentials();
-		if (toldProperties != null
-				&& !new LazySetIntersection<IndexedPropertyChain>(
-						toldProperties, relation_.getSaturated()
-								.getLeftComposableProperties()).isEmpty()) {
-			ruleEngine.produce(source_, new ForwardLink(relation_, context));
+			/*
+			 * convert backward link to a forward link if it can potentially be
+			 * composed
+			 */
+			Set<IndexedPropertyChain> toldProperties = source_.getRoot()
+					.getPosPropertiesInExistentials();
+			if (toldProperties != null
+					&& !new LazySetIntersection<IndexedPropertyChain>(
+							toldProperties, relation_.getSaturated()
+									.getLeftComposableProperties()).isEmpty()) {
+				ruleEngine
+						.produce(source_, new ForwardLink(relation_, context));
+			}
+		} finally {
+			statistics.backLinkTime += CachedTimeThread.currentTimeMillis;
 		}
 
 	}

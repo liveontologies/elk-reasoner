@@ -100,8 +100,7 @@ public class IndexedClass extends IndexedClassEntity {
 
 		RuleStatistics timer = ruleEngine.getRulesTimer();
 
-		timer.timeClassDecompositionRule -= CachedTimeThread
-				.currentTimeMillis();
+		timer.timeClassDecompositionRule -= CachedTimeThread.currentTimeMillis;
 		timer.countClassDecompositionRule++;
 
 		try {
@@ -128,8 +127,7 @@ public class IndexedClass extends IndexedClassEntity {
 						BottomBackwardLinkRule.FACTORY_);
 			}
 		} finally {
-			timer.timeClassDecompositionRule += CachedTimeThread
-					.currentTimeMillis();
+			timer.timeClassDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
@@ -148,8 +146,7 @@ public class IndexedClass extends IndexedClassEntity {
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
 			RuleStatistics stats = ruleEngine.getRulesTimer();
 
-			stats.timeClassBottomBackwardLinkRule -= CachedTimeThread
-					.currentTimeMillis();
+			stats.timeClassBottomBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
 			stats.countClassBottomBackwardLinkRule++;
 
 			try {
@@ -158,8 +155,7 @@ public class IndexedClass extends IndexedClassEntity {
 						new PositiveSuperClassExpression(ruleEngine
 								.getOwlNothing()));
 			} finally {
-				stats.timeClassBottomBackwardLinkRule += CachedTimeThread
-						.currentTimeMillis();
+				stats.timeClassBottomBackwardLinkRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 

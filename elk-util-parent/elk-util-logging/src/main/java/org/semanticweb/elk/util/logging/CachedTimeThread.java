@@ -36,9 +36,10 @@ public class CachedTimeThread extends Thread {
 	private static final int UPDATE_FREQUENCY_ = 10;
 
 	/**
-	 * the snapshot of the current time computed last time
+	 * the current time in milliseconds delayed by at most 10 milliseconds the
+	 * value that would be returned by {@link System#currentTimeMillis()}
 	 */
-	private static volatile long currentTimeMillis = System.currentTimeMillis();
+	public static volatile long currentTimeMillis = System.currentTimeMillis();
 
 	CachedTimeThread() {
 		setDaemon(true);
@@ -46,15 +47,6 @@ public class CachedTimeThread extends Thread {
 
 	static {
 		new CachedTimeThread().start();
-	}
-
-	/**
-	 * @return the current time in milliseconds delayed by at most 10
-	 *         milliseconds the value that would be returned by
-	 *         {@link System#currentTimeMillis()}
-	 */
-	public static long currentTimeMillis() {
-		return currentTimeMillis;
 	}
 
 	@Override
