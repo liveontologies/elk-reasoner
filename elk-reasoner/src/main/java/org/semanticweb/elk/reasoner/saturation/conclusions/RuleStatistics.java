@@ -1,6 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-
 /*
  * #%L
  * ELK Reasoner

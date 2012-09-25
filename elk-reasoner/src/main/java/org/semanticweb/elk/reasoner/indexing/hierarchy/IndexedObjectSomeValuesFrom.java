@@ -147,16 +147,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		RuleStatistics stats = ruleEngine.getRulesTimer();
 
-		stats.timeObjectSomeValuesFromDecompositionRule -= CachedTimeThread
-				.currentTimeMillis();
+		stats.timeObjectSomeValuesFromDecompositionRule -= CachedTimeThread.currentTimeMillis;
 		stats.countObjectSomeValuesFromDecompositionRule++;
 
 		try {
 			ruleEngine.produce(ruleEngine.getCreateContext(filler),
 					new BackwardLink(context, property));
 		} finally {
-			stats.timeObjectSomeValuesFromDecompositionRule += CachedTimeThread
-					.currentTimeMillis();
+			stats.timeObjectSomeValuesFromDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
@@ -191,8 +189,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 			RuleStatistics stats = ruleEngine.getRulesTimer();
 
-			stats.timeObjectSomeValuesFromCompositionRule -= CachedTimeThread
-					.currentTimeMillis();
+			stats.timeObjectSomeValuesFromCompositionRule -= CachedTimeThread.currentTimeMillis;
 			stats.countObjectSomeValuesFromCompositionRule++;
 
 			try {
@@ -254,8 +251,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 								new NegativeSuperClassExpression(e));
 				}
 			} finally {
-				stats.timeObjectSomeValuesFromCompositionRule += CachedTimeThread
-						.currentTimeMillis();
+				stats.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 
@@ -317,8 +313,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
 			RuleStatistics stats = ruleEngine.getRulesTimer();
 
-			stats.timeObjectSomeValuesFromBackwardLinkRule -= CachedTimeThread
-					.currentTimeMillis();
+			stats.timeObjectSomeValuesFromBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
 			stats.countObjectSomeValuesFromBackwardLinkRule++;
 
 			try {
@@ -327,8 +322,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					ruleEngine.produce(link.getSource(),
 							new NegativeSuperClassExpression(carry));
 			} finally {
-				stats.timeObjectSomeValuesFromBackwardLinkRule += CachedTimeThread
-						.currentTimeMillis();
+				stats.timeObjectSomeValuesFromBackwardLinkRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 

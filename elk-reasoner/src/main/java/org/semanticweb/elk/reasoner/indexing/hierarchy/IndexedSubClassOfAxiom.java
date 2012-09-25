@@ -112,7 +112,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 			RuleStatistics stats = ruleEngine.getRulesTimer();
 
-			stats.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis();
+			stats.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis;
 			stats.countSubClassOfRule++;
 
 			try {
@@ -121,8 +121,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 					ruleEngine.produce(context,
 							new PositiveSuperClassExpression(implied));
 			} finally {
-				stats.timeSubClassOfRule += CachedTimeThread
-						.currentTimeMillis();
+				stats.timeSubClassOfRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 

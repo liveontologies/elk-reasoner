@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+
 /**
  * The counters for the numbers of {@link Conclusion}s derived and stored within
  * {@link Context}s. This class is designed to work for concurrent computations.
@@ -40,11 +43,14 @@ public class ConclusionsCounter {
 
 	int backLinkInfNo;
 	int backLinkNo;
+	long backLinkTime;
 	int forwLinkInfNo;
 	int forwLinkNo;
+	long forwLinkTime;
 	int posSuperClassExpressionInfNo;
 	int negSuperClassExpressionInfNo;
 	int superClassExpressionNo;
+	long superClassExpressionTime;
 
 	/**
 	 * @return the number of times a {@link BackwardLink} has been produced
@@ -61,6 +67,14 @@ public class ConclusionsCounter {
 	}
 
 	/**
+	 * @return the time spent within
+	 *         {@link BackwardLink#apply(RuleEngine, Context)}
+	 */
+	public long getBackLinkTime() {
+		return backLinkTime;
+	}
+
+	/**
 	 * @return the number of times a {@link BackwardLink} has been produced
 	 */
 	public int getForwLinkInfNo() {
@@ -72,6 +86,14 @@ public class ConclusionsCounter {
 	 */
 	public int getForwLinkNo() {
 		return forwLinkNo;
+	}
+
+	/**
+	 * @return the time spent within
+	 *         {@link ForwardLink#apply(RuleEngine, Context)}
+	 */
+	public long getForwLinkTime() {
+		return forwLinkTime;
 	}
 
 	/**
@@ -99,16 +121,27 @@ public class ConclusionsCounter {
 	}
 
 	/**
+	 * @return the time spent within
+	 *         {@link SuperClassExpression#apply(RuleEngine, Context)}
+	 */
+	public long getSuperClassExpressionTime() {
+		return superClassExpressionTime;
+	}
+
+	/**
 	 * Reset all statistics counters to zero.
 	 */
 	public void reset() {
 		backLinkInfNo = 0;
 		backLinkNo = 0;
+		backLinkTime = 0;
 		forwLinkInfNo = 0;
 		forwLinkNo = 0;
+		forwLinkTime = 0;
 		posSuperClassExpressionInfNo = 0;
 		negSuperClassExpressionInfNo = 0;
 		superClassExpressionNo = 0;
+		superClassExpressionTime = 0;
 	}
 
 	/**
@@ -123,11 +156,14 @@ public class ConclusionsCounter {
 	public synchronized void merge(ConclusionsCounter statistics) {
 		this.backLinkInfNo += statistics.backLinkInfNo;
 		this.backLinkNo += statistics.backLinkNo;
+		this.backLinkTime += statistics.backLinkTime;
 		this.forwLinkInfNo += statistics.forwLinkInfNo;
 		this.forwLinkNo += statistics.forwLinkNo;
+		this.forwLinkTime += statistics.forwLinkTime;
 		this.posSuperClassExpressionInfNo += statistics.posSuperClassExpressionInfNo;
 		this.negSuperClassExpressionInfNo += statistics.negSuperClassExpressionInfNo;
 		this.superClassExpressionNo += statistics.superClassExpressionNo;
+		this.superClassExpressionTime += statistics.superClassExpressionTime;
 		statistics.reset();
 	}
 
