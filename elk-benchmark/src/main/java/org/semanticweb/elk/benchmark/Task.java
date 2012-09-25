@@ -36,6 +36,6 @@ package org.semanticweb.elk.benchmark;
 public interface Task {
 
 	public String getName();
-	public void prepare(String... args) throws TaskException;
+	public void prepare() throws TaskException;
 	public Result run() throws TaskException;
 }

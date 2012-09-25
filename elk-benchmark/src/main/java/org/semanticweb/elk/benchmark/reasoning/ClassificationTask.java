@@ -52,24 +52,30 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  */
 public class ClassificationTask implements Task {
 
-	private Reasoner reasoner;
+	private Reasoner reasoner_;
+	private final String ontologyFile_;
+	private final ReasonerConfiguration reasonerConfig_;
+	
+	public ClassificationTask(String[] args) {
+		ontologyFile_ = args[0];
+		reasonerConfig_ = getConfig(args);
+	}
 	
 	@Override
 	public String getName() {
-		return "EL classification";
+		return "EL classification [" + ontologyFile_.substring(ontologyFile_.lastIndexOf('/')) + "]";
 	}
 
 	@Override
-	public void prepare(String... args) throws TaskException {
+	public void prepare() throws TaskException {
 		try {
-			ReasonerConfiguration config = getConfig(args);
-			File ontologyFile = BenchmarkUtils.getFile(args[0]);
+			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
 			
-			reasoner = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), config);
-			reasoner.registerOntologyLoader(new Owl2StreamLoader(
+			reasoner_ = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), reasonerConfig_);
+			reasoner_.registerOntologyLoader(new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(), ontologyFile));
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
-			reasoner.loadOntology();
+			reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
+			reasoner_.loadOntology();
 		} catch (Exception e) {
 			throw new TaskException(e);
 		}
@@ -88,7 +94,7 @@ public class ClassificationTask implements Task {
 	@Override
 	public Result run() throws TaskException {
 		try {
-			Taxonomy<ElkClass> t = reasoner.getTaxonomy();
+			Taxonomy<ElkClass> t = reasoner_.getTaxonomy();
 			
 			System.out.println(TaxonomyHasher.hash(t));
 			
@@ -97,7 +103,7 @@ public class ClassificationTask implements Task {
 		}
 		finally {
 			try {
-				reasoner.shutdown();
+				reasoner_.shutdown();
 			} catch (InterruptedException e) {}
 		}
 		

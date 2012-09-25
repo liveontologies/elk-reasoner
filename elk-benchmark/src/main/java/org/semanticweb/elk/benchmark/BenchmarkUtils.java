@@ -26,8 +26,6 @@
 package org.semanticweb.elk.benchmark;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,17 +74,6 @@ public class BenchmarkUtils {
 		}
 	}
 
-	public static Task instantiateTask(String className)
-			throws ClassNotFoundException, SecurityException,
-			NoSuchMethodException, IllegalArgumentException,
-			InstantiationException, IllegalAccessException,
-			InvocationTargetException {
-		Class<?> clazz = Class.forName(className);
-		Constructor<?> constructor = clazz.getConstructor(new Class<?>[] {});
-
-		return (Task) constructor.newInstance(new Object[] {});
-	}
-
 	/*
 	 * A macro method, reads system properties, instantiates the task and runs
 	 * it
@@ -97,15 +84,33 @@ public class BenchmarkUtils {
 						Constants.WARM_UPS, Constants.RUNS,
 						Constants.TASK_PARAMS });
 		// First, need to instantiate the task
-		Task task = BenchmarkUtils.instantiateTask(propMap
-				.get(Constants.TASK_CLASS_NAME));
+		Task task = TaskFactory.create(propMap
+				.get(Constants.TASK_CLASS_NAME), BenchmarkUtils
+				.getCommaSeparatedParameter(Constants.TASK_PARAMS));
 		TaskRunner runner = new TaskRunner(task, Integer.valueOf(propMap
 				.get(Constants.WARM_UPS)), Integer.valueOf(propMap
 				.get(Constants.RUNS)));
 
-		runner.run(BenchmarkUtils
-				.getCommaSeparatedParameter(Constants.TASK_PARAMS));
+		runner.run();
 	}
+	
+	/*
+	 * A macro method, reads system properties, instantiates the task and runs it
+	 */
+	public static void multiRun() throws Exception {
+		Map<String, String> propMap = BenchmarkUtils
+				.getSystemProperties(new String[] { Constants.TASK_CLASS_NAME,
+						Constants.WARM_UPS, Constants.RUNS,
+						Constants.TASK_PARAMS });
+
+		MultiTask task = (MultiTask) TaskFactory.create(propMap.get(Constants.TASK_CLASS_NAME), BenchmarkUtils
+				.getCommaSeparatedParameter(Constants.TASK_PARAMS));
+		TaskRunner runner = new MultiTaskRunner(task, Integer.valueOf(propMap
+				.get(Constants.WARM_UPS)), Integer.valueOf(propMap
+				.get(Constants.RUNS)));
+
+		runner.run();
+	}	
 
 	public static File getFile(String path) {
 		if (path.startsWith("~" + File.separator)) {

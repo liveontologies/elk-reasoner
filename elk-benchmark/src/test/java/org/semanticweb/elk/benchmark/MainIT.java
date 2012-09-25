@@ -37,7 +37,7 @@ import org.junit.Test;
 public class MainIT {
 
 	@Test
-	public void testRun() throws Exception {
-		BenchmarkUtils.run();
+	public void testMultiRun() throws Exception {
+		BenchmarkUtils.multiRun();
 	}
 }
