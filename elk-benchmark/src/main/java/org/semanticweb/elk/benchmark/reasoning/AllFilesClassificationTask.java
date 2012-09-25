@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.benchmark;
+package org.semanticweb.elk.benchmark.reasoning;
 /*
  * #%L
  * ELK Benchmarking Package
@@ -24,25 +24,29 @@ package org.semanticweb.elk.benchmark;
  * #L%
  */
 
-import java.lang.reflect.Constructor;
+import org.semanticweb.elk.benchmark.AllFilesMultiTask;
+import org.semanticweb.elk.benchmark.Task;
+import org.semanticweb.elk.benchmark.TaskFactory;
 
 /**
- * A very simple factory for creating tasks via reflection
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TaskFactory {
+public class AllFilesClassificationTask extends AllFilesMultiTask {
 
-	public static Task create(String className, String[] params) {
-		try {
-			Class<?> clazz = Class.forName(className);
-			Constructor<?> constructor = clazz.getConstructor(new Class<?>[] {String[].class});
-
-			return (Task) constructor.newInstance(new Object[] {params});
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	public AllFilesClassificationTask(String[] args) {
+		super(args);
 	}
+
+	@Override
+	public String getName() {
+		return "Multi classification";
+	}
+
+	@Override
+	public Task instantiateSubTask(String[] args) {
+		return TaskFactory.create(ClassificationTask.class.getName(), args);
+	}
+
 }
