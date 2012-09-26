@@ -106,8 +106,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		RuleStatistics stats = ruleEngine.getRulesTimer();
 
-		stats.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread
-				.currentTimeMillis();
+		stats.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread.currentTimeMillis;
 		stats.countObjectIntersectionOfDecompositionRule++;
 
 		try {
@@ -116,8 +115,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			ruleEngine.produce(context, new PositiveSuperClassExpression(
 					secondConjunct));
 		} finally {
-			stats.timeObjectIntersectionOfDecompositionRule += CachedTimeThread
-					.currentTimeMillis();
+			stats.timeObjectIntersectionOfDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
@@ -182,8 +180,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 			RuleStatistics stats = ruleEngine.getRulesTimer();
 
-			stats.timeObjectIntersectionOfCompositionRule -= CachedTimeThread
-					.currentTimeMillis();
+			stats.timeObjectIntersectionOfCompositionRule -= CachedTimeThread.currentTimeMillis;
 			stats.countObjectIntersectionOfCompositionRule++;
 
 			try {
@@ -195,8 +192,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 							new NegativeSuperClassExpression(
 									conjunctionsByConjunct_.get(common)));
 			} finally {
-				stats.timeObjectIntersectionOfCompositionRule += CachedTimeThread
-						.currentTimeMillis();
+				stats.timeObjectIntersectionOfCompositionRule += CachedTimeThread.currentTimeMillis;
 			}
 
 		}

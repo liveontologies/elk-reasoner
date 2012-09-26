@@ -71,34 +71,40 @@ public class ForwardLink implements Conclusion {
 	public void apply(RuleEngine ruleEngine, Context context) {
 
 		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		statistics.forwLinkInfNo++;
+		statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
+		try {
 
-		if (!context
-				.getBackwardLinkRulesChain()
-				.getCreate(ThisBackwardLinkRule.MATCHER_,
-						ThisBackwardLinkRule.FACTORY_).addForwardLink(this))
-			return;
+			statistics.forwLinkInfNo++;
 
-		statistics.forwLinkNo++;
+			if (!context
+					.getBackwardLinkRulesChain()
+					.getCreate(ThisBackwardLinkRule.MATCHER_,
+							ThisBackwardLinkRule.FACTORY_).addForwardLink(this))
+				return;
 
-		/* compose the link with all backward links */
-		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
-				.getSaturated().getCompositionsByLeftSubProperty();
-		final Multimap<IndexedPropertyChain, Context> backLinks = context
-				.getBackwardLinksByObjectProperty();
+			statistics.forwLinkNo++;
 
-		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-				comps.keySet(), backLinks.keySet())) {
+			/* compose the link with all backward links */
+			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
+					.getSaturated().getCompositionsByLeftSubProperty();
+			final Multimap<IndexedPropertyChain, Context> backLinks = context
+					.getBackwardLinksByObjectProperty();
 
-			Collection<IndexedPropertyChain> compositions = comps
-					.get(backwardRelation);
-			Collection<Context> sources = backLinks.get(backwardRelation);
+			for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+					comps.keySet(), backLinks.keySet())) {
 
-			for (IndexedPropertyChain composition : compositions)
-				for (Context source : sources) {
-					ruleEngine.produce(target_, new BackwardLink(source,
-							composition));
-				}
+				Collection<IndexedPropertyChain> compositions = comps
+						.get(backwardRelation);
+				Collection<Context> sources = backLinks.get(backwardRelation);
+
+				for (IndexedPropertyChain composition : compositions)
+					for (Context source : sources) {
+						ruleEngine.produce(target_, new BackwardLink(source,
+								composition));
+					}
+			}
+		} finally {
+			statistics.forwLinkTime += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
@@ -148,8 +154,7 @@ public class ForwardLink implements Conclusion {
 
 			RuleStatistics timer = ruleEngine.getRulesTimer();
 
-			timer.timeForwardLinkBackwardLinkRule -= CachedTimeThread
-					.currentTimeMillis();
+			timer.timeForwardLinkBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
 
 			timer.countForwardLinkBackwardLinkRule++;
 
@@ -179,8 +184,7 @@ public class ForwardLink implements Conclusion {
 				}
 
 			} finally {
-				timer.timeForwardLinkBackwardLinkRule += CachedTimeThread
-						.currentTimeMillis();
+				timer.timeForwardLinkBackwardLinkRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 

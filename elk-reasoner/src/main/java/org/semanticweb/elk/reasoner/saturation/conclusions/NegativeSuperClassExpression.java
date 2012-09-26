@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * A {@link SuperClassExpression}, for which the structure of the enclosed
@@ -47,22 +48,30 @@ public class NegativeSuperClassExpression extends SuperClassExpression {
 
 	@Override
 	public void apply(RuleEngine ruleEngine, Context context) {
-		if (!storeInContext(context, ruleEngine.getConclusionsCounter()))
-			return;
+		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
+		statistics.superClassExpressionTime -= CachedTimeThread.currentTimeMillis;
+		try {
 
-		// applying all composition rules
-		ContextRules compositionRule = expression.getCompositionRules();
-
-		for (;;) {
-			if (compositionRule == null)
+			if (!storeInContext(context, statistics))
 				return;
-			compositionRule.apply(ruleEngine, context);
-			compositionRule = compositionRule.next();
+
+			// applying all composition rules
+			ContextRules compositionRule = expression.getCompositionRules();
+
+			for (;;) {
+				if (compositionRule == null)
+					return;
+				compositionRule.apply(ruleEngine, context);
+				compositionRule = compositionRule.next();
+			}
+		} finally {
+			statistics.superClassExpressionTime += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
 	@Override
-	public boolean storeInContext(Context context, ConclusionsCounter statistics) {
+	protected boolean storeInContext(Context context,
+			ConclusionsCounter statistics) {
 		statistics.negSuperClassExpressionInfNo++;
 		return super.storeInContext(context, statistics);
 	}

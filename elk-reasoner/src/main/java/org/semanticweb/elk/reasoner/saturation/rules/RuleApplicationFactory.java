@@ -174,15 +174,32 @@ public class RuleApplicationFactory implements
 								.getNegativeSuperClassExpressionInfNo()
 						+ "/"
 						+ aggregatedConclusionsCounter_
-								.getSuperClassExpressionNo());
+								.getSuperClassExpressionNo()
+						+ " ("
+						+ aggregatedConclusionsCounter_
+								.getSuperClassExpressionTime() + " ms)");
 			if (aggregatedConclusionsCounter_.getBackLinkInfNo() > 0)
 				LOGGER_.debug("Backward Links produced/unique: "
 						+ aggregatedConclusionsCounter_.getBackLinkInfNo()
-						+ "/" + aggregatedConclusionsCounter_.getBackLinkNo());
+						+ "/" + aggregatedConclusionsCounter_.getBackLinkNo()
+						+ " ("
+						+ aggregatedConclusionsCounter_.getBackLinkTime()
+						+ " ms)");
 			if (aggregatedConclusionsCounter_.getForwLinkInfNo() > 0)
 				LOGGER_.debug("Forward Links produced/unique: "
 						+ aggregatedConclusionsCounter_.getForwLinkInfNo()
-						+ "/" + aggregatedConclusionsCounter_.getForwLinkNo());
+						+ "/" + aggregatedConclusionsCounter_.getForwLinkNo()
+						+ " ("
+						+ aggregatedConclusionsCounter_.getForwLinkTime()
+						+ " ms)");
+			LOGGER_.debug("Total conclusion processing time: "
+					+ (aggregatedConclusionsCounter_
+							.getSuperClassExpressionTime()
+							+ aggregatedConclusionsCounter_.getBackLinkTime() + aggregatedConclusionsCounter_
+								.getForwLinkTime()) + " ms"
+
+			);
+
 			// RULES STATISTICS:
 			if (aggregatedRuleStats_
 					.getObjectSomeValuesFromCompositionRuleCount() > 0)
@@ -253,6 +270,24 @@ public class RuleApplicationFactory implements
 				LOGGER_.debug("SubClassOf expansion rules: "
 						+ aggregatedRuleStats_.getSubClassOfRuleCount() + " ("
 						+ aggregatedRuleStats_.getSubClassOfRuleTime() + " ms)");
+			LOGGER_.debug("Total rules time: "
+					+ (aggregatedRuleStats_
+							.getObjectSomeValuesFromCompositionRuleTime()
+							+ aggregatedRuleStats_
+									.getObjectSomeValuesFromDecompositionRuleTime()
+							+ aggregatedRuleStats_
+									.getObjectSomeValuesFromBackwardLinkRuleTime()
+							+ aggregatedRuleStats_
+									.getObjectIntersectionOfCompositionRuleTime()
+							+ aggregatedRuleStats_
+									.getObjectIntersectionOfDecompositionRuleTime()
+							+ aggregatedRuleStats_
+									.getForwardLinkBackwardLinkRuleTime()
+							+ aggregatedRuleStats_
+									.getClassDecompositionRuleTime()
+							+ aggregatedRuleStats_
+									.getClassBottomBackwardLinkRuleTime() + aggregatedRuleStats_
+								.getSubClassOfRuleTime()) + " ms");
 		}
 	}
 
@@ -305,8 +340,7 @@ public class RuleApplicationFactory implements
 
 		@Override
 		public void process() {
-			factoryStats_.timeContextProcess -= CachedTimeThread
-					.currentTimeMillis();
+			factoryStats_.timeContextProcess -= CachedTimeThread.currentTimeMillis;
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
@@ -315,8 +349,7 @@ public class RuleApplicationFactory implements
 					break;
 				process(nextContext);
 			}
-			factoryStats_.timeContextProcess += CachedTimeThread
-					.currentTimeMillis();
+			factoryStats_.timeContextProcess += CachedTimeThread.currentTimeMillis;
 		}
 
 		@Override
@@ -407,14 +440,15 @@ public class RuleApplicationFactory implements
 		protected void process(Context context) {
 			factoryStats_.contContextProcess++;
 			for (;;) {
-				Conclusion item = context.takeToDo();
-				if (item == null)
-					break;
-				item.apply(this, context);
+				Conclusion conclusion = context.takeToDo();
+				if (conclusion == null)
+					if (context.deactivate())
+						// context was re-activated
+						continue;
+					else
+						break;
+				conclusion.apply(this, context);
 			}
-			if (context.deactivate())
-				// context was re-activated
-				activeContexts_.add(context);
 		}
 
 		private void initContext(Context context) {
