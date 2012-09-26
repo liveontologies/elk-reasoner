@@ -83,11 +83,20 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
+	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, int increment,
 			int positiveIncrement, int negativeIncrement) {
+		
+		if (occurrenceNo == 0 && increment > 0) {
+			indexUpdater.addClass(elkClass);
+		}
+		
 		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
+		
+		if (occurrenceNo == 0 && increment < 0) {
+			indexUpdater.removeClass(elkClass);
+		}		
 	}
 
 	@Override

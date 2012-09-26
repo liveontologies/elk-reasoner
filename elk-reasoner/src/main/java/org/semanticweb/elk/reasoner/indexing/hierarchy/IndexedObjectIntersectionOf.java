@@ -77,12 +77,13 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
+	protected void updateOccurrenceNumbers(IndexUpdater indexUpdater, int increment,
 			int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			registerContextRules();
+			// FIXME invoke the updater here
 		}
 
 		positiveOccurrenceNo += positiveIncrement;

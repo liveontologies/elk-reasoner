@@ -105,7 +105,7 @@ abstract public class IndexedClassExpression {
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	abstract void updateOccurrenceNumbers(int increment,
+	abstract void updateOccurrenceNumbers(IndexUpdater updater, int increment,
 			int positiveIncrement, int negativeIncrement);
 
 	
@@ -308,9 +308,6 @@ abstract public class IndexedClassExpression {
 
 		@Override
 		public void apply(RuleEngine ruleEngine, Context context) {
-
-			//System.err.println("Disjointness rule: " + IndexedClassExpression.this + " -> " + context.getRoot());
-			
 			if (disjointClasses_ != null
 					&& !new LazySetIntersection<IndexedClassExpression>(
 							disjointClasses_,
