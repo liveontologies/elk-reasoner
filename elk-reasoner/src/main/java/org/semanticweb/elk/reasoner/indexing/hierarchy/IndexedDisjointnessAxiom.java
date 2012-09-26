@@ -22,22 +22,244 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
+ * Defines the disjointness inference rule for indexed class expressions
+ * 
  * @author Frantisek Simancik
+ * @author Pavel Klinov
  * 
  */
-public class IndexedDisjointnessAxiom {
+public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 	private final List<IndexedClassExpression> members_;
+	private final IndexedClassExpression first_;
+	private final IndexedClassExpression second_;
 
 	IndexedDisjointnessAxiom(List<IndexedClassExpression> members) {
-		this.members_ = members;
+		members_ = members;
+		first_ = second_ = null;
+	}
+
+	IndexedDisjointnessAxiom(IndexedClassExpression first,
+			IndexedClassExpression second) {
+		first_ = first;
+		second_ = second;
+		members_ = null;
 	}
 
 	public List<IndexedClassExpression> getMembers() {
-		return members_;
+		return members_ != null ? members_ : Arrays.asList(first_, second_);
 	}
 
+	@Override
+	protected void updateOccurrenceNumbers(int increment) {
+		if (increment > 0) {
+			registerCompositionRule();
+		} else {
+			deregisterCompositionRule();
+		}
+	}
+
+	public void registerCompositionRule() {
+		if (members_ == null) {
+			first_.getChainCompositionRules()
+					.getCreate(ThisCompositionRule.MATCHER_,
+							ThisCompositionRule.FACTORY_)
+					.addDisjointClass(second_);
+			second_.getChainCompositionRules()
+					.getCreate(ThisCompositionRule.MATCHER_,
+							ThisCompositionRule.FACTORY_)
+					.addDisjointClass(first_);
+		}
+
+		else {
+			for (IndexedClassExpression ice : members_) {
+				ice.getChainCompositionRules()
+						.getCreate(ThisCompositionRule.MATCHER_,
+								ThisCompositionRule.FACTORY_)
+						.addDisjointnessAxiom(this);
+			}
+		}
+	}
+
+	public void deregisterCompositionRule() {
+		if (members_ == null) {
+			deregisterBinaryRule(first_, second_);
+			deregisterBinaryRule(second_, first_);
+		} else {
+			for (IndexedClassExpression ice : members_) {
+				deregisterNaryRule(ice);
+			}
+		}
+	}
+
+	private void deregisterBinaryRule(IndexedClassExpression first,
+			IndexedClassExpression second) {
+		Chain<ContextRules> compositionRules = first.getChainCompositionRules();
+		ThisCompositionRule rule = compositionRules
+				.find(ThisCompositionRule.MATCHER_);
+
+		rule.removeDisjointClass(second);
+
+		if (rule.isEmpty()) {
+			compositionRules.remove(ThisCompositionRule.MATCHER_);
+		}
+	}
+
+	private void deregisterNaryRule(IndexedClassExpression ice) {
+		Chain<ContextRules> compositionRules = ice.getChainCompositionRules();
+		ThisCompositionRule rule = compositionRules
+				.find(ThisCompositionRule.MATCHER_);
+
+		rule.removeDisjointnessAxiom(this);
+
+		if (rule.isEmpty()) {
+			compositionRules.remove(ThisCompositionRule.MATCHER_);
+		}
+	}
+
+	/**
+	 * That's the actual disjointness rule which is registered as a context rule
+	 * for class expressions.
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 */
+	private static class ThisCompositionRule extends ContextRules {
+
+		/**
+		 * {@link IndexedClassExpression} that appear in binary disjointess
+		 * axioms with this object.
+		 */
+		private Set<IndexedClassExpression> disjointClasses_;
+
+		/**
+		 * List of all larger (non-binary) disjointness axioms in which this
+		 * object appears.
+		 * 
+		 */
+		private List<IndexedDisjointnessAxiom> disjointnessAxioms_;
+
+		public ThisCompositionRule(ContextRules tail) {
+			super(tail);
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, Context context) {
+
+			// System.err.println("Disjointness rule: " +
+			// IndexedClassExpression.this + " -> " + context.getRoot());
+
+			if (disjointClasses_ != null
+					&& !new LazySetIntersection<IndexedClassExpression>(
+							disjointClasses_,
+							context.getSuperClassExpressions()).isEmpty()) {
+
+				ruleEngine.produce(context, new PositiveSuperClassExpression(
+						ruleEngine.getOwlNothing()));
+				return;
+			}
+
+			if (disjointnessAxioms_ != null)
+				for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
+					if (!context.addDisjointnessAxiom(disAxiom))
+						ruleEngine.produce(
+								context,
+								new PositiveSuperClassExpression(ruleEngine
+										.getOwlNothing()));
+
+		}
+
+		protected boolean isEmpty() {
+			return disjointClasses_ == null && disjointnessAxioms_ == null;
+		}
+
+		protected void addDisjointClass(IndexedClassExpression disjointClass) {
+			if (disjointClasses_ == null) {
+				disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
+			}
+
+			disjointClasses_.add(disjointClass);
+		}
+
+		/**
+		 * @param disjointClass
+		 * @return true if successfully removed
+		 */
+		protected boolean removeDisjointClass(
+				IndexedClassExpression disjointClass) {
+			boolean success = false;
+			if (disjointClasses_ != null) {
+				success = disjointClasses_.remove(disjointClass);
+
+				if (disjointClasses_.isEmpty()) {
+					disjointClasses_ = null;
+				}
+			}
+			return success;
+		}
+
+		protected void addDisjointnessAxiom(
+				IndexedDisjointnessAxiom disjointnessAxiom) {
+			if (disjointnessAxioms_ == null) {
+				disjointnessAxioms_ = new LinkedList<IndexedDisjointnessAxiom>();
+			}
+
+			disjointnessAxioms_.add(disjointnessAxiom);
+		}
+
+		/**
+		 * @param disjointnessAxiom
+		 * @return true if successfully removed
+		 */
+		protected boolean removeDisjointnessAxiom(
+				IndexedDisjointnessAxiom disjointnessAxiom) {
+			boolean success = false;
+
+			if (disjointnessAxioms_ != null) {
+				Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms_
+						.iterator();
+				while (i.hasNext())
+					if (i.next().getMembers()
+							.equals(disjointnessAxiom.getMembers())) {
+						i.remove();
+						break;
+					}
+
+				if (disjointnessAxioms_.isEmpty()) {
+					disjointnessAxioms_ = null;
+				}
+			}
+
+			return success;
+		}
+
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+				ThisCompositionRule.class);
+
+		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule create(ContextRules tail) {
+				return new ThisCompositionRule(tail);
+			}
+		};
+	}
 }
