@@ -12,5 +12,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 public interface IndexChange {
 
-	public boolean apply(IndexedClassExpression target);
+	public boolean add(IndexedClassExpression target);
+	
+	public boolean remove(IndexedClassExpression target);
 }

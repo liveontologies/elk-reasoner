@@ -40,16 +40,23 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	private IndexedClass indexedOwlThing;
 	private IndexedClass indexedOwlNothing;
 
-	private final ElkObjectIndexerVisitor elkObjectIndexer;
-	private final ElkAxiomIndexerVisitor axiomInserter;
-	private final ElkAxiomIndexerVisitor axiomDeleter;
+	private final ElkObjectIndexerVisitor elkObjectIndexer_;
+	private final ElkAxiomIndexerVisitor directAxiomInserter_;
+	private final ElkAxiomIndexerVisitor directAxiomDeleter_;
+	private final ElkAxiomIndexerVisitor incrementalAxiomInserter_;
+	private final ElkAxiomIndexerVisitor incrementalAxiomDeleter_;	
+	
+	private final DifferentialIndex diffIndex_;
 
 	protected Collection<IndexedObjectProperty> reflexiveObjectProperties;
 
 	public OntologyIndexImpl() {
-		this.elkObjectIndexer = new ElkObjectIndexerVisitor(this);
-		this.axiomInserter = new ElkAxiomIndexerVisitor(this, true);
-		this.axiomDeleter = new ElkAxiomIndexerVisitor(this, false);
+		this.diffIndex_ = new DifferentialIndex();
+		this.elkObjectIndexer_ = new ElkObjectIndexerVisitor(this);
+		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(this, new DirectIndexUpdater(), true);
+		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, new DirectIndexUpdater(), false);
+		this.incrementalAxiomInserter_ = new ElkAxiomIndexerVisitor(this, new IncrementalIndexUpdater(diffIndex_), true);
+		this.incrementalAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, new IncrementalIndexUpdater(diffIndex_), false);		
 		indexPredefined();
 	}
 
@@ -65,15 +72,15 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	private void indexPredefined() {
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
-		this.indexedOwlThing = axiomInserter
+		this.indexedOwlThing = directAxiomInserter_
 				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
-		this.indexedOwlNothing = axiomInserter
+		this.indexedOwlNothing = directAxiomInserter_
 				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	@Override
 	public IndexedClassExpression getIndexed(ElkClassExpression representative) {
-		IndexedClassExpression result = representative.accept(elkObjectIndexer);
+		IndexedClassExpression result = representative.accept(elkObjectIndexer_);
 		if (result.occurs())
 			return result;
 		else
@@ -84,7 +91,7 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	public IndexedPropertyChain getIndexed(
 			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression) {
 		IndexedPropertyChain result = elkSubObjectPropertyExpression
-				.accept(elkObjectIndexer);
+				.accept(elkObjectIndexer_);
 		if (result.occurs())
 			return result;
 		else
@@ -154,12 +161,12 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 
 	@Override
 	public ElkAxiomProcessor getAxiomInserter() {
-		return axiomInserter;
+		return directAxiomInserter_;
 	}
 
 	@Override
 	public ElkAxiomProcessor getAxiomDeleter() {
-		return axiomDeleter;
+		return directAxiomDeleter_;
 	}
 
 	@Override
@@ -193,4 +200,15 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 		return indexedOwlNothing;
 	}
 
+	public ElkAxiomProcessor getIncrementalAxiomInserter() {
+		return incrementalAxiomInserter_;
+	}
+
+	public ElkAxiomProcessor getIncrementalAxiomDeleter() {
+		return incrementalAxiomDeleter_;
+	}	
+	
+	public DifferentialIndex getDifferentialIndex() {
+		return diffIndex_;
+	}	
 }

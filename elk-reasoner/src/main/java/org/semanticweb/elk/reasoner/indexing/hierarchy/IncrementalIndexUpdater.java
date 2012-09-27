@@ -22,10 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
-
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
  * An index updater that saves the changes into the {@link DifferentialIndex} object,
@@ -34,20 +31,21 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
  * respective method.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  * 
  */
 public class IncrementalIndexUpdater implements IndexUpdater {
 
-	protected final DifferentialIndex indexChange;
+	private final DifferentialIndex differentialIndex_;
 
-	public IncrementalIndexUpdater(DifferentialIndex indexChange) {
-		this.indexChange = indexChange;
+	public IncrementalIndexUpdater(DifferentialIndex indexChange_) {
+		this.differentialIndex_ = indexChange_;
 	}
 
-	@Override
+	/*@Override
 	public boolean addToldSuperClassExpression(IndexedClassExpression target,
 			IndexedClassExpression superClassExpression) {
-		IndexedClassExpressionChange change = indexChange
+		IndexedClassExpressionChange change = indexChange_
 				.getCreateAdditions(target);
 		if (change.toldSuperClassExpressions == null)
 			change.toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(
@@ -59,7 +57,7 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	public boolean removeToldSuperClassExpression(
 			IndexedClassExpression target,
 			IndexedClassExpression superClassExpression) {
-		IndexedClassExpressionChange change = indexChange
+		IndexedClassExpressionChange change = indexChange_
 				.getCreateDeletions(target);
 		if (change.toldSuperClassExpressions == null)
 			change.toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(
@@ -71,7 +69,7 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	public boolean addNegConjunctionByConjunct(IndexedClassExpression target,
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
-		IndexedClassExpressionChange change = indexChange
+		IndexedClassExpressionChange change = indexChange_
 				.getCreateAdditions(target);
 		if (change.negConjunctionsByConjunct == null)
 			change.negConjunctionsByConjunct = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
@@ -84,7 +82,7 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 			IndexedClassExpression target,
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
-		IndexedClassExpressionChange change = indexChange
+		IndexedClassExpressionChange change = indexChange_
 				.getCreateDeletions(target);
 		if (change.negConjunctionsByConjunct == null)
 			change.negConjunctionsByConjunct = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
@@ -95,7 +93,7 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	@Override
 	public boolean addNegExistential(IndexedClassExpression target,
 			IndexedObjectSomeValuesFrom existential) {
-		IndexedClassExpressionChange change = indexChange
+		IndexedClassExpressionChange change = indexChange_
 				.getCreateAdditions(target);
 		if (change.negExistentials == null)
 			change.negExistentials = new ArrayList<IndexedObjectSomeValuesFrom>(
@@ -106,7 +104,7 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	@Override
 	public boolean removeNegExistential(IndexedClassExpression target,
 			IndexedObjectSomeValuesFrom existential) {
-		IndexedClassExpressionChange change = indexChange
+		IndexedClassExpressionChange change = indexChange_
 				.getCreateDeletions(target);
 		if (change.negExistentials == null)
 			change.negExistentials = new ArrayList<IndexedObjectSomeValuesFrom>(
@@ -136,16 +134,25 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	public boolean removeToldSuperObjectProperty(IndexedPropertyChain target,
 			IndexedObjectProperty superObjectProperty) {
 		return false;
-	}
+	}*/
 
 	@Override
 	public void addClass(ElkClass newClass) {
-		indexChange.addedClasses.add(newClass);
+		differentialIndex_.addedClasses.add(newClass);
 	}
 
 	@Override
 	public void removeClass(ElkClass oldClass) {
-		indexChange.removedClasses.add(oldClass);
+		differentialIndex_.removedClasses.add(oldClass);
 	}
 
+	@Override
+	public boolean add(IndexedClassExpression target, IndexChange change) {
+		return differentialIndex_.getCreateAdditions(target).add(change);
+	}
+
+	@Override
+	public boolean remove(IndexedClassExpression target, IndexChange change) {
+		return differentialIndex_.getCreateDeletions(target).add(change);
+	}
 }

@@ -22,10 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
-
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
  * An index updater through which the fields of expressions are modified
@@ -36,7 +33,7 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
  */
 class DirectIndexUpdater implements IndexUpdater {
 
-	public boolean addToldSuperClassExpression(IndexedClassExpression target,
+/*	public boolean addToldSuperClassExpression(IndexedClassExpression target,
 			IndexedClassExpression superClassExpression) {
 		if (target.toldSuperClassExpressions == null)
 			target.toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(
@@ -132,12 +129,23 @@ class DirectIndexUpdater implements IndexUpdater {
 				target.toldSuperProperties = null;
 		}
 		return success;
-	}
+	}*/
 
+	@Override
 	public void addClass(ElkClass newClass) {
 	}
 
+	@Override
 	public void removeClass(ElkClass oldClass) {
 	}
 
+	@Override
+	public boolean add(IndexedClassExpression target, IndexChange change) {
+		return change.add(target);
+	}
+
+	@Override
+	public boolean remove(IndexedClassExpression target, IndexChange change) {
+		return change.remove(target);
+	}
 }

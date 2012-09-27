@@ -50,6 +50,11 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ElkAxiomIndexerVisitor.class);
+	
+	/**
+	 * The object through which the changes in the index are recorded
+	 */
+	private final IndexUpdater indexUpdater_;	
 
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
@@ -74,8 +79,9 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
 	public ElkAxiomIndexerVisitor(OntologyIndexImpl ontologyIndex,
-			boolean insert) {
+			IndexUpdater updater, boolean insert) {
 		this.ontologyIndex = ontologyIndex;
+		this.indexUpdater_ = updater;
 		this.multiplicity = insert ? 1 : -1;
 		this.neutralIndexer = new ElkObjectIndexerVisitor(
 				new UpdateCacheFilter(multiplicity, 0, 0));
@@ -139,7 +145,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			List<? extends ElkClassExpression> disjointClasses) {
 
 		// treat this as a positive occurrence of owl:Nothing
-		ontologyIndex.getIndexedOwlNothing().updateOccurrenceNumbers(
+		ontologyIndex.getIndexedOwlNothing().updateOccurrenceNumbers(indexUpdater_,
 				multiplicity, multiplicity, 0);
 
 		if (disjointClasses.size() == 2) {
@@ -217,6 +223,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		}
 	}
 
+	
 	/**
 	 * A filter that is applied after the given indexed object has been
 	 * retrieved from the cache. It is used to update the occurrence counts of
@@ -245,8 +252,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			if (!result.occurs() && increment > 0)
 				ontologyIndex.add(result);
 
-			result.updateOccurrenceNumbers(increment, positiveIncrement,
-					negativeIncrement);
+			result.updateOccurrenceNumbers(indexUpdater_, increment,
+					positiveIncrement, negativeIncrement);
 
 			if (!result.occurs() && increment < 0)
 				ontologyIndex.remove(result);

@@ -51,20 +51,20 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	 * are binarized during index construction. The conjuncts may not correspond
 	 * to any ElkClassExpression in the ontology.
 	 */
-	protected final IndexedClassExpression firstConjunct, secondConjunct;
+	private final IndexedClassExpression firstConjunct_, secondConjunct_;
 
 	protected IndexedObjectIntersectionOf(IndexedClassExpression firstConjunct,
 			IndexedClassExpression secondConjunct) {
-		this.firstConjunct = firstConjunct;
-		this.secondConjunct = secondConjunct;
+		this.firstConjunct_ = firstConjunct;
+		this.secondConjunct_ = secondConjunct; 
 	}
 
 	public IndexedClassExpression getFirstConjunct() {
-		return firstConjunct;
+		return firstConjunct_;
 	}
 
 	public IndexedClassExpression getSecondConjunct() {
-		return secondConjunct;
+		return secondConjunct_;
 	}
 
 	public <O> O accept(IndexedObjectIntersectionOfVisitor<O> visitor) {
@@ -82,8 +82,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			registerContextRules();
-			// FIXME invoke the updater here
+			registerContextRules(indexUpdater);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -91,15 +90,15 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
-			deregisterContextRules();
+			deregisterContextRules(indexUpdater);
 		}
 
 	}
 
 	@Override
 	public String toString() {
-		return "ObjectIntersectionOf(" + this.firstConjunct + ' '
-				+ this.secondConjunct + ')';
+		return "ObjectIntersectionOf(" + this.firstConjunct_ + ' '
+				+ this.secondConjunct_ + ')';
 	}
 
 	@Override
@@ -111,42 +110,74 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		try {
 			ruleEngine.produce(context, new PositiveSuperClassExpression(
-					firstConjunct));
+					firstConjunct_));
 			ruleEngine.produce(context, new PositiveSuperClassExpression(
-					secondConjunct));
+					secondConjunct_));
 		} finally {
 			stats.timeObjectIntersectionOfDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
-	public void registerContextRules() {
-		firstConjunct
+	public void registerContextRules(final IndexUpdater indexUpdater) {
+		indexUpdater.add(firstConjunct_, this);
+		indexUpdater.add(secondConjunct_, this);
+	}
+
+	public void deregisterContextRules(final IndexUpdater indexUpdater) {
+		indexUpdater.remove(firstConjunct_, this);
+		indexUpdater.remove(secondConjunct_, this);		
+	}
+
+	private boolean register(
+			Matcher<ContextRules, ThisCompositionRule> matcher,
+			IndexedClassExpression conjunctOne,
+			IndexedClassExpression conjunctTwo) {
+		return conjunctOne
 				.getChainCompositionRules()
 				.getCreate(ThisCompositionRule.MATCHER_,
 						ThisCompositionRule.FACTORY_)
-				.addConjunctionByConjunct(this, secondConjunct);
-		secondConjunct
-				.getChainCompositionRules()
-				.getCreate(ThisCompositionRule.MATCHER_,
-						ThisCompositionRule.FACTORY_)
-				.addConjunctionByConjunct(this, firstConjunct);
+				.addConjunctionByConjunct(this, conjunctTwo);
 	}
-
-	public void deregisterContextRules() {
-		deregister(ThisCompositionRule.MATCHER_, firstConjunct, secondConjunct);
-		deregister(ThisCompositionRule.MATCHER_, secondConjunct, firstConjunct);
-	}
-
-	@SuppressWarnings("static-method")
-	private void deregister(Matcher<ContextRules, ThisCompositionRule> matcher,
+	
+	private boolean deregister(Matcher<ContextRules, ThisCompositionRule> matcher,
 			IndexedClassExpression conjunctOne,
 			IndexedClassExpression conjunctTwo) {
 		Chain<ContextRules> rules = conjunctOne.getChainCompositionRules();
 		ThisCompositionRule rule = rules.find(matcher);
-		rule.removeConjunctionByConjunct(conjunctTwo);
+		boolean changed = rule.removeConjunctionByConjunct(conjunctTwo);
+		
 		if (rule.isEmpty())
 			rules.remove(matcher);
+		
+		return changed;
 	}
+	
+	
+	@Override
+	public boolean add(IndexedClassExpression target) {
+		boolean changed = false;
+
+		if (target == firstConjunct_) {
+			changed |= register(ThisCompositionRule.MATCHER_, target, secondConjunct_);
+		} else if (target == secondConjunct_) {
+			changed |= register(ThisCompositionRule.MATCHER_, target, firstConjunct_);
+		}
+
+		return changed;
+	}
+	
+	@Override
+	public boolean remove(IndexedClassExpression target) {
+		boolean changed = false;
+
+		if (target == firstConjunct_) {
+			changed |= deregister(ThisCompositionRule.MATCHER_, target, secondConjunct_);
+		} else if (target == secondConjunct_) {
+			changed |= deregister(ThisCompositionRule.MATCHER_, target, firstConjunct_);
+		}
+
+		return changed;
+	}	
 
 	private static class ThisCompositionRule extends ContextRules {
 
@@ -158,14 +189,16 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 					4);
 		}
 
-		private void addConjunctionByConjunct(
+		private boolean addConjunctionByConjunct(
 				IndexedObjectIntersectionOf conjunction,
 				IndexedClassExpression conjunct) {
-			conjunctionsByConjunct_.put(conjunct, conjunction);
+			Object previous = conjunctionsByConjunct_.put(conjunct, conjunction);
+			
+			return previous == null || previous != conjunction;
 		}
 
-		private void removeConjunctionByConjunct(IndexedClassExpression conjunct) {
-			conjunctionsByConjunct_.remove(conjunct);
+		private boolean removeConjunctionByConjunct(IndexedClassExpression conjunct) {
+			return conjunctionsByConjunct_.remove(conjunct) != null;
 		}
 
 		/**

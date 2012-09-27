@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
@@ -51,14 +50,14 @@ public class DifferentialIndex {
 	 * indexed class expression to dummy index class expression objects whose
 	 * fields represent the added entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, IndexedClassExpressionChange> indexAdditions;
+	final Map<IndexedClassExpression, List<IndexChange>> indexAdditions;
 
 	/**
 	 * The map representing entries to be removed from the ontology index; it
 	 * maps indexed class expression to dummy index class expression objects
 	 * whose fields represent the removed entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, IndexedClassExpressionChange> indexDeletions;
+	final Map<IndexedClassExpression, List<IndexChange>> indexDeletions;
 
 	/**
 	 * The list of ELK classes to be added to the signature of the ontology; the
@@ -87,7 +86,7 @@ public class DifferentialIndex {
 	 *         objects containing index additions for these class expressions
 	 * 
 	 */
-	public Map<IndexedClassExpression, IndexedClassExpressionChange> getIndexAdditions() {
+	public Map<IndexedClassExpression, List<IndexChange>> getIndexAdditions() {
 		return this.indexAdditions;
 	}
 
@@ -95,7 +94,7 @@ public class DifferentialIndex {
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index deletions for these class expressions
 	 */
-	public Map<IndexedClassExpression, IndexedClassExpressionChange> getIndexDeletions() {
+	public Map<IndexedClassExpression, List<IndexChange>> getIndexDeletions() {
 		return this.indexDeletions;
 	}
 
@@ -109,13 +108,14 @@ public class DifferentialIndex {
 	 * @return the object which contains all index additions for the given
 	 *         indexed class expression
 	 */
-	public IndexedClassExpressionChange getCreateAdditions(
-			IndexedClassExpression target) {
-		IndexedClassExpressionChange result = indexAdditions.get(target);
+	public List<IndexChange> getCreateAdditions(IndexedClassExpression target) {
+		List<IndexChange> result = indexAdditions.get(target);
+
 		if (result == null) {
-			result = new IndexedClassExpressionChange();
+			result = new ArrayList<IndexChange>();
 			indexAdditions.put(target, result);
 		}
+
 		return result;
 	}
 
@@ -129,15 +129,17 @@ public class DifferentialIndex {
 	 * @return the object which contains all index deletions for the given
 	 *         indexed class expression
 	 */
-	public IndexedClassExpressionChange getCreateDeletions(
-			IndexedClassExpression target) {
-		IndexedClassExpressionChange result = indexDeletions.get(target);
+	public List<IndexChange> getCreateDeletions(IndexedClassExpression target) {
+		List<IndexChange> result = indexDeletions.get(target);
+
 		if (result == null) {
-			result = new IndexedClassExpressionChange();
-			indexDeletions.put(target, result);
+			result = new ArrayList<IndexChange>();
+			indexAdditions.put(target, result);
 		}
+
 		return result;
 	}
+
 
 	/**
 	 * @return the list of ELK classes to be added to the signature of the
@@ -156,9 +158,9 @@ public class DifferentialIndex {
 	}
 
 	public DifferentialIndex() {
-		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, IndexedClassExpressionChange>(
+		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, List<IndexChange>>(
 				127);
-		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, IndexedClassExpressionChange>(
+		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, List<IndexChange>>(
 				127);
 		this.addedClasses = new ArrayList<ElkClass>(127);
 		this.removedClasses = new ArrayList<ElkClass>(127);
@@ -169,10 +171,24 @@ public class DifferentialIndex {
 	 * Commits the changes to the indexed objects and clears all changes.
 	 */
 	public void commit() {
-		// TODO: make this code less error-prone
-
 		// commit deletions
 		for (IndexedClassExpression target : indexDeletions.keySet()) {
+			for (IndexChange deletion : indexDeletions.get(target)) {
+				directIndexUpdater.remove(target, deletion);
+			}
+		}
+		
+		indexDeletions.clear();
+		
+		for (IndexedClassExpression target : indexAdditions.keySet()) {
+			for (IndexChange addition : indexAdditions.get(target)) {
+				directIndexUpdater.add(target, addition);
+			}
+		}
+		
+		indexAdditions.clear();
+		
+		/*for (IndexedClassExpression target : indexDeletions.keySet()) {
 			IndexedClassExpressionChange change = indexDeletions.get(target);
 			if (change.toldSuperClassExpressions != null)
 				for (IndexedClassExpression superClassExpression : change.toldSuperClassExpressions) {
@@ -192,7 +208,7 @@ public class DifferentialIndex {
 				}
 		}
 		
-		indexDeletions.clear();
+		
 		// commit additions
 		for (IndexedClassExpression target : indexAdditions.keySet()) {
 			IndexedClassExpressionChange change = indexAdditions.get(target);
@@ -212,7 +228,7 @@ public class DifferentialIndex {
 					directIndexUpdater.addNegExistential(target, existential);
 				}
 		}
-		indexAdditions.clear();
+		indexAdditions.clear();*/
 	}
 
 	public void clearSignatureChange() {

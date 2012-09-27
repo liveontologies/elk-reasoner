@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+
 
 /**
  * Functions through which entries for indexed class expressions are updated.
@@ -30,44 +32,12 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * 
  */
 interface IndexUpdater {
-
-	public boolean apply(final IndexedClassExpression target, final IndexChange change);
-	/*public boolean addToldSuperClassExpression(IndexedClassExpression target,
-			IndexedClassExpression superClassExpression);
-
-	public boolean removeToldSuperClassExpression(
-			IndexedClassExpression target,
-			IndexedClassExpression superClassExpression);
-
-	public boolean addNegConjunctionByConjunct(IndexedClassExpression target,
-			IndexedObjectIntersectionOf conjunction,
-			IndexedClassExpression conjunct);
-
-	public boolean removeNegConjunctionByConjunct(
-			IndexedClassExpression target,
-			IndexedObjectIntersectionOf conjunction,
-			IndexedClassExpression conjunct);
-
-	public boolean addNegExistential(IndexedClassExpression target,
-			IndexedObjectSomeValuesFrom existential);
-
-	public boolean removeNegExistential(IndexedClassExpression target,
-			IndexedObjectSomeValuesFrom existential);
-
-	public boolean addToldSubObjectProperty(IndexedObjectProperty target,
-			IndexedPropertyChain subObjectProperty);
-
-	public boolean removeToldSubObjectProperty(IndexedObjectProperty target,
-			IndexedPropertyChain subObjectProperty);
-
-	public boolean addToldSuperObjectProperty(IndexedPropertyChain target,
-			IndexedObjectProperty superObjectProperty);
-
-	public boolean removeToldSuperObjectProperty(IndexedPropertyChain target,
-			IndexedObjectProperty superObjectProperty);
-
+	
+	public boolean add(final IndexedClassExpression target, final IndexChange change);
+	
+	public boolean remove(final IndexedClassExpression target, final IndexChange change);
+	
 	public void addClass(ElkClass newClass);
 
-	public void removeClass(ElkClass oldClass);*/
-
+	public void removeClass(ElkClass oldClass);	
 }
