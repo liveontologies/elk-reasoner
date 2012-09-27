@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
- * An index updater that saves the changes into the {@link IndexChange} object,
+ * An index updater that saves the changes into the {@link DifferentialIndex} object,
  * instead of immediately applying them for the affected indexed objects. The
  * changes can be committed to the indexed object all at once by calling the
  * respective method.
@@ -38,9 +38,9 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
  */
 public class IncrementalIndexUpdater implements IndexUpdater {
 
-	protected final IndexChange indexChange;
+	protected final DifferentialIndex indexChange;
 
-	public IncrementalIndexUpdater(IndexChange indexChange) {
+	public IncrementalIndexUpdater(DifferentialIndex indexChange) {
 		this.indexChange = indexChange;
 	}
 

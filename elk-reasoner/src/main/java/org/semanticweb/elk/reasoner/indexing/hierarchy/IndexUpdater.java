@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 
 /**
  * Functions through which entries for indexed class expressions are updated.
@@ -32,7 +31,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
  */
 interface IndexUpdater {
 
-	public boolean addToldSuperClassExpression(IndexedClassExpression target,
+	public boolean apply(final IndexedClassExpression target, final IndexChange change);
+	/*public boolean addToldSuperClassExpression(IndexedClassExpression target,
 			IndexedClassExpression superClassExpression);
 
 	public boolean removeToldSuperClassExpression(
@@ -68,6 +68,6 @@ interface IndexUpdater {
 
 	public void addClass(ElkClass newClass);
 
-	public void removeClass(ElkClass oldClass);
+	public void removeClass(ElkClass oldClass);*/
 
 }

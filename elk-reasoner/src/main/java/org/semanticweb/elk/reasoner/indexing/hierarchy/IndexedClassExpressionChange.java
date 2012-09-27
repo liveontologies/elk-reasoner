@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
 /**
  * A dummy class representing changes in the index.
@@ -32,25 +29,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class IndexedClassExpressionChange extends IndexedClassExpression {
+public class IndexedClassExpressionChange implements IndexChange {
 
 	@Override
-	protected void updateOccurrenceNumbers(IndexUpdater indexUpdater,
-			int increment, int positiveIncrement, int negativeIncrement) {
+	public boolean apply(IndexedClassExpression target) {
+		// TODO Auto-generated method stub
+		return false;
 	}
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return null;
-	}
-
-	@Override
-	public String toString() {
-		return null;
-	}
-
-	@Override
-	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-	}
-
 }
+
