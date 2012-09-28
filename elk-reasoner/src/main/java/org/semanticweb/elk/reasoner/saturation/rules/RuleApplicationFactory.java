@@ -110,6 +110,11 @@ public class RuleApplicationFactory implements
 	 */
 	private final ThisStatistics aggregatedFactoryStats_;
 
+	/**
+	 * The number of finished workers;
+	 */
+	private final AtomicInteger workerCount_ = new AtomicInteger(0);
+
 	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
 		this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
@@ -123,7 +128,6 @@ public class RuleApplicationFactory implements
 
 		owlThing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
-
 	}
 
 	@Override
@@ -158,9 +162,10 @@ public class RuleApplicationFactory implements
 			if (approximateContextNumber_.get() > 0)
 				LOGGER_.debug("Contexts created: " + approximateContextNumber_);
 			if (approximateContextNumber_.get() > 0)
-				LOGGER_.debug("Contexts processsing: "
+				LOGGER_.debug("Contexts processing: "
 						+ aggregatedFactoryStats_.contContextProcess + " ("
-						+ aggregatedFactoryStats_.timeContextProcess + " ms)");
+						+ aggregatedFactoryStats_.timeContextProcess
+						/ workerCount_.get() + " ms)");
 			// CONCLUSIONS STATISTICS:
 			if (aggregatedConclusionsCounter_
 					.getPositiveSuperClassExpressionInfNo()
@@ -177,26 +182,28 @@ public class RuleApplicationFactory implements
 								.getSuperClassExpressionNo()
 						+ " ("
 						+ aggregatedConclusionsCounter_
-								.getSuperClassExpressionTime() + " ms)");
+								.getSuperClassExpressionTime()
+						/ workerCount_.get() + " ms)");
 			if (aggregatedConclusionsCounter_.getBackLinkInfNo() > 0)
 				LOGGER_.debug("Backward Links produced/unique: "
 						+ aggregatedConclusionsCounter_.getBackLinkInfNo()
 						+ "/" + aggregatedConclusionsCounter_.getBackLinkNo()
 						+ " ("
 						+ aggregatedConclusionsCounter_.getBackLinkTime()
-						+ " ms)");
+						/ workerCount_.get() + " ms)");
 			if (aggregatedConclusionsCounter_.getForwLinkInfNo() > 0)
 				LOGGER_.debug("Forward Links produced/unique: "
 						+ aggregatedConclusionsCounter_.getForwLinkInfNo()
 						+ "/" + aggregatedConclusionsCounter_.getForwLinkNo()
 						+ " ("
 						+ aggregatedConclusionsCounter_.getForwLinkTime()
-						+ " ms)");
+						/ workerCount_.get() + " ms)");
 			LOGGER_.debug("Total conclusion processing time: "
 					+ (aggregatedConclusionsCounter_
 							.getSuperClassExpressionTime()
 							+ aggregatedConclusionsCounter_.getBackLinkTime() + aggregatedConclusionsCounter_
-								.getForwLinkTime()) + " ms"
+								.getForwLinkTime()) / workerCount_.get()
+					+ " ms"
 
 			);
 
@@ -209,7 +216,7 @@ public class RuleApplicationFactory implements
 						+ " ("
 						+ aggregatedRuleStats_
 								.getObjectSomeValuesFromCompositionRuleTime()
-						+ " ms)");
+						/ workerCount_.get() + " ms)");
 			if (aggregatedRuleStats_
 					.getObjectSomeValuesFromDecompositionRuleCount() > 0)
 				LOGGER_.debug("ObjectSomeValuesFrom decomposition rules: "
@@ -218,7 +225,7 @@ public class RuleApplicationFactory implements
 						+ " ("
 						+ aggregatedRuleStats_
 								.getObjectSomeValuesFromDecompositionRuleTime()
-						+ " ms)");
+						/ workerCount_.get() + " ms)");
 			if (aggregatedRuleStats_
 					.getObjectSomeValuesFromBackwardLinkRuleCount() > 0)
 				LOGGER_.debug("ObjectSomeValuesFrom backward link rules: "
@@ -227,7 +234,7 @@ public class RuleApplicationFactory implements
 						+ " ("
 						+ aggregatedRuleStats_
 								.getObjectSomeValuesFromBackwardLinkRuleTime()
-						+ " ms)");
+						/ workerCount_.get() + " ms)");
 			if (aggregatedRuleStats_
 					.getObjectIntersectionOfCompositionRuleCount() > 0)
 				LOGGER_.debug("ObjectIntersectionOf composition rules: "
@@ -236,7 +243,7 @@ public class RuleApplicationFactory implements
 						+ " ("
 						+ aggregatedRuleStats_
 								.getObjectIntersectionOfCompositionRuleTime()
-						+ " ms)");
+						/ workerCount_.get() + " ms)");
 			if (aggregatedRuleStats_
 					.getObjectIntersectionOfDecompositionRuleCount() > 0)
 				LOGGER_.debug("ObjectIntersectionOf decomposition rules: "
@@ -245,31 +252,34 @@ public class RuleApplicationFactory implements
 						+ " ("
 						+ aggregatedRuleStats_
 								.getObjectIntersectionOfDecompositionRuleTime()
-						+ " ms)");
+						/ workerCount_.get() + " ms)");
 			if (aggregatedRuleStats_.getForwardLinkBackwardLinkRuleCount() > 0)
 				LOGGER_.debug("ForwardLink backward link rules: "
 						+ aggregatedRuleStats_
 								.getForwardLinkBackwardLinkRuleCount()
 						+ " ("
 						+ aggregatedRuleStats_
-								.getForwardLinkBackwardLinkRuleTime() + " ms)");
+								.getForwardLinkBackwardLinkRuleTime()
+						/ workerCount_.get() + " ms)");
 			if (aggregatedRuleStats_.getClassDecompositionRuleCount() > 0)
 				LOGGER_.debug("Class decomposition rules: "
 						+ aggregatedRuleStats_.getClassDecompositionRuleCount()
 						+ " ("
 						+ aggregatedRuleStats_.getClassDecompositionRuleTime()
-						+ "ms)");
+						/ workerCount_.get() + "ms)");
 			if (aggregatedRuleStats_.getClassBottomBackwardLinkRuleCount() > 0)
 				LOGGER_.debug("owl:Nothing backward link rules: "
 						+ aggregatedRuleStats_
 								.getClassBottomBackwardLinkRuleCount()
 						+ " ("
 						+ aggregatedRuleStats_
-								.getClassBottomBackwardLinkRuleTime() + " ms)");
+								.getClassBottomBackwardLinkRuleTime()
+						/ workerCount_.get() + " ms)");
 			if (aggregatedRuleStats_.getSubClassOfRuleCount() > 0)
 				LOGGER_.debug("SubClassOf expansion rules: "
 						+ aggregatedRuleStats_.getSubClassOfRuleCount() + " ("
-						+ aggregatedRuleStats_.getSubClassOfRuleTime() + " ms)");
+						+ aggregatedRuleStats_.getSubClassOfRuleTime()
+						/ workerCount_.get() + " ms)");
 			LOGGER_.debug("Total rules time: "
 					+ (aggregatedRuleStats_
 							.getObjectSomeValuesFromCompositionRuleTime()
@@ -287,7 +297,8 @@ public class RuleApplicationFactory implements
 									.getClassDecompositionRuleTime()
 							+ aggregatedRuleStats_
 									.getClassBottomBackwardLinkRuleTime() + aggregatedRuleStats_
-								.getSubClassOfRuleTime()) + " ms");
+								.getSubClassOfRuleTime()) / workerCount_.get()
+					+ " ms");
 		}
 	}
 
@@ -359,6 +370,7 @@ public class RuleApplicationFactory implements
 			aggregatedConclusionsCounter_.merge(conclusionsCounter_);
 			aggregatedRuleStats_.merge(ruleStats_);
 			aggregatedFactoryStats_.merge(factoryStats_);
+			workerCount_.incrementAndGet();
 		}
 
 		/**
@@ -418,15 +430,16 @@ public class RuleApplicationFactory implements
 		 * Schedule the given item to be processed in the given context
 		 * 
 		 * @param context
-		 *            the context in which the item should be processed
-		 * @param item
-		 *            the item to be processed in the given context
+		 *            the context in which the conclusion is processed
+		 * @param conclusion
+		 *            the conclusion produced in the given context
 		 */
 		@Override
-		public void produce(Context context, Conclusion item) {
+		public void produce(Context context, Conclusion conclusion) {
 			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
-			if (context.addToDo(item))
+				LOGGER_.trace(context.getRoot() + ": new conclusion "
+						+ conclusion);
+			if (context.addToDo(conclusion))
 				// context was activated
 				activeContexts_.add(context);
 		}
