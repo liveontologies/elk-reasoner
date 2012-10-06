@@ -134,6 +134,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		}
 	}
 
+	final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 2;
+
 	@Override
 	public void indexDisjointClassExpressions(
 			List<? extends ElkClassExpression> disjointClasses) {
@@ -142,26 +144,13 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		ontologyIndex.getIndexedOwlNothing().updateOccurrenceNumbers(
 				multiplicity, multiplicity, 0);
 
-		if (disjointClasses.size() == 2) {
-			// the binary case
-			IndexedClassExpression ice0 = disjointClasses.get(0).accept(
-					negativeIndexer);
-			IndexedClassExpression ice1 = disjointClasses.get(1).accept(
-					negativeIndexer);
-
-			(new IndexedDisjointnessAxiom(ice0, ice1))
-					.updateOccurrenceNumbers(multiplicity);
-		} else if (disjointClasses.size() > 2) {
-			// the unary case
-			List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
-					disjointClasses.size());
-			for (ElkClassExpression c : disjointClasses) {
-				indexed.add(c.accept(negativeIndexer));
-			}
-
-			(new IndexedDisjointnessAxiom(indexed))
-					.updateOccurrenceNumbers(multiplicity);
+		List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
+				disjointClasses.size());
+		for (ElkClassExpression c : disjointClasses) {
+			indexed.add(c.accept(negativeIndexer));
 		}
+		(new IndexedDisjointnessAxiom(indexed))
+				.updateOccurrenceNumbers(multiplicity);
 	}
 
 	@Override

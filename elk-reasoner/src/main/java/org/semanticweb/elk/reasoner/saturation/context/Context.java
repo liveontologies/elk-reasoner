@@ -60,11 +60,6 @@ public interface Context {
 	 *         {@link IndexedClassExpression}
 	 */
 	public Set<IndexedClassExpression> getSuperClassExpressions();
-	
-	
-	public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms();
-	
-	public boolean addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * @return the {@link Context}s from which there exists an (implied)
@@ -126,6 +121,8 @@ public interface Context {
 	 *         not thread safe.
 	 */
 	public boolean addSuperClassExpression(SuperClassExpression expression);
+
+	public boolean addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this

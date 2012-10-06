@@ -146,11 +146,6 @@ public class ContextImpl implements Context {
 			return Operations.emptyMultimap();
 		return backwardLinksByObjectProperty_;
 	}
-
-	@Override
-	public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
-		return disjointnessAxioms_;
-	}
 	
 	@Override
 	public boolean addDisjointnessAxiom(
