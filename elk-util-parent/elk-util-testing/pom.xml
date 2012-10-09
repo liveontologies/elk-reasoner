@@ -19,9 +19,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${parent.groupId}</groupId>
 			<artifactId>elk-util-io</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

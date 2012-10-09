@@ -14,35 +14,35 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${parent.groupId}</groupId>
 			<artifactId>elk-standalone</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${parent.version}</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${parent.groupId}</groupId>
 			<artifactId>elk-protege</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${parent.version}</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${parent.groupId}</groupId>
 			<artifactId>elk-owlapi-standalone</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${parent.version}</version>
 			<type>jar</type>
 			<classifier>bin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${parent.groupId}</groupId>
 			<artifactId>elk-owlapi-standalone</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${parent.version}</version>
 			<type>jar</type>
 			<classifier>src</classifier>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${parent.groupId}</groupId>
 			<artifactId>elk-owlapi-standalone</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${parent.version}</version>
 			<type>jar</type>
 			<classifier>lib</classifier>
 		</dependency>
@@ -74,9 +74,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${parent.groupId}</groupId>
 			<artifactId>elk-util-testing</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${parent.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

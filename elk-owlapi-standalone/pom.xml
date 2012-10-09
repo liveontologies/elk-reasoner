@@ -15,9 +15,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${parent.groupId}</groupId>
 			<artifactId>elk-owlapi</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${parent.version}</version>
 		</dependency>
 	</dependencies>
 
