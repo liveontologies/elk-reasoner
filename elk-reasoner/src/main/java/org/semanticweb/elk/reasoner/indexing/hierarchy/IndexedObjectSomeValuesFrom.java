@@ -92,17 +92,18 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement) {
+	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, final int increment,
+			final int positiveIncrement, final int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			registerCompositionRule();
+			registerCompositionRule(indexUpdater);
 		}
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
 			// first positive occurrence of this expression
-			filler.addPosPropertyInExistential(property);
+			//filler.addPosPropertyInExistential(property);
+			indexUpdater.add(filler, new ThisPositiveIndexedObjectSomeValuesFrom());
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -110,23 +111,27 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			deregisterCompositionRule();
+			deregisterCompositionRule(indexUpdater);
 		}
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
 			// no positive occurrences of this expression left
-			filler.removePosPropertyInExistential(property);
+			indexUpdater.remove(filler, new ThisPositiveIndexedObjectSomeValuesFrom());
+			//filler.removePosPropertyInExistential(property);
 		}
 	}
 
-	public void registerCompositionRule() {
-		filler.getChainCompositionRules()
+	public void registerCompositionRule(final IndexUpdater indexUpdater) {
+		indexUpdater.add(filler, this);
+		
+		/*filler.getChainCompositionRules()
 				.getCreate(ThisCompositionRule.MATCHER_,
-						ThisCompositionRule.FACTORY_).addNegExistential(this);
+						ThisCompositionRule.FACTORY_).addNegExistential(this);*/
 	}
 
-	public void deregisterCompositionRule() {
-		Chain<ContextRules> rules = filler.getChainCompositionRules();
+	public void deregisterCompositionRule(final IndexUpdater indexUpdater) {
+		indexUpdater.remove(filler, this);
+		/*Chain<ContextRules> rules = filler.getChainCompositionRules();
 		ThisCompositionRule rule = rules.find(ThisCompositionRule.MATCHER_);
 		if (rule != null) {
 			rule.removeNegExistential(this);
@@ -134,7 +139,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				rules.remove(ThisCompositionRule.MATCHER_);
 		} else {
 			// TODO: throw/log something, this should never happen
-		}
+		}*/
 	}
 
 	@Override
@@ -157,6 +162,38 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			stats.timeObjectSomeValuesFromDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
+	
+	/*
+	 * The next two methods treat this object as a negative ObjectSomeValuesFrom
+	 */
+	@Override
+	public boolean add(IndexedClassExpression target) {
+		return filler
+				.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_,
+						ThisCompositionRule.FACTORY_).addNegExistential(this);
+	}
+
+	@Override
+	public boolean remove(IndexedClassExpression target) {
+		boolean changed = false;		
+		Chain<ContextRules> rules = filler.getChainCompositionRules();
+		ThisCompositionRule rule = rules.find(ThisCompositionRule.MATCHER_);
+		
+		if (rule != null) {
+			changed |= rule.removeNegExistential(this);
+			if (rule.isEmpty()) {
+				rules.remove(ThisCompositionRule.MATCHER_);
+				changed = true;
+			}
+		} else {
+			// TODO: throw/log something, this should never happen
+		}
+		
+		return changed;
+	}
+
+
 
 	private static class ThisCompositionRule extends ContextRules {
 
@@ -168,13 +205,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					1);
 		}
 
-		private void addNegExistential(IndexedObjectSomeValuesFrom existential) {
-			negExistentials_.add(existential);
+		private boolean addNegExistential(IndexedObjectSomeValuesFrom existential) {
+			return negExistentials_.add(existential);
 		}
 
-		private void removeNegExistential(
+		private boolean removeNegExistential(
 				IndexedObjectSomeValuesFrom existential) {
-			negExistentials_.remove(existential);
+			return negExistentials_.remove(existential);
 		}
 
 		/**
@@ -337,4 +374,27 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			}
 		};
 	}
+	
+	/**
+	 * Records a positive occurrence of this SomeValuesFrom expression.
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private class ThisPositiveIndexedObjectSomeValuesFrom implements IndexChange {
+
+		@Override
+		public boolean add(IndexedClassExpression target) {
+			return filler.addPosPropertyInExistential(property);
+		}
+
+		@Override
+		public boolean remove(IndexedClassExpression target) {	
+			return filler.removePosPropertyInExistential(property);
+		}
+	}
+	
+	
+/*	final IndexChange thisPositiveChange_ = new ThisPositiveIndexedObjectSomeValuesFrom();*/
 }

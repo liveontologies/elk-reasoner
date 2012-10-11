@@ -215,24 +215,26 @@ abstract public class IndexedClassExpression implements IndexChange {
 	
 	@Override
 	public boolean add(IndexedClassExpression target) {
-		boolean changed = false;
+/*		boolean changed = false;
 		
 		for (IndexedPropertyChain chain : getPosPropertiesInExistentials()) {
 			changed |= target.addPosPropertyInExistential(chain);
 		}
 		
-		return changed;
+		return changed;*/
+		return false;
 	}
 	
 	@Override
 	public boolean remove(IndexedClassExpression target) {
-		boolean changed = false;
+		/*boolean changed = false;
 		
 		for (IndexedPropertyChain chain : getPosPropertiesInExistentials()) {
 			changed |= target.removePosPropertyInExistential(chain);
 		}
 		
-		return changed;
+		return changed;*/
+		return false;
 	}	
 	
 

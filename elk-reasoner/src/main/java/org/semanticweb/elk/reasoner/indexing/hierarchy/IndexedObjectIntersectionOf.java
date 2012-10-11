@@ -179,6 +179,9 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		return changed;
 	}	
 
+	/**
+	 * 
+	 */
 	private static class ThisCompositionRule extends ContextRules {
 
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;

@@ -46,32 +46,51 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment) {
+	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, final int increment) {
 
 		if (increment > 0) {
-			registerCompositionRule();
+			registerCompositionRule(indexUpdater);
 		} else {
-			deregisterCompositionRule();
+			deregisterCompositionRule(indexUpdater);
 		}
 	}
 
-	public void registerCompositionRule() {
-		subClass.getChainCompositionRules()
+	public void registerCompositionRule(IndexUpdater indexUpdater) {
+		indexUpdater.add(subClass, this);
+	}
+
+	public void deregisterCompositionRule(IndexUpdater indexUpdater) {
+		indexUpdater.remove(subClass, this);
+	}
+
+	@Override
+	public boolean add(IndexedClassExpression target) {
+		return target.getChainCompositionRules()
 				.getCreate(ThisCompositionRule.MATCHER_,
 						ThisCompositionRule.FACTORY_)
 				.addToldSuperClassExpression(superClass);
 	}
 
-	public void deregisterCompositionRule() {
-		Chain<ContextRules> compositionRules = subClass
+	@Override
+	public boolean remove(IndexedClassExpression target) {
+		Chain<ContextRules> compositionRules = target
 				.getChainCompositionRules();
 		ThisCompositionRule rule = compositionRules
 				.find(ThisCompositionRule.MATCHER_);
-		rule.removeToldSuperClassExpression(superClass);
-		if (rule.isEmpty())
+		boolean changed = rule.removeToldSuperClassExpression(superClass);
+		
+		if (rule.isEmpty()) {
 			compositionRules.remove(ThisCompositionRule.MATCHER_);
-	}
-
+			
+			return true;
+		}
+		
+		return changed;
+	}	
+	
+	/**
+	 * 
+	 */
 	private static class ThisCompositionRule extends ContextRules {
 
 		/**
@@ -86,18 +105,18 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 					1);
 		}
 
-		protected void addToldSuperClassExpression(
+		protected boolean addToldSuperClassExpression(
 				IndexedClassExpression superClassExpression) {
-			toldSuperClassExpressions_.add(superClassExpression);
+			return toldSuperClassExpressions_.add(superClassExpression);
 		}
 
 		/**
 		 * @param superClassExpression
 		 * @return true if successfully removed
 		 */
-		protected void removeToldSuperClassExpression(
+		protected boolean removeToldSuperClassExpression(
 				IndexedClassExpression superClassExpression) {
-			toldSuperClassExpressions_.remove(superClassExpression);
+			return toldSuperClassExpressions_.remove(superClassExpression);
 		}
 
 		/**

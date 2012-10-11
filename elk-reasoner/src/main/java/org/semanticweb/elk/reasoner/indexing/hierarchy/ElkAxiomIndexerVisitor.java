@@ -102,7 +102,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 				.accept(positiveIndexer);
 
 		(new IndexedSubClassOfAxiom(subIndexedClass, superIndexedClass))
-				.updateOccurrenceNumbers(multiplicity);
+				.updateOccurrenceNumbers(indexUpdater_, multiplicity);
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedClassExpression indexedType = type.accept(positiveIndexer);
 
 		(new IndexedSubClassOfAxiom(indexedIndividual, indexedType))
-				.updateOccurrenceNumbers(multiplicity);
+				.updateOccurrenceNumbers(indexUpdater_, multiplicity);
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 					negativeIndexer);
 
 			(new IndexedDisjointnessAxiom(ice0, ice1))
-					.updateOccurrenceNumbers(multiplicity);
+					.updateOccurrenceNumbers(indexUpdater_, multiplicity);
 		} else if (disjointClasses.size() > 2) {
 			// the unary case
 			List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
@@ -166,7 +166,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			}
 
 			(new IndexedDisjointnessAxiom(indexed))
-					.updateOccurrenceNumbers(multiplicity);
+					.updateOccurrenceNumbers(indexUpdater_, multiplicity);
 		}
 	}
 

@@ -57,7 +57,7 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
+	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, int increment,
 			int positiveIncrement, int negativeIncrement) {
 		occurrenceNo_ += increment;
 		positiveOccurrenceNo += positiveIncrement;

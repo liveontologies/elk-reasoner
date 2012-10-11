@@ -144,7 +144,11 @@ public class IndexedClass extends IndexedClassEntity {
 	public String toString() {
 		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
 	}
+	
 
+	/**
+	 * 
+	 */
 	private static class BottomBackwardLinkRule extends BackwardLinkRules {
 
 		BottomBackwardLinkRule(BackwardLinkRules tail) {
@@ -179,5 +183,4 @@ public class IndexedClass extends IndexedClassEntity {
 		};
 
 	}
-
 }

@@ -49,7 +49,7 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
+	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, int increment,
 			int positiveIncrement, int negativeIncrement) {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;

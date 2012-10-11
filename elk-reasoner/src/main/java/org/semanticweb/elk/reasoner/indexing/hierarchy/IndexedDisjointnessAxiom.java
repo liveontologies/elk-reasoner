@@ -69,16 +69,19 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment) {
+	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, final int increment) {
 		if (increment > 0) {
-			registerCompositionRule();
+			registerCompositionRule(indexUpdater);
 		} else {
-			deregisterCompositionRule();
+			deregisterCompositionRule(indexUpdater);
 		}
 	}
 
-	public void registerCompositionRule() {
+	public void registerCompositionRule(IndexUpdater indexUpdater) {
 		if (members_ == null) {
+			indexUpdater.add(first_, this);
+			indexUpdater.add(second_, this);
+			
 			first_.getChainCompositionRules()
 					.getCreate(ThisCompositionRule.MATCHER_,
 							ThisCompositionRule.FACTORY_)
@@ -91,6 +94,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		else {
 			for (IndexedClassExpression ice : members_) {
+				indexUpdater.add(ice, this);
+				
 				ice.getChainCompositionRules()
 						.getCreate(ThisCompositionRule.MATCHER_,
 								ThisCompositionRule.FACTORY_)
@@ -99,42 +104,57 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 	}
 
-	public void deregisterCompositionRule() {
+	public void deregisterCompositionRule(IndexUpdater indexUpdater) {
 		if (members_ == null) {
-			deregisterBinaryRule(first_, second_);
-			deregisterBinaryRule(second_, first_);
+			indexUpdater.remove(first_, this);
+			indexUpdater.remove(second_, this);
 		} else {
 			for (IndexedClassExpression ice : members_) {
-				deregisterNaryRule(ice);
+				indexUpdater.remove(ice, this);
 			}
 		}
 	}
 
-	private void deregisterBinaryRule(IndexedClassExpression first,
-			IndexedClassExpression second) {
-		Chain<ContextRules> compositionRules = first.getChainCompositionRules();
-		ThisCompositionRule rule = compositionRules
-				.find(ThisCompositionRule.MATCHER_);
-
-		rule.removeDisjointClass(second);
-
-		if (rule.isEmpty()) {
-			compositionRules.remove(ThisCompositionRule.MATCHER_);
+	@Override
+	public boolean add(IndexedClassExpression target) {
+		if (members_ == null) {
+			return target.getChainCompositionRules()
+			.getCreate(ThisCompositionRule.MATCHER_,
+					ThisCompositionRule.FACTORY_)
+			.addDisjointClass(target == first_ ? second_ : first_);
+		}
+		else {
+			return target.getChainCompositionRules()
+			.getCreate(ThisCompositionRule.MATCHER_,
+					ThisCompositionRule.FACTORY_)
+			.addDisjointnessAxiom(this);
 		}
 	}
 
-	private void deregisterNaryRule(IndexedClassExpression ice) {
-		Chain<ContextRules> compositionRules = ice.getChainCompositionRules();
+	@Override
+	public boolean remove(IndexedClassExpression target) {
+		boolean changed = false;
+		Chain<ContextRules> compositionRules = target.getChainCompositionRules();
 		ThisCompositionRule rule = compositionRules
-				.find(ThisCompositionRule.MATCHER_);
-
-		rule.removeDisjointnessAxiom(this);
-
+				.find(ThisCompositionRule.MATCHER_);		
+		
+		if (members_ == null) {
+			changed = rule.removeDisjointClass(target == first_ ? second_ : first_);
+		}
+		else {
+			changed = rule.removeDisjointnessAxiom(this);
+		}
+		
 		if (rule.isEmpty()) {
 			compositionRules.remove(ThisCompositionRule.MATCHER_);
+			
+			return true;
 		}
-	}
-
+		
+		return changed;
+	}	
+	
+	
 	/**
 	 * That's the actual disjointness rule which is registered as a context rule
 	 * for class expressions.
@@ -192,12 +212,12 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return disjointClasses_ == null && disjointnessAxioms_ == null;
 		}
 
-		protected void addDisjointClass(IndexedClassExpression disjointClass) {
+		protected boolean addDisjointClass(IndexedClassExpression disjointClass) {
 			if (disjointClasses_ == null) {
 				disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
 			}
 
-			disjointClasses_.add(disjointClass);
+			return disjointClasses_.add(disjointClass);
 		}
 
 		/**
@@ -214,16 +234,17 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 					disjointClasses_ = null;
 				}
 			}
+			
 			return success;
 		}
 
-		protected void addDisjointnessAxiom(
+		protected boolean addDisjointnessAxiom(
 				IndexedDisjointnessAxiom disjointnessAxiom) {
 			if (disjointnessAxioms_ == null) {
 				disjointnessAxioms_ = new LinkedList<IndexedDisjointnessAxiom>();
 			}
 
-			disjointnessAxioms_.add(disjointnessAxiom);
+			return disjointnessAxioms_.add(disjointnessAxiom);
 		}
 
 		/**
