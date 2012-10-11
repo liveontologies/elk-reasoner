@@ -15,9 +15,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-cli</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
