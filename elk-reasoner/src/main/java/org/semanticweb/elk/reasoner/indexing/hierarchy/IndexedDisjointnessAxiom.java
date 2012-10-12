@@ -53,7 +53,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	 * {@link ThisNaryCompositionRule}s with the members; otherwise, we register
 	 * {@link ThisBinaryCompositionRule} with the members.
 	 */
-	final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 3;
+	private final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 3;
 
 	private final List<IndexedClassExpression> members_;
 
