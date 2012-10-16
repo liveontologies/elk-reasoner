@@ -45,11 +45,11 @@ public class ContextModificationListener implements RuleApplicationListener {
 	}
 
 	public void notifyCreated(SaturatedClassExpression context) {
-		modifiedContexts.add(context);
+		modifiedContexts.addCompositionRulesTo(context);
 	}
 
 	public void notifyMofidified(SaturatedClassExpression context) {
-		modifiedContexts.add(context);
+		modifiedContexts.addCompositionRulesTo(context);
 
 	}
 

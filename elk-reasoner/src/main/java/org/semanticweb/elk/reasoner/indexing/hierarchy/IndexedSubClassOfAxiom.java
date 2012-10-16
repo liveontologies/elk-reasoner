@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
@@ -34,6 +35,7 @@ import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
+
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -47,46 +49,12 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 	@Override
 	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, final int increment) {
-
 		if (increment > 0) {
-			registerCompositionRule(indexUpdater);
+			indexUpdater.add(subClass, new ThisRegistrationRule());
 		} else {
-			deregisterCompositionRule(indexUpdater);
+			indexUpdater.remove(subClass, new ThisRegistrationRule());
 		}
 	}
-
-	public void registerCompositionRule(IndexUpdater indexUpdater) {
-		indexUpdater.add(subClass, this);
-	}
-
-	public void deregisterCompositionRule(IndexUpdater indexUpdater) {
-		indexUpdater.remove(subClass, this);
-	}
-
-	@Override
-	public boolean add(IndexedClassExpression target) {
-		return target.getChainCompositionRules()
-				.getCreate(ThisCompositionRule.MATCHER_,
-						ThisCompositionRule.FACTORY_)
-				.addToldSuperClassExpression(superClass);
-	}
-
-	@Override
-	public boolean remove(IndexedClassExpression target) {
-		Chain<ContextRules> compositionRules = target
-				.getChainCompositionRules();
-		ThisCompositionRule rule = compositionRules
-				.find(ThisCompositionRule.MATCHER_);
-		boolean changed = rule.removeToldSuperClassExpression(superClass);
-		
-		if (rule.isEmpty()) {
-			compositionRules.remove(ThisCompositionRule.MATCHER_);
-			
-			return true;
-		}
-		
-		return changed;
-	}	
 	
 	/**
 	 * 
@@ -154,5 +122,67 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			}
 		};
 
+		@Override
+		public boolean addTo(Chain<ContextRules> ruleChain) {
+			return addTo(ruleChain, toldSuperClassExpressions_);
+		}
+
+		@Override
+		public boolean removeFrom(Chain<ContextRules> ruleChain) {
+			return removeFrom(ruleChain, toldSuperClassExpressions_);
+		}
+		
+		public static boolean addTo(Chain<ContextRules> ruleChain, List<IndexedClassExpression> superClasses) {
+			ThisCompositionRule rule = ruleChain.getCreate(ThisCompositionRule.MATCHER_, ThisCompositionRule.FACTORY_);
+			boolean changed = false;
+			
+			for (IndexedClassExpression ice : superClasses) {
+				changed |= rule.addToldSuperClassExpression(ice);
+			}
+
+			return changed;
+		}
+
+		static boolean removeFrom(Chain<ContextRules> ruleChain, List<IndexedClassExpression> superClasses) {
+			ThisCompositionRule rule = ruleChain.find(ThisCompositionRule.MATCHER_);
+			boolean changed = false;
+			
+			if (rule != null) {
+				for (IndexedClassExpression ice : superClasses) {
+					changed |= rule.removeToldSuperClassExpression(ice);
+				}
+				
+				if (rule.isEmpty()) {
+					ruleChain.remove(ThisCompositionRule.MATCHER_);
+					
+					return true;
+				}
+			}
+			
+			return changed;
+		}		
+	}
+	
+	/**
+	 * 
+	 */
+	private class ThisRegistrationRule extends ContextRules {
+
+		public ThisRegistrationRule() {
+			super(null);
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, Context element) {}
+
+		@Override
+		public boolean addTo(Chain<ContextRules> ruleChain) {
+			return ThisCompositionRule.addTo(ruleChain, Collections.singletonList(superClass));
+		}
+
+		@Override
+		public boolean removeFrom(Chain<ContextRules> ruleChain) {
+			return ThisCompositionRule.removeFrom(ruleChain, Collections.singletonList(superClass));
+		}
 	}
 }

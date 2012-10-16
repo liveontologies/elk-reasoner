@@ -49,7 +49,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
  */
-abstract public class IndexedClassExpression implements IndexChange {
+abstract public class IndexedClassExpression {
 
 	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
 
@@ -192,8 +192,7 @@ abstract public class IndexedClassExpression implements IndexChange {
 		return hashCode_;
 	}
 
-	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
-
+	
 	Chain<ContextRules> getChainCompositionRules() {
 		return new AbstractChain<ContextRules>() {
 			@Override
@@ -211,33 +210,9 @@ abstract public class IndexedClassExpression implements IndexChange {
 	public ContextRules getCompositionRules() {
 		return compositionRules;
 	}
-	
-	
-	@Override
-	public boolean add(IndexedClassExpression target) {
-/*		boolean changed = false;
-		
-		for (IndexedPropertyChain chain : getPosPropertiesInExistentials()) {
-			changed |= target.addPosPropertyInExistential(chain);
-		}
-		
-		return changed;*/
-		return false;
-	}
-	
-	@Override
-	public boolean remove(IndexedClassExpression target) {
-		/*boolean changed = false;
-		
-		for (IndexedPropertyChain chain : getPosPropertiesInExistentials()) {
-			changed |= target.removePosPropertyInExistential(chain);
-		}
-		
-		return changed;*/
-		return false;
-	}	
-	
 
 	@Override
 	public abstract String toString();
+	
+	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);	
 }

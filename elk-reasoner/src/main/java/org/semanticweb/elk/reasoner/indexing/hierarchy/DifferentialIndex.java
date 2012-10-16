@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.saturation.rules.BaseContextRuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
@@ -50,14 +52,14 @@ public class DifferentialIndex {
 	 * indexed class expression to dummy index class expression objects whose
 	 * fields represent the added entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, List<IndexChange>> indexAdditions;
+	final Map<IndexedClassExpression, BaseContextRuleChain> indexAdditions;
 
 	/**
 	 * The map representing entries to be removed from the ontology index; it
 	 * maps indexed class expression to dummy index class expression objects
 	 * whose fields represent the removed entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, List<IndexChange>> indexDeletions;
+	final Map<IndexedClassExpression, BaseContextRuleChain> indexDeletions;
 
 	/**
 	 * The list of ELK classes to be added to the signature of the ontology; the
@@ -76,17 +78,11 @@ public class DifferentialIndex {
 	final List<ElkClass> removedClasses;
 
 	/**
-	 * The index updater which is used to commit all saved changes to the
-	 * respective objects;
-	 */
-	final IndexUpdater directIndexUpdater;
-
-	/**
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index additions for these class expressions
 	 * 
 	 */
-	public Map<IndexedClassExpression, List<IndexChange>> getIndexAdditions() {
+	public Map<IndexedClassExpression, BaseContextRuleChain> getIndexAdditions() {
 		return this.indexAdditions;
 	}
 
@@ -94,7 +90,7 @@ public class DifferentialIndex {
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index deletions for these class expressions
 	 */
-	public Map<IndexedClassExpression, List<IndexChange>> getIndexDeletions() {
+	public Map<IndexedClassExpression, BaseContextRuleChain> getIndexDeletions() {
 		return this.indexDeletions;
 	}
 
@@ -108,15 +104,18 @@ public class DifferentialIndex {
 	 * @return the object which contains all index additions for the given
 	 *         indexed class expression
 	 */
-	public List<IndexChange> getCreateAdditions(IndexedClassExpression target) {
-		List<IndexChange> result = indexAdditions.get(target);
+	public boolean registerAdditions(IndexedClassExpression target, ContextRules rules) {
+		BaseContextRuleChain result = indexAdditions.get(target);
 
 		if (result == null) {
-			result = new ArrayList<IndexChange>();
+			result = new BaseContextRuleChain();
 			indexAdditions.put(target, result);
+			
+			return true;
 		}
-
-		return result;
+		else {
+			return rules.addTo(result);	
+		}
 	}
 
 	/**
@@ -129,15 +128,18 @@ public class DifferentialIndex {
 	 * @return the object which contains all index deletions for the given
 	 *         indexed class expression
 	 */
-	public List<IndexChange> getCreateDeletions(IndexedClassExpression target) {
-		List<IndexChange> result = indexDeletions.get(target);
+	public boolean registerDeletions(IndexedClassExpression target, ContextRules rules) {
+		BaseContextRuleChain result = indexDeletions.get(target);
 
 		if (result == null) {
-			result = new ArrayList<IndexChange>();
+			result = new BaseContextRuleChain();
 			indexAdditions.put(target, result);
+			
+			return true;
 		}
-
-		return result;
+		else {
+			return rules.addTo(result);	
+		}
 	}
 
 
@@ -158,13 +160,12 @@ public class DifferentialIndex {
 	}
 
 	public DifferentialIndex() {
-		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, List<IndexChange>>(
+		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, BaseContextRuleChain>(
 				127);
-		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, List<IndexChange>>(
+		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, BaseContextRuleChain>(
 				127);
 		this.addedClasses = new ArrayList<ElkClass>(127);
 		this.removedClasses = new ArrayList<ElkClass>(127);
-		this.directIndexUpdater = new DirectIndexUpdater();
 	}
 
 	/**
@@ -173,17 +174,13 @@ public class DifferentialIndex {
 	public void commit() {
 		// commit deletions
 		for (IndexedClassExpression target : indexDeletions.keySet()) {
-			for (IndexChange deletion : indexDeletions.get(target)) {
-				directIndexUpdater.remove(target, deletion);
-			}
+			indexDeletions.get(target).next().removeFrom(target.getChainCompositionRules());
 		}
 		
 		indexDeletions.clear();
 		
 		for (IndexedClassExpression target : indexAdditions.keySet()) {
-			for (IndexChange addition : indexAdditions.get(target)) {
-				directIndexUpdater.add(target, addition);
-			}
+			indexAdditions.get(target).next().addTo(target.getChainCompositionRules());			
 		}
 		
 		indexAdditions.clear();

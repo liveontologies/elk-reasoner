@@ -82,7 +82,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			registerContextRules(indexUpdater);
+			indexUpdater.add(firstConjunct_, new ThisRegistrationRule(secondConjunct_));
+			indexUpdater.add(secondConjunct_, new ThisRegistrationRule(firstConjunct_));
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -90,7 +91,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
-			deregisterContextRules(indexUpdater);
+			indexUpdater.remove(firstConjunct_, new ThisRegistrationRule(secondConjunct_));
+			indexUpdater.remove(secondConjunct_, new ThisRegistrationRule(firstConjunct_));
 		}
 
 	}
@@ -118,66 +120,6 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 	}
 
-	public void registerContextRules(final IndexUpdater indexUpdater) {
-		indexUpdater.add(firstConjunct_, this);
-		indexUpdater.add(secondConjunct_, this);
-	}
-
-	public void deregisterContextRules(final IndexUpdater indexUpdater) {
-		indexUpdater.remove(firstConjunct_, this);
-		indexUpdater.remove(secondConjunct_, this);		
-	}
-
-	private boolean register(
-			Matcher<ContextRules, ThisCompositionRule> matcher,
-			IndexedClassExpression conjunctOne,
-			IndexedClassExpression conjunctTwo) {
-		return conjunctOne
-				.getChainCompositionRules()
-				.getCreate(ThisCompositionRule.MATCHER_,
-						ThisCompositionRule.FACTORY_)
-				.addConjunctionByConjunct(this, conjunctTwo);
-	}
-	
-	private boolean deregister(Matcher<ContextRules, ThisCompositionRule> matcher,
-			IndexedClassExpression conjunctOne,
-			IndexedClassExpression conjunctTwo) {
-		Chain<ContextRules> rules = conjunctOne.getChainCompositionRules();
-		ThisCompositionRule rule = rules.find(matcher);
-		boolean changed = rule.removeConjunctionByConjunct(conjunctTwo);
-		
-		if (rule.isEmpty())
-			rules.remove(matcher);
-		
-		return changed;
-	}
-	
-	
-	@Override
-	public boolean add(IndexedClassExpression target) {
-		boolean changed = false;
-
-		if (target == firstConjunct_) {
-			changed |= register(ThisCompositionRule.MATCHER_, target, secondConjunct_);
-		} else if (target == secondConjunct_) {
-			changed |= register(ThisCompositionRule.MATCHER_, target, firstConjunct_);
-		}
-
-		return changed;
-	}
-	
-	@Override
-	public boolean remove(IndexedClassExpression target) {
-		boolean changed = false;
-
-		if (target == firstConjunct_) {
-			changed |= deregister(ThisCompositionRule.MATCHER_, target, secondConjunct_);
-		} else if (target == secondConjunct_) {
-			changed |= deregister(ThisCompositionRule.MATCHER_, target, firstConjunct_);
-		}
-
-		return changed;
-	}	
 
 	/**
 	 * 
@@ -191,7 +133,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);
 		}
-
+		
 		private boolean addConjunctionByConjunct(
 				IndexedObjectIntersectionOf conjunction,
 				IndexedClassExpression conjunct) {
@@ -242,5 +184,72 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 				return new ThisCompositionRule(tail);
 			}
 		};
+
+		@Override
+		public boolean addTo(Chain<ContextRules> ruleChain) {
+			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
+			boolean changed = false;
+			
+			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : conjunctionsByConjunct_.entrySet()) {
+				changed |= rule.addConjunctionByConjunct(entry.getValue(), entry.getKey());
+			}
+			
+			return changed;
+		}
+
+		@Override
+		public boolean removeFrom(Chain<ContextRules> ruleChain) {
+			ThisCompositionRule rule = ruleChain.find(MATCHER_);
+			boolean changed = false;
+			
+			if (rule != null) {
+				for (IndexedClassExpression conjunct : conjunctionsByConjunct_.keySet()) {
+					changed |= rule.removeConjunctionByConjunct(conjunct);
+				}
+				
+				if (rule.isEmpty()) {
+					ruleChain.remove(MATCHER_);
+				}
+			}
+			
+			return changed;
+		}
+	}
+	
+	/**
+	 * Used only to add or remove this conjunct to an existing composition rule.
+	 */
+	private class ThisRegistrationRule extends ContextRules {
+
+		private final IndexedClassExpression conjunct_;
+		
+		private ThisRegistrationRule(IndexedClassExpression conjunct) {
+			super(null);
+			conjunct_ = conjunct;
+		}
+		
+		@Override
+		public void apply(RuleEngine ruleEngine, Context element) {}
+
+		@Override
+		public boolean addTo(Chain<ContextRules> ruleChain) {
+			return ruleChain.getCreate(ThisCompositionRule.MATCHER_, ThisCompositionRule.FACTORY_).addConjunctionByConjunct(IndexedObjectIntersectionOf.this, conjunct_);			
+		}
+
+		@Override
+		public boolean removeFrom(Chain<ContextRules> ruleChain) {
+			ThisCompositionRule rule = ruleChain.find(ThisCompositionRule.MATCHER_);
+			boolean changed = false;
+			
+			if (rule != null) {
+				changed = rule.removeConjunctionByConjunct(conjunct_);
+				
+				if (rule.isEmpty()) {
+					ruleChain.remove(ThisCompositionRule.MATCHER_);
+				}
+			}
+			
+			return changed;
+		}
 	}
 }

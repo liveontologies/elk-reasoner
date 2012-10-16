@@ -3,6 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+
 /**
  * Represents a single change to the index
  * 
@@ -12,7 +13,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 public interface IndexChange {
 
-	public boolean add(IndexedClassExpression target);
+	//public boolean addTo(Chain<ContextRules> targetRules);
 	
-	public boolean remove(IndexedClassExpression target);
+	//public boolean removeFrom(Chain<ContextRules> targetRules);
 }

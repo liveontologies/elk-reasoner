@@ -47,4 +47,19 @@ public abstract class ContextRules extends ChainImpl<ContextRules> implements
 		super(tail);
 	}
 
+	/**
+	 * Adds these rules to the given chain
+	 * 
+	 * @param ruleChain
+	 * @return
+	 */
+	public abstract boolean addTo(Chain<ContextRules> ruleChain);
+	
+	/**
+	 * Removes these rules from the given chain
+	 * 
+	 * @param ruleChain
+	 * @return
+	 */
+	public abstract boolean removeFrom(Chain<ContextRules> ruleChain);
 }
