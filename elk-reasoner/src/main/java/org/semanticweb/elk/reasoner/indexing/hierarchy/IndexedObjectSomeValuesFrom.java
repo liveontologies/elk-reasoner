@@ -357,7 +357,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 			try {
 				for (IndexedClassExpression carry : propagationsByObjectProperty_
-						.get(link.getReltaion()))
+						.get(link.getRelation()))
 					ruleEngine.produce(link.getSource(),
 							new NegativeSuperClassExpression(carry));
 			} finally {

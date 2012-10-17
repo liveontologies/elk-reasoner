@@ -34,8 +34,12 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
@@ -128,7 +132,7 @@ public class RuleApplicationFactory implements
 
 	@Override
 	public Engine getEngine() {
-		return new Engine();
+		return new Engine(new AddConclusionVisitor());
 	}
 
 	@Override
@@ -312,25 +316,28 @@ public class RuleApplicationFactory implements
 	public class Engine implements InputProcessor<IndexedClassExpression>,
 			RuleEngine {
 
+		protected final ConclusionVisitor<Boolean> conclusionVisitor_;
+		
 		/**
 		 * Local {@link ConclusionsCounter} created for every worker
 		 */
-		private final ConclusionsCounter conclusionsCounter_ = new ConclusionsCounter();
+		protected final ConclusionsCounter conclusionsCounter_ = new ConclusionsCounter();
 		/**
 		 * Local {@link RuleStatistics} created for every worker
 		 */
-		private final RuleStatistics ruleStats_ = new RuleStatistics();
+		protected final RuleStatistics ruleStats_ = new RuleStatistics();
 		/**
 		 * Local {@link ThisStatistics} created for every worker
 		 */
-		private final ThisStatistics factoryStats_ = new ThisStatistics();
+		protected final ThisStatistics factoryStats_ = new ThisStatistics();
 		/**
 		 * Worker-local counter for the number of created contexts
 		 */
 		private int localContextNumber = 0;
 
 		// don't allow creating of engines directly; only through the factory
-		private Engine() {
+		protected Engine(ConclusionVisitor<Boolean> visitor) {
+			conclusionVisitor_ = visitor;
 		}
 
 		@Override
@@ -461,15 +468,65 @@ public class RuleApplicationFactory implements
 				produce(context, new PositiveSuperClassExpression(owlThing));
 		}
 
+		@Override
+		public boolean updateContext(Context context, Conclusion conclusion) {
+			return conclusion.accept(conclusionVisitor_, context);
+		}
 	}
+	
+	/**
+	 * Used to add different kinds of conclusions to the context
+	 */
+	protected static class AddConclusionVisitor implements ConclusionVisitor<Boolean> {
 
+		@Override
+		public Boolean visit(NegativeSuperClassExpression negSCE,
+				Context context) {
+			
+			if (context.addSuperClassExpression(negSCE)) {
+				//statistics_.superClassExpressionNo++;
+				//statistics_.negSuperClassExpressionInfNo++;
+				return true;
+			}
+			
+			return false;
+		}
+
+		@Override
+		public Boolean visit(PositiveSuperClassExpression posSCE,
+				Context context) {
+			if (context.addSuperClassExpression(posSCE)) {
+				//statistics_.superClassExpressionNo++;
+				//statistics_.posSuperClassExpressionInfNo++;
+				return true;
+			}
+			
+			return false;
+		}
+
+		@Override
+		public Boolean visit(BackwardLink link, Context context) {
+			//statistics_.backLinkInfNo++;
+			return !context.addBackwardLink(link);
+			//statistics_.backLinkNo++;
+		}
+
+		@Override
+		public Boolean visit(ForwardLink link, Context context) {
+			//statistics_.forwLinkInfNo++;
+			return link.addToContextBackwardLinkRule(context);
+			//statistics_.forwLinkNo++;
+		}
+	}
+	
+	
 	/**
 	 * Counters accumulating statistical information about this factory.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private static class ThisStatistics {
+	protected static class ThisStatistics {
 		/**
 		 * the number of times a context has been processed using
 		 * {@link Engine#process(Context)}

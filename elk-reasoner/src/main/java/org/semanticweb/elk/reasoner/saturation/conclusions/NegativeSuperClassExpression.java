@@ -52,8 +52,9 @@ public class NegativeSuperClassExpression extends SuperClassExpression {
 		statistics.superClassExpressionTime -= CachedTimeThread.currentTimeMillis;
 		try {
 
-			if (!storeInContext(context, statistics))
+			if (!ruleEngine.updateContext(context, this)) {
 				return;
+			}
 
 			// applying all composition rules
 			ContextRules compositionRule = expression.getCompositionRules();
@@ -68,11 +69,9 @@ public class NegativeSuperClassExpression extends SuperClassExpression {
 			statistics.superClassExpressionTime += CachedTimeThread.currentTimeMillis;
 		}
 	}
-
+	
 	@Override
-	protected boolean storeInContext(Context context,
-			ConclusionsCounter statistics) {
-		statistics.negSuperClassExpressionInfNo++;
-		return super.storeInContext(context, statistics);
-	}
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}	
 }

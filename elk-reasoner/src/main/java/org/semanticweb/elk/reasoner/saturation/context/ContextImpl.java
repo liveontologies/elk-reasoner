@@ -183,6 +183,21 @@ public class ContextImpl implements Context {
 			backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
 		return backwardLinksByObjectProperty_.add(relation, source);
 	}
+	
+	@Override
+	public boolean removeBackwardLink(BackwardLink link) {
+		boolean changed = false;
+		
+		if (backwardLinksByObjectProperty_ != null) {
+			changed = backwardLinksByObjectProperty_.remove(link.getRelation(), link.getSource());
+			
+			if (backwardLinksByObjectProperty_.isEmpty()) {
+				backwardLinksByObjectProperty_ = null;
+			}
+		}
+
+		return changed;
+	}
 
 	@Override
 	public boolean addSuperClassExpression(SuperClassExpression expression) {
@@ -191,6 +206,11 @@ public class ContextImpl implements Context {
 					+ ": adding a superclass to a saturated context: "
 					+ expression);
 		return superClassExpressions_.add(expression.getExpression());
+	}
+	
+	@Override
+	public boolean removeSuperClassExpression(SuperClassExpression expression) {
+		return superClassExpressions_.remove(expression.getExpression());
 	}
 
 	@Override

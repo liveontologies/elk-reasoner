@@ -74,15 +74,9 @@ public class ForwardLink implements Conclusion {
 		statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
 		try {
 
-			statistics.forwLinkInfNo++;
-
-			if (!context
-					.getBackwardLinkRulesChain()
-					.getCreate(ThisBackwardLinkRule.MATCHER_,
-							ThisBackwardLinkRule.FACTORY_).addForwardLink(this))
+			if (!ruleEngine.updateContext(context, this)) {
 				return;
-
-			statistics.forwLinkNo++;
+			}
 
 			/* compose the link with all backward links */
 			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
@@ -106,6 +100,25 @@ public class ForwardLink implements Conclusion {
 		} finally {
 			statistics.forwLinkTime += CachedTimeThread.currentTimeMillis;
 		}
+	}
+	
+	@Override
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}	
+	
+	public boolean addToContextBackwardLinkRule(Context context) {
+		return context
+				.getBackwardLinkRulesChain()
+				.getCreate(ThisBackwardLinkRule.MATCHER_,
+						ThisBackwardLinkRule.FACTORY_).addForwardLink(this);
+	}
+	
+	public boolean removeFromContextBackwardLinkRule(Context context) {
+		ThisBackwardLinkRule rule = context.getBackwardLinkRulesChain().find(
+				ThisBackwardLinkRule.MATCHER_);
+
+		return rule != null ? rule.removeForwardLink(this) : false;
 	}
 
 	/**
@@ -148,6 +161,11 @@ public class ForwardLink implements Conclusion {
 			return forwardLinksByObjectProperty_.add(link.relation_,
 					link.target_);
 		}
+		
+		private boolean removeForwardLink(ForwardLink link) {
+			return forwardLinksByObjectProperty_.remove(link.relation_,
+					link.target_);
+		}		
 
 		@Override
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {
@@ -162,7 +180,7 @@ public class ForwardLink implements Conclusion {
 
 				/* compose the link with all forward links */
 				final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
-						.getReltaion().getSaturated()
+						.getRelation().getSaturated()
 						.getCompositionsByRightSubProperty();
 				if (comps == null)
 					return;

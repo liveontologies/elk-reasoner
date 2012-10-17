@@ -56,27 +56,6 @@ public abstract class SuperClassExpression implements Conclusion {
 		return expression;
 	}
 
-	/**
-	 * saves this {@link SuperClassExpression} in the given {@link Context} and
-	 * updates the information in the provided {@link ConclusionsCounter}
-	 * 
-	 * @param context
-	 *            the {@link Context} in which the given
-	 *            {@link SuperClassExpression} is saved
-	 * @param statistics
-	 *            the object used to update the statistical information about
-	 *            {@link SuperClassExpression}s
-	 * @return
-	 */
-	protected boolean storeInContext(Context context,
-			ConclusionsCounter statistics) {
-		if (context.addSuperClassExpression(this)) {
-			statistics.superClassExpressionNo++;
-			return true;
-		}
-		return false;
-	}
-
 	@Override
 	public String toString() {
 		return expression.toString();

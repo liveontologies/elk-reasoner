@@ -52,8 +52,9 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 		statistics.superClassExpressionTime -= CachedTimeThread.currentTimeMillis;
 		try {
 
-			if (!storeInContext(context, statistics))
+			if (!ruleEngine.updateContext(context, this)) {
 				return;
+			}
 
 			// apply decomposition rules
 			expression.applyDecompositionRule(ruleEngine, context);
@@ -73,10 +74,7 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 	}
 
 	@Override
-	protected boolean storeInContext(Context context,
-			ConclusionsCounter statistics) {
-		statistics.posSuperClassExpressionInfNo++;
-		return super.storeInContext(context, statistics);
-	}
-
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}	
 }

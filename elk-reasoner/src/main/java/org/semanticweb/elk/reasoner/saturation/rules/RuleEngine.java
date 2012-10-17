@@ -81,4 +81,15 @@ public interface RuleEngine {
 	 */
 	public RuleStatistics getRulesTimer();
 
+	/**
+	 * Places/removes this conclusion into the context's internal data
+	 * structures, e.g., superclasses or backward links. Has been introduced to
+	 * abstract rules from what the engine is actually doing, e.g., saturating
+	 * to de-saturating contexts.
+	 * 
+	 * @param context
+	 * @param conclusion
+	 * @return
+	 */
+	public boolean updateContext(Context context, Conclusion conclusion);
 }

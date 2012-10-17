@@ -75,15 +75,6 @@ public class BackwardLink implements Conclusion {
 		return source_;
 	}
 
-	/**
-	 * @return the {@link IndexedPropertyChain} of this {@link BackwardLink}
-	 *         which is used in the existential restriction corresponding to
-	 *         this {@link BackwardLink}
-	 * 
-	 */
-	public IndexedPropertyChain getReltaion() {
-		return relation_;
-	}
 
 	@Override
 	public void apply(RuleEngine ruleEngine, Context context) {
@@ -91,12 +82,10 @@ public class BackwardLink implements Conclusion {
 		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
 		try {
-			statistics.backLinkInfNo++;
-
-			if (!context.addBackwardLink(this))
+			
+			if (!ruleEngine.updateContext(context, this)) {
 				return;
-
-			statistics.backLinkNo++;
+			}
 
 			// apply all backward link rules of the context
 			BackwardLinkRules rules = context.getBackwardLinkRules();
@@ -130,4 +119,8 @@ public class BackwardLink implements Conclusion {
 		return (relation_ + "<-" + source_.getRoot());
 	}
 
+	@Override
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}
 }

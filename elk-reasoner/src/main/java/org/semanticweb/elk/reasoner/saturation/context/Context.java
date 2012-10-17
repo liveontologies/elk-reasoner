@@ -113,6 +113,13 @@ public interface Context {
 	 *         safe.
 	 */
 	public boolean addBackwardLink(BackwardLink link);
+	
+	/**
+	 * TODO
+	 * @param link
+	 * @return
+	 */
+	public boolean removeBackwardLink(BackwardLink link);
 
 	/**
 	 * Adds the given {@link SuperClassExpression} to this {@link Context}.
@@ -126,6 +133,13 @@ public interface Context {
 	 *         not thread safe.
 	 */
 	public boolean addSuperClassExpression(SuperClassExpression expression);
+	
+	/**
+	 * TODO
+	 * @param expression
+	 * @return
+	 */
+	public boolean removeSuperClassExpression(SuperClassExpression expression);
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this

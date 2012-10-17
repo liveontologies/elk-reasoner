@@ -37,7 +37,5 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  */
 public interface Conclusion extends Rule<Context> {
 
-	// it is only require that a conclusion is able to be applied, that is,
-	// processed within a context
-
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context);
 }
