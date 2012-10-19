@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 
 /**
@@ -145,6 +146,16 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	@Override
 	public void removeClass(ElkClass oldClass) {
 		differentialIndex_.removedClasses.add(oldClass);
+	}
+	
+	@Override
+	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
+		differentialIndex_.addedIndividuals.add(newIndividual);
+	}
+
+	@Override
+	public void removeNamedIndividual(ElkNamedIndividual newIndividual) {
+		differentialIndex_.removedIndividuals.remove(newIndividual);
 	}
 
 	@Override

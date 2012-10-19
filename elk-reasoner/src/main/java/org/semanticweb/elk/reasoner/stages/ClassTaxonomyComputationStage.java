@@ -44,7 +44,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private ClassTaxonomyComputation computation_ = null;
+	protected ClassTaxonomyComputation computation_ = null;
 
 	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);

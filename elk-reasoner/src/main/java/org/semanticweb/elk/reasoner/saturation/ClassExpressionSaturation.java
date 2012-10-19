@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -42,23 +43,33 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ClassExpressionSaturation<I extends IndexedClassExpression>
 		extends
-		ReasonerComputation<SaturationJob<I>, ClassExpressionSaturationFactory<SaturationJob<I>>.Engine, ClassExpressionSaturationFactory<SaturationJob<I>>> {
+		ReasonerComputation<SaturationJob<I>, ClassExpressionSaturationFactory<SaturationJob<I>>> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturation.class);
 
 	public ClassExpressionSaturation(Collection<I> inputs,
-			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+			ComputationExecutor executor,
+			int maxWorkers,
+			ProgressMonitor progressMonitor,
+			OntologyIndex ontologyIndex) {
+		this(inputs, executor, maxWorkers, progressMonitor, new RuleApplicationFactory(ontologyIndex));
+	}
+	
+	public ClassExpressionSaturation(Collection<I> inputs,
+			ComputationExecutor executor,
+			int maxWorkers,
+			ProgressMonitor progressMonitor,
+			RuleApplicationFactory ruleAppFactory) {
 		super(
 				new TodoJobs<I>(inputs),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(
-						ontologyIndex,
+						ruleAppFactory,
 						maxWorkers,
-						new DummyClassExpressionSaturationListener<SaturationJob<I>, ClassExpressionSaturationFactory<SaturationJob<I>>.Engine>()),
+						new DummyClassExpressionSaturationListener<SaturationJob<I>>()),
 				executor, maxWorkers, progressMonitor);
-	}
+	}	
 
 	/**
 	 * Print statistics about the saturation computation

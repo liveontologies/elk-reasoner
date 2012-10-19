@@ -118,7 +118,7 @@ public class ClassTaxonomyComputationFactory implements
 	 */
 	private class ThisTransitiveReductionListener
 			implements
-			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>, TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>.Engine> {
+			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>> {
 
 		@Override
 		public void notifyFinished(TransitiveReductionJob<IndexedClass> job)

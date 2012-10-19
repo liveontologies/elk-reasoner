@@ -59,7 +59,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
 	 */
-	private final OntologyIndexImpl ontologyIndex;
+	private final IndexedObjectCache ontologyIndex;
 
 	/**
 	 * 1 if adding axioms, -1 if removing axioms
@@ -74,13 +74,19 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			negativeIndexer;
 
 	/**
+	 * We'll update it's occurrence when indexing disjointness axioms
+	 */
+	private final IndexedClass owlNothing_;
+	
+	/**
 	 * @param ontologyIndex
 	 * @param insert
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
-	public ElkAxiomIndexerVisitor(OntologyIndexImpl ontologyIndex,
+	public ElkAxiomIndexerVisitor(IndexedObjectCache ontologyIndex, IndexedClass owlNothing,
 			IndexUpdater updater, boolean insert) {
 		this.ontologyIndex = ontologyIndex;
+		this.owlNothing_ = owlNothing;
 		this.indexUpdater_ = updater;
 		this.multiplicity = insert ? 1 : -1;
 		this.neutralIndexer = new ElkObjectIndexerVisitor(
@@ -145,8 +151,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			List<? extends ElkClassExpression> disjointClasses) {
 
 		// treat this as a positive occurrence of owl:Nothing
-		ontologyIndex.getIndexedOwlNothing().updateOccurrenceNumbers(indexUpdater_,
-				multiplicity, multiplicity, 0);
+		owlNothing_.updateOccurrenceNumbers(indexUpdater_, multiplicity,
+				multiplicity, 0);
 
 		if (disjointClasses.size() == 2) {
 			// the binary case
@@ -177,16 +183,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
 				.accept(positiveIndexer);
 
-		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
-				&& multiplicity > 0)
-			ontologyIndex.addReflexiveObjectProperty(indexedReflexiveProperty);
-
 		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity;
-
-		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
-				&& multiplicity < 0)
-			ontologyIndex
-					.removeReflexiveObjectProperty(indexedReflexiveProperty);
 	}
 
 	@Override

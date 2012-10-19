@@ -79,7 +79,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	/**
 	 * The listener object implementing callback functions for this engine
 	 */
-	private final TransitiveReductionListener<J, Engine> listener;
+	private final TransitiveReductionListener<J> listener;
 	/**
 	 * The object used to process the finished saturation jobs
 	 */
@@ -112,7 +112,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 *            engine
 	 */
 	public TransitiveReductionFactory(OntologyIndex ontologyIndex,
-			int maxWorkers, TransitiveReductionListener<J, Engine> listener) {
+			int maxWorkers, TransitiveReductionListener<J> listener) {
 		this.listener = listener;
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
@@ -146,7 +146,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 */
 	private class ThisClassExpressionSaturationListener
 			implements
-			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>, ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>.Engine> {
+			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>> {
 
 		@Override
 		public void notifyFinished(

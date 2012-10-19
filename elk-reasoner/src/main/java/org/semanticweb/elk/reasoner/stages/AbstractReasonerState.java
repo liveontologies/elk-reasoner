@@ -54,6 +54,10 @@ public abstract class AbstractReasonerState {
 			.getLogger(AbstractReasonerState.class);
 
 	/**
+	 * 
+	 */
+	final IncrementalReasonerState incrementalState;
+	/**
 	 * {@code true} if the ontology is loaded
 	 */
 	boolean doneLoading = false;
@@ -109,7 +113,10 @@ public abstract class AbstractReasonerState {
 	private Loader changesLoader;
 
 	protected AbstractReasonerState() {
-		this.ontologyIndex = new OntologyIndexImpl();
+		OntologyIndexImpl ontoIndex = new OntologyIndexImpl();
+		
+		this.ontologyIndex = ontoIndex;
+		this.incrementalState = new IncrementalReasonerState(ontoIndex, ontologyIndex.getIndexedOwlNothing());
 	}
 
 	/**
@@ -153,9 +160,16 @@ public abstract class AbstractReasonerState {
 
 	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
 		resetChangesLoading();
-		this.changesLoader = changesLoader.getLoader(
-				ontologyIndex.getAxiomInserter(),
-				ontologyIndex.getAxiomDeleter());
+
+		if (incrementalState != null) {
+			this.changesLoader = changesLoader.getLoader(
+					incrementalState.diffIndex_.getAxiomInserter(),
+					incrementalState.diffIndex_.getAxiomDeleter());
+		} else {
+			this.changesLoader = changesLoader.getLoader(
+					ontologyIndex.getAxiomInserter(),
+					ontologyIndex.getAxiomDeleter());
+		}
 	}
 
 	/**
@@ -240,7 +254,13 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public boolean isInconsistent() throws ElkException {
-		getStageExecutor().complete(new ConsistencyCheckingStage(this));
+		
+		ReasonerStage stage = incrementalState == null || incrementalState.diffIndex_.isEmpty() 
+				? new ConsistencyCheckingStage(	this) 
+				: new IncrementalConsistencyCheckingStage(this); 
+		
+		getStageExecutor().complete(stage);
+		
 		return inconsistentOntology;
 	}
 
@@ -280,10 +300,18 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
-		if (isInconsistent())
-			throw new ElkInconsistentOntologyException();
 
-		getStageExecutor().complete(new ClassTaxonomyComputationStage(this));
+		if (isInconsistent())
+			throw new ElkInconsistentOntologyException();		
+		
+		if (incrementalState != null && incrementalState.diffIndex_.isEmpty()) {
+			getStageExecutor()
+					.complete(new IncrementalClassTaxonomyComputationStage(this));
+		} else {
+			getStageExecutor()
+					.complete(new ClassTaxonomyComputationStage(this));
+		}
+		
 		return taxonomy;
 	}
 

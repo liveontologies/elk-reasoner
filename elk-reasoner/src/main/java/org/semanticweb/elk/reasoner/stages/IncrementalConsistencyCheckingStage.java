@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -32,74 +31,46 @@ import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
  * A {@link ReasonerStage} during which consistency of the current ontology is
  * checked
  * 
- * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  * 
  */
-class ConsistencyCheckingStage extends AbstractReasonerStage {
+class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-			.getLogger(ConsistencyCheckingStage.class);
+			.getLogger(IncrementalConsistencyCheckingStage.class);
 
-	/**
-	 * the computation used for this stage
-	 */
-	protected ConsistencyChecking computation_ = null;
-
-	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
+	public IncrementalConsistencyCheckingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
 	@Override
 	public String getName() {
-		return "Consistency Checking";
-	}
-
-	@Override
-	public boolean done() {
-		return reasoner.doneConsistencyCheck;
+		return "Incremental Consistency Checking";
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(
+		//add incremental stages: 
+		return null;//Arrays.asList();
+		/*return Arrays.asList(
 				(ReasonerStage) new OntologyLoadingStage(reasoner),
 				(ReasonerStage) new ChangesLoadingStage(reasoner),
-				(ReasonerStage) new ContextInitializationStage(reasoner));		
+				(ReasonerStage) new ContextInitializationStage(reasoner));*/		
 	}
 
-	@Override
-	public void execute() throws ElkInterruptedException {
-		if (computation_ == null)
-			initComputation();
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-		reasoner.inconsistentOntology = computation_.isInconsistent();
-		reasoner.doneConsistencyCheck = true;
-	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
+		//TODO need one stage that will be executed for any reasoning task:
+		//it will re-saturate all affected contexts but will NOT saturate new classes (that should be done only for classification)
+		//i.e. it shouldn't create new contexts
 		this.computation_ = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-	}
-
-	@Override
-	public void printInfo() {
-		if (computation_ != null)
-			computation_.printStatistics();
 	}
 
 }

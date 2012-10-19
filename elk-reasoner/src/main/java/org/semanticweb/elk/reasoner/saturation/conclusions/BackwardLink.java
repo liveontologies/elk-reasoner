@@ -82,11 +82,6 @@ public class BackwardLink implements Conclusion {
 		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
 		try {
-			
-			if (!ruleEngine.updateContext(context, this)) {
-				return;
-			}
-
 			// apply all backward link rules of the context
 			BackwardLinkRules rules = context.getBackwardLinkRules();
 
@@ -111,8 +106,12 @@ public class BackwardLink implements Conclusion {
 		} finally {
 			statistics.backLinkTime += CachedTimeThread.currentTimeMillis;
 		}
-
 	}
+	
+	@Override
+	public void deapply(RuleEngine ruleEngine, Context context) {
+		apply(ruleEngine, context);
+	}	
 
 	@Override
 	public String toString() {

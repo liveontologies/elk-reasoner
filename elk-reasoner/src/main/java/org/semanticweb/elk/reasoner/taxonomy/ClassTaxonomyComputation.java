@@ -41,7 +41,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ClassTaxonomyComputation
 		extends
-		ReasonerComputation<IndexedClass, ClassTaxonomyComputationFactory.Engine, ClassTaxonomyComputationFactory> {
+		ReasonerComputation<IndexedClass, ClassTaxonomyComputationFactory> {
 
 	public ClassTaxonomyComputation(Collection<IndexedClass> inputs,
 			ComputationExecutor executor, int maxWorkers,

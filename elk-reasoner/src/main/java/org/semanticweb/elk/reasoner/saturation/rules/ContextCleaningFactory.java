@@ -24,6 +24,11 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		super(ontologyIndex);
 	}
 
+	@Override
+	public Engine getEngine() {
+		return new CleaningEngine();
+	}
+
 	/**
 	 * Used to clean modified contexts after deleting conclusions
 	 * 
@@ -31,7 +36,7 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	public class CleaningEngine extends Engine {
+	public class CleaningEngine extends DeletionEngine {
 
 		private CleaningEngine() {
 			//cleaning engine deletes conclusions
@@ -39,23 +44,9 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		}
 		
 		@Override
-		protected void process(Context context) {
-			factoryStats_.contContextProcess++;
-			
-			for (;;) {
-				Conclusion conclusion = context.takeToDo();
-				if (conclusion == null)
-					if (context.deactivate())
-						// context was re-activated
-						continue;
-					else
-						break;
-				
-				if (!context.isSaturated()) {
-					// do not modify saturated contexts
-					conclusion.apply(this, context);
-				}
-			}
+		protected boolean preApply(Conclusion conclusion, Context context) {
+			// this engine should not modify saturated contexts
+			return !context.isSaturated() && super.preApply(conclusion, context);
 		}
 	}	
 }

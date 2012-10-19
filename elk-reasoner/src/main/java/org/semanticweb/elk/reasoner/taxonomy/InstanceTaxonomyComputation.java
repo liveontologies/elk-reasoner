@@ -42,7 +42,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class InstanceTaxonomyComputation
 		extends
-		ReasonerComputation<IndexedIndividual, InstanceTaxonomyComputationFactory.Engine, InstanceTaxonomyComputationFactory> {
+		ReasonerComputation<IndexedIndividual, InstanceTaxonomyComputationFactory> {
 
 	public InstanceTaxonomyComputation(Collection<IndexedIndividual> inputs,
 			ComputationExecutor executor, int maxWorkers,

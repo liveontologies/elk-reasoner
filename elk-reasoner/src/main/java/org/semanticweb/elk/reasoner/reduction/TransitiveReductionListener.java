@@ -39,6 +39,6 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNot
  * 
  * @see TransitiveReductionFactory
  */
-public interface TransitiveReductionListener<J extends TransitiveReductionJob<?>, P extends TransitiveReductionFactory<?, J>.Engine>
-		extends InputProcessorListenerNotifyFinishedJob<J, P> {
+public interface TransitiveReductionListener<J extends TransitiveReductionJob<?>>
+		extends InputProcessorListenerNotifyFinishedJob<J> {
 }

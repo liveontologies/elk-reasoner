@@ -104,9 +104,10 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 			try {
 
-				for (IndexedClassExpression implied : toldSuperClassExpressions_)
+				for (IndexedClassExpression implied : toldSuperClassExpressions_) {
 					ruleEngine.produce(context,
 							new PositiveSuperClassExpression(implied));
+				}
 			} finally {
 				stats.timeSubClassOfRule += CachedTimeThread.currentTimeMillis;
 			}

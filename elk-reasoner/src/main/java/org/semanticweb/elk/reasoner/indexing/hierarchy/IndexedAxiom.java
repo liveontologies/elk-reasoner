@@ -21,7 +21,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-public abstract class IndexedAxiom implements IndexChange {
+public abstract class IndexedAxiom {
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.

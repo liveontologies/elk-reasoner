@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
@@ -50,28 +49,34 @@ public class NegativeSuperClassExpression extends SuperClassExpression {
 	public void apply(RuleEngine ruleEngine, Context context) {
 		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		statistics.superClassExpressionTime -= CachedTimeThread.currentTimeMillis;
+
 		try {
-
-			if (!ruleEngine.updateContext(context, this)) {
-				return;
-			}
-
 			// applying all composition rules
-			ContextRules compositionRule = expression.getCompositionRules();
-
-			for (;;) {
-				if (compositionRule == null)
-					return;
-				compositionRule.apply(ruleEngine, context);
-				compositionRule = compositionRule.next();
-			}
+			applyCompositionRules(ruleEngine, context);
+			
 		} finally {
 			statistics.superClassExpressionTime += CachedTimeThread.currentTimeMillis;
 		}
 	}
 	
 	@Override
+	public void deapply(RuleEngine ruleEngine, Context context) {
+		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
+		statistics.superClassExpressionTime -= CachedTimeThread.currentTimeMillis;
+		
+		try {
+			expression.applyDecompositionRule(ruleEngine, context);
+			// applying all composition rules
+			applyCompositionRules(ruleEngine, context);
+			
+		} finally {
+			statistics.superClassExpressionTime += CachedTimeThread.currentTimeMillis;
+		}
+	}
+	
+	
+	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
-	}	
+	}
 }

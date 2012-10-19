@@ -59,9 +59,18 @@ public class IndexedIndividual extends IndexedClassEntity {
 	@Override
 	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, int increment,
 			int positiveIncrement, int negativeIncrement) {
+		
+		if (occurrenceNo_ == 0 && increment > 0) {
+			indexUpdater.addNamedIndividual(elkNamedIndividual_);
+		}
+		
 		occurrenceNo_ += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
+		
+		if (occurrenceNo_ == 0 && increment < 0) {
+			indexUpdater.removeNamedIndividual(elkNamedIndividual_);
+		}		
 	}
 
 	@Override

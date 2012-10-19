@@ -19,4 +19,6 @@ public interface ConclusionVisitor<R> {
 	public R visit(BackwardLink link, Context context);
 	
 	public R visit(ForwardLink link, Context context);
+
+	public R visit(IndexChange indexChange, Context context);
 }

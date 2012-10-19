@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
@@ -43,20 +42,12 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	private final ElkObjectIndexerVisitor elkObjectIndexer_;
 	private final ElkAxiomIndexerVisitor directAxiomInserter_;
 	private final ElkAxiomIndexerVisitor directAxiomDeleter_;
-	private final ElkAxiomIndexerVisitor incrementalAxiomInserter_;
-	private final ElkAxiomIndexerVisitor incrementalAxiomDeleter_;	
 	
-	private final DifferentialIndex diffIndex_;
-
-	protected Collection<IndexedObjectProperty> reflexiveObjectProperties;
-
 	public OntologyIndexImpl() {
-		this.diffIndex_ = new DifferentialIndex();
 		this.elkObjectIndexer_ = new ElkObjectIndexerVisitor(this);
-		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(this, new DirectIndexUpdater(), true);
-		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, new DirectIndexUpdater(), false);
-		this.incrementalAxiomInserter_ = new ElkAxiomIndexerVisitor(this, new IncrementalIndexUpdater(diffIndex_), true);
-		this.incrementalAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, new IncrementalIndexUpdater(diffIndex_), false);		
+		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(this, getIndexedOwlNothing(), new DirectIndexUpdater(), true);
+		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, getIndexedOwlNothing(), new DirectIndexUpdater(), false);
+	
 		indexPredefined();
 	}
 
@@ -169,26 +160,6 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 		return directAxiomDeleter_;
 	}
 
-	@Override
-	public Collection<IndexedObjectProperty> getReflexiveObjectProperties() {
-		return reflexiveObjectProperties;
-	}
-
-	protected void addReflexiveObjectProperty(
-			IndexedObjectProperty reflexiveObjectProperty) {
-		if (reflexiveObjectProperties == null)
-			reflexiveObjectProperties = new LinkedList<IndexedObjectProperty>();
-		reflexiveObjectProperties.add(reflexiveObjectProperty);
-	}
-
-	protected boolean removeReflexiveObjectProperty(
-			IndexedObjectProperty reflexiveObjectProperty) {
-		boolean success = reflexiveObjectProperties
-				.remove(reflexiveObjectProperty);
-		if (reflexiveObjectProperties.isEmpty())
-			reflexiveObjectProperties = null;
-		return success;
-	}
 
 	@Override
 	public IndexedClass getIndexedOwlThing() {
@@ -199,16 +170,4 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	public IndexedClass getIndexedOwlNothing() {
 		return indexedOwlNothing;
 	}
-
-	public ElkAxiomProcessor getIncrementalAxiomInserter() {
-		return incrementalAxiomInserter_;
-	}
-
-	public ElkAxiomProcessor getIncrementalAxiomDeleter() {
-		return incrementalAxiomDeleter_;
-	}	
-	
-	public DifferentialIndex getDifferentialIndex() {
-		return diffIndex_;
-	}	
 }

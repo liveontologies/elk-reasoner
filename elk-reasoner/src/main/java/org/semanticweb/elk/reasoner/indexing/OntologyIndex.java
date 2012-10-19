@@ -94,7 +94,8 @@ public interface OntologyIndex {
 	/**
 	 * @return the {@link IndexedClassExpression}s for all
 	 *         {@link ElkClassExpression}s occurring in the ontology (including
-	 *         {@code owl:Thing} and {@code owl:Nothing})
+	 *         {@code owl:Thing} and {@code owl:Nothing}) or added/removed
+	 *         from the ontology since the last commit of the differential index
 	 */
 	Collection<IndexedClassExpression> getIndexedClassExpressions();
 
@@ -123,12 +124,6 @@ public interface OntologyIndex {
 	 *         {@link ElkObjectProperty}s occurring in the ontology.
 	 */
 	Collection<IndexedObjectProperty> getIndexedObjectProperties();
-
-	/**
-	 * @return the {@link IndexedObjectProperty}s for all reflexive
-	 *         {@link ElkObjectProperty}s occurring in the ontology.
-	 */
-	Collection<IndexedObjectProperty> getReflexiveObjectProperties();
 
 	/**
 	 * @return the {@link ElkAxiomProcessor} using which one can add

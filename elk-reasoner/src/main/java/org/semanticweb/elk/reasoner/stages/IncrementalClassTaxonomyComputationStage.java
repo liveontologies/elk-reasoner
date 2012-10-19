@@ -1,0 +1,51 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.stages;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
+
+/**
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
+class IncrementalClassTaxonomyComputationStage extends
+		ClassTaxonomyComputationStage {
+
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IncrementalClassTaxonomyComputationStage.class);	
+	
+	public IncrementalClassTaxonomyComputationStage(
+			AbstractReasonerState reasoner) {
+		super(reasoner);
+	}
+
+	@Override
+	public String getName() {
+		return "Incremental Class Taxonomy Computation";
+	}
+
+	@Override
+	public List<ReasonerStage> getDependencies() {
+		return Arrays.asList((ReasonerStage) new IncrementalConsistencyCheckingStage(reasoner));
+	}
+
+	@Override
+	void initComputation() {
+		super.initComputation();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		this.computation_ = new ClassTaxonomyComputation(
+				//Decide which classes need to be saturated
+				reasoner.ontologyIndex.getIndexedClasses(),
+				reasoner.getProcessExecutor(), workerNo, progressMonitor,
+				reasoner.ontologyIndex);
+	}
+
+	
+}

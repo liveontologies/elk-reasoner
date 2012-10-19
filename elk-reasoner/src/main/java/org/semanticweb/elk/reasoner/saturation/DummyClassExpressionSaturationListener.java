@@ -36,8 +36,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @param <P>
  *            the type of the {@link InputProcessor} for the input jobs
  */
-public class DummyClassExpressionSaturationListener<J extends SaturationJob<? extends IndexedClassExpression>, P extends ClassExpressionSaturationFactory<J>.Engine>
-		implements ClassExpressionSaturationListener<J, P> {
+public class DummyClassExpressionSaturationListener<J extends SaturationJob<? extends IndexedClassExpression>>
+		implements ClassExpressionSaturationListener<J> {
 
 	@Override
 	public void notifyFinished(J job) throws InterruptedException {

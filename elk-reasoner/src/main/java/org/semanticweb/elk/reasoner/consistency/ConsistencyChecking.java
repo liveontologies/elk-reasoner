@@ -50,7 +50,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ConsistencyChecking
 		extends
-		ReasonerComputation<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>.Engine, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
+		ReasonerComputation<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -210,7 +210,7 @@ public class ConsistencyChecking
 	 */
 	private static class ThisClassExpressionSaturationListener
 			implements
-			ClassExpressionSaturationListener<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>.Engine> {
+			ClassExpressionSaturationListener<SaturationJob<IndexedClassEntity>> {
 
 		private final ConsistencyMonitor consistenceMonitor;
 

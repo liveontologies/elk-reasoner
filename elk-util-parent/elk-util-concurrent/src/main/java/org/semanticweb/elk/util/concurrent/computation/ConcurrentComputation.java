@@ -47,7 +47,7 @@ import java.util.concurrent.BlockingQueue;
  * @param <F>
  *            the type of the factory for the input processors
  */
-public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends InputProcessorFactory<I, P>> {
+public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	/**
 	 * the factory for the input processor engines
 	 */
@@ -199,7 +199,8 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 		public final void run() {
 			I nextInput;
 			// we use one engine per worker run
-			P inputProcessor = inputProcessorFactory.getEngine();
+			InputProcessor<I> inputProcessor = inputProcessorFactory.getEngine();
+			
 			try {
 				for (;;) {
 					if (interrupted)

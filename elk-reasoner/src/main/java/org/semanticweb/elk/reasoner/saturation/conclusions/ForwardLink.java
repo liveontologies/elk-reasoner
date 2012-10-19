@@ -74,10 +74,6 @@ public class ForwardLink implements Conclusion {
 		statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
 		try {
 
-			if (!ruleEngine.updateContext(context, this)) {
-				return;
-			}
-
 			/* compose the link with all backward links */
 			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
 					.getSaturated().getCompositionsByLeftSubProperty();
@@ -103,6 +99,11 @@ public class ForwardLink implements Conclusion {
 	}
 	
 	@Override
+	public void deapply(RuleEngine ruleEngine, Context context) {
+		apply(ruleEngine, context);
+	}	
+	
+	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
 	}	
@@ -119,6 +120,13 @@ public class ForwardLink implements Conclusion {
 				ThisBackwardLinkRule.MATCHER_);
 
 		return rule != null ? rule.removeForwardLink(this) : false;
+	}
+	
+	public boolean containsBackwardLinkRule(Context context) {
+		ThisBackwardLinkRule rule = context.getBackwardLinkRulesChain().find(
+				ThisBackwardLinkRule.MATCHER_);
+		
+		return rule != null ? rule.containsForwardLink(this) : false;
 	}
 
 	/**
@@ -166,6 +174,11 @@ public class ForwardLink implements Conclusion {
 			return forwardLinksByObjectProperty_.remove(link.relation_,
 					link.target_);
 		}		
+		
+		private boolean containsForwardLink(ForwardLink link) {
+			return forwardLinksByObjectProperty_.contains(link.relation_,
+					link.target_);
+		}
 
 		@Override
 		public void apply(RuleEngine ruleEngine, BackwardLink link) {

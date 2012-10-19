@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.saturation.rules.BaseContextRuleChain;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 
@@ -47,19 +49,21 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
  */
 public class DifferentialIndex {
 
+	final IndexedObjectCache objectCache_;
+	
 	/**
 	 * The map representing entries to be added to the ontology index; it maps
 	 * indexed class expression to dummy index class expression objects whose
 	 * fields represent the added entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, BaseContextRuleChain> indexAdditions;
+	final Map<IndexedClassExpression, IndexChange> indexAdditions;
 
 	/**
 	 * The map representing entries to be removed from the ontology index; it
 	 * maps indexed class expression to dummy index class expression objects
 	 * whose fields represent the removed entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, BaseContextRuleChain> indexDeletions;
+	final Map<IndexedClassExpression, IndexChange> indexDeletions;
 
 	/**
 	 * The list of ELK classes to be added to the signature of the ontology; the
@@ -76,13 +80,22 @@ public class DifferentialIndex {
 	 * are not necessarily disjoint.
 	 */
 	final List<ElkClass> removedClasses;
+	
+	final List<ElkNamedIndividual> addedIndividuals;
+	
+	final List<ElkNamedIndividual> removedIndividuals;
+	
+	private final ElkAxiomIndexerVisitor axiomInserter_;
+	
+	private final ElkAxiomIndexerVisitor axiomDeleter_;	
+	
 
 	/**
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index additions for these class expressions
 	 * 
 	 */
-	public Map<IndexedClassExpression, BaseContextRuleChain> getIndexAdditions() {
+	public Map<IndexedClassExpression, IndexChange> getIndexAdditions() {
 		return this.indexAdditions;
 	}
 
@@ -90,7 +103,7 @@ public class DifferentialIndex {
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index deletions for these class expressions
 	 */
-	public Map<IndexedClassExpression, BaseContextRuleChain> getIndexDeletions() {
+	public Map<IndexedClassExpression, IndexChange> getIndexDeletions() {
 		return this.indexDeletions;
 	}
 
@@ -105,10 +118,10 @@ public class DifferentialIndex {
 	 *         indexed class expression
 	 */
 	public boolean registerAdditions(IndexedClassExpression target, ContextRules rules) {
-		BaseContextRuleChain result = indexAdditions.get(target);
+		IndexChange result = indexAdditions.get(target);
 
 		if (result == null) {
-			result = new BaseContextRuleChain();
+			result = new IndexChange();
 			indexAdditions.put(target, result);
 			
 			return true;
@@ -129,10 +142,10 @@ public class DifferentialIndex {
 	 *         indexed class expression
 	 */
 	public boolean registerDeletions(IndexedClassExpression target, ContextRules rules) {
-		BaseContextRuleChain result = indexDeletions.get(target);
+		IndexChange result = indexDeletions.get(target);
 
 		if (result == null) {
-			result = new BaseContextRuleChain();
+			result = new IndexChange();
 			indexAdditions.put(target, result);
 			
 			return true;
@@ -158,14 +171,26 @@ public class DifferentialIndex {
 	public List<ElkClass> getRemovedClasses() {
 		return this.removedClasses;
 	}
+	
+	public List<ElkNamedIndividual> getAddedIndividuals() {
+		return this.addedIndividuals;
+	}
+	
+	public List<ElkNamedIndividual> getRemovedIndividuals() {
+		return this.removedIndividuals;
+	}
 
-	public DifferentialIndex() {
-		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, BaseContextRuleChain>(
-				127);
-		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, BaseContextRuleChain>(
-				127);
+	
+	public DifferentialIndex(IndexedObjectCache objectCache, IndexedClass owlNothing) {
+		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, IndexChange>(127);
+		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, IndexChange>(127);
 		this.addedClasses = new ArrayList<ElkClass>(127);
 		this.removedClasses = new ArrayList<ElkClass>(127);
+		this.addedIndividuals = new ArrayList<ElkNamedIndividual>();
+		this.removedIndividuals = new ArrayList<ElkNamedIndividual>();
+		this.objectCache_ = objectCache;
+		this.axiomInserter_ = new ElkAxiomIndexerVisitor(objectCache, owlNothing, new IncrementalIndexUpdater(this), true);
+		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache, owlNothing, new IncrementalIndexUpdater(this), false);		
 	}
 
 	/**
@@ -184,52 +209,26 @@ public class DifferentialIndex {
 		}
 		
 		indexAdditions.clear();
-		
-		/*for (IndexedClassExpression target : indexDeletions.keySet()) {
-			IndexedClassExpressionChange change = indexDeletions.get(target);
-			if (change.toldSuperClassExpressions != null)
-				for (IndexedClassExpression superClassExpression : change.toldSuperClassExpressions) {
-					directIndexUpdater.removeToldSuperClassExpression(target,
-							superClassExpression);
-				}
-			if (change.negConjunctionsByConjunct != null)
-				for (Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : change.negConjunctionsByConjunct
-						.entrySet()) {
-					directIndexUpdater.removeNegConjunctionByConjunct(target,
-							entry.getValue(), entry.getKey());
-				}
-			if (change.negExistentials != null)
-				for (IndexedObjectSomeValuesFrom existential : change.negExistentials) {
-					directIndexUpdater
-							.removeNegExistential(target, existential);
-				}
-		}
-		
-		
-		// commit additions
-		for (IndexedClassExpression target : indexAdditions.keySet()) {
-			IndexedClassExpressionChange change = indexAdditions.get(target);
-			if (change.toldSuperClassExpressions != null)
-				for (IndexedClassExpression superClassExpression : change.toldSuperClassExpressions) {
-					directIndexUpdater.addToldSuperClassExpression(target,
-							superClassExpression);
-				}
-			if (change.negConjunctionsByConjunct != null)
-				for (Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : change.negConjunctionsByConjunct
-						.entrySet()) {
-					directIndexUpdater.addNegConjunctionByConjunct(target,
-							entry.getValue(), entry.getKey());
-				}
-			if (change.negExistentials != null)
-				for (IndexedObjectSomeValuesFrom existential : change.negExistentials) {
-					directIndexUpdater.addNegExistential(target, existential);
-				}
-		}
-		indexAdditions.clear();*/
 	}
 
 	public void clearSignatureChange() {
 		addedClasses.clear();
 		removedClasses.clear();
+		addedIndividuals.clear();
+		removedIndividuals.clear();
 	}
+	
+	public boolean isEmpty() {
+		return indexAdditions.isEmpty() && indexDeletions.isEmpty();
+	}
+	
+	
+	public ElkAxiomProcessor getAxiomInserter() {
+		return axiomInserter_;
+	}
+
+	
+	public ElkAxiomProcessor getAxiomDeleter() {
+		return axiomDeleter_;
+	}	
 }

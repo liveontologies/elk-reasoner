@@ -22,9 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import java.util.Collection;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,19 +30,18 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
@@ -70,11 +67,6 @@ public class RuleApplicationFactory implements
 	 * Cached constants
 	 */
 	private final IndexedClassExpression owlThing_, owlNothing_;
-
-	/**
-	 * The set of reflexive properties of the ontology
-	 */
-	private final Set<IndexedObjectProperty> reflexiveProperties_;
 
 	/**
 	 * The queue containing all activated contexts. Every activated context
@@ -119,11 +111,6 @@ public class RuleApplicationFactory implements
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
 		this.aggregatedRuleStats_ = new RuleStatistics();
 		this.aggregatedFactoryStats_ = new ThisStatistics();
-		this.reflexiveProperties_ = new ArrayHashSet<IndexedObjectProperty>();
-		Collection<IndexedObjectProperty> reflexiveObjectProperties = ontologyIndex
-				.getReflexiveObjectProperties();
-		if (reflexiveObjectProperties != null)
-			reflexiveProperties_.addAll(reflexiveObjectProperties);
 
 		owlThing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
@@ -335,11 +322,14 @@ public class RuleApplicationFactory implements
 		 */
 		private int localContextNumber = 0;
 
-		// don't allow creating of engines directly; only through the factory
 		protected Engine(ConclusionVisitor<Boolean> visitor) {
 			conclusionVisitor_ = visitor;
 		}
 
+		protected ConclusionVisitor<Boolean> getConclusionVisitor() {
+			return conclusionVisitor_;
+		}
+		
 		@Override
 		public void submit(IndexedClassExpression job) {
 			getCreateContext(job);
@@ -381,13 +371,6 @@ public class RuleApplicationFactory implements
 		 */
 		public IndexedClassExpression getOwlThing() {
 			return owlThing_;
-		}
-
-		/**
-		 * @return the reflexive object properties in this ontology
-		 */
-		public Set<IndexedObjectProperty> getReflexiveObjectProperties() {
-			return reflexiveProperties_;
 		}
 
 		/**
@@ -448,14 +431,27 @@ public class RuleApplicationFactory implements
 			factoryStats_.contContextProcess++;
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
-				if (conclusion == null)
+				if (conclusion == null) {
 					if (context.deactivate())
 						// context was re-activated
 						continue;
 					else
 						break;
-				conclusion.apply(this, context);
+				}
+				
+				if (preApply(conclusion, context)) {
+					conclusion.apply(this, context);
+					postApply(conclusion, context);
+				}
 			}
+		}
+
+		protected boolean preApply(Conclusion conclusion, Context context) {
+			return conclusion.accept(conclusionVisitor_, context);
+		}
+
+		protected void postApply(Conclusion conclusion, Context context) {
+			// nothing here
 		}
 
 		private void initContext(Context context) {
@@ -466,11 +462,6 @@ public class RuleApplicationFactory implements
 			IndexedClassExpression owlThing = getOwlThing();
 			if (owlThing.occursNegatively())
 				produce(context, new PositiveSuperClassExpression(owlThing));
-		}
-
-		@Override
-		public boolean updateContext(Context context, Conclusion conclusion) {
-			return conclusion.accept(conclusionVisitor_, context);
 		}
 	}
 	
@@ -516,6 +507,12 @@ public class RuleApplicationFactory implements
 			//statistics_.forwLinkInfNo++;
 			return link.addToContextBackwardLinkRule(context);
 			//statistics_.forwLinkNo++;
+		}
+
+		@Override
+		public Boolean visit(IndexChange indexChange, Context context) {
+			// need not add this element, just apply all its rules
+			return true;
 		}
 	}
 	

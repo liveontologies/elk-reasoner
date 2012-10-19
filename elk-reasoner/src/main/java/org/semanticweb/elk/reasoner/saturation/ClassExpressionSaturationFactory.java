@@ -69,7 +69,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	/**
 	 * The listener object implementing callback functions for this engine
 	 */
-	private final ClassExpressionSaturationListener<J, Engine> listener_;
+	private final ClassExpressionSaturationListener<J> listener_;
 	/**
 	 * The rule application engine used internally for execution of the
 	 * saturation rules.
@@ -160,12 +160,18 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 */
 	public ClassExpressionSaturationFactory(OntologyIndex ontologyIndex,
 			int maxWorkers,
-			ClassExpressionSaturationListener<J, Engine> listener) {
+			ClassExpressionSaturationListener<J> listener) {
+		this(new RuleApplicationFactory(ontologyIndex), maxWorkers, listener);
+	}	
+	
+	public ClassExpressionSaturationFactory(RuleApplicationFactory ruleAppFactory,
+			int maxWorkers,
+			ClassExpressionSaturationListener<J> listener) {
 		this.threshold_ = 64 + 32 * maxWorkers;
 		this.listener_ = listener;
 		this.jobsToDo_ = new ConcurrentLinkedQueue<J>();
 		this.jobsInProgress_ = new ConcurrentLinkedQueue<J>();
-		this.ruleApplicationFactory_ = new RuleApplicationFactory(ontologyIndex);
+		this.ruleApplicationFactory_ = ruleAppFactory;
 		this.aggregatedStats_ = new ThisStatistics();
 	}
 
@@ -177,11 +183,11 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */
-	public ClassExpressionSaturationFactory(OntologyIndex ontologyIndex,
+	public ClassExpressionSaturationFactory(RuleApplicationFactory ruleAppFactory,
 			int maxWorkers) {
 		/* we use a dummy listener */
-		this(ontologyIndex, maxWorkers,
-				new ClassExpressionSaturationListener<J, Engine>() {
+		this(ruleAppFactory, maxWorkers,
+				new ClassExpressionSaturationListener<J>() {
 
 					@Override
 					public void notifyFinished(J job)

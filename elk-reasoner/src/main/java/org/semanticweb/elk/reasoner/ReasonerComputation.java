@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
@@ -39,13 +38,11 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * 
  * @param <I>
  *            the input that can be processed by the computation
- * @param <P>
- *            the processor of the input
  * @param <F>
  *            the type of the factory for the input processors
  */
-public class ReasonerComputation<I, P extends InputProcessor<I>, F extends InputProcessorFactory<I, P>>
-		extends ConcurrentComputation<I, P, F> {
+public class ReasonerComputation<I, F extends InputProcessorFactory<I, ?>>
+		extends ConcurrentComputation<I, F> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
