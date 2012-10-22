@@ -91,7 +91,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		super.initComputation();
 		this.computation_ = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
+				reasoner.getProgressMonitor(), reasoner.ontologyIndex, reasoner.saturationState);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}

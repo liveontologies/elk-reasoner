@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -84,7 +85,8 @@ public class ConsistencyChecking
 			Collection<SaturationJob<IndexedClassEntity>> inputJobs,
 			ConsistencyMonitor consistencyMonitor,
 			ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>> saturationFactory,
-			ComputationExecutor executor, int maxWorkers,
+			ComputationExecutor executor,
+			int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputJobs, saturationFactory, executor, maxWorkers,
 				progressMonitor);
@@ -110,14 +112,17 @@ public class ConsistencyChecking
 	 *            the monitor for reporting the progress of the computation
 	 */
 	public ConsistencyChecking(Collection<IndexedClassEntity> inputEntities,
-			ConsistencyMonitor consistencyMonitor, OntologyIndex ontologyIndex,
-			ComputationExecutor executor, int maxWorkers,
+			ConsistencyMonitor consistencyMonitor,
+			SaturationState saturationState,
+			ComputationExecutor executor,
+			int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		this(
 				new TodoJobs(inputEntities, consistencyMonitor),
 				consistencyMonitor,
 				new ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>(
-						ontologyIndex, maxWorkers,
+						saturationState,
+						maxWorkers,
 						new ThisClassExpressionSaturationListener(
 								consistencyMonitor)), executor, maxWorkers,
 				progressMonitor);
@@ -175,9 +180,9 @@ public class ConsistencyChecking
 	 *            the indexed representation of the ontology
 	 */
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex, SaturationState saturationState) {
 		this(getTestEntities(ontologyIndex), new ConsistencyMonitor(),
-				ontologyIndex, executor, maxWorkers, progressMonitor);
+				saturationState, executor, maxWorkers, progressMonitor);
 	}
 
 	@Override

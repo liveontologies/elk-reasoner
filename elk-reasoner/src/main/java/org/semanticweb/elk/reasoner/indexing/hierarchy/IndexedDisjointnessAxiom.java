@@ -29,10 +29,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -134,7 +134,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context context) {
+		public void apply(SaturationState state, Context context) {
 
 			// System.err.println("Disjointness rule: " +
 			// IndexedClassExpression.this + " -> " + context.getRoot());
@@ -144,17 +144,17 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 							disjointClasses_,
 							context.getSuperClassExpressions()).isEmpty()) {
 
-				ruleEngine.produce(context, new PositiveSuperClassExpression(
-						ruleEngine.getOwlNothing()));
+				state.produce(context, new PositiveSuperClassExpression(
+						state.getOwlNothing()));
 				return;
 			}
 
 			if (disjointnessAxioms_ != null)
 				for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
 					if (!context.addDisjointnessAxiom(disAxiom))
-						ruleEngine.produce(
+						state.produce(
 								context,
-								new PositiveSuperClassExpression(ruleEngine
+								new PositiveSuperClassExpression(state
 										.getOwlNothing()));
 
 		}
@@ -317,7 +317,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context element) {}
+		public void apply(SaturationState state, Context element) {}
 
 		@Override
 		public boolean addTo(Chain<ContextRules> ruleChain) {
@@ -340,7 +340,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context element) {}
+		public void apply(SaturationState state, Context element) {}
 
 		@Override
 		public boolean addTo(Chain<ContextRules> ruleChain) {

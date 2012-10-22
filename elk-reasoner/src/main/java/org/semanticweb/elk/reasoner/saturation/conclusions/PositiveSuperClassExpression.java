@@ -23,9 +23,8 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * A {@link SuperClassExpression}, for which the structure of the enclosed
@@ -46,23 +45,23 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 	}
 
 	@Override
-	public void apply(RuleEngine ruleEngine, Context context) {
-		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		statistics.superClassExpressionTime -= CachedTimeThread.currentTimeMillis;
+	public void apply(SaturationState state, Context context) {
+		//ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
+		//statistics.superClassExpressionTime -= CachedTimeThread.currentTimeMillis;
 		try {
 
 			// apply decomposition rules
-			expression.applyDecompositionRule(ruleEngine, context);
+			expression.applyDecompositionRule(state, context);
 			// applying all composition rules
-			applyCompositionRules(ruleEngine, context);
+			applyCompositionRules(state, context);
 		} finally {
-			statistics.superClassExpressionTime += CachedTimeThread.currentTimeMillis;
+			//statistics.superClassExpressionTime += CachedTimeThread.currentTimeMillis;
 		}
 	}
 	
 	@Override
-	public void deapply(RuleEngine ruleEngine, Context context) {
-		apply(ruleEngine, context);
+	public void deapply(SaturationState state, Context context) {
+		apply(state, context);
 	}	
 
 	@Override

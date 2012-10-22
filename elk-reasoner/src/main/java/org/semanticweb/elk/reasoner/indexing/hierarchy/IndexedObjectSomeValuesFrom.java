@@ -30,13 +30,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -44,7 +44,6 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkObjectSomeValuesFrom in an ontology.
@@ -135,17 +134,17 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		RuleStatistics stats = ruleEngine.getRulesTimer();
+	public void applyDecompositionRule(SaturationState state, Context context) {
+		/*RuleStatistics stats = ruleEngine.getRulesTimer();
 
 		stats.timeObjectSomeValuesFromDecompositionRule -= CachedTimeThread.currentTimeMillis;
-		stats.countObjectSomeValuesFromDecompositionRule++;
+		stats.countObjectSomeValuesFromDecompositionRule++;*/
 
 		try {
-			ruleEngine.produce(ruleEngine.getCreateContext(filler),
+			state.produce(state.getCreateContext(filler),
 					new BackwardLink(context, property));
 		} finally {
-			stats.timeObjectSomeValuesFromDecompositionRule += CachedTimeThread.currentTimeMillis;
+			//stats.timeObjectSomeValuesFromDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
@@ -180,12 +179,12 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context context) {
+		public void apply(SaturationState state, Context context) {
 
-			RuleStatistics stats = ruleEngine.getRulesTimer();
+			/*RuleStatistics stats = ruleEngine.getRulesTimer();
 
 			stats.timeObjectSomeValuesFromCompositionRule -= CachedTimeThread.currentTimeMillis;
-			stats.countObjectSomeValuesFromCompositionRule++;
+			stats.countObjectSomeValuesFromCompositionRule++;*/
 
 			try {
 
@@ -204,7 +203,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
 							candidatePropagationProperties, relation
 									.getSaturated().getSubProperties())) {
-						addPropagation(ruleEngine, property, e, context);
+						addPropagation(state, property, e, context);
 					}
 
 					/*
@@ -231,26 +230,26 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 									&& property.getRightChains() == null) {
 								for (IndexedPropertyChain superChain : property
 										.getToldSuperProperties()) {
-									addPropagation(ruleEngine, superChain, e,
+									addPropagation(state, superChain, e,
 											context);
 								}
 							} else {
-								addPropagation(ruleEngine, property, e, context);
+								addPropagation(state, property, e, context);
 							}
 						}
 					}
 
 					// propagating to the this context if relation is reflexive
 					if (relation.getSaturated().isReflexive())
-						ruleEngine.produce(context,
+						state.produce(context,
 								new NegativeSuperClassExpression(e));
 				}
 			} finally {
-				stats.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
+				//stats.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 
-		private static void addPropagation(RuleEngine ruleEngine,
+		private static void addPropagation(SaturationState state,
 				IndexedPropertyChain propRelation,
 				IndexedClassExpression carry, Context context) {
 
@@ -269,9 +268,10 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 				Collection<Context> targets = backLinks.get(propRelation);
 
-				for (Context target : targets)
-					ruleEngine.produce(target,
+				for (Context target : targets) {
+					state.produce(target,
 							new NegativeSuperClassExpression(carry));
+				}
 			}
 
 		}
@@ -349,19 +349,19 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, BackwardLink link) {
-			RuleStatistics stats = ruleEngine.getRulesTimer();
+		public void apply(SaturationState state, BackwardLink link) {
+			/*RuleStatistics stats = ruleEngine.getRulesTimer();
 
 			stats.timeObjectSomeValuesFromBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
-			stats.countObjectSomeValuesFromBackwardLinkRule++;
+			stats.countObjectSomeValuesFromBackwardLinkRule++;*/
 
 			try {
 				for (IndexedClassExpression carry : propagationsByObjectProperty_
 						.get(link.getRelation()))
-					ruleEngine.produce(link.getSource(),
+					state.produce(link.getSource(),
 							new NegativeSuperClassExpression(carry));
 			} finally {
-				stats.timeObjectSomeValuesFromBackwardLinkRule += CachedTimeThread.currentTimeMillis;
+				//stats.timeObjectSomeValuesFromBackwardLinkRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 
@@ -387,7 +387,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context element) {}
+		public void apply(SaturationState state, Context element) {}
 
 		@Override
 		public boolean addTo(Chain<ContextRules> ruleChain) {

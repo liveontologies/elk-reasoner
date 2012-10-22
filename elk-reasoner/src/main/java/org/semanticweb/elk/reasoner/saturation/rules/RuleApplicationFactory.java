@@ -22,15 +22,13 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -40,7 +38,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -63,16 +60,18 @@ public class RuleApplicationFactory implements
 	private static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
+	
+	private final SaturationState saturationState_;
 	/**
 	 * Cached constants
 	 */
-	private final IndexedClassExpression owlThing_, owlNothing_;
+	//private final IndexedClassExpression owlThing_, owlNothing_;
 
 	/**
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
-	private final Queue<Context> activeContexts_;
+	//private final Queue<Context> activeContexts_;
 
 	/**
 	 * The approximate number of contexts ever created by this engine. This
@@ -106,15 +105,16 @@ public class RuleApplicationFactory implements
 	 */
 	private final ThisStatistics aggregatedFactoryStats_;
 
-	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
-		this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
+	public RuleApplicationFactory(final SaturationState saturationState/*OntologyIndex ontologyIndex*/) {
+		//this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
 		this.aggregatedRuleStats_ = new RuleStatistics();
 		this.aggregatedFactoryStats_ = new ThisStatistics();
 
-		owlThing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
-		owlNothing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
-
+		this.saturationState_ = saturationState;
+		
+		//owlThing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
+		//owlNothing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	@Override
@@ -300,8 +300,7 @@ public class RuleApplicationFactory implements
 			LOGGER_.error("More unique forward links than produced!");
 	}
 
-	public class Engine implements InputProcessor<IndexedClassExpression>,
-			RuleEngine {
+	public class Engine implements InputProcessor<IndexedClassExpression>, RuleEngine, ContextCreationListener {
 
 		protected final ConclusionVisitor<Boolean> conclusionVisitor_;
 		
@@ -324,6 +323,7 @@ public class RuleApplicationFactory implements
 
 		protected Engine(ConclusionVisitor<Boolean> visitor) {
 			conclusionVisitor_ = visitor;
+			saturationState_.registerContextCreationListener(this);
 		}
 
 		protected ConclusionVisitor<Boolean> getConclusionVisitor() {
@@ -332,7 +332,7 @@ public class RuleApplicationFactory implements
 		
 		@Override
 		public void submit(IndexedClassExpression job) {
-			getCreateContext(job);
+			saturationState_.getCreateContext(job);
 		}
 
 		@Override
@@ -341,7 +341,9 @@ public class RuleApplicationFactory implements
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
-				Context nextContext = activeContexts_.poll();
+				
+				Context nextContext = saturationState_.pollForContext();//activeContexts_.poll();
+				
 				if (nextContext == null)
 					break;
 				process(nextContext);
@@ -356,22 +358,23 @@ public class RuleApplicationFactory implements
 			aggregatedConclusionsCounter_.merge(conclusionsCounter_);
 			aggregatedRuleStats_.merge(ruleStats_);
 			aggregatedFactoryStats_.merge(factoryStats_);
+			saturationState_.deregisterContextCreationListener(this);
 		}
 
 		/**
 		 * @return the {@code owl:Thing} object in this ontology
 		 */
-		@Override
+		/*@Override
 		public IndexedClassExpression getOwlNothing() {
 			return owlNothing_;
-		}
+		}*/
 
 		/**
 		 * @return the {@code owl:Nothing} object in this ontology
 		 */
-		public IndexedClassExpression getOwlThing() {
+		/*public IndexedClassExpression getOwlThing() {
 			return owlThing_;
-		}
+		}*/
 
 		/**
 		 * @return the object collecting statistics of rule applications
@@ -386,7 +389,7 @@ public class RuleApplicationFactory implements
 			return this.ruleStats_;
 		}
 
-		@Override
+/*		@Override
 		public Context getCreateContext(IndexedClassExpression root) {
 			if (root.getContext() == null) {
 				Context context = new ContextImpl(root);
@@ -398,11 +401,12 @@ public class RuleApplicationFactory implements
 					if (LOGGER_.isTraceEnabled()) {
 						LOGGER_.trace(root + ": context created");
 					}
-					initContext(context);
+					
+					saturationState_.initContext(context);
 				}
 			}
 			return root.getContext();
-		}
+		}*/
 
 		/**
 		 * Schedule the given item to be processed in the given context
@@ -412,14 +416,14 @@ public class RuleApplicationFactory implements
 		 * @param item
 		 *            the item to be processed in the given context
 		 */
-		@Override
+		/*@Override
 		public void produce(Context context, Conclusion item) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
 			if (context.addToDo(item))
 				// context was activated
 				activeContexts_.add(context);
-		}
+		}*/
 
 		/**
 		 * Process all scheduled items in the given context
@@ -440,7 +444,7 @@ public class RuleApplicationFactory implements
 				}
 				
 				if (preApply(conclusion, context)) {
-					conclusion.apply(this, context);
+					conclusion.apply(saturationState_, context);
 					postApply(conclusion, context);
 				}
 			}
@@ -454,7 +458,18 @@ public class RuleApplicationFactory implements
 			// nothing here
 		}
 
-		private void initContext(Context context) {
+		@Override
+		public void notifyContextCreation(Context newContext) {
+			if (++localContextNumber == contextUpdateInterval_) {
+				approximateContextNumber_.addAndGet(localContextNumber);
+				localContextNumber = 0;
+			}
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(newContext.getRoot() + ": context created");
+			}
+		}		
+		
+		/*public void initContext(Context context) {
 			produce(context,
 					new PositiveSuperClassExpression(context.getRoot()));
 			// TODO: register this as a ContextRule when owlThing occurs
@@ -462,7 +477,7 @@ public class RuleApplicationFactory implements
 			IndexedClassExpression owlThing = getOwlThing();
 			if (owlThing.occursNegatively())
 				produce(context, new PositiveSuperClassExpression(owlThing));
-		}
+		}*/
 	}
 	
 	/**
@@ -515,7 +530,6 @@ public class RuleApplicationFactory implements
 			return true;
 		}
 	}
-	
 	
 	/**
 	 * Counters accumulating statistical information about this factory.

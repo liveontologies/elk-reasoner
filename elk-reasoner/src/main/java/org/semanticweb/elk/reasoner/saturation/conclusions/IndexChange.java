@@ -3,9 +3,9 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 
 /**
@@ -29,18 +29,18 @@ public class IndexChange  extends AbstractChain<ContextRules> implements Conclus
 	
 	
 	@Override
-	public void deapply(RuleEngine ruleEngine, Context context) {
-		apply(ruleEngine, context);
+	public void deapply(SaturationState state, Context context) {
+		apply(state, context);
 	}
 
 	@Override
-	public void apply(RuleEngine ruleEngine, Context context) {
+	public void apply(SaturationState state, Context context) {
 		ContextRules compositionRule = contextRules_.next();
 
 		for (;;) {
 			if (compositionRule == null)
 				return;
-			compositionRule.apply(ruleEngine, context);
+			compositionRule.apply(state, context);
 			compositionRule = compositionRule.next();
 		}
 	}

@@ -3,7 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -20,8 +20,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
-	public ContextCleaningFactory(OntologyIndex ontologyIndex) {
-		super(ontologyIndex);
+	public ContextCleaningFactory(final SaturationState saturationState) {
+		super(saturationState);
 	}
 
 	@Override

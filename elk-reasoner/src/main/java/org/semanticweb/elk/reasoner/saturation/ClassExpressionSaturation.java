@@ -29,7 +29,6 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -53,23 +52,42 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
-			OntologyIndex ontologyIndex) {
-		this(inputs, executor, maxWorkers, progressMonitor, new RuleApplicationFactory(ontologyIndex));
-	}
+			SaturationState saturationState) {
+		this(inputs, executor, maxWorkers, progressMonitor, saturationState, new DummyClassExpressionSaturationListener<SaturationJob<I>>());
+	}	
 	
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
-			RuleApplicationFactory ruleAppFactory) {
+			SaturationState saturationState,
+			ClassExpressionSaturationListener<SaturationJob<I>> listener
+			) {
+		super(
+				new TodoJobs<I>(inputs),
+				new ClassExpressionSaturationFactory<SaturationJob<I>>(
+						saturationState,
+						maxWorkers,
+						listener),
+				executor, maxWorkers, progressMonitor);
+	}	
+	
+	public ClassExpressionSaturation(Collection<I> inputs,
+			ComputationExecutor executor,
+			int maxWorkers,
+			ProgressMonitor progressMonitor,
+			RuleApplicationFactory ruleAppFactory,
+			ClassExpressionSaturationListener<SaturationJob<I>> listener
+			) {
 		super(
 				new TodoJobs<I>(inputs),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(
 						ruleAppFactory,
 						maxWorkers,
-						new DummyClassExpressionSaturationListener<SaturationJob<I>>()),
+						listener),
 				executor, maxWorkers, progressMonitor);
 	}	
+	
 
 	/**
 	 * Print statistics about the saturation computation

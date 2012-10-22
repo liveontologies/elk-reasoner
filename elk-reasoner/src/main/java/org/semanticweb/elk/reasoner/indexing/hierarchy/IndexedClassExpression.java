@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -102,8 +102,7 @@ abstract public class IndexedClassExpression {
 			int positiveIncrement, int negativeIncrement);
 
 	
-	public abstract void applyDecompositionRule(RuleEngine ruleEngine,
-			Context context);
+	public abstract void applyDecompositionRule(SaturationState state, Context context);
 
 	/**
 	 * @return the {@link IndexedObjectProperty} objects that occur in positive

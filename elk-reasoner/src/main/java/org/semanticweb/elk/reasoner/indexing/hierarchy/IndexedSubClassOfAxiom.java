@@ -26,15 +26,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
@@ -95,21 +94,21 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context context) {
+		public void apply(SaturationState state, Context context) {
 
-			RuleStatistics stats = ruleEngine.getRulesTimer();
+			/*RuleStatistics stats = ruleEngine.getRulesTimer();
 
 			stats.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis;
-			stats.countSubClassOfRule++;
+			stats.countSubClassOfRule++;*/
 
 			try {
 
 				for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-					ruleEngine.produce(context,
+					state.produce(context,
 							new PositiveSuperClassExpression(implied));
 				}
 			} finally {
-				stats.timeSubClassOfRule += CachedTimeThread.currentTimeMillis;
+				//stats.timeSubClassOfRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 
@@ -174,7 +173,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context element) {}
+		public void apply(SaturationState state, Context element) {}
 
 		@Override
 		public boolean addTo(Chain<ContextRules> ruleChain) {

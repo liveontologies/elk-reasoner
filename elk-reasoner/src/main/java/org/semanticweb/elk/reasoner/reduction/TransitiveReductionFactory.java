@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -116,7 +117,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.listener = listener;
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
-				ontologyIndex, maxWorkers,
+				new SaturationState(ontologyIndex.getIndexedOwlThing(), ontologyIndex.getIndexedOwlNothing()), maxWorkers,
 				new ThisClassExpressionSaturationListener());
 	}
 

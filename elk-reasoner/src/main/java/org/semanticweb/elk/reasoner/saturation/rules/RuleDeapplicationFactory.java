@@ -3,7 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -23,8 +23,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
-	public RuleDeapplicationFactory(OntologyIndex ontologyIndex) {
-		super(ontologyIndex);
+	public RuleDeapplicationFactory(final SaturationState saturationState) {
+		super(saturationState);
 	}
 
 	@Override

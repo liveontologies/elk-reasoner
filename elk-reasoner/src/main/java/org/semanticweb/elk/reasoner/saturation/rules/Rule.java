@@ -1,4 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 /*
  * #%L
  * ELK Reasoner
@@ -35,11 +37,11 @@ public interface Rule<E> {
 	/**
 	 * Applying the rule to an element using a {@link RuleEngine}
 	 * 
-	 * @param ruleEngine
-	 *            a {@link RuleEngine} used for this rule application
+	 * @param state
+	 *            a {@link SaturationState} which could be changed as a result of this rule's application
 	 * @param element
 	 *            the element to which the rule is applied
 	 */
-	public void apply(RuleEngine ruleEngine, E element);
+	public void apply(SaturationState state, E element);
 
 }

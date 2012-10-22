@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -53,6 +54,8 @@ public abstract class AbstractReasonerState {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(AbstractReasonerState.class);
 
+	final SaturationState saturationState;
+	
 	/**
 	 * 
 	 */
@@ -117,6 +120,7 @@ public abstract class AbstractReasonerState {
 		
 		this.ontologyIndex = ontoIndex;
 		this.incrementalState = new IncrementalReasonerState(ontoIndex, ontologyIndex.getIndexedOwlNothing());
+		this.saturationState = new SaturationState(ontoIndex.getIndexedOwlThing(), ontoIndex.getIndexedOwlNothing());
 	}
 
 	/**
@@ -163,8 +167,8 @@ public abstract class AbstractReasonerState {
 
 		if (incrementalState != null) {
 			this.changesLoader = changesLoader.getLoader(
-					incrementalState.diffIndex_.getAxiomInserter(),
-					incrementalState.diffIndex_.getAxiomDeleter());
+					incrementalState.diffIndex.getAxiomInserter(),
+					incrementalState.diffIndex.getAxiomDeleter());
 		} else {
 			this.changesLoader = changesLoader.getLoader(
 					ontologyIndex.getAxiomInserter(),
@@ -255,7 +259,7 @@ public abstract class AbstractReasonerState {
 	 */
 	public boolean isInconsistent() throws ElkException {
 		
-		ReasonerStage stage = incrementalState == null || incrementalState.diffIndex_.isEmpty() 
+		ReasonerStage stage = incrementalState == null || incrementalState.diffIndex.isEmpty() 
 				? new ConsistencyCheckingStage(	this) 
 				: new IncrementalConsistencyCheckingStage(this); 
 		
@@ -304,7 +308,7 @@ public abstract class AbstractReasonerState {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();		
 		
-		if (incrementalState != null && incrementalState.diffIndex_.isEmpty()) {
+		if (incrementalState != null && incrementalState.diffIndex.isEmpty()) {
 			getStageExecutor()
 					.complete(new IncrementalClassTaxonomyComputationStage(this));
 		} else {

@@ -26,18 +26,17 @@ import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkObjectIntersectionOf in an ontology.
@@ -104,19 +103,19 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		RuleStatistics stats = ruleEngine.getRulesTimer();
+	public void applyDecompositionRule(SaturationState state, Context context) {
+		/*RuleStatistics stats = ruleEngine.getRulesTimer();
 
 		stats.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread.currentTimeMillis;
-		stats.countObjectIntersectionOfDecompositionRule++;
+		stats.countObjectIntersectionOfDecompositionRule++;*/
 
 		try {
-			ruleEngine.produce(context, new PositiveSuperClassExpression(
+			state.produce(context, new PositiveSuperClassExpression(
 					firstConjunct_));
-			ruleEngine.produce(context, new PositiveSuperClassExpression(
+			state.produce(context, new PositiveSuperClassExpression(
 					secondConjunct_));
 		} finally {
-			stats.timeObjectIntersectionOfDecompositionRule += CachedTimeThread.currentTimeMillis;
+			//stats.timeObjectIntersectionOfDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
@@ -154,23 +153,23 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context context) {
+		public void apply(SaturationState state, Context context) {
 
-			RuleStatistics stats = ruleEngine.getRulesTimer();
+			/*RuleStatistics stats = ruleEngine.getRulesTimer();
 
 			stats.timeObjectIntersectionOfCompositionRule -= CachedTimeThread.currentTimeMillis;
-			stats.countObjectIntersectionOfCompositionRule++;
+			stats.countObjectIntersectionOfCompositionRule++;*/
 
 			try {
 
 				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 						conjunctionsByConjunct_.keySet(),
 						context.getSuperClassExpressions()))
-					ruleEngine.produce(context,
+					state.produce(context,
 							new NegativeSuperClassExpression(
 									conjunctionsByConjunct_.get(common)));
 			} finally {
-				stats.timeObjectIntersectionOfCompositionRule += CachedTimeThread.currentTimeMillis;
+				//stats.timeObjectIntersectionOfCompositionRule += CachedTimeThread.currentTimeMillis;
 			}
 
 		}
@@ -229,7 +228,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 		
 		@Override
-		public void apply(RuleEngine ruleEngine, Context element) {}
+		public void apply(SaturationState state, Context element) {}
 
 		@Override
 		public boolean addTo(Chain<ContextRules> ruleChain) {

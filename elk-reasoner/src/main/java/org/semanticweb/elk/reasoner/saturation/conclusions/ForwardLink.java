@@ -25,16 +25,15 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from this
@@ -68,10 +67,10 @@ public class ForwardLink implements Conclusion {
 	}
 
 	@Override
-	public void apply(RuleEngine ruleEngine, Context context) {
+	public void apply(SaturationState state, Context context) {
 
-		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
+		//ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
+		//statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
 		try {
 
 			/* compose the link with all backward links */
@@ -89,18 +88,18 @@ public class ForwardLink implements Conclusion {
 
 				for (IndexedPropertyChain composition : compositions)
 					for (Context source : sources) {
-						ruleEngine.produce(target_, new BackwardLink(source,
+						state.produce(target_, new BackwardLink(source,
 								composition));
 					}
 			}
 		} finally {
-			statistics.forwLinkTime += CachedTimeThread.currentTimeMillis;
+			//statistics.forwLinkTime += CachedTimeThread.currentTimeMillis;
 		}
 	}
 	
 	@Override
-	public void deapply(RuleEngine ruleEngine, Context context) {
-		apply(ruleEngine, context);
+	public void deapply(SaturationState state, Context context) {
+		apply(state, context);
 	}	
 	
 	@Override
@@ -181,13 +180,13 @@ public class ForwardLink implements Conclusion {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, BackwardLink link) {
+		public void apply(SaturationState state, BackwardLink link) {
 
-			RuleStatistics timer = ruleEngine.getRulesTimer();
+			/*RuleStatistics timer = ruleEngine.getRulesTimer();
 
 			timer.timeForwardLinkBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
 
-			timer.countForwardLinkBackwardLinkRule++;
+			timer.countForwardLinkBackwardLinkRule++;*/
 
 			try {
 
@@ -210,12 +209,12 @@ public class ForwardLink implements Conclusion {
 
 					for (IndexedPropertyChain composition : compositions)
 						for (Context forwardTarget : forwardTargets)
-							ruleEngine.produce(forwardTarget, new BackwardLink(
+							state.produce(forwardTarget, new BackwardLink(
 									source, composition));
 				}
 
 			} finally {
-				timer.timeForwardLinkBackwardLinkRule += CachedTimeThread.currentTimeMillis;
+				//timer.timeForwardLinkBackwardLinkRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 

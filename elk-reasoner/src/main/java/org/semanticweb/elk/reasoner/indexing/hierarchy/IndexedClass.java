@@ -27,17 +27,16 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -105,15 +104,15 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
+	public void applyDecompositionRule(SaturationState state, Context context) {
 
-		RuleStatistics timer = ruleEngine.getRulesTimer();
+		/*RuleStatistics timer = ruleEngine.getRulesTimer();
 
 		timer.timeClassDecompositionRule -= CachedTimeThread.currentTimeMillis;
-		timer.countClassDecompositionRule++;
+		timer.countClassDecompositionRule++;*/
 
 		try {
-			if (this.equals(ruleEngine.getOwlNothing())) {
+			if (this.equals(state.getOwlNothing())) {
 				context.setInconsistent();
 
 				// propagating bottom to the predecessors
@@ -127,7 +126,7 @@ public class IndexedClass extends IndexedClassEntity {
 					Collection<Context> targets = backLinks.get(propRelation);
 
 					for (Context target : targets)
-						ruleEngine.produce(target, carry);
+						state.produce(target, carry);
 				}
 
 				// register the backward link rule for propagation of bottom
@@ -136,7 +135,7 @@ public class IndexedClass extends IndexedClassEntity {
 						BottomBackwardLinkRule.FACTORY_);
 			}
 		} finally {
-			timer.timeClassDecompositionRule += CachedTimeThread.currentTimeMillis;
+			//timer.timeClassDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
@@ -156,19 +155,18 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, BackwardLink link) {
-			RuleStatistics stats = ruleEngine.getRulesTimer();
+		public void apply(SaturationState state, BackwardLink link) {
+			/*RuleStatistics stats = ruleEngine.getRulesTimer();
 
 			stats.timeClassBottomBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
-			stats.countClassBottomBackwardLinkRule++;
+			stats.countClassBottomBackwardLinkRule++;*/
 
 			try {
-				ruleEngine.produce(
+				state.produce(
 						link.getSource(),
-						new PositiveSuperClassExpression(ruleEngine
-								.getOwlNothing()));
+						new PositiveSuperClassExpression(state.getOwlNothing()));
 			} finally {
-				stats.timeClassBottomBackwardLinkRule += CachedTimeThread.currentTimeMillis;
+				//stats.timeClassBottomBackwardLinkRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
 

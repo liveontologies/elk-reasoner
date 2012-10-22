@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
+import org.semanticweb.elk.reasoner.incremental.ContextModificationListener;
+import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
@@ -41,6 +43,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 	// private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
 
 	private ClassExpressionSaturation<IndexedClassExpression> desaturation_ = null;
+	private final ContextModificationListener listener_ = new ContextModificationListener();
 
 	public IncrementalDeSaturationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -48,18 +51,17 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public String getName() {
-		return "Incremental Context Desaturation";
+		return IncrementalStages.DESATURATION.toString();
 	}
 
 	@Override
 	public boolean done() {
-		// TODO new constant?
-		return reasoner.doneContextReset;
+		return reasoner.incrementalState.getStageStatus(IncrementalStages.DESATURATION);
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ChangesLoadingStage(reasoner));
+		return Arrays.asList((ReasonerStage) new IncrementalChangesInitializationStage(reasoner, true));
 	}
 
 	@Override
@@ -68,16 +70,22 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 			initComputation();
 		}
 		
+		listener_.reset();
+		progressMonitor.start(getName());
+		
 		try {
-			// First, initialize changes, that is, take all concepts where superclasses have some registered changes
-			// and put those superclasses in the ToDo queue
-			
-			// Second, run de-saturation
-
+			for (;;) {
+				desaturation_.process();
+				if (!interrupted())
+					break;
+			}
 		} finally {
 			progressMonitor.finish();
 		}
-		reasoner.doneContextReset = true;
+		
+		reasoner.incrementalState.setStageStatus(IncrementalStages.DESATURATION, true);
+		// save for future processing
+		reasoner.incrementalState.classesToProcess = listener_.getModifiedClassExpressions();
 	}
 	
 	
@@ -86,19 +94,20 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 	void initComputation() {
 		super.initComputation();
 
-		RuleDeapplicationFactory deappFactory = new RuleDeapplicationFactory(reasoner.ontologyIndex);
+		RuleDeapplicationFactory deappFactory = new RuleDeapplicationFactory(reasoner.saturationState);
 		
 		desaturation_ = new ClassExpressionSaturation<IndexedClassExpression>(
-				reasoner.incrementalState.classesToProcess_,
+				reasoner.incrementalState.classesToProcess,
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				deappFactory);
+				deappFactory,
+				listener_);
 	}
 
 	@Override
 	public void printInfo() {
-		// TODO Auto-generated method stub
-		
+		if (desaturation_ != null)
+			desaturation_.printStatistics();
 	}
 }

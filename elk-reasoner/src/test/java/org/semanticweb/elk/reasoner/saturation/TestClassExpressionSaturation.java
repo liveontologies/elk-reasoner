@@ -35,7 +35,7 @@ public class TestClassExpressionSaturation<J extends SaturationJob<? extends Ind
 	public TestClassExpressionSaturation(ComputationExecutor executor,
 			int maxWorkers, OntologyIndex ontologyIndex) {
 		super(
-				new ClassExpressionSaturationFactory<J>(new RuleApplicationFactory(ontologyIndex),
+				new ClassExpressionSaturationFactory<J>(new RuleApplicationFactory(new SaturationState(ontologyIndex.getIndexedOwlThing(), ontologyIndex.getIndexedOwlNothing())),
 						maxWorkers), executor, maxWorkers);
 	}
 }

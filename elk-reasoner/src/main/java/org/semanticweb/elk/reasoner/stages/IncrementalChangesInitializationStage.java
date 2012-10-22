@@ -25,11 +25,10 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.incremental.ContextModificationListener;
+import org.semanticweb.elk.reasoner.incremental.ChangesInitializationListener;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
+import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
 
 /**
  * Reverts inferences
@@ -43,21 +42,22 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 	//private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
 
 	private IncrementalChangesInitialization initialization_ = null;
-	private final ContextModificationListener<IndexedClassExpression> listener_ = new ContextModificationListener<IndexedClassExpression>();
+	private final ChangesInitializationListener<IndexedClassExpression> listener_ = new ChangesInitializationListener<IndexedClassExpression>();
+	private final boolean deletions_;
 
-	public IncrementalChangesInitializationStage(AbstractReasonerState reasoner) {
+	public IncrementalChangesInitializationStage(AbstractReasonerState reasoner, boolean deletions) {
 		super(reasoner);
+		deletions_ = deletions;
 	}
 
 	@Override
 	public String getName() {
-		return "Incremental Context Desaturation";
+		return IncrementalStages.CHANGES_INIT.toString();
 	}
 
 	@Override
 	public boolean done() {
-		// TODO new constant?
-		return reasoner.doneContextReset;
+		return reasoner.incrementalState.getStageStatus(IncrementalStages.CHANGES_INIT);
 	}
 
 	@Override
@@ -82,10 +82,10 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		// TODO new constant
-		reasoner.doneContextReset = true;
+
+		reasoner.incrementalState.setStageStatus(IncrementalStages.CHANGES_INIT, true);
 		// save for future processing
-		reasoner.incrementalState.classesToProcess_ = listener_.getModifiedClassExpressions();
+		reasoner.incrementalState.classesToProcess = listener_.getModifiedClassExpressions();
 	}
 	
 	
@@ -93,13 +93,11 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		// this factory will be shared between the initialization and (de)saturation computations
-		RuleDeapplicationFactory deappFactory = new RuleDeapplicationFactory(reasoner.ontologyIndex);
 		
 		initialization_ = new IncrementalChangesInitialization(
 				reasoner.ontologyIndex.getIndexedClassExpressions(),
-				reasoner.incrementalState.diffIndex_.getIndexDeletions(),
-				deappFactory,
+				deletions_ ? reasoner.incrementalState.diffIndex.getIndexDeletions() : reasoner.incrementalState.diffIndex.getIndexAdditions(),
+				reasoner.saturationState,
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),

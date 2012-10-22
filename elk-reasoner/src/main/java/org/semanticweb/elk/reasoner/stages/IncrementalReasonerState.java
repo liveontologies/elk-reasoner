@@ -4,7 +4,9 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
+import java.util.EnumMap;
 
+import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -20,13 +22,29 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
  */
 public class IncrementalReasonerState {
 
-	final DifferentialIndex diffIndex_;
+	final DifferentialIndex diffIndex;
 	
-	Collection<IndexedClassExpression> classesToProcess_; 
+	Collection<IndexedClassExpression> classesToProcess; 
+	
+	final EnumMap<IncrementalStages, Boolean> stageStatusMap = new EnumMap<IncrementalStages, Boolean>(IncrementalStages.class);
 	
 	IncrementalReasonerState(IndexedObjectCache objectCache, IndexedClass owlNothing) {
-		diffIndex_ = new DifferentialIndex(objectCache, owlNothing);
+		diffIndex = new DifferentialIndex(objectCache, owlNothing);
+		
+		initStageStatuses();
 	}
 	
+	private void initStageStatuses() {
+		for (IncrementalStages type : IncrementalStages.values()) {
+			stageStatusMap.put(type, false);
+		}
+	}
+
+	void setStageStatus(IncrementalStages stageType, boolean status) {
+		stageStatusMap.put(stageType, status);
+	}
 	
+	boolean getStageStatus(IncrementalStages stageType) {
+		return stageStatusMap.get(stageType);
+	}	
 }
