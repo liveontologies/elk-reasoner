@@ -22,10 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.context;
 
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -40,6 +37,7 @@ import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
+import org.semanticweb.elk.util.concurrent.collections.Stack;
 
 /**
  * Context implementation that is used for EL reasoning. It provides data
@@ -51,7 +49,9 @@ import org.semanticweb.elk.util.collections.chains.AbstractChain;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ContextImpl implements Context {
+public class ContextImpl extends Stack<Conclusion> implements Context {
+
+	private static final long serialVersionUID = 6979593286040818144L;
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger.getLogger(ContextImpl.class);
@@ -86,13 +86,13 @@ public class ContextImpl implements Context {
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
 	 */
-	private final Queue<Conclusion> toDo_;
+	// private final Queue<Conclusion> toDo_;
 
 	/**
 	 * the flag used to trigger activation and de-activation of contexts. If
 	 * this value is {@code false} then {@link #toDo_} queue should be empty
 	 */
-	private final AtomicBoolean isActive_;
+	// private final AtomicBoolean isActive_;
 
 	/**
 	 * {@code true} if all derived {@link SuperClassExpression} of
@@ -114,8 +114,8 @@ public class ContextImpl implements Context {
 	 */
 	public ContextImpl(IndexedClassExpression root) {
 		this.root_ = root;
-		this.toDo_ = new ConcurrentLinkedQueue<Conclusion>();
-		this.isActive_ = new AtomicBoolean(false);
+		// this.toDo_ = new ConcurrentLinkedQueue<Conclusion>();
+		// this.isActive_ = new AtomicBoolean(false);
 		this.superClassExpressions_ = new ArrayHashSet<IndexedClassExpression>(
 				13);
 	}
@@ -146,7 +146,7 @@ public class ContextImpl implements Context {
 			return Operations.emptyMultimap();
 		return backwardLinksByObjectProperty_;
 	}
-	
+
 	@Override
 	public boolean addDisjointnessAxiom(
 			IndexedDisjointnessAxiom disjointnessAxiom) {
@@ -211,26 +211,28 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean addToDo(Conclusion conclusion) {
-		toDo_.add(conclusion);
-		if (isActive_.get()) {
-			return false;
-		}
-		return isActive_.compareAndSet(false, true);
+		return this.add(conclusion);
+		// toDo_.add(conclusion);
+		// if (isActive_.get()) {
+		// return false;
+		// }
+		// return isActive_.compareAndSet(false, true);
 	}
 
 	@Override
-	public Conclusion takeToDo() {
-		return toDo_.poll();
+	public Iterable<Conclusion> takeToDo() {
+		return this;
 	}
 
 	@Override
 	public boolean deactivate() {
-		if (!isActive_.get()) {
-			return false;
-		}
-		if (isActive_.compareAndSet(true, false) && !toDo_.isEmpty())
-			return isActive_.compareAndSet(false, true);
 		return false;
+		// if (!isActive_.get()) {
+		// return false;
+		// }
+		// if (isActive_.compareAndSet(true, false) && !toDo_.isEmpty())
+		// return isActive_.compareAndSet(false, true);
+		// return false;
 	}
 
 }

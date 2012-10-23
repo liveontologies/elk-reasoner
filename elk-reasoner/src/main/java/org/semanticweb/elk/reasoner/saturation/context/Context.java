@@ -177,7 +177,7 @@ public interface Context {
 	 * @see #addToDo(Conclusion)
 	 * @see #deactivate()
 	 */
-	public Conclusion takeToDo();
+	public Iterable<Conclusion> takeToDo();
 
 	/**
 	 * @return {@code true} if a contradiction has not been derived for the root

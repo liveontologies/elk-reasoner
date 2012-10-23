@@ -452,14 +452,7 @@ public class RuleApplicationFactory implements
 		 */
 		protected void process(Context context) {
 			factoryStats_.contContextProcess++;
-			for (;;) {
-				Conclusion conclusion = context.takeToDo();
-				if (conclusion == null)
-					if (context.deactivate())
-						// context was re-activated
-						continue;
-					else
-						break;
+			for (Conclusion conclusion : context.takeToDo()) {
 				conclusion.apply(this, context);
 			}
 		}
