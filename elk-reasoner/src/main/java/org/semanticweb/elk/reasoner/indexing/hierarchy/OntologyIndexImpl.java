@@ -44,11 +44,13 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	private final ElkAxiomIndexerVisitor directAxiomDeleter_;
 	
 	public OntologyIndexImpl() {
-		this.elkObjectIndexer_ = new ElkObjectIndexerVisitor(this);
-		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(this, getIndexedOwlNothing(), new DirectIndexUpdater(), true);
-		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, getIndexedOwlNothing(), new DirectIndexUpdater(), false);
+		elkObjectIndexer_ = new ElkObjectIndexerVisitor(this);
 	
 		indexPredefined();
+		
+		directAxiomInserter_ = new ElkAxiomIndexerVisitor(this, getIndexedOwlNothing(), new DirectIndexUpdater(), true);
+		directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, getIndexedOwlNothing(), new DirectIndexUpdater(), false);
+		
 	}
 
 	@Override
