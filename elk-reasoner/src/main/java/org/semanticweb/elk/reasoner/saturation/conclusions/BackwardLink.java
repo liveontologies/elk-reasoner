@@ -93,12 +93,13 @@ public class BackwardLink implements Conclusion {
 			 * convert backward link to a forward link if it can potentially be
 			 * composed
 			 */
-			Set<IndexedPropertyChain> toldProperties = source_.getRoot()
+			/*Set<IndexedPropertyChain> toldProperties = source_.getRoot()
 					.getPosPropertiesInExistentials();
 			if (toldProperties != null
 					&& !new LazySetIntersection<IndexedPropertyChain>(
 							toldProperties, relation_.getSaturated()
-									.getLeftComposableProperties()).isEmpty()) {
+									.getLeftComposableProperties()).isEmpty()) {*/
+			if (!relation_.getSaturated().getLeftComposableProperties().isEmpty()) {
 				state.produce(source_, new ForwardLink(relation_, context));
 			}
 		} finally {

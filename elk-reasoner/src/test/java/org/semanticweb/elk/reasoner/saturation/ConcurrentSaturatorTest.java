@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
@@ -46,6 +47,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		super(testName);
 	}
 
+	@Test
 	public void testExistentials() throws InterruptedException,
 			ExecutionException {
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -65,7 +67,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		inserter.visit(objectFactory.getSubClassOfAxiom(a,
 				objectFactory.getObjectSomeValuesFrom(r, b)));
 		inserter.visit(objectFactory.getSubClassOfAxiom(
-				objectFactory.getObjectSomeValuesFrom(s, c), d));
+				objectFactory.getObjectSomeValuesFrom(r, c), d));
 		inserter.visit(objectFactory.getSubObjectPropertyOfAxiom(r, s));
 
 		IndexedClassExpression A = ontologyIndex.getIndexed(a);
@@ -85,6 +87,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 	}
 
+	@Test
 	public void testConjunctions() throws InterruptedException,
 			ExecutionException {
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));

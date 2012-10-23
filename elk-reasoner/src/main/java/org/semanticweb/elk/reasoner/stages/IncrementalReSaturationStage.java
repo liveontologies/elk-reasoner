@@ -41,9 +41,11 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		// these two stages run in parallel and both modify the shares saturation state
+		// these two stages run in parallel and both modify the shared saturation state
 		return Arrays.asList(
+					// this initializes changes for additions
 					(ReasonerStage) new IncrementalChangesInitializationStage(reasoner, false),
+					// this initializes fully cleaned context
 					(ReasonerStage) new IncrementalContextInitializationStage(reasoner));
 	}
 
@@ -74,11 +76,12 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-
+		// time to commit the differential index
+		reasoner.incrementalState.diffIndex.commit();
+		
 		RuleApplicationFactory appFactory = new RuleApplicationFactory(reasoner.saturationState);
 		
 		saturation_ = new ClassExpressionSaturation<IndexedClassExpression>(
-				reasoner.incrementalState.classesToProcess,
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),

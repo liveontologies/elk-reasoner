@@ -151,6 +151,11 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			List<? extends ElkClassExpression> disjointClasses) {
 
 		// treat this as a positive occurrence of owl:Nothing
+		if (owlNothing_ == null) throw new RuntimeException("owlNothing_");
+		
+		if (indexUpdater_ == null) throw new RuntimeException("updater");
+		
+		
 		owlNothing_.updateOccurrenceNumbers(indexUpdater_, multiplicity,
 				multiplicity, 0);
 

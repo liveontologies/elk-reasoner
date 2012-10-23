@@ -107,7 +107,11 @@ public class SaturationState {
 	}
 	
 	/**
+	 * A tiny chain of listeners supporting register/deregister operations
 	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
 	 */
 	private static class ContextCreationListenerChain {
 		
@@ -124,13 +128,15 @@ public class SaturationState {
 			tail = tail_;
 		}
 		
-		
+		/**
+		 * Notify all registered listeners that a context has been created
+		 */
 		void notifyAll(Context newContext) {
 			ContextCreationListener head = head_;
 			
 			while (head != null) {
 				head.notifyContextCreation(newContext);
-				head = tail_.head_;
+				head = tail_ == null ? null : tail_.head_;
 			}
 		}
 		
@@ -145,17 +151,19 @@ public class SaturationState {
 			ContextCreationListenerChain curr = this;
 			ContextCreationListenerChain prev = null;
 			
-			while (curr.head_ != null) {
+			while (curr != null && curr.head_ != null) {
 				if (curr.head_ == listener) {
 					if (prev == null) {
 						//removing the head
-						head_ = tail_.head_;
-						tail_ = tail_.tail_;
+						head_ = tail_ == null ? null : tail_.head_;
+						tail_ = tail_ == null ? null : tail_.tail_;
 					}
 					else {
 						prev.tail_ = curr.tail_;
 						curr.tail_ = null;
 					}
+					
+					break;
 				}
 				
 				prev = curr;
