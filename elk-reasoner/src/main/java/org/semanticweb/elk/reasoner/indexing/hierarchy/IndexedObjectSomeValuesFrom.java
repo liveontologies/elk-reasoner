@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
@@ -38,7 +37,6 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -188,11 +186,11 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 			try {
 
-				final Set<IndexedPropertyChain> candidatePropagationProperties = context
+				/*final Set<IndexedPropertyChain> candidatePropagationProperties = context
 						.getRoot().getPosPropertiesInExistentials();
 
 				if (candidatePropagationProperties == null)
-					return;
+					return;*/
 
 				for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 					IndexedPropertyChain relation = e.getRelation();
@@ -200,11 +198,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					 * creating propagations for relevant sub-properties of the
 					 * relation
 					 */
-					for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
+					for (IndexedPropertyChain property : relation.getSaturated().getSubProperties()) {
+						addPropagation(state, property, e, context);
+					}
+					/*for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
 							candidatePropagationProperties, relation
 									.getSaturated().getSubProperties())) {
 						addPropagation(state, property, e, context);
-					}
+					}*/
 
 					/*
 					 * creating propagations for relevant sub-compositions of
@@ -214,10 +215,11 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 							.getSaturated().getSubCompositions()) {
 						SaturatedPropertyChain propertySaturation = property
 								.getSaturated();
-						if (!new LazySetIntersection<IndexedPropertyChain>(
+						if (!propertySaturation.getRightSubProperties().isEmpty()) {
+						/*if (!new LazySetIntersection<IndexedPropertyChain>(
 								candidatePropagationProperties,
 								propertySaturation.getRightSubProperties())
-								.isEmpty()) {
+								.isEmpty()) {*/
 							/*
 							 * create propagations for told super-properties of
 							 * the chain instead of the chain itself if the
