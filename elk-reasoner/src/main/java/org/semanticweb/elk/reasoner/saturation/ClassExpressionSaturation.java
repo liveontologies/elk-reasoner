@@ -24,11 +24,13 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.AbstractCollection;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -48,30 +50,39 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ClassExpressionSaturation.class);
 
+	/*
+	 * Takes inputs and uses the default rule application factory and a dummy listener
+	 */
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
-			SaturationState saturationState) {
-		this(inputs, executor, maxWorkers, progressMonitor, saturationState, new DummyClassExpressionSaturationListener<SaturationJob<I>>());
+			OntologyIndex ontIndex) {
+		this(inputs, executor, maxWorkers, progressMonitor, ontIndex, new DummyClassExpressionSaturationListener<SaturationJob<I>>());
 	}	
 	
+	/*
+	 * Takes inputs and uses the default rule application factory
+	 */
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
-			SaturationState saturationState,
+			OntologyIndex ontIndex,
 			ClassExpressionSaturationListener<SaturationJob<I>> listener
 			) {
 		super(
 				new TodoJobs<I>(inputs),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(
-						saturationState,
+						new SaturationState(ontIndex.getIndexedOwlThing(), ontIndex.getIndexedOwlNothing()),
 						maxWorkers,
 						listener),
 				executor, maxWorkers, progressMonitor);
 	}	
 	
+	/*
+	 * Takes inputs but uses the given rule application factory
+	 */
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor,
 			int maxWorkers,
@@ -81,6 +92,25 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 			) {
 		super(
 				new TodoJobs<I>(inputs),
+				new ClassExpressionSaturationFactory<SaturationJob<I>>(
+						ruleAppFactory,
+						maxWorkers,
+						listener),
+				executor, maxWorkers, progressMonitor);
+	}	
+	
+	/*
+	 * Does NOT take inputs, assumes the saturation state has been initialized so the computation can carry on.
+	 */
+	public ClassExpressionSaturation(
+			ComputationExecutor executor,
+			int maxWorkers,
+			ProgressMonitor progressMonitor,
+			RuleApplicationFactory ruleAppFactory,
+			ClassExpressionSaturationListener<SaturationJob<I>> listener
+			) {
+		super(
+				new TodoJobs<I>(Collections.<I>emptyList()),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(
 						ruleAppFactory,
 						maxWorkers,
@@ -103,9 +133,8 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	static class TodoJobs<I extends IndexedClassExpression> extends
-			AbstractCollection<SaturationJob<I>> implements
-			Collection<SaturationJob<I>> {
+	private static class TodoJobs<I extends IndexedClassExpression> extends
+			AbstractCollection<SaturationJob<I>>  {
 
 		private final Collection<I> inputs;
 
@@ -142,9 +171,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 				public void remove() {
 					inputsIterator.remove();
 				}
-
 			};
-
 		}
 	}
 }

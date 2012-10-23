@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -51,12 +52,7 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		//add incremental stages: 
-		return null;//Arrays.asList();
-		/*return Arrays.asList(
-				(ReasonerStage) new OntologyLoadingStage(reasoner),
-				(ReasonerStage) new ChangesLoadingStage(reasoner),
-				(ReasonerStage) new ContextInitializationStage(reasoner));*/		
+		return Arrays.asList((ReasonerStage) new IncrementalReSaturationStage(reasoner));		
 	}
 
 

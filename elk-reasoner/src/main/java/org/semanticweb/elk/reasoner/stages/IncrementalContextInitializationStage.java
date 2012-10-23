@@ -96,5 +96,4 @@ public class IncrementalContextInitializationStage extends
 		if (initContexts_ > 0 && LOGGER_.isDebugEnabled())
 			LOGGER_.debug("Contexts init:" + initContexts_);
 	}
-
 }

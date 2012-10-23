@@ -89,7 +89,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
 				reasoner.ontologyIndex.getIndexedClasses(),
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.saturationState);
+				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}

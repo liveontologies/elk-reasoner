@@ -3,6 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -22,8 +23,6 @@ public class SaturationState {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger.getLogger(SaturationState.class);
-	
-	
 	
 	
 	/**
@@ -97,6 +96,14 @@ public class SaturationState {
 	
 	public void deregisterContextCreationListener(ContextCreationListener listener) {
 		contextCreationListeners_.remove(listener);
+	}
+	
+	int size() {
+		return activeContexts_.size();
+	}
+	
+	Iterator<Context> getActiveContextIterator() {
+		return activeContexts_.iterator();
 	}
 	
 	/**

@@ -65,7 +65,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 		}
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.CONTEXT_CLEANING, true);
-		// save for future processing
+		// save cleaned contexts for future processing
 		reasoner.incrementalState.classesToProcess = listener_.getModifiedClassExpressions();
 	}
 	

@@ -41,6 +41,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
+		// these two stages run in parallel and both modify the shares saturation state
 		return Arrays.asList(
 					(ReasonerStage) new IncrementalChangesInitializationStage(reasoner, false),
 					(ReasonerStage) new IncrementalContextInitializationStage(reasoner));

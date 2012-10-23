@@ -84,8 +84,6 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		}
 
 		reasoner.incrementalState.setStageStatus(IncrementalStages.CHANGES_INIT, true);
-		// save for future processing
-		reasoner.incrementalState.classesToProcess = listener_.getModifiedClassExpressions();
 	}
 	
 	

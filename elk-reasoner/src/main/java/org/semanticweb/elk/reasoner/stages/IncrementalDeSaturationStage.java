@@ -84,7 +84,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 		}
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.DESATURATION, true);
-		// save for future processing
+		// save modified contexts for future processing
 		reasoner.incrementalState.classesToProcess = listener_.getModifiedClassExpressions();
 	}
 	
@@ -97,7 +97,6 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 		RuleDeapplicationFactory deappFactory = new RuleDeapplicationFactory(reasoner.saturationState);
 		
 		desaturation_ = new ClassExpressionSaturation<IndexedClassExpression>(
-				reasoner.incrementalState.classesToProcess,
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),

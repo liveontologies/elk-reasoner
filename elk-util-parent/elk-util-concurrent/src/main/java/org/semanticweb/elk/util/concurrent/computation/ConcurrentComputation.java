@@ -202,6 +202,16 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 			InputProcessor<I> inputProcessor = inputProcessorFactory.getEngine();
 			
 			try {
+				// this first invocation of process() takes care of the case
+				// when the engine doesn't need any input but has to process
+				// some of its internal state (thus, there's no submit())
+				try {
+					inputProcessor.process();
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					return;
+				}
+				
 				for (;;) {
 					if (interrupted)
 						break;
