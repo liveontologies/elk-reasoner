@@ -65,9 +65,11 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	private void indexPredefined() {
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
-		this.indexedOwlThing = directAxiomInserter_
+		ElkAxiomIndexerVisitor tmpIndexer = new ElkAxiomIndexerVisitor(this, null, new DirectIndexUpdater(), true);
+		
+		this.indexedOwlThing = tmpIndexer
 				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
-		this.indexedOwlNothing = directAxiomInserter_
+		this.indexedOwlNothing = tmpIndexer
 				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 	}
 
