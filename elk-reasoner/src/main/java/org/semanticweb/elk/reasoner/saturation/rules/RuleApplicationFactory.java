@@ -300,6 +300,9 @@ public class RuleApplicationFactory implements
 			LOGGER_.error("More unique forward links than produced!");
 	}
 
+	/**
+	 * 
+	 */
 	public class Engine implements InputProcessor<IndexedClassExpression>, RuleEngine, ContextCreationListener {
 
 		protected final ConclusionVisitor<Boolean> conclusionVisitor_;
@@ -344,9 +347,12 @@ public class RuleApplicationFactory implements
 				
 				Context nextContext = saturationState_.pollForContext();//activeContexts_.poll();
 				
-				if (nextContext == null)
+				if (nextContext == null) {
 					break;
-				process(nextContext);
+				}
+				else {
+					process(nextContext);
+				}
 			}
 			factoryStats_.timeContextProcess += CachedTimeThread.currentTimeMillis;
 		}
@@ -360,21 +366,6 @@ public class RuleApplicationFactory implements
 			aggregatedFactoryStats_.merge(factoryStats_);
 			saturationState_.deregisterContextCreationListener(this);
 		}
-
-		/**
-		 * @return the {@code owl:Thing} object in this ontology
-		 */
-		/*@Override
-		public IndexedClassExpression getOwlNothing() {
-			return owlNothing_;
-		}*/
-
-		/**
-		 * @return the {@code owl:Nothing} object in this ontology
-		 */
-		/*public IndexedClassExpression getOwlThing() {
-			return owlThing_;
-		}*/
 
 		/**
 		 * @return the object collecting statistics of rule applications
@@ -436,11 +427,15 @@ public class RuleApplicationFactory implements
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
 				if (conclusion == null) {
-					if (context.deactivate())
+					if (context.deactivate()) {
 						// context was re-activated
+						//LOGGER_.trace(context.getRoot() + " is still active, continuing...");
 						continue;
-					else
+					}
+					else {
+						//LOGGER_.trace(context.getRoot() + " is now deactivated, stopping...");
 						break;
+					}
 				}
 				
 				if (preApply(conclusion, context)) {
@@ -513,7 +508,7 @@ public class RuleApplicationFactory implements
 		@Override
 		public Boolean visit(BackwardLink link, Context context) {
 			//statistics_.backLinkInfNo++;
-			return !context.addBackwardLink(link);
+			return context.addBackwardLink(link);
 			//statistics_.backLinkNo++;
 		}
 
