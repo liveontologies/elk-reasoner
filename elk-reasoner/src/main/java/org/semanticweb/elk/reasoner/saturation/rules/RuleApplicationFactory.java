@@ -452,7 +452,10 @@ public class RuleApplicationFactory implements
 		 */
 		protected void process(Context context) {
 			factoryStats_.contContextProcess++;
-			for (Conclusion conclusion : context.takeToDo()) {
+			for (;;) {
+				Conclusion conclusion = context.takeToDo();
+				if (conclusion == null)
+					return;
 				conclusion.apply(this, context);
 			}
 		}
