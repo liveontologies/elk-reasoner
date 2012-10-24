@@ -17,6 +17,10 @@ public class IndexChange  extends AbstractChain<ContextRules> implements Conclus
 
 	private ContextRules contextRules_;
 
+	public IndexChange(ContextRules rules) {
+		contextRules_ = rules;
+	}
+	
 	@Override
 	public ContextRules next() {
 		return contextRules_;
@@ -35,7 +39,7 @@ public class IndexChange  extends AbstractChain<ContextRules> implements Conclus
 
 	@Override
 	public void apply(SaturationState state, Context context) {
-		ContextRules compositionRule = contextRules_.next();
+		ContextRules compositionRule = contextRules_;
 
 		for (;;) {
 			if (compositionRule == null)

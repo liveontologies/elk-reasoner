@@ -122,7 +122,7 @@ public class DifferentialIndex {
 		IndexChange result = indexAdditions.get(target);
 
 		if (result == null) {
-			result = new IndexChange();
+			result = new IndexChange(rules);
 			indexAdditions.put(target, result);
 			
 			return true;
@@ -146,7 +146,7 @@ public class DifferentialIndex {
 		IndexChange result = indexDeletions.get(target);
 
 		if (result == null) {
-			result = new IndexChange();
+			result = new IndexChange(rules);
 			indexDeletions.put(target, result);
 			
 			return true;
