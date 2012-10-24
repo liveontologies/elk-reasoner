@@ -45,6 +45,7 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
  * expressions.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  * 
  */
 public class DifferentialIndex {
@@ -146,7 +147,7 @@ public class DifferentialIndex {
 
 		if (result == null) {
 			result = new IndexChange();
-			indexAdditions.put(target, result);
+			indexDeletions.put(target, result);
 			
 			return true;
 		}
