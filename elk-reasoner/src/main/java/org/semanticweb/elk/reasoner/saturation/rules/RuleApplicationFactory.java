@@ -57,22 +57,11 @@ public class RuleApplicationFactory implements
 		InputProcessorFactory<IndexedClassExpression, Engine> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
 	
-	private final SaturationState saturationState_;
-	/**
-	 * Cached constants
-	 */
-	//private final IndexedClassExpression owlThing_, owlNothing_;
-
-	/**
-	 * The queue containing all activated contexts. Every activated context
-	 * occurs exactly once.
-	 */
-	//private final Queue<Context> activeContexts_;
-
+	protected final SaturationState saturationState_;
 	/**
 	 * The approximate number of contexts ever created by this engine. This
 	 * number is used not only for statistical purposes, but also by saturation
@@ -105,16 +94,12 @@ public class RuleApplicationFactory implements
 	 */
 	private final ThisStatistics aggregatedFactoryStats_;
 
-	public RuleApplicationFactory(final SaturationState saturationState/*OntologyIndex ontologyIndex*/) {
-		//this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
+	public RuleApplicationFactory(final SaturationState saturationState) {
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
 		this.aggregatedRuleStats_ = new RuleStatistics();
 		this.aggregatedFactoryStats_ = new ThisStatistics();
 
 		this.saturationState_ = saturationState;
-		
-		//owlThing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
-		//owlNothing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	@Override
@@ -345,7 +330,7 @@ public class RuleApplicationFactory implements
 				if (Thread.currentThread().isInterrupted())
 					break;
 				
-				Context nextContext = saturationState_.pollForContext();//activeContexts_.poll();
+				Context nextContext = saturationState_.pollForContext();
 				
 				if (nextContext == null) {
 					break;
@@ -380,42 +365,6 @@ public class RuleApplicationFactory implements
 			return this.ruleStats_;
 		}
 
-/*		@Override
-		public Context getCreateContext(IndexedClassExpression root) {
-			if (root.getContext() == null) {
-				Context context = new ContextImpl(root);
-				if (root.setContext(context)) {
-					if (++localContextNumber == contextUpdateInterval_) {
-						approximateContextNumber_.addAndGet(localContextNumber);
-						localContextNumber = 0;
-					}
-					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace(root + ": context created");
-					}
-					
-					saturationState_.initContext(context);
-				}
-			}
-			return root.getContext();
-		}*/
-
-		/**
-		 * Schedule the given item to be processed in the given context
-		 * 
-		 * @param context
-		 *            the context in which the item should be processed
-		 * @param item
-		 *            the item to be processed in the given context
-		 */
-		/*@Override
-		public void produce(Context context, Conclusion item) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
-			if (context.addToDo(item))
-				// context was activated
-				activeContexts_.add(context);
-		}*/
-
 		/**
 		 * Process all scheduled items in the given context
 		 * 
@@ -429,20 +378,22 @@ public class RuleApplicationFactory implements
 				if (conclusion == null) {
 					if (context.deactivate()) {
 						// context was re-activated
-						//LOGGER_.trace(context.getRoot() + " is still active, continuing...");
 						continue;
 					}
 					else {
-						//LOGGER_.trace(context.getRoot() + " is now deactivated, stopping...");
 						break;
 					}
 				}
 				
 				if (preApply(conclusion, context)) {
-					conclusion.apply(saturationState_, context);
+					process(conclusion, context);
 					postApply(conclusion, context);
 				}
 			}
+		}
+
+		protected void process(Conclusion conclusion, Context context) {
+			conclusion.apply(saturationState_, context);
 		}
 
 		protected boolean preApply(Conclusion conclusion, Context context) {
@@ -463,16 +414,6 @@ public class RuleApplicationFactory implements
 				LOGGER_.trace(newContext.getRoot() + ": context created");
 			}
 		}		
-		
-		/*public void initContext(Context context) {
-			produce(context,
-					new PositiveSuperClassExpression(context.getRoot()));
-			// TODO: register this as a ContextRule when owlThing occurs
-			// negative and apply all such context initialization rules here
-			IndexedClassExpression owlThing = getOwlThing();
-			if (owlThing.occursNegatively())
-				produce(context, new PositiveSuperClassExpression(owlThing));
-		}*/
 	}
 	
 	/**

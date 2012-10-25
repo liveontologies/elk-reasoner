@@ -52,7 +52,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public String getName() {
-		return IncrementalStages.CHANGES_INIT.toString();
+		return IncrementalStages.CHANGES_INIT.toString() + " (" + ( deletions_ ? "deletions" : "additions" ) + ")";
 	}
 
 	@Override

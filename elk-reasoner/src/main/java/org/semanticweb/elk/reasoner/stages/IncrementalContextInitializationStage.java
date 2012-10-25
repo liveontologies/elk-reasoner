@@ -31,13 +31,16 @@ public class IncrementalContextInitializationStage extends
 	 */
 	private int maxContexts_;
 
+	private final ReasonerStage dependency_;
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
 	private Iterator<IndexedClassExpression> todo = null;
 
-	public IncrementalContextInitializationStage(AbstractReasonerState reasoner) {
+	public IncrementalContextInitializationStage(AbstractReasonerState reasoner, ReasonerStage dependency) {
 		super(reasoner);
+		
+		this.dependency_ = dependency;
 	}
 
 	@Override
@@ -52,7 +55,7 @@ public class IncrementalContextInitializationStage extends
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Collections.emptyList();
+		return Collections.singletonList(dependency_);
 	}
 
 	@Override

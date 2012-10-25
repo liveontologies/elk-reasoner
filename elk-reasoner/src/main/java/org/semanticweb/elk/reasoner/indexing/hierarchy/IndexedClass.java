@@ -179,6 +179,5 @@ public class IndexedClass extends IndexedClassEntity {
 				return new BottomBackwardLinkRule(tail);
 			}
 		};
-
 	}
 }

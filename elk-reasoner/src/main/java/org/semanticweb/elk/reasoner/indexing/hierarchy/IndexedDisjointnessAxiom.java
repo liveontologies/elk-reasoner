@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,11 +79,11 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 	public void registerCompositionRule(IndexUpdater indexUpdater) {
 		if (members_ == null) {
-			indexUpdater.add(first_, new ThisBinaryRegistrationRule(second_));
-			indexUpdater.add(second_, new ThisBinaryRegistrationRule(first_));
+			indexUpdater.add(first_, new ThisCompositionRule(second_));
+			indexUpdater.add(second_, new ThisCompositionRule(first_));
 		}
 		else {
-			ThisNaryRegistrationRule regRule = new ThisNaryRegistrationRule(); 
+			ThisCompositionRule regRule = new ThisCompositionRule(this); 
 			
 			for (IndexedClassExpression ice : members_) {
 				indexUpdater.add(ice, regRule);
@@ -94,10 +93,10 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 	public void deregisterCompositionRule(IndexUpdater indexUpdater) {
 		if (members_ == null) {
-			indexUpdater.remove(first_, new ThisBinaryRegistrationRule(second_));
-			indexUpdater.remove(second_, new ThisBinaryRegistrationRule(first_));
+			indexUpdater.remove(first_, new ThisCompositionRule(second_));
+			indexUpdater.remove(second_, new ThisCompositionRule(first_));
 		} else {
-			ThisNaryRegistrationRule regRule = new ThisNaryRegistrationRule();
+			ThisCompositionRule regRule = new ThisCompositionRule(this);
 			
 			for (IndexedClassExpression ice : members_) {
 				indexUpdater.remove(ice, regRule);
@@ -129,8 +128,20 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 */
 		private List<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
-		public ThisCompositionRule(ContextRules tail) {
+		ThisCompositionRule(ContextRules tail) {
 			super(tail);
+		}
+		
+		ThisCompositionRule(IndexedClassExpression disjointClass) {
+			super(null);
+			disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
+			disjointClasses_.add(disjointClass);
+		}
+		
+		ThisCompositionRule(IndexedDisjointnessAxiom axiom) {
+			super(null);
+			disjointnessAxioms_ = new LinkedList<IndexedDisjointnessAxiom>();
+			disjointnessAxioms_.add(axiom);
 		}
 
 		@Override
@@ -304,52 +315,4 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return changed;
 		}
 	}
-	
-	/**
-	 */
-	private static class ThisBinaryRegistrationRule extends ContextRules {
-
-		private final IndexedClassExpression disjointClass_;
-		
-		public ThisBinaryRegistrationRule(IndexedClassExpression ice) {
-			super(null);
-			disjointClass_ = ice;
-		}
-
-		@Override
-		public void apply(SaturationState state, Context element) {}
-
-		@Override
-		public boolean addTo(Chain<ContextRules> ruleChain) {
-			return ThisCompositionRule.addTo(ruleChain, Collections.singleton(disjointClass_));
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ContextRules> ruleChain) {
-			return ThisCompositionRule.removeFrom(ruleChain, Collections.singleton(disjointClass_));
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	private class ThisNaryRegistrationRule extends ContextRules {
-
-		public ThisNaryRegistrationRule() {
-			super(null);
-		}
-
-		@Override
-		public void apply(SaturationState state, Context element) {}
-
-		@Override
-		public boolean addTo(Chain<ContextRules> ruleChain) {
-			return ThisCompositionRule.addTo(ruleChain, Collections.singletonList(IndexedDisjointnessAxiom.this));
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ContextRules> ruleChain) {
-			return ThisCompositionRule.removeFrom(ruleChain, Collections.singletonList(IndexedDisjointnessAxiom.this));
-		}
-	}	
 }

@@ -22,13 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import java.util.Set;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a

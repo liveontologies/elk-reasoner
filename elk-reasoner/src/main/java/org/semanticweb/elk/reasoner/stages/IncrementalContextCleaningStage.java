@@ -42,7 +42,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new IncrementalContextInitializationStage(reasoner));
+		return Arrays.asList((ReasonerStage) new IncrementalContextInitializationStage(reasoner, new IncrementalDeSaturationStage(reasoner)));
 	}
 
 	@Override

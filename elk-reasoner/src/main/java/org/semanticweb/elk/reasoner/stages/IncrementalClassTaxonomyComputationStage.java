@@ -41,7 +41,7 @@ class IncrementalClassTaxonomyComputationStage extends
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		this.computation_ = new ClassTaxonomyComputation(
-				//Decide which classes need to be saturated
+				//Only need to saturate new classes?
 				reasoner.ontologyIndex.getIndexedClasses(),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
 				reasoner.ontologyIndex);

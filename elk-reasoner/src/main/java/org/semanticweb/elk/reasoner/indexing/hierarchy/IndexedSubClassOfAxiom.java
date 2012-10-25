@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -49,9 +48,9 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	@Override
 	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, final int increment) {
 		if (increment > 0) {
-			indexUpdater.add(subClass, new ThisRegistrationRule());
+			indexUpdater.add(subClass, new ThisCompositionRule(superClass));
 		} else {
-			indexUpdater.remove(subClass, new ThisRegistrationRule());
+			indexUpdater.remove(subClass, new ThisCompositionRule(superClass));
 		}
 	}
 	
@@ -68,8 +67,17 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		ThisCompositionRule(ContextRules tail) {
 			super(tail);
-			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
-					1);
+			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(1);
+		}
+		
+		/*
+		 * used for registration
+		 */
+		ThisCompositionRule(IndexedClassExpression ice) {
+			super(null);
+			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(1);
+			
+			toldSuperClassExpressions_.add(ice);
 		}
 
 		protected boolean addToldSuperClassExpression(
@@ -161,28 +169,5 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			
 			return changed;
 		}		
-	}
-	
-	/**
-	 * 
-	 */
-	private class ThisRegistrationRule extends ContextRules {
-
-		public ThisRegistrationRule() {
-			super(null);
-		}
-
-		@Override
-		public void apply(SaturationState state, Context element) {}
-
-		@Override
-		public boolean addTo(Chain<ContextRules> ruleChain) {
-			return ThisCompositionRule.addTo(ruleChain, Collections.singletonList(superClass));
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ContextRules> ruleChain) {
-			return ThisCompositionRule.removeFrom(ruleChain, Collections.singletonList(superClass));
-		}
 	}
 }

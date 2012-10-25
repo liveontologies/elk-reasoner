@@ -61,6 +61,7 @@ public class SaturationState {
 		if (context.addToDo(item)) {
 			// context was activated
 			activeContexts_.add(context);
+			//LOGGER_.trace(context.getRoot() + " was activated!");	
 		}
 	}
 	

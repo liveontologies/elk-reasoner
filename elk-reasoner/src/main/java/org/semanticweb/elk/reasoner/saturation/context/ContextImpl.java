@@ -258,4 +258,21 @@ public class ContextImpl implements Context {
 		return false;
 	}
 
+	@Override
+	public boolean containsBackwardLink(BackwardLink link) {
+		if (backwardLinksByObjectProperty_ != null) {
+			return backwardLinksByObjectProperty_.contains(link.getRelation(), link.getSource());
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean containsSuperClassExpression(SuperClassExpression expression) {
+		return superClassExpressions_.contains(expression.getExpression());
+	}
+	
+	public void removeBackwardLinkRules() {
+		backwardLinkRules_ = null;
+	}
 }

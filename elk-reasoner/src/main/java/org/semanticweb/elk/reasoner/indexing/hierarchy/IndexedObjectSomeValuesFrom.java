@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
@@ -96,7 +95,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			// register the composition rule for the filler
-			indexUpdater.add(filler, new ThisRegistrationRule());
+			indexUpdater.add(filler, new ThisCompositionRule(this));
 		}
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
@@ -113,8 +112,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			//deregisterCompositionRule(indexUpdater);
-			indexUpdater.remove(filler, new ThisRegistrationRule());
+			indexUpdater.remove(filler, new ThisCompositionRule(this));
 		}
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
@@ -156,8 +154,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		ThisCompositionRule(ContextRules tail) {
 			super(tail);
-			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(
-					1);
+			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(1);
+		}
+		
+		ThisCompositionRule(IndexedObjectSomeValuesFrom negExistential) {
+			super(null);
+			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(1);
+			this.negExistentials_.add(negExistential);
 		}
 
 		private boolean addNegExistential(IndexedObjectSomeValuesFrom existential) {
@@ -195,8 +198,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 					IndexedPropertyChain relation = e.getRelation();
 					/*
-					 * creating propagations for relevant sub-properties of the
-					 * relation
+					 * creating propagations for relevant sub-properties of the relation
 					 */
 					for (IndexedPropertyChain property : relation.getSaturated().getSubProperties()) {
 						addPropagation(state, property, e, context);
@@ -208,8 +210,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					}*/
 
 					/*
-					 * creating propagations for relevant sub-compositions of
-					 * the relation
+					 * creating propagations for relevant sub-compositions of the relation
 					 */
 					for (IndexedPropertyChain property : relation
 							.getSaturated().getSubCompositions()) {
@@ -255,10 +256,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				IndexedPropertyChain propRelation,
 				IndexedClassExpression carry, Context context) {
 
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context.getRoot() + ": new propagation "
-						+ propRelation + "->" + carry);
-
 			if (context
 					.getBackwardLinkRulesChain()
 					.getCreate(ThisBackwardLinkRule.MATCHER_,
@@ -267,6 +264,10 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				// propagate over all backward links
 				final Multimap<IndexedPropertyChain, Context> backLinks = context
 						.getBackwardLinksByObjectProperty();
+				
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace(context.getRoot() + ": new propagation "
+							+ propRelation + "->" + carry);				
 
 				Collection<Context> targets = backLinks.get(propRelation);
 
@@ -377,28 +378,5 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				return new ThisBackwardLinkRule(tail);
 			}
 		};
-	}
-	
-	/**
-	 * Used only to add this negative existential to a set of context rules
-	 */
-	private class ThisRegistrationRule extends ContextRules {
-
-		public ThisRegistrationRule() {
-			super(null);
-		}
-
-		@Override
-		public void apply(SaturationState state, Context element) {}
-
-		@Override
-		public boolean addTo(Chain<ContextRules> ruleChain) {
-			return ThisCompositionRule.addTo(ruleChain, Collections.singletonList(IndexedObjectSomeValuesFrom.this));
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ContextRules> ruleChain) {
-			return ThisCompositionRule.removeFrom(ruleChain, Collections.singletonList(IndexedObjectSomeValuesFrom.this));
-		}
 	}
 }

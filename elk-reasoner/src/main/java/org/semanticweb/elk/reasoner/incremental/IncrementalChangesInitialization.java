@@ -12,6 +12,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -40,7 +41,7 @@ public class IncrementalChangesInitialization
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
 			InputProcessorListenerNotifyFinishedJob<IndexedClassExpression> listener) {
-		super(null, new ContextInitializationFactory(state, changes, listener), executor, maxWorkers, progressMonitor);
+		super(inputs, new ContextInitializationFactory(state, changes, listener), executor, maxWorkers, progressMonitor);
 	}
 }
 
@@ -70,6 +71,8 @@ class ContextInitializationFactory implements InputProcessorFactory<IndexedClass
 				Context context = ice.getContext();
 				
 				if (context != null) {
+					
+					boolean changed = false;
 
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
 							indexChanges_.keySet(),
@@ -77,6 +80,12 @@ class ContextInitializationFactory implements InputProcessorFactory<IndexedClass
 						IndexChange change = indexChanges_.get(changedICE);
 						// place the accumulated changes into the queue
 						saturationState_.produce(context, change);
+						changed = true;
+					}
+					
+					if (changed) {
+						// FIXME get rid of the cast
+						((ContextImpl)context).removeBackwardLinkRules();
 					}
 				}
 			}

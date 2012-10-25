@@ -120,6 +120,8 @@ public interface Context {
 	 * @return
 	 */
 	public boolean removeBackwardLink(BackwardLink link);
+	
+	public boolean containsBackwardLink(BackwardLink link);
 
 	/**
 	 * Adds the given {@link SuperClassExpression} to this {@link Context}.
@@ -140,6 +142,8 @@ public interface Context {
 	 * @return
 	 */
 	public boolean removeSuperClassExpression(SuperClassExpression expression);
+	
+	public boolean containsSuperClassExpression(SuperClassExpression expression);
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this

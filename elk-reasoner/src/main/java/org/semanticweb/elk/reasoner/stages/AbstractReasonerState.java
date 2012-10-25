@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
@@ -59,7 +60,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * 
 	 */
-	final IncrementalReasonerState incrementalState;
+	IncrementalReasonerState incrementalState;
 	/**
 	 * {@code true} if the ontology is loaded
 	 */
@@ -97,6 +98,8 @@ public abstract class AbstractReasonerState {
 	 * {@code true} if all stages have been reseted after changes
 	 */
 	final OntologyIndex ontologyIndex;
+	
+	private final IndexedObjectCache objectCache_;
 	/**
 	 * {@code true} if the current ontology is inconsistent
 	 */
@@ -119,10 +122,19 @@ public abstract class AbstractReasonerState {
 		OntologyIndexImpl ontoIndex = new OntologyIndexImpl();
 		
 		this.ontologyIndex = ontoIndex;
-		this.incrementalState = new IncrementalReasonerState(ontoIndex, ontologyIndex.getIndexedOwlNothing());
+		this.objectCache_ = ontoIndex;
 		this.saturationState = new SaturationState(ontoIndex.getIndexedOwlThing(), ontoIndex.getIndexedOwlNothing());
 	}
 
+	public void setIncrementalMode(boolean set) {
+		if (set && incrementalState == null) {
+			incrementalState = new IncrementalReasonerState(objectCache_, ontologyIndex.getIndexedOwlNothing());
+		}
+		else if (!set) {
+			incrementalState = null;
+		}
+	}
+	
 	/**
 	 * Reset the loading stage and all subsequent stages
 	 */
@@ -169,10 +181,11 @@ public abstract class AbstractReasonerState {
 			this.changesLoader = changesLoader.getLoader(
 					incrementalState.diffIndex.getAxiomInserter(),
 					incrementalState.diffIndex.getAxiomDeleter());
-		} else {
+		}
+		else {
 			this.changesLoader = changesLoader.getLoader(
 					ontologyIndex.getAxiomInserter(),
-					ontologyIndex.getAxiomDeleter());
+					ontologyIndex.getAxiomDeleter());			
 		}
 	}
 
@@ -259,7 +272,7 @@ public abstract class AbstractReasonerState {
 	 */
 	public boolean isInconsistent() throws ElkException {
 		
-		ReasonerStage stage = incrementalState == null || incrementalState.diffIndex.isEmpty() 
+		ReasonerStage stage = incrementalState == null 
 				? new ConsistencyCheckingStage(	this) 
 				: new IncrementalConsistencyCheckingStage(this); 
 		
@@ -308,7 +321,7 @@ public abstract class AbstractReasonerState {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();		
 		
-		if (incrementalState != null && incrementalState.diffIndex.isEmpty()) {
+		if (incrementalState != null) {
 			getStageExecutor()
 					.complete(new IncrementalClassTaxonomyComputationStage(this));
 		} else {

@@ -3,6 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
@@ -15,6 +16,8 @@ import org.semanticweb.elk.util.collections.chains.AbstractChain;
  */
 public class IndexChange  extends AbstractChain<ContextRules> implements Conclusion {
 
+	private static final Logger LOGGER_ = Logger.getLogger(IndexChange.class);
+	
 	private ContextRules contextRules_;
 
 	public IndexChange(ContextRules rules) {
@@ -41,6 +44,10 @@ public class IndexChange  extends AbstractChain<ContextRules> implements Conclus
 	public void apply(SaturationState state, Context context) {
 		ContextRules compositionRule = contextRules_;
 
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Applying rules to the index change in the context of " + context.getRoot());
+		}
+		
 		for (;;) {
 			if (compositionRule == null)
 				return;
