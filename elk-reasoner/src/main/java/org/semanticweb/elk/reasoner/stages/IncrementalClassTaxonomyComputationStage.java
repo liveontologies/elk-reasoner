@@ -32,6 +32,7 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
+		//TODO need some incremental taxonomy update/clean phase
 		return Arrays.asList((ReasonerStage) new IncrementalConsistencyCheckingStage(reasoner));
 	}
 
