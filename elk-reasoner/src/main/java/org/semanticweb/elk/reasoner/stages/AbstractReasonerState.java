@@ -152,6 +152,8 @@ public abstract class AbstractReasonerState {
 
 	/**
 	 * Reset the changes loading stage and all subsequent stages
+	 * 
+	 * FIXME get rid of this proliferation of boolean flags
 	 */
 	private void resetChangesLoading() {
 		if (this.changesLoader != null) {

@@ -10,11 +10,20 @@ package org.semanticweb.elk.reasoner.incremental;
  */
 public enum IncrementalStages {
 
-	CHANGES_INIT {
+	ADDITIONS_INIT {
 
 		@Override
 		public String toString() {
-			return "Incremental Changes Initialization";
+			return "Incremental Additions Initialization";
+		}
+		
+	},
+
+	DELETIONS_INIT {
+
+		@Override
+		public String toString() {
+			return "Incremental Deletions Initialization";
 		}
 		
 	},

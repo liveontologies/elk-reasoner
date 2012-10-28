@@ -50,14 +50,18 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		deletions_ = deletions;
 	}
 
+	private IncrementalStages stage() {
+		return deletions_ ? IncrementalStages.DELETIONS_INIT : IncrementalStages.ADDITIONS_INIT;
+	}
+	
 	@Override
 	public String getName() {
-		return IncrementalStages.CHANGES_INIT.toString() + " (" + ( deletions_ ? "deletions" : "additions" ) + ")";
+		return stage().toString();
 	}
 
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(IncrementalStages.CHANGES_INIT);
+		return reasoner.incrementalState.getStageStatus(stage());
 	}
 
 	@Override
@@ -83,10 +87,8 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 
-		reasoner.incrementalState.setStageStatus(IncrementalStages.CHANGES_INIT, true);
+		reasoner.incrementalState.setStageStatus(stage(), true);
 	}
-	
-	
 
 	@Override
 	void initComputation() {
