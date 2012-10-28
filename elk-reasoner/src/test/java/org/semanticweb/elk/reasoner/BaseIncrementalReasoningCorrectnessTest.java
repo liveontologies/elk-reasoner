@@ -33,7 +33,6 @@ import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
-import org.semanticweb.elk.util.collections.LazyCollectionMinusSet;
 
 /**
  * @author Pavel Klinov
@@ -43,7 +42,7 @@ import org.semanticweb.elk.util.collections.LazyCollectionMinusSet;
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOutput, AO extends TestOutput> {
 
-	final static int REPEAT_NUMBER = 5;
+	final static int REPEAT_NUMBER = 1;
 	final static double DELETE_RATIO = 0.3;
 	
 	protected final ReasoningTestManifest<EO, AO> manifest;
@@ -80,23 +79,23 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	 */
 	@Test
 	public void incrementalReasoning() throws ElkException {
+		TestChangesLoader initialLoader = new TestChangesLoader();		
 		TestChangesLoader loader = new TestChangesLoader();
 		//TestChangesLoader incrementalLoader = new TestChangesLoader();
 		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(new SimpleStageExecutor(), 1);
 		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
 		
-		standardReasoner.registerOntologyLoader(loader);
+		standardReasoner.registerOntologyLoader(initialLoader);
 		standardReasoner.registerOntologyChangesLoader(loader);
-		incrementalReasoner.registerOntologyLoader(loader);
+		incrementalReasoner.registerOntologyLoader(initialLoader);
 		incrementalReasoner.registerOntologyChangesLoader(loader);
+		
 		incrementalReasoner.setIncrementalMode(true);
 		//initial load
-		add(loader, axioms);
+		add(initialLoader, axioms);
 		//add(loader, axioms);
 		//initial correctness check
-		correctnessCheck(standardReasoner, incrementalReasoner);
-		
-		standardReasoner.registerOntologyLoader(null);
+		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 		
 		long seed = System.currentTimeMillis(); 
 		Random rnd = new Random(seed);
@@ -106,16 +105,17 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
 			//incremental changes
 			loader.clear();
-			//incrementalLoader.clear();
-			remove(loader, new LazyCollectionMinusSet<ElkAxiom>(axioms, deleted));
-			//remove(incrementalLoader, new LazyCollectionMinusSet<ElkAxiom>(axioms, deleted));
-			
-			correctnessCheck(standardReasoner, incrementalReasoner);
+			remove(loader, deleted);
+			standardReasoner.registerOntologyChangesLoader(loader);
+			incrementalReasoner.registerOntologyChangesLoader(loader);
+						
+			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 			//add the axioms back
-			add(loader, new LazyCollectionMinusSet<ElkAxiom>(axioms, deleted));
-			//add(incrementalLoader, new LazyCollectionMinusSet<ElkAxiom>(axioms, deleted));
+			add(loader, deleted);
+			standardReasoner.registerOntologyChangesLoader(loader);
+			incrementalReasoner.registerOntologyChangesLoader(loader);			
 			
-			correctnessCheck(standardReasoner, incrementalReasoner);
+			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}
 	}
 
@@ -171,5 +171,5 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		return axioms;
 	}	
 	
-	protected abstract void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner) throws ElkException;
+	protected abstract void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner, long seed) throws ElkException;
 }

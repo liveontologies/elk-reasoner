@@ -39,11 +39,11 @@ public class BaseIncrementalClassificationCorrectnessTest
 	}
 
 	@Override
-	protected void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner) throws ElkException {
+	protected void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner, long seed) throws ElkException {
 		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomy();
-		Taxonomy<ElkClass> incremental = standardReasoner.getTaxonomy();
+		Taxonomy<ElkClass> incremental = incrementalReasoner.getTaxonomy();
 		
-		assertEquals(TaxonomyHasher.hash(expected), TaxonomyHasher.hash(incremental));
+		assertEquals("Seed " + seed, TaxonomyHasher.hash(expected), TaxonomyHasher.hash(incremental));
 	}
 
 	@Config
