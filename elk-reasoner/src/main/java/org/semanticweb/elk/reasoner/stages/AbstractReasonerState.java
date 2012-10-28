@@ -165,6 +165,10 @@ public abstract class AbstractReasonerState {
 			doneClassSaturation = false;
 			doneClassTaxonomy = false;
 			doneInstanceTaxonomy = false;
+			
+			if (incrementalState != null) {
+				incrementalState.resetAllStagesStatus();
+			}
 		}
 	}
 

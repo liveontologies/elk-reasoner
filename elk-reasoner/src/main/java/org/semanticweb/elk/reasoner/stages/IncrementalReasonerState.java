@@ -46,5 +46,11 @@ public class IncrementalReasonerState {
 	
 	boolean getStageStatus(IncrementalStages stageType) {
 		return stageStatusMap.get(stageType);
+	}
+
+	void resetAllStagesStatus() {
+		for (IncrementalStages stage : stageStatusMap.keySet()) {
+			stageStatusMap.put(stage, false);
+		}		
 	}	
 }
