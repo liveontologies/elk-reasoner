@@ -116,8 +116,7 @@ public class ContextImpl implements Context {
 		this.root_ = root;
 		this.toDo_ = new ConcurrentLinkedQueue<Conclusion>();
 		this.isActive_ = new AtomicBoolean(false);
-		this.superClassExpressions_ = new ArrayHashSet<IndexedClassExpression>(
-				13);
+		this.superClassExpressions_ = new Subsumers();
 	}
 
 	@Override
@@ -146,7 +145,7 @@ public class ContextImpl implements Context {
 			return Operations.emptyMultimap();
 		return backwardLinksByObjectProperty_;
 	}
-	
+
 	@Override
 	public boolean addDisjointnessAxiom(
 			IndexedDisjointnessAxiom disjointnessAxiom) {
