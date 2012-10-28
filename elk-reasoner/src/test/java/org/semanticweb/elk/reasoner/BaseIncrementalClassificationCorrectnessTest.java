@@ -6,12 +6,15 @@ package org.semanticweb.elk.reasoner;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -40,8 +43,22 @@ public class BaseIncrementalClassificationCorrectnessTest
 
 	@Override
 	protected void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner, long seed) throws ElkException {
+		System.out.println("===========================================");
+		
 		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomy();
+		
+		System.out.println("===========================================");
+		
 		Taxonomy<ElkClass> incremental = incrementalReasoner.getTaxonomy();
+		
+		try {
+			Writer writer = new OutputStreamWriter(System.out);
+			TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
+			TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		assertEquals("Seed " + seed, TaxonomyHasher.hash(expected), TaxonomyHasher.hash(incremental));
 	}

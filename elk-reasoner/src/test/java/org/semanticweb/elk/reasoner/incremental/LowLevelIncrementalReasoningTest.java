@@ -59,5 +59,45 @@ public class LowLevelIncrementalReasoningTest {
 		
 		assertFalse(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
 	}
+	
+	@Test
+	public void testPropositionalAdditions() throws ElkException {
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
+		TestChangesLoader loader = new TestChangesLoader();
+		
+		reasoner.registerOntologyLoader(loader);
+		
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
+		
+		loader.add(objectFactory.getSubClassOfAxiom(a, c))
+			.add(objectFactory.getSubClassOfAxiom(c, d));
+		
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+
+		loader.clear();
+		reasoner.setIncrementalMode(true);
+		reasoner.registerOntologyChangesLoader(loader);
+		
+		loader.add(objectFactory.getSubClassOfAxiom(a, b))
+			.add(objectFactory.getSubClassOfAxiom(b, d));
+		
+		System.out.println("===========================================");
+		
+		taxonomy = reasoner.getTaxonomy();
+		
+		/*try {
+			Writer writer = new OutputStreamWriter(System.out);
+			TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
+		
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(b)));
+	}	
 }
 

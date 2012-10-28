@@ -27,6 +27,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
@@ -97,12 +98,17 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		//initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 		
-		long seed = System.currentTimeMillis(); 
+		long seed = 456;//System.currentTimeMillis(); 
 		Random rnd = new Random(seed);
 		
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
 			// delete some axioms
 			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
+			
+			for (ElkAxiom del : deleted) {
+				System.err.println(OwlFunctionalStylePrinter.toString(del));
+			}
+			
 			//incremental changes
 			loader.clear();
 			remove(loader, deleted);
@@ -111,6 +117,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 						
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 			//add the axioms back
+			loader.clear();
 			add(loader, deleted);
 			standardReasoner.registerOntologyChangesLoader(loader);
 			incrementalReasoner.registerOntologyChangesLoader(loader);			
