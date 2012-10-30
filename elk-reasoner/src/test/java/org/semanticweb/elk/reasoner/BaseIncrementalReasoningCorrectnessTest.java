@@ -121,12 +121,12 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 						
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 			//add the axioms back
-			loader.clear();
+			/*loader.clear();
 			add(loader, deleted);
 			standardReasoner.registerOntologyChangesLoader(loader);
 			incrementalReasoner.registerOntologyChangesLoader(loader);			
 			
-			correctnessCheck(standardReasoner, incrementalReasoner, seed);
+			correctnessCheck(standardReasoner, incrementalReasoner, seed);*/
 		}
 	}
 

@@ -5,6 +5,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -62,10 +63,10 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	/**
 	 * Used to check whether conclusions are contained in the context
 	 */
-	protected static class ContainsConclusionVisitor implements ConclusionVisitor<Boolean> {
+	protected class ContainsConclusionVisitor implements ConclusionVisitor<Boolean> {
 
 		public Boolean visitSuperclass(SuperClassExpression sce, Context context) {
-			return context.containsSuperClassExpression(sce);
+			return context.containsSuperClassExpression(sce.getExpression());
 		}		
 		
 		@Override
@@ -93,13 +94,18 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		@Override
 		public Boolean visit(IndexChange indexChange, Context context) {
 			return true;
+		}
+
+		@Override
+		public Boolean visit(Bottom bot, Context context) {
+			return context.isInconsistent();
 		}		
 	}	
 	
 	/**
 	 * Used to remove different kinds of conclusions from the context
 	 */
-	protected static class DeleteConclusionVisitor implements ConclusionVisitor<Boolean> {
+	protected class DeleteConclusionVisitor implements ConclusionVisitor<Boolean> {
 
 		public Boolean visitSuperclass(SuperClassExpression sce, Context context) {
 			
@@ -107,7 +113,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 				LOGGER_.trace(context.getRoot() + ": removing superclass " + sce);
 			}
 			
-			if (context.removeSuperClassExpression(sce)) {
+			if (context.removeSuperClassExpression(sce.getExpression())) {
 				return true;
 			}
 			
@@ -142,6 +148,11 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		public Boolean visit(IndexChange indexChange, Context context) {
 			// need not remove this element, just apply all its rules
 			return true;
+		}	
+		
+		@Override
+		public Boolean visit(Bottom bot, Context context) {
+			return context.isInconsistent();
 		}		
 	}	
 }

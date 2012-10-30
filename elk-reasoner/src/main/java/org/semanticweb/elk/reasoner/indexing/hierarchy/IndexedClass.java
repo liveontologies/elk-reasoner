@@ -22,21 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Collection;
-
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
-import org.semanticweb.elk.util.collections.Multimap;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -105,79 +96,13 @@ public class IndexedClass extends IndexedClassEntity {
 
 	@Override
 	public void applyDecompositionRule(SaturationState state, Context context) {
-
-		/*RuleStatistics timer = ruleEngine.getRulesTimer();
-
-		timer.timeClassDecompositionRule -= CachedTimeThread.currentTimeMillis;
-		timer.countClassDecompositionRule++;*/
-
-		try {
-			if (this.equals(state.getOwlNothing())) {
-				context.setInconsistent();
-
-				// propagating bottom to the predecessors
-				final Multimap<IndexedPropertyChain, Context> backLinks = context
-						.getBackwardLinksByObjectProperty();
-
-				Conclusion carry = new PositiveSuperClassExpression(this);
-
-				for (IndexedPropertyChain propRelation : backLinks.keySet()) {
-
-					Collection<Context> targets = backLinks.get(propRelation);
-
-					for (Context target : targets)
-						state.produce(target, carry);
-				}
-
-				// register the backward link rule for propagation of bottom
-				context.getBackwardLinkRulesChain().getCreate(
-						BottomBackwardLinkRule.MATCHER_,
-						BottomBackwardLinkRule.FACTORY_);
-			}
-		} finally {
-			//timer.timeClassDecompositionRule += CachedTimeThread.currentTimeMillis;
+		if (this.equals(state.getOwlNothing())) {
+			state.produce(context, new Bottom());
 		}
 	}
 
 	@Override
 	public String toString() {
 		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
-	}
-	
-
-	/**
-	 * 
-	 */
-	private static class BottomBackwardLinkRule extends BackwardLinkRules {
-
-		BottomBackwardLinkRule(BackwardLinkRules tail) {
-			super(tail);
-		}
-
-		@Override
-		public void apply(SaturationState state, BackwardLink link) {
-			/*RuleStatistics stats = ruleEngine.getRulesTimer();
-
-			stats.timeClassBottomBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
-			stats.countClassBottomBackwardLinkRule++;*/
-
-			try {
-				state.produce(
-						link.getSource(),
-						new PositiveSuperClassExpression(state.getOwlNothing()));
-			} finally {
-				//stats.timeClassBottomBackwardLinkRule += CachedTimeThread.currentTimeMillis;
-			}
-		}
-
-		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, BottomBackwardLinkRule>(
-				BottomBackwardLinkRule.class);
-
-		private static ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule>() {
-			@Override
-			public BottomBackwardLinkRule create(BackwardLinkRules tail) {
-				return new BottomBackwardLinkRule(tail);
-			}
-		};
 	}
 }

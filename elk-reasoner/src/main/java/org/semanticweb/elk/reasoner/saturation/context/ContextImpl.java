@@ -136,8 +136,8 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public void setInconsistent() {
-		isInconsistent = true;
+	public void setConsistent(boolean consistent) {
+		isInconsistent = !consistent;
 	}
 
 	@Override
@@ -200,17 +200,17 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public boolean addSuperClassExpression(SuperClassExpression expression) {
+	public boolean addSuperClassExpression(IndexedClassExpression expression) {
 		if (isSaturated)
 			LOGGER_.error(getRoot()
 					+ ": adding a superclass to a saturated context: "
 					+ expression);
-		return superClassExpressions_.add(expression.getExpression());
+		return superClassExpressions_.add(expression);
 	}
 	
 	@Override
-	public boolean removeSuperClassExpression(SuperClassExpression expression) {
-		return superClassExpressions_.remove(expression.getExpression());
+	public boolean removeSuperClassExpression(IndexedClassExpression expression) {
+		return superClassExpressions_.remove(expression);
 	}
 
 	@Override
@@ -268,8 +268,8 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public boolean containsSuperClassExpression(SuperClassExpression expression) {
-		return superClassExpressions_.contains(expression.getExpression());
+	public boolean containsSuperClassExpression(IndexedClassExpression expression) {
+		return superClassExpressions_.contains(expression);
 	}
 	
 	public void removeBackwardLinkRules() {

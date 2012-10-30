@@ -61,4 +61,8 @@ public class IndexChange  extends AbstractChain<ContextRules> implements Conclus
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public String toString() {
+		return "Set of incremental changes";
+	}
 }

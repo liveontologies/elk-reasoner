@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
@@ -419,13 +420,13 @@ public class RuleApplicationFactory implements
 	/**
 	 * Used to add different kinds of conclusions to the context
 	 */
-	protected static class AddConclusionVisitor implements ConclusionVisitor<Boolean> {
+	protected class AddConclusionVisitor implements ConclusionVisitor<Boolean> {
 
 		@Override
 		public Boolean visit(NegativeSuperClassExpression negSCE,
 				Context context) {
 			
-			if (context.addSuperClassExpression(negSCE)) {
+			if (context.addSuperClassExpression(negSCE.getExpression())) {
 				//statistics_.superClassExpressionNo++;
 				//statistics_.negSuperClassExpressionInfNo++;
 				return true;
@@ -437,7 +438,7 @@ public class RuleApplicationFactory implements
 		@Override
 		public Boolean visit(PositiveSuperClassExpression posSCE,
 				Context context) {
-			if (context.addSuperClassExpression(posSCE)) {
+			if (context.addSuperClassExpression(posSCE.getExpression())) {
 				//statistics_.superClassExpressionNo++;
 				//statistics_.posSuperClassExpressionInfNo++;
 				return true;
@@ -464,6 +465,11 @@ public class RuleApplicationFactory implements
 		public Boolean visit(IndexChange indexChange, Context context) {
 			// need not add this element, just apply all its rules
 			return true;
+		}
+
+		@Override
+		public Boolean visit(Bottom bot, Context context) {
+			return !context.isInconsistent();
 		}
 	}
 	

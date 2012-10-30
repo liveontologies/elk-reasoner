@@ -127,23 +127,23 @@ public interface Context {
 	 * Adds the given {@link SuperClassExpression} to this {@link Context}.
 	 * 
 	 * @param expression
-	 *            the {@link SuperClassExpression} being added to this
+	 *            the {@link IndexedClassExpression} being added to this
 	 *            {@link Context}
 	 * @return {@code true} if this {@link Context} has changed as the result of
 	 *         calling this method, i.e., the {@code SuperClassExpression} has
 	 *         not been added before for this {@link Context}. This method is
 	 *         not thread safe.
 	 */
-	public boolean addSuperClassExpression(SuperClassExpression expression);
+	public boolean addSuperClassExpression(IndexedClassExpression expression);
 	
 	/**
 	 * TODO
 	 * @param expression
 	 * @return
 	 */
-	public boolean removeSuperClassExpression(SuperClassExpression expression);
+	public boolean removeSuperClassExpression(IndexedClassExpression expression);
 	
-	public boolean containsSuperClassExpression(SuperClassExpression expression);
+	public boolean containsSuperClassExpression(IndexedClassExpression expression);
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this
@@ -213,10 +213,9 @@ public interface Context {
 	public boolean isSaturated();
 
 	/**
-	 * Marks this {@code Context} as inconsistent. After this the call of
-	 * {@link #isInconsistent()} should return {@code true}
+	 * Marks this {@code Context} as consistent or inconsistent.
 	 */
-	public void setInconsistent();
+	public void setConsistent(boolean consistent);
 
 	/**
 	 * Marks this {@code Context} as saturated. After this call there should not
