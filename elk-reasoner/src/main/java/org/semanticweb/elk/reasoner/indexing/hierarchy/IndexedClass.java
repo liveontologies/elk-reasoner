@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
@@ -37,6 +38,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class IndexedClass extends IndexedClassEntity {
 
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(IndexedClass.class);
+	
+	
 	/**
 	 * The indexed ElkClass
 	 */
@@ -96,7 +101,10 @@ public class IndexedClass extends IndexedClassEntity {
 
 	@Override
 	public void applyDecompositionRule(SaturationState state, Context context) {
-		if (this.equals(state.getOwlNothing())) {
+		if (this == state.getOwlNothing()) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Producing owl:Nothing for " + context.getRoot());
+			}			
 			state.produce(context, new Bottom());
 		}
 	}

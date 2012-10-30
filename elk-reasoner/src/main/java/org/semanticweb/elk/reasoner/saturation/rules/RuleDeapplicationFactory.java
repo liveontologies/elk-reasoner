@@ -66,6 +66,13 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	protected class ContainsConclusionVisitor implements ConclusionVisitor<Boolean> {
 
 		public Boolean visitSuperclass(SuperClassExpression sce, Context context) {
+			
+			if (sce.getExpression().equals(saturationState_.getOwlNothing())) {
+				System.out.println(context.containsSuperClassExpression(sce.getExpression()));
+				System.out.println(context.containsSuperClassExpression(saturationState_.getOwlNothing()));
+				System.out.println(context.isInconsistent());
+			}
+			
 			return context.containsSuperClassExpression(sce.getExpression());
 		}		
 		

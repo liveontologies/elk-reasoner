@@ -438,6 +438,7 @@ public class RuleApplicationFactory implements
 		@Override
 		public Boolean visit(PositiveSuperClassExpression posSCE,
 				Context context) {
+			
 			if (context.addSuperClassExpression(posSCE.getExpression())) {
 				//statistics_.superClassExpressionNo++;
 				//statistics_.posSuperClassExpressionInfNo++;

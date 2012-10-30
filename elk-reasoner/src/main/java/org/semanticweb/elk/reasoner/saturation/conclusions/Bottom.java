@@ -5,6 +5,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -21,6 +22,8 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class Bottom implements Conclusion {
 
+	protected static final Logger LOGGER_ = Logger.getLogger(Bottom.class);
+	
 	@Override
 	public void deapply(SaturationState state, Context context) {
 		context.setConsistent(true);
@@ -29,11 +32,20 @@ public class Bottom implements Conclusion {
 
 	@Override
 	public void apply(SaturationState state, Context context) {
+/*		if (!context.containsSuperClassExpression(state.getOwlNothing())) {
+			throw new RuntimeException();
+		}*/
+		
 		context.setConsistent(false);
 		propagateThroughBackwardLinks(state, context);
 	}
 	
 	private void propagateThroughBackwardLinks(SaturationState state, Context context) {
+		
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Applying rules for owl:Nothing");
+		}
+		
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
 				.getBackwardLinksByObjectProperty();
 
@@ -42,7 +54,9 @@ public class Bottom implements Conclusion {
 			Collection<Context> targets = backLinks.get(propRelation);
 
 			for (Context target : targets) {
-				state.produce(target, this);
+				//the reason we propagate a positive SCE, not the Bot directly,
+				//is because we want the SCE to appear in the list of superclasses
+				state.produce(target, new PositiveSuperClassExpression(state.getOwlNothing()));
 			}
 		}
 
