@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,9 @@ import org.semanticweb.elk.testing.TestOutput;
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOutput, AO extends TestOutput> {
 
+	// logger for this class
+	protected static final Logger LOGGER_ = Logger.getLogger(BaseIncrementalReasoningCorrectnessTest.class);	
+	
 	final static int REPEAT_NUMBER = 1;
 	final static double DELETE_RATIO = 0.3;
 	

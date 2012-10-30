@@ -14,6 +14,7 @@ import java.net.URL;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -45,11 +46,11 @@ public class BaseIncrementalClassificationCorrectnessTest
 	protected void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner, long seed) throws ElkException {
 		System.out.println("===========================================");
 		
-		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomy();
+		Taxonomy<ElkClass> expected = getTaxonomy(standardReasoner);
 		
 		System.out.println("===========================================");
 		
-		Taxonomy<ElkClass> incremental = incrementalReasoner.getTaxonomy();
+		Taxonomy<ElkClass> incremental = getTaxonomy(incrementalReasoner);
 		
 		try {
 			Writer writer = new OutputStreamWriter(System.out);
@@ -61,6 +62,20 @@ public class BaseIncrementalClassificationCorrectnessTest
 		}
 		
 		assertEquals("Seed " + seed, TaxonomyHasher.hash(expected), TaxonomyHasher.hash(incremental));
+	}
+	
+	private Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner) {
+		Taxonomy<ElkClass> result = null;
+		
+		try {
+			result = reasoner.getTaxonomy();
+		} catch (ElkException e) {
+			LOGGER_.info("Ontology is inconsistent");
+			
+			result = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
+		}
+		
+		return result;
 	}
 
 	@Config
