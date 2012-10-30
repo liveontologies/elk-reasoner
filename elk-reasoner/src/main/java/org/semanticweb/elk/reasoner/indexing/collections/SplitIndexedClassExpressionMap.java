@@ -27,4 +27,6 @@ public interface SplitIndexedClassExpressionMap<V> extends
 
 	public Map<IndexedDataHasValue, V> getDataExistentialsMapReadWrite();
 
+	public SplitIndexedClassExpressionSet keySet();
+
 }

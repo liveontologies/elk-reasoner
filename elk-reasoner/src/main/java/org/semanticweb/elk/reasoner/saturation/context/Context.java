@@ -22,8 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
-import java.util.Set;
-
+import org.semanticweb.elk.reasoner.indexing.collections.SplitIndexedClassExpressionSet;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -59,7 +58,7 @@ public interface Context {
 	 *         {@link SuperClassExpression}s of the root
 	 *         {@link IndexedClassExpression}
 	 */
-	public Set<IndexedClassExpression> getSuperClassExpressions();
+	public SplitIndexedClassExpressionSet getSuperClassExpressions();
 
 	/**
 	 * @return the {@link Context}s from which there exists an (implied)

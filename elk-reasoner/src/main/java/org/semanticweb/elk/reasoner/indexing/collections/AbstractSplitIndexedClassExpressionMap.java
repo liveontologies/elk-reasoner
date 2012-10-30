@@ -218,7 +218,7 @@ public abstract class AbstractSplitIndexedClassExpressionMap<V> extends
 	}
 
 	@Override
-	public Set<IndexedClassExpression> keySet() {
+	public SplitIndexedClassExpressionSet keySet() {
 		return new AbstractSplitIndexedClassExpressionSet() {
 
 			@Override

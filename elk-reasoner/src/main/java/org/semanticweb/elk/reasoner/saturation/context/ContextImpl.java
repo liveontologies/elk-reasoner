@@ -28,6 +28,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.indexing.collections.SplitIndexedClassExpressionSet;
+import org.semanticweb.elk.reasoner.indexing.collections.SplitIndexedClassExpressionSetImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -67,7 +69,7 @@ public class ContextImpl implements Context {
 	 * the representation of all derived {@link SuperClassExpression}s computed
 	 * for this {@link Context}; these should be super-classes of {@link #root_}
 	 */
-	private final Set<IndexedClassExpression> superClassExpressions_;
+	private final SplitIndexedClassExpressionSet superClassExpressions_;
 
 	/**
 	 * the indexed representation of all derived {@link BackwardLink}s computed
@@ -116,7 +118,7 @@ public class ContextImpl implements Context {
 		this.root_ = root;
 		this.toDo_ = new ConcurrentLinkedQueue<Conclusion>();
 		this.isActive_ = new AtomicBoolean(false);
-		this.superClassExpressions_ = new Subsumers();
+		this.superClassExpressions_ = new SplitIndexedClassExpressionSetImpl();
 	}
 
 	@Override
@@ -125,7 +127,7 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public Set<IndexedClassExpression> getSuperClassExpressions() {
+	public SplitIndexedClassExpressionSet getSuperClassExpressions() {
 		return superClassExpressions_;
 	}
 

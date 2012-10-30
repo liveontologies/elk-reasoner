@@ -14,16 +14,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.ArrayHashMultiSet;
 import org.semanticweb.elk.util.collections.Operations;
 
 public class Subsumers extends AbstractSet<IndexedClassExpression> implements
 		Set<IndexedClassExpression> {
 
-	private Set<IndexedClassEntity> classEntities_;
-	private Set<IndexedObjectIntersectionOf> objectIntersections_;
-	private Set<IndexedObjectSomeValuesFrom> objectExistentials_;
-	private Set<IndexedDataHasValue> dataExistentials_;
+	private ArrayHashMultiSet<IndexedClassEntity> classEntities_;
+	private ArrayHashMultiSet<IndexedObjectIntersectionOf> objectIntersections_;
+	private ArrayHashMultiSet<IndexedObjectSomeValuesFrom> objectExistentials_;
+	private ArrayHashMultiSet<IndexedDataHasValue> dataExistentials_;
 
 	public Subsumers() {
 	}
@@ -73,21 +73,21 @@ public class Subsumers extends AbstractSet<IndexedClassExpression> implements
 		@Override
 		public Boolean visit(IndexedClass element) {
 			if (classEntities_ == null)
-				classEntities_ = new ArrayHashSet<IndexedClassEntity>(3);
+				classEntities_ = new ArrayHashMultiSet<IndexedClassEntity>(3);
 			return classEntities_.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedIndividual element) {
 			if (classEntities_ == null)
-				classEntities_ = new ArrayHashSet<IndexedClassEntity>(3);
+				classEntities_ = new ArrayHashMultiSet<IndexedClassEntity>(3);
 			return classEntities_.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
 			if (objectIntersections_ == null)
-				objectIntersections_ = new ArrayHashSet<IndexedObjectIntersectionOf>(
+				objectIntersections_ = new ArrayHashMultiSet<IndexedObjectIntersectionOf>(
 						3);
 			return objectIntersections_.add(element);
 		}
@@ -95,7 +95,7 @@ public class Subsumers extends AbstractSet<IndexedClassExpression> implements
 		@Override
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
 			if (objectExistentials_ == null)
-				objectExistentials_ = new ArrayHashSet<IndexedObjectSomeValuesFrom>(
+				objectExistentials_ = new ArrayHashMultiSet<IndexedObjectSomeValuesFrom>(
 						3);
 			return objectExistentials_.add(element);
 		}
@@ -103,7 +103,8 @@ public class Subsumers extends AbstractSet<IndexedClassExpression> implements
 		@Override
 		public Boolean visit(IndexedDataHasValue element) {
 			if (dataExistentials_ == null)
-				dataExistentials_ = new ArrayHashSet<IndexedDataHasValue>(3);
+				dataExistentials_ = new ArrayHashMultiSet<IndexedDataHasValue>(
+						3);
 			return dataExistentials_.add(element);
 		}
 

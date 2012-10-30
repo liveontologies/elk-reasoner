@@ -22,8 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Map;
-
+import org.semanticweb.elk.reasoner.indexing.collections.LazySplitIndexedClassExpressionSetIntersection;
+import org.semanticweb.elk.reasoner.indexing.collections.SplitIndexedClassExpressionMap;
+import org.semanticweb.elk.reasoner.indexing.collections.SplitIndexedClassExpressionMapImpl;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitorEx;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
@@ -33,8 +34,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExp
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -163,12 +162,11 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 	private static class ThisCompositionRule extends ContextRules {
 
-		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
+		private final SplitIndexedClassExpressionMap<IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
 		ThisCompositionRule(ContextRules tail) {
 			super(tail);
-			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
-					4);
+			this.conjunctionsByConjunct_ = new SplitIndexedClassExpressionMapImpl<IndexedObjectIntersectionOf>();
 		}
 
 		private void addConjunctionByConjunct(
@@ -198,7 +196,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 			try {
 
-				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+				for (IndexedClassExpression common : new LazySplitIndexedClassExpressionSetIntersection(
 						conjunctionsByConjunct_.keySet(),
 						context.getSuperClassExpressions()))
 					ruleEngine.produce(context,
