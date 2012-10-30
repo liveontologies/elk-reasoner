@@ -25,18 +25,24 @@ package org.semanticweb.elk.util.concurrent.collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * A modification of the non-blocking Treiber's Algorithm (Treiber, 1986) for
- * Stack which allows to check when the pushed element is the first element in
- * the stack. This stack does not allow storing null values.
+ * A thread-safe implementation of stack based on the non-blocking Treiber's
+ * Algorithm (Treiber, 1986). The implementation allows to check when the pushed
+ * element is the first element in the stack. This stack does not allow storing
+ * {@code null} values.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <T>
+ * @param <E>
+ *            the type of elements in the stack
  */
-public class CheckStack<T> {
+public class ActivationStack<E> {
 
-	private final AtomicReference<Node<T>> top_ = new AtomicReference<Node<T>>();
+	private final AtomicReference<Node<E>> top_ = new AtomicReference<Node<E>>();
 
+	/**
+	 * a special dummy node used to mark the end of the stack after it has been
+	 * activated
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static Node<?> dummyNode = new Node(null);
 
@@ -46,8 +52,8 @@ public class CheckStack<T> {
 	 * stack is cleared after it has been constructed or after {@link #pop()}
 	 * returns {@code null}. Note that the stack might be empty in the sense
 	 * that the next call to {@link #pop()} should return {@code null}, but not
-	 * cleared. To clear the stack, it is necessary that {@link #pop()} should
-	 * return {@code null}.
+	 * cleared. In this case the stack is cleared only after {@link #pop()}
+	 * returns {@code null}.
 	 * 
 	 * @param element
 	 * @return {@code true} if this is the first element inserted after the
@@ -56,16 +62,16 @@ public class CheckStack<T> {
 	 *             if null element is inserted
 	 */
 	@SuppressWarnings("unchecked")
-	public boolean push(T element) {
+	public boolean push(E element) {
 		if (element == null)
 			throw new IllegalArgumentException(
 					"Elements in the stack cannot be null");
-		Node<T> newHead = new Node<T>(element);
-		Node<T> oldHead;
+		Node<E> newHead = new Node<E>(element);
+		Node<E> oldHead;
 		for (;;) {
 			oldHead = top_.get();
 			if (oldHead == null)
-				newHead.next = (Node<T>) dummyNode;
+				newHead.next = (Node<E>) dummyNode;
 			else
 				newHead.next = oldHead;
 			if (top_.compareAndSet(oldHead, newHead)) {
@@ -77,16 +83,23 @@ public class CheckStack<T> {
 		}
 	}
 
+	public E peek() {
+		Node<E> head = top_.get();
+		if (head == null)
+			return null;
+		return head.item;
+	}
+
 	/**
 	 * Takes and removes the head element of the stack.
 	 * 
 	 * @return the head element in the stack or {@code null} if there are no
 	 *         elements in the stack
 	 */
-	public T pop() {
+	public E pop() {
 		for (;;) {
-			Node<T> oldHead = top_.get();
-			Node<T> newHead;
+			Node<E> oldHead = top_.get();
+			Node<E> newHead;
 			if (oldHead == null)
 				return null;
 			newHead = oldHead.next;

@@ -26,7 +26,7 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
-public class CheckStackTest extends TestCase {
+public class ActivationStackTest extends TestCase {
 
 	/**
 	 * the number of stack used in the test
@@ -44,7 +44,6 @@ public class CheckStackTest extends TestCase {
 	 * the number of stack iterations for every worker
 	 */
 	private static final int ITERATIONS_ = 10000;
-
 	/**
 	 * we create an array of stacks that can store integer values
 	 */
@@ -53,13 +52,13 @@ public class CheckStackTest extends TestCase {
 	/**
 	 * the stack to store all non-empty stacks
 	 */
-	final CheckStack<StackMonitor<Integer>> nonEmptyStacks = new CheckStack<StackMonitor<Integer>>();
+	final ActivationStack<StackMonitor<Integer>> nonEmptyStacks = new ActivationStack<StackMonitor<Integer>>();
 	/**
 	 * this will be used to determine in which stack to insert elements
 	 */
 	final Random generator = new Random(123);
 
-	public CheckStackTest(String testName) {
+	public ActivationStackTest(String testName) {
 		super(testName);
 	}
 
@@ -87,7 +86,7 @@ public class CheckStackTest extends TestCase {
 			 * stack should be added to the nonEmptyStacks. No worker should
 			 * access the stack at this time.
 			 */
-			monitor.checkAccessed();
+			monitor.checkActive();
 			nonEmptyStacks.push(monitor);
 		}
 	}
@@ -105,9 +104,9 @@ public class CheckStackTest extends TestCase {
 	/**
 	 * Each worker is repeatedly takes the next stack with unprocessed values
 	 * and distribute these values randomly over stacks until it becomes empty.
-	 * When working with elements the stack will be locked to check if it is
-	 * being accessed by another worker. If everything works correctly, this
-	 * should never happen.
+	 * Only one worker should be working with each stack, therefore, when
+	 * working with elements the stack we lock the respective monitor of the
+	 * stack. If everything works correctly, no double locking should occur.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
@@ -133,8 +132,8 @@ public class CheckStackTest extends TestCase {
 	}
 
 	/**
-	 * A wrapper around {@link CheckStack} which allows to monitor access to the
-	 * stack using locks (boolean values)
+	 * A wrapper around {@link ActivationStack} which allows to monitor access
+	 * to the stack using locks (boolean values)
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
@@ -142,25 +141,28 @@ public class CheckStackTest extends TestCase {
 	 *            the type of elements in the stack
 	 */
 	private static class StackMonitor<T> {
-		final CheckStack<T> stack;
-		private volatile boolean isAccessed_ = false;
+		final ActivationStack<T> stack;
+		/**
+		 * {@code true} if this monitor is locked by a worker
+		 */
+		private volatile boolean islocked_ = false;
 
 		public StackMonitor() {
-			this.stack = new CheckStack<T>();
+			this.stack = new ActivationStack<T>();
 		}
 
 		public void lock() {
-			checkAccessed();
-			isAccessed_ = true;
+			checkActive();
+			islocked_ = true;
 		}
 
 		public void unlock() {
-			isAccessed_ = false;
+			islocked_ = false;
 		}
 
-		public void checkAccessed() {
-			if (isAccessed_)
-				fail("The stack is aready being accessed");
+		public void checkActive() {
+			if (islocked_)
+				fail("The stack is being accessed from two workers");
 		}
 	}
 

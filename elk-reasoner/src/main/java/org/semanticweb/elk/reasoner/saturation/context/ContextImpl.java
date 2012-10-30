@@ -37,7 +37,7 @@ import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
-import org.semanticweb.elk.util.concurrent.collections.CheckStack;
+import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
 
 /**
  * Context implementation that is used for EL reasoning. It provides data
@@ -84,7 +84,7 @@ public class ContextImpl implements Context {
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
 	 */
-	private final CheckStack<Conclusion> toDo_;
+	private final ActivationStack<Conclusion> toDo_;
 
 	/**
 	 * {@code true} if all derived {@link SuperClassExpression} of
@@ -106,7 +106,7 @@ public class ContextImpl implements Context {
 	 */
 	public ContextImpl(IndexedClassExpression root) {
 		this.root_ = root;
-		this.toDo_ = new CheckStack<Conclusion>();
+		this.toDo_ = new ActivationStack<Conclusion>();
 		this.superClassExpressions_ = new ArrayHashSet<IndexedClassExpression>(
 				13);
 	}
