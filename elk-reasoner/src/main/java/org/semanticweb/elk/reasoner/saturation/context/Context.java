@@ -221,6 +221,6 @@ public interface Context {
 	 * Marks this {@code Context} as saturated. After this call there should not
 	 * be further {@link SuperClassExpression}s added to this {@link Context}.
 	 */
-	public void setSaturated();
+	public void setSaturated(boolean saturated);
 
 }

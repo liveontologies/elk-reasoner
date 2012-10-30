@@ -3,6 +3,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -38,9 +40,20 @@ public class SaturationState {
 	
 	private final ContextCreationListenerChain contextCreationListeners_ = new ContextCreationListenerChain();
 	
+	private final Queue<IndexedClassExpression> modifiedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
+	
+	
 	public SaturationState(IndexedClassExpression top, IndexedClassExpression bot) {
 		owlThing_ = top;
 		owlNothing_ = bot;
+	}	
+	
+	public void markAsModified(Context context) {
+		modifiedContexts_.add(context.getRoot());
+	}
+	
+	public Collection<IndexedClassExpression> getModifiedContexts() {
+		return modifiedContexts_ == null ? Collections.<IndexedClassExpression>emptyList() : modifiedContexts_;
 	}
 	
 	public Context pollForContext() {
@@ -89,6 +102,7 @@ public class SaturationState {
 	
 	public void reset() {
 		activeContexts_.clear();
+		modifiedContexts_.clear();
 	}
 	
 	public void registerContextCreationListener(ContextCreationListener listener) {

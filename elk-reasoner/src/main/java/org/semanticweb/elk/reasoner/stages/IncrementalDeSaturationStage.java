@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.incremental.ContextModificationListener;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
@@ -43,7 +42,6 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 	// private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
 
 	private ClassExpressionSaturation<IndexedClassExpression> desaturation_ = null;
-	private final ContextModificationListener listener_ = new ContextModificationListener();
 
 	public IncrementalDeSaturationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -70,7 +68,6 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 			initComputation();
 		}
 		
-		listener_.reset();
 		progressMonitor.start(getName());
 		
 		try {
@@ -85,7 +82,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.DESATURATION, true);
 		// save modified contexts for future processing
-		reasoner.incrementalState.classesToProcess = listener_.getModifiedClassExpressions();
+		reasoner.incrementalState.classesToProcess = reasoner.saturationState.getModifiedContexts();
 	}
 	
 	
@@ -94,14 +91,13 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 	void initComputation() {
 		super.initComputation();
 
-		RuleDeapplicationFactory deappFactory = new RuleDeapplicationFactory(reasoner.saturationState);
+		RuleDeapplicationFactory deappFactory = new RuleDeapplicationFactory(reasoner.saturationState, true);
 		
 		desaturation_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				deappFactory,
-				listener_);
+				deappFactory);
 	}
 
 	@Override

@@ -261,7 +261,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				J nextJob = jobsInProgress_.poll();
 				IndexedClassExpression root = nextJob.getInput();
 				Context rootSaturation = root.getContext();
-				rootSaturation.setSaturated();
+				rootSaturation.setSaturated(true);
 				nextJob.setOutput(rootSaturation);
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace(root + ": saturation finished");

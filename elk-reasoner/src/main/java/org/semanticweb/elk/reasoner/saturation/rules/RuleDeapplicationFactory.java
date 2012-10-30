@@ -27,6 +27,10 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	public RuleDeapplicationFactory(final SaturationState saturationState) {
 		super(saturationState);
 	}
+	
+	public RuleDeapplicationFactory(final SaturationState saturationState, boolean trackModifiedContexts) {
+		super(saturationState, trackModifiedContexts);
+	}	
 
 	@Override
 	public Engine getEngine() {
@@ -67,12 +71,6 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		public Boolean visitSuperclass(SuperClassExpression sce, Context context) {
 			
-			if (sce.getExpression().equals(saturationState_.getOwlNothing())) {
-				System.out.println(context.containsSuperClassExpression(sce.getExpression()));
-				System.out.println(context.containsSuperClassExpression(saturationState_.getOwlNothing()));
-				System.out.println(context.isInconsistent());
-			}
-			
 			return context.containsSuperClassExpression(sce.getExpression());
 		}		
 		
@@ -112,7 +110,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	/**
 	 * Used to remove different kinds of conclusions from the context
 	 */
-	protected class DeleteConclusionVisitor implements ConclusionVisitor<Boolean> {
+	protected class DeleteConclusionVisitor extends BaseConclusionVisitor {
 
 		public Boolean visitSuperclass(SuperClassExpression sce, Context context) {
 			
@@ -121,6 +119,8 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 			}
 			
 			if (context.removeSuperClassExpression(sce.getExpression())) {
+				markAsModified(context);
+				
 				return true;
 			}
 			
@@ -141,13 +141,25 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean visit(BackwardLink link, Context context) {
-			return !context.removeBackwardLink(link);
+			if (context.removeBackwardLink(link)) {
+				markAsModified(context);
+				
+				return true;
+			}
+			
+			return false;
 		}
 
 		@Override
 		public Boolean visit(ForwardLink link, Context context) {
 			//statistics_.forwLinkInfNo++;
-			return link.removeFromContextBackwardLinkRule(context);
+			if (link.removeFromContextBackwardLinkRule(context)) {
+				markAsModified(context);
+				
+				return true;
+			}
+			
+			return false;
 			//statistics_.forwLinkNo++;
 		}
 		

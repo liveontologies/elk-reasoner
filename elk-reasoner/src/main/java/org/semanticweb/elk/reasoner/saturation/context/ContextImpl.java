@@ -162,8 +162,8 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public void setSaturated() {
-		isSaturated = true;
+	public void setSaturated(boolean saturated) {
+		isSaturated = saturated;
 	}
 
 	@Override

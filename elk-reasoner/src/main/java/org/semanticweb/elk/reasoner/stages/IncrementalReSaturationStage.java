@@ -6,7 +6,6 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.incremental.ContextModificationListener;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
@@ -23,8 +22,6 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 	// private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
 
 	private ClassExpressionSaturation<IndexedClassExpression> saturation_ = null;
-	private final ContextModificationListener listener_ = new ContextModificationListener();
-
 	public IncrementalReSaturationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
@@ -55,7 +52,6 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 			initComputation();
 		}
 		
-		listener_.reset();
 		progressMonitor.start(getName());
 		
 		try {
@@ -85,8 +81,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				appFactory,
-				listener_);
+				appFactory);
 	}
 
 	@Override

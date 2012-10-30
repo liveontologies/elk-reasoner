@@ -94,15 +94,21 @@ public class RuleApplicationFactory implements
 	 * The {@link ThisStatistics} aggregated for all workers
 	 */
 	private final ThisStatistics aggregatedFactoryStats_;
-
+	
+	private final boolean trackModifiedContexts_;
+	
 	public RuleApplicationFactory(final SaturationState saturationState) {
+		this(saturationState, false);
+	}
+	
+	public RuleApplicationFactory(final SaturationState saturationState, boolean trackModifiedContexts) {
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
 		this.aggregatedRuleStats_ = new RuleStatistics();
 		this.aggregatedFactoryStats_ = new ThisStatistics();
-
 		this.saturationState_ = saturationState;
-	}
-
+		this.trackModifiedContexts_ = trackModifiedContexts;
+	}	
+	
 	@Override
 	public Engine getEngine() {
 		return new Engine(new AddConclusionVisitor());
@@ -417,10 +423,21 @@ public class RuleApplicationFactory implements
 		}		
 	}
 	
+	protected abstract class BaseConclusionVisitor implements ConclusionVisitor<Boolean> {
+		
+		protected void markAsModified(Context context) {
+			// re-use the saturation flag as a sign that the context is modified for the first time
+			if (trackModifiedContexts_ && context.isSaturated()) {
+				saturationState_.markAsModified(context);
+				context.setSaturated(false);
+			}
+		}
+	}
+	
 	/**
 	 * Used to add different kinds of conclusions to the context
 	 */
-	protected class AddConclusionVisitor implements ConclusionVisitor<Boolean> {
+	protected class AddConclusionVisitor extends BaseConclusionVisitor {
 
 		@Override
 		public Boolean visit(NegativeSuperClassExpression negSCE,
@@ -429,6 +446,8 @@ public class RuleApplicationFactory implements
 			if (context.addSuperClassExpression(negSCE.getExpression())) {
 				//statistics_.superClassExpressionNo++;
 				//statistics_.negSuperClassExpressionInfNo++;
+				markAsModified(context);
+				
 				return true;
 			}
 			
@@ -442,6 +461,8 @@ public class RuleApplicationFactory implements
 			if (context.addSuperClassExpression(posSCE.getExpression())) {
 				//statistics_.superClassExpressionNo++;
 				//statistics_.posSuperClassExpressionInfNo++;
+				markAsModified(context);
+				
 				return true;
 			}
 			
@@ -451,14 +472,26 @@ public class RuleApplicationFactory implements
 		@Override
 		public Boolean visit(BackwardLink link, Context context) {
 			//statistics_.backLinkInfNo++;
-			return context.addBackwardLink(link);
+			if (context.addBackwardLink(link)) {
+				markAsModified(context);
+				
+				return true;
+			}
+			
+			return false;
 			//statistics_.backLinkNo++;
 		}
 
 		@Override
 		public Boolean visit(ForwardLink link, Context context) {
 			//statistics_.forwLinkInfNo++;
-			return link.addToContextBackwardLinkRule(context);
+			if (link.addToContextBackwardLinkRule(context)) {
+				markAsModified(context);
+				
+				return true;
+			}
+			
+			return false;
 			//statistics_.forwLinkNo++;
 		}
 
