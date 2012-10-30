@@ -25,7 +25,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitorEx;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -74,6 +76,18 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return accept((IndexedObjectIntersectionOfVisitor<O>) visitor);
+	}
+
+	public <O, P> O accept(IndexedObjectIntersectionOfVisitorEx<O, P> visitor,
+			P parameter) {
+		return visitor.visit(this, parameter);
+	}
+
+	@Override
+	public <O, P> O accept(IndexedClassExpressionVisitorEx<O, P> visitor,
+			P parameter) {
+		return accept((IndexedObjectIntersectionOfVisitorEx<O, P>) visitor,
+				parameter);
 	}
 
 	@Override

@@ -26,7 +26,9 @@ import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitorEx;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
@@ -64,16 +66,29 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 		return accept((IndexedDataHasValueVisitor<O>) visitor);
 	}
 
+	public <O, P> O accept(IndexedDataHasValueVisitorEx<O, P> visitor,
+			P parameter) {
+		return visitor.visit(this, parameter);
+	}
+
+	@Override
+	public <O, P> O accept(IndexedClassExpressionVisitorEx<O, P> visitor,
+			P parameter) {
+		return accept((IndexedDataHasValueVisitorEx<O, P>) visitor, parameter);
+	}
+
 	@Override
 	public String toString() {
-		return "DataHasValue(" + '<' + this.property.getIri().getFullIriAsString()
-				+ "> \"" + this.filler.getLexicalForm() + "\"^^<"
-				+ this.filler.getDatatype().getIri().getFullIriAsString() + ">)";
+		return "DataHasValue(" + '<'
+				+ this.property.getIri().getFullIriAsString() + "> \""
+				+ this.filler.getLexicalForm() + "\"^^<"
+				+ this.filler.getDatatype().getIri().getFullIriAsString()
+				+ ">)";
 	}
 
 	@Override
 	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

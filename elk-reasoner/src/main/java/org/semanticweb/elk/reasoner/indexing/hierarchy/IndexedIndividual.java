@@ -24,7 +24,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitorEx;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 
@@ -54,6 +56,16 @@ public class IndexedIndividual extends IndexedClassEntity {
 	@Override
 	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	public <O, P> O accept(IndexedIndividualVisitorEx<O, P> visitor, P parameter) {
+		return visitor.visit(this, parameter);
+	}
+
+	@Override
+	public <O, P> O accept(IndexedClassEntityVisitorEx<O, P> visitor,
+			P parameter) {
+		return visitor.visit(this, parameter);
 	}
 
 	@Override

@@ -26,7 +26,9 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitorEx;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
@@ -80,6 +82,16 @@ public class IndexedClass extends IndexedClassEntity {
 	@Override
 	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	public <O, P> O accept(IndexedClassVisitorEx<O, P> visitor, P parameter) {
+		return visitor.visit(this, parameter);
+	}
+
+	@Override
+	public <O, P> O accept(IndexedClassEntityVisitorEx<O, P> visitor,
+			P parameter) {
+		return visitor.visit(this, parameter);
 	}
 
 	@Override

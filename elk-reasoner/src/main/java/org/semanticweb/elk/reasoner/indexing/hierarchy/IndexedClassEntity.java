@@ -23,7 +23,9 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitorEx;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitorEx;
 
 public abstract class IndexedClassEntity extends IndexedClassExpression {
 
@@ -32,6 +34,15 @@ public abstract class IndexedClassEntity extends IndexedClassExpression {
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return accept((IndexedClassEntityVisitor<O>) visitor);
+	}
+
+	abstract public <O, P> O accept(IndexedClassEntityVisitorEx<O, P> visitor,
+			P parameter);
+
+	@Override
+	public <O, P> O accept(IndexedClassExpressionVisitorEx<O, P> visitor,
+			P parameter) {
+		return accept((IndexedClassEntityVisitorEx<O, P>) visitor, parameter);
 	}
 
 }

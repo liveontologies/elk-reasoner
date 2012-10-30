@@ -28,7 +28,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitorEx;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -89,6 +91,18 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return accept((IndexedObjectSomeValuesFromVisitor<O>) visitor);
+	}
+
+	public <O, P> O accept(IndexedObjectSomeValuesFromVisitorEx<O, P> visitor,
+			P parameter) {
+		return visitor.visit(this, parameter);
+	}
+
+	@Override
+	public <O, P> O accept(IndexedClassExpressionVisitorEx<O, P> visitor,
+			P parameter) {
+		return accept((IndexedObjectSomeValuesFromVisitorEx<O, P>) visitor,
+				parameter);
 	}
 
 	@Override
@@ -337,4 +351,5 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			}
 		};
 	}
+
 }

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
@@ -97,10 +98,9 @@ abstract public class IndexedClassExpression {
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	abstract void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement);
+	abstract void updateOccurrenceNumbers(int increment, int positiveIncrement,
+			int negativeIncrement);
 
-	
 	public abstract void applyDecompositionRule(RuleEngine ruleEngine,
 			Context context);
 
@@ -113,7 +113,6 @@ abstract public class IndexedClassExpression {
 	public Set<IndexedPropertyChain> getPosPropertiesInExistentials() {
 		return posPropertiesInExistentials_;
 	}
-
 
 	protected void addPosPropertyInExistential(IndexedPropertyChain property) {
 		if (posPropertiesInExistentials_ == null)
@@ -192,6 +191,9 @@ abstract public class IndexedClassExpression {
 	}
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
+
+	public abstract <O, P> O accept(
+			IndexedClassExpressionVisitorEx<O, P> visitor, P parameter);
 
 	Chain<ContextRules> getChainCompositionRules() {
 		return new AbstractChain<ContextRules>() {
