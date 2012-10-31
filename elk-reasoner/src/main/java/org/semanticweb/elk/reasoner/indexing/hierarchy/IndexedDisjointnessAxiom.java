@@ -23,7 +23,8 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -117,7 +118,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	private static class ThisCompositionRule extends ContextRules {
 
 		/**
-		 * {@link IndexedClassExpression} that appear in binary disjointess
+		 * {@link IndexedClassExpression} that appear in binary disjointness
 		 * axioms with this object.
 		 */
 		private Set<IndexedClassExpression> disjointClasses_;
@@ -127,7 +128,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 * object appears.
 		 * 
 		 */
-		private List<IndexedDisjointnessAxiom> disjointnessAxioms_;
+		private Collection<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
 		ThisCompositionRule(ContextRules tail) {
 			super(tail);
@@ -135,7 +136,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		
 		ThisCompositionRule(IndexedClassExpression disjointClass) {
 			super(null);
-			disjointClasses_ = new ArrayHashSet<IndexedClassExpression>();
+			disjointClasses_ = new HashSet<IndexedClassExpression>();
 			disjointClasses_.add(disjointClass);
 		}
 		
@@ -201,40 +202,21 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return success;
 		}
 
-		protected boolean addDisjointnessAxiom(
-				IndexedDisjointnessAxiom disjointnessAxiom) {
+		protected boolean addDisjointnessAxioms(Collection<IndexedDisjointnessAxiom> axioms) {
 			if (disjointnessAxioms_ == null) {
 				disjointnessAxioms_ = new LinkedList<IndexedDisjointnessAxiom>();
 			}
 
-			return disjointnessAxioms_.add(disjointnessAxiom);
+			return disjointnessAxioms_.addAll(axioms);
 		}
-
-		/**
-		 * @param disjointnessAxiom
-		 * @return true if successfully removed
-		 */
-		protected boolean removeDisjointnessAxiom(
-				IndexedDisjointnessAxiom disjointnessAxiom) {
-			boolean success = false;
-
+		
+		protected boolean removeDisjointnessAxioms(Collection<IndexedDisjointnessAxiom> axioms) {
 			if (disjointnessAxioms_ != null) {
-				Iterator<IndexedDisjointnessAxiom> i = disjointnessAxioms_
-						.iterator();
-				while (i.hasNext())
-					if (i.next().getMembers()
-							.equals(disjointnessAxiom.getMembers())) {
-						i.remove();
-						break;
-					}
-
-				if (disjointnessAxioms_.isEmpty()) {
-					disjointnessAxioms_ = null;
-				}
+				return disjointnessAxioms_.removeAll(axioms);
 			}
-
-			return success;
-		}
+			
+			return false;
+		}		
 
 		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
 				ThisCompositionRule.class);
@@ -267,13 +249,11 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return changed;
 		}
 		
-		public static boolean addTo(Chain<ContextRules> ruleChain, List<IndexedDisjointnessAxiom> axioms) {
+		public static boolean addTo(Chain<ContextRules> ruleChain, Collection<IndexedDisjointnessAxiom> axioms) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
 			
-			for (IndexedDisjointnessAxiom axiom : axioms) {
-				changed |= rule.addDisjointnessAxiom(axiom);
-			}
+			rule.addDisjointnessAxioms(axioms);
 			
 			return changed;
 		}		
@@ -297,14 +277,13 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return changed;
 		}		
 		
-		public static boolean removeFrom(Chain<ContextRules> ruleChain, List<IndexedDisjointnessAxiom> axioms) {
+		public static boolean removeFrom(Chain<ContextRules> ruleChain, Collection<IndexedDisjointnessAxiom> axioms) {
 			ThisCompositionRule rule = ruleChain.find(ThisCompositionRule.MATCHER_);
 			boolean changed = false;
 			
 			if (rule != null) {
-				for (IndexedDisjointnessAxiom axiom : axioms) {
-					changed |= rule.removeDisjointnessAxiom(axiom);
-				}
+				
+				changed |= rule.removeDisjointnessAxioms(axioms);
 				
 				if (rule.isEmpty()) {
 					ruleChain.remove(ThisCompositionRule.MATCHER_);
