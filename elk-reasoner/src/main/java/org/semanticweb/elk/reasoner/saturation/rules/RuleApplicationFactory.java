@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
@@ -487,8 +488,7 @@ public class RuleApplicationFactory implements
 		public Boolean visit(ForwardLink link, Context context) {
 			//statistics_.forwLinkInfNo++;
 			if (link.addToContextBackwardLinkRule(context)) {
-				//markAsModified(context);
-				
+			
 				return true;
 			}
 			
@@ -510,12 +510,19 @@ public class RuleApplicationFactory implements
 		@Override
 		public Boolean visit(Propagation propagation, Context context) {
 			if (propagation.addToContextBackwardLinkRule(context)) {
-				//markAsModified(context);
 				
 				return true;
 			}
 			
 			return false;
+		}
+
+		@Override
+		public Boolean visit(DisjointnessAxiom axiom, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Trying to add disjointness axiom to " + context.getRoot());
+			}
+			return !context.addDisjointnessAxiom(axiom.getAxiom());
 		}
 	}
 	

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
@@ -157,16 +158,16 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 				state.produce(context, new PositiveSuperClassExpression(
 						state.getOwlNothing()));
-				return;
-			}
-
-			if (disjointnessAxioms_ != null)
-				for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-					if (!context.addDisjointnessAxiom(disAxiom))
+			} 
+			else if (disjointnessAxioms_ != null)
+				for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_) {
+					state.produce(context, new DisjointnessAxiom(disAxiom));
+				}
+					/*if (!context.addDisjointnessAxiom(disAxiom))
 						state.produce(
 								context,
 								new PositiveSuperClassExpression(state
-										.getOwlNothing()));
+										.getOwlNothing()));*/
 
 		}
 

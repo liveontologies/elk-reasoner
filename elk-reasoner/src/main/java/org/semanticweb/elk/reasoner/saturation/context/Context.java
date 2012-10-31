@@ -223,4 +223,13 @@ public interface Context {
 	 */
 	public void setSaturated(boolean saturated);
 
+	/**
+	 * TODO
+	 * @param axiom
+	 * @return
+	 */
+	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+
+	public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+
 }

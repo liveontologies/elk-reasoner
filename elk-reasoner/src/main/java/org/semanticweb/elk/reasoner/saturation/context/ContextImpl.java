@@ -271,4 +271,14 @@ public class ContextImpl implements Context {
 	public boolean containsSuperClassExpression(IndexedClassExpression expression) {
 		return superClassExpressions_.contains(expression);
 	}
+
+	@Override
+	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+		return disjointnessAxioms_.contains(axiom);
+	}
+
+	@Override
+	public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+		return disjointnessAxioms_.remove(axiom);
+	}
 }
