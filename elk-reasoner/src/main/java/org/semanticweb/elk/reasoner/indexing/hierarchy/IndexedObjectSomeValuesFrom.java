@@ -25,18 +25,15 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.util.collections.HashSetMultimap;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -51,8 +48,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(IndexedObjectSomeValuesFrom.class);
+	//private static final Logger LOGGER_ = Logger.getLogger(IndexedObjectSomeValuesFrom.class);
 
 	protected final IndexedObjectProperty property;
 
@@ -201,7 +197,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					 * creating propagations for relevant sub-properties of the relation
 					 */
 					for (IndexedPropertyChain property : relation.getSaturated().getSubProperties()) {
-						addPropagation(state, property, e, context);
+						//addPropagation(state, property, e, context);
+						state.produce(context, new Propagation(property, e));
 					}
 					/*for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
 							candidatePropagationProperties, relation
@@ -232,11 +229,10 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 							if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
 									&& property.getRightChains() == null) {
 								for (IndexedPropertyChain superChain : property.getToldSuperProperties()) {
-									addPropagation(state, superChain, e,
-											context);
+									state.produce(context, new Propagation(superChain, e));
 								}
 							} else {
-								addPropagation(state, property, e, context);
+								state.produce(context, new Propagation(property, e));
 							}
 						}
 					}
@@ -249,33 +245,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			} finally {
 				//stats.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
 			}
-		}
-
-		private static void addPropagation(SaturationState state,
-				IndexedPropertyChain propRelation,
-				IndexedClassExpression carry, Context context) {
-
-			if (context
-					.getBackwardLinkRulesChain()
-					.getCreate(ThisBackwardLinkRule.MATCHER_,
-							ThisBackwardLinkRule.FACTORY_)
-					.addPropagationByObjectProperty(propRelation, carry)) {
-				// propagate over all backward links
-				final Multimap<IndexedPropertyChain, Context> backLinks = context
-						.getBackwardLinksByObjectProperty();
-				
-				if (LOGGER_.isTraceEnabled())
-					LOGGER_.trace(context.getRoot() + ": new propagation "
-							+ propRelation + "->" + carry);				
-
-				Collection<Context> targets = backLinks.get(propRelation);
-
-				for (Context target : targets) {
-					state.produce(target,
-							new NegativeSuperClassExpression(carry));
-				}
-			}
-
 		}
 
 		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
@@ -328,54 +297,5 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			
 			return changed;
 		}		
-	}
-
-	/**
-	 * 
-	 * 
-	 */
-	private static class ThisBackwardLinkRule extends BackwardLinkRules {
-
-		private final Multimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty_;
-
-		ThisBackwardLinkRule(BackwardLinkRules tail) {
-			super(tail);
-			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
-					1);
-		}
-
-		private boolean addPropagationByObjectProperty(
-				IndexedPropertyChain propRelation,
-				IndexedClassExpression conclusion) {
-			return propagationsByObjectProperty_.add(propRelation, conclusion);
-		}
-
-		@Override
-		public void apply(SaturationState state, BackwardLink link) {
-			/*RuleStatistics stats = ruleEngine.getRulesTimer();
-
-			stats.timeObjectSomeValuesFromBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
-			stats.countObjectSomeValuesFromBackwardLinkRule++;*/
-
-			try {
-				for (IndexedClassExpression carry : propagationsByObjectProperty_
-						.get(link.getRelation()))
-					state.produce(link.getSource(),
-							new NegativeSuperClassExpression(carry));
-			} finally {
-				//stats.timeObjectSomeValuesFromBackwardLinkRule += CachedTimeThread.currentTimeMillis;
-			}
-		}
-
-		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(
-				ThisBackwardLinkRule.class);
-
-		private static ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule>() {
-
-			@Override
-			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
-				return new ThisBackwardLinkRule(tail);
-			}
-		};
 	}
 }

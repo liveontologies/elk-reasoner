@@ -23,4 +23,6 @@ public interface ConclusionVisitor<R> {
 	public R visit(IndexChange indexChange, Context context);
 	
 	public R visit(Bottom bot, Context context);
+
+	public R visit(Propagation propagation, Context context);
 }

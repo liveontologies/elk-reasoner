@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -486,7 +487,7 @@ public class RuleApplicationFactory implements
 		public Boolean visit(ForwardLink link, Context context) {
 			//statistics_.forwLinkInfNo++;
 			if (link.addToContextBackwardLinkRule(context)) {
-				markAsModified(context);
+				//markAsModified(context);
 				
 				return true;
 			}
@@ -504,6 +505,17 @@ public class RuleApplicationFactory implements
 		@Override
 		public Boolean visit(Bottom bot, Context context) {
 			return !context.isInconsistent();
+		}
+
+		@Override
+		public Boolean visit(Propagation propagation, Context context) {
+			if (propagation.addToContextBackwardLinkRule(context)) {
+				//markAsModified(context);
+				
+				return true;
+			}
+			
+			return false;
 		}
 	}
 	

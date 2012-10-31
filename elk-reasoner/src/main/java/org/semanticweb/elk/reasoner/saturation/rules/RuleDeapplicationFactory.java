@@ -12,6 +12,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -104,6 +105,11 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		@Override
 		public Boolean visit(Bottom bot, Context context) {
 			return context.isInconsistent();
+		}
+
+		@Override
+		public Boolean visit(Propagation propagation, Context context) {
+			return propagation.containsBackwardLinkRule(context);
 		}		
 	}	
 	
@@ -176,6 +182,17 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		@Override
 		public Boolean visit(Bottom bot, Context context) {
 			return context.isInconsistent();
+		}
+
+		@Override
+		public Boolean visit(Propagation propagation, Context context) {
+			if (propagation.removeFromContextBackwardLinkRule(context)) {
+				//markAsModified(context);
+				
+				return true;
+			}
+			
+			return false;
 		}		
 	}	
 }

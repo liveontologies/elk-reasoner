@@ -5,7 +5,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -22,7 +21,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class Bottom implements Conclusion {
 
-	protected static final Logger LOGGER_ = Logger.getLogger(Bottom.class);
+	//private static final Logger LOGGER_ = Logger.getLogger(Bottom.class);
 	
 	@Override
 	public void deapply(SaturationState state, Context context) {
@@ -57,12 +56,6 @@ public class Bottom implements Conclusion {
 				state.produce(target, new PositiveSuperClassExpression(state.getOwlNothing()));
 			}
 		}
-		
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Registering the Bot backward link rule for " + context.getRoot());
-		}
-
-				
 	}
 
 	@Override
