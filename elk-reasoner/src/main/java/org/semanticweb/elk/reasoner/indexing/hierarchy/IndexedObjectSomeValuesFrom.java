@@ -231,8 +231,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 							 */
 							if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
 									&& property.getRightChains() == null) {
-								for (IndexedPropertyChain superChain : property
-										.getToldSuperProperties()) {
+								for (IndexedPropertyChain superChain : property.getToldSuperProperties()) {
 									addPropagation(state, superChain, e,
 											context);
 								}

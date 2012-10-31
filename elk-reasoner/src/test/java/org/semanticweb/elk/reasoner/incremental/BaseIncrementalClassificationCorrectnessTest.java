@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.incremental;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,6 +14,10 @@ import java.net.URL;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;

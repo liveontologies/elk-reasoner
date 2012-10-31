@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.incremental;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -29,7 +29,9 @@ import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;

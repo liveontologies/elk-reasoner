@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
@@ -70,7 +71,7 @@ public abstract class IndexedPropertyChain {
 	 *         assigned
 	 */
 	public List<IndexedObjectProperty> getToldSuperProperties() {
-		return toldSuperProperties_;
+		return toldSuperProperties_ == null ? Collections.<IndexedObjectProperty>emptyList() : toldSuperProperties_;
 	}
 
 	/**

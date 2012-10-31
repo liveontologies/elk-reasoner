@@ -253,8 +253,7 @@ public class IndexedPropertyChainSaturation {
 		for (IndexedPropertyChain ipc : v) {
 			SaturatedPropertyChain saturated = ipc.getSaturated(false);
 			Collection<? extends IndexedPropertyChain> superProperties = saturated != null ? saturated
-					.getSuperProperties() : emptyIfNull(ipc
-					.getToldSuperProperties());
+					.getSuperProperties() : ipc.getToldSuperProperties();
 
 			for (IndexedPropertyChain prop : v) {
 				if (ipc != prop && superProperties.contains(prop)) {
@@ -300,7 +299,7 @@ public class IndexedPropertyChainSaturation {
 					addSuperChain(chain, prop);
 				}
 				
-				props.addAll(emptyIfNull(ipc.getToldSuperProperties()));
+				props.addAll(ipc.getToldSuperProperties());
 				
 				return null;
 			}
@@ -321,7 +320,7 @@ public class IndexedPropertyChainSaturation {
 				IndexedPropertyChain composable = chain.getComposable(ipc);
 				
 				if (isReflexive(composable)) {
-					props.addAll(emptyIfNull(chain.getToldSuperProperties()));
+					props.addAll(chain.getToldSuperProperties());
 					props.add(chain);
 				}
 			}
@@ -385,7 +384,7 @@ public class IndexedPropertyChainSaturation {
 
 			if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
 					&& chain.getRightChains() == null) {
-				for (IndexedPropertyChain superChain : emptyIfNull(chain.getToldSuperProperties())) {
+				for (IndexedPropertyChain superChain : chain.getToldSuperProperties()) {
 					added |= compositionMultimap.add(next, superChain);
 				}
 			} else {
