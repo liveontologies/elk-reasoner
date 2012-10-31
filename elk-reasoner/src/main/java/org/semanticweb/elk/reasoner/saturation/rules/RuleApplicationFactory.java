@@ -41,6 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
@@ -78,9 +79,7 @@ public class RuleApplicationFactory implements
 	 */
 	private final Queue<Context> activeContexts_;
 
-	private final Queue<Context> minorActiveContexts_;
-
-	private static final int ACTIVATION_THRESHOLD_ = 5;
+	private final Queue<Engine> activeWorkers_;
 
 	/**
 	 * The approximate number of contexts ever created by this engine. This
@@ -121,7 +120,7 @@ public class RuleApplicationFactory implements
 
 	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
 		this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
-		this.minorActiveContexts_ = new ConcurrentLinkedQueue<Context>();
+		this.activeWorkers_ = new ConcurrentLinkedQueue<Engine>();
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
 		this.aggregatedRuleStats_ = new RuleStatistics();
 		this.aggregatedFactoryStats_ = new ThisStatistics();
@@ -345,6 +344,10 @@ public class RuleApplicationFactory implements
 		 */
 		private int localContextNumber = 0;
 
+		private volatile int stamp_ = 0;
+
+		private ActivationStack<Context> recentActiveContexts = new ActivationStack<Context>();
+
 		// don't allow creating of engines directly; only through the factory
 		private Engine() {
 		}
@@ -360,11 +363,19 @@ public class RuleApplicationFactory implements
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
-				Context nextContext = activeContexts_.poll();
+				Context nextContext = recentActiveContexts.pop();
 				if (nextContext == null)
-					nextContext = minorActiveContexts_.poll();
-				if (nextContext == null)
-					break;
+					nextContext = activeContexts_.poll();
+				if (nextContext == null) {
+					Engine worker = activeWorkers_.poll();
+					if (worker == null)
+						break;
+					nextContext = worker.recentActiveContexts.pop();
+					if (nextContext == null)
+						continue;
+					else
+						activeWorkers_.add(worker);
+				}
 				process(nextContext);
 			}
 			factoryStats_.timeContextProcess += CachedTimeThread.currentTimeMillis;
@@ -448,10 +459,12 @@ public class RuleApplicationFactory implements
 						+ conclusion);
 			if (context.addToDo(conclusion)) {
 				// context was activated
-				if (context.getActivationCounter() > ACTIVATION_THRESHOLD_)
+				Engine worker = context.getWorker();
+				if (worker != null && worker.stamp_ - context.getStamp() < 32) {
+					if (worker.recentActiveContexts.push(context))
+						activeWorkers_.add(worker);
+				} else
 					activeContexts_.add(context);
-				else
-					minorActiveContexts_.add(context);
 			}
 		}
 
@@ -463,7 +476,8 @@ public class RuleApplicationFactory implements
 		 */
 		protected void process(Context context) {
 			factoryStats_.contContextProcess++;
-			context.incrementActivationCounter();
+			context.setWorker(this);
+			context.setStamp(++stamp_);
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
 				if (conclusion == null)

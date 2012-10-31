@@ -177,7 +177,13 @@ public interface Context {
 	 */
 	public void setSaturated();
 		
-	public int getActivationCounter();
-	public int incrementActivationCounter();
+//	public int getActivationCounter();
+//	public int incrementActivationCounter();
 
+	public void setStamp(int stamp);
+	public int getStamp();
+	
+	public void setWorker(RuleApplicationFactory.Engine worker);
+	public RuleApplicationFactory.Engine getWorker();
+	
 }

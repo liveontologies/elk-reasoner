@@ -32,6 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -98,7 +100,10 @@ public class ContextImpl implements Context {
 	 */
 	protected volatile boolean isInconsistent = false;
 
-	private int activationCounter = 0;
+//	private int activationCounter = 0;
+	
+	private volatile int stamp = 0;
+	private volatile RuleApplicationFactory.Engine worker = null;
 
 	/**
 	 * Construct a new {@link Context} for the given root
@@ -151,6 +156,7 @@ public class ContextImpl implements Context {
 
 	@Override
 	public void setSaturated() {
+		worker = null;
 		isSaturated = true;
 	}
 
@@ -213,12 +219,32 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public int getActivationCounter() {
-		return activationCounter;
+	public void setStamp(int stamp) {
+		this.stamp = stamp;		
 	}
 
 	@Override
-	public int incrementActivationCounter() {
-		return ++activationCounter;
+	public int getStamp() {
+		return this.stamp;
 	}
+
+	@Override
+	public void setWorker(Engine worker) {
+		this.worker = worker;
+	}
+
+	@Override
+	public Engine getWorker() {		
+		return worker;
+	}
+
+//	@Override
+//	public int getActivationCounter() {
+//		return activationCounter;
+//	}
+//
+//	@Override
+//	public int incrementActivationCounter() {
+//		return ++activationCounter;
+//	}
 }
