@@ -3,13 +3,11 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Collection;
 import java.util.EnumMap;
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 
 /**
@@ -24,7 +22,7 @@ public class IncrementalReasonerState {
 
 	final DifferentialIndex diffIndex;
 	
-	Collection<IndexedClassExpression> classesToProcess; 
+	//Collection<IndexedClassExpression> classesToProcess; 
 	
 	final EnumMap<IncrementalStages, Boolean> stageStatusMap = new EnumMap<IncrementalStages, Boolean>(IncrementalStages.class);
 	

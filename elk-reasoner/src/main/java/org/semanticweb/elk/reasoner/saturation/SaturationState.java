@@ -100,11 +100,6 @@ public class SaturationState {
 		}
 	}
 	
-	public void reset() {
-		activeContexts_.clear();
-		modifiedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
-	}
-	
 	public void registerContextCreationListener(ContextCreationListener listener) {
 		contextCreationListeners_.prepend(listener);
 	}

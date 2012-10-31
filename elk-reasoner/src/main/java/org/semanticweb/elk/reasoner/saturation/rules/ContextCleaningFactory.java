@@ -20,8 +20,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
-	public ContextCleaningFactory(final SaturationState saturationState) {
-		super(saturationState);
+	public ContextCleaningFactory(final SaturationState saturationState, boolean trackModifiedContexts) {
+		super(saturationState, trackModifiedContexts);
 	}
 
 	@Override

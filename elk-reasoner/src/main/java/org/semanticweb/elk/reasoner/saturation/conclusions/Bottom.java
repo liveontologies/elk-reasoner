@@ -28,23 +28,21 @@ public class Bottom implements Conclusion {
 	public void deapply(SaturationState state, Context context) {
 		context.setConsistent(true);
 		propagateThroughBackwardLinks(state, context);
+		context.getBackwardLinkRulesChain().remove(
+				BottomBackwardLinkRule.MATCHER_);		
 	}
 
 	@Override
 	public void apply(SaturationState state, Context context) {
-/*		if (!context.containsSuperClassExpression(state.getOwlNothing())) {
-			throw new RuntimeException();
-		}*/
-		
 		context.setConsistent(false);
 		propagateThroughBackwardLinks(state, context);
+		// register the backward link rule for propagation of bottom
+		context.getBackwardLinkRulesChain().getCreate(
+						BottomBackwardLinkRule.MATCHER_,
+						BottomBackwardLinkRule.FACTORY_);		
 	}
 	
 	private void propagateThroughBackwardLinks(SaturationState state, Context context) {
-		
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Applying rules for owl:Nothing");
-		}
 		
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
 				.getBackwardLinksByObjectProperty();
@@ -59,11 +57,12 @@ public class Bottom implements Conclusion {
 				state.produce(target, new PositiveSuperClassExpression(state.getOwlNothing()));
 			}
 		}
+		
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Registering the Bot backward link rule for " + context.getRoot());
+		}
 
-		// register the backward link rule for propagation of bottom
-		context.getBackwardLinkRulesChain().getCreate(
-				BottomBackwardLinkRule.MATCHER_,
-				BottomBackwardLinkRule.FACTORY_);		
+				
 	}
 
 	@Override

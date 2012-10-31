@@ -63,7 +63,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.CONTEXT_CLEANING, true);
 		// save cleaned contexts for future processing
-		reasoner.incrementalState.classesToProcess = reasoner.saturationState.getModifiedContexts();
+		//reasoner.incrementalState.classesToProcess = reasoner.saturationState.getModifiedContexts();
 	}
 	
 	
@@ -72,11 +72,9 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	void initComputation() {
 		super.initComputation();
 
-		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(reasoner.saturationState);
+		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(reasoner.saturationState, true);
 		
-		reasoner.saturationState.reset();//reset the queue of modified contexts
 		cleaning_ = new ClassExpressionSaturation<IndexedClassExpression>(
-				reasoner.incrementalState.classesToProcess,
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),

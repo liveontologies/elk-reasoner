@@ -141,6 +141,10 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean visit(BackwardLink link, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(context.getRoot() + ": removing backward link " + link);
+			}
+			
 			if (context.removeBackwardLink(link)) {
 				markAsModified(context);
 				

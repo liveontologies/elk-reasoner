@@ -20,7 +20,7 @@ public class IncrementalContextInitializationStage extends
 		AbstractReasonerStage {
 
 	// logger for this class
-		private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = Logger
 				.getLogger(IncrementalContextInitializationStage.class);	
 	/**
 	 * The counter for deleted contexts
@@ -77,8 +77,9 @@ public class IncrementalContextInitializationStage extends
 				initContexts_++;
 				progressMonitor.report(initContexts_, maxContexts_);
 				
-				if (interrupted())
+				if (interrupted()) {
 					continue;
+				}
 			}
 		} finally {
 			progressMonitor.finish();
@@ -89,8 +90,8 @@ public class IncrementalContextInitializationStage extends
 	@Override
 	void initComputation() {
 		super.initComputation();
-		todo = reasoner.incrementalState.classesToProcess.iterator();
-		maxContexts_ = reasoner.incrementalState.classesToProcess.size();
+		todo = reasoner.saturationState.getModifiedContexts().iterator();
+		maxContexts_ = reasoner.saturationState.getModifiedContexts().size();
 		initContexts_ = 0;
 	}
 

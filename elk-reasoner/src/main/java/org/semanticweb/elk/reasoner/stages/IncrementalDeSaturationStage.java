@@ -82,7 +82,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.DESATURATION, true);
 		// save modified contexts for future processing
-		reasoner.incrementalState.classesToProcess = reasoner.saturationState.getModifiedContexts();
+		//reasoner.incrementalState.classesToProcess = reasoner.saturationState.getModifiedContexts();
 	}
 	
 	

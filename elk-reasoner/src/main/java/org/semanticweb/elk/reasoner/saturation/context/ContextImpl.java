@@ -271,8 +271,4 @@ public class ContextImpl implements Context {
 	public boolean containsSuperClassExpression(IndexedClassExpression expression) {
 		return superClassExpressions_.contains(expression);
 	}
-	
-	public void removeBackwardLinkRules() {
-		backwardLinkRules_ = null;
-	}
 }
