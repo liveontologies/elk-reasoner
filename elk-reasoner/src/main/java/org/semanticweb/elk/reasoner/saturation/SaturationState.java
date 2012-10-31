@@ -40,7 +40,7 @@ public class SaturationState {
 	
 	private final ContextCreationListenerChain contextCreationListeners_ = new ContextCreationListenerChain();
 	
-	private final Queue<IndexedClassExpression> modifiedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
+	private Queue<IndexedClassExpression> modifiedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 	
 	
 	public SaturationState(IndexedClassExpression top, IndexedClassExpression bot) {
@@ -102,7 +102,7 @@ public class SaturationState {
 	
 	public void reset() {
 		activeContexts_.clear();
-		modifiedContexts_.clear();
+		modifiedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 	}
 	
 	public void registerContextCreationListener(ContextCreationListener listener) {

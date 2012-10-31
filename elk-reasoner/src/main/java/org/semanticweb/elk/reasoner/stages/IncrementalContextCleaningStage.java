@@ -6,7 +6,6 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.incremental.ContextModificationListener;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
@@ -24,7 +23,6 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	// private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
 
 	private ClassExpressionSaturation<IndexedClassExpression> cleaning_ = null;
-	private final ContextModificationListener listener_ = new ContextModificationListener();
 
 	public IncrementalContextCleaningStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -51,7 +49,6 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 			initComputation();
 		}
 		
-		listener_.reset();
 		progressMonitor.start(getName());
 		
 		try {
@@ -66,7 +63,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.CONTEXT_CLEANING, true);
 		// save cleaned contexts for future processing
-		reasoner.incrementalState.classesToProcess = listener_.getModifiedClassExpressions();
+		reasoner.incrementalState.classesToProcess = reasoner.saturationState.getModifiedContexts();
 	}
 	
 	
@@ -77,13 +74,13 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(reasoner.saturationState);
 		
+		reasoner.saturationState.reset();//reset the queue of modified contexts
 		cleaning_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.incrementalState.classesToProcess,
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				cleaningFactory,
-				listener_);
+				cleaningFactory);
 	}
 
 	@Override

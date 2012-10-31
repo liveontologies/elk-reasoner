@@ -87,15 +87,14 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
-			RuleApplicationFactory ruleAppFactory,
-			ClassExpressionSaturationListener<SaturationJob<I>> listener
+			RuleApplicationFactory ruleAppFactory
 			) {
 		super(
 				new TodoJobs<I>(inputs),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(
 						ruleAppFactory,
 						maxWorkers,
-						listener),
+						new DummyClassExpressionSaturationListener<SaturationJob<I>>()),
 				executor, maxWorkers, progressMonitor);
 	}	
 	
