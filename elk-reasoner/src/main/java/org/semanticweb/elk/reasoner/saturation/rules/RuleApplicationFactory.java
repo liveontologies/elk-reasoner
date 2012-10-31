@@ -78,6 +78,10 @@ public class RuleApplicationFactory implements
 	 */
 	private final Queue<Context> activeContexts_;
 
+	private final Queue<Context> minorActiveContexts_;
+
+	private static final int ACTIVATION_THRESHOLD_ = 5;
+
 	/**
 	 * The approximate number of contexts ever created by this engine. This
 	 * number is used not only for statistical purposes, but also by saturation
@@ -117,6 +121,7 @@ public class RuleApplicationFactory implements
 
 	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
 		this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
+		this.minorActiveContexts_ = new ConcurrentLinkedQueue<Context>();
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
 		this.aggregatedRuleStats_ = new RuleStatistics();
 		this.aggregatedFactoryStats_ = new ThisStatistics();
@@ -357,6 +362,8 @@ public class RuleApplicationFactory implements
 					break;
 				Context nextContext = activeContexts_.poll();
 				if (nextContext == null)
+					nextContext = minorActiveContexts_.poll();
+				if (nextContext == null)
 					break;
 				process(nextContext);
 			}
@@ -439,9 +446,13 @@ public class RuleApplicationFactory implements
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion "
 						+ conclusion);
-			if (context.addToDo(conclusion))
+			if (context.addToDo(conclusion)) {
 				// context was activated
-				activeContexts_.add(context);
+				if (context.getActivationCounter() > ACTIVATION_THRESHOLD_)
+					activeContexts_.add(context);
+				else
+					minorActiveContexts_.add(context);
+			}
 		}
 
 		/**
@@ -452,6 +463,7 @@ public class RuleApplicationFactory implements
 		 */
 		protected void process(Context context) {
 			factoryStats_.contContextProcess++;
+			context.incrementActivationCounter();
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
 				if (conclusion == null)

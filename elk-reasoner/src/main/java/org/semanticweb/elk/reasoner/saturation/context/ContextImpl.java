@@ -98,6 +98,8 @@ public class ContextImpl implements Context {
 	 */
 	protected volatile boolean isInconsistent = false;
 
+	private int activationCounter = 0;
+
 	/**
 	 * Construct a new {@link Context} for the given root
 	 * {@link IndexedClassExpression}. Initially, the context is not active.
@@ -208,5 +210,15 @@ public class ContextImpl implements Context {
 	@Override
 	public Conclusion takeToDo() {
 		return toDo_.pop();
+	}
+
+	@Override
+	public int getActivationCounter() {
+		return activationCounter;
+	}
+
+	@Override
+	public int incrementActivationCounter() {
+		return ++activationCounter;
 	}
 }

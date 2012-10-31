@@ -176,5 +176,8 @@ public interface Context {
 	 * be further {@link SuperClassExpression}s added to this {@link Context}.
 	 */
 	public void setSaturated();
+		
+	public int getActivationCounter();
+	public int incrementActivationCounter();
 
 }
