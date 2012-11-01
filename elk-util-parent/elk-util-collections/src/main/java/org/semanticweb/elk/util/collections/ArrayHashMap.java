@@ -26,6 +26,7 @@
 package org.semanticweb.elk.util.collections;
 
 import java.util.AbstractCollection;
+import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -48,7 +49,7 @@ import java.util.Set;
  *            the type of the values
  * 
  */
-public class ArrayHashMap<K, V> implements Map<K, V> {
+public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 
 	/**
 	 * The default initial capacity - MUST be a power of two.
@@ -423,13 +424,6 @@ public class ArrayHashMap<K, V> implements Map<K, V> {
 		if (size == lowerSize)
 			shrink();
 		return result;
-	}
-
-	@Override
-	public void putAll(Map<? extends K, ? extends V> m) {
-		for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
-			put(entry.getKey(), entry.getValue());
-		}
 	}
 
 	@Override
