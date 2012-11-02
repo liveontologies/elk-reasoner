@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
@@ -50,7 +50,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	protected static final Logger LOGGER_ = Logger.getLogger(BaseIncrementalReasoningCorrectnessTest.class);	
 	
 	final static int REPEAT_NUMBER = 1;
-	final static double DELETE_RATIO = 0.3;
+	final static double DELETE_RATIO = 0.2;
 	
 	protected final ReasoningTestManifest<EO, AO> manifest;
 	protected List<ElkAxiom> axioms;
@@ -162,7 +162,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	}
 
 	protected boolean filterAxiom(ElkAxiom axiom) {
-		return axiom instanceof ElkPropertyAxiom;
+		return !(axiom instanceof ElkClassAxiom);
 	}
 	
 	protected List<ElkAxiom> loadAxioms(InputStream stream) throws IOException, Owl2ParseException {

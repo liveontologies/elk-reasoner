@@ -23,7 +23,7 @@
 package org.semanticweb.elk.owl.parsing.javacc;
 
 import java.io.InputStream;
-import java.io.StringReader;
+import java.io.Reader;
 
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
@@ -36,7 +36,7 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 	}
 
 	@Override
-	public Owl2Parser getParser(StringReader reader) {
+	public Owl2Parser getParser(Reader reader) {
 		return new Owl2FunctionalStyleParser(reader);
 	}
 
