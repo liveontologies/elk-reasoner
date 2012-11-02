@@ -105,8 +105,31 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			}
 		}
 	}
-
 	
+	/*
+	 * the following two methods are required because indexed axioms do not go
+	 * through the index cache (only objects do)
+	 */
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(getMembers().toArray());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof IndexedDisjointnessAxiom) {
+			IndexedDisjointnessAxiom axiom = (IndexedDisjointnessAxiom) obj;
+			
+			return getMembers().equals(axiom.getMembers());
+		}
+		else {
+			return false;
+		}
+	}
+
+
+
+
 	/**
 	 * That's the actual disjointness rule which is registered as a context rule
 	 * for class expressions.

@@ -115,7 +115,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean visit(DisjointnessAxiom axiom, Context context) {
-			return context.containsDisjointnessAxiom(axiom.getAxiom());
+			return context.containsDisjointnessAxiom(axiom.getAxiom()) > 0;
 		}		
 	}	
 	
@@ -208,7 +208,9 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 				LOGGER_.trace("Removing disjointness axiom from " + context.getRoot());
 			}
 			
-			return context.removeDisjointnessAxiom(axiom.getAxiom());
+			context.removeDisjointnessAxiom(axiom.getAxiom());
+			 
+			return true;
 		}		
 	}	
 }

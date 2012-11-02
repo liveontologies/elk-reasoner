@@ -522,7 +522,8 @@ public class RuleApplicationFactory implements
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Trying to add disjointness axiom to " + context.getRoot());
 			}
-			return !context.addDisjointnessAxiom(axiom.getAxiom());
+			// should always be true
+			return context.addDisjointnessAxiom(axiom.getAxiom()) > 0;
 		}
 	}
 	

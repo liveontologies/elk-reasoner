@@ -62,9 +62,9 @@ public interface Context {
 	public Set<IndexedClassExpression> getSuperClassExpressions();
 	
 	
-	public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms();
+	//public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms();
 	
-	public boolean addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+	public int addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * @return the {@link Context}s from which there exists an (implied)
@@ -228,8 +228,7 @@ public interface Context {
 	 * @param axiom
 	 * @return
 	 */
-	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+	public int containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
-	public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
+	public int removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 }

@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.context;
 
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -35,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -75,7 +77,7 @@ public class ContextImpl implements Context {
 	 */
 	private Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty_ = null;
 
-	private Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
+	private Map<IndexedDisjointnessAxiom, Integer> disjointnessAxioms_;
 
 	/**
 	 * the rules that should be applied to each derived {@link BackwardLink} in
@@ -148,17 +150,18 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
-		return disjointnessAxioms_;
-	}
-	
-	@Override
-	public boolean addDisjointnessAxiom(
-			IndexedDisjointnessAxiom disjointnessAxiom) {
-		if (disjointnessAxioms_ == null)
-			disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointnessAxiom>();
+	public int addDisjointnessAxiom(IndexedDisjointnessAxiom disjointnessAxiom) {
+		
+		if (disjointnessAxioms_ == null) {
+			disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointnessAxiom, Integer>();
+		}
 
-		return disjointnessAxioms_.add(disjointnessAxiom);
+		Integer counter = disjointnessAxioms_.get(disjointnessAxiom);
+		
+		counter = counter == null ? 1 : counter+ 1;
+		disjointnessAxioms_.put(disjointnessAxiom, counter);
+		
+		return counter;
 	}
 
 	@Override
@@ -273,12 +276,27 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		return disjointnessAxioms_.contains(axiom);
+	public int containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+		Integer counter = disjointnessAxioms_.get(axiom);
+		
+		return counter == null ? 0 : counter;
 	}
 
 	@Override
-	public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		return disjointnessAxioms_.remove(axiom);
+	public int removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+		if (disjointnessAxioms_ == null) {
+			return 0;
+		}
+
+		Integer counter = disjointnessAxioms_.get(axiom);
+		
+		if (counter == null || counter <= 0) {
+			return counter;
+		}
+		else {
+			disjointnessAxioms_.put(axiom, counter.intValue() - 1);
+			
+			return counter.intValue() - 1;
+		}
 	}
 }

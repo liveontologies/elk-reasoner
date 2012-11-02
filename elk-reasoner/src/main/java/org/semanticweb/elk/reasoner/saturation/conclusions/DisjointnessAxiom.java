@@ -31,8 +31,9 @@ public class DisjointnessAxiom implements Conclusion {
 
 	@Override
 	public void apply(SaturationState state, Context context) {
-		// should be called only if this axiom is processed the >1 time for the same context 
-		state.produce(context, new PositiveSuperClassExpression(state.getOwlNothing()));
+		if (context.containsDisjointnessAxiom(axiom_) > 1) {
+			state.produce(context, new PositiveSuperClassExpression(state.getOwlNothing()));
+		}
 	}
 
 	@Override
