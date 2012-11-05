@@ -25,10 +25,8 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.incremental.ChangesInitializationListener;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
  * Reverts inferences
@@ -42,7 +40,6 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 	//private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
 
 	private IncrementalChangesInitialization initialization_ = null;
-	private final ChangesInitializationListener<IndexedClassExpression> listener_ = new ChangesInitializationListener<IndexedClassExpression>();
 	private final boolean deletions_;
 
 	public IncrementalChangesInitializationStage(AbstractReasonerState reasoner, boolean deletions) {
@@ -101,7 +98,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				listener_);
+				!deletions_);
 	}
 
 	@Override

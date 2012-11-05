@@ -85,10 +85,10 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			indexUpdater.add(second_, new ThisCompositionRule(first_));
 		}
 		else {
-			ThisCompositionRule regRule = new ThisCompositionRule(this); 
+			//ThisCompositionRule regRule = new ThisCompositionRule(this); 
 			
 			for (IndexedClassExpression ice : members_) {
-				indexUpdater.add(ice, regRule);
+				indexUpdater.add(ice, new ThisCompositionRule(this));
 			}
 		}
 	}
@@ -126,6 +126,13 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return false;
 		}
 	}
+
+
+	@Override
+	public String toString() {
+		return "DisjointClasses(" + Arrays.toString(getMembers().toArray()) + ")";
+	}
+
 
 
 

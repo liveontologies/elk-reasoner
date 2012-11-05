@@ -17,7 +17,6 @@ import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyFinishedJob;
 
 /**
  * Goes through the input class expressions and puts
@@ -39,8 +38,8 @@ public class IncrementalChangesInitialization
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
-			InputProcessorListenerNotifyFinishedJob<IndexedClassExpression> listener) {
-		super(inputs, new ContextInitializationFactory(state, changes, listener), executor, maxWorkers, progressMonitor);
+			boolean initContexts) {
+		super(inputs, new ContextInitializationFactory(state, changes, initContexts), executor, maxWorkers, progressMonitor);
 	}
 }
 
@@ -51,27 +50,29 @@ class ContextInitializationFactory implements InputProcessorFactory<IndexedClass
 	
 	private final SaturationState saturationState_;
 	private final Map<IndexedClassExpression, IndexChange> indexChanges_;
-	private final InputProcessorListenerNotifyFinishedJob<IndexedClassExpression> listener_;
+	//private final boolean initContexts_;
 	
 	public ContextInitializationFactory(SaturationState state,
 			Map<IndexedClassExpression,
 			IndexChange> indexChanges,
-			InputProcessorListenerNotifyFinishedJob<IndexedClassExpression> listener) {
+			boolean initContexts) {
 		saturationState_ = state;
 		indexChanges_ = indexChanges;
-		listener_ = listener;
+		//initContexts_ = initContexts;
 	}
 
 	@Override
 	public InputProcessor<IndexedClassExpression> getEngine() {
 
-		return new BaseInputProcessor<IndexedClassExpression>(listener_) {
+		return new BaseInputProcessor<IndexedClassExpression>() {
 			
 			@Override
 			protected void process(IndexedClassExpression ice) {
 				Context context = ice.getContext();
 				
-				if (context != null) {
+				if (context != null/* || initContexts_*/) {
+					
+					//context = saturationState_.getCreateContext(ice);
 					
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
 							indexChanges_.keySet(),

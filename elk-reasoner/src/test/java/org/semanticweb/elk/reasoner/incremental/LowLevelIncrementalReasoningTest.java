@@ -4,6 +4,8 @@
 package org.semanticweb.elk.reasoner.incremental;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -78,6 +80,37 @@ public class LowLevelIncrementalReasoningTest {
 		
 		assertFalse(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
 	}
+	
+	
+	@Test
+	public void testNewClassUnsatisfiable() throws ElkException {
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
+		TestChangesLoader loader = new TestChangesLoader();
+		
+		reasoner.registerOntologyLoader(loader);
+		
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		
+		loader.add(objectFactory.getSubClassOfAxiom(a, b));
+
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+		
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(b)));
+		loader.clear();
+		
+		reasoner.setIncrementalMode(true);
+		reasoner.registerOntologyChangesLoader(loader);
+
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
+		loader.add(objectFactory.getDisjointClassesAxiom(Arrays.asList(c, d, c)));
+		
+		taxonomy = reasoner.getTaxonomy();
+		
+		assertSame(taxonomy.getBottomNode(), taxonomy.getNode(c));
+		assertNotSame(taxonomy.getBottomNode(), taxonomy.getNode(d));
+	}	
 	
 	@Test
 	public void testDeleteFromForest() throws ElkException, IOException {

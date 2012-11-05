@@ -49,7 +49,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger.getLogger(BaseIncrementalReasoningCorrectnessTest.class);	
 	
-	final static int REPEAT_NUMBER = 1;
+	final static int REPEAT_NUMBER = 10;
 	final static double DELETE_RATIO = 0.2;
 	
 	protected final ReasoningTestManifest<EO, AO> manifest;
@@ -100,7 +100,6 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		incrementalReasoner.setIncrementalMode(true);
 		//initial load
 		add(initialLoader, axioms);
-		//add(loader, axioms);
 		//initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 		
@@ -123,12 +122,12 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 						
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 			//add the axioms back
-			/*loader.clear();
+			loader.clear();
 			add(loader, deleted);
 			standardReasoner.registerOntologyChangesLoader(loader);
 			incrementalReasoner.registerOntologyChangesLoader(loader);			
 			
-			correctnessCheck(standardReasoner, incrementalReasoner, seed);*/
+			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}
 	}
 

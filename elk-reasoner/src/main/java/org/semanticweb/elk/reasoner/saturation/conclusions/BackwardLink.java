@@ -99,9 +99,6 @@ public class BackwardLink implements Conclusion {
 			if (!relation_.getSaturated().getLeftComposableProperties().isEmpty()) {
 				state.produce(source_, new ForwardLink(relation_, context));
 			}
-			else {
-				System.out.println("No composition!");
-			}
 		} finally {
 			//statistics.backLinkTime += CachedTimeThread.currentTimeMillis;
 		}
