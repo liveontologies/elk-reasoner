@@ -8,6 +8,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
+import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
  * @author Pavel Klinov
@@ -33,7 +34,6 @@ public class IndexChange  extends AbstractChain<ContextRules> implements Conclus
 	public void setNext(ContextRules tail) {
 		contextRules_ = tail;
 	}	
-	
 	
 	@Override
 	public void deapply(SaturationState state, Context context) {
@@ -65,4 +65,22 @@ public class IndexChange  extends AbstractChain<ContextRules> implements Conclus
 	public String toString() {
 		return "Set of incremental changes";
 	}
+	
+	public void addTo(Chain<ContextRules> rules) {
+		ContextRules next = contextRules_;
+		
+		while (next != null) {
+			next.addTo(rules);
+			next = next.next();
+		}
+	}
+	
+	public void removeFrom(Chain<ContextRules> rules) {
+		ContextRules next = contextRules_;
+		
+		while (next != null) {
+			next.removeFrom(rules);
+			next = next.next();
+		}
+	}	
 }

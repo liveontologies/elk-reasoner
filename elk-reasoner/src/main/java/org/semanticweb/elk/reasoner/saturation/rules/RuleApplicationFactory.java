@@ -299,7 +299,7 @@ public class RuleApplicationFactory implements
 	 */
 	public class Engine implements InputProcessor<IndexedClassExpression>, RuleEngine, ContextCreationListener {
 
-		protected final ConclusionVisitor<Boolean> conclusionVisitor_;
+		protected final ConclusionVisitor<Boolean> conclusionVisitor;
 		
 		/**
 		 * Local {@link ConclusionsCounter} created for every worker
@@ -319,12 +319,12 @@ public class RuleApplicationFactory implements
 		private int localContextNumber = 0;
 
 		protected Engine(ConclusionVisitor<Boolean> visitor) {
-			conclusionVisitor_ = visitor;
+			conclusionVisitor = visitor;
 			saturationState_.registerContextCreationListener(this);
 		}
 
 		protected ConclusionVisitor<Boolean> getConclusionVisitor() {
-			return conclusionVisitor_;
+			return conclusionVisitor;
 		}
 		
 		@Override
@@ -406,7 +406,7 @@ public class RuleApplicationFactory implements
 		}
 
 		protected boolean preApply(Conclusion conclusion, Context context) {
-			return conclusion.accept(conclusionVisitor_, context);
+			return conclusion.accept(conclusionVisitor, context);
 		}
 
 		protected void postApply(Conclusion conclusion, Context context) {

@@ -44,15 +44,21 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 */
 	public class DeletionEngine extends Engine {
 		
-		protected final ContainsConclusionVisitor containsVisitor_ = new ContainsConclusionVisitor();
+		protected final ConclusionVisitor<Boolean> containsVisitor;
 		
-		protected DeletionEngine(ConclusionVisitor<Boolean> visitor) {
-			super(visitor);
+		protected DeletionEngine(ConclusionVisitor<Boolean> postVisitor) {
+			super(postVisitor);
+			containsVisitor = new ContainsConclusionVisitor();
 		}
-
+		
+		protected DeletionEngine(ConclusionVisitor<Boolean> preVisitor, ConclusionVisitor<Boolean> postVisitor) {
+			super(postVisitor);
+			containsVisitor = preVisitor;
+		}
+		
 		@Override
 		protected boolean preApply(Conclusion conclusion, Context context) {
-			return conclusion.accept(containsVisitor_, context);
+			return conclusion.accept(containsVisitor, context);
 		}
 
 		@Override
@@ -62,7 +68,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		
 		@Override
 		protected void postApply(Conclusion conclusion, Context context) {
-			conclusion.accept(conclusionVisitor_, context);
+			conclusion.accept(conclusionVisitor, context);
 		}		
 	}
 	
@@ -71,20 +77,17 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 */
 	protected class ContainsConclusionVisitor implements ConclusionVisitor<Boolean> {
 
-		public Boolean visitSuperclass(SuperClassExpression sce, Context context) {
-			
+		protected Boolean visitSuperclass(SuperClassExpression sce, Context context) {
 			return context.containsSuperClassExpression(sce.getExpression());
 		}		
 		
 		@Override
-		public Boolean visit(NegativeSuperClassExpression negSCE,
-				Context context) {
+		public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
 			return visitSuperclass(negSCE, context);
 		}
 
 		@Override
-		public Boolean visit(PositiveSuperClassExpression posSCE,
-				Context context) {
+		public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
 			return visitSuperclass(posSCE, context);
 		}
 
@@ -125,12 +128,12 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	protected class DeleteConclusionVisitor extends BaseConclusionVisitor {
 
 		public Boolean visitSuperclass(SuperClassExpression sce, Context context) {
-			
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(context.getRoot() + ": removing superclass " + sce);
-			}
-			
 			if (context.removeSuperClassExpression(sce.getExpression())) {
+				
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace(context.getRoot() + ": removing superclass " + sce);
+				}
+				
 				markAsModified(context);
 				
 				return true;
@@ -153,12 +156,10 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean visit(BackwardLink link, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(context.getRoot() + ": removing backward link " + link);
-			}
-			
 			if (context.removeBackwardLink(link)) {
-				markAsModified(context);
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace(context.getRoot() + ": removing backward link " + link);
+				}
 				
 				return true;
 			}
@@ -170,7 +171,6 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		public Boolean visit(ForwardLink link, Context context) {
 			//statistics_.forwLinkInfNo++;
 			if (link.removeFromContextBackwardLinkRule(context)) {
-				markAsModified(context);
 				
 				return true;
 			}
@@ -193,7 +193,6 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		@Override
 		public Boolean visit(Propagation propagation, Context context) {
 			if (propagation.removeFromContextBackwardLinkRule(context)) {
-				//markAsModified(context);
 				
 				return true;
 			}

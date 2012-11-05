@@ -34,7 +34,6 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -97,7 +96,7 @@ public class LowLevelIncrementalReasoningTest {
 			List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
 			TestChangesLoader initialLoader = new TestChangesLoader();		
 			TestChangesLoader loader = new TestChangesLoader();
-			Reasoner reasoner = TestReasonerUtils.createTestReasoner(new SimpleStageExecutor(), 1);
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
 			
 			reasoner.registerOntologyLoader(initialLoader);
 			

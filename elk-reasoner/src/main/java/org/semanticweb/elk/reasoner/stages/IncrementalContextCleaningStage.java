@@ -6,6 +6,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
@@ -20,7 +21,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 	// logger for this class
-	// private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
+	private static final Logger LOGGER_ = Logger.getLogger(IncrementalContextCleaningStage.class);
 
 	private ClassExpressionSaturation<IndexedClassExpression> cleaning_ = null;
 
@@ -62,8 +63,6 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 		}
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.CONTEXT_CLEANING, true);
-		// save cleaned contexts for future processing
-		//reasoner.incrementalState.classesToProcess = reasoner.saturationState.getModifiedContexts();
 	}
 	
 	
@@ -73,6 +72,8 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 		super.initComputation();
 
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(reasoner.saturationState, true);
+		
+		LOGGER_.trace(reasoner.saturationState.getModifiedContexts());
 		
 		cleaning_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.getProcessExecutor(),

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -37,6 +38,8 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
+	private static final Logger LOGGER_ = Logger.getLogger(IndexedSubClassOfAxiom.class);	
+	
 	protected final IndexedClassExpression subClass, superClass;
 
 	protected IndexedSubClassOfAxiom(IndexedClassExpression subClass,
@@ -162,6 +165,10 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 				
 				if (rule.isEmpty()) {
 					ruleChain.remove(ThisCompositionRule.MATCHER_);
+					
+					if (LOGGER_.isTraceEnabled()) {
+						LOGGER_.trace("Removed SubClassOf rule, superclasses: " + superClasses);
+					}
 					
 					return true;
 				}

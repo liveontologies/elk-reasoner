@@ -5,6 +5,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -24,7 +25,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 public class Propagation implements Conclusion {
 
 	// logger for this class
-	//private static final Logger LOGGER_ = Logger.getLogger(Propagation.class);	
+	private static final Logger LOGGER_ = Logger.getLogger(Propagation.class);	
 	
 	private final IndexedPropertyChain relation_;
 	
@@ -48,15 +49,18 @@ public class Propagation implements Conclusion {
 	@Override
 	public void apply(SaturationState state, Context context) {
 		// propagate over all backward links
-		final Multimap<IndexedPropertyChain, Context> backLinks = context
-				.getBackwardLinksByObjectProperty();
+		final Multimap<IndexedPropertyChain, Context> backLinks = context.getBackwardLinksByObjectProperty();
+		boolean propagated = false;
 		
 		Collection<Context> targets = backLinks.get(relation_);
 
 		for (Context target : targets) {
 			state.produce(target,
 					new NegativeSuperClassExpression(carry_));
+			propagated = true;
 		}
+		
+		if (!propagated) LOGGER_.trace("No backward link to propagate " + relation_ + "->" + carry_);
 	}
 
 	@Override

@@ -127,6 +127,14 @@ public class ForwardLink implements Conclusion {
 		
 		return rule != null ? rule.containsForwardLink(this) : false;
 	}
+	
+	@Override
+	public String toString() {
+		return relation_ + "->" + target_.getRoot();
+	}
+
+
+
 
 	/**
 	 * A type of {@link BackwardLinkRules} created for {@link ForwardLink}s and

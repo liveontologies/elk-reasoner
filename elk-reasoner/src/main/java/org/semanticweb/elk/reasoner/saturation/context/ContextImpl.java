@@ -299,4 +299,9 @@ public class ContextImpl implements Context {
 			return counter.intValue() - 1;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return root_.toString();
+	}
 }

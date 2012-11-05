@@ -4,7 +4,8 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -26,27 +27,24 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
 	@Override
 	public Engine getEngine() {
-		return new CleaningEngine();
+		return new DeletionEngine(new PreApplyConclusionVisitor(), new DeleteConclusionVisitor());
 	}
 
 	/**
-	 * Used to clean modified contexts after deleting conclusions
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * Used to check whether conclusions are contained in the context
+	 * but also returns false for context-modifying conclusions
+	 * if the context is saturated
 	 */
-	public class CleaningEngine extends DeletionEngine {
+	protected class PreApplyConclusionVisitor extends ContainsConclusionVisitor {
 
-		private CleaningEngine() {
-			//cleaning engine deletes conclusions
-			super(new DeleteConclusionVisitor());
-		}
+		@Override
+		protected Boolean visitSuperclass(SuperClassExpression sce, Context context) {
+			return !context.isSaturated() && context.containsSuperClassExpression(sce.getExpression());
+		}		
 		
 		@Override
-		protected boolean preApply(Conclusion conclusion, Context context) {
-			// this engine should not modify saturated contexts
-			return !context.isSaturated() && super.preApply(conclusion, context);
-		}
+		public Boolean visit(DisjointnessAxiom axiom, Context context) {
+			return !context.isSaturated() && context.containsDisjointnessAxiom(axiom.getAxiom()) > 0;
+		}		
 	}	
 }

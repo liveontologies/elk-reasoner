@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
@@ -50,6 +51,8 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
  */
 public class DifferentialIndex {
 
+	private static final Logger LOGGER_ = Logger.getLogger(DifferentialIndex.class);	
+	
 	final IndexedObjectCache objectCache_;
 	
 	/**
@@ -197,16 +200,20 @@ public class DifferentialIndex {
 	/**
 	 * Commits the changes to the indexed objects and clears all changes.
 	 */
-	public void commit() {
+	public void commit() {	
 		// commit deletions
 		for (IndexedClassExpression target : indexDeletions.keySet()) {
-			indexDeletions.get(target).next().removeFrom(target.getChainCompositionRules());
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Committing index deletions for " + target);
+			}
+			
+			indexDeletions.get(target).removeFrom(target.getChainCompositionRules());
 		}
 		
 		indexDeletions.clear();
 		
 		for (IndexedClassExpression target : indexAdditions.keySet()) {
-			indexAdditions.get(target).next().addTo(target.getChainCompositionRules());			
+			indexAdditions.get(target).addTo(target.getChainCompositionRules());			
 		}
 		
 		indexAdditions.clear();
