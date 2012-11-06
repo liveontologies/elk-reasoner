@@ -15,13 +15,13 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class IndexChange  extends AbstractChain<ContextRules> implements Conclusion {
+public class IncrementalContextRuleChain  extends AbstractChain<ContextRules> implements Conclusion {
 
-	private static final Logger LOGGER_ = Logger.getLogger(IndexChange.class);
+	private static final Logger LOGGER_ = Logger.getLogger(IncrementalContextRuleChain.class);
 	
 	private ContextRules contextRules_;
 
-	public IndexChange(ContextRules rules) {
+	public IncrementalContextRuleChain(ContextRules rules) {
 		contextRules_ = rules;
 	}
 	

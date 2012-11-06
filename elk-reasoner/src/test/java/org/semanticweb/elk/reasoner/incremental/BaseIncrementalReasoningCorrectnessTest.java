@@ -49,7 +49,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger.getLogger(BaseIncrementalReasoningCorrectnessTest.class);	
 	
-	final static int REPEAT_NUMBER = 10;
+	final static int REPEAT_NUMBER = 1;
 	final static double DELETE_RATIO = 0.2;
 	
 	protected final ReasoningTestManifest<EO, AO> manifest;
@@ -103,7 +103,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		//initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 		
-		long seed = 456;//System.currentTimeMillis(); 
+		long seed = 1352217936813L;//System.currentTimeMillis(); 
 		Random rnd = new Random(seed);
 		
 		for (int i = 0; i < REPEAT_NUMBER; i++) {

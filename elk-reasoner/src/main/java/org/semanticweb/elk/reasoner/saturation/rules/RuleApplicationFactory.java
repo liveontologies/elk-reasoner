@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
+import org.semanticweb.elk.reasoner.saturation.conclusions.IncrementalContextRuleChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
@@ -497,7 +497,7 @@ public class RuleApplicationFactory implements
 		}
 
 		@Override
-		public Boolean visit(IndexChange indexChange, Context context) {
+		public Boolean visit(IncrementalContextRuleChain indexChange, Context context) {
 			// need not add this element, just apply all its rules
 			return true;
 		}

@@ -10,7 +10,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
+import org.semanticweb.elk.reasoner.saturation.conclusions.IncrementalContextRuleChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
@@ -102,7 +102,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		}
 		
 		@Override
-		public Boolean visit(IndexChange indexChange, Context context) {
+		public Boolean visit(IncrementalContextRuleChain indexChange, Context context) {
 			return true;
 		}
 
@@ -180,7 +180,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		}
 		
 		@Override
-		public Boolean visit(IndexChange indexChange, Context context) {
+		public Boolean visit(IncrementalContextRuleChain indexChange, Context context) {
 			// need not remove this element, just apply all its rules
 			return true;
 		}	

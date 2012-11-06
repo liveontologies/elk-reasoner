@@ -90,6 +90,16 @@ public class IncrementalContextInitializationStage extends
 	@Override
 	void initComputation() {
 		super.initComputation();
+		
+		for (IndexedClassExpression ice : reasoner.incrementalState.diffIndex.getClassExpressionWithIndexRuleChanges()) {
+			if (ice.getContext() != null) {
+				if (ice.getContext().isSaturated()) {
+					reasoner.saturationState.markAsModified(ice.getContext());
+					ice.getContext().setSaturated(false);
+				}
+			}
+		}
+		
 		todo = reasoner.saturationState.getModifiedContexts().iterator();
 		maxContexts_ = reasoner.saturationState.getModifiedContexts().size();
 		initContexts_ = 0;

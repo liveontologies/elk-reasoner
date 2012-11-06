@@ -66,6 +66,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 		}
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.SATURATION, true);
+		reasoner.saturationState.clearModifiedContexts();
 	}
 	
 	
@@ -79,7 +80,6 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 		RuleApplicationFactory appFactory = new RuleApplicationFactory(reasoner.saturationState);
 		
 		LOGGER_.trace(reasoner.saturationState.getModifiedContexts());
-
 		
 		saturation_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.getProcessExecutor(),

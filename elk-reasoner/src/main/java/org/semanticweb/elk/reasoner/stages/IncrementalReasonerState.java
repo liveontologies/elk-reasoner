@@ -22,8 +22,6 @@ public class IncrementalReasonerState {
 
 	final DifferentialIndex diffIndex;
 	
-	//Collection<IndexedClassExpression> classesToProcess; 
-	
 	final EnumMap<IncrementalStages, Boolean> stageStatusMap = new EnumMap<IncrementalStages, Boolean>(IncrementalStages.class);
 	
 	IncrementalReasonerState(IndexedObjectCache objectCache, IndexedClass owlNothing) {

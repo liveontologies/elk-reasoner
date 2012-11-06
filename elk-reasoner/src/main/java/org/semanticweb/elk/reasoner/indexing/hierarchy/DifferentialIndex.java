@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +31,12 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
+import org.semanticweb.elk.reasoner.indexing.IncrementalIndexRuleChain;
+import org.semanticweb.elk.reasoner.indexing.IndexRules;
+import org.semanticweb.elk.reasoner.saturation.conclusions.IncrementalContextRuleChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
+import org.semanticweb.elk.util.collections.LazySetUnion;
 
 /**
  * An object representing incremental changes in the index. The changes are
@@ -53,21 +57,22 @@ public class DifferentialIndex {
 
 	private static final Logger LOGGER_ = Logger.getLogger(DifferentialIndex.class);	
 	
-	final IndexedObjectCache objectCache_;
-	
 	/**
 	 * The map representing entries to be added to the ontology index; it maps
 	 * indexed class expression to dummy index class expression objects whose
 	 * fields represent the added entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, IndexChange> indexAdditions;
+	final Map<IndexedClassExpression, IncrementalContextRuleChain> indexAdditions;
 
 	/**
 	 * The map representing entries to be removed from the ontology index; it
 	 * maps indexed class expression to dummy index class expression objects
 	 * whose fields represent the removed entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, IndexChange> indexDeletions;
+	final Map<IndexedClassExpression, IncrementalContextRuleChain> indexDeletions;
+	
+	final Map<IndexedClassExpression, IncrementalIndexRuleChain> indexRuleAdditions;
+	final Map<IndexedClassExpression, IncrementalIndexRuleChain> indexRuleDeletions;
 
 	/**
 	 * The list of ELK classes to be added to the signature of the ontology; the
@@ -99,7 +104,7 @@ public class DifferentialIndex {
 	 *         objects containing index additions for these class expressions
 	 * 
 	 */
-	public Map<IndexedClassExpression, IndexChange> getIndexAdditions() {
+	public Map<IndexedClassExpression, IncrementalContextRuleChain> getIndexAdditions() {
 		return this.indexAdditions;
 	}
 
@@ -107,7 +112,7 @@ public class DifferentialIndex {
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index deletions for these class expressions
 	 */
-	public Map<IndexedClassExpression, IndexChange> getIndexDeletions() {
+	public Map<IndexedClassExpression, IncrementalContextRuleChain> getIndexDeletions() {
 		return this.indexDeletions;
 	}
 
@@ -121,11 +126,11 @@ public class DifferentialIndex {
 	 * @return the object which contains all index additions for the given
 	 *         indexed class expression
 	 */
-	public boolean registerAdditions(IndexedClassExpression target, ContextRules rules) {
-		IndexChange result = indexAdditions.get(target);
+	public boolean registerContextRuleAdditions(IndexedClassExpression target, ContextRules rules) {
+		IncrementalContextRuleChain result = indexAdditions.get(target);
 
 		if (result == null) {
-			result = new IndexChange(rules);
+			result = new IncrementalContextRuleChain(rules);
 			indexAdditions.put(target, result);
 			
 			return true;
@@ -145,11 +150,11 @@ public class DifferentialIndex {
 	 * @return the object which contains all index deletions for the given
 	 *         indexed class expression
 	 */
-	public boolean registerDeletions(IndexedClassExpression target, ContextRules rules) {
-		IndexChange result = indexDeletions.get(target);
+	public boolean registerContextRuleDeletions(IndexedClassExpression target, ContextRules rules) {
+		IncrementalContextRuleChain result = indexDeletions.get(target);
 
 		if (result == null) {
-			result = new IndexChange(rules);
+			result = new IncrementalContextRuleChain(rules);
 			indexDeletions.put(target, result);
 			
 			return true;
@@ -159,7 +164,38 @@ public class DifferentialIndex {
 		}
 	}
 
+	public boolean registerIndexRuleAdditions(IndexedClassExpression target, IndexRules<IndexedClassExpression> rules) {
+		IncrementalIndexRuleChain result = indexRuleAdditions.get(target);
 
+		if (result == null) {
+			result = new IncrementalIndexRuleChain(rules);
+			indexRuleAdditions.put(target, result);
+			
+			return true;
+		}
+		else {
+			return rules.addTo(result);	
+		}
+	}
+	
+	public boolean registerIndexRuleDeletions(IndexedClassExpression target, IndexRules<IndexedClassExpression> rules) {
+		IncrementalIndexRuleChain result = indexRuleDeletions.get(target);
+
+		if (result == null) {
+			result = new IncrementalIndexRuleChain(rules);
+			indexRuleDeletions.put(target, result);
+			
+			return true;
+		}
+		else {
+			return rules.addTo(result);	
+		}
+	}	
+	
+	public Collection<IndexedClassExpression> getClassExpressionWithIndexRuleChanges() {
+		return new LazySetUnion<IndexedClassExpression>(indexRuleAdditions.keySet(), indexRuleDeletions.keySet());
+	}
+	
 	/**
 	 * @return the list of ELK classes to be added to the signature of the
 	 *         ontology
@@ -186,13 +222,14 @@ public class DifferentialIndex {
 
 	
 	public DifferentialIndex(IndexedObjectCache objectCache, IndexedClass owlNothing) {
-		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, IndexChange>(127);
-		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, IndexChange>(127);
+		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, IncrementalContextRuleChain>(127);
+		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, IncrementalContextRuleChain>(127);
+		this.indexRuleAdditions = new ArrayHashMap<IndexedClassExpression, IncrementalIndexRuleChain>(127);
+		this.indexRuleDeletions = new ArrayHashMap<IndexedClassExpression, IncrementalIndexRuleChain>(127);
 		this.addedClasses = new ArrayList<ElkClass>(127);
 		this.removedClasses = new ArrayList<ElkClass>(127);
 		this.addedIndividuals = new ArrayList<ElkNamedIndividual>();
 		this.removedIndividuals = new ArrayList<ElkNamedIndividual>();
-		this.objectCache_ = objectCache;
 		this.axiomInserter_ = new ElkAxiomIndexerVisitor(objectCache, owlNothing, new IncrementalIndexUpdater(this), true);
 		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache, owlNothing, new IncrementalIndexUpdater(this), false);		
 	}
@@ -201,10 +238,10 @@ public class DifferentialIndex {
 	 * Commits the changes to the indexed objects and clears all changes.
 	 */
 	public void commit() {	
-		// commit deletions
+		// commit context rule deletions and additions
 		for (IndexedClassExpression target : indexDeletions.keySet()) {
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing index deletions for " + target);
+				LOGGER_.trace("Committing context rule deletions for " + target);
 			}
 			
 			indexDeletions.get(target).removeFrom(target.getChainCompositionRules());
@@ -217,8 +254,26 @@ public class DifferentialIndex {
 		}
 		
 		indexAdditions.clear();
+		//commit direct index changes
+		for (IndexedClassExpression target : indexRuleDeletions.keySet()) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Committing index rule deletions for " + target);
+			}
+			indexRuleDeletions.get(target).deapply(target); 
+		}
+		
+		indexRuleDeletions.clear();
+		
+		for (IndexedClassExpression target : indexRuleAdditions.keySet()) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Committing index rule additions for " + target);
+			}
+			indexRuleAdditions.get(target).apply(target);
+		}
+		
+		indexRuleAdditions.clear();
 	}
-
+	
 	public void clearSignatureChange() {
 		addedClasses.clear();
 		removedClasses.clear();
@@ -227,7 +282,7 @@ public class DifferentialIndex {
 	}
 	
 	public boolean isEmpty() {
-		return indexAdditions.isEmpty() && indexDeletions.isEmpty();
+		return indexAdditions.isEmpty() && indexDeletions.isEmpty() && indexRuleAdditions.isEmpty() && indexRuleDeletions.isEmpty();
 	}
 	
 	

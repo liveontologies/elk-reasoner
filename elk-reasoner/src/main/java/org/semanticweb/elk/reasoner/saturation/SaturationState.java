@@ -56,6 +56,10 @@ public class SaturationState {
 		return modifiedContexts_ == null ? Collections.<IndexedClassExpression>emptyList() : modifiedContexts_;
 	}
 	
+	public void clearModifiedContexts() {
+		modifiedContexts_.clear();
+	}
+	
 	public Context pollForContext() {
 		return activeContexts_.poll();
 	}

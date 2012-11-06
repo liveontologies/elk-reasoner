@@ -10,7 +10,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.IndexChange;
+import org.semanticweb.elk.reasoner.saturation.conclusions.IncrementalContextRuleChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
@@ -33,7 +33,7 @@ public class IncrementalChangesInitialization
 
 	public IncrementalChangesInitialization(
 			Collection<IndexedClassExpression> inputs,
-			Map<IndexedClassExpression, IndexChange> changes,
+			Map<IndexedClassExpression, IncrementalContextRuleChain> changes,
 			SaturationState state,
 			ComputationExecutor executor,
 			int maxWorkers,
@@ -49,16 +49,15 @@ class ContextInitializationFactory implements InputProcessorFactory<IndexedClass
 	//private static final Logger LOGGER_ = Logger.getLogger(ContextInitializationFactory.class);	
 	
 	private final SaturationState saturationState_;
-	private final Map<IndexedClassExpression, IndexChange> indexChanges_;
+	private final Map<IndexedClassExpression, IncrementalContextRuleChain> indexChanges_;
 	//private final boolean initContexts_;
 	
 	public ContextInitializationFactory(SaturationState state,
 			Map<IndexedClassExpression,
-			IndexChange> indexChanges,
+			IncrementalContextRuleChain> indexChanges,
 			boolean initContexts) {
 		saturationState_ = state;
 		indexChanges_ = indexChanges;
-		//initContexts_ = initContexts;
 	}
 
 	@Override
@@ -70,14 +69,17 @@ class ContextInitializationFactory implements InputProcessorFactory<IndexedClass
 			protected void process(IndexedClassExpression ice) {
 				Context context = ice.getContext();
 				
-				if (context != null/* || initContexts_*/) {
+				if (context != null) {
 					
-					//context = saturationState_.getCreateContext(ice);
+					if (context.isSaturated()) {
+						saturationState_.markAsModified(context);
+						context.setSaturated(false);
+					}
 					
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
 							indexChanges_.keySet(),
 							context.getSuperClassExpressions())) {
-						IndexChange change = indexChanges_.get(changedICE);
+						IncrementalContextRuleChain change = indexChanges_.get(changedICE);
 						// place the accumulated changes into the queue
 						saturationState_.produce(context, change);
 					}

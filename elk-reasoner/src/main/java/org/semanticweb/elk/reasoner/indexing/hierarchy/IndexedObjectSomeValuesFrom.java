@@ -24,7 +24,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.IndexRules;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -34,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -99,7 +102,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			// FIXME This optimisation is off for the moment
 			// because it's unclear what to do if an ICE
 			// first appears in a positive existential (incrementally)
-
+			indexUpdater.add(filler, new PosExistentialRule(property));
 			// filler.addPosPropertyInExistential(property);
 		}
 
@@ -116,6 +119,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			//indexUpdater.remove(filler, new PositiveIndexedObjectSomeValuesFromRule());
 			// FIXME See above
 			//filler.removePosPropertyInExistential(property);
+			indexUpdater.remove(filler, new PosExistentialRule(property));
 		}
 	}
 
@@ -133,13 +137,22 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		stats.countObjectSomeValuesFromDecompositionRule++;*/
 
 		try {
-			state.produce(state.getCreateContext(filler),
-					new BackwardLink(context, property));
+			state.produce(state.getCreateContext(filler), new BackwardLink(context, property));
 		} finally {
 			//stats.timeObjectSomeValuesFromDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 
+	
+	private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+			ThisCompositionRule.class);
+
+	private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+		@Override
+		public ThisCompositionRule create(ContextRules tail) {
+			return new ThisCompositionRule(tail);
+		}
+	};	
 
 	/**
 	 * 
@@ -185,11 +198,12 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 			try {
 
-				/*final Set<IndexedPropertyChain> candidatePropagationProperties = context
+				final Set<IndexedPropertyChain> candidatePropagationProperties = context
 						.getRoot().getPosPropertiesInExistentials();
 
-				if (candidatePropagationProperties == null)
-					return;*/
+				if (candidatePropagationProperties == null) {
+					//return;
+				}
 
 				for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 					IndexedPropertyChain relation = e.getRelation();
@@ -197,22 +211,19 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					 * creating propagations for relevant sub-properties of the relation
 					 */
 					for (IndexedPropertyChain property : relation.getSaturated().getSubProperties()) {
-						//addPropagation(state, property, e, context);
 						state.produce(context, new Propagation(property, e));
 					}
 					/*for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
-							candidatePropagationProperties, relation
-									.getSaturated().getSubProperties())) {
-						addPropagation(state, property, e, context);
+							candidatePropagationProperties, relation.getSaturated().getSubProperties())) {
+						state.produce(context, new Propagation(property, e));
 					}*/
 
 					/*
 					 * creating propagations for relevant sub-compositions of the relation
 					 */
-					for (IndexedPropertyChain property : relation
-							.getSaturated().getSubCompositions()) {
-						SaturatedPropertyChain propertySaturation = property
-								.getSaturated();
+					for (IndexedPropertyChain property : relation.getSaturated().getSubCompositions()) {
+						SaturatedPropertyChain propertySaturation = property.getSaturated();
+						
 						if (!propertySaturation.getRightSubProperties().isEmpty()) {
 						/*if (!new LazySetIntersection<IndexedPropertyChain>(
 								candidatePropagationProperties,
@@ -239,23 +250,12 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 					// propagating to the this context if relation is reflexive
 					if (relation.getSaturated().isReflexive())
-						state.produce(context,
-								new NegativeSuperClassExpression(e));
+						state.produce(context, new NegativeSuperClassExpression(e));
 				}
 			} finally {
 				//stats.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
 			}
 		}
-
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
-				ThisCompositionRule.class);
-
-		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule create(ContextRules tail) {
-				return new ThisCompositionRule(tail);
-			}
-		};
 
 		@Override
 		public boolean addTo(Chain<ContextRules> ruleChain) {
@@ -297,5 +297,78 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			
 			return changed;
 		}		
+	}
+
+	
+	
+	/**
+	 * 
+	 */
+	private static class PosExistentialRule extends IndexRules<IndexedClassExpression> {
+		
+		private static Matcher<IndexRules<IndexedClassExpression>, PosExistentialRule> THIS_MATCHER_ = new SimpleTypeBasedMatcher<IndexRules<IndexedClassExpression>, PosExistentialRule>(PosExistentialRule.class);
+
+		private static ReferenceFactory<IndexRules<IndexedClassExpression>, PosExistentialRule> THIS_FACTORY_ = new ReferenceFactory<IndexRules<IndexedClassExpression>, PosExistentialRule>() {
+			@Override
+			public PosExistentialRule create(IndexRules<IndexedClassExpression> tail) {
+				return new PosExistentialRule(tail);
+			}
+		};	
+
+		private final Set<IndexedObjectProperty> properties_ = new ArrayHashSet<IndexedObjectProperty>(16);
+		
+		PosExistentialRule(IndexRules<IndexedClassExpression> tail) {
+			super(tail);
+		}
+		
+		PosExistentialRule(IndexedObjectProperty property) {
+			super(null);
+			properties_.add(property);
+		}
+
+		@Override
+		public boolean addTo(Chain<IndexRules<IndexedClassExpression>> ruleChain) {
+			PosExistentialRule rule = ruleChain.getCreate(THIS_MATCHER_, THIS_FACTORY_);
+			
+			return rule.properties_.addAll(properties_);
+		}
+
+		@Override
+		public boolean removeFrom(	Chain<IndexRules<IndexedClassExpression>> ruleChain) {
+			PosExistentialRule rule = ruleChain.find(THIS_MATCHER_);
+			boolean changed = false;
+			
+			if (rule != null) {
+				changed = rule.properties_.removeAll(properties_);
+				
+				if (rule.properties_.isEmpty()) {
+					ruleChain.remove(THIS_MATCHER_);
+				}
+			}
+			
+			return changed;
+		}
+
+		@Override
+		public Boolean apply(IndexedClassExpression filler) {
+			boolean changed = false;
+			
+			for (IndexedObjectProperty property : properties_) {
+				changed |= filler.addPosPropertyInExistential(property);
+			}
+			
+			return changed;
+		}
+
+		@Override
+		public Boolean deapply(IndexedClassExpression filler) {
+			boolean changed = false;
+			
+			for (IndexedObjectProperty property : properties_) {
+				changed |= filler.removePosPropertyInExistential(property);
+			}
+			
+			return changed;
+		}
 	}
 }

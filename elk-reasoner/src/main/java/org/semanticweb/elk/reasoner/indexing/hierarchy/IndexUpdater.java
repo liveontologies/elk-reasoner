@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.indexing.IndexRules;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 
 
@@ -38,6 +39,10 @@ interface IndexUpdater {
 	public boolean add(final IndexedClassExpression target, final ContextRules rules);
 	
 	public boolean remove(final IndexedClassExpression target, final ContextRules rules);
+	
+	public boolean add(final IndexedClassExpression target, final IndexRules<IndexedClassExpression> rules);
+	
+	public boolean remove(final IndexedClassExpression target, final IndexRules<IndexedClassExpression> rules);	
 	
 	public void addClass(ElkClass newClass);
 

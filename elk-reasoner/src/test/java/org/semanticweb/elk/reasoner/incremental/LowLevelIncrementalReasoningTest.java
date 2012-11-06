@@ -81,6 +81,42 @@ public class LowLevelIncrementalReasoningTest {
 		assertFalse(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
 	}
 	
+	@Test
+	public void testDeletePositiveExistential() throws ElkException {
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
+		TestChangesLoader loader = new TestChangesLoader();
+		
+		reasoner.registerOntologyLoader(loader);
+		
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
+		ElkClass e = objectFactory.getClass(new ElkFullIri(":E"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri("R"));
+		ElkAxiom posExistential = objectFactory.getSubClassOfAxiom(a, objectFactory.getObjectSomeValuesFrom(r, b)); 
+		
+		loader.add(objectFactory.getSubClassOfAxiom(b, d))
+			.add(posExistential)
+			.add(objectFactory.getSubClassOfAxiom(a, e))
+			.add(objectFactory.getSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(r, d), c));
+
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+		
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
+		// now delete A subclass R some B, should retract A subclass C
+		loader.clear();
+		
+		reasoner.setIncrementalMode(true);
+		reasoner.registerOntologyChangesLoader(loader);
+		
+		loader.remove(posExistential);
+		
+		taxonomy = reasoner.getTaxonomy();
+		
+		assertFalse(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
+	}	
+	
 	
 	@Test
 	public void testNewClassUnsatisfiable() throws ElkException {

@@ -24,10 +24,11 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.indexing.IndexRules;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 
 /**
- * An index updater through which the fields of expressions are modified
+ * An index updater through which the index data structures are modified
  * directly.
  * 
  * @author "Yevgeny Kazakov"
@@ -59,5 +60,15 @@ class DirectIndexUpdater implements IndexUpdater {
 	@Override
 	public boolean remove(IndexedClassExpression target, ContextRules rules) {
 		return rules.removeFrom(target.getChainCompositionRules());
+	}
+
+	@Override
+	public boolean add(IndexedClassExpression target, 	IndexRules<IndexedClassExpression> rules) {
+		return rules.apply(target);
+	}
+
+	@Override
+	public boolean remove(IndexedClassExpression target, IndexRules<IndexedClassExpression> rules) {
+		return rules.deapply(target);
 	}
 }
