@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.semanticweb.elk</groupId>
+		<artifactId>elk-parent</artifactId>
+		<version>0.3.2-SNAPSHOT</version>
+	</parent>
+	<artifactId>elk-anotations-client</artifactId>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-annotations</artifactId>
+			<version>0.3.2-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+
+	<build>
+		<plugins>
+			<!-- Run annotation processors on src/main/java sources -->
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>2.1.0</version>
+				<executions>
+					<execution>					
+						<id>process</id>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<processors>
+								<!-- list of processors to use -->
+								<processor>org.semanticweb.elk.annotations.ProfiledProcessor</processor>
+							</processors>
+							<compilerArgument>-proc:none</compilerArgument>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

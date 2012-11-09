@@ -1,0 +1,113 @@
+###################################################################################################
+## MACROS
+###################################################################################################
+## prints given elements with the given seaprator
+#macro ( list $elements $separator )
+#foreach($element in $elements)$element#if( $foreach.hasNext )$separator#end#end##
+#end
+## prints given elements with the separator enclosed in prefix and suffix if not empty
+#macro ( listPS $elements $separator $prefix $suffix )
+#if (!${elements.isEmpty()})##
+$prefix#list($elements, $separator )$suffix##
+#end## 
+#end##
+## comma-separated list of generic type parameters enclosed in '<' '>'
+#macro ( gTypes $typeParameters )##
+#listPS ( $typeParameters, ', ', '<', '>' )##
+#end##
+## comma-separated list type parameters with bounds
+#macro ( gTypesBound $typeParameters )##
+#if(!${typeParameters.isEmpty()})##
+<#foreach($typeParameter in $typeParameters)$typeParameter##
+#listPS ( ${typeParameter.bounds}, ' & ', ' extends ', '')##
+#if( $foreach.hasNext ), #end##
+#end>##
+#end##
+#end##
+## get identifier of a method
+#macro ( mid $method )##
+${method.getAnnotation($measuredAnnot).value()}##
+#end##
+###################################################################################################
+## BEGINNING OF FILE
+###################################################################################################
+package ${packageElement};
+
+public class ${classElement.simpleName}Profiled#gTypesBound(${classElement.typeParameters})##
+ extends ${classElement.simpleName}## 
+#gTypes (${classElement.typeParameters})## 
+ {
+
+## fields
+	// time measurements 
+#foreach($method in $methods)
+	long time#mid($method) = 0;
+#end
+	// execution counts
+#foreach($method in $methods)
+	int count#mid($method) = 0;
+#end
+## methods	 
+#foreach($method in $methods)
+
+	public long get#mid($method)Time() {
+		return this.time#mid($method);	
+	}
+#end
+#foreach($method in $methods)
+
+	public long get#mid($method)Count() {
+		return this.count#mid($method);	
+	}
+#end
+
+## merging
+	public synchronized void merge(${classElement.simpleName}Profiled#gTypes(${classElement.typeParameters}) statistics) {
+		// merging times
+#foreach($method in $methods)
+		this.time#mid($method) += statistics.time#mid($method); 
+#end
+		// merging execution counts
+#foreach($method in $methods)
+		this.count#mid($method) += statistics.count#mid($method); 
+#end
+   }
+#foreach($method in $methods)
+
+	@Override
+	/*
+	 * Automatically generated. Do not edit.
+	 */ 
+ ## the modifiers of the method, such as 'public' or 'protected'
+	#list( ${method.modifiers}, ' ' )##   
+## the generic type parameteres of the method if there are any
+#gTypesBound(${method.typeParameters})##
+## the return type of the method and the method name
+ ${method.returnType} ${method.simpleName}##
+## the method parameters together with their types
+(#foreach($parameter in ${method.parameters})##
+#if($foreach.hasNext)${parameter.asType()}## print type of all parameters except the last one
+#else## the last parameter should be a variable argument if the method has variable arguments 
+#if($method.isVarArgs())${parameter.asType().getComponentType()}...##
+#else${parameter.asType()}##
+#end##
+#end ${parameter}#if( $foreach.hasNext ), #end## separate by commas
+#end)##
+## throws declarations if not empty
+#listPS( ${method.thrownTypes}, ', ', ' throws ', '' )##
+## method body 
+ {
+		this.count#mid($method)++;
+		this.time#mid($method) -= System.currentTimeMillis();
+		##
+#if (${method.returnType}!="void")##
+${method.returnType} result = ##
+#end##
+super.${method.simpleName}(#list( ${method.parameters}, ', ' ));
+		this.time#mid($method) += System.currentTimeMillis();
+#if (${method.returnType}!="void")##
+		return result;
+#end##
+	}
+#end##
+}##
