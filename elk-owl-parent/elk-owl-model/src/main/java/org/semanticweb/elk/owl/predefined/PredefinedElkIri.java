@@ -70,10 +70,10 @@ public enum PredefinedElkIri {
 	 *         order
 	 */
 	public static int compare(ElkIri firstIri, ElkIri secondIri) {
-		boolean isOwl0 = firstIri.equals(OWL_THING)
-				|| firstIri.equals(OWL_NOTHING);
-		boolean isOwl1 = secondIri.equals(OWL_THING)
-				|| secondIri.equals(OWL_NOTHING);
+		boolean isOwl0 = firstIri.equals(OWL_THING.get())
+				|| firstIri.equals(OWL_NOTHING.get());
+		boolean isOwl1 = secondIri.equals(OWL_THING.get())
+				|| secondIri.equals(OWL_NOTHING.get());
 
 		if (isOwl0 == isOwl1)
 			return firstIri.compareTo(secondIri);
