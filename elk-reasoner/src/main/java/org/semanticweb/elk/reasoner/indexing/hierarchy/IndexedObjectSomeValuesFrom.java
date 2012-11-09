@@ -100,11 +100,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
 			// first positive occurrence of this expression
-			// FIXME This optimisation is off for the moment
-			// because it's unclear what to do if an ICE
-			// first appears in a positive existential (incrementally)
 			indexUpdater.add(filler, new PosExistentialRule(property));
-			// filler.addPosPropertyInExistential(property);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -117,9 +113,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
 			// no positive occurrences of this expression left
-			//indexUpdater.remove(filler, new PositiveIndexedObjectSomeValuesFromRule());
-			// FIXME See above
-			//filler.removePosPropertyInExistential(property);
 			indexUpdater.remove(filler, new PosExistentialRule(property));
 		}
 	}
