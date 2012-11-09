@@ -12,6 +12,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.IncrementalContextRuleChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -38,8 +39,8 @@ public class IncrementalChangesInitialization
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
-			boolean initContexts) {
-		super(inputs, new ContextInitializationFactory(state, changes, initContexts), executor, maxWorkers, progressMonitor);
+			ContextRules changedGlobalRules) {
+		super(inputs, new ContextInitializationFactory(state, changes, changedGlobalRules), executor, maxWorkers, progressMonitor);
 	}
 }
 
@@ -50,14 +51,15 @@ class ContextInitializationFactory implements InputProcessorFactory<IndexedClass
 	
 	private final SaturationState saturationState_;
 	private final Map<IndexedClassExpression, IncrementalContextRuleChain> indexChanges_;
-	//private final boolean initContexts_;
+	private final ContextRules changedGlobalRules_;
 	
 	public ContextInitializationFactory(SaturationState state,
 			Map<IndexedClassExpression,
 			IncrementalContextRuleChain> indexChanges,
-			boolean initContexts) {
+			ContextRules changedGlobalRules) {
 		saturationState_ = state;
 		indexChanges_ = indexChanges;
+		changedGlobalRules_ = changedGlobalRules;
 	}
 
 	@Override
@@ -71,9 +73,14 @@ class ContextInitializationFactory implements InputProcessorFactory<IndexedClass
 				
 				if (context != null) {
 					
-					if (context.isSaturated()) {
+					if (!context.isSaturated()) {
+						//FIXME replace by a stage which will complete all context not saturated due to an interruption 
 						saturationState_.markAsModified(context);
-						context.setSaturated(false);
+					}
+					
+					if (changedGlobalRules_ != null) {
+						//apply changes in the global context rules
+						saturationState_.produce(context, new IncrementalContextRuleChain(changedGlobalRules_));
 					}
 					
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(

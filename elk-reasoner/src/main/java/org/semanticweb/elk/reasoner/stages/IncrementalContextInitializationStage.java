@@ -91,7 +91,7 @@ public class IncrementalContextInitializationStage extends
 	void initComputation() {
 		super.initComputation();
 		
-		for (IndexedClassExpression ice : reasoner.incrementalState.diffIndex.getClassExpressionWithIndexRuleChanges()) {
+		for (IndexedClassExpression ice : reasoner.incrementalState.diffIndex.getClassExpressionsWithIndexRuleChanges()) {
 			if (ice.getContext() != null) {
 				if (ice.getContext().isSaturated()) {
 					reasoner.saturationState.markAsModified(ice.getContext());

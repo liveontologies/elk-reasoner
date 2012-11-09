@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.IndexRules;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 
 /**
@@ -34,8 +35,14 @@ import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
  * @author "Yevgeny Kazakov"
  * 
  */
-class DirectIndexUpdater implements IndexUpdater {
+public class DirectIndexUpdater implements IndexUpdater {
 
+	private final OntologyIndex ontIndex_;
+	
+	public DirectIndexUpdater(OntologyIndex index) {
+		ontIndex_ = index;
+	}
+	
 	@Override
 	public void addClass(ElkClass newClass) {
 	}
@@ -70,5 +77,15 @@ class DirectIndexUpdater implements IndexUpdater {
 	@Override
 	public boolean remove(IndexedClassExpression target, IndexRules<IndexedClassExpression> rules) {
 		return rules.deapply(target);
+	}
+
+	@Override
+	public boolean add(ContextRules rules) {
+		return rules.addTo(ontIndex_.getContextInitRuleChain());
+	}
+
+	@Override
+	public boolean remove(ContextRules rules) {
+		return rules.removeFrom(ontIndex_.getContextInitRuleChain());
 	}
 }

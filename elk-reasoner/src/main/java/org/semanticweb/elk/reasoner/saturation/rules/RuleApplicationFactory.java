@@ -442,9 +442,7 @@ public class RuleApplicationFactory implements
 	protected class AddConclusionVisitor extends BaseConclusionVisitor {
 
 		@Override
-		public Boolean visit(NegativeSuperClassExpression negSCE,
-				Context context) {
-			
+		public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
 			if (context.addSuperClassExpression(negSCE.getExpression())) {
 				//statistics_.superClassExpressionNo++;
 				//statistics_.negSuperClassExpressionInfNo++;
@@ -457,9 +455,7 @@ public class RuleApplicationFactory implements
 		}
 
 		@Override
-		public Boolean visit(PositiveSuperClassExpression posSCE,
-				Context context) {
-			
+		public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
 			if (context.addSuperClassExpression(posSCE.getExpression())) {
 				//statistics_.superClassExpressionNo++;
 				//statistics_.posSuperClassExpressionInfNo++;
@@ -499,6 +495,8 @@ public class RuleApplicationFactory implements
 		@Override
 		public Boolean visit(IncrementalContextRuleChain indexChange, Context context) {
 			// need not add this element, just apply all its rules
+			markAsModified(context);
+			
 			return true;
 		}
 

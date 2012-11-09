@@ -37,6 +37,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.IncrementalContextRul
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetUnion;
+import org.semanticweb.elk.util.collections.chains.AbstractChain;
+import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
  * An object representing incremental changes in the index. The changes are
@@ -56,6 +58,12 @@ import org.semanticweb.elk.util.collections.LazySetUnion;
 public class DifferentialIndex {
 
 	private static final Logger LOGGER_ = Logger.getLogger(DifferentialIndex.class);	
+	
+	private final DirectIndexUpdater directUpdater_;
+	
+	ContextRules addedContextInitRules_ = null;
+	
+	ContextRules removedContextInitRules_ = null;
 	
 	/**
 	 * The map representing entries to be added to the ontology index; it maps
@@ -97,7 +105,21 @@ public class DifferentialIndex {
 	private final ElkAxiomIndexerVisitor axiomInserter_;
 	
 	private final ElkAxiomIndexerVisitor axiomDeleter_;	
+
 	
+	public DifferentialIndex(DirectIndexUpdater directUpdater, IndexedObjectCache objectCache, IndexedClass owlNothing) {
+		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, IncrementalContextRuleChain>(127);
+		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, IncrementalContextRuleChain>(127);
+		this.indexRuleAdditions = new ArrayHashMap<IndexedClassExpression, IncrementalIndexRuleChain>(127);
+		this.indexRuleDeletions = new ArrayHashMap<IndexedClassExpression, IncrementalIndexRuleChain>(127);
+		this.addedClasses = new ArrayList<ElkClass>(127);
+		this.removedClasses = new ArrayList<ElkClass>(127);
+		this.addedIndividuals = new ArrayList<ElkNamedIndividual>();
+		this.removedIndividuals = new ArrayList<ElkNamedIndividual>();
+		this.axiomInserter_ = new ElkAxiomIndexerVisitor(objectCache, owlNothing, new IncrementalIndexUpdater(this), true);
+		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache, owlNothing, new IncrementalIndexUpdater(this), false);
+		this.directUpdater_ = directUpdater;
+	}	
 
 	/**
 	 * @return the map from indexed class expressions to the corresponding
@@ -116,6 +138,52 @@ public class DifferentialIndex {
 		return this.indexDeletions;
 	}
 
+	public ContextRules getAddedContextInitRules() {
+		return addedContextInitRules_;
+	}
+	
+	public ContextRules getRemovedContextInitRules() {
+		return removedContextInitRules_;
+	}
+	
+	public Chain<ContextRules> getAddedContextInitRuleChain() {
+		return new AbstractChain<ContextRules>() {
+
+			@Override
+			public ContextRules next() {
+				return addedContextInitRules_;
+			}
+
+			@Override
+			public void setNext(ContextRules tail) {
+				addedContextInitRules_ = tail;
+			}
+		};
+	}	
+	
+	public Chain<ContextRules> getRemovedContextInitRuleChain() {
+		return new AbstractChain<ContextRules>() {
+
+			@Override
+			public ContextRules next() {
+				return removedContextInitRules_;
+			}
+
+			@Override
+			public void setNext(ContextRules tail) {
+				removedContextInitRules_ = tail;
+			}
+		};
+	}	
+	
+	public boolean registerContextInitRuleAdditions(ContextRules rules) {
+		return rules.addTo(getAddedContextInitRuleChain());
+	}
+	
+	public boolean registerContextInitRuleDeletions(ContextRules rules) {
+		return rules.addTo(getRemovedContextInitRuleChain());
+	}
+	
 	/**
 	 * Get the object assigned to the given indexed class expression for storing
 	 * index additions, or assign a new one if no such object has been assigned.
@@ -192,7 +260,7 @@ public class DifferentialIndex {
 		}
 	}	
 	
-	public Collection<IndexedClassExpression> getClassExpressionWithIndexRuleChanges() {
+	public Collection<IndexedClassExpression> getClassExpressionsWithIndexRuleChanges() {
 		return new LazySetUnion<IndexedClassExpression>(indexRuleAdditions.keySet(), indexRuleDeletions.keySet());
 	}
 	
@@ -221,19 +289,6 @@ public class DifferentialIndex {
 	}
 
 	
-	public DifferentialIndex(IndexedObjectCache objectCache, IndexedClass owlNothing) {
-		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, IncrementalContextRuleChain>(127);
-		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, IncrementalContextRuleChain>(127);
-		this.indexRuleAdditions = new ArrayHashMap<IndexedClassExpression, IncrementalIndexRuleChain>(127);
-		this.indexRuleDeletions = new ArrayHashMap<IndexedClassExpression, IncrementalIndexRuleChain>(127);
-		this.addedClasses = new ArrayList<ElkClass>(127);
-		this.removedClasses = new ArrayList<ElkClass>(127);
-		this.addedIndividuals = new ArrayList<ElkNamedIndividual>();
-		this.removedIndividuals = new ArrayList<ElkNamedIndividual>();
-		this.axiomInserter_ = new ElkAxiomIndexerVisitor(objectCache, owlNothing, new IncrementalIndexUpdater(this), true);
-		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache, owlNothing, new IncrementalIndexUpdater(this), false);		
-	}
-
 	/**
 	 * Commits the changes to the indexed objects and clears all changes.
 	 */
@@ -272,6 +327,17 @@ public class DifferentialIndex {
 		}
 		
 		indexRuleAdditions.clear();
+		//commit changes in the context initialization rules
+		
+		if (addedContextInitRules_ != null) {
+			directUpdater_.add(addedContextInitRules_);
+			addedContextInitRules_ = null;
+		}
+		
+		if (removedContextInitRules_ != null) {
+			directUpdater_.remove(removedContextInitRules_);
+			removedContextInitRules_ = null;
+		}
 	}
 	
 	public void clearSignatureChange() {

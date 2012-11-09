@@ -123,12 +123,12 @@ public abstract class AbstractReasonerState {
 		
 		this.ontologyIndex = ontoIndex;
 		this.objectCache_ = ontoIndex;
-		this.saturationState = new SaturationState(ontoIndex.getIndexedOwlThing(), ontoIndex.getIndexedOwlNothing());
+		this.saturationState = new SaturationState(ontoIndex);
 	}
 
 	public void setIncrementalMode(boolean set) {
 		if (set && incrementalState == null) {
-			incrementalState = new IncrementalReasonerState(objectCache_, ontologyIndex.getIndexedOwlNothing());
+			incrementalState = new IncrementalReasonerState(objectCache_, ontologyIndex);
 		}
 		else if (!set) {
 			incrementalState = null;

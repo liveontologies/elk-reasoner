@@ -143,14 +143,12 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		}		
 		
 		@Override
-		public Boolean visit(NegativeSuperClassExpression negSCE,
-				Context context) {
+		public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
 			return visitSuperclass(negSCE, context);
 		}
 
 		@Override
-		public Boolean visit(PositiveSuperClassExpression posSCE,
-				Context context) {
+		public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
 			return visitSuperclass(posSCE, context);
 		}
 
@@ -181,6 +179,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		
 		@Override
 		public Boolean visit(IncrementalContextRuleChain indexChange, Context context) {
+			markAsModified(context);
 			// need not remove this element, just apply all its rules
 			return true;
 		}	

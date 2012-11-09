@@ -84,4 +84,14 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	public boolean remove(IndexedClassExpression target, IndexRules<IndexedClassExpression> rules) {
 		return differentialIndex_.registerIndexRuleDeletions(target, rules);
 	}
+
+	@Override
+	public boolean add(ContextRules rules) {
+		return differentialIndex_.registerContextInitRuleAdditions(rules);
+	}
+
+	@Override
+	public boolean remove(ContextRules rules) {
+		return differentialIndex_.registerContextInitRuleDeletions(rules);
+	}
 }

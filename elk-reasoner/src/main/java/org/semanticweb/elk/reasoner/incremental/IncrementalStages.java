@@ -61,8 +61,15 @@ public enum IncrementalStages {
 		public String toString() {
 			return "Incremental Context Cleaning";
 		}
+	},
 		
-	};	
+	COMPLETION {
+
+		@Override
+		public String toString() {
+			return "Incremental Context Completion";
+		}
+	};
 
 	@Override
 	public abstract String toString();	

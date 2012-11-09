@@ -47,7 +47,7 @@ import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.MockInstanceTaxonomy.MutableTypeNode;
@@ -67,8 +67,8 @@ public class MockTaxonomyLoader {
 		// can't use predefined Elk classes here because they don't override
 		// hashCode() and equals() for easy lookups (they're enums)
 		final MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
-				factory.getClass(PredefinedElkIri.OWL_THING.get()),
-				factory.getClass(PredefinedElkIri.OWL_NOTHING.get()),
+				factory.getClass(PredefinedElkClass.OWL_THING.getIri()),
+				factory.getClass(PredefinedElkClass.OWL_NOTHING.getIri()),
 				Comparators.ELK_CLASS_COMPARATOR,
 				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);

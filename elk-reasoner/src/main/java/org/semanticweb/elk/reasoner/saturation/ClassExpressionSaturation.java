@@ -74,7 +74,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 		super(
 				new TodoJobs<I>(inputs),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(
-						new SaturationState(ontIndex.getIndexedOwlThing(), ontIndex.getIndexedOwlNothing()),
+						new SaturationState(ontIndex),
 						maxWorkers,
 						listener),
 				executor, maxWorkers, progressMonitor);

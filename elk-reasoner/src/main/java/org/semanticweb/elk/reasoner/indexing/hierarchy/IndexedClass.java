@@ -24,11 +24,18 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -38,8 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class IndexedClass extends IndexedClassEntity {
 
-	protected static final Logger LOGGER_ = Logger
-			.getLogger(IndexedClass.class);
+	protected static final Logger LOGGER_ = Logger.getLogger(IndexedClass.class);
 	
 	
 	/**
@@ -85,12 +91,20 @@ public class IndexedClass extends IndexedClassEntity {
 			indexUpdater.addClass(elkClass);
 		}
 		
+		if (negativeOccurrenceNo == 0 && increment > 0 && elkClass.getIri().equals(PredefinedElkClass.OWL_THING.getIri())) {
+			indexUpdater.add(new OwlThingContextInitializationRule(null));
+		}		
+		
 		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 		
 		if (occurrenceNo == 0 && increment < 0) {
 			indexUpdater.removeClass(elkClass);
+		}
+		
+		if (negativeOccurrenceNo == 0 && increment < 0 && elkClass.getIri().equals(PredefinedElkClass.OWL_THING.getIri())) {
+			indexUpdater.remove(new OwlThingContextInitializationRule(null));
 		}		
 	}
 
@@ -112,5 +126,54 @@ public class IndexedClass extends IndexedClassEntity {
 	@Override
 	public String toString() {
 		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
+	}
+	
+	
+	private static Matcher<ContextRules, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, OwlThingContextInitializationRule>(
+			OwlThingContextInitializationRule.class);
+
+	private static ReferenceFactory<ContextRules, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ContextRules, OwlThingContextInitializationRule>() {
+		@Override
+		public OwlThingContextInitializationRule create(ContextRules tail) {
+			return new OwlThingContextInitializationRule(tail);
+		}
+	};
+	
+	
+	/**
+	 * Adds owl:Thing to the context (it should be registered iff Thing occurs negatively)
+	 */
+	private static class OwlThingContextInitializationRule extends ContextRules {
+
+		public OwlThingContextInitializationRule(ContextRules tail) {
+			super(tail);
+		}
+
+		@Override
+		public void apply(SaturationState state, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying owl:Thing context init rule to " + context.getRoot());
+			}
+			
+			state.produce(context, new PositiveSuperClassExpression(state.getOwlThing()));			
+		}
+
+		@Override
+		public boolean addTo(Chain<ContextRules> rules) {
+			OwlThingContextInitializationRule rule = rules.find(MATCHER_);
+			
+			if (rule == null) {
+				rules.getCreate(MATCHER_, FACTORY_);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		@Override
+		public boolean removeFrom(Chain<ContextRules> rules) {
+			return rules.remove(MATCHER_) != null;
+		}		
 	}
 }

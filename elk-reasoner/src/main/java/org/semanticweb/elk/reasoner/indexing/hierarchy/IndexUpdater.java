@@ -44,6 +44,10 @@ interface IndexUpdater {
 	
 	public boolean remove(final IndexedClassExpression target, final IndexRules<IndexedClassExpression> rules);	
 	
+	public boolean add(final ContextRules rules);
+	
+	public boolean remove(final ContextRules rules);	
+	
 	public void addClass(ElkClass newClass);
 
 	public void removeClass(ElkClass oldClass);	

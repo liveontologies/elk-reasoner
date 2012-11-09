@@ -10,11 +10,13 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 
 /**
  * @author Pavel Klinov
@@ -26,6 +28,7 @@ public class SaturationState {
 	// logger for this class
 	private static final Logger LOGGER_ = Logger.getLogger(SaturationState.class);
 	
+	private final OntologyIndex ontologyIndex_;
 	
 	/**
 	 * Cached constants
@@ -43,9 +46,10 @@ public class SaturationState {
 	private Queue<IndexedClassExpression> modifiedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 	
 	
-	public SaturationState(IndexedClassExpression top, IndexedClassExpression bot) {
-		owlThing_ = top;
-		owlNothing_ = bot;
+	public SaturationState(OntologyIndex index) {
+		ontologyIndex_ = index;
+		owlThing_ = index.getIndexedOwlThing();
+		owlNothing_ = index.getIndexedOwlNothing();
 	}	
 	
 	public void markAsModified(Context context) {
@@ -97,10 +101,17 @@ public class SaturationState {
 		produce(context, new PositiveSuperClassExpression(context.getRoot()));
 		// TODO: register this as a ContextRule when owlThing occurs
 		// negative and apply all such context initialization rules here
-		IndexedClassExpression owlThing = getOwlThing();
+		/*IndexedClassExpression owlThing = getOwlThing();
 		
 		if (owlThing.occursNegatively()) {
 			produce(context, new PositiveSuperClassExpression(owlThing));
+		}*/
+		//apply all context initialization rules
+		ContextRules initRules = ontologyIndex_.getContextInitRules();
+		
+		while (initRules != null) {
+			initRules.apply(this, context);
+			initRules = initRules.next();
 		}
 	}
 	

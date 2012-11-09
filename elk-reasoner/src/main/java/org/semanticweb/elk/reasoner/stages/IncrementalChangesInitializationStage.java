@@ -98,7 +98,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				!deletions_);
+				deletions_ ? reasoner.incrementalState.diffIndex.getRemovedContextInitRules() : reasoner.incrementalState.diffIndex.getRemovedContextInitRules());
 	}
 
 	@Override

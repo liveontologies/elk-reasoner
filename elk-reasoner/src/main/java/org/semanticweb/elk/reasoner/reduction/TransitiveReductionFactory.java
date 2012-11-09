@@ -117,7 +117,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.listener = listener;
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
-				new SaturationState(ontologyIndex.getIndexedOwlThing(), ontologyIndex.getIndexedOwlNothing()), maxWorkers,
+				new SaturationState(ontologyIndex),
+				maxWorkers,
 				new ThisClassExpressionSaturationListener());
 	}
 

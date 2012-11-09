@@ -77,7 +77,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 		// time to commit the differential index
 		reasoner.incrementalState.diffIndex.commit();
 		
-		RuleApplicationFactory appFactory = new RuleApplicationFactory(reasoner.saturationState);
+		RuleApplicationFactory appFactory = new RuleApplicationFactory(reasoner.saturationState, true);
 		
 		LOGGER_.trace(reasoner.saturationState.getModifiedContexts());
 		
