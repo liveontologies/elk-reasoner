@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -202,7 +203,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 						.getRoot().getPosPropertiesInExistentials();
 
 				if (candidatePropagationProperties == null) {
-					//return;
+					return;
 				}
 
 				for (IndexedObjectSomeValuesFrom e : negExistentials_) {
@@ -210,13 +211,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					/*
 					 * creating propagations for relevant sub-properties of the relation
 					 */
-					for (IndexedPropertyChain property : relation.getSaturated().getSubProperties()) {
-						state.produce(context, new Propagation(property, e));
-					}
-					/*for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
-							candidatePropagationProperties, relation.getSaturated().getSubProperties())) {
+					/*for (IndexedPropertyChain property : relation.getSaturated().getSubProperties()) {
 						state.produce(context, new Propagation(property, e));
 					}*/
+					for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
+							candidatePropagationProperties, relation.getSaturated().getSubProperties())) {
+						state.produce(context, new Propagation(property, e));
+					}
 
 					/*
 					 * creating propagations for relevant sub-compositions of the relation
@@ -224,11 +225,11 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					for (IndexedPropertyChain property : relation.getSaturated().getSubCompositions()) {
 						SaturatedPropertyChain propertySaturation = property.getSaturated();
 						
-						if (!propertySaturation.getRightSubProperties().isEmpty()) {
-						/*if (!new LazySetIntersection<IndexedPropertyChain>(
+						//if (!propertySaturation.getRightSubProperties().isEmpty()) {
+						if (!new LazySetIntersection<IndexedPropertyChain>(
 								candidatePropagationProperties,
 								propertySaturation.getRightSubProperties())
-								.isEmpty()) {*/
+								.isEmpty()) {
 							/*
 							 * create propagations for told super-properties of
 							 * the chain instead of the chain itself if the
@@ -291,8 +292,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					ruleChain.remove(MATCHER_);
 					changed = true;
 				}
-			} else {
-				// TODO: throw/log something, this should never happen
 			}
 			
 			return changed;

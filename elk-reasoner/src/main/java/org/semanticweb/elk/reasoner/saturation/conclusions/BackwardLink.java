@@ -22,10 +22,13 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import java.util.Set;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
@@ -90,13 +93,13 @@ public class BackwardLink implements Conclusion {
 			 * convert backward link to a forward link if it can potentially be
 			 * composed
 			 */
-			/*Set<IndexedPropertyChain> toldProperties = source_.getRoot()
-					.getPosPropertiesInExistentials();
+			Set<IndexedPropertyChain> toldProperties = source_.getRoot().getPosPropertiesInExistentials();
+			
 			if (toldProperties != null
 					&& !new LazySetIntersection<IndexedPropertyChain>(
 							toldProperties, relation_.getSaturated()
-									.getLeftComposableProperties()).isEmpty()) {*/
-			if (!relation_.getSaturated().getLeftComposableProperties().isEmpty()) {
+									.getLeftComposableProperties()).isEmpty()) {
+			//if (!relation_.getSaturated().getLeftComposableProperties().isEmpty()) {
 				state.produce(source_, new ForwardLink(relation_, context));
 			}
 		} finally {
