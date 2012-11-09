@@ -45,9 +45,9 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class IndexedClass extends IndexedClassEntity {
 
-	protected static final Logger LOGGER_ = Logger.getLogger(IndexedClass.class);
-	
-	
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(IndexedClass.class);
+
 	/**
 	 * The indexed ElkClass
 	 */
@@ -84,28 +84,30 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, int increment,
-			int positiveIncrement, int negativeIncrement) {
-		
+	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater,
+			int increment, int positiveIncrement, int negativeIncrement) {
+
 		if (occurrenceNo == 0 && increment > 0) {
 			indexUpdater.addClass(elkClass);
 		}
-		
-		if (negativeOccurrenceNo == 0 && increment > 0 && elkClass.getIri().equals(PredefinedElkClass.OWL_THING.getIri())) {
-			indexUpdater.add(new OwlThingContextInitializationRule(null));
-		}		
-		
+
+		if (negativeOccurrenceNo == 0 && increment > 0
+				&& elkClass.equals(PredefinedElkClass.OWL_THING)) {
+			indexUpdater.add(new OwlThingContextInitializationRule());
+		}
+
 		occurrenceNo += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
-		
+
 		if (occurrenceNo == 0 && increment < 0) {
 			indexUpdater.removeClass(elkClass);
 		}
-		
-		if (negativeOccurrenceNo == 0 && increment < 0 && elkClass.getIri().equals(PredefinedElkClass.OWL_THING.getIri())) {
-			indexUpdater.remove(new OwlThingContextInitializationRule(null));
-		}		
+
+		if (negativeOccurrenceNo == 0 && increment < 0
+				&& elkClass.equals(PredefinedElkClass.OWL_THING)) {
+			indexUpdater.remove(new OwlThingContextInitializationRule());
+		}
 	}
 
 	@Override
@@ -118,7 +120,7 @@ public class IndexedClass extends IndexedClassEntity {
 		if (this == state.getOwlNothing()) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Producing owl:Nothing for " + context.getRoot());
-			}			
+			}
 			state.produce(context, new Bottom());
 		}
 	}
@@ -127,46 +129,50 @@ public class IndexedClass extends IndexedClassEntity {
 	public String toString() {
 		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
 	}
-	
-	
-	private static Matcher<ContextRules, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, OwlThingContextInitializationRule>(
-			OwlThingContextInitializationRule.class);
 
-	private static ReferenceFactory<ContextRules, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ContextRules, OwlThingContextInitializationRule>() {
-		@Override
-		public OwlThingContextInitializationRule create(ContextRules tail) {
-			return new OwlThingContextInitializationRule(tail);
-		}
-	};
-	
-	
 	/**
-	 * Adds owl:Thing to the context (it should be registered iff Thing occurs negatively)
+	 * Adds {@code owl:Thing} to the context (it should be registered iff Thing
+	 * occurs negatively)
 	 */
 	private static class OwlThingContextInitializationRule extends ContextRules {
 
-		public OwlThingContextInitializationRule(ContextRules tail) {
+		private OwlThingContextInitializationRule(ContextRules tail) {
 			super(tail);
+		}
+
+		public OwlThingContextInitializationRule() {
+			super(null);
 		}
 
 		@Override
 		public void apply(SaturationState state, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying owl:Thing context init rule to " + context.getRoot());
+				LOGGER_.trace("Applying owl:Thing context init rule to "
+						+ context.getRoot());
 			}
-			
-			state.produce(context, new PositiveSuperClassExpression(state.getOwlThing()));			
+
+			state.produce(context,
+					new PositiveSuperClassExpression(state.getOwlThing()));
 		}
+
+		private static Matcher<ContextRules, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, OwlThingContextInitializationRule>(
+				OwlThingContextInitializationRule.class);
+
+		private static ReferenceFactory<ContextRules, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ContextRules, OwlThingContextInitializationRule>() {
+			@Override
+			public OwlThingContextInitializationRule create(ContextRules tail) {
+				return new OwlThingContextInitializationRule(tail);
+			}
+		};
 
 		@Override
 		public boolean addTo(Chain<ContextRules> rules) {
 			OwlThingContextInitializationRule rule = rules.find(MATCHER_);
-			
+
 			if (rule == null) {
 				rules.getCreate(MATCHER_, FACTORY_);
 				return true;
-			}
-			else {
+			} else {
 				return false;
 			}
 		}
@@ -174,6 +180,6 @@ public class IndexedClass extends IndexedClassEntity {
 		@Override
 		public boolean removeFrom(Chain<ContextRules> rules) {
 			return rules.remove(MATCHER_) != null;
-		}		
+		}
 	}
 }

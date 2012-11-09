@@ -127,7 +127,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
-		ThisCompositionRule(ContextRules tail) {
+		private ThisCompositionRule(ContextRules tail) {
 			super(tail);
 			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);

@@ -160,7 +160,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 */
 		private Collection<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
-		ThisCompositionRule(ContextRules tail) {
+		private ThisCompositionRule(ContextRules tail) {
 			super(tail);
 		}
 		
