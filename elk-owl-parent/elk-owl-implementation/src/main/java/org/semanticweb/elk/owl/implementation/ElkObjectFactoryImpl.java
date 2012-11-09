@@ -115,6 +115,7 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.managers.DummyElkObjectManager;
 import org.semanticweb.elk.owl.managers.ElkObjectManager;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 
 /**
@@ -124,12 +125,6 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
  * @author Markus Kroetzsch
  */
 public class ElkObjectFactoryImpl implements ElkObjectFactory {
-
-	protected static final ElkClass ELK_OWL_THING = new ElkClassImpl(
-			PredefinedElkIri.OWL_THING.get());
-
-	protected static final ElkClass ELK_OWL_NOTHING = new ElkClassImpl(
-			PredefinedElkIri.OWL_NOTHING.get());
 
 	protected static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
 			PredefinedElkIri.OWL_TOP_OBJECT_PROPERTY.get());
@@ -829,12 +824,12 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	@Override
 	public ElkClass getOwlNothing() {
-		return ElkObjectFactoryImpl.ELK_OWL_NOTHING;
+		return PredefinedElkClass.OWL_NOTHING;
 	}
 
 	@Override
 	public ElkClass getOwlThing() {
-		return ElkObjectFactoryImpl.ELK_OWL_THING;
+		return PredefinedElkClass.OWL_THING;
 	}
 
 	@Override
