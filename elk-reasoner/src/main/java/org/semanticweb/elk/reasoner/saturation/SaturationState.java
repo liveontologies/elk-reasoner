@@ -99,13 +99,6 @@ public class SaturationState {
 	
 	public void initContext(Context context) {
 		produce(context, new PositiveSuperClassExpression(context.getRoot()));
-		// TODO: register this as a ContextRule when owlThing occurs
-		// negative and apply all such context initialization rules here
-		/*IndexedClassExpression owlThing = getOwlThing();
-		
-		if (owlThing.occursNegatively()) {
-			produce(context, new PositiveSuperClassExpression(owlThing));
-		}*/
 		//apply all context initialization rules
 		ContextRules initRules = ontologyIndex_.getContextInitRules();
 		
