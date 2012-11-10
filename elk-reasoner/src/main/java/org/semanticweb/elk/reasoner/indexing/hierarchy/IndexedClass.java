@@ -182,4 +182,5 @@ public class IndexedClass extends IndexedClassEntity {
 			return rules.remove(MATCHER_) != null;
 		}
 	}
+
 }

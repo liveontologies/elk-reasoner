@@ -30,26 +30,26 @@ import org.semanticweb.elk.owl.util.OwlObjectNameVisitor;
  * @author Frantisek Simancik
  * 
  */
-public class IndexingException extends ElkRuntimeException {
+public class ElkIndexingException extends ElkRuntimeException {
 
 	private static final long serialVersionUID = -8678875783274619601L;
 
-	protected IndexingException() {
+	protected ElkIndexingException() {
 	}
 
-	public IndexingException(String message) {
+	public ElkIndexingException(String message) {
 		super(message);
 	}
 
-	public IndexingException(String message, Throwable cause) {
+	public ElkIndexingException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public IndexingException(Throwable cause) {
+	public ElkIndexingException(Throwable cause) {
 		super(cause);
 	}
 
-	protected IndexingException(ElkObject elkObject) {
+	protected ElkIndexingException(ElkObject elkObject) {
 		this("ELK does not support " + OwlObjectNameVisitor.getName(elkObject)
 				+ ".");
 	}

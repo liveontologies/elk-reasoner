@@ -28,13 +28,16 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 
 /**
- * A cache of all indexed objects in the ontology backed by a KeyEntryHashSet.
- * It uses indexed Entries to compare object with respect to structural
- * equality. Supports (non-recursive) addition, removal, and retrieval of single
- * indexed objects. The recursion for indexing subobjects is in the
- * ElkObjectIndexerVisitor.
+ * A cache of all indexed objects in the ontology backed by a
+ * {@link KeyEntryHashSet}. It uses indexed {@link KeyEntry}s to compare object
+ * with respect to structural equality. Supports (non-recursive) addition,
+ * removal, and retrieval of single indexed objects. The recursion for indexing
+ * subobjects is in the {@link ElkObjectIndexerVisitor}.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ * @seenElkObjectIndexerVisitor
  * 
  */
 public class IndexedObjectCache implements IndexedObjectFilter {
