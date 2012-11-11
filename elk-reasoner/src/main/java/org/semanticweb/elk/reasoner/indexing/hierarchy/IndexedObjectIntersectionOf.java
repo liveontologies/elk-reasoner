@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Map;
 
+import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
@@ -167,7 +168,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 				return true;
 
 			if (previous != conjunction)
-				throw new ElkIndexingException(
+				throw new ElkRuntimeException(
 						"Cannot index different conjunctions with the same conjuncts: "
 								+ conjunction + "; " + previous);
 			return false;
