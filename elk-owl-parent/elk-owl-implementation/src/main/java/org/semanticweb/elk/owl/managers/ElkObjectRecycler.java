@@ -26,24 +26,24 @@ package org.semanticweb.elk.owl.managers;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * Interface for classes that implement ElkObject management.
+ * Interface for classes using which one can reuse already created
+ * {@link ElkObject}s.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public interface ElkObjectManager {
+public interface ElkObjectRecycler {
 
 	/**
-	 * Get a canonical reference for the given ElkObject.
-	 * 
-	 * The method always returns an ElkObject that is structurally equivalent to
-	 * the one that was given. However, it might return another Java object in
-	 * cases where it already knows about an ElkObject that is structurally
-	 * equivalent to the given one.
+	 * Process the given {@link ElkObject} and either return itself, or another
+	 * (previously processed) {@link ElkObject} that is structurally equivalent
+	 * to the given one.
 	 * 
 	 * @param object
-	 *            the object to get a substitute for
-	 * @return an object that is structurally equivalent to the given one
+	 *            the input {@link ElkObject} which should be processed
+	 * @return an {@link ElkObject} that is structurally equivalent to the given
+	 *         object
 	 */
-	public ElkObject getCanonicalElkObject(ElkObject object);
+	public ElkObject recycle(ElkObject object);
 
 }

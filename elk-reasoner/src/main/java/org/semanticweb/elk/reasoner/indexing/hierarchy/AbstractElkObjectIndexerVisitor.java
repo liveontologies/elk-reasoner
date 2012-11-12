@@ -59,7 +59,7 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 /**
  * Visitor for {@link ElkClassExpression}s,
  * {@link ElkSubObjectPropertyExpression}s, and {@link ElkIndividual}s that
- * simply throws an unsupported IndexingException on all arguments.
+ * simply throws an {@link IndexingException} on all arguments.
  * 
  * @author Frantisek Simancik
  * 

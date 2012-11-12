@@ -25,7 +25,6 @@ package org.semanticweb.elk.owl.parsing.javacc;
 import java.io.InputStream;
 import java.io.Reader;
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
@@ -33,52 +32,41 @@ import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
 public class Owl2FunctionalStyleParser extends
 		AbstractOwl2FunctionalStyleParser {
 
-	private final ElkPrefixDeclarations prefixDeclarations;
+	private final ElkObjectFactory objectFactory_;
 
-	private final ElkObjectFactory objectFactory;
+	private final ElkPrefixDeclarations prefixDeclarations_;
 
 	private Owl2FunctionalStyleParser(InputStream stream,
-			ElkPrefixDeclarations prefixDeclarations,
-			ElkObjectFactory objectFactory) {
+			ElkObjectFactory objectFactory,
+			ElkPrefixDeclarations prefixDeclarations) {
 		super(stream);
-		this.prefixDeclarations = prefixDeclarations;
-		this.objectFactory = objectFactory;
+		this.objectFactory_ = objectFactory;
+		this.prefixDeclarations_ = prefixDeclarations;
 	}
 
-	Owl2FunctionalStyleParser(InputStream stream,
+	Owl2FunctionalStyleParser(InputStream stream, ElkObjectFactory objectFactory) {
+		this(stream, objectFactory, new ElkPrefixDeclarationsImpl());
+	}
+
+	Owl2FunctionalStyleParser(Reader reader, ElkObjectFactory objectFactory,
 			ElkPrefixDeclarations prefixDeclarations) {
-		this(stream, prefixDeclarations, new ElkObjectFactoryImpl());
-	}
-
-	Owl2FunctionalStyleParser(InputStream stream) {
-		this(stream, new ElkPrefixDeclarationsImpl());
-	}
-
-	Owl2FunctionalStyleParser(Reader reader,
-			ElkPrefixDeclarations prefixDeclarations,
-			ElkObjectFactory objectFactory) {
 		super(reader);
-		this.prefixDeclarations = prefixDeclarations;
-		this.objectFactory = objectFactory;
+		this.objectFactory_ = objectFactory;
+		this.prefixDeclarations_ = prefixDeclarations;
 	}
 
-	Owl2FunctionalStyleParser(Reader reader,
-			ElkPrefixDeclarations prefixDeclarations) {
-		this(reader, prefixDeclarations, new ElkObjectFactoryImpl());
-	}
-
-	Owl2FunctionalStyleParser(Reader reader) {
-		this(reader, new ElkPrefixDeclarationsImpl());
+	Owl2FunctionalStyleParser(Reader reader, ElkObjectFactory objectFactory) {
+		this(reader, objectFactory, new ElkPrefixDeclarationsImpl());
 	}
 
 	@Override
 	protected ElkPrefixDeclarations getElkPrefixDeclarations() {
-		return prefixDeclarations;
+		return prefixDeclarations_;
 	}
 
 	@Override
 	protected ElkObjectFactory getElkObjectFactory() {
-		return this.objectFactory;
+		return this.objectFactory_;
 	}
 
 }
