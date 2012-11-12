@@ -38,29 +38,33 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 	// logger for this class
-	//private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
+	// private static final Logger LOGGER_ =
+	// Logger.getLogger(IncrementalDeSaturationStage.class);
 	private final ReasonerStage dependency_;
-	
+
 	private IncrementalChangesInitialization initialization_ = null;
-	
+
 	private final boolean deletions_;
 
-	IncrementalChangesInitializationStage(AbstractReasonerState reasoner, boolean deletions) {
+	IncrementalChangesInitializationStage(AbstractReasonerState reasoner,
+			boolean deletions) {
 		super(reasoner);
 		deletions_ = deletions;
 		dependency_ = null;
 	}
-	
-	IncrementalChangesInitializationStage(AbstractReasonerState reasoner, boolean deletions, ReasonerStage dependency) {
+
+	IncrementalChangesInitializationStage(AbstractReasonerState reasoner,
+			boolean deletions, ReasonerStage dependency) {
 		super(reasoner);
 		deletions_ = deletions;
 		dependency_ = dependency;
 	}
 
 	private IncrementalStages stage() {
-		return deletions_ ? IncrementalStages.DELETIONS_INIT : IncrementalStages.ADDITIONS_INIT;
+		return deletions_ ? IncrementalStages.DELETIONS_INIT
+				: IncrementalStages.ADDITIONS_INIT;
 	}
-	
+
 	@Override
 	public String getName() {
 		return stage().toString();
@@ -73,7 +77,8 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return dependency_ != null ? Arrays.asList(dependency_) : Collections.<ReasonerStage>emptyList();
+		return dependency_ != null ? Arrays.asList(dependency_) : Collections
+				.<ReasonerStage> emptyList();
 	}
 
 	@Override
@@ -81,7 +86,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		if (initialization_ == null) {
 			initComputation();
 		}
-		
+
 		progressMonitor.start(getName());
 
 		try {
@@ -100,16 +105,19 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		
+
 		initialization_ = new IncrementalChangesInitialization(
 				reasoner.ontologyIndex.getIndexedClassExpressions(),
-				deletions_ ? reasoner.incrementalState.diffIndex.getIndexDeletions() : reasoner.incrementalState.diffIndex.getIndexAdditions(),
-				reasoner.saturationState,
-				reasoner.getProcessExecutor(),
-				workerNo,
+				deletions_ ? reasoner.incrementalState.diffIndex
+						.getIndexDeletions()
+						: reasoner.incrementalState.diffIndex
+								.getIndexAdditions(), reasoner.saturationState,
+				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(),
-				deletions_ ? reasoner.incrementalState.diffIndex.getRemovedContextInitRules() : reasoner.incrementalState.diffIndex.getRemovedContextInitRules(),
-				deletions_);
+				deletions_ ? reasoner.incrementalState.diffIndex
+						.getRemovedContextInitRules()
+						: reasoner.incrementalState.diffIndex
+								.getAddedContextInitRules(), deletions_);
 	}
 
 	@Override

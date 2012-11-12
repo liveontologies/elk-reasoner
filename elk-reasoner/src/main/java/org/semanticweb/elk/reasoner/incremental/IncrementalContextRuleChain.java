@@ -1,7 +1,8 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -33,19 +34,22 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
+ *         
+ * @author "Yevgeny Kazakov"
  */
-public class IncrementalContextRuleChain  extends AbstractChain<ContextRules> implements Conclusion {
+public class IncrementalContextRuleChain extends AbstractChain<ContextRules> {
 
-	private static final Logger LOGGER_ = Logger.getLogger(IncrementalContextRuleChain.class);
-	
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IncrementalContextRuleChain.class);
+
 	private ContextRules contextRules_;
 
 	public IncrementalContextRuleChain(ContextRules rules) {
 		contextRules_ = rules;
 	}
-	
+
 	@Override
 	public ContextRules next() {
 		return contextRules_;
@@ -54,21 +58,16 @@ public class IncrementalContextRuleChain  extends AbstractChain<ContextRules> im
 	@Override
 	public void setNext(ContextRules tail) {
 		contextRules_ = tail;
-	}	
-	
-	@Override
-	public void deapply(SaturationState state, Context context) {
-		apply(state, context);
 	}
 
-	@Override
 	public void apply(SaturationState state, Context context) {
 		ContextRules compositionRule = contextRules_;
 
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Applying rules to the index change in the context of " + context.getRoot());
+			LOGGER_.trace("Applying rules to the index change in the context of "
+					+ context.getRoot());
 		}
-		
+
 		for (;;) {
 			if (compositionRule == null)
 				return;
@@ -77,31 +76,21 @@ public class IncrementalContextRuleChain  extends AbstractChain<ContextRules> im
 		}
 	}
 
-	@Override
-	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
-		return visitor.visit(this, context);
-	}
-
-	@Override
-	public String toString() {
-		return "Set of incremental changes";
-	}
-	
 	public void addTo(Chain<ContextRules> rules) {
 		ContextRules next = contextRules_;
-		
+
 		while (next != null) {
 			next.addTo(rules);
 			next = next.next();
 		}
 	}
-	
+
 	public void removeFrom(Chain<ContextRules> rules) {
 		ContextRules next = contextRules_;
-		
+
 		while (next != null) {
 			next.removeFrom(rules);
 			next = next.next();
 		}
-	}	
+	}
 }

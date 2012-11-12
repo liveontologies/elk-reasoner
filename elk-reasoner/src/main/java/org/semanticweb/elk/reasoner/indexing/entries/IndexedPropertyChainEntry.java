@@ -29,7 +29,6 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * The wrapper class to define custom equality and hash functions for indexed
- * The wrapper class to define custom equality and hash functions for indexed
  * property chains to be used in {@link KeyEntryHashSet}. It is based on the
  * extension of the {@link StrongKeyEntry} class.
  * 

@@ -36,7 +36,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.IncrementalContextRuleChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
@@ -491,15 +490,7 @@ public class RuleApplicationFactory implements
 			return false;
 			//statistics_.forwLinkNo++;
 		}
-
-		@Override
-		public Boolean visit(IncrementalContextRuleChain indexChange, Context context) {
-			// need not add this element, just apply all its rules
-			markAsModified(context);
-			
-			return true;
-		}
-
+		
 		@Override
 		public Boolean visit(Bottom bot, Context context) {
 			return !context.isInconsistent();

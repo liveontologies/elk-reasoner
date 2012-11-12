@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,7 +32,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.IncrementalContextRuleChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
@@ -39,21 +39,23 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * Creates an engine which applies rules backwards, e.g., removes conclusions from the context instead of adding them
+ * Creates an engine which applies rules backwards, e.g., removes conclusions
+ * from the context instead of adding them
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 	public RuleDeapplicationFactory(final SaturationState saturationState) {
 		super(saturationState);
 	}
-	
-	public RuleDeapplicationFactory(final SaturationState saturationState, boolean trackModifiedContexts) {
+
+	public RuleDeapplicationFactory(final SaturationState saturationState,
+			boolean trackModifiedContexts) {
 		super(saturationState, trackModifiedContexts);
-	}	
+	}
 
 	@Override
 	public Engine getEngine() {
@@ -64,19 +66,20 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 * 
 	 */
 	public class DeletionEngine extends Engine {
-		
+
 		protected final ConclusionVisitor<Boolean> containsVisitor;
-		
+
 		protected DeletionEngine(ConclusionVisitor<Boolean> postVisitor) {
 			super(postVisitor);
 			containsVisitor = new ContainsConclusionVisitor();
 		}
-		
-		protected DeletionEngine(ConclusionVisitor<Boolean> preVisitor, ConclusionVisitor<Boolean> postVisitor) {
+
+		protected DeletionEngine(ConclusionVisitor<Boolean> preVisitor,
+				ConclusionVisitor<Boolean> postVisitor) {
 			super(postVisitor);
 			containsVisitor = preVisitor;
 		}
-		
+
 		@Override
 		protected boolean preApply(Conclusion conclusion, Context context) {
 			return conclusion.accept(containsVisitor, context);
@@ -86,29 +89,33 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		protected void process(Conclusion conclusion, Context context) {
 			conclusion.deapply(saturationState_, context);
 		}
-		
+
 		@Override
 		protected void postApply(Conclusion conclusion, Context context) {
 			conclusion.accept(conclusionVisitor, context);
-		}		
+		}
 	}
-	
+
 	/**
 	 * Used to check whether conclusions are contained in the context
 	 */
-	protected class ContainsConclusionVisitor implements ConclusionVisitor<Boolean> {
+	protected class ContainsConclusionVisitor implements
+			ConclusionVisitor<Boolean> {
 
-		protected Boolean visitSuperclass(SuperClassExpression sce, Context context) {
+		protected Boolean visitSuperclass(SuperClassExpression sce,
+				Context context) {
 			return context.containsSuperClassExpression(sce.getExpression());
-		}		
-		
+		}
+
 		@Override
-		public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
+		public Boolean visit(NegativeSuperClassExpression negSCE,
+				Context context) {
 			return visitSuperclass(negSCE, context);
 		}
 
 		@Override
-		public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
+		public Boolean visit(PositiveSuperClassExpression posSCE,
+				Context context) {
 			return visitSuperclass(posSCE, context);
 		}
 
@@ -120,11 +127,6 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		@Override
 		public Boolean visit(ForwardLink link, Context context) {
 			return link.containsBackwardLinkRule(context);
-		}
-		
-		@Override
-		public Boolean visit(IncrementalContextRuleChain indexChange, Context context) {
-			return true;
 		}
 
 		@Override
@@ -140,9 +142,9 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		@Override
 		public Boolean visit(DisjointnessAxiom axiom, Context context) {
 			return context.containsDisjointnessAxiom(axiom.getAxiom()) > 0;
-		}		
-	}	
-	
+		}
+	}
+
 	/**
 	 * Used to remove different kinds of conclusions from the context
 	 */
@@ -150,26 +152,29 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		public Boolean visitSuperclass(SuperClassExpression sce, Context context) {
 			if (context.removeSuperClassExpression(sce.getExpression())) {
-				
+
 				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(context.getRoot() + ": removing superclass " + sce);
+					LOGGER_.trace(context.getRoot() + ": removing superclass "
+							+ sce);
 				}
-				
+
 				markAsModified(context);
-				
+
 				return true;
 			}
-			
+
 			return false;
-		}		
-		
+		}
+
 		@Override
-		public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
+		public Boolean visit(NegativeSuperClassExpression negSCE,
+				Context context) {
 			return visitSuperclass(negSCE, context);
 		}
 
 		@Override
-		public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
+		public Boolean visit(PositiveSuperClassExpression posSCE,
+				Context context) {
 			return visitSuperclass(posSCE, context);
 		}
 
@@ -177,34 +182,28 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		public Boolean visit(BackwardLink link, Context context) {
 			if (context.removeBackwardLink(link)) {
 				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(context.getRoot() + ": removing backward link " + link);
+					LOGGER_.trace(context.getRoot()
+							+ ": removing backward link " + link);
 				}
-				
+
 				return true;
 			}
-			
+
 			return false;
 		}
 
 		@Override
 		public Boolean visit(ForwardLink link, Context context) {
-			//statistics_.forwLinkInfNo++;
+			// statistics_.forwLinkInfNo++;
 			if (link.removeFromContextBackwardLinkRule(context)) {
-				
+
 				return true;
 			}
-			
+
 			return false;
-			//statistics_.forwLinkNo++;
+			// statistics_.forwLinkNo++;
 		}
-		
-		@Override
-		public Boolean visit(IncrementalContextRuleChain indexChange, Context context) {
-			markAsModified(context);
-			// need not remove this element, just apply all its rules
-			return true;
-		}	
-		
+
 		@Override
 		public Boolean visit(Bottom bot, Context context) {
 			return context.isInconsistent();
@@ -213,23 +212,24 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		@Override
 		public Boolean visit(Propagation propagation, Context context) {
 			if (propagation.removeFromContextBackwardLinkRule(context)) {
-				
+
 				return true;
 			}
-			
+
 			return false;
 		}
 
 		@Override
 		public Boolean visit(DisjointnessAxiom axiom, Context context) {
-			
+
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Removing disjointness axiom from " + context.getRoot());
+				LOGGER_.trace("Removing disjointness axiom from "
+						+ context.getRoot());
 			}
-			
+
 			context.removeDisjointnessAxiom(axiom.getAxiom());
-			 
+
 			return true;
-		}		
-	}	
+		}
+	}
 }

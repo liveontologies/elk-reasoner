@@ -40,8 +40,6 @@ public interface ConclusionVisitor<R> {
 	public R visit(BackwardLink link, Context context);
 	
 	public R visit(ForwardLink link, Context context);
-
-	public R visit(IncrementalContextRuleChain indexChange, Context context);
 	
 	public R visit(Bottom bot, Context context);
 
