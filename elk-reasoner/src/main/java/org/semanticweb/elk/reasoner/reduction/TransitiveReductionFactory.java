@@ -275,13 +275,13 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				R root = output.root;
 				LOGGER_.trace(root + ": transitive reduction finished");
 				for (ElkClass equivalent : output.equivalent) {
-					LOGGER_.trace(root + ": equivalent " + equivalent);
+					LOGGER_.trace(root + ": equivalent " + equivalent.getIri());
 				}
 				for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.directSuperClasses) {
 					String message = root + ": direct super class ["
 							+ direct.getRoot();
 					for (ElkClass equivalent : direct.equivalent)
-						message = message + ", " + equivalent;
+						message = message + ", " + equivalent.getIri();
 					message = message + "]";
 					LOGGER_.trace(message);
 				}

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
@@ -38,13 +39,22 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 	// logger for this class
 	//private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
-
+	private final ReasonerStage dependency_;
+	
 	private IncrementalChangesInitialization initialization_ = null;
+	
 	private final boolean deletions_;
 
-	public IncrementalChangesInitializationStage(AbstractReasonerState reasoner, boolean deletions) {
+	IncrementalChangesInitializationStage(AbstractReasonerState reasoner, boolean deletions) {
 		super(reasoner);
 		deletions_ = deletions;
+		dependency_ = null;
+	}
+	
+	IncrementalChangesInitializationStage(AbstractReasonerState reasoner, boolean deletions, ReasonerStage dependency) {
+		super(reasoner);
+		deletions_ = deletions;
+		dependency_ = dependency;
 	}
 
 	private IncrementalStages stage() {
@@ -63,7 +73,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ChangesLoadingStage(reasoner));
+		return dependency_ != null ? Arrays.asList(dependency_) : Collections.<ReasonerStage>emptyList();
 	}
 
 	@Override
@@ -98,12 +108,12 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				deletions_ ? reasoner.incrementalState.diffIndex.getRemovedContextInitRules() : reasoner.incrementalState.diffIndex.getRemovedContextInitRules());
+				deletions_ ? reasoner.incrementalState.diffIndex.getRemovedContextInitRules() : reasoner.incrementalState.diffIndex.getRemovedContextInitRules(),
+				deletions_);
 	}
 
 	@Override
 	public void printInfo() {
 		// TODO Auto-generated method stub
-		
 	}
 }

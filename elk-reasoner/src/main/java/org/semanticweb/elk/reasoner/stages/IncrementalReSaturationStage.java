@@ -60,7 +60,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		// these two stages run in parallel and both modify the shared saturation state
+		// these two stages both modify the shared saturation state
 		return Arrays.asList(
 					// this initializes fully cleaned contexts (should execute cleaning first)
 					(ReasonerStage) new IncrementalContextInitializationStage(reasoner, new IncrementalContextCleaningStage(reasoner)),
@@ -87,6 +87,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 		}
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.SATURATION, true);
+		// at this point we're done with unsaturated contexts
 		reasoner.saturationState.clearModifiedContexts();
 	}
 	

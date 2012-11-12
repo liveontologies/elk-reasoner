@@ -85,8 +85,6 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.CONTEXT_CLEANING, true);
 	}
-	
-	
 
 	@Override
 	void initComputation() {

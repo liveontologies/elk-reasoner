@@ -59,7 +59,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new IncrementalChangesInitializationStage(reasoner, true));
+		return Arrays.asList((ReasonerStage) new IncrementalChangesInitializationStage(reasoner, true, new IncrementalCompletionStage(reasoner)));
 	}
 
 	@Override

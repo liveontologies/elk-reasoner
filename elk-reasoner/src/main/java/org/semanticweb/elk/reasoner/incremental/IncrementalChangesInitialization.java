@@ -49,8 +49,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class IncrementalChangesInitialization
-		extends
+public class IncrementalChangesInitialization	extends
 		ReasonerComputation<IndexedClassExpression, ContextInitializationFactory> {
 
 	public IncrementalChangesInitialization(
@@ -60,8 +59,9 @@ public class IncrementalChangesInitialization
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
-			ContextRules changedGlobalRules) {
-		super(inputs, new ContextInitializationFactory(state, changes, changedGlobalRules), executor, maxWorkers, progressMonitor);
+			ContextRules changedGlobalRules,
+			boolean expectAllContextsSaturated) {
+		super(inputs, new ContextInitializationFactory(state, changes, changedGlobalRules, expectAllContextsSaturated), executor, maxWorkers, progressMonitor);
 	}
 }
 
@@ -73,14 +73,17 @@ class ContextInitializationFactory implements InputProcessorFactory<IndexedClass
 	private final SaturationState saturationState_;
 	private final Map<IndexedClassExpression, IncrementalContextRuleChain> indexChanges_;
 	private final ContextRules changedGlobalRules_;
+	private final boolean expectAllContextsSaturated_;
 	
 	public ContextInitializationFactory(SaturationState state,
 			Map<IndexedClassExpression,
 			IncrementalContextRuleChain> indexChanges,
-			ContextRules changedGlobalRules) {
+			ContextRules changedGlobalRules,
+			boolean expectAllContextsSaturated) {
 		saturationState_ = state;
 		indexChanges_ = indexChanges;
 		changedGlobalRules_ = changedGlobalRules;
+		expectAllContextsSaturated_ = expectAllContextsSaturated;
 	}
 
 	@Override
@@ -94,9 +97,13 @@ class ContextInitializationFactory implements InputProcessorFactory<IndexedClass
 				
 				if (context != null) {
 					
-					if (!context.isSaturated()) {
-						//FIXME replace by a stage which will complete all context not saturated due to an interruption 
-						saturationState_.markAsModified(context);
+					if (expectAllContextsSaturated_ && !context.isSaturated()) {
+						/*
+						 * If we expect that all contexts are saturated at the beginning of this phase
+						 * (e.g. we ran the completion phase before) but the flag isn't set for some context,
+						 * then we set it
+						 */
+						context.setSaturated(true);
 					}
 					
 					if (changedGlobalRules_ != null) {

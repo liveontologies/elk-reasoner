@@ -82,6 +82,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
+		
 		reasoner.inconsistentOntology = computation_.isInconsistent();
 		reasoner.doneConsistencyCheck = true;
 	}
