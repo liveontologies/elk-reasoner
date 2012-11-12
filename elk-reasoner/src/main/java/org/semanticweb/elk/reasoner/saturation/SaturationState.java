@@ -17,6 +17,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExp
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.util.collections.chains.ChainImpl;
+import org.semanticweb.elk.util.collections.chains.Matcher;
 
 /**
  * @author Pavel Klinov
@@ -41,7 +43,7 @@ public class SaturationState {
 	 */
 	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
 	
-	private final ContextCreationListenerChain contextCreationListeners_ = new ContextCreationListenerChain();
+	private ContextCreationListenerChain contextCreationListeners_ = null;//new ContextCreationListenerChain2();
 	
 	private Queue<IndexedClassExpression> modifiedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 	
@@ -109,11 +111,16 @@ public class SaturationState {
 	}
 	
 	public void registerContextCreationListener(ContextCreationListener listener) {
-		contextCreationListeners_.prepend(listener);
+		if (contextCreationListeners_ == null) {
+			contextCreationListeners_ = new ContextCreationListenerChain(listener, null);
+		}
+		else {
+			contextCreationListeners_.register(listener);
+		}
 	}
 	
 	public void deregisterContextCreationListener(ContextCreationListener listener) {
-		contextCreationListeners_.remove(listener);
+		contextCreationListeners_.deregister(listener);
 	}
 	
 	int size() {
@@ -131,61 +138,53 @@ public class SaturationState {
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	private static class ContextCreationListenerChain {
+	
+	private static class ContextCreationListenerChain extends ChainImpl<ContextCreationListenerChain> {
 		
-		private ContextCreationListener head_;
+		/*
+		 * The matcher used to find existing listeners
+		 */
+		private static class ListenerMatcher implements Matcher<ContextCreationListenerChain, ContextCreationListenerChain> {
+
+			private final ContextCreationListener toMatch_;
+			
+			ListenerMatcher(ContextCreationListener listener) {
+				toMatch_ = listener;
+			}
+			
+			@Override
+			public ContextCreationListenerChain match(ContextCreationListenerChain candidate) {
+				return (candidate.listener_ == toMatch_) ? candidate : null;
+			}
+			
+		};
 		
-		private ContextCreationListenerChain tail_;
+		private final ContextCreationListener listener_;
 		
-		ContextCreationListenerChain() {
-			this(null, null);
+		ContextCreationListenerChain(final ContextCreationListener listener, final ContextCreationListenerChain tail) {
+			super(tail);
+			listener_ = listener;
 		}
 		
-		ContextCreationListenerChain(ContextCreationListener head, ContextCreationListenerChain tail) {
-			head = head_;
-			tail = tail_;
+		void register(final ContextCreationListener listener) {
+			if (find(new ListenerMatcher(listener)) == null) {
+				setNext(new ContextCreationListenerChain(listener, next()));
+			}
+		}
+		
+		void deregister(final ContextCreationListener listener) {
+			remove(new ListenerMatcher(listener));
 		}
 		
 		/**
 		 * Notify all registered listeners that a context has been created
 		 */
-		void notifyAll(Context newContext) {
-			ContextCreationListener head = head_;
+		void notifyAll(final Context newContext) {
+			ContextCreationListenerChain head = next();
 			
 			while (head != null) {
-				head.notifyContextCreation(newContext);
-				head = tail_ == null ? null : tail_.head_;
-			}
-		}
-		
-		void prepend(ContextCreationListener listener) {
-			ContextCreationListenerChain newTail = new ContextCreationListenerChain(head_, tail_);
-			
-			head_ = listener;
-			tail_ = newTail;
-		}
-		
-		void remove(ContextCreationListener listener) {
-			ContextCreationListenerChain curr = this;
-			ContextCreationListenerChain prev = null;
-			
-			while (curr != null && curr.head_ != null) {
-				if (curr.head_ == listener) {
-					if (prev == null) {
-						//removing the head
-						head_ = tail_ == null ? null : tail_.head_;
-						tail_ = tail_ == null ? null : tail_.tail_;
-					}
-					else {
-						prev.tail_ = curr.tail_;
-						curr.tail_ = null;
-					}
-					
-					break;
-				}
-				
-				prev = curr;
-				curr = curr.tail_;
+				head.listener_.notifyContextCreation(newContext);
+				head = head.next();
 			}
 		}
 	}
