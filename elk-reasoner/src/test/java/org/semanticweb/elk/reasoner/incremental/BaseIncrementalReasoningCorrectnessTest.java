@@ -43,7 +43,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -73,7 +72,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
 
-	final static int REPEAT_NUMBER = 1;
+	final static int REPEAT_NUMBER = 5;
 	final static double DELETE_RATIO = 0.2;
 
 	protected final ReasoningTestManifest<EO, AO> manifest;
