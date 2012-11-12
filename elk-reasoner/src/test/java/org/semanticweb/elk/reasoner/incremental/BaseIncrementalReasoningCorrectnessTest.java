@@ -3,6 +3,28 @@
  */
 package org.semanticweb.elk.reasoner.incremental;
 
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
@@ -21,6 +43,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -40,18 +63,19 @@ import org.semanticweb.elk.testing.TestOutput;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOutput, AO extends TestOutput> {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger.getLogger(BaseIncrementalReasoningCorrectnessTest.class);	
-	
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
+
 	final static int REPEAT_NUMBER = 1;
 	final static double DELETE_RATIO = 0.2;
-	
+
 	protected final ReasoningTestManifest<EO, AO> manifest;
 	protected List<ElkAxiom> axioms;
 
@@ -63,7 +87,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	@Before
 	public void before() throws IOException, Owl2ParseException {
 		assumeTrue(!ignore(manifest.getInput()));
-		
+
 		InputStream stream = null;
 
 		try {
@@ -72,116 +96,123 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
-		
+
 	}
 
 	@SuppressWarnings("static-method")
 	protected boolean ignore(TestInput input) {
 		return false;
 	}
-	
+
 	/**
 	 * The main test method
-	 * @throws ElkException 
+	 * 
+	 * @throws ElkException
 	 */
 	@Test
 	public void incrementalReasoning() throws ElkException {
-		TestChangesLoader initialLoader = new TestChangesLoader();		
+		TestChangesLoader initialLoader = new TestChangesLoader();
 		TestChangesLoader loader = new TestChangesLoader();
-		//TestChangesLoader incrementalLoader = new TestChangesLoader();
-		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(new SimpleStageExecutor(), 1);
-		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
-		
+		// TestChangesLoader incrementalLoader = new TestChangesLoader();
+		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
+				new SimpleStageExecutor(), 1);
+		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
+				new LoggingStageExecutor(), 1);
+
 		standardReasoner.registerOntologyLoader(initialLoader);
 		standardReasoner.registerOntologyChangesLoader(loader);
 		incrementalReasoner.registerOntologyLoader(initialLoader);
 		incrementalReasoner.registerOntologyChangesLoader(loader);
-		
+
 		incrementalReasoner.setIncrementalMode(true);
-		//initial load
+		// initial load
 		add(initialLoader, axioms);
-		//initial correctness check
+		// initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
-		
-		long seed = /*1352217936813L;*/System.currentTimeMillis(); 
+
+		long seed = /* 1352217936813L; */System.currentTimeMillis();
 		Random rnd = new Random(seed);
-		
+
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
 			// delete some axioms
 			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
-			
+
 			for (ElkAxiom del : deleted) {
 				System.err.println(OwlFunctionalStylePrinter.toString(del));
 			}
-			
-			//incremental changes
+
+			// incremental changes
 			loader.clear();
 			remove(loader, deleted);
 			standardReasoner.registerOntologyChangesLoader(loader);
 			incrementalReasoner.registerOntologyChangesLoader(loader);
-						
+
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
-			//add the axioms back
+			// add the axioms back
 			loader.clear();
 			add(loader, deleted);
 			standardReasoner.registerOntologyChangesLoader(loader);
-			incrementalReasoner.registerOntologyChangesLoader(loader);			
-			
+			incrementalReasoner.registerOntologyChangesLoader(loader);
+
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}
 	}
 
-	
 	private void add(TestChangesLoader loader, Collection<ElkAxiom> axiomList) {
 		for (ElkAxiom axiom : axiomList) {
 			loader.add(axiom);
 		}
 	}
-	
+
 	private void remove(TestChangesLoader loader, Collection<ElkAxiom> axiomList) {
 		for (ElkAxiom axiom : axiomList) {
 			loader.remove(axiom);
 		}
-	}	
+	}
 
-	protected Set<ElkAxiom> getRandomSubset(List<ElkAxiom> axioms, Random rnd, double fraction) {
+	protected Set<ElkAxiom> getRandomSubset(List<ElkAxiom> axioms, Random rnd,
+			double fraction) {
 		Collections.shuffle(axioms, rnd);
-		
+
 		Set<ElkAxiom> subset = new HashSet<ElkAxiom>();
-		
-		for (int i = 0; i < axioms.size() && subset.size() <= fraction * axioms.size(); i++) {
+
+		for (int i = 0; i < axioms.size()
+				&& subset.size() <= fraction * axioms.size(); i++) {
 			ElkAxiom axiom = axioms.get(i);
-			
+
 			if (!filterAxiom(axiom)) {
-				subset.add(axiom);				
+				subset.add(axiom);
 			}
 		}
-		
+
 		return subset;
 	}
 
 	protected boolean filterAxiom(ElkAxiom axiom) {
 		return !(axiom instanceof ElkClassAxiom);
 	}
-	
-	protected List<ElkAxiom> loadAxioms(InputStream stream) throws IOException, Owl2ParseException {
-		Owl2Parser parser = new Owl2FunctionalStyleParserFactory().getParser(stream);
+
+	protected List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
+			Owl2ParseException {
+		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
+				.getParser(stream);
 		final List<ElkAxiom> axioms = new ArrayList<ElkAxiom>();
-		
+
 		parser.accept(new Owl2ParserAxiomProcessor() {
-			
+
 			@Override
 			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
 			}
-			
+
 			@Override
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
 				axioms.add(elkAxiom);
 			}
 		});
-		
+
 		return axioms;
-	}	
-	
-	protected abstract void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner, long seed) throws ElkException;
+	}
+
+	protected abstract void correctnessCheck(Reasoner standardReasoner,
+			Reasoner incrementalReasoner, long seed) throws ElkException;
 }

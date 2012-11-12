@@ -31,8 +31,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.semanticweb.elk.io.IOUtils;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.taxonomy.MockTaxonomyLoader;
@@ -77,9 +80,12 @@ public abstract class DiffRealizationCorrectnessTest extends
 								InputStream stream = null;
 
 								try {
+									ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(
+											new ElkEntityRecycler());
 									InstanceTaxonomy<ElkClass, ElkNamedIndividual> expectedTaxonomy = MockTaxonomyLoader
-											.load(new Owl2FunctionalStyleParserFactory()
-													.getParser(stream = output
+											.load(objectFactory,
+													new Owl2FunctionalStyleParserFactory(
+															objectFactory).getParser(stream = output
 															.openStream()));
 
 									return new TaxonomyDiffManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput>(

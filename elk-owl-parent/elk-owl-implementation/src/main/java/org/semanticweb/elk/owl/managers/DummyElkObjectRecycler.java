@@ -1,4 +1,5 @@
 package org.semanticweb.elk.owl.managers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,20 +23,19 @@ package org.semanticweb.elk.owl.managers;
  * #L%
  */
 
-
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * Implementation of the ElkObjectManager interface that does not keep track of
- * existing objects and rather allows for multiple instances of structurally
- * equivalent ElkObjects. This reduces the management overhead.
+ * An {@link ElkObjectRecycler} that does not recycle anything and simply
+ * returns the input {@link ElkObject}.
  * 
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
  */
-public class DummyElkObjectManager implements ElkObjectManager {
+public class DummyElkObjectRecycler implements ElkObjectRecycler {
 
 	@Override
-	public ElkObject getCanonicalElkObject(ElkObject object) {
+	public ElkObject recycle(ElkObject object) {
 		return object;
 	}
 

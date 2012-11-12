@@ -1,11 +1,48 @@
 Ontology(
-Declaration(Class(<http://example.org/B>))
-Declaration(Class(<http://example.org/E>))
-Declaration(Class(<http://example.org/D>))
-Declaration(Class(<http://example.org/C>))
 Declaration(Class(<http://example.org/A>))
+
+Declaration(Class(<http://example.org/B>))
+Declaration(Class(<http://example.org/C>))
+Declaration(Class(<http://example.org/D>))
+
+Declaration(Class(<http://example.org/BB>))
+Declaration(Class(<http://example.org/CC>))
+Declaration(Class(<http://example.org/DD>))
+
+Declaration(Class(<http://example.org/BC>))
+Declaration(Class(<http://example.org/BD>))
+Declaration(Class(<http://example.org/CB>))
+Declaration(Class(<http://example.org/CD>))
+Declaration(Class(<http://example.org/DC>))
+Declaration(Class(<http://example.org/DB>))
+
+Declaration(Class(<http://example.org/BCD>))
+Declaration(Class(<http://example.org/BDC>))
+Declaration(Class(<http://example.org/CBD>))
+Declaration(Class(<http://example.org/CDB>))
+Declaration(Class(<http://example.org/DBC>))
+Declaration(Class(<http://example.org/DCB>))
+
 SubClassOf(<http://example.org/A> <http://example.org/B>)
 SubClassOf(<http://example.org/A> <http://example.org/C>)
 SubClassOf(<http://example.org/A> <http://example.org/D>)
-SubClassOf(<http://example.org/A> <http://example.org/E>)
+
+SubClassOf(<http://example.org/B> <http://example.org/BB>)
+SubClassOf(<http://example.org/C> <http://example.org/CC>)
+SubClassOf(<http://example.org/D> <http://example.org/DD>)
+
+SubClassOf(<http://example.org/A> <http://example.org/BC>)
+SubClassOf(<http://example.org/A> <http://example.org/BD>)
+SubClassOf(<http://example.org/A> <http://example.org/CB>)
+SubClassOf(<http://example.org/A> <http://example.org/CD>)
+SubClassOf(<http://example.org/A> <http://example.org/DC>)
+SubClassOf(<http://example.org/A> <http://example.org/DB>)
+
+SubClassOf(<http://example.org/A> <http://example.org/BCD>)
+SubClassOf(<http://example.org/A> <http://example.org/BDC>)
+SubClassOf(<http://example.org/A> <http://example.org/CBD>)
+SubClassOf(<http://example.org/A> <http://example.org/CDB>)
+SubClassOf(<http://example.org/A> <http://example.org/DBC>)
+SubClassOf(<http://example.org/A> <http://example.org/DCB>)
+
 )

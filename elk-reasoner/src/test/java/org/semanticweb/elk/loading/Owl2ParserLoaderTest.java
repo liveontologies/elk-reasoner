@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.loading;
+
 /*
  * #%L
  * ELK Reasoner
@@ -43,7 +44,7 @@ public class Owl2ParserLoaderTest {
 
 	private void load(String ontology) throws ElkLoadingException {
 		StringReader reader = null;
-		
+
 		try {
 			Owl2ParserLoader loader = new Owl2ParserLoader(
 					new Owl2FunctionalStyleParserFactory().getParser(reader = new StringReader(
@@ -53,27 +54,26 @@ public class Owl2ParserLoaderTest {
 
 						}
 					});
-			
+
 			loader.load();
 		} finally {
 			reader.close();
 		}
 	}
 
-	
 	@Test(expected = ElkLoadingException.class)
-	public void expectedLoadingExceptionOnSyntaxError() throws ElkLoadingException {
+	public void expectedLoadingExceptionOnSyntaxError()
+			throws ElkLoadingException {
 		String ontology = ""//
 				+ "Prefix( : = <http://example.org/> )"//
 				+ "Ontology((((()("//
 				+ "EquivalentClasses(:B :C)"//
 				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 				+ "))";
-		
 
 		load(ontology);
-	}	
-	
+	}
+
 	/*
 	 * Makes sure we always throw an exception of the expected type when can't
 	 * loading something
@@ -86,15 +86,13 @@ public class Owl2ParserLoaderTest {
 				+ "EquivalentClasses(:B :C)"//
 				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 				+ ")";
-		
+
 		load(ontology);
 	}
-	
+
 	@After
 	public void cleanUp() {
 		Thread.interrupted();
 	}
-
-
 
 }

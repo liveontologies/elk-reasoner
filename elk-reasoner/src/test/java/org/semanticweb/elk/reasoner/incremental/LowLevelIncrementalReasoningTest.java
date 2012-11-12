@@ -3,6 +3,28 @@
  */
 package org.semanticweb.elk.reasoner.incremental;
 
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -41,140 +63,155 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class LowLevelIncrementalReasoningTest {
 
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
-	
+
 	@Test
 	public void testBasicDeletion() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
-		
+
 		reasoner.registerOntologyLoader(loader);
-		
+
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
-		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri("R"));
-		
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
+				"R"));
+
 		loader.add(objectFactory.getSubClassOfAxiom(b, d))
-			.add(objectFactory.getSubClassOfAxiom(a, objectFactory.getObjectSomeValuesFrom(r, b)))
-			.add(objectFactory.getSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(r, d), c));
+				.add(objectFactory.getSubClassOfAxiom(a,
+						objectFactory.getObjectSomeValuesFrom(r, b)))
+				.add(objectFactory.getSubClassOfAxiom(
+						objectFactory.getObjectSomeValuesFrom(r, d), c));
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
-		
-		assertTrue(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
+
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(c)));
 		// now delete B [= D, should retract A [= C
 		loader.clear();
-		
+
 		reasoner.setIncrementalMode(true);
 		reasoner.registerOntologyChangesLoader(loader);
-		
+
 		loader.remove(objectFactory.getSubClassOfAxiom(b, d));
-		
+
 		taxonomy = reasoner.getTaxonomy();
-		
-		assertFalse(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
+
+		assertFalse(taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(c)));
 	}
-	
+
 	@Test
 	public void testDeletePositiveExistential() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
-		
+
 		reasoner.registerOntologyLoader(loader);
-		
+
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 		ElkClass e = objectFactory.getClass(new ElkFullIri(":E"));
-		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri("R"));
-		ElkAxiom posExistential = objectFactory.getSubClassOfAxiom(a, objectFactory.getObjectSomeValuesFrom(r, b)); 
-		
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
+				"R"));
+		ElkAxiom posExistential = objectFactory.getSubClassOfAxiom(a,
+				objectFactory.getObjectSomeValuesFrom(r, b));
+
 		loader.add(objectFactory.getSubClassOfAxiom(b, d))
-			.add(posExistential)
-			.add(objectFactory.getSubClassOfAxiom(a, e))
-			.add(objectFactory.getSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(r, d), c));
+				.add(posExistential)
+				.add(objectFactory.getSubClassOfAxiom(a, e))
+				.add(objectFactory.getSubClassOfAxiom(
+						objectFactory.getObjectSomeValuesFrom(r, d), c));
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
-		
-		assertTrue(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
+
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(c)));
 		// now delete A subclass R some B, should retract A subclass C
 		loader.clear();
-		
+
 		reasoner.setIncrementalMode(true);
 		reasoner.registerOntologyChangesLoader(loader);
-		
+
 		loader.remove(posExistential);
-		
+
 		taxonomy = reasoner.getTaxonomy();
-		
-		assertFalse(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
-	}	
-	
-	
+
+		assertFalse(taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(c)));
+	}
+
 	@Test
 	public void testNewClassUnsatisfiable() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
-		
+
 		reasoner.registerOntologyLoader(loader);
-		
+
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
-		
+
 		loader.add(objectFactory.getSubClassOfAxiom(a, b));
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
-		
-		assertTrue(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(b)));
+
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(b)));
 		loader.clear();
-		
+
 		reasoner.setIncrementalMode(true);
 		reasoner.registerOntologyChangesLoader(loader);
 
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 		loader.add(objectFactory.getDisjointClassesAxiom(Arrays.asList(c, d, c)));
-		
+
 		taxonomy = reasoner.getTaxonomy();
-		
+
 		assertSame(taxonomy.getBottomNode(), taxonomy.getNode(c));
 		assertNotSame(taxonomy.getBottomNode(), taxonomy.getNode(d));
-	}	
-	
+	}
+
 	@Test
 	public void testDeleteFromForest() throws ElkException, IOException {
 		InputStream stream = null;
-		String toDelete = "Prefix(test:=<http://www.test.com/schema#>) Ontology(\n" 
-		+ "SubClassOf(ObjectSomeValuesFrom(<test:has-color> <test:brown>) <test:brown-thing>) \n" 
-		+ "SubClassOf(<test:green> <test:color>) \n" 
-		+ ")";
+		String toDelete = "Prefix(test:=<http://www.test.com/schema#>) Ontology(\n"
+				+ "SubClassOf(ObjectSomeValuesFrom(<test:has-color> <test:brown>) <test:brown-thing>) \n"
+				+ "SubClassOf(<test:green> <test:color>) \n" + ")";
 		ElkClass tree = objectFactory.getClass(new ElkFullIri("test:tree"));
-		ElkClass greenThing = objectFactory.getClass(new ElkFullIri("test:green-thing"));
-		
+		ElkClass greenThing = objectFactory.getClass(new ElkFullIri(
+				"test:green-thing"));
+
 		try {
-			stream = getClass().getClassLoader().getResourceAsStream("incremental/forest.owl");
-			
+			stream = getClass().getClassLoader().getResourceAsStream(
+					"incremental/forest.owl");
+
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
-			TestChangesLoader initialLoader = new TestChangesLoader();		
+			TestChangesLoader initialLoader = new TestChangesLoader();
 			TestChangesLoader loader = new TestChangesLoader();
-			Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
-			
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+					new LoggingStageExecutor(), 1);
+
 			reasoner.registerOntologyLoader(initialLoader);
-			
+
 			for (ElkAxiom axiom : ontology) {
 				initialLoader.add(axiom);
 			}
-			
+
 			Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
-			
+
 			try {
 				Writer writer = new OutputStreamWriter(System.out);
 				TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
@@ -182,20 +219,21 @@ public class LowLevelIncrementalReasoningTest {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			assertTrue(taxonomy.getNode(tree).getDirectSuperNodes().contains(taxonomy.getNode(greenThing)));			
-			
+
+			assertTrue(taxonomy.getNode(tree).getDirectSuperNodes()
+					.contains(taxonomy.getNode(greenThing)));
+
 			System.out.println("===========================================");
-			
+
 			reasoner.setIncrementalMode(true);
-			
+
 			for (ElkAxiom del : deletions) {
 				loader.remove(del);
 			}
-			
+
 			reasoner.registerOntologyChangesLoader(loader);
 			taxonomy = reasoner.getTaxonomy();
-			
+
 			try {
 				Writer writer = new OutputStreamWriter(System.out);
 				TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
@@ -203,161 +241,163 @@ public class LowLevelIncrementalReasoningTest {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			assertTrue(taxonomy.getNode(tree).getDirectSuperNodes().contains(taxonomy.getNode(greenThing)));
-			
+
+			assertTrue(taxonomy.getNode(tree).getDirectSuperNodes()
+					.contains(taxonomy.getNode(greenThing)));
+
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
 	}
-	
+
 	@Test
 	public void testPropositionalAdditions() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
-		
+
 		reasoner.registerOntologyLoader(loader);
-		
+
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
-		
-		loader.add(objectFactory.getSubClassOfAxiom(a, c))
-			.add(objectFactory.getSubClassOfAxiom(c, d));
-		
+
+		loader.add(objectFactory.getSubClassOfAxiom(a, c)).add(
+				objectFactory.getSubClassOfAxiom(c, d));
+
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
 		loader.clear();
 		reasoner.setIncrementalMode(true);
 		reasoner.registerOntologyChangesLoader(loader);
-		
-		loader.add(objectFactory.getSubClassOfAxiom(a, b))
-			.add(objectFactory.getSubClassOfAxiom(b, d));
-		
+
+		loader.add(objectFactory.getSubClassOfAxiom(a, b)).add(
+				objectFactory.getSubClassOfAxiom(b, d));
+
 		System.out.println("===========================================");
-		
+
 		taxonomy = reasoner.getTaxonomy();
-		
-		/*try {
-			Writer writer = new OutputStreamWriter(System.out);
-			TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-		
-		assertTrue(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(c)));
-		assertTrue(taxonomy.getNode(a).getDirectSuperNodes().contains(taxonomy.getNode(b)));
+
+		/*
+		 * try { Writer writer = new OutputStreamWriter(System.out);
+		 * TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+		 * writer.flush(); } catch (IOException e) { e.printStackTrace(); }
+		 */
+
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(c)));
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(b)));
 	}
-	
+
 	@Test
 	public void testDeleteBinaryDisjointness() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
-		
+
 		reasoner.registerOntologyLoader(loader);
-		
+
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
-		ElkAxiom disjAxiom = objectFactory.getDisjointClassesAxiom(Arrays.asList(b, c)); 
-		
+		ElkAxiom disjAxiom = objectFactory.getDisjointClassesAxiom(Arrays
+				.asList(b, c));
+
 		loader.add(objectFactory.getSubClassOfAxiom(a, b))
-			.add(objectFactory.getSubClassOfAxiom(a, c))
-			.add(disjAxiom);
+				.add(objectFactory.getSubClassOfAxiom(a, c)).add(disjAxiom);
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
-		
+
 		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 		// now delete disjointness, A should become satisfiable
 		loader.clear();
-		
+
 		reasoner.setIncrementalMode(true);
 		reasoner.registerOntologyChangesLoader(loader);
-		
+
 		loader.remove(disjAxiom);
-		
+
 		System.out.println("===========================================");
-		
+
 		taxonomy = reasoner.getTaxonomy();
-		
-		/*try {
-			Writer writer = new OutputStreamWriter(System.out);
-			TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-		
+
+		/*
+		 * try { Writer writer = new OutputStreamWriter(System.out);
+		 * TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+		 * writer.flush(); } catch (IOException e) { e.printStackTrace(); }
+		 */
+
 		assertFalse(taxonomy.getNode(a) == taxonomy.getBottomNode());
-	}	
-	
+	}
+
 	@Test
 	public void testDeleteNaryDisjointness() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
-		
+
 		reasoner.registerOntologyLoader(loader);
-		
+
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
-		ElkAxiom disjAxiom = objectFactory.getDisjointClassesAxiom(Arrays.asList(a, b, c, d)); 
-		
+		ElkAxiom disjAxiom = objectFactory.getDisjointClassesAxiom(Arrays
+				.asList(a, b, c, d));
+
 		loader.add(objectFactory.getSubClassOfAxiom(a, b))
-			.add(objectFactory.getSubClassOfAxiom(a, c))
-			.add(objectFactory.getSubClassOfAxiom(c, d))
-			.add(disjAxiom);
+				.add(objectFactory.getSubClassOfAxiom(a, c))
+				.add(objectFactory.getSubClassOfAxiom(c, d)).add(disjAxiom);
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
-		
+
 		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 		// now delete disjointness, A should become satisfiable
 		loader.clear();
-		
+
 		reasoner.setIncrementalMode(true);
 		reasoner.registerOntologyChangesLoader(loader);
-		
+
 		loader.remove(disjAxiom);
-		
+
 		System.out.println("===========================================");
-		
+
 		taxonomy = reasoner.getTaxonomy();
-		
-		/*try {
-			Writer writer = new OutputStreamWriter(System.out);
-			TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-		
+
+		/*
+		 * try { Writer writer = new OutputStreamWriter(System.out);
+		 * TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+		 * writer.flush(); } catch (IOException e) { e.printStackTrace(); }
+		 */
+
 		assertFalse(taxonomy.getNode(a) == taxonomy.getBottomNode());
-	}	
-	
-	
-	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException, Owl2ParseException {
+	}
+
+	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
+			Owl2ParseException {
 		return loadAxioms(new InputStreamReader(stream));
 	}
-	
-	private List<ElkAxiom> loadAxioms(Reader reader) throws IOException, Owl2ParseException {
-		Owl2Parser parser = new Owl2FunctionalStyleParserFactory().getParser(reader);
+
+	private List<ElkAxiom> loadAxioms(Reader reader) throws IOException,
+			Owl2ParseException {
+		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
+				.getParser(reader);
 		final List<ElkAxiom> axioms = new ArrayList<ElkAxiom>();
-		
+
 		parser.accept(new Owl2ParserAxiomProcessor() {
-			
+
 			@Override
 			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
 			}
-			
+
 			@Override
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
 				axioms.add(elkAxiom);
 			}
 		});
-		
+
 		return axioms;
-	}	
+	}
 }

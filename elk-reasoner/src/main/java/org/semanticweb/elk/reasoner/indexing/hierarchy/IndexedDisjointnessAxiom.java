@@ -133,10 +133,6 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		return "DisjointClasses(" + Arrays.toString(getMembers().toArray()) + ")";
 	}
 
-
-
-
-
 	/**
 	 * That's the actual disjointness rule which is registered as a context rule
 	 * for class expressions.
@@ -160,7 +156,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 */
 		private Collection<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
-		ThisCompositionRule(ContextRules tail) {
+		private ThisCompositionRule(ContextRules tail) {
 			super(tail);
 		}
 		

@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -34,22 +35,15 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * Represents all occurrences of an ElkClassExpression in an ontology. To this
- * end, objects of this class keeps a number of lists to describe the
- * relationships to other (indexed) class expressions. The data structures are
- * optimized for quickly retrieving the relevant relationships during
- * inferencing.
- * 
- * This class is mainly a data container that provides direct public access to
- * its content. The task of updating index structures consistently in a global
- * sense is left to callers.
+ * Represents all occurrences of an {@link ElkClassExpression} in an ontology.
  * 
  * @author "Frantisek Simancik"
  * @author "Markus Kroetzsch"
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
  */
-abstract public class IndexedClassExpression {
+abstract public class IndexedClassExpression implements
+		Comparable<IndexedClassExpression> {
 
 	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
 
@@ -101,8 +95,8 @@ abstract public class IndexedClassExpression {
 	abstract void updateOccurrenceNumbers(IndexUpdater updater, int increment,
 			int positiveIncrement, int negativeIncrement);
 
-	
-	public abstract void applyDecompositionRule(SaturationState state, Context context);
+	public abstract void applyDecompositionRule(SaturationState state,
+			Context context);
 
 	/**
 	 * @return the {@link IndexedObjectProperty} objects that occur in positive
@@ -113,7 +107,6 @@ abstract public class IndexedClassExpression {
 	public Set<IndexedPropertyChain> getPosPropertiesInExistentials() {
 		return posPropertiesInExistentials_;
 	}
-
 
 	protected boolean addPosPropertyInExistential(IndexedPropertyChain property) {
 		if (posPropertiesInExistentials_ == null)
@@ -191,7 +184,21 @@ abstract public class IndexedClassExpression {
 		return hashCode_;
 	}
 
-	
+	@Override
+	public int compareTo(IndexedClassExpression o) {
+		if (this == o)
+			return 0;
+		else if (this.hashCode_ == o.hashCode_) {
+			/*
+			 * this should happen very rarely when structurally equal
+			 * expressions are identified; in this case we rely on the unique
+			 * string representation of indexed objects
+			 */
+			return this.toString().compareTo(o.toString());
+		} else
+			return (this.hashCode_ < o.hashCode_ ? -1 : 1);
+	}
+
 	Chain<ContextRules> getChainCompositionRules() {
 		return new AbstractChain<ContextRules>() {
 			@Override
@@ -212,6 +219,6 @@ abstract public class IndexedClassExpression {
 
 	@Override
 	public abstract String toString();
-	
-	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);	
+
+	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
 }
