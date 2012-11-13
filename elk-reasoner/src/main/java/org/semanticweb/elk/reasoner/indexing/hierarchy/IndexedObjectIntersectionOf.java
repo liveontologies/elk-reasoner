@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExp
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -146,7 +147,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
-		private ThisCompositionRule(ContextRules tail) {
+		private ThisCompositionRule(RuleChain<Context> tail) {
 			super(tail);
 			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);
@@ -211,18 +212,18 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		}
 
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+		private static Matcher<RuleChain<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<RuleChain<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+		private static ReferenceFactory<RuleChain<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<RuleChain<Context>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ContextRules tail) {
+			public ThisCompositionRule create(RuleChain<Context> tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<ContextRules> ruleChain) {
+		public boolean addTo(Chain<RuleChain<Context>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
 
@@ -233,10 +234,11 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			}
 
 			return changed;
+
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ContextRules> ruleChain) {
+		public boolean removeFrom(Chain<RuleChain<Context>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 
@@ -252,6 +254,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			}
 
 			return changed;
+
 		}
 	}
 }

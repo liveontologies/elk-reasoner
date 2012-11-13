@@ -39,7 +39,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
@@ -144,8 +145,8 @@ public interface OntologyIndex {
 	 */
 	void clear();
 	
-	public ContextRules getContextInitRules();
+	public RuleChain<Context> getContextInitRules();
 	
-	public Chain<ContextRules> getContextInitRuleChain();
+	public Chain<RuleChain<Context>> getContextInitRuleChain();
 	
 }

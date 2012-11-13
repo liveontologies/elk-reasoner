@@ -34,7 +34,8 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.incremental.IncrementalContextRuleChain;
 import org.semanticweb.elk.reasoner.indexing.IncrementalIndexRuleChain;
 import org.semanticweb.elk.reasoner.indexing.IndexRules;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
@@ -62,9 +63,9 @@ public class DifferentialIndex {
 
 	private final DirectIndexUpdater directUpdater_;
 
-	ContextRules addedContextInitRules_ = null;
+	RuleChain<Context> addedContextInitRules_ = null;
 
-	ContextRules removedContextInitRules_ = null;
+	RuleChain<Context> removedContextInitRules_ = null;
 
 	/**
 	 * The map representing entries to be added to the ontology index; it maps
@@ -155,41 +156,41 @@ public class DifferentialIndex {
 				: new IncrementalContextRuleChain(removedContextInitRules_);
 	}
 
-	public Chain<ContextRules> getAddedContextInitRuleChain() {
-		return new AbstractChain<ContextRules>() {
+	public Chain<RuleChain<Context>> getAddedContextInitRuleChain() {
+		return new AbstractChain<RuleChain<Context>>() {
 
 			@Override
-			public ContextRules next() {
+			public RuleChain<Context> next() {
 				return addedContextInitRules_;
 			}
 
 			@Override
-			public void setNext(ContextRules tail) {
+			public void setNext(RuleChain<Context> tail) {
 				addedContextInitRules_ = tail;
 			}
 		};
 	}
 
-	public Chain<ContextRules> getRemovedContextInitRuleChain() {
-		return new AbstractChain<ContextRules>() {
+	public Chain<RuleChain<Context>> getRemovedContextInitRuleChain() {
+		return new AbstractChain<RuleChain<Context>>() {
 
 			@Override
-			public ContextRules next() {
+			public RuleChain<Context> next() {
 				return removedContextInitRules_;
 			}
 
 			@Override
-			public void setNext(ContextRules tail) {
+			public void setNext(RuleChain<Context> tail) {
 				removedContextInitRules_ = tail;
 			}
 		};
 	}
 
-	public boolean registerContextInitRuleAdditions(ContextRules rules) {
+	public boolean registerContextInitRuleAdditions(RuleChain<Context> rules) {
 		return rules.addTo(getAddedContextInitRuleChain());
 	}
 
-	public boolean registerContextInitRuleDeletions(ContextRules rules) {
+	public boolean registerContextInitRuleDeletions(RuleChain<Context> rules) {
 		return rules.addTo(getRemovedContextInitRuleChain());
 	}
 
@@ -204,7 +205,7 @@ public class DifferentialIndex {
 	 *         indexed class expression
 	 */
 	public boolean registerContextRuleAdditions(IndexedClassExpression target,
-			ContextRules rules) {
+			RuleChain<Context> rules) {
 		IncrementalContextRuleChain result = indexAdditions.get(target);
 
 		if (result == null) {
@@ -228,7 +229,7 @@ public class DifferentialIndex {
 	 *         indexed class expression
 	 */
 	public boolean registerContextRuleDeletions(IndexedClassExpression target,
-			ContextRules rules) {
+			RuleChain<Context> rules) {
 		IncrementalContextRuleChain result = indexDeletions.get(target);
 
 		if (result == null) {

@@ -30,16 +30,17 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
-
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
-	private static final Logger LOGGER_ = Logger.getLogger(IndexedSubClassOfAxiom.class);	
-	
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IndexedSubClassOfAxiom.class);
+
 	protected final IndexedClassExpression subClass, superClass;
 
 	protected IndexedSubClassOfAxiom(IndexedClassExpression subClass,
@@ -49,14 +50,15 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, final int increment) {
+	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater,
+			final int increment) {
 		if (increment > 0) {
 			indexUpdater.add(subClass, new ThisCompositionRule(superClass));
 		} else {
 			indexUpdater.remove(subClass, new ThisCompositionRule(superClass));
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -68,18 +70,20 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		 */
 		private List<IndexedClassExpression> toldSuperClassExpressions_;
 
-		ThisCompositionRule(ContextRules tail) {
+		ThisCompositionRule(RuleChain<Context> tail) {
 			super(tail);
-			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(1);
+			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
+					1);
 		}
-		
+
 		/*
 		 * used for registration
 		 */
 		ThisCompositionRule(IndexedClassExpression ice) {
 			super(null);
-			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(1);
-			
+			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
+					1);
+
 			toldSuperClassExpressions_.add(ice);
 		}
 
@@ -107,74 +111,75 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		@Override
 		public void apply(SaturationState state, Context context) {
 
-			/*RuleStatistics stats = ruleEngine.getRulesTimer();
-
-			stats.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis;
-			stats.countSubClassOfRule++;*/
+			/*
+			 * RuleStatistics stats = ruleEngine.getRulesTimer();
+			 * 
+			 * stats.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis;
+			 * stats.countSubClassOfRule++;
+			 */
 
 			try {
 
 				for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-					state.produce(context,
-							new PositiveSuperClassExpression(implied));
+					state.produce(context, new PositiveSuperClassExpression(
+							implied));
 				}
 			} finally {
-				//stats.timeSubClassOfRule += CachedTimeThread.currentTimeMillis;
+				// stats.timeSubClassOfRule +=
+				// CachedTimeThread.currentTimeMillis;
 			}
 		}
 
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+		private static Matcher<RuleChain<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<RuleChain<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+		private static ReferenceFactory<RuleChain<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<RuleChain<Context>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ContextRules tail) {
+			public ThisCompositionRule create(RuleChain<Context> tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<ContextRules> ruleChain) {
-			return addTo(ruleChain, toldSuperClassExpressions_);
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ContextRules> ruleChain) {
-			return removeFrom(ruleChain, toldSuperClassExpressions_);
-		}
-		
-		public static boolean addTo(Chain<ContextRules> ruleChain, List<IndexedClassExpression> superClasses) {
-			ThisCompositionRule rule = ruleChain.getCreate(ThisCompositionRule.MATCHER_, ThisCompositionRule.FACTORY_);
+		public boolean addTo(Chain<RuleChain<Context>> ruleChain) {
+			ThisCompositionRule rule = ruleChain.getCreate(
+					ThisCompositionRule.MATCHER_, ThisCompositionRule.FACTORY_);
 			boolean changed = false;
-			
-			for (IndexedClassExpression ice : superClasses) {
+
+			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
 				changed |= rule.addToldSuperClassExpression(ice);
 			}
 
 			return changed;
+
 		}
 
-		static boolean removeFrom(Chain<ContextRules> ruleChain, List<IndexedClassExpression> superClasses) {
-			ThisCompositionRule rule = ruleChain.find(ThisCompositionRule.MATCHER_);
+		@Override
+		public boolean removeFrom(Chain<RuleChain<Context>> ruleChain) {
+			ThisCompositionRule rule = ruleChain
+					.find(ThisCompositionRule.MATCHER_);
 			boolean changed = false;
-			
+
 			if (rule != null) {
-				for (IndexedClassExpression ice : superClasses) {
+				for (IndexedClassExpression ice : toldSuperClassExpressions_) {
 					changed |= rule.removeToldSuperClassExpression(ice);
 				}
-				
+
 				if (rule.isEmpty()) {
 					ruleChain.remove(ThisCompositionRule.MATCHER_);
-					
+
 					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace("Removed SubClassOf rule, superclasses: " + superClasses);
+						LOGGER_.trace("Removed SubClassOf rule, superclasses: "
+								+ toldSuperClassExpressions_);
 					}
-					
+
 					return true;
 				}
 			}
-			
+
 			return changed;
-		}		
+
+		}
+
 	}
 }

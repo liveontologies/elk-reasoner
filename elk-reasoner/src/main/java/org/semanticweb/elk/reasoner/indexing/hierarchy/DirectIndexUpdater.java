@@ -26,7 +26,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.IndexRules;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 
 /**
  * An index updater through which the index data structures are modified
@@ -60,12 +61,12 @@ public class DirectIndexUpdater implements IndexUpdater {
 	}
 
 	@Override
-	public boolean add(IndexedClassExpression target, ContextRules rules) {
+	public boolean add(IndexedClassExpression target, RuleChain<Context> rules) {
 		return rules.addTo(target.getChainCompositionRules());
 	}
 
 	@Override
-	public boolean remove(IndexedClassExpression target, ContextRules rules) {
+	public boolean remove(IndexedClassExpression target, RuleChain<Context> rules) {
 		return rules.removeFrom(target.getChainCompositionRules());
 	}
 
@@ -80,12 +81,12 @@ public class DirectIndexUpdater implements IndexUpdater {
 	}
 
 	@Override
-	public boolean add(ContextRules rules) {
+	public boolean add(RuleChain<Context> rules) {
 		return rules.addTo(ontIndex_.getContextInitRuleChain());
 	}
 
 	@Override
-	public boolean remove(ContextRules rules) {
+	public boolean remove(RuleChain<Context> rules) {
 		return rules.removeFrom(ontIndex_.getContextInitRuleChain());
 	}
 }

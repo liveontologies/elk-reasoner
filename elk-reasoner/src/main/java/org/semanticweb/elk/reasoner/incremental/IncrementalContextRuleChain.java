@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.incremental;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
@@ -36,32 +36,33 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- *         
+ * 
  * @author "Yevgeny Kazakov"
  */
-public class IncrementalContextRuleChain extends AbstractChain<ContextRules> {
+public class IncrementalContextRuleChain extends
+		AbstractChain<RuleChain<Context>> implements Chain<RuleChain<Context>> {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalContextRuleChain.class);
 
-	private ContextRules contextRules_;
+	private RuleChain<Context> contextRules_;
 
-	public IncrementalContextRuleChain(ContextRules rules) {
+	public IncrementalContextRuleChain(RuleChain<Context> rules) {
 		contextRules_ = rules;
 	}
 
 	@Override
-	public ContextRules next() {
+	public RuleChain<Context> next() {
 		return contextRules_;
 	}
 
 	@Override
-	public void setNext(ContextRules tail) {
+	public void setNext(RuleChain<Context> tail) {
 		contextRules_ = tail;
 	}
 
 	public void apply(SaturationState state, Context context) {
-		ContextRules compositionRule = contextRules_;
+		RuleChain<Context> compositionRule = contextRules_;
 
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Applying rules to the index change in the context of "
@@ -76,8 +77,8 @@ public class IncrementalContextRuleChain extends AbstractChain<ContextRules> {
 		}
 	}
 
-	public void addTo(Chain<ContextRules> rules) {
-		ContextRules next = contextRules_;
+	public void addTo(Chain<RuleChain<Context>> rules) {
+		RuleChain<Context> next = contextRules_;
 
 		while (next != null) {
 			next.addTo(rules);
@@ -85,8 +86,8 @@ public class IncrementalContextRuleChain extends AbstractChain<ContextRules> {
 		}
 	}
 
-	public void removeFrom(Chain<ContextRules> rules) {
-		ContextRules next = contextRules_;
+	public void removeFrom(Chain<RuleChain<Context>> rules) {
+		RuleChain<Context> next = contextRules_;
 
 		while (next != null) {
 			next.removeFrom(rules);

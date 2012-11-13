@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.chains.ChainImpl;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 
@@ -123,7 +123,7 @@ public class SaturationState {
 	public void initContext(Context context) {
 		produce(context, new PositiveSuperClassExpression(context.getRoot()));
 		//apply all context initialization rules
-		ContextRules initRules = ontologyIndex_.getContextInitRules();
+		RuleChain<Context> initRules = ontologyIndex_.getContextInitRules();
 		
 		while (initRules != null) {
 			initRules.apply(this, context);

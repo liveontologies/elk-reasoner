@@ -1,7 +1,4 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
-
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,26 +21,35 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
  * #L%
  */
 
+import org.semanticweb.elk.util.collections.chains.Chain;
+
 /**
- * A rule that can be applied to elements of a particular type using a
- * {@link RuleEngine}.
+ * A {@link Rule} that can be inserted to or deleted from {@link Chain}s
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <E>
  *            the type of elements to which the rule can be applied
+ * 
+ * @see RuleChain
  */
-public interface Rule<E> {
+public interface ChainableRule<E> extends Rule<E> {
 
 	/**
-	 * Applying the rule to an element using a {@link RuleEngine}
+	 * Adds this {@link Rule} to the given {@link Chain}
 	 * 
-	 * @param state
-	 *            a {@link SaturationState} which could be changed as a result
-	 *            of this rule's application
-	 * @param element
-	 *            the element to which the rule is applied
+	 * @param ruleChain
+	 * @return {@code true} if the input {@link Chain} has been modified
+	 * 
 	 */
-	public void apply(SaturationState state, E element);
-	
+	public boolean addTo(Chain<RuleChain<E>> ruleChain);
+
+	/**
+	 * Removes this {@link Rule} from the given {@link Chain}
+	 * 
+	 * @param ruleChain
+	 * @return {@code true} if the input {@link Chain} has been modified
+	 */
+	public boolean removeFrom(Chain<RuleChain<E>> ruleChain);
+
 }

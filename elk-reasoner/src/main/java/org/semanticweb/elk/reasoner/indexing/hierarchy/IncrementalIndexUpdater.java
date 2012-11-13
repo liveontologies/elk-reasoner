@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.IndexRules;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 
 /**
  * An index updater that saves the changes into the {@link DifferentialIndex} object,
@@ -66,12 +67,12 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	}
 
 	@Override
-	public boolean add(IndexedClassExpression target, ContextRules rules) {
+	public boolean add(IndexedClassExpression target, RuleChain<Context> rules) {
 		return differentialIndex_.registerContextRuleAdditions(target, rules);
 	}
 
 	@Override
-	public boolean remove(IndexedClassExpression target, ContextRules rules) {
+	public boolean remove(IndexedClassExpression target, RuleChain<Context> rules) {
 		return differentialIndex_.registerContextRuleDeletions(target, rules);
 	}
 
@@ -86,12 +87,12 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	}
 
 	@Override
-	public boolean add(ContextRules rules) {
+	public boolean add(RuleChain<Context> rules) {
 		return differentialIndex_.registerContextInitRuleAdditions(rules);
 	}
 
 	@Override
-	public boolean remove(ContextRules rules) {
+	public boolean remove(RuleChain<Context> rules) {
 		return differentialIndex_.registerContextInitRuleDeletions(rules);
 	}
 }

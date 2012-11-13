@@ -31,7 +31,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -45,7 +46,7 @@ public class OntologyIndexImpl extends IndexedObjectCache implements OntologyInd
 	private final ElkAxiomIndexerVisitor directAxiomInserter_;
 	private final ElkAxiomIndexerVisitor directAxiomDeleter_;
 	
-	private ContextRules contextInitRules_ = null;
+	private RuleChain<Context> contextInitRules_ = null;
 	
 	public OntologyIndexImpl() {
 		elkObjectIndexer_ = new ElkObjectIndexerVisitor(this);
@@ -77,21 +78,21 @@ public class OntologyIndexImpl extends IndexedObjectCache implements OntologyInd
 	}
 
 	@Override
-	public ContextRules getContextInitRules() {
+	public RuleChain<Context> getContextInitRules() {
 		return contextInitRules_;
 	}
 	
 	@Override
-	public Chain<ContextRules> getContextInitRuleChain() {
-		return new AbstractChain<ContextRules>() {
+	public Chain<RuleChain<Context>> getContextInitRuleChain() {
+		return new AbstractChain<RuleChain<Context>>() {
 
 			@Override
-			public ContextRules next() {
+			public RuleChain<Context> next() {
 				return contextInitRules_;
 			}
 
 			@Override
-			public void setNext(ContextRules tail) {
+			public void setNext(RuleChain<Context> tail) {
 				contextInitRules_ = tail;
 			}
 		};

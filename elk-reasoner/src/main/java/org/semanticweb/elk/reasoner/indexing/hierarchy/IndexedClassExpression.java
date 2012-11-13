@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -47,7 +47,7 @@ abstract public class IndexedClassExpression implements
 
 	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
 
-	ContextRules compositionRules;
+	RuleChain<Context> compositionRules;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -190,30 +190,30 @@ abstract public class IndexedClassExpression implements
 			return 0;
 		else if (this.hashCode_ == o.hashCode_) {
 			/*
-			 * this should happen very rarely when structurally equal
-			 * expressions are identified; in this case we rely on the unique
-			 * string representation of indexed objects
+			 * hash code collision for different elements should happen very
+			 * rarely; in this case we rely on the unique string representation
+			 * of indexed objects to compare them
 			 */
 			return this.toString().compareTo(o.toString());
 		} else
 			return (this.hashCode_ < o.hashCode_ ? -1 : 1);
 	}
 
-	Chain<ContextRules> getChainCompositionRules() {
-		return new AbstractChain<ContextRules>() {
+	Chain<RuleChain<Context>> getChainCompositionRules() {
+		return new AbstractChain<RuleChain<Context>>() {
 			@Override
-			public ContextRules next() {
+			public RuleChain<Context> next() {
 				return compositionRules;
 			}
 
 			@Override
-			public void setNext(ContextRules tail) {
+			public void setNext(RuleChain<Context> tail) {
 				compositionRules = tail;
 			}
 		};
 	}
 
-	public ContextRules getCompositionRules() {
+	public RuleChain<Context> getCompositionRules() {
 		return compositionRules;
 	}
 

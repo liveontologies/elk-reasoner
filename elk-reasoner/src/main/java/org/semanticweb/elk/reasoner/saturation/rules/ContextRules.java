@@ -1,7 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.ChainImpl;
 
 /*
@@ -33,8 +32,8 @@ import org.semanticweb.elk.util.collections.chains.ChainImpl;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class ContextRules extends ChainImpl<ContextRules> implements
-		Rule<Context>, Chain<ContextRules> {
+public abstract class ContextRules extends ChainImpl<RuleChain<Context>>
+		implements RuleChain<Context> {
 
 	/**
 	 * Creates a new chain of {@link ContextRules} by appending to the given
@@ -43,23 +42,8 @@ public abstract class ContextRules extends ChainImpl<ContextRules> implements
 	 * @param tail
 	 *            a chain of {@link ContextRules} to be appended to this rule
 	 */
-	public ContextRules(ContextRules tail) {
+	public ContextRules(RuleChain<Context> tail) {
 		super(tail);
 	}
 
-	/**
-	 * Adds these rules to the given chain
-	 * 
-	 * @param ruleChain
-	 * @return
-	 */
-	public abstract boolean addTo(Chain<ContextRules> ruleChain);
-	
-	/**
-	 * Removes these rules from the given chain
-	 * 
-	 * @param ruleChain
-	 * @return
-	 */
-	public abstract boolean removeFrom(Chain<ContextRules> ruleChain);
 }
