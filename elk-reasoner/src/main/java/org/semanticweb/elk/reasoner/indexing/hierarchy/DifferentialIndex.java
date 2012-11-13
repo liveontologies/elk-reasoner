@@ -32,9 +32,10 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.incremental.IncrementalContextRuleChain;
+import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.indexing.IncrementalIndexRuleChain;
-import org.semanticweb.elk.reasoner.indexing.IndexRules;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetUnion;
@@ -186,12 +187,12 @@ public class DifferentialIndex {
 		};
 	}
 
-	public boolean registerContextInitRuleAdditions(RuleChain<Context> rules) {
-		return rules.addTo(getAddedContextInitRuleChain());
+	public boolean registerContextInitRuleAdditions(ChainableRule<Context> rule) {
+		return rule.addTo(getAddedContextInitRuleChain());
 	}
 
-	public boolean registerContextInitRuleDeletions(RuleChain<Context> rules) {
-		return rules.addTo(getRemovedContextInitRuleChain());
+	public boolean registerContextInitRuleDeletions(ChainableRule<Context> rule) {
+		return rule.addTo(getRemovedContextInitRuleChain());
 	}
 
 	/**
@@ -205,16 +206,17 @@ public class DifferentialIndex {
 	 *         indexed class expression
 	 */
 	public boolean registerContextRuleAdditions(IndexedClassExpression target,
-			RuleChain<Context> rules) {
-		IncrementalContextRuleChain result = indexAdditions.get(target);
+			ChainableRule<Context> rule) {
+		IncrementalContextRuleChain ruleChain = indexAdditions.get(target);
 
-		if (result == null) {
-			result = new IncrementalContextRuleChain(rules);
-			indexAdditions.put(target, result);
+		if (ruleChain == null) {
+			ruleChain = new IncrementalContextRuleChain();
+			rule.addTo(ruleChain);
+			indexAdditions.put(target, ruleChain);
 
 			return true;
 		} else {
-			return rules.addTo(result);
+			return rule.addTo(ruleChain);
 		}
 	}
 
@@ -229,44 +231,47 @@ public class DifferentialIndex {
 	 *         indexed class expression
 	 */
 	public boolean registerContextRuleDeletions(IndexedClassExpression target,
-			RuleChain<Context> rules) {
-		IncrementalContextRuleChain result = indexDeletions.get(target);
+			ChainableRule<Context> rule) {
+		IncrementalContextRuleChain ruleChain = indexDeletions.get(target);
 
-		if (result == null) {
-			result = new IncrementalContextRuleChain(rules);
-			indexDeletions.put(target, result);
+		if (ruleChain == null) {
+			ruleChain = new IncrementalContextRuleChain();
+			rule.addTo(ruleChain);
+			indexDeletions.put(target, ruleChain);
 
 			return true;
 		} else {
-			return rules.addTo(result);
+			return rule.addTo(ruleChain);
 		}
 	}
 
 	public boolean registerIndexRuleAdditions(IndexedClassExpression target,
-			IndexRules<IndexedClassExpression> rules) {
-		IncrementalIndexRuleChain result = indexRuleAdditions.get(target);
+			ChainableIndexRule<IndexedClassExpression> rule) {
+		IncrementalIndexRuleChain ruleChain = indexRuleAdditions.get(target);
 
-		if (result == null) {
-			result = new IncrementalIndexRuleChain(rules);
-			indexRuleAdditions.put(target, result);
+		if (ruleChain == null) {
+			ruleChain = new IncrementalIndexRuleChain();
+			rule.addTo(ruleChain);
+			indexRuleAdditions.put(target, ruleChain);
 
 			return true;
 		} else {
-			return rules.addTo(result);
+			return rule.addTo(ruleChain);
 		}
 	}
 
 	public boolean registerIndexRuleDeletions(IndexedClassExpression target,
-			IndexRules<IndexedClassExpression> rules) {
-		IncrementalIndexRuleChain result = indexRuleDeletions.get(target);
+			ChainableIndexRule<IndexedClassExpression> rule) {
+		IncrementalIndexRuleChain ruleChain = indexRuleDeletions.get(target);
 
-		if (result == null) {
-			result = new IncrementalIndexRuleChain(rules);
-			indexRuleDeletions.put(target, result);
+		if (ruleChain == null) {
+			ruleChain = new IncrementalIndexRuleChain();
+			rule.addTo(ruleChain);
+			indexRuleDeletions.put(target, ruleChain);
 
 			return true;
 		} else {
-			return rules.addTo(result);
+			return rule.addTo(ruleChain);
 		}
 	}
 

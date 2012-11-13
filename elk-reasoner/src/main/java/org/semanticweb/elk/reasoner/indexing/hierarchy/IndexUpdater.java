@@ -24,10 +24,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.IndexRules;
+import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
-
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 
 /**
  * Functions through which entries for indexed class expressions are updated.
@@ -36,24 +35,28 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
  * 
  */
 interface IndexUpdater {
-	
-	public boolean add(final IndexedClassExpression target, final RuleChain<Context> rules);
-	
-	public boolean remove(final IndexedClassExpression target, final RuleChain<Context> rules);
-	
-	public boolean add(final IndexedClassExpression target, final IndexRules<IndexedClassExpression> rules);
-	
-	public boolean remove(final IndexedClassExpression target, final IndexRules<IndexedClassExpression> rules);	
-	
-	public boolean add(final RuleChain<Context> rules);
-	
-	public boolean remove(final RuleChain<Context> rules);	
-	
+
+	public boolean add(final IndexedClassExpression target,
+			final ChainableRule<Context> rule);
+
+	public boolean remove(final IndexedClassExpression target,
+			final ChainableRule<Context> rule);
+
+	public boolean add(final IndexedClassExpression target,
+			final ChainableIndexRule<IndexedClassExpression> rule);
+
+	public boolean remove(final IndexedClassExpression target,
+			final ChainableIndexRule<IndexedClassExpression> rule);
+
+	public boolean add(final ChainableRule<Context> rule);
+
+	public boolean remove(final ChainableRule<Context> rule);
+
 	public void addClass(ElkClass newClass);
 
-	public void removeClass(ElkClass oldClass);	
-	
+	public void removeClass(ElkClass oldClass);
+
 	public void addNamedIndividual(ElkNamedIndividual newIndividual);
 
-	public void removeNamedIndividual(ElkNamedIndividual newIndividual);	
+	public void removeNamedIndividual(ElkNamedIndividual newIndividual);
 }

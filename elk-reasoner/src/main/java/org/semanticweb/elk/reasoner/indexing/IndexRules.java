@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing;
  * #L%
  */
 
-import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.ChainImpl;
 
 /**
@@ -32,9 +31,9 @@ import org.semanticweb.elk.util.collections.chains.ChainImpl;
  *
  * pavel.klinov@uni-ulm.de
  */
-public abstract class IndexRules<T> extends ChainImpl<IndexRules<T>> implements IndexRule<T, Boolean> {
+public abstract class IndexRules<T> extends ChainImpl<IndexRuleChain<T>> implements IndexRuleChain<T> {
 
-	protected IndexRules(IndexRules<T> tail) {
+	protected IndexRules(IndexRuleChain<T> tail) {
 		super(tail);
 	}
 	
@@ -61,20 +60,5 @@ public abstract class IndexRules<T> extends ChainImpl<IndexRules<T>> implements 
 		
 		return changed;
 	}*/	
-	
-	/**
-	 * Adds these rules to the given chain
-	 * 
-	 * @param ruleChain
-	 * @return
-	 */
-	public abstract boolean addTo(Chain<IndexRules<T>> ruleChain);
-	
-	/**
-	 * Removes these rules from the given chain
-	 * 
-	 * @param ruleChain
-	 * @return
-	 */
-	public abstract boolean removeFrom(Chain<IndexRules<T>> ruleChain);	
+			
 }

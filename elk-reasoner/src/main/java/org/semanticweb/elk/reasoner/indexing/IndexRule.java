@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.indexing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,22 +25,28 @@ package org.semanticweb.elk.reasoner.indexing;
  * #L%
  */
 
-
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <T>
+ *            the type of elements to which the index rule can be applied
  */
-public interface IndexRule<T, R> {
+public interface IndexRule<T> {
 
 	/**
 	 * Applying the rule to an indexed element
 	 * 
 	 * @param element
 	 *            the element to which the rule is applied
+	 * @return {@code true} if the input has changed in the result of the
+	 *         operation
 	 */
-	public R apply(T element);
-	
-	public R deapply(T element);
+	public boolean apply(T element);
+
+	public boolean deapply(T element);
 
 }

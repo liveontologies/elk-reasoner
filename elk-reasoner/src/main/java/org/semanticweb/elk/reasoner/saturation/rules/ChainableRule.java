@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.collections.chains.Chainable;
 
 /**
  * A {@link Rule} that can be inserted to or deleted from {@link Chain}s
@@ -33,23 +35,6 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * 
  * @see RuleChain
  */
-public interface ChainableRule<E> extends Rule<E> {
-
-	/**
-	 * Adds this {@link Rule} to the given {@link Chain}
-	 * 
-	 * @param ruleChain
-	 * @return {@code true} if the input {@link Chain} has been modified
-	 * 
-	 */
-	public boolean addTo(Chain<RuleChain<E>> ruleChain);
-
-	/**
-	 * Removes this {@link Rule} from the given {@link Chain}
-	 * 
-	 * @param ruleChain
-	 * @return {@code true} if the input {@link Chain} has been modified
-	 */
-	public boolean removeFrom(Chain<RuleChain<E>> ruleChain);
+public interface ChainableRule<E> extends Rule<E>, Chainable<RuleChain<E>> {
 
 }

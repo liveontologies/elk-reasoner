@@ -1,5 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.rules;
-
+package org.semanticweb.elk.reasoner.indexing;
 /*
  * #%L
  * ELK Reasoner
@@ -25,17 +24,17 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
- * A chain of the rules that can be applied to elements of a particular type
- * {@link RuleEngine}.
+ * A chain of {@link IndexRule}s
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <E>
- *            the type of elements to which the rule can be applied
+ *            the type of elements to which the index rules can be applied
  * 
- * @see ChainableRule
+ * @see ChainableIndexRule
  * 
  */
-public interface RuleChain<E> extends ChainableRule<E>, Chain<RuleChain<E>> {
+public interface IndexRuleChain<E> extends ChainableIndexRule<E>,
+		Chain<IndexRuleChain<E>> {
 
 }

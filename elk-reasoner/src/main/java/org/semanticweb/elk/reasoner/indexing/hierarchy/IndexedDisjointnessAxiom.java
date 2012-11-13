@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -141,7 +142,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class ThisCompositionRule extends ContextRules {
+	private static class ThisCompositionRule extends ContextRules implements
+			ChainableRule<Context> {
 
 		/**
 		 * {@link IndexedClassExpression} that appear in binary disjointness

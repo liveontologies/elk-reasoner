@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.IndexRuleChain;
 import org.semanticweb.elk.reasoner.indexing.IndexRules;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
@@ -322,7 +323,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		private final Set<IndexedObjectProperty> properties_ = new ArrayHashSet<IndexedObjectProperty>(
 				16);
 
-		private PosExistentialRule(IndexRules<IndexedClassExpression> tail) {
+		private PosExistentialRule(IndexRuleChain<IndexedClassExpression> tail) {
 			super(tail);
 		}
 
@@ -331,19 +332,20 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			properties_.add(property);
 		}
 
-		private static Matcher<IndexRules<IndexedClassExpression>, PosExistentialRule> MATCHER_ = new SimpleTypeBasedMatcher<IndexRules<IndexedClassExpression>, PosExistentialRule>(
+		private static Matcher<IndexRuleChain<IndexedClassExpression>, PosExistentialRule> MATCHER_ = new SimpleTypeBasedMatcher<IndexRuleChain<IndexedClassExpression>, PosExistentialRule>(
 				PosExistentialRule.class);
 
-		private static ReferenceFactory<IndexRules<IndexedClassExpression>, PosExistentialRule> FACTORY_ = new ReferenceFactory<IndexRules<IndexedClassExpression>, PosExistentialRule>() {
+		private static ReferenceFactory<IndexRuleChain<IndexedClassExpression>, PosExistentialRule> FACTORY_ = new ReferenceFactory<IndexRuleChain<IndexedClassExpression>, PosExistentialRule>() {
 			@Override
 			public PosExistentialRule create(
-					IndexRules<IndexedClassExpression> tail) {
+					IndexRuleChain<IndexedClassExpression> tail) {
 				return new PosExistentialRule(tail);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<IndexRules<IndexedClassExpression>> ruleChain) {
+		public boolean addTo(
+				Chain<IndexRuleChain<IndexedClassExpression>> ruleChain) {
 			PosExistentialRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 
 			return rule.properties_.addAll(properties_);
@@ -351,7 +353,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public boolean removeFrom(
-				Chain<IndexRules<IndexedClassExpression>> ruleChain) {
+				Chain<IndexRuleChain<IndexedClassExpression>> ruleChain) {
 			PosExistentialRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 
@@ -367,7 +369,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public Boolean apply(IndexedClassExpression filler) {
+		public boolean apply(IndexedClassExpression filler) {
 			boolean changed = false;
 
 			for (IndexedObjectProperty property : properties_) {
@@ -378,7 +380,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public Boolean deapply(IndexedClassExpression filler) {
+		public boolean deapply(IndexedClassExpression filler) {
 			boolean changed = false;
 
 			for (IndexedObjectProperty property : properties_) {
@@ -387,5 +389,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 			return changed;
 		}
+
 	}
 }

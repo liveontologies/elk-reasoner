@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -135,7 +136,8 @@ public class IndexedClass extends IndexedClassEntity {
 	 * Adds {@code owl:Thing} to the context (it should be registered iff Thing
 	 * occurs negatively)
 	 */
-	private static class OwlThingContextInitializationRule extends ContextRules {
+	private static class OwlThingContextInitializationRule extends ContextRules
+			implements ChainableRule<Context> {
 
 		private OwlThingContextInitializationRule(RuleChain<Context> tail) {
 			super(tail);

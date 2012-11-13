@@ -33,13 +33,7 @@ package org.semanticweb.elk.util.collections.chains;
  *            The type of elements in the chain.
  */
 public abstract class AbstractChain<T extends Reference<T>> implements Chain<T> {
-
-	@Override
-	public abstract T next();
-
-	@Override
-	public abstract void setNext(T tail);
-
+	
 	@Override
 	public <S extends T> S find(Matcher<T, S> matcher) {
 		T candidate = next();

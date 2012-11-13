@@ -24,10 +24,10 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.IndexRules;
+import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 
 /**
  * An index updater through which the index data structures are modified
@@ -39,11 +39,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 public class DirectIndexUpdater implements IndexUpdater {
 
 	private final OntologyIndex ontIndex_;
-	
+
 	public DirectIndexUpdater(OntologyIndex index) {
 		ontIndex_ = index;
 	}
-	
+
 	@Override
 	public void addClass(ElkClass newClass) {
 	}
@@ -51,7 +51,7 @@ public class DirectIndexUpdater implements IndexUpdater {
 	@Override
 	public void removeClass(ElkClass oldClass) {
 	}
-	
+
 	@Override
 	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
 	}
@@ -61,32 +61,36 @@ public class DirectIndexUpdater implements IndexUpdater {
 	}
 
 	@Override
-	public boolean add(IndexedClassExpression target, RuleChain<Context> rules) {
-		return rules.addTo(target.getChainCompositionRules());
+	public boolean add(IndexedClassExpression target,
+			ChainableRule<Context> rule) {
+		return rule.addTo(target.getChainCompositionRules());
 	}
 
 	@Override
-	public boolean remove(IndexedClassExpression target, RuleChain<Context> rules) {
-		return rules.removeFrom(target.getChainCompositionRules());
+	public boolean remove(IndexedClassExpression target,
+			ChainableRule<Context> rule) {
+		return rule.removeFrom(target.getChainCompositionRules());
 	}
 
 	@Override
-	public boolean add(IndexedClassExpression target, 	IndexRules<IndexedClassExpression> rules) {
-		return rules.apply(target);
+	public boolean add(IndexedClassExpression target,
+			ChainableIndexRule<IndexedClassExpression> rule) {
+		return rule.apply(target);
 	}
 
 	@Override
-	public boolean remove(IndexedClassExpression target, IndexRules<IndexedClassExpression> rules) {
-		return rules.deapply(target);
+	public boolean remove(IndexedClassExpression target,
+			ChainableIndexRule<IndexedClassExpression> rule) {
+		return rule.deapply(target);
 	}
 
 	@Override
-	public boolean add(RuleChain<Context> rules) {
-		return rules.addTo(ontIndex_.getContextInitRuleChain());
+	public boolean add(ChainableRule<Context> rule) {
+		return rule.addTo(ontIndex_.getContextInitRuleChain());
 	}
 
 	@Override
-	public boolean remove(RuleChain<Context> rules) {
-		return rules.removeFrom(ontIndex_.getContextInitRuleChain());
+	public boolean remove(ChainableRule<Context> rule) {
+		return rule.removeFrom(ontIndex_.getContextInitRuleChain());
 	}
 }

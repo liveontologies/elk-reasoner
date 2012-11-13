@@ -47,6 +47,10 @@ public class IncrementalContextRuleChain extends
 
 	private RuleChain<Context> contextRules_;
 
+	public IncrementalContextRuleChain() {
+		contextRules_ = null;
+	}
+
 	public IncrementalContextRuleChain(RuleChain<Context> rules) {
 		contextRules_ = rules;
 	}

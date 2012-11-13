@@ -24,15 +24,15 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.IndexRules;
+import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 
 /**
- * An index updater that saves the changes into the {@link DifferentialIndex} object,
- * instead of immediately applying them for the affected indexed objects. The
- * changes can be committed to the indexed object all at once by calling the
- * respective method.
+ * An index updater that saves the changes into the {@link DifferentialIndex}
+ * object, instead of immediately applying them for the affected indexed
+ * objects. The changes can be committed to the indexed object all at once by
+ * calling the respective method.
  * 
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
@@ -55,7 +55,7 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	public void removeClass(ElkClass oldClass) {
 		differentialIndex_.removedClasses.add(oldClass);
 	}
-	
+
 	@Override
 	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
 		differentialIndex_.addedIndividuals.add(newIndividual);
@@ -67,32 +67,36 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	}
 
 	@Override
-	public boolean add(IndexedClassExpression target, RuleChain<Context> rules) {
-		return differentialIndex_.registerContextRuleAdditions(target, rules);
+	public boolean add(IndexedClassExpression target,
+			ChainableRule<Context> rule) {
+		return differentialIndex_.registerContextRuleAdditions(target, rule);
 	}
 
 	@Override
-	public boolean remove(IndexedClassExpression target, RuleChain<Context> rules) {
-		return differentialIndex_.registerContextRuleDeletions(target, rules);
+	public boolean remove(IndexedClassExpression target,
+			ChainableRule<Context> rule) {
+		return differentialIndex_.registerContextRuleDeletions(target, rule);
 	}
 
 	@Override
-	public boolean add(IndexedClassExpression target,	IndexRules<IndexedClassExpression> rules) {
-		return differentialIndex_.registerIndexRuleAdditions(target, rules);
+	public boolean add(IndexedClassExpression target,
+			ChainableIndexRule<IndexedClassExpression> rule) {
+		return differentialIndex_.registerIndexRuleAdditions(target, rule);
 	}
 
 	@Override
-	public boolean remove(IndexedClassExpression target, IndexRules<IndexedClassExpression> rules) {
-		return differentialIndex_.registerIndexRuleDeletions(target, rules);
+	public boolean remove(IndexedClassExpression target,
+			ChainableIndexRule<IndexedClassExpression> rule) {
+		return differentialIndex_.registerIndexRuleDeletions(target, rule);
 	}
 
 	@Override
-	public boolean add(RuleChain<Context> rules) {
-		return differentialIndex_.registerContextInitRuleAdditions(rules);
+	public boolean add(ChainableRule<Context> rule) {
+		return differentialIndex_.registerContextInitRuleAdditions(rule);
 	}
 
 	@Override
-	public boolean remove(RuleChain<Context> rules) {
-		return differentialIndex_.registerContextInitRuleDeletions(rules);
+	public boolean remove(ChainableRule<Context> rule) {
+		return differentialIndex_.registerContextInitRuleDeletions(rule);
 	}
 }
