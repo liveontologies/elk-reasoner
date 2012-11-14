@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,4 +38,8 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 public interface IndexRuleChain<E> extends ChainableIndexRule<E>,
 		Chain<IndexRuleChain<E>> {
 
+	public boolean applyAll(E element);
+
+	public boolean deapplyAll(E element);
+	
 }

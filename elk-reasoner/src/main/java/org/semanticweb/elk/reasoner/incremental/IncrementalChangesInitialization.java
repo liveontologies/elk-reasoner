@@ -56,11 +56,11 @@ public class IncrementalChangesInitialization
 
 	public IncrementalChangesInitialization(
 			Collection<IndexedClassExpression> inputs,
-			Map<IndexedClassExpression, RuleChain<Context>> changes,
-			SaturationState state, ComputationExecutor executor,
-			int maxWorkers, ProgressMonitor progressMonitor,
 			RuleChain<Context> changedGlobalRules,
-			boolean expectAllContextsSaturated) {
+			Map<IndexedClassExpression, RuleChain<Context>> changes,
+			SaturationState state, boolean expectAllContextsSaturated,
+			ComputationExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
 				changedGlobalRules, expectAllContextsSaturated), executor,
 				maxWorkers, progressMonitor);
@@ -111,27 +111,16 @@ class ContextInitializationFactory
 					}
 
 					if (changedGlobalRules_ != null) {
-						// apply changes in the global context rules
-						RuleChain<Context> rule = changedGlobalRules_;
-						for (;;) {
-							if (rule == null)
-								break;
-							rule.apply(saturationState_, context);
-							rule = rule.next();
-						}
+						// apply all changed global context rules
+						changedGlobalRules_.applyAll(saturationState_, context);
 					}
 
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
 							indexChanges_.keySet(),
 							context.getSuperClassExpressions())) {
-						// applying the changes for this class expression
-						RuleChain<Context> rule = indexChanges_.get(changedICE);
-						for (;;) {
-							if (rule == null)
-								break;
-							rule.apply(saturationState_, context);
-							rule = rule.next();
-						}
+						// applying the changed rules for this class expression
+						indexChanges_.get(changedICE).applyAll(
+								saturationState_, context);
 					}
 				}
 			}

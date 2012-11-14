@@ -109,15 +109,15 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		initialization_ = new IncrementalChangesInitialization(
 				reasoner.ontologyIndex.getIndexedClassExpressions(),
 				deletions_ ? reasoner.incrementalState.diffIndex
-						.getIndexDeletions()
-						: reasoner.incrementalState.diffIndex
-								.getIndexAdditions(), reasoner.saturationState,
-				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(),
-				deletions_ ? reasoner.incrementalState.diffIndex
 						.getRemovedContextInitRules()
 						: reasoner.incrementalState.diffIndex
-								.getAddedContextInitRules(), deletions_);
+								.getAddedContextInitRules(),
+				deletions_ ? reasoner.incrementalState.diffIndex
+						.getRemovedContextRulesByClassExpressions()
+						: reasoner.incrementalState.diffIndex
+								.getAddedContextRulesByClassExpressions(), reasoner.saturationState,
+				deletions_, reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor());
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.ChainImpl;
@@ -69,6 +70,16 @@ public abstract class ContextRules extends ChainImpl<RuleChain<Context>>
 				break;
 		}
 		return result;
+	}
+
+	@Override
+	public void applyAll(SaturationState state, Context context) {
+		RuleChain<Context> current = this;
+		for (;;) {
+			current.apply(state, context);
+			if ((current = current.next()) == null)
+				break;
+		}
 	}
 
 }

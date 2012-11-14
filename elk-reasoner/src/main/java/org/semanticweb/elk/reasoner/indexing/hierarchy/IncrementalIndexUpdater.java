@@ -69,34 +69,34 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	@Override
 	public boolean add(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		return differentialIndex_.registerContextRuleAdditions(target, rule);
+		return differentialIndex_.registerAddedContextRule(target, rule);
 	}
 
 	@Override
 	public boolean remove(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		return differentialIndex_.registerContextRuleDeletions(target, rule);
+		return differentialIndex_.registerRemovedContextRule(target, rule);
 	}
 
 	@Override
 	public boolean add(IndexedClassExpression target,
 			ChainableIndexRule<IndexedClassExpression> rule) {
-		return differentialIndex_.registerIndexRuleAdditions(target, rule);
+		return differentialIndex_.registerAddedIndexRule(target, rule);
 	}
 
 	@Override
 	public boolean remove(IndexedClassExpression target,
 			ChainableIndexRule<IndexedClassExpression> rule) {
-		return differentialIndex_.registerIndexRuleDeletions(target, rule);
+		return differentialIndex_.registerRemovedIndexRule(target, rule);
 	}
 
 	@Override
 	public boolean add(ChainableRule<Context> rule) {
-		return differentialIndex_.registerContextInitRuleAdditions(rule);
+		return differentialIndex_.registerAddedContextInitRule(rule);
 	}
 
 	@Override
 	public boolean remove(ChainableRule<Context> rule) {
-		return differentialIndex_.registerContextInitRuleDeletions(rule);
+		return differentialIndex_.registerRemovedContextInitRule(rule);
 	}
 }

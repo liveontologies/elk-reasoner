@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.indexing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,37 +29,56 @@ import org.semanticweb.elk.util.collections.chains.ChainImpl;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public abstract class IndexRules<T> extends ChainImpl<IndexRuleChain<T>> implements IndexRuleChain<T> {
+public abstract class IndexRules<T> extends ChainImpl<IndexRuleChain<T>>
+		implements IndexRuleChain<T> {
 
 	protected IndexRules(IndexRuleChain<T> tail) {
 		super(tail);
 	}
-	
-/*	@Override
-	public Boolean apply(T target) {
-		IndexRule<T, Boolean> next = null;
-		boolean changed = false;
-		
-		while((next = next()) != null) {
-			changed |= next.apply(target).booleanValue();
+
+	@Override
+	public boolean applyAll(T element) {
+		IndexRuleChain<T> current = this;
+		boolean result = false;
+		for (;;) {
+			result |= current.apply(element);
+			if ((current = current.next()) == null)
+				break;
 		}
-		
-		return changed;
+		return result;
+	}
+
+	@Override
+	public boolean deapplyAll(T element) {
+		IndexRuleChain<T> current = this;
+		boolean result = false;
+		for (;;) {
+			result |= current.deapply(element);
+			if ((current = current.next()) == null)
+				break;
+		}
+		return result;
 	}
 	
-	@Override
-	public Boolean deapply(T target) {
-		IndexRule<T, Boolean> next = null;
-		boolean changed = false;
-		
-		while((next = next()) != null) {
-			changed |= next.deapply(target).booleanValue();
-		}
-		
-		return changed;
-	}*/	
-			
+	/*
+	 * @Override public Boolean apply(T target) { IndexRule<T, Boolean> next =
+	 * null; boolean changed = false;
+	 * 
+	 * while((next = next()) != null) { changed |=
+	 * next.apply(target).booleanValue(); }
+	 * 
+	 * return changed; }
+	 * 
+	 * @Override public Boolean deapply(T target) { IndexRule<T, Boolean> next =
+	 * null; boolean changed = false;
+	 * 
+	 * while((next = next()) != null) { changed |=
+	 * next.deapply(target).booleanValue(); }
+	 * 
+	 * return changed; }
+	 */
+
 }
