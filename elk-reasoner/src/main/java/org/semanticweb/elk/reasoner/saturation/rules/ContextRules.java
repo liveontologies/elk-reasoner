@@ -1,6 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.ChainImpl;
 
 /*
@@ -44,6 +45,30 @@ public abstract class ContextRules extends ChainImpl<RuleChain<Context>>
 	 */
 	public ContextRules(RuleChain<Context> tail) {
 		super(tail);
+	}
+
+	@Override
+	public boolean addAllTo(Chain<RuleChain<Context>> chain) {
+		RuleChain<Context> current = this;
+		boolean result = false;
+		for (;;) {
+			result |= current.addTo(chain);
+			if ((current = current.next()) == null)
+				break;
+		}
+		return result;
+	}
+
+	@Override
+	public boolean removeAllFrom(Chain<RuleChain<Context>> chain) {
+		RuleChain<Context> current = this;
+		boolean result = false;
+		for (;;) {
+			result |= current.removeFrom(chain);
+			if ((current = current.next()) == null)
+				break;
+		}
+		return result;
 	}
 
 }

@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -55,10 +56,10 @@ public class IncrementalChangesInitialization
 
 	public IncrementalChangesInitialization(
 			Collection<IndexedClassExpression> inputs,
-			Map<IndexedClassExpression, IncrementalContextRuleChain> changes,
+			Map<IndexedClassExpression, RuleChain<Context>> changes,
 			SaturationState state, ComputationExecutor executor,
 			int maxWorkers, ProgressMonitor progressMonitor,
-			IncrementalContextRuleChain changedGlobalRules,
+			RuleChain<Context> changedGlobalRules,
 			boolean expectAllContextsSaturated) {
 		super(inputs, new ContextInitializationFactory(state, changes,
 				changedGlobalRules, expectAllContextsSaturated), executor,
@@ -74,14 +75,13 @@ class ContextInitializationFactory
 	// Logger.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState saturationState_;
-	private final Map<IndexedClassExpression, IncrementalContextRuleChain> indexChanges_;
-	private final IncrementalContextRuleChain changedGlobalRules_;
+	private final Map<IndexedClassExpression, RuleChain<Context>> indexChanges_;
+	private final RuleChain<Context> changedGlobalRules_;
 	private final boolean expectAllContextsSaturated_;
 
-	public ContextInitializationFactory(
-			SaturationState state,
-			Map<IndexedClassExpression, IncrementalContextRuleChain> indexChanges,
-			IncrementalContextRuleChain changedGlobalRules,
+	public ContextInitializationFactory(SaturationState state,
+			Map<IndexedClassExpression, RuleChain<Context>> indexChanges,
+			RuleChain<Context> changedGlobalRules,
 			boolean expectAllContextsSaturated) {
 		saturationState_ = state;
 		indexChanges_ = indexChanges;
@@ -112,16 +112,26 @@ class ContextInitializationFactory
 
 					if (changedGlobalRules_ != null) {
 						// apply changes in the global context rules
-						changedGlobalRules_.apply(saturationState_, context);
+						RuleChain<Context> rule = changedGlobalRules_;
+						for (;;) {
+							if (rule == null)
+								break;
+							rule.apply(saturationState_, context);
+							rule = rule.next();
+						}
 					}
 
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
 							indexChanges_.keySet(),
 							context.getSuperClassExpressions())) {
-						IncrementalContextRuleChain changes = indexChanges_
-								.get(changedICE);
-						// applying the changes to this context
-						changes.apply(saturationState_, context);
+						// applying the changes for this class expression
+						RuleChain<Context> rule = indexChanges_.get(changedICE);
+						for (;;) {
+							if (rule == null)
+								break;
+							rule.apply(saturationState_, context);
+							rule = rule.next();
+						}
 					}
 				}
 			}

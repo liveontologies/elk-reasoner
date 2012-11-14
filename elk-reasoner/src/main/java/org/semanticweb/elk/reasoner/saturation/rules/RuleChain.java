@@ -38,4 +38,21 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  */
 public interface RuleChain<E> extends ChainableRule<E>, Chain<RuleChain<E>> {
 
+	/**
+	 * Adds all rules in this chain to the given {@link Chain}
+	 * 
+	 * @param ruleChain
+	 * @return {@code true} if the input {@link Chain} has been modified
+	 * 
+	 */
+	public boolean addAllTo(Chain<RuleChain<E>> chain);
+
+	/**
+	 * Removes all rules in this chain from the given {@link Chain}
+	 * 
+	 * @param ruleChain
+	 * @return {@code true} if the input {@link Chain} has been modified
+	 */
+	public boolean removeAllFrom(Chain<RuleChain<E>> chain);
+
 }

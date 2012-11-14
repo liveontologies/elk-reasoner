@@ -31,9 +31,9 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.incremental.IncrementalContextRuleChain;
 import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.indexing.IncrementalIndexRuleChain;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
@@ -62,7 +62,7 @@ public class DifferentialIndex {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(DifferentialIndex.class);
 
-	private final DirectIndexUpdater directUpdater_;
+	private final OntologyIndex mainIndex_;
 
 	RuleChain<Context> addedContextInitRules_ = null;
 
@@ -73,14 +73,14 @@ public class DifferentialIndex {
 	 * indexed class expression to dummy index class expression objects whose
 	 * fields represent the added entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, IncrementalContextRuleChain> indexAdditions;
+	final Map<IndexedClassExpression, RuleChain<Context>> indexAdditions;
 
 	/**
 	 * The map representing entries to be removed from the ontology index; it
 	 * maps indexed class expression to dummy index class expression objects
 	 * whose fields represent the removed entries for these class expressions
 	 */
-	final Map<IndexedClassExpression, IncrementalContextRuleChain> indexDeletions;
+	final Map<IndexedClassExpression, RuleChain<Context>> indexDeletions;
 
 	final Map<IndexedClassExpression, IncrementalIndexRuleChain> indexRuleAdditions;
 	final Map<IndexedClassExpression, IncrementalIndexRuleChain> indexRuleDeletions;
@@ -109,11 +109,11 @@ public class DifferentialIndex {
 
 	private final ElkAxiomIndexerVisitor axiomDeleter_;
 
-	public DifferentialIndex(DirectIndexUpdater directUpdater,
+	public DifferentialIndex(OntologyIndex mainIndex,
 			IndexedObjectCache objectCache, IndexedClass owlNothing) {
-		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, IncrementalContextRuleChain>(
+		this.indexAdditions = new ArrayHashMap<IndexedClassExpression, RuleChain<Context>>(
 				127);
-		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, IncrementalContextRuleChain>(
+		this.indexDeletions = new ArrayHashMap<IndexedClassExpression, RuleChain<Context>>(
 				127);
 		this.indexRuleAdditions = new ArrayHashMap<IndexedClassExpression, IncrementalIndexRuleChain>(
 				127);
@@ -127,7 +127,7 @@ public class DifferentialIndex {
 				owlNothing, new IncrementalIndexUpdater(this), true);
 		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
 				owlNothing, new IncrementalIndexUpdater(this), false);
-		this.directUpdater_ = directUpdater;
+		this.mainIndex_ = mainIndex;
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class DifferentialIndex {
 	 *         objects containing index additions for these class expressions
 	 * 
 	 */
-	public Map<IndexedClassExpression, IncrementalContextRuleChain> getIndexAdditions() {
+	public Map<IndexedClassExpression, RuleChain<Context>> getIndexAdditions() {
 		return this.indexAdditions;
 	}
 
@@ -143,18 +143,54 @@ public class DifferentialIndex {
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index deletions for these class expressions
 	 */
-	public Map<IndexedClassExpression, IncrementalContextRuleChain> getIndexDeletions() {
+	public Map<IndexedClassExpression, RuleChain<Context>> getIndexDeletions() {
 		return this.indexDeletions;
 	}
 
-	public IncrementalContextRuleChain getAddedContextInitRules() {
-		return addedContextInitRules_ == null ? null
-				: new IncrementalContextRuleChain(addedContextInitRules_);
+	public Chain<RuleChain<Context>> getIndexAdditionsChain(
+			final IndexedClassExpression target) {
+		return new AbstractChain<RuleChain<Context>>() {
+
+			@Override
+			public RuleChain<Context> next() {
+				return indexAdditions.get(target);
+			}
+
+			@Override
+			public void setNext(RuleChain<Context> tail) {
+				if (tail == null)
+					indexAdditions.remove(target);
+				else
+					indexAdditions.put(target, tail);
+			}
+		};
 	}
 
-	public IncrementalContextRuleChain getRemovedContextInitRules() {
-		return removedContextInitRules_ == null ? null
-				: new IncrementalContextRuleChain(removedContextInitRules_);
+	public Chain<RuleChain<Context>> getIndexDeletionsChain(
+			final IndexedClassExpression target) {
+		return new AbstractChain<RuleChain<Context>>() {
+
+			@Override
+			public RuleChain<Context> next() {
+				return indexDeletions.get(target);
+			}
+
+			@Override
+			public void setNext(RuleChain<Context> tail) {
+				if (tail == null)
+					indexDeletions.remove(target);
+				else
+					indexDeletions.put(target, tail);
+			}
+		};
+	}
+
+	public RuleChain<Context> getAddedContextInitRules() {
+		return addedContextInitRules_;
+	}
+
+	public RuleChain<Context> getRemovedContextInitRules() {
+		return removedContextInitRules_;
 	}
 
 	public Chain<RuleChain<Context>> getAddedContextInitRuleChain() {
@@ -207,17 +243,7 @@ public class DifferentialIndex {
 	 */
 	public boolean registerContextRuleAdditions(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		IncrementalContextRuleChain ruleChain = indexAdditions.get(target);
-
-		if (ruleChain == null) {
-			ruleChain = new IncrementalContextRuleChain();
-			rule.addTo(ruleChain);
-			indexAdditions.put(target, ruleChain);
-
-			return true;
-		} else {
-			return rule.addTo(ruleChain);
-		}
+		return rule.addTo(getIndexAdditionsChain(target));
 	}
 
 	/**
@@ -232,17 +258,7 @@ public class DifferentialIndex {
 	 */
 	public boolean registerContextRuleDeletions(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		IncrementalContextRuleChain ruleChain = indexDeletions.get(target);
-
-		if (ruleChain == null) {
-			ruleChain = new IncrementalContextRuleChain();
-			rule.addTo(ruleChain);
-			indexDeletions.put(target, ruleChain);
-
-			return true;
-		} else {
-			return rule.addTo(ruleChain);
-		}
+		return rule.addTo(getIndexDeletionsChain(target));
 	}
 
 	public boolean registerIndexRuleAdditions(IndexedClassExpression target,
@@ -314,14 +330,18 @@ public class DifferentialIndex {
 				LOGGER_.trace("Committing context rule deletions for " + target);
 			}
 
-			indexDeletions.get(target).removeFrom(
+			indexDeletions.get(target).removeAllFrom(
 					target.getChainCompositionRules());
 		}
 
 		indexDeletions.clear();
 
 		for (IndexedClassExpression target : indexAdditions.keySet()) {
-			indexAdditions.get(target).addTo(target.getChainCompositionRules());
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Committing context rule additions for " + target);
+			}
+			indexAdditions.get(target).addAllTo(
+					target.getChainCompositionRules());
 		}
 
 		indexAdditions.clear();
@@ -346,12 +366,14 @@ public class DifferentialIndex {
 		// commit changes in the context initialization rules
 
 		if (addedContextInitRules_ != null) {
-			directUpdater_.add(addedContextInitRules_);
+			addedContextInitRules_.addAllTo(mainIndex_
+					.getContextInitRuleChain());
 			addedContextInitRules_ = null;
 		}
 
 		if (removedContextInitRules_ != null) {
-			directUpdater_.remove(removedContextInitRules_);
+			removedContextInitRules_.removeAllFrom(mainIndex_
+					.getContextInitRuleChain());
 			removedContextInitRules_ = null;
 		}
 	}
