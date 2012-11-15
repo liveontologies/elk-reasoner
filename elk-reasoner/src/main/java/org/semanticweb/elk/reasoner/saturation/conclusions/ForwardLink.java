@@ -67,10 +67,10 @@ public class ForwardLink implements Conclusion {
 	}
 
 	@Override
-	public void apply(SaturationState state, Context context) {
+	public void apply(SaturationState.Engine engine, Context context) {
 
-		//ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		//statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
+		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
+		// statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
 		try {
 
 			/* compose the link with all backward links */
@@ -88,53 +88,50 @@ public class ForwardLink implements Conclusion {
 
 				for (IndexedPropertyChain composition : compositions)
 					for (Context source : sources) {
-						state.produce(target_, new BackwardLink(source,
+						engine.produce(target_, new BackwardLink(source,
 								composition));
 					}
 			}
 		} finally {
-			//statistics.forwLinkTime += CachedTimeThread.currentTimeMillis;
+			// statistics.forwLinkTime += CachedTimeThread.currentTimeMillis;
 		}
 	}
-	
+
 	@Override
-	public void deapply(SaturationState state, Context context) {
-		apply(state, context);
-	}	
-	
+	public void deapply(SaturationState.Engine engine, Context context) {
+		apply(engine, context);
+	}
+
 	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
-	}	
-	
+	}
+
 	public boolean addToContextBackwardLinkRule(Context context) {
 		return context
 				.getBackwardLinkRulesChain()
 				.getCreate(ThisBackwardLinkRule.MATCHER_,
 						ThisBackwardLinkRule.FACTORY_).addForwardLink(this);
 	}
-	
+
 	public boolean removeFromContextBackwardLinkRule(Context context) {
 		ThisBackwardLinkRule rule = context.getBackwardLinkRulesChain().find(
 				ThisBackwardLinkRule.MATCHER_);
 
 		return rule != null ? rule.removeForwardLink(this) : false;
 	}
-	
+
 	public boolean containsBackwardLinkRule(Context context) {
 		ThisBackwardLinkRule rule = context.getBackwardLinkRulesChain().find(
 				ThisBackwardLinkRule.MATCHER_);
-		
+
 		return rule != null ? rule.containsForwardLink(this) : false;
 	}
-	
+
 	@Override
 	public String toString() {
 		return relation_ + "->" + target_.getRoot();
 	}
-
-
-
 
 	/**
 	 * A type of {@link BackwardLinkRules} created for {@link ForwardLink}s and
@@ -176,25 +173,28 @@ public class ForwardLink implements Conclusion {
 			return forwardLinksByObjectProperty_.add(link.relation_,
 					link.target_);
 		}
-		
+
 		private boolean removeForwardLink(ForwardLink link) {
 			return forwardLinksByObjectProperty_.remove(link.relation_,
 					link.target_);
-		}		
-		
+		}
+
 		private boolean containsForwardLink(ForwardLink link) {
 			return forwardLinksByObjectProperty_.contains(link.relation_,
 					link.target_);
 		}
 
 		@Override
-		public void apply(SaturationState state, BackwardLink link) {
+		public void apply(SaturationState.Engine engine, BackwardLink link) {
 
-			/*RuleStatistics timer = ruleEngine.getRulesTimer();
-
-			timer.timeForwardLinkBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
-
-			timer.countForwardLinkBackwardLinkRule++;*/
+			/*
+			 * RuleStatistics timer = ruleEngine.getRulesTimer();
+			 * 
+			 * timer.timeForwardLinkBackwardLinkRule -=
+			 * CachedTimeThread.currentTimeMillis;
+			 * 
+			 * timer.countForwardLinkBackwardLinkRule++;
+			 */
 
 			try {
 
@@ -217,12 +217,13 @@ public class ForwardLink implements Conclusion {
 
 					for (IndexedPropertyChain composition : compositions)
 						for (Context forwardTarget : forwardTargets)
-							state.produce(forwardTarget, new BackwardLink(
+							engine.produce(forwardTarget, new BackwardLink(
 									source, composition));
 				}
 
 			} finally {
-				//timer.timeForwardLinkBackwardLinkRule += CachedTimeThread.currentTimeMillis;
+				// timer.timeForwardLinkBackwardLinkRule +=
+				// CachedTimeThread.currentTimeMillis;
 			}
 		}
 

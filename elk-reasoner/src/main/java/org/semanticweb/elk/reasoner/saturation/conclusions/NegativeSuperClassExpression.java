@@ -45,35 +45,38 @@ public class NegativeSuperClassExpression extends SuperClassExpression {
 	}
 
 	@Override
-	public void apply(SaturationState state, Context context) {
-		//ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		//statistics.superClassExpressionTime -= CachedTimeThread.currentTimeMillis;
+	public void apply(SaturationState.Engine engine, Context context) {
+		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
+		// statistics.superClassExpressionTime -=
+		// CachedTimeThread.currentTimeMillis;
 
 		try {
 			// applying all composition rules
-			applyCompositionRules(state, context);
-			
+			applyCompositionRules(engine, context);
+
 		} finally {
-			//statistics.superClassExpressionTime += CachedTimeThread.currentTimeMillis;
+			// statistics.superClassExpressionTime +=
+			// CachedTimeThread.currentTimeMillis;
 		}
 	}
-	
+
 	@Override
-	public void deapply(SaturationState state, Context context) {
-		//ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		//statistics.superClassExpressionTime -= CachedTimeThread.currentTimeMillis;
-		
+	public void deapply(SaturationState.Engine engine, Context context) {
+		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
+		// statistics.superClassExpressionTime -=
+		// CachedTimeThread.currentTimeMillis;
+
 		try {
-			expression.applyDecompositionRule(state, context);
+			expression.applyDecompositionRule(engine, context);
 			// applying all composition rules
-			applyCompositionRules(state, context);
-			
+			applyCompositionRules(engine, context);
+
 		} finally {
-			//statistics.superClassExpressionTime += CachedTimeThread.currentTimeMillis;
+			// statistics.superClassExpressionTime +=
+			// CachedTimeThread.currentTimeMillis;
 		}
 	}
-	
-	
+
 	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);

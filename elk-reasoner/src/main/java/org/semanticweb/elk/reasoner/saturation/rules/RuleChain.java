@@ -41,15 +41,15 @@ public interface RuleChain<E> extends ChainableRule<E>, Chain<RuleChain<E>> {
 
 	/**
 	 * Applies all rules in this chain to an element within a
-	 * {@link SaturationState}
+	 * {@link SaturationState.Engine}
 	 * 
-	 * @param state
-	 *            a {@link SaturationState} which could be changed as a result
-	 *            of this rule's application
+	 * @param saturationEngine
+	 *            a {@link SaturationState.Engine} which could be changed as a
+	 *            result of this rule's application
 	 * @param element
 	 *            the element to which the rule is applied
 	 */
-	public void applyAll(SaturationState state, E element);
+	public void applyAll(SaturationState.Engine saturationEngine, E element);
 
 	/**
 	 * Adds all rules in this chain to the given {@link Chain}

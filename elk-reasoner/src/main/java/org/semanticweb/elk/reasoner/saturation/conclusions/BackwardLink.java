@@ -74,18 +74,17 @@ public class BackwardLink implements Conclusion {
 		return source_;
 	}
 
-
 	@Override
-	public void apply(SaturationState state, Context context) {
+	public void apply(SaturationState.Engine engine, Context context) {
 
-		//ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		//statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
+		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
+		// statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
 		try {
 			// apply all backward link rules of the context
 			BackwardLinkRules rules = context.getBackwardLinkRules();
 
 			while (rules != null) {
-				rules.apply(state, this);
+				rules.apply(engine, this);
 				rules = rules.next();
 			}
 
@@ -93,24 +92,27 @@ public class BackwardLink implements Conclusion {
 			 * convert backward link to a forward link if it can potentially be
 			 * composed
 			 */
-			Set<IndexedPropertyChain> toldProperties = source_.getRoot().getPosPropertiesInExistentials();
-			
+			Set<IndexedPropertyChain> toldProperties = source_.getRoot()
+					.getPosPropertiesInExistentials();
+
 			if (toldProperties != null
 					&& !new LazySetIntersection<IndexedPropertyChain>(
 							toldProperties, relation_.getSaturated()
 									.getLeftComposableProperties()).isEmpty()) {
-			//if (!relation_.getSaturated().getLeftComposableProperties().isEmpty()) {
-				state.produce(source_, new ForwardLink(relation_, context));
+				// if
+				// (!relation_.getSaturated().getLeftComposableProperties().isEmpty())
+				// {
+				engine.produce(source_, new ForwardLink(relation_, context));
 			}
 		} finally {
-			//statistics.backLinkTime += CachedTimeThread.currentTimeMillis;
+			// statistics.backLinkTime += CachedTimeThread.currentTimeMillis;
 		}
 	}
-	
+
 	@Override
-	public void deapply(SaturationState state, Context context) {
-		apply(state, context);
-	}	
+	public void deapply(SaturationState.Engine engine, Context context) {
+		apply(engine, context);
+	}
 
 	@Override
 	public String toString() {

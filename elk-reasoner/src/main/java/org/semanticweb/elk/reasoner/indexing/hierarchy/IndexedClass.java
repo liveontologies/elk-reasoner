@@ -118,12 +118,13 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	public void applyDecompositionRule(SaturationState state, Context context) {
-		if (this == state.getOwlNothing()) {
+	public void applyDecompositionRule(SaturationState.Engine engine,
+			Context context) {
+		if (this == engine.getOwlNothing()) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Producing owl:Nothing for " + context.getRoot());
 			}
-			state.produce(context, new Bottom());
+			engine.produce(context, new Bottom());
 		}
 	}
 
@@ -148,14 +149,14 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		@Override
-		public void apply(SaturationState state, Context context) {
+		public void apply(SaturationState.Engine engine, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying owl:Thing context init rule to "
 						+ context.getRoot());
 			}
 
-			state.produce(context,
-					new PositiveSuperClassExpression(state.getOwlThing()));
+			engine.produce(context,
+					new PositiveSuperClassExpression(engine.getOwlThing()));
 		}
 
 		private static Matcher<RuleChain<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<RuleChain<Context>, OwlThingContextInitializationRule>(

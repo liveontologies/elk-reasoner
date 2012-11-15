@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
+
 /*
  * #%L
  * ELK Reasoner
@@ -30,30 +31,31 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class DisjointnessAxiom implements Conclusion {
 
 	private final IndexedDisjointnessAxiom axiom_;
-	
+
 	public DisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
 		axiom_ = axiom;
 	}
-	
+
 	public IndexedDisjointnessAxiom getAxiom() {
 		return axiom_;
 	}
-	
+
 	@Override
-	public void deapply(SaturationState state, Context context) {
-		apply(state, context);
+	public void deapply(SaturationState.Engine engine, Context context) {
+		apply(engine, context);
 	}
 
 	@Override
-	public void apply(SaturationState state, Context context) {
+	public void apply(SaturationState.Engine engine, Context context) {
 		if (context.containsDisjointnessAxiom(axiom_) > 1) {
-			state.produce(context, new PositiveSuperClassExpression(state.getOwlNothing()));
+			engine.produce(context,
+					new PositiveSuperClassExpression(engine.getOwlNothing()));
 		}
 	}
 

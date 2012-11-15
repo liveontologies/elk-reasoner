@@ -128,7 +128,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecompositionRule(SaturationState state, Context context) {
+	public void applyDecompositionRule(SaturationState.Engine engine,
+			Context context) {
 		/*
 		 * RuleStatistics stats = ruleEngine.getRulesTimer();
 		 * 
@@ -138,7 +139,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		 */
 
 		try {
-			state.produce(state.getCreateContext(filler), new BackwardLink(
+			engine.produce(engine.getCreateContext(filler), new BackwardLink(
 					context, property));
 		} finally {
 			// stats.timeObjectSomeValuesFromDecompositionRule +=
@@ -184,7 +185,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(SaturationState state, Context context) {
+		public void apply(SaturationState.Engine state, Context context) {
 
 			/*
 			 * RuleStatistics stats = ruleEngine.getRulesTimer();

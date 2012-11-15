@@ -157,15 +157,13 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * @param listener
 	 *            the listener object implementing callback functions
 	 */
-	public ClassExpressionSaturationFactory(
-			SaturationState saturationState,
-			int maxWorkers,
-			ClassExpressionSaturationListener<J> listener) {
+	public ClassExpressionSaturationFactory(SaturationState saturationState,
+			int maxWorkers, ClassExpressionSaturationListener<J> listener) {
 		this(new RuleApplicationFactory(saturationState), maxWorkers, listener);
-	}	
-	
-	public ClassExpressionSaturationFactory(RuleApplicationFactory ruleAppFactory,
-			int maxWorkers,
+	}
+
+	public ClassExpressionSaturationFactory(
+			RuleApplicationFactory ruleAppFactory, int maxWorkers,
 			ClassExpressionSaturationListener<J> listener) {
 		this.threshold_ = 64 + 32 * maxWorkers;
 		this.listener_ = listener;
@@ -183,8 +181,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */
-	public ClassExpressionSaturationFactory(RuleApplicationFactory ruleAppFactory,
-			int maxWorkers) {
+	public ClassExpressionSaturationFactory(
+			RuleApplicationFactory ruleAppFactory, int maxWorkers) {
 		/* we use a dummy listener */
 		this(ruleAppFactory, maxWorkers,
 				new ClassExpressionSaturationListener<J>() {
@@ -294,7 +292,6 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 	public class Engine implements InputProcessor<J> {
 
-		// thread local objects
 		private final RuleApplicationFactory.Engine ruleApplicationEngine_ = ruleApplicationFactory_
 				.getEngine();
 
@@ -351,7 +348,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 					return;
 				int snapshotCountContextsProcessed = countContextsProcessed_
 						.get();
-				if (ruleApplicationFactory_.getApproximateContextNumber()
+				if (ruleApplicationFactory_.getRegisteredCreatedContextCount()
 						- snapshotCountContextsProcessed > threshold_) {
 					synchronized (countContextsProcessed_) {
 						if (countContextsProcessed_.get() > snapshotCountContextsProcessed)
@@ -360,8 +357,6 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 							 * to check again if we can submit a new job
 							 */
 							continue;
-						
-						LOGGER_.warn("Waiting: " + snapshotCountContextsProcessed + ", " + ruleApplicationFactory_.getApproximateContextNumber());
 						workersWaiting_ = true;
 						countContextsProcessed_.wait();
 						continue;
@@ -428,7 +423,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			 * started workers only after that
 			 */
 			int snapshotContextNo = ruleApplicationFactory_
-					.getApproximateContextNumber();
+					.getRegisteredCreatedContextCount();
 			int snapshotCountJobsSubmitted = countJobsSubmitted_.get();
 			if (countStartedWorkers_.get() > snapshotFinishedWorkers)
 				// this means that some started worker did not finish yet
@@ -445,12 +440,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			 * snapshots.
 			 */
 			updateIfSmaller(countJobsProcessed_, snapshotCountJobsSubmitted);
-			
+
 			boolean updatedContextsProcessed = updateIfSmaller(
 					countContextsProcessed_, snapshotContextNo);
-			
-			LOGGER_.warn("Waking up: " + snapshotContextNo + ", updateContextsProcessed=" + updatedContextsProcessed);
-			
+
 			if (updatedContextsProcessed && workersWaiting_) {
 				/*
 				 * waking up all workers waiting for new processed contexts

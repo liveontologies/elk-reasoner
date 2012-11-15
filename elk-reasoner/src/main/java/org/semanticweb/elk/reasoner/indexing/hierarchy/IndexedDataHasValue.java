@@ -49,8 +49,8 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater, int increment,
-			int positiveIncrement, int negativeIncrement) {
+	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater,
+			int increment, int positiveIncrement, int negativeIncrement) {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 	}
@@ -66,14 +66,17 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 
 	@Override
 	public String toString() {
-		return "DataHasValue(" + '<' + this.property.getIri().getFullIriAsString()
-				+ "> \"" + this.filler.getLexicalForm() + "\"^^<"
-				+ this.filler.getDatatype().getIri().getFullIriAsString() + ">)";
+		return "DataHasValue(" + '<'
+				+ this.property.getIri().getFullIriAsString() + "> \""
+				+ this.filler.getLexicalForm() + "\"^^<"
+				+ this.filler.getDatatype().getIri().getFullIriAsString()
+				+ ">)";
 	}
 
 	@Override
-	public void applyDecompositionRule(SaturationState state, Context context) {
+	public void applyDecompositionRule(SaturationState.Engine engine,
+			Context context) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

@@ -73,10 +73,11 @@ public abstract class ContextRules extends ChainImpl<RuleChain<Context>>
 	}
 
 	@Override
-	public void applyAll(SaturationState state, Context context) {
+	public void applyAll(SaturationState.Engine engine,
+			Context context) {
 		RuleChain<Context> current = this;
 		for (;;) {
-			current.apply(state, context);
+			current.apply(engine, context);
 			if ((current = current.next()) == null)
 				break;
 		}

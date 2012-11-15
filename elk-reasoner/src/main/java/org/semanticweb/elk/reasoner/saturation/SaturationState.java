@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -38,21 +38,20 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExp
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
-import org.semanticweb.elk.util.collections.chains.ChainImpl;
-import org.semanticweb.elk.util.collections.chains.Matcher;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class SaturationState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(SaturationState.class);
-	
+	private static final Logger LOGGER_ = Logger
+			.getLogger(SaturationState.class);
+
 	private final OntologyIndex ontologyIndex_;
-	
+
 	/**
 	 * Cached constants
 	 */
@@ -63,150 +62,209 @@ public class SaturationState {
 	 * occurs exactly once.
 	 */
 	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
-	
-	private ContextCreationListenerChain contextCreationListeners_ = null;//new ContextCreationListenerChain2();
-	
+
+	// private ContextCreationListenerChain contextCreationListeners_ = null;//
+	// new
+	// ContextCreationListenerChain2();
+
 	private Queue<IndexedClassExpression> modifiedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
-	
-	
-	public SaturationState(OntologyIndex index) {
-		ontologyIndex_ = index;
-		owlThing_ = index.getIndexedOwlThing();
-		owlNothing_ = index.getIndexedOwlNothing();
-	}	
 	
 	public void markAsModified(Context context) {
 		modifiedContexts_.add(context.getRoot());
 	}
 	
 	public Collection<IndexedClassExpression> getModifiedContexts() {
-		return modifiedContexts_ == null ? Collections.<IndexedClassExpression>emptyList() : modifiedContexts_;
+		return modifiedContexts_ == null ? Collections
+				.<IndexedClassExpression> emptyList() : modifiedContexts_;
 	}
-	
+
 	public void clearModifiedContexts() {
 		modifiedContexts_.clear();
 	}
-	
-	public Context pollForContext() {
-		return activeContexts_.poll();
+
+	private final Engine defaultEngine_ = new Engine(
+			new ContextCreationListener() {
+
+				@Override
+				public void notifyContextCreation(Context newContext) {
+					// Dummy listener, which does not do anything
+				}
+
+			});
+
+	public SaturationState(OntologyIndex index) {
+		ontologyIndex_ = index;
+		owlThing_ = index.getIndexedOwlThing();
+		owlNothing_ = index.getIndexedOwlNothing();
 	}
-	
-	public IndexedClassExpression getOwlThing() {
-		return owlThing_;
+
+	// public void registerContextCreationListener(ContextCreationListener
+	// listener) {
+	// if (contextCreationListeners_ == null) {
+	// contextCreationListeners_ = new ContextCreationListenerChain(
+	// listener, null);
+	// } else {
+	// contextCreationListeners_.register(listener);
+	// }
+	// }
+	//
+	// public void deregisterContextCreationListener(
+	// ContextCreationListener listener) {
+	// contextCreationListeners_.deregister(listener);
+	// }
+
+	/**
+	 * @return an {@link Engine} for modifying this {@link SaturationState}. The
+	 *         methods of this {@link Engine} are thread safe
+	 */
+	public Engine getEngine() {
+		return defaultEngine_;
 	}
-	
-	public IndexedClassExpression getOwlNothing() {
-		return owlNothing_;
+
+	/**
+	 * Creates a new {@link Engine} for modifying this {@link SaturationState}
+	 * associated with the given {@link ContextCreationListener}. If
+	 * {@link ContextCreationListener} is not thread safe, the calls of the
+	 * methods for the same {@link Engine} should be synchornized
+	 * 
+	 * @param contextCreationListener
+	 *            {@link ContextCreationListener} to be used for this
+	 *            {@link Engine}
+	 * @return a new {@link Engine} associated with the given
+	 *         {@link ContextCreationListener}
+	 */
+	public Engine getEngine(ContextCreationListener contextCreationListener) {
+		return new Engine(contextCreationListener);
 	}
-	
-	public void produce(Context context, Conclusion item) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
-		if (context.addToDo(item)) {
-			// context was activated
-			activeContexts_.add(context);
-			//LOGGER_.trace(context.getRoot() + " was activated!");	
+
+	/**
+	 * Functions that can modify the saturation state are grouped here. With
+	 * every {@link Engine} one can register a {@link ContextCreationListener}
+	 * that will be executed every time this {@link Engine} creates a new
+	 * {@code Context}. Although all functions of this {@link Engine} are thread
+	 * safe, the function of the {@link ContextCreationListener} might not be,
+	 * in which the access of functions of {@link Engine} should be synchronized
+	 * between threads.
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	public class Engine {
+
+		private final ContextCreationListener contextCreationListener_;
+
+		private Engine(ContextCreationListener contextCreationListener) {
+			this.contextCreationListener_ = contextCreationListener;
 		}
-	}
-	
-	public Context getCreateContext(IndexedClassExpression root) {
-		if (root.getContext() == null) {
-			Context context = new ContextImpl(root);
-			if (root.setContext(context)) {
-				initContext(context);
-				contextCreationListeners_.notifyAll(context);
+
+		public IndexedClassExpression getOwlThing() {
+			return owlThing_;
+		}
+
+		public IndexedClassExpression getOwlNothing() {
+			return owlNothing_;
+		}		
+
+		public Context pollForContext() {
+			return activeContexts_.poll();
+		}
+
+		public void produce(Context context, Conclusion item) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
+			if (context.addToDo(item)) {
+				// context was activated
+				activeContexts_.add(context);
+				// LOGGER_.trace(context.getRoot() + " was activated!");
 			}
 		}
-		return root.getContext();
-	}	
-	
-	public void initContext(Context context) {
-		produce(context, new PositiveSuperClassExpression(context.getRoot()));
-		//apply all context initialization rules
-		RuleChain<Context> initRules = ontologyIndex_.getContextInitRules();
-		
-		while (initRules != null) {
-			initRules.apply(this, context);
-			initRules = initRules.next();
+
+		public Context getCreateContext(IndexedClassExpression root) {
+			if (root.getContext() == null) {
+				Context context = new ContextImpl(root);
+				if (root.setContext(context)) {
+					initContext(context);
+					contextCreationListener_.notifyContextCreation(context);
+					// contextCreationListeners_.notifyAll(context);
+				}
+			}
+			return root.getContext();
 		}
-	}
-	
-	public void registerContextCreationListener(ContextCreationListener listener) {
-		if (contextCreationListeners_ == null) {
-			contextCreationListeners_ = new ContextCreationListenerChain(listener, null);
+
+		public void initContext(Context context) {
+			produce(context,
+					new PositiveSuperClassExpression(context.getRoot()));
+			// apply all context initialization rules
+			RuleChain<Context> initRules = ontologyIndex_.getContextInitRules();
+
+			while (initRules != null) {
+				initRules.apply(this, context);
+				initRules = initRules.next();
+			}
 		}
-		else {
-			contextCreationListeners_.register(listener);
-		}
+
 	}
-	
-	public void deregisterContextCreationListener(ContextCreationListener listener) {
-		contextCreationListeners_.deregister(listener);
-	}
-	
-	int size() {
-		return activeContexts_.size();
-	}
-	
-	Iterator<Context> getActiveContextIterator() {
-		return activeContexts_.iterator();
-	}
-	
+
 	/**
 	 * A tiny chain of listeners supporting register/deregister operations
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
-	
-	private static class ContextCreationListenerChain extends ChainImpl<ContextCreationListenerChain> {
-		
-		/*
-		 * The matcher used to find existing listeners
-		 */
-		private static class ListenerMatcher implements Matcher<ContextCreationListenerChain, ContextCreationListenerChain> {
 
-			private final ContextCreationListener toMatch_;
-			
-			ListenerMatcher(ContextCreationListener listener) {
-				toMatch_ = listener;
-			}
-			
-			@Override
-			public ContextCreationListenerChain match(ContextCreationListenerChain candidate) {
-				return (candidate.listener_ == toMatch_) ? candidate : null;
-			}
-			
-		};
-		
-		private final ContextCreationListener listener_;
-		
-		ContextCreationListenerChain(final ContextCreationListener listener, final ContextCreationListenerChain tail) {
-			super(tail);
-			listener_ = listener;
-		}
-		
-		void register(final ContextCreationListener listener) {
-			if (find(new ListenerMatcher(listener)) == null) {
-				setNext(new ContextCreationListenerChain(listener, next()));
-			}
-		}
-		
-		void deregister(final ContextCreationListener listener) {
-			remove(new ListenerMatcher(listener));
-		}
-		
-		/**
-		 * Notify all registered listeners that a context has been created
-		 */
-		void notifyAll(final Context newContext) {
-			ContextCreationListenerChain head = next();
-			
-			while (head != null) {
-				head.listener_.notifyContextCreation(newContext);
-				head = head.next();
-			}
-		}
-	}
+	// private static class ContextCreationListenerChain extends
+	// ChainImpl<ContextCreationListenerChain> {
+	//
+	// /*
+	// * The matcher used to find existing listeners
+	// */
+	// private static class ListenerMatcher
+	// implements
+	// Matcher<ContextCreationListenerChain, ContextCreationListenerChain> {
+	//
+	// private final ContextCreationListener toMatch_;
+	//
+	// ListenerMatcher(ContextCreationListener listener) {
+	// toMatch_ = listener;
+	// }
+	//
+	// @Override
+	// public ContextCreationListenerChain match(
+	// ContextCreationListenerChain candidate) {
+	// return (candidate.listener_ == toMatch_) ? candidate : null;
+	// }
+	//
+	// };
+	//
+	// private final ContextCreationListener listener_;
+	//
+	// ContextCreationListenerChain(final ContextCreationListener listener,
+	// final ContextCreationListenerChain tail) {
+	// super(tail);
+	// listener_ = listener;
+	// }
+	//
+	// void register(final ContextCreationListener listener) {
+	// if (find(new ListenerMatcher(listener)) == null) {
+	// setNext(new ContextCreationListenerChain(listener, next()));
+	// }
+	// }
+	//
+	// void deregister(final ContextCreationListener listener) {
+	// remove(new ListenerMatcher(listener));
+	// }
+	//
+	// /**
+	// * Notify all registered listeners that a context has been created
+	// */
+	// void notifyAll(final Context newContext) {
+	// ContextCreationListenerChain head = next();
+	//
+	// while (head != null) {
+	// head.listener_.notifyContextCreation(newContext);
+	// head = head.next();
+	// }
+	// }
+	// }
 }

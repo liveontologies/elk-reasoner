@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,8 +29,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public interface ReversibleRule<E> extends Rule<E> {
 
@@ -38,5 +39,5 @@ public interface ReversibleRule<E> extends Rule<E> {
 	 * @param ruleEngine
 	 * @param element
 	 */
-	public void deapply(SaturationState state, E element);
+	public void deapply(SaturationState.Engine engine, E element);
 }

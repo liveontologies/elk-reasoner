@@ -62,24 +62,7 @@ public class RuleApplicationFactory implements
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	
-	protected final SaturationState saturationState_;
-	/**
-	 * The approximate number of contexts ever created by this engine. This
-	 * number is used not only for statistical purposes, but also by saturation
-	 * engine callers to control when to submit new saturation tasks: if there
-	 * are too many unprocessed contexts, new saturation tasks are not
-	 * submitted.
-	 */
-	protected final AtomicInteger approximateContextNumber_ = new AtomicInteger(
-			0);
-
-	/**
-	 * To reduce thread congestion, {@link #approximateContextNumber_} is not
-	 * updated immediately when contexts are created, but after a worker creates
-	 * {@link #contextUpdateInterval_} new contexts.
-	 */
-	private final int contextUpdateInterval_ = 32;
+	private final SaturationState saturationState_;
 
 	/**
 	 * The {@link ConclusionsCounter} aggregated for all workers
@@ -95,21 +78,36 @@ public class RuleApplicationFactory implements
 	 * The {@link ThisStatistics} aggregated for all workers
 	 */
 	private final ThisStatistics aggregatedFactoryStats_;
-	
+
+	/**
+	 * The approximate number of created contexts. This number is a multiple of
+	 * {@link #CONTEXT_UPDATE_INTERVAL_}. Every worker updates this number when
+	 * it creates {@link #CONTEXT_UPDATE_INTERVAL_} new contexts. This is done
+	 * to reduce thread contention on this counter. For correctness, this should
+	 * be updated only in the methods
+	 * {@link Engine#submit(IndexedClassExpression)} or {@link Engine#process()}
+	 */
+	private final AtomicInteger approximateContextNumber_ = new AtomicInteger(0);
+	/**
+	 * @see #approximateContextNumber_
+	 */
+	private static final int CONTEXT_UPDATE_INTERVAL_ = 32;
+
 	private final boolean trackModifiedContexts_;
-	
+
 	public RuleApplicationFactory(final SaturationState saturationState) {
 		this(saturationState, false);
 	}
-	
-	public RuleApplicationFactory(final SaturationState saturationState, boolean trackModifiedContexts) {
+
+	public RuleApplicationFactory(final SaturationState saturationState,
+			boolean trackModifiedContexts) {
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
 		this.aggregatedRuleStats_ = new RuleStatistics();
 		this.aggregatedFactoryStats_ = new ThisStatistics();
 		this.saturationState_ = saturationState;
 		this.trackModifiedContexts_ = trackModifiedContexts;
-	}	
-	
+	}
+
 	@Override
 	public Engine getEngine() {
 		return new Engine(new AddConclusionVisitor());
@@ -121,14 +119,13 @@ public class RuleApplicationFactory implements
 	}
 
 	/**
-	 * Returns the approximate number of contexts created. The real number of
-	 * contexts is larger, but to ensure good concurrency performance it is not
-	 * updated often. It is exact when all engines created by this factory
-	 * finish.
-	 * 
-	 * @return the approximate number of created contexts
+	 * @return the approximate number of contexts created by all {@link Engine}.
+	 *         This number never exceeds the actual number of context created
+	 *         and can only change when
+	 *         {@link Engine#submit(IndexedClassExpression)} or
+	 *         {@link Engine#process()} are called
 	 */
-	public int getApproximateContextNumber() {
+	public int getRegisteredCreatedContextCount() {
 		return approximateContextNumber_.get();
 	}
 
@@ -139,9 +136,10 @@ public class RuleApplicationFactory implements
 		if (LOGGER_.isDebugEnabled()) {
 			checkStatistics();
 			// CONTEXT STATISTICS:
-			if (approximateContextNumber_.get() > 0)
-				LOGGER_.debug("Contexts created: " + approximateContextNumber_);
-			if (approximateContextNumber_.get() > 0)
+			if (aggregatedFactoryStats_.countCreatedContexts > 0)
+				LOGGER_.debug("Contexts created: "
+						+ aggregatedFactoryStats_.countCreatedContexts);
+			if (aggregatedFactoryStats_.countCreatedContexts > 0)
 				LOGGER_.debug("Contexts processsing: "
 						+ aggregatedFactoryStats_.contContextProcess + " ("
 						+ aggregatedFactoryStats_.timeContextProcess + " ms)");
@@ -276,8 +274,7 @@ public class RuleApplicationFactory implements
 	}
 
 	private void checkStatistics() {
-		if (aggregatedFactoryStats_.contContextProcess < approximateContextNumber_
-				.get())
+		if (aggregatedFactoryStats_.contContextProcess < aggregatedFactoryStats_.countCreatedContexts)
 			LOGGER_.error("More contexts than context activations!");
 		if (aggregatedConclusionsCounter_
 				.getPositiveSuperClassExpressionInfNo()
@@ -296,10 +293,13 @@ public class RuleApplicationFactory implements
 	/**
 	 * 
 	 */
-	public class Engine implements InputProcessor<IndexedClassExpression>, RuleEngine, ContextCreationListener {
+	public class Engine implements InputProcessor<IndexedClassExpression>,
+			RuleEngine {
+
+		protected final SaturationState.Engine saturationEngine;
 
 		protected final ConclusionVisitor<Boolean> conclusionVisitor;
-		
+
 		/**
 		 * Local {@link ConclusionsCounter} created for every worker
 		 */
@@ -312,23 +312,32 @@ public class RuleApplicationFactory implements
 		 * Local {@link ThisStatistics} created for every worker
 		 */
 		protected final ThisStatistics factoryStats_ = new ThisStatistics();
-		/**
-		 * Worker-local counter for the number of created contexts
-		 */
-		private int localContextNumber = 0;
 
 		protected Engine(ConclusionVisitor<Boolean> visitor) {
 			conclusionVisitor = visitor;
-			saturationState_.registerContextCreationListener(this);
+			this.saturationEngine = saturationState_
+					.getEngine(new ContextCreationListener() {
+						private int localContextNumber_ = 0;
+
+						@Override
+						public void notifyContextCreation(Context newContext) {
+							factoryStats_.countCreatedContexts++;
+							if (++localContextNumber_ == CONTEXT_UPDATE_INTERVAL_) {
+								approximateContextNumber_
+										.addAndGet(CONTEXT_UPDATE_INTERVAL_);
+								localContextNumber_ = 0;
+							}
+						}
+					});
 		}
 
 		protected ConclusionVisitor<Boolean> getConclusionVisitor() {
 			return conclusionVisitor;
 		}
-		
+
 		@Override
 		public void submit(IndexedClassExpression job) {
-			saturationState_.getCreateContext(job);
+			saturationEngine.getCreateContext(job);
 		}
 
 		@Override
@@ -337,13 +346,12 @@ public class RuleApplicationFactory implements
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
-				
-				Context nextContext = saturationState_.pollForContext();
-				
+
+				Context nextContext = saturationEngine.pollForContext();
+
 				if (nextContext == null) {
 					break;
-				}
-				else {
+				} else {
 					process(nextContext);
 				}
 			}
@@ -352,12 +360,9 @@ public class RuleApplicationFactory implements
 
 		@Override
 		public void finish() {
-			approximateContextNumber_.addAndGet(localContextNumber);
-			localContextNumber = 0;
 			aggregatedConclusionsCounter_.merge(conclusionsCounter_);
 			aggregatedRuleStats_.merge(ruleStats_);
 			aggregatedFactoryStats_.merge(factoryStats_);
-			saturationState_.deregisterContextCreationListener(this);
 		}
 
 		/**
@@ -387,12 +392,11 @@ public class RuleApplicationFactory implements
 					if (context.deactivate()) {
 						// context was re-activated
 						continue;
-					}
-					else {
+					} else {
 						break;
 					}
 				}
-				
+
 				if (preApply(conclusion, context)) {
 					process(conclusion, context);
 					postApply(conclusion, context);
@@ -401,7 +405,7 @@ public class RuleApplicationFactory implements
 		}
 
 		protected void process(Conclusion conclusion, Context context) {
-			conclusion.apply(saturationState_, context);
+			conclusion.apply(saturationEngine, context);
 		}
 
 		protected boolean preApply(Conclusion conclusion, Context context) {
@@ -412,85 +416,79 @@ public class RuleApplicationFactory implements
 			// nothing here
 		}
 
-		@Override
-		public void notifyContextCreation(Context newContext) {
-			if (++localContextNumber == contextUpdateInterval_) {
-				approximateContextNumber_.addAndGet(localContextNumber);
-				localContextNumber = 0;
-			}
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(newContext.getRoot() + ": context created");
-			}
-		}		
 	}
-	
-	protected abstract class BaseConclusionVisitor implements ConclusionVisitor<Boolean> {
-		
+
+	protected abstract class BaseConclusionVisitor implements
+			ConclusionVisitor<Boolean> {
+
 		protected void markAsModified(Context context) {
-			// re-use the saturation flag as a sign that the context is modified for the first time
+			// re-use the saturation flag as a sign that the context is modified
+			// for the first time
 			if (trackModifiedContexts_ && context.isSaturated()) {
 				saturationState_.markAsModified(context);
 				context.setSaturated(false);
 			}
 		}
 	}
-	
+
 	/**
 	 * Used to add different kinds of conclusions to the context
 	 */
 	protected class AddConclusionVisitor extends BaseConclusionVisitor {
 
 		@Override
-		public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
+		public Boolean visit(NegativeSuperClassExpression negSCE,
+				Context context) {
 			if (context.addSuperClassExpression(negSCE.getExpression())) {
-				//statistics_.superClassExpressionNo++;
-				//statistics_.negSuperClassExpressionInfNo++;
+				// statistics_.superClassExpressionNo++;
+				// statistics_.negSuperClassExpressionInfNo++;
 				markAsModified(context);
-				
+
 				return true;
 			}
-			
+
 			return false;
 		}
 
 		@Override
-		public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
+		public Boolean visit(PositiveSuperClassExpression posSCE,
+				Context context) {
 			if (context.addSuperClassExpression(posSCE.getExpression())) {
-				//statistics_.superClassExpressionNo++;
-				//statistics_.posSuperClassExpressionInfNo++;
+				// statistics_.superClassExpressionNo++;
+				// statistics_.posSuperClassExpressionInfNo++;
 				markAsModified(context);
-				
+
 				return true;
 			}
-			
+
 			return false;
 		}
 
 		@Override
 		public Boolean visit(BackwardLink link, Context context) {
-			//statistics_.backLinkInfNo++;
+			// statistics_.backLinkInfNo++;
 			if (context.addBackwardLink(link)) {
 				markAsModified(context);
-				
+
 				return true;
 			}
-			
+
 			return false;
-			//statistics_.backLinkNo++;
+			// statistics_.backLinkNo++;
 		}
 
 		@Override
 		public Boolean visit(ForwardLink link, Context context) {
-			//statistics_.forwLinkInfNo++;
+			// statistics_.forwLinkInfNo++;
 			if (link.addToContextBackwardLinkRule(context)) {
-			
+
 				return true;
 			}
-			
+
 			return false;
-			//statistics_.forwLinkNo++;
+			// statistics_.forwLinkNo++;
 		}
-		
+
 		@Override
 		public Boolean visit(Bottom bot, Context context) {
 			return !context.isInconsistent();
@@ -499,23 +497,24 @@ public class RuleApplicationFactory implements
 		@Override
 		public Boolean visit(Propagation propagation, Context context) {
 			if (propagation.addToContextBackwardLinkRule(context)) {
-				
+
 				return true;
 			}
-			
+
 			return false;
 		}
 
 		@Override
 		public Boolean visit(DisjointnessAxiom axiom, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Trying to add disjointness axiom to " + context.getRoot());
+				LOGGER_.trace("Trying to add disjointness axiom to "
+						+ context.getRoot());
 			}
 			// should always be true
 			return context.addDisjointnessAxiom(axiom.getAxiom()) > 0;
 		}
 	}
-	
+
 	/**
 	 * Counters accumulating statistical information about this factory.
 	 * 
@@ -523,6 +522,12 @@ public class RuleApplicationFactory implements
 	 * 
 	 */
 	protected static class ThisStatistics {
+
+		/**
+		 * The number of created contexts
+		 */
+		int countCreatedContexts;
+
 		/**
 		 * the number of times a context has been processed using
 		 * {@link Engine#process(Context)}

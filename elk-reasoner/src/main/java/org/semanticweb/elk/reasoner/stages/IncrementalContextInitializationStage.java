@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -34,15 +35,15 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class IncrementalContextInitializationStage extends
 		AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-				.getLogger(IncrementalContextInitializationStage.class);	
+			.getLogger(IncrementalContextInitializationStage.class);
 	/**
 	 * The counter for deleted contexts
 	 */
@@ -58,9 +59,10 @@ public class IncrementalContextInitializationStage extends
 	 */
 	private Iterator<IndexedClassExpression> todo = null;
 
-	public IncrementalContextInitializationStage(AbstractReasonerState reasoner, ReasonerStage dependency) {
+	public IncrementalContextInitializationStage(
+			AbstractReasonerState reasoner, ReasonerStage dependency) {
 		super(reasoner);
-		
+
 		this.dependency_ = dependency;
 	}
 
@@ -71,7 +73,8 @@ public class IncrementalContextInitializationStage extends
 
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(IncrementalStages.CONTEXT_INIT);
+		return reasoner.incrementalState
+				.getStageStatus(IncrementalStages.CONTEXT_INIT);
 	}
 
 	@Override
@@ -81,7 +84,7 @@ public class IncrementalContextInitializationStage extends
 
 	@Override
 	public void execute() throws ElkInterruptedException {
-		
+
 		if (todo == null)
 			initComputation();
 		try {
@@ -90,14 +93,15 @@ public class IncrementalContextInitializationStage extends
 				if (!todo.hasNext())
 					break;
 				IndexedClassExpression ice = todo.next();
-				
+
 				if (ice.getContext() != null) {
-					reasoner.saturationState.initContext(ice.getContext());
+					reasoner.saturationState.getEngine().initContext(
+							ice.getContext());
 				}
-				
+
 				initContexts_++;
 				progressMonitor.report(initContexts_, maxContexts_);
-				
+
 				if (interrupted()) {
 					continue;
 				}
@@ -111,8 +115,9 @@ public class IncrementalContextInitializationStage extends
 	@Override
 	void initComputation() {
 		super.initComputation();
-		
-		for (IndexedClassExpression ice : reasoner.incrementalState.diffIndex.getClassExpressionsWithIndexRuleChanges()) {
+
+		for (IndexedClassExpression ice : reasoner.incrementalState.diffIndex
+				.getClassExpressionsWithIndexRuleChanges()) {
 			if (ice.getContext() != null) {
 				if (ice.getContext().isSaturated()) {
 					reasoner.saturationState.markAsModified(ice.getContext());
@@ -120,7 +125,7 @@ public class IncrementalContextInitializationStage extends
 				}
 			}
 		}
-		
+
 		todo = reasoner.saturationState.getModifiedContexts().iterator();
 		maxContexts_ = reasoner.saturationState.getModifiedContexts().size();
 		initContexts_ = 0;

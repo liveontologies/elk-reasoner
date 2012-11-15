@@ -87,7 +87,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		protected void process(Conclusion conclusion, Context context) {
-			conclusion.deapply(saturationState_, context);
+			conclusion.deapply(saturationEngine, context);
 		}
 
 		@Override
