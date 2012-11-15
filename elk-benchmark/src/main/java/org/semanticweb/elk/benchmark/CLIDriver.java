@@ -41,6 +41,7 @@ public class CLIDriver {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		BenchmarkUtils.multiRun();
+		BenchmarkUtils.run();
+		//BenchmarkUtils.multiRun();
 	}
 }

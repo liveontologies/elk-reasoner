@@ -360,6 +360,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 							 * to check again if we can submit a new job
 							 */
 							continue;
+						
+						LOGGER_.warn("Waiting: " + snapshotCountContextsProcessed + ", " + ruleApplicationFactory_.getApproximateContextNumber());
 						workersWaiting_ = true;
 						countContextsProcessed_.wait();
 						continue;
@@ -443,8 +445,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			 * snapshots.
 			 */
 			updateIfSmaller(countJobsProcessed_, snapshotCountJobsSubmitted);
+			
 			boolean updatedContextsProcessed = updateIfSmaller(
 					countContextsProcessed_, snapshotContextNo);
+			
+			LOGGER_.warn("Waking up: " + snapshotContextNo + ", updateContextsProcessed=" + updatedContextsProcessed);
+			
 			if (updatedContextsProcessed && workersWaiting_) {
 				/*
 				 * waking up all workers waiting for new processed contexts
