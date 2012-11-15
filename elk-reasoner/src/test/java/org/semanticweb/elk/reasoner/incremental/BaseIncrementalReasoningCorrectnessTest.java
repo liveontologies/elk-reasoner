@@ -52,6 +52,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
@@ -115,8 +116,8 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		// TestChangesLoader incrementalLoader = new TestChangesLoader();
 		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
 				new SimpleStageExecutor(), 1);
-		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+		Reasoner incrementalReasoner = new ReasonerFactory()
+				.createReasoner(new LoggingStageExecutor());
 
 		standardReasoner.registerOntologyLoader(initialLoader);
 		standardReasoner.registerOntologyChangesLoader(loader);
