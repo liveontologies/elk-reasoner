@@ -94,7 +94,7 @@ public class SaturationState {
 	 * @return an {@link Writer} for modifying this {@link SaturationState}. The
 	 *         methods of this {@link Writer} are thread safe
 	 */
-	public Writer getWrite() {
+	public Writer getWriter() {
 		return defaultEngine_;
 	}
 

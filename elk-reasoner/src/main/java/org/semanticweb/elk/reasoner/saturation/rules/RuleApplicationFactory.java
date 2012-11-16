@@ -425,7 +425,7 @@ public class RuleApplicationFactory implements
 			// re-use the saturation flag as a sign that the context is modified
 			// for the first time
 			if (trackModifiedContexts_ && context.isSaturated()) {
-				saturationState_.getWrite().markAsNotSaturated(context);
+				saturationState_.getWriter().markAsNotSaturated(context);
 			}
 		}
 	}

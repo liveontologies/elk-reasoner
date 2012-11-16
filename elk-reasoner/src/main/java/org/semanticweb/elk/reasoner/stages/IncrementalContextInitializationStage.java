@@ -96,7 +96,7 @@ public class IncrementalContextInitializationStage extends
 				IndexedClassExpression ice = todo.next();
 
 				if (ice.getContext() != null) {
-					reasoner.saturationState.getWrite().initContext(
+					reasoner.saturationState.getWriter().initContext(
 							ice.getContext());
 				}
 
@@ -117,7 +117,7 @@ public class IncrementalContextInitializationStage extends
 	void initComputation() {
 		super.initComputation();
 
-		SaturationState.Writer saturationEngine = reasoner.saturationState.getWrite();
+		SaturationState.Writer saturationEngine = reasoner.saturationState.getWriter();
 		
 		for (IndexedClassExpression ice : reasoner.incrementalState.diffIndex
 				.getClassExpressionsWithIndexRuleChanges()) {

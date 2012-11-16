@@ -83,7 +83,7 @@ class ContextInitializationFactory
 			Map<IndexedClassExpression, RuleChain<Context>> indexChanges,
 			RuleChain<Context> changedGlobalRules,
 			boolean expectAllContextsSaturated) {
-		saturationEngine_ = state.getWrite();
+		saturationEngine_ = state.getWriter();
 		indexChanges_ = indexChanges;
 		changedGlobalRules_ = changedGlobalRules;
 		expectAllContextsSaturated_ = expectAllContextsSaturated;
