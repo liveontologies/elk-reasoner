@@ -87,7 +87,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		protected void process(Conclusion conclusion, Context context) {
-			conclusion.deapply(saturationEngine, context);
+			conclusion.deapply(saturationStateWriter, context);
 		}
 
 		@Override
@@ -158,7 +158,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 							+ sce);
 				}
 
-				markAsModified(context);
+				markAsNotSaturated(context);
 
 				return true;
 			}

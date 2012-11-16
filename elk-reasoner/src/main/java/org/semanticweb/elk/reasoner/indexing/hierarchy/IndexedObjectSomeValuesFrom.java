@@ -128,7 +128,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecompositionRule(SaturationState.Engine engine,
+	public void applyDecompositionRule(SaturationState.Writer writer,
 			Context context) {
 		/*
 		 * RuleStatistics stats = ruleEngine.getRulesTimer();
@@ -139,7 +139,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		 */
 
 		try {
-			engine.produce(engine.getCreateContext(filler), new BackwardLink(
+			writer.produce(writer.getCreateContext(filler), new BackwardLink(
 					context, property));
 		} finally {
 			// stats.timeObjectSomeValuesFromDecompositionRule +=
@@ -185,7 +185,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(SaturationState.Engine state, Context context) {
+		public void apply(SaturationState.Writer writer, Context context) {
 
 			/*
 			 * RuleStatistics stats = ruleEngine.getRulesTimer();
@@ -218,7 +218,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
 							candidatePropagationProperties, relation
 									.getSaturated().getSubProperties())) {
-						state.produce(context, new Propagation(property, e));
+						writer.produce(context, new Propagation(property, e));
 					}
 
 					/*
@@ -249,11 +249,11 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 									&& property.getRightChains() == null) {
 								for (IndexedPropertyChain superChain : property
 										.getToldSuperProperties()) {
-									state.produce(context, new Propagation(
+									writer.produce(context, new Propagation(
 											superChain, e));
 								}
 							} else {
-								state.produce(context, new Propagation(
+								writer.produce(context, new Propagation(
 										property, e));
 							}
 						}
@@ -261,7 +261,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 					// propagating to the this context if relation is reflexive
 					if (relation.getSaturated().isReflexive())
-						state.produce(context,
+						writer.produce(context,
 								new NegativeSuperClassExpression(e));
 				}
 			} finally {

@@ -39,5 +39,5 @@ public interface ReversibleRule<E> extends Rule<E> {
 	 * @param ruleEngine
 	 * @param element
 	 */
-	public void deapply(SaturationState.Engine engine, E element);
+	public void deapply(SaturationState.Writer engine, E element);
 }

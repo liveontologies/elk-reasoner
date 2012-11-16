@@ -175,7 +175,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(SaturationState.Engine engine, Context context) {
+		public void apply(SaturationState.Writer writer, Context context) {
 
 			// System.err.println("Disjointness rule: " +
 			// IndexedClassExpression.this + " -> " + context.getRoot());
@@ -185,12 +185,12 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 							disjointClasses_,
 							context.getSuperClassExpressions()).isEmpty()) {
 
-				engine.produce(
+				writer.produce(
 						context,
-						new PositiveSuperClassExpression(engine.getOwlNothing()));
+						new PositiveSuperClassExpression(writer.getOwlNothing()));
 			} else if (disjointnessAxioms_ != null)
 				for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_) {
-					engine.produce(context, new DisjointnessAxiom(disAxiom));
+					writer.produce(context, new DisjointnessAxiom(disAxiom));
 				}
 			/*
 			 * if (!context.addDisjointnessAxiom(disAxiom)) state.produce(

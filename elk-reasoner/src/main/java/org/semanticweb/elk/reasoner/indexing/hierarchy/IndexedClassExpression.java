@@ -95,7 +95,7 @@ abstract public class IndexedClassExpression implements
 	abstract void updateOccurrenceNumbers(IndexUpdater updater, int increment,
 			int positiveIncrement, int negativeIncrement);
 
-	public abstract void applyDecompositionRule(SaturationState.Engine engine,
+	public abstract void applyDecompositionRule(SaturationState.Writer writer,
 			Context context);
 
 	/**

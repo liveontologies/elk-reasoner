@@ -85,7 +85,7 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	public void applyDecompositionRule(SaturationState.Engine engine,
+	public void applyDecompositionRule(SaturationState.Writer writer,
 			Context context) {
 		// nothing so far
 	}

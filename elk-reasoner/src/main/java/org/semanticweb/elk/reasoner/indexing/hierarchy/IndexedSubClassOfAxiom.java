@@ -109,7 +109,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(SaturationState.Engine engine, Context context) {
+		public void apply(SaturationState.Writer writer, Context context) {
 
 			/*
 			 * RuleStatistics stats = ruleEngine.getRulesTimer();
@@ -121,7 +121,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			try {
 
 				for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-					engine.produce(context, new PositiveSuperClassExpression(
+					writer.produce(context, new PositiveSuperClassExpression(
 							implied));
 				}
 			} finally {

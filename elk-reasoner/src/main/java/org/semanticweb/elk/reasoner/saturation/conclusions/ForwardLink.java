@@ -67,7 +67,7 @@ public class ForwardLink implements Conclusion {
 	}
 
 	@Override
-	public void apply(SaturationState.Engine engine, Context context) {
+	public void apply(SaturationState.Writer engine, Context context) {
 
 		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		// statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
@@ -98,7 +98,7 @@ public class ForwardLink implements Conclusion {
 	}
 
 	@Override
-	public void deapply(SaturationState.Engine engine, Context context) {
+	public void deapply(SaturationState.Writer engine, Context context) {
 		apply(engine, context);
 	}
 
@@ -185,7 +185,7 @@ public class ForwardLink implements Conclusion {
 		}
 
 		@Override
-		public void apply(SaturationState.Engine engine, BackwardLink link) {
+		public void apply(SaturationState.Writer engine, BackwardLink link) {
 
 			/*
 			 * RuleStatistics timer = ruleEngine.getRulesTimer();

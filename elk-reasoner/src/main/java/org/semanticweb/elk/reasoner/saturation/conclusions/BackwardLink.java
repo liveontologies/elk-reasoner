@@ -75,7 +75,7 @@ public class BackwardLink implements Conclusion {
 	}
 
 	@Override
-	public void apply(SaturationState.Engine engine, Context context) {
+	public void apply(SaturationState.Writer engine, Context context) {
 
 		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		// statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
@@ -110,7 +110,7 @@ public class BackwardLink implements Conclusion {
 	}
 
 	@Override
-	public void deapply(SaturationState.Engine engine, Context context) {
+	public void deapply(SaturationState.Writer engine, Context context) {
 		apply(engine, context);
 	}
 

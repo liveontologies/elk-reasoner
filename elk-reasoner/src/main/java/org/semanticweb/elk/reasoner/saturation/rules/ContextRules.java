@@ -73,7 +73,7 @@ public abstract class ContextRules extends ChainImpl<RuleChain<Context>>
 	}
 
 	@Override
-	public void applyAll(SaturationState.Engine engine,
+	public void applyAll(SaturationState.Writer engine,
 			Context context) {
 		RuleChain<Context> current = this;
 		for (;;) {

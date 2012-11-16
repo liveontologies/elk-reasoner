@@ -296,32 +296,32 @@ public class RuleApplicationFactory implements
 	public class Engine implements InputProcessor<IndexedClassExpression>,
 			RuleEngine {
 
-		protected final SaturationState.Engine saturationEngine;
+		protected final SaturationState.Writer saturationStateWriter;
 
 		protected final ConclusionVisitor<Boolean> conclusionVisitor;
 
 		/**
 		 * Local {@link ConclusionsCounter} created for every worker
 		 */
-		protected final ConclusionsCounter conclusionsCounter_ = new ConclusionsCounter();
+		protected final ConclusionsCounter conclusionsCounter = new ConclusionsCounter();
 		/**
 		 * Local {@link RuleStatistics} created for every worker
 		 */
-		protected final RuleStatistics ruleStats_ = new RuleStatistics();
+		protected final RuleStatistics ruleStats = new RuleStatistics();
 		/**
 		 * Local {@link ThisStatistics} created for every worker
 		 */
-		protected final ThisStatistics factoryStats_ = new ThisStatistics();
+		protected final ThisStatistics factoryStats = new ThisStatistics();
 
 		protected Engine(ConclusionVisitor<Boolean> visitor) {
 			conclusionVisitor = visitor;
-			this.saturationEngine = saturationState_
-					.getEngine(new ContextCreationListener() {
+			this.saturationStateWriter = saturationState_
+					.getWriter(new ContextCreationListener() {
 						private int localContextNumber_ = 0;
 
 						@Override
 						public void notifyContextCreation(Context newContext) {
-							factoryStats_.countCreatedContexts++;
+							factoryStats.countCreatedContexts++;
 							if (++localContextNumber_ == CONTEXT_UPDATE_INTERVAL_) {
 								approximateContextNumber_
 										.addAndGet(CONTEXT_UPDATE_INTERVAL_);
@@ -337,17 +337,17 @@ public class RuleApplicationFactory implements
 
 		@Override
 		public void submit(IndexedClassExpression job) {
-			saturationEngine.getCreateContext(job);
+			saturationStateWriter.getCreateContext(job);
 		}
 
 		@Override
 		public void process() {
-			factoryStats_.timeContextProcess -= CachedTimeThread.currentTimeMillis;
+			factoryStats.timeContextProcess -= CachedTimeThread.currentTimeMillis;
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
 
-				Context nextContext = saturationEngine.pollForContext();
+				Context nextContext = saturationStateWriter.pollForContext();
 
 				if (nextContext == null) {
 					break;
@@ -355,14 +355,14 @@ public class RuleApplicationFactory implements
 					process(nextContext);
 				}
 			}
-			factoryStats_.timeContextProcess += CachedTimeThread.currentTimeMillis;
+			factoryStats.timeContextProcess += CachedTimeThread.currentTimeMillis;
 		}
 
 		@Override
 		public void finish() {
-			aggregatedConclusionsCounter_.merge(conclusionsCounter_);
-			aggregatedRuleStats_.merge(ruleStats_);
-			aggregatedFactoryStats_.merge(factoryStats_);
+			aggregatedConclusionsCounter_.merge(conclusionsCounter);
+			aggregatedRuleStats_.merge(ruleStats);
+			aggregatedFactoryStats_.merge(factoryStats);
 		}
 
 		/**
@@ -370,12 +370,12 @@ public class RuleApplicationFactory implements
 		 */
 		@Override
 		public ConclusionsCounter getConclusionsCounter() {
-			return this.conclusionsCounter_;
+			return this.conclusionsCounter;
 		}
 
 		@Override
 		public RuleStatistics getRulesTimer() {
-			return this.ruleStats_;
+			return this.ruleStats;
 		}
 
 		/**
@@ -385,7 +385,7 @@ public class RuleApplicationFactory implements
 		 *            the context in which to process the scheduled items
 		 */
 		protected void process(Context context) {
-			factoryStats_.contContextProcess++;
+			factoryStats.contContextProcess++;
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
 				if (conclusion == null) {
@@ -405,7 +405,7 @@ public class RuleApplicationFactory implements
 		}
 
 		protected void process(Conclusion conclusion, Context context) {
-			conclusion.apply(saturationEngine, context);
+			conclusion.apply(saturationStateWriter, context);
 		}
 
 		protected boolean preApply(Conclusion conclusion, Context context) {
@@ -421,12 +421,11 @@ public class RuleApplicationFactory implements
 	protected abstract class BaseConclusionVisitor implements
 			ConclusionVisitor<Boolean> {
 
-		protected void markAsModified(Context context) {
+		protected void markAsNotSaturated(Context context) {
 			// re-use the saturation flag as a sign that the context is modified
 			// for the first time
 			if (trackModifiedContexts_ && context.isSaturated()) {
-				saturationState_.markAsModified(context);
-				context.setSaturated(false);
+				saturationState_.getWrite().markAsNotSaturated(context);
 			}
 		}
 	}
@@ -442,7 +441,7 @@ public class RuleApplicationFactory implements
 			if (context.addSuperClassExpression(negSCE.getExpression())) {
 				// statistics_.superClassExpressionNo++;
 				// statistics_.negSuperClassExpressionInfNo++;
-				markAsModified(context);
+				markAsNotSaturated(context);
 
 				return true;
 			}
@@ -456,7 +455,7 @@ public class RuleApplicationFactory implements
 			if (context.addSuperClassExpression(posSCE.getExpression())) {
 				// statistics_.superClassExpressionNo++;
 				// statistics_.posSuperClassExpressionInfNo++;
-				markAsModified(context);
+				markAsNotSaturated(context);
 
 				return true;
 			}
@@ -468,7 +467,7 @@ public class RuleApplicationFactory implements
 		public Boolean visit(BackwardLink link, Context context) {
 			// statistics_.backLinkInfNo++;
 			if (context.addBackwardLink(link)) {
-				markAsModified(context);
+				markAsNotSaturated(context);
 
 				return true;
 			}

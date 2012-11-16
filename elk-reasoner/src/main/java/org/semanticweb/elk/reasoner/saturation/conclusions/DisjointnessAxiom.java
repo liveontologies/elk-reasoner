@@ -47,12 +47,12 @@ public class DisjointnessAxiom implements Conclusion {
 	}
 
 	@Override
-	public void deapply(SaturationState.Engine engine, Context context) {
+	public void deapply(SaturationState.Writer engine, Context context) {
 		apply(engine, context);
 	}
 
 	@Override
-	public void apply(SaturationState.Engine engine, Context context) {
+	public void apply(SaturationState.Writer engine, Context context) {
 		if (context.containsDisjointnessAxiom(axiom_) > 1) {
 			engine.produce(context,
 					new PositiveSuperClassExpression(engine.getOwlNothing()));

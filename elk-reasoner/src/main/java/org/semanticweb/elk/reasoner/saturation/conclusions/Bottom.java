@@ -46,7 +46,7 @@ public class Bottom implements Conclusion {
 	// private static final Logger LOGGER_ = Logger.getLogger(Bottom.class);
 
 	@Override
-	public void deapply(SaturationState.Engine engine, Context context) {
+	public void deapply(SaturationState.Writer engine, Context context) {
 		context.setConsistent(true);
 		propagateThroughBackwardLinks(engine, context);
 		context.getBackwardLinkRulesChain().remove(
@@ -54,7 +54,7 @@ public class Bottom implements Conclusion {
 	}
 
 	@Override
-	public void apply(SaturationState.Engine engine, Context context) {
+	public void apply(SaturationState.Writer engine, Context context) {
 		context.setConsistent(false);
 		propagateThroughBackwardLinks(engine, context);
 		// register the backward link rule for propagation of bottom
@@ -63,7 +63,7 @@ public class Bottom implements Conclusion {
 				BottomBackwardLinkRule.FACTORY_);
 	}
 
-	private void propagateThroughBackwardLinks(SaturationState.Engine engine,
+	private void propagateThroughBackwardLinks(SaturationState.Writer engine,
 			Context context) {
 
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
@@ -104,7 +104,7 @@ public class Bottom implements Conclusion {
 		}
 
 		@Override
-		public void apply(SaturationState.Engine engine, BackwardLink link) {
+		public void apply(SaturationState.Writer engine, BackwardLink link) {
 			/*
 			 * RuleStatistics stats = ruleEngine.getRulesTimer();
 			 * 

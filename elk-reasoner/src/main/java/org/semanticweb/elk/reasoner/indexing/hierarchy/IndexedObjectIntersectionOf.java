@@ -120,7 +120,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecompositionRule(SaturationState.Engine engine,
+	public void applyDecompositionRule(SaturationState.Writer writer,
 			Context context) {
 		/*
 		 * RuleStatistics stats = ruleEngine.getRulesTimer();
@@ -131,9 +131,9 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		 */
 
 		try {
-			engine.produce(context, new PositiveSuperClassExpression(
+			writer.produce(context, new PositiveSuperClassExpression(
 					firstConjunct_));
-			engine.produce(context, new PositiveSuperClassExpression(
+			writer.produce(context, new PositiveSuperClassExpression(
 					secondConjunct_));
 		} finally {
 			// stats.timeObjectIntersectionOfDecompositionRule +=
@@ -189,7 +189,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(SaturationState.Engine engine, Context context) {
+		public void apply(SaturationState.Writer writer, Context context) {
 
 			/*
 			 * RuleStatistics stats = ruleEngine.getRulesTimer();
@@ -204,7 +204,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 						conjunctionsByConjunct_.keySet(),
 						context.getSuperClassExpressions()))
-					engine.produce(context, new NegativeSuperClassExpression(
+					writer.produce(context, new NegativeSuperClassExpression(
 							conjunctionsByConjunct_.get(common)));
 			} finally {
 				// stats.timeObjectIntersectionOfCompositionRule +=

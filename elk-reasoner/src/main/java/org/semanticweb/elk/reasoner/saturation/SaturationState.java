@@ -62,27 +62,19 @@ public class SaturationState {
 	 * occurs exactly once.
 	 */
 	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
-
-	// private ContextCreationListenerChain contextCreationListeners_ = null;//
-	// new
-	// ContextCreationListenerChain2();
-
-	private Queue<IndexedClassExpression> modifiedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 	
-	public void markAsModified(Context context) {
-		modifiedContexts_.add(context.getRoot());
-	}
+	/**
+	 * The queue of all contexts for which computation of the closure under
+	 * inference rules has not yet been finished.
+	 */
+	private Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 	
 	public Collection<IndexedClassExpression> getModifiedContexts() {
-		return modifiedContexts_ == null ? Collections
-				.<IndexedClassExpression> emptyList() : modifiedContexts_;
+		return notSaturatedContexts_ == null ? Collections
+				.<IndexedClassExpression> emptyList() : notSaturatedContexts_;
 	}
 
-	public void clearModifiedContexts() {
-		modifiedContexts_.clear();
-	}
-
-	private final Engine defaultEngine_ = new Engine(
+	private final Writer defaultEngine_ = new Writer(
 			new ContextCreationListener() {
 
 				@Override
@@ -98,62 +90,47 @@ public class SaturationState {
 		owlNothing_ = index.getIndexedOwlNothing();
 	}
 
-	// public void registerContextCreationListener(ContextCreationListener
-	// listener) {
-	// if (contextCreationListeners_ == null) {
-	// contextCreationListeners_ = new ContextCreationListenerChain(
-	// listener, null);
-	// } else {
-	// contextCreationListeners_.register(listener);
-	// }
-	// }
-	//
-	// public void deregisterContextCreationListener(
-	// ContextCreationListener listener) {
-	// contextCreationListeners_.deregister(listener);
-	// }
-
 	/**
-	 * @return an {@link Engine} for modifying this {@link SaturationState}. The
-	 *         methods of this {@link Engine} are thread safe
+	 * @return an {@link Writer} for modifying this {@link SaturationState}. The
+	 *         methods of this {@link Writer} are thread safe
 	 */
-	public Engine getEngine() {
+	public Writer getWrite() {
 		return defaultEngine_;
 	}
 
 	/**
-	 * Creates a new {@link Engine} for modifying this {@link SaturationState}
+	 * Creates a new {@link Writer} for modifying this {@link SaturationState}
 	 * associated with the given {@link ContextCreationListener}. If
 	 * {@link ContextCreationListener} is not thread safe, the calls of the
-	 * methods for the same {@link Engine} should be synchornized
+	 * methods for the same {@link Writer} should be synchronized
 	 * 
 	 * @param contextCreationListener
 	 *            {@link ContextCreationListener} to be used for this
-	 *            {@link Engine}
-	 * @return a new {@link Engine} associated with the given
+	 *            {@link Writer}
+	 * @return a new {@link Writer} associated with the given
 	 *         {@link ContextCreationListener}
 	 */
-	public Engine getEngine(ContextCreationListener contextCreationListener) {
-		return new Engine(contextCreationListener);
+	public Writer getWriter(ContextCreationListener contextCreationListener) {
+		return new Writer(contextCreationListener);
 	}
 
 	/**
-	 * Functions that can modify the saturation state are grouped here. With
-	 * every {@link Engine} one can register a {@link ContextCreationListener}
-	 * that will be executed every time this {@link Engine} creates a new
-	 * {@code Context}. Although all functions of this {@link Engine} are thread
+	 * Functions that can write the saturation state are grouped here. With
+	 * every {@link Writer} one can register a {@link ContextCreationListener}
+	 * that will be executed every time this {@link Writer} creates a new
+	 * {@code Context}. Although all functions of this {@link Writer} are thread
 	 * safe, the function of the {@link ContextCreationListener} might not be,
-	 * in which the access of functions of {@link Engine} should be synchronized
+	 * in which the access of functions of {@link Writer} should be synchronized
 	 * between threads.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	public class Engine {
+	public class Writer {
 
 		private final ContextCreationListener contextCreationListener_;
 
-		private Engine(ContextCreationListener contextCreationListener) {
+		private Writer(ContextCreationListener contextCreationListener) {
 			this.contextCreationListener_ = contextCreationListener;
 		}
 
@@ -185,7 +162,6 @@ public class SaturationState {
 				if (root.setContext(context)) {
 					initContext(context);
 					contextCreationListener_.notifyContextCreation(context);
-					// contextCreationListeners_.notifyAll(context);
 				}
 			}
 			return root.getContext();
@@ -203,68 +179,13 @@ public class SaturationState {
 			}
 		}
 
+		public void markAsNotSaturated(Context context) {
+			notSaturatedContexts_.add(context.getRoot());
+			context.setSaturated(false);
+		}		
+
+		public void clearNotSaturatedContexts() {
+			notSaturatedContexts_.clear();
+		}		
 	}
-
-	/**
-	 * A tiny chain of listeners supporting register/deregister operations
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 */
-
-	// private static class ContextCreationListenerChain extends
-	// ChainImpl<ContextCreationListenerChain> {
-	//
-	// /*
-	// * The matcher used to find existing listeners
-	// */
-	// private static class ListenerMatcher
-	// implements
-	// Matcher<ContextCreationListenerChain, ContextCreationListenerChain> {
-	//
-	// private final ContextCreationListener toMatch_;
-	//
-	// ListenerMatcher(ContextCreationListener listener) {
-	// toMatch_ = listener;
-	// }
-	//
-	// @Override
-	// public ContextCreationListenerChain match(
-	// ContextCreationListenerChain candidate) {
-	// return (candidate.listener_ == toMatch_) ? candidate : null;
-	// }
-	//
-	// };
-	//
-	// private final ContextCreationListener listener_;
-	//
-	// ContextCreationListenerChain(final ContextCreationListener listener,
-	// final ContextCreationListenerChain tail) {
-	// super(tail);
-	// listener_ = listener;
-	// }
-	//
-	// void register(final ContextCreationListener listener) {
-	// if (find(new ListenerMatcher(listener)) == null) {
-	// setNext(new ContextCreationListenerChain(listener, next()));
-	// }
-	// }
-	//
-	// void deregister(final ContextCreationListener listener) {
-	// remove(new ListenerMatcher(listener));
-	// }
-	//
-	// /**
-	// * Notify all registered listeners that a context has been created
-	// */
-	// void notifyAll(final Context newContext) {
-	// ContextCreationListenerChain head = next();
-	//
-	// while (head != null) {
-	// head.listener_.notifyContextCreation(newContext);
-	// head = head.next();
-	// }
-	// }
-	// }
 }

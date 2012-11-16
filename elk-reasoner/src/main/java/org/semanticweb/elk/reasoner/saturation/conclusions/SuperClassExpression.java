@@ -63,7 +63,7 @@ public abstract class SuperClassExpression implements Conclusion {
 		return expression.toString();
 	}
 
-	protected void applyCompositionRules(SaturationState.Engine state,
+	protected void applyCompositionRules(SaturationState.Writer state,
 			Context context) {
 		RuleChain<Context> compositionRule = expression.getCompositionRules();
 

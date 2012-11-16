@@ -74,7 +74,7 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecompositionRule(SaturationState.Engine engine,
+	public void applyDecompositionRule(SaturationState.Writer writer,
 			Context context) {
 		// TODO Auto-generated method stub
 

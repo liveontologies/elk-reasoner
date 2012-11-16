@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 
 /**
  * A rule that can be applied to elements of a particular type within a
- * {@link SaturationState.Engine}.
+ * {@link SaturationState.Writer}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -36,14 +36,14 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 public interface Rule<E> {
 
 	/**
-	 * Applying the rule to an element within a {@link SaturationState.Engine}
+	 * Applying the rule to an element within a {@link SaturationState.Writer}
 	 * 
 	 * @param engine
-	 *            a {@link SaturationState.Engine} which could be changed as a
+	 *            a {@link SaturationState.Writer} which could be changed as a
 	 *            result of this rule's application
 	 * @param element
 	 *            the element to which the rule is applied
 	 */
-	public void apply(SaturationState.Engine engine, E element);
+	public void apply(SaturationState.Writer engine, E element);
 
 }

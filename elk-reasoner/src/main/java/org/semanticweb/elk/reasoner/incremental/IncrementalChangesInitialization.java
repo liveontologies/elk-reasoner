@@ -74,7 +74,7 @@ class ContextInitializationFactory
 	// private static final Logger LOGGER_ =
 	// Logger.getLogger(ContextInitializationFactory.class);
 
-	private final SaturationState.Engine saturationEngine_;
+	private final SaturationState.Writer saturationEngine_;
 	private final Map<IndexedClassExpression, RuleChain<Context>> indexChanges_;
 	private final RuleChain<Context> changedGlobalRules_;
 	private final boolean expectAllContextsSaturated_;
@@ -83,7 +83,7 @@ class ContextInitializationFactory
 			Map<IndexedClassExpression, RuleChain<Context>> indexChanges,
 			RuleChain<Context> changedGlobalRules,
 			boolean expectAllContextsSaturated) {
-		saturationEngine_ = state.getEngine();
+		saturationEngine_ = state.getWrite();
 		indexChanges_ = indexChanges;
 		changedGlobalRules_ = changedGlobalRules;
 		expectAllContextsSaturated_ = expectAllContextsSaturated;
