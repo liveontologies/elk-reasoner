@@ -21,13 +21,15 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  */
 public class LoaderThatRemembersAxioms extends Owl2StreamLoader implements ElkAxiomProcessor {
 
+	private final int limit_;
 	private final List<ElkAxiom> loaded_ = new LinkedList<ElkAxiom>();
 	
 	private ElkAxiomProcessor processor_;
 	
-	public LoaderThatRemembersAxioms(Owl2ParserFactory parserFactory, File file)
+	public LoaderThatRemembersAxioms(Owl2ParserFactory parserFactory, File file, int maxAxiomsToRemember)
 			throws FileNotFoundException {
 		super(parserFactory, file);
+		limit_ = maxAxiomsToRemember;
 	}
 	
 	@Override
@@ -41,7 +43,10 @@ public class LoaderThatRemembersAxioms extends Owl2StreamLoader implements ElkAx
 	@Override
 	public void visit(ElkAxiom elkAxiom) {
 		processor_.visit(elkAxiom);
-		loaded_.add(elkAxiom);
+		
+		if (loaded_.size() <= limit_) {
+			loaded_.add(elkAxiom);
+		}
 	}
 
 
