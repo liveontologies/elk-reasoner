@@ -24,10 +24,12 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 // TODO: documentation
@@ -46,7 +48,7 @@ public class ClassTaxonomyComputation
 	public ClassTaxonomyComputation(Collection<IndexedClass> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
-			IndividualClassTaxonomy partialTaxonomy) {
+			UpdateableTaxonomy<ElkClass> partialTaxonomy) {
 		super(inputs, new ClassTaxonomyComputationFactory(ontologyIndex,
 				maxWorkers, partialTaxonomy), executor, maxWorkers,
 				progressMonitor);
@@ -63,7 +65,7 @@ public class ClassTaxonomyComputation
 	 * @return the taxonomy computed by this computation; the method
 	 *         {@link #process()} should be called first to compute the taxonomy
 	 */
-	public IndividualClassTaxonomy getTaxonomy() {
+	public UpdateableTaxonomy<ElkClass> getTaxonomy() {
 		return inputProcessorFactory.getTaxonomy();
 	}
 

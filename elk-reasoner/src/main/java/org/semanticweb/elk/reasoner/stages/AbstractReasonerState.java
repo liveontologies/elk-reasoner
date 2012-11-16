@@ -35,9 +35,10 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.taxonomy.IndividualClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -105,9 +106,14 @@ public abstract class AbstractReasonerState {
 	 */
 	boolean inconsistentOntology = false;
 	/**
-	 * Taxonomy that stores (partial) reasoning results.
+	 * Taxonomy that stores (partial) classification
 	 */
-	IndividualClassTaxonomy taxonomy = null;
+	UpdateableTaxonomy<ElkClass> taxonomy = null;
+	
+	/**
+	 * Taxonomy that stores (partial) classification
+	 */
+	UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = null;
 
 	/**
 	 * The source where the input ontology can be loaded
@@ -367,7 +373,8 @@ public abstract class AbstractReasonerState {
 			throw new ElkInconsistentOntologyException();
 
 		getStageExecutor().complete(new InstanceTaxonomyComputationStage(this));
-		return taxonomy;
+		
+		return instanceTaxonomy;
 	}
 
 	/**

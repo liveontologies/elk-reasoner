@@ -43,6 +43,9 @@ import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -57,7 +60,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  */
 public class NonBottomClassNode implements
-		TypeNode<ElkClass, ElkNamedIndividual> {
+		UpdateableTypeNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -113,7 +116,8 @@ public class NonBottomClassNode implements
 	 * @param superNode
 	 *            node to add
 	 */
-	void addDirectSuperNode(NonBottomClassNode superNode) {
+	@Override
+	public void addDirectSuperNode(UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct super-node " + superNode);
 		directSuperNodes_.add(superNode);
@@ -125,7 +129,8 @@ public class NonBottomClassNode implements
 	 * @param subNode
 	 *            node to add
 	 */
-	void addDirectSubNode(NonBottomClassNode subNode) {
+	@Override
+	public void addDirectSubNode(UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct sub-node " + subNode);
 		if (directSubNodes_.isEmpty()) {
@@ -140,8 +145,9 @@ public class NonBottomClassNode implements
 	 * @param instanceNode
 	 *            node to add
 	 */
-	void addDirectInstanceNode(
-			InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
+	@Override
+	public void addDirectInstanceNode(
+			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct instance-node " + instanceNode);
 		directInstanceNodes_.add(instanceNode);
@@ -283,5 +289,24 @@ public class NonBottomClassNode implements
 			result = getDirectInstanceNodes();
 		}
 		return Collections.unmodifiableSet(result);
+	}
+
+	@Override
+	public void clearMembers() {
+		members_.clear();
+	}
+
+	//TODO think how to get rid of these unchecked casts
+	//in principle they can never fail 
+	@SuppressWarnings("unchecked")
+	@Override
+	public void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
+		addDirectSuperNode((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)superNode);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+		addDirectSubNode((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)subNode);
 	}
 }

@@ -39,6 +39,8 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -57,7 +59,7 @@ public class ClassTaxonomyComputationFactory implements
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
-	private final IndividualClassTaxonomy taxonomy_;
+	private final UpdateableTaxonomy<ElkClass> taxonomy_;
 	/**
 	 * The transitive reduction shared structures used in the taxonomy
 	 * construction
@@ -71,7 +73,7 @@ public class ClassTaxonomyComputationFactory implements
 	/**
 	 * The reference to cache the value of the top node for frequent use
 	 */
-	private final AtomicReference<NonBottomClassNode> topNodeRef_;
+	private final AtomicReference<UpdateableTaxonomyNode<ElkClass>> topNodeRef_;
 
 	/**
 	 * Create a shared engine for the input ontology index and a partially
@@ -88,13 +90,13 @@ public class ClassTaxonomyComputationFactory implements
 	 *            results in
 	 */
 	public ClassTaxonomyComputationFactory(OntologyIndex ontologyIndex,
-			int maxWorkers, IndividualClassTaxonomy partialTaxonomy) {
+			int maxWorkers, UpdateableTaxonomy<ElkClass> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>(
 				ontologyIndex, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
-		this.topNodeRef_ = new AtomicReference<NonBottomClassNode>();
+		this.topNodeRef_ = new AtomicReference<UpdateableTaxonomyNode<ElkClass>>();
 	}
 
 	/**
@@ -143,7 +145,7 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 
-			NonBottomClassNode node = taxonomy_.getCreateClassNode(output
+			UpdateableTaxonomyNode<ElkClass> node = taxonomy_.getCreateNode(output
 					.getEquivalent());
 
 			// FIXME this sort of equality check is not guaranteed to work
@@ -155,15 +157,14 @@ public class ClassTaxonomyComputationFactory implements
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSuperClasses()) {
-				NonBottomClassNode superNode = taxonomy_
-						.getCreateClassNode(directSuperEquivalent
+				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_.getCreateNode(directSuperEquivalent
 								.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);
 			}
 			// if there are no direct super nodes, then the top node is the
 			// only direct super node
 			if (node.getDirectSuperNodes().isEmpty()) {
-				NonBottomClassNode topNode = getCreateTopNode();
+				UpdateableTaxonomyNode<ElkClass> topNode = getCreateTopNode();
 				assignDirectSuperClassNode(node, topNode);
 			}
 		}
@@ -172,7 +173,7 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 
-			taxonomy_.addUnsatisfiableClass(output.getRoot().getElkClass());
+			taxonomy_.addToBottomNode(output.getRoot().getElkClass());
 		}
 
 		@Override
@@ -193,10 +194,10 @@ public class ClassTaxonomyComputationFactory implements
 	 * top node.
 	 * 
 	 */
-	NonBottomClassNode getCreateTopNode() {
+	UpdateableTaxonomyNode<ElkClass> getCreateTopNode() {
 		if (topNodeRef_.get() == null) {
-			NonBottomClassNode topNode = taxonomy_
-					.getCreateClassNode(Collections
+			UpdateableTaxonomyNode<ElkClass> topNode = taxonomy_
+					.getCreateNode(Collections
 							.<ElkClass> singleton(PredefinedElkClass.OWL_THING));
 			topNodeRef_.compareAndSet(null, topNode);
 		}
@@ -213,8 +214,8 @@ public class ClassTaxonomyComputationFactory implements
 	 * @param superNode
 	 *            the node that should be the super-node of the first node
 	 */
-	private static void assignDirectSuperClassNode(NonBottomClassNode subNode,
-			NonBottomClassNode superNode) {
+	private static void assignDirectSuperClassNode(UpdateableTaxonomyNode<ElkClass> subNode,
+			UpdateableTaxonomyNode<ElkClass> superNode) {
 		subNode.addDirectSuperNode(superNode);
 		/*
 		 * since super-nodes can be added from different nodes, this call should
@@ -230,7 +231,7 @@ public class ClassTaxonomyComputationFactory implements
 	 * 
 	 * @return the taxonomy constructed by this engine
 	 */
-	public IndividualClassTaxonomy getTaxonomy() {
+	public UpdateableTaxonomy<ElkClass> getTaxonomy() {
 		return this.taxonomy_;
 	}
 

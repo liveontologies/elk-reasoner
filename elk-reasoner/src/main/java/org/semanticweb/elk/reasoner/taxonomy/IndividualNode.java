@@ -39,9 +39,10 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -56,7 +57,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  */
 public class IndividualNode implements
-		InstanceNode<ElkClass, ElkNamedIndividual> {
+		UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -101,7 +102,8 @@ public class IndividualNode implements
 	 * @param typeNode
 	 *            node to add
 	 */
-	void addDirectTypeNode(NonBottomClassNode typeNode) {
+	@Override
+	public void addDirectTypeNode(UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct type-node " + typeNode);
 		directTypeNodes_.add(typeNode);
@@ -176,7 +178,7 @@ public class IndividualNode implements
 	}
 
 	@Override
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
+	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy() {
 		return this.taxonomy_;
 	}
 
@@ -185,4 +187,9 @@ public class IndividualNode implements
 		return getCanonicalMember().getIri().getFullIriAsString();
 	}
 
+	@Override
+	public void clearMembers() {
+		// TODO Auto-generated method stub
+		
+	}
 }

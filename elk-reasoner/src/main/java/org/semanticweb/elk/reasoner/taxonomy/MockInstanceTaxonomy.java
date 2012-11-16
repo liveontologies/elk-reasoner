@@ -395,7 +395,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject> impl
 		
 		@Override
 		public void addDirectInstance(InstanceNode<T,I> instance) {
-			assert instance.getTaxonomy() == getTaxonomy();
+			assert instance.getInstanceTaxonomy() == getTaxonomy();
 			assert this != getBottomNode();
 			
 			if (this != getTopNode()) { 
@@ -621,7 +621,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject> impl
 
 			for (TypeNode<T,I> type : types) {
 				assert type != null;
-				assert type.getTaxonomy() == getTaxonomy();
+				assert type.getTaxonomy() == getInstanceTaxonomy();
 				
 				((MockTypeNode)type).addDirectInstance(this);
 			}
@@ -651,7 +651,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject> impl
 		}
 
 		@Override
-		public InstanceTaxonomy<T, I> getTaxonomy() {
+		public InstanceTaxonomy<T, I> getInstanceTaxonomy() {
 			return MockInstanceTaxonomy.this;
 		}
 		

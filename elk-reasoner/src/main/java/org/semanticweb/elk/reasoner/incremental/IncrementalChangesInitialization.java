@@ -74,7 +74,7 @@ class ContextInitializationFactory
 	// private static final Logger LOGGER_ =
 	// Logger.getLogger(ContextInitializationFactory.class);
 
-	private final SaturationState.Writer saturationEngine_;
+	private final SaturationState.Writer saturationStateWriter_;
 	private final Map<IndexedClassExpression, RuleChain<Context>> indexChanges_;
 	private final RuleChain<Context> changedGlobalRules_;
 	private final boolean expectAllContextsSaturated_;
@@ -83,7 +83,7 @@ class ContextInitializationFactory
 			Map<IndexedClassExpression, RuleChain<Context>> indexChanges,
 			RuleChain<Context> changedGlobalRules,
 			boolean expectAllContextsSaturated) {
-		saturationEngine_ = state.getWriter();
+		saturationStateWriter_ = state.getWriter();
 		indexChanges_ = indexChanges;
 		changedGlobalRules_ = changedGlobalRules;
 		expectAllContextsSaturated_ = expectAllContextsSaturated;
@@ -113,7 +113,7 @@ class ContextInitializationFactory
 					if (changedGlobalRules_ != null) {
 						// apply all changed global context rules
 						changedGlobalRules_
-								.applyAll(saturationEngine_, context);
+								.applyAll(saturationStateWriter_, context);
 					}
 
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
@@ -121,7 +121,7 @@ class ContextInitializationFactory
 							context.getSuperClassExpressions())) {
 						// applying the changed rules for this class expression
 						indexChanges_.get(changedICE).applyAll(
-								saturationEngine_, context);
+								saturationStateWriter_, context);
 					}
 				}
 			}

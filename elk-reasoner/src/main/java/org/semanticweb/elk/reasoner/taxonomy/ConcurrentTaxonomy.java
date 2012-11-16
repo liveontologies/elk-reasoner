@@ -45,6 +45,9 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 
@@ -57,7 +60,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-class ConcurrentTaxonomy extends IndividualClassTaxonomy {
+class ConcurrentTaxonomy implements UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> {//IndividualClassTaxonomy {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -170,7 +173,7 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 	}
 
 	@Override
-	NonBottomClassNode getCreateClassNode(Collection<ElkClass> members) {
+	public NonBottomClassNode getCreateTypeNode(Collection<ElkClass> members) {
 		ElkClass someMember = members.iterator().next();
 
 		NonBottomClassNode previous = classNodeLookup_.get(getKey(someMember));
@@ -198,7 +201,7 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 	}
 
 	@Override
-	IndividualNode getCreateIndividualNode(
+	public IndividualNode getCreateIndividualNode(
 			Collection<ElkNamedIndividual> members) {
 
 		IndividualNode node = new IndividualNode(this, members);
@@ -223,10 +226,48 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 	}
 
 	@Override
-	void addUnsatisfiableClass(ElkClass elkClass) {
-		unsatisfiableClasses.add(elkClass);
+	public boolean addToBottomNode(ElkClass elkClass) {
+		return unsatisfiableClasses.add(elkClass);
+	}
+	
+	@Override
+	public UpdateableTaxonomyNode<ElkClass> getCreateNode(Collection<ElkClass> members) {
+		return getCreateTypeNode(members);
 	}
 
+	@Override
+	public boolean removeNode(ElkClass member) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeInstanceNode(ElkNamedIndividual instance) {
+		// TODO Auto-generated method stub
+		return false;
+	}	
+
+	
+	@Override
+	public UpdateableTaxonomyNode<ElkClass> getUpdateableNode(ElkClass elkObject) {
+		return getUpdateableTypeNode(elkObject);
+	}
+
+	@Override
+	public Iterable<? extends UpdateableTaxonomyNode<ElkClass>> getUpdateableNodes() {
+		return classNodeLookup_.values();
+	}
+
+	@Override
+	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getUpdateableTypeNode(ElkClass elkObject) {
+		return classNodeLookup_.get(getKey(elkObject));
+	}
+
+	/*@Override
+	public Iterable<? extends UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getUpdateableTypeNodes() {
+		return classNodeLookup_.values();
+	}*/	
+	
 	/**
 	 * Special implementation for the bottom node in the taxonomy. Instead of
 	 * storing its sub- and super-classes, the respective answers are computed
@@ -301,5 +342,4 @@ class ConcurrentTaxonomy extends IndividualClassTaxonomy {
 			return Collections.emptySet();
 		}
 	}
-
 }

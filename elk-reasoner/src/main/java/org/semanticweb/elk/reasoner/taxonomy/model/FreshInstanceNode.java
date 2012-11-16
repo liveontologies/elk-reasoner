@@ -50,7 +50,7 @@ public class FreshInstanceNode<T extends ElkObject, I extends ElkObject>
 	}
 
 	@Override
-	public InstanceTaxonomy<T, I> getTaxonomy() {
+	public InstanceTaxonomy<T, I> getInstanceTaxonomy() {
 		return taxonomy;
 	}
 

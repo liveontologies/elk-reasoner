@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 
 /**
@@ -48,12 +49,11 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	@Override
 	public String getName() {
-		return "Incremental Class Taxonomy Computation";
+		return IncrementalStages.TAXONOMY_CONSTRUCTION.toString();
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		//TODO need some incremental taxonomy update/clean phase
 		return Arrays.asList((ReasonerStage) new IncrementalConsistencyCheckingStage(reasoner));
 	}
 
@@ -68,6 +68,4 @@ class IncrementalClassTaxonomyComputationStage extends
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
 				reasoner.ontologyIndex);
 	}
-
-	
 }

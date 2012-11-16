@@ -90,6 +90,22 @@ public enum IncrementalStages {
 		public String toString() {
 			return "Incremental Context Completion";
 		}
+	},
+		
+	TAXONOMY_CLEANING {
+
+		@Override
+		public String toString() {
+			return "Incremental Taxonomy Cleaning";
+		}
+	},
+	
+	TAXONOMY_CONSTRUCTION {
+
+		@Override
+		public String toString() {
+			return "Incremental Taxonomy Construction";
+		}
 	};
 
 	@Override

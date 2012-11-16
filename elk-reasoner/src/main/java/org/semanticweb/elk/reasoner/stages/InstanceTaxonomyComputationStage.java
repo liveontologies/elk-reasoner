@@ -81,6 +81,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 		reasoner.taxonomy = computation_.getTaxonomy();
+		reasoner.instanceTaxonomy = computation_.getTaxonomy();
 		reasoner.doneInstanceTaxonomy = true;
 	}
 
@@ -91,7 +92,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			this.computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.ontologyIndex, reasoner.taxonomy);
+					reasoner.ontologyIndex, reasoner.instanceTaxonomy);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}

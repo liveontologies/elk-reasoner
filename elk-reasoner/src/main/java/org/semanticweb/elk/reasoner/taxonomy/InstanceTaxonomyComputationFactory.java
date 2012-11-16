@@ -24,6 +24,8 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
@@ -37,6 +39,9 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -60,7 +65,7 @@ public class InstanceTaxonomyComputationFactory implements
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
-	private final IndividualClassTaxonomy taxonomy_;
+	private final UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy_;
 	/**
 	 * The transitive reduction shared structures used in the taxonomy
 	 * construction
@@ -91,7 +96,7 @@ public class InstanceTaxonomyComputationFactory implements
 	 *            results in
 	 */
 	public InstanceTaxonomyComputationFactory(OntologyIndex ontologyIndex,
-			int maxWorkers, IndividualClassTaxonomy partialTaxonomy) {
+			int maxWorkers, UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>(
 				ontologyIndex, maxWorkers,
@@ -134,13 +139,13 @@ public class InstanceTaxonomyComputationFactory implements
 				TransitiveReductionOutputEquivalentDirect<IndexedIndividual> output) {
 
 			// only supports singleton individuals
-			IndividualNode node = taxonomy_.getCreateIndividualNode(Collections
+			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_.getCreateIndividualNode(Collections
 					.singleton(output.getRoot().getElkNamedIndividual()));
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSuperClasses()) {
-				NonBottomClassNode superNode = taxonomy_
-						.getCreateClassNode(directSuperEquivalent
+				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = taxonomy_
+						.getCreateTypeNode(directSuperEquivalent
 								.getEquivalent());
 				assignDirectTypeNode(node, superNode);
 			}
@@ -179,8 +184,8 @@ public class InstanceTaxonomyComputationFactory implements
 	 * @param typeNode
 	 *            the node that should be the super-node of the first node
 	 */
-	private static void assignDirectTypeNode(IndividualNode instanceNode,
-			NonBottomClassNode typeNode) {
+	private static void assignDirectTypeNode(UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
+			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
 		instanceNode.addDirectTypeNode(typeNode);
 		/*
 		 * since type-nodes can be added from different nodes, this call should
@@ -196,7 +201,7 @@ public class InstanceTaxonomyComputationFactory implements
 	 * 
 	 * @return the taxonomy constructed by this engine
 	 */
-	public IndividualClassTaxonomy getTaxonomy() {
+	public UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
 		return this.taxonomy_;
 	}
 

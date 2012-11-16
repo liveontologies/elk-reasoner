@@ -24,10 +24,13 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 // TODO: documentation
@@ -47,7 +50,7 @@ public class InstanceTaxonomyComputation
 	public InstanceTaxonomyComputation(Collection<IndexedIndividual> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
-			IndividualClassTaxonomy partialTaxonomy) {
+			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
 		super(inputs, new InstanceTaxonomyComputationFactory(ontologyIndex,
 				maxWorkers, partialTaxonomy), executor, maxWorkers,
 				progressMonitor);
@@ -64,7 +67,7 @@ public class InstanceTaxonomyComputation
 	 * @return the taxonomy computed by this computation; the method
 	 *         {@link #process()} should be called first to compute the taxonomy
 	 */
-	public IndividualClassTaxonomy getTaxonomy() {
+	public UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
 		return inputProcessorFactory.getTaxonomy();
 	}
 

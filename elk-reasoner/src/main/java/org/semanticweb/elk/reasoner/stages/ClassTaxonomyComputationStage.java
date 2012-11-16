@@ -82,6 +82,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
+		
 		reasoner.taxonomy = computation_.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
 	}

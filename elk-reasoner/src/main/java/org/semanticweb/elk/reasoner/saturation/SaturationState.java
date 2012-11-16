@@ -69,7 +69,7 @@ public class SaturationState {
 	 */
 	private Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 	
-	public Collection<IndexedClassExpression> getModifiedContexts() {
+	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
 		return notSaturatedContexts_ == null ? Collections
 				.<IndexedClassExpression> emptyList() : notSaturatedContexts_;
 	}

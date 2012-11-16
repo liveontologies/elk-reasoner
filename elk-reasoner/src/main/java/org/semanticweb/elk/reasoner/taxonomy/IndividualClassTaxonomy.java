@@ -37,13 +37,13 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
  * @author Markus Kroetzsch
  * 
  */
-public abstract class IndividualClassTaxonomy implements
+public interface IndividualClassTaxonomy extends
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> {
 
-	abstract NonBottomClassNode getCreateClassNode(Collection<ElkClass> members);
+	NonBottomClassNode getCreateClassNode(Collection<ElkClass> members);
 
-	abstract IndividualNode getCreateIndividualNode(
+	IndividualNode getCreateIndividualNode(
 			Collection<ElkNamedIndividual> members);
 
-	abstract void addUnsatisfiableClass(ElkClass elkClass);
+	void addUnsatisfiableClass(ElkClass elkClass);
 }

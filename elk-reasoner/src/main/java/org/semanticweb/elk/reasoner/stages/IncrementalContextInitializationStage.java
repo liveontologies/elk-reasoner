@@ -128,8 +128,8 @@ public class IncrementalContextInitializationStage extends
 			}
 		}
 
-		todo = reasoner.saturationState.getModifiedContexts().iterator();
-		maxContexts_ = reasoner.saturationState.getModifiedContexts().size();
+		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();
+		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size();
 		initContexts_ = 0;
 	}
 
