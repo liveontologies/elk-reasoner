@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
@@ -87,11 +85,11 @@ public class RuleApplicationFactory implements
 	 * be updated only in the methods
 	 * {@link Engine#submit(IndexedClassExpression)} or {@link Engine#process()}
 	 */
-	private final AtomicInteger approximateContextNumber_ = new AtomicInteger(0);
+	//private final AtomicInteger approximateContextNumber_ = new AtomicInteger(0);
 	/**
 	 * @see #approximateContextNumber_
 	 */
-	private static final int CONTEXT_UPDATE_INTERVAL_ = 32;
+	//private static final int CONTEXT_UPDATE_INTERVAL_ = 32;
 
 	private final boolean trackModifiedContexts_;
 
@@ -110,8 +108,12 @@ public class RuleApplicationFactory implements
 
 	@Override
 	public Engine getEngine() {
-		return new Engine(new AddConclusionVisitor());
+		return new Engine(new AddConclusionVisitor(), null/*no context creation listener*/);
 	}
+	
+	public Engine getEngine(ContextCreationListener listener) {
+		return new Engine(new AddConclusionVisitor(), listener);
+	}	
 
 	@Override
 	public void finish() {
@@ -125,9 +127,9 @@ public class RuleApplicationFactory implements
 	 *         {@link Engine#submit(IndexedClassExpression)} or
 	 *         {@link Engine#process()} are called
 	 */
-	public int getRegisteredCreatedContextCount() {
+	/*public int getRegisteredCreatedContextCount() {
 		return approximateContextNumber_.get();
-	}
+	}*/
 
 	/**
 	 * Prints statistic of rule applications
@@ -312,20 +314,24 @@ public class RuleApplicationFactory implements
 		 * Local {@link ThisStatistics} created for every worker
 		 */
 		protected final ThisStatistics factoryStats = new ThisStatistics();
-
-		protected Engine(ConclusionVisitor<Boolean> visitor) {
+		
+		protected Engine(final ConclusionVisitor<Boolean> visitor,
+				final ContextCreationListener listener) {
 			conclusionVisitor = visitor;
 			this.saturationStateWriter = saturationState_
 					.getWriter(new ContextCreationListener() {
-						private int localContextNumber_ = 0;
 
 						@Override
 						public void notifyContextCreation(Context newContext) {
+							// this is local context creation stats
 							factoryStats.countCreatedContexts++;
-							if (++localContextNumber_ == CONTEXT_UPDATE_INTERVAL_) {
-								approximateContextNumber_
-										.addAndGet(CONTEXT_UPDATE_INTERVAL_);
-								localContextNumber_ = 0;
+							/*
+							 * notify the provided listener so that outer code
+							 * e.g. {@link ClassExpressionSaturationFactory} can track
+							 * the number of created contexts
+							 */
+							if (listener != null) {
+								listener.notifyContextCreation(newContext);
 							}
 						}
 					});

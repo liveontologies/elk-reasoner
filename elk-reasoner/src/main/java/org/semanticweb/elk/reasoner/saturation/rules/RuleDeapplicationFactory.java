@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
@@ -59,7 +60,12 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 	@Override
 	public Engine getEngine() {
-		return new DeletionEngine(new DeleteConclusionVisitor());
+		return new DeletionEngine(new DeleteConclusionVisitor(), null);
+	}
+	
+	@Override
+	public Engine getEngine(ContextCreationListener listener) {
+		return new DeletionEngine(new DeleteConclusionVisitor(), listener);
 	}
 
 	/**
@@ -69,14 +75,15 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		protected final ConclusionVisitor<Boolean> containsVisitor;
 
-		protected DeletionEngine(ConclusionVisitor<Boolean> postVisitor) {
-			super(postVisitor);
+		protected DeletionEngine(ConclusionVisitor<Boolean> postVisitor,
+				ContextCreationListener listener) {
+			super(postVisitor, listener);
 			containsVisitor = new ContainsConclusionVisitor();
 		}
 
 		protected DeletionEngine(ConclusionVisitor<Boolean> preVisitor,
-				ConclusionVisitor<Boolean> postVisitor) {
-			super(postVisitor);
+				ConclusionVisitor<Boolean> postVisitor, ContextCreationListener listener) {
+			super(postVisitor, listener);
 			containsVisitor = preVisitor;
 		}
 

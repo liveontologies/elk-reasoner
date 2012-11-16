@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
@@ -47,8 +48,8 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	}
 
 	@Override
-	public Engine getEngine() {
-		return new DeletionEngine(new PreApplyConclusionVisitor(), new DeleteConclusionVisitor());
+	public Engine getEngine(ContextCreationListener listener) {
+		return new DeletionEngine(new PreApplyConclusionVisitor(), new DeleteConclusionVisitor(), listener);
 	}
 
 	/**
