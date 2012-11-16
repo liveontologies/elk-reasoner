@@ -60,7 +60,7 @@ public class IncrementalClassificationTask implements Task {
 		try {
 			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
 			LoaderThatRemembersAxioms loader = new LoaderThatRemembersAxioms(
-					new Owl2FunctionalStyleParserFactory(), ontologyFile);
+					new Owl2FunctionalStyleParserFactory(), ontologyFile, 100000);
 
 			reasoner_ = new ReasonerFactory().createReasoner(
 					new LoggingStageExecutor(), reasonerConfig_);
