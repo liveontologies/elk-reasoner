@@ -65,26 +65,16 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
 public class RuleApplicationEngine {
 
 	// Statistical information
-	public static AtomicInteger otherRules = new AtomicInteger(0);
-	public static AtomicInteger otherNo = new AtomicInteger(0);
+	private static AtomicInteger otherRules = new AtomicInteger(0);
+	private static AtomicInteger otherNo = new AtomicInteger(0);
 
-	public static AtomicInteger reachRules = new AtomicInteger(0);
-	public static AtomicInteger reachNo = new AtomicInteger(0);
+	private static AtomicInteger reachRules = new AtomicInteger(0);
+	private static AtomicInteger reachNo = new AtomicInteger(0);
 	
-	public static AtomicInteger confirmedSubsumptions = new AtomicInteger(0);
-	
-	public static AtomicInteger newSuperClasses = new AtomicInteger(0);
-	public static AtomicInteger newSubsumptions = new AtomicInteger(0);
-	
-	public static AtomicInteger atomicSubNominal = new AtomicInteger(0);
-	public static AtomicInteger nominalSubNominal = new AtomicInteger(0);
-	public static AtomicInteger complexSubNominal = new AtomicInteger(0);
-	
-	public static boolean secondPhase = false;
+	private static boolean secondPhase = false;
 	
 	public static void write() {
 		System.err.printf("%d %d %s %s\n", otherRules.get()+reachRules.get(), otherNo.get()+reachNo.get(), reachRules, reachNo);
-		System.err.printf("%s %s %s\n", atomicSubNominal, nominalSubNominal, complexSubNominal);
 	}
 	
 	
@@ -93,9 +83,6 @@ public class RuleApplicationEngine {
 		otherNo.set(0);
 		reachRules.set(0);
 		reachNo.set(0);
-		atomicSubNominal.set(0);
-		nominalSubNominal.set(0);
-		complexSubNominal.set(0);
 	}
 	
 	public static void setSecondPhase() {
@@ -131,14 +118,8 @@ public class RuleApplicationEngine {
 		owlThing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
 		owlNothing = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
 		
-		int nominalNo = 0;
-		for (IndexedNominal nominal : ontologyIndex.getIndexedNominals()) {
-			SaturatedClassExpression context = getCreateContext(nominal);
-//			if (secondPhase)
-//				enqueue(context, new Reachability(DefiniteMarkers.INSTANCE));
-			nominalNo++;
-		}
-		System.err.println("Indexed Nominals: " + nominalNo);
+		for (IndexedNominal nominal : ontologyIndex.getIndexedNominals())
+			getCreateContext(nominal);
 	}
 
 	/**
@@ -408,22 +389,6 @@ public class RuleApplicationEngine {
 
 		private void processClassExpression(IndexedClassExpression ice, Markers markers) {
 
-			if (secondPhase && markers.isDefinite() && context.root instanceof IndexedClass) {
-				if (!context.newSubsumption && context.secondPhase) {
-					context.newSubsumption = true;
-					newSubsumptions.incrementAndGet();
-				}
-				if (ice instanceof IndexedClass) {
-					if (!context.newSuperClass) {
-						context.newSuperClass = true;
-						newSuperClasses.incrementAndGet();
-					}
-					confirmedSubsumptions.incrementAndGet();
-				}
-			}
-			
-
-
 			/* process subsumptions */
 			if (ice.getToldSuperClassExpressions() != null) {
 				for (IndexedClassExpression implied : ice
@@ -474,7 +439,6 @@ public class RuleApplicationEngine {
 				}
 				
 				// optimization for finding more non-empty classes in Stage 1
-				
 //				if (context.reachable.isDefinite() && markers.isDefinite() ) {
 //					SaturatedClassExpression target = getCreateContext(ice);
 //					enqueue(target, new Reachability(DefiniteMarkers.INSTANCE));
@@ -571,19 +535,6 @@ public class RuleApplicationEngine {
 							enqueue(mce2.getKey(), new SuperClassExpression(mark(mce1.getKey().getRoot(), intersection)));
 						}
 					}
-				
-//				if (mce1.getMarkers().isDefinite()) {
-
-					if (mce1.getKey().getRoot() instanceof IndexedClass) {
-						atomicSubNominal.incrementAndGet();
-					}
-					else if (mce1.getKey().getRoot() instanceof IndexedNominal) {
-						nominalSubNominal.incrementAndGet();
-					}
-					else {
-						complexSubNominal.incrementAndGet();
-					}
-//				}
 			}
 
 			return null;

@@ -30,10 +30,13 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
+import org.semanticweb.elk.reasoner.saturation.SaturationJob;
+import org.semanticweb.elk.reasoner.saturation.classes.RuleApplicationEngine;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyEngine;
-import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyComputation;
 import org.semanticweb.elk.util.logging.Statistics;
 
 public class Reasoner {
@@ -91,40 +94,88 @@ public class Reasoner {
 		final int maxIndexedClassCount = ontologyIndex.getIndexedClassCount();
 		// variable used in progress monitors
 		int progress;
-
-		// Saturation stage
-		ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
-				executor, workerNo, ontologyIndex);
-
-		TaxonomyComputation taxonomyComputation = new TaxonomyComputation(
-				executor, workerNo, ontologyIndex);
-
+		
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("Classification using " + workerNo + " workers");
-		Statistics.logOperationStart("Classification", LOGGER_);
-		progressMonitor.start("Classification");
 
+		// Object Property Saturation stage
+		ObjectPropertySaturation objectPropertySaturation = new ObjectPropertySaturation(
+				executor, workerNo, ontologyIndex);
 		try {
 			objectPropertySaturation.compute();
-		} catch (InterruptedException e1) {
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
+		// first Class Expression Saturation stage
+		Statistics.logOperationStart("First Saturation Stage", LOGGER_);
+		progressMonitor.start("First Saturation Stage");
 		progress = 0;
-		taxonomyComputation.start();
-		for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
-			try {
-				taxonomyComputation.submit(ic);
-			} catch (InterruptedException e) {
+		
+		ClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
+				executor, workerNo, ontologyIndex);
+		classExpressionSaturation.start();
+
+		try{
+			for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
+				classExpressionSaturation.submit(new SaturationJob<IndexedClassExpression>(ic, null));
+				progressMonitor.report(++progress, maxIndexedClassCount);
 			}
-			progressMonitor.report(++progress, maxIndexedClassCount);
+			classExpressionSaturation.waitCompletion();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
+		
+		progressMonitor.finish();
+		Statistics.logOperationFinish("First Saturation Stage", LOGGER_);
+		Statistics.logMemoryUsage(LOGGER_);
+
+		// second Class Expression Saturation stage
+		Statistics.logOperationStart("Second Saturation Stage", LOGGER_);
+		progressMonitor.start("Second Saturation Stage");
+		progress = 0;
+		
+		RuleApplicationEngine.setSecondPhase();
+		classExpressionSaturation = new ClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
+				executor, workerNo, ontologyIndex);
+		classExpressionSaturation.start();
+
 		try {
+			for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
+				if (ic.getSaturated().setSaturated() > 0)
+					classExpressionSaturation.submit(new SaturationJob<IndexedClassExpression>(ic,ic.getSaturated()));
+				progressMonitor.report(++progress, maxIndexedClassCount);
+			}
+			classExpressionSaturation.waitCompletion();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		progressMonitor.finish();
+		Statistics.logOperationFinish("Second Saturation Stage", LOGGER_);
+		Statistics.logMemoryUsage(LOGGER_);
+
+		
+		// Taxonomy Construction stage
+		Statistics.logOperationStart("Taxonomy Construction", LOGGER_);
+		progressMonitor.start("Taxonomy Construction");
+		progress = 0;
+
+		TaxonomyComputation taxonomyComputation = new TaxonomyComputation(executor, workerNo, ontologyIndex);
+		taxonomyComputation.start();
+		try {
+			for (IndexedClass ic : ontologyIndex.getIndexedClasses()) {
+				taxonomyComputation.submit(ic);
+				progressMonitor.report(++progress, maxIndexedClassCount);
+			}
 			taxonomyComputation.waitCompletion();
 		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		classTaxonomy = taxonomyComputation.getClassTaxonomy();
+		
 		progressMonitor.finish();
-		Statistics.logOperationFinish("Classification", LOGGER_);
+		Statistics.logOperationFinish("Taxonomy Construction", LOGGER_);
 		Statistics.logMemoryUsage(LOGGER_);
 	}
 
@@ -136,24 +187,5 @@ public class Reasoner {
 		executor.shutdownNow();
 	}
 
-	public class TaxonomyComputation extends
-			ConcurrentComputation<IndexedClass> {
-
-		final ClassTaxonomyEngine classTaxonomyEngine;
-
-		public TaxonomyComputation(ExecutorService executor, int maxWorkers,
-				ClassTaxonomyEngine classTaxonomyEngine) {
-			super(classTaxonomyEngine, executor, maxWorkers, 8 * maxWorkers, 16);
-			this.classTaxonomyEngine = classTaxonomyEngine;
-		}
-
-		public TaxonomyComputation(ExecutorService executor, int maxWorkers,
-				OntologyIndex ontologyIndex) {
-			this(executor, maxWorkers, new ClassTaxonomyEngine(ontologyIndex));
-		}
-
-		public ClassTaxonomy getClassTaxonomy() {
-			return classTaxonomyEngine.getClassTaxonomy();
-		}
-	}
+	
 }

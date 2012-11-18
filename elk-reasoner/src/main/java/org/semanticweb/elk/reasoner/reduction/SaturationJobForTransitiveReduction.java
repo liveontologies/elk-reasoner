@@ -39,7 +39,7 @@ abstract class SaturationJobForTransitiveReduction<I extends IndexedClassExpress
 	 * @param initiatingJob
 	 */
 	public SaturationJobForTransitiveReduction(I input) {
-		super(input);
+		super(input, null);
 	}
 
 	public abstract J getInitiatorJob();

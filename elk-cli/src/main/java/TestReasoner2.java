@@ -52,12 +52,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.ObjectPropertySaturation;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.reasoner.saturation.classes.RuleApplicationEngine;
 import org.semanticweb.elk.reasoner.saturation.classes.SaturatedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.markers.ConnectedComponent;
-import org.semanticweb.elk.reasoner.saturation.markers.Marked;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Pair;
 
@@ -130,7 +130,6 @@ public class TestReasoner2 {
 			}
 		}
 		
-		System.err.println("Non empty: " + SaturatedClassExpression.nonEmptyNo);
 		System.err.println("Second phase: " + secondPhase.size());
 		System.err.println("Possible subsumptions: " + possibleSubsumptions);
 
@@ -154,11 +153,6 @@ public class TestReasoner2 {
 		RuleApplicationEngine.write();
 		System.err.println("Time: " + (time21-time20));
 		reasoner.shutdown();
-		
-		System.err.println("Confirmed subsumptions: " + RuleApplicationEngine.confirmedSubsumptions);
-		System.err.println("New subsumptions: " + RuleApplicationEngine.newSubsumptions);
-		System.err.println("New superClasses: " + RuleApplicationEngine.newSuperClasses);
-	
 	}
 	
 	static IndexedClass getIndexedClass(OntologyIndex ontology, String name) throws Exception {
@@ -323,11 +317,8 @@ public class TestReasoner2 {
 		List<Pair<Integer, Integer>> edges = new LinkedList<Pair<Integer, Integer>> ();
 		for (Map.Entry<SaturatedClassExpression, Integer> i : id.entrySet()) {
 			SaturatedClassExpression context = i.getKey();
-			for (Marked<IndexedClassExpression> mce : context.superClassExpressions)
-				if (mce.getMarkers().isDefinite() && mce.getKey() instanceof IndexedObjectSomeValuesFrom) {
-					IndexedObjectSomeValuesFrom e = (IndexedObjectSomeValuesFrom) mce.getKey();
-					edges.add(new Pair<Integer, Integer> (i.getValue(), id.get(e.getFiller().getSaturated())));
-				}
+			for (IndexedObjectSomeValuesFrom e : context.getSuperObjectSomeValuesFroms())
+				edges.add(new Pair<Integer, Integer> (i.getValue(), id.get(e.getFiller().getSaturated())));
 		}
 		
 		PrintWriter out = new PrintWriter(new FileWriter(file));
@@ -383,13 +374,11 @@ public class TestReasoner2 {
 		queue.addLast(root);
 		while (!queue.isEmpty()) {
 			SaturatedClassExpression x = queue.removeLast();
-			for (Marked<IndexedClassExpression> mce: x.superClassExpressions)
-				if (mce.getMarkers().isDefinite() && mce.getKey() instanceof IndexedObjectSomeValuesFrom) {
-					IndexedObjectSomeValuesFrom e = (IndexedObjectSomeValuesFrom) mce.getKey();
-					SaturatedClassExpression y = e.getFiller().getSaturated();
-					if (result.add(y))
-						queue.addLast(y);
-				}
+			for (IndexedObjectSomeValuesFrom e  : x.getSuperObjectSomeValuesFroms()) {
+				SaturatedClassExpression y = e.getFiller().getSaturated();
+				if (result.add(y))
+					queue.addLast(y);
+			}
 		}
 		return result;
 	}

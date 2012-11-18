@@ -5,7 +5,7 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,30 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.concurrent.ExecutorService;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 
-public class ClassExpressionSaturation<J extends SaturationJob<? extends IndexedClassExpression>>
-		extends ConcurrentComputation<J> {
+public class TaxonomyComputation extends ConcurrentComputation<IndexedClass> {
 
-	public ClassExpressionSaturation(ExecutorService executor, int maxWorkers,
+	final ClassTaxonomyEngine classTaxonomyEngine;
+
+	public TaxonomyComputation(ExecutorService executor, int maxWorkers,
+			ClassTaxonomyEngine classTaxonomyEngine) {
+		super(classTaxonomyEngine, executor, maxWorkers, 8 * maxWorkers, 16);
+		this.classTaxonomyEngine = classTaxonomyEngine;
+	}
+
+	public TaxonomyComputation(ExecutorService executor, int maxWorkers,
 			OntologyIndex ontologyIndex) {
-		super(new ClassExpressionSaturationEngine<J>(ontologyIndex), executor,
-				maxWorkers, 8 * maxWorkers, 32);
+		this(executor, maxWorkers, new ClassTaxonomyEngine(ontologyIndex));
+	}
+
+	public ClassTaxonomy getClassTaxonomy() {
+		return classTaxonomyEngine.getClassTaxonomy();
 	}
 }

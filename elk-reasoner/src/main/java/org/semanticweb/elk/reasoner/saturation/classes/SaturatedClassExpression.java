@@ -28,11 +28,11 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedNominal;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.markers.DefiniteMarkers;
 import org.semanticweb.elk.reasoner.saturation.markers.Marked;
@@ -58,13 +58,13 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 
 	protected final Queue<Derivable> queue;
 
-	public final MarkedHashSet<IndexedClassExpression> superClassExpressions;
+	protected final MarkedHashSet<IndexedClassExpression> superClassExpressions;
 
 	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> backwardLinksByObjectProperty;
 
 	protected MarkedMultimap<IndexedPropertyChain, SaturatedClassExpression> forwardLinksByObjectProperty;
 
-	public Markers reachable;
+	protected Markers reachable;
 	
 	// this field is only required for nominals
 	protected MarkedHashSet<SaturatedClassExpression> subNominals;
@@ -74,14 +74,6 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 	protected boolean isSatisfiable = true;
 
 	protected final AtomicBoolean saturated;
-	
-	
-	// used for keeping statistics
-	protected boolean newSubsumption = false;
-	protected boolean newSuperClass = false;
-	protected boolean secondPhase = false;
-	public static final AtomicInteger nonEmptyNo = new AtomicInteger(0);
-
 	
 	/**
 	 * If set to true, then composition rules will be applied to derive all
@@ -117,11 +109,19 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 	}
 
 	/**
-	 * @return the set of derived indexed class expressions
+	 * @return the set of derived indexed classes
 	 */
 	public Set<IndexedClass> getSuperClasses() {
 		return new IndexedClassSetView();
 	}
+	
+	/**
+	 * @return the set of derived indexed existentials
+	 */
+	public Set<IndexedObjectSomeValuesFrom> getSuperObjectSomeValuesFroms() {
+		return new IndexedObjectSomeValuesFromSetView();
+	}
+	
 
 	/**
 	 * Sets the context as active if it was false. This method is thread safe:
@@ -154,7 +154,6 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 	public int setSaturated() {
 		if (this.saturated.compareAndSet(false, true)) {
 			if (reachable.isDefinite()) {
-				nonEmptyNo.incrementAndGet();
 				return 0;
 			}
 
@@ -162,8 +161,6 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 			for (Marked<IndexedClassExpression> mce : superClassExpressions)
 				if (!mce.getMarkers().isDefinite() && mce.getKey() instanceof IndexedClass)
 					c++;
-
-			secondPhase = c > 0;
 			return c;
 		}
 		return 0;
@@ -201,6 +198,24 @@ public class SaturatedClassExpression implements Marked<SaturatedClassExpression
 		@Override
 		public Iterator<IndexedClass> iterator() {
 			return Operations.filter(superClassExpressions, IndexedClass.class).iterator();
+		}
+
+		@Override
+		public int size() {
+			throw new UnsupportedOperationException();
+		}
+	}
+	
+	private class IndexedObjectSomeValuesFromSetView extends AbstractSet<IndexedObjectSomeValuesFrom> {
+
+		@Override
+		public boolean contains(Object obj) {
+			return superClassExpressions.contains(obj);
+		}
+		
+		@Override
+		public Iterator<IndexedObjectSomeValuesFrom> iterator() {
+			return Operations.filter(superClassExpressions, IndexedObjectSomeValuesFrom.class).iterator();
 		}
 
 		@Override

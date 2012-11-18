@@ -1,3 +1,4 @@
+package org.semanticweb.elk.reasoner.saturation;
 /*
  * #%L
  * ELK Reasoner
@@ -26,8 +27,6 @@ import java.util.concurrent.ExecutorService;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationEngine;
-import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 
 public class ClassExpressionSaturation<J extends SaturationJob<? extends IndexedClassExpression>>
