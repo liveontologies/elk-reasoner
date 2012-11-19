@@ -54,7 +54,7 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new IncrementalConsistencyCheckingStage(reasoner));
+		return Arrays.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(reasoner));
 	}
 
 	@Override

@@ -50,7 +50,6 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
@@ -137,9 +136,9 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 			// delete some axioms
 			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
 
-			for (ElkAxiom del : deleted) {
+			/*for (ElkAxiom del : deleted) {
 				System.err.println(OwlFunctionalStylePrinter.toString(del));
-			}
+			}*/
 
 			// incremental changes
 			loader.clear();

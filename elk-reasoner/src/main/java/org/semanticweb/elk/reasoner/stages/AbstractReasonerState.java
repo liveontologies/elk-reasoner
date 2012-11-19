@@ -111,7 +111,8 @@ public abstract class AbstractReasonerState {
 	UpdateableTaxonomy<ElkClass> taxonomy = null;
 	
 	/**
-	 * Taxonomy that stores (partial) classification
+	 * Taxonomy that stores (partial) classification and (partial) realization
+	 * of individuals
 	 */
 	UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = null;
 

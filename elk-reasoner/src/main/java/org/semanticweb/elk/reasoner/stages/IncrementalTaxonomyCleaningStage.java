@@ -2,12 +2,34 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
@@ -24,6 +46,8 @@ import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyCleaning;
  */
 public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
+	private static final Logger LOGGER_ = Logger.getLogger(IncrementalTaxonomyCleaningStage.class);	
+	
 	private ClassTaxonomyCleaning cleaning_ = null;	
 	
 	public IncrementalTaxonomyCleaningStage(AbstractReasonerState reasoner) {
@@ -47,6 +71,13 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() throws ElkException {
+		
+		if (reasoner.taxonomy == null) {
+			//perhaps an inconsistency has been detected?
+			//exit
+			return;
+		}
+		
 		if (cleaning_ == null) {
 			initComputation();
 		}
@@ -65,6 +96,8 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 		reasoner.incrementalState.setStageStatus(IncrementalStages.TAXONOMY_CLEANING, true);
 		reasoner.incrementalState.diffIndex.clearSignatureChanges();
+		// at this point we're done with unsaturated contexts
+		reasoner.saturationState.getWriter().clearNotSaturatedContexts();		
 	}
 
 	@Override
@@ -90,10 +123,10 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 					@Override
 					public ElkClass next() {
-						ElkClass next = remIter_.next();
+						ElkClass next = remIter_.hasNext() ? remIter_.next() : null;
 						
 						if (next == null) {
-							next = modIter_.next();
+							next = modIter_.hasNext() ? modIter_.next() : null;
 						}
 						
 						return next;
@@ -111,6 +144,14 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 				return removed.size() + modified.size();
 			}
 		};
+		
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Taxonomy nodes to be cleaned: " + inputs);
+		}
+		
+		/*if (reasoner.taxonomy == null) {
+			throw new RuntimeException();
+		}*/
 		
 		cleaning_ = new ClassTaxonomyCleaning(inputs, reasoner.taxonomy, reasoner.getProcessExecutor(), workerNo, progressMonitor);
 	}
@@ -174,7 +215,8 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 		@Override
 		public int size() {
-			//upper bound
+			// upper bound, the actual size may be smaller since some contexts'
+			// roots could be complex expressions
 			return ices_.size();
 		}		
 	}

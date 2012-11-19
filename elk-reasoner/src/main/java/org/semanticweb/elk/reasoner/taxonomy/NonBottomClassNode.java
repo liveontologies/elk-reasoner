@@ -213,8 +213,13 @@ class NonBottomClassNode implements
 
 	@Override
 	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
-		return Collections.unmodifiableSet(directSuperNodes_);
+		return getDirectUpdateableSuperNodes();
 	}
+	
+	@Override
+	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectUpdateableSuperNodes() {
+		return Collections.unmodifiableSet(directSuperNodes_);
+	}	
 	
 	@Override
 	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {

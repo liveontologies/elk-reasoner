@@ -192,4 +192,16 @@ public class IndividualNode implements
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public boolean trySetModified(boolean modified) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isModified() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

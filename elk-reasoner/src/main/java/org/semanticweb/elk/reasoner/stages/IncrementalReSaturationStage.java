@@ -87,8 +87,6 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 		}
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.SATURATION, true);
-		// at this point we're done with unsaturated contexts
-		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
 	}
 	
 	

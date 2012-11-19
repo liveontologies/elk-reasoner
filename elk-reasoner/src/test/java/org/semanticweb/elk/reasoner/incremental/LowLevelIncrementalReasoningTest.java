@@ -26,7 +26,9 @@ package org.semanticweb.elk.reasoner.incremental;
  */
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -374,6 +376,52 @@ public class LowLevelIncrementalReasoningTest {
 
 		assertFalse(taxonomy.getNode(a) == taxonomy.getBottomNode());
 	}
+	
+	@Test
+	public void testAddClassRemoveClass() throws ElkException {
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new LoggingStageExecutor(), 1);
+		TestChangesLoader loader = new TestChangesLoader();
+
+		reasoner.registerOntologyLoader(loader);
+
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
+		ElkClass e = objectFactory.getClass(new ElkFullIri(":E"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
+				"R"));
+
+		loader.add(objectFactory.getSubClassOfAxiom(b, c))
+				.add(objectFactory.getSubClassOfAxiom(d, a))
+				.add(objectFactory.getSubClassOfAxiom(a,
+						objectFactory.getObjectSomeValuesFrom(r, b)));
+
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+
+		assertTrue(taxonomy.getNode(d).getDirectSuperNodes()
+				.contains(taxonomy.getNode(a)));
+		//A should be deleted, E should appear, D should be a subclass of C now
+		loader.clear();
+
+		reasoner.setIncrementalMode(true);
+		reasoner.registerOntologyChangesLoader(loader);
+
+		loader.remove(objectFactory.getSubClassOfAxiom(d, a))
+		.remove(objectFactory.getSubClassOfAxiom(a,
+						objectFactory.getObjectSomeValuesFrom(r, b)))
+						.add(objectFactory.getSubClassOfAxiom(d, c))
+						.add(objectFactory.getSubClassOfAxiom(e, b));
+		
+		taxonomy = reasoner.getTaxonomy();
+
+		assertNull(taxonomy.getNode(a));
+		assertNotNull(taxonomy.getNode(d));
+		assertNotNull(taxonomy.getNode(e));
+		assertTrue(taxonomy.getNode(d).getDirectSuperNodes()
+				.contains(taxonomy.getNode(c)));
+	}	
 
 	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
 			Owl2ParseException {

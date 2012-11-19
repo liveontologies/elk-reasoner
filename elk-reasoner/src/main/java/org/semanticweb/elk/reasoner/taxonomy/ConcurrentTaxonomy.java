@@ -239,14 +239,16 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 		boolean changed = false;
 		
 		if (node.equals(getTopNode())) {
-			// removing node assignment for members except owl:Thing
-			for (ElkClass member : node.getMembers()) {
-				if (!member.equals(PredefinedElkClass.OWL_THING)) {
-					changed |= classNodeLookup_.remove(getKey(member)) != null;
+			synchronized (getTopNode()) {
+				// removing node assignment for members except owl:Thing
+				for (ElkClass member : node.getMembers()) {
+					if (!member.equals(PredefinedElkClass.OWL_THING)) {
+						changed |= classNodeLookup_.remove(getKey(member)) != null;
+					}
 				}
+
+				getTopNode().clearMembers();
 			}
-			
-			getTopNode().clearMembers();
 		
 		} else {
 			allClassNodes_.remove(node);
@@ -281,11 +283,6 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 		return classNodeLookup_.get(getKey(elkObject));
 	}
 
-	/*@Override
-	public Iterable<? extends UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getUpdateableTypeNodes() {
-		return classNodeLookup_.values();
-	}*/	
-	
 	/**
 	 * Special implementation for the bottom node in the taxonomy. Instead of
 	 * storing its sub- and super-classes, the respective answers are computed

@@ -26,7 +26,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 
 /**
  * A {@link ReasonerStage} during which the instance taxonomy of the current
@@ -80,19 +83,42 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		reasoner.taxonomy = computation_.getTaxonomy();
+
 		reasoner.instanceTaxonomy = computation_.getTaxonomy();
+		reasoner.taxonomy = reasoner.instanceTaxonomy;
 		reasoner.doneInstanceTaxonomy = true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	void initComputation() {
 		super.initComputation();
-		if (reasoner.doneClassTaxonomy)
+		if (reasoner.doneClassTaxonomy) {
+			// TODO Think how to get rid of this type cast
+			// it's here b/c our class taxonomy computation outputs
+			// updateable class taxonomy (as it, in principle, should)
+			// while here we have to start with a partial instance taxonomy
+			// we just *know* that concurrent taxonomy is an instance of both
+			// so we can cast here.
+			// This can be avoided either by obliging the class taxonomy
+			// computation to always compute some instance taxonomy
+			// or (better) by initializing instance taxonomy based
+			// on class taxonomy if the latter happens to not be an instance
+			// taxonomy
+			if (reasoner.taxonomy instanceof UpdateableInstanceTaxonomy) {
+				reasoner.instanceTaxonomy = (UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual>) reasoner.taxonomy;
+			} else {
+				// this should never happen
+				throw new IllegalStateException(
+						"Class taxonomy does not support instances, can't proceed");
+			}
+
 			this.computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.ontologyIndex, reasoner.instanceTaxonomy);
+		}
+
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
