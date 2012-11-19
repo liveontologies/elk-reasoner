@@ -64,13 +64,53 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		}
 
 		reasoner.incrementalState.setStageStatus(IncrementalStages.TAXONOMY_CLEANING, true);
+		reasoner.incrementalState.diffIndex.clearSignatureChanges();
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
 		
-		Collection<ElkClass> inputs = new ContextRootCollection(reasoner.saturationState.getNotSaturatedContexts());
+		final Collection<ElkClass> removed = reasoner.incrementalState.diffIndex.getRemovedClasses();
+		final Collection<ElkClass> modified = new ContextRootCollection(reasoner.saturationState.getNotSaturatedContexts());
+		//TODO do a generic lazy collection concatenation?
+		Collection<ElkClass> inputs = new AbstractCollection<ElkClass>() {
+
+			private Iterator<ElkClass> remIter_ = removed.iterator();
+			private Iterator<ElkClass> modIter_ = modified.iterator();
+			
+			@Override
+			public Iterator<ElkClass> iterator() {
+				return new Iterator<ElkClass>() {
+
+					@Override
+					public boolean hasNext() {
+						return remIter_.hasNext() || modIter_.hasNext();
+					}
+
+					@Override
+					public ElkClass next() {
+						ElkClass next = remIter_.next();
+						
+						if (next == null) {
+							next = modIter_.next();
+						}
+						
+						return next;
+					}
+
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+				};
+			}
+
+			@Override
+			public int size() {
+				return removed.size() + modified.size();
+			}
+		};
 		
 		cleaning_ = new ClassTaxonomyCleaning(inputs, reasoner.taxonomy, reasoner.getProcessExecutor(), workerNo, progressMonitor);
 	}

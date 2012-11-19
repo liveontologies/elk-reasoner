@@ -20,6 +20,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
+ * TODO docs
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
