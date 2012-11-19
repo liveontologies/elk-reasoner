@@ -95,6 +95,11 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private final Queue<SaturationJobSuperClass<R, J>> auxJobQueue;
 
 	/**
+	 * The jobs which root {@link IndexedClassExpression}s are already saturated
+	 */
+	private final Queue<J> jobsWithSaturatedRoot;
+
+	/**
 	 * The saturation factory used for computing saturations for relevant
 	 * indexed class expressions
 	 */
@@ -116,9 +121,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			int maxWorkers, TransitiveReductionListener<J> listener) {
 		this.listener = listener;
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
+		this.jobsWithSaturatedRoot = new ConcurrentLinkedQueue<J>();
 		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
-				new SaturationState(ontologyIndex),
-				maxWorkers,
+				new SaturationState(ontologyIndex), maxWorkers,
 				new ThisClassExpressionSaturationListener());
 	}
 
@@ -171,11 +176,42 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		@Override
 		public void visit(SaturationJobRoot<R, J> saturationJob)
 				throws InterruptedException {
+			processRootSaturation(saturationJob.initiatorJob);
+
+		}
+
+		@Override
+		public void visit(SaturationJobSuperClass<R, J> saturationJob)
+				throws InterruptedException {
 			/*
-			 * We know that the saturation for the root indexed class expression
-			 * of the initiator job should already be computed
+			 * In this case the saturation for the super-class candidate is
+			 * computed; we need to update the output of the transitive
+			 * reduction using this candidate and resume processing of the
+			 * transitive reduction state.
 			 */
-			J initiatorJob = saturationJob.initiatorJob;
+			IndexedClass candidate = saturationJob.getInput();
+			TransitiveReductionState<R, J> state = saturationJob.state;
+			updateTransitiveReductionOutput(state.output, candidate,
+					candidate.getContext());
+			processTransitiveReductionState(state);
+		}
+
+		/**
+		 * Processing jobs for which saturation of the root
+		 * {@link IndexedClassExpression} has been computed
+		 * 
+		 * @param initiatorJob
+		 *            the jobs for which saturation of the root
+		 *            {@link IndexedClassExpression} has been computed
+		 * @throws InterruptedException
+		 *             if interrupted while processing
+		 */
+		private void processRootSaturation(J initiatorJob)
+				throws InterruptedException {
+			/*
+			 * It is required that the saturation for the root indexed class
+			 * expression of the initiator job should already be computed
+			 */
 			R root = initiatorJob.getInput();
 			Context saturation = root.getContext();
 			/*
@@ -205,22 +241,6 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * transitive reduction; when the state will be processed, its
 			 * output will be submitted as the output of transitive reduction.
 			 */
-			processTransitiveReductionState(state);
-		}
-
-		@Override
-		public void visit(SaturationJobSuperClass<R, J> saturationJob)
-				throws InterruptedException {
-			/*
-			 * In this case the saturation for the super-class candidate is
-			 * computed; we need to update the output of the transitive
-			 * reduction using this candidate and resume processing of the
-			 * transitive reduction state.
-			 */
-			IndexedClass candidate = saturationJob.getInput();
-			TransitiveReductionState<R, J> state = saturationJob.state;
-			updateTransitiveReductionOutput(state.output, candidate,
-					candidate.getContext());
 			processTransitiveReductionState(state);
 		}
 
@@ -386,7 +406,11 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace(root + ": transitive reduction started");
 			}
-			saturationEngine.submit(new SaturationJobRoot<R, J>(job));
+			Context context = root.getContext();
+			if (context != null && context.isSaturated()) {
+				jobsWithSaturatedRoot.add(job);
+			} else
+				saturationEngine.submit(new SaturationJobRoot<R, J>(job));
 		}
 
 		@Override
@@ -394,6 +418,12 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					return;
+				J processedJob = jobsWithSaturatedRoot.poll();
+				if (processedJob != null) {
+					saturationOutputProcessor
+							.processRootSaturation(processedJob);
+					continue;
+				}
 				saturationEngine.process();
 				SaturationJobForTransitiveReduction<R, ?, J> nextJob = auxJobQueue
 						.poll();
