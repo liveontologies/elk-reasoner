@@ -3,6 +3,8 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Set;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -14,9 +16,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  */
 public interface UpdateableTypeNode<T extends ElkObject, I extends ElkObject> extends TypeNode<T, I>, UpdateableTaxonomyNode<T> {
 
-	//public void addDirectSuperNode(UpdateableTypeNode<T, I> superNode);
-
-	//public void addDirectSubNode(UpdateableTypeNode<T, I> subNode);
+	@Override
+	public Set<UpdateableTypeNode<T, I>> getDirectUpdateableSubNodes();
+	
+	@Override
+	public Set<UpdateableTypeNode<T, I>> getDirectSuperNodes();
 	
 	public void addDirectInstanceNode(	UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode);
 	

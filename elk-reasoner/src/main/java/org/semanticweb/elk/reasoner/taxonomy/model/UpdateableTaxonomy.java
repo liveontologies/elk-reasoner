@@ -18,7 +18,7 @@ public interface UpdateableTaxonomy<T extends ElkObject> extends Taxonomy<T> {
 	
 	public boolean addToBottomNode(T member);
 	
-	public boolean removeNode(T member);
+	public boolean removeNode(UpdateableTaxonomyNode<T> node);
 	
 	public UpdateableTaxonomyNode<T> getUpdateableNode(T elkObject);
 

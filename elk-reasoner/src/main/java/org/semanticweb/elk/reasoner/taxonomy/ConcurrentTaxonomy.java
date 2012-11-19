@@ -45,7 +45,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.Operations;
@@ -60,7 +59,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-class ConcurrentTaxonomy implements UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> {//IndividualClassTaxonomy {
+class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -96,7 +95,7 @@ class ConcurrentTaxonomy implements UpdateableInstanceTaxonomy<ElkClass, ElkName
 				.newSetFromMap(new ConcurrentHashMap<InstanceNode<ElkClass, ElkNamedIndividual>, Boolean>());
 
 		this.bottomClassNode = new BottomClassNode();
-		allClassNodes_.add(this.bottomClassNode);
+		this.allClassNodes_.add(this.bottomClassNode);
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 		this.unsatisfiableClasses = Collections
 				.synchronizedSet(new TreeSet<ElkClass>(
@@ -163,8 +162,8 @@ class ConcurrentTaxonomy implements UpdateableInstanceTaxonomy<ElkClass, ElkName
 	}
 
 	@Override
-	public TypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
-		return getTypeNode(PredefinedElkClass.OWL_THING);
+	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
+		return classNodeLookup_.get(getKey(PredefinedElkClass.OWL_THING));//getTypeNode(PredefinedElkClass.OWL_THING);
 	}
 
 	@Override
@@ -236,9 +235,28 @@ class ConcurrentTaxonomy implements UpdateableInstanceTaxonomy<ElkClass, ElkName
 	}
 
 	@Override
-	public boolean removeNode(ElkClass member) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean removeNode(UpdateableTaxonomyNode<ElkClass> node) {
+		boolean changed = false;
+		
+		if (node.equals(getTopNode())) {
+			// removing node assignment for members except owl:Thing
+			for (ElkClass member : node.getMembers()) {
+				if (!member.equals(PredefinedElkClass.OWL_THING)) {
+					changed |= classNodeLookup_.remove(getKey(member)) != null;
+				}
+			}
+			
+			getTopNode().clearMembers();
+		
+		} else {
+			allClassNodes_.remove(node);
+			// removing node assignment for members
+			for (ElkClass member : node.getMembers()) {
+				changed |= classNodeLookup_.remove(getKey(member)) != null;
+			}
+		}
+		
+		return changed;
 	}
 
 	@Override

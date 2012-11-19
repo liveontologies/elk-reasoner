@@ -58,13 +58,13 @@ public interface TypeNode<T extends ElkObject, I extends ElkObject>
 	public Set<? extends InstanceNode<T, I>> getAllInstanceNodes();
 	
 	@Override
-	public Set<TypeNode<T,I>> getDirectSuperNodes();
+	public Set<? extends TypeNode<T,I>> getDirectSuperNodes();
 	@Override
-	public Set<TypeNode<T,I>> getAllSuperNodes();
+	public Set<? extends TypeNode<T,I>> getAllSuperNodes();
 	@Override
-	public Set<TypeNode<T,I>> getDirectSubNodes();
+	public Set<? extends TypeNode<T,I>> getDirectSubNodes();
 	@Override
-	public Set<TypeNode<T,I>> getAllSubNodes();
+	public Set<? extends TypeNode<T,I>> getAllSubNodes();
 	@Override
 	public InstanceTaxonomy<T,I> getTaxonomy();
 

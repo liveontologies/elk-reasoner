@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -79,17 +80,23 @@ class NonBottomClassNode implements
 	 * ElkClass nodes whose members are direct super-classes of the members of
 	 * this node.
 	 */
-	private final Set<TypeNode<ElkClass, ElkNamedIndividual>> directSuperNodes_;
+	private final Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directSuperNodes_;
 	/**
 	 * ElkClass nodes, except for the bottom node, whose members are direct
 	 * sub-classes of the members of this node.
 	 */
-	private final Set<TypeNode<ElkClass, ElkNamedIndividual>> directSubNodes_;
+	private final Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directSubNodes_;
 	/**
 	 * ElkNamedIndividual nodes whose members are instances of the members of
 	 * this node.
 	 */
 	private final Set<InstanceNode<ElkClass, ElkNamedIndividual>> directInstanceNodes_;
+	
+	/**
+	 * <tt>true</tt> if the direct super-nodes of this node need to be
+	 * recomputed
+	 */
+	private final AtomicBoolean modified_ = new AtomicBoolean(true);	
 
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
@@ -100,13 +107,12 @@ class NonBottomClassNode implements
 	 * @param members
 	 *            non-empty list of equivalent ElkClass objects
 	 */
-	//TODO think how to get rid of these unchecked casts
 	protected NonBottomClassNode(ConcurrentTaxonomy taxonomy,
 			Collection<ElkClass> members) {
 		this.taxonomy_ = taxonomy;
 		this.members_ = new ArrayList<ElkClass>(members);
-		this.directSubNodes_ = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>();
-		this.directSuperNodes_ = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>();
+		this.directSubNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
+		this.directSuperNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 		this.directInstanceNodes_ = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>();
 		Collections.sort(this.members_, Comparators.ELK_CLASS_COMPARATOR);
 	}
@@ -206,10 +212,10 @@ class NonBottomClassNode implements
 	}
 
 	@Override
-	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
+	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
 		return Collections.unmodifiableSet(directSuperNodes_);
 	}
-
+	
 	@Override
 	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {
 		Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
@@ -230,7 +236,7 @@ class NonBottomClassNode implements
 	@Override
 	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
 		if (!directSubNodes_.isEmpty()) {
-			return Collections.unmodifiableSet(directSubNodes_);
+			return Collections.<TypeNode<ElkClass, ElkNamedIndividual>>unmodifiableSet(directSubNodes_);
 		} else {
 			Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
 					1);
@@ -238,6 +244,15 @@ class NonBottomClassNode implements
 			return Collections.unmodifiableSet(result);
 		}
 	}
+	
+	@Override
+	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectUpdateableSubNodes() {
+		if (!directSubNodes_.isEmpty()) {
+			return Collections.unmodifiableSet(directSubNodes_);
+		} else {
+			return Collections.emptySet();
+		}
+	}	
 
 	@Override
 	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
@@ -309,5 +324,25 @@ class NonBottomClassNode implements
 	@Override
 	public void clearMembers() {
 		members_.clear();
+	}
+	
+	@Override
+	public boolean trySetModified(boolean modified) {
+		return modified_.compareAndSet(!modified, modified);
+	}
+
+	@Override
+	public boolean isModified() {
+		return modified_.get();
+	}
+
+	@Override
+	public boolean removeDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+		return directSubNodes_.remove(subNode);
+	}
+
+	@Override
+	public boolean removeDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
+		return directSuperNodes_.remove(superNode);
 	}
 }

@@ -20,7 +20,5 @@ public interface UpdateableInstanceTaxonomy<T extends ElkObject, I extends ElkOb
 	
 	public UpdateableTypeNode<T, I> getUpdateableTypeNode(T elkObject);
 
-	//public Iterable<? extends UpdateableTypeNode<T, I>> getUpdateableTypeNodes();
-	
 	public boolean removeInstanceNode(I instance); 
 }
