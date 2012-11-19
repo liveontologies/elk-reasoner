@@ -100,6 +100,7 @@ public class NonBottomClassNode implements
 	 * @param members
 	 *            non-empty list of equivalent ElkClass objects
 	 */
+	//TODO think how to get rid of these unchecked casts
 	protected NonBottomClassNode(ConcurrentTaxonomy taxonomy,
 			Collection<ElkClass> members) {
 		this.taxonomy_ = taxonomy;
@@ -116,11 +117,17 @@ public class NonBottomClassNode implements
 	 * @param superNode
 	 *            node to add
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public void addDirectSuperNode(UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode) {
+	public void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct super-node " + superNode);
-		directSuperNodes_.add(superNode);
+		try {
+			directSuperNodes_.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)superNode);
+		}
+		catch (ClassCastException e) {
+			throw new IllegalArgumentException(superNode + " is not a type node!");
+		}
 	}
 
 	/**
@@ -129,14 +136,22 @@ public class NonBottomClassNode implements
 	 * @param subNode
 	 *            node to add
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public void addDirectSubNode(UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
+	public void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct sub-node " + subNode);
-		if (directSubNodes_.isEmpty()) {
-			this.taxonomy_.countNodesWithSubClasses.incrementAndGet();
+		
+		try {
+			directSubNodes_.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)subNode);
+			
+			if (directSubNodes_.isEmpty()) {
+				this.taxonomy_.countNodesWithSubClasses.incrementAndGet();
+			}
 		}
-		directSubNodes_.add(subNode);
+		catch (ClassCastException e) {
+			throw new IllegalArgumentException(subNode + " is not a type node!");
+		}
 	}
 
 	/**
@@ -294,19 +309,5 @@ public class NonBottomClassNode implements
 	@Override
 	public void clearMembers() {
 		members_.clear();
-	}
-
-	//TODO think how to get rid of these unchecked casts
-	//in principle they can never fail 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
-		addDirectSuperNode((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)superNode);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
-		addDirectSubNode((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)subNode);
 	}
 }
