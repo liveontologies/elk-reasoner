@@ -103,16 +103,30 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 */
 	private final AtomicInteger countJobsFinished_ = new AtomicInteger(0);
 
-	private final Queue<Context> contextsInProgress_;
+	/**
+	 * The buffer for not saturated contexts, i.e., those for which method
+	 * {@link Context#isSaturated()} not necessarily returns {@code true}
+	 */
+	private final Queue<Context> nonSaturatedContexts_;
+	/**
+	 * The number of contexts created
+	 */
 	private final AtomicInteger countContextsCreated_ = new AtomicInteger(0);
+	/**
+	 * The counter of contexts processed, as determined by the procedure
+	 */
 	private final AtomicInteger countContextsProcessed_ = new AtomicInteger(0);
+	/**
+	 * The number of created contexts, which are marked as saturated, i.e., for
+	 * which {@link Context#isSaturated()} returns {@code true}
+	 */
 	private final AtomicInteger countContextsFinished_ = new AtomicInteger(0);
-
 	/**
 	 * The threshold used to submit new jobs. The job is successfully submitted
-	 * if difference between the number of created contexts and processed
-	 * contexts does not exceed this threshold; otherwise the computation is
-	 * suspended, and will resume only when all possible rules are applied.
+	 * if difference between {@link #countContextsCreated_} and {
+	 * {@link #countContextsProcessed_} is less than {@link #threshold_};
+	 * otherwise the computation is suspended, and will resume only when all
+	 * possible rules are applied.
 	 */
 	private final int threshold_;
 	/**
@@ -172,7 +186,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		this.jobsInProgress_ = new ConcurrentLinkedQueue<J>();
 		this.ruleApplicationFactory_ = ruleAppFactory;
 		this.aggregatedStats_ = new ThisStatistics();
-		this.contextsInProgress_ = new ConcurrentLinkedQueue<Context>();
+		this.nonSaturatedContexts_ = new ConcurrentLinkedQueue<Context>();
 	}
 
 	/**
@@ -248,7 +262,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			}
 			if (countContextsFinished_.compareAndSet(shapshotContextsFinished,
 					shapshotContextsFinished + 1)) {
-				Context nextContext = contextsInProgress_.poll();
+				Context nextContext = nonSaturatedContexts_.poll();
 				nextContext.setSaturated(true);
 			}
 		}
@@ -356,7 +370,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				.getEngine(new ContextCreationListener() {
 					@Override
 					public void notifyContextCreation(Context newContext) {
-						contextsInProgress_.add(newContext);
+						nonSaturatedContexts_.add(newContext);
 						countContextsCreated_.incrementAndGet();
 					}
 				});
