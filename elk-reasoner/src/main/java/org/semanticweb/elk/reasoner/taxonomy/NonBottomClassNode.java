@@ -59,7 +59,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class NonBottomClassNode implements
+class NonBottomClassNode implements
 		UpdateableTypeNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
