@@ -41,4 +41,8 @@ public abstract class ElkIriObject extends ElkObjectImpl {
 		return iri;
 	}
 	
+	@Override
+	public String toString() {
+		return iri.toString();
+	}
 }
