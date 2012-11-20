@@ -30,7 +30,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -60,10 +61,9 @@ public interface Context {
 	 *         {@link IndexedClassExpression}
 	 */
 	public Set<IndexedClassExpression> getSuperClassExpressions();
-	
-	
-	//public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms();
-	
+
+	// public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms();
+
 	public int addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
@@ -90,7 +90,7 @@ public interface Context {
 	 *         this context. This method should be used to access the rules
 	 *         without modifying them.
 	 */
-	public BackwardLinkRules getBackwardLinkRules();
+	public LinkRule<BackwardLink> getBackwardLinkRuleHead();
 
 	/**
 	 * @return the {@link Chain} view of all {@link BackwardLinkRules}
@@ -100,7 +100,7 @@ public interface Context {
 	 *         methods of the {@link Chain} interface without without worrying
 	 *         about {@code null} values.
 	 */
-	public Chain<BackwardLinkRules> getBackwardLinkRulesChain();
+	public Chain<ModifiableLinkRule<BackwardLink>> getBackwardLinkRuleChain();
 
 	/**
 	 * Adds the given {@code BackwardLink} to this {@link Context}.
@@ -113,14 +113,15 @@ public interface Context {
 	 *         safe.
 	 */
 	public boolean addBackwardLink(BackwardLink link);
-	
+
 	/**
 	 * TODO
+	 * 
 	 * @param link
 	 * @return
 	 */
 	public boolean removeBackwardLink(BackwardLink link);
-	
+
 	public boolean containsBackwardLink(BackwardLink link);
 
 	/**
@@ -135,15 +136,17 @@ public interface Context {
 	 *         not thread safe.
 	 */
 	public boolean addSuperClassExpression(IndexedClassExpression expression);
-	
+
 	/**
 	 * TODO
+	 * 
 	 * @param expression
 	 * @return
 	 */
 	public boolean removeSuperClassExpression(IndexedClassExpression expression);
-	
-	public boolean containsSuperClassExpression(IndexedClassExpression expression);
+
+	public boolean containsSuperClassExpression(
+			IndexedClassExpression expression);
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this
@@ -225,6 +228,7 @@ public interface Context {
 
 	/**
 	 * TODO
+	 * 
 	 * @param axiom
 	 * @return
 	 */

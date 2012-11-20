@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -83,7 +83,7 @@ public class ContextImpl implements Context {
 	 * the rules that should be applied to each derived {@link BackwardLink} in
 	 * this {@link Context}; can be {@code null}
 	 */
-	private BackwardLinkRules backwardLinkRules_ = null;
+	private ModifiableLinkRule<BackwardLink> backwardLinkRules_ = null;
 
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
@@ -217,23 +217,23 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public AbstractChain<BackwardLinkRules> getBackwardLinkRulesChain() {
-		return new AbstractChain<BackwardLinkRules>() {
+	public AbstractChain<ModifiableLinkRule<BackwardLink>> getBackwardLinkRuleChain() {
+		return new AbstractChain<ModifiableLinkRule<BackwardLink>>() {
 
 			@Override
-			public BackwardLinkRules next() {
+			public ModifiableLinkRule<BackwardLink> next() {
 				return backwardLinkRules_;
 			}
 
 			@Override
-			public void setNext(BackwardLinkRules tail) {
+			public void setNext(ModifiableLinkRule<BackwardLink> tail) {
 				backwardLinkRules_ = tail;
 			}
 		};
 	}
 
 	@Override
-	public BackwardLinkRules getBackwardLinkRules() {
+	public ModifiableLinkRule<BackwardLink> getBackwardLinkRuleHead() {
 		return backwardLinkRules_;
 	}
 

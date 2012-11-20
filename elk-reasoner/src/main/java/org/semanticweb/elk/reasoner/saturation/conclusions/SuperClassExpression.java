@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 
 /**
  * A {@link Conclusion} representing an implied {@link IndexedClassExpression}
@@ -65,8 +65,8 @@ public abstract class SuperClassExpression implements Conclusion {
 
 	protected void applyCompositionRules(SaturationState.Writer state,
 			Context context) {
-		RuleChain<Context> compositionRule = expression.getCompositionRules();
 
+		LinkRule<Context> compositionRule = expression.getCompositionRuleHead();
 		for (;;) {
 			if (compositionRule == null)
 				return;

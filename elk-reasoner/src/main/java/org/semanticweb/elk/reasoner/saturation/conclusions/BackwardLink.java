@@ -27,7 +27,7 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
@@ -81,11 +81,11 @@ public class BackwardLink implements Conclusion {
 		// statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
 		try {
 			// apply all backward link rules of the context
-			BackwardLinkRules rules = context.getBackwardLinkRules();
-
-			while (rules != null) {
-				rules.apply(engine, this);
-				rules = rules.next();
+			LinkRule<BackwardLink> backLinkRule = context
+					.getBackwardLinkRuleHead();
+			while (backLinkRule != null) {
+				backLinkRule.apply(engine, this);
+				backLinkRule = backLinkRule.next();
 			}
 
 			/*

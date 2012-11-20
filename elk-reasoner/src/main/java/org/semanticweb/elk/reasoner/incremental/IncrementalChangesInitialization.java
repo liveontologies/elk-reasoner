@@ -33,7 +33,8 @@ import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -56,8 +57,8 @@ public class IncrementalChangesInitialization
 
 	public IncrementalChangesInitialization(
 			Collection<IndexedClassExpression> inputs,
-			RuleChain<Context> changedGlobalRules,
-			Map<IndexedClassExpression, RuleChain<Context>> changes,
+			ChainableRule<Context> changedGlobalRules,
+			Map<IndexedClassExpression, ChainableRule<Context>> changes,
 			SaturationState state, boolean expectAllContextsSaturated,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
@@ -75,17 +76,18 @@ class ContextInitializationFactory
 	// Logger.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState.Writer saturationStateWriter_;
-	private final Map<IndexedClassExpression, RuleChain<Context>> indexChanges_;
-	private final RuleChain<Context> changedGlobalRules_;
+	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
+	private final LinkRule<Context> changedGlobalRuleHead_;
 	private final boolean expectAllContextsSaturated_;
 
-	public ContextInitializationFactory(SaturationState state,
-			Map<IndexedClassExpression, RuleChain<Context>> indexChanges,
-			RuleChain<Context> changedGlobalRules,
+	public ContextInitializationFactory(
+			SaturationState state,
+			Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges,
+			LinkRule<Context> changedGlobalRuleHead,
 			boolean expectAllContextsSaturated) {
 		saturationStateWriter_ = state.getWriter();
 		indexChanges_ = indexChanges;
-		changedGlobalRules_ = changedGlobalRules;
+		changedGlobalRuleHead_ = changedGlobalRuleHead;
 		expectAllContextsSaturated_ = expectAllContextsSaturated;
 	}
 
@@ -110,18 +112,24 @@ class ContextInitializationFactory
 						context.setSaturated(true);
 					}
 
-					if (changedGlobalRules_ != null) {
+					LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
+					while (nextGlobalRule != null) {
 						// apply all changed global context rules
-						changedGlobalRules_
-								.applyAll(saturationStateWriter_, context);
+						nextGlobalRule.apply(saturationStateWriter_, context);
+						nextGlobalRule = nextGlobalRule.next();
 					}
 
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
 							indexChanges_.keySet(),
 							context.getSuperClassExpressions())) {
 						// applying the changed rules for this class expression
-						indexChanges_.get(changedICE).applyAll(
-								saturationStateWriter_, context);
+						LinkRule<Context> nextLocalRule = indexChanges_
+								.get(changedICE);
+						while (nextLocalRule != null) {
+							nextLocalRule
+									.apply(saturationStateWriter_, context);
+							nextLocalRule = nextLocalRule.next();
+						}
 					}
 				}
 			}

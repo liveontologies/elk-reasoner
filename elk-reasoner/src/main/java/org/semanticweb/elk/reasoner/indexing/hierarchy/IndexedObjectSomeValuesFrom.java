@@ -26,8 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.IndexRuleChain;
-import org.semanticweb.elk.reasoner.indexing.IndexRules;
+import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -36,12 +35,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExp
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
@@ -150,12 +149,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	/**
 	 * 
 	 */
-	private static class ThisCompositionRule extends ContextRules {
+	private static class ThisCompositionRule extends
+			ModifiableLinkImpl<ChainableRule<Context>> implements
+			ChainableRule<Context> {
 
 		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
-		private ThisCompositionRule(RuleChain<Context> tail) {
-			super(tail);
+		private ThisCompositionRule(ChainableRule<Context> next) {
+			super(next);
 			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(
 					1);
 		}
@@ -270,18 +271,18 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			}
 		}
 
-		private static Matcher<RuleChain<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<RuleChain<Context>, ThisCompositionRule>(
+		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<RuleChain<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<RuleChain<Context>, ThisCompositionRule>() {
+		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(RuleChain<Context> tail) {
-				return new ThisCompositionRule(tail);
+			public ThisCompositionRule create(ChainableRule<Context> next) {
+				return new ThisCompositionRule(next);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<RuleChain<Context>> ruleChain) {
+		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
 
@@ -294,7 +295,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<RuleChain<Context>> ruleChain) {
+		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
 			boolean changed = false;
 			ThisCompositionRule rule = ruleChain.find(MATCHER_);
 
@@ -319,12 +320,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 * 
 	 */
 	private static class PosExistentialRule extends
-			IndexRules<IndexedClassExpression> {
+			ModifiableLinkImpl<ChainableIndexRule<IndexedClassExpression>>
+			implements ChainableIndexRule<IndexedClassExpression> {
 
 		private final Set<IndexedObjectProperty> properties_ = new ArrayHashSet<IndexedObjectProperty>(
 				16);
 
-		private PosExistentialRule(IndexRuleChain<IndexedClassExpression> tail) {
+		private PosExistentialRule(
+				ChainableIndexRule<IndexedClassExpression> tail) {
 			super(tail);
 		}
 
@@ -333,20 +336,20 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			properties_.add(property);
 		}
 
-		private static Matcher<IndexRuleChain<IndexedClassExpression>, PosExistentialRule> MATCHER_ = new SimpleTypeBasedMatcher<IndexRuleChain<IndexedClassExpression>, PosExistentialRule>(
+		private static Matcher<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule>(
 				PosExistentialRule.class);
 
-		private static ReferenceFactory<IndexRuleChain<IndexedClassExpression>, PosExistentialRule> FACTORY_ = new ReferenceFactory<IndexRuleChain<IndexedClassExpression>, PosExistentialRule>() {
+		private static ReferenceFactory<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule> FACTORY_ = new ReferenceFactory<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule>() {
 			@Override
 			public PosExistentialRule create(
-					IndexRuleChain<IndexedClassExpression> tail) {
+					ChainableIndexRule<IndexedClassExpression> tail) {
 				return new PosExistentialRule(tail);
 			}
 		};
 
 		@Override
 		public boolean addTo(
-				Chain<IndexRuleChain<IndexedClassExpression>> ruleChain) {
+				Chain<ChainableIndexRule<IndexedClassExpression>> ruleChain) {
 			PosExistentialRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 
 			return rule.properties_.addAll(properties_);
@@ -354,7 +357,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public boolean removeFrom(
-				Chain<IndexRuleChain<IndexedClassExpression>> ruleChain) {
+				Chain<ChainableIndexRule<IndexedClassExpression>> ruleChain) {
 			PosExistentialRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 

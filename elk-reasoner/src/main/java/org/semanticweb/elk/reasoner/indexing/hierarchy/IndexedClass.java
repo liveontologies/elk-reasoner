@@ -32,10 +32,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
@@ -137,10 +136,11 @@ public class IndexedClass extends IndexedClassEntity {
 	 * Adds {@code owl:Thing} to the context (it should be registered iff Thing
 	 * occurs negatively)
 	 */
-	private static class OwlThingContextInitializationRule extends ContextRules
-			implements ChainableRule<Context> {
+	private static class OwlThingContextInitializationRule extends
+			ModifiableLinkImpl<ChainableRule<Context>> implements
+			ChainableRule<Context> {
 
-		private OwlThingContextInitializationRule(RuleChain<Context> tail) {
+		private OwlThingContextInitializationRule(ChainableRule<Context> tail) {
 			super(tail);
 		}
 
@@ -159,19 +159,19 @@ public class IndexedClass extends IndexedClassEntity {
 					new PositiveSuperClassExpression(writer.getOwlThing()));
 		}
 
-		private static Matcher<RuleChain<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<RuleChain<Context>, OwlThingContextInitializationRule>(
+		private static Matcher<ChainableRule<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, OwlThingContextInitializationRule>(
 				OwlThingContextInitializationRule.class);
 
-		private static ReferenceFactory<RuleChain<Context>, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<RuleChain<Context>, OwlThingContextInitializationRule>() {
+		private static ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule>() {
 			@Override
 			public OwlThingContextInitializationRule create(
-					RuleChain<Context> tail) {
+					ChainableRule<Context> tail) {
 				return new OwlThingContextInitializationRule(tail);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<RuleChain<Context>> ruleChain) {
+		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
 			OwlThingContextInitializationRule rule = ruleChain.find(MATCHER_);
 
 			if (rule == null) {
@@ -183,7 +183,7 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<RuleChain<Context>> ruleChain) {
+		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
 			return ruleChain.remove(MATCHER_) != null;
 		}
 	}

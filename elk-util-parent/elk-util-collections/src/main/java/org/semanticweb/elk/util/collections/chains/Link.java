@@ -23,37 +23,19 @@ package org.semanticweb.elk.util.collections.chains;
  */
 
 /**
- * A simple implementation of the {@link Chain} interface. The methods are not
- * thread safe.
+ * An object holding a (possibly {@code null}) reference to other object.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
- *            The types of elements in the chain.
+ *            the type of the object in the reference
  */
-public class ChainImpl<T extends Reference<T>> extends AbstractChain<T>
-		implements Chain<T> {
+public interface Link<T> {
 
 	/**
-	 * the field to store the tail of the chain
+	 * @return the object assigned in the reference or {@code null} if there is
+	 *         no object assigned
 	 */
-	private T tail_ = null;
-
-	public ChainImpl() {
-	}
-
-	public ChainImpl(T tail) {
-		this.tail_ = tail;
-	}
-
-	@Override
-	public T next() {
-		return tail_;
-	}
-
-	@Override
-	public void setNext(T tail) {
-		tail_ = tail;
-	}
+	T next();
 
 }

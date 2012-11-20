@@ -40,7 +40,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
@@ -97,8 +98,8 @@ public interface OntologyIndex {
 	/**
 	 * @return the {@link IndexedClassExpression}s for all
 	 *         {@link ElkClassExpression}s occurring in the ontology (including
-	 *         {@code owl:Thing} and {@code owl:Nothing}) or added/removed
-	 *         from the ontology since the last commit of the differential index
+	 *         {@code owl:Thing} and {@code owl:Nothing}) or added/removed from
+	 *         the ontology since the last commit of the differential index
 	 */
 	Collection<IndexedClassExpression> getIndexedClassExpressions();
 
@@ -144,9 +145,9 @@ public interface OntologyIndex {
 	 * Erase all information from this {@link OntologyIndex}
 	 */
 	void clear();
-	
-	public RuleChain<Context> getContextInitRules();
-	
-	public Chain<RuleChain<Context>> getContextInitRuleChain();
-	
+
+	public LinkRule<Context> getContextInitRuleHead();
+
+	Chain<ChainableRule<Context>> getContextInitRuleChain();
+
 }

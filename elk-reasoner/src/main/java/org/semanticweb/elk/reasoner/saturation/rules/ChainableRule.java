@@ -1,5 +1,4 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
-
 /*
  * #%L
  * ELK Reasoner
@@ -22,19 +21,10 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Chainable;
+import org.semanticweb.elk.util.collections.chains.ModifiableLink;
 
-/**
- * A {@link Rule} that can be inserted to or deleted from {@link Chain}s
- * 
- * @author "Yevgeny Kazakov"
- * 
- * @param <E>
- *            the type of elements to which the rule can be applied
- * 
- * @see RuleChain
- */
-public interface ChainableRule<E> extends Rule<E>, Chainable<RuleChain<E>> {
+public interface ChainableRule<E> extends LinkRule<E>,
+		ModifiableLink<ChainableRule<E>>, Chainable<ChainableRule<E>> {
 
 }

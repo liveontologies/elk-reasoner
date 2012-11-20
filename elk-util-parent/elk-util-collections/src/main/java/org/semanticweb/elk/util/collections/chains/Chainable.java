@@ -1,4 +1,5 @@
 package org.semanticweb.elk.util.collections.chains;
+
 /*
  * #%L
  * ELK Utilities Collections
@@ -29,7 +30,7 @@ package org.semanticweb.elk.util.collections.chains;
  * @param <T>
  *            the types of the elements in the chain
  */
-public interface Chainable<T extends Reference<T>> {
+public interface Chainable<T extends ModifiableLink<T>> {
 
 	/**
 	 * Adds this element to the given {@link Chain}

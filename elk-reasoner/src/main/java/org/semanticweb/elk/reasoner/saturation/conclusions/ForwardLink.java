@@ -27,11 +27,12 @@ import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
@@ -109,20 +110,20 @@ public class ForwardLink implements Conclusion {
 
 	public boolean addToContextBackwardLinkRule(Context context) {
 		return context
-				.getBackwardLinkRulesChain()
+				.getBackwardLinkRuleChain()
 				.getCreate(ThisBackwardLinkRule.MATCHER_,
 						ThisBackwardLinkRule.FACTORY_).addForwardLink(this);
 	}
 
 	public boolean removeFromContextBackwardLinkRule(Context context) {
-		ThisBackwardLinkRule rule = context.getBackwardLinkRulesChain().find(
+		ThisBackwardLinkRule rule = context.getBackwardLinkRuleChain().find(
 				ThisBackwardLinkRule.MATCHER_);
 
 		return rule != null ? rule.removeForwardLink(this) : false;
 	}
 
 	public boolean containsBackwardLinkRule(Context context) {
-		ThisBackwardLinkRule rule = context.getBackwardLinkRulesChain().find(
+		ThisBackwardLinkRule rule = context.getBackwardLinkRuleChain().find(
 				ThisBackwardLinkRule.MATCHER_);
 
 		return rule != null ? rule.containsForwardLink(this) : false;
@@ -134,18 +135,20 @@ public class ForwardLink implements Conclusion {
 	}
 
 	/**
-	 * A type of {@link BackwardLinkRules} created for {@link ForwardLink}s and
-	 * stored in the {@link Context} where it is produced. There can be at most
-	 * one rule of this type stored in every {@link Context}. The rule
-	 * essentially indexes all {@link ForwardLink}s produced in this
-	 * {@link Context} and applies inferences with every produced
-	 * {@link BackwardLink} in this {@link Context}, such as computing implied
-	 * role chains.
+	 * A type of {@link ModifiableLinkRule<BackwardLink>} created for
+	 * {@link ForwardLink}s and stored in the {@link Context} where it is
+	 * produced. There can be at most one rule of this type stored in every
+	 * {@link Context}. The rule essentially indexes all {@link ForwardLink}s
+	 * produced in this {@link Context} and applies inferences with every
+	 * produced {@link BackwardLink} in this {@link Context}, such as computing
+	 * implied role chains.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private static class ThisBackwardLinkRule extends BackwardLinkRules {
+	private static class ThisBackwardLinkRule extends
+			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
+			ModifiableLinkRule<BackwardLink> {
 
 		/**
 		 * the record that stores all {@link ForwardLink}s produced in the
@@ -154,7 +157,7 @@ public class ForwardLink implements Conclusion {
 		 */
 		private final Multimap<IndexedPropertyChain, Context> forwardLinksByObjectProperty_;
 
-		ThisBackwardLinkRule(BackwardLinkRules tail) {
+		ThisBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
 			super(tail);
 			this.forwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>(
 					3);
@@ -227,16 +230,17 @@ public class ForwardLink implements Conclusion {
 			}
 		}
 
-		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(
+		private static Matcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>(
 				ThisBackwardLinkRule.class);
 
 		/**
 		 * The factory used for appending a new instance of this rule to a
-		 * {@link BackwardLinkRules} chain
+		 * {@link ModifiableLinkRule<BackwardLink>} chain
 		 */
-		private static ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule>() {
+		private static ReferenceFactory<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>() {
 			@Override
-			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
+			public ThisBackwardLinkRule create(
+					ModifiableLinkRule<BackwardLink> tail) {
 				return new ThisBackwardLinkRule(tail);
 			}
 		};

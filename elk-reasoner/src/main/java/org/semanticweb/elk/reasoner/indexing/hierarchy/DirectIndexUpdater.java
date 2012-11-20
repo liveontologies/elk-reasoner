@@ -63,13 +63,13 @@ public class DirectIndexUpdater implements IndexUpdater {
 	@Override
 	public boolean add(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		return rule.addTo(target.getChainCompositionRules());
+		return rule.addTo(target.getCompositionRuleChain());
 	}
 
 	@Override
 	public boolean remove(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		return rule.removeFrom(target.getChainCompositionRules());
+		return rule.removeFrom(target.getCompositionRuleChain());
 	}
 
 	@Override

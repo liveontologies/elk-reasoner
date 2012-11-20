@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,8 +23,9 @@ package org.semanticweb.elk.reasoner.indexing;
  */
 
 import org.semanticweb.elk.util.collections.chains.Chainable;
+import org.semanticweb.elk.util.collections.chains.ModifiableLink;
 
-public interface ChainableIndexRule<T> extends IndexRule<T>,
-		Chainable<IndexRuleChain<T>> {
+public interface ChainableIndexRule<E> extends LinkIndexRule<E>,
+		ModifiableLink<ChainableIndexRule<E>>, Chainable<ChainableIndexRule<E>> {
 
 }

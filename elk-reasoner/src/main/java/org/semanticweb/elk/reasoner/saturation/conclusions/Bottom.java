@@ -1,15 +1,11 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
-
 /*
  * #%L
  * ELK Reasoner
- * $Id:$
- * $HeadURL:$
+ * 
+ * $Id$
+ * $HeadURL$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +20,17 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
@@ -49,7 +47,7 @@ public class Bottom implements Conclusion {
 	public void deapply(SaturationState.Writer engine, Context context) {
 		context.setConsistent(true);
 		propagateThroughBackwardLinks(engine, context);
-		context.getBackwardLinkRulesChain().remove(
+		context.getBackwardLinkRuleChain().remove(
 				BottomBackwardLinkRule.MATCHER_);
 	}
 
@@ -58,7 +56,7 @@ public class Bottom implements Conclusion {
 		context.setConsistent(false);
 		propagateThroughBackwardLinks(engine, context);
 		// register the backward link rule for propagation of bottom
-		context.getBackwardLinkRulesChain().getCreate(
+		context.getBackwardLinkRuleChain().getCreate(
 				BottomBackwardLinkRule.MATCHER_,
 				BottomBackwardLinkRule.FACTORY_);
 	}
@@ -97,9 +95,11 @@ public class Bottom implements Conclusion {
 	/**
 	 * A backward link rule to propagate bottom through any new backward links
 	 */
-	private static class BottomBackwardLinkRule extends BackwardLinkRules {
+	private static class BottomBackwardLinkRule extends
+			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
+			ModifiableLinkRule<BackwardLink> {
 
-		BottomBackwardLinkRule(BackwardLinkRules tail) {
+		BottomBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
 			super(tail);
 		}
 
@@ -123,12 +123,13 @@ public class Bottom implements Conclusion {
 			}
 		}
 
-		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, BottomBackwardLinkRule>(
+		private static Matcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>(
 				BottomBackwardLinkRule.class);
 
-		private static ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule>() {
+		private static ReferenceFactory<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>() {
 			@Override
-			public BottomBackwardLinkRule create(BackwardLinkRules tail) {
+			public BottomBackwardLinkRule create(
+					ModifiableLinkRule<BackwardLink> tail) {
 				return new BottomBackwardLinkRule(tail);
 			}
 		};

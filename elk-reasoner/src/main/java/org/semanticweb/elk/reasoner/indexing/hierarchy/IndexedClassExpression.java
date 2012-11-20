@@ -28,7 +28,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -47,7 +48,7 @@ abstract public class IndexedClassExpression implements
 
 	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
 
-	RuleChain<Context> compositionRules;
+	ChainableRule<Context> compositionRuleHead;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -199,22 +200,22 @@ abstract public class IndexedClassExpression implements
 			return (this.hashCode_ < o.hashCode_ ? -1 : 1);
 	}
 
-	Chain<RuleChain<Context>> getChainCompositionRules() {
-		return new AbstractChain<RuleChain<Context>>() {
-			@Override
-			public RuleChain<Context> next() {
-				return compositionRules;
-			}
-
-			@Override
-			public void setNext(RuleChain<Context> tail) {
-				compositionRules = tail;
-			}
-		};
+	public LinkRule<Context> getCompositionRuleHead() {
+		return compositionRuleHead;
 	}
 
-	public RuleChain<Context> getCompositionRules() {
-		return compositionRules;
+	Chain<ChainableRule<Context>> getCompositionRuleChain() {
+		return new AbstractChain<ChainableRule<Context>>() {
+			@Override
+			public ChainableRule<Context> next() {
+				return compositionRuleHead;
+			}
+
+			@Override
+			public void setNext(ChainableRule<Context> tail) {
+				compositionRuleHead = tail;
+			}
+		};
 	}
 
 	@Override

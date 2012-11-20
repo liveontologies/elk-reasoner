@@ -32,12 +32,12 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
@@ -144,11 +144,13 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	/**
 	 * 
 	 */
-	private static class ThisCompositionRule extends ContextRules {
+	private static class ThisCompositionRule extends
+			ModifiableLinkImpl<ChainableRule<Context>> implements
+			ChainableRule<Context> {
 
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
-		private ThisCompositionRule(RuleChain<Context> tail) {
+		private ThisCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
 			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);
@@ -213,18 +215,18 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		}
 
-		private static Matcher<RuleChain<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<RuleChain<Context>, ThisCompositionRule>(
+		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<RuleChain<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<RuleChain<Context>, ThisCompositionRule>() {
+		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(RuleChain<Context> tail) {
+			public ThisCompositionRule create(ChainableRule<Context> tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<RuleChain<Context>> ruleChain) {
+		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
 
@@ -239,7 +241,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<RuleChain<Context>> ruleChain) {
+		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 

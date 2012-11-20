@@ -25,15 +25,16 @@ package org.semanticweb.elk.util.collections.chains;
 /**
  * This class provides a skeletal implementation of the {@link Chain} interface
  * to minimize the effort required to implement this interface. Essentially, one
- * has to provide only the implementation of the {@link Reference} interface.
+ * has to provide only the implementation of the {@link Link} interface.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
  *            The type of elements in the chain.
  */
-public abstract class AbstractChain<T extends Reference<T>> implements Chain<T> {
-	
+public abstract class AbstractChain<T extends ModifiableLink<T>> implements
+		Chain<T> {
+
 	@Override
 	public <S extends T> S find(Matcher<T, S> matcher) {
 		T candidate = next();
@@ -66,7 +67,7 @@ public abstract class AbstractChain<T extends Reference<T>> implements Chain<T> 
 
 	@Override
 	public <S extends T> S remove(Matcher<T, S> matcher) {
-		Reference<T> point = this;
+		ModifiableLink<T> point = this;
 		for (;;) {
 			T next = point.next();
 			if (next == null)

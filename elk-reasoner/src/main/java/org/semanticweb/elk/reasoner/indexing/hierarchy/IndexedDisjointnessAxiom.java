@@ -34,12 +34,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
@@ -142,7 +141,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class ThisCompositionRule extends ContextRules implements
+	private static class ThisCompositionRule extends
+			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
 		/**
@@ -158,7 +158,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 */
 		private Collection<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
-		private ThisCompositionRule(RuleChain<Context> tail) {
+		private ThisCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
 		}
 
@@ -248,30 +248,31 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return false;
 		}
 
-		private static Matcher<RuleChain<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<RuleChain<Context>, ThisCompositionRule>(
+		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<RuleChain<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<RuleChain<Context>, ThisCompositionRule>() {
+		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(RuleChain<Context> tail) {
+			public ThisCompositionRule create(ChainableRule<Context> tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<RuleChain<Context>> ruleChain) {
+		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
 			return disjointClasses_ != null ? addTo(ruleChain, disjointClasses_)
 					: addTo(ruleChain, disjointnessAxioms_);
 		}
 
 		@Override
-		public boolean removeFrom(Chain<RuleChain<Context>> ruleChain) {
+		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
 			return disjointClasses_ != null ? removeFrom(ruleChain,
 					disjointClasses_) : removeFrom(ruleChain,
 					disjointnessAxioms_);
 		}
 
-		public static boolean addTo(Chain<RuleChain<Context>> ruleChain,
+		public static boolean addTo(
+				Chain<ChainableRule<Context>> ruleChain,
 				Set<IndexedClassExpression> classes) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
@@ -283,7 +284,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return changed;
 		}
 
-		public static boolean addTo(Chain<RuleChain<Context>> ruleChain,
+		public static boolean addTo(
+				Chain<ChainableRule<Context>> ruleChain,
 				Collection<IndexedDisjointnessAxiom> axioms) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
@@ -293,7 +295,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return changed;
 		}
 
-		public static boolean removeFrom(Chain<RuleChain<Context>> ruleChain,
+		public static boolean removeFrom(
+				Chain<ChainableRule<Context>> ruleChain,
 				Set<IndexedClassExpression> classes) {
 			ThisCompositionRule rule = ruleChain
 					.find(ThisCompositionRule.MATCHER_);
@@ -314,7 +317,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return changed;
 		}
 
-		public static boolean removeFrom(Chain<RuleChain<Context>> ruleChain,
+		public static boolean removeFrom(
+				Chain<ChainableRule<Context>> ruleChain,
 				Collection<IndexedDisjointnessAxiom> axioms) {
 			ThisCompositionRule rule = ruleChain
 					.find(ThisCompositionRule.MATCHER_);

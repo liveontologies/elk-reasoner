@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 
 /**
  * @author Pavel Klinov
@@ -62,13 +62,13 @@ public class SaturationState {
 	 * occurs exactly once.
 	 */
 	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
-	
+
 	/**
 	 * The queue of all contexts for which computation of the closure under
 	 * inference rules has not yet been finished.
 	 */
 	private Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
-	
+
 	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
 		return notSaturatedContexts_ == null ? Collections
 				.<IndexedClassExpression> emptyList() : notSaturatedContexts_;
@@ -140,7 +140,7 @@ public class SaturationState {
 
 		public IndexedClassExpression getOwlNothing() {
 			return owlNothing_;
-		}		
+		}
 
 		public Context pollForContext() {
 			return activeContexts_.poll();
@@ -171,21 +171,21 @@ public class SaturationState {
 			produce(context,
 					new PositiveSuperClassExpression(context.getRoot()));
 			// apply all context initialization rules
-			RuleChain<Context> initRules = ontologyIndex_.getContextInitRules();
-
-			while (initRules != null) {
-				initRules.apply(this, context);
-				initRules = initRules.next();
+			LinkRule<Context> initRule = ontologyIndex_
+					.getContextInitRuleHead();
+			while (initRule != null) {
+				initRule.apply(this, context);
+				initRule = initRule.next();
 			}
 		}
 
 		public void markAsNotSaturated(Context context) {
 			notSaturatedContexts_.add(context.getRoot());
 			context.setSaturated(false);
-		}		
+		}
 
 		public void clearNotSaturatedContexts() {
 			notSaturatedContexts_.clear();
-		}		
+		}
 	}
 }

@@ -32,12 +32,14 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleChain;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
-public class OntologyIndexImpl extends IndexedObjectCache implements OntologyIndex {
+public class OntologyIndexImpl extends IndexedObjectCache implements
+		OntologyIndex {
 
 	private IndexedClass indexedOwlThing;
 	private IndexedClass indexedOwlNothing;
@@ -45,16 +47,18 @@ public class OntologyIndexImpl extends IndexedObjectCache implements OntologyInd
 	private final ElkObjectIndexerVisitor elkObjectIndexer_;
 	private final ElkAxiomIndexerVisitor directAxiomInserter_;
 	private final ElkAxiomIndexerVisitor directAxiomDeleter_;
-	
-	private RuleChain<Context> contextInitRules_ = null;
-	
+
+	private ChainableRule<Context> contextInitRules_ = null;
+
 	public OntologyIndexImpl() {
 		elkObjectIndexer_ = new ElkObjectIndexerVisitor(this);
-	
+
 		indexPredefined();
-		
-		directAxiomInserter_ = new ElkAxiomIndexerVisitor(this, getIndexedOwlNothing(), new DirectIndexUpdater(this), true);
-		directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, getIndexedOwlNothing(), new DirectIndexUpdater(this), false);
+
+		directAxiomInserter_ = new ElkAxiomIndexerVisitor(this,
+				getIndexedOwlNothing(), new DirectIndexUpdater(this), true);
+		directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this,
+				getIndexedOwlNothing(), new DirectIndexUpdater(this), false);
 	}
 
 	@Override
@@ -69,8 +73,9 @@ public class OntologyIndexImpl extends IndexedObjectCache implements OntologyInd
 	private void indexPredefined() {
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
-		ElkAxiomIndexerVisitor tmpIndexer = new ElkAxiomIndexerVisitor(this, null, new DirectIndexUpdater(this), true);
-		
+		ElkAxiomIndexerVisitor tmpIndexer = new ElkAxiomIndexerVisitor(this,
+				null, new DirectIndexUpdater(this), true);
+
 		this.indexedOwlThing = tmpIndexer
 				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
 		this.indexedOwlNothing = tmpIndexer
@@ -78,30 +83,30 @@ public class OntologyIndexImpl extends IndexedObjectCache implements OntologyInd
 	}
 
 	@Override
-	public RuleChain<Context> getContextInitRules() {
+	public LinkRule<Context> getContextInitRuleHead() {
 		return contextInitRules_;
 	}
-	
+
 	@Override
-	public Chain<RuleChain<Context>> getContextInitRuleChain() {
-		return new AbstractChain<RuleChain<Context>>() {
+	public Chain<ChainableRule<Context>> getContextInitRuleChain() {
+		return new AbstractChain<ChainableRule<Context>>() {
 
 			@Override
-			public RuleChain<Context> next() {
+			public ChainableRule<Context> next() {
 				return contextInitRules_;
 			}
 
 			@Override
-			public void setNext(RuleChain<Context> tail) {
+			public void setNext(ChainableRule<Context> tail) {
 				contextInitRules_ = tail;
 			}
 		};
 	}
-	
-	
+
 	@Override
 	public IndexedClassExpression getIndexed(ElkClassExpression representative) {
-		IndexedClassExpression result = representative.accept(elkObjectIndexer_);
+		IndexedClassExpression result = representative
+				.accept(elkObjectIndexer_);
 		if (result.occurs())
 			return result;
 		else
@@ -189,7 +194,6 @@ public class OntologyIndexImpl extends IndexedObjectCache implements OntologyInd
 	public ElkAxiomProcessor getAxiomDeleter() {
 		return directAxiomDeleter_;
 	}
-
 
 	@Override
 	public IndexedClass getIndexedOwlThing() {
