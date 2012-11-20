@@ -93,22 +93,22 @@ public class DifferentialIndex {
 	/**
 	 * The map of added {@link Rule}s for index class expressions;
 	 */
-	private final Map<IndexedClassExpression, ChainableRule<Context>> addedContextRulesByClassExpressions_;
+	private final Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_;
 
 	/**
 	 * The map of removed {@link Rule}s for index class expressions;
 	 */
-	private final Map<IndexedClassExpression, ChainableRule<Context>> removedContextRulesByClassExpressions_;
+	private final Map<IndexedClassExpression, ChainableRule<Context>> removedContextRuleHeadByClassExpressions_;
 
 	/**
 	 * The map of added {@link IndexRule}s for index class expressions;
 	 */
-	private final Map<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>> addedIndexRulesByClassExpressions_;
+	private final Map<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>> addedIndexRuleHeadByClassExpressions_;
 
 	/**
 	 * The map of removed {@link IndexRule}s for index class expressions;
 	 */
-	private final Map<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>> removedIndexRulesByClassExpressions_;
+	private final Map<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>> removedIndexRuleHeadByClassExpressions_;
 
 	private final ElkAxiomIndexerVisitor axiomInserter_;
 
@@ -120,13 +120,13 @@ public class DifferentialIndex {
 		this.removedClasses = new ArrayList<ElkClass>(127);
 		this.addedIndividuals = new ArrayList<ElkNamedIndividual>();
 		this.removedIndividuals = new ArrayList<ElkNamedIndividual>();
-		this.addedContextRulesByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
+		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
-		this.removedContextRulesByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
+		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
-		this.addedIndexRulesByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>>(
+		this.addedIndexRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>>(
 				127);
-		this.removedIndexRulesByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>>(
+		this.removedIndexRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>>(
 				127);
 		this.axiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
 				owlNothing, new IncrementalIndexUpdater(this), true);
@@ -149,7 +149,7 @@ public class DifferentialIndex {
 	 * 
 	 */
 	public Map<IndexedClassExpression, ChainableRule<Context>> getAddedContextRulesByClassExpressions() {
-		return this.addedContextRulesByClassExpressions_;
+		return this.addedContextRuleHeadByClassExpressions_;
 	}
 
 	/**
@@ -157,13 +157,13 @@ public class DifferentialIndex {
 	 *         objects containing index deletions for these class expressions
 	 */
 	public Map<IndexedClassExpression, ChainableRule<Context>> getRemovedContextRulesByClassExpressions() {
-		return this.removedContextRulesByClassExpressions_;
+		return this.removedContextRuleHeadByClassExpressions_;
 	}
 
 	public Collection<IndexedClassExpression> getClassExpressionsWithIndexRuleChanges() {
 		return new LazySetUnion<IndexedClassExpression>(
-				addedIndexRulesByClassExpressions_.keySet(),
-				removedIndexRulesByClassExpressions_.keySet());
+				addedIndexRuleHeadByClassExpressions_.keySet(),
+				removedIndexRuleHeadByClassExpressions_.keySet());
 	}
 
 	/**
@@ -194,70 +194,6 @@ public class DifferentialIndex {
 	 * Commits the changes to the indexed objects and clears all changes.
 	 */
 	public void commit() {
-		// commit context rule deletions and additions
-		for (IndexedClassExpression target : removedContextRulesByClassExpressions_
-				.keySet()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing context rule deletions for " + target);
-			}
-
-			ChainableRule<Context> nextRule = removedContextRulesByClassExpressions_
-					.get(target);
-			Chain<ChainableRule<Context>> chain = target
-					.getCompositionRuleChain();
-			while (nextRule != null) {
-				nextRule.removeFrom(chain);
-				nextRule = nextRule.next();
-			}
-		}
-
-		removedContextRulesByClassExpressions_.clear();
-
-		for (IndexedClassExpression target : addedContextRulesByClassExpressions_
-				.keySet()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing context rule additions for " + target);
-			}
-			ChainableRule<Context> nextRule = addedContextRulesByClassExpressions_
-					.get(target);
-			Chain<ChainableRule<Context>> chain = target
-					.getCompositionRuleChain();
-			while (nextRule != null) {
-				nextRule.addTo(chain);
-				nextRule = nextRule.next();
-			}
-		}
-		addedContextRulesByClassExpressions_.clear();
-
-		// commit direct index changes
-		for (IndexedClassExpression target : removedIndexRulesByClassExpressions_
-				.keySet()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing index rule deletions for " + target);
-			}
-			ChainableIndexRule<IndexedClassExpression> nextRule = removedIndexRulesByClassExpressions_
-					.get(target);
-			while (nextRule != null) {
-				nextRule.deapply(target);
-				nextRule = nextRule.next();
-			}
-		}
-		removedIndexRulesByClassExpressions_.clear();
-
-		for (IndexedClassExpression target : addedIndexRulesByClassExpressions_
-				.keySet()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing index rule additions for " + target);
-			}
-			ChainableIndexRule<IndexedClassExpression> nextRule = addedIndexRulesByClassExpressions_
-					.get(target);
-			while (nextRule != null) {
-				nextRule.apply(target);
-				nextRule = nextRule.next();
-			}
-		}
-		addedIndexRulesByClassExpressions_.clear();
-
 		// commit changes in the context initialization rules
 		ChainableRule<Context> nextRule;
 		Chain<ChainableRule<Context>> chain;
@@ -277,6 +213,66 @@ public class DifferentialIndex {
 			nextRule = nextRule.next();
 		}
 		addedContextInitRules_ = null;
+
+		// commit context rule deletions and additions
+		for (IndexedClassExpression target : removedContextRuleHeadByClassExpressions_
+				.keySet()) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Committing context rule deletions for " + target);
+			}
+
+			nextRule = removedContextRuleHeadByClassExpressions_.get(target);
+			chain = target.getCompositionRuleChain();
+			while (nextRule != null) {
+				nextRule.removeFrom(chain);
+				nextRule = nextRule.next();
+			}
+		}
+
+		removedContextRuleHeadByClassExpressions_.clear();
+
+		for (IndexedClassExpression target : addedContextRuleHeadByClassExpressions_
+				.keySet()) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Committing context rule additions for " + target);
+			}
+			nextRule = addedContextRuleHeadByClassExpressions_.get(target);
+			chain = target.getCompositionRuleChain();
+			while (nextRule != null) {
+				nextRule.addTo(chain);
+				nextRule = nextRule.next();
+			}
+		}
+		addedContextRuleHeadByClassExpressions_.clear();
+
+		// commit direct index changes
+		for (IndexedClassExpression target : removedIndexRuleHeadByClassExpressions_
+				.keySet()) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Committing index rule deletions for " + target);
+			}
+			ChainableIndexRule<IndexedClassExpression> nextIndexRule = removedIndexRuleHeadByClassExpressions_
+					.get(target);
+			while (nextIndexRule != null) {
+				nextIndexRule.deapply(target);
+				nextIndexRule = nextIndexRule.next();
+			}
+		}
+		removedIndexRuleHeadByClassExpressions_.clear();
+
+		for (IndexedClassExpression target : addedIndexRuleHeadByClassExpressions_
+				.keySet()) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Committing index rule additions for " + target);
+			}
+			ChainableIndexRule<IndexedClassExpression> nextIndexRule = addedIndexRuleHeadByClassExpressions_
+					.get(target);
+			while (nextIndexRule != null) {
+				nextIndexRule.apply(target);
+				nextIndexRule = nextIndexRule.next();
+			}
+		}
+		addedIndexRuleHeadByClassExpressions_.clear();
 	}
 
 	public void clearSignatureChanges() {
@@ -287,13 +283,12 @@ public class DifferentialIndex {
 	}
 
 	public boolean isEmpty() {
-		return addedContextRulesByClassExpressions_.isEmpty()
-				&& removedContextRulesByClassExpressions_.isEmpty()
-				&& addedIndexRulesByClassExpressions_.isEmpty()
-				&& removedIndexRulesByClassExpressions_.isEmpty()
-				&& addedContextInitRules_ == null
-				&& removedContextInitRules_ == null;
-
+		return addedContextInitRules_ == null
+				&& removedContextInitRules_ == null
+				&& addedContextRuleHeadByClassExpressions_.isEmpty()
+				&& removedContextRuleHeadByClassExpressions_.isEmpty()
+				&& addedIndexRuleHeadByClassExpressions_.isEmpty()
+				&& removedIndexRuleHeadByClassExpressions_.isEmpty();
 	}
 
 	public ElkAxiomProcessor getAxiomInserter() {
@@ -336,80 +331,26 @@ public class DifferentialIndex {
 
 	private Chain<ChainableRule<Context>> getAddedContextRuleChain(
 			final IndexedClassExpression target) {
-		return new AbstractChain<ChainableRule<Context>>() {
-
-			@Override
-			public ChainableRule<Context> next() {
-				return addedContextRulesByClassExpressions_.get(target);
-			}
-
-			@Override
-			public void setNext(ChainableRule<Context> tail) {
-				if (tail == null)
-					addedContextRulesByClassExpressions_.remove(target);
-				else
-					addedContextRulesByClassExpressions_.put(target, tail);
-			}
-		};
+		return AbstractChain.getMapBackedChain(
+				addedContextRuleHeadByClassExpressions_, target);
 	}
 
 	private Chain<ChainableRule<Context>> getRemovedContextRuleChain(
 			final IndexedClassExpression target) {
-		return new AbstractChain<ChainableRule<Context>>() {
-
-			@Override
-			public ChainableRule<Context> next() {
-				return removedContextRulesByClassExpressions_.get(target);
-			}
-
-			@Override
-			public void setNext(ChainableRule<Context> tail) {
-				if (tail == null)
-					removedContextRulesByClassExpressions_.remove(target);
-				else
-					removedContextRulesByClassExpressions_.put(target, tail);
-			}
-		};
+		return AbstractChain.getMapBackedChain(
+				removedContextRuleHeadByClassExpressions_, target);
 	}
 
 	private Chain<ChainableIndexRule<IndexedClassExpression>> getAddedIndexRuleChain(
 			final IndexedClassExpression target) {
-		return new AbstractChain<ChainableIndexRule<IndexedClassExpression>>() {
-
-			@Override
-			public ChainableIndexRule<IndexedClassExpression> next() {
-				return addedIndexRulesByClassExpressions_.get(target);
-			}
-
-			@Override
-			public void setNext(
-					ChainableIndexRule<IndexedClassExpression> tail) {
-				if (tail == null)
-					addedIndexRulesByClassExpressions_.remove(target);
-				else
-					addedIndexRulesByClassExpressions_.put(target, tail);
-			}
-		};
+		return AbstractChain.getMapBackedChain(
+				addedIndexRuleHeadByClassExpressions_, target);
 	}
 
 	private Chain<ChainableIndexRule<IndexedClassExpression>> getRemovedIndexRuleChain(
 			final IndexedClassExpression target) {
-		return new AbstractChain<ChainableIndexRule<IndexedClassExpression>>() {
-
-			@Override
-			public ChainableIndexRule<IndexedClassExpression> next() {
-				return removedIndexRulesByClassExpressions_.get(target);
-			}
-
-			@Override
-			public void setNext(
-					ChainableIndexRule<IndexedClassExpression> tail) {
-				if (tail == null)
-					removedIndexRulesByClassExpressions_.remove(target);
-				else
-					removedIndexRulesByClassExpressions_.put(target, tail);
-			}
-		};
+		return AbstractChain.getMapBackedChain(
+				removedIndexRuleHeadByClassExpressions_, target);
 	}
 
 	boolean registerAddedContextInitRule(ChainableRule<Context> rule) {

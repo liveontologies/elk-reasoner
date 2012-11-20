@@ -30,9 +30,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 
 /**
  * An index updater that saves the changes into the {@link DifferentialIndex}
- * object, instead of immediately applying them for the affected indexed
- * objects. The changes can be committed to the indexed object all at once by
- * calling the respective method.
+ * object, instead of immediately applying them to {@link OntologyIndex}. The
+ * changes can be committed afterwards to the main {@link OntologyIndex}.
  * 
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov

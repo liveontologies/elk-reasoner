@@ -130,6 +130,16 @@ public interface OntologyIndex {
 	Collection<IndexedObjectProperty> getIndexedObjectProperties();
 
 	/**
+	 * @return the first context initialization rule assigned to this
+	 *         {@link OntologyIndex}, or {@code null} if there no such rules;
+	 *         all other rules can be obtained by traversing over
+	 *         {@link LinkRule#next()}
+	 */
+	LinkRule<Context> getContextInitRuleHead();
+
+	// TODO: separate read-only methods from methods that can modify this index
+
+	/**
 	 * @return the {@link ElkAxiomProcessor} using which one can add
 	 *         {@link ElkAxiom}s to the ontology
 	 */
@@ -146,8 +156,11 @@ public interface OntologyIndex {
 	 */
 	void clear();
 
-	public LinkRule<Context> getContextInitRuleHead();
-
+	/**
+	 * @return a {@link Chain} view of context initialization rules assigned to
+	 *         this {@link OntologyIndex}; it can be used for inserting new
+	 *         rules or deleting existing ones
+	 */
 	Chain<ChainableRule<Context>> getContextInitRuleChain();
 
 }

@@ -271,10 +271,10 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			}
 		}
 
-		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
 			@Override
 			public ThisCompositionRule create(ChainableRule<Context> next) {
 				return new ThisCompositionRule(next);
@@ -336,10 +336,10 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			properties_.add(property);
 		}
 
-		private static Matcher<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule>(
+		private static final Matcher<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule>(
 				PosExistentialRule.class);
 
-		private static ReferenceFactory<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule> FACTORY_ = new ReferenceFactory<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule>() {
+		private static final ReferenceFactory<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule> FACTORY_ = new ReferenceFactory<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule>() {
 			@Override
 			public PosExistentialRule create(
 					ChainableIndexRule<IndexedClassExpression> tail) {

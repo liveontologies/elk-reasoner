@@ -133,8 +133,9 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	/**
-	 * Adds {@code owl:Thing} to the context (it should be registered iff Thing
-	 * occurs negatively)
+	 * Adds {@code owl:Thing} to the context. It should be registered as a
+	 * context initialization rule iff {@code owl:Thing} occurs negatively in
+	 * the ontology.
 	 */
 	private static class OwlThingContextInitializationRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
@@ -159,10 +160,10 @@ public class IndexedClass extends IndexedClassEntity {
 					new PositiveSuperClassExpression(writer.getOwlThing()));
 		}
 
-		private static Matcher<ChainableRule<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, OwlThingContextInitializationRule>(
+		private static final Matcher<ChainableRule<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, OwlThingContextInitializationRule>(
 				OwlThingContextInitializationRule.class);
 
-		private static ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule>() {
+		private static final ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule>() {
 			@Override
 			public OwlThingContextInitializationRule create(
 					ChainableRule<Context> tail) {

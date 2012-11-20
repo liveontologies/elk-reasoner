@@ -1,5 +1,7 @@
 package org.semanticweb.elk.util.collections.chains;
 
+import java.util.Map;
+
 /*
  * #%L
  * ELK Reasoner
@@ -81,4 +83,35 @@ public abstract class AbstractChain<T extends ModifiableLink<T>> implements
 		}
 	}
 
+	/**
+	 * Creates a {@link Chain} view of the value associated with the given key
+	 * in the given {@link Map}. The values of the map must be instances of the
+	 * type that can be used in the {@link Chain} interface. All operations with
+	 * the returned {@link Chain}, such as addition or removal, will be
+	 * reflected accordingly in the corresponding value in the {@link Map}.
+	 * 
+	 * @param map
+	 *            the {@link Map} that backs the data
+	 * @param key
+	 *            the key for which to return the {@link Chain} view of the data
+	 * @return the {@link Chain} view of the data associated with key in map
+	 */
+	public static <K, T extends ModifiableLink<T>> Chain<T> getMapBackedChain(
+			final Map<K, T> map, final K key) {
+		return new AbstractChain<T>() {
+
+			@Override
+			public T next() {
+				return map.get(key);
+			}
+
+			@Override
+			public void setNext(T next) {
+				if (next == null)
+					map.remove(key);
+				else
+					map.put(key, next);
+			}
+		};
+	}
 }
