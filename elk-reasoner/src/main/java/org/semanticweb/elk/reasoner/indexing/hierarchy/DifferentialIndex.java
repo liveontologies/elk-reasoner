@@ -277,7 +277,6 @@ public class DifferentialIndex {
 			nextRule = nextRule.next();
 		}
 		addedContextInitRules_ = null;
-
 	}
 
 	public void clearSignatureChanges() {

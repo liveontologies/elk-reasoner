@@ -23,11 +23,17 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 
 /**
  * Reverts inferences
@@ -106,16 +112,29 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 	void initComputation() {
 		super.initComputation();
 
-		initialization_ = new IncrementalChangesInitialization(
-				reasoner.ontologyIndex.getIndexedClassExpressions(),
-				deletions_ ? reasoner.incrementalState.diffIndex
-						.getRemovedContextInitRules()
-						: reasoner.incrementalState.diffIndex
-								.getAddedContextInitRules(),
-				deletions_ ? reasoner.incrementalState.diffIndex
-						.getRemovedContextRulesByClassExpressions()
-						: reasoner.incrementalState.diffIndex
-								.getAddedContextRulesByClassExpressions(), reasoner.saturationState,
+		DifferentialIndex diffIndex = reasoner.incrementalState.diffIndex;
+		ChainableRule<Context> changedInitRules = null;
+		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
+		Collection<IndexedClassExpression> inputs = Collections.emptyList();
+
+		if (deletions_) {
+			changedInitRules = diffIndex.getRemovedContextInitRules();
+			changedRulesByCE = diffIndex
+					.getRemovedContextRulesByClassExpressions();
+		} else {
+			changedInitRules = diffIndex.getAddedContextInitRules();
+			changedRulesByCE = diffIndex
+					.getAddedContextRulesByClassExpressions();
+		}
+
+		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
+			inputs = reasoner.ontologyIndex.getIndexedClassExpressions();
+		}
+		
+		System.out.println("Input size " + inputs.size());
+
+		initialization_ = new IncrementalChangesInitialization(inputs,
+				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				deletions_, reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor());
 	}
