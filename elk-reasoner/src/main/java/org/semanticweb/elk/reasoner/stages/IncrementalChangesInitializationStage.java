@@ -131,7 +131,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 			inputs = reasoner.ontologyIndex.getIndexedClassExpressions();
 		}
 		
-		System.out.println("Input size " + inputs.size());
+		//System.out.println("Input size " + inputs.size());
 
 		initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
