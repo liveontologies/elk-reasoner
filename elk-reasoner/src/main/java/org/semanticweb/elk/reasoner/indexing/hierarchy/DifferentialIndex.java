@@ -242,17 +242,17 @@ public class DifferentialIndex {
 		addedIndexRulesByClassExpressions_.clear();
 		// commit changes in the context initialization rules
 
-		if (addedContextInitRules_ != null) {
-			addedContextInitRules_.addAllTo(mainIndex_
-					.getContextInitRuleChain());
-			addedContextInitRules_ = null;
-		}
-
 		if (removedContextInitRules_ != null) {
 			removedContextInitRules_.removeAllFrom(mainIndex_
 					.getContextInitRuleChain());
 			removedContextInitRules_ = null;
 		}
+		
+		if (addedContextInitRules_ != null) {
+			addedContextInitRules_.addAllTo(mainIndex_
+					.getContextInitRuleChain());
+			addedContextInitRules_ = null;
+		}		
 	}
 
 	public void clearSignatureChanges() {

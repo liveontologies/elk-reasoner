@@ -1,6 +1,10 @@
 package org.semanticweb.elk.benchmark.reasoning;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -10,13 +14,16 @@ import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
-import org.semanticweb.elk.benchmark.util.LoaderThatRemembersAxioms;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
+import org.semanticweb.elk.owl.iris.ElkPrefix;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owl.parsing.Owl2Parser;
+import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -36,13 +43,12 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class IncrementalClassificationTask implements Task {
 
-	private Reasoner reasoner_;
 	private final String ontologyFile_;
 	private final ReasonerConfiguration reasonerConfig_;
 	private List<ElkAxiom> loadedAxioms_ = null;
 
 	final static int REPEAT_NUMBER = 1;
-	final static double CHANGE_FRACTION = 0.2;
+	final static double CHANGE_FRACTION = 0.02;
 
 	public IncrementalClassificationTask(String[] args) {
 		ontologyFile_ = args[0];
@@ -57,23 +63,47 @@ public class IncrementalClassificationTask implements Task {
 
 	@Override
 	public void prepare() throws TaskException {
+		InputStream stream = null;
+		
 		try {
 			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
-			LoaderThatRemembersAxioms loader = new LoaderThatRemembersAxioms(
-					new Owl2FunctionalStyleParserFactory(), ontologyFile, 100000);
 
-			reasoner_ = new ReasonerFactory().createReasoner(
-					new LoggingStageExecutor(), reasonerConfig_);
-			reasoner_.registerOntologyLoader(loader);
-			reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
-			reasoner_.loadOntology();
+			stream = new FileInputStream(ontologyFile);
 			// remember the loaded axioms
-			loadedAxioms_ = loader.getLoadedAxioms();
+			loadedAxioms_ = loadAxioms(stream);
 		} catch (Exception e) {
 			throw new TaskException(e);
 		}
+		finally {
+			IOUtils.closeQuietly(stream);
+		}
 	}
 
+	protected List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
+			Owl2ParseException {
+		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
+				.getParser(stream);
+		final List<ElkAxiom> axioms = new ArrayList<ElkAxiom>();
+
+		parser.accept(new Owl2ParserAxiomProcessor() {
+
+			@Override
+			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+			}
+
+			@Override
+			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
+				axioms.add(elkAxiom);
+			}
+		});
+
+		return axioms;
+	}
+	
+	protected boolean passAxiom(ElkAxiom axiom) {
+		return axiom instanceof ElkClassAxiom;
+	}	
+	
 	private ReasonerConfiguration getConfig(String[] args) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
 
@@ -87,13 +117,17 @@ public class IncrementalClassificationTask implements Task {
 
 	@Override
 	public Result run() throws TaskException {
+		Reasoner standardReasoner = null;
+		Reasoner incrementalReasoner = null;
+		
 		try {
 			TestChangesLoader initialLoader = new TestChangesLoader();
 			TestChangesLoader loader = new TestChangesLoader();
-			Reasoner standardReasoner = new ReasonerFactory()
-					.createReasoner(new LoggingStageExecutor());
-			Reasoner incrementalReasoner = new ReasonerFactory()
-					.createReasoner(new LoggingStageExecutor());
+			
+			standardReasoner = new ReasonerFactory().createReasoner(
+					new LoggingStageExecutor(), reasonerConfig_);
+			incrementalReasoner = new ReasonerFactory().createReasoner(
+					new LoggingStageExecutor(), reasonerConfig_);
 
 			standardReasoner.registerOntologyLoader(initialLoader);
 			standardReasoner.registerOntologyChangesLoader(loader);
@@ -106,7 +140,7 @@ public class IncrementalClassificationTask implements Task {
 			// initial correctness check
 			correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-			long seed =  12345; //System.currentTimeMillis();
+			long seed = 123;//System.currentTimeMillis();
 			Random rnd = new Random(seed);
 
 			for (int i = 0; i < REPEAT_NUMBER; i++) {
@@ -114,9 +148,11 @@ public class IncrementalClassificationTask implements Task {
 				Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms_, rnd,
 						CHANGE_FRACTION);
 
-				for (ElkAxiom del : deleted) {
+				System.out.println("===========DELETING==============");
+				
+				/*for (ElkAxiom del : deleted) {
 					System.err.println(OwlFunctionalStylePrinter.toString(del));
-				}
+				}*/
 
 				// incremental changes
 				loader.clear();
@@ -125,6 +161,9 @@ public class IncrementalClassificationTask implements Task {
 				incrementalReasoner.registerOntologyChangesLoader(loader);
 
 				correctnessCheck(standardReasoner, incrementalReasoner, seed);
+				
+				System.out.println("===========ADDING==============");
+				
 				// add the axioms back
 				loader.clear();
 				add(loader, deleted);
@@ -138,7 +177,8 @@ public class IncrementalClassificationTask implements Task {
 			throw new TaskException(e);
 		} finally {
 			try {
-				reasoner_.shutdown();
+				standardReasoner.shutdown();
+				incrementalReasoner.shutdown();
 			} catch (InterruptedException e) {
 			}
 		}
@@ -157,8 +197,20 @@ public class IncrementalClassificationTask implements Task {
 			subset.addAll(axioms); 
 		}
 		else {
-			for (int i = 0; i < num; i++) {
-				subset.add(axioms.get(rnd.nextInt(num)));
+			int filteredCnt = 0;
+			final int STOP = 100;
+			
+			for (int i = 0; i < num && filteredCnt < STOP;) {
+				ElkAxiom axiom = axioms.get(rnd.nextInt(num)); 
+				
+				if (passAxiom(axiom)) {
+					subset.add(axiom);
+					i++;
+					filteredCnt = 0;
+				}
+				else {
+					filteredCnt++;
+				}
 			}
 		}
 		
@@ -179,11 +231,14 @@ public class IncrementalClassificationTask implements Task {
 	
 	protected void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner, long seed) throws ElkException {
 		Taxonomy<ElkClass> expected = getTaxonomy(standardReasoner);
+		
+		System.out.println("===========INCREMENTAL==============");
+		
 		Taxonomy<ElkClass> incremental = getTaxonomy(incrementalReasoner);
 		int expectedHashCode = TaxonomyHasher.hash(expected);
-		int gotten = TaxonomyHasher.hash(incremental);
+		int gottenHashCode = TaxonomyHasher.hash(incremental);
 		
-		if (expectedHashCode != gotten) {
+		if (expectedHashCode != gottenHashCode) {
 			throw new RuntimeException("Comparison failed for seed " + seed);
 		}
 	}

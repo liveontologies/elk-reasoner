@@ -5,7 +5,7 @@ package org.semanticweb.elk.benchmark.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.loading.Loader;
@@ -22,7 +22,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 public class LoaderThatRemembersAxioms extends Owl2StreamLoader implements ElkAxiomProcessor {
 
 	private final int limit_;
-	private final List<ElkAxiom> loaded_ = new LinkedList<ElkAxiom>();
+	private final List<ElkAxiom> loaded_;
 	
 	private ElkAxiomProcessor processor_;
 	
@@ -30,6 +30,7 @@ public class LoaderThatRemembersAxioms extends Owl2StreamLoader implements ElkAx
 			throws FileNotFoundException {
 		super(parserFactory, file);
 		limit_ = maxAxiomsToRemember;
+		loaded_ = new ArrayList<ElkAxiom>(maxAxiomsToRemember);
 	}
 	
 	@Override
