@@ -199,23 +199,21 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 		public final void run() {
 			I nextInput;
 			// we use one engine per worker run
-			InputProcessor<I> inputProcessor = inputProcessorFactory.getEngine();
-			
+			InputProcessor<I> inputProcessor = inputProcessorFactory
+					.getEngine();
+
 			try {
-				// this first invocation of process() takes care of the case
-				// when the engine doesn't need any input but has to process
-				// some of its internal state (thus, there's no submit())
-				try {
-					inputProcessor.process();
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					return;
-				}
-				
+				boolean doneProcess = false;
 				for (;;) {
 					if (interrupted)
 						break;
 					try {
+						// make sure that all previously submitted inputs are
+						// processed
+						if (!doneProcess) {
+							inputProcessor.process(); // can be interrupted
+							doneProcess = true;
+						}
 						if (finishRequested) {
 							nextInput = buffer.poll();
 							if (nextInput == null) {
