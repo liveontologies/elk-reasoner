@@ -64,8 +64,6 @@ public interface Context {
 
 	// public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms();
 
-	public int addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
 	/**
 	 * @return the {@link Context}s from which there exists an (implied)
 	 *         "existential relation" with this {@link Context} indexed by the
@@ -84,21 +82,20 @@ public interface Context {
 	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty();
 
 	/**
-	 * @return the {@link BackwardLinkRules} registered with this
-	 *         {@link Context} or {@code null} if no such a rule is registered.
-	 *         These rules are applied to every {@link BackwardLink} inserted to
-	 *         this context. This method should be used to access the rules
-	 *         without modifying them.
+	 * @return the first backward link rule assigned to this {@link Context}, or
+	 *         {@code null} if there no such rules; all other rules can be
+	 *         obtained by traversing over {@link LinkRule#next()}; this method
+	 *         should be used to access the rules without modifying them.
 	 */
 	public LinkRule<BackwardLink> getBackwardLinkRuleHead();
 
 	/**
-	 * @return the {@link Chain} view of all {@link BackwardLinkRules}
-	 *         registered with this {@link Context}; this is always not
-	 *         {@code null}. This method can be used for convenient search and
-	 *         modification (addition and deletion) of the rules using the
-	 *         methods of the {@link Chain} interface without without worrying
-	 *         about {@code null} values.
+	 * @return the {@link Chain} view of all backward link rules assigned to
+	 *         this {@link Context}; this is always not {@code null}. This
+	 *         method can be used for convenient search and modification
+	 *         (addition and deletion) of the rules using the methods of the
+	 *         {@link Chain} interface without without worrying about
+	 *         {@code null} values.
 	 */
 	public Chain<ModifiableLinkRule<BackwardLink>> getBackwardLinkRuleChain();
 
@@ -147,6 +144,42 @@ public interface Context {
 
 	public boolean containsSuperClassExpression(
 			IndexedClassExpression expression);
+
+	/**
+	 * Adds one instance of {@link IndexedDisjointnessAxiom} to this
+	 * {@link Context}.
+	 * 
+	 * @param axiom
+	 *            the {@link IndexedDisjointnessAxiom} to be added to this
+	 *            {@link Context}
+	 * @return the number of occurrences of the given
+	 *         {@link IndexedDisjointnessAxiom} in this {@link Context} before
+	 *         this operation
+	 */
+	public int addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+
+	/**
+	 * Removes one instance of the given {@link IndexedDisjointnessAxiom} from
+	 * this {@link Context}.
+	 * 
+	 * @param axiom
+	 *            the {@link IndexedDisjointnessAxiom} to be added to this
+	 *            {@link Context}
+	 * @return the number of occurrences of the given
+	 *         {@link IndexedDisjointnessAxiom} in this {@link Context} before
+	 *         this operation
+	 */
+	public int removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+
+	/**
+	 * @param axiom
+	 *            the {@link IndexedDisjointnessAxiom} to be checked for
+	 *            occurrences in this {@link Context}
+	 * 
+	 * @return the number of occurrences of the given
+	 *         {@link IndexedDisjointnessAxiom} in this {@link Context}
+	 */
+	public int containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this
@@ -216,9 +249,11 @@ public interface Context {
 	public boolean isSaturated();
 
 	/**
-	 * Marks this {@code Context} as consistent or inconsistent.
+	 * Sets the inconsistency of this {@code Context} to the given value.
+	 * 
+	 * @return the previous inconsistency value
 	 */
-	public void setConsistent(boolean consistent);
+	public boolean setInconsistent(boolean consistent);
 
 	/**
 	 * Marks this {@code Context} as saturated. After this call there should not
@@ -226,13 +261,4 @@ public interface Context {
 	 */
 	public void setSaturated(boolean saturated);
 
-	/**
-	 * TODO
-	 * 
-	 * @param axiom
-	 * @return
-	 */
-	public int containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
-	public int removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 }

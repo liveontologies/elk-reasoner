@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,9 +27,9 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextSaturationCheckingConclusionVisitor;
 
 /**
  * Creates an engine which works as the de-application engine except that it
@@ -43,30 +44,47 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
-	public ContextCleaningFactory(final SaturationState saturationState, boolean trackModifiedContexts) {
+	public ContextCleaningFactory(final SaturationState saturationState,
+			boolean trackModifiedContexts) {
 		super(saturationState, trackModifiedContexts);
 	}
 
 	@Override
+	public Engine getEngine() {
+		return new Engine();
+	}
+
+	@Override
 	public Engine getEngine(ContextCreationListener listener) {
-		return new DeletionEngine(new PreApplyConclusionVisitor(), new DeleteConclusionVisitor(), listener);
+		return new Engine(listener);
 	}
 
 	/**
-	 * Used to check whether conclusions are contained in the context
-	 * but also returns false for context-modifying conclusions
-	 * if the context is saturated
+	 * 
 	 */
-	protected class PreApplyConclusionVisitor extends ContainsConclusionVisitor {
+	public class Engine extends RuleDeapplicationFactory.Engine {
 
+		protected Engine() {
+			super();
+		}
+
+		protected Engine(ContextCreationListener listener) {
+			super(listener);
+		}
+
+		/**
+		 * Used to check whether conclusions are contained in the context but
+		 * also returns false for context-modifying conclusions if the context
+		 * is saturated
+		 */
 		@Override
-		protected Boolean visitSuperclass(SuperClassExpression sce, Context context) {
-			return !context.isSaturated() && context.containsSuperClassExpression(sce.getExpression());
-		}		
-		
-		@Override
-		public Boolean visit(DisjointnessAxiom axiom, Context context) {
-			return !context.isSaturated() && context.containsDisjointnessAxiom(axiom.getAxiom()) > 0;
-		}		
-	}	
+		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
+				SaturationState.Writer saturationStateWriter) {
+			return new CombinedConclusionVisitor(
+					new ContextSaturationCheckingConclusionVisitor(),
+					super.getBaseConclusionProcessor(saturationStateWriter));
+		}
+
+	}
+
 }

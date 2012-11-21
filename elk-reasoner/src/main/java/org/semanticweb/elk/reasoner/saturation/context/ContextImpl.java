@@ -138,8 +138,10 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public void setConsistent(boolean consistent) {
-		isInconsistent = !consistent;
+	public boolean setInconsistent(boolean inconsistent) {
+		boolean result = isInconsistent;
+		isInconsistent = inconsistent;
+		return result;
 	}
 
 	@Override
@@ -151,17 +153,33 @@ public class ContextImpl implements Context {
 
 	@Override
 	public int addDisjointnessAxiom(IndexedDisjointnessAxiom disjointnessAxiom) {
-		
 		if (disjointnessAxioms_ == null) {
 			disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointnessAxiom, Integer>();
 		}
-
 		Integer counter = disjointnessAxioms_.get(disjointnessAxiom);
-		
-		counter = counter == null ? 1 : counter+ 1;
-		disjointnessAxioms_.put(disjointnessAxiom, counter);
-		
+		if (counter == null)
+			counter = 0;
+		disjointnessAxioms_.put(disjointnessAxiom, counter + 1);
 		return counter;
+	}
+
+	@Override
+	public int removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+		if (disjointnessAxioms_ == null) {
+			return 0;
+		}
+		Integer counter = disjointnessAxioms_.get(axiom);
+
+		if (counter > 0)
+			disjointnessAxioms_.put(axiom, counter - 1);
+		return counter;
+	}
+
+	@Override
+	public int containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+		Integer counter = disjointnessAxioms_.get(axiom);
+
+		return counter == null ? 0 : counter;
 	}
 
 	@Override
@@ -186,14 +204,15 @@ public class ContextImpl implements Context {
 			backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
 		return backwardLinksByObjectProperty_.add(relation, source);
 	}
-	
+
 	@Override
 	public boolean removeBackwardLink(BackwardLink link) {
 		boolean changed = false;
-		
+
 		if (backwardLinksByObjectProperty_ != null) {
-			changed = backwardLinksByObjectProperty_.remove(link.getRelation(), link.getSource());
-			
+			changed = backwardLinksByObjectProperty_.remove(link.getRelation(),
+					link.getSource());
+
 			if (backwardLinksByObjectProperty_.isEmpty()) {
 				backwardLinksByObjectProperty_ = null;
 			}
@@ -210,7 +229,7 @@ public class ContextImpl implements Context {
 					+ expression);
 		return superClassExpressions_.add(expression);
 	}
-	
+
 	@Override
 	public boolean removeSuperClassExpression(IndexedClassExpression expression) {
 		return superClassExpressions_.remove(expression);
@@ -264,40 +283,17 @@ public class ContextImpl implements Context {
 	@Override
 	public boolean containsBackwardLink(BackwardLink link) {
 		if (backwardLinksByObjectProperty_ != null) {
-			return backwardLinksByObjectProperty_.contains(link.getRelation(), link.getSource());
+			return backwardLinksByObjectProperty_.contains(link.getRelation(),
+					link.getSource());
 		}
 
 		return false;
 	}
 
 	@Override
-	public boolean containsSuperClassExpression(IndexedClassExpression expression) {
+	public boolean containsSuperClassExpression(
+			IndexedClassExpression expression) {
 		return superClassExpressions_.contains(expression);
-	}
-
-	@Override
-	public int containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		Integer counter = disjointnessAxioms_.get(axiom);
-		
-		return counter == null ? 0 : counter;
-	}
-
-	@Override
-	public int removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		if (disjointnessAxioms_ == null) {
-			return 0;
-		}
-
-		Integer counter = disjointnessAxioms_.get(axiom);
-		
-		if (counter == null || counter <= 0) {
-			return counter;
-		}
-		else {
-			disjointnessAxioms_.put(axiom, counter.intValue() - 1);
-			
-			return counter.intValue() - 1;
-		}
 	}
 
 	@Override
