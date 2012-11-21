@@ -29,6 +29,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -225,17 +226,26 @@ public class TaxonomyPrinter {
 	 */
 	protected static void printDeclarations(Taxonomy<ElkClass> classTaxonomy,
 			ElkObjectFactory objectFactory, Writer writer) throws IOException {
+		
+		List<ElkClass> classes = new ArrayList<ElkClass>(classTaxonomy.getNodes().size() * 2);
+		
 		for (TaxonomyNode<ElkClass> classNode : classTaxonomy.getNodes()) {
 			for (ElkClass clazz : classNode.getMembers()) {
 				if (!clazz.getIri().equals(PredefinedElkIri.OWL_THING.get())
 						&& !clazz.getIri().equals(
 								PredefinedElkIri.OWL_NOTHING.get())) {
-					ElkDeclarationAxiom decl = objectFactory
-							.getDeclarationAxiom(clazz);
-					OwlFunctionalStylePrinter.append(writer, decl, true);
-					writer.append('\n');
+					classes.add(clazz);
+					
 				}
 			}
+		}
+		
+		Collections.sort(classes, CLASS_COMPARATOR);
+		
+		for (ElkClass clazz : classes) {
+			ElkDeclarationAxiom decl = objectFactory.getDeclarationAxiom(clazz);
+			OwlFunctionalStylePrinter.append(writer, decl, true);
+			writer.append('\n');
 		}
 	}
 
