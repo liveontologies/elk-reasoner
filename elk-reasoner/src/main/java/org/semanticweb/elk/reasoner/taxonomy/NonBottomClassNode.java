@@ -39,7 +39,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
@@ -126,7 +125,7 @@ class NonBottomClassNode implements
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
+	public synchronized void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct super-node " + superNode);
 		try {
@@ -145,7 +144,7 @@ class NonBottomClassNode implements
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+	public synchronized void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct sub-node " + subNode);
 		
@@ -344,7 +343,7 @@ class NonBottomClassNode implements
 	}
 
 	@Override
-	public boolean removeDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+	public synchronized boolean removeDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
 		boolean changed = directSubNodes_.remove(subNode);
 		
 		if (directSubNodes_.isEmpty()) {
@@ -355,7 +354,7 @@ class NonBottomClassNode implements
 	}
 
 	@Override
-	public boolean removeDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
+	public synchronized boolean removeDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
 		return directSuperNodes_.remove(superNode);
 	}
 }

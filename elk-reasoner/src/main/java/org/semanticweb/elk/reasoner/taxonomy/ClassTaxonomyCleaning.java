@@ -93,21 +93,12 @@ class ClassTaxonomyCleaningFactory
 				}
 				
 				if (node.trySetModified(true)) {
-					
-					//System.out.println("Node set as modified: " + node);
-					
 					toRemove.add(node);
-				}
-				else {
-					//System.out.println("Node NOT set as modified: " + node);
 				}
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
 					for (UpdateableTaxonomyNode<ElkClass> subNode : node.getDirectUpdateableSubNodes()) {
 						if (!subNode.trySetModified(true)) {
-							
-							//System.out.println("Subnode set as modified: " + subNode);
-							
 							continue;
 						}
 						
@@ -136,11 +127,7 @@ class ClassTaxonomyCleaningFactory
 								node.getDirectUpdateableSuperNodes());
 
 						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
-							synchronized (superNode) {
-								
-								superNode.removeDirectSubNode(node);
-							}
-							
+							superNode.removeDirectSubNode(node);
 							node.removeDirectSuperNode(superNode);
 						}
 					}

@@ -2,8 +2,11 @@ package org.semanticweb.elk.benchmark.reasoning;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +33,7 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -140,7 +144,7 @@ public class IncrementalClassificationTask implements Task {
 			// initial correctness check
 			correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-			long seed = 123;//System.currentTimeMillis();
+			long seed = 1353526500142L;//System.currentTimeMillis();
 			Random rnd = new Random(seed);
 
 			for (int i = 0; i < REPEAT_NUMBER; i++) {
@@ -190,7 +194,7 @@ public class IncrementalClassificationTask implements Task {
 	 * can return a smaller subset than requested because one axiom can be randomly picked more than once
 	 */
 	private Set<ElkAxiom> getRandomSubset(List<ElkAxiom> axioms, Random rnd, double fraction) {
-		int num = (int) (axioms.size() * fraction);
+		int num = 75;//(int) (axioms.size() * fraction);
 		Set<ElkAxiom> subset = new ArrayHashSet<ElkAxiom>(num); 
 		
 		if (num >= axioms.size()) {
@@ -235,10 +239,26 @@ public class IncrementalClassificationTask implements Task {
 		System.out.println("===========INCREMENTAL==============");
 		
 		Taxonomy<ElkClass> incremental = getTaxonomy(incrementalReasoner);
+		
 		int expectedHashCode = TaxonomyHasher.hash(expected);
 		int gottenHashCode = TaxonomyHasher.hash(incremental);
 		
 		if (expectedHashCode != gottenHashCode) {
+			
+			try {
+				Writer writer1 = new OutputStreamWriter(new FileOutputStream(new File("/home/pavel/tmp/expected.owl")));
+				Writer writer2 = new OutputStreamWriter(new FileOutputStream(new File("/home/pavel/tmp/gotten.owl")));				
+				TaxonomyPrinter.dumpClassTaxomomy(expected, writer1, false);
+				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer2, false);
+				writer1.flush();
+				writer2.flush();
+				writer1.close();
+				writer2.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			
 			throw new RuntimeException("Comparison failed for seed " + seed);
 		}
 	}

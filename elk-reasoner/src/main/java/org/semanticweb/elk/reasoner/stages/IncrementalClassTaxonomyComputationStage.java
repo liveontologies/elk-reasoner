@@ -112,6 +112,10 @@ class IncrementalClassTaxonomyComputationStage extends
 
 			};
 
+			for (IndexedClass cl : modified) {
+				System.out.println(cl);
+			}
+			
 			//System.out.println("Classes to be updated in the taxonomy: " + modified);
 
 			computation_ = new ClassTaxonomyComputation(modified,

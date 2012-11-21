@@ -163,7 +163,7 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 
 	@Override
 	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
-		return classNodeLookup_.get(getKey(PredefinedElkClass.OWL_THING));//getTypeNode(PredefinedElkClass.OWL_THING);
+		return classNodeLookup_.get(getKey(PredefinedElkClass.OWL_THING));
 	}
 
 	@Override
@@ -243,35 +243,11 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 	public boolean removeNode(UpdateableTaxonomyNode<ElkClass> node) {
 		boolean changed = false;
 		
-		//System.out.println("To be removed " + node + "\n" + "classNodeLookup_ before " + classNodeLookup_  + " " + System.identityHashCode(classNodeLookup_));
-		
-		/*if (node.equals(getTopNode())) {
-			synchronized (getTopNode()) {
-				// removing node assignment for members except owl:Thing
-				for (ElkClass member : node.getMembers()) {
-					if (!member.equals(PredefinedElkClass.OWL_THING)) {
-						changed |= classNodeLookup_.remove(getKey(member)) != null;
-					}
-				}
-
-				getTopNode().clearMembers();
-			}
-		
-		} else {
-			allClassNodes_.remove(node);
-			// removing node assignment for members
-			for (ElkClass member : node.getMembers()) {
-				changed |= classNodeLookup_.remove(getKey(member)) != null;
-			}
-		}*/
-		
 		allClassNodes_.remove(node);
 		// removing node assignment for members
 		for (ElkClass member : node.getMembers()) {
 			changed |= classNodeLookup_.remove(getKey(member)) != null;
 		}
-		
-		//System.out.println("classNodeLookup_ after " + classNodeLookup_  + " " + System.identityHashCode(classNodeLookup_));
 		
 		return changed;
 	}
