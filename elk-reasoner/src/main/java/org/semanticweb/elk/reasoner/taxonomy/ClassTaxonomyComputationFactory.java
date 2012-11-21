@@ -167,6 +167,8 @@ public class ClassTaxonomyComputationFactory implements
 				UpdateableTaxonomyNode<ElkClass> topNode = getCreateTopNode();
 				assignDirectSuperClassNode(node, topNode);
 			}
+			
+			node.trySetModified(false);
 		}
 
 		@Override

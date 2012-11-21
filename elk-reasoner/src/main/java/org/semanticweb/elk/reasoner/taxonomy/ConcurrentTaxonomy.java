@@ -175,7 +175,12 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 	public NonBottomClassNode getCreateTypeNode(Collection<ElkClass> members) {
 		ElkClass someMember = members.iterator().next();
 
+		if (OwlFunctionalStylePrinter.toString(someMember).equals(":C")) {
+			System.out.println("classNodeLookup_ when adding " + members + classNodeLookup_  + " " + System.identityHashCode(classNodeLookup_));
+		}
+		
 		NonBottomClassNode previous = classNodeLookup_.get(getKey(someMember));
+		
 		if (previous != null)
 			return previous;
 
@@ -238,7 +243,9 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 	public boolean removeNode(UpdateableTaxonomyNode<ElkClass> node) {
 		boolean changed = false;
 		
-		if (node.equals(getTopNode())) {
+		//System.out.println("To be removed " + node + "\n" + "classNodeLookup_ before " + classNodeLookup_  + " " + System.identityHashCode(classNodeLookup_));
+		
+		/*if (node.equals(getTopNode())) {
 			synchronized (getTopNode()) {
 				// removing node assignment for members except owl:Thing
 				for (ElkClass member : node.getMembers()) {
@@ -256,7 +263,15 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 			for (ElkClass member : node.getMembers()) {
 				changed |= classNodeLookup_.remove(getKey(member)) != null;
 			}
+		}*/
+		
+		allClassNodes_.remove(node);
+		// removing node assignment for members
+		for (ElkClass member : node.getMembers()) {
+			changed |= classNodeLookup_.remove(getKey(member)) != null;
 		}
+		
+		//System.out.println("classNodeLookup_ after " + classNodeLookup_  + " " + System.identityHashCode(classNodeLookup_));
 		
 		return changed;
 	}

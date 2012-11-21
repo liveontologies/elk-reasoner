@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
@@ -149,11 +150,12 @@ class NonBottomClassNode implements
 			LOGGER_.trace(this + ": new direct sub-node " + subNode);
 		
 		try {
-			directSubNodes_.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)subNode);
 			
 			if (directSubNodes_.isEmpty()) {
 				this.taxonomy_.countNodesWithSubClasses.incrementAndGet();
 			}
+			
+			directSubNodes_.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)subNode);
 		}
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException(subNode + " is not a type node!");
@@ -329,6 +331,10 @@ class NonBottomClassNode implements
 	@Override
 	public void clearMembers() {
 		members_.clear();
+		
+		if (equals(taxonomy_.getTopNode())) {
+			members_.add(PredefinedElkClass.OWL_THING);
+		}
 	}
 	
 	@Override
@@ -343,7 +349,13 @@ class NonBottomClassNode implements
 
 	@Override
 	public boolean removeDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
-		return directSubNodes_.remove(subNode);
+		boolean changed = directSubNodes_.remove(subNode);
+		
+		if (directSubNodes_.isEmpty()) {
+			taxonomy_.countNodesWithSubClasses.decrementAndGet();
+		}
+		
+		return changed;
 	}
 
 	@Override

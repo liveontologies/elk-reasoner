@@ -61,7 +61,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * 
 	 */
-	IncrementalReasonerState incrementalState;
+	IncrementalReasonerState incrementalState = null;
 	/**
 	 * {@code true} if the ontology is loaded
 	 */
