@@ -331,10 +331,6 @@ class NonBottomClassNode implements
 	@Override
 	public void clearMembers() {
 		members_.clear();
-		
-		if (equals(taxonomy_.getTopNode())) {
-			members_.add(PredefinedElkClass.OWL_THING);
-		}
 	}
 	
 	@Override
