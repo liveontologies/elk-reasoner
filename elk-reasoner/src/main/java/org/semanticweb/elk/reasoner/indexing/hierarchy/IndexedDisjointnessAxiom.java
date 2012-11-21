@@ -248,10 +248,10 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return false;
 		}
 
-		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
 			@Override
 			public ThisCompositionRule create(ChainableRule<Context> tail) {
 				return new ThisCompositionRule(tail);
@@ -271,8 +271,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 					disjointnessAxioms_);
 		}
 
-		public static boolean addTo(
-				Chain<ChainableRule<Context>> ruleChain,
+		public static boolean addTo(Chain<ChainableRule<Context>> ruleChain,
 				Set<IndexedClassExpression> classes) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
@@ -284,8 +283,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return changed;
 		}
 
-		public static boolean addTo(
-				Chain<ChainableRule<Context>> ruleChain,
+		public static boolean addTo(Chain<ChainableRule<Context>> ruleChain,
 				Collection<IndexedDisjointnessAxiom> axioms) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;

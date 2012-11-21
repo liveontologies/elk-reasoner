@@ -46,8 +46,16 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 abstract public class IndexedClassExpression implements
 		Comparable<IndexedClassExpression> {
 
+	/**
+	 * The {@link IndexedPropertyChain}s with which this
+	 * {@link IndexedClassExpression} is used positively as a filler
+	 */
 	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
 
+	/**
+	 * The first composition rule assigned to this
+	 * {@link IndexedClassExpression}
+	 */
 	ChainableRule<Context> compositionRuleHead;
 
 	/**
@@ -200,10 +208,21 @@ abstract public class IndexedClassExpression implements
 			return (this.hashCode_ < o.hashCode_ ? -1 : 1);
 	}
 
+	/**
+	 * @return the first composition rule assigned to this
+	 *         {@link IndexedClassExpression}, or {@code null} if there no such
+	 *         rules; all other rules can be obtained by traversing over
+	 *         {@link LinkRule#next()}
+	 */
 	public LinkRule<Context> getCompositionRuleHead() {
 		return compositionRuleHead;
 	}
 
+	/**
+	 * @return a {@link Chain} view of composition rules assigned to this
+	 *         {@link IndexedClassExpression}; it can be used for inserting new
+	 *         rules or deleting existing ones
+	 */
 	Chain<ChainableRule<Context>> getCompositionRuleChain() {
 		return new AbstractChain<ChainableRule<Context>>() {
 			@Override

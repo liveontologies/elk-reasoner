@@ -123,10 +123,10 @@ public class Bottom implements Conclusion {
 			}
 		}
 
-		private static Matcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>(
+		private static final Matcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>(
 				BottomBackwardLinkRule.class);
 
-		private static ReferenceFactory<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>() {
+		private static final ReferenceFactory<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>() {
 			@Override
 			public BottomBackwardLinkRule create(
 					ModifiableLinkRule<BackwardLink> tail) {

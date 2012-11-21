@@ -132,10 +132,10 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			}
 		}
 
-		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
 			@Override
 			public ThisCompositionRule create(ChainableRule<Context> tail) {
 				return new ThisCompositionRule(tail);
