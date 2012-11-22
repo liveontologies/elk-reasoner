@@ -180,8 +180,8 @@ public class SaturationState {
 		}
 
 		public void markAsNotSaturated(Context context) {
-			notSaturatedContexts_.add(context.getRoot());
-			context.setSaturated(false);
+			if (context.setSaturated(false))
+				notSaturatedContexts_.add(context.getRoot());
 		}
 
 		public void clearNotSaturatedContexts() {

@@ -258,7 +258,9 @@ public interface Context {
 	/**
 	 * Marks this {@code Context} as saturated. After this call there should not
 	 * be further {@link SuperClassExpression}s added to this {@link Context}.
+	 * 
+	 * @return the previous saturated status value
 	 */
-	public void setSaturated(boolean saturated);
+	public boolean setSaturated(boolean saturated);
 
 }
