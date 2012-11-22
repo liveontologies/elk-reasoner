@@ -306,24 +306,6 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					LOGGER_.trace(message);
 				}
 			}
-			
-			/*if (output.root instanceof IndexedClass) {
-				ElkClass cl = ((IndexedClass) output.root).getElkClass();
-				
-				if (cl.getIri().toString().equals("<http://www.co-ode.org/ontologies/galen#AdrenalGland>")) {
-					
-					System.out.println(output.root.getContext().getSuperClassExpressions());
-					
-					for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.directSuperClasses) {
-						String message = output.root + ": direct super class ["
-								+ direct.getRoot();
-						for (ElkClass equivalent : direct.equivalent)
-							message = message + ", " + equivalent.getIri();
-						message = message + "]";
-						System.out.println(message);
-					}
-				}
-			}*/
 		}
 
 		/**

@@ -98,14 +98,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		reasoner.incrementalState.diffIndex.clearSignatureChanges();
 		// at this point we're done with unsaturated contexts
 		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
-		
-		/*try {
-			Writer writer = new OutputStreamWriter(System.out);
-			TaxonomyPrinter.dumpClassTaxomomy(reasoner.taxonomy, writer, false);
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/		
 	}
 
 	@Override

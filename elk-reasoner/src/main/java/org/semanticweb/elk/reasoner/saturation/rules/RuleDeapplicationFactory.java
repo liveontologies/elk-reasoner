@@ -193,6 +193,8 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 							+ ": removing backward link " + link);
 				}
 				
+				//markAsNotSaturated(context);
+				
 				markAsNotSaturated(link.getSourceContext(context));
 
 				return true;

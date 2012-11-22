@@ -31,7 +31,9 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
@@ -150,6 +152,9 @@ public class SaturationState {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
 			if (context.addToDo(item)) {
+				
+				//debugCheck(context, item);
+				
 				// context was activated
 				activeContexts_.add(context);
 				// LOGGER_.trace(context.getRoot() + " was activated!");
@@ -186,6 +191,21 @@ public class SaturationState {
 
 		public void clearNotSaturatedContexts() {
 			notSaturatedContexts_.clear();
+		}
+		
+		public boolean debugCheck(Context context, Conclusion conclusion) {
+			if (context.getRoot() instanceof IndexedClass) {
+				ElkClass cl = ((IndexedClass) context.getRoot()).getElkClass();
+				
+				if (cl.getIri().toString().equals("<http://www.co-ode.org/ontologies/galen#CoracohumeralLigament>")) {
+					
+					System.out.println("!!!PRODUCED!!! " + conclusion + " saturated? " + context.isSaturated());
+					
+					return true;
+				}
+			}
+			
+			return false;
 		}
 	}
 }

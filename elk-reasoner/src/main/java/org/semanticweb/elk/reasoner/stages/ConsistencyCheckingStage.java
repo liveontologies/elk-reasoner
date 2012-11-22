@@ -85,6 +85,20 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		
 		reasoner.inconsistentOntology = computation_.isInconsistent();
 		reasoner.doneConsistencyCheck = true;
+		
+		
+/*		for (IndexedClass root : reasoner.ontologyIndex.getIndexedClasses()) {
+			ElkClass cl = root.getElkClass();
+
+			if (root.getContext() != null
+					&& cl.getIri()
+							.toString()
+							.equals("<http://www.co-ode.org/ontologies/galen#AdductorBrevisOfThigh>")) {
+
+				System.out.println("number of superclasses "
+						+ root.getContext().getSuperClassExpressions().size());
+			}
+		}*/	
 	}
 
 	@Override

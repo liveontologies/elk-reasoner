@@ -450,6 +450,7 @@ public class RuleApplicationFactory implements
 		public Boolean visit(BackwardLink link, Context context) {
 			// statistics_.backLinkInfNo++;
 			if (context.addBackwardLink(link)) {
+				//markAsNotSaturated(context);
 				markAsNotSaturated(link.getSourceContext(context));
 
 				return true;
@@ -480,7 +481,7 @@ public class RuleApplicationFactory implements
 		@Override
 		public Boolean visit(Propagation propagation, Context context) {
 			if (propagation.addToContextBackwardLinkRule(context)) {
-
+				
 				return true;
 			}
 

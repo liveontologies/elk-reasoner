@@ -51,7 +51,7 @@ public class IncrementalClassificationTask implements Task {
 	private final ReasonerConfiguration reasonerConfig_;
 	private List<ElkAxiom> loadedAxioms_ = null;
 
-	final static int REPEAT_NUMBER = 1;
+	final static int REPEAT_NUMBER = 5;
 	final static double CHANGE_FRACTION = 0.02;
 
 	public IncrementalClassificationTask(String[] args) {
@@ -144,7 +144,7 @@ public class IncrementalClassificationTask implements Task {
 			// initial correctness check
 			correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-			long seed = 1353526500142L;//System.currentTimeMillis();
+			long seed = System.currentTimeMillis();
 			Random rnd = new Random(seed);
 
 			for (int i = 0; i < REPEAT_NUMBER; i++) {
@@ -155,7 +155,7 @@ public class IncrementalClassificationTask implements Task {
 				System.out.println("===========DELETING==============");
 				
 				/*for (ElkAxiom del : deleted) {
-					System.err.println(OwlFunctionalStylePrinter.toString(del));
+					System.out.println(OwlFunctionalStylePrinter.toString(del));
 				}*/
 
 				// incremental changes
@@ -194,7 +194,7 @@ public class IncrementalClassificationTask implements Task {
 	 * can return a smaller subset than requested because one axiom can be randomly picked more than once
 	 */
 	private Set<ElkAxiom> getRandomSubset(List<ElkAxiom> axioms, Random rnd, double fraction) {
-		int num = 75;//(int) (axioms.size() * fraction);
+		int num = (int) (axioms.size() * fraction);
 		Set<ElkAxiom> subset = new ArrayHashSet<ElkAxiom>(num); 
 		
 		if (num >= axioms.size()) {

@@ -62,11 +62,6 @@ public class PositiveSuperClassExpression extends SuperClassExpression {
 	}
 
 	@Override
-	public void deapply(SaturationState.Writer engine, Context context) {
-		apply(engine, context);
-	}
-
-	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
 	}

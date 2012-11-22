@@ -26,7 +26,9 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -66,7 +68,17 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		
 		@Override
 		public Boolean visit(DisjointnessAxiom axiom, Context context) {
-			return !context.isSaturated() && context.containsDisjointnessAxiom(axiom.getAxiom()) > 0;
-		}		
+			return !context.isSaturated() && super.visit(axiom, context);
+		}
+
+		@Override
+		public Boolean visit(BackwardLink link, Context context) {
+			return !link.getSourceContext(context).isSaturated() && super.visit(link, context);
+		}
+		
+		@Override
+		public Boolean visit(ForwardLink link, Context context) {
+			return !link.getSourceContext(context).isSaturated() && super.visit(link, context);
+		}
 	}	
 }

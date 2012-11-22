@@ -52,10 +52,6 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		// This stage is executed for any reasoning task:
-		// it will re-saturate all affected contexts but will NOT saturate new
-		// classes (that should be done only for classification)
-		// i.e. it shouldn't create new contexts
 		return Arrays.asList((ReasonerStage) new IncrementalReSaturationStage(reasoner));		
 	}
 

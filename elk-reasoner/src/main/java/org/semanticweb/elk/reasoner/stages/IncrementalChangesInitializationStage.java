@@ -135,7 +135,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 		initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
-				deletions_, reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor());
 	}
 
