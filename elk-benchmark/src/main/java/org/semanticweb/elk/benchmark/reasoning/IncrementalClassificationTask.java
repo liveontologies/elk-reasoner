@@ -51,7 +51,7 @@ public class IncrementalClassificationTask implements Task {
 	private final ReasonerConfiguration reasonerConfig_;
 	private List<ElkAxiom> loadedAxioms_ = null;
 
-	final static int REPEAT_NUMBER = 10;
+	final static int REPEAT_NUMBER = 1;
 	final static double CHANGE_FRACTION = 0.02;
 
 	public IncrementalClassificationTask(String[] args) {

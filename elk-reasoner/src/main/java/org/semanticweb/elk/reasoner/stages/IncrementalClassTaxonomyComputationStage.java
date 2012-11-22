@@ -25,20 +25,14 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
-import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.Operations.Condition;
 
 /**
  * @author Pavel Klinov
@@ -64,11 +58,7 @@ class IncrementalClassTaxonomyComputationStage extends
 	@Override
 	public List<ReasonerStage> getDependencies() {
 		return Arrays
-				.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(
-						reasoner)/*
-								 * new
-								 * IncrementalConsistencyCheckingStage(reasoner)
-								 */);
+				.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(reasoner)/*new IncrementalConsistencyCheckingStage(reasoner)*/);
 	}
 
 	@Override
@@ -86,7 +76,7 @@ class IncrementalClassTaxonomyComputationStage extends
 					reasoner.ontologyIndex);
 		} else {
 
-			Collection<IndexedClass> modified = new AbstractSet<IndexedClass>() {
+			/*Collection<IndexedClass> modified = new AbstractSet<IndexedClass>() {
 
 				@Override
 				public Iterator<IndexedClass> iterator() {
@@ -120,7 +110,11 @@ class IncrementalClassTaxonomyComputationStage extends
 
 			computation_ = new ClassTaxonomyComputation(modified,
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.ontologyIndex, reasoner.taxonomy);
+					reasoner.ontologyIndex, reasoner.taxonomy);*/
+			
+			computation_ = new ClassTaxonomyComputation(indexedClasses,
+					reasoner.getProcessExecutor(), workerNo, progressMonitor,
+					reasoner.ontologyIndex);			
 		}
 
 	}

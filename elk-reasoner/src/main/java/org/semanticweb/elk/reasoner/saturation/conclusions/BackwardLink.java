@@ -42,7 +42,7 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class BackwardLink implements Conclusion {
+public class BackwardLink extends BaseConclusion {
 
 	/**
 	 * the source {@link Context} of this {@link BackwardLink}; the root of the
@@ -110,8 +110,8 @@ public class BackwardLink implements Conclusion {
 	}
 
 	@Override
-	public void deapply(SaturationState.Writer engine, Context context) {
-		apply(engine, context);
+	public Context getSourceContext(Context contextWhereStored) {
+		return source_;
 	}
 
 	@Override

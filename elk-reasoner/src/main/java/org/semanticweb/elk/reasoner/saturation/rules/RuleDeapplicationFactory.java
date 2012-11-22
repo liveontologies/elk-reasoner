@@ -165,7 +165,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 							+ sce);
 				}
 
-				markAsNotSaturated(context);
+				markAsNotSaturated(sce.getSourceContext(context));
 
 				return true;
 			}
@@ -192,6 +192,8 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 					LOGGER_.trace(context.getRoot()
 							+ ": removing backward link " + link);
 				}
+				
+				markAsNotSaturated(link.getSourceContext(context));
 
 				return true;
 			}
@@ -204,6 +206,8 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 			// statistics_.forwLinkInfNo++;
 			if (link.removeFromContextBackwardLinkRule(context)) {
 
+				markAsNotSaturated(link.getSourceContext(context));
+				
 				return true;
 			}
 

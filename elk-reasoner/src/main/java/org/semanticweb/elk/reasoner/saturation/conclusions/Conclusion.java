@@ -39,4 +39,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 public interface Conclusion extends ReversibleRule<Context> {
 
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context);
+	
+	public Context getSourceContext(Context contextWhereStored);
 }

@@ -424,7 +424,7 @@ public class RuleApplicationFactory implements
 			if (context.addSuperClassExpression(negSCE.getExpression())) {
 				// statistics_.superClassExpressionNo++;
 				// statistics_.negSuperClassExpressionInfNo++;
-				markAsNotSaturated(context);
+				markAsNotSaturated(negSCE.getSourceContext(context));
 
 				return true;
 			}
@@ -438,7 +438,7 @@ public class RuleApplicationFactory implements
 			if (context.addSuperClassExpression(posSCE.getExpression())) {
 				// statistics_.superClassExpressionNo++;
 				// statistics_.posSuperClassExpressionInfNo++;
-				markAsNotSaturated(context);
+				markAsNotSaturated(posSCE.getSourceContext(context));
 
 				return true;
 			}
@@ -450,7 +450,7 @@ public class RuleApplicationFactory implements
 		public Boolean visit(BackwardLink link, Context context) {
 			// statistics_.backLinkInfNo++;
 			if (context.addBackwardLink(link)) {
-				markAsNotSaturated(context);
+				markAsNotSaturated(link.getSourceContext(context));
 
 				return true;
 			}
@@ -463,7 +463,8 @@ public class RuleApplicationFactory implements
 		public Boolean visit(ForwardLink link, Context context) {
 			// statistics_.forwLinkInfNo++;
 			if (link.addToContextBackwardLinkRule(context)) {
-
+				markAsNotSaturated(link.getSourceContext(context));
+				
 				return true;
 			}
 

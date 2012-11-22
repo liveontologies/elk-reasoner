@@ -44,7 +44,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class Propagation implements Conclusion {
+public class Propagation extends BaseConclusion {
 
 	// logger for this class
 	// private static final Logger LOGGER_ =
@@ -58,11 +58,6 @@ public class Propagation implements Conclusion {
 			final IndexedClassExpression carry) {
 		relation_ = relation;
 		carry_ = carry;
-	}
-
-	@Override
-	public void deapply(SaturationState.Writer engine, Context context) {
-		apply(engine, context);
 	}
 
 	@Override

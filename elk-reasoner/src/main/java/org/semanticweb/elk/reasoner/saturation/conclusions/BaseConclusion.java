@@ -2,7 +2,6 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
-
 /*
  * #%L
  * ELK Reasoner
@@ -25,42 +24,24 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public class DisjointnessAxiom extends BaseConclusion {
+public abstract class BaseConclusion implements Conclusion {
 
-	private final IndexedDisjointnessAxiom axiom_;
-
-	public DisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		axiom_ = axiom;
-	}
-
-	public IndexedDisjointnessAxiom getAxiom() {
-		return axiom_;
+	@Override
+	public void deapply(Writer writer, Context context) {
+		apply(writer, context);
 	}
 
 	@Override
-	public void apply(SaturationState.Writer engine, Context context) {
-		if (context.containsDisjointnessAxiom(axiom_) > 1) {
-			engine.produce(context,
-					new PositiveSuperClassExpression(engine.getOwlNothing()));
-		}
+	public Context getSourceContext(Context contextWhereStored) {
+		return contextWhereStored;
 	}
 
-	@Override
-	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
-		return visitor.visit(this, context);
-	}
-
-	@Override
-	public String toString() {
-		return axiom_.toString();
-	}
 }
