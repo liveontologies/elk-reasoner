@@ -31,9 +31,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
@@ -193,7 +191,7 @@ public class SaturationState {
 			notSaturatedContexts_.clear();
 		}
 		
-		public boolean debugCheck(Context context, Conclusion conclusion) {
+/*		private boolean debugCheck(Context context, Conclusion conclusion) {
 			if (context.getRoot() instanceof IndexedClass) {
 				ElkClass cl = ((IndexedClass) context.getRoot()).getElkClass();
 				
@@ -206,6 +204,6 @@ public class SaturationState {
 			}
 			
 			return false;
-		}
+		}*/
 	}
 }

@@ -330,11 +330,6 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
-
-		/*for (IndexedClassExpression ice : ontologyIndex.getIndexedClasses()) {
-			System.out.println(ice + ", context " + ice.getContext());
-		}*/
-		
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();		
 		
@@ -345,10 +340,6 @@ public abstract class AbstractReasonerState {
 			getStageExecutor()
 					.complete(new ClassTaxonomyComputationStage(this));
 		}
-		
-		/*for (IndexedClassExpression ice : ontologyIndex.getIndexedClasses()) {
-			System.out.println(ice + ", context " + ice.getContext());
-		}*/
 		
 		return taxonomy;
 	}

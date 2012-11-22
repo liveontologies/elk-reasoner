@@ -175,10 +175,6 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 	public NonBottomClassNode getCreateTypeNode(Collection<ElkClass> members) {
 		ElkClass someMember = members.iterator().next();
 
-		if (OwlFunctionalStylePrinter.toString(someMember).equals(":C")) {
-			System.out.println("classNodeLookup_ when adding " + members + classNodeLookup_  + " " + System.identityHashCode(classNodeLookup_));
-		}
-		
 		NonBottomClassNode previous = classNodeLookup_.get(getKey(someMember));
 		
 		if (previous != null)
