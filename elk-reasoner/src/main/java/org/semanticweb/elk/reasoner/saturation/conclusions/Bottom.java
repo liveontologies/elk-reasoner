@@ -45,7 +45,6 @@ public class Bottom extends BaseConclusion {
 
 	@Override
 	public void deapply(SaturationState.Writer engine, Context context) {
-		context.setConsistent(true);
 		propagateThroughBackwardLinks(engine, context);
 		context.getBackwardLinkRuleChain().remove(
 				BottomBackwardLinkRule.MATCHER_);
@@ -53,7 +52,6 @@ public class Bottom extends BaseConclusion {
 
 	@Override
 	public void apply(SaturationState.Writer engine, Context context) {
-		context.setConsistent(false);
 		propagateThroughBackwardLinks(engine, context);
 		// register the backward link rule for propagation of bottom
 		context.getBackwardLinkRuleChain().getCreate(

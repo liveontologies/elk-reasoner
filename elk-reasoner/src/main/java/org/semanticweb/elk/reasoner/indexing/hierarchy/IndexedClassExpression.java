@@ -212,16 +212,20 @@ abstract public class IndexedClassExpression implements
 	 * @return the first composition rule assigned to this
 	 *         {@link IndexedClassExpression}, or {@code null} if there no such
 	 *         rules; all other rules can be obtained by traversing over
-	 *         {@link LinkRule#next()}
+	 *         {@link LinkRule#next()}; this method should be used to access the
+	 *         rules without modifying them.
 	 */
 	public LinkRule<Context> getCompositionRuleHead() {
 		return compositionRuleHead;
 	}
 
 	/**
-	 * @return a {@link Chain} view of composition rules assigned to this
-	 *         {@link IndexedClassExpression}; it can be used for inserting new
-	 *         rules or deleting existing ones
+	 * @return the {@link Chain} view of all composition rules assigned to this
+	 *         {@link IndexedClassExpression}; this is always not {@code null}.
+	 *         This method can be used for convenient search and modification
+	 *         (addition and deletion) of the rules using the methods of the
+	 *         {@link Chain} interface without without worrying about
+	 *         {@code null} values.
 	 */
 	Chain<ChainableRule<Context>> getCompositionRuleChain() {
 		return new AbstractChain<ChainableRule<Context>>() {

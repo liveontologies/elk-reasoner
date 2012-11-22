@@ -27,16 +27,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.MarkingConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -94,14 +91,11 @@ public class RuleApplicationFactory implements
 
 	@Override
 	public Engine getEngine() {
-		return new Engine(new AddConclusionVisitor(), null/*
-														 * no context creation
-														 * listener
-														 */);
+		return new Engine();
 	}
 
 	public Engine getEngine(ContextCreationListener listener) {
-		return new Engine(new AddConclusionVisitor(), listener);
+		return new Engine(listener);
 	}
 
 	@Override
@@ -278,7 +272,7 @@ public class RuleApplicationFactory implements
 
 		protected final SaturationState.Writer saturationStateWriter;
 
-		protected final ConclusionVisitor<Boolean> conclusionVisitor;
+		protected final ConclusionVisitor<Boolean> conclusionProcessor;
 
 		/**
 		 * Local {@link ConclusionsCounter} created for every worker
@@ -291,31 +285,40 @@ public class RuleApplicationFactory implements
 		/**
 		 * Local {@link ThisStatistics} created for every worker
 		 */
-		protected final ThisStatistics factoryStats = new ThisStatistics();
+		protected final ThisStatistics factoryStats;
 
-		protected Engine(final ConclusionVisitor<Boolean> visitor,
-				final ContextCreationListener listener) {
-			conclusionVisitor = visitor;
-			this.saturationStateWriter = saturationState_.getWriter(
+		protected Engine(SaturationState.Writer saturationStateWriter,
+				ThisStatistics factoryStats) {
+			this.conclusionProcessor = getConclusionProcessor(saturationStateWriter);
+			this.saturationStateWriter = saturationStateWriter;
+			this.factoryStats = factoryStats;
+		}
 
-			listener == null ? new ContextCreationListener() {
-				@Override
-				public void notifyContextCreation(Context newContext) {
-					factoryStats.countCreatedContexts++;
-				}
-			} : new ContextCreationListener() {
+		protected Engine(SaturationState.Writer saturationStateWriter) {
+			this(saturationStateWriter, new ThisStatistics());
+		}
+
+		protected Engine() {
+			this(saturationState_.getWriter());
+		}
+
+		protected Engine(final ContextCreationListener listener,
+				final ThisStatistics factoryStats) {
+			this(saturationState_.getWriter(new ContextCreationListener() {
 				@Override
 				public void notifyContextCreation(Context newContext) {
 					factoryStats.countCreatedContexts++;
 					listener.notifyContextCreation(newContext);
 				}
-			}
+			}), factoryStats);
+		}
 
-			);
+		protected Engine(final ContextCreationListener listener) {
+			this(listener, new ThisStatistics());
 		}
 
 		protected ConclusionVisitor<Boolean> getConclusionVisitor() {
-			return conclusionVisitor;
+			return conclusionProcessor;
 		}
 
 		@Override
@@ -379,123 +382,24 @@ public class RuleApplicationFactory implements
 						break;
 					}
 				}
-
-				if (preApply(conclusion, context)) {
-					process(conclusion, context);
-					postApply(conclusion, context);
-				}
+				conclusion.accept(conclusionProcessor, context);
 			}
 		}
 
-		protected void process(Conclusion conclusion, Context context) {
-			conclusion.apply(saturationStateWriter, context);
+		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
+				SaturationState.Writer saturationStateWriter) {
+			return new CombinedConclusionVisitor(
+					new ConclusionInsertionVisitor(),
+					new ConclusionApplicationVisitor(saturationStateWriter));
 		}
 
-		protected boolean preApply(Conclusion conclusion, Context context) {
-			return conclusion.accept(conclusionVisitor, context);
-		}
 
-		protected void postApply(Conclusion conclusion, Context context) {
-			// nothing here
-		}
-
-	}
-
-	protected abstract class BaseConclusionVisitor implements
-			ConclusionVisitor<Boolean> {
-
-		protected void markAsNotSaturated(Context context) {
-			// re-use the saturation flag as a sign that the context is modified
-			// for the first time
-			if (trackModifiedContexts_ && context.isSaturated()) {
-				saturationState_.getWriter().markAsNotSaturated(context);
-			}
-		}
-	}
-
-	/**
-	 * Used to add different kinds of conclusions to the context
-	 */
-	protected class AddConclusionVisitor extends BaseConclusionVisitor {
-
-		@Override
-		public Boolean visit(NegativeSuperClassExpression negSCE,
-				Context context) {
-			if (context.addSuperClassExpression(negSCE.getExpression())) {
-				// statistics_.superClassExpressionNo++;
-				// statistics_.negSuperClassExpressionInfNo++;
-				markAsNotSaturated(negSCE.getSourceContext(context));
-
-				return true;
-			}
-
-			return false;
-		}
-
-		@Override
-		public Boolean visit(PositiveSuperClassExpression posSCE,
-				Context context) {
-			if (context.addSuperClassExpression(posSCE.getExpression())) {
-				// statistics_.superClassExpressionNo++;
-				// statistics_.posSuperClassExpressionInfNo++;
-				markAsNotSaturated(posSCE.getSourceContext(context));
-
-				return true;
-			}
-
-			return false;
-		}
-
-		@Override
-		public Boolean visit(BackwardLink link, Context context) {
-			// statistics_.backLinkInfNo++;
-			if (context.addBackwardLink(link)) {
-				//markAsNotSaturated(context);
-				markAsNotSaturated(link.getSourceContext(context));
-
-				return true;
-			}
-
-			return false;
-			// statistics_.backLinkNo++;
-		}
-
-		@Override
-		public Boolean visit(ForwardLink link, Context context) {
-			// statistics_.forwLinkInfNo++;
-			if (link.addToContextBackwardLinkRule(context)) {
-				markAsNotSaturated(link.getSourceContext(context));
-				
-				return true;
-			}
-
-			return false;
-			// statistics_.forwLinkNo++;
-		}
-
-		@Override
-		public Boolean visit(Bottom bot, Context context) {
-			return !context.isInconsistent();
-		}
-
-		@Override
-		public Boolean visit(Propagation propagation, Context context) {
-			if (propagation.addToContextBackwardLinkRule(context)) {
-				
-				return true;
-			}
-
-			return false;
-		}
-
-		@Override
-		public Boolean visit(DisjointnessAxiom axiom, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Trying to add disjointness axiom to "
-						+ context.getRoot());
-			}
-			// should always be true
-			return context.addDisjointnessAxiom(axiom.getAxiom()) > 0;
+		protected ConclusionVisitor<Boolean> getConclusionProcessor(
+				SaturationState.Writer saturationStateWriter) {
+			return trackModifiedContexts_ ? new CombinedConclusionVisitor(
+					getBaseConclusionProcessor(saturationStateWriter),
+					new MarkingConclusionVisitor(saturationStateWriter))
+					: getBaseConclusionProcessor(saturationStateWriter);
 		}
 	}
 
