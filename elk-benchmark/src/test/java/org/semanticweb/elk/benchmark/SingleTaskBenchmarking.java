@@ -1,9 +1,12 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.benchmark;
 /*
  * #%L
- * ELK Bencharking Package
- * 
- * $Id$
- * $HeadURL$
+ * ELK Benchmarking Package
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,24 +23,21 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.benchmark;
 
 import org.junit.Test;
 
-
-
 /**
+ * Integration test which expects a single task to run (parameters passed as
+ * System properties)
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class MainIT {
+public class SingleTaskBenchmarking {
 
 	@Test
-	public void testMultiRun() throws Exception {
-		BenchmarkUtils.multiRun();
+	public void testRun() throws Exception {
+		BenchmarkUtils.run();
 	}
 }
