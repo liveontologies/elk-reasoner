@@ -53,6 +53,12 @@
 			<artifactId>elk-util-logging</artifactId>
 			<version>0.3.2-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.semanticweb.elk</groupId>
+			<artifactId>elk-reasoner</artifactId>
+			<version>0.3.2-SNAPSHOT</version>
+			<type>test-jar</type>
+		</dependency>		
 	</dependencies>
 
 	<build>
@@ -69,7 +75,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>			
 		</plugins>
 	</build>
 
