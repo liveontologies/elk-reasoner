@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -34,9 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -101,11 +98,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			indexUpdater.add(filler, new ThisCompositionRule(this));
 		}
 
-		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
-			// first positive occurrence of this expression
-			indexUpdater.add(filler, new PosExistentialRule(property));
-		}
-
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 
@@ -114,10 +106,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			indexUpdater.remove(filler, new ThisCompositionRule(this));
 		}
 
-		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
-			// no positive occurrences of this expression left
-			indexUpdater.remove(filler, new PosExistentialRule(property));
-		}
 	}
 
 	@Override
@@ -143,6 +131,17 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		} finally {
 			// stats.timeObjectSomeValuesFromDecompositionRule +=
 			// CachedTimeThread.currentTimeMillis;
+		}
+	}
+
+	public static void generatePropagations(SaturationState.Writer writer,
+			IndexedPropertyChain property, Context context) {
+		for (IndexedClassExpression ice : context.getSuperClassExpressions()) {
+			ThisCompositionRule rule = ice.getCompositionRuleChain().find(
+					ThisCompositionRule.MATCHER_);
+			if (rule == null)
+				continue;
+			rule.apply(writer, property, context);
 		}
 	}
 
@@ -198,12 +197,19 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 			try {
 
-				final Set<IndexedPropertyChain> candidatePropagationProperties = context
-						.getRoot().getPosPropertiesInExistentials();
+				// final Set<IndexedPropertyChain>
+				// candidatePropagationProperties = context
+				// .getRoot().getPosPropertiesInExistentials();
 
-				if (candidatePropagationProperties == null) {
-					return;
-				}
+				final Set<IndexedPropertyChain> candidatePropagationProperties = context
+						.getBackwardLinksByObjectProperty().keySet();
+
+				// TODO: deal with reflexive roles using another composition
+				// rule and uncomment this
+
+				// if (candidatePropagationProperties.isEmpty()) {
+				// return;
+				// }
 
 				for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 					IndexedPropertyChain relation = e.getRelation();
@@ -222,44 +228,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 						writer.produce(context, new Propagation(property, e));
 					}
 
-					/*
-					 * creating propagations for relevant sub-compositions of
-					 * the relation
-					 */
-					for (IndexedPropertyChain property : relation
-							.getSaturated().getSubCompositions()) {
-						SaturatedPropertyChain propertySaturation = property
-								.getSaturated();
-
-						// if
-						// (!propertySaturation.getRightSubProperties().isEmpty())
-						// {
-						if (!new LazySetIntersection<IndexedPropertyChain>(
-								candidatePropagationProperties,
-								propertySaturation.getRightSubProperties())
-								.isEmpty()) {
-							/*
-							 * create propagations for told super-properties of
-							 * the chain instead of the chain itself if the
-							 * optimization is on. otherwise a composed backward
-							 * link will be created for a super-property while
-							 * the propagation for the chain, so we can lose the
-							 * entailment.
-							 */
-							if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
-									&& property.getRightChains() == null) {
-								for (IndexedPropertyChain superChain : property
-										.getToldSuperProperties()) {
-									writer.produce(context, new Propagation(
-											superChain, e));
-								}
-							} else {
-								writer.produce(context, new Propagation(
-										property, e));
-							}
-						}
-					}
-
+					// TODO: create a composition rule to deal with reflexivity
 					// propagating to the this context if relation is reflexive
 					if (relation.getSaturated().isReflexive())
 						writer.produce(context,
@@ -269,6 +238,18 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				// stats.timeObjectSomeValuesFromCompositionRule +=
 				// CachedTimeThread.currentTimeMillis;
 			}
+		}
+
+		private void apply(SaturationState.Writer writer,
+				IndexedPropertyChain property, Context context) {
+
+			for (IndexedObjectSomeValuesFrom e : negExistentials_) {
+				if (e.getRelation().getSaturated().getSubProperties()
+						.contains(property)) {
+					writer.produce(context, new Propagation(property, e));
+				}
+			}
+
 		}
 
 		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
@@ -316,83 +297,4 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	}
 
-	/**
-	 * 
-	 */
-	private static class PosExistentialRule extends
-			ModifiableLinkImpl<ChainableIndexRule<IndexedClassExpression>>
-			implements ChainableIndexRule<IndexedClassExpression> {
-
-		private final Set<IndexedObjectProperty> properties_ = new ArrayHashSet<IndexedObjectProperty>(
-				16);
-
-		private PosExistentialRule(
-				ChainableIndexRule<IndexedClassExpression> tail) {
-			super(tail);
-		}
-
-		PosExistentialRule(IndexedObjectProperty property) {
-			super(null);
-			properties_.add(property);
-		}
-
-		private static final Matcher<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule>(
-				PosExistentialRule.class);
-
-		private static final ReferenceFactory<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule> FACTORY_ = new ReferenceFactory<ChainableIndexRule<IndexedClassExpression>, PosExistentialRule>() {
-			@Override
-			public PosExistentialRule create(
-					ChainableIndexRule<IndexedClassExpression> tail) {
-				return new PosExistentialRule(tail);
-			}
-		};
-
-		@Override
-		public boolean addTo(
-				Chain<ChainableIndexRule<IndexedClassExpression>> ruleChain) {
-			PosExistentialRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
-
-			return rule.properties_.addAll(properties_);
-		}
-
-		@Override
-		public boolean removeFrom(
-				Chain<ChainableIndexRule<IndexedClassExpression>> ruleChain) {
-			PosExistentialRule rule = ruleChain.find(MATCHER_);
-			boolean changed = false;
-
-			if (rule != null) {
-				changed = rule.properties_.removeAll(properties_);
-
-				if (rule.properties_.isEmpty()) {
-					ruleChain.remove(MATCHER_);
-				}
-			}
-
-			return changed;
-		}
-
-		@Override
-		public boolean apply(IndexedClassExpression filler) {
-			boolean changed = false;
-
-			for (IndexedObjectProperty property : properties_) {
-				changed |= filler.addPosPropertyInExistential(property);
-			}
-
-			return changed;
-		}
-
-		@Override
-		public boolean deapply(IndexedClassExpression filler) {
-			boolean changed = false;
-
-			for (IndexedObjectProperty property : properties_) {
-				changed |= filler.removePosPropertyInExistential(property);
-			}
-
-			return changed;
-		}
-
-	}
 }

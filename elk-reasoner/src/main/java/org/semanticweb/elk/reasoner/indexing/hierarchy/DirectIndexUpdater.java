@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -70,18 +69,6 @@ public class DirectIndexUpdater implements IndexUpdater {
 	public boolean remove(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
 		return rule.removeFrom(target.getCompositionRuleChain());
-	}
-
-	@Override
-	public boolean add(IndexedClassExpression target,
-			ChainableIndexRule<IndexedClassExpression> rule) {
-		return rule.apply(target);
-	}
-
-	@Override
-	public boolean remove(IndexedClassExpression target,
-			ChainableIndexRule<IndexedClassExpression> rule) {
-		return rule.deapply(target);
 	}
 
 	@Override

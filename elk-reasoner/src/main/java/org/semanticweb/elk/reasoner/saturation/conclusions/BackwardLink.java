@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -80,6 +81,15 @@ public class BackwardLink implements Conclusion {
 		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		// statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
 		try {
+
+			// if this is the first/last backward link for this relation,
+			// generate new propagations for this relation
+			if (context.getBackwardLinksByObjectProperty().get(relation_)
+					.size() == 1) {
+				IndexedObjectSomeValuesFrom.generatePropagations(engine,
+						relation_, context);
+			}
+
 			// apply all backward link rules of the context
 			LinkRule<BackwardLink> backLinkRule = context
 					.getBackwardLinkRuleHead();
