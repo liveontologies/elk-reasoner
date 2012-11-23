@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.taxonomy;
  */
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -83,8 +82,6 @@ class ClassTaxonomyCleaningFactory
 			@Override
 			public void submit(ElkClass elkClass) {
 				
-				if (classTaxonomy_ == null) throw new RuntimeException();
-				
 				if (classTaxonomy_.getBottomNode().getMembers().remove(elkClass)) {
 					return;
 				}
@@ -94,18 +91,22 @@ class ClassTaxonomyCleaningFactory
 				if (node == null) {
 					return;
 				}
+				
 				if (node.trySetModified(true)) {
 					toRemove.add(node);
 				}
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
 					for (UpdateableTaxonomyNode<ElkClass> subNode : node.getDirectUpdateableSubNodes()) {
-						if (!subNode.trySetModified(true))
+						if (!subNode.trySetModified(true)) {
 							continue;
+						}
+						
 						toRemove.add(subNode);
 					}
 				}
 				
+				//System.out.println("Node removed: " + node);
 				classTaxonomy_.removeNode(node);
 			}
 
@@ -115,23 +116,22 @@ class ClassTaxonomyCleaningFactory
 				for (;;) {
 					UpdateableTaxonomyNode<ElkClass> node = toRemove.poll();
 					
-					if (node == null)
+					if (node == null) {
 						return;
+					}
 					
-					List<UpdateableTaxonomyNode<ElkClass>> superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>();
 					// remove all super-class links
-					synchronized (node) {						
-						for (Iterator<? extends UpdateableTaxonomyNode<ElkClass>> iter = node.getDirectUpdateableSuperNodes().iterator(); iter.hasNext();) {
-							superNodes.add(iter.next());
-							iter.remove();
+					synchronized (node) {
+
+						List<UpdateableTaxonomyNode<ElkClass>> superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>(
+								node.getDirectUpdateableSuperNodes());
+
+						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
+							superNode.removeDirectSubNode(node);
+							node.removeDirectSuperNode(superNode);
 						}
 					}
-					
-					for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
-						superNode.removeDirectSubNode(node);
-					}
 				}
-
 			}
 
 			@Override

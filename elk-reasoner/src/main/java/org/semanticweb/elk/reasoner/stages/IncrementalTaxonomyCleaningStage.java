@@ -97,7 +97,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		reasoner.incrementalState.setStageStatus(IncrementalStages.TAXONOMY_CLEANING, true);
 		reasoner.incrementalState.diffIndex.clearSignatureChanges();
 		// at this point we're done with unsaturated contexts
-		reasoner.saturationState.getWriter().clearNotSaturatedContexts();		
+		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
 	}
 
 	@Override
@@ -109,13 +109,13 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		//TODO do a generic lazy collection concatenation?
 		Collection<ElkClass> inputs = new AbstractCollection<ElkClass>() {
 
-			private Iterator<ElkClass> remIter_ = removed.iterator();
-			private Iterator<ElkClass> modIter_ = modified.iterator();
-			
 			@Override
 			public Iterator<ElkClass> iterator() {
 				return new Iterator<ElkClass>() {
 
+					private Iterator<ElkClass> remIter_ = removed.iterator();
+					private Iterator<ElkClass> modIter_ = modified.iterator();					
+					
 					@Override
 					public boolean hasNext() {
 						return remIter_.hasNext() || modIter_.hasNext();
@@ -148,10 +148,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Taxonomy nodes to be cleaned: " + inputs);
 		}
-		
-		/*if (reasoner.taxonomy == null) {
-			throw new RuntimeException();
-		}*/
 		
 		cleaning_ = new ClassTaxonomyCleaning(inputs, reasoner.taxonomy, reasoner.getProcessExecutor(), workerNo, progressMonitor);
 	}

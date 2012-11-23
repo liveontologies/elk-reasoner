@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
  * A common implementation of {@link ReasonerStage}s for a given reasoner.
@@ -90,5 +91,11 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	void initComputation() {
 		this.workerNo = reasoner.getNumberOfWorkers();
 		this.progressMonitor = reasoner.getProgressMonitor();
+	}
+	
+	protected void markAllContextsAsSaturated() {
+		for (IndexedClassExpression ice : reasoner.saturationState.getNotSaturatedContexts()) {
+			ice.getContext().setSaturated(true);
+		}
 	}
 }

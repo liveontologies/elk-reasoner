@@ -150,6 +150,9 @@ public class SaturationState {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
 			if (context.addToDo(item)) {
+				
+				//debugCheck(context, item);
+				
 				// context was activated
 				activeContexts_.add(context);
 				// LOGGER_.trace(context.getRoot() + " was activated!");
@@ -187,5 +190,20 @@ public class SaturationState {
 		public void clearNotSaturatedContexts() {
 			notSaturatedContexts_.clear();
 		}
+		
+/*		private boolean debugCheck(Context context, Conclusion conclusion) {
+			if (context.getRoot() instanceof IndexedClass) {
+				ElkClass cl = ((IndexedClass) context.getRoot()).getElkClass();
+				
+				if (cl.getIri().toString().equals("<http://www.co-ode.org/ontologies/galen#CoracohumeralLigament>")) {
+					
+					System.out.println("!!!PRODUCED!!! " + conclusion + " saturated? " + context.isSaturated());
+					
+					return true;
+				}
+			}
+			
+			return false;
+		}*/
 	}
 }

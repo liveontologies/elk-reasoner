@@ -125,7 +125,7 @@ class NonBottomClassNode implements
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
+	public synchronized void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct super-node " + superNode);
 		try {
@@ -144,16 +144,17 @@ class NonBottomClassNode implements
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+	public synchronized void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct sub-node " + subNode);
 		
 		try {
-			directSubNodes_.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)subNode);
 			
 			if (directSubNodes_.isEmpty()) {
 				this.taxonomy_.countNodesWithSubClasses.incrementAndGet();
 			}
+			
+			directSubNodes_.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)subNode);
 		}
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException(subNode + " is not a type node!");
@@ -342,12 +343,18 @@ class NonBottomClassNode implements
 	}
 
 	@Override
-	public boolean removeDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
-		return directSubNodes_.remove(subNode);
+	public synchronized boolean removeDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+		boolean changed = directSubNodes_.remove(subNode);
+		
+		if (directSubNodes_.isEmpty()) {
+			taxonomy_.countNodesWithSubClasses.decrementAndGet();
+		}
+		
+		return changed;
 	}
 
 	@Override
-	public boolean removeDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
+	public synchronized boolean removeDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
 		return directSuperNodes_.remove(superNode);
 	}
 }

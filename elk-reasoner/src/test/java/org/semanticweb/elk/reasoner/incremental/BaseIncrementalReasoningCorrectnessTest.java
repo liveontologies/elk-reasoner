@@ -129,7 +129,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		// initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-		long seed =  /*1352732278515L;*/System.currentTimeMillis();
+		long seed = /*1353518711098L;*/System.currentTimeMillis();
 		Random rnd = new Random(seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {

@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -56,7 +55,7 @@ import org.semanticweb.elk.util.collections.chains.AbstractChain;
 public class ContextImpl implements Context {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(ContextImpl.class);
+	//private static final Logger LOGGER_ = Logger.getLogger(ContextImpl.class);
 
 	/**
 	 * the root {@link IndexedClassExpression} for which the
@@ -198,13 +197,18 @@ public class ContextImpl implements Context {
 	public boolean addBackwardLink(BackwardLink link) {
 		Context source = link.getSource();
 		IndexedPropertyChain relation = link.getRelation();
-		if (source.isSaturated())
+		
+		if (backwardLinksByObjectProperty_ == null)
+			backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
+		
+		return backwardLinksByObjectProperty_.add(relation, source);
+		
+		/*if (changed && source.isSaturated())
 			LOGGER_.error(getRoot()
 					+ ": adding a backward link to a saturated context: "
 					+ link);
-		if (backwardLinksByObjectProperty_ == null)
-			backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
-		return backwardLinksByObjectProperty_.add(relation, source);
+		
+		return changed;*/
 	}
 
 	@Override
@@ -225,11 +229,14 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean addSuperClassExpression(IndexedClassExpression expression) {
-		if (isSaturated)
+		return superClassExpressions_.add(expression);
+		
+		/*if (changed && isSaturated) 
 			LOGGER_.error(getRoot()
 					+ ": adding a superclass to a saturated context: "
 					+ expression);
-		return superClassExpressions_.add(expression);
+		
+		return changed;*/
 	}
 
 	@Override

@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,24 +25,32 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import java.util.AbstractSet;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Condition;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 class IncrementalClassTaxonomyComputationStage extends
 		ClassTaxonomyComputationStage {
 
 	private static final Logger LOGGER_ = Logger
-			.getLogger(IncrementalClassTaxonomyComputationStage.class);	
-	
+			.getLogger(IncrementalClassTaxonomyComputationStage.class);
+
 	public IncrementalClassTaxonomyComputationStage(
 			AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -54,7 +63,8 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(reasoner));
+		return Arrays
+				.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(reasoner)/*new IncrementalConsistencyCheckingStage(reasoner)*/);
 	}
 
 	@Override
@@ -62,10 +72,49 @@ class IncrementalClassTaxonomyComputationStage extends
 		super.initComputation();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		this.computation_ = new ClassTaxonomyComputation(
-				//Only need to saturate new classes?
-				reasoner.ontologyIndex.getIndexedClasses(),
-				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.ontologyIndex);
+
+		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
+				.getIndexedClasses();
+
+		if (reasoner.taxonomy == null) {
+			computation_ = new ClassTaxonomyComputation(indexedClasses,
+					reasoner.getProcessExecutor(), workerNo, progressMonitor,
+					reasoner.ontologyIndex);
+		} else {
+
+			Collection<IndexedClass> modified = new AbstractSet<IndexedClass>() {
+
+				@Override
+				public Iterator<IndexedClass> iterator() {
+					return Operations.filter(
+							reasoner.ontologyIndex.getIndexedClasses(),
+							new Condition<IndexedClass>() {
+
+								@Override
+								public boolean holds(IndexedClass clazz) {
+									UpdateableNode<ElkClass> node = reasoner.taxonomy
+											.getUpdateableNode(clazz
+													.getElkClass());
+
+									return node == null || node.isModified();
+								}
+							}).iterator();
+				}
+
+				@Override
+				public int size() {
+					return indexedClasses.size();
+				}
+
+			};
+
+			
+			//System.out.println("Classes to be updated in the taxonomy: " + modified);
+
+			computation_ = new ClassTaxonomyComputation(modified,
+					reasoner.getProcessExecutor(), workerNo, progressMonitor,
+					reasoner.ontologyIndex, reasoner.taxonomy);
+		}
+
 	}
 }

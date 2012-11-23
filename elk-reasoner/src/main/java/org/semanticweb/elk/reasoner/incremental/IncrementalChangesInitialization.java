@@ -59,11 +59,11 @@ public class IncrementalChangesInitialization
 			Collection<IndexedClassExpression> inputs,
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
-			SaturationState state, boolean expectAllContextsSaturated,
+			SaturationState state,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
-				changedGlobalRules, expectAllContextsSaturated), executor,
+				changedGlobalRules), executor,
 				maxWorkers, progressMonitor);
 	}
 }
@@ -78,17 +78,14 @@ class ContextInitializationFactory
 	private final SaturationState.Writer saturationStateWriter_;
 	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
 	private final LinkRule<Context> changedGlobalRuleHead_;
-	private final boolean expectAllContextsSaturated_;
 
 	public ContextInitializationFactory(
 			SaturationState state,
 			Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges,
-			LinkRule<Context> changedGlobalRuleHead,
-			boolean expectAllContextsSaturated) {
+			LinkRule<Context> changedGlobalRuleHead) {
 		saturationStateWriter_ = state.getWriter();
 		indexChanges_ = indexChanges;
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
-		expectAllContextsSaturated_ = expectAllContextsSaturated;
 	}
 
 	@Override
@@ -101,16 +98,6 @@ class ContextInitializationFactory
 				Context context = ice.getContext();
 
 				if (context != null) {
-
-					if (expectAllContextsSaturated_ && !context.isSaturated()) {
-						/*
-						 * If we expect that all contexts are saturated at the
-						 * beginning of this phase (e.g. we ran the completion
-						 * phase before) but the flag isn't set for some
-						 * context, then we set it
-						 */
-						context.setSaturated(true);
-					}
 
 					LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
 					while (nextGlobalRule != null) {

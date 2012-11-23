@@ -74,21 +74,6 @@ public class RuleApplicationFactory implements
 	 */
 	private final ThisStatistics aggregatedFactoryStats_;
 
-	/**
-	 * The approximate number of created contexts. This number is a multiple of
-	 * {@link #CONTEXT_UPDATE_INTERVAL_}. Every worker updates this number when
-	 * it creates {@link #CONTEXT_UPDATE_INTERVAL_} new contexts. This is done
-	 * to reduce thread contention on this counter. For correctness, this should
-	 * be updated only in the methods
-	 * {@link Engine#submit(IndexedClassExpression)} or {@link Engine#process()}
-	 */
-	// private final AtomicInteger approximateContextNumber_ = new
-	// AtomicInteger(0);
-	/**
-	 * @see #approximateContextNumber_
-	 */
-	// private static final int CONTEXT_UPDATE_INTERVAL_ = 32;
-
 	private final boolean trackModifiedContexts_;
 
 	public RuleApplicationFactory(final SaturationState saturationState) {
@@ -117,18 +102,6 @@ public class RuleApplicationFactory implements
 	public void finish() {
 		checkStatistics();
 	}
-
-	/**
-	 * @return the approximate number of contexts created by all {@link Engine}.
-	 *         This number never exceeds the actual number of context created
-	 *         and can only change when
-	 *         {@link Engine#submit(IndexedClassExpression)} or
-	 *         {@link Engine#process()} are called
-	 */
-	/*
-	 * public int getRegisteredCreatedContextCount() { return
-	 * approximateContextNumber_.get(); }
-	 */
 
 	/**
 	 * Prints statistic of rule applications
@@ -419,6 +392,7 @@ public class RuleApplicationFactory implements
 					new ConclusionInsertionVisitor(),
 					new ConclusionApplicationVisitor(saturationStateWriter));
 		}
+
 
 		protected ConclusionVisitor<Boolean> getConclusionProcessor(
 				SaturationState.Writer saturationStateWriter) {

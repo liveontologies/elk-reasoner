@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.util.collections;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -393,6 +394,11 @@ public class ArrayHashSet<E> implements Set<E> {
 			if (data[i] != null)
 				data[i] = null;
 		size = 0;
+	}
+	
+	@Override
+	public String toString() {
+		return Arrays.toString(toArray());
 	}
 
 	private class ElementIterator implements Iterator<E> {

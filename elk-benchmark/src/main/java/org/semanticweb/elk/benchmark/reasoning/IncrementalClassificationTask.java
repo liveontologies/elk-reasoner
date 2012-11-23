@@ -2,8 +2,11 @@ package org.semanticweb.elk.benchmark.reasoning;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +33,7 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -47,7 +51,7 @@ public class IncrementalClassificationTask implements Task {
 	private final ReasonerConfiguration reasonerConfig_;
 	private List<ElkAxiom> loadedAxioms_ = null;
 
-	final static int REPEAT_NUMBER = 1;
+	final static int REPEAT_NUMBER = 5;
 	final static double CHANGE_FRACTION = 0.02;
 
 	public IncrementalClassificationTask(String[] args) {
@@ -140,7 +144,7 @@ public class IncrementalClassificationTask implements Task {
 			// initial correctness check
 			correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-			long seed = 123;//System.currentTimeMillis();
+			long seed = System.currentTimeMillis();
 			Random rnd = new Random(seed);
 
 			for (int i = 0; i < REPEAT_NUMBER; i++) {
@@ -151,7 +155,7 @@ public class IncrementalClassificationTask implements Task {
 				System.out.println("===========DELETING==============");
 				
 				/*for (ElkAxiom del : deleted) {
-					System.err.println(OwlFunctionalStylePrinter.toString(del));
+					System.out.println(OwlFunctionalStylePrinter.toString(del));
 				}*/
 
 				// incremental changes
@@ -235,10 +239,26 @@ public class IncrementalClassificationTask implements Task {
 		System.out.println("===========INCREMENTAL==============");
 		
 		Taxonomy<ElkClass> incremental = getTaxonomy(incrementalReasoner);
+		
 		int expectedHashCode = TaxonomyHasher.hash(expected);
 		int gottenHashCode = TaxonomyHasher.hash(incremental);
 		
 		if (expectedHashCode != gottenHashCode) {
+			
+			try {
+				Writer writer1 = new OutputStreamWriter(new FileOutputStream(new File("/home/pavel/tmp/expected.owl")));
+				Writer writer2 = new OutputStreamWriter(new FileOutputStream(new File("/home/pavel/tmp/gotten.owl")));				
+				TaxonomyPrinter.dumpClassTaxomomy(expected, writer1, false);
+				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer2, false);
+				writer1.flush();
+				writer2.flush();
+				writer1.close();
+				writer2.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			
 			throw new RuntimeException("Comparison failed for seed " + seed);
 		}
 	}

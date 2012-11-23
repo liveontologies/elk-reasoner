@@ -422,6 +422,55 @@ public class LowLevelIncrementalReasoningTest {
 		assertTrue(taxonomy.getNode(d).getDirectSuperNodes()
 				.contains(taxonomy.getNode(c)));
 	}	
+	
+	/*
+	 * This tests that removing a backward link unsaturates its 
+	 * source context, not the context where the link is stored
+	 */
+	@Test
+	public void testDeleteBackwardLinkAndModifySourceContext() throws ElkException {
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new LoggingStageExecutor(), 1);
+		TestChangesLoader loader = new TestChangesLoader();
+
+		reasoner.registerOntologyLoader(loader);
+
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
+		ElkClass e = objectFactory.getClass(new ElkFullIri(":E"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
+				"R"));
+		ElkAxiom toDelete = objectFactory.getSubClassOfAxiom(b,
+				objectFactory.getObjectSomeValuesFrom(r, c));
+		ElkAxiom toAdd1 = objectFactory.getSubClassOfAxiom(
+				objectFactory.getObjectSomeValuesFrom(r, d), e);
+		ElkAxiom toAdd2 = objectFactory.getSubClassOfAxiom(c, d);
+
+		loader.add(
+				objectFactory.getSubClassOfAxiom(a,
+						objectFactory.getObjectSomeValuesFrom(r, b)))
+				.add(objectFactory.getSubClassOfAxiom(a,
+						objectFactory.getObjectSomeValuesFrom(r, c)))						
+				.add(toDelete)
+				.add(objectFactory.getSubObjectPropertyOfAxiom(objectFactory
+						.getObjectPropertyChain(Arrays.asList(r, r)), r));
+
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+
+		loader.clear();
+
+		reasoner.setIncrementalMode(true);
+		reasoner.registerOntologyChangesLoader(loader);
+
+		loader.remove(toDelete).add(toAdd1).add(toAdd2);
+
+		taxonomy = reasoner.getTaxonomy();
+
+		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
+				.contains(taxonomy.getNode(e)));
+	}	
 
 	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
 			Owl2ParseException {

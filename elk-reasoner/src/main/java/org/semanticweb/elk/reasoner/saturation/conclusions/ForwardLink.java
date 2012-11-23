@@ -48,7 +48,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ForwardLink implements Conclusion {
+public class ForwardLink extends BaseConclusion {
 
 	/**
 	 * the {@link IndexedPropertyChain} in the existential restriction
@@ -96,11 +96,6 @@ public class ForwardLink implements Conclusion {
 		} finally {
 			// statistics.forwLinkTime += CachedTimeThread.currentTimeMillis;
 		}
-	}
-
-	@Override
-	public void deapply(SaturationState.Writer engine, Context context) {
-		apply(engine, context);
 	}
 
 	@Override
