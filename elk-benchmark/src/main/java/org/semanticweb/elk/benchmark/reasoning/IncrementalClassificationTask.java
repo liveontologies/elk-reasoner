@@ -1,4 +1,25 @@
 package org.semanticweb.elk.benchmark.reasoning;
+/*
+ * #%L
+ * ELK Benchmarking Package
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +69,7 @@ public class IncrementalClassificationTask implements Task {
 	private List<ElkAxiom> loadedAxioms_ = null;
 
 	final static int REPEAT_NUMBER = 5;
-	final static double CHANGE_FRACTION = 0.02;
+	final static int AXIOMS_TO_CHANGE = 10000;
 
 	public IncrementalClassificationTask(String[] args) {
 		ontologyFile_ = args[0];
@@ -145,8 +166,7 @@ public class IncrementalClassificationTask implements Task {
 
 			for (int i = 0; i < REPEAT_NUMBER; i++) {
 				// delete some axioms
-				Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms_, rnd,
-						CHANGE_FRACTION);
+				Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms_, rnd);
 
 				System.out.println("===========DELETING==============");
 				
@@ -189,19 +209,18 @@ public class IncrementalClassificationTask implements Task {
 	/*
 	 * can return a smaller subset than requested because one axiom can be randomly picked more than once
 	 */
-	private Set<ElkAxiom> getRandomSubset(List<ElkAxiom> axioms, Random rnd, double fraction) {
-		int num = 50;//(int) (axioms.size() * fraction);
-		Set<ElkAxiom> subset = new ArrayHashSet<ElkAxiom>(num); 
+	private Set<ElkAxiom> getRandomSubset(List<ElkAxiom> axioms, Random rnd) {
+		Set<ElkAxiom> subset = new ArrayHashSet<ElkAxiom>(AXIOMS_TO_CHANGE); 
 		
-		if (num >= axioms.size()) {
+		if (AXIOMS_TO_CHANGE >= axioms.size()) {
 			subset.addAll(axioms); 
 		}
 		else {
 			int filteredCnt = 0;
 			final int STOP = 100;
 			
-			for (int i = 0; i < num && filteredCnt < STOP;) {
-				ElkAxiom axiom = axioms.get(rnd.nextInt(num)); 
+			for (int i = 0; i < AXIOMS_TO_CHANGE && filteredCnt < STOP;) {
+				ElkAxiom axiom = axioms.get(rnd.nextInt(AXIOMS_TO_CHANGE)); 
 				
 				if (passAxiom(axiom)) {
 					subset.add(axiom);
