@@ -44,7 +44,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class Propagation extends BaseConclusion {
+public class Propagation extends AbstractConclusion {
 
 	// logger for this class
 	// private static final Logger LOGGER_ =

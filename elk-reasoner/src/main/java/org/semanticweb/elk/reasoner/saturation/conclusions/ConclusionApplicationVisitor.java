@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,8 +32,6 @@ public class ConclusionApplicationVisitor implements ConclusionVisitor<Boolean> 
 	public ConclusionApplicationVisitor(SaturationState.Writer engine) {
 		this.engine_ = engine;
 	}
-
-	// TODO: move the contents of Conclusion#apply method here
 
 	@Override
 	public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {

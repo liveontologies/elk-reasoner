@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class SuperClassExpression extends BaseConclusion {
+public abstract class SuperClassExpression extends AbstractConclusion {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this

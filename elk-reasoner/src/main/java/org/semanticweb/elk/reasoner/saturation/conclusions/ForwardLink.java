@@ -48,7 +48,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ForwardLink extends BaseConclusion {
+public class ForwardLink extends AbstractConclusion {
 
 	/**
 	 * the {@link IndexedPropertyChain} in the existential restriction

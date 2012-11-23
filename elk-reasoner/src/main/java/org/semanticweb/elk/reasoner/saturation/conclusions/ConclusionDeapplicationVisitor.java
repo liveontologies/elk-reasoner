@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,15 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
-public class ConclusionDeapplicationVisitor implements ConclusionVisitor<Boolean> {
+public class ConclusionDeapplicationVisitor implements
+		ConclusionVisitor<Boolean> {
 
 	private final SaturationState.Writer engine_;
 
 	public ConclusionDeapplicationVisitor(SaturationState.Writer engine) {
 		this.engine_ = engine;
 	}
-
-	// TODO: move the contents of Conclusion#deapply method here
 
 	@Override
 	public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {

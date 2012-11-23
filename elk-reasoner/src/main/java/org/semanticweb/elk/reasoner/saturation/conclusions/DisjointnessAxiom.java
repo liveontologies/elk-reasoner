@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class DisjointnessAxiom extends BaseConclusion {
+public class DisjointnessAxiom extends AbstractConclusion {
 
 	private final IndexedDisjointnessAxiom axiom_;
 

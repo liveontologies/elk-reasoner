@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,10 +30,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public abstract class BaseConclusion implements Conclusion {
+public abstract class AbstractConclusion implements Conclusion {
 
 	@Override
 	public void deapply(Writer writer, Context context) {

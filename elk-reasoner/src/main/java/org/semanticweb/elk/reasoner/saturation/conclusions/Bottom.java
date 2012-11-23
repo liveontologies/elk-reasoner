@@ -39,7 +39,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class Bottom extends BaseConclusion {
+public class Bottom extends AbstractConclusion {
 
 	// private static final Logger LOGGER_ = Logger.getLogger(Bottom.class);
 

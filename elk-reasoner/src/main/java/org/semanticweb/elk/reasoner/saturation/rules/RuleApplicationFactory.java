@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplication
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.MarkingConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -404,7 +404,7 @@ public class RuleApplicationFactory implements
 				SaturationState.Writer saturationStateWriter) {
 			return trackModifiedContexts_ ? new CombinedConclusionVisitor(
 					getBaseConclusionProcessor(saturationStateWriter),
-					new MarkingConclusionVisitor(saturationStateWriter))
+					new ConclusionSourceUnsaturationVisitor(saturationStateWriter))
 					: getBaseConclusionProcessor(saturationStateWriter);
 		}
 	}

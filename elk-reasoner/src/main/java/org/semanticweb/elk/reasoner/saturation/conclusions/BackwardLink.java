@@ -42,7 +42,7 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class BackwardLink extends BaseConclusion {
+public class BackwardLink extends AbstractConclusion {
 
 	/**
 	 * the source {@link Context} of this {@link BackwardLink}; the root of the
