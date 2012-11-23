@@ -27,9 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextSaturationCheckingConclusionVisitor;
 
 /**
  * Creates an engine which works as the de-application engine except that it
@@ -60,29 +57,25 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	}
 
 	/**
-	 * 
+	 * A {@link RuleDeapplicationFactory} that uses a
+	 * {@link SaturationState.Writer} that does not produce conclusions if their
+	 * source is marked as saturated.
 	 */
 	public class Engine extends RuleDeapplicationFactory.Engine {
 
 		protected Engine() {
-			super();
+			super(saturationState.getSaturationCheckingWriter());
 		}
 
-		protected Engine(ContextCreationListener listener) {
-			super(listener);
+		protected Engine(final ContextCreationListener listener) {
+			this(listener, new ThisStatistics());
 		}
 
-		/**
-		 * Used to check whether conclusions are contained in the context but
-		 * also returns false for context-modifying conclusions if the context
-		 * is saturated
-		 */
-		@Override
-		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				SaturationState.Writer saturationStateWriter) {
-			return new CombinedConclusionVisitor(
-					new ContextSaturationCheckingConclusionVisitor(),
-					super.getBaseConclusionProcessor(saturationStateWriter));
+		protected Engine(final ContextCreationListener listener,
+				final ThisStatistics factoryStats) {
+			super(saturationState
+					.getSaturationCheckingWriter(getEngineListener(listener,
+							factoryStats)), factoryStats);
 		}
 
 	}

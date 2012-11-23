@@ -57,7 +57,7 @@ public class RuleApplicationFactory implements
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	private final SaturationState saturationState_;
+	final SaturationState saturationState;
 
 	/**
 	 * The {@link ConclusionsCounter} aggregated for all workers
@@ -85,7 +85,7 @@ public class RuleApplicationFactory implements
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
 		this.aggregatedRuleStats_ = new RuleStatistics();
 		this.aggregatedFactoryStats_ = new ThisStatistics();
-		this.saturationState_ = saturationState;
+		this.saturationState = saturationState;
 		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
 
@@ -264,6 +264,18 @@ public class RuleApplicationFactory implements
 			LOGGER_.error("More unique forward links than produced!");
 	}
 
+	static ContextCreationListener getEngineListener(
+			final ContextCreationListener listener,
+			final ThisStatistics factoryStats) {
+		return new ContextCreationListener() {
+			@Override
+			public void notifyContextCreation(Context newContext) {
+				factoryStats.countCreatedContexts++;
+				listener.notifyContextCreation(newContext);
+			}
+		};
+	}
+
 	/**
 	 * 
 	 */
@@ -299,18 +311,13 @@ public class RuleApplicationFactory implements
 		}
 
 		protected Engine() {
-			this(saturationState_.getWriter());
+			this(saturationState.getWriter());
 		}
 
 		protected Engine(final ContextCreationListener listener,
 				final ThisStatistics factoryStats) {
-			this(saturationState_.getWriter(new ContextCreationListener() {
-				@Override
-				public void notifyContextCreation(Context newContext) {
-					factoryStats.countCreatedContexts++;
-					listener.notifyContextCreation(newContext);
-				}
-			}), factoryStats);
+			this(saturationState.getWriter(getEngineListener(listener,
+					factoryStats)), factoryStats);
 		}
 
 		protected Engine(final ContextCreationListener listener) {
@@ -393,7 +400,6 @@ public class RuleApplicationFactory implements
 					new ConclusionApplicationVisitor(saturationStateWriter));
 		}
 
-
 		protected ConclusionVisitor<Boolean> getConclusionProcessor(
 				SaturationState.Writer saturationStateWriter) {
 			return trackModifiedContexts_ ? new CombinedConclusionVisitor(
@@ -409,7 +415,7 @@ public class RuleApplicationFactory implements
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	protected static class ThisStatistics {
+	static class ThisStatistics {
 
 		/**
 		 * The number of created contexts

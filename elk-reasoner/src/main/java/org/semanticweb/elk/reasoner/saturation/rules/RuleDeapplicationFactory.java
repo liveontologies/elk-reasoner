@@ -77,6 +77,15 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 			super(listener);
 		}
 
+		protected Engine(SaturationState.Writer saturationStateWriter,
+				ThisStatistics factoryStats) {
+			super(saturationStateWriter, factoryStats);
+		}
+
+		protected Engine(SaturationState.Writer saturationStateWriter) {
+			super(saturationStateWriter);
+		}
+
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
 				SaturationState.Writer saturationStateWriter) {

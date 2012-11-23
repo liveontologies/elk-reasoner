@@ -74,15 +74,17 @@ public class SaturationState {
 				.<IndexedClassExpression> emptyList() : notSaturatedContexts_;
 	}
 
-	private final Writer defaultEngine_ = new Writer(
-			new ContextCreationListener() {
+	private static final ContextCreationListener DUMMY_LISTENER = new ContextCreationListener() {
+		@Override
+		public void notifyContextCreation(Context newContext) {
+			// Dummy listener, which does not do anything
+		}
+	};
 
-				@Override
-				public void notifyContextCreation(Context newContext) {
-					// Dummy listener, which does not do anything
-				}
+	private final Writer defaultEngine_ = new Writer(DUMMY_LISTENER);
 
-			});
+	private final Writer defaultSaturationCheckingEngine_ = new SaturationCheckingWriter(
+			DUMMY_LISTENER);
 
 	public SaturationState(OntologyIndex index) {
 		ontologyIndex_ = index;
@@ -96,6 +98,10 @@ public class SaturationState {
 	 */
 	public Writer getWriter() {
 		return defaultEngine_;
+	}
+
+	public Writer getSaturationCheckingWriter() {
+		return defaultSaturationCheckingEngine_;
 	}
 
 	/**
@@ -112,6 +118,11 @@ public class SaturationState {
 	 */
 	public Writer getWriter(ContextCreationListener contextCreationListener) {
 		return new Writer(contextCreationListener);
+	}
+
+	public Writer getSaturationCheckingWriter(
+			ContextCreationListener contextCreationListener) {
+		return new SaturationCheckingWriter(contextCreationListener);
 	}
 
 	/**
@@ -146,13 +157,13 @@ public class SaturationState {
 			return activeContexts_.poll();
 		}
 
-		public void produce(Context context, Conclusion item) {
+		public void produce(Context context, Conclusion conclusion) {
 			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context.getRoot() + ": new conclusion " + item);
-			if (context.addToDo(item)) {
-				
-				//debugCheck(context, item);
-				
+				LOGGER_.trace(context + ": new conclusion " + conclusion);
+			if (context.addToDo(conclusion)) {
+
+				// debugCheck(context, item);
+
 				// context was activated
 				activeContexts_.add(context);
 				// LOGGER_.trace(context.getRoot() + " was activated!");
@@ -190,20 +201,43 @@ public class SaturationState {
 		public void clearNotSaturatedContexts() {
 			notSaturatedContexts_.clear();
 		}
-		
-/*		private boolean debugCheck(Context context, Conclusion conclusion) {
-			if (context.getRoot() instanceof IndexedClass) {
-				ElkClass cl = ((IndexedClass) context.getRoot()).getElkClass();
-				
-				if (cl.getIri().toString().equals("<http://www.co-ode.org/ontologies/galen#CoracohumeralLigament>")) {
-					
-					System.out.println("!!!PRODUCED!!! " + conclusion + " saturated? " + context.isSaturated());
-					
-					return true;
-				}
-			}
-			
-			return false;
-		}*/
+
+		/*
+		 * private boolean debugCheck(Context context, Conclusion conclusion) {
+		 * if (context.getRoot() instanceof IndexedClass) { ElkClass cl =
+		 * ((IndexedClass) context.getRoot()).getElkClass();
+		 * 
+		 * if (cl.getIri().toString().equals(
+		 * "<http://www.co-ode.org/ontologies/galen#CoracohumeralLigament>")) {
+		 * 
+		 * System.out.println("!!!PRODUCED!!! " + conclusion + " saturated? " +
+		 * context.isSaturated());
+		 * 
+		 * return true; } }
+		 * 
+		 * return false; }
+		 */
 	}
+
+	/**
+	 * A {@link Writer} that does not produce conclusions if their source
+	 * context is already saturated.
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	private class SaturationCheckingWriter extends Writer {
+		private SaturationCheckingWriter(
+				ContextCreationListener contextCreationListener) {
+			super(contextCreationListener);
+		}
+
+		@Override
+		public void produce(Context context, Conclusion conclusion) {
+			if (conclusion.getSourceContext(context).isSaturated())
+				return;
+			super.produce(context, conclusion);
+		}
+	}
+
 }
