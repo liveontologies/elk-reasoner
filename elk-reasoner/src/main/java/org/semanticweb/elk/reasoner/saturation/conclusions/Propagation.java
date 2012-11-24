@@ -44,7 +44,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class Propagation extends BaseConclusion {
+public class Propagation extends AbstractConclusion {
 
 	// logger for this class
 	// private static final Logger LOGGER_ =
@@ -74,7 +74,7 @@ public class Propagation extends BaseConclusion {
 		Collection<Context> targets = backLinks.get(relation_);
 
 		for (Context target : targets) {
-			engine.produce(target, new NegativeSuperClassExpression(carry_));
+			engine.produce(target, new NegativeSubsumer(carry_));
 		}
 	}
 
@@ -157,7 +157,7 @@ public class Propagation extends BaseConclusion {
 				for (IndexedClassExpression carry : propagationsByObjectProperty_
 						.get(link.getRelation()))
 					engine.produce(link.getSource(),
-							new NegativeSuperClassExpression(carry));
+							new NegativeSubsumer(carry));
 			} finally {
 				// stats.timeObjectSomeValuesFromBackwardLinkRule +=
 				// CachedTimeThread.currentTimeMillis;

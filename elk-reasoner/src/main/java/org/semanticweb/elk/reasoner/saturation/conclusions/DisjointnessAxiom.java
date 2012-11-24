@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class DisjointnessAxiom extends BaseConclusion {
+public class DisjointnessAxiom extends AbstractConclusion {
 
 	private final IndexedDisjointnessAxiom axiom_;
 
@@ -48,9 +48,9 @@ public class DisjointnessAxiom extends BaseConclusion {
 
 	@Override
 	public void apply(SaturationState.Writer engine, Context context) {
-		if (context.containsDisjointnessAxiom(axiom_) > 1) {
+		if (context.inconsistencyDisjointnessAxiom(axiom_)) {
 			engine.produce(context,
-					new PositiveSuperClassExpression(engine.getOwlNothing()));
+					new PositiveSubsumer(engine.getOwlNothing()));
 		}
 	}
 

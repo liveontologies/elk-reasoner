@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -232,7 +232,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					// propagating to the this context if relation is reflexive
 					if (relation.getSaturated().isReflexive())
 						writer.produce(context,
-								new NegativeSuperClassExpression(e));
+								new NegativeSubsumer(e));
 				}
 			} finally {
 				// stats.timeObjectSomeValuesFromCompositionRule +=

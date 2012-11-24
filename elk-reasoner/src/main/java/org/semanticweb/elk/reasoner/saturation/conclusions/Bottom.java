@@ -39,7 +39,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class Bottom extends BaseConclusion {
+public class Bottom extends AbstractConclusion {
 
 	// private static final Logger LOGGER_ = Logger.getLogger(Bottom.class);
 
@@ -75,7 +75,7 @@ public class Bottom extends BaseConclusion {
 				// superclasses
 				engine.produce(
 						target,
-						new PositiveSuperClassExpression(engine.getOwlNothing()));
+						new PositiveSubsumer(engine.getOwlNothing()));
 			}
 		}
 	}
@@ -114,7 +114,7 @@ public class Bottom extends BaseConclusion {
 			try {
 				engine.produce(
 						link.getSource(),
-						new PositiveSuperClassExpression(engine.getOwlNothing()));
+						new PositiveSubsumer(engine.getOwlNothing()));
 			} finally {
 				// stats.timeClassBottomBackwardLinkRule +=
 				// CachedTimeThread.currentTimeMillis;

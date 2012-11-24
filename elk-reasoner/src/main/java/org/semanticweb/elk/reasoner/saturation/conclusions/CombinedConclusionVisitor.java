@@ -35,12 +35,12 @@ public class CombinedConclusionVisitor implements ConclusionVisitor<Boolean> {
 	}
 
 	@Override
-	public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
+	public Boolean visit(NegativeSubsumer negSCE, Context context) {
 		return first_.visit(negSCE, context) && second_.visit(negSCE, context);
 	}
 
 	@Override
-	public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
+	public Boolean visit(PositiveSubsumer posSCE, Context context) {
 		return first_.visit(posSCE, context) && second_.visit(posSCE, context);
 	}
 

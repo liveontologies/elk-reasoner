@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.benchmark;
 /*
  * #%L
- * ELK Reasoner
+ * ELK Benchmarking Package
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,24 +24,20 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.junit.Test;
 
 /**
+ * Integration test which expects a single task to run (parameters passed as
+ * System properties)
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public abstract class BaseConclusion implements Conclusion {
+public class SingleTaskBenchmarking {
 
-	@Override
-	public void deapply(Writer writer, Context context) {
-		apply(writer, context);
+	@Test
+	public void testRun() throws Exception {
+		BenchmarkUtils.run();
 	}
-
-	@Override
-	public Context getSourceContext(Context contextWhereStored) {
-		return contextWhereStored;
-	}
-
 }

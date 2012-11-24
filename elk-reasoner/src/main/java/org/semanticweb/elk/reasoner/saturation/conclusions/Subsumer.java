@@ -28,31 +28,31 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 
 /**
- * A {@link Conclusion} representing an implied {@link IndexedClassExpression}
+ * A {@link Conclusion} representing a subsumer {@link IndexedClassExpression}
  * of the root of the {@link Context} for which it is produced. Intuitively, if
  * a subclass axiom {@code SubClassOf(:A :B)} is derived by inference rules,
- * then a {@link SuperClassExpression} corresponding to {@code :B} can be
- * produced for the context with root {@code :A}
+ * then a {@link Subsumer} corresponding to {@code :B} can be produced for the
+ * context with root {@code :A}
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class SuperClassExpression extends BaseConclusion {
+public abstract class Subsumer extends AbstractConclusion {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this
-	 * {@link SuperClassExpression}
+	 * {@link Subsumer}
 	 */
 	protected final IndexedClassExpression expression;
 
-	public SuperClassExpression(IndexedClassExpression expression) {
+	public Subsumer(IndexedClassExpression expression) {
 		this.expression = expression;
 	}
 
 	/**
 	 * @return the {@code IndexedClassExpression} represented by this
-	 *         {@link SuperClassExpression}
+	 *         {@link Subsumer}
 	 */
 	public IndexedClassExpression getExpression() {
 		return expression;

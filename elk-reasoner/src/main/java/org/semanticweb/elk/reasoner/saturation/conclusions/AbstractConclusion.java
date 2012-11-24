@@ -1,9 +1,13 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.saturation.conclusions;
+
 /*
  * #%L
- * ELK Bencharking Package
- * 
- * $Id$
- * $HeadURL$
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,24 +24,25 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.benchmark;
 
-import org.junit.Test;
-
-
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class MainIT {
+public abstract class AbstractConclusion implements Conclusion {
 
-	@Test
-	public void testMultiRun() throws Exception {
-		BenchmarkUtils.multiRun();
+	@Override
+	public void deapply(Writer writer, Context context) {
+		apply(writer, context);
 	}
+
+	@Override
+	public Context getSourceContext(Context contextWhereStored) {
+		return contextWhereStored;
+	}
+
 }

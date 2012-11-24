@@ -1,12 +1,9 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
 /*
  * #%L
- * ELK Reasoner
- * $Id:$
- * $HeadURL:$
+ * ELK Bencharking Package
+ * 
+ * $Id$
+ * $HeadURL$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -23,27 +20,27 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * limitations under the License.
  * #L%
  */
+/**
+ * 
+ */
+package org.semanticweb.elk.benchmark;
 
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.junit.Test;
+
+
 
 /**
+ * Integration test which expects a multi task to run (parameters passed as
+ * System properties)
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public interface ConclusionVisitor<R> {
+public class MultiTaskBenchmarking {
 
-	public R visit(NegativeSubsumer negSCE, Context context);
-	
-	public R visit(PositiveSubsumer posSCE, Context context);
-	
-	public R visit(BackwardLink link, Context context);
-	
-	public R visit(ForwardLink link, Context context);
-	
-	public R visit(Bottom bot, Context context);
-
-	public R visit(Propagation propagation, Context context);
-
-	public R visit(DisjointnessAxiom disjointnessAxiom, Context context);
+	@Test
+	public void testMultiRun() throws Exception {
+		BenchmarkUtils.multiRun();
+	}
 }

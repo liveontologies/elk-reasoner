@@ -108,7 +108,7 @@ class ContextInitializationFactory
 
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
 							indexChanges_.keySet(),
-							context.getSuperClassExpressions())) {
+							context.getSubsumers())) {
 						// applying the changed rules for this class expression
 						LinkRule<Context> nextLocalRule = indexChanges_
 								.get(changedICE);

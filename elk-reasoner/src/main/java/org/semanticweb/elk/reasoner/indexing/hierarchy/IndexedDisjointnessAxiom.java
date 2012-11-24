@@ -31,7 +31,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -183,11 +183,11 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			if (disjointClasses_ != null
 					&& !new LazySetIntersection<IndexedClassExpression>(
 							disjointClasses_,
-							context.getSuperClassExpressions()).isEmpty()) {
+							context.getSubsumers()).isEmpty()) {
 
 				writer.produce(
 						context,
-						new PositiveSuperClassExpression(writer.getOwlNothing()));
+						new PositiveSubsumer(writer.getOwlNothing()));
 			} else if (disjointnessAxioms_ != null)
 				for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_) {
 					writer.produce(context, new DisjointnessAxiom(disAxiom));

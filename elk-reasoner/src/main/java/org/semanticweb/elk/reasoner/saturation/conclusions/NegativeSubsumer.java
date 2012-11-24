@@ -27,20 +27,19 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A {@link SuperClassExpression}, for which the structure of the enclosed
+ * A {@link Subsumer}, for which the structure of the enclosed
  * {@link IndexedClassExpression} should not be taken into account when applying
  * the rules within {@link Context}. That is, only composition rules stored with
  * this {@link IndexedClassExpression} should be applied to
- * {@link NegativeSuperClassExpression}s.
+ * {@link NegativeSubsumer}s.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public class NegativeSuperClassExpression extends SuperClassExpression {
+public class NegativeSubsumer extends Subsumer {
 
-	public NegativeSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
+	public NegativeSubsumer(IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
 	}
 

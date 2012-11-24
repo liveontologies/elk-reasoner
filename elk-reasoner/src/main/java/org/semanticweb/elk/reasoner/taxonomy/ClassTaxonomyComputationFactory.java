@@ -156,7 +156,7 @@ public class ClassTaxonomyComputationFactory implements
 			}
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
-					.getDirectSuperClasses()) {
+					.getDirectSubsumers()) {
 				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_.getCreateNode(directSuperEquivalent
 								.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);

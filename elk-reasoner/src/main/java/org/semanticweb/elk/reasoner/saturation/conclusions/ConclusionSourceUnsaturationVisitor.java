@@ -25,56 +25,60 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
-public class MarkingConclusionVisitor implements ConclusionVisitor<Boolean> {
+/**
+ * A {@link ConclusionVisitor} that marks the source context of the conclusion
+ * as not saturated
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public class ConclusionSourceUnsaturationVisitor implements
+		ConclusionVisitor<Boolean> {
 
 	private final SaturationState.Writer engine_;
 
-	public MarkingConclusionVisitor(SaturationState.Writer engine) {
+	public ConclusionSourceUnsaturationVisitor(SaturationState.Writer engine) {
 		this.engine_ = engine;
 	}
 
-	// TODO: move the contents of Conclusion#apply method here
-
-	@Override
-	public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
-		engine_.markAsNotSaturated(context);
+	Boolean mark(Conclusion conclusion, Context context) {
+		engine_.markAsNotSaturated(conclusion.getSourceContext(context));
 		return true;
 	}
 
 	@Override
-	public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
-		engine_.markAsNotSaturated(context);
-		return true;
+	public Boolean visit(NegativeSubsumer negSCE, Context context) {
+		return mark(negSCE, context);
+	}
+
+	@Override
+	public Boolean visit(PositiveSubsumer posSCE, Context context) {
+		return mark(posSCE, context);
 	}
 
 	@Override
 	public Boolean visit(BackwardLink link, Context context) {
-		engine_.markAsNotSaturated(link.getSource());
-		return true;
+		return mark(link, context);
 	}
 
 	@Override
 	public Boolean visit(ForwardLink link, Context context) {
-		engine_.markAsNotSaturated(context);
-		return true;
+		return mark(link, context);
 	}
 
 	@Override
 	public Boolean visit(Bottom bot, Context context) {
-		engine_.markAsNotSaturated(context);
-		return true;
+		return mark(bot, context);
 	}
 
 	@Override
 	public Boolean visit(Propagation propagation, Context context) {
-		engine_.markAsNotSaturated(context);
-		return true;
+		return mark(propagation, context);
 	}
 
 	@Override
 	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
-		engine_.markAsNotSaturated(context);
-		return true;
+		return mark(disjointnessAxiom, context);
 	}
 
 }

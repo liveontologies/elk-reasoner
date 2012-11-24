@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplication
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.MarkingConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -57,7 +57,7 @@ public class RuleApplicationFactory implements
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	private final SaturationState saturationState_;
+	final SaturationState saturationState;
 
 	/**
 	 * The {@link ConclusionsCounter} aggregated for all workers
@@ -85,7 +85,7 @@ public class RuleApplicationFactory implements
 		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
 		this.aggregatedRuleStats_ = new RuleStatistics();
 		this.aggregatedFactoryStats_ = new ThisStatistics();
-		this.saturationState_ = saturationState;
+		this.saturationState = saturationState;
 		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
 
@@ -130,10 +130,10 @@ public class RuleApplicationFactory implements
 								.getNegativeSuperClassExpressionInfNo()
 						+ "/"
 						+ aggregatedConclusionsCounter_
-								.getSuperClassExpressionNo()
+								.getSubsumerNo()
 						+ " ("
 						+ aggregatedConclusionsCounter_
-								.getSuperClassExpressionTime() + " ms)");
+								.getSubsumerTime() + " ms)");
 			if (aggregatedConclusionsCounter_.getBackLinkInfNo() > 0)
 				LOGGER_.debug("Backward Links produced/unique: "
 						+ aggregatedConclusionsCounter_.getBackLinkInfNo()
@@ -150,7 +150,7 @@ public class RuleApplicationFactory implements
 						+ " ms)");
 			LOGGER_.debug("Total conclusion processing time: "
 					+ (aggregatedConclusionsCounter_
-							.getSuperClassExpressionTime()
+							.getSubsumerTime()
 							+ aggregatedConclusionsCounter_.getBackLinkTime() + aggregatedConclusionsCounter_
 								.getForwLinkTime()) + " ms"
 
@@ -254,7 +254,7 @@ public class RuleApplicationFactory implements
 				.getPositiveSuperClassExpressionInfNo()
 				+ aggregatedConclusionsCounter_
 						.getNegativeSuperClassExpressionInfNo() < aggregatedConclusionsCounter_
-					.getSuperClassExpressionNo())
+					.getSubsumerNo())
 			LOGGER_.error("More unique derived superclasses than produced!");
 		if (aggregatedConclusionsCounter_.getBackLinkInfNo() < aggregatedConclusionsCounter_
 				.getBackLinkNo())
@@ -262,6 +262,18 @@ public class RuleApplicationFactory implements
 		if (aggregatedConclusionsCounter_.getForwLinkInfNo() < aggregatedConclusionsCounter_
 				.getForwLinkNo())
 			LOGGER_.error("More unique forward links than produced!");
+	}
+
+	static ContextCreationListener getEngineListener(
+			final ContextCreationListener listener,
+			final ThisStatistics factoryStats) {
+		return new ContextCreationListener() {
+			@Override
+			public void notifyContextCreation(Context newContext) {
+				factoryStats.countCreatedContexts++;
+				listener.notifyContextCreation(newContext);
+			}
+		};
 	}
 
 	/**
@@ -299,18 +311,13 @@ public class RuleApplicationFactory implements
 		}
 
 		protected Engine() {
-			this(saturationState_.getWriter());
+			this(saturationState.getWriter());
 		}
 
 		protected Engine(final ContextCreationListener listener,
 				final ThisStatistics factoryStats) {
-			this(saturationState_.getWriter(new ContextCreationListener() {
-				@Override
-				public void notifyContextCreation(Context newContext) {
-					factoryStats.countCreatedContexts++;
-					listener.notifyContextCreation(newContext);
-				}
-			}), factoryStats);
+			this(saturationState.getWriter(getEngineListener(listener,
+					factoryStats)), factoryStats);
 		}
 
 		protected Engine(final ContextCreationListener listener) {
@@ -393,12 +400,11 @@ public class RuleApplicationFactory implements
 					new ConclusionApplicationVisitor(saturationStateWriter));
 		}
 
-
 		protected ConclusionVisitor<Boolean> getConclusionProcessor(
 				SaturationState.Writer saturationStateWriter) {
 			return trackModifiedContexts_ ? new CombinedConclusionVisitor(
 					getBaseConclusionProcessor(saturationStateWriter),
-					new MarkingConclusionVisitor(saturationStateWriter))
+					new ConclusionSourceUnsaturationVisitor(saturationStateWriter))
 					: getBaseConclusionProcessor(saturationStateWriter);
 		}
 	}
@@ -409,7 +415,7 @@ public class RuleApplicationFactory implements
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	protected static class ThisStatistics {
+	static class ThisStatistics {
 
 		/**
 		 * The number of created contexts

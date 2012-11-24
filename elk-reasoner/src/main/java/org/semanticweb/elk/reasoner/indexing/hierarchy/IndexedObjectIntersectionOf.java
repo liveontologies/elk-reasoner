@@ -29,8 +29,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
@@ -131,9 +131,9 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		 */
 
 		try {
-			writer.produce(context, new PositiveSuperClassExpression(
+			writer.produce(context, new PositiveSubsumer(
 					firstConjunct_));
-			writer.produce(context, new PositiveSuperClassExpression(
+			writer.produce(context, new PositiveSubsumer(
 					secondConjunct_));
 		} finally {
 			// stats.timeObjectIntersectionOfDecompositionRule +=
@@ -205,8 +205,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 						conjunctionsByConjunct_.keySet(),
-						context.getSuperClassExpressions()))
-					writer.produce(context, new NegativeSuperClassExpression(
+						context.getSubsumers()))
+					writer.produce(context, new NegativeSubsumer(
 							conjunctionsByConjunct_.get(common)));
 			} finally {
 				// stats.timeObjectIntersectionOfCompositionRule +=
