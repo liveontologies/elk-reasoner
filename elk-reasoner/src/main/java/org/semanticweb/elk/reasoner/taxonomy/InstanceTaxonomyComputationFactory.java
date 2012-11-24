@@ -143,7 +143,7 @@ public class InstanceTaxonomyComputationFactory implements
 					.singleton(output.getRoot().getElkNamedIndividual()));
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
-					.getDirectSuperClasses()) {
+					.getDirectSubsumers()) {
 				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = taxonomy_
 						.getCreateTypeNode(directSuperEquivalent
 								.getEquivalent());

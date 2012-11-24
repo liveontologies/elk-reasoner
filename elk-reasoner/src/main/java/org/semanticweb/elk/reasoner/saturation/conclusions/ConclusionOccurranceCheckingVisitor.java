@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,13 +28,13 @@ public class ConclusionOccurranceCheckingVisitor implements
 		ConclusionVisitor<Boolean> {
 
 	@Override
-	public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
-		return context.containsSuperClassExpression(negSCE.getExpression());
+	public Boolean visit(NegativeSubsumer negSCE, Context context) {
+		return context.containsSubsumer(negSCE.getExpression());
 	}
 
 	@Override
-	public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
-		return context.containsSuperClassExpression(posSCE.getExpression());
+	public Boolean visit(PositiveSubsumer posSCE, Context context) {
+		return context.containsSubsumer(posSCE.getExpression());
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class ConclusionOccurranceCheckingVisitor implements
 
 	@Override
 	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
-		return context.containsDisjointnessAxiom(disjointnessAxiom.getAxiom()) > 0;
+		return context.containsDisjointnessAxiom(disjointnessAxiom.getAxiom());
 	}
 
 }

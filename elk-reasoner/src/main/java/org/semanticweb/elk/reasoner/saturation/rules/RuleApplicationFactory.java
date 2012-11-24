@@ -130,10 +130,10 @@ public class RuleApplicationFactory implements
 								.getNegativeSuperClassExpressionInfNo()
 						+ "/"
 						+ aggregatedConclusionsCounter_
-								.getSuperClassExpressionNo()
+								.getSubsumerNo()
 						+ " ("
 						+ aggregatedConclusionsCounter_
-								.getSuperClassExpressionTime() + " ms)");
+								.getSubsumerTime() + " ms)");
 			if (aggregatedConclusionsCounter_.getBackLinkInfNo() > 0)
 				LOGGER_.debug("Backward Links produced/unique: "
 						+ aggregatedConclusionsCounter_.getBackLinkInfNo()
@@ -150,7 +150,7 @@ public class RuleApplicationFactory implements
 						+ " ms)");
 			LOGGER_.debug("Total conclusion processing time: "
 					+ (aggregatedConclusionsCounter_
-							.getSuperClassExpressionTime()
+							.getSubsumerTime()
 							+ aggregatedConclusionsCounter_.getBackLinkTime() + aggregatedConclusionsCounter_
 								.getForwLinkTime()) + " ms"
 
@@ -254,7 +254,7 @@ public class RuleApplicationFactory implements
 				.getPositiveSuperClassExpressionInfNo()
 				+ aggregatedConclusionsCounter_
 						.getNegativeSuperClassExpressionInfNo() < aggregatedConclusionsCounter_
-					.getSuperClassExpressionNo())
+					.getSubsumerNo())
 			LOGGER_.error("More unique derived superclasses than produced!");
 		if (aggregatedConclusionsCounter_.getBackLinkInfNo() < aggregatedConclusionsCounter_
 				.getBackLinkNo())

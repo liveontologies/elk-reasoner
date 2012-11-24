@@ -33,9 +33,9 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public interface ConclusionVisitor<R> {
 
-	public R visit(NegativeSuperClassExpression negSCE, Context context);
+	public R visit(NegativeSubsumer negSCE, Context context);
 	
-	public R visit(PositiveSuperClassExpression posSCE, Context context);
+	public R visit(PositiveSubsumer posSCE, Context context);
 	
 	public R visit(BackwardLink link, Context context);
 	

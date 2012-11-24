@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -123,7 +123,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			try {
 
 				for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-					writer.produce(context, new PositiveSuperClassExpression(
+					writer.produce(context, new PositiveSubsumer(
 							implied));
 				}
 			} finally {

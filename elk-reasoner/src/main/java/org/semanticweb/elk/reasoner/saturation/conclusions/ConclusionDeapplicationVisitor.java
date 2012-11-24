@@ -35,13 +35,13 @@ public class ConclusionDeapplicationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
+	public Boolean visit(NegativeSubsumer negSCE, Context context) {
 		negSCE.deapply(engine_, context);
 		return true;
 	}
 
 	@Override
-	public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
+	public Boolean visit(PositiveSubsumer posSCE, Context context) {
 		posSCE.deapply(engine_, context);
 		return true;
 	}

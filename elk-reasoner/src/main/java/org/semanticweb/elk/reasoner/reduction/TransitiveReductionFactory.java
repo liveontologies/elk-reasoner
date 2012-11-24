@@ -246,11 +246,10 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 
 		/**
 		 * Processing of transitive reduction state by iterating over the
-		 * derived indexed class expression candidates and updating the
-		 * equivalent and direct-super classes using their saturations. If the
-		 * saturation is not yet computed, a new saturation job is created for
-		 * this purpose and the processing of the state is suspended until the
-		 * job is finished.
+		 * derived subsumers and updating the equivalent and direct subsumers
+		 * using their saturations. If the saturation is not yet computed, a new
+		 * saturation job is created for this purpose and the processing of the
+		 * state is suspended until the job is finished.
 		 * 
 		 * @param state
 		 *            the transitive reduction state to be processed
@@ -261,10 +260,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				TransitiveReductionState<R, J> state)
 				throws InterruptedException {
 
-			Iterator<IndexedClassExpression> superClassExpressionsIterator = state.superClassExpressionsIterator;
-			while (superClassExpressionsIterator.hasNext()) {
-				IndexedClassExpression next = superClassExpressionsIterator
-						.next();
+			Iterator<IndexedClassExpression> subsumerIterator = state.subsumerIterator;
+			while (subsumerIterator.hasNext()) {
+				IndexedClassExpression next = subsumerIterator.next();
 				if (!(next instanceof IndexedClass))
 					continue;
 				IndexedClass candidate = (IndexedClass) next;
@@ -297,7 +295,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				for (ElkClass equivalent : output.equivalent) {
 					LOGGER_.trace(root + ": equivalent " + equivalent.getIri());
 				}
-				for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.directSuperClasses) {
+				for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.directSubsumers) {
 					String message = root + ": direct super class ["
 							+ direct.getRoot();
 					for (ElkClass equivalent : direct.equivalent)
@@ -328,7 +326,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				return;
 			}
 			Set<IndexedClassExpression> candidateSupers = candidateSaturation
-					.getSuperClassExpressions();
+					.getSubsumers();
 			/*
 			 * If the saturation for the candidate contains the root, the
 			 * candidate is equivalent to the root
@@ -342,7 +340,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * super-classes, we iterate over the direct super classes computed
 			 * so far.
 			 */
-			Iterator<TransitiveReductionOutputEquivalent<IndexedClass>> iteratorDirectSuperClasses = output.directSuperClasses
+			Iterator<TransitiveReductionOutputEquivalent<IndexedClass>> iteratorDirectSuperClasses = output.directSubsumers
 					.iterator();
 			while (iteratorDirectSuperClasses.hasNext()) {
 				TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = iteratorDirectSuperClasses
@@ -353,7 +351,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				 * If the (already computed) saturation for the direct
 				 * super-class contains the candidate, it cannot be direct.
 				 */
-				if (directSuperClass.getContext().getSuperClassExpressions()
+				if (directSuperClass.getContext().getSubsumers()
 						.contains(candidate)) {
 					/*
 					 * If, in addition, the saturation for the candidate
@@ -384,7 +382,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			TransitiveReductionOutputEquivalent<IndexedClass> candidateOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
 					candidate);
 			candidateOutput.equivalent.add(candidate.getElkClass());
-			output.directSuperClasses.add(candidateOutput);
+			output.directSubsumers.add(candidateOutput);
 		}
 	}
 

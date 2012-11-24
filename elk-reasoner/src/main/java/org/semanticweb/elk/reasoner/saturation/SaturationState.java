@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
@@ -183,7 +183,7 @@ public class SaturationState {
 
 		public void initContext(Context context) {
 			produce(context,
-					new PositiveSuperClassExpression(context.getRoot()));
+					new PositiveSubsumer(context.getRoot()));
 			// apply all context initialization rules
 			LinkRule<Context> initRule = ontologyIndex_
 					.getContextInitRuleHead();

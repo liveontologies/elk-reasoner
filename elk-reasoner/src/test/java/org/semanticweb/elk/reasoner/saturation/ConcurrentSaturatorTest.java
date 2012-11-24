@@ -82,7 +82,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		classExpressionSaturation.finish();
 
-		assertTrue("A contains D", A.getContext().getSuperClassExpressions()
+		assertTrue("A contains D", A.getContext().getSubsumers()
 				.contains(D));
 
 	}
@@ -130,15 +130,15 @@ public class ConcurrentSaturatorTest extends TestCase {
 		Context context = A.getContext();
 
 		assertTrue("A contains A",
-				context.getSuperClassExpressions().contains(A));
+				context.getSubsumers().contains(A));
 		assertTrue("A contains B",
-				context.getSuperClassExpressions().contains(B));
+				context.getSubsumers().contains(B));
 		assertTrue("A contains C",
-				context.getSuperClassExpressions().contains(C));
+				context.getSubsumers().contains(C));
 		assertTrue("A contains I",
-				context.getSuperClassExpressions().contains(I));
+				context.getSubsumers().contains(I));
 		assertTrue("A contains D",
-				context.getSuperClassExpressions().contains(D));
+				context.getSubsumers().contains(D));
 	}
 
 }

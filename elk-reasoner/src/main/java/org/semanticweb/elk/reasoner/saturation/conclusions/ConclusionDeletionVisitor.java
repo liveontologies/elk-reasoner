@@ -27,13 +27,13 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class ConclusionDeletionVisitor implements ConclusionVisitor<Boolean> {
 
 	@Override
-	public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
-		return context.removeSuperClassExpression(negSCE.getExpression());
+	public Boolean visit(NegativeSubsumer negSCE, Context context) {
+		return context.removeSubsumer(negSCE.getExpression());
 	}
 
 	@Override
-	public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
-		return context.removeSuperClassExpression(posSCE.getExpression());
+	public Boolean visit(PositiveSubsumer posSCE, Context context) {
+		return context.removeSubsumer(posSCE.getExpression());
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class ConclusionDeletionVisitor implements ConclusionVisitor<Boolean> {
 
 	@Override
 	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
-		return context.removeDisjointnessAxiom(disjointnessAxiom.getAxiom()) >= 1;
+		return context.removeDisjointnessAxiom(disjointnessAxiom.getAxiom());
 	}
 
 }

@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -55,20 +55,21 @@ import org.semanticweb.elk.util.collections.chains.AbstractChain;
 public class ContextImpl implements Context {
 
 	// logger for this class
-	//private static final Logger LOGGER_ = Logger.getLogger(ContextImpl.class);
+	// private static final Logger LOGGER_ =
+	// Logger.getLogger(ContextImpl.class);
 
 	/**
-	 * the root {@link IndexedClassExpression} for which the
-	 * {@link #superClassExpressions_} are computed
+	 * the root {@link IndexedClassExpression} for which the {@link #subsumers_}
+	 * are computed
 	 * 
 	 */
 	private final IndexedClassExpression root_;
 
 	/**
-	 * the representation of all derived {@link SuperClassExpression}s computed
-	 * for this {@link Context}; these should be super-classes of {@link #root_}
+	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
+	 * super-classes) of {@link #root_}
 	 */
-	private final Set<IndexedClassExpression> superClassExpressions_;
+	private final Set<IndexedClassExpression> subsumers_;
 
 	/**
 	 * the indexed representation of all derived {@link BackwardLink}s computed
@@ -76,7 +77,10 @@ public class ContextImpl implements Context {
 	 */
 	private Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty_ = null;
 
-	private Map<IndexedDisjointnessAxiom, Integer> disjointnessAxioms_;
+	/**
+	 * 
+	 */
+	private Map<IndexedDisjointnessAxiom, Boolean> disjointnessAxioms_;
 
 	/**
 	 * the rules that should be applied to each derived {@link BackwardLink} in
@@ -96,14 +100,13 @@ public class ContextImpl implements Context {
 	private final AtomicBoolean isActive_;
 
 	/**
-	 * {@code true} if all derived {@link SuperClassExpression} of
+	 * {@code true} if all derived {@link Subsumer} of
 	 * {@link #root_} have been computed.
 	 */
 	protected volatile boolean isSaturated = false;
 
 	/**
-	 * {@code true} if {@code owl:Nothing} is stored in
-	 * {@link #superClassExpressions_}
+	 * {@code true} if {@code owl:Nothing} is stored in {@link #subsumers_}
 	 */
 	protected volatile boolean isInconsistent = false;
 
@@ -117,8 +120,7 @@ public class ContextImpl implements Context {
 		this.root_ = root;
 		this.toDo_ = new ConcurrentLinkedQueue<Conclusion>();
 		this.isActive_ = new AtomicBoolean(false);
-		this.superClassExpressions_ = new ArrayHashSet<IndexedClassExpression>(
-				13);
+		this.subsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
 	}
 
 	@Override
@@ -127,8 +129,8 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public Set<IndexedClassExpression> getSuperClassExpressions() {
-		return superClassExpressions_;
+	public Set<IndexedClassExpression> getSubsumers() {
+		return subsumers_;
 	}
 
 	@Override
@@ -151,34 +153,55 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public int addDisjointnessAxiom(IndexedDisjointnessAxiom disjointnessAxiom) {
+	public boolean addDisjointnessAxiom(
+			IndexedDisjointnessAxiom disjointnessAxiom) {
 		if (disjointnessAxioms_ == null) {
-			disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointnessAxiom, Integer>();
+			disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointnessAxiom, Boolean>();
 		}
-		Integer counter = disjointnessAxioms_.get(disjointnessAxiom);
-		if (counter == null)
-			counter = 0;
-		disjointnessAxioms_.put(disjointnessAxiom, counter + 1);
-		return counter;
+		Boolean inconsistency = disjointnessAxioms_.get(disjointnessAxiom);
+		if (inconsistency == null)
+			inconsistency = false;
+		else if (inconsistency == true)
+			// nothing changes
+			return false;
+		else
+			inconsistency = true;
+		disjointnessAxioms_.put(disjointnessAxiom, inconsistency);
+		return true;
 	}
 
 	@Override
-	public int removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+	public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
 		if (disjointnessAxioms_ == null) {
-			return 0;
+			return false;
 		}
-		Integer counter = disjointnessAxioms_.get(axiom);
-
-		if (counter > 0)
-			disjointnessAxioms_.put(axiom, counter - 1);
-		return counter;
+		Boolean inconcistency = disjointnessAxioms_.get(axiom);
+		if (inconcistency == null)
+			return false;
+		if (inconcistency)
+			disjointnessAxioms_.put(axiom, false);
+		else {
+			// inconcistency = false
+			disjointnessAxioms_.remove(axiom);
+			if (disjointnessAxioms_.isEmpty())
+				disjointnessAxioms_ = null;
+		}
+		return true;
 	}
 
 	@Override
-	public int containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		Integer counter = disjointnessAxioms_.get(axiom);
+	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+		if (disjointnessAxioms_ == null)
+			return false;
+		return disjointnessAxioms_.containsKey(axiom);
+	}
 
-		return counter == null ? 0 : counter;
+	@Override
+	public boolean inconsistencyDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+		Boolean inconsistency = disjointnessAxioms_.get(axiom);
+		if (inconsistency == null)
+			return false;
+		return inconsistency;
 	}
 
 	@Override
@@ -197,18 +220,18 @@ public class ContextImpl implements Context {
 	public boolean addBackwardLink(BackwardLink link) {
 		Context source = link.getSource();
 		IndexedPropertyChain relation = link.getRelation();
-		
+
 		if (backwardLinksByObjectProperty_ == null)
 			backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
-		
+
 		return backwardLinksByObjectProperty_.add(relation, source);
-		
-		/*if (changed && source.isSaturated())
-			LOGGER_.error(getRoot()
-					+ ": adding a backward link to a saturated context: "
-					+ link);
-		
-		return changed;*/
+
+		/*
+		 * if (changed && source.isSaturated()) LOGGER_.error(getRoot() +
+		 * ": adding a backward link to a saturated context: " + link);
+		 * 
+		 * return changed;
+		 */
 	}
 
 	@Override
@@ -228,20 +251,20 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public boolean addSuperClassExpression(IndexedClassExpression expression) {
-		return superClassExpressions_.add(expression);
-		
-		/*if (changed && isSaturated) 
-			LOGGER_.error(getRoot()
-					+ ": adding a superclass to a saturated context: "
-					+ expression);
-		
-		return changed;*/
+	public boolean addSubsumer(IndexedClassExpression expression) {
+		return subsumers_.add(expression);
+
+		/*
+		 * if (changed && isSaturated) LOGGER_.error(getRoot() +
+		 * ": adding a superclass to a saturated context: " + expression);
+		 * 
+		 * return changed;
+		 */
 	}
 
 	@Override
-	public boolean removeSuperClassExpression(IndexedClassExpression expression) {
-		return superClassExpressions_.remove(expression);
+	public boolean removeSubsumer(IndexedClassExpression expression) {
+		return subsumers_.remove(expression);
 	}
 
 	@Override
@@ -300,13 +323,13 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public boolean containsSuperClassExpression(
-			IndexedClassExpression expression) {
-		return superClassExpressions_.contains(expression);
+	public boolean containsSubsumer(IndexedClassExpression expression) {
+		return subsumers_.contains(expression);
 	}
 
 	@Override
 	public String toString() {
 		return root_.toString();
 	}
+
 }

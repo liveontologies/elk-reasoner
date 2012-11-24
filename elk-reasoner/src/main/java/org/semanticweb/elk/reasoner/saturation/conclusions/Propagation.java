@@ -74,7 +74,7 @@ public class Propagation extends AbstractConclusion {
 		Collection<Context> targets = backLinks.get(relation_);
 
 		for (Context target : targets) {
-			engine.produce(target, new NegativeSuperClassExpression(carry_));
+			engine.produce(target, new NegativeSubsumer(carry_));
 		}
 	}
 
@@ -157,7 +157,7 @@ public class Propagation extends AbstractConclusion {
 				for (IndexedClassExpression carry : propagationsByObjectProperty_
 						.get(link.getRelation()))
 					engine.produce(link.getSource(),
-							new NegativeSuperClassExpression(carry));
+							new NegativeSubsumer(carry));
 			} finally {
 				// stats.timeObjectSomeValuesFromBackwardLinkRule +=
 				// CachedTimeThread.currentTimeMillis;

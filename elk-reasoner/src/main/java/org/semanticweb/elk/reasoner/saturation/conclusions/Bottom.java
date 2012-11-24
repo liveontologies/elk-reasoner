@@ -75,7 +75,7 @@ public class Bottom extends AbstractConclusion {
 				// superclasses
 				engine.produce(
 						target,
-						new PositiveSuperClassExpression(engine.getOwlNothing()));
+						new PositiveSubsumer(engine.getOwlNothing()));
 			}
 		}
 	}
@@ -114,7 +114,7 @@ public class Bottom extends AbstractConclusion {
 			try {
 				engine.produce(
 						link.getSource(),
-						new PositiveSuperClassExpression(engine.getOwlNothing()));
+						new PositiveSubsumer(engine.getOwlNothing()));
 			} finally {
 				// stats.timeClassBottomBackwardLinkRule +=
 				// CachedTimeThread.currentTimeMillis;

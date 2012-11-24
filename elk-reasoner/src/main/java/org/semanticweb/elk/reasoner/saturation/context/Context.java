@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
@@ -57,12 +56,10 @@ public interface Context {
 
 	/**
 	 * @return the object representing all derived (implied)
-	 *         {@link SuperClassExpression}s of the root
+	 *         {@link IndexedClassExpression}s that subsume the root
 	 *         {@link IndexedClassExpression}
 	 */
-	public Set<IndexedClassExpression> getSuperClassExpressions();
-
-	// public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms();
+	public Set<IndexedClassExpression> getSubsumers();
 
 	/**
 	 * @return the {@link Context}s from which there exists an (implied)
@@ -122,28 +119,46 @@ public interface Context {
 	public boolean containsBackwardLink(BackwardLink link);
 
 	/**
-	 * Adds the given {@link SuperClassExpression} to this {@link Context}.
+	 * Adds the given {@link IndexedClassExpression} to the subsumers of the
+	 * root {@link IndexedClassExpression} of this {@link Context}.
 	 * 
 	 * @param expression
-	 *            the {@link IndexedClassExpression} being added to this
-	 *            {@link Context}
-	 * @return {@code true} if this {@link Context} has changed as the result of
-	 *         calling this method, i.e., the {@code SuperClassExpression} has
-	 *         not been added before for this {@link Context}. This method is
-	 *         not thread safe.
+	 *            the {@link IndexedClassExpression} to be added as a susbumer
+	 *            of the root {@link IndexedClassExpression} of this
+	 *            {@link Context}.
+	 * @return {@code true} if the set of subsumers of this {@link Context} has
+	 *         changed as the result of calling this method, i.e., the input
+	 *         {@code IndexedClassExpression} was not a subsumer before. This
+	 *         method is not thread safe.
 	 */
-	public boolean addSuperClassExpression(IndexedClassExpression expression);
+	public boolean addSubsumer(IndexedClassExpression expression);
 
 	/**
-	 * TODO
+	 * Removes the given {@link IndexedClassExpression} from the subsumers of
+	 * the root {@link IndexedClassExpression} of this {@link Context}.
 	 * 
 	 * @param expression
-	 * @return
+	 *            the {@link IndexedClassExpression} to be removed from the
+	 *            subsumers of the root in this {@link Context}
+	 * @return {@code true} if the set of subsumers of this {@link Context} has
+	 *         changed as the result of calling this method, i.e., the input
+	 *         {@code IndexedClassExpression} was a subsumer before. This method
+	 *         is not thread safe.
 	 */
-	public boolean removeSuperClassExpression(IndexedClassExpression expression);
+	public boolean removeSubsumer(IndexedClassExpression expression);
 
-	public boolean containsSuperClassExpression(
-			IndexedClassExpression expression);
+	/**
+	 * Tests whether the given {@link IndexedClassExpression} is a subsumer of
+	 * the root {@link IndexedClassExpression} of this {@link Context}.
+	 * 
+	 * @param expression
+	 *            the {@link IndexedClassExpression} to be tested for this
+	 *            {@link Context}
+	 * @return {@code true} if the given {@link IndexedClassExpression} is a
+	 *         subsumer of the root in this {@link Context}. This method is not
+	 *         thread safe.
+	 */
+	public boolean containsSubsumer(IndexedClassExpression expression);
 
 	/**
 	 * Adds one instance of {@link IndexedDisjointnessAxiom} to this
@@ -152,34 +167,43 @@ public interface Context {
 	 * @param axiom
 	 *            the {@link IndexedDisjointnessAxiom} to be added to this
 	 *            {@link Context}
-	 * @return the number of occurrences of the given
-	 *         {@link IndexedDisjointnessAxiom} in this {@link Context} before
-	 *         this operation
+	 * @return {@code true} if adding the axiom changes the state of this
+	 *         {@link Context}, i.e., some rules need to be applied
 	 */
-	public int addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+	public boolean addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * Removes one instance of the given {@link IndexedDisjointnessAxiom} from
 	 * this {@link Context}.
 	 * 
 	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be added to this
+	 *            the {@link IndexedDisjointnessAxiom} to be removed from this
 	 *            {@link Context}
-	 * @return the number of occurrences of the given
-	 *         {@link IndexedDisjointnessAxiom} in this {@link Context} before
-	 *         this operation
+	 * @return {@code true} if the state of this {@link Context} has changed as
+	 *         the result of calling this method, i.e., the context has
+	 *         contained this {@link IndexedDisjointnessAxiom}
 	 */
-	public int removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+	public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * @param axiom
 	 *            the {@link IndexedDisjointnessAxiom} to be checked for
 	 *            occurrences in this {@link Context}
 	 * 
-	 * @return the number of occurrences of the given
-	 *         {@link IndexedDisjointnessAxiom} in this {@link Context}
+	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} occurs
+	 *         in this {@link Context}
 	 */
-	public int containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+
+	/**
+	 * @param axiom
+	 *            the {@link IndexedDisjointnessAxiom} to be checked for causing
+	 *            inconsistency in this {@link Context}
+	 * 
+	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} causes
+	 *         inconsistency of this {@link Context}
+	 */
+	public boolean inconsistencyDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this
@@ -243,8 +267,10 @@ public interface Context {
 	public boolean isInconsistent();
 
 	/**
-	 * @return {@code true} if all implied {@link SuperClassExpression}s have
-	 *         computed for the root of this {@link Context}.
+	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
+	 *         as determined by the function
+	 *         {@link Conclusion#getSourceContext(Context)}, are already
+	 *         computed.
 	 */
 	public boolean isSaturated();
 
@@ -256,10 +282,11 @@ public interface Context {
 	public boolean setInconsistent(boolean consistent);
 
 	/**
-	 * Marks this {@code Context} as saturated. After this call there should not
-	 * be further {@link SuperClassExpression}s added to this {@link Context}.
+	 * Marks this {@code Context} as saturated. This means that all all
+	 * {@link Conclusion}s for this {@link Context} are already computed.
 	 * 
-	 * @return the previous saturated status value
+	 * @return the previous value of the saturation state for this
+	 *         {@link Context}
 	 */
 	public boolean setSaturated(boolean saturated);
 

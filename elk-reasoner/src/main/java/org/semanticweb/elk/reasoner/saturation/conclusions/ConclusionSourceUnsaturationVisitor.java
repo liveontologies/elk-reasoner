@@ -47,12 +47,12 @@ public class ConclusionSourceUnsaturationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(NegativeSuperClassExpression negSCE, Context context) {
+	public Boolean visit(NegativeSubsumer negSCE, Context context) {
 		return mark(negSCE, context);
 	}
 
 	@Override
-	public Boolean visit(PositiveSuperClassExpression posSCE, Context context) {
+	public Boolean visit(PositiveSubsumer posSCE, Context context) {
 		return mark(posSCE, context);
 	}
 

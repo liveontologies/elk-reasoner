@@ -47,10 +47,10 @@ public class ConclusionsCounter {
 	int forwLinkInfNo;
 	int forwLinkNo;
 	long forwLinkTime;
-	int posSuperClassExpressionInfNo;
-	int negSuperClassExpressionInfNo;
-	int superClassExpressionNo;
-	long superClassExpressionTime;
+	int posSubsumerInfNo;
+	int negSubsumerInfNo;
+	int subsumersNo;
+	long subsumersTime;
 
 	/**
 	 * @return the number of times a {@link BackwardLink} has been produced
@@ -97,35 +97,33 @@ public class ConclusionsCounter {
 	}
 
 	/**
-	 * @return the number of times a {@link PositiveSuperClassExpression} has
+	 * @return the number of times a {@link PositiveSubsumer} has
 	 *         been produced
 	 */
 	public int getPositiveSuperClassExpressionInfNo() {
-		return posSuperClassExpressionInfNo;
+		return posSubsumerInfNo;
 	}
 
 	/**
-	 * @return the number of times a {@link NegativeSuperClassExpression} has
+	 * @return the number of times a {@link NegativeSubsumer} has
 	 *         been produced
 	 */
 	public int getNegativeSuperClassExpressionInfNo() {
-		return negSuperClassExpressionInfNo;
+		return negSubsumerInfNo;
 	}
 
 	/**
-	 * @return the number of different {@link SuperClassExpression}s produced
-	 *         and stored
+	 * @return the number of different {@link Subsumer}s produced and stored
 	 */
-	public int getSuperClassExpressionNo() {
-		return superClassExpressionNo;
+	public int getSubsumerNo() {
+		return subsumersNo;
 	}
 
 	/**
-	 * @return the time spent within
-	 *         {@link SuperClassExpression#apply(RuleEngine, Context)}
+	 * @return the time spent within {@link Subsumer#apply(RuleEngine, Context)}
 	 */
-	public long getSuperClassExpressionTime() {
-		return superClassExpressionTime;
+	public long getSubsumerTime() {
+		return subsumersTime;
 	}
 
 	/**
@@ -138,10 +136,10 @@ public class ConclusionsCounter {
 		forwLinkInfNo = 0;
 		forwLinkNo = 0;
 		forwLinkTime = 0;
-		posSuperClassExpressionInfNo = 0;
-		negSuperClassExpressionInfNo = 0;
-		superClassExpressionNo = 0;
-		superClassExpressionTime = 0;
+		posSubsumerInfNo = 0;
+		negSubsumerInfNo = 0;
+		subsumersNo = 0;
+		subsumersTime = 0;
 	}
 
 	/**
@@ -160,10 +158,10 @@ public class ConclusionsCounter {
 		this.forwLinkInfNo += statistics.forwLinkInfNo;
 		this.forwLinkNo += statistics.forwLinkNo;
 		this.forwLinkTime += statistics.forwLinkTime;
-		this.posSuperClassExpressionInfNo += statistics.posSuperClassExpressionInfNo;
-		this.negSuperClassExpressionInfNo += statistics.negSuperClassExpressionInfNo;
-		this.superClassExpressionNo += statistics.superClassExpressionNo;
-		this.superClassExpressionTime += statistics.superClassExpressionTime;
+		this.posSubsumerInfNo += statistics.posSubsumerInfNo;
+		this.negSubsumerInfNo += statistics.negSubsumerInfNo;
+		this.subsumersNo += statistics.subsumersNo;
+		this.subsumersTime += statistics.subsumersTime;
 		statistics.reset();
 	}
 
