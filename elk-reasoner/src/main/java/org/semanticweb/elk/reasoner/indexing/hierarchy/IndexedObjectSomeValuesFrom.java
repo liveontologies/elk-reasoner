@@ -136,7 +136,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	public static void generatePropagations(SaturationState.Writer writer,
 			IndexedPropertyChain property, Context context) {
-		for (IndexedClassExpression ice : context.getSuperClassExpressions()) {
+		for (IndexedClassExpression ice : context.getSubsumers()) {
 			ThisCompositionRule rule = ice.getCompositionRuleChain().find(
 					ThisCompositionRule.MATCHER_);
 			if (rule == null)
@@ -231,8 +231,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 					// TODO: create a composition rule to deal with reflexivity
 					// propagating to the this context if relation is reflexive
 					if (relation.getSaturated().isReflexive())
-						writer.produce(context,
-								new NegativeSubsumer(e));
+						writer.produce(context, new NegativeSubsumer(e));
 				}
 			} finally {
 				// stats.timeObjectSomeValuesFromCompositionRule +=
