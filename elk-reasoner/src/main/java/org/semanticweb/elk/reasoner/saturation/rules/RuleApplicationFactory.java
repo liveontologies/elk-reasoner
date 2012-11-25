@@ -27,13 +27,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.TimedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PreprocessedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -57,22 +60,15 @@ public class RuleApplicationFactory implements
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
+	final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
+	final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
+
 	final SaturationState saturationState;
-
-	/**
-	 * The {@link ConclusionsCounter} aggregated for all workers
-	 */
-	private final ConclusionsCounter aggregatedConclusionsCounter_;
-
-	/**
-	 * The {@link RuleStatistics} aggregated for all workers
-	 */
-	private final RuleStatistics aggregatedRuleStats_;
 
 	/**
 	 * The {@link ThisStatistics} aggregated for all workers
 	 */
-	private final ThisStatistics aggregatedFactoryStats_;
+	private final ThisStatistics aggregatedStats_;
 
 	private final boolean trackModifiedContexts_;
 
@@ -82,9 +78,7 @@ public class RuleApplicationFactory implements
 
 	public RuleApplicationFactory(final SaturationState saturationState,
 			boolean trackModifiedContexts) {
-		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
-		this.aggregatedRuleStats_ = new RuleStatistics();
-		this.aggregatedFactoryStats_ = new ThisStatistics();
+		this.aggregatedStats_ = new ThisStatistics();
 		this.saturationState = saturationState;
 		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
@@ -100,168 +94,14 @@ public class RuleApplicationFactory implements
 
 	@Override
 	public void finish() {
-		checkStatistics();
+		aggregatedStats_.check();
 	}
 
 	/**
 	 * Prints statistic of rule applications
 	 */
 	public void printStatistics() {
-		if (LOGGER_.isDebugEnabled()) {
-			checkStatistics();
-			// CONTEXT STATISTICS:
-			if (aggregatedFactoryStats_.countCreatedContexts > 0)
-				LOGGER_.debug("Contexts created: "
-						+ aggregatedFactoryStats_.countCreatedContexts);
-			if (aggregatedFactoryStats_.countCreatedContexts > 0)
-				LOGGER_.debug("Contexts processsing: "
-						+ aggregatedFactoryStats_.contContextProcess + " ("
-						+ aggregatedFactoryStats_.timeContextProcess + " ms)");
-			// CONCLUSIONS STATISTICS:
-			if (aggregatedConclusionsCounter_
-					.getPositiveSuperClassExpressionInfNo()
-					+ aggregatedConclusionsCounter_
-							.getNegativeSuperClassExpressionInfNo() > 0)
-				LOGGER_.debug("Super classes positive/negative/unique: "
-						+ aggregatedConclusionsCounter_
-								.getPositiveSuperClassExpressionInfNo()
-						+ "/"
-						+ aggregatedConclusionsCounter_
-								.getNegativeSuperClassExpressionInfNo()
-						+ "/"
-						+ aggregatedConclusionsCounter_
-								.getSubsumerNo()
-						+ " ("
-						+ aggregatedConclusionsCounter_
-								.getSubsumerTime() + " ms)");
-			if (aggregatedConclusionsCounter_.getBackLinkInfNo() > 0)
-				LOGGER_.debug("Backward Links produced/unique: "
-						+ aggregatedConclusionsCounter_.getBackLinkInfNo()
-						+ "/" + aggregatedConclusionsCounter_.getBackLinkNo()
-						+ " ("
-						+ aggregatedConclusionsCounter_.getBackLinkTime()
-						+ " ms)");
-			if (aggregatedConclusionsCounter_.getForwLinkInfNo() > 0)
-				LOGGER_.debug("Forward Links produced/unique: "
-						+ aggregatedConclusionsCounter_.getForwLinkInfNo()
-						+ "/" + aggregatedConclusionsCounter_.getForwLinkNo()
-						+ " ("
-						+ aggregatedConclusionsCounter_.getForwLinkTime()
-						+ " ms)");
-			LOGGER_.debug("Total conclusion processing time: "
-					+ (aggregatedConclusionsCounter_
-							.getSubsumerTime()
-							+ aggregatedConclusionsCounter_.getBackLinkTime() + aggregatedConclusionsCounter_
-								.getForwLinkTime()) + " ms"
-
-			);
-
-			// RULES STATISTICS:
-			if (aggregatedRuleStats_
-					.getObjectSomeValuesFromCompositionRuleCount() > 0)
-				LOGGER_.debug("ObjectSomeValuesFrom composition rules: "
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromCompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromCompositionRuleTime()
-						+ " ms)");
-			if (aggregatedRuleStats_
-					.getObjectSomeValuesFromDecompositionRuleCount() > 0)
-				LOGGER_.debug("ObjectSomeValuesFrom decomposition rules: "
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromDecompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromDecompositionRuleTime()
-						+ " ms)");
-			if (aggregatedRuleStats_
-					.getObjectSomeValuesFromBackwardLinkRuleCount() > 0)
-				LOGGER_.debug("ObjectSomeValuesFrom backward link rules: "
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromBackwardLinkRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromBackwardLinkRuleTime()
-						+ " ms)");
-			if (aggregatedRuleStats_
-					.getObjectIntersectionOfCompositionRuleCount() > 0)
-				LOGGER_.debug("ObjectIntersectionOf composition rules: "
-						+ aggregatedRuleStats_
-								.getObjectIntersectionOfCompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectIntersectionOfCompositionRuleTime()
-						+ " ms)");
-			if (aggregatedRuleStats_
-					.getObjectIntersectionOfDecompositionRuleCount() > 0)
-				LOGGER_.debug("ObjectIntersectionOf decomposition rules: "
-						+ aggregatedRuleStats_
-								.getObjectIntersectionOfDecompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectIntersectionOfDecompositionRuleTime()
-						+ " ms)");
-			if (aggregatedRuleStats_.getForwardLinkBackwardLinkRuleCount() > 0)
-				LOGGER_.debug("ForwardLink backward link rules: "
-						+ aggregatedRuleStats_
-								.getForwardLinkBackwardLinkRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getForwardLinkBackwardLinkRuleTime() + " ms)");
-			if (aggregatedRuleStats_.getClassDecompositionRuleCount() > 0)
-				LOGGER_.debug("Class decomposition rules: "
-						+ aggregatedRuleStats_.getClassDecompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_.getClassDecompositionRuleTime()
-						+ "ms)");
-			if (aggregatedRuleStats_.getClassBottomBackwardLinkRuleCount() > 0)
-				LOGGER_.debug("owl:Nothing backward link rules: "
-						+ aggregatedRuleStats_
-								.getClassBottomBackwardLinkRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getClassBottomBackwardLinkRuleTime() + " ms)");
-			if (aggregatedRuleStats_.getSubClassOfRuleCount() > 0)
-				LOGGER_.debug("SubClassOf expansion rules: "
-						+ aggregatedRuleStats_.getSubClassOfRuleCount() + " ("
-						+ aggregatedRuleStats_.getSubClassOfRuleTime() + " ms)");
-			LOGGER_.debug("Total rules time: "
-					+ (aggregatedRuleStats_
-							.getObjectSomeValuesFromCompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getObjectSomeValuesFromDecompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getObjectSomeValuesFromBackwardLinkRuleTime()
-							+ aggregatedRuleStats_
-									.getObjectIntersectionOfCompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getObjectIntersectionOfDecompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getForwardLinkBackwardLinkRuleTime()
-							+ aggregatedRuleStats_
-									.getClassDecompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getClassBottomBackwardLinkRuleTime() + aggregatedRuleStats_
-								.getSubClassOfRuleTime()) + " ms");
-		}
-	}
-
-	private void checkStatistics() {
-		if (aggregatedFactoryStats_.contContextProcess < aggregatedFactoryStats_.countCreatedContexts)
-			LOGGER_.error("More contexts than context activations!");
-		if (aggregatedConclusionsCounter_
-				.getPositiveSuperClassExpressionInfNo()
-				+ aggregatedConclusionsCounter_
-						.getNegativeSuperClassExpressionInfNo() < aggregatedConclusionsCounter_
-					.getSubsumerNo())
-			LOGGER_.error("More unique derived superclasses than produced!");
-		if (aggregatedConclusionsCounter_.getBackLinkInfNo() < aggregatedConclusionsCounter_
-				.getBackLinkNo())
-			LOGGER_.error("More unique backward links than produced!");
-		if (aggregatedConclusionsCounter_.getForwLinkInfNo() < aggregatedConclusionsCounter_
-				.getForwLinkNo())
-			LOGGER_.error("More unique forward links than produced!");
+		aggregatedStats_.print();
 	}
 
 	static ContextCreationListener getEngineListener(
@@ -282,28 +122,21 @@ public class RuleApplicationFactory implements
 	public class Engine implements InputProcessor<IndexedClassExpression>,
 			RuleEngine {
 
-		protected final SaturationState.Writer saturationStateWriter;
+		private final SaturationState.Writer saturationStateWriter_;
 
-		protected final ConclusionVisitor<Boolean> conclusionProcessor;
+		private final ConclusionVisitor<?> conclusionProcessor_;
 
-		/**
-		 * Local {@link ConclusionsCounter} created for every worker
-		 */
-		protected final ConclusionsCounter conclusionsCounter = new ConclusionsCounter();
-		/**
-		 * Local {@link RuleStatistics} created for every worker
-		 */
-		protected final RuleStatistics ruleStats = new RuleStatistics();
 		/**
 		 * Local {@link ThisStatistics} created for every worker
 		 */
-		protected final ThisStatistics factoryStats;
+		protected final ThisStatistics localStatistics;
 
 		protected Engine(SaturationState.Writer saturationStateWriter,
-				ThisStatistics factoryStats) {
-			this.conclusionProcessor = getConclusionProcessor(saturationStateWriter);
-			this.saturationStateWriter = saturationStateWriter;
-			this.factoryStats = factoryStats;
+				ThisStatistics localStatistics) {
+			this.conclusionProcessor_ = getConclusionProcessor(
+					saturationStateWriter, localStatistics);
+			this.saturationStateWriter_ = saturationStateWriter;
+			this.localStatistics = localStatistics;
 		}
 
 		protected Engine(SaturationState.Writer saturationStateWriter) {
@@ -324,23 +157,19 @@ public class RuleApplicationFactory implements
 			this(listener, new ThisStatistics());
 		}
 
-		protected ConclusionVisitor<Boolean> getConclusionVisitor() {
-			return conclusionProcessor;
-		}
-
 		@Override
 		public void submit(IndexedClassExpression job) {
-			saturationStateWriter.getCreateContext(job);
+			saturationStateWriter_.getCreateContext(job);
 		}
 
 		@Override
 		public void process() {
-			factoryStats.timeContextProcess -= CachedTimeThread.currentTimeMillis;
+			localStatistics.timeContextProcess -= CachedTimeThread.currentTimeMillis;
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
 
-				Context nextContext = saturationStateWriter.pollForContext();
+				Context nextContext = saturationStateWriter_.pollForContext();
 
 				if (nextContext == null) {
 					break;
@@ -348,27 +177,13 @@ public class RuleApplicationFactory implements
 					process(nextContext);
 				}
 			}
-			factoryStats.timeContextProcess += CachedTimeThread.currentTimeMillis;
+			localStatistics.timeContextProcess += CachedTimeThread.currentTimeMillis;
 		}
 
 		@Override
 		public void finish() {
-			aggregatedConclusionsCounter_.merge(conclusionsCounter);
-			aggregatedRuleStats_.merge(ruleStats);
-			aggregatedFactoryStats_.merge(factoryStats);
-		}
-
-		/**
-		 * @return the object collecting statistics of rule applications
-		 */
-		@Override
-		public ConclusionsCounter getConclusionsCounter() {
-			return this.conclusionsCounter;
-		}
-
-		@Override
-		public RuleStatistics getRulesTimer() {
-			return this.ruleStats;
+			aggregatedStats_.add(localStatistics);
+			localStatistics.reset();
 		}
 
 		/**
@@ -378,7 +193,7 @@ public class RuleApplicationFactory implements
 		 *            the context in which to process the scheduled items
 		 */
 		protected void process(Context context) {
-			factoryStats.contContextProcess++;
+			localStatistics.contContextProcess++;
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
 				if (conclusion == null) {
@@ -389,23 +204,95 @@ public class RuleApplicationFactory implements
 						break;
 					}
 				}
-				conclusion.accept(conclusionProcessor, context);
+				conclusion.accept(conclusionProcessor_, context);
 			}
 		}
 
-		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				SaturationState.Writer saturationStateWriter) {
-			return new CombinedConclusionVisitor(
-					new ConclusionInsertionVisitor(),
-					new ConclusionApplicationVisitor(saturationStateWriter));
+		/**
+		 * Filters the {@link ConclusionVisitor} that applies inference rules to
+		 * {@link Conclusion}s by wrapping, if necessary, with the code
+		 * producing statistics
+		 * 
+		 * @param ruleProcessor
+		 *            the {@link ConclusionVisitor} to be wrapped
+		 * @param localStatistics
+		 *            the object accumulating local statistics for this worker
+		 * @return the input {@link ConclusionVisitor} possibly wrapped with
+		 *         some code for producing statistics
+		 */
+		protected ConclusionVisitor<Boolean> filterRuleConclusionProcessor(
+				ConclusionVisitor<Boolean> ruleProcessor,
+				ThisStatistics localStatistics) {
+			if (COLLECT_CONCLUSION_COUNTS) {
+				return new PreprocessedConclusionVisitor<Boolean>(
+						new CountingConclusionVisitor(
+								localStatistics.conclusionsStatistics_
+										.getUsedConclusionCounts()),
+						ruleProcessor);
+			} else
+				return ruleProcessor;
 		}
 
-		protected ConclusionVisitor<Boolean> getConclusionProcessor(
-				SaturationState.Writer saturationStateWriter) {
-			return trackModifiedContexts_ ? new CombinedConclusionVisitor(
-					getBaseConclusionProcessor(saturationStateWriter),
-					new ConclusionSourceUnsaturationVisitor(saturationStateWriter))
-					: getBaseConclusionProcessor(saturationStateWriter);
+		/**
+		 * Returns the base {@link ConclusionVisitor} that performs processing
+		 * of {@code Conclusion}s within a {@link Context}. This can be further
+		 * wrapped in some other code.
+		 * 
+		 * @param saturationStateWriter
+		 *            the {@link SaturationState.Writer} using which one can
+		 *            produce new {@link Conclusion}s in {@link Context}s
+		 * @param localStatistics
+		 *            the object accumulating local statistics for this worker
+		 * @return the base {@link ConclusionVisitor} that performs processing
+		 *         of {@code Conclusion}s within a {@link Context}
+		 */
+		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
+				SaturationState.Writer saturationStateWriter,
+				ThisStatistics localStatistics) {
+			return new CombinedConclusionVisitor(
+					new ConclusionInsertionVisitor(),
+					filterRuleConclusionProcessor(
+							new ConclusionApplicationVisitor(
+									saturationStateWriter), localStatistics));
+		}
+
+		/**
+		 * Returns the final {@link ConclusionVisitor} that is used by this
+		 * {@link Engine} for processing {@code Conclusion}s within
+		 * {@link Context}s
+		 * 
+		 * @param saturationStateWriter
+		 *            the {@link SaturationState.Writer} using which one can
+		 *            produce new {@link Conclusion}s in {@link Context}s
+		 * @param localStatistics
+		 *            the object accumulating local statistics for this worker
+		 * @return the final {@link ConclusionVisitor} that is used by this
+		 *         {@link Engine} for processing {@code Conclusion}s within
+		 *         {@link Context}s
+		 */
+		protected ConclusionVisitor<?> getConclusionProcessor(
+				SaturationState.Writer saturationStateWriter,
+				ThisStatistics localStatistics) {
+			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(
+					saturationStateWriter, localStatistics);
+			if (trackModifiedContexts_)
+				result = new CombinedConclusionVisitor(result,
+						new ConclusionSourceUnsaturationVisitor(
+								saturationStateWriter));
+			if (COLLECT_CONCLUSION_COUNTS) {
+				result = new PreprocessedConclusionVisitor<Boolean>(
+						new CountingConclusionVisitor(
+								localStatistics.conclusionsStatistics_
+										.getProcessedConclusionCounts()),
+						result);
+			}
+			if (COLLECT_CONCLUSION_TIMES)
+				return new TimedConclusionVisitor(
+						localStatistics.conclusionsStatistics_
+								.getConclusionTimers(),
+						result);
+			else
+				return result;
 		}
 	}
 
@@ -417,11 +304,14 @@ public class RuleApplicationFactory implements
 	 */
 	static class ThisStatistics {
 
+		private final ConclusionStatistics conclusionsStatistics_ = new ConclusionStatistics();
+
+		private final RuleStatistics ruleStatistics_ = new RuleStatistics();
+
 		/**
 		 * The number of created contexts
 		 */
 		int countCreatedContexts;
-
 		/**
 		 * the number of times a context has been processed using
 		 * {@link Engine#process(Context)}
@@ -433,9 +323,37 @@ public class RuleApplicationFactory implements
 		 */
 		long timeContextProcess;
 
-		public synchronized void merge(ThisStatistics statistics) {
+		public void reset() {
+			conclusionsStatistics_.reset();
+			ruleStatistics_.reset();
+			countCreatedContexts = 0;
+			timeContextProcess = 0;
+		}
+
+		public synchronized void add(ThisStatistics statistics) {
+			this.conclusionsStatistics_.add(statistics.conclusionsStatistics_);
+			this.ruleStatistics_.add(statistics.ruleStatistics_);
 			this.contContextProcess += statistics.contContextProcess;
 			this.timeContextProcess += statistics.timeContextProcess;
+		}
+
+		public void check() {
+			if (countCreatedContexts > contContextProcess)
+				LOGGER_.error("More contexts than context activations!");
+			conclusionsStatistics_.check();
+			ruleStatistics_.check();
+		}
+
+		public void print() {
+			if (!LOGGER_.isDebugEnabled())
+				return;
+			if (countCreatedContexts > 0)
+				LOGGER_.debug("Contexts created: " + countCreatedContexts);
+			if (countCreatedContexts > 0)
+				LOGGER_.debug("Contexts processsing: " + contContextProcess
+						+ " (" + timeContextProcess + " ms)");
+			conclusionsStatistics_.print();
+			ruleStatistics_.print();
 		}
 	}
 

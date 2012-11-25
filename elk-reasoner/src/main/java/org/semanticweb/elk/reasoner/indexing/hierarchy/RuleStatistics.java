@@ -29,7 +29,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * 
  */
 public class RuleStatistics extends
-		org.semanticweb.elk.reasoner.saturation.conclusions.RuleStatistics {
+		org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics {
 
 	/**
 	 * the number of rule applications for composition of
@@ -278,7 +278,7 @@ public class RuleStatistics extends
 	}
 
 	public synchronized void merge(RuleStatistics stats) {
-		super.merge(stats);
+		super.add(stats);
 		this.countObjectIntersectionOfCompositionRule += stats.countObjectIntersectionOfCompositionRule;
 		this.timeObjectIntersectionOfCompositionRule += stats.timeObjectIntersectionOfCompositionRule;
 		this.countObjectIntersectionOfDecompositionRule += stats.countObjectIntersectionOfDecompositionRule;

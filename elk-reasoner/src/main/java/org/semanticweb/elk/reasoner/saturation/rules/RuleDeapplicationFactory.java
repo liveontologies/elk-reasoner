@@ -27,11 +27,11 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeapplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeletionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionOccurranceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 
 /**
  * Creates an engine which applies rules backwards, e.g., removes conclusions
@@ -88,10 +88,15 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				SaturationState.Writer saturationStateWriter) {
-			return new CombinedConclusionVisitor(new CombinedConclusionVisitor(
-					new ConclusionOccurranceCheckingVisitor(),
-					new ConclusionDeapplicationVisitor(saturationStateWriter)),
+				SaturationState.Writer saturationStateWriter,
+				ThisStatistics localStatistics) {
+			return new CombinedConclusionVisitor(
+					new CombinedConclusionVisitor(
+							new ConclusionOccurranceCheckingVisitor(),
+							filterRuleConclusionProcessor(
+									new ConclusionDeapplicationVisitor(
+											saturationStateWriter),
+									localStatistics)),
 					new ConclusionDeletionVisitor());
 		}
 	}

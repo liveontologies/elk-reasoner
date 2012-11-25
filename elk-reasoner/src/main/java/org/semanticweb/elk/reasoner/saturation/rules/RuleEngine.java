@@ -23,8 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
 
 /**
  * A common interface for engines used in the saturation for
@@ -72,10 +70,10 @@ public interface RuleEngine {
 	/**
 	 * @return the {@link ConclusionsCounter} of this {@link RuleEngine}.
 	 */
-	public ConclusionsCounter getConclusionsCounter();
+//	public ConclusionsCounter getConclusionsCounter();
 
 	/**
 	 * @return the {@link ConclusionsCounter} of this {@link RuleEngine}.
 	 */
-	public RuleStatistics getRulesTimer();
+//	public RuleStatistics getRulesTimer();
 }
