@@ -55,7 +55,7 @@ public class CombinedConclusionVisitor implements ConclusionVisitor<Boolean> {
 	}
 
 	@Override
-	public Boolean visit(Bottom bot, Context context) {
+	public Boolean visit(Contradiction bot, Context context) {
 		return first_.visit(bot, context) && second_.visit(bot, context);
 	}
 

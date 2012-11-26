@@ -53,8 +53,8 @@ public class CountingConclusionVisitor implements ConclusionVisitor<Integer> {
 	}
 
 	@Override
-	public Integer visit(Bottom bot, Context context) {
-		return counter_.countBottoms++;
+	public Integer visit(Contradiction bot, Context context) {
+		return counter_.countContradictions++;
 	}
 
 	@Override

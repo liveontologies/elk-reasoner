@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
+
 /*
  * #%L
  * ELK Reasoner
@@ -64,10 +65,10 @@ public class TimedConclusionVisitor implements ConclusionVisitor<Long> {
 	}
 
 	@Override
-	public Long visit(Bottom bot, Context context) {
-		timer_.timeBottoms -= CachedTimeThread.currentTimeMillis;
+	public Long visit(Contradiction bot, Context context) {
+		timer_.timeContradictions -= CachedTimeThread.currentTimeMillis;
 		processor_.visit(bot, context);
-		return timer_.timeBottoms += CachedTimeThread.currentTimeMillis;
+		return timer_.timeContradictions += CachedTimeThread.currentTimeMillis;
 	}
 
 	@Override

@@ -47,7 +47,7 @@ public class ConclusionInsertionVisitor implements ConclusionVisitor<Boolean> {
 	}
 
 	@Override
-	public Boolean visit(Bottom bot, Context context) {
+	public Boolean visit(Contradiction bot, Context context) {
 		return !context.setInconsistent(true);
 	}
 

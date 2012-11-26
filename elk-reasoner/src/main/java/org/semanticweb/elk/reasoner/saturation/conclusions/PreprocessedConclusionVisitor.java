@@ -60,7 +60,7 @@ public class PreprocessedConclusionVisitor<T> implements ConclusionVisitor<T> {
 	}
 
 	@Override
-	public T visit(Bottom bot, Context context) {
+	public T visit(Contradiction bot, Context context) {
 		preprocessor_.visit(bot, context);
 		return visitor_.visit(bot, context);
 	}

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -223,12 +223,12 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	/**
-	 * This composition rule can produce only {@link Bottom}. Each rule
+	 * This composition rule can produce only {@link Contradiction}. Each rule
 	 * for a member registers all other members with which this member occurs in
 	 * an {@link IndexedDisjointnessAxiom}. When the rule is applied, it is
 	 * checked if the intersection of this set of "forbidden subsumers" with the
 	 * subsumers derived in the context is non-empty, and if so, derives a
-	 * {@link Bottom}.
+	 * {@link Contradiction}.
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -260,7 +260,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		public void apply(SaturationState.Writer writer, Context context) {
 			if (!new LazySetIntersection<IndexedClassExpression>(
 					forbiddenSubsumers_, context.getSubsumers()).isEmpty()) {
-				writer.produce(context, new Bottom());
+				writer.produce(context, new Contradiction());
 			}
 		}
 

@@ -41,7 +41,7 @@ public interface ConclusionVisitor<R> {
 	
 	public R visit(ForwardLink link, Context context);
 	
-	public R visit(Bottom bot, Context context);
+	public R visit(Contradiction bot, Context context);
 
 	public R visit(Propagation propagation, Context context);
 

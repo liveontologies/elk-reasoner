@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Bottom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -92,7 +92,7 @@ public class IndexedClass extends IndexedClassEntity {
 			indexUpdater.addClass(elkClass);
 		}
 
-		if (negativeOccurrenceNo == 0 && increment > 0
+		if (negativeOccurrenceNo == 0 && negativeIncrement > 0
 				&& elkClass.equals(PredefinedElkClass.OWL_THING)) {
 			indexUpdater.add(new OwlThingContextInitializationRule());
 		}
@@ -105,7 +105,7 @@ public class IndexedClass extends IndexedClassEntity {
 			indexUpdater.removeClass(elkClass);
 		}
 
-		if (negativeOccurrenceNo == 0 && increment < 0
+		if (negativeOccurrenceNo == 0 && negativeIncrement < 0
 				&& elkClass.equals(PredefinedElkClass.OWL_THING)) {
 			indexUpdater.remove(new OwlThingContextInitializationRule());
 		}
@@ -123,7 +123,7 @@ public class IndexedClass extends IndexedClassEntity {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Producing owl:Nothing for " + context.getRoot());
 			}
-			writer.produce(context, new Bottom());
+			writer.produce(context, new Contradiction());
 		}
 	}
 

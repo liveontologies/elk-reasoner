@@ -67,7 +67,7 @@ public class ConclusionSourceUnsaturationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(Bottom bot, Context context) {
+	public Boolean visit(Contradiction bot, Context context) {
 		return mark(bot, context);
 	}
 

@@ -88,6 +88,10 @@ public class ConclusionStatistics {
 			LOGGER_.error("Forward Links" + ERR_MSG_MORE_USED);
 		if (usedConclusionCounts_.countPropagations > processedConclusionCounts_.countPropagations)
 			LOGGER_.error("Propagations" + ERR_MSG_MORE_USED);
+		if (usedConclusionCounts_.countContradictions > processedConclusionCounts_.countContradictions)
+			LOGGER_.error("Contradictions" + ERR_MSG_MORE_USED);
+		if (usedConclusionCounts_.countDisjointnessAxioms > processedConclusionCounts_.countDisjointnessAxioms)
+			LOGGER_.error("Disjointness Axioms" + ERR_MSG_MORE_USED);
 	}
 
 	public void print() {
@@ -97,49 +101,49 @@ public class ConclusionStatistics {
 			return;
 		if (processedConclusionCounts_.countPositiveSubsumers > 0
 				|| conclusionProcessingTimer_.timePositiveSubsumers > 0)
-			LOGGER_.debug("Positive Subsumers processed/used: "
+			LOGGER_.debug("Positive Subsumers produced/used: "
 					+ processedConclusionCounts_.countPositiveSubsumers + "/"
 					+ usedConclusionCounts_.countPositiveSubsumers + " ("
 					+ conclusionProcessingTimer_.timePositiveSubsumers
 					/ addCounter + " ms)");
 		if (processedConclusionCounts_.countNegativeSubsumers > 0
 				|| conclusionProcessingTimer_.timeNegativeSubsumers > 0)
-			LOGGER_.debug("Negative Subsumers processed/used: "
+			LOGGER_.debug("Negative Subsumers produced/used: "
 					+ processedConclusionCounts_.countNegativeSubsumers + "/"
 					+ usedConclusionCounts_.countNegativeSubsumers + " ("
 					+ conclusionProcessingTimer_.timeNegativeSubsumers
 					/ addCounter + " ms)");
 		if (processedConclusionCounts_.countBackwardLinks > 0
 				|| conclusionProcessingTimer_.timeBackwardLinks > 0)
-			LOGGER_.debug("Backward Links processed/used: "
+			LOGGER_.debug("Backward Links produced/used: "
 					+ processedConclusionCounts_.countBackwardLinks + "/"
 					+ usedConclusionCounts_.countBackwardLinks + " ("
 					+ conclusionProcessingTimer_.timeBackwardLinks / addCounter
 					+ " ms)");
 		if (processedConclusionCounts_.countForwardLinks > 0
 				|| conclusionProcessingTimer_.timeForwardLinks > 0)
-			LOGGER_.debug("Forward Links processed/used: "
+			LOGGER_.debug("Forward Links produced/used: "
 					+ processedConclusionCounts_.countForwardLinks + "/"
 					+ usedConclusionCounts_.countForwardLinks + " ("
 					+ conclusionProcessingTimer_.timeForwardLinks / addCounter
 					+ " ms)");
 		if (processedConclusionCounts_.countPropagations > 0
 				|| conclusionProcessingTimer_.timePropagations > 0)
-			LOGGER_.debug("Propagations processed/used: "
+			LOGGER_.debug("Propagations produced/used: "
 					+ processedConclusionCounts_.countPropagations + "/"
 					+ usedConclusionCounts_.countPropagations + " ("
 					+ conclusionProcessingTimer_.timePropagations / addCounter
 					+ " ms)");
-		if (processedConclusionCounts_.countBottoms > 0
-				|| conclusionProcessingTimer_.timeBottoms > 0)
-			LOGGER_.debug("Bottoms processed/used: "
-					+ processedConclusionCounts_.countBottoms + "/"
-					+ usedConclusionCounts_.countBottoms + " ("
-					+ conclusionProcessingTimer_.timeBottoms / addCounter
-					+ " ms)");
+		if (processedConclusionCounts_.countContradictions > 0
+				|| conclusionProcessingTimer_.timeContradictions > 0)
+			LOGGER_.debug("Contradictions produced/used: "
+					+ processedConclusionCounts_.countContradictions + "/"
+					+ usedConclusionCounts_.countContradictions + " ("
+					+ conclusionProcessingTimer_.timeContradictions
+					/ addCounter + " ms)");
 		if (processedConclusionCounts_.countDisjointnessAxioms > 0
 				|| conclusionProcessingTimer_.timeDisjointnessAxioms > 0)
-			LOGGER_.debug("Disjointness Axioms processed/used: "
+			LOGGER_.debug("Disjointness Axioms produced/used: "
 					+ processedConclusionCounts_.countDisjointnessAxioms + "/"
 					+ usedConclusionCounts_.countDisjointnessAxioms + " ("
 					+ conclusionProcessingTimer_.timeDisjointnessAxioms

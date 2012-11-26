@@ -32,7 +32,7 @@ public class ConclusionTimer {
 
 	long timeForwardLinks;
 
-	long timeBottoms;
+	long timeContradictions;
 
 	long timePropagations;
 
@@ -55,7 +55,7 @@ public class ConclusionTimer {
 	}
 
 	public long getTimeBottoms() {
-		return timeBottoms;
+		return timeContradictions;
 	}
 
 	public long getTimePropagations() {
@@ -69,7 +69,7 @@ public class ConclusionTimer {
 	public long getTotalTime() {
 		return timeNegativeSubsumers + timePositiveSubsumers
 				+ timeBackwardLinks + timeForwardLinks + timePropagations
-				+ timeBottoms + timeDisjointnessAxioms;
+				+ timeContradictions + timeDisjointnessAxioms;
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class ConclusionTimer {
 		timePositiveSubsumers = 0;
 		timeBackwardLinks = 0;
 		timeForwardLinks = 0;
-		timeBottoms = 0;
+		timeContradictions = 0;
 		timePropagations = 0;
 		timeDisjointnessAxioms = 0;
 	}
@@ -99,7 +99,7 @@ public class ConclusionTimer {
 		this.timePositiveSubsumers += statistics.timePositiveSubsumers;
 		this.timeBackwardLinks += statistics.timeBackwardLinks;
 		this.timeForwardLinks += statistics.timeForwardLinks;
-		this.timeBottoms += statistics.timeBottoms;
+		this.timeContradictions += statistics.timeContradictions;
 		this.timePropagations += statistics.timePropagations;
 		this.timeDisjointnessAxioms += statistics.timeDisjointnessAxioms;
 	}

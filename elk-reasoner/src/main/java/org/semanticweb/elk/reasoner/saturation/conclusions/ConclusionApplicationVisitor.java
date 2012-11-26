@@ -58,7 +58,7 @@ public class ConclusionApplicationVisitor implements ConclusionVisitor<Boolean> 
 	}
 
 	@Override
-	public Boolean visit(Bottom bot, Context context) {
+	public Boolean visit(Contradiction bot, Context context) {
 		bot.apply(engine_, context);
 		return true;
 	}

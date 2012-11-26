@@ -59,7 +59,7 @@ public class ConclusionDeapplicationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(Bottom bot, Context context) {
+	public Boolean visit(Contradiction bot, Context context) {
 		bot.deapply(engine_, context);
 		return true;
 	}

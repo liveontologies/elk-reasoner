@@ -32,7 +32,7 @@ public class ConclusionCounter {
 
 	int countForwardLinks;
 
-	int countBottoms;
+	int countContradictions;
 
 	int countPropagations;
 
@@ -55,7 +55,7 @@ public class ConclusionCounter {
 	}
 
 	public int getCountBottoms() {
-		return countBottoms;
+		return countContradictions;
 	}
 
 	public int getCountPropagations() {
@@ -74,7 +74,7 @@ public class ConclusionCounter {
 		countPositiveSubsumers = 0;
 		countBackwardLinks = 0;
 		countForwardLinks = 0;
-		countBottoms = 0;
+		countContradictions = 0;
 		countPropagations = 0;
 		countDisjointnessAxioms = 0;
 	}
@@ -93,7 +93,7 @@ public class ConclusionCounter {
 		this.countPositiveSubsumers += statistics.countPositiveSubsumers;
 		this.countBackwardLinks += statistics.countBackwardLinks;
 		this.countForwardLinks += statistics.countForwardLinks;
-		this.countBottoms += statistics.countBottoms;
+		this.countContradictions += statistics.countContradictions;
 		this.countPropagations += statistics.countPropagations;
 		this.countDisjointnessAxioms += statistics.countDisjointnessAxioms;
 	}
