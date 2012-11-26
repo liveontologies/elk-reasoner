@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -43,7 +44,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
  */
-abstract public class IndexedClassExpression implements
+abstract public class IndexedClassExpression extends IndexedObject implements
 		Comparable<IndexedClassExpression> {
 
 	/**
@@ -241,8 +242,11 @@ abstract public class IndexedClassExpression implements
 		};
 	}
 
-	@Override
-	public abstract String toString();
-
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
+
+	@Override
+	public <O> O accept(IndexedObjectVisitor<O> visitor) {
+		return accept((IndexedClassExpressionVisitor<O>) visitor);
+	}
+
 }

@@ -38,23 +38,24 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
- * Visitor for {@link ElkClassExpression}s,
- * {@link ElkSubObjectPropertyExpression}s, and {@link ElkIndividual}s that
- * returns the corresponding {@link IndexedClassExpression} filtered through the
- * {@link IndexedObjectFilter} provided in the constructor.
+ * A converter from {@link ElkClassExpression}s,
+ * {@link ElkSubObjectPropertyExpression}s, and {@link ElkIndividual}s to
+ * corresponding {@link IndexedObject}s with filtering through the provided
+ * {@link IndexedObjectFilter}.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
+public class IndexObjectConverter extends AbstractIndexObjectConverter {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
-			.getLogger(ElkObjectIndexerVisitor.class);
+			.getLogger(IndexObjectConverter.class);
 
 	protected IndexedObjectFilter objectFilter;
 
@@ -63,20 +64,20 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 	 *            filter that is applied to the indexed objects after
 	 *            construction
 	 */
-	public ElkObjectIndexerVisitor(IndexedObjectFilter objectFilter) {
+	public IndexObjectConverter(IndexedObjectFilter objectFilter) {
 		this.objectFilter = objectFilter;
 	}
 
 	@Override
 	public IndexedClassExpression visit(ElkClass elkClass) {
-		return objectFilter.filter(new IndexedClass(elkClass));
+		return objectFilter.visit(new IndexedClass(elkClass));
 	}
 
 	@Override
 	public IndexedClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
 		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectHasValue
 				.getProperty().accept(this);
-		return objectFilter.filter(new IndexedObjectSomeValuesFrom(iop,
+		return objectFilter.visit(new IndexedObjectSomeValuesFrom(iop,
 				elkObjectHasValue.getFiller().accept(this)));
 	}
 
@@ -93,7 +94,7 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 			if (result == null)
 				result = ice;
 			else
-				result = objectFilter.filter(new IndexedObjectIntersectionOf(
+				result = objectFilter.visit(new IndexedObjectIntersectionOf(
 						result, ice));
 		}
 
@@ -105,7 +106,7 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
 		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectSomeValuesFrom
 				.getProperty().accept(this);
-		return objectFilter.filter(new IndexedObjectSomeValuesFrom(iop,
+		return objectFilter.visit(new IndexedObjectSomeValuesFrom(iop,
 				elkObjectSomeValuesFrom.getFiller().accept(this)));
 	}
 
@@ -115,13 +116,12 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 			LOGGER_.warn(new ElkMessage(
 					"ELK supports DataHasValue only partially. Reasoning might be incomplete.",
 					"reasoner.indexing.dataHasValue"));
-		return objectFilter.filter(new IndexedDataHasValue(elkDataHasValue));
+		return objectFilter.visit(new IndexedDataHasValue(elkDataHasValue));
 	}
 
 	@Override
 	public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
-		return objectFilter
-				.filter(new IndexedObjectProperty(elkObjectProperty));
+		return objectFilter.visit(new IndexedObjectProperty(elkObjectProperty));
 	}
 
 	/*
@@ -152,7 +152,7 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 				continue;
 			}
 
-			result = objectFilter.filter(new IndexedBinaryPropertyChain(iop,
+			result = objectFilter.visit(new IndexedBinaryPropertyChain(iop,
 					result));
 		}
 
@@ -161,7 +161,7 @@ public class ElkObjectIndexerVisitor extends AbstractElkObjectIndexerVisitor {
 
 	@Override
 	public IndexedIndividual visit(ElkNamedIndividual elkNamedIndividual) {
-		return (IndexedIndividual) objectFilter.filter(new IndexedIndividual(
+		return (IndexedIndividual) objectFilter.visit(new IndexedIndividual(
 				elkNamedIndividual));
 	}
 }

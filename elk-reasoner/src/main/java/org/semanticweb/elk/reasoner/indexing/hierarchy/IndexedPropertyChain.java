@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.properties.IndexedPropertyChainSaturation;
@@ -50,7 +51,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class IndexedPropertyChain {
+public abstract class IndexedPropertyChain extends IndexedObject {
 
 	/**
 	 * All told super object properties of this
@@ -71,7 +72,8 @@ public abstract class IndexedPropertyChain {
 	 *         assigned
 	 */
 	public List<IndexedObjectProperty> getToldSuperProperties() {
-		return toldSuperProperties_ == null ? Collections.<IndexedObjectProperty>emptyList() : toldSuperProperties_;
+		return toldSuperProperties_ == null ? Collections
+				.<IndexedObjectProperty> emptyList() : toldSuperProperties_;
 	}
 
 	/**
@@ -171,10 +173,7 @@ public abstract class IndexedPropertyChain {
 	 */
 	abstract void updateOccurrenceNumber(int increment);
 
-	/**
-	 * @return {@code true} if this {@link IndexedPropertyChain} occur in the
-	 *         ontology index
-	 */
+	@Override
 	public boolean occurs() {
 		return occurrenceNo > 0;
 	}
@@ -251,10 +250,13 @@ public abstract class IndexedPropertyChain {
 	}
 
 	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);
-	
-	public abstract <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor, P parameter);
 
 	@Override
-	public abstract String toString();
+	public <O> O accept(IndexedObjectVisitor<O> visitor) {
+		return accept((IndexedPropertyChainVisitor<O>) visitor);
+	}
+
+	public abstract <O, P> O accept(
+			IndexedPropertyChainVisitorEx<O, P> visitor, P parameter);
 
 }

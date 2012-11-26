@@ -44,14 +44,14 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	private IndexedClass indexedOwlThing;
 	private IndexedClass indexedOwlNothing;
 
-	private final ElkObjectIndexerVisitor elkObjectIndexer_;
+	private final IndexObjectConverter elkObjectIndexer_;
 	private final ElkAxiomIndexerVisitor directAxiomInserter_;
 	private final ElkAxiomIndexerVisitor directAxiomDeleter_;
 
 	private ChainableRule<Context> contextInitRules_ = null;
 
 	public OntologyIndexImpl() {
-		elkObjectIndexer_ = new ElkObjectIndexerVisitor(this);
+		elkObjectIndexer_ = new IndexObjectConverter(this);
 
 		indexPredefined();
 

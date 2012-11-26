@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -41,21 +42,47 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IndexedSubClassOfAxiom.class);
 
-	protected final IndexedClassExpression subClass, superClass;
+	private final IndexedClassExpression subClass_, superClass_;
 
 	protected IndexedSubClassOfAxiom(IndexedClassExpression subClass,
 			IndexedClassExpression superClass) {
-		this.subClass = subClass;
-		this.superClass = superClass;
+		this.subClass_ = subClass;
+		this.superClass_ = superClass;
+	}
+
+	public IndexedClassExpression getSubClass() {
+		return this.subClass_;
+	}
+
+	public IndexedClassExpression getSuperClass() {
+		return this.superClass_;
+	}
+	
+	@Override
+	public boolean occurs() {
+		// we do not cache sub class axioms
+		// TODO: introduce a method for testing if we cache an object in the index
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "SubClassOf(" + this.subClass_ + ' ' + this.superClass_ + ')';
+	}
+
+	@Override
+	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
 	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater,
 			final int increment) {
 		if (increment > 0) {
-			indexUpdater.add(subClass, new ThisCompositionRule(superClass));
+			indexUpdater.add(subClass_, new ThisCompositionRule(superClass_));
 		} else {
-			indexUpdater.remove(subClass, new ThisCompositionRule(superClass));
+			indexUpdater
+					.remove(subClass_, new ThisCompositionRule(superClass_));
 		}
 	}
 
@@ -123,8 +150,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			try {
 
 				for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-					writer.produce(context, new PositiveSubsumer(
-							implied));
+					writer.produce(context, new PositiveSubsumer(implied));
 				}
 			} finally {
 				// stats.timeSubClassOfRule +=
@@ -184,4 +210,5 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 	}
+
 }

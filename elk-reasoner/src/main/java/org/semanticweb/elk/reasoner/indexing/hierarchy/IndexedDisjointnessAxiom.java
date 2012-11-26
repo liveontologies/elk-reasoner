@@ -22,14 +22,17 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
@@ -46,62 +49,107 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
-	private final List<IndexedClassExpression> members_;
+	/**
+	 * {@link IndexedClassExpression}s that have at least two equal occurrences
+	 * (according to the {@link Object#equals(Object)} method) in this
+	 * {@link IndexedDisjointnessAxiom}
+	 */
+	private final Set<IndexedClassExpression> inconsistentMembers_;
+	/**
+	 * {@link IndexedClassExpression}s that occur exactly once in this
+	 * {@link IndexedDisjointnessAxiom}
+	 */
+	private final Set<IndexedClassExpression> disjointMembers_;
+
+	/**
+	 * This counts how often this {@link IndexedDisjointnessAxiom} occurrs in
+	 * the ontology.
+	 */
+	int occurrenceNo = 0;
 
 	IndexedDisjointnessAxiom(List<IndexedClassExpression> members) {
-		members_ = members;
+		this.inconsistentMembers_ = new ArrayHashSet<IndexedClassExpression>(1);
+		this.disjointMembers_ = new ArrayHashSet<IndexedClassExpression>(2);
+		for (IndexedClassExpression member : members) {
+			if (inconsistentMembers_.contains(member))
+				continue;
+			if (!disjointMembers_.add(member)) {
+				disjointMembers_.remove(member);
+				inconsistentMembers_.add(member);
+			}
+		}
 	}
 
-	public List<IndexedClassExpression> getMembers() {
-		return members_;
+	/**
+	 * @return {@link IndexedClassExpression}s that have at least two equal
+	 *         occurrences (according to the {@link Object#equals(Object)}
+	 *         method) in this {@link IndexedDisjointnessAxiom}
+	 */
+	public Set<IndexedClassExpression> getInconsistentMembers() {
+		return inconsistentMembers_;
+	}
+
+	/**
+	 * {@link IndexedClassExpression}s that occur exactly once in this
+	 * {@link IndexedDisjointnessAxiom}
+	 */
+	public Set<IndexedClassExpression> getDisjointMembers() {
+		return disjointMembers_;
+	}
+
+	@Override
+	public boolean occurs() {
+		return occurrenceNo > 0;
 	}
 
 	@Override
 	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater,
 			final int increment) {
-		if (increment > 0) {
+
+		if (occurrenceNo == 0 && increment > 0) {
+			// first occurrence of this axiom
 			registerCompositionRule(indexUpdater);
-		} else {
+		}
+
+		occurrenceNo += increment;
+
+		if (occurrenceNo == 0 && increment < 0) {
+			// last occurrence of this axiom
 			deregisterCompositionRule(indexUpdater);
 		}
 	}
 
+	@Override
+	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public String toString() {
+		List<IndexedClassExpression> members = new LinkedList<IndexedClassExpression>();
+		for (IndexedClassExpression inconsistentMember : inconsistentMembers_) {
+			// each inconsistent member is added two times
+			members.add(inconsistentMember);
+			members.add(inconsistentMember);
+		}
+		members.addAll(disjointMembers_);
+		return "DisjointClasses(" + members + ")";
+	}
+
 	private void registerCompositionRule(IndexUpdater indexUpdater) {
-		for (IndexedClassExpression ice : members_) {
+		for (IndexedClassExpression ice : inconsistentMembers_)
+			indexUpdater.add(ice, new ThisContradictionRule());
+		for (IndexedClassExpression ice : disjointMembers_) {
 			indexUpdater.add(ice, new ThisCompositionRule(this));
 		}
 	}
 
 	private void deregisterCompositionRule(IndexUpdater indexUpdater) {
-		for (IndexedClassExpression ice : members_) {
+		for (IndexedClassExpression ice : inconsistentMembers_)
+			indexUpdater.remove(ice, new ThisContradictionRule());
+		for (IndexedClassExpression ice : disjointMembers_) {
 			indexUpdater.remove(ice, new ThisCompositionRule(this));
 		}
-	}
-
-	/*
-	 * the following two methods are required because indexed axioms do not go
-	 * through the index cache (only instances of IndexedClassExpression do)
-	 */
-	@Override
-	public int hashCode() {
-		return Arrays.hashCode(getMembers().toArray());
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof IndexedDisjointnessAxiom) {
-			IndexedDisjointnessAxiom axiom = (IndexedDisjointnessAxiom) obj;
-
-			return getMembers().equals(axiom.getMembers());
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public String toString() {
-		return "DisjointClasses(" + Arrays.toString(getMembers().toArray())
-				+ ")";
 	}
 
 	/**
@@ -123,17 +171,14 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			ChainableRule<Context> {
 
 		/**
-		 * List of relevant {@link IndexedDisjointnessAxiom}s in which the
-		 * member, for which this rule is registered, appears. Note: this should
-		 * allow for duplicate axioms in order to handle correctly situations
-		 * when {@link IndexedDisjointnessAxiom}s contain multiple copies of the
-		 * same element.
+		 * Set of relevant {@link IndexedDisjointnessAxiom}s in which the
+		 * member, for which this rule is registered, appears.
 		 */
-		private final List<IndexedDisjointnessAxiom> disjointnessAxioms_;
+		private final Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
 		private ThisCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
-			disjointnessAxioms_ = new LinkedList<IndexedDisjointnessAxiom>();
+			disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointnessAxiom>();
 		}
 
 		ThisCompositionRule(IndexedDisjointnessAxiom axiom) {
@@ -179,6 +224,74 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 				return new ThisCompositionRule(tail);
 			}
 		};
+	}
+
+	/**
+	 * A rule which derives a {@link Contradiction} for inconsistent members of
+	 * this {@link IndexedDisjointnessAxiom}.
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	private static class ThisContradictionRule extends
+			ModifiableLinkImpl<ChainableRule<Context>> implements
+			ChainableRule<Context> {
+		/**
+		 * How many times the {@link IndexedClassExpression} for which this rule
+		 * is registered, occurs in {@link IndexedDisjointnessAxiom} more than
+		 * one times.
+		 */
+		private int contradictionCounter;
+
+		public ThisContradictionRule(ChainableRule<Context> tail) {
+			super(tail);
+			this.contradictionCounter = 0;
+		}
+
+		ThisContradictionRule() {
+			this((ChainableRule<Context>) null);
+			this.contradictionCounter++;
+		}
+
+		@Override
+		public void apply(SaturationState.Writer writer, Context context) {
+			writer.produce(context, new Contradiction());
+		}
+
+		protected boolean isEmpty() {
+			return this.contradictionCounter == 0;
+		}
+
+		@Override
+		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+			ThisContradictionRule rule = ruleChain
+					.getCreate(MATCHER_, FACTORY_);
+			rule.contradictionCounter += this.contradictionCounter;
+			return this.contradictionCounter != 0;
+		}
+
+		@Override
+		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+			ThisContradictionRule rule = ruleChain.find(MATCHER_);
+			if (rule == null) {
+				return false;
+			}
+			rule.contradictionCounter -= this.contradictionCounter;
+			if (rule.isEmpty())
+				ruleChain.remove(MATCHER_);
+			return this.contradictionCounter != 0;
+		}
+
+		private static Matcher<ChainableRule<Context>, ThisContradictionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisContradictionRule>(
+				ThisContradictionRule.class);
+
+		private static ReferenceFactory<ChainableRule<Context>, ThisContradictionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisContradictionRule>() {
+			@Override
+			public ThisContradictionRule create(ChainableRule<Context> tail) {
+				return new ThisContradictionRule(tail);
+			}
+		};
+
 	}
 
 }

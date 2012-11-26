@@ -36,6 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
@@ -70,7 +71,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 * The ElkObjectIndexer used for indexing a neutral, a positive, and a
 	 * negative occurrence of an elk object respectively.
 	 */
-	private final ElkObjectIndexerVisitor neutralIndexer, positiveIndexer,
+	private final IndexObjectConverter neutralIndexer, positiveIndexer,
 			negativeIndexer;
 
 	/**
@@ -89,12 +90,12 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		this.owlNothing_ = owlNothing;
 		this.indexUpdater_ = updater;
 		this.multiplicity = insert ? 1 : -1;
-		this.neutralIndexer = new ElkObjectIndexerVisitor(
-				new UpdateCacheFilter(multiplicity, 0, 0));
-		this.positiveIndexer = new ElkObjectIndexerVisitor(
-				new UpdateCacheFilter(multiplicity, multiplicity, 0));
-		this.negativeIndexer = new ElkObjectIndexerVisitor(
-				new UpdateCacheFilter(multiplicity, 0, multiplicity));
+		this.neutralIndexer = new IndexObjectConverter(new UpdateCacheFilter(
+				multiplicity, 0, 0));
+		this.positiveIndexer = new IndexObjectConverter(new UpdateCacheFilter(
+				multiplicity, multiplicity, 0));
+		this.negativeIndexer = new IndexObjectConverter(new UpdateCacheFilter(
+				multiplicity, 0, multiplicity));
 	}
 
 	@Override
@@ -165,8 +166,16 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		for (ElkClassExpression c : disjointClasses) {
 			indexed.add(c.accept(negativeIndexer));
 		}
-		(new IndexedDisjointnessAxiom(indexed)).updateOccurrenceNumbers(
-				indexUpdater_, multiplicity);
+
+		IndexedDisjointnessAxiom axiom = ontologyIndex
+				.visit(new IndexedDisjointnessAxiom(indexed));
+		if (!axiom.occurs() && multiplicity > 0)
+			axiom.accept(ontologyIndex.inserter);
+
+		axiom.updateOccurrenceNumbers(indexUpdater_, multiplicity);
+
+		if (!axiom.occurs() && multiplicity < 0)
+			axiom.accept(ontologyIndex.deletor);
 	}
 
 	@Override
@@ -234,36 +243,92 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			this.negativeIncrement = negativeIncrement;
 		}
 
-		@Override
-		public IndexedClassExpression filter(IndexedClassExpression ice) {
-			IndexedClassExpression result = ontologyIndex.filter(ice);
+		public <T extends IndexedClassExpression> T update(T ice) {
+			if (!ice.occurs() && increment > 0)
+				ice.accept(ontologyIndex.inserter);
 
-			if (!result.occurs() && increment > 0)
-				ontologyIndex.add(result);
-
-			result.updateOccurrenceNumbers(indexUpdater_, increment,
+			ice.updateOccurrenceNumbers(indexUpdater_, increment,
 					positiveIncrement, negativeIncrement);
 
-			if (!result.occurs() && increment < 0)
-				ontologyIndex.remove(result);
+			if (!ice.occurs() && increment < 0)
+				ice.accept(ontologyIndex.deletor);
 
-			return result;
+			return ice;
+		}
+
+		public <T extends IndexedPropertyChain> T update(T ipc) {
+			if (!ipc.occurs() && increment > 0)
+				ipc.accept(ontologyIndex.inserter);
+
+			ipc.updateOccurrenceNumber(increment);
+
+			if (!ipc.occurs() && increment < 0)
+				ipc.accept(ontologyIndex.deletor);
+
+			return ipc;
+		}
+
+		// TODO: the filter is not used for axioms at the moment
+		public <T extends IndexedAxiom> T update(T axiom) {
+			if (!axiom.occurs() && increment > 0)
+				axiom.accept(ontologyIndex.inserter);
+
+			axiom.updateOccurrenceNumbers(indexUpdater_, increment);
+
+			if (!axiom.occurs() && increment < 0)
+				axiom.accept(ontologyIndex.deletor);
+
+			return axiom;
 		}
 
 		@Override
-		public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
-			IndexedPropertyChain result = ontologyIndex.filter(ipc);
-
-			if (!result.occurs() && increment > 0)
-				ontologyIndex.add(result);
-
-			result.updateOccurrenceNumber(increment);
-
-			if (!result.occurs() && increment < 0)
-				ontologyIndex.remove(result);
-
-			return result;
+		public IndexedClass visit(IndexedClass element) {
+			return update(ontologyIndex.visit(element));
 		}
+
+		@Override
+		public IndexedIndividual visit(IndexedIndividual element) {
+			return update(ontologyIndex.visit(element));
+		}
+
+		@Override
+		public IndexedObjectIntersectionOf visit(
+				IndexedObjectIntersectionOf element) {
+			return update(ontologyIndex.visit(element));
+		}
+
+		@Override
+		public IndexedObjectSomeValuesFrom visit(
+				IndexedObjectSomeValuesFrom element) {
+			return update(ontologyIndex.visit(element));
+		}
+
+		@Override
+		public IndexedDataHasValue visit(IndexedDataHasValue element) {
+			return update(ontologyIndex.visit(element));
+		}
+
+		@Override
+		public IndexedObjectProperty visit(IndexedObjectProperty element) {
+			return update(ontologyIndex.visit(element));
+		}
+
+		@Override
+		public IndexedBinaryPropertyChain visit(
+				IndexedBinaryPropertyChain element) {
+			return update(ontologyIndex.visit(element));
+		}
+
+		@Override
+		public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom axiom) {
+			return update(ontologyIndex.visit(axiom));
+		}
+
+		@Override
+		public IndexedDisjointnessAxiom visit(IndexedDisjointnessAxiom axiom) {
+			return update(ontologyIndex.visit(axiom));
+		}
+
 	}
 
 }

@@ -30,7 +30,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * @author Frantisek Simancik
  * 
  */
-interface IndexedObjectFilter {
+interface IndexedObjectFilterOld {
 
 	/**
 	 * @param ice

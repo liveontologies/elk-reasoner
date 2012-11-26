@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
@@ -52,19 +53,21 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 
 /**
- * Visitor for {@link ElkClassExpression}s,
- * {@link ElkSubObjectPropertyExpression}s, and {@link ElkIndividual}s that
- * simply throws an {@link IndexingException} on all arguments.
+ * A converter from {@link ElkClassExpression}s,
+ * {@link ElkSubObjectPropertyExpression}s, and {@link ElkIndividual}s to
+ * corresponding {@link IndexedObject}s that simply throws an
+ * {@link IndexingException} on all arguments.
  * 
  * @author Frantisek Simancik
  * 
  */
-public abstract class AbstractElkObjectIndexerVisitor implements
+public abstract class AbstractIndexObjectConverter implements
 		ElkClassExpressionVisitor<IndexedClassExpression>,
 		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain>,
 		ElkIndividualVisitor<IndexedIndividual> {
