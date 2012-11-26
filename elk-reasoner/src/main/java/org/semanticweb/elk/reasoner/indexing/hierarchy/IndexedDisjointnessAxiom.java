@@ -25,15 +25,11 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
@@ -49,14 +45,6 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * 
  */
 public class IndexedDisjointnessAxiom extends IndexedAxiom {
-
-	/**
-	 * We use two types of composition rules for disjointness axioms. If the
-	 * number of members in the axiom exceeds the threshold, we register
-	 * {@link ThisNaryCompositionRule}s with the members; otherwise, we register
-	 * {@link ThisBinaryCompositionRule} with the members.
-	 */
-	private final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 3;
 
 	private final List<IndexedClassExpression> members_;
 
@@ -79,42 +67,14 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	private void registerCompositionRule(IndexUpdater indexUpdater) {
-		if (members_.size() > DISJOINT_AXIOM_BINARIZATION_THRESHOLD) {
-			for (IndexedClassExpression ice : members_) {
-				indexUpdater.add(ice, new ThisNaryCompositionRule(this));
-			}
-		} else {
-			for (final IndexedClassExpression member : members_) {
-				boolean selfFound = false; // true when otherMember = member
-				for (IndexedClassExpression otherMember : members_) {
-					if (!selfFound && otherMember == member) {
-						selfFound = true;
-						continue;
-					}
-					indexUpdater.add(member, new ThisBinaryCompositionRule(
-							otherMember));
-				}
-			}
+		for (IndexedClassExpression ice : members_) {
+			indexUpdater.add(ice, new ThisCompositionRule(this));
 		}
 	}
 
 	private void deregisterCompositionRule(IndexUpdater indexUpdater) {
-		if (members_.size() > DISJOINT_AXIOM_BINARIZATION_THRESHOLD) {
-			for (IndexedClassExpression ice : members_) {
-				indexUpdater.remove(ice, new ThisNaryCompositionRule(this));
-			}
-		} else {
-			for (final IndexedClassExpression member : members_) {
-				boolean selfFound = false; // true when otherMember = member
-				for (IndexedClassExpression otherMember : members_) {
-					if (!selfFound && otherMember == member) {
-						selfFound = true;
-						continue;
-					}
-					indexUpdater.remove(member, new ThisBinaryCompositionRule(
-							otherMember));
-				}
-			}
+		for (IndexedClassExpression ice : members_) {
+			indexUpdater.remove(ice, new ThisCompositionRule(this));
 		}
 	}
 
@@ -145,11 +105,11 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	/**
-	 * This composition rule derives the disjointness axioms as a new kind of a
-	 * super class expression. For each member, all disjointness axioms
+	 * {@link ThisCompositionRule} derives the disjointness axioms as a new kind
+	 * of a super class expression. For each member, all disjointness axioms
 	 * containing this member are registered with this rule (possibly several
 	 * times if the member occurs several times in one axiom). If the rule
-	 * produce some disjointness axiom in a context at least two times, this
+	 * produces some disjointness axiom in a context at least two times, this
 	 * means that two different members of this disjointness axioms have been
 	 * derived in the context. Therefore, a contradiction should be produced.
 	 * 
@@ -158,7 +118,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	 *         pavel.klinov@uni-ulm.de
 	 * @author "Yevgeny Kazakov"
 	 */
-	private static class ThisNaryCompositionRule extends
+	private static class ThisCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
@@ -171,12 +131,12 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 */
 		private final List<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
-		private ThisNaryCompositionRule(ChainableRule<Context> tail) {
+		private ThisCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
 			disjointnessAxioms_ = new LinkedList<IndexedDisjointnessAxiom>();
 		}
 
-		ThisNaryCompositionRule(IndexedDisjointnessAxiom axiom) {
+		ThisCompositionRule(IndexedDisjointnessAxiom axiom) {
 			this((ChainableRule<Context>) null);
 			disjointnessAxioms_.add(axiom);
 		}
@@ -193,14 +153,13 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ThisNaryCompositionRule rule = ruleChain.getCreate(MATCHER_,
-					FACTORY_);
+			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			return rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
 		}
 
 		@Override
 		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
-			ThisNaryCompositionRule rule = ruleChain.find(MATCHER_);
+			ThisCompositionRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 			if (rule != null) {
 				changed = rule.disjointnessAxioms_
@@ -211,90 +170,13 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return changed;
 		}
 
-		private static Matcher<ChainableRule<Context>, ThisNaryCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisNaryCompositionRule>(
-				ThisNaryCompositionRule.class);
+		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+				ThisCompositionRule.class);
 
-		private static ReferenceFactory<ChainableRule<Context>, ThisNaryCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisNaryCompositionRule>() {
+		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
 			@Override
-			public ThisNaryCompositionRule create(ChainableRule<Context> tail) {
-				return new ThisNaryCompositionRule(tail);
-			}
-		};
-	}
-
-	/**
-	 * This composition rule can produce only {@link Contradiction}. Each rule
-	 * for a member registers all other members with which this member occurs in
-	 * an {@link IndexedDisjointnessAxiom}. When the rule is applied, it is
-	 * checked if the intersection of this set of "forbidden subsumers" with the
-	 * subsumers derived in the context is non-empty, and if so, derives a
-	 * {@link Contradiction}.
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 * @author "Yevgeny Kazakov"
-	 */
-	private static class ThisBinaryCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
-
-		/**
-		 * {@link IndexedClassExpression}s that appear with the member for which
-		 * this rule is registered. The member itself is not included in this
-		 * set, unless it appears in some disjointness axiom at least two times.
-		 */
-		private final Set<IndexedClassExpression> forbiddenSubsumers_;
-
-		public ThisBinaryCompositionRule(ChainableRule<Context> tail) {
-			super(tail);
-			this.forbiddenSubsumers_ = new ArrayHashSet<IndexedClassExpression>();
-		}
-
-		ThisBinaryCompositionRule(IndexedClassExpression forbiddenSuperClass) {
-			this((ChainableRule<Context>) null);
-			this.forbiddenSubsumers_.add(forbiddenSuperClass);
-		}
-
-		@Override
-		public void apply(SaturationState.Writer writer, Context context) {
-			if (!new LazySetIntersection<IndexedClassExpression>(
-					forbiddenSubsumers_, context.getSubsumers()).isEmpty()) {
-				writer.produce(context, new Contradiction());
-			}
-		}
-
-		protected boolean isEmpty() {
-			return forbiddenSubsumers_.isEmpty();
-		}
-
-		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ThisBinaryCompositionRule rule = ruleChain.getCreate(MATCHER_,
-					FACTORY_);
-			return rule.forbiddenSubsumers_.addAll(this.forbiddenSubsumers_);
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
-			ThisBinaryCompositionRule rule = ruleChain.find(MATCHER_);
-			boolean changed = false;
-			if (rule != null) {
-				changed = rule.forbiddenSubsumers_
-						.removeAll(this.forbiddenSubsumers_);
-				if (rule.isEmpty())
-					ruleChain.remove(MATCHER_);
-			}
-			return changed;
-		}
-
-		private static Matcher<ChainableRule<Context>, ThisBinaryCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisBinaryCompositionRule>(
-				ThisBinaryCompositionRule.class);
-
-		private static ReferenceFactory<ChainableRule<Context>, ThisBinaryCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisBinaryCompositionRule>() {
-			@Override
-			public ThisBinaryCompositionRule create(ChainableRule<Context> tail) {
-				return new ThisBinaryCompositionRule(tail);
+			public ThisCompositionRule create(ChainableRule<Context> tail) {
+				return new ThisCompositionRule(tail);
 			}
 		};
 	}

@@ -217,9 +217,39 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 		return null;
 	}
 
+	private final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 2;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.AbstractElkAxiomVisitor#visit(org.semanticweb
+	 * .elk.owl.interfaces.ElkDisjointClassesAxiom)
+	 * 
+	 * Binarize disjointness axioms that contain not many classes
+	 */
 	@Override
 	public Void visit(ElkDisjointClassesAxiom axiom) {
-		indexDisjointClassExpressions(axiom.getClassExpressions());
+		List<? extends ElkClassExpression> members = axiom
+				.getClassExpressions();
+		// if the axiom contains sufficiently many disjoint classes, convert it
+		// natively
+		if (axiom.getClassExpressions().size() > DISJOINT_AXIOM_BINARIZATION_THRESHOLD) {
+			indexDisjointClassExpressions(axiom.getClassExpressions());
+			return null;
+		}
+		// otherwise, apply binarization and convert to subclass axioms
+		for (final ElkClassExpression member : members) {
+			boolean selfFound = false; // true when otherMember = member
+			for (ElkClassExpression otherMember : members) {
+				if (!selfFound && otherMember == member) {
+					selfFound = true;
+					continue;
+				}
+				indexSubClassOfAxiom(objectFactory.getObjectIntersectionOf(
+						member, otherMember), objectFactory.getOwlNothing());
+			}
+		}
 		return null;
 	}
 
