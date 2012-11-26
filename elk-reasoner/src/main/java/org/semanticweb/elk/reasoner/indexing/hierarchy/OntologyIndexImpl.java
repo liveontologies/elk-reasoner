@@ -51,9 +51,9 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	private ChainableRule<Context> contextInitRules_ = null;
 
 	public OntologyIndexImpl() {
-		elkObjectIndexer_ = new IndexObjectConverter(this);
+		elkObjectIndexer_ = new IndexObjectConverter(this, this);
 
-		indexPredefined();
+		indexPredefinedEntities();
 
 		directAxiomInserter_ = new ElkAxiomIndexerVisitor(this,
 				getIndexedOwlNothing(), new DirectIndexUpdater(this), true);
@@ -64,13 +64,13 @@ public class OntologyIndexImpl extends IndexedObjectCache implements
 	@Override
 	public void clear() {
 		super.clear();
-		indexPredefined();
+		indexPredefinedEntities();
 	}
 
 	/**
 	 * Process predefine declarations of OWL ontologies
 	 */
-	private void indexPredefined() {
+	private void indexPredefinedEntities() {
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
 		ElkAxiomIndexerVisitor tmpIndexer = new ElkAxiomIndexerVisitor(this,

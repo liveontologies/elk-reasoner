@@ -30,11 +30,13 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 
 /**
- * A cache of all indexed objects in the ontology backed by a
+ * A cache of {@link IndexedObject}s in the ontology backed by a
  * {@link KeyEntryHashSet}. It uses indexed {@link KeyEntry}s to compare object
  * with respect to structural equality. Supports (non-recursive) addition,
  * removal, and retrieval of single indexed objects. The recursion for indexing
- * subobjects is in the {@link IndexObjectConverter}.
+ * subobjects is in the {@link IndexObjectConverter}. Not all
+ * {@link IndexedObject}s are cached but only those whose uniqueness modulo
+ * structural equivalence is important for index updating to work correctly.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"

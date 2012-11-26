@@ -36,7 +36,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomFilter;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionFilter;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainFilter;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
@@ -44,6 +46,7 @@ import org.semanticweb.elk.util.logging.ElkMessage;
  * either only add or only remove axioms.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
@@ -60,7 +63,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
 	 */
-	private final IndexedObjectCache ontologyIndex;
+	private final IndexedObjectCache objectCache;
 
 	/**
 	 * 1 if adding axioms, -1 if removing axioms
@@ -68,34 +71,50 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	private final int multiplicity;
 
 	/**
-	 * The ElkObjectIndexer used for indexing a neutral, a positive, and a
-	 * negative occurrence of an elk object respectively.
+	 * {@link IndexObjectConverter}s used for indexing a neutral, a positive,
+	 * and a negative occurrence of {@link IndexedClassExpression}s.
 	 */
 	private final IndexObjectConverter neutralIndexer, positiveIndexer,
 			negativeIndexer;
 
 	/**
-	 * We'll update it's occurrence when indexing disjointness axioms
+	 * An {@link IndexedAxiomFilter} used to update occurrences of
+	 * {@link IndexedAxiom}s
+	 */
+	private final IndexedAxiomFilter axiomUpdateFilter;
+
+	/**
+	 * A reference to the indexed {@code owl:Nothing}, which occurrence counters
+	 * is updated when creating {@link IndexedDisjointnessAxiom}s, which
+	 * implicitly assumed to contain {@code owl:Nothing} positively. This can be
+	 * used to detect if axioms can cause inconsistency: if {@code owl:Nothing}
+	 * never occurs positively in this way, then no inconsistency can be caused.
 	 */
 	private final IndexedClass owlNothing_;
 
 	/**
-	 * @param ontologyIndex
+	 * @param objectCache
 	 * @param insert
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
-	public ElkAxiomIndexerVisitor(IndexedObjectCache ontologyIndex,
+	public ElkAxiomIndexerVisitor(IndexedObjectCache objectCache,
 			IndexedClass owlNothing, IndexUpdater updater, boolean insert) {
-		this.ontologyIndex = ontologyIndex;
+		this.objectCache = objectCache;
 		this.owlNothing_ = owlNothing;
 		this.indexUpdater_ = updater;
 		this.multiplicity = insert ? 1 : -1;
-		this.neutralIndexer = new IndexObjectConverter(new UpdateCacheFilter(
-				multiplicity, 0, 0));
-		this.positiveIndexer = new IndexObjectConverter(new UpdateCacheFilter(
-				multiplicity, multiplicity, 0));
-		this.negativeIndexer = new IndexObjectConverter(new UpdateCacheFilter(
-				multiplicity, 0, multiplicity));
+		IndexedPropertyChainFilter propertyOccurrenceUpdateFilter = new PropertyOccurrenceUpdateFilter(
+				multiplicity);
+		this.neutralIndexer = new IndexObjectConverter(
+				new ClassOccurrenceUpdateFilter(multiplicity, 0, 0),
+				propertyOccurrenceUpdateFilter);
+		this.positiveIndexer = new IndexObjectConverter(
+				new ClassOccurrenceUpdateFilter(multiplicity, multiplicity, 0),
+				propertyOccurrenceUpdateFilter);
+		this.negativeIndexer = new IndexObjectConverter(
+				new ClassOccurrenceUpdateFilter(multiplicity, 0, multiplicity),
+				propertyOccurrenceUpdateFilter);
+		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity);
 	}
 
 	@Override
@@ -108,8 +127,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedClassExpression superIndexedClass = superElkClass
 				.accept(positiveIndexer);
 
-		(new IndexedSubClassOfAxiom(subIndexedClass, superIndexedClass))
-				.updateOccurrenceNumbers(indexUpdater_, multiplicity);
+		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(subIndexedClass,
+				superIndexedClass));
 	}
 
 	@Override
@@ -121,8 +140,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		IndexedClassExpression indexedType = type.accept(positiveIndexer);
 
-		(new IndexedSubClassOfAxiom(indexedIndividual, indexedType))
-				.updateOccurrenceNumbers(indexUpdater_, multiplicity);
+		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(indexedIndividual,
+				indexedType));
 	}
 
 	@Override
@@ -153,10 +172,10 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		// treat this as a positive occurrence of owl:Nothing
 		if (owlNothing_ == null)
-			throw new RuntimeException("owlNothing_");
+			throw new NullPointerException("owlNothing not provided!");
 
 		if (indexUpdater_ == null)
-			throw new RuntimeException("updater");
+			throw new NullPointerException("indexUpdater not provided!");
 
 		owlNothing_.updateOccurrenceNumbers(indexUpdater_, multiplicity,
 				multiplicity, 0);
@@ -167,15 +186,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			indexed.add(c.accept(negativeIndexer));
 		}
 
-		IndexedDisjointnessAxiom axiom = ontologyIndex
-				.visit(new IndexedDisjointnessAxiom(indexed));
-		if (!axiom.occurs() && multiplicity > 0)
-			axiom.accept(ontologyIndex.inserter);
-
-		axiom.updateOccurrenceNumbers(indexUpdater_, multiplicity);
-
-		if (!axiom.occurs() && multiplicity < 0)
-			axiom.accept(ontologyIndex.deletor);
+		axiomUpdateFilter.visit(new IndexedDisjointnessAxiom(indexed));
 	}
 
 	@Override
@@ -223,20 +234,17 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	}
 
 	/**
-	 * A filter that is applied after the given indexed object has been
-	 * retrieved from the cache. It is used to update the occurrence counts of
-	 * the indexed object, add it to the cache in case of first occurrence, and
-	 * remove it from the cache in case of last occurrence.
-	 * 
-	 * 
-	 * @author Frantisek Simancik
-	 * 
+	 * A {@link ClassOccurrenceUpdateFilter}, which is responsible for updating
+	 * the occurrence counters of {@link IndexedClassExpression}s, as well as
+	 * for adding such objects to the index when its occurrences becomes
+	 * non-zero, and removing from the index, when its occurrences becomes zero.
 	 */
-	private class UpdateCacheFilter implements IndexedObjectFilter {
+	private class ClassOccurrenceUpdateFilter implements
+			IndexedClassExpressionFilter {
 
 		protected final int increment, positiveIncrement, negativeIncrement;
 
-		UpdateCacheFilter(int increment, int positiveIncrement,
+		ClassOccurrenceUpdateFilter(int increment, int positiveIncrement,
 				int negativeIncrement) {
 			this.increment = increment;
 			this.positiveIncrement = positiveIncrement;
@@ -245,88 +253,127 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		public <T extends IndexedClassExpression> T update(T ice) {
 			if (!ice.occurs() && increment > 0)
-				ice.accept(ontologyIndex.inserter);
+				ice.accept(objectCache.inserter);
 
 			ice.updateOccurrenceNumbers(indexUpdater_, increment,
 					positiveIncrement, negativeIncrement);
 
 			if (!ice.occurs() && increment < 0)
-				ice.accept(ontologyIndex.deletor);
+				ice.accept(objectCache.deletor);
 
 			return ice;
 		}
 
-		public <T extends IndexedPropertyChain> T update(T ipc) {
-			if (!ipc.occurs() && increment > 0)
-				ipc.accept(ontologyIndex.inserter);
-
-			ipc.updateOccurrenceNumber(increment);
-
-			if (!ipc.occurs() && increment < 0)
-				ipc.accept(ontologyIndex.deletor);
-
-			return ipc;
-		}
-
-		// TODO: the filter is not used for axioms at the moment
-		public <T extends IndexedAxiom> T update(T axiom) {
-			if (!axiom.occurs() && increment > 0)
-				axiom.accept(ontologyIndex.inserter);
-
-			axiom.updateOccurrenceNumbers(indexUpdater_, increment);
-
-			if (!axiom.occurs() && increment < 0)
-				axiom.accept(ontologyIndex.deletor);
-
-			return axiom;
-		}
-
 		@Override
 		public IndexedClass visit(IndexedClass element) {
-			return update(ontologyIndex.visit(element));
+			return update(objectCache.visit(element));
 		}
 
 		@Override
 		public IndexedIndividual visit(IndexedIndividual element) {
-			return update(ontologyIndex.visit(element));
+			return update(objectCache.visit(element));
 		}
 
 		@Override
 		public IndexedObjectIntersectionOf visit(
 				IndexedObjectIntersectionOf element) {
-			return update(ontologyIndex.visit(element));
+			return update(objectCache.visit(element));
 		}
 
 		@Override
 		public IndexedObjectSomeValuesFrom visit(
 				IndexedObjectSomeValuesFrom element) {
-			return update(ontologyIndex.visit(element));
+			return update(objectCache.visit(element));
 		}
 
 		@Override
 		public IndexedDataHasValue visit(IndexedDataHasValue element) {
-			return update(ontologyIndex.visit(element));
+			return update(objectCache.visit(element));
+		}
+
+	}
+
+	/**
+	 * A {@link PropertyOccurrenceUpdateFilter}, which responsible for updating
+	 * the occurrence counter of {@link IndexedPropertyChain}s, as well as for
+	 * adding such objects to the index, when its occurrence counter becomes
+	 * non-zero, and remove from the index, when its occurrence counter becomes
+	 * zero.
+	 * 
+	 * @author Frantisek Simancik
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	private class PropertyOccurrenceUpdateFilter implements
+			IndexedPropertyChainFilter {
+		protected final int increment;
+
+		PropertyOccurrenceUpdateFilter(int increment) {
+			this.increment = increment;
+		}
+
+		public <T extends IndexedPropertyChain> T update(T ipc) {
+			if (!ipc.occurs() && increment > 0)
+				ipc.accept(objectCache.inserter);
+
+			ipc.updateOccurrenceNumber(increment);
+
+			if (!ipc.occurs() && increment < 0)
+				ipc.accept(objectCache.deletor);
+
+			return ipc;
 		}
 
 		@Override
 		public IndexedObjectProperty visit(IndexedObjectProperty element) {
-			return update(ontologyIndex.visit(element));
+			return update(objectCache.visit(element));
 		}
 
 		@Override
 		public IndexedBinaryPropertyChain visit(
 				IndexedBinaryPropertyChain element) {
-			return update(ontologyIndex.visit(element));
+			return update(objectCache.visit(element));
+		}
+
+	}
+
+	/**
+	 * A {@link AxiomOccurrenceUpdateFilter}, which responsible for updating the
+	 * occurrence counter of {@link IndexedAxiom}s, as well as for adding such
+	 * objects to the index, when its occurrence counter becomes non-zero, and
+	 * remove from the index, when its occurrence counter becomes zero.
+	 * 
+	 * @author Frantisek Simancik
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	private class AxiomOccurrenceUpdateFilter implements IndexedAxiomFilter {
+		protected final int increment;
+
+		AxiomOccurrenceUpdateFilter(int increment) {
+			this.increment = increment;
+		}
+
+		public <T extends IndexedAxiom> T update(T axiom) {
+			if (!axiom.occurs() && increment > 0)
+				axiom.accept(objectCache.inserter);
+
+			axiom.updateOccurrenceNumbers(indexUpdater_, increment);
+
+			if (!axiom.occurs() && increment < 0)
+				axiom.accept(objectCache.deletor);
+
+			return axiom;
 		}
 
 		@Override
 		public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom axiom) {
-			return update(ontologyIndex.visit(axiom));
+			return update(objectCache.visit(axiom));
 		}
 
 		@Override
 		public IndexedDisjointnessAxiom visit(IndexedDisjointnessAxiom axiom) {
-			return update(ontologyIndex.visit(axiom));
+			return update(objectCache.visit(axiom));
 		}
 
 	}
