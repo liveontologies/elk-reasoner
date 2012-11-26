@@ -9,9 +9,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 
-	<groupId>org.semanticweb.elk</groupId>
 	<artifactId>elk-benchmark</artifactId>
-	<version>0.3.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>ELK Benchmarking Package</name>
@@ -24,34 +22,34 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-cli</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-owl-model</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-owl-implementation</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-owl-parsing-javacc</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-util-testing</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-util-logging</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>

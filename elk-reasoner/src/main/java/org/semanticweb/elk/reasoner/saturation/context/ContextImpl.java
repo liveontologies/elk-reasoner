@@ -23,10 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.context;
 
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
@@ -41,6 +38,7 @@ import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
+import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
 
 /**
  * Context implementation that is used for EL reasoning. It provides data
@@ -91,17 +89,11 @@ public class ContextImpl implements Context {
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
 	 */
-	private final Queue<Conclusion> toDo_;
+	private final ActivationStack<Conclusion> toDo_;
 
 	/**
-	 * the flag used to trigger activation and de-activation of contexts. If
-	 * this value is {@code false} then {@link #toDo_} queue should be empty
-	 */
-	private final AtomicBoolean isActive_;
-
-	/**
-	 * {@code true} if all derived {@link Subsumer} of
-	 * {@link #root_} have been computed.
+	 * {@code true} if all derived {@link Subsumer} of {@link #root_} have been
+	 * computed.
 	 */
 	protected volatile boolean isSaturated = false;
 
@@ -118,8 +110,7 @@ public class ContextImpl implements Context {
 	 */
 	public ContextImpl(IndexedClassExpression root) {
 		this.root_ = root;
-		this.toDo_ = new ConcurrentLinkedQueue<Conclusion>();
-		this.isActive_ = new AtomicBoolean(false);
+		this.toDo_ = new ActivationStack<Conclusion>();
 		this.subsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
 	}
 
@@ -131,6 +122,28 @@ public class ContextImpl implements Context {
 	@Override
 	public Set<IndexedClassExpression> getSubsumers() {
 		return subsumers_;
+	}
+
+	@Override
+	public boolean addSubsumer(IndexedClassExpression expression) {
+		return subsumers_.add(expression);
+
+		/*
+		 * if (changed && isSaturated) LOGGER_.error(getRoot() +
+		 * ": adding a superclass to a saturated context: " + expression);
+		 * 
+		 * return changed;
+		 */
+	}
+
+	@Override
+	public boolean containsSubsumer(IndexedClassExpression expression) {
+		return subsumers_.contains(expression);
+	}
+
+	@Override
+	public boolean removeSubsumer(IndexedClassExpression expression) {
+		return subsumers_.remove(expression);
 	}
 
 	@Override
@@ -153,6 +166,16 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
+	public boolean containsBackwardLink(BackwardLink link) {
+		if (backwardLinksByObjectProperty_ != null) {
+			return backwardLinksByObjectProperty_.contains(link.getRelation(),
+					link.getSource());
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean addDisjointnessAxiom(
 			IndexedDisjointnessAxiom disjointnessAxiom) {
 		if (disjointnessAxioms_ == null) {
@@ -164,7 +187,7 @@ public class ContextImpl implements Context {
 		else if (inconsistency == true)
 			// nothing changes
 			return false;
-		else
+		else // inconsistency == false;
 			inconsistency = true;
 		disjointnessAxioms_.put(disjointnessAxiom, inconsistency);
 		return true;
@@ -251,23 +274,6 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public boolean addSubsumer(IndexedClassExpression expression) {
-		return subsumers_.add(expression);
-
-		/*
-		 * if (changed && isSaturated) LOGGER_.error(getRoot() +
-		 * ": adding a superclass to a saturated context: " + expression);
-		 * 
-		 * return changed;
-		 */
-	}
-
-	@Override
-	public boolean removeSubsumer(IndexedClassExpression expression) {
-		return subsumers_.remove(expression);
-	}
-
-	@Override
 	public AbstractChain<ModifiableLinkRule<BackwardLink>> getBackwardLinkRuleChain() {
 		return new AbstractChain<ModifiableLinkRule<BackwardLink>>() {
 
@@ -290,41 +296,12 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean addToDo(Conclusion conclusion) {
-		toDo_.add(conclusion);
-		if (isActive_.get()) {
-			return false;
-		}
-		return isActive_.compareAndSet(false, true);
+		return toDo_.push(conclusion);
 	}
 
 	@Override
 	public Conclusion takeToDo() {
-		return toDo_.poll();
-	}
-
-	@Override
-	public boolean deactivate() {
-		if (!isActive_.get()) {
-			return false;
-		}
-		if (isActive_.compareAndSet(true, false) && !toDo_.isEmpty())
-			return isActive_.compareAndSet(false, true);
-		return false;
-	}
-
-	@Override
-	public boolean containsBackwardLink(BackwardLink link) {
-		if (backwardLinksByObjectProperty_ != null) {
-			return backwardLinksByObjectProperty_.contains(link.getRelation(),
-					link.getSource());
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean containsSubsumer(IndexedClassExpression expression) {
-		return subsumers_.contains(expression);
+		return toDo_.pop();
 	}
 
 	@Override

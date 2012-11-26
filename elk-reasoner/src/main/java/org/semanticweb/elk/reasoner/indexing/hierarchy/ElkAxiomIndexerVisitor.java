@@ -50,11 +50,11 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ElkAxiomIndexerVisitor.class);
-	
+
 	/**
 	 * The object through which the changes in the index are recorded
 	 */
-	private final IndexUpdater indexUpdater_;	
+	private final IndexUpdater indexUpdater_;
 
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
@@ -77,14 +77,14 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 * We'll update it's occurrence when indexing disjointness axioms
 	 */
 	private final IndexedClass owlNothing_;
-	
+
 	/**
 	 * @param ontologyIndex
 	 * @param insert
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
-	public ElkAxiomIndexerVisitor(IndexedObjectCache ontologyIndex, IndexedClass owlNothing,
-			IndexUpdater updater, boolean insert) {
+	public ElkAxiomIndexerVisitor(IndexedObjectCache ontologyIndex,
+			IndexedClass owlNothing, IndexUpdater updater, boolean insert) {
 		this.ontologyIndex = ontologyIndex;
 		this.owlNothing_ = owlNothing;
 		this.indexUpdater_ = updater;
@@ -151,34 +151,22 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			List<? extends ElkClassExpression> disjointClasses) {
 
 		// treat this as a positive occurrence of owl:Nothing
-		if (owlNothing_ == null) throw new RuntimeException("owlNothing_");
-		
-		if (indexUpdater_ == null) throw new RuntimeException("updater");
-		
-		
+		if (owlNothing_ == null)
+			throw new RuntimeException("owlNothing_");
+
+		if (indexUpdater_ == null)
+			throw new RuntimeException("updater");
+
 		owlNothing_.updateOccurrenceNumbers(indexUpdater_, multiplicity,
 				multiplicity, 0);
 
-		if (disjointClasses.size() == 2) {
-			// the binary case
-			IndexedClassExpression ice0 = disjointClasses.get(0).accept(
-					negativeIndexer);
-			IndexedClassExpression ice1 = disjointClasses.get(1).accept(
-					negativeIndexer);
-
-			(new IndexedDisjointnessAxiom(ice0, ice1))
-					.updateOccurrenceNumbers(indexUpdater_, multiplicity);
-		} else if (disjointClasses.size() > 2) {
-			// the unary case
-			List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
-					disjointClasses.size());
-			for (ElkClassExpression c : disjointClasses) {
-				indexed.add(c.accept(negativeIndexer));
-			}
-
-			(new IndexedDisjointnessAxiom(indexed))
-					.updateOccurrenceNumbers(indexUpdater_, multiplicity);
+		List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
+				disjointClasses.size());
+		for (ElkClassExpression c : disjointClasses) {
+			indexed.add(c.accept(negativeIndexer));
 		}
+		(new IndexedDisjointnessAxiom(indexed)).updateOccurrenceNumbers(
+				indexUpdater_, multiplicity);
 	}
 
 	@Override
@@ -225,7 +213,6 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		}
 	}
 
-	
 	/**
 	 * A filter that is applied after the given indexed object has been
 	 * retrieved from the cache. It is used to update the occurrence counts of

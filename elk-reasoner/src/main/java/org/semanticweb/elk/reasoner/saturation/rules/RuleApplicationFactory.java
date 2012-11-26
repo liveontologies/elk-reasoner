@@ -27,16 +27,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.TimedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PreprocessedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.TimedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -196,14 +196,8 @@ public class RuleApplicationFactory implements
 			localStatistics.contContextProcess++;
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
-				if (conclusion == null) {
-					if (context.deactivate()) {
-						// context was re-activated
-						continue;
-					} else {
-						break;
-					}
-				}
+				if (conclusion == null)
+					return;
 				conclusion.accept(conclusionProcessor_, context);
 			}
 		}

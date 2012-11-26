@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.util.collections;
 
+import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -44,7 +45,7 @@ import java.util.Set;
  *            the type of the elements in this set
  * 
  */
-public class ArrayHashSet<E> implements Set<E> {
+public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 
 	/**
 	 * The default initial capacity - MUST be a power of two.
@@ -337,55 +338,17 @@ public class ArrayHashSet<E> implements Set<E> {
 	}
 
 	@Override
+	public boolean removeAll(Collection<?> c) {
+		boolean modified = false;
+		for (Object o : c) {
+			modified |= remove(o);
+		}
+		return modified;
+	}
+
+	@Override
 	public Iterator<E> iterator() {
 		return new ElementIterator();
-	}
-
-	@Override
-	public Object[] toArray() {
-		Object[] result = new Object[size];
-		int i = 0;
-		for (E element : this) {
-			result[i++] = element;
-		}
-		return result;
-	}
-
-	@Override
-	public <T> T[] toArray(T[] a) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	@Override
-	public boolean containsAll(Collection<?> c) {
-		for (Object o : c) {
-			if (!contains(o))
-				return false;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean addAll(Collection<? extends E> c) {
-		boolean change = false;
-		
-		for (E element : c)
-			change = add(element) || change; // order is important here
-		return change;
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> c) {
-		boolean changed = false;
-		for (Object o : c)
-			changed = changed || remove(o);
-		return changed;
 	}
 
 	@Override
@@ -395,7 +358,7 @@ public class ArrayHashSet<E> implements Set<E> {
 				data[i] = null;
 		size = 0;
 	}
-	
+
 	@Override
 	public String toString() {
 		return Arrays.toString(toArray());

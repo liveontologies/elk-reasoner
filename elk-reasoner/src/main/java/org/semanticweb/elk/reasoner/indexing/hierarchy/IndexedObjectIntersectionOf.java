@@ -131,10 +131,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		 */
 
 		try {
-			writer.produce(context, new PositiveSubsumer(
-					firstConjunct_));
-			writer.produce(context, new PositiveSubsumer(
-					secondConjunct_));
+			writer.produce(context, new PositiveSubsumer(firstConjunct_));
+			writer.produce(context, new PositiveSubsumer(secondConjunct_));
 		} finally {
 			// stats.timeObjectIntersectionOfDecompositionRule +=
 			// CachedTimeThread.currentTimeMillis;

@@ -207,46 +207,21 @@ public interface Context {
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this
-	 * {@link Context}. If the method returns {@code true} then this context is
-	 * <em>activated</em> by this call. Each context can be activated at most
-	 * once after it has been created or deactivated using the method
-	 * {@link #deactivate()}. Insertion of {@link Conclusion}s and activation
-	 * {@link Context}s is thread-safe: if several threads call this method for
-	 * the same {@link Context} and possibly (but not necessarily) different
-	 * {@link Conclusion}s then at most one of these method returns {@code true}
-	 * (in unspecified order), unless {{@link #deactivate()} is called as well.
+	 * {@link Context}. The method returns {@code true} when this is the first
+	 * unprocessed conclusion added to the context after it is being created or
+	 * cleared (that is, {@link #takeToDo()} has returned {@code null}). If
+	 * several threads call this method at the same time for the same
+	 * {@link Context} then at most one of these method returns {@code true},
+	 * unless {@link #takeToDo()} is called as well.
 	 * 
 	 * @param conclusion
 	 *            the {@link Conclusion} added to be processed within this
 	 *            {@link Context}
-	 * @return {@code true} if the context has been activated by this call
-	 * @see #deactivate()
+	 * @return {@code true} when the added conclusion is the first unprocessed
+	 *         conclusion for this context
+	 * @see #takeToDo()
 	 */
 	public boolean addToDo(Conclusion conclusion);
-
-	/**
-	 * Deactivate an activated {@link Context}. Only deactivated contexts can be
-	 * subsequently activated by calling {@link #addToDo(Conclusion)}. The
-	 * method returns {@code true} if the {@link Context} becomes activated
-	 * again during the call of this function. This can happen either if the
-	 * context contains some unprocessed {@link Conclusion}s or such
-	 * {@link Conclusion}s have been added by concurrent calls of
-	 * {@link #addToDo(Conclusion)}. It is guaranteed that if after the call of
-	 * {@link #deactivate()} there have been at least one call of
-	 * {@link #addToDo(Conclusion)} and no other call of {@link #deactivate()},
-	 * then exactly one of these calls return {@code true}. If there have been
-	 * no calls of {@link #addToDo(Conclusion)} after {@link #deactivate()} and
-	 * {@link #deactivate()} returns {@code false}, it is guaranteed that there
-	 * are no unprocessed {@link Conclusion}s in this {@link Context}, i.e., the
-	 * method {{@link #takeToDo()} returns {@code false}.
-	 * 
-	 * @return {@code true} if this {@link Context} has been re-activated by
-	 *         this call
-	 * @see #addToDo(Conclusion)
-	 * @see #takeToDo()
-	 * 
-	 */
-	public boolean deactivate();
 
 	/**
 	 * Removes and returns one of the unprocessed {@link Conclusion}s of this
@@ -256,7 +231,6 @@ public interface Context {
 	 * @return some unprocessed {@link Conclusion} of this context, if there is
 	 *         one, or {@code null} if there is no such {@link Conclusion}
 	 * @see #addToDo(Conclusion)
-	 * @see #deactivate()
 	 */
 	public Conclusion takeToDo();
 
