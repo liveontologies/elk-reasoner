@@ -79,6 +79,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * 
 	 * @return true if the represented class expression occurs in the ontology
 	 */
+	@Override
 	public boolean occurs() {
 		return positiveOccurrenceNo > 0 || negativeOccurrenceNo > 0;
 	}
