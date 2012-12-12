@@ -24,7 +24,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
  * A {@link Subsumer}, for which the structure of the enclosed
@@ -43,17 +45,16 @@ public class PositiveSubsumer extends Subsumer {
 		super(superClassExpression);
 	}
 
-	@Override
-	public void apply(SaturationState.Writer engine, Context context) {
+	//@Override
+	public void apply(SaturationState.Writer engine, Context context, RuleApplicationVisitor ruleAppVisitor) {
 		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		// statistics.superClassExpressionTime -=
 		// CachedTimeThread.currentTimeMillis;
 		try {
-
 			// apply decomposition rules
 			expression.applyDecompositionRule(engine, context);
 			// applying all composition rules
-			applyCompositionRules(engine, context);
+			applyCompositionRules(engine, context, ruleAppVisitor);
 		} finally {
 			// statistics.superClassExpressionTime +=
 			// CachedTimeThread.currentTimeMillis;
@@ -63,5 +64,9 @@ public class PositiveSubsumer extends Subsumer {
 	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
+	}
+	
+	public void deapply(Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
+		apply(writer, context, ruleAppVisitor);
 	}
 }

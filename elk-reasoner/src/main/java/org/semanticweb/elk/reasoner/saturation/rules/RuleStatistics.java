@@ -1,4 +1,9 @@
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
+package org.semanticweb.elk.reasoner.saturation.rules;
+
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 
 /*
  * #%L
@@ -83,7 +88,7 @@ public class RuleStatistics extends
 	 * the number of applications of the backward link rule in
 	 * {@link IndexedObjectSomeValuesFrom}
 	 */
-	int countObjectSomeValuesFromBackwardLinkRule;
+	int countPropagationBackwardLinkRule;
 
 	/**
 	 * the time spent within the backward link rule of
@@ -105,7 +110,7 @@ public class RuleStatistics extends
 	 * the number of rule applications of the backward link rule in
 	 * {@link IndexedClass}
 	 */
-	int countClassBottomBackwardLinkRule;
+	int countContradictionBackwardLinkRule;
 
 	/**
 	 * the time spent within the backward link rule of {@link IndexedClass}
@@ -192,7 +197,7 @@ public class RuleStatistics extends
 	 *         {@link IndexedObjectSomeValuesFrom}
 	 */
 	public long getObjectSomeValuesFromBackwardLinkRuleCount() {
-		return countObjectSomeValuesFromBackwardLinkRule;
+		return countPropagationBackwardLinkRule;
 	}
 
 	/**
@@ -224,7 +229,7 @@ public class RuleStatistics extends
 	 *         {@link IndexedClass}
 	 */
 	public long getClassBottomBackwardLinkRuleCount() {
-		return countClassBottomBackwardLinkRule;
+		return countContradictionBackwardLinkRule;
 	}
 
 	/**
@@ -261,7 +266,7 @@ public class RuleStatistics extends
 		timeObjectSomeValuesFromCompositionRule = 0;
 		countObjectSomeValuesFromDecompositionRule = 0;
 		timeObjectSomeValuesFromDecompositionRule = 0;
-		countObjectSomeValuesFromBackwardLinkRule = 0;
+		countPropagationBackwardLinkRule = 0;
 		timeObjectSomeValuesFromBackwardLinkRule = 0;
 		countObjectIntersectionOfDecompositionRule = 0;
 		timeObjectIntersectionOfDecompositionRule = 0;
@@ -271,7 +276,7 @@ public class RuleStatistics extends
 		timeObjectIntersectionOfDecompositionRule = 0;
 		countClassDecompositionRule = 0;
 		timeClassDecompositionRule = 0;
-		countClassBottomBackwardLinkRule = 0;
+		countContradictionBackwardLinkRule = 0;
 		timeClassBottomBackwardLinkRule = 0;
 		countSubClassOfRule = 0;
 		timeSubClassOfRule = 0;
@@ -287,11 +292,11 @@ public class RuleStatistics extends
 		this.timeObjectSomeValuesFromCompositionRule += stats.timeObjectSomeValuesFromCompositionRule;
 		this.countObjectSomeValuesFromDecompositionRule += stats.countObjectSomeValuesFromDecompositionRule;
 		this.timeObjectSomeValuesFromDecompositionRule += stats.timeObjectSomeValuesFromDecompositionRule;
-		this.countObjectSomeValuesFromBackwardLinkRule += stats.countObjectSomeValuesFromBackwardLinkRule;
+		this.countPropagationBackwardLinkRule += stats.countPropagationBackwardLinkRule;
 		this.timeObjectSomeValuesFromBackwardLinkRule += stats.timeObjectSomeValuesFromBackwardLinkRule;
 		this.countClassDecompositionRule += stats.countClassDecompositionRule;
 		this.timeClassDecompositionRule += stats.timeClassDecompositionRule;
-		this.countClassBottomBackwardLinkRule += stats.countClassBottomBackwardLinkRule;
+		this.countContradictionBackwardLinkRule += stats.countContradictionBackwardLinkRule;
 		this.timeClassBottomBackwardLinkRule += stats.timeClassBottomBackwardLinkRule;
 		this.countSubClassOfRule += stats.countSubClassOfRule;
 		this.timeSubClassOfRule += stats.timeSubClassOfRule;

@@ -26,8 +26,10 @@ import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -141,7 +143,7 @@ public class ForwardLink extends AbstractConclusion {
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private static class ThisBackwardLinkRule extends
+	public static class ThisBackwardLinkRule extends
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
 			ModifiableLinkRule<BackwardLink> {
 
@@ -239,6 +241,11 @@ public class ForwardLink extends AbstractConclusion {
 				return new ThisBackwardLinkRule(tail);
 			}
 		};
-
+		
+		@Override
+		public void accept(RuleApplicationVisitor visitor, Writer writer,
+				BackwardLink backwardLink) {
+			visitor.visit(this, writer, backwardLink);
+		}
 	}
 }

@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
@@ -62,6 +61,8 @@ public class RuleApplicationFactory implements
 
 	final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
 	final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
+	final boolean COLLECT_RULE_COUNTS = true;// LOGGER_.isDebugEnabled();
+	final boolean COLLECT_RULE_TIMES = true;// LOGGER_.isDebugEnabled();
 
 	final SaturationState saturationState;
 
@@ -243,11 +244,38 @@ public class RuleApplicationFactory implements
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
 				SaturationState.Writer saturationStateWriter,
 				ThisStatistics localStatistics) {
+
 			return new CombinedConclusionVisitor(
 					new ConclusionInsertionVisitor(),
 					filterRuleConclusionProcessor(
 							new ConclusionApplicationVisitor(
-									saturationStateWriter), localStatistics));
+									saturationStateWriter,
+									getRuleApplicationVisitor(localStatistics)),
+							localStatistics));
+		}
+
+		/**
+		 * 
+		 * @param localStatistics
+		 * @return
+		 */
+		protected RuleApplicationVisitor getRuleApplicationVisitor(
+				ThisStatistics localStatistics) {
+			RuleApplicationVisitor ruleAppVisitor = new BasicRuleApplicationVisitor();
+			RuleStatistics ruleStats = localStatistics.ruleStatistics_;
+
+			if (COLLECT_RULE_COUNTS) {
+				ruleAppVisitor = new CombinedRuleApplicationVisitor(
+						ruleAppVisitor, new CountingRuleApplicationVisitor(
+								ruleStats));
+			}
+
+			if (COLLECT_RULE_TIMES) {
+				ruleAppVisitor = new TimeRuleApplicationVisitor(ruleAppVisitor,
+						ruleStats);
+			}
+
+			return ruleAppVisitor;
 		}
 
 		/**

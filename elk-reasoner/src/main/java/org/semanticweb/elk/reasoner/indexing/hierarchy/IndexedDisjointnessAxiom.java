@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -166,7 +167,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	 *         pavel.klinov@uni-ulm.de
 	 * @author "Yevgeny Kazakov"
 	 */
-	private static class ThisCompositionRule extends
+	public static class ThisCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
@@ -184,6 +185,12 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		ThisCompositionRule(IndexedDisjointnessAxiom axiom) {
 			this((ChainableRule<Context>) null);
 			disjointnessAxioms_.add(axiom);
+		}
+		
+		@Override
+		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
+				Context context) {
+			visitor.visit(this, writer, context);
 		}
 
 		@Override
@@ -233,7 +240,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private static class ThisContradictionRule extends
+	public static class ThisContradictionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 		/**
@@ -291,6 +298,12 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 				return new ThisContradictionRule(tail);
 			}
 		};
+		
+		@Override
+		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
+				Context context) {
+			visitor.visit(this, writer, context);
+		}
 
 	}
 

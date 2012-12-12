@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
@@ -137,7 +138,7 @@ public class IndexedClass extends IndexedClassEntity {
 	 * context initialization rule iff {@code owl:Thing} occurs negatively in
 	 * the ontology.
 	 */
-	private static class OwlThingContextInitializationRule extends
+	public static class OwlThingContextInitializationRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
@@ -187,6 +188,12 @@ public class IndexedClass extends IndexedClassEntity {
 		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
 			return ruleChain.remove(MATCHER_) != null;
 		}
+
+		@Override
+		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
+				Context context) {
+			visitor.visit(this, writer, context);
+		} 
 	}
 
 }

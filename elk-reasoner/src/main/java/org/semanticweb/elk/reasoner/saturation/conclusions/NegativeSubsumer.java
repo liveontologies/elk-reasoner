@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
  * A {@link Subsumer}, for which the structure of the enclosed
@@ -43,15 +44,15 @@ public class NegativeSubsumer extends Subsumer {
 		super(superClassExpression);
 	}
 
-	@Override
-	public void apply(SaturationState.Writer engine, Context context) {
+	//@Override
+	public void apply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
 		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		// statistics.superClassExpressionTime -=
 		// CachedTimeThread.currentTimeMillis;
 
 		try {
 			// applying all composition rules
-			applyCompositionRules(engine, context);
+			applyCompositionRules(writer, context, ruleAppVisitor);
 
 		} finally {
 			// statistics.superClassExpressionTime +=
@@ -59,16 +60,16 @@ public class NegativeSubsumer extends Subsumer {
 		}
 	}
 
-	@Override
-	public void deapply(SaturationState.Writer engine, Context context) {
+	//@Override
+	public void deapply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
 		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		// statistics.superClassExpressionTime -=
 		// CachedTimeThread.currentTimeMillis;
 
 		try {
-			expression.applyDecompositionRule(engine, context);
+			expression.applyDecompositionRule(writer, context);
 			// applying all composition rules
-			applyCompositionRules(engine, context);
+			applyCompositionRules(writer, context, ruleAppVisitor);
 
 		} finally {
 			// statistics.superClassExpressionTime +=

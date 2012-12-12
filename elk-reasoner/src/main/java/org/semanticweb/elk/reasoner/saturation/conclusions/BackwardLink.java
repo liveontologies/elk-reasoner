@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
@@ -42,7 +43,7 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class BackwardLink extends AbstractConclusion {
+public class BackwardLink implements Conclusion {// extends AbstractConclusion {
 
 	/**
 	 * the source {@link Context} of this {@link BackwardLink}; the root of the
@@ -74,8 +75,11 @@ public class BackwardLink extends AbstractConclusion {
 		return source_;
 	}
 
-	@Override
-	public void apply(SaturationState.Writer engine, Context context) {
+	public void deapply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
+		apply(writer, context, ruleAppVisitor);
+	}
+	
+	public void apply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
 
 		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		// statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
@@ -84,7 +88,8 @@ public class BackwardLink extends AbstractConclusion {
 			LinkRule<BackwardLink> backLinkRule = context
 					.getBackwardLinkRuleHead();
 			while (backLinkRule != null) {
-				backLinkRule.apply(engine, this);
+				//backLinkRule.apply(engine, this);
+				backLinkRule.accept(ruleAppVisitor, writer, this);
 				backLinkRule = backLinkRule.next();
 			}
 
@@ -102,7 +107,7 @@ public class BackwardLink extends AbstractConclusion {
 				// if
 				// (!relation_.getSaturated().getLeftComposableProperties().isEmpty())
 				// {
-				engine.produce(source_, new ForwardLink(relation_, context));
+				writer.produce(source_, new ForwardLink(relation_, context));
 			}
 		} finally {
 			// statistics.backLinkTime += CachedTimeThread.currentTimeMillis;

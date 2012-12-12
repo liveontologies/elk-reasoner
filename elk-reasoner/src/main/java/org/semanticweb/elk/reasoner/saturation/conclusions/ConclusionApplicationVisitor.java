@@ -24,54 +24,57 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 public class ConclusionApplicationVisitor implements ConclusionVisitor<Boolean> {
 
-	private final SaturationState.Writer engine_;
+	private final SaturationState.Writer writer_;
+	private final RuleApplicationVisitor ruleAppVisitor_;
 
-	public ConclusionApplicationVisitor(SaturationState.Writer engine) {
-		this.engine_ = engine;
+	public ConclusionApplicationVisitor(SaturationState.Writer writer, RuleApplicationVisitor ruleAppVisitor) {
+		this.writer_ = writer;
+		this.ruleAppVisitor_ = ruleAppVisitor;
 	}
 
 	@Override
 	public Boolean visit(NegativeSubsumer negSCE, Context context) {
-		negSCE.apply(engine_, context);
+		negSCE.apply(writer_, context, ruleAppVisitor_);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
-		posSCE.apply(engine_, context);
+		posSCE.apply(writer_, context, ruleAppVisitor_);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(BackwardLink link, Context context) {
-		link.apply(engine_, context);
+		link.apply(writer_, context, ruleAppVisitor_);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(ForwardLink link, Context context) {
-		link.apply(engine_, context);
+		link.apply(writer_, context);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(Contradiction bot, Context context) {
-		bot.apply(engine_, context);
+		bot.apply(writer_, context);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(Propagation propagation, Context context) {
-		propagation.apply(engine_, context);
+		propagation.apply(writer_, context);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
-		disjointnessAxiom.apply(engine_, context);
+		disjointnessAxiom.apply(writer_, context);
 		return true;
 	}
 

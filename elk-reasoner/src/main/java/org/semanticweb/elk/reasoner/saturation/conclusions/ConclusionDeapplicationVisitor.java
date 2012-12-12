@@ -24,56 +24,59 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 public class ConclusionDeapplicationVisitor implements
 		ConclusionVisitor<Boolean> {
 
-	private final SaturationState.Writer engine_;
+	private final SaturationState.Writer writer_;
+	private final RuleApplicationVisitor ruleAppVisitor_;
+	
 
-	public ConclusionDeapplicationVisitor(SaturationState.Writer engine) {
-		this.engine_ = engine;
+	public ConclusionDeapplicationVisitor(SaturationState.Writer writer, RuleApplicationVisitor ruleAppVisitor) {
+		this.writer_ = writer;
+		this.ruleAppVisitor_ = ruleAppVisitor;
 	}
 
 	@Override
 	public Boolean visit(NegativeSubsumer negSCE, Context context) {
-		negSCE.deapply(engine_, context);
+		negSCE.deapply(writer_, context, ruleAppVisitor_);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
-		posSCE.deapply(engine_, context);
+		posSCE.deapply(writer_, context, ruleAppVisitor_);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(BackwardLink link, Context context) {
-		link.deapply(engine_, context);
+		link.deapply(writer_, context, ruleAppVisitor_);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(ForwardLink link, Context context) {
-		link.deapply(engine_, context);
+		link.deapply(writer_, context);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(Contradiction bot, Context context) {
-		bot.deapply(engine_, context);
+		bot.deapply(writer_, context);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(Propagation propagation, Context context) {
-		propagation.deapply(engine_, context);
+		propagation.deapply(writer_, context);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
-		disjointnessAxiom.deapply(engine_, context);
+		disjointnessAxiom.deapply(writer_, context);
 		return true;
 	}
-
 }

@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -142,7 +143,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	/**
 	 * 
 	 */
-	private static class ThisCompositionRule extends
+	public static class ThisCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
@@ -256,6 +257,12 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 			return changed;
 
+		}
+		
+		@Override
+		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
+				Context context) {
+			visitor.visit(this, writer, context);
 		}
 	}
 }

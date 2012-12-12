@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
@@ -40,8 +41,6 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  *         pavel.klinov@uni-ulm.de
  */
 public class Contradiction extends AbstractConclusion {
-
-	// private static final Logger LOGGER_ = Logger.getLogger(Bottom.class);
 
 	@Override
 	public void deapply(SaturationState.Writer engine, Context context) {
@@ -93,7 +92,7 @@ public class Contradiction extends AbstractConclusion {
 	/**
 	 * A backward link rule to propagate bottom through any new backward links
 	 */
-	private static class BottomBackwardLinkRule extends
+	public static class BottomBackwardLinkRule extends
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
 			ModifiableLinkRule<BackwardLink> {
 
@@ -131,5 +130,11 @@ public class Contradiction extends AbstractConclusion {
 				return new BottomBackwardLinkRule(tail);
 			}
 		};
+
+		@Override
+		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
+				BackwardLink backwardLink) {
+			visitor.visit(this, writer, backwardLink);
+		}
 	}
 }

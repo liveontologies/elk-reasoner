@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
@@ -89,7 +90,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	/**
 	 * 
 	 */
-	private static class ThisCompositionRule extends
+	public static class ThisCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
@@ -208,7 +209,12 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			return changed;
 
 		}
-
+		
+		@Override
+		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
+				Context context) {
+			visitor.visit(this, writer, context);
+		}
 	}
 
 }

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 
 /**
@@ -38,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class Subsumer extends AbstractConclusion {
+public abstract class Subsumer implements Conclusion {//extends AbstractConclusion {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this
@@ -63,15 +64,21 @@ public abstract class Subsumer extends AbstractConclusion {
 		return expression.toString();
 	}
 
-	protected void applyCompositionRules(SaturationState.Writer state,
-			Context context) {
+	protected void applyCompositionRules(SaturationState.Writer writer,
+			Context context, RuleApplicationVisitor ruleAppVisitor) {
 
 		LinkRule<Context> compositionRule = expression.getCompositionRuleHead();
 		for (;;) {
 			if (compositionRule == null)
 				return;
-			compositionRule.apply(state, context);
+			//compositionRule.apply(writer, context);
+			compositionRule.accept(ruleAppVisitor, writer, context);
 			compositionRule = compositionRule.next();
 		}
 	}
+	
+	@Override
+	public Context getSourceContext(Context contextWhereStored) {
+		return contextWhereStored;
+	}	
 }
