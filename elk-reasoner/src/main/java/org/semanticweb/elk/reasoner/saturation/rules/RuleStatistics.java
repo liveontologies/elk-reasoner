@@ -129,6 +129,46 @@ public class RuleStatistics extends
 	long timeSubClassOfRule;
 
 	/**
+	 * 
+	 */
+	int countOwlThingContextInitializationRule;
+	
+	/**
+	 * 
+	 */
+	long timeOwlThingContextInitializationRule;
+
+	/**
+	 * 
+	 */
+	int countDisjointnessAxiomCompositionRule;
+	
+	/**
+	 * 
+	 */
+	long timeDisjointnessAxiomCompositionRule;
+
+	/**
+	 * 
+	 */
+	int countDisjointnessAxiomContradictionRule;
+	
+	/**
+	 * 
+	 */
+	long timeDisjointnessAxiomContradictionRule;
+
+	/**
+	 * 
+	 */
+	int countBackwardLinkFromForwardLinkRule;
+	
+	/**
+	 * 
+	 */
+	long timeBackwardLinkFromForwardLinkRule;
+
+	/**
 	 * @return the number of rule applications for composition of
 	 *         {@link IndexedObjectIntersectionOf}
 	 */
@@ -280,6 +320,14 @@ public class RuleStatistics extends
 		timeClassBottomBackwardLinkRule = 0;
 		countSubClassOfRule = 0;
 		timeSubClassOfRule = 0;
+		countOwlThingContextInitializationRule = 0;
+		timeOwlThingContextInitializationRule = 0;
+		countDisjointnessAxiomCompositionRule = 0;
+		timeDisjointnessAxiomCompositionRule = 0;
+		countDisjointnessAxiomContradictionRule = 0;
+		timeDisjointnessAxiomContradictionRule = 0;
+		countBackwardLinkFromForwardLinkRule = 0;
+		timeBackwardLinkFromForwardLinkRule = 0;
 	}
 
 	public synchronized void merge(RuleStatistics stats) {
@@ -300,6 +348,13 @@ public class RuleStatistics extends
 		this.timeClassBottomBackwardLinkRule += stats.timeClassBottomBackwardLinkRule;
 		this.countSubClassOfRule += stats.countSubClassOfRule;
 		this.timeSubClassOfRule += stats.timeSubClassOfRule;
+		this.countOwlThingContextInitializationRule += stats.countOwlThingContextInitializationRule;
+		this.timeOwlThingContextInitializationRule += stats.timeOwlThingContextInitializationRule;
+		this.countDisjointnessAxiomCompositionRule += stats.countDisjointnessAxiomCompositionRule;
+		this.timeDisjointnessAxiomCompositionRule += stats.timeDisjointnessAxiomCompositionRule;
+		this.countDisjointnessAxiomContradictionRule += stats.countDisjointnessAxiomContradictionRule;
+		this.timeDisjointnessAxiomContradictionRule += stats.timeDisjointnessAxiomContradictionRule;
+		this.countBackwardLinkFromForwardLinkRule += stats.countBackwardLinkFromForwardLinkRule;
+		this.timeBackwardLinkFromForwardLinkRule += stats.timeBackwardLinkFromForwardLinkRule;		
 	}
-
 }

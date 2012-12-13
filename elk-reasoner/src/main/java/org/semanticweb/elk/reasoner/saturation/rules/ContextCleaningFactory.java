@@ -73,9 +73,10 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
 		protected Engine(final ContextCreationListener listener,
 				final ThisStatistics factoryStats) {
-			super(saturationState
-					.getSaturationCheckingWriter(getEngineListener(listener,
-							factoryStats)), factoryStats);
+			super(saturationState.getSaturationCheckingWriter(
+					getEngineListener(listener, factoryStats),
+					getEngineRuleApplicationVisitor(factoryStats)),
+					factoryStats);
 		}
 
 	}

@@ -59,10 +59,10 @@ public class RuleApplicationFactory implements
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
-	final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
-	final boolean COLLECT_RULE_COUNTS = true;// LOGGER_.isDebugEnabled();
-	final boolean COLLECT_RULE_TIMES = true;// LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_RULE_COUNTS = true;// LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_RULE_TIMES = true;// LOGGER_.isDebugEnabled();
 
 	final SaturationState saturationState;
 
@@ -116,6 +116,30 @@ public class RuleApplicationFactory implements
 			}
 		};
 	}
+	
+	/**
+	 * 
+	 * @param localStatistics
+	 * @return
+	 */
+	static RuleApplicationVisitor getEngineRuleApplicationVisitor(
+			ThisStatistics localStatistics) {
+		RuleApplicationVisitor ruleAppVisitor = new BasicRuleApplicationVisitor();
+		RuleStatistics ruleStats = localStatistics.ruleStatistics_;
+
+		if (COLLECT_RULE_COUNTS) {
+			ruleAppVisitor = new CombinedRuleApplicationVisitor(
+					ruleAppVisitor, new CountingRuleApplicationVisitor(
+							ruleStats));
+		}
+
+		if (COLLECT_RULE_TIMES) {
+			ruleAppVisitor = new TimeRuleApplicationVisitor(ruleAppVisitor,
+					ruleStats);
+		}
+
+		return ruleAppVisitor;
+	}	
 
 	/**
 	 * 
@@ -150,8 +174,10 @@ public class RuleApplicationFactory implements
 
 		protected Engine(final ContextCreationListener listener,
 				final ThisStatistics factoryStats) {
-			this(saturationState.getWriter(getEngineListener(listener,
-					factoryStats)), factoryStats);
+			this(saturationState.getWriter(
+					getEngineListener(listener, factoryStats),
+					getEngineRuleApplicationVisitor(factoryStats)),
+					factoryStats);
 		}
 
 		protected Engine(final ContextCreationListener listener) {
@@ -250,33 +276,11 @@ public class RuleApplicationFactory implements
 					filterRuleConclusionProcessor(
 							new ConclusionApplicationVisitor(
 									saturationStateWriter,
-									getRuleApplicationVisitor(localStatistics)),
+									getEngineRuleApplicationVisitor(localStatistics)),
 							localStatistics));
 		}
 
-		/**
-		 * 
-		 * @param localStatistics
-		 * @return
-		 */
-		protected RuleApplicationVisitor getRuleApplicationVisitor(
-				ThisStatistics localStatistics) {
-			RuleApplicationVisitor ruleAppVisitor = new BasicRuleApplicationVisitor();
-			RuleStatistics ruleStats = localStatistics.ruleStatistics_;
 
-			if (COLLECT_RULE_COUNTS) {
-				ruleAppVisitor = new CombinedRuleApplicationVisitor(
-						ruleAppVisitor, new CountingRuleApplicationVisitor(
-								ruleStats));
-			}
-
-			if (COLLECT_RULE_TIMES) {
-				ruleAppVisitor = new TimeRuleApplicationVisitor(ruleAppVisitor,
-						ruleStats);
-			}
-
-			return ruleAppVisitor;
-		}
 
 		/**
 		 * Returns the final {@link ConclusionVisitor} that is used by this

@@ -37,7 +37,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
+import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
  * @author Pavel Klinov
@@ -81,10 +83,12 @@ public class SaturationState {
 		}
 	};
 
-	private final Writer defaultEngine_ = new Writer(DUMMY_LISTENER);
+	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicRuleApplicationVisitor();
+	
+	private final Writer defaultWriter_ = new Writer(DUMMY_LISTENER, DEFAULT_INIT_RULE_APP_VISITOR);
 
-	private final Writer defaultSaturationCheckingEngine_ = new SaturationCheckingWriter(
-			DUMMY_LISTENER);
+	private final Writer defaultSaturationCheckingWriter_ = new SaturationCheckingWriter(
+			DUMMY_LISTENER, DEFAULT_INIT_RULE_APP_VISITOR);
 
 	public SaturationState(OntologyIndex index) {
 		ontologyIndex_ = index;
@@ -97,11 +101,11 @@ public class SaturationState {
 	 *         methods of this {@link Writer} are thread safe
 	 */
 	public Writer getWriter() {
-		return defaultEngine_;
+		return defaultWriter_;
 	}
 
 	public Writer getSaturationCheckingWriter() {
-		return defaultSaturationCheckingEngine_;
+		return defaultSaturationCheckingWriter_;
 	}
 
 	/**
@@ -116,13 +120,13 @@ public class SaturationState {
 	 * @return a new {@link Writer} associated with the given
 	 *         {@link ContextCreationListener}
 	 */
-	public Writer getWriter(ContextCreationListener contextCreationListener) {
-		return new Writer(contextCreationListener);
+	public Writer getWriter(ContextCreationListener contextCreationListener, RuleApplicationVisitor ruleAppVisitor) {
+		return new Writer(contextCreationListener, ruleAppVisitor);
 	}
 
 	public Writer getSaturationCheckingWriter(
-			ContextCreationListener contextCreationListener) {
-		return new SaturationCheckingWriter(contextCreationListener);
+			ContextCreationListener contextCreationListener, RuleApplicationVisitor ruleAppVisitor) {
+		return new SaturationCheckingWriter(contextCreationListener, ruleAppVisitor);
 	}
 
 	/**
@@ -140,9 +144,12 @@ public class SaturationState {
 	public class Writer {
 
 		private final ContextCreationListener contextCreationListener_;
+		
+		private final RuleApplicationVisitor initRuleAppVisitor_;
 
-		private Writer(ContextCreationListener contextCreationListener) {
+		private Writer(ContextCreationListener contextCreationListener, RuleApplicationVisitor ruleAppVisitor) {
 			this.contextCreationListener_ = contextCreationListener;
+			this.initRuleAppVisitor_ = ruleAppVisitor;
 		}
 
 		public IndexedClassExpression getOwlThing() {
@@ -188,7 +195,8 @@ public class SaturationState {
 			LinkRule<Context> initRule = ontologyIndex_
 					.getContextInitRuleHead();
 			while (initRule != null) {
-				initRule.apply(this, context);
+				initRule.accept(initRuleAppVisitor_, this, context);
+				//initRule.apply(this, context);
 				initRule = initRule.next();
 			}
 		}
@@ -228,8 +236,8 @@ public class SaturationState {
 	 */
 	private class SaturationCheckingWriter extends Writer {
 		private SaturationCheckingWriter(
-				ContextCreationListener contextCreationListener) {
-			super(contextCreationListener);
+				ContextCreationListener contextCreationListener, RuleApplicationVisitor ruleAppVisitor) {
+			super(contextCreationListener, ruleAppVisitor);
 		}
 
 		@Override

@@ -53,15 +53,13 @@ public class CountingRuleApplicationVisitor implements RuleApplicationVisitor {
 	public void visit(
 			OwlThingContextInitializationRule rule,
 			Writer writer, Context context) {
-		//TODO add counter
-		//ruleStats_.
+		ruleStats_.countOwlThingContextInitializationRule++;
 	}
 
 	@Override
 	public void visit(IndexedDisjointnessAxiom.ThisCompositionRule rule, Writer writer,
 			Context context) {
-		//TODO add counter
-		//ruleStats_.count
+		ruleStats_.countDisjointnessAxiomCompositionRule++;
 	}
 
 	@Override
@@ -88,13 +86,13 @@ public class CountingRuleApplicationVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(IndexedDisjointnessAxiom.ThisContradictionRule rule,
 			Writer writer, Context context) {
-		//TODO
+		ruleStats_.countDisjointnessAxiomContradictionRule++;
 	}
 
 	@Override
 	public void visit(ForwardLink.ThisBackwardLinkRule rule, Writer writer,
 			BackwardLink backwardLink) {
-		//TODO
+		ruleStats_.countBackwardLinkFromForwardLinkRule++;
 	}
 
 	@Override
@@ -108,6 +106,5 @@ public class CountingRuleApplicationVisitor implements RuleApplicationVisitor {
 	public void visit(BottomBackwardLinkRule rule,
 			Writer writer, BackwardLink backwardLink) {
 		ruleStats_.countContradictionBackwardLinkRule++;	
-	}
-	
+	}	
 }
