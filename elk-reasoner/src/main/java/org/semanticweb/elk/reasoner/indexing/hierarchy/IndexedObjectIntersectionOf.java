@@ -29,10 +29,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -121,25 +122,11 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public void applyDecompositionRule(SaturationState.Writer writer,
-			Context context) {
-		/*
-		 * RuleStatistics stats = ruleEngine.getRulesTimer();
-		 * 
-		 * stats.timeObjectIntersectionOfDecompositionRule -=
-		 * CachedTimeThread.currentTimeMillis;
-		 * stats.countObjectIntersectionOfDecompositionRule++;
-		 */
-
-		try {
-			writer.produce(context, new PositiveSubsumer(firstConjunct_));
-			writer.produce(context, new PositiveSubsumer(secondConjunct_));
-		} finally {
-			// stats.timeObjectIntersectionOfDecompositionRule +=
-			// CachedTimeThread.currentTimeMillis;
-		}
+	public void accept(DecompositionRuleApplicationVisitor visitor,
+			Writer writer, Context context) {
+		visitor.visit(this, writer, context);
 	}
-
+	
 	/**
 	 * 
 	 */

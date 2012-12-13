@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class BasicRuleApplicationVisitor implements RuleApplicationVisitor {
+public class BasicCompositionRuleApplicationVisitor implements RuleApplicationVisitor {
 
 	@Override
 	public void visit(

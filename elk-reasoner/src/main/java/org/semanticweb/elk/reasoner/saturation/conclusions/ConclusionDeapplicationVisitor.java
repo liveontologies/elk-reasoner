@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 public class ConclusionDeapplicationVisitor implements
@@ -31,22 +32,23 @@ public class ConclusionDeapplicationVisitor implements
 
 	private final SaturationState.Writer writer_;
 	private final RuleApplicationVisitor ruleAppVisitor_;
-	
+	private final DecompositionRuleApplicationVisitor decompRuleAppVisitor_;
 
-	public ConclusionDeapplicationVisitor(SaturationState.Writer writer, RuleApplicationVisitor ruleAppVisitor) {
+	public ConclusionDeapplicationVisitor(SaturationState.Writer writer, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
 		this.writer_ = writer;
 		this.ruleAppVisitor_ = ruleAppVisitor;
+		this.decompRuleAppVisitor_ = decompVisitor;
 	}
 
 	@Override
 	public Boolean visit(NegativeSubsumer negSCE, Context context) {
-		negSCE.deapply(writer_, context, ruleAppVisitor_);
+		negSCE.deapply(writer_, context, ruleAppVisitor_, decompRuleAppVisitor_);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
-		posSCE.deapply(writer_, context, ruleAppVisitor_);
+		posSCE.deapply(writer_, context, ruleAppVisitor_, decompRuleAppVisitor_);
 		return true;
 	}
 

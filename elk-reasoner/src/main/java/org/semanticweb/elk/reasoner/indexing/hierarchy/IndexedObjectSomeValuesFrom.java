@@ -30,12 +30,13 @@ import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -127,24 +128,12 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				+ ')';
 	}
 
+	
+	
 	@Override
-	public void applyDecompositionRule(SaturationState.Writer writer,
-			Context context) {
-		/*
-		 * RuleStatistics stats = ruleEngine.getRulesTimer();
-		 * 
-		 * stats.timeObjectSomeValuesFromDecompositionRule -=
-		 * CachedTimeThread.currentTimeMillis;
-		 * stats.countObjectSomeValuesFromDecompositionRule++;
-		 */
-
-		try {
-			writer.produce(writer.getCreateContext(filler), new BackwardLink(
-					context, property));
-		} finally {
-			// stats.timeObjectSomeValuesFromDecompositionRule +=
-			// CachedTimeThread.currentTimeMillis;
-		}
+	public void accept(DecompositionRuleApplicationVisitor visitor,
+			Writer writer, Context context) {
+		visitor.visit(this, writer, context);
 	}
 
 	/**

@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
@@ -100,14 +101,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 		return positiveOccurrenceNo > 0;
 	}
 
-	/**
-	 * Non-recursively. The recursion is implemented in indexing visitors.
-	 */
-	abstract void updateOccurrenceNumbers(IndexUpdater updater, int increment,
-			int positiveIncrement, int negativeIncrement);
-
-	public abstract void applyDecompositionRule(SaturationState.Writer writer,
-			Context context);
 
 	/**
 	 * @return the {@link IndexedObjectProperty} objects that occur in positive
@@ -243,11 +236,29 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 		};
 	}
 
-	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
-
 	@Override
 	public <O> O accept(IndexedObjectVisitor<O> visitor) {
 		return accept((IndexedClassExpressionVisitor<O>) visitor);
-	}
+	}	
+	
+	/**
+	 * Non-recursively. The recursion is implemented in indexing visitors.
+	 */
+	abstract void updateOccurrenceNumbers(IndexUpdater updater, int increment,
+			int positiveIncrement, int negativeIncrement);	
+	
+
+	/**
+	 * 
+	 * @param visitor
+	 * @return
+	 */
+	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
+	
+	/**
+	 * 
+	 * @param visitor
+	 */
+	public abstract void accept(DecompositionRuleApplicationVisitor visitor, SaturationState.Writer writer, Context context);
 
 }

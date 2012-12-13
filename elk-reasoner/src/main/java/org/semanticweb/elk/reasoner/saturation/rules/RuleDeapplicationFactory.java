@@ -96,7 +96,8 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 							filterRuleConclusionProcessor(
 									new ConclusionDeapplicationVisitor(
 											saturationStateWriter,
-											getEngineRuleApplicationVisitor(localStatistics)),
+											getEngineCompositionRuleApplicationVisitor(localStatistics),
+											getEngineDecompositionRuleApplicationVisitor(localStatistics)),
 									localStatistics)),
 					new ConclusionDeletionVisitor());
 		}

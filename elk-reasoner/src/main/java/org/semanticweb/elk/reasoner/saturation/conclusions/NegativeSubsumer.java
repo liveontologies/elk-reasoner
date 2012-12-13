@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
@@ -61,13 +62,14 @@ public class NegativeSubsumer extends Subsumer {
 	}
 
 	//@Override
-	public void deapply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
+	public void deapply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
 		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		// statistics.superClassExpressionTime -=
 		// CachedTimeThread.currentTimeMillis;
 
 		try {
-			expression.applyDecompositionRule(writer, context);
+			//expression.applyDecompositionRule(writer, context);
+			expression.accept(decompVisitor, writer, context);
 			// applying all composition rules
 			applyCompositionRules(writer, context, ruleAppVisitor);
 

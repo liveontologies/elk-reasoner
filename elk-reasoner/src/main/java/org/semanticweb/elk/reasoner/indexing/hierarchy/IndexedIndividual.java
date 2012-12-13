@@ -25,8 +25,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
 public class IndexedIndividual extends IndexedClassEntity {
 	/**
@@ -85,8 +86,8 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	public void applyDecompositionRule(SaturationState.Writer writer,
-			Context context) {
-		// nothing so far
+	public void accept(DecompositionRuleApplicationVisitor visitor,
+			Writer writer, Context context) {
+		// TODO Auto-generated method stub
 	}
 }

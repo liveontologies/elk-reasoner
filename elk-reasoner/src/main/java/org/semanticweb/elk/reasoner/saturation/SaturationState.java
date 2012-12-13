@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
-import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
@@ -83,7 +83,7 @@ public class SaturationState {
 		}
 	};
 
-	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicRuleApplicationVisitor();
+	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
 	
 	private final Writer defaultWriter_ = new Writer(DUMMY_LISTENER, DEFAULT_INIT_RULE_APP_VISITOR);
 

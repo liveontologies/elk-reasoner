@@ -28,10 +28,11 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -116,17 +117,12 @@ public class IndexedClass extends IndexedClassEntity {
 	public boolean occurs() {
 		return occurrenceNo > 0;
 	}
-
+	
 	@Override
-	public void applyDecompositionRule(SaturationState.Writer writer,
-			Context context) {
-		if (this == writer.getOwlNothing()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Producing owl:Nothing for " + context.getRoot());
-			}
-			writer.produce(context, new Contradiction());
-		}
-	}
+	public void accept(DecompositionRuleApplicationVisitor visitor,
+			Writer writer, Context context) {
+		visitor.visit(this, writer, context);
+	}	
 
 	@Override
 	public String toString() {
@@ -195,5 +191,4 @@ public class IndexedClass extends IndexedClassEntity {
 			visitor.visit(this, writer, context);
 		} 
 	}
-
 }

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.BasicDecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -122,9 +123,9 @@ public class RuleApplicationFactory implements
 	 * @param localStatistics
 	 * @return
 	 */
-	static RuleApplicationVisitor getEngineRuleApplicationVisitor(
+	static RuleApplicationVisitor getEngineCompositionRuleApplicationVisitor(
 			ThisStatistics localStatistics) {
-		RuleApplicationVisitor ruleAppVisitor = new BasicRuleApplicationVisitor();
+		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
 		RuleStatistics ruleStats = localStatistics.ruleStatistics_;
 
 		if (COLLECT_RULE_COUNTS) {
@@ -134,8 +135,25 @@ public class RuleApplicationFactory implements
 		}
 
 		if (COLLECT_RULE_TIMES) {
-			ruleAppVisitor = new TimeRuleApplicationVisitor(ruleAppVisitor,
-					ruleStats);
+			ruleAppVisitor = TimeRuleApplicationVisitor.getTimeCompositionRuleApplicationVisitor(ruleAppVisitor, ruleStats);
+		}
+
+		return ruleAppVisitor;
+	}	
+	
+	static DecompositionRuleApplicationVisitor getEngineDecompositionRuleApplicationVisitor(
+			ThisStatistics localStatistics) {
+		DecompositionRuleApplicationVisitor ruleAppVisitor = new BasicDecompositionRuleApplicationVisitor();
+		RuleStatistics ruleStats = localStatistics.ruleStatistics_;
+
+		if (COLLECT_RULE_COUNTS) {
+			ruleAppVisitor = new CombinedDecompositionRuleApplicationVisitor(
+					ruleAppVisitor, new CountingRuleApplicationVisitor(
+							ruleStats));
+		}
+
+		if (COLLECT_RULE_TIMES) {
+			ruleAppVisitor = TimeRuleApplicationVisitor.getTimeDecompositionRuleApplicationVisitor(ruleAppVisitor, ruleStats);
 		}
 
 		return ruleAppVisitor;
@@ -176,7 +194,7 @@ public class RuleApplicationFactory implements
 				final ThisStatistics factoryStats) {
 			this(saturationState.getWriter(
 					getEngineListener(listener, factoryStats),
-					getEngineRuleApplicationVisitor(factoryStats)),
+					getEngineCompositionRuleApplicationVisitor(factoryStats)),
 					factoryStats);
 		}
 
@@ -270,13 +288,16 @@ public class RuleApplicationFactory implements
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
 				SaturationState.Writer saturationStateWriter,
 				ThisStatistics localStatistics) {
-
+			
+			
+			
 			return new CombinedConclusionVisitor(
 					new ConclusionInsertionVisitor(),
 					filterRuleConclusionProcessor(
 							new ConclusionApplicationVisitor(
 									saturationStateWriter,
-									getEngineRuleApplicationVisitor(localStatistics)),
+									getEngineCompositionRuleApplicationVisitor(localStatistics),
+									getEngineDecompositionRuleApplicationVisitor(localStatistics)),
 							localStatistics));
 		}
 

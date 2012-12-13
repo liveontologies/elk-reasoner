@@ -4,6 +4,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 
 /*
  * #%L
@@ -33,8 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class RuleStatistics extends
-		org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics {
+public class RuleStatistics extends ConclusionStatistics {
 
 	/**
 	 * the number of rule applications for composition of
@@ -94,7 +94,7 @@ public class RuleStatistics extends
 	 * the time spent within the backward link rule of
 	 * {@link IndexedObjectSomeValuesFrom}
 	 */
-	long timeObjectSomeValuesFromBackwardLinkRule;
+	long timePropagationBackwardLinkRule;
 
 	/**
 	 * the number of rule applications for decomposition of {@link IndexedClass}
@@ -115,7 +115,7 @@ public class RuleStatistics extends
 	/**
 	 * the time spent within the backward link rule of {@link IndexedClass}
 	 */
-	long timeClassBottomBackwardLinkRule;
+	long timeContradictionBackwardLinkRule;
 
 	/**
 	 * the number of rule applications unfolding {@link IndexedSubClassOfAxiom}
@@ -169,134 +169,6 @@ public class RuleStatistics extends
 	long timeBackwardLinkFromForwardLinkRule;
 
 	/**
-	 * @return the number of rule applications for composition of
-	 *         {@link IndexedObjectIntersectionOf}
-	 */
-	public long getObjectIntersectionOfCompositionRuleCount() {
-		return countObjectIntersectionOfCompositionRule;
-	}
-
-	/**
-	 * @return the time spent within the composition rule of
-	 *         {@link IndexedObjectIntersectionOf}
-	 */
-	public long getObjectIntersectionOfCompositionRuleTime() {
-		return timeObjectIntersectionOfCompositionRule;
-	}
-
-	/**
-	 * @return the number of rule applications for decomposition of
-	 *         {@link IndexedObjectIntersectionOf}
-	 */
-	public long getObjectIntersectionOfDecompositionRuleCount() {
-		return countObjectIntersectionOfDecompositionRule;
-	}
-
-	/**
-	 * @return the time spent within the decomposition rule of
-	 *         {@link IndexedObjectIntersectionOf}
-	 */
-	public long getObjectIntersectionOfDecompositionRuleTime() {
-		return timeObjectIntersectionOfDecompositionRule;
-	}
-
-	/**
-	 * @return the number of rule applications for composition of
-	 *         {@link IndexedObjectIntersectionOf}
-	 */
-	public long getObjectSomeValuesFromCompositionRuleCount() {
-		return countObjectSomeValuesFromCompositionRule;
-	}
-
-	/**
-	 * @return the time spent within the composition rule of
-	 *         {@link IndexedObjectSomeValuesFrom}
-	 */
-	public long getObjectSomeValuesFromCompositionRuleTime() {
-		return timeObjectSomeValuesFromCompositionRule;
-	}
-
-	/**
-	 * @return the number of rule applications for decomposition of
-	 *         {@link IndexedObjectSomeValuesFrom}
-	 */
-	public long getObjectSomeValuesFromDecompositionRuleCount() {
-		return countObjectSomeValuesFromDecompositionRule;
-	}
-
-	/**
-	 * @return the time spent within the decomposition rule of
-	 *         {@link IndexedObjectSomeValuesFrom}
-	 */
-	public long getObjectSomeValuesFromDecompositionRuleTime() {
-		return timeObjectSomeValuesFromDecompositionRule;
-	}
-
-	/**
-	 * @return the number of applications of the backward link rule in
-	 *         {@link IndexedObjectSomeValuesFrom}
-	 */
-	public long getObjectSomeValuesFromBackwardLinkRuleCount() {
-		return countPropagationBackwardLinkRule;
-	}
-
-	/**
-	 * @return the time spent within the backward link rule of
-	 *         {@link IndexedObjectSomeValuesFrom}
-	 */
-	public long getObjectSomeValuesFromBackwardLinkRuleTime() {
-		return timeObjectSomeValuesFromBackwardLinkRule;
-	}
-
-	/**
-	 * @return the number of rule applications for decomposition of
-	 *         {@link IndexedClass}
-	 */
-	public long getClassDecompositionRuleCount() {
-		return countClassDecompositionRule;
-	}
-
-	/**
-	 * @return the time spent within the decomposition rule of
-	 *         {@link IndexedClass}
-	 */
-	public long getClassDecompositionRuleTime() {
-		return timeClassDecompositionRule;
-	}
-
-	/**
-	 * @return the number of rule applications of the backward link rule in
-	 *         {@link IndexedClass}
-	 */
-	public long getClassBottomBackwardLinkRuleCount() {
-		return countContradictionBackwardLinkRule;
-	}
-
-	/**
-	 * @return the time spent within the backward link rule of
-	 *         {@link IndexedClass}
-	 */
-	public long getClassBottomBackwardLinkRuleTime() {
-		return timeClassBottomBackwardLinkRule;
-	}
-
-	/**
-	 * @return the number of rule applications unfolding
-	 *         {@link IndexedSubClassOfAxiom}
-	 */
-	public long getSubClassOfRuleCount() {
-		return countSubClassOfRule;
-	}
-
-	/**
-	 * @return the time spent within the composition rule of
-	 *         {@link IndexedSubClassOfAxiom}
-	 */
-	public long getSubClassOfRuleTime() {
-		return timeSubClassOfRule;
-	}
-
-	/**
 	 * Reset all timers to zero.
 	 */
 	@Override
@@ -307,7 +179,7 @@ public class RuleStatistics extends
 		countObjectSomeValuesFromDecompositionRule = 0;
 		timeObjectSomeValuesFromDecompositionRule = 0;
 		countPropagationBackwardLinkRule = 0;
-		timeObjectSomeValuesFromBackwardLinkRule = 0;
+		timePropagationBackwardLinkRule = 0;
 		countObjectIntersectionOfDecompositionRule = 0;
 		timeObjectIntersectionOfDecompositionRule = 0;
 		countObjectIntersectionOfCompositionRule = 0;
@@ -317,7 +189,7 @@ public class RuleStatistics extends
 		countClassDecompositionRule = 0;
 		timeClassDecompositionRule = 0;
 		countContradictionBackwardLinkRule = 0;
-		timeClassBottomBackwardLinkRule = 0;
+		timeContradictionBackwardLinkRule = 0;
 		countSubClassOfRule = 0;
 		timeSubClassOfRule = 0;
 		countOwlThingContextInitializationRule = 0;
@@ -341,11 +213,11 @@ public class RuleStatistics extends
 		this.countObjectSomeValuesFromDecompositionRule += stats.countObjectSomeValuesFromDecompositionRule;
 		this.timeObjectSomeValuesFromDecompositionRule += stats.timeObjectSomeValuesFromDecompositionRule;
 		this.countPropagationBackwardLinkRule += stats.countPropagationBackwardLinkRule;
-		this.timeObjectSomeValuesFromBackwardLinkRule += stats.timeObjectSomeValuesFromBackwardLinkRule;
+		this.timePropagationBackwardLinkRule += stats.timePropagationBackwardLinkRule;
 		this.countClassDecompositionRule += stats.countClassDecompositionRule;
 		this.timeClassDecompositionRule += stats.timeClassDecompositionRule;
 		this.countContradictionBackwardLinkRule += stats.countContradictionBackwardLinkRule;
-		this.timeClassBottomBackwardLinkRule += stats.timeClassBottomBackwardLinkRule;
+		this.timeContradictionBackwardLinkRule += stats.timeContradictionBackwardLinkRule;
 		this.countSubClassOfRule += stats.countSubClassOfRule;
 		this.timeSubClassOfRule += stats.timeSubClassOfRule;
 		this.countOwlThingContextInitializationRule += stats.countOwlThingContextInitializationRule;

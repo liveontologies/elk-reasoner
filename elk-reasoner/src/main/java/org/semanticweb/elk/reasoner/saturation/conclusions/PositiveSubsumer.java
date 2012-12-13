@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
@@ -46,15 +47,16 @@ public class PositiveSubsumer extends Subsumer {
 	}
 
 	//@Override
-	public void apply(SaturationState.Writer engine, Context context, RuleApplicationVisitor ruleAppVisitor) {
+	public void apply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
 		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
 		// statistics.superClassExpressionTime -=
 		// CachedTimeThread.currentTimeMillis;
 		try {
 			// apply decomposition rules
-			expression.applyDecompositionRule(engine, context);
+			expression.accept(decompVisitor, writer, context);
+			//expression.applyDecompositionRule(writer, context);
 			// applying all composition rules
-			applyCompositionRules(engine, context, ruleAppVisitor);
+			applyCompositionRules(writer, context, ruleAppVisitor);
 		} finally {
 			// statistics.superClassExpressionTime +=
 			// CachedTimeThread.currentTimeMillis;
@@ -66,7 +68,7 @@ public class PositiveSubsumer extends Subsumer {
 		return visitor.visit(this, context);
 	}
 	
-	public void deapply(Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
-		apply(writer, context, ruleAppVisitor);
+	public void deapply(Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
+		apply(writer, context, ruleAppVisitor, decompVisitor);
 	}
 }

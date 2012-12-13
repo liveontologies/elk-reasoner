@@ -24,16 +24,19 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 public class ConclusionApplicationVisitor implements ConclusionVisitor<Boolean> {
 
 	private final SaturationState.Writer writer_;
 	private final RuleApplicationVisitor ruleAppVisitor_;
+	private final DecompositionRuleApplicationVisitor decompRuleAppVisitor_;
 
-	public ConclusionApplicationVisitor(SaturationState.Writer writer, RuleApplicationVisitor ruleAppVisitor) {
+	public ConclusionApplicationVisitor(SaturationState.Writer writer, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
 		this.writer_ = writer;
 		this.ruleAppVisitor_ = ruleAppVisitor;
+		this.decompRuleAppVisitor_ = decompVisitor;
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public class ConclusionApplicationVisitor implements ConclusionVisitor<Boolean> 
 
 	@Override
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
-		posSCE.apply(writer_, context, ruleAppVisitor_);
+		posSCE.apply(writer_, context, ruleAppVisitor_, decompRuleAppVisitor_);
 		return true;
 	}
 

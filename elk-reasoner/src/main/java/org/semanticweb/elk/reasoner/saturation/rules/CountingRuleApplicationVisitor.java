@@ -24,7 +24,9 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -41,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class CountingRuleApplicationVisitor implements RuleApplicationVisitor {
+public class CountingRuleApplicationVisitor implements RuleApplicationVisitor, DecompositionRuleApplicationVisitor {
 
 	private final RuleStatistics ruleStats_;
 	
@@ -106,5 +108,27 @@ public class CountingRuleApplicationVisitor implements RuleApplicationVisitor {
 	public void visit(BottomBackwardLinkRule rule,
 			Writer writer, BackwardLink backwardLink) {
 		ruleStats_.countContradictionBackwardLinkRule++;	
+	}
+
+	@Override
+	public void visit(IndexedClass ice, Writer writer, Context context) {
+		ruleStats_.countClassDecompositionRule++;
+	}
+
+	@Override
+	public void visit(IndexedDataHasValue ice, Writer writer, Context context) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void visit(IndexedObjectIntersectionOf ice, Writer writer,
+			Context context) {
+		ruleStats_.countObjectIntersectionOfDecompositionRule++;
+	}
+
+	@Override
+	public void visit(IndexedObjectSomeValuesFrom ice, Writer writer,
+			Context context) {
+		ruleStats_.countObjectSomeValuesFromDecompositionRule++;
 	}	
 }
