@@ -53,15 +53,17 @@ public class TimeRuleApplicationVisitor {
 			public void visit(
 					OwlThingContextInitializationRule rule,
 					Writer writer, Context context) {
-				//TODO
+				ruleStats.timeOwlThingContextInitializationRule -= CachedTimeThread.currentTimeMillis;
 				ruleAppVisitor.visit(rule, writer, context);
+				ruleStats.timeOwlThingContextInitializationRule += CachedTimeThread.currentTimeMillis;
 			}
 
 			@Override
 			public void visit(IndexedDisjointnessAxiom.ThisCompositionRule rule, Writer writer,
 					Context context) {
-				//TODO
+				ruleStats.timeDisjointnessAxiomCompositionRule -= CachedTimeThread.currentTimeMillis;
 				ruleAppVisitor.visit(rule, writer, context);
+				ruleStats.timeDisjointnessAxiomCompositionRule += CachedTimeThread.currentTimeMillis;
 			}
 
 			@Override
@@ -94,15 +96,17 @@ public class TimeRuleApplicationVisitor {
 			@Override
 			public void visit(IndexedDisjointnessAxiom.ThisContradictionRule rule,
 					Writer writer, Context context) {
-				//TODO
+				ruleStats.timeDisjointnessAxiomContradictionRule-= CachedTimeThread.currentTimeMillis;
 				ruleAppVisitor.visit(rule, writer, context);
+				ruleStats.timeDisjointnessAxiomContradictionRule += CachedTimeThread.currentTimeMillis;
 			}
 
 			@Override
 			public void visit(ForwardLink.ThisBackwardLinkRule rule, Writer writer,
 					BackwardLink backwardLink) {
-				//TODO
+				ruleStats.timeBackwardLinkFromForwardLinkRule-= CachedTimeThread.currentTimeMillis;
 				ruleAppVisitor.visit(rule, writer, backwardLink);
+				ruleStats.timeBackwardLinkFromForwardLinkRule += CachedTimeThread.currentTimeMillis;
 			}
 
 			@Override
