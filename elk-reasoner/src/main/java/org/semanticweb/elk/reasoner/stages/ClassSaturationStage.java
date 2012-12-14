@@ -79,8 +79,9 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
+		
 		reasoner.doneClassSaturation = true;
-
+		reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 	}
 
 	@Override

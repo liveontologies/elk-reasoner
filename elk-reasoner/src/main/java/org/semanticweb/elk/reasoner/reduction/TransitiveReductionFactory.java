@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -143,6 +144,10 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	public void printStatistics() {
 		saturationFactory.printStatistics();
 	}
+	
+	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
+		return saturationFactory.getRuleAndConclusionStatistics();
+	}	
 
 	/**
 	 * The listener class used for the class expression saturation engine, which
@@ -437,5 +442,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		}
 
 	}
+
+
 
 }

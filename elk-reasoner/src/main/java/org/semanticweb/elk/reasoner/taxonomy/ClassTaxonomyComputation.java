@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -74,6 +75,10 @@ public class ClassTaxonomyComputation
 	 */
 	public void printStatistics() {
 		inputProcessorFactory.printStatistics();
+	}
+
+	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
+		return inputProcessorFactory.getRuleAndConclusionStatistics();
 	}
 
 }

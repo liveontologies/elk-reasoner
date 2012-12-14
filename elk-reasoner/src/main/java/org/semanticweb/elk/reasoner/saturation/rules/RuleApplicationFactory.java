@@ -27,12 +27,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.BasicDecompositionRuleApp
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PreprocessedConclusionVisitor;
@@ -70,7 +70,7 @@ public class RuleApplicationFactory implements
 	/**
 	 * The {@link ThisStatistics} aggregated for all workers
 	 */
-	private final ThisStatistics aggregatedStats_;
+	private final RuleAndConclusionStatistics aggregatedStats_;
 
 	private final boolean trackModifiedContexts_;
 
@@ -80,7 +80,7 @@ public class RuleApplicationFactory implements
 
 	public RuleApplicationFactory(final SaturationState saturationState,
 			boolean trackModifiedContexts) {
-		this.aggregatedStats_ = new ThisStatistics();
+		this.aggregatedStats_ = new RuleAndConclusionStatistics();
 		this.saturationState = saturationState;
 		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
@@ -96,19 +96,16 @@ public class RuleApplicationFactory implements
 
 	@Override
 	public void finish() {
-		aggregatedStats_.check();
+		aggregatedStats_.check(LOGGER_);
 	}
 
-	/**
-	 * Prints statistic of rule applications
-	 */
-	public void printStatistics() {
-		aggregatedStats_.print();
+	public RuleAndConclusionStatistics getStatistics() {
+		return aggregatedStats_;
 	}
 
 	static ContextCreationListener getEngineListener(
 			final ContextCreationListener listener,
-			final ThisStatistics factoryStats) {
+			final RuleAndConclusionStatistics factoryStats) {
 		return new ContextCreationListener() {
 			@Override
 			public void notifyContextCreation(Context newContext) {
@@ -124,9 +121,9 @@ public class RuleApplicationFactory implements
 	 * @return
 	 */
 	static RuleApplicationVisitor getEngineCompositionRuleApplicationVisitor(
-			ThisStatistics localStatistics) {
+			RuleAndConclusionStatistics localStatistics) {
 		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
-		RuleStatistics ruleStats = localStatistics.ruleStatistics_;
+		RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 
 		if (COLLECT_RULE_COUNTS) {
 			ruleAppVisitor = new CombinedRuleApplicationVisitor(
@@ -142,9 +139,9 @@ public class RuleApplicationFactory implements
 	}	
 	
 	static DecompositionRuleApplicationVisitor getEngineDecompositionRuleApplicationVisitor(
-			ThisStatistics localStatistics) {
+			RuleAndConclusionStatistics localStatistics) {
 		DecompositionRuleApplicationVisitor ruleAppVisitor = new BasicDecompositionRuleApplicationVisitor();
-		RuleStatistics ruleStats = localStatistics.ruleStatistics_;
+		RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 
 		if (COLLECT_RULE_COUNTS) {
 			ruleAppVisitor = new CombinedDecompositionRuleApplicationVisitor(
@@ -172,10 +169,10 @@ public class RuleApplicationFactory implements
 		/**
 		 * Local {@link ThisStatistics} created for every worker
 		 */
-		protected final ThisStatistics localStatistics;
+		protected final RuleAndConclusionStatistics localStatistics;
 
 		protected Engine(SaturationState.Writer saturationStateWriter,
-				ThisStatistics localStatistics) {
+				RuleAndConclusionStatistics localStatistics) {
 			this.conclusionProcessor_ = getConclusionProcessor(
 					saturationStateWriter, localStatistics);
 			this.saturationStateWriter_ = saturationStateWriter;
@@ -183,7 +180,7 @@ public class RuleApplicationFactory implements
 		}
 
 		protected Engine(SaturationState.Writer saturationStateWriter) {
-			this(saturationStateWriter, new ThisStatistics());
+			this(saturationStateWriter, new RuleAndConclusionStatistics());
 		}
 
 		protected Engine() {
@@ -191,7 +188,7 @@ public class RuleApplicationFactory implements
 		}
 
 		protected Engine(final ContextCreationListener listener,
-				final ThisStatistics factoryStats) {
+				final RuleAndConclusionStatistics factoryStats) {
 			this(saturationState.getWriter(
 					getEngineListener(listener, factoryStats),
 					getEngineCompositionRuleApplicationVisitor(factoryStats)),
@@ -199,7 +196,7 @@ public class RuleApplicationFactory implements
 		}
 
 		protected Engine(final ContextCreationListener listener) {
-			this(listener, new ThisStatistics());
+			this(listener, new RuleAndConclusionStatistics());
 		}
 
 		@Override
@@ -261,11 +258,11 @@ public class RuleApplicationFactory implements
 		 */
 		protected ConclusionVisitor<Boolean> filterRuleConclusionProcessor(
 				ConclusionVisitor<Boolean> ruleProcessor,
-				ThisStatistics localStatistics) {
+				RuleAndConclusionStatistics localStatistics) {
 			if (COLLECT_CONCLUSION_COUNTS) {
 				return new PreprocessedConclusionVisitor<Boolean>(
 						new CountingConclusionVisitor(
-								localStatistics.conclusionsStatistics_
+								localStatistics.getConclusionStatistics()
 										.getUsedConclusionCounts()),
 						ruleProcessor);
 			} else
@@ -287,9 +284,7 @@ public class RuleApplicationFactory implements
 		 */
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
 				SaturationState.Writer saturationStateWriter,
-				ThisStatistics localStatistics) {
-			
-			
+				RuleAndConclusionStatistics localStatistics) {
 			
 			return new CombinedConclusionVisitor(
 					new ConclusionInsertionVisitor(),
@@ -319,7 +314,7 @@ public class RuleApplicationFactory implements
 		 */
 		protected ConclusionVisitor<?> getConclusionProcessor(
 				SaturationState.Writer saturationStateWriter,
-				ThisStatistics localStatistics) {
+				RuleAndConclusionStatistics localStatistics) {
 			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(
 					saturationStateWriter, localStatistics);
 			if (trackModifiedContexts_)
@@ -329,78 +324,17 @@ public class RuleApplicationFactory implements
 			if (COLLECT_CONCLUSION_COUNTS) {
 				result = new PreprocessedConclusionVisitor<Boolean>(
 						new CountingConclusionVisitor(
-								localStatistics.conclusionsStatistics_
+								localStatistics.getConclusionStatistics()
 										.getProcessedConclusionCounts()),
 						result);
 			}
 			if (COLLECT_CONCLUSION_TIMES)
 				return new TimedConclusionVisitor(
-						localStatistics.conclusionsStatistics_
+						localStatistics.getConclusionStatistics()
 								.getConclusionTimers(),
 						result);
 			else
 				return result;
-		}
-	}
-
-	/**
-	 * Counters accumulating statistical information about this factory.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
-	static class ThisStatistics {
-
-		private final ConclusionStatistics conclusionsStatistics_ = new ConclusionStatistics();
-
-		private final RuleStatistics ruleStatistics_ = new RuleStatistics();
-
-		/**
-		 * The number of created contexts
-		 */
-		int countCreatedContexts;
-		/**
-		 * the number of times a context has been processed using
-		 * {@link Engine#process(Context)}
-		 */
-		int contContextProcess;
-
-		/**
-		 * the time spent within {@link Engine#process()}
-		 */
-		long timeContextProcess;
-
-		public void reset() {
-			conclusionsStatistics_.reset();
-			ruleStatistics_.reset();
-			countCreatedContexts = 0;
-			timeContextProcess = 0;
-		}
-
-		public synchronized void add(ThisStatistics statistics) {
-			this.conclusionsStatistics_.add(statistics.conclusionsStatistics_);
-			this.ruleStatistics_.add(statistics.ruleStatistics_);
-			this.contContextProcess += statistics.contContextProcess;
-			this.timeContextProcess += statistics.timeContextProcess;
-		}
-
-		public void check() {
-			if (countCreatedContexts > contContextProcess)
-				LOGGER_.error("More contexts than context activations!");
-			conclusionsStatistics_.check();
-			ruleStatistics_.check();
-		}
-
-		public void print() {
-			if (!LOGGER_.isDebugEnabled())
-				return;
-			if (countCreatedContexts > 0)
-				LOGGER_.debug("Contexts created: " + countCreatedContexts);
-			if (countCreatedContexts > 0)
-				LOGGER_.debug("Contexts processsing: " + contContextProcess
-						+ " (" + timeContextProcess + " ms)");
-			conclusionsStatistics_.print();
-			ruleStatistics_.print();
 		}
 	}
 

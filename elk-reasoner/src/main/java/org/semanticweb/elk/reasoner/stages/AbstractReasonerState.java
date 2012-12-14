@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
@@ -57,6 +58,17 @@ public abstract class AbstractReasonerState {
 			.getLogger(AbstractReasonerState.class);
 
 	final SaturationState saturationState;
+	
+	/**
+	 * Accumulated statistics regarding produced conclusions and rule
+	 * applications. Stored here because more than one stage can apply
+	 * inference rules (e.g. during incremental reasoning).
+	 * 
+	 * TODO Better to hide this behind a common interface? Then we
+	 * can uniformly maintain aggregated stats of different kinds produced by
+	 * different computations across multiple stages
+	 */
+	final RuleAndConclusionStatistics ruleAndConclusionStats;
 	
 	/**
 	 * 
@@ -131,6 +143,7 @@ public abstract class AbstractReasonerState {
 		this.ontologyIndex = ontoIndex;
 		this.objectCache_ = ontoIndex;
 		this.saturationState = new SaturationState(ontoIndex);
+		this.ruleAndConclusionStats = new RuleAndConclusionStatistics();
 	}
 
 	public void setIncrementalMode(boolean set) {
@@ -246,6 +259,7 @@ public abstract class AbstractReasonerState {
 	 */
 	public void reset() {
 		resetLoading();
+		ruleAndConclusionStats.reset();
 	}
 
 	/**

@@ -140,7 +140,7 @@ public class TimeRuleApplicationVisitor {
 
 			@Override
 			public void visit(IndexedDataHasValue ice, Writer writer, Context context) {
-				// TODO Auto-generated method stub
+				// TODO 
 				ruleAppVisitor.visit(ice, writer, context);
 			}
 

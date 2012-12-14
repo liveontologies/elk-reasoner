@@ -220,7 +220,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * Print statistics about the saturation
 	 */
 	public void printStatistics() {
-		ruleApplicationFactory_.printStatistics();
+		ruleApplicationFactory_.getStatistics().print(LOGGER_);
 		checkStatistics();
 		if (LOGGER_.isDebugEnabled()) {
 			if (aggregatedStats_.jobsSubmittedNo > 0)
@@ -245,6 +245,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		if (aggregatedStats_.jobsSubmittedNo != aggregatedStats_.jobsAlreadyDoneNo
 				+ +aggregatedStats_.jobsProcessedNo)
 			LOGGER_.error("Some submitted saturation jobs were not processed!");
+	}
+	
+	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
+		return ruleApplicationFactory_.getStatistics();
 	}
 
 	/**
@@ -519,5 +523,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			this.locks += statistics.locks;
 		}
 	}
+
+
 
 }

@@ -64,8 +64,6 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	public List<ReasonerStage> getDependencies() {
 		return Arrays.asList((ReasonerStage) new ConsistencyCheckingStage(
 				reasoner));
-		// return Arrays
-		// .asList((ReasonerStage) new ClassSaturationStage(reasoner));
 	}
 
 	@Override
@@ -85,6 +83,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		
 		reasoner.taxonomy = computation_.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
+		reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 	}
 
 	@Override

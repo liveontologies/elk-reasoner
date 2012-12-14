@@ -123,6 +123,10 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	public void printStatistics() {
 		inputProcessorFactory.printStatistics();
 	}
+	
+	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
+		return inputProcessorFactory.getRuleAndConclusionStatistics();
+	}	
 
 	/**
 	 * Dynamic collection view for saturation checking jobs that correspond to

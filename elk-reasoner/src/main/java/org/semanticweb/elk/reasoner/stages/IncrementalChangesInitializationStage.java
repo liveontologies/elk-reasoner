@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -50,15 +51,17 @@ import org.semanticweb.elk.reasoner.saturation.rules.TimeRuleApplicationVisitor;
 class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 	// logger for this class
-	//private static final Logger LOGGER_ =
-	//Logger.getLogger(IncrementalChangesInitializationStage.class);
+	// private static final Logger LOGGER_ =
+	// Logger.getLogger(IncrementalChangesInitializationStage.class);
 	static final boolean COLLECT_RULE_COUNTS = true;// LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_RULE_TIMES = true;// LOGGER_.isDebugEnabled();	
+	static final boolean COLLECT_RULE_TIMES = true;// LOGGER_.isDebugEnabled();
 	private final ReasonerStage dependency_;
 
 	private IncrementalChangesInitialization initialization_ = null;
 
 	private final boolean deletions_;
+
+	private final RuleAndConclusionStatistics stageStatistics_ = new RuleAndConclusionStatistics();
 
 	IncrementalChangesInitializationStage(AbstractReasonerState reasoner,
 			boolean deletions) {
@@ -114,6 +117,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		}
 
 		reasoner.incrementalState.setStageStatus(stage(), true);
+		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 	}
 
 	@Override
@@ -124,7 +128,8 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
 		Collection<IndexedClassExpression> inputs = Collections.emptyList();
-		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(new RuleStatistics());
+		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(stageStatistics_
+				.getRuleStatistics());
 
 		if (deletions_) {
 			changedInitRules = diffIndex.getRemovedContextInitRules();
@@ -139,8 +144,6 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
 			inputs = reasoner.ontologyIndex.getIndexedClassExpressions();
 		}
-		
-		//System.out.println("Input size " + inputs.size());
 
 		initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
@@ -153,13 +156,14 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
 
 		if (COLLECT_RULE_COUNTS) {
-			ruleAppVisitor = new CombinedRuleApplicationVisitor(
-					ruleAppVisitor, new CountingRuleApplicationVisitor(
-							ruleStatistics));
+			ruleAppVisitor = new CombinedRuleApplicationVisitor(ruleAppVisitor,
+					new CountingRuleApplicationVisitor(ruleStatistics));
 		}
 
 		if (COLLECT_RULE_TIMES) {
-			ruleAppVisitor = TimeRuleApplicationVisitor.getTimeCompositionRuleApplicationVisitor(ruleAppVisitor, ruleStatistics);
+			ruleAppVisitor = TimeRuleApplicationVisitor
+					.getTimeCompositionRuleApplicationVisitor(ruleAppVisitor,
+							ruleStatistics);
 		}
 
 		return ruleAppVisitor;
