@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
@@ -51,10 +52,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.TimeRuleApplicationVisitor;
 class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 	// logger for this class
-	// private static final Logger LOGGER_ =
-	// Logger.getLogger(IncrementalChangesInitializationStage.class);
-	static final boolean COLLECT_RULE_COUNTS = true;// LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_RULE_TIMES = true;// LOGGER_.isDebugEnabled();
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IncrementalChangesInitializationStage.class);
+	static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
 	private final ReasonerStage dependency_;
 
 	private IncrementalChangesInitialization initialization_ = null;

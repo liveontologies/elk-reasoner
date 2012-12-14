@@ -62,8 +62,8 @@ public class RuleApplicationFactory implements
 
 	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
 	static final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_RULE_COUNTS = true;// LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_RULE_TIMES = true;// LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
 
 	final SaturationState saturationState;
 
