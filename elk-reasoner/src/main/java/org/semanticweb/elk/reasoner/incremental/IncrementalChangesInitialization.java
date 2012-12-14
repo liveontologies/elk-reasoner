@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -59,12 +60,11 @@ public class IncrementalChangesInitialization
 			Collection<IndexedClassExpression> inputs,
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
-			SaturationState state,
-			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor) {
+			SaturationState state, ComputationExecutor executor,
+			RuleApplicationVisitor ruleAppVisitor,
+			int maxWorkers, ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
-				changedGlobalRules), executor,
-				maxWorkers, progressMonitor);
+				changedGlobalRules, ruleAppVisitor), executor, maxWorkers, progressMonitor);
 	}
 }
 
@@ -78,14 +78,17 @@ class ContextInitializationFactory
 	private final SaturationState.Writer saturationStateWriter_;
 	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
 	private final LinkRule<Context> changedGlobalRuleHead_;
+	private final RuleApplicationVisitor ruleAppVisitor_;
 
 	public ContextInitializationFactory(
 			SaturationState state,
 			Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges,
-			LinkRule<Context> changedGlobalRuleHead) {
+			LinkRule<Context> changedGlobalRuleHead,
+			RuleApplicationVisitor ruleAppVisitor) {
 		saturationStateWriter_ = state.getWriter();
 		indexChanges_ = indexChanges;
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
+		ruleAppVisitor_ = ruleAppVisitor;
 	}
 
 	@Override
@@ -102,19 +105,19 @@ class ContextInitializationFactory
 					LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
 					while (nextGlobalRule != null) {
 						// apply all changed global context rules
-						nextGlobalRule.apply(saturationStateWriter_, context);
+						nextGlobalRule.accept(ruleAppVisitor_, saturationStateWriter_, context);
+						//nextGlobalRule.apply(saturationStateWriter_, context);
 						nextGlobalRule = nextGlobalRule.next();
 					}
 
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
-							indexChanges_.keySet(),
-							context.getSubsumers())) {
+							indexChanges_.keySet(), context.getSubsumers())) {
 						// applying the changed rules for this class expression
 						LinkRule<Context> nextLocalRule = indexChanges_
 								.get(changedICE);
 						while (nextLocalRule != null) {
-							nextLocalRule
-									.apply(saturationStateWriter_, context);
+							nextLocalRule.accept(ruleAppVisitor_, saturationStateWriter_, context);
+							//nextLocalRule.apply(saturationStateWriter_, context);
 							nextLocalRule = nextLocalRule.next();
 						}
 					}

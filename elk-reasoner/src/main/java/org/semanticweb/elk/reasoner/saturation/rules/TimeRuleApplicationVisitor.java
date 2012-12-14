@@ -46,7 +46,7 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
  */
 public class TimeRuleApplicationVisitor {
 
-	static RuleApplicationVisitor getTimeCompositionRuleApplicationVisitor(final RuleApplicationVisitor ruleAppVisitor, final RuleStatistics ruleStats) {
+	public static RuleApplicationVisitor getTimeCompositionRuleApplicationVisitor(final RuleApplicationVisitor ruleAppVisitor, final RuleStatistics ruleStats) {
 		return new RuleApplicationVisitor() {
 			
 			@Override
@@ -157,118 +157,4 @@ public class TimeRuleApplicationVisitor {
 			}
 		};
 	}
-	
-	
-	
-	/*private final RuleStatistics ruleStats_;
-	private final RuleApplicationVisitor compositionRuleProcessor_;
-	private final DecompositionRuleApplicationVisitor decompositionRuleProcessor_;
-	
-	TimeRuleApplicationVisitor(RuleApplicationVisitor processor, DecompositionRuleApplicationVisitor decompProcessor, RuleStatistics stats) {
-		compositionRuleProcessor_ = processor;
-		decompositionRuleProcessor_ = decompProcessor;
-		ruleStats_ = stats;
-	}
-	
-	@Override
-	public void visit(
-			OwlThingContextInitializationRule rule,
-			Writer writer, Context context) {
-		//TODO
-		compositionRuleProcessor_.visit(rule, writer, context);
-	}
-
-	@Override
-	public void visit(IndexedDisjointnessAxiom.ThisCompositionRule rule, Writer writer,
-			Context context) {
-		//TODO
-		compositionRuleProcessor_.visit(rule, writer, context);
-	}
-
-	@Override
-	public void visit(
-			IndexedObjectIntersectionOf.ThisCompositionRule rule,
-			Writer writer, Context context) {
-		ruleStats_.timeObjectIntersectionOfCompositionRule -= CachedTimeThread.currentTimeMillis;
-		compositionRuleProcessor_.visit(rule, writer, context);
-		ruleStats_.timeObjectIntersectionOfCompositionRule += CachedTimeThread.currentTimeMillis;
-	}
-
-	@Override
-	public void visit(
-			IndexedSubClassOfAxiom.ThisCompositionRule rule,
-			Writer writer, Context context) {
-		ruleStats_.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis;
-		compositionRuleProcessor_.visit(rule, writer, context);
-		ruleStats_.timeSubClassOfRule += CachedTimeThread.currentTimeMillis;
-	}
-
-	@Override
-	public void visit(
-			IndexedObjectSomeValuesFrom.ThisCompositionRule rule,
-			Writer writer, Context context) {
-		ruleStats_.timeObjectSomeValuesFromCompositionRule -= CachedTimeThread.currentTimeMillis;
-		compositionRuleProcessor_.visit(rule, writer, context);
-		ruleStats_.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
-	}
-
-	@Override
-	public void visit(IndexedDisjointnessAxiom.ThisContradictionRule rule,
-			Writer writer, Context context) {
-		//TODO
-		compositionRuleProcessor_.visit(rule, writer, context);
-	}
-
-	@Override
-	public void visit(ForwardLink.ThisBackwardLinkRule rule, Writer writer,
-			BackwardLink backwardLink) {
-		//TODO
-		compositionRuleProcessor_.visit(rule, writer, backwardLink);
-	}
-
-	@Override
-	public void visit(
-			Propagation.ThisBackwardLinkRule rule,
-			Writer writer, BackwardLink backwardLink) {
-		ruleStats_.timePropagationBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
-		compositionRuleProcessor_.visit(rule, writer, backwardLink);
-		ruleStats_.timePropagationBackwardLinkRule += CachedTimeThread.currentTimeMillis;
-	}
-
-	@Override
-	public void visit(BottomBackwardLinkRule rule,
-			Writer writer, BackwardLink backwardLink) {
-		ruleStats_.timeContradictionBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
-		compositionRuleProcessor_.visit(rule, writer, backwardLink);
-		ruleStats_.timeContradictionBackwardLinkRule += CachedTimeThread.currentTimeMillis;
-	}
-
-	@Override
-	public void visit(IndexedClass ice, Writer writer, Context context) {
-		ruleStats_.timeClassDecompositionRule -= CachedTimeThread.currentTimeMillis;
-		decompositionRuleProcessor_.visit(ice, writer, context);
-		ruleStats_.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
-	}
-
-	@Override
-	public void visit(IndexedDataHasValue ice, Writer writer, Context context) {
-		// TODO Auto-generated method stub
-		decompositionRuleProcessor_.visit(ice, writer, context);
-	}
-
-	@Override
-	public void visit(IndexedObjectIntersectionOf ice, Writer writer,
-			Context context) {
-		ruleStats_.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread.currentTimeMillis;
-		decompositionRuleProcessor_.visit(ice, writer, context);
-		ruleStats_.timeObjectIntersectionOfDecompositionRule += CachedTimeThread.currentTimeMillis;
-	}
-
-	@Override
-	public void visit(IndexedObjectSomeValuesFrom ice, Writer writer,
-			Context context) {
-		ruleStats_.timeObjectSomeValuesFromDecompositionRule -= CachedTimeThread.currentTimeMillis;
-		decompositionRuleProcessor_.visit(ice, writer, context);
-		ruleStats_.timeObjectSomeValuesFromDecompositionRule += CachedTimeThread.currentTimeMillis;		
-	}*/
 }

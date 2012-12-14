@@ -33,7 +33,13 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.CombinedRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CountingRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.rules.TimeRuleApplicationVisitor;
 
 /**
  * Reverts inferences
@@ -44,8 +50,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 	// logger for this class
-	// private static final Logger LOGGER_ =
-	// Logger.getLogger(IncrementalDeSaturationStage.class);
+	//private static final Logger LOGGER_ =
+	//Logger.getLogger(IncrementalChangesInitializationStage.class);
+	static final boolean COLLECT_RULE_COUNTS = true;// LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_RULE_TIMES = true;// LOGGER_.isDebugEnabled();	
 	private final ReasonerStage dependency_;
 
 	private IncrementalChangesInitialization initialization_ = null;
@@ -116,6 +124,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
 		Collection<IndexedClassExpression> inputs = Collections.emptyList();
+		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(new RuleStatistics());
 
 		if (deletions_) {
 			changedInitRules = diffIndex.getRemovedContextInitRules();
@@ -135,8 +144,25 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 		initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
-				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProcessExecutor(), ruleAppVisitor, workerNo,
 				reasoner.getProgressMonitor());
+	}
+
+	private RuleApplicationVisitor getRuleApplicationVisitor(
+			RuleStatistics ruleStatistics) {
+		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
+
+		if (COLLECT_RULE_COUNTS) {
+			ruleAppVisitor = new CombinedRuleApplicationVisitor(
+					ruleAppVisitor, new CountingRuleApplicationVisitor(
+							ruleStatistics));
+		}
+
+		if (COLLECT_RULE_TIMES) {
+			ruleAppVisitor = TimeRuleApplicationVisitor.getTimeCompositionRuleApplicationVisitor(ruleAppVisitor, ruleStatistics);
+		}
+
+		return ruleAppVisitor;
 	}
 
 	@Override

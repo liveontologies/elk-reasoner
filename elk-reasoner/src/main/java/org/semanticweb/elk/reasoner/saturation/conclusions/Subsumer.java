@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class Subsumer implements Conclusion {//extends AbstractConclusion {
+public abstract class Subsumer implements Conclusion {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this
@@ -71,7 +71,6 @@ public abstract class Subsumer implements Conclusion {//extends AbstractConclusi
 		for (;;) {
 			if (compositionRule == null)
 				return;
-			//compositionRule.apply(writer, context);
 			compositionRule.accept(ruleAppVisitor, writer, context);
 			compositionRule = compositionRule.next();
 		}

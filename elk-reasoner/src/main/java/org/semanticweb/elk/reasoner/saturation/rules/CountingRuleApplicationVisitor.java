@@ -47,7 +47,7 @@ public class CountingRuleApplicationVisitor implements RuleApplicationVisitor, D
 
 	private final RuleStatistics ruleStats_;
 	
-	CountingRuleApplicationVisitor(RuleStatistics stats) {
+	public CountingRuleApplicationVisitor(RuleStatistics stats) {
 		ruleStats_ = stats;
 	}
 	

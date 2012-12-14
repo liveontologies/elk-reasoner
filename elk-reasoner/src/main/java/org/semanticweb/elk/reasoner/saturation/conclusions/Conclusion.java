@@ -1,7 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /*
  * #%L
@@ -29,18 +28,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  * A general type of conclusions, produced by inference rules. This is the main
  * type of information that is exchanged between {@link Context}s. When a
  * {@link Conclusion} has been derived for a particular {@link Context}, it
- * should be processed within this context, therefore every {@link Conclusion}
- * should implement the {@link Rule} interface for argument {@link Context}.
+ * should be processed within this context.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface Conclusion {//extends ReversibleRule<Context> {
+public interface Conclusion {
 
-	//public void apply(SaturationState.Writer writer, Context element);
-	
-	//public void deapply(SaturationState.Writer writer, Context element);
-	
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context);
 	
 	public Context getSourceContext(Context contextWhereStored);

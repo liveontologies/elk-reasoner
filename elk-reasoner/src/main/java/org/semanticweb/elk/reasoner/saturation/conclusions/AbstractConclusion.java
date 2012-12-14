@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public abstract class AbstractConclusion implements Conclusion {
 
-	//@Override
+
 	public void deapply(Writer writer, Context context) {
 		apply(writer, context);
 	}
