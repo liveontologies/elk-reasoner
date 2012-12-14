@@ -25,9 +25,6 @@ import org.apache.log4j.Logger;
  */
 
 public class ConclusionStatistics {
-	// logger for this class
-	protected static final Logger LOGGER_ = Logger
-			.getLogger(ConclusionStatistics.class);
 
 	private final ConclusionCounter processedConclusionCounts_;
 	private final ConclusionCounter usedConclusionCounts_;
@@ -77,80 +74,80 @@ public class ConclusionStatistics {
 
 	private static String ERR_MSG_MORE_USED = ": more used that processed!";
 
-	public void check() {
+	public void check(Logger logger) {
 		if (usedConclusionCounts_.countPositiveSubsumers > processedConclusionCounts_.countPositiveSubsumers)
-			LOGGER_.error("Positive Subsumers" + ERR_MSG_MORE_USED);
+			logger.error("Positive Subsumers" + ERR_MSG_MORE_USED);
 		if (usedConclusionCounts_.countNegativeSubsumers > processedConclusionCounts_.countNegativeSubsumers)
-			LOGGER_.error("Negative Subsumers" + ERR_MSG_MORE_USED);
+			logger.error("Negative Subsumers" + ERR_MSG_MORE_USED);
 		if (usedConclusionCounts_.countBackwardLinks > processedConclusionCounts_.countBackwardLinks)
-			LOGGER_.error("Backward Links" + ERR_MSG_MORE_USED);
+			logger.error("Backward Links" + ERR_MSG_MORE_USED);
 		if (usedConclusionCounts_.countForwardLinks > processedConclusionCounts_.countForwardLinks)
-			LOGGER_.error("Forward Links" + ERR_MSG_MORE_USED);
+			logger.error("Forward Links" + ERR_MSG_MORE_USED);
 		if (usedConclusionCounts_.countPropagations > processedConclusionCounts_.countPropagations)
-			LOGGER_.error("Propagations" + ERR_MSG_MORE_USED);
+			logger.error("Propagations" + ERR_MSG_MORE_USED);
 		if (usedConclusionCounts_.countContradictions > processedConclusionCounts_.countContradictions)
-			LOGGER_.error("Contradictions" + ERR_MSG_MORE_USED);
+			logger.error("Contradictions" + ERR_MSG_MORE_USED);
 		if (usedConclusionCounts_.countDisjointnessAxioms > processedConclusionCounts_.countDisjointnessAxioms)
-			LOGGER_.error("Disjointness Axioms" + ERR_MSG_MORE_USED);
+			logger.error("Disjointness Axioms" + ERR_MSG_MORE_USED);
 	}
 
-	public void print() {
-		if (!LOGGER_.isDebugEnabled())
+	public void print(Logger logger) {
+		if (!logger.isDebugEnabled())
 			return;
 		if (addCounter == 0)
 			return;
 		if (processedConclusionCounts_.countPositiveSubsumers > 0
 				|| conclusionProcessingTimer_.timePositiveSubsumers > 0)
-			LOGGER_.debug("Positive Subsumers produced/used: "
+			logger.debug("Positive Subsumers produced/used: "
 					+ processedConclusionCounts_.countPositiveSubsumers + "/"
 					+ usedConclusionCounts_.countPositiveSubsumers + " ("
 					+ conclusionProcessingTimer_.timePositiveSubsumers
 					/ addCounter + " ms)");
 		if (processedConclusionCounts_.countNegativeSubsumers > 0
 				|| conclusionProcessingTimer_.timeNegativeSubsumers > 0)
-			LOGGER_.debug("Negative Subsumers produced/used: "
+			logger.debug("Negative Subsumers produced/used: "
 					+ processedConclusionCounts_.countNegativeSubsumers + "/"
 					+ usedConclusionCounts_.countNegativeSubsumers + " ("
 					+ conclusionProcessingTimer_.timeNegativeSubsumers
 					/ addCounter + " ms)");
 		if (processedConclusionCounts_.countBackwardLinks > 0
 				|| conclusionProcessingTimer_.timeBackwardLinks > 0)
-			LOGGER_.debug("Backward Links produced/used: "
+			logger.debug("Backward Links produced/used: "
 					+ processedConclusionCounts_.countBackwardLinks + "/"
 					+ usedConclusionCounts_.countBackwardLinks + " ("
 					+ conclusionProcessingTimer_.timeBackwardLinks / addCounter
 					+ " ms)");
 		if (processedConclusionCounts_.countForwardLinks > 0
 				|| conclusionProcessingTimer_.timeForwardLinks > 0)
-			LOGGER_.debug("Forward Links produced/used: "
+			logger.debug("Forward Links produced/used: "
 					+ processedConclusionCounts_.countForwardLinks + "/"
 					+ usedConclusionCounts_.countForwardLinks + " ("
 					+ conclusionProcessingTimer_.timeForwardLinks / addCounter
 					+ " ms)");
 		if (processedConclusionCounts_.countPropagations > 0
 				|| conclusionProcessingTimer_.timePropagations > 0)
-			LOGGER_.debug("Propagations produced/used: "
+			logger.debug("Propagations produced/used: "
 					+ processedConclusionCounts_.countPropagations + "/"
 					+ usedConclusionCounts_.countPropagations + " ("
 					+ conclusionProcessingTimer_.timePropagations / addCounter
 					+ " ms)");
 		if (processedConclusionCounts_.countContradictions > 0
 				|| conclusionProcessingTimer_.timeContradictions > 0)
-			LOGGER_.debug("Contradictions produced/used: "
+			logger.debug("Contradictions produced/used: "
 					+ processedConclusionCounts_.countContradictions + "/"
 					+ usedConclusionCounts_.countContradictions + " ("
 					+ conclusionProcessingTimer_.timeContradictions
 					/ addCounter + " ms)");
 		if (processedConclusionCounts_.countDisjointnessAxioms > 0
 				|| conclusionProcessingTimer_.timeDisjointnessAxioms > 0)
-			LOGGER_.debug("Disjointness Axioms produced/used: "
+			logger.debug("Disjointness Axioms produced/used: "
 					+ processedConclusionCounts_.countDisjointnessAxioms + "/"
 					+ usedConclusionCounts_.countDisjointnessAxioms + " ("
 					+ conclusionProcessingTimer_.timeDisjointnessAxioms
 					/ addCounter + " ms)");
 		long totalTime = conclusionProcessingTimer_.getTotalTime();
 		if (totalTime > 0)
-			LOGGER_.debug("Total conclusion processing time: " + totalTime
+			logger.debug("Total conclusion processing time: " + totalTime
 					/ addCounter + " ms");
 	}
 }

@@ -135,7 +135,7 @@ public class TimeRuleApplicationVisitor {
 			public void visit(IndexedClass ice, Writer writer, Context context) {
 				ruleStats.timeClassDecompositionRule -= CachedTimeThread.currentTimeMillis;
 				ruleAppVisitor.visit(ice, writer, context);
-				ruleStats.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
+				ruleStats.timeClassDecompositionRule += CachedTimeThread.currentTimeMillis;
 			}
 
 			@Override

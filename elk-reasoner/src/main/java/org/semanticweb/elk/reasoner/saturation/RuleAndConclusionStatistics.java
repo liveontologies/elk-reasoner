@@ -73,8 +73,7 @@ public class RuleAndConclusionStatistics {
 	public void check(Logger logger) {
 		if (countCreatedContexts > contContextProcess)
 			logger.error("More contexts than context activations!");
-		conclusionsStatistics_.check();
-		ruleStatistics_.check();
+		conclusionsStatistics_.check(logger);
 	}
 
 	public void print(Logger logger) {
@@ -85,8 +84,8 @@ public class RuleAndConclusionStatistics {
 		if (countCreatedContexts > 0)
 			logger.debug("Contexts processsing: " + contContextProcess
 					+ " (" + timeContextProcess + " ms)");
-		conclusionsStatistics_.print();
-		ruleStatistics_.print();
+		conclusionsStatistics_.print(logger);
+		ruleStatistics_.print(logger);
 	}
 	
 	public RuleStatistics getRuleStatistics() {
