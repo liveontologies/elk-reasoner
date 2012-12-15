@@ -49,6 +49,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
@@ -162,6 +163,13 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
 		indexSubObjectPropertyOfAxiom(axiom.getSubObjectPropertyExpression(),
 				axiom.getSuperObjectPropertyExpression());
+		return null;
+	}
+
+	@Override
+	public Void visit(ElkSubDataPropertyOfAxiom axiom) {
+		indexSubDataPropertyOfAxiom(axiom.getSubDataPropertyExpression(),
+				axiom.getSuperDataPropertyExpression());
 		return null;
 	}
 
