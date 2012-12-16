@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.semanticweb.elk</groupId>
 	<artifactId>elk-parent</artifactId>
-	<version>0.3.1-SNAPSHOT</version>
+	<version>0.3.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -138,8 +138,8 @@
 	<distributionManagement>
 		<downloadUrl>http://code.google.com/p/elk-reasoner/downloads/list</downloadUrl>
 		<site>
-			<id>elk-reasoner.googlecode.com</id>
-			<url>svn:https://elk-reasoner.googlecode.com/svn/m2/site</url>
+			<id>elk.semanticweb.org</id>
+			<url>scp://elk.semanticweb.org/home/elkuser/elk_semanticweb_org/www/maven/${project.version}</url>
 		</site>
 	</distributionManagement>
 
@@ -168,23 +168,12 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<owlapi.version>3.3</owlapi.version>
+		<owlapi.version>3.4</owlapi.version>
 		<protege.version>4.1.0</protege.version>
 		<java.required.version>1.6</java.required.version>
 		<!-- TODO: get current year automatically -->
 		<currentYear>2012</currentYear>
 	</properties>
-
-	<repositories>
-		<!-- adding a Sonatype repository for official owlapi releases; remove 
-			once it is synced with Maven central -->
-		<repository>
-			<id>Sonatype repository</id>
-			<name>Sonatype's Maven repository</name>
-			<url>https://oss.sonatype.org/content/repositories/releases/</url>
-		</repository>
-	</repositories>
-
 
 	<build>
 		<pluginManagement>
@@ -251,13 +240,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>2.7</version>
-					<dependencies>
-						<dependency>
-							<groupId>com.google.code.maven-svn-wagon</groupId>
-							<artifactId>maven-svn-wagon</artifactId>
-							<version>1.4</version>
-						</dependency>
-					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -265,9 +247,9 @@
 					<version>3.1</version>
 					<dependencies>
 						<dependency>
-							<groupId>com.google.code.maven-svn-wagon</groupId>
-							<artifactId>maven-svn-wagon</artifactId>
-							<version>1.4</version>
+							<groupId>org.apache.maven.wagon</groupId>
+							<artifactId>wagon-ssh</artifactId>
+							<version>2.2</version>
 						</dependency>
 					</dependencies>
 				</plugin>

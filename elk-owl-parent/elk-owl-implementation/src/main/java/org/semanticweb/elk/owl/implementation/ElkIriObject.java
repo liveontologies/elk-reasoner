@@ -40,4 +40,31 @@ public abstract class ElkIriObject extends ElkObjectImpl {
 	public ElkIri getIri() {
 		return iri;
 	}
+
+	@Override
+	public int hashCode() {
+		return iri.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ElkIriObject other = (ElkIriObject) obj;
+		if (iri == null) {
+			if (other.iri != null)
+				return false;
+		} else if (!iri.equals(other.iri))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return iri.toString();
+	}
 }

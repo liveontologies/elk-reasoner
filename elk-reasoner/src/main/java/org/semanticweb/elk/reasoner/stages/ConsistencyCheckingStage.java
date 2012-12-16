@@ -44,7 +44,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private ConsistencyChecking computation = null;
+	private ConsistencyChecking computation_ = null;
 
 	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -62,36 +62,34 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new ObjectPropertyCompositionsPrecomputationStage(
-						reasoner),
-						(ReasonerStage) new DataPropertyHierarchyComputationStage(
-								reasoner),
-						(ReasonerStage) new ContextInitializationStage(reasoner));
+		return Arrays.asList(
+				(ReasonerStage) new OntologyLoadingStage(reasoner),
+				(ReasonerStage) new ChangesLoadingStage(reasoner),
+				(ReasonerStage) new ContextInitializationStage(reasoner));		
 	}
 
 	@Override
 	public void execute() throws ElkInterruptedException {
-		if (computation == null)
+		if (computation_ == null)
 			initComputation();
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
-				computation.process();
+				computation_.process();
 				if (!interrupted())
 					break;
 			}
 		} finally {
 			progressMonitor.finish();
 		}
-		reasoner.consistentOntology = computation.isConsistent();
+		reasoner.inconsistentOntology = computation_.isInconsistent();
 		reasoner.doneConsistencyCheck = true;
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		this.computation = new ConsistencyChecking(
+		this.computation_ = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
 		if (LOGGER_.isInfoEnabled())
@@ -100,8 +98,8 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		if (computation != null)
-			computation.printStatistics();
+		if (computation_ != null)
+			computation_.printStatistics();
 	}
 
 }

@@ -1,0 +1,14 @@
+/elk-util-collections
+/elk-util-common
+/elk-util-concurrent
+/elk-util-hashing
+/elk-util-io
+/elk-util-logging
+/elk-util-testing
+!/elk-util-logging/
+!/elk-util-concurrent/
+!/elk-util-testing/
+!/elk-util-common/
+!/elk-util-collections/
+!/elk-util-hashing/
+!/elk-util-io/

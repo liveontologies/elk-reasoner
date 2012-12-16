@@ -22,8 +22,22 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.Map;
+
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkObjectIntersectionOf in an ontology.
@@ -68,8 +82,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			firstConjunct.addNegConjunctionByConjunct(this, secondConjunct);
-			secondConjunct.addNegConjunctionByConjunct(this, firstConjunct);
+			registerContextRules();
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -77,8 +90,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
-			firstConjunct.removeNegConjunctionByConjunct(this, secondConjunct);
-			secondConjunct.removeNegConjunctionByConjunct(this, firstConjunct);
+			deregisterContextRules();
 		}
 
 	}
@@ -89,4 +101,109 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 				+ this.secondConjunct + ')';
 	}
 
+	@Override
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
+		RuleStatistics stats = ruleEngine.getRulesTimer();
+
+		stats.timeObjectIntersectionOfDecompositionRule -= CachedTimeThread.currentTimeMillis;
+		stats.countObjectIntersectionOfDecompositionRule++;
+
+		try {
+			ruleEngine.produce(context, new PositiveSuperClassExpression(
+					firstConjunct));
+			ruleEngine.produce(context, new PositiveSuperClassExpression(
+					secondConjunct));
+		} finally {
+			stats.timeObjectIntersectionOfDecompositionRule += CachedTimeThread.currentTimeMillis;
+		}
+	}
+
+	public void registerContextRules() {
+		firstConjunct
+				.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_,
+						ThisCompositionRule.FACTORY_)
+				.addConjunctionByConjunct(this, secondConjunct);
+		secondConjunct
+				.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_,
+						ThisCompositionRule.FACTORY_)
+				.addConjunctionByConjunct(this, firstConjunct);
+	}
+
+	public void deregisterContextRules() {
+		deregister(ThisCompositionRule.MATCHER_, firstConjunct, secondConjunct);
+		deregister(ThisCompositionRule.MATCHER_, secondConjunct, firstConjunct);
+	}
+
+	@SuppressWarnings("static-method")
+	private void deregister(Matcher<ContextRules, ThisCompositionRule> matcher,
+			IndexedClassExpression conjunctOne,
+			IndexedClassExpression conjunctTwo) {
+		Chain<ContextRules> rules = conjunctOne.getChainCompositionRules();
+		ThisCompositionRule rule = rules.find(matcher);
+		rule.removeConjunctionByConjunct(conjunctTwo);
+		if (rule.isEmpty())
+			rules.remove(matcher);
+	}
+
+	private static class ThisCompositionRule extends ContextRules {
+
+		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
+
+		ThisCompositionRule(ContextRules tail) {
+			super(tail);
+			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
+					4);
+		}
+
+		private void addConjunctionByConjunct(
+				IndexedObjectIntersectionOf conjunction,
+				IndexedClassExpression conjunct) {
+			conjunctionsByConjunct_.put(conjunct, conjunction);
+		}
+
+		private void removeConjunctionByConjunct(IndexedClassExpression conjunct) {
+			conjunctionsByConjunct_.remove(conjunct);
+		}
+
+		/**
+		 * @return {@code true} if this rule never does anything
+		 */
+		private boolean isEmpty() {
+			return conjunctionsByConjunct_.isEmpty();
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, Context context) {
+
+			RuleStatistics stats = ruleEngine.getRulesTimer();
+
+			stats.timeObjectIntersectionOfCompositionRule -= CachedTimeThread.currentTimeMillis;
+			stats.countObjectIntersectionOfCompositionRule++;
+
+			try {
+
+				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+						conjunctionsByConjunct_.keySet(),
+						context.getSuperClassExpressions()))
+					ruleEngine.produce(context,
+							new NegativeSuperClassExpression(
+									conjunctionsByConjunct_.get(common)));
+			} finally {
+				stats.timeObjectIntersectionOfCompositionRule += CachedTimeThread.currentTimeMillis;
+			}
+
+		}
+
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+				ThisCompositionRule.class);
+
+		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule create(ContextRules tail) {
+				return new ThisCompositionRule(tail);
+			}
+		};
+	}
 }

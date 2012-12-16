@@ -1951,10 +1951,10 @@ ElkAnnotationValue annotationValue():
 {
 	ElkAnnotationValue value = null;
 }{
-	value = anonymousIndividual() 
+	( value = anonymousIndividual() 
 	| value = iri() 
 	| value = literal()
-	{
+	) {
 		return value;
 	}
 }
@@ -1965,9 +1965,9 @@ ElkAnnotationAxiom annotationAxiom():
 	ElkAnnotationAxiom annAxiom = null;
 }{
 	( annAxiom = annotationAssertion()
-	| subAnnotationPropertyOf()
-	| annotationPropertyDomain()
-	| annotationPropertyRange()
+	| annAxiom = subAnnotationPropertyOf()
+	| annAxiom = annotationPropertyDomain()
+	| annAxiom = annotationPropertyRange()
 	) { 
 		return annAxiom; 
 	}
@@ -1994,9 +1994,9 @@ ElkAnnotationSubject annotationSubject():
 {
 	ElkAnnotationSubject subject = null;
 }{
-	(subject = iri() 
-	| subject = anonymousIndividual() )
-	{
+	( subject = iri() 
+	| subject = anonymousIndividual()
+	) {
 		return subject;
 	}
 }

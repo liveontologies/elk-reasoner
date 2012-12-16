@@ -44,7 +44,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private InstanceTaxonomyComputation computation = null;
+	private InstanceTaxonomyComputation computation_ = null;
 
 	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -68,19 +68,19 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() throws ElkInterruptedException {
-		if (computation == null)
+		if (computation_ == null)
 			initComputation();
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
-				computation.process();
+				computation_.process();
 				if (!interrupted())
 					break;
 			}
 		} finally {
 			progressMonitor.finish();
 		}
-		reasoner.taxonomy = computation.getTaxonomy();
+		reasoner.taxonomy = computation_.getTaxonomy();
 		reasoner.doneInstanceTaxonomy = true;
 	}
 
@@ -88,7 +88,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	void initComputation() {
 		super.initComputation();
 		if (reasoner.doneClassTaxonomy)
-			this.computation = new InstanceTaxonomyComputation(
+			this.computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.ontologyIndex, reasoner.taxonomy);
@@ -98,8 +98,8 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		if (computation != null)
-			computation.printStatistics();
+		if (computation_ != null)
+			computation_.printStatistics();
 	}
 
 }

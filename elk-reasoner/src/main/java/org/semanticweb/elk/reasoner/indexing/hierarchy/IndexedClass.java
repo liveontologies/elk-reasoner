@@ -22,9 +22,22 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.Collection;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkClass in an ontology.
@@ -63,7 +76,7 @@ public class IndexedClass extends IndexedClassEntity {
 	public <O> O accept(IndexedClassVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
 		return visitor.visit(this);
@@ -82,15 +95,80 @@ public class IndexedClass extends IndexedClassEntity {
 		return occurrenceNo > 0;
 	}
 
-	/**
-	 * Represent the object's ElkClass as a string. This implementation reflects
-	 * the fact that we generally consider only one IndexedClass for each
-	 * ElkClass.
-	 * 
-	 * @return String representation.
-	 */
+	@Override
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
+
+		RuleStatistics timer = ruleEngine.getRulesTimer();
+
+		timer.timeClassDecompositionRule -= CachedTimeThread.currentTimeMillis;
+		timer.countClassDecompositionRule++;
+
+		try {
+			if (this.equals(ruleEngine.getOwlNothing())) {
+				context.setInconsistent();
+
+				// propagating bottom to the predecessors
+				final Multimap<IndexedPropertyChain, Context> backLinks = context
+						.getBackwardLinksByObjectProperty();
+
+				Conclusion carry = new PositiveSuperClassExpression(this);
+
+				for (IndexedPropertyChain propRelation : backLinks.keySet()) {
+
+					Collection<Context> targets = backLinks.get(propRelation);
+
+					for (Context target : targets)
+						ruleEngine.produce(target, carry);
+				}
+
+				// register the backward link rule for propagation of bottom
+				context.getBackwardLinkRulesChain().getCreate(
+						BottomBackwardLinkRule.MATCHER_,
+						BottomBackwardLinkRule.FACTORY_);
+			}
+		} finally {
+			timer.timeClassDecompositionRule += CachedTimeThread.currentTimeMillis;
+		}
+	}
+
 	@Override
 	public String toString() {
 		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
 	}
+
+	private static class BottomBackwardLinkRule extends BackwardLinkRules {
+
+		BottomBackwardLinkRule(BackwardLinkRules tail) {
+			super(tail);
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, BackwardLink link) {
+			RuleStatistics stats = ruleEngine.getRulesTimer();
+
+			stats.timeClassBottomBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
+			stats.countClassBottomBackwardLinkRule++;
+
+			try {
+				ruleEngine.produce(
+						link.getSource(),
+						new PositiveSuperClassExpression(ruleEngine
+								.getOwlNothing()));
+			} finally {
+				stats.timeClassBottomBackwardLinkRule += CachedTimeThread.currentTimeMillis;
+			}
+		}
+
+		private static Matcher<BackwardLinkRules, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, BottomBackwardLinkRule>(
+				BottomBackwardLinkRule.class);
+
+		private static ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, BottomBackwardLinkRule>() {
+			@Override
+			public BottomBackwardLinkRule create(BackwardLinkRules tail) {
+				return new BottomBackwardLinkRule(tail);
+			}
+		};
+
+	}
+
 }

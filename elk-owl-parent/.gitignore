@@ -1,0 +1,6 @@
+/elk-owl-implementation
+/elk-owl-model
+/elk-owl-parsing-javacc
+!/elk-owl-model/
+!/elk-owl-parsing-javacc/
+!/elk-owl-implementation/

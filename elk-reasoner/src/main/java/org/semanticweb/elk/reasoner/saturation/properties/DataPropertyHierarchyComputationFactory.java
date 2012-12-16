@@ -33,9 +33,9 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 /**
  * The factory for engines that compute the transitive closure of
  * {@link ElkDataProperty} hierarchy.
- * 
+ *
  * @author "Yevgeny Kazakov"
- * 
+ *
  */
 public class DataPropertyHierarchyComputationFactory implements
 		InputProcessorFactory<IndexedDataProperty, Engine> {
@@ -47,6 +47,10 @@ public class DataPropertyHierarchyComputationFactory implements
 
 	DataPropertyHierarchyComputationFactory() {
 		this.engine = new Engine();
+	}
+
+	@Override
+	public void finish() {
 	}
 
 	class Engine implements InputProcessor<IndexedDataProperty> {

@@ -121,6 +121,7 @@ public class OwlOntologyLoader implements OntologyLoader {
 						if (LOGGER_.isTraceEnabled())
 							LOGGER_.trace(status);
 						initAxioms(importsClosureIterator.next());
+						continue;
 					}
 					OWLAxiom axiom = axiomsIterator.next();
 					if (LOGGER_.isTraceEnabled())

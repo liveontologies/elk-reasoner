@@ -64,12 +64,15 @@ public class SimpleInterrupter implements Interrupter {
 	 * De-registers a thread to be interrupted (so that no thread is interrupted
 	 * accidently)
 	 */
-	public void clearThreadToInterrupt() {
+	public synchronized void clearThreadToInterrupt() {
 		this.toInterrupt = null;
 	}
 
 	@Override
-	public void interrupt() {
+	// I've seen an NPE here, which can only happen
+	// if some thread managed to clear the to-be-interrupted thread
+	// before another one interrupts it
+	public synchronized void interrupt() {
 		interrupted = true;
 		if (toInterrupt != null)
 			toInterrupt.interrupt();

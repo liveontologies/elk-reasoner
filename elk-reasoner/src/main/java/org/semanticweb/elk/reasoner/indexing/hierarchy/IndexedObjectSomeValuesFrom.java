@@ -22,8 +22,28 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
+import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.util.collections.HashSetMultimap;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Represents all occurrences of an ElkObjectSomeValuesFrom in an ontology.
@@ -32,6 +52,10 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFro
  * 
  */
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IndexedObjectSomeValuesFrom.class);
 
 	protected final IndexedObjectProperty property;
 
@@ -73,7 +97,12 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			filler.addNegExistential(this);
+			registerCompositionRule();
+		}
+
+		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
+			// first positive occurrence of this expression
+			filler.addPosPropertyInExistential(property);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -81,7 +110,30 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			filler.removeNegExistential(this);
+			deregisterCompositionRule();
+		}
+
+		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
+			// no positive occurrences of this expression left
+			filler.removePosPropertyInExistential(property);
+		}
+	}
+
+	public void registerCompositionRule() {
+		filler.getChainCompositionRules()
+				.getCreate(ThisCompositionRule.MATCHER_,
+						ThisCompositionRule.FACTORY_).addNegExistential(this);
+	}
+
+	public void deregisterCompositionRule() {
+		Chain<ContextRules> rules = filler.getChainCompositionRules();
+		ThisCompositionRule rule = rules.find(ThisCompositionRule.MATCHER_);
+		if (rule != null) {
+			rule.removeNegExistential(this);
+			if (rule.isEmpty())
+				rules.remove(ThisCompositionRule.MATCHER_);
+		} else {
+			// TODO: throw/log something, this should never happen
 		}
 	}
 
@@ -91,4 +143,198 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				+ ')';
 	}
 
+	@Override
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
+		RuleStatistics stats = ruleEngine.getRulesTimer();
+
+		stats.timeObjectSomeValuesFromDecompositionRule -= CachedTimeThread.currentTimeMillis;
+		stats.countObjectSomeValuesFromDecompositionRule++;
+
+		try {
+			ruleEngine.produce(ruleEngine.getCreateContext(filler),
+					new BackwardLink(context, property));
+		} finally {
+			stats.timeObjectSomeValuesFromDecompositionRule += CachedTimeThread.currentTimeMillis;
+		}
+	}
+
+	private static class ThisCompositionRule extends ContextRules {
+
+		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
+
+		ThisCompositionRule(ContextRules tail) {
+			super(tail);
+			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(
+					1);
+		}
+
+		private void addNegExistential(IndexedObjectSomeValuesFrom existential) {
+			negExistentials_.add(existential);
+		}
+
+		private void removeNegExistential(
+				IndexedObjectSomeValuesFrom existential) {
+			negExistentials_.remove(existential);
+		}
+
+		/**
+		 * @return {@code true} if this rule never does anything
+		 */
+		private boolean isEmpty() {
+			return negExistentials_.isEmpty();
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, Context context) {
+
+			RuleStatistics stats = ruleEngine.getRulesTimer();
+
+			stats.timeObjectSomeValuesFromCompositionRule -= CachedTimeThread.currentTimeMillis;
+			stats.countObjectSomeValuesFromCompositionRule++;
+
+			try {
+
+				final Set<IndexedPropertyChain> candidatePropagationProperties = context
+						.getRoot().getPosPropertiesInExistentials();
+
+				if (candidatePropagationProperties == null)
+					return;
+
+				for (IndexedObjectSomeValuesFrom e : negExistentials_) {
+					IndexedPropertyChain relation = e.getRelation();
+					/*
+					 * creating propagations for relevant sub-properties of the
+					 * relation
+					 */
+					for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
+							candidatePropagationProperties, relation
+									.getSaturated().getSubProperties())) {
+						addPropagation(ruleEngine, property, e, context);
+					}
+
+					/*
+					 * creating propagations for relevant sub-compositions of
+					 * the relation
+					 */
+					for (IndexedPropertyChain property : relation
+							.getSaturated().getSubCompositions()) {
+						SaturatedPropertyChain propertySaturation = property
+								.getSaturated();
+						if (!new LazySetIntersection<IndexedPropertyChain>(
+								candidatePropagationProperties,
+								propertySaturation.getRightSubProperties())
+								.isEmpty()) {
+							/*
+							 * create propagations for told super-properties of
+							 * the chain instead of the chain itself if the
+							 * optimization is on. otherwise a composed backward
+							 * link will be created for a super-property while
+							 * the propagation for the chain, so we can lose the
+							 * entailment.
+							 */
+							if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
+									&& property.getRightChains() == null) {
+								for (IndexedPropertyChain superChain : property
+										.getToldSuperProperties()) {
+									addPropagation(ruleEngine, superChain, e,
+											context);
+								}
+							} else {
+								addPropagation(ruleEngine, property, e, context);
+							}
+						}
+					}
+
+					// propagating to the this context if relation is reflexive
+					if (relation.getSaturated().isReflexive())
+						ruleEngine.produce(context,
+								new NegativeSuperClassExpression(e));
+				}
+			} finally {
+				stats.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
+			}
+		}
+
+		private static void addPropagation(RuleEngine ruleEngine,
+				IndexedPropertyChain propRelation,
+				IndexedClassExpression carry, Context context) {
+
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace(context.getRoot() + ": new propagation "
+						+ propRelation + "->" + carry);
+
+			if (context
+					.getBackwardLinkRulesChain()
+					.getCreate(ThisBackwardLinkRule.MATCHER_,
+							ThisBackwardLinkRule.FACTORY_)
+					.addPropagationByObjectProperty(propRelation, carry)) {
+				// propagate over all backward links
+				final Multimap<IndexedPropertyChain, Context> backLinks = context
+						.getBackwardLinksByObjectProperty();
+
+				Collection<Context> targets = backLinks.get(propRelation);
+
+				for (Context target : targets)
+					ruleEngine.produce(target,
+							new NegativeSuperClassExpression(carry));
+			}
+
+		}
+
+		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+				ThisCompositionRule.class);
+
+		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule create(ContextRules tail) {
+				return new ThisCompositionRule(tail);
+			}
+		};
+
+	}
+
+	private static class ThisBackwardLinkRule extends BackwardLinkRules {
+
+		private final Multimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty_;
+
+		ThisBackwardLinkRule(BackwardLinkRules tail) {
+			super(tail);
+			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
+					1);
+		}
+
+		private boolean addPropagationByObjectProperty(
+				IndexedPropertyChain propRelation,
+				IndexedClassExpression conclusion) {
+			return propagationsByObjectProperty_.add(propRelation, conclusion);
+		}
+
+		@Override
+		public void apply(RuleEngine ruleEngine, BackwardLink link) {
+			RuleStatistics stats = ruleEngine.getRulesTimer();
+
+			stats.timeObjectSomeValuesFromBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
+			stats.countObjectSomeValuesFromBackwardLinkRule++;
+
+			try {
+				for (IndexedClassExpression carry : propagationsByObjectProperty_
+						.get(link.getReltaion()))
+					ruleEngine.produce(link.getSource(),
+							new NegativeSuperClassExpression(carry));
+			} finally {
+				stats.timeObjectSomeValuesFromBackwardLinkRule += CachedTimeThread.currentTimeMillis;
+			}
+		}
+
+		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(
+				ThisBackwardLinkRule.class);
+
+		private static ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule>() {
+
+			@Override
+			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
+				return new ThisBackwardLinkRule(tail);
+			}
+		};
+	}
 }

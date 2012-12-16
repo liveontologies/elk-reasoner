@@ -27,17 +27,21 @@ package org.semanticweb.elk.benchmark.reasoning;
 
 import java.io.File;
 
+import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
+import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * A task to classify an ontology
@@ -48,23 +52,30 @@ import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
  */
 public class ClassificationTask implements Task {
 
-	private Reasoner reasoner;
+	private Reasoner reasoner_;
+	private final String ontologyFile_;
+	private final ReasonerConfiguration reasonerConfig_;
+	
+	public ClassificationTask(String[] args) {
+		ontologyFile_ = args[0];
+		reasonerConfig_ = getConfig(args);
+	}
 	
 	@Override
 	public String getName() {
-		return "EL classification";
+		return "EL classification [" + ontologyFile_.substring(ontologyFile_.lastIndexOf('/')) + "]";
 	}
 
 	@Override
-	public void prepare(String... args) throws TaskException {
+	public void prepare() throws TaskException {
 		try {
-			ReasonerConfiguration config = getConfig(args);
+			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
 			
-			reasoner = new ReasonerFactory().createReasoner(new SimpleStageExecutor(), config);
-			reasoner.registerOntologyLoader(new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), new File(args[0])));
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
-			reasoner.loadOntology();
+			reasoner_ = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), reasonerConfig_);
+			reasoner_.registerOntologyLoader(new Owl2StreamLoader(
+				new Owl2FunctionalStyleParserFactory(), ontologyFile));
+			reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
+			reasoner_.loadOntology();
 		} catch (Exception e) {
 			throw new TaskException(e);
 		}
@@ -83,13 +94,16 @@ public class ClassificationTask implements Task {
 	@Override
 	public Result run() throws TaskException {
 		try {
-			reasoner.getTaxonomy();
+			Taxonomy<ElkClass> t = reasoner_.getTaxonomy();
+			
+			System.out.println(TaxonomyHasher.hash(t));
+			
 		} catch (ElkException e) {
 			throw new TaskException(e);
 		}
 		finally {
 			try {
-				reasoner.shutdown();
+				reasoner_.shutdown();
 			} catch (InterruptedException e) {}
 		}
 		

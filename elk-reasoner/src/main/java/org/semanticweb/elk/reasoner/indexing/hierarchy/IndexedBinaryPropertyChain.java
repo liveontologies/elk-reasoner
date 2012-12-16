@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 
 /**
  * Represents a complex ElkSubObjectPropertyOfAxiom. The chain consists of two
@@ -78,6 +79,7 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 		if (occurrenceNo == 0 && increment > 0) {
 			// first occurrence of this expression
 			rightProperty_.addRightChain(this);
+			leftProperty_.addLeftChain(this);
 		}
 
 		occurrenceNo += increment;
@@ -85,6 +87,7 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 		if (occurrenceNo == 0 && increment < 0) {
 			// no occurrences of this conjunction left
 			rightProperty_.removeRightChain(this);
+			leftProperty_.removeLeftChain(this);
 		}
 
 	}
@@ -97,10 +100,26 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	public <O> O accept(IndexedBinaryPropertyChainVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+	
+	@Override
+	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor, P parameter) {
+		return visitor.visit(this, parameter);
+	}
+	
 
 	@Override
 	public List<IndexedPropertyChain> getToldSubProperties() {
 		return null;
+	}
+	
+	/**
+	 * Returns the property which is composable with the given property in this chain 
+	 * 
+	 * @param ipc
+	 * @return
+	 */
+	public IndexedPropertyChain getComposable(IndexedPropertyChain ipc) {
+		return ipc == leftProperty_ ? rightProperty_ : (ipc == rightProperty_ ? leftProperty_ : null);
 	}
 
 	@Override

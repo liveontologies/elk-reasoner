@@ -45,8 +45,8 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
-import org.semanticweb.elk.reasoner.taxonomy.inconsistent.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 

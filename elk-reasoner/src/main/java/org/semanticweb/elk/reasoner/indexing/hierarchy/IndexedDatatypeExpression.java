@@ -22,9 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDatatypeExpressionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  *
@@ -94,6 +100,48 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 				return "DataSomeValuesFrom(" + valueSpace.toString() + ")";
 			default:
 				return null;
+		}
+	}
+
+	@Override
+	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
+		RuleStatistics stats = ruleEngine.getRulesTimer();
+
+		stats.timeDatatypeExpressionDecompositionRule -= CachedTimeThread.currentTimeMillis;
+		stats.countDatatypeExpressionDecompositionRule++;
+
+		try {
+			IndexedDataProperty idp = getProperty();
+			ValueSpace vs = getValueSpace();
+			if (vs == EmptyValueSpace.INSTANCE) {
+				// this means that value space is inconsistent; in this
+				// case we are done
+				ruleEngine.produce(context, new PositiveSuperClassExpression(
+						ruleEngine.getOwlNothing()));
+			}
+			for (IndexedDataProperty superProperty : idp.getSaturated()
+					.getSuperProperties()) {
+				Iterable<IndexedDatatypeExpression> negativeDatatypeExpressions = superProperty
+						.getNegativeDatatypeExpressions();
+				if (negativeDatatypeExpressions == null) {
+					continue;
+				}
+				for (IndexedDatatypeExpression candidate : negativeDatatypeExpressions) {
+					if (candidate == this) // already derived
+					{
+						continue;
+					}
+					// check if the candidate value space subsumes the current
+					// value space
+					if (vs.isSubsumedBy(candidate.getValueSpace())) {
+						ruleEngine.produce(context,
+								// no decomposition rule should be applied to the result
+								new NegativeSuperClassExpression(candidate));
+					}
+				}
+			}
+		} finally {
+			stats.timeDatatypeExpressionDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 

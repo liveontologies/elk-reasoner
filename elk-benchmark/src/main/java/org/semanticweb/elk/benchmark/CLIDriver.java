@@ -26,6 +26,7 @@
 package org.semanticweb.elk.benchmark;
 
 
+
 /**
  * A simple command line tool which instantiates a task and passes it to the
  * task runner.
@@ -40,6 +41,6 @@ public class CLIDriver {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		BenchmarkUtils.run();
+		BenchmarkUtils.multiRun();
 	}
 }

@@ -50,7 +50,11 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
  */
 public class FuncSyntaxParsingTask implements Task {
 
-	private File file = null;
+	private final File file_;
+	
+	public FuncSyntaxParsingTask(String[] args) throws TaskException {
+		file_ = new File(args[0]);
+	}
 
 	private static Owl2Parser createParser(InputStream stream) {
 		return new Owl2FunctionalStyleParserFactory().getParser(stream);
@@ -61,7 +65,7 @@ public class FuncSyntaxParsingTask implements Task {
 		InputStream stream = null;
 
 		try {
-			stream = new FileInputStream(file);
+			stream = new FileInputStream(file_);
 			Owl2Parser parser = createParser(stream);
 
 			parser.accept(new Owl2ParserAxiomProcessor() {
@@ -89,11 +93,6 @@ public class FuncSyntaxParsingTask implements Task {
 	}
 
 	@Override
-	public void prepare(String... args) throws TaskException {
-		file = new File(args[0]);
-
-		if (!file.exists() || !file.isFile()) {
-			throw new TaskException("Wrong file: " + args[0]);
-		}
+	public void prepare() throws TaskException {		
 	}
 }

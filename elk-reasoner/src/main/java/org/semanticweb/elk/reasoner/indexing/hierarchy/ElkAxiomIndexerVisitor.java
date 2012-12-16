@@ -98,11 +98,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedClassExpression superIndexedClass = superElkClass
 				.accept(positiveIndexer);
 
-		if (multiplicity == 1) {
-			subIndexedClass.addToldSuperClassExpression(superIndexedClass);
-		} else {
-			subIndexedClass.removeToldSuperClassExpression(superIndexedClass);
-		}
+		(new IndexedSubClassOfAxiom(subIndexedClass, superIndexedClass))
+				.updateOccurrenceNumbers(multiplicity);
 	}
 
 	@Override
@@ -114,11 +111,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		IndexedClassExpression indexedType = type.accept(positiveIndexer);
 
-		if (multiplicity == 1) {
-			indexedIndividual.addToldSuperClassExpression(indexedType);
-		} else {
-			indexedIndividual.removeToldSuperClassExpression(indexedType);
-		}
+		(new IndexedSubClassOfAxiom(indexedIndividual, indexedType))
+				.updateOccurrenceNumbers(multiplicity);
 	}
 
 	@Override
@@ -134,7 +128,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		if (multiplicity == 1) {
 			indexedSubProperty.addToldSuperProperty(indexedSuperProperty);
-			indexedSuperProperty.addToldSubProperty(indexedSubProperty);
+			indexedSuperProperty.addToldSubObjectProperty(indexedSubProperty);
 		} else {
 			indexedSubProperty.removeToldSuperProperty(indexedSuperProperty);
 			indexedSuperProperty.removeToldSubProperty(indexedSubProperty);
@@ -159,6 +153,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		}
 	}
 
+	final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 2;
+
 	@Override
 	public void indexDisjointClassExpressions(
 			List<? extends ElkClassExpression> disjointClasses) {
@@ -167,37 +163,13 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		ontologyIndex.getIndexedOwlNothing().updateOccurrenceNumbers(
 				multiplicity, multiplicity, 0);
 
-		if (disjointClasses.size() == 2) {
-			IndexedClassExpression ice0 = disjointClasses.get(0).accept(
-					negativeIndexer);
-			IndexedClassExpression ice1 = disjointClasses.get(1).accept(
-					negativeIndexer);
-
-			if (multiplicity == 1) {
-				ice0.addDisjointClass(ice1);
-				ice1.addDisjointClass(ice0);
-			} else {
-				ice0.removeDisjointClass(ice1);
-				ice1.removeDisjointClass(ice0);
-			}
+		List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
+				disjointClasses.size());
+		for (ElkClassExpression c : disjointClasses) {
+			indexed.add(c.accept(negativeIndexer));
 		}
-
-		else { // disjointClasses.size() > 2
-			List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
-					disjointClasses.size());
-			for (ElkClassExpression c : disjointClasses)
-				indexed.add(c.accept(negativeIndexer));
-
-			IndexedDisjointnessAxiom indexedDisjointnessAxiom = new IndexedDisjointnessAxiom(
-					indexed);
-
-			for (IndexedClassExpression ice : indexed) {
-				if (multiplicity == 1)
-					ice.addDisjointnessAxiom(indexedDisjointnessAxiom);
-				else
-					ice.removeDisjointnessAxiom(indexedDisjointnessAxiom);
-			}
-		}
+		(new IndexedDisjointnessAxiom(indexed))
+				.updateOccurrenceNumbers(multiplicity);
 	}
 
 	@Override
@@ -207,9 +179,14 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
 				.accept(positiveIndexer);
 
-		if (multiplicity == 1)
+		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
+				&& multiplicity > 0)
 			ontologyIndex.addReflexiveObjectProperty(indexedReflexiveProperty);
-		else
+
+		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity;
+
+		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
+				&& multiplicity < 0)
 			ontologyIndex
 					.removeReflexiveObjectProperty(indexedReflexiveProperty);
 	}
