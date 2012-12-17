@@ -1,7 +1,7 @@
 /*
  * #%L
  * ELK Reasoner
- * 
+ * *
  * $Id$
  * $HeadURL$
  * %%
@@ -31,9 +31,9 @@ import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 /**
  * A {@link ReasonerStage} during which consistency of the current ontology is
  * checked
- * 
+ *
  * @author "Yevgeny Kazakov"
- * 
+ *
  */
 class ConsistencyCheckingStage extends AbstractReasonerStage {
 
@@ -65,7 +65,8 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		return Arrays.asList(
 				(ReasonerStage) new OntologyLoadingStage(reasoner),
 				(ReasonerStage) new ChangesLoadingStage(reasoner),
-				(ReasonerStage) new ContextInitializationStage(reasoner));		
+				(ReasonerStage) new ContextInitializationStage(reasoner),
+				(ReasonerStage) new DataPropertyHierarchyComputationStage(reasoner));
 	}
 
 	@Override

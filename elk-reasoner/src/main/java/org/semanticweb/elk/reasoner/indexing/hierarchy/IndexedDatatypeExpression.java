@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDatatypeExpressionV
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
@@ -119,24 +120,25 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 				ruleEngine.produce(context, new PositiveSuperClassExpression(
 						ruleEngine.getOwlNothing()));
 			}
-			for (IndexedDataProperty superProperty : idp.getSaturated()
-					.getSuperProperties()) {
-				Iterable<IndexedDatatypeExpression> negativeDatatypeExpressions = superProperty
-						.getNegativeDatatypeExpressions();
-				if (negativeDatatypeExpressions == null) {
-					continue;
-				}
-				for (IndexedDatatypeExpression candidate : negativeDatatypeExpressions) {
-					if (candidate == this) // already derived
-					{
+			SaturatedDataProperty saturatedDataProperty = idp.getSaturated();
+			if (saturatedDataProperty != null) {
+				for (IndexedDataProperty superProperty : saturatedDataProperty.getSuperProperties()) {
+					Iterable<IndexedDatatypeExpression> negativeDatatypeExpressions = superProperty
+							.getNegativeDatatypeExpressions();
+					if (negativeDatatypeExpressions == null) {
 						continue;
 					}
-					// check if the candidate value space subsumes the current
-					// value space
-					if (vs.isSubsumedBy(candidate.getValueSpace())) {
-						ruleEngine.produce(context,
-								// no decomposition rule should be applied to the result
-								new NegativeSuperClassExpression(candidate));
+					for (IndexedDatatypeExpression candidate : negativeDatatypeExpressions) {
+						if (candidate == this) // already derived
+						{
+							continue;
+						}
+						// check if the candidate value space subsumes the current
+						// value space
+						if (vs.isSubsumedBy(candidate.getValueSpace())) {
+							ruleEngine.produce(context,
+									new NegativeSuperClassExpression(candidate));
+						}
 					}
 				}
 			}
