@@ -34,7 +34,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class RuleStatistics {//extends ConclusionStatistics {
+public class RuleStatistics {
+	
+	/**
+	 * Counts the number of times other rule stats were added to this one, for
+	 * averaging purposes
+	 */
+	private int addCounter = 0;
 
 	/**
 	 * the number of rule applications for composition of
@@ -203,6 +209,7 @@ public class RuleStatistics {//extends ConclusionStatistics {
 	}
 
 	public synchronized void add(RuleStatistics stats) {
+		addCounter++;
 		countObjectIntersectionOfCompositionRule += stats.countObjectIntersectionOfCompositionRule;
 		timeObjectIntersectionOfCompositionRule += stats.timeObjectIntersectionOfCompositionRule;
 		countObjectIntersectionOfDecompositionRule += stats.countObjectIntersectionOfDecompositionRule;
@@ -230,68 +237,68 @@ public class RuleStatistics {//extends ConclusionStatistics {
 	}
 
 	public void print(Logger logger) {
-		if (!logger.isDebugEnabled())
+		if (!logger.isDebugEnabled() || addCounter <= 0)
 			return;
 		
 		if (countBackwardLinkFromForwardLinkRule > 0) 
-			logger.debug("Rule for producing backward links from forward links"
+			logger.debug("Rule for producing backward links from forward links "
 					+ countBackwardLinkFromForwardLinkRule + " ("
-					+ timeBackwardLinkFromForwardLinkRule + " ms)");
+					+ timeBackwardLinkFromForwardLinkRule / addCounter + " ms)");
 		
 		if (countDisjointnessAxiomContradictionRule > 0) 
-			logger.debug("Disjointness axiom contradiction rule"
+			logger.debug("Disjointness axiom contradiction rule" 
 					+ countDisjointnessAxiomContradictionRule + " ("
-					+ timeDisjointnessAxiomContradictionRule + " ms)");
+					+ timeDisjointnessAxiomContradictionRule / addCounter + " ms)");
 		
 		if (countDisjointnessAxiomCompositionRule > 0) 
-			logger.debug("Disjointness axiom composition rule"
+			logger.debug("Disjointness axiom composition rule "
 					+ countDisjointnessAxiomCompositionRule + " ("
-					+ timeDisjointnessAxiomCompositionRule + " ms)");
+					+ timeDisjointnessAxiomCompositionRule / addCounter + " ms)");
 		
 		if (countOwlThingContextInitializationRule > 0) 
-			logger.debug("owl:Thing context init rule"
+			logger.debug("owl:Thing context init rule "
 					+ countOwlThingContextInitializationRule + " ("
-					+ timeOwlThingContextInitializationRule + " ms)");
+					+ timeOwlThingContextInitializationRule / addCounter + " ms)");
 		
 		if (countSubClassOfRule > 0) 
 			logger.debug("Subclass rule"
 					+ countSubClassOfRule + " ("
-					+ timeSubClassOfRule + " ms)");
+					+ timeSubClassOfRule / addCounter + " ms)");
 		
 		if (countContradictionBackwardLinkRule > 0) 
-			logger.debug("Rule for propagating owl:Nothing"
+			logger.debug("Rule for propagating owl:Nothing "
 					+ countContradictionBackwardLinkRule + " ("
-					+ timeContradictionBackwardLinkRule + " ms)");
+					+ timeContradictionBackwardLinkRule / addCounter + " ms)");
 		
 		if (countClassDecompositionRule > 0) 
-			logger.debug("Class decomposition rule"
+			logger.debug("Class decomposition rule "
 					+ countClassDecompositionRule + " ("
-					+ timeClassDecompositionRule + " ms)");
+					+ timeClassDecompositionRule / addCounter + " ms)");
 		
 		if (countPropagationBackwardLinkRule > 0) 
-			logger.debug("Rule for propagation via backward links"
+			logger.debug("Rule for propagation via backward links "
 					+ countPropagationBackwardLinkRule + " ("
-					+ timePropagationBackwardLinkRule + " ms)");		
+					+ timePropagationBackwardLinkRule / addCounter + " ms)");		
 		
 		if (countObjectSomeValuesFromDecompositionRule > 0) 
 			logger.debug("Some values from decomposition rule "
 					+ countObjectSomeValuesFromDecompositionRule + " ("
-					+ timeObjectSomeValuesFromDecompositionRule + " ms)");
+					+ timeObjectSomeValuesFromDecompositionRule / addCounter + " ms)");
 		
 		if (countObjectSomeValuesFromCompositionRule > 0) 
 			logger.debug("Some values from composition rule "
 					+ countObjectSomeValuesFromCompositionRule + " ("
-					+ timeObjectSomeValuesFromCompositionRule + " ms)");
+					+ timeObjectSomeValuesFromCompositionRule / addCounter + " ms)");
 		
 		if (countObjectIntersectionOfDecompositionRule > 0) 
 			logger.debug("Intersection decomposition rule "
 					+ countObjectIntersectionOfDecompositionRule + " ("
-					+ timeObjectIntersectionOfDecompositionRule + " ms)");
+					+ timeObjectIntersectionOfDecompositionRule / addCounter + " ms)");
 		
 		if (countObjectIntersectionOfCompositionRule > 0) 
 			logger.debug("Intersection composition rule "
 					+ countObjectIntersectionOfCompositionRule + " ("
-					+ timeObjectIntersectionOfCompositionRule + " ms)");
+					+ timeObjectIntersectionOfCompositionRule / addCounter + " ms)");
 	}
 	
 	
