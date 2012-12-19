@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import org.semanticweb.elk.benchmark.AllFilesMultiTask;
 import org.semanticweb.elk.benchmark.Result;
@@ -99,8 +101,45 @@ public class AllFilesIncrementalClassificationTask extends AllFilesMultiTask {
 			return new ClassifyIncrementally(args[0]);
 		}
 	}
-
 	
+	
+	@Override
+	protected File[] sortFiles(File[] files) {
+		//There should be one file and multiple dirs.
+		//the file should go first, the rest should be sorted by name
+		File file = null;
+		File[] result = new File[files.length];
+		
+		for (int i = 0; i <  files.length; i++) {
+			if (files[i].isDirectory()) {
+				result[i] = files[i];
+			}
+			else {
+				file = files[i];
+			}
+		}
+		
+		Arrays.sort(result, new Comparator<File>() {
+
+			@Override
+			public int compare(File o1, File o2) {
+				if (o1 == null) {
+					return -1;
+				}
+				else if (o2 == null) {
+					return 1;
+				}
+				else {
+					return o1.getName().compareTo(o2.getName());
+				}
+			}});
+
+		result[0] = file;
+		
+		return result;
+	}
+
+
 	private class ClassifyFirstTime implements Task {
 
 		private final File ontologyFile_;
@@ -120,6 +159,7 @@ public class AllFilesIncrementalClassificationTask extends AllFilesMultiTask {
 			
 			try {
 				stream = new FileInputStream(ontologyFile_);
+				reasoner_.setIncrementalMode(false);
 				reasoner_.registerOntologyLoader(new Owl2StreamLoader(
 						new Owl2FunctionalStyleParserFactory(), stream));
 				reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
@@ -183,6 +223,7 @@ public class AllFilesIncrementalClassificationTask extends AllFilesMultiTask {
 				}
 			});
 			
+			reasoner_.setIncrementalMode(true);
 			reasoner_.registerOntologyChangesLoader(loader);
 		}
 

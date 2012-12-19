@@ -64,7 +64,9 @@ public abstract class AllFilesMultiTask implements MultiTask {
 		
 		System.arraycopy(args_, 0, taskArgs, 0, args_.length);
 		
-		for (File file : dir.listFiles()) {
+		File[] files = sortFiles(dir.listFiles());
+		
+		for (File file : files) {
 			
 			try {
 				taskArgs[0] = file.getCanonicalPath();
@@ -76,6 +78,10 @@ public abstract class AllFilesMultiTask implements MultiTask {
 		}
 		
 		return tasks;
+	}
+
+	protected File[] sortFiles(File[] listFiles) {
+		return listFiles;
 	}
 
 	public abstract Task instantiateSubTask(String[] args);
