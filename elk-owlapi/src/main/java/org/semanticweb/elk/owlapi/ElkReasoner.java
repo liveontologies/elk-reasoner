@@ -925,11 +925,11 @@ public class ElkReasoner implements OWLReasoner {
 				throws OWLException {
 			for (OWLOntologyChange change : changes) {
 				if (!change.getOntology().equals(owlOntology_)) {
-					LOGGER_.warn("Ignoring the change not applicable to the current onttolgy: + change");
+					LOGGER_.warn("Ignoring the change not applicable to the current ontology: " + change);
 					continue;
 				}
 				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("registring change: " + change);
+					LOGGER_.trace("registering change: " + change);
 				}
 				ontologyChangesLoader_.registerChange(change);
 				if (!change.isAxiomChange()) {
