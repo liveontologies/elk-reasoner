@@ -246,7 +246,7 @@ public class RuleStatistics {
 					+ timeBackwardLinkFromForwardLinkRule / addCounter + " ms)");
 		
 		if (countDisjointnessAxiomContradictionRule > 0) 
-			logger.debug("Disjointness axiom contradiction rule" 
+			logger.debug("Disjointness axiom contradiction rule " 
 					+ countDisjointnessAxiomContradictionRule + " ("
 					+ timeDisjointnessAxiomContradictionRule / addCounter + " ms)");
 		
@@ -261,7 +261,7 @@ public class RuleStatistics {
 					+ timeOwlThingContextInitializationRule / addCounter + " ms)");
 		
 		if (countSubClassOfRule > 0) 
-			logger.debug("Subclass rule"
+			logger.debug("Subclass rule "
 					+ countSubClassOfRule + " ("
 					+ timeSubClassOfRule / addCounter + " ms)");
 		
