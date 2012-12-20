@@ -35,10 +35,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +58,6 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
@@ -77,8 +74,11 @@ public class LowLevelIncrementalReasoningTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		reasoner.setIncrementalMode(false);
 		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -101,9 +101,8 @@ public class LowLevelIncrementalReasoningTest {
 		loader.clear();
 
 		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
 
-		loader.remove(objectFactory.getSubClassOfAxiom(b, d));
+		changeLoader.remove(objectFactory.getSubClassOfAxiom(b, d));
 
 		taxonomy = reasoner.getTaxonomy();
 
@@ -116,8 +115,11 @@ public class LowLevelIncrementalReasoningTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		reasoner.setIncrementalMode(false);
 		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);		
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -143,9 +145,7 @@ public class LowLevelIncrementalReasoningTest {
 		loader.clear();
 
 		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
-
-		loader.remove(posExistential);
+		changeLoader.remove(posExistential);
 
 		taxonomy = reasoner.getTaxonomy();
 
@@ -158,8 +158,11 @@ public class LowLevelIncrementalReasoningTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		reasoner.setIncrementalMode(false);
 		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);	
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -173,12 +176,11 @@ public class LowLevelIncrementalReasoningTest {
 		loader.clear();
 
 		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
 
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
-		loader.add(objectFactory.getDisjointClassesAxiom(Arrays.asList(c, d, c)));
-
+		
+		changeLoader.add(objectFactory.getDisjointClassesAxiom(Arrays.asList(c, d, c)));
 		taxonomy = reasoner.getTaxonomy();
 
 		assertSame(taxonomy.getBottomNode(), taxonomy.getNode(c));
@@ -202,11 +204,14 @@ public class LowLevelIncrementalReasoningTest {
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
 			TestChangesLoader initialLoader = new TestChangesLoader();
-			TestChangesLoader loader = new TestChangesLoader();
+			TestChangesLoader changeLoader = new TestChangesLoader();
+			
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 					new LoggingStageExecutor(), 1);
 
+			reasoner.setIncrementalMode(false);
 			reasoner.registerOntologyLoader(initialLoader);
+			reasoner.registerOntologyChangesLoader(changeLoader);
 
 			for (ElkAxiom axiom : ontology) {
 				initialLoader.add(axiom);
@@ -214,35 +219,19 @@ public class LowLevelIncrementalReasoningTest {
 
 			Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
-			try {
-				Writer writer = new OutputStreamWriter(System.out);
-				TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-				writer.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
 			assertTrue(taxonomy.getNode(tree).getDirectSuperNodes()
 					.contains(taxonomy.getNode(greenThing)));
 
-			System.out.println("===========================================");
+			//System.out.println("===========================================");
 
 			reasoner.setIncrementalMode(true);
 
 			for (ElkAxiom del : deletions) {
-				loader.remove(del);
+				changeLoader.remove(del);
 			}
 
-			reasoner.registerOntologyChangesLoader(loader);
+			//reasoner.registerOntologyChangesLoader(loader);
 			taxonomy = reasoner.getTaxonomy();
-
-			try {
-				Writer writer = new OutputStreamWriter(System.out);
-				TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-				writer.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 
 			assertTrue(taxonomy.getNode(tree).getDirectSuperNodes()
 					.contains(taxonomy.getNode(greenThing)));
@@ -257,8 +246,11 @@ public class LowLevelIncrementalReasoningTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		reasoner.setIncrementalMode(false);
 		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -275,19 +267,12 @@ public class LowLevelIncrementalReasoningTest {
 		// now delete it one time
 		loader.clear();
 		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
 
-		loader.add(objectFactory.getSubClassOfAxiom(a, b));
+		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b));
 
-		System.out.println("===========================================");
+		//System.out.println("===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
-
-		/*
-		 * try { Writer writer = new OutputStreamWriter(System.out);
-		 * TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-		 * writer.flush(); } catch (IOException e) { e.printStackTrace(); }
-		 */
 
 		// B should still be a superclass of A
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
@@ -296,20 +281,14 @@ public class LowLevelIncrementalReasoningTest {
 		// now delete it the second time
 
 		loader.clear();
-		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
+		//reasoner.setIncrementalMode(true);
+		//reasoner.registerOntologyChangesLoader(loader);
 
-		loader.add(objectFactory.getSubClassOfAxiom(a, b));
+		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b));
 
-		System.out.println("===========================================");
+		//System.out.println("===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
-
-		/*
-		 * try { Writer writer = new OutputStreamWriter(System.out);
-		 * TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-		 * writer.flush(); } catch (IOException e) { e.printStackTrace(); }
-		 */
 
 		// B should still be no longer a superclass of A
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
@@ -321,8 +300,11 @@ public class LowLevelIncrementalReasoningTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		reasoner.setIncrementalMode(false);
 		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -336,20 +318,13 @@ public class LowLevelIncrementalReasoningTest {
 
 		loader.clear();
 		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
 
-		loader.add(objectFactory.getSubClassOfAxiom(a, b)).add(
+		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b)).add(
 				objectFactory.getSubClassOfAxiom(b, d));
 
-		System.out.println("===========================================");
+		//System.out.println("===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
-
-		/*
-		 * try { Writer writer = new OutputStreamWriter(System.out);
-		 * TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-		 * writer.flush(); } catch (IOException e) { e.printStackTrace(); }
-		 */
 
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(c)));
@@ -362,8 +337,11 @@ public class LowLevelIncrementalReasoningTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		reasoner.setIncrementalMode(false);
 		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -385,33 +363,20 @@ public class LowLevelIncrementalReasoningTest {
 		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
 		// now delete one disjointness, A should remain unsatisfiable
-		loader.clear();
-
 		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
 
-		loader.remove(disjCB);
+		changeLoader.remove(disjCB);
 
-		System.out.println("===========================================");
+		//System.out.println("===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
-
-		/*
-		 * try { Writer writer = new OutputStreamWriter(System.out);
-		 * TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-		 * writer.flush(); } catch (IOException e) { e.printStackTrace(); }
-		 */
 
 		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
 		// delete another disjointness, A should become satisfiable again
-		loader.clear();
-		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
+		changeLoader.remove(disjBC);
 
-		loader.remove(disjBC);
-
-		System.out.println("===========================================");
+		//System.out.println("===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
 
@@ -423,8 +388,11 @@ public class LowLevelIncrementalReasoningTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		reasoner.setIncrementalMode(false);
 		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -446,45 +414,27 @@ public class LowLevelIncrementalReasoningTest {
 		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
 		// now delete one disjointness, A should is still unsatisfiable
-		loader.clear();
+		//loader.clear();
 
 		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
+		//reasoner.registerOntologyChangesLoader(loader);
 
-		loader.remove(disjABCD);
+		changeLoader.remove(disjABCD);
 
-		System.out.println("===========================================");
+		//System.out.println("===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
-
-		/*
-		 * try { Writer writer = new OutputStreamWriter(System.out);
-		 * TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-		 * writer.flush(); } catch (IOException e) { e.printStackTrace(); }
-		 */
 
 		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
 		// now delete the other disjointness, A should is become satisfiable
-		loader.clear();
+		changeLoader.remove(disjACBD);
 
-		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
-
-		loader.remove(disjACBD);
-
-		System.out.println("===========================================");
+		//System.out.println("===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
 
-		/*
-		 * try { Writer writer = new OutputStreamWriter(System.out);
-		 * TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-		 * writer.flush(); } catch (IOException e) { e.printStackTrace(); }
-		 */
-
 		assertFalse(taxonomy.getNode(a) == taxonomy.getBottomNode());
-
 	}
 
 	@Test
@@ -492,8 +442,11 @@ public class LowLevelIncrementalReasoningTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		reasoner.setIncrementalMode(false);
 		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -513,12 +466,9 @@ public class LowLevelIncrementalReasoningTest {
 		assertTrue(taxonomy.getNode(d).getDirectSuperNodes()
 				.contains(taxonomy.getNode(a)));
 		// A should be deleted, E should appear, D should be a subclass of C now
-		loader.clear();
-
 		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
 
-		loader.remove(objectFactory.getSubClassOfAxiom(d, a))
+		changeLoader.remove(objectFactory.getSubClassOfAxiom(d, a))
 				.remove(objectFactory.getSubClassOfAxiom(a,
 						objectFactory.getObjectSomeValuesFrom(r, b)))
 				.add(objectFactory.getSubClassOfAxiom(d, c))
@@ -543,8 +493,11 @@ public class LowLevelIncrementalReasoningTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		reasoner.setIncrementalMode(false);
 		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -570,12 +523,8 @@ public class LowLevelIncrementalReasoningTest {
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
-		loader.clear();
-
 		reasoner.setIncrementalMode(true);
-		reasoner.registerOntologyChangesLoader(loader);
-
-		loader.remove(toDelete).add(toAdd1).add(toAdd2);
+		changeLoader.remove(toDelete).add(toAdd1).add(toAdd2);
 
 		taxonomy = reasoner.getTaxonomy();
 

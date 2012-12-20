@@ -71,7 +71,7 @@ public enum IncrementalStages {
 
 		@Override
 		public String toString() {
-			return "Incremental Saturation";
+			return "Incremental Re-saturation";
 		}
 		
 	},	

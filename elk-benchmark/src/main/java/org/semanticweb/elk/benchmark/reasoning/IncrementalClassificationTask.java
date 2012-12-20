@@ -186,10 +186,10 @@ public class IncrementalClassificationTask implements Task {
 	public Result run() throws TaskException {
 		
 		try {
-			TestChangesLoader loader = new TestChangesLoader();
+			TestChangesLoader changeLoader = new TestChangesLoader();
 			
-			standardReasoner_.registerOntologyChangesLoader(loader);
-			incrementalReasoner_.registerOntologyChangesLoader(loader);
+			standardReasoner_.registerOntologyChangesLoader(changeLoader);
+			incrementalReasoner_.registerOntologyChangesLoader(changeLoader);
 
 			// initial correctness check
 			correctnessCheck(standardReasoner_, incrementalReasoner_, -1);
@@ -201,27 +201,25 @@ public class IncrementalClassificationTask implements Task {
 				// delete some axioms
 				Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms_, rnd);
 
-				System.out.println("===========DELETING " + axiomsToChange_ + " AXIOMS=============");
+				//System.out.println("===========DELETING " + axiomsToChange_ + " AXIOMS=============");
 				
 				/*for (ElkAxiom del : deleted) {
 					System.out.println(OwlFunctionalStylePrinter.toString(del));
 				}*/
 
 				// incremental changes
-				loader.clear();
-				remove(loader, deleted);
-				standardReasoner_.registerOntologyChangesLoader(loader);
-				incrementalReasoner_.registerOntologyChangesLoader(loader);
+				changeLoader.clear();
+				remove(changeLoader, deleted);
+				standardReasoner_.registerOntologyChangesLoader(changeLoader);
+				incrementalReasoner_.registerOntologyChangesLoader(changeLoader);
 
 				correctnessCheck(standardReasoner_, incrementalReasoner_, seed);
 				
-				System.out.println("===========ADDING BACK=============");
+				//System.out.println("===========ADDING BACK=============");
 				
 				// add the axioms back
-				loader.clear();
-				add(loader, deleted);
-				standardReasoner_.registerOntologyChangesLoader(loader);
-				incrementalReasoner_.registerOntologyChangesLoader(loader);
+				changeLoader.clear();
+				add(changeLoader, deleted);
 
 				correctnessCheck(standardReasoner_, incrementalReasoner_, seed);
 			}

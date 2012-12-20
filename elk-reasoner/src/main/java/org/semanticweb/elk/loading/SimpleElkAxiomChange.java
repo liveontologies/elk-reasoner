@@ -1,9 +1,12 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.loading;
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,27 +23,33 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.loading;
 
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 /**
- * An {@link ChangesLoader} for no changes
- * 
- * @author "Yevgeny Kazakov"
- * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public class EmptyChangesLoader implements ChangesLoader {
+public class SimpleElkAxiomChange implements ElkAxiomChange {
 
+	private final ElkAxiom axiom_;
+	
+	private final int multiplicity_;
+	
+	public SimpleElkAxiomChange(final ElkAxiom axiom, final int m) {
+		axiom_ = axiom;
+		multiplicity_ = m;
+	}
+	
 	@Override
-	public Loader getLoader(ElkAxiomProcessor axiomInserter,
-			ElkAxiomProcessor axiomDeleter) {
-		return new EmptyLoader();
+	public ElkAxiom getAxiom() {
+		return axiom_;
 	}
 
 	@Override
-	public void registerChangeListener(AxiomChangeListener listener) {
-		// does nothing
+	public int getMultiplicity() {
+		return multiplicity_;
 	}
 
 }

@@ -294,9 +294,9 @@ public class ElkReasoner implements OWLReasoner {
 				reasoner_.loadOntology();
 				ontologyReloadRequired_ = false;
 			}
-			// this causes the reasoner to update the changes from the listener
-			reasoner_.registerOntologyChangesLoader(ontologyChangesLoader_);
-			reasoner_.loadChanges();
+			// notify the reasoner re: the changes from the listener
+			ontologyChangesLoader_.flush();
+			reasoner_.loadChanges();	
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {

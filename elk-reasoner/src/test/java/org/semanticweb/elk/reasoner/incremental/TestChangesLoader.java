@@ -27,10 +27,12 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.semanticweb.elk.loading.AxiomChangeListener;
 import org.semanticweb.elk.loading.ChangesLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.SimpleElkAxiomChange;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
@@ -43,13 +45,22 @@ public class TestChangesLoader implements ChangesLoader, OntologyLoader {
 
 	private final Queue<ElkAxiom> additions_ = new LinkedList<ElkAxiom>();
 	private final Queue<ElkAxiom> deletions_ = new LinkedList<ElkAxiom>();
+	private AxiomChangeListener listener_ = null;
 	
 	public TestChangesLoader add(final ElkAxiom axiom) {
+		if (listener_ != null) {
+			listener_.notify(new SimpleElkAxiomChange(axiom, -1));
+		}
+		
 		additions_.add(axiom);
 		return this;
 	}
 	
 	public TestChangesLoader remove(final ElkAxiom axiom) {
+		if (listener_ != null) {
+			listener_.notify(new SimpleElkAxiomChange(axiom, -1));
+		}
+		
 		deletions_.add(axiom);
 		return this;
 	}
@@ -71,7 +82,12 @@ public class TestChangesLoader implements ChangesLoader, OntologyLoader {
 			public void visit(ElkAxiom elkAxiom) {
 				// does nothing
 			}});
-	}	
+	}
+	
+	@Override
+	public void registerChangeListener(AxiomChangeListener listener) {
+		listener_ = listener;
+	}
 
 	/**
 	 * 

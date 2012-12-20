@@ -111,18 +111,21 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	@Test
 	public void incrementalReasoning() throws ElkException {
 		TestChangesLoader initialLoader = new TestChangesLoader();
-		TestChangesLoader loader = new TestChangesLoader();
-		// TestChangesLoader incrementalLoader = new TestChangesLoader();
+		// TODO tweak TestChangesLoader to be able to use one loader for several
+		// reasoners
+		TestChangesLoader changeLoader1 = new TestChangesLoader();
+		TestChangesLoader changeLoader2 = new TestChangesLoader();
 		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
 				new SimpleStageExecutor(), 1);
 		Reasoner incrementalReasoner = new ReasonerFactory()
 				.createReasoner(new LoggingStageExecutor());
 
 		standardReasoner.registerOntologyLoader(initialLoader);
-		standardReasoner.registerOntologyChangesLoader(loader);
+		standardReasoner.registerOntologyChangesLoader(changeLoader1);
 		incrementalReasoner.registerOntologyLoader(initialLoader);
-		incrementalReasoner.registerOntologyChangesLoader(loader);
+		incrementalReasoner.registerOntologyChangesLoader(changeLoader2);
 
+		standardReasoner.setIncrementalMode(false);
 		incrementalReasoner.setIncrementalMode(true);
 		// initial load
 		add(initialLoader, axioms);
@@ -141,18 +144,20 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 			}*/
 
 			// incremental changes
-			loader.clear();
-			remove(loader, deleted);
-			standardReasoner.registerOntologyChangesLoader(loader);
-			incrementalReasoner.registerOntologyChangesLoader(loader);
+			changeLoader1.clear();
+			changeLoader2.clear();
+			remove(changeLoader1, deleted);
+			remove(changeLoader2, deleted);
 
+			standardReasoner.setIncrementalMode(false);
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 			// add the axioms back
-			loader.clear();
-			add(loader, deleted);
-			standardReasoner.registerOntologyChangesLoader(loader);
-			incrementalReasoner.registerOntologyChangesLoader(loader);
+			changeLoader1.clear();
+			changeLoader2.clear();
+			add(changeLoader1, deleted);
+			add(changeLoader2, deleted);
 
+			standardReasoner.setIncrementalMode(false);
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}
 	}

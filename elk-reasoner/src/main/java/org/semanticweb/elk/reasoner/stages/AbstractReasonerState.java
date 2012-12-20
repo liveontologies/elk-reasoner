@@ -23,19 +23,23 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.AxiomChangeListener;
 import org.semanticweb.elk.loading.ChangesLoader;
+import org.semanticweb.elk.loading.ElkAxiomChange;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkPropertyAxiom;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
@@ -131,11 +135,11 @@ public abstract class AbstractReasonerState {
 	/**
 	 * The source where the input ontology can be loaded
 	 */
-	private Loader ontologyLoader;
+	private Loader ontologyLoader_;
 	/**
 	 * The source where changes in ontology can be loaded
 	 */
-	private Loader changesLoader;
+	private ChangesLoader changesLoader_;
 
 	protected AbstractReasonerState() {
 		OntologyIndexImpl ontoIndex = new OntologyIndexImpl();
@@ -144,6 +148,7 @@ public abstract class AbstractReasonerState {
 		this.objectCache_ = ontoIndex;
 		this.saturationState = new SaturationState(ontoIndex);
 		this.ruleAndConclusionStats = new RuleAndConclusionStatistics();
+		this.incrementalState = new IncrementalReasonerState(objectCache_, ontologyIndex);
 	}
 
 	public void setIncrementalMode(boolean set) {
@@ -159,15 +164,18 @@ public abstract class AbstractReasonerState {
 	 * Reset the loading stage and all subsequent stages
 	 */
 	private void resetLoading() {
-		if (this.ontologyLoader != null) {
-			this.ontologyLoader.dispose();
-			this.ontologyLoader = null;
+		if (this.ontologyLoader_ != null) {
+			this.ontologyLoader_.dispose();
+			this.ontologyLoader_ = null;
 		}
+		
 		if (doneLoading) {
 			doneLoading = false;
 			ontologyIndex.clear();
 		}
+		
 		resetChangesLoading();
+		registerOntologyChangesLoader(null);
 	}
 
 	/**
@@ -176,10 +184,6 @@ public abstract class AbstractReasonerState {
 	 * FIXME get rid of this proliferation of boolean flags
 	 */
 	private void resetChangesLoading() {
-		if (this.changesLoader != null) {
-			this.changesLoader.dispose();
-			this.changesLoader = null;
-		}
 		if (doneChangeLoading) {
 			doneChangeLoading = false;
 			doneContextReset = false;
@@ -193,40 +197,68 @@ public abstract class AbstractReasonerState {
 			}
 		}
 	}
-
+	
 	public void registerOntologyLoader(OntologyLoader ontologyLoader) {
 		resetLoading();
-		this.ontologyLoader = ontologyLoader.getLoader(ontologyIndex
+		this.ontologyLoader_ = ontologyLoader.getLoader(ontologyIndex
 				.getAxiomInserter());
 	}
 
 	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
 		resetChangesLoading();
+		
+		changesLoader_ = changesLoader;
+		
+		if (changesLoader_ != null) {
+			changesLoader_.registerChangeListener(new AxiomChangeListener() {
 
-		if (incrementalState != null) {
-			this.changesLoader = changesLoader.getLoader(
-					incrementalState.diffIndex.getAxiomInserter(),
-					incrementalState.diffIndex.getAxiomDeleter());
-		}
-		else {
-			this.changesLoader = changesLoader.getLoader(
-					ontologyIndex.getAxiomInserter(),
-					ontologyIndex.getAxiomDeleter());			
+				@Override
+				public void notify(ElkAxiomChange change) {
+
+					if (!incrementalChange(change)) {
+						incrementalState = null;
+					}
+
+					resetChangesLoading();
+				}
+			});
 		}
 	}
 
+		
+	private boolean incrementalChange(ElkAxiomChange change) {
+		ElkAxiom axiom = change.getAxiom();
+		//FIXME Here we should determine if the axiom is in the supported fragment
+		//if not, the method should return true
+		return !(axiom instanceof ElkPropertyAxiom<?>);
+	}		
+		
 	/**
 	 * @return the source where the input ontology can be loaded
 	 */
 	Loader getOntologyLoader() {
-		return ontologyLoader;
+		return ontologyLoader_;
 	}
 
 	/**
 	 * @return the source where changes in ontology can be loaded
 	 */
 	Loader getChangesLoader() {
-		return changesLoader;
+		//return changesLoader;
+		if (changesLoader_ == null) {
+			return null;
+		}
+		
+		if (incrementalState != null) {
+			return changesLoader_.getLoader(
+					incrementalState.diffIndex.getAxiomInserter(),
+					incrementalState.diffIndex.getAxiomDeleter());
+		}
+		else {
+			return changesLoader_.getLoader(
+					ontologyIndex.getAxiomInserter(),
+					ontologyIndex.getAxiomDeleter());			
+		}
 	}
 
 	/**
@@ -322,6 +354,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public void loadOntology() throws ElkException {
+		setIncrementalMode(false);
 		getStageExecutor().complete(new OntologyLoadingStage(this));
 	}
 
@@ -353,6 +386,7 @@ public abstract class AbstractReasonerState {
 		} else {
 			getStageExecutor()
 					.complete(new ClassTaxonomyComputationStage(this));
+			this.incrementalState = new IncrementalReasonerState(objectCache_, ontologyIndex);
 		}
 		
 		return taxonomy;
