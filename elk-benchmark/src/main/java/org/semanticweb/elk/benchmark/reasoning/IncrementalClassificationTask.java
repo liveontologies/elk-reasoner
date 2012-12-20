@@ -186,10 +186,11 @@ public class IncrementalClassificationTask implements Task {
 	public Result run() throws TaskException {
 		
 		try {
-			TestChangesLoader changeLoader = new TestChangesLoader();
+			TestChangesLoader changeLoader1 = new TestChangesLoader();
+			TestChangesLoader changeLoader2 = new TestChangesLoader();
 			
-			standardReasoner_.registerOntologyChangesLoader(changeLoader);
-			incrementalReasoner_.registerOntologyChangesLoader(changeLoader);
+			standardReasoner_.registerOntologyChangesLoader(changeLoader1);
+			incrementalReasoner_.registerOntologyChangesLoader(changeLoader2);
 
 			// initial correctness check
 			correctnessCheck(standardReasoner_, incrementalReasoner_, -1);
@@ -199,6 +200,8 @@ public class IncrementalClassificationTask implements Task {
 
 			for (int i = 0; i < REPEAT_NUMBER; i++) {
 				// delete some axioms
+				standardReasoner_.setIncrementalMode(false);
+				
 				Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms_, rnd);
 
 				//System.out.println("===========DELETING " + axiomsToChange_ + " AXIOMS=============");
@@ -208,18 +211,22 @@ public class IncrementalClassificationTask implements Task {
 				}*/
 
 				// incremental changes
-				changeLoader.clear();
-				remove(changeLoader, deleted);
-				standardReasoner_.registerOntologyChangesLoader(changeLoader);
-				incrementalReasoner_.registerOntologyChangesLoader(changeLoader);
+				changeLoader1.clear();
+				changeLoader2.clear();
+				remove(changeLoader1, deleted);
+				remove(changeLoader2, deleted);
 
 				correctnessCheck(standardReasoner_, incrementalReasoner_, seed);
+				
+				standardReasoner_.setIncrementalMode(false);
 				
 				//System.out.println("===========ADDING BACK=============");
 				
 				// add the axioms back
-				changeLoader.clear();
-				add(changeLoader, deleted);
+				changeLoader1.clear();
+				changeLoader2.clear();
+				add(changeLoader1, deleted);
+				add(changeLoader2, deleted);
 
 				correctnessCheck(standardReasoner_, incrementalReasoner_, seed);
 			}

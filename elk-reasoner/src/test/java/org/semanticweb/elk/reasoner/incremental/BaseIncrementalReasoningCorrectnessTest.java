@@ -137,6 +137,8 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
 			// delete some axioms
+			standardReasoner.setIncrementalMode(false);
+			
 			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
 
 			/*for (ElkAxiom del : deleted) {
@@ -149,15 +151,15 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 			remove(changeLoader1, deleted);
 			remove(changeLoader2, deleted);
 
-			standardReasoner.setIncrementalMode(false);
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
+			
+			standardReasoner.setIncrementalMode(false);
 			// add the axioms back
 			changeLoader1.clear();
 			changeLoader2.clear();
 			add(changeLoader1, deleted);
 			add(changeLoader2, deleted);
 
-			standardReasoner.setIncrementalMode(false);
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}
 	}
