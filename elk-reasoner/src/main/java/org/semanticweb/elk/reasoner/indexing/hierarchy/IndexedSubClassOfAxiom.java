@@ -58,11 +58,12 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	public IndexedClassExpression getSuperClass() {
 		return this.superClass_;
 	}
-	
+
 	@Override
 	public boolean occurs() {
 		// we do not cache sub class axioms
-		// TODO: introduce a method for testing if we cache an object in the index
+		// TODO: introduce a method for testing if we cache an object in the
+		// index
 		return false;
 	}
 
@@ -140,22 +141,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		@Override
 		public void apply(SaturationState.Writer writer, Context context) {
-
-			/*
-			 * RuleStatistics stats = ruleEngine.getRulesTimer();
-			 * 
-			 * stats.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis;
-			 * stats.countSubClassOfRule++;
-			 */
-
-			try {
-
-				for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-					writer.produce(context, new PositiveSubsumer(implied));
-				}
-			} finally {
-				// stats.timeSubClassOfRule +=
-				// CachedTimeThread.currentTimeMillis;
+			for (IndexedClassExpression implied : toldSuperClassExpressions_) {
+				writer.produce(context, new PositiveSubsumer(implied));
 			}
 		}
 
@@ -209,10 +196,10 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			return changed;
 
 		}
-		
+
 		@Override
-		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
-				Context context) {
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 	}

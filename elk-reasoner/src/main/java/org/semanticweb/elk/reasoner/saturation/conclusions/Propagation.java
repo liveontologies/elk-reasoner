@@ -147,23 +147,9 @@ public class Propagation extends AbstractConclusion {
 
 		@Override
 		public void apply(SaturationState.Writer engine, BackwardLink link) {
-			/*
-			 * RuleStatistics stats = ruleEngine.getRulesTimer();
-			 * 
-			 * stats.timeObjectSomeValuesFromBackwardLinkRule -=
-			 * CachedTimeThread.currentTimeMillis;
-			 * stats.countObjectSomeValuesFromBackwardLinkRule++;
-			 */
-
-			try {
-				for (IndexedClassExpression carry : propagationsByObjectProperty_
-						.get(link.getRelation()))
-					engine.produce(link.getSource(),
-							new NegativeSubsumer(carry));
-			} finally {
-				// stats.timeObjectSomeValuesFromBackwardLinkRule +=
-				// CachedTimeThread.currentTimeMillis;
-			}
+			for (IndexedClassExpression carry : propagationsByObjectProperty_
+					.get(link.getRelation()))
+				engine.produce(link.getSource(), new NegativeSubsumer(carry));
 		}
 
 		private static Matcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>(
@@ -177,7 +163,7 @@ public class Propagation extends AbstractConclusion {
 				return new ThisBackwardLinkRule(tail);
 			}
 		};
-		
+
 		@Override
 		public void accept(RuleApplicationVisitor visitor, Writer writer,
 				BackwardLink backwardLink) {

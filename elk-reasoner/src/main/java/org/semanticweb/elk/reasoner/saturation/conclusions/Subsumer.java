@@ -68,16 +68,14 @@ public abstract class Subsumer implements Conclusion {
 			Context context, RuleApplicationVisitor ruleAppVisitor) {
 
 		LinkRule<Context> compositionRule = expression.getCompositionRuleHead();
-		for (;;) {
-			if (compositionRule == null)
-				return;
+		while (compositionRule != null) {
 			compositionRule.accept(ruleAppVisitor, writer, context);
 			compositionRule = compositionRule.next();
 		}
 	}
-	
+
 	@Override
 	public Context getSourceContext(Context contextWhereStored) {
 		return contextWhereStored;
-	}	
+	}
 }

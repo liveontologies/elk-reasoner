@@ -73,8 +73,7 @@ public class Contradiction extends AbstractConclusion {
 				// is because we want the SCE to appear in the list of
 				// superclasses
 				// TODO: why we need bottom?
-				engine.produce(
-						target,
+				engine.produce(target,
 						new PositiveSubsumer(engine.getOwlNothing()));
 			}
 		}
@@ -103,23 +102,9 @@ public class Contradiction extends AbstractConclusion {
 
 		@Override
 		public void apply(SaturationState.Writer engine, BackwardLink link) {
-			/*
-			 * RuleStatistics stats = ruleEngine.getRulesTimer();
-			 * 
-			 * stats.timeClassBottomBackwardLinkRule -=
-			 * CachedTimeThread.currentTimeMillis;
-			 * stats.countClassBottomBackwardLinkRule++;
-			 */
-
-			try {
-				// TODO: why not to propagate contradictions?
-				engine.produce(
-						link.getSource(),
-						new PositiveSubsumer(engine.getOwlNothing()));
-			} finally {
-				// stats.timeClassBottomBackwardLinkRule +=
-				// CachedTimeThread.currentTimeMillis;
-			}
+			// TODO: why not to propagate contradictions?
+			engine.produce(link.getSource(),
+					new PositiveSubsumer(engine.getOwlNothing()));
 		}
 
 		private static final Matcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>(
@@ -134,8 +119,8 @@ public class Contradiction extends AbstractConclusion {
 		};
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
-				BackwardLink backwardLink) {
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationState.Writer writer, BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}
 	}

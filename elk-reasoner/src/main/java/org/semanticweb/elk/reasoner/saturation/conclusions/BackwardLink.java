@@ -75,42 +75,35 @@ public class BackwardLink implements Conclusion {// extends AbstractConclusion {
 		return source_;
 	}
 
-	public void deapply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
+	public void deapply(SaturationState.Writer writer, Context context,
+			RuleApplicationVisitor ruleAppVisitor) {
 		apply(writer, context, ruleAppVisitor);
 	}
-	
-	public void apply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
 
-		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		// statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
-		try {
-			// apply all backward link rules of the context
-			LinkRule<BackwardLink> backLinkRule = context
-					.getBackwardLinkRuleHead();
-			while (backLinkRule != null) {
-				//backLinkRule.apply(engine, this);
-				backLinkRule.accept(ruleAppVisitor, writer, this);
-				backLinkRule = backLinkRule.next();
-			}
+	public void apply(SaturationState.Writer writer, Context context,
+			RuleApplicationVisitor ruleAppVisitor) {
+		// apply all backward link rules of the context
+		LinkRule<BackwardLink> backLinkRule = context.getBackwardLinkRuleHead();
+		while (backLinkRule != null) {
+			backLinkRule.accept(ruleAppVisitor, writer, this);
+			backLinkRule = backLinkRule.next();
+		}
 
-			/*
-			 * convert backward link to a forward link if it can potentially be
-			 * composed
-			 */
-			Set<IndexedPropertyChain> toldProperties = source_.getRoot()
-					.getPosPropertiesInExistentials();
+		/*
+		 * convert backward link to a forward link if it can potentially be
+		 * composed
+		 */
+		Set<IndexedPropertyChain> toldProperties = source_.getRoot()
+				.getPosPropertiesInExistentials();
 
-			if (toldProperties != null
-					&& !new LazySetIntersection<IndexedPropertyChain>(
-							toldProperties, relation_.getSaturated()
-									.getLeftComposableProperties()).isEmpty()) {
-				// if
-				// (!relation_.getSaturated().getLeftComposableProperties().isEmpty())
-				// {
-				writer.produce(source_, new ForwardLink(relation_, context));
-			}
-		} finally {
-			// statistics.backLinkTime += CachedTimeThread.currentTimeMillis;
+		if (toldProperties != null
+				&& !new LazySetIntersection<IndexedPropertyChain>(
+						toldProperties, relation_.getSaturated()
+								.getLeftComposableProperties()).isEmpty()) {
+			// if
+			// (!relation_.getSaturated().getLeftComposableProperties().isEmpty())
+			// {
+			writer.produce(source_, new ForwardLink(relation_, context));
 		}
 	}
 

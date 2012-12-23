@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
@@ -29,6 +30,13 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
+/**
+ * Represents all occurrences of an {@link ElkIndividual} in an ontology.
+ * 
+ * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class IndexedIndividual extends IndexedClassEntity {
 	/**
 	 * The ElkNamedIndividual that is the sole instance of this nominal

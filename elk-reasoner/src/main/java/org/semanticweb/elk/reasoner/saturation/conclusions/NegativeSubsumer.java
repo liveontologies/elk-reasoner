@@ -45,38 +45,16 @@ public class NegativeSubsumer extends Subsumer {
 		super(superClassExpression);
 	}
 
-	//@Override
-	public void apply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor) {
-		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		// statistics.superClassExpressionTime -=
-		// CachedTimeThread.currentTimeMillis;
-
-		try {
-			// applying all composition rules
-			applyCompositionRules(writer, context, ruleAppVisitor);
-
-		} finally {
-			// statistics.superClassExpressionTime +=
-			// CachedTimeThread.currentTimeMillis;
-		}
+	public void apply(SaturationState.Writer writer, Context context,
+			RuleApplicationVisitor ruleAppVisitor) {
+		applyCompositionRules(writer, context, ruleAppVisitor);
 	}
 
-	//@Override
-	public void deapply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
-		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		// statistics.superClassExpressionTime -=
-		// CachedTimeThread.currentTimeMillis;
-
-		try {
-			//expression.applyDecompositionRule(writer, context);
-			expression.accept(decompVisitor, writer, context);
-			// applying all composition rules
-			applyCompositionRules(writer, context, ruleAppVisitor);
-
-		} finally {
-			// statistics.superClassExpressionTime +=
-			// CachedTimeThread.currentTimeMillis;
-		}
+	public void deapply(SaturationState.Writer writer, Context context,
+			RuleApplicationVisitor ruleAppVisitor,
+			DecompositionRuleApplicationVisitor decompVisitor) {
+		expression.accept(decompVisitor, writer, context);
+		applyCompositionRules(writer, context, ruleAppVisitor);
 	}
 
 	@Override

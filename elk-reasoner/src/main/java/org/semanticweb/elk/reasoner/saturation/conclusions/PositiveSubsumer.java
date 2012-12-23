@@ -46,29 +46,24 @@ public class PositiveSubsumer extends Subsumer {
 		super(superClassExpression);
 	}
 
-	//@Override
-	public void apply(SaturationState.Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
-		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		// statistics.superClassExpressionTime -=
-		// CachedTimeThread.currentTimeMillis;
-		try {
-			// apply decomposition rules
-			expression.accept(decompVisitor, writer, context);
-			//expression.applyDecompositionRule(writer, context);
-			// applying all composition rules
-			applyCompositionRules(writer, context, ruleAppVisitor);
-		} finally {
-			// statistics.superClassExpressionTime +=
-			// CachedTimeThread.currentTimeMillis;
-		}
+	// @Override
+	public void apply(SaturationState.Writer writer, Context context,
+			RuleApplicationVisitor ruleAppVisitor,
+			DecompositionRuleApplicationVisitor decompVisitor) {
+		// apply decomposition rules
+		expression.accept(decompVisitor, writer, context);
+		// applying all composition rules
+		applyCompositionRules(writer, context, ruleAppVisitor);
 	}
 
 	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
 	}
-	
-	public void deapply(Writer writer, Context context, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
+
+	public void deapply(Writer writer, Context context,
+			RuleApplicationVisitor ruleAppVisitor,
+			DecompositionRuleApplicationVisitor decompVisitor) {
 		apply(writer, context, ruleAppVisitor, decompVisitor);
 	}
 }

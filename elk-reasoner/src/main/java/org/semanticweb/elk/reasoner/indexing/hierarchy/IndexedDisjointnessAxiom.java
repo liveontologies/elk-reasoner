@@ -155,12 +155,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 	/**
 	 * {@link ThisCompositionRule} derives the disjointness axioms as a new kind
-	 * of a super class expression. For each member, all disjointness axioms
-	 * containing this member are registered with this rule (possibly several
-	 * times if the member occurs several times in one axiom). If the rule
-	 * produces some disjointness axiom in a context at least two times, this
-	 * means that two different members of this disjointness axioms have been
-	 * derived in the context. Therefore, a contradiction should be produced.
+	 * of element. For each subsumer, all disjointness axioms containing this
+	 * subsumer are registered using this rule.
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -186,10 +182,10 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			this((ChainableRule<Context>) null);
 			disjointnessAxioms_.add(axiom);
 		}
-		
+
 		@Override
-		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
-				Context context) {
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 
@@ -244,9 +240,9 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 		/**
-		 * How many times the {@link IndexedClassExpression} for which this rule
-		 * is registered, occurs in {@link IndexedDisjointnessAxiom} more than
-		 * one times.
+		 * The number of {@link IndexedDisjointnessAxiom}s in which the
+		 * {@link IndexedClassExpression}, for which this rule is registered,
+		 * occurs more than once.
 		 */
 		private int contradictionCounter;
 
@@ -298,10 +294,10 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 				return new ThisContradictionRule(tail);
 			}
 		};
-		
+
 		@Override
-		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
-				Context context) {
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 

@@ -72,31 +72,24 @@ public class ForwardLink extends AbstractConclusion {
 	@Override
 	public void apply(SaturationState.Writer engine, Context context) {
 
-		// ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		// statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
-		try {
+		/* compose the link with all backward links */
+		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
+				.getSaturated().getCompositionsByLeftSubProperty();
+		final Multimap<IndexedPropertyChain, Context> backLinks = context
+				.getBackwardLinksByObjectProperty();
 
-			/* compose the link with all backward links */
-			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
-					.getSaturated().getCompositionsByLeftSubProperty();
-			final Multimap<IndexedPropertyChain, Context> backLinks = context
-					.getBackwardLinksByObjectProperty();
+		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+				comps.keySet(), backLinks.keySet())) {
 
-			for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-					comps.keySet(), backLinks.keySet())) {
+			Collection<IndexedPropertyChain> compositions = comps
+					.get(backwardRelation);
+			Collection<Context> sources = backLinks.get(backwardRelation);
 
-				Collection<IndexedPropertyChain> compositions = comps
-						.get(backwardRelation);
-				Collection<Context> sources = backLinks.get(backwardRelation);
-
-				for (IndexedPropertyChain composition : compositions)
-					for (Context source : sources) {
-						engine.produce(target_, new BackwardLink(source,
-								composition));
-					}
-			}
-		} finally {
-			// statistics.forwLinkTime += CachedTimeThread.currentTimeMillis;
+			for (IndexedPropertyChain composition : compositions)
+				for (Context source : sources) {
+					engine.produce(target_, new BackwardLink(source,
+							composition));
+				}
 		}
 	}
 
@@ -187,44 +180,29 @@ public class ForwardLink extends AbstractConclusion {
 		@Override
 		public void apply(SaturationState.Writer engine, BackwardLink link) {
 
-			/*
-			 * RuleStatistics timer = ruleEngine.getRulesTimer();
-			 * 
-			 * timer.timeForwardLinkBackwardLinkRule -=
-			 * CachedTimeThread.currentTimeMillis;
-			 * 
-			 * timer.countForwardLinkBackwardLinkRule++;
-			 */
+			/* compose the link with all forward links */
+			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
+					.getRelation().getSaturated()
+					.getCompositionsByRightSubProperty();
+			if (comps == null)
+				return;
 
-			try {
+			Context source = link.getSource();
 
-				/* compose the link with all forward links */
-				final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
-						.getRelation().getSaturated()
-						.getCompositionsByRightSubProperty();
-				if (comps == null)
-					return;
+			for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+					comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
 
-				Context source = link.getSource();
+				Collection<IndexedPropertyChain> compositions = comps
+						.get(forwardRelation);
+				Collection<Context> forwardTargets = forwardLinksByObjectProperty_
+						.get(forwardRelation);
 
-				for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-						comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
-
-					Collection<IndexedPropertyChain> compositions = comps
-							.get(forwardRelation);
-					Collection<Context> forwardTargets = forwardLinksByObjectProperty_
-							.get(forwardRelation);
-
-					for (IndexedPropertyChain composition : compositions)
-						for (Context forwardTarget : forwardTargets)
-							engine.produce(forwardTarget, new BackwardLink(
-									source, composition));
-				}
-
-			} finally {
-				// timer.timeForwardLinkBackwardLinkRule +=
-				// CachedTimeThread.currentTimeMillis;
+				for (IndexedPropertyChain composition : compositions)
+					for (Context forwardTarget : forwardTargets)
+						engine.produce(forwardTarget, new BackwardLink(source,
+								composition));
 			}
+
 		}
 
 		private static Matcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>(
@@ -241,7 +219,7 @@ public class ForwardLink extends AbstractConclusion {
 				return new ThisBackwardLinkRule(tail);
 			}
 		};
-		
+
 		@Override
 		public void accept(RuleApplicationVisitor visitor, Writer writer,
 				BackwardLink backwardLink) {

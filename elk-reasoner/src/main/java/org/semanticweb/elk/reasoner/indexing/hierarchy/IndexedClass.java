@@ -41,9 +41,10 @@ import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
- * Represents all occurrences of an ElkClass in an ontology.
+ * Represents all occurrences of an {@link ElkClass} in an ontology.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class IndexedClass extends IndexedClassEntity {
@@ -117,12 +118,12 @@ public class IndexedClass extends IndexedClassEntity {
 	public boolean occurs() {
 		return occurrenceNo > 0;
 	}
-	
+
 	@Override
 	public void accept(DecompositionRuleApplicationVisitor visitor,
 			Writer writer, Context context) {
 		visitor.visit(this, writer, context);
-	}	
+	}
 
 	@Override
 	public String toString() {
@@ -153,8 +154,7 @@ public class IndexedClass extends IndexedClassEntity {
 						+ context.getRoot());
 			}
 
-			writer.produce(context,
-					new PositiveSubsumer(writer.getOwlThing()));
+			writer.produce(context, new PositiveSubsumer(writer.getOwlThing()));
 		}
 
 		private static final Matcher<ChainableRule<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, OwlThingContextInitializationRule>(
@@ -186,9 +186,9 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
-				Context context) {
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
-		} 
+		}
 	}
 }

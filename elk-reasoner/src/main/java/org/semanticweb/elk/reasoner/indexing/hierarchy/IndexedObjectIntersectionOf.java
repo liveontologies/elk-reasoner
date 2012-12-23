@@ -126,7 +126,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			Writer writer, Context context) {
 		visitor.visit(this, writer, context);
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -178,26 +178,10 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		@Override
 		public void apply(SaturationState.Writer writer, Context context) {
-
-			/*
-			 * RuleStatistics stats = ruleEngine.getRulesTimer();
-			 * 
-			 * stats.timeObjectIntersectionOfCompositionRule -=
-			 * CachedTimeThread.currentTimeMillis;
-			 * stats.countObjectIntersectionOfCompositionRule++;
-			 */
-
-			try {
-
-				for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-						conjunctionsByConjunct_.keySet(),
-						context.getSubsumers()))
-					writer.produce(context, new NegativeSubsumer(
-							conjunctionsByConjunct_.get(common)));
-			} finally {
-				// stats.timeObjectIntersectionOfCompositionRule +=
-				// CachedTimeThread.currentTimeMillis;
-			}
+			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+					conjunctionsByConjunct_.keySet(), context.getSubsumers()))
+				writer.produce(context, new NegativeSubsumer(
+						conjunctionsByConjunct_.get(common)));
 
 		}
 
@@ -245,10 +229,10 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			return changed;
 
 		}
-		
+
 		@Override
-		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
-				Context context) {
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 	}

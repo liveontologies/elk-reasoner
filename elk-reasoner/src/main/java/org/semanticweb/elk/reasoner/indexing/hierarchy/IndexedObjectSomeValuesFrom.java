@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
@@ -47,16 +48,14 @@ import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
- * Represents all occurrences of an ElkObjectSomeValuesFrom in an ontology.
+ * Represents all occurrences of an {@link ElkObjectSomeValuesFrom} in an
+ * ontology.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
-
-	// logger for this class
-	// private static final Logger LOGGER_ =
-	// Logger.getLogger(IndexedObjectSomeValuesFrom.class);
 
 	protected final IndexedObjectProperty property;
 
@@ -128,8 +127,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				+ ')';
 	}
 
-	
-	
 	@Override
 	public void accept(DecompositionRuleApplicationVisitor visitor,
 			Writer writer, Context context) {
@@ -178,86 +175,62 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		@Override
 		public void apply(SaturationState.Writer writer, Context context) {
 
-			/*
-			 * RuleStatistics stats = ruleEngine.getRulesTimer();
-			 * 
-			 * stats.timeObjectSomeValuesFromCompositionRule -=
-			 * CachedTimeThread.currentTimeMillis;
-			 * stats.countObjectSomeValuesFromCompositionRule++;
-			 */
+			final Set<IndexedPropertyChain> candidatePropagationProperties = context
+					.getRoot().getPosPropertiesInExistentials();
 
-			try {
+			if (candidatePropagationProperties == null) {
+				return;
+			}
 
-				final Set<IndexedPropertyChain> candidatePropagationProperties = context
-						.getRoot().getPosPropertiesInExistentials();
-
-				if (candidatePropagationProperties == null) {
-					return;
+			for (IndexedObjectSomeValuesFrom e : negExistentials_) {
+				IndexedPropertyChain relation = e.getRelation();
+				/*
+				 * creating propagations for relevant sub-properties of the
+				 * relation
+				 */
+				for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
+						candidatePropagationProperties, relation.getSaturated()
+								.getSubProperties())) {
+					writer.produce(context, new Propagation(property, e));
 				}
 
-				for (IndexedObjectSomeValuesFrom e : negExistentials_) {
-					IndexedPropertyChain relation = e.getRelation();
-					/*
-					 * creating propagations for relevant sub-properties of the
-					 * relation
-					 */
-					/*
-					 * for (IndexedPropertyChain property :
-					 * relation.getSaturated().getSubProperties()) {
-					 * state.produce(context, new Propagation(property, e)); }
-					 */
-					for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
-							candidatePropagationProperties, relation
-									.getSaturated().getSubProperties())) {
-						writer.produce(context, new Propagation(property, e));
-					}
+				/*
+				 * creating propagations for relevant sub-compositions of the
+				 * relation
+				 */
+				for (IndexedPropertyChain property : relation.getSaturated()
+						.getSubCompositions()) {
+					SaturatedPropertyChain propertySaturation = property
+							.getSaturated();
 
-					/*
-					 * creating propagations for relevant sub-compositions of
-					 * the relation
-					 */
-					for (IndexedPropertyChain property : relation
-							.getSaturated().getSubCompositions()) {
-						SaturatedPropertyChain propertySaturation = property
-								.getSaturated();
-
-						// if
-						// (!propertySaturation.getRightSubProperties().isEmpty())
-						// {
-						if (!new LazySetIntersection<IndexedPropertyChain>(
-								candidatePropagationProperties,
-								propertySaturation.getRightSubProperties())
-								.isEmpty()) {
-							/*
-							 * create propagations for told super-properties of
-							 * the chain instead of the chain itself if the
-							 * optimization is on. otherwise a composed backward
-							 * link will be created for a super-property while
-							 * the propagation for the chain, so we can lose the
-							 * entailment.
-							 */
-							if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
-									&& property.getRightChains() == null) {
-								for (IndexedPropertyChain superChain : property
-										.getToldSuperProperties()) {
-									writer.produce(context, new Propagation(
-											superChain, e));
-								}
-							} else {
+					if (!new LazySetIntersection<IndexedPropertyChain>(
+							candidatePropagationProperties,
+							propertySaturation.getRightSubProperties())
+							.isEmpty()) {
+						/*
+						 * create propagations for told super-properties of the
+						 * chain instead of the chain itself if the optimization
+						 * is on. otherwise a composed backward link will be
+						 * created for a super-property while the propagation
+						 * for the chain, so we can lose the entailment.
+						 */
+						if (SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
+								&& property.getRightChains() == null) {
+							for (IndexedPropertyChain superChain : property
+									.getToldSuperProperties()) {
 								writer.produce(context, new Propagation(
-										property, e));
+										superChain, e));
 							}
+						} else {
+							writer.produce(context,
+									new Propagation(property, e));
 						}
 					}
-
-					// propagating to the this context if relation is reflexive
-					if (relation.getSaturated().isReflexive())
-						writer.produce(context,
-								new NegativeSubsumer(e));
 				}
-			} finally {
-				// stats.timeObjectSomeValuesFromCompositionRule +=
-				// CachedTimeThread.currentTimeMillis;
+
+				// propagating to the this context if relation is reflexive
+				if (relation.getSaturated().isReflexive())
+					writer.produce(context, new NegativeSubsumer(e));
 			}
 		}
 
@@ -303,10 +276,10 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			return changed;
 
 		}
-		
+
 		@Override
-		public void accept(RuleApplicationVisitor visitor, SaturationState.Writer writer,
-				Context context) {
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 
