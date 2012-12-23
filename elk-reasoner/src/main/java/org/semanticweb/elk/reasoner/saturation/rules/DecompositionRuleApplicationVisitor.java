@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -33,16 +34,20 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public interface DecompositionRuleApplicationVisitor {
 
-	public void visit(IndexedClass ice, SaturationState.Writer writer, Context context);
-	
-	public void visit(IndexedDataHasValue ice, SaturationState.Writer writer, Context context);
-	
-	public void visit(IndexedObjectIntersectionOf ice, SaturationState.Writer writer, Context context);
-	
-	public void visit(IndexedObjectSomeValuesFrom ice, SaturationState.Writer writer, Context context);
+	public void visit(IndexedClass ice, SaturationState.Writer writer,
+			Context context);
+
+	public void visit(IndexedObjectIntersectionOf ice,
+			SaturationState.Writer writer, Context context);
+
+	public void visit(IndexedObjectSomeValuesFrom ice,
+			SaturationState.Writer writer, Context context);
+
+	public void visit(IndexedDataHasValue ice, SaturationState.Writer writer,
+			Context context);
 }

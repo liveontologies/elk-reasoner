@@ -73,7 +73,7 @@ public class ConclusionTimer {
 	}
 
 	/**
-	 * Reset all counters to zero.
+	 * Reset all times to zero.
 	 */
 	public void reset() {
 		timeNegativeSubsumers = 0;
@@ -86,22 +86,22 @@ public class ConclusionTimer {
 	}
 
 	/**
-	 * Adds all counters of the argument to the corresponding counters of this
-	 * object. The counters should not be directly modified other than using
-	 * this method during this operation. The counter in the argument will be
-	 * reseted after this operation.
+	 * Adds all timers of the argument to the corresponding counters of this
+	 * object. The timers should not be directly modified other than using this
+	 * method during this operation. The timers in the argument will be reseted
+	 * after this operation.
 	 * 
-	 * @param statistics
+	 * @param timer
 	 *            the object which counters should be added
 	 */
-	public synchronized void add(ConclusionTimer statistics) {
-		this.timeNegativeSubsumers += statistics.timeNegativeSubsumers;
-		this.timePositiveSubsumers += statistics.timePositiveSubsumers;
-		this.timeBackwardLinks += statistics.timeBackwardLinks;
-		this.timeForwardLinks += statistics.timeForwardLinks;
-		this.timeContradictions += statistics.timeContradictions;
-		this.timePropagations += statistics.timePropagations;
-		this.timeDisjointnessAxioms += statistics.timeDisjointnessAxioms;
+	public synchronized void add(ConclusionTimer timer) {
+		this.timeNegativeSubsumers += timer.timeNegativeSubsumers;
+		this.timePositiveSubsumers += timer.timePositiveSubsumers;
+		this.timeBackwardLinks += timer.timeBackwardLinks;
+		this.timeForwardLinks += timer.timeForwardLinks;
+		this.timeContradictions += timer.timeContradictions;
+		this.timePropagations += timer.timePropagations;
+		this.timeDisjointnessAxioms += timer.timeDisjointnessAxioms;
 	}
 
 }

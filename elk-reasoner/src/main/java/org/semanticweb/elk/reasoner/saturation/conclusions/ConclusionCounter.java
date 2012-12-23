@@ -85,17 +85,17 @@ public class ConclusionCounter {
 	 * this method during this operation. The counter in the argument will be
 	 * reseted after this operation.
 	 * 
-	 * @param statistics
+	 * @param counter
 	 *            the object which counters should be added
 	 */
-	public synchronized void add(ConclusionCounter statistics) {
-		this.countNegativeSubsumers += statistics.countNegativeSubsumers;
-		this.countPositiveSubsumers += statistics.countPositiveSubsumers;
-		this.countBackwardLinks += statistics.countBackwardLinks;
-		this.countForwardLinks += statistics.countForwardLinks;
-		this.countContradictions += statistics.countContradictions;
-		this.countPropagations += statistics.countPropagations;
-		this.countDisjointnessAxioms += statistics.countDisjointnessAxioms;
+	public synchronized void add(ConclusionCounter counter) {
+		this.countNegativeSubsumers += counter.countNegativeSubsumers;
+		this.countPositiveSubsumers += counter.countPositiveSubsumers;
+		this.countBackwardLinks += counter.countBackwardLinks;
+		this.countForwardLinks += counter.countForwardLinks;
+		this.countContradictions += counter.countContradictions;
+		this.countPropagations += counter.countPropagations;
+		this.countDisjointnessAxioms += counter.countDisjointnessAxioms;
 	}
 
 }

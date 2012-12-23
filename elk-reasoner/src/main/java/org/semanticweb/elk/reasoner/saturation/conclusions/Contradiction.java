@@ -72,6 +72,7 @@ public class Contradiction extends AbstractConclusion {
 				// the reason we propagate a positive SCE, not the Bot directly,
 				// is because we want the SCE to appear in the list of
 				// superclasses
+				// TODO: why we need bottom?
 				engine.produce(
 						target,
 						new PositiveSubsumer(engine.getOwlNothing()));
@@ -111,6 +112,7 @@ public class Contradiction extends AbstractConclusion {
 			 */
 
 			try {
+				// TODO: why not to propagate contradictions?
 				engine.produce(
 						link.getSource(),
 						new PositiveSubsumer(engine.getOwlNothing()));

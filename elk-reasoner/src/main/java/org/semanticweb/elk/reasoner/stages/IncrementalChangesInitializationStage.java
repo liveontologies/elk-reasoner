@@ -37,11 +37,10 @@ import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CombinedRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.CountingRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounterVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
-import org.semanticweb.elk.reasoner.saturation.rules.TimeRuleApplicationVisitor;
 
 /**
  * Reverts inferences
@@ -157,14 +156,13 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
 
 		if (COLLECT_RULE_COUNTS) {
-			ruleAppVisitor = new CombinedRuleApplicationVisitor(ruleAppVisitor,
-					new CountingRuleApplicationVisitor(ruleStatistics));
+			ruleAppVisitor = new RuleApplicationCounterVisitor(ruleAppVisitor,
+					ruleStatistics.ruleCounter);
 		}
 
 		if (COLLECT_RULE_TIMES) {
-			ruleAppVisitor = TimeRuleApplicationVisitor
-					.getTimeCompositionRuleApplicationVisitor(ruleAppVisitor,
-							ruleStatistics);
+			ruleAppVisitor = new RuleApplicationTimerVisitor(ruleAppVisitor,
+					ruleStatistics.ruleTimer);
 		}
 
 		return ruleAppVisitor;
