@@ -258,7 +258,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public void apply(SaturationState.Writer writer, Context context) {
-			writer.produce(context, new Contradiction());
+			writer.produce(context, Contradiction.getInstance());
 		}
 
 		protected boolean isEmpty() {

@@ -37,10 +37,21 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * @author Pavel Klinov
+ * @author "Yevgeny Kazakov"
  * 
  *         pavel.klinov@uni-ulm.de
  */
 public class Contradiction extends AbstractConclusion {
+
+	private static Contradiction INSTANCE_ = new Contradiction();
+
+	public static Contradiction getInstance() {
+		return INSTANCE_;
+	}
+
+	private Contradiction() {
+		// do not allow creation of instances outside of this class
+	}
 
 	@Override
 	public void deapply(SaturationState.Writer engine, Context context) {
@@ -69,12 +80,7 @@ public class Contradiction extends AbstractConclusion {
 			Collection<Context> targets = backLinks.get(propRelation);
 
 			for (Context target : targets) {
-				// the reason we propagate a positive SCE, not the Bot directly,
-				// is because we want the SCE to appear in the list of
-				// superclasses
-				// TODO: why we need bottom?
-				engine.produce(target,
-						new PositiveSubsumer(engine.getOwlNothing()));
+				engine.produce(target, Contradiction.getInstance());
 			}
 		}
 	}
@@ -86,7 +92,7 @@ public class Contradiction extends AbstractConclusion {
 
 	@Override
 	public String toString() {
-		return "owl:Nothing";
+		return "Contradiction";
 	}
 
 	/**
@@ -102,9 +108,7 @@ public class Contradiction extends AbstractConclusion {
 
 		@Override
 		public void apply(SaturationState.Writer engine, BackwardLink link) {
-			// TODO: why not to propagate contradictions?
-			engine.produce(link.getSource(),
-					new PositiveSubsumer(engine.getOwlNothing()));
+			engine.produce(link.getSource(), Contradiction.getInstance());
 		}
 
 		private static final Matcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>(

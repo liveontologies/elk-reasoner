@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -33,22 +34,23 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
  * Performs decomposition of all sorts of indexed class expressions
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class BasicDecompositionRuleApplicationVisitor implements
 		DecompositionRuleApplicationVisitor {
 
 	protected static final Logger LOGGER_ = Logger
-			.getLogger(BasicDecompositionRuleApplicationVisitor.class);	
-	
+			.getLogger(BasicDecompositionRuleApplicationVisitor.class);
+
 	@Override
 	public void visit(IndexedClass ice, Writer writer, Context context) {
 		if (ice == writer.getOwlNothing()) {
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Producing owl:Nothing for " + context.getRoot());
+				LOGGER_.trace("Producing contradiction for "
+						+ context.getRoot());
 			}
-			writer.produce(context, new Contradiction());
+			writer.produce(context, Contradiction.getInstance());
 		}
 	}
 
@@ -67,8 +69,8 @@ public class BasicDecompositionRuleApplicationVisitor implements
 	@Override
 	public void visit(IndexedObjectSomeValuesFrom ice, Writer writer,
 			Context context) {
-		writer.produce(writer.getCreateContext(ice.getFiller()), new BackwardLink(
-				context, ice.getRelation()));
+		writer.produce(writer.getCreateContext(ice.getFiller()),
+				new BackwardLink(context, ice.getRelation()));
 	}
 
 }
