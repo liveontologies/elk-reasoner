@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,6 +28,8 @@ package org.semanticweb.elk.reasoner.incremental;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -38,6 +41,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -50,53 +54,63 @@ import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
 public class BaseIncrementalClassificationCorrectnessTest
-		extends BaseIncrementalReasoningCorrectnessTest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> {
+		extends
+		BaseIncrementalReasoningCorrectnessTest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> {
 
-	final static String INPUT_DATA_LOCATION = "classification_test_input";	
-	
+	final static String INPUT_DATA_LOCATION = "classification_test_input";
+
 	public BaseIncrementalClassificationCorrectnessTest(
 			ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
 
+	@SuppressWarnings("finally")
 	@Override
-	protected void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner, long seed) throws ElkException {
-		//System.out.println("===========================================");
-		
+	protected void correctnessCheck(Reasoner standardReasoner,
+			Reasoner incrementalReasoner, long seed) throws ElkException {
+		if (LOGGER_.isDebugEnabled())
+			LOGGER_.debug("======= Computing Expected Taxonomy =======");
+
 		Taxonomy<ElkClass> expected = getTaxonomy(standardReasoner);
-		
-		//System.out.println("===========================================");
-		
+
+		if (LOGGER_.isDebugEnabled())
+			LOGGER_.debug("======= Computing Incremental Taxonomy =======");
+
 		Taxonomy<ElkClass> incremental = getTaxonomy(incrementalReasoner);
-		
-		/*try {
-			Writer writer = new OutputStreamWriter(System.out);
-			TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
-			TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-		
-		assertEquals("Seed " + seed, TaxonomyHasher.hash(expected), TaxonomyHasher.hash(incremental));
+
+		try {
+			assertEquals("Seed " + seed, TaxonomyHasher.hash(expected),
+					TaxonomyHasher.hash(incremental));
+		} catch (AssertionError e) {
+			try {
+				Writer writer = new OutputStreamWriter(System.out);
+				TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
+				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
+				writer.flush();
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			} finally {
+				throw e;
+			}
+		}
 	}
-	
+
 	private Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner) {
 		Taxonomy<ElkClass> result = null;
-		
+
 		try {
 			result = reasoner.getTaxonomy();
 		} catch (ElkException e) {
 			LOGGER_.info("Ontology is inconsistent");
-			
+
 			result = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
 		}
-		
+
 		return result;
 	}
 
@@ -114,8 +128,9 @@ public class BaseIncrementalClassificationCorrectnessTest
 							public TestManifest<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>(input, null);
+								return new TaxonomyDiffManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>(
+										input, null);
 							}
 						});
-	}	
+	}
 }

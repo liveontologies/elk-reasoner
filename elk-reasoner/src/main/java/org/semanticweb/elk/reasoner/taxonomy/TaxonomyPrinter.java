@@ -100,13 +100,13 @@ public class TaxonomyPrinter {
 	 *             If an I/O error occurs
 	 */
 	public static void dumpClassTaxomomy(Taxonomy<ElkClass> taxonomy,
-			Writer writer, boolean addHash) throws IOException {
-		writer.write("Ontology(\n");
+			Appendable writer, boolean addHash) throws IOException {
+		writer.append("Ontology(\n");
 		processTaxomomy(taxonomy, writer);
-		writer.write(")\n");
+		writer.append(")\n");
 
 		if (addHash) {
-			writer.write("\n# Hash code: " + getHashString(taxonomy) + "\n");
+			writer.append("\n# Hash code: " + getHashString(taxonomy) + "\n");
 		}
 	}
 
@@ -186,7 +186,7 @@ public class TaxonomyPrinter {
 	 * @throws IOException
 	 */
 	protected static void processTaxomomy(Taxonomy<ElkClass> classTaxonomy,
-			Writer writer) throws IOException {
+			Appendable writer) throws IOException {
 
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
@@ -225,23 +225,25 @@ public class TaxonomyPrinter {
 	 * @throws IOException
 	 */
 	protected static void printDeclarations(Taxonomy<ElkClass> classTaxonomy,
-			ElkObjectFactory objectFactory, Writer writer) throws IOException {
-		
-		List<ElkClass> classes = new ArrayList<ElkClass>(classTaxonomy.getNodes().size() * 2);
-		
+			ElkObjectFactory objectFactory, Appendable writer)
+			throws IOException {
+
+		List<ElkClass> classes = new ArrayList<ElkClass>(classTaxonomy
+				.getNodes().size() * 2);
+
 		for (TaxonomyNode<ElkClass> classNode : classTaxonomy.getNodes()) {
 			for (ElkClass clazz : classNode.getMembers()) {
 				if (!clazz.getIri().equals(PredefinedElkIri.OWL_THING.get())
 						&& !clazz.getIri().equals(
 								PredefinedElkIri.OWL_NOTHING.get())) {
 					classes.add(clazz);
-					
+
 				}
 			}
 		}
-		
+
 		Collections.sort(classes, CLASS_COMPARATOR);
-		
+
 		for (ElkClass clazz : classes) {
 			ElkDeclarationAxiom decl = objectFactory.getDeclarationAxiom(clazz);
 			OwlFunctionalStylePrinter.append(writer, decl, true);
@@ -276,7 +278,7 @@ public class TaxonomyPrinter {
 	 */
 	protected static void printClassAxioms(ElkClass elkClass,
 			ArrayList<ElkClass> orderedEquivalentClasses,
-			TreeSet<ElkClass> orderedSubClasses, Writer writer)
+			TreeSet<ElkClass> orderedSubClasses, Appendable writer)
 			throws IOException {
 
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
@@ -284,7 +286,8 @@ public class TaxonomyPrinter {
 		if (orderedEquivalentClasses.size() > 1) {
 			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = objectFactory
 					.getEquivalentClassesAxiom(orderedEquivalentClasses);
-			OwlFunctionalStylePrinter.append(writer, elkEquivalentClassesAxiom, true);
+			OwlFunctionalStylePrinter.append(writer, elkEquivalentClassesAxiom,
+					true);
 			writer.append('\n');
 		}
 
@@ -294,7 +297,8 @@ public class TaxonomyPrinter {
 						PredefinedElkIri.OWL_NOTHING.get())) {
 					ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
 							.getSubClassOfAxiom(elkSubClass, elkClass);
-					OwlFunctionalStylePrinter.append(writer, elkSubClassAxiom, true);
+					OwlFunctionalStylePrinter.append(writer, elkSubClassAxiom,
+							true);
 					writer.append('\n');
 				}
 	}
