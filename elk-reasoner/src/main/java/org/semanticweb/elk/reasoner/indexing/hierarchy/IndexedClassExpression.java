@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
@@ -32,7 +30,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -47,12 +44,6 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 abstract public class IndexedClassExpression extends IndexedObject implements
 		Comparable<IndexedClassExpression> {
-
-	/**
-	 * The {@link IndexedPropertyChain}s with which this
-	 * {@link IndexedClassExpression} is used positively as a filler
-	 */
-	private Set<IndexedPropertyChain> posPropertiesInExistentials_;
 
 	/**
 	 * The first composition rule assigned to this
@@ -99,35 +90,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 */
 	public boolean occursPositively() {
 		return positiveOccurrenceNo > 0;
-	}
-
-
-	/**
-	 * @return the {@link IndexedObjectProperty} objects that occur in positive
-	 *         {@link IndexedObjectSomeValuesFrom} that have this
-	 *         {@link IndexedClassExpression} as the filler, or {@code null} if
-	 *         none is assigned
-	 */
-	public Set<IndexedPropertyChain> getPosPropertiesInExistentials() {
-		return posPropertiesInExistentials_;
-	}
-
-	protected boolean addPosPropertyInExistential(IndexedPropertyChain property) {
-		if (posPropertiesInExistentials_ == null)
-			posPropertiesInExistentials_ = new ArrayHashSet<IndexedPropertyChain>(
-					1);
-		return posPropertiesInExistentials_.add(property);
-	}
-
-	protected boolean removePosPropertyInExistential(
-			IndexedPropertyChain property) {
-		boolean success = false;
-		if (posPropertiesInExistentials_ != null) {
-			success = posPropertiesInExistentials_.remove(property);
-			if (posPropertiesInExistentials_.isEmpty())
-				posPropertiesInExistentials_ = null;
-		}
-		return success;
 	}
 
 	// TODO: replace pointers to contexts by a mapping
@@ -239,14 +201,13 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	@Override
 	public <O> O accept(IndexedObjectVisitor<O> visitor) {
 		return accept((IndexedClassExpressionVisitor<O>) visitor);
-	}	
-	
+	}
+
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
 	abstract void updateOccurrenceNumbers(IndexUpdater updater, int increment,
-			int positiveIncrement, int negativeIncrement);	
-	
+			int positiveIncrement, int negativeIncrement);
 
 	/**
 	 * 
@@ -254,11 +215,12 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * @return
 	 */
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
-	
+
 	/**
 	 * 
 	 * @param visitor
 	 */
-	public abstract void accept(DecompositionRuleApplicationVisitor visitor, SaturationState.Writer writer, Context context);
+	public abstract void accept(DecompositionRuleApplicationVisitor visitor,
+			SaturationState.Writer writer, Context context);
 
 }

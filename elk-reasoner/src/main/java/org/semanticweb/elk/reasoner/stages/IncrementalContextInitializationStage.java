@@ -32,7 +32,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 
 /**
  * @author Pavel Klinov
@@ -116,20 +115,9 @@ public class IncrementalContextInitializationStage extends
 	@Override
 	void initComputation() {
 		super.initComputation();
-
-		SaturationState.Writer saturationEngine = reasoner.saturationState.getWriter();
-		
-		for (IndexedClassExpression ice : reasoner.incrementalState.diffIndex
-				.getClassExpressionsWithIndexRuleChanges()) {
-			if (ice.getContext() != null) {
-				if (ice.getContext().isSaturated()) {
-					saturationEngine.markAsNotSaturated(ice.getContext());
-				}
-			}
-		}
-
 		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();
-		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size();
+		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts()
+				.size();
 		initContexts_ = 0;
 	}
 

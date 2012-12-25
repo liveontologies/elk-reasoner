@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,14 +30,11 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.indexing.ChainableIndexRule;
-import org.semanticweb.elk.reasoner.indexing.IndexRule;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
-import org.semanticweb.elk.util.collections.LazySetUnion;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
@@ -100,16 +96,6 @@ public class DifferentialIndex {
 	 */
 	private final Map<IndexedClassExpression, ChainableRule<Context>> removedContextRuleHeadByClassExpressions_;
 
-	/**
-	 * The map of added {@link IndexRule}s for index class expressions;
-	 */
-	private final Map<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>> addedIndexRuleHeadByClassExpressions_;
-
-	/**
-	 * The map of removed {@link IndexRule}s for index class expressions;
-	 */
-	private final Map<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>> removedIndexRuleHeadByClassExpressions_;
-
 	private final ElkAxiomIndexerVisitor axiomInserter_;
 
 	private final ElkAxiomIndexerVisitor axiomDeleter_;
@@ -123,10 +109,6 @@ public class DifferentialIndex {
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
-				127);
-		this.addedIndexRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>>(
-				127);
-		this.removedIndexRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableIndexRule<IndexedClassExpression>>(
 				127);
 		this.axiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
 				owlNothing, new IncrementalIndexUpdater(this), true);
@@ -158,12 +140,6 @@ public class DifferentialIndex {
 	 */
 	public Map<IndexedClassExpression, ChainableRule<Context>> getRemovedContextRulesByClassExpressions() {
 		return this.removedContextRuleHeadByClassExpressions_;
-	}
-
-	public Collection<IndexedClassExpression> getClassExpressionsWithIndexRuleChanges() {
-		return new LazySetUnion<IndexedClassExpression>(
-				addedIndexRuleHeadByClassExpressions_.keySet(),
-				removedIndexRuleHeadByClassExpressions_.keySet());
 	}
 
 	/**
@@ -245,34 +221,6 @@ public class DifferentialIndex {
 		}
 		addedContextRuleHeadByClassExpressions_.clear();
 
-		// commit direct index changes
-		for (IndexedClassExpression target : removedIndexRuleHeadByClassExpressions_
-				.keySet()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing index rule deletions for " + target);
-			}
-			ChainableIndexRule<IndexedClassExpression> nextIndexRule = removedIndexRuleHeadByClassExpressions_
-					.get(target);
-			while (nextIndexRule != null) {
-				nextIndexRule.deapply(target);
-				nextIndexRule = nextIndexRule.next();
-			}
-		}
-		removedIndexRuleHeadByClassExpressions_.clear();
-
-		for (IndexedClassExpression target : addedIndexRuleHeadByClassExpressions_
-				.keySet()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing index rule additions for " + target);
-			}
-			ChainableIndexRule<IndexedClassExpression> nextIndexRule = addedIndexRuleHeadByClassExpressions_
-					.get(target);
-			while (nextIndexRule != null) {
-				nextIndexRule.apply(target);
-				nextIndexRule = nextIndexRule.next();
-			}
-		}
-		addedIndexRuleHeadByClassExpressions_.clear();
 	}
 
 	public void clearSignatureChanges() {
@@ -286,9 +234,7 @@ public class DifferentialIndex {
 		return addedContextInitRules_ == null
 				&& removedContextInitRules_ == null
 				&& addedContextRuleHeadByClassExpressions_.isEmpty()
-				&& removedContextRuleHeadByClassExpressions_.isEmpty()
-				&& addedIndexRuleHeadByClassExpressions_.isEmpty()
-				&& removedIndexRuleHeadByClassExpressions_.isEmpty();
+				&& removedContextRuleHeadByClassExpressions_.isEmpty();
 	}
 
 	public ElkAxiomProcessor getAxiomInserter() {
@@ -341,18 +287,6 @@ public class DifferentialIndex {
 				removedContextRuleHeadByClassExpressions_, target);
 	}
 
-	private Chain<ChainableIndexRule<IndexedClassExpression>> getAddedIndexRuleChain(
-			final IndexedClassExpression target) {
-		return AbstractChain.getMapBackedChain(
-				addedIndexRuleHeadByClassExpressions_, target);
-	}
-
-	private Chain<ChainableIndexRule<IndexedClassExpression>> getRemovedIndexRuleChain(
-			final IndexedClassExpression target) {
-		return AbstractChain.getMapBackedChain(
-				removedIndexRuleHeadByClassExpressions_, target);
-	}
-
 	boolean registerAddedContextInitRule(ChainableRule<Context> rule) {
 		return rule.addTo(getAddedContextInitRuleChain());
 	}
@@ -389,15 +323,5 @@ public class DifferentialIndex {
 	boolean registerRemovedContextRule(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
 		return rule.addTo(getRemovedContextRuleChain(target));
-	}
-
-	boolean registerAddedIndexRule(IndexedClassExpression target,
-			ChainableIndexRule<IndexedClassExpression> rule) {
-		return rule.addTo(getAddedIndexRuleChain(target));
-	}
-
-	boolean registerRemovedIndexRule(IndexedClassExpression target,
-			ChainableIndexRule<IndexedClassExpression> rule) {
-		return rule.addTo(getRemovedIndexRuleChain(target));
 	}
 }

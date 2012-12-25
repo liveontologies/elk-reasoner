@@ -22,14 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import java.util.Set;
-
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
@@ -82,6 +80,14 @@ public class BackwardLink implements Conclusion {// extends AbstractConclusion {
 
 	public void apply(SaturationState.Writer writer, Context context,
 			RuleApplicationVisitor ruleAppVisitor) {
+
+		// if this is the first/last backward link for this relation,
+		// generate new propagations for this relation
+		if (context.getBackwardLinksByObjectProperty().get(relation_).size() == 1) {
+			IndexedObjectSomeValuesFrom.generatePropagations(writer, relation_,
+					context);
+		}
+
 		// apply all backward link rules of the context
 		LinkRule<BackwardLink> backLinkRule = context.getBackwardLinkRuleHead();
 		while (backLinkRule != null) {
@@ -93,13 +99,7 @@ public class BackwardLink implements Conclusion {// extends AbstractConclusion {
 		 * convert backward link to a forward link if it can potentially be
 		 * composed
 		 */
-		Set<IndexedPropertyChain> toldProperties = source_.getRoot()
-				.getPosPropertiesInExistentials();
-
-		if (toldProperties != null
-				&& !new LazySetIntersection<IndexedPropertyChain>(
-						toldProperties, relation_.getSaturated()
-								.getLeftComposableProperties()).isEmpty()) {
+		if (!relation_.getSaturated().getLeftComposableProperties().isEmpty()) {
 			// if
 			// (!relation_.getSaturated().getLeftComposableProperties().isEmpty())
 			// {
