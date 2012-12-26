@@ -46,6 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
  * Reverts inferences
  * 
  * @author Pavel Klinov
+ * @author "Yevgeny Kazakov"
  * 
  */
 class IncrementalChangesInitializationStage extends AbstractReasonerStage {
@@ -116,6 +117,14 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 
+		/*
+		 * if this stage is completed successfully, the corresponding
+		 * incremental part of the index is not needed anymore
+		 */
+		if (deletions_)
+			reasoner.incrementalState.diffIndex.clearDeletedRules();
+		else
+			reasoner.incrementalState.diffIndex.commitAddedRules();
 		reasoner.incrementalState.setStageStatus(stage(), true);
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 	}

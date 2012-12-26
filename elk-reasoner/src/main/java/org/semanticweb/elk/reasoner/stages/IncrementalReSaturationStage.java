@@ -95,9 +95,6 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		// time to commit the differential index
-		reasoner.incrementalState.diffIndex.commit();
-		
 		RuleApplicationFactory appFactory = new RuleApplicationFactory(reasoner.saturationState, true);
 		
 		LOGGER_.debug("Number of contexts to re-saturate " + reasoner.saturationState.getNotSaturatedContexts().size());

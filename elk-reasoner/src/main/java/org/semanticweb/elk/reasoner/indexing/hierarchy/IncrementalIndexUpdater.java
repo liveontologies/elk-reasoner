@@ -47,22 +47,22 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 
 	@Override
 	public void addClass(ElkClass newClass) {
-		differentialIndex_.addedClasses.add(newClass);
+		differentialIndex_.addClass(newClass);
 	}
 
 	@Override
 	public void removeClass(ElkClass oldClass) {
-		differentialIndex_.removedClasses.add(oldClass);
+		differentialIndex_.removeClass(oldClass);
 	}
 
 	@Override
 	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
-		differentialIndex_.addedIndividuals.add(newIndividual);
+		differentialIndex_.addNamedIndividual(newIndividual);
 	}
 
 	@Override
 	public void removeNamedIndividual(ElkNamedIndividual newIndividual) {
-		differentialIndex_.removedIndividuals.remove(newIndividual);
+		differentialIndex_.removeNamedIndividual(newIndividual);
 	}
 
 	@Override

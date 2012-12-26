@@ -152,8 +152,7 @@ public class RuleStatistics {
 						+ decompositionRuleTimer.timeIndexedClass
 						+ decompositionRuleTimer.timeIndexedDataHasValue
 						+ decompositionRuleTimer.timeIndexedObjectIntersectionOf + decompositionRuleTimer.timeIndexedObjectSomeValuesFrom)
-				/ addCounter);
-
+				/ addCounter + " ms");
 	}
 
 }

@@ -100,9 +100,6 @@ public class BackwardLink implements Conclusion {// extends AbstractConclusion {
 		 * composed
 		 */
 		if (!relation_.getSaturated().getLeftComposableProperties().isEmpty()) {
-			// if
-			// (!relation_.getSaturated().getLeftComposableProperties().isEmpty())
-			// {
 			writer.produce(source_, new ForwardLink(relation_, context));
 		}
 	}
