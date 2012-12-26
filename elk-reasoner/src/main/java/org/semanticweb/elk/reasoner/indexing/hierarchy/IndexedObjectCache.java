@@ -201,7 +201,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	protected final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
 		@Override
 		public Boolean visit(IndexedClass element) {
-			if (indexedClassExpressionLookup.remove(element)) {
+			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedClassCount--;
 				return true;
 			} else
@@ -210,7 +210,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedIndividual element) {
-			if (indexedClassExpressionLookup.remove(element)) {
+			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedIndividualCount--;
 				return true;
 			} else
@@ -219,22 +219,22 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
-			return indexedClassExpressionLookup.remove(element);
+			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
-			return indexedClassExpressionLookup.remove(element);
+			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedDataHasValue element) {
-			return indexedClassExpressionLookup.remove(element);
+			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectProperty element) {
-			if (indexedPropertyChainLookup.remove(element)) {
+			if (indexedPropertyChainLookup.removeEntry(element) != null) {
 				indexedObjectPropertyCount--;
 				return true;
 			} else
@@ -243,7 +243,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedBinaryPropertyChain element) {
-			return indexedPropertyChainLookup.remove(element);
+			return indexedPropertyChainLookup.removeEntry(element) != null;
 		}
 
 		@Override
@@ -254,7 +254,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedDisjointnessAxiom axiom) {
-			return indexedAxiomLookup.remove(axiom);
+			return indexedAxiomLookup.removeEntry(axiom) != null;
 		}
 	};
 
