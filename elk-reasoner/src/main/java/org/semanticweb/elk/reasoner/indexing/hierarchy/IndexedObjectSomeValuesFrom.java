@@ -115,6 +115,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				+ ')';
 	}
 
+	@Override
 	public void accept(DecompositionRuleApplicationVisitor visitor,
 			Writer writer, Context context) {
 		visitor.visit(this, writer, context);
