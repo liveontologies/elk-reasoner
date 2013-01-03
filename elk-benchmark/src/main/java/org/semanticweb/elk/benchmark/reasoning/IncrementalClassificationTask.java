@@ -279,7 +279,7 @@ public class IncrementalClassificationTask implements Task {
 	protected void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner, long seed) throws ElkException {
 		Taxonomy<ElkClass> expected = getTaxonomy(standardReasoner);
 		
-		System.out.println("===========INCREMENTAL==============");
+//		System.out.println("===========INCREMENTAL==============");
 		
 		Taxonomy<ElkClass> incremental = getTaxonomy(incrementalReasoner);
 		
