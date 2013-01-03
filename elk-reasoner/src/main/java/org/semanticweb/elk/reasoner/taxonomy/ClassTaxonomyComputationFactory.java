@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -56,6 +57,10 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  */
 public class ClassTaxonomyComputationFactory implements
 		InputProcessorFactory<IndexedClass, Engine> {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ClassTaxonomyComputationFactory.class);
 
 	/**
 	 * The class taxonomy object into which we write the result
@@ -119,8 +124,7 @@ public class ClassTaxonomyComputationFactory implements
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	private class ThisTransitiveReductionListener
-			implements
+	private class ThisTransitiveReductionListener implements
 			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>> {
 
 		@Override
@@ -145,21 +149,20 @@ public class ClassTaxonomyComputationFactory implements
 		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
+			
+			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
+					.getCreateNode(output.getEquivalent());
 
-			UpdateableTaxonomyNode<ElkClass> node = taxonomy_.getCreateNode(output
-					.getEquivalent());
-
-			// FIXME this sort of equality check is not guaranteed to work
-			// for ElkClasses
 			if (node.getMembers().contains(PredefinedElkClass.OWL_THING)) {
 				topNodeRef_.compareAndSet(null, node);
+				node.trySetModified(false);
 				return;
 			}
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
-				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_.getCreateNode(directSuperEquivalent
-								.getEquivalent());
+				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_
+						.getCreateNode(directSuperEquivalent.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);
 			}
 			// if there are no direct super nodes, then the top node is the
@@ -168,7 +171,7 @@ public class ClassTaxonomyComputationFactory implements
 				UpdateableTaxonomyNode<ElkClass> topNode = getCreateTopNode();
 				assignDirectSuperClassNode(node, topNode);
 			}
-			
+
 			node.trySetModified(false);
 		}
 
@@ -177,6 +180,9 @@ public class ClassTaxonomyComputationFactory implements
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 
 			taxonomy_.addToBottomNode(output.getRoot().getElkClass());
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(output.getRoot() + ": added to the bottom node");
+			}
 		}
 
 		@Override
@@ -202,6 +208,7 @@ public class ClassTaxonomyComputationFactory implements
 			UpdateableTaxonomyNode<ElkClass> topNode = taxonomy_
 					.getCreateNode(Collections
 							.<ElkClass> singleton(PredefinedElkClass.OWL_THING));
+			topNode.trySetModified(false);
 			topNodeRef_.compareAndSet(null, topNode);
 		}
 		return topNodeRef_.get();
@@ -217,7 +224,8 @@ public class ClassTaxonomyComputationFactory implements
 	 * @param superNode
 	 *            the node that should be the super-node of the first node
 	 */
-	private static void assignDirectSuperClassNode(UpdateableTaxonomyNode<ElkClass> subNode,
+	private static void assignDirectSuperClassNode(
+			UpdateableTaxonomyNode<ElkClass> subNode,
 			UpdateableTaxonomyNode<ElkClass> superNode) {
 		subNode.addDirectSuperNode(superNode);
 		/*
@@ -255,7 +263,7 @@ public class ClassTaxonomyComputationFactory implements
 	public void printStatistics() {
 		transitiveReductionShared_.printStatistics();
 	}
-	
+
 	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
 		return transitiveReductionShared_.getRuleAndConclusionStatistics();
 	}
@@ -277,6 +285,9 @@ public class ClassTaxonomyComputationFactory implements
 
 		@Override
 		public final void submit(IndexedClass job) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(job + ": taxonomy construction started");
+			}
 			transitiveReductionEngine
 					.submit(new TransitiveReductionJob<IndexedClass>(job));
 		}
@@ -292,7 +303,5 @@ public class ClassTaxonomyComputationFactory implements
 		}
 
 	}
-
-
 
 }

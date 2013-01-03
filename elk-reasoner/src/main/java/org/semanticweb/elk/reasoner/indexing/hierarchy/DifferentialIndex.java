@@ -55,50 +55,36 @@ public class DifferentialIndex {
 			.getLogger(DifferentialIndex.class);
 
 	/**
-	 * The list of {@link ElkClass}es to be added to the signature of the
-	 * ontology; the new signature is obtained by adding {@link #addedClasses_}
-	 * and removing {@link #removedClasses_} in this particular order; these
-	 * sets are not necessarily disjoint.
+	 * The list of {@link ElkClass}es to be added to, respectively removed from
+	 * the signature of the ontology; the new signature is obtained by adding
+	 * {@link #addedClasses_} and removing {@link #removedClasses_} in this
+	 * particular order; these sets are not necessarily disjoint.
 	 */
-	private final List<ElkClass> addedClasses_;
+	private final List<ElkClass> addedClasses_, removedClasses_;
 
-	/**
-	 * The list of {@link ElkClass}es to be removed from the signature of the
-	 * ontology; the new signature is obtained by adding {@link #addedClasses_}
-	 * and removing {@link #removedClasses_} in this particular order; these
-	 * sets are not necessarily disjoint.
-	 */
-	private final List<ElkClass> removedClasses_;
-
-	private final List<ElkNamedIndividual> addedIndividuals_;
-
-	private final List<ElkNamedIndividual> removedIndividuals_;
+	private final List<ElkNamedIndividual> addedIndividuals_,
+			removedIndividuals_;
 
 	private final OntologyIndex mainIndex_;
 
 	/**
-	 * The added initialization {@link Rule}s
+	 * object that should be deleted
 	 */
-	private ChainableRule<Context> addedContextInitRules_ = null;
+	private final IndexedObjectCache todoDeletions_;
 
 	/**
-	 * The removed initialization {@link Rule}s
+	 * The added and removed initialization {@link Rule}s
 	 */
-	private ChainableRule<Context> removedContextInitRules_ = null;
+	private ChainableRule<Context> addedContextInitRules_ = null,
+			removedContextInitRules_ = null;
 
 	/**
-	 * The map of added {@link Rule}s for index class expressions;
+	 * The maps of added and removed {@link Rule}s for index class expressions;
 	 */
-	private final Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_;
+	private final Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
+			removedContextRuleHeadByClassExpressions_;
 
-	/**
-	 * The map of removed {@link Rule}s for index class expressions;
-	 */
-	private final Map<IndexedClassExpression, ChainableRule<Context>> removedContextRuleHeadByClassExpressions_;
-
-	private final ElkAxiomIndexerVisitor axiomInserter_;
-
-	private final ElkAxiomIndexerVisitor axiomDeleter_;
+	private final ElkAxiomIndexerVisitor axiomInserter_, axiomDeleter_;
 
 	public DifferentialIndex(OntologyIndex mainIndex,
 			IndexedObjectCache objectCache, IndexedClass owlNothing) {
@@ -106,6 +92,7 @@ public class DifferentialIndex {
 		this.removedClasses_ = new ArrayList<ElkClass>(127);
 		this.addedIndividuals_ = new ArrayList<ElkNamedIndividual>();
 		this.removedIndividuals_ = new ArrayList<ElkNamedIndividual>();
+		this.todoDeletions_ = new IndexedObjectCache();
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
@@ -174,6 +161,8 @@ public class DifferentialIndex {
 	public void clearDeletedRules() {
 		removedContextInitRules_ = null;
 		removedContextRuleHeadByClassExpressions_.clear();
+		mainIndex_.getIndexedObjectCache().subtract(todoDeletions_);
+		todoDeletions_.clear();
 	}
 
 	/**
@@ -206,7 +195,6 @@ public class DifferentialIndex {
 			}
 		}
 		addedContextRuleHeadByClassExpressions_.clear();
-
 	}
 
 	public void clearSignatureChanges() {
@@ -281,6 +269,14 @@ public class DifferentialIndex {
 		removedClasses_.add(oldClass);
 	}
 
+	boolean addIndexedObject(IndexedObject iobj) {
+		return iobj.accept(mainIndex_.getIndexedObjectCache().inserter);
+	}
+
+	boolean removeIndexedObject(IndexedObject iobj) {
+		return iobj.accept(todoDeletions_.inserter);
+	}
+
 	void addNamedIndividual(ElkNamedIndividual newIndividual) {
 		addedIndividuals_.add(newIndividual);
 	}
@@ -294,8 +290,9 @@ public class DifferentialIndex {
 	}
 
 	boolean registerRemovedContextInitRule(ChainableRule<Context> rule) {
-		return rule.removeFrom(mainIndex_.getContextInitRuleChain())
-				&& rule.addTo(getRemovedContextInitRuleChain());
+		return rule.removeFrom(getAddedContextInitRuleChain())
+				|| (rule.removeFrom(mainIndex_.getContextInitRuleChain()) && rule
+						.addTo(getRemovedContextInitRuleChain()));
 	}
 
 	/**
@@ -325,7 +322,8 @@ public class DifferentialIndex {
 	 */
 	boolean registerRemovedContextRule(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		return rule.removeFrom(target.getCompositionRuleChain())
-				&& rule.addTo(getRemovedContextRuleChain(target));
+		return rule.removeFrom(getAddedContextRuleChain(target))
+				|| (rule.removeFrom(target.getCompositionRuleChain()) && rule
+						.addTo(getRemovedContextRuleChain(target)));
 	}
 }

@@ -61,10 +61,11 @@ public class IncrementalChangesInitialization
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
 			SaturationState state, ComputationExecutor executor,
-			RuleApplicationVisitor ruleAppVisitor,
-			int maxWorkers, ProgressMonitor progressMonitor) {
+			RuleApplicationVisitor ruleAppVisitor, int maxWorkers,
+			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
-				changedGlobalRules, ruleAppVisitor), executor, maxWorkers, progressMonitor);
+				changedGlobalRules, ruleAppVisitor), executor, maxWorkers,
+				progressMonitor);
 	}
 }
 
@@ -105,8 +106,8 @@ class ContextInitializationFactory
 					LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
 					while (nextGlobalRule != null) {
 						// apply all changed global context rules
-						nextGlobalRule.accept(ruleAppVisitor_, saturationStateWriter_, context);
-						//nextGlobalRule.apply(saturationStateWriter_, context);
+						nextGlobalRule.accept(ruleAppVisitor_,
+								saturationStateWriter_, context);
 						nextGlobalRule = nextGlobalRule.next();
 					}
 
@@ -116,8 +117,8 @@ class ContextInitializationFactory
 						LinkRule<Context> nextLocalRule = indexChanges_
 								.get(changedICE);
 						while (nextLocalRule != null) {
-							nextLocalRule.accept(ruleAppVisitor_, saturationStateWriter_, context);
-							//nextLocalRule.apply(saturationStateWriter_, context);
+							nextLocalRule.accept(ruleAppVisitor_,
+									saturationStateWriter_, context);
 							nextLocalRule = nextLocalRule.next();
 						}
 					}

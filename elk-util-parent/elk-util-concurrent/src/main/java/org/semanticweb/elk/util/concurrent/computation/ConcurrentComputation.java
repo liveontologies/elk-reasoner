@@ -121,7 +121,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	/**
 	 * Starts the workers to process the input.
 	 * 
-	 * @return {@code true} if the operation was successfull
+	 * @return {@code true} if the operation was successful
 	 */
 	public synchronized boolean start() {
 		finishRequested = false;

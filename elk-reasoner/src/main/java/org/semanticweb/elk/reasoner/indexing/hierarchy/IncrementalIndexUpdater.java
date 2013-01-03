@@ -86,4 +86,14 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	public boolean remove(ChainableRule<Context> rule) {
 		return differentialIndex_.registerRemovedContextInitRule(rule);
 	}
+
+	@Override
+	public boolean add(IndexedObject object) {
+		return differentialIndex_.addIndexedObject(object);
+	}
+
+	@Override
+	public boolean remove(IndexedObject object) {
+		return differentialIndex_.removeIndexedObject(object);
+	}
 }

@@ -236,8 +236,9 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	/**
 	 * A {@link ClassOccurrenceUpdateFilter}, which is responsible for updating
 	 * the occurrence counters of {@link IndexedClassExpression}s, as well as
-	 * for adding such objects to the index when its occurrences becomes
-	 * non-zero, and removing from the index, when its occurrences becomes zero.
+	 * for adding such objects to the {@link IndexedObjectCache} when its
+	 * occurrences becomes non-zero, and removing from the
+	 * {@link IndexedObjectCache}, when its occurrences becomes zero.
 	 */
 	private class ClassOccurrenceUpdateFilter implements
 			IndexedClassExpressionFilter {
@@ -253,13 +254,13 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		public <T extends IndexedClassExpression> T update(T ice) {
 			if (!ice.occurs() && increment > 0)
-				ice.accept(objectCache.inserter);
+				indexUpdater_.add(ice);
 
 			ice.updateOccurrenceNumbers(indexUpdater_, increment,
 					positiveIncrement, negativeIncrement);
 
 			if (!ice.occurs() && increment < 0)
-				ice.accept(objectCache.deletor);
+				indexUpdater_.remove(ice);
 
 			return ice;
 		}
@@ -314,12 +315,12 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		public <T extends IndexedPropertyChain> T update(T ipc) {
 			if (!ipc.occurs() && increment > 0)
-				ipc.accept(objectCache.inserter);
+				indexUpdater_.add(ipc);
 
 			ipc.updateOccurrenceNumber(increment);
 
 			if (!ipc.occurs() && increment < 0)
-				ipc.accept(objectCache.deletor);
+				indexUpdater_.remove(ipc);
 
 			return ipc;
 		}
@@ -356,12 +357,12 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		public <T extends IndexedAxiom> T update(T axiom) {
 			if (!axiom.occurs() && increment > 0)
-				axiom.accept(objectCache.inserter);
+				indexUpdater_.add(axiom);
 
 			axiom.updateOccurrenceNumbers(indexUpdater_, increment);
 
 			if (!axiom.occurs() && increment < 0)
-				axiom.accept(objectCache.deletor);
+				indexUpdater_.remove(axiom);
 
 			return axiom;
 		}

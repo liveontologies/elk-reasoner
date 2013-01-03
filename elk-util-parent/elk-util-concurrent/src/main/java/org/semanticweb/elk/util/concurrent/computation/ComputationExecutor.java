@@ -37,10 +37,6 @@ import java.util.concurrent.TimeUnit;
  * @author "Yevgeny Kazakov"
  * 
  */
-/**
- * @author "Yevgeny Kazakov"
- * 
- */
 public class ComputationExecutor extends ThreadPoolExecutor {
 
 	/**

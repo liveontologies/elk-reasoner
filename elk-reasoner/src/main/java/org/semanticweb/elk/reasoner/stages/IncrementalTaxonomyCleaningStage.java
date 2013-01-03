@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,20 +37,22 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyCleaning;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * TODO docs
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
-	private static final Logger LOGGER_ = Logger.getLogger(IncrementalTaxonomyCleaningStage.class);	
-	
-	private ClassTaxonomyCleaning cleaning_ = null;	
-	
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IncrementalTaxonomyCleaningStage.class);
+
+	private ClassTaxonomyCleaning cleaning_ = null;
+
 	public IncrementalTaxonomyCleaningStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
@@ -61,23 +64,26 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(IncrementalStages.TAXONOMY_CLEANING);
+		return reasoner.incrementalState
+				.getStageStatus(IncrementalStages.TAXONOMY_CLEANING);
 	}
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new IncrementalConsistencyCheckingStage(reasoner));
+		return Arrays
+				.asList((ReasonerStage) new IncrementalConsistencyCheckingStage(
+						reasoner));
 	}
 
 	@Override
 	public void execute() throws ElkException {
-		
+
 		if (reasoner.taxonomy == null) {
-			//perhaps an inconsistency has been detected?
-			//exit
+			// perhaps an inconsistency has been detected?
+			// exit
 			return;
 		}
-		
+
 		if (cleaning_ == null) {
 			initComputation();
 		}
@@ -94,7 +100,8 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 
-		reasoner.incrementalState.setStageStatus(IncrementalStages.TAXONOMY_CLEANING, true);
+		reasoner.incrementalState.setStageStatus(
+				IncrementalStages.TAXONOMY_CLEANING, true);
 		reasoner.incrementalState.diffIndex.clearSignatureChanges();
 		// at this point we're done with unsaturated contexts
 		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
@@ -103,53 +110,21 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		
-		final Collection<ElkClass> removed = reasoner.incrementalState.diffIndex.getRemovedClasses();
-		final Collection<ElkClass> modified = new ContextRootCollection(reasoner.saturationState.getNotSaturatedContexts());
-		//TODO do a generic lazy collection concatenation?
-		Collection<ElkClass> inputs = new AbstractCollection<ElkClass>() {
 
-			@Override
-			public Iterator<ElkClass> iterator() {
-				return new Iterator<ElkClass>() {
+		final Collection<ElkClass> removed = reasoner.incrementalState.diffIndex
+				.getRemovedClasses();
+		final Collection<ElkClass> modified = new ContextRootCollection(
+				reasoner.saturationState.getNotSaturatedContexts());
+		Collection<ElkClass> inputs = Operations.getCollection(
+				Operations.concat(removed, modified),
+				removed.size() + modified.size());
 
-					private Iterator<ElkClass> remIter_ = removed.iterator();
-					private Iterator<ElkClass> modIter_ = modified.iterator();					
-					
-					@Override
-					public boolean hasNext() {
-						return remIter_.hasNext() || modIter_.hasNext();
-					}
-
-					@Override
-					public ElkClass next() {
-						ElkClass next = remIter_.hasNext() ? remIter_.next() : null;
-						
-						if (next == null) {
-							next = modIter_.hasNext() ? modIter_.next() : null;
-						}
-						
-						return next;
-					}
-
-					@Override
-					public void remove() {
-						throw new UnsupportedOperationException();
-					}
-				};
-			}
-
-			@Override
-			public int size() {
-				return removed.size() + modified.size();
-			}
-		};
-		
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Taxonomy nodes to be cleaned: " + inputs);
 		}
-		
-		cleaning_ = new ClassTaxonomyCleaning(inputs, reasoner.taxonomy, reasoner.getProcessExecutor(), workerNo, progressMonitor);
+
+		cleaning_ = new ClassTaxonomyCleaning(inputs, reasoner.taxonomy,
+				reasoner.getProcessExecutor(), workerNo, progressMonitor);
 	}
 
 	@Override
@@ -157,56 +132,58 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	/*
 	 * Used to pass a collection of context's roots without extra copying
 	 */
-	private static class ContextRootCollection extends AbstractCollection<ElkClass> {
+	private static class ContextRootCollection extends
+			AbstractCollection<ElkClass> {
 
 		private final Collection<IndexedClassExpression> ices_;
-		
+
 		ContextRootCollection(Collection<IndexedClassExpression> ices) {
 			ices_ = ices;
 		}
-		
+
 		@Override
 		public Iterator<ElkClass> iterator() {
-			return new Iterator<ElkClass>(){
-				
+			return new Iterator<ElkClass>() {
+
 				private ElkClass curr_ = null;
-				private final Iterator<IndexedClassExpression> iter_ = ices_.iterator();
+				private final Iterator<IndexedClassExpression> iter_ = ices_
+						.iterator();
 
 				@Override
 				public boolean hasNext() {
 					if (curr_ != null) {
 						return true;
-					}
-					else {
+					} else {
 						while (curr_ == null && iter_.hasNext()) {
 							IndexedClassExpression expr = iter_.next();
-							
+
 							if (expr instanceof IndexedClass) {
-								curr_ = ((IndexedClass)expr).getElkClass();
+								curr_ = ((IndexedClass) expr).getElkClass();
 							}
 						}
 					}
-					
+
 					return curr_ != null;
 				}
 
 				@Override
 				public ElkClass next() {
 					ElkClass tmp = curr_;
-					
+
 					curr_ = null;
-					
+
 					return tmp;
 				}
 
 				@Override
 				public void remove() {
 					throw new UnsupportedOperationException();
-				}};
+				}
+			};
 		}
 
 		@Override
@@ -214,6 +191,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			// upper bound, the actual size may be smaller since some contexts'
 			// roots could be complex expressions
 			return ices_.size();
-		}		
+		}
 	}
 }

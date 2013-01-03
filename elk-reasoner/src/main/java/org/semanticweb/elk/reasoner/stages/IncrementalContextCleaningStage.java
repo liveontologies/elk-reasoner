@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,13 +37,14 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(IncrementalContextCleaningStage.class);
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IncrementalContextCleaningStage.class);
 
 	private ClassExpressionSaturation<IndexedClassExpression> cleaning_ = null;
 
@@ -57,12 +59,15 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(IncrementalStages.CONTEXT_CLEANING);
+		return reasoner.incrementalState
+				.getStageStatus(IncrementalStages.CONTEXT_CLEANING);
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new IncrementalContextInitializationStage(reasoner, new IncrementalDeSaturationStage(reasoner)));
+		return Arrays
+				.asList((ReasonerStage) new IncrementalContextInitializationStage(
+						reasoner, new IncrementalDeSaturationStage(reasoner)));
 	}
 
 	@Override
@@ -70,9 +75,9 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 		if (cleaning_ == null) {
 			initComputation();
 		}
-		
+
 		progressMonitor.start(getName());
-		
+
 		try {
 			for (;;) {
 				cleaning_.process();
@@ -82,25 +87,37 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		
-		reasoner.incrementalState.setStageStatus(IncrementalStages.CONTEXT_CLEANING, true);
+
+		for (IndexedClassExpression ice : reasoner.saturationState
+				.getNotSaturatedContexts()) {
+			if (ice.getContext().getSubsumers().size() > 0) {
+				LOGGER_.error("Context not cleaned: " + ice + "!");
+				System.err.println("Context not cleaned: " + ice + "!");
+				System.err.println(ice.getContext().getSubsumers().size()
+						+ " subsumers: " + ice.getContext().getSubsumers());
+			}
+
+		}
+
+		reasoner.incrementalState.setStageStatus(
+				IncrementalStages.CONTEXT_CLEANING, true);
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
 
-		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(reasoner.saturationState, true);
-		
+		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
+				reasoner.saturationState, true);
+
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Contexts to be cleaned: " + reasoner.saturationState.getNotSaturatedContexts());
+			LOGGER_.trace("Contexts to be cleaned: "
+					+ reasoner.saturationState.getNotSaturatedContexts());
 		}
-		
+
 		cleaning_ = new ClassExpressionSaturation<IndexedClassExpression>(
-				reasoner.getProcessExecutor(),
-				workerNo,
-				reasoner.getProgressMonitor(),
-				cleaningFactory);
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor(), cleaningFactory);
 	}
 
 	@Override

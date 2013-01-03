@@ -87,7 +87,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 		}
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.SATURATION, true);
-		markAllContextsAsSaturated();
+		markAllContextsAsSaturated();		
 	}
 	
 	

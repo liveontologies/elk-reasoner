@@ -53,7 +53,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	protected int indexedIndividualCount = 0;
 	protected int indexedObjectPropertyCount = 0;
 
-	protected IndexedObjectCache() {
+	public IndexedObjectCache() {
 		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
 				new IndexedClassExpressionViewFactory(), 1024);
 		indexedPropertyChainLookup = new KeyEntryHashSet<IndexedPropertyChain>(
@@ -62,16 +62,32 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				new IndexedAxiomViewFactory(), 1024);
 	}
 
-	protected void clear() {
+	public void clear() {
 		indexedClassExpressionLookup.clear();
 		indexedPropertyChainLookup.clear();
+		indexedAxiomLookup.clear();
 		indexedClassCount = 0;
 		indexedIndividualCount = 0;
 		indexedObjectPropertyCount = 0;
 	}
 
-	private static <T> T resolveCache(T cached, T element) {
-		return cached == null ? element : cached;
+	/**
+	 * Remove all object of the given {@link IndexedObjectCache} from this
+	 * {@link IndexedObjectCache}
+	 * 
+	 * @param other
+	 *            the {@link IndexedObjectCache} whose stored object should be
+	 *            removed from this {@link IndexedObjectCache}
+	 */
+	public void subtract(IndexedObjectCache other) {
+		for (IndexedClassExpression ice : other.indexedClassExpressionLookup) {
+			ice.accept(deletor);
+		}	
+		for (IndexedPropertyChain ipc : other.indexedPropertyChainLookup)
+			ipc.accept(deletor);
+		for (IndexedAxiom ax : other.indexedAxiomLookup)
+			ax.accept(deletor);
+		// the counters should be subtracted during deletion
 	}
 
 	@Override
@@ -136,6 +152,10 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	public IndexedDisjointnessAxiom visit(IndexedDisjointnessAxiom axiom) {
 		return resolveCache(
 				(IndexedDisjointnessAxiom) indexedAxiomLookup.get(axiom), axiom);
+	}
+
+	private static <T> T resolveCache(T cached, T element) {
+		return cached == null ? element : cached;
 	}
 
 	protected final IndexedObjectVisitor<Boolean> inserter = new IndexedObjectVisitor<Boolean>() {

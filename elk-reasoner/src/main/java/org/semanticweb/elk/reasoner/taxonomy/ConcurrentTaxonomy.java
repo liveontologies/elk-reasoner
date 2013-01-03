@@ -171,16 +171,44 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 		return bottomClassNode;
 	}
 
+	public void updateMembers(NonBottomClassNode node,
+			Collection<ElkClass> members) {
+		synchronized (node) {
+			if (node.getMembers().size() == members.size())
+				return;
+			node.setMembers(members);
+		}
+
+	}
+
 	@Override
 	public NonBottomClassNode getCreateTypeNode(Collection<ElkClass> members) {
-		ElkClass someMember = members.iterator().next();
 
-		NonBottomClassNode previous = classNodeLookup_.get(getKey(someMember));
-		
-		if (previous != null)
+		NonBottomClassNode previous;
+
+		// search if some node is already assigned to some member, and if so
+		// use this node and update its members if necessary (members can only
+		// increase during the incremental update)
+		for (ElkClass member : members) {
+			previous = classNodeLookup_.get(getKey(member));
+			if (previous == null)
+				continue;
+			synchronized (previous) {
+				if (previous.getMembers().size() < members.size())
+					previous.setMembers(members);
+				else
+					return previous;
+			}
+
+			for (ElkClass newMember : members) {
+				classNodeLookup_.put(getKey(newMember), previous);
+			}
 			return previous;
+		}
 
+		// otherwise create a new node
 		NonBottomClassNode node = new NonBottomClassNode(this, members);
+
 		// we first assign the node to the canonical member to avoid
 		// concurrency problems
 		ElkClass canonical = node.getCanonicalMember();
@@ -190,20 +218,22 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 
 		allClassNodes_.add(node);
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(OwlFunctionalStylePrinter.toString(canonical)
-					+ ": node created");
+			LOGGER_.trace("node created: " + node);
 		}
 		for (ElkClass member : members) {
 			if (member != canonical)
 				classNodeLookup_.put(getKey(member), node);
 		}
+
 		return node;
 	}
 
 	@Override
 	public IndividualNode getCreateIndividualNode(
 			Collection<ElkNamedIndividual> members) {
-
+        // TODO: use the same technique as for getCreateTypeNode for incremental update
+		// TODO: avoid code duplication!
+		
 		IndividualNode node = new IndividualNode(this, members);
 		// we first assign the node to the canonical member to avoid
 		// concurrency problems
@@ -229,22 +259,26 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 	public boolean addToBottomNode(ElkClass elkClass) {
 		return unsatisfiableClasses.add(elkClass);
 	}
-	
+
 	@Override
-	public UpdateableTaxonomyNode<ElkClass> getCreateNode(Collection<ElkClass> members) {
+	public UpdateableTaxonomyNode<ElkClass> getCreateNode(
+			Collection<ElkClass> members) {
 		return getCreateTypeNode(members);
 	}
 
 	@Override
 	public boolean removeNode(UpdateableTaxonomyNode<ElkClass> node) {
 		boolean changed = false;
-		
+
 		allClassNodes_.remove(node);
 		// removing node assignment for members
 		for (ElkClass member : node.getMembers()) {
 			changed |= classNodeLookup_.remove(getKey(member)) != null;
 		}
-		
+		if (changed && LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace(node + ": node removed");
+		}
+
 		return changed;
 	}
 
@@ -252,9 +286,8 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 	public boolean removeInstanceNode(ElkNamedIndividual instance) {
 		// TODO Auto-generated method stub
 		return false;
-	}	
+	}
 
-	
 	@Override
 	public UpdateableTaxonomyNode<ElkClass> getUpdateableNode(ElkClass elkObject) {
 		return getUpdateableTypeNode(elkObject);
@@ -266,7 +299,8 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 	}
 
 	@Override
-	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getUpdateableTypeNode(ElkClass elkObject) {
+	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getUpdateableTypeNode(
+			ElkClass elkObject) {
 		return classNodeLookup_.get(getKey(elkObject));
 	}
 

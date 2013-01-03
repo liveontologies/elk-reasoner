@@ -39,7 +39,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -91,12 +90,12 @@ class NonBottomClassNode implements
 	 * this node.
 	 */
 	private final Set<InstanceNode<ElkClass, ElkNamedIndividual>> directInstanceNodes_;
-	
+
 	/**
 	 * <tt>true</tt> if the direct super-nodes of this node need to be
 	 * recomputed
 	 */
-	private final AtomicBoolean modified_ = new AtomicBoolean(true);	
+	private final AtomicBoolean modified_ = new AtomicBoolean(true);
 
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
@@ -125,14 +124,16 @@ class NonBottomClassNode implements
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
+	public synchronized void addDirectSuperNode(
+			UpdateableTaxonomyNode<ElkClass> superNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct super-node " + superNode);
 		try {
-			directSuperNodes_.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)superNode);
-		}
-		catch (ClassCastException e) {
-			throw new IllegalArgumentException(superNode + " is not a type node!");
+			directSuperNodes_
+					.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>) superNode);
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException(superNode
+					+ " is not a type node!");
 		}
 	}
 
@@ -144,19 +145,20 @@ class NonBottomClassNode implements
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+	public synchronized void addDirectSubNode(
+			UpdateableTaxonomyNode<ElkClass> subNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct sub-node " + subNode);
-		
+
 		try {
-			
+
 			if (directSubNodes_.isEmpty()) {
 				this.taxonomy_.countNodesWithSubClasses.incrementAndGet();
 			}
-			
-			directSubNodes_.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>)subNode);
-		}
-		catch (ClassCastException e) {
+
+			directSubNodes_
+					.add((UpdateableTypeNode<ElkClass, ElkNamedIndividual>) subNode);
+		} catch (ClassCastException e) {
 			throw new IllegalArgumentException(subNode + " is not a type node!");
 		}
 	}
@@ -175,6 +177,7 @@ class NonBottomClassNode implements
 		directInstanceNodes_.add(instanceNode);
 	}
 
+	// TODO: change the type of the output to SortedSet
 	@Override
 	public Set<ElkClass> getMembers() {
 		// create an unmodifiable set view of the members; alternatively, one
@@ -216,12 +219,12 @@ class NonBottomClassNode implements
 	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
 		return getDirectUpdateableSuperNodes();
 	}
-	
+
 	@Override
 	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectUpdateableSuperNodes() {
 		return Collections.unmodifiableSet(directSuperNodes_);
-	}	
-	
+	}
+
 	@Override
 	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {
 		Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
@@ -242,7 +245,8 @@ class NonBottomClassNode implements
 	@Override
 	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
 		if (!directSubNodes_.isEmpty()) {
-			return Collections.<TypeNode<ElkClass, ElkNamedIndividual>>unmodifiableSet(directSubNodes_);
+			return Collections
+					.<TypeNode<ElkClass, ElkNamedIndividual>> unmodifiableSet(directSubNodes_);
 		} else {
 			Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
 					1);
@@ -250,7 +254,7 @@ class NonBottomClassNode implements
 			return Collections.unmodifiableSet(result);
 		}
 	}
-	
+
 	@Override
 	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectUpdateableSubNodes() {
 		if (!directSubNodes_.isEmpty()) {
@@ -258,7 +262,7 @@ class NonBottomClassNode implements
 		} else {
 			return Collections.emptySet();
 		}
-	}	
+	}
 
 	@Override
 	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
@@ -297,7 +301,7 @@ class NonBottomClassNode implements
 
 	@Override
 	public String toString() {
-		return OwlFunctionalStylePrinter.toString(getCanonicalMember());
+		return members_.toString();
 	}
 
 	@Override
@@ -329,12 +333,26 @@ class NonBottomClassNode implements
 
 	@Override
 	public void clearMembers() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(this + ": clear members");
 		members_.clear();
 	}
-	
+
+	public void setMembers(Collection<ElkClass> members) {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(this + ": updating members to " + members);
+		members_.clear();
+		members_.addAll(members);
+		Collections.sort(this.members_, Comparators.ELK_CLASS_COMPARATOR);
+	}
+
 	@Override
 	public boolean trySetModified(boolean modified) {
-		return modified_.compareAndSet(!modified, modified);
+		boolean result = modified_.compareAndSet(!modified, modified);
+		if (result && LOGGER_.isTraceEnabled())
+			LOGGER_.trace("node " + this + ": set "
+					+ (modified ? "modified" : "not modifiled"));
+		return result;
 	}
 
 	@Override
@@ -343,18 +361,29 @@ class NonBottomClassNode implements
 	}
 
 	@Override
-	public synchronized boolean removeDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+	public synchronized boolean removeDirectSubNode(
+			UpdateableTaxonomyNode<ElkClass> subNode) {
 		boolean changed = directSubNodes_.remove(subNode);
-		
+
+		if (changed && LOGGER_.isTraceEnabled())
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace(this + ": removed direct sub-node " + subNode);
+
 		if (directSubNodes_.isEmpty()) {
 			taxonomy_.countNodesWithSubClasses.decrementAndGet();
 		}
-		
+
 		return changed;
 	}
 
 	@Override
-	public synchronized boolean removeDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
-		return directSuperNodes_.remove(superNode);
+	public synchronized boolean removeDirectSuperNode(
+			UpdateableTaxonomyNode<ElkClass> superNode) {
+		boolean changed = directSuperNodes_.remove(superNode);
+
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(this + ": removed direct super-node " + superNode);
+
+		return changed;
 	}
 }

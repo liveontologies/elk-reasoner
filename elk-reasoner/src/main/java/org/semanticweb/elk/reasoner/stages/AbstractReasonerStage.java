@@ -92,10 +92,11 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		this.workerNo = reasoner.getNumberOfWorkers();
 		this.progressMonitor = reasoner.getProgressMonitor();
 	}
-	
+
 	protected void markAllContextsAsSaturated() {
-		for (IndexedClassExpression ice : reasoner.saturationState.getNotSaturatedContexts()) {
+		for (IndexedClassExpression ice : reasoner.saturationState
+				.getNotSaturatedContexts()) {
 			ice.getContext().setSaturated(true);
-		}
+		}		
 	}
 }

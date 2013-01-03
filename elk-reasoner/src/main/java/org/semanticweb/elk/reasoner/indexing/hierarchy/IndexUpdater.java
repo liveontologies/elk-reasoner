@@ -45,6 +45,10 @@ interface IndexUpdater {
 
 	public boolean remove(final ChainableRule<Context> rule);
 
+	public boolean add(IndexedObject object);
+
+	public boolean remove(IndexedObject object);
+
 	public void addClass(ElkClass newClass);
 
 	public void removeClass(ElkClass oldClass);

@@ -40,9 +40,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 public interface Node<T extends ElkObject> {
 
 	/**
-	 * Get an unmodifiable set of objects that this Node represents.
+	 * Get an unmodifiable set of objects that this Node represents. The
+	 * membership in this set is checked using the structural equality.
 	 * 
-	 * @return collection of equivalent objects
+	 * @return collection of logically equivalent objects
 	 */
 	public Set<T> getMembers();
 

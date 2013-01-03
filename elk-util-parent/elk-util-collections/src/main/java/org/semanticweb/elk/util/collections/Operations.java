@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.util.collections;
 
+import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -156,6 +157,22 @@ public class Operations {
 						}
 					}
 				};
+			}
+		};
+	}
+
+	public static <T> Collection<T> getCollection(final Iterable<T> iterable,
+			final int size) {
+		return new AbstractCollection<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				return iterable.iterator();
+			}
+
+			@Override
+			public int size() {
+				return size;
 			}
 		};
 	}

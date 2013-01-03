@@ -62,18 +62,18 @@ public abstract class AbstractReasonerState {
 			.getLogger(AbstractReasonerState.class);
 
 	final SaturationState saturationState;
-	
+
 	/**
 	 * Accumulated statistics regarding produced conclusions and rule
-	 * applications. Stored here because more than one stage can apply
-	 * inference rules (e.g. during incremental reasoning).
+	 * applications. Stored here because more than one stage can apply inference
+	 * rules (e.g. during incremental reasoning).
 	 * 
-	 * TODO Better to hide this behind a common interface? Then we
-	 * can uniformly maintain aggregated stats of different kinds produced by
-	 * different computations across multiple stages
+	 * TODO Better to hide this behind a common interface? Then we can uniformly
+	 * maintain aggregated stats of different kinds produced by different
+	 * computations across multiple stages
 	 */
 	final RuleAndConclusionStatistics ruleAndConclusionStats;
-	
+
 	/**
 	 * 
 	 */
@@ -115,7 +115,7 @@ public abstract class AbstractReasonerState {
 	 * {@code true} if all stages have been reseted after changes
 	 */
 	final OntologyIndex ontologyIndex;
-	
+
 	private final IndexedObjectCache objectCache_;
 	/**
 	 * {@code true} if the current ontology is inconsistent
@@ -125,7 +125,7 @@ public abstract class AbstractReasonerState {
 	 * Taxonomy that stores (partial) classification
 	 */
 	UpdateableTaxonomy<ElkClass> taxonomy = null;
-	
+
 	/**
 	 * Taxonomy that stores (partial) classification and (partial) realization
 	 * of individuals
@@ -142,24 +142,23 @@ public abstract class AbstractReasonerState {
 	private ChangesLoader changesLoader_;
 
 	protected AbstractReasonerState() {
-		OntologyIndexImpl ontoIndex = new OntologyIndexImpl();
-		
-		this.ontologyIndex = ontoIndex;
-		this.objectCache_ = ontoIndex;
-		this.saturationState = new SaturationState(ontoIndex);
+		this.objectCache_ = new IndexedObjectCache();
+		this.ontologyIndex = new OntologyIndexImpl(objectCache_);
+		this.saturationState = new SaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new RuleAndConclusionStatistics();
-		this.incrementalState = new IncrementalReasonerState(objectCache_, ontologyIndex);
+		this.incrementalState = new IncrementalReasonerState(objectCache_,
+				ontologyIndex);
 	}
 
 	public void setIncrementalMode(boolean set) {
 		if (set && incrementalState == null) {
-			incrementalState = new IncrementalReasonerState(objectCache_, ontologyIndex);
-		}
-		else if (!set) {
+			incrementalState = new IncrementalReasonerState(objectCache_,
+					ontologyIndex);
+		} else if (!set) {
 			incrementalState = null;
 		}
 	}
-	
+
 	/**
 	 * Reset the loading stage and all subsequent stages
 	 */
@@ -168,12 +167,12 @@ public abstract class AbstractReasonerState {
 			this.ontologyLoader_.dispose();
 			this.ontologyLoader_ = null;
 		}
-		
+
 		if (doneLoading) {
 			doneLoading = false;
 			ontologyIndex.clear();
 		}
-		
+
 		resetChangesLoading();
 		registerOntologyChangesLoader(null);
 	}
@@ -191,13 +190,13 @@ public abstract class AbstractReasonerState {
 			doneClassSaturation = false;
 			doneClassTaxonomy = false;
 			doneInstanceTaxonomy = false;
-			
+
 			if (incrementalState != null) {
 				incrementalState.resetAllStagesStatus();
 			}
 		}
 	}
-	
+
 	public void registerOntologyLoader(OntologyLoader ontologyLoader) {
 		resetLoading();
 		this.ontologyLoader_ = ontologyLoader.getLoader(ontologyIndex
@@ -206,9 +205,9 @@ public abstract class AbstractReasonerState {
 
 	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
 		resetChangesLoading();
-		
+
 		changesLoader_ = changesLoader;
-		
+
 		if (changesLoader_ != null) {
 			changesLoader_.registerChangeListener(new AxiomChangeListener() {
 
@@ -225,14 +224,14 @@ public abstract class AbstractReasonerState {
 		}
 	}
 
-		
 	private boolean incrementalChange(ElkAxiomChange change) {
 		ElkAxiom axiom = change.getAxiom();
-		//FIXME Here we should determine if the axiom is in the supported fragment
-		//if not, the method should return true
+		// FIXME Here we should determine if the axiom is in the supported
+		// fragment
+		// if not, the method should return true
 		return !(axiom instanceof ElkPropertyAxiom<?>);
-	}		
-		
+	}
+
 	/**
 	 * @return the source where the input ontology can be loaded
 	 */
@@ -244,20 +243,18 @@ public abstract class AbstractReasonerState {
 	 * @return the source where changes in ontology can be loaded
 	 */
 	Loader getChangesLoader() {
-		//return changesLoader;
+		// return changesLoader;
 		if (changesLoader_ == null) {
 			return null;
 		}
-		
+
 		if (incrementalState != null) {
 			return changesLoader_.getLoader(
 					incrementalState.diffIndex.getAxiomInserter(),
 					incrementalState.diffIndex.getAxiomDeleter());
-		}
-		else {
-			return changesLoader_.getLoader(
-					ontologyIndex.getAxiomInserter(),
-					ontologyIndex.getAxiomDeleter());			
+		} else {
+			return changesLoader_.getLoader(ontologyIndex.getAxiomInserter(),
+					ontologyIndex.getAxiomDeleter());
 		}
 	}
 
@@ -330,13 +327,12 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public boolean isInconsistent() throws ElkException {
-		
-		ReasonerStage stage = incrementalState == null 
-				? new ConsistencyCheckingStage(	this) 
-				: new IncrementalConsistencyCheckingStage(this); 
-		
+
+		ReasonerStage stage = incrementalState == null ? new ConsistencyCheckingStage(
+				this) : new IncrementalConsistencyCheckingStage(this);
+
 		getStageExecutor().complete(stage);
-		
+
 		return inconsistentOntology;
 	}
 
@@ -378,17 +374,18 @@ public abstract class AbstractReasonerState {
 	 */
 	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
 		if (isInconsistent())
-			throw new ElkInconsistentOntologyException();		
-		
+			throw new ElkInconsistentOntologyException();
+
 		if (incrementalState != null) {
-			getStageExecutor()
-					.complete(new IncrementalClassTaxonomyComputationStage(this));
+			getStageExecutor().complete(
+					new IncrementalClassTaxonomyComputationStage(this));
 		} else {
 			getStageExecutor()
 					.complete(new ClassTaxonomyComputationStage(this));
-			this.incrementalState = new IncrementalReasonerState(objectCache_, ontologyIndex);
+			this.incrementalState = new IncrementalReasonerState(objectCache_,
+					ontologyIndex);
 		}
-		
+
 		return taxonomy;
 	}
 
@@ -413,7 +410,7 @@ public abstract class AbstractReasonerState {
 			throw new ElkInconsistentOntologyException();
 
 		getStageExecutor().complete(new InstanceTaxonomyComputationStage(this));
-		
+
 		return instanceTaxonomy;
 	}
 
