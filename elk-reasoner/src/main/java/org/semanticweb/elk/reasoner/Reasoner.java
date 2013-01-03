@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
@@ -89,9 +90,11 @@ public class Reasoner extends AbstractReasonerState {
 	 * {@link ReasonerFactory}.
 	 * */
 	protected Reasoner(ReasonerStageExecutor stageExecutor,
-			ExecutorService executor, int workerNo) {
+			ExecutorService executor, ReasonerConfiguration config) {
+		super(config);
+		
 		this.stageExecutor = stageExecutor;
-		this.workerNo = workerNo;
+		this.workerNo = config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
 		reset();

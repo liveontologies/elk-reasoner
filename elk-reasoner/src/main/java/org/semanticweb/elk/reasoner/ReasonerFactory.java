@@ -70,6 +70,6 @@ public class ReasonerFactory {
 		return new Reasoner(
 				stageExecutor,
 				Executors.newCachedThreadPool(),
-				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
+				config);
 	}
 }

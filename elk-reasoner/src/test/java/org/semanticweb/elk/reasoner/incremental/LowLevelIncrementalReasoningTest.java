@@ -72,7 +72,7 @@ public class LowLevelIncrementalReasoningTest {
 	@Test
 	public void testBasicDeletion() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+				new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
@@ -113,7 +113,7 @@ public class LowLevelIncrementalReasoningTest {
 	@Test
 	public void testDeletePositiveExistential() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+				new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
@@ -156,7 +156,7 @@ public class LowLevelIncrementalReasoningTest {
 	@Test
 	public void testNewClassUnsatisfiable() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+				new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
@@ -207,7 +207,7 @@ public class LowLevelIncrementalReasoningTest {
 			TestChangesLoader changeLoader = new TestChangesLoader();
 			
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					new LoggingStageExecutor(), 1);
+					new LoggingStageExecutor());
 
 			reasoner.setIncrementalMode(false);
 			reasoner.registerOntologyLoader(initialLoader);
@@ -244,7 +244,7 @@ public class LowLevelIncrementalReasoningTest {
 	@Test
 	public void testDuplicateSubclassAxioms() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+				new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
@@ -298,7 +298,7 @@ public class LowLevelIncrementalReasoningTest {
 	@Test
 	public void testPropositionalAdditions() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+				new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
@@ -335,7 +335,7 @@ public class LowLevelIncrementalReasoningTest {
 	@Test
 	public void testDeleteBinaryDisjointness() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+				new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
@@ -386,7 +386,7 @@ public class LowLevelIncrementalReasoningTest {
 	@Test
 	public void testDeleteNaryDisjointness() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+				new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
@@ -440,7 +440,7 @@ public class LowLevelIncrementalReasoningTest {
 	@Test
 	public void testAddClassRemoveClass() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+				new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
@@ -491,7 +491,7 @@ public class LowLevelIncrementalReasoningTest {
 	public void testDeleteBackwardLinkAndModifySourceContext()
 			throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
+				new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 

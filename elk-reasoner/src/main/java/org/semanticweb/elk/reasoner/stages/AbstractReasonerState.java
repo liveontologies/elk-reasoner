@@ -35,6 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkPropertyAxiom;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
@@ -61,6 +62,8 @@ public abstract class AbstractReasonerState {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(AbstractReasonerState.class);
 
+	final ReasonerConfiguration config_;
+	
 	final SaturationState saturationState;
 	
 	/**
@@ -141,7 +144,7 @@ public abstract class AbstractReasonerState {
 	 */
 	private ChangesLoader changesLoader_;
 
-	protected AbstractReasonerState() {
+	protected AbstractReasonerState(final ReasonerConfiguration config) {
 		OntologyIndexImpl ontoIndex = new OntologyIndexImpl();
 		
 		this.ontologyIndex = ontoIndex;
@@ -149,6 +152,7 @@ public abstract class AbstractReasonerState {
 		this.saturationState = new SaturationState(ontoIndex);
 		this.ruleAndConclusionStats = new RuleAndConclusionStatistics();
 		this.incrementalState = new IncrementalReasonerState(objectCache_, ontologyIndex);
+		this.config_ = config;
 	}
 
 	public void setIncrementalMode(boolean set) {
@@ -437,4 +441,7 @@ public abstract class AbstractReasonerState {
 		return ontologyIndex;
 	}
 
+	protected boolean useIncrementalTaxonomy() {
+		return config_.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY);
+	}
 }

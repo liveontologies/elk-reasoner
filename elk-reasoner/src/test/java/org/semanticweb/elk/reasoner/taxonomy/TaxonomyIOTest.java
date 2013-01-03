@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.concurrent.Executors;
 
 import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
@@ -53,7 +52,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
+import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
@@ -175,8 +174,11 @@ public class TaxonomyIOTest {
 
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(resource);
-			TestReasoner reasoner = new TestReasoner(stream,
-					new TestStageExecutor());
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(new TestStageExecutor(), 1); 
+			
+			reasoner.registerOntologyLoader(new Owl2StreamLoader(
+					new Owl2FunctionalStyleParserFactory(), stream));
+			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			return reasoner.getInstanceTaxonomy();
 		} finally {
@@ -195,16 +197,5 @@ public class TaxonomyIOTest {
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
-	}
-}
-
-class TestReasoner extends Reasoner {
-
-	protected TestReasoner(InputStream stream,
-			ReasonerStageExecutor stageExecutor) {
-		super(stageExecutor, Executors.newSingleThreadExecutor(), 1);
-		registerOntologyLoader(new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), stream));
-		registerOntologyChangesLoader(new EmptyChangesLoader());
 	}
 }

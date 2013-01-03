@@ -64,24 +64,30 @@ class IncrementalClassTaxonomyComputationStage extends
 	@Override
 	public List<ReasonerStage> getDependencies() {
 		return Arrays
-				.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(reasoner)/*new IncrementalConsistencyCheckingStage(reasoner)*/);
+				.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(reasoner));
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
 
 		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
 				.getIndexedClasses();
+		
+		if (!reasoner.useIncrementalTaxonomy()) {
+			reasoner.taxonomy = null;
+		}
 
 		if (reasoner.taxonomy == null) {
+			
+			if (LOGGER_.isInfoEnabled())
+				LOGGER_.info("Using non-incremental taxonomy");			
+			
 			computation_ = new ClassTaxonomyComputation(indexedClasses,
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.ontologyIndex);
 		} else {
-
+			
 			Collection<IndexedClass> modified = new AbstractSet<IndexedClass>() {
 
 				@Override
