@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -69,11 +68,10 @@ public class SaturationState {
 	 * The queue of all contexts for which computation of the closure under
 	 * inference rules has not yet been finished.
 	 */
-	private Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
+	private final Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 
 	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
-		return notSaturatedContexts_ == null ? Collections
-				.<IndexedClassExpression> emptyList() : notSaturatedContexts_;
+		return notSaturatedContexts_;
 	}
 
 	private static final ContextCreationListener DUMMY_LISTENER = new ContextCreationListener() {
@@ -84,8 +82,9 @@ public class SaturationState {
 	};
 
 	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
-	
-	private final Writer defaultWriter_ = new Writer(DUMMY_LISTENER, DEFAULT_INIT_RULE_APP_VISITOR);
+
+	private final Writer defaultWriter_ = new Writer(DUMMY_LISTENER,
+			DEFAULT_INIT_RULE_APP_VISITOR);
 
 	private final Writer defaultSaturationCheckingWriter_ = new SaturationCheckingWriter(
 			DUMMY_LISTENER, DEFAULT_INIT_RULE_APP_VISITOR);
@@ -120,13 +119,16 @@ public class SaturationState {
 	 * @return a new {@link Writer} associated with the given
 	 *         {@link ContextCreationListener}
 	 */
-	public Writer getWriter(ContextCreationListener contextCreationListener, RuleApplicationVisitor ruleAppVisitor) {
+	public Writer getWriter(ContextCreationListener contextCreationListener,
+			RuleApplicationVisitor ruleAppVisitor) {
 		return new Writer(contextCreationListener, ruleAppVisitor);
 	}
 
 	public Writer getSaturationCheckingWriter(
-			ContextCreationListener contextCreationListener, RuleApplicationVisitor ruleAppVisitor) {
-		return new SaturationCheckingWriter(contextCreationListener, ruleAppVisitor);
+			ContextCreationListener contextCreationListener,
+			RuleApplicationVisitor ruleAppVisitor) {
+		return new SaturationCheckingWriter(contextCreationListener,
+				ruleAppVisitor);
 	}
 
 	/**
@@ -144,10 +146,11 @@ public class SaturationState {
 	public class Writer {
 
 		private final ContextCreationListener contextCreationListener_;
-		
+
 		private final RuleApplicationVisitor initRuleAppVisitor_;
 
-		private Writer(ContextCreationListener contextCreationListener, RuleApplicationVisitor ruleAppVisitor) {
+		private Writer(ContextCreationListener contextCreationListener,
+				RuleApplicationVisitor ruleAppVisitor) {
 			this.contextCreationListener_ = contextCreationListener;
 			this.initRuleAppVisitor_ = ruleAppVisitor;
 		}
@@ -189,24 +192,29 @@ public class SaturationState {
 		}
 
 		public void initContext(Context context) {
-			produce(context,
-					new PositiveSubsumer(context.getRoot()));
+			produce(context, new PositiveSubsumer(context.getRoot()));
 			// apply all context initialization rules
 			LinkRule<Context> initRule = ontologyIndex_
 					.getContextInitRuleHead();
 			while (initRule != null) {
 				initRule.accept(initRuleAppVisitor_, this, context);
-				//initRule.apply(this, context);
+				// initRule.apply(this, context);
 				initRule = initRule.next();
 			}
 		}
 
 		public void markAsNotSaturated(Context context) {
-			if (context.setSaturated(false))
+			if (context.setSaturated(false)) {
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace(context + ": marked as non-saturated");
+//				Thread.dumpStack();
 				notSaturatedContexts_.add(context.getRoot());
+			}
 		}
 
 		public void clearNotSaturatedContexts() {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Clear non-saturated contexts");
 			notSaturatedContexts_.clear();
 		}
 
@@ -236,7 +244,8 @@ public class SaturationState {
 	 */
 	private class SaturationCheckingWriter extends Writer {
 		private SaturationCheckingWriter(
-				ContextCreationListener contextCreationListener, RuleApplicationVisitor ruleAppVisitor) {
+				ContextCreationListener contextCreationListener,
+				RuleApplicationVisitor ruleAppVisitor) {
 			super(contextCreationListener, ruleAppVisitor);
 		}
 

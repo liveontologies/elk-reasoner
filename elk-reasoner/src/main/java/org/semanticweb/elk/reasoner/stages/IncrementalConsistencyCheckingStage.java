@@ -52,6 +52,7 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
+		// TODO: what will happen with the taxonomy? Will it be correctly updated after several (incremental) consistency tests?
 		return Arrays.asList((ReasonerStage) new IncrementalReSaturationStage(reasoner));		
 	}
 

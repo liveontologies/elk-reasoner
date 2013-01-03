@@ -37,6 +37,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -162,5 +163,10 @@ public interface OntologyIndex {
 	 *         rules or deleting existing ones
 	 */
 	Chain<ChainableRule<Context>> getContextInitRuleChain();
+
+	/**
+	 * @return the {@link IndexedObjectCache} associated with this index
+	 */
+	IndexedObjectCache getIndexedObjectCache();
 
 }

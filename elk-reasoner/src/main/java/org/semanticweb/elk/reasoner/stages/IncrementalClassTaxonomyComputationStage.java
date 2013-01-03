@@ -70,6 +70,13 @@ class IncrementalClassTaxonomyComputationStage extends
 	@Override
 	void initComputation() {
 		super.initComputation();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		// TODO: at some point we need to clear non-saturated contexts when everything is fine
+		// currently this is cleaned during the taxonomy cleaning stage, but this stage might not
+		// be executed at all; also, the non saturated contexts are not cleaned at all during
+		// incremental consistency checking. Something needs to be done about it.
+		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
 
 		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
 				.getIndexedClasses();
@@ -77,7 +84,7 @@ class IncrementalClassTaxonomyComputationStage extends
 		if (!reasoner.useIncrementalTaxonomy()) {
 			reasoner.taxonomy = null;
 		}
-
+		
 		if (reasoner.taxonomy == null) {
 			
 			if (LOGGER_.isInfoEnabled())
@@ -109,6 +116,7 @@ class IncrementalClassTaxonomyComputationStage extends
 
 				@Override
 				public int size() {
+					// TODO: this is only an upper bound; calculate exactly
 					return indexedClasses.size();
 				}
 

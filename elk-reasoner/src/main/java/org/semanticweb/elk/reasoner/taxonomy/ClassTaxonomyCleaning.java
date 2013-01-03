@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.taxonomy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -43,51 +44,51 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * TODO docs
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class ClassTaxonomyCleaning extends
 		ReasonerComputation<ElkClass, ClassTaxonomyCleaningFactory> {
 
-	public ClassTaxonomyCleaning(
-			Collection<? extends ElkClass> inputs,
+	public ClassTaxonomyCleaning(Collection<? extends ElkClass> inputs,
 			UpdateableTaxonomy<ElkClass> classTaxonomy,
-			ComputationExecutor executor,
-			int maxWorkers,
+			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		super(inputs, new ClassTaxonomyCleaningFactory(classTaxonomy), executor, maxWorkers, progressMonitor);
+		super(inputs, new ClassTaxonomyCleaningFactory(classTaxonomy),
+				executor, maxWorkers, progressMonitor);
 	}
 
 }
 
-class ClassTaxonomyCleaningFactory
-		implements
+class ClassTaxonomyCleaningFactory implements
 		InputProcessorFactory<ElkClass, InputProcessor<ElkClass>> {
 
 	private final UpdateableTaxonomy<ElkClass> classTaxonomy_;
-	
+
 	ClassTaxonomyCleaningFactory(UpdateableTaxonomy<ElkClass> taxonomy) {
 		classTaxonomy_ = taxonomy;
 	}
-	
+
 	@Override
 	public InputProcessor<ElkClass> getEngine() {
 		return new InputProcessor<ElkClass>() {
-			
+
 			/**
 			 * Temporary queue of nodes that should be removed from the taxonomy
 			 */
-			private final Queue<UpdateableTaxonomyNode<ElkClass>> toRemove = new ConcurrentLinkedQueue<UpdateableTaxonomyNode<ElkClass>>();			
+			private final Queue<UpdateableTaxonomyNode<ElkClass>> toRemove = new ConcurrentLinkedQueue<UpdateableTaxonomyNode<ElkClass>>();
 
 			@Override
 			public void submit(ElkClass elkClass) {
-				
-				if (classTaxonomy_.getBottomNode().getMembers().remove(elkClass)) {
+
+				if (classTaxonomy_.getBottomNode().getMembers()
+						.remove(elkClass)) {
 					return;
 				}
-				
-				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy_.getUpdateableNode(elkClass);
-				
+
+				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy_
+						.getUpdateableNode(elkClass);
+
 				if (node == null) {
 					return;
 				}
@@ -97,29 +98,28 @@ class ClassTaxonomyCleaningFactory
 				}
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
-					for (UpdateableTaxonomyNode<ElkClass> subNode : node.getDirectUpdateableSubNodes()) {
-						if (!subNode.trySetModified(true)) {
-							continue;
+					for (UpdateableTaxonomyNode<ElkClass> subNode : node
+							.getDirectUpdateableSubNodes()) {
+						if (subNode.trySetModified(true)) {
+							toRemove.add(subNode);
 						}
-						
-						toRemove.add(subNode);
 					}
 				}
 				
-				//System.out.println("Node removed: " + node);
+				// remove node from the taxonomy
 				classTaxonomy_.removeNode(node);
 			}
 
 			@Override
 			public void process() throws InterruptedException {
-				
+
 				for (;;) {
 					UpdateableTaxonomyNode<ElkClass> node = toRemove.poll();
-					
+
 					if (node == null) {
 						return;
 					}
-					
+
 					// remove all super-class links
 					synchronized (node) {
 
@@ -128,9 +128,11 @@ class ClassTaxonomyCleaningFactory
 
 						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
 							superNode.removeDirectSubNode(node);
-							node.removeDirectSuperNode(superNode);
+							node.removeDirectSuperNode(superNode);											
 						}
+												
 					}
+
 				}
 			}
 
@@ -138,7 +140,7 @@ class ClassTaxonomyCleaningFactory
 			public void finish() {
 				// TODO Auto-generated method stub
 			}
-			
+
 		};
 	}
 

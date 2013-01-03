@@ -115,6 +115,8 @@ public class IncrementalContextInitializationStage extends
 	@Override
 	void initComputation() {
 		super.initComputation();
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("Contexts to be initialized: " + reasoner.saturationState.getNotSaturatedContexts());
 		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();
 		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts()
 				.size();

@@ -80,4 +80,15 @@ public class DirectIndexUpdater implements IndexUpdater {
 	public boolean remove(ChainableRule<Context> rule) {
 		return rule.removeFrom(ontIndex_.getContextInitRuleChain());
 	}
+
+	@Override
+	public boolean add(IndexedObject object) {
+		return object.accept(ontIndex_.getIndexedObjectCache().inserter);
+	}
+
+	@Override
+	public boolean remove(IndexedObject object) {
+		return object.accept(ontIndex_.getIndexedObjectCache().deletor);
+	}
+
 }
