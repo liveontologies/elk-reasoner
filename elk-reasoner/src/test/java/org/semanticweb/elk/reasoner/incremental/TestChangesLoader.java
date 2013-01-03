@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -38,52 +39,58 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
  */
 public class TestChangesLoader implements ChangesLoader, OntologyLoader {
 
-	private final Queue<ElkAxiom> additions_ = new LinkedList<ElkAxiom>();
-	private final Queue<ElkAxiom> deletions_ = new LinkedList<ElkAxiom>();
+	// axioms that are coming in the changes
+	private final Queue<ElkAxiom> axioms_ = new LinkedList<ElkAxiom>();
+	// sequence of changes: true - additions, false - deletions
+	private final Queue<Boolean> changes_ = new LinkedList<Boolean>();
 	private AxiomChangeListener listener_ = null;
-	
+
 	public TestChangesLoader add(final ElkAxiom axiom) {
 		if (listener_ != null) {
 			listener_.notify(new SimpleElkAxiomChange(axiom, -1));
 		}
-		
-		additions_.add(axiom);
+		axioms_.add(axiom);
+		changes_.add(true);
 		return this;
 	}
-	
+
 	public TestChangesLoader remove(final ElkAxiom axiom) {
 		if (listener_ != null) {
 			listener_.notify(new SimpleElkAxiomChange(axiom, -1));
 		}
-		
-		deletions_.add(axiom);
+		axioms_.add(axiom);
+		changes_.add(false);
 		return this;
 	}
-	
+
 	public void clear() {
-		additions_.clear();
-		deletions_.clear();
-	}	
-	
+		axioms_.clear();
+		changes_.clear();
+	}
+
 	@Override
-	public Loader getLoader(ElkAxiomProcessor axiomInserter, ElkAxiomProcessor axiomDeleter) {
+	public Loader getLoader(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) {
 		return new TestLoader(axiomInserter, axiomDeleter);
 	}
-	
+
 	@Override
 	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
-		return new TestLoader(axiomLoader, new ElkAxiomProcessor(){
+		return new TestLoader(axiomLoader, new ElkAxiomProcessor() {
 			@Override
 			public void visit(ElkAxiom elkAxiom) {
 				// does nothing
-			}});
+			}
+		});
 	}
-	
+
 	@Override
 	public void registerChangeListener(AxiomChangeListener listener) {
 		listener_ = listener;
@@ -95,7 +102,7 @@ public class TestChangesLoader implements ChangesLoader, OntologyLoader {
 	class TestLoader implements Loader {
 
 		private final ElkAxiomProcessor inserter_, deleter_;
-		
+
 		TestLoader(ElkAxiomProcessor inserter, ElkAxiomProcessor deleter) {
 			inserter_ = inserter;
 			deleter_ = deleter;
@@ -103,16 +110,20 @@ public class TestChangesLoader implements ChangesLoader, OntologyLoader {
 
 		@Override
 		public void load() throws ElkLoadingException {
-			for (ElkAxiom axiom : additions_) {
-				inserter_.visit(axiom);
-			}
-			
-			for (ElkAxiom axiom : deletions_) {
-				deleter_.visit(axiom);
+			for (;;) {
+				ElkAxiom axiom = axioms_.poll();
+				if (axiom == null)
+					break;
+				boolean isAdded = changes_.poll();
+				if (isAdded)
+					inserter_.visit(axiom);
+				else
+					deleter_.visit(axiom);
 			}
 		}
 
 		@Override
-		public void dispose() {}		
+		public void dispose() {
+		}
 	}
 }

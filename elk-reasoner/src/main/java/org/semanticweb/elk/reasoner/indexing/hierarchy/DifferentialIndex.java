@@ -270,7 +270,8 @@ public class DifferentialIndex {
 	}
 
 	boolean addIndexedObject(IndexedObject iobj) {
-		return iobj.accept(mainIndex_.getIndexedObjectCache().inserter);
+		return iobj.accept(todoDeletions_.deletor)
+				|| iobj.accept(mainIndex_.getIndexedObjectCache().inserter);
 	}
 
 	boolean removeIndexedObject(IndexedObject iobj) {

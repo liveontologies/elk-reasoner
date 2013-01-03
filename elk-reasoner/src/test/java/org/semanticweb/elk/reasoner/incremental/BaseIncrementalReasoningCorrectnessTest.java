@@ -110,7 +110,8 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	 */
 	@Test
 	public void incrementalReasoning() throws ElkException {
-		TestChangesLoader initialLoader = new TestChangesLoader();
+		TestChangesLoader initialLoader1 = new TestChangesLoader();
+		TestChangesLoader initialLoader2 = new TestChangesLoader();
 		// TODO tweak TestChangesLoader to be able to use one loader for several
 		// reasoners
 		TestChangesLoader changeLoader1 = new TestChangesLoader();
@@ -120,15 +121,16 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		Reasoner incrementalReasoner = new ReasonerFactory()
 				.createReasoner(new LoggingStageExecutor());
 
-		standardReasoner.registerOntologyLoader(initialLoader);
+		standardReasoner.registerOntologyLoader(initialLoader1);
 		standardReasoner.registerOntologyChangesLoader(changeLoader1);
-		incrementalReasoner.registerOntologyLoader(initialLoader);
+		incrementalReasoner.registerOntologyLoader(initialLoader2);
 		incrementalReasoner.registerOntologyChangesLoader(changeLoader2);
 
 		standardReasoner.setIncrementalMode(false);
 		incrementalReasoner.setIncrementalMode(true);
 		// initial load
-		add(initialLoader, axioms);
+		add(initialLoader1, axioms);
+		add(initialLoader2, axioms);
 		// initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
