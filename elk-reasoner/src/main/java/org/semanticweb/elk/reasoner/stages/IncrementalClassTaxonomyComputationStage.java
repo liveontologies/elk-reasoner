@@ -28,14 +28,23 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.taxonomy.BasicTaxonomyValidator;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
+import org.semanticweb.elk.reasoner.taxonomy.InvalidTaxonomyException;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyAcyclicityAndReductionValidator;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyLinkConsistencyVisitor;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNodeDisjointnessVisitor;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyValidator;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
@@ -46,7 +55,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  *         pavel.klinov@uni-ulm.de
  */
 class IncrementalClassTaxonomyComputationStage extends
-		ClassTaxonomyComputationStage {
+		ClassTaxonomyComputationStage implements PostProcessingReasonerStage {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalClassTaxonomyComputationStage.class);
@@ -131,4 +140,43 @@ class IncrementalClassTaxonomyComputationStage extends
 		}
 
 	}
+
+	@Override
+	public Collection<ReasonerStage> getPostProcessingStages() {
+		return Collections.<ReasonerStage>singleton(new CheckTaxonomyStage());
+	}
+	
+	/**
+	 * Used to check validity of the computed taxonomy
+	 */
+	private class CheckTaxonomyStage extends BaseReasonerStage {
+
+		@Override
+		public String getName() {
+			return "Checking validity of class taxonomy";
+		}
+
+		@Override
+		public void execute() throws ElkException {
+			Taxonomy<ElkClass> taxonomy = reasoner.taxonomy;
+			
+			try {
+				if (taxonomy != null) {
+					TaxonomyValidator<ElkClass> validator = new BasicTaxonomyValidator<ElkClass>()
+							.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>())
+							.add(new TaxonomyLinkConsistencyVisitor<ElkClass>());
+
+					validator.validate(taxonomy);
+
+					new TaxonomyAcyclicityAndReductionValidator<ElkClass>()
+							.validate(taxonomy);
+				}
+			} catch (InvalidTaxonomyException e) {
+				LOGGER_.error("Invalid taxonomy", e);
+				
+				throw e;
+			}
+		}
+	}
+	
 }

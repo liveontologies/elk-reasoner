@@ -39,17 +39,17 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 		
 		if (stage instanceof PostProcessingReasonerStage) {
 
-			if (LOGGER_.isDebugEnabled()) {
-				LOGGER_.debug("Starting post processing...");
+			if (LOGGER_.isInfoEnabled()) {
+				LOGGER_.info("Starting post processing...");
 			}
 
 			for (ReasonerStage ppStage : ((PostProcessingReasonerStage) stage)
 					.getPostProcessingStages()) {
-				ppStage.execute();
+				super.complete(ppStage);
 			}
 
-			if (LOGGER_.isDebugEnabled()) {
-				LOGGER_.debug("Post processing finished");
+			if (LOGGER_.isInfoEnabled()) {
+				LOGGER_.info("Post processing finished");
 			}
 		}
 	}
