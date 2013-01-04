@@ -52,13 +52,13 @@ public class OntologyIndexImpl implements OntologyIndex {
 
 	public OntologyIndexImpl(IndexedObjectCache objectCache) {
 		objectCache_ = objectCache;
-		elkObjectIndexer_ = new IndexObjectConverter(objectCache_, objectCache_);
+		elkObjectIndexer_ = new IndexObjectConverter(objectCache, objectCache);
 
 		indexPredefinedEntities();
 
-		directAxiomInserter_ = new ElkAxiomIndexerVisitor(objectCache_,
+		directAxiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
 				getIndexedOwlNothing(), new DirectIndexUpdater(this), true);
-		directAxiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache_,
+		directAxiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
 				getIndexedOwlNothing(), new DirectIndexUpdater(this), false);
 	}
 
