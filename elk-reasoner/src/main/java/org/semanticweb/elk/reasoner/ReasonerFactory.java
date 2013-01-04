@@ -29,6 +29,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
@@ -44,6 +45,12 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 public class ReasonerFactory {
 
 	final static Logger LOGGER_ = Logger.getLogger(ReasonerFactory.class);
+	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new PostProcessingStageExecutor();
+
+	public Reasoner createReasoner() {
+		return createReasoner(DEFAULT_STAGE_EXECUTOR,
+				ReasonerConfiguration.getConfiguration());
+	}
 
 	/**
 	 * Creates {@link Reasoner} with the configuration loaded from
@@ -64,12 +71,9 @@ public class ReasonerFactory {
 	 * @param config
 	 * @return ELK reasoner
 	 */
-	@SuppressWarnings("static-method")
 	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor,
 			ReasonerConfiguration config) {
-		return new Reasoner(
-				stageExecutor,
-				Executors.newCachedThreadPool(),
+		return new Reasoner(stageExecutor, Executors.newCachedThreadPool(),
 				config);
 	}
 }

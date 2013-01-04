@@ -54,7 +54,6 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
@@ -117,8 +116,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		TestChangesLoader changeLoader2 = new TestChangesLoader();
 		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
 				new SimpleStageExecutor(), 1);
-		Reasoner incrementalReasoner = new ReasonerFactory()
-				.createReasoner(new LoggingStageExecutor());
+		Reasoner incrementalReasoner = new ReasonerFactory().createReasoner();
 
 		standardReasoner.registerOntologyLoader(initialLoader);
 		standardReasoner.registerOntologyChangesLoader(changeLoader1);

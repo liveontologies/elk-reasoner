@@ -39,7 +39,7 @@ public class LoggingStageExecutor extends SimpleInterrupter implements
 		ReasonerStageExecutor {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = Logger
 			.getLogger(LoggingStageExecutor.class);
 
 	@Override

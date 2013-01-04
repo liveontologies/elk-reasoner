@@ -26,9 +26,12 @@ package org.semanticweb.elk.reasoner.stages;
  */
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
@@ -40,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalContextCleaningStage extends AbstractReasonerStage {
+public class IncrementalContextCleaningStage extends AbstractReasonerStage implements PostProcessingReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -88,17 +91,6 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 
-		for (IndexedClassExpression ice : reasoner.saturationState
-				.getNotSaturatedContexts()) {
-			if (ice.getContext().getSubsumers().size() > 0) {
-				LOGGER_.error("Context not cleaned: " + ice + "!");
-				System.err.println("Context not cleaned: " + ice + "!");
-				System.err.println(ice.getContext().getSubsumers().size()
-						+ " subsumers: " + ice.getContext().getSubsumers());
-			}
-
-		}
-
 		reasoner.incrementalState.setStageStatus(
 				IncrementalStages.CONTEXT_CLEANING, true);
 	}
@@ -124,5 +116,34 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	public void printInfo() {
 		if (cleaning_ != null)
 			cleaning_.printStatistics();
+	}
+
+	@Override
+	public Collection<ReasonerStage> getPostProcessingStages() {
+		return Collections.<ReasonerStage>singleton(new CheckCleaningStage());
+	}
+	
+	/**
+	 * Used to check that all unsaturated contexts have been cleaned 
+	 */
+	private class CheckCleaningStage extends BaseReasonerStage {
+
+		@Override
+		public String getName() {
+			return "Checking that unsaturated contexts are clean";
+		}
+
+		@Override
+		public void execute() throws ElkException {
+			for (IndexedClassExpression ice : reasoner.saturationState
+					.getNotSaturatedContexts()) {
+				if (ice.getContext().getSubsumers().size() > 0) {
+					//LOGGER_.error("Context not cleaned: " + ice + "!");
+					System.err.println("Context not cleaned: " + ice + "!");
+					System.err.println(ice.getContext().getSubsumers().size()
+							+ " subsumers: " + ice.getContext().getSubsumers());
+				}
+			}
+		}
 	}
 }

@@ -87,6 +87,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 		reasoner.incrementalState.setStageStatus(IncrementalStages.COMPLETION, true);
 		markAllContextsAsSaturated();
+		//reasoner.saturationState.getWriter().clearNotSaturatedContexts();
 	}
 
 	@Override
