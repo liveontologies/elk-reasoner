@@ -103,8 +103,10 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			// first negative occurrence of this expression
 			indexUpdater.add(firstConjunct_, new ThisCompositionRule(
 					secondConjunct_, this));
-			indexUpdater.add(secondConjunct_, new ThisCompositionRule(
-					firstConjunct_, this));
+			// if both conjuncts are the same, do not index the second time
+			if (!secondConjunct_.equals(firstConjunct_))
+				indexUpdater.add(secondConjunct_, new ThisCompositionRule(
+						firstConjunct_, this));
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -114,8 +116,10 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			// no negative occurrences of this conjunction left
 			indexUpdater.remove(firstConjunct_, new ThisCompositionRule(
 					secondConjunct_, this));
-			indexUpdater.remove(secondConjunct_, new ThisCompositionRule(
-					firstConjunct_, this));
+			// if both conjuncts are the same, do not de-index the second time
+			if (!secondConjunct_.equals(firstConjunct_))
+				indexUpdater.remove(secondConjunct_, new ThisCompositionRule(
+						firstConjunct_, this));
 		}
 
 	}
@@ -222,6 +226,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			if (previous == null)
 				return true;
 
+			// FIXME: check when *same* conjunctions can be indexed twice; this should happen as well
 			if (previous != conjunction)
 				throw new ElkRuntimeException(
 						"Cannot index different conjunctions with the same conjuncts: "
