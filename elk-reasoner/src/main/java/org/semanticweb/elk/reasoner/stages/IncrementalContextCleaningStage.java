@@ -43,7 +43,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalContextCleaningStage extends AbstractReasonerStage implements PostProcessingReasonerStage {
+public class IncrementalContextCleaningStage extends AbstractReasonerStage
+		implements PostProcessingReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -120,11 +121,11 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage imple
 
 	@Override
 	public Collection<ReasonerStage> getPostProcessingStages() {
-		return Collections.<ReasonerStage>singleton(new CheckCleaningStage());
+		return Collections.<ReasonerStage> singleton(new CheckCleaningStage());
 	}
-	
+
 	/**
-	 * Used to check that all unsaturated contexts have been cleaned 
+	 * Used to check that all unsaturated contexts have been cleaned
 	 */
 	private class CheckCleaningStage extends BaseReasonerStage {
 
@@ -138,9 +139,8 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage imple
 			for (IndexedClassExpression ice : reasoner.saturationState
 					.getNotSaturatedContexts()) {
 				if (ice.getContext().getSubsumers().size() > 0) {
-					//LOGGER_.error("Context not cleaned: " + ice + "!");
-					System.err.println("Context not cleaned: " + ice + "!");
-					System.err.println(ice.getContext().getSubsumers().size()
+					LOGGER_.error("Context not cleaned: " + ice + "!" + "\n"
+							+ ice.getContext().getSubsumers().size()
 							+ " subsumers: " + ice.getContext().getSubsumers());
 				}
 			}
