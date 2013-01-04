@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
@@ -51,6 +52,8 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * 
  */
 public class ForwardLink extends AbstractConclusion {
+
+	private static final Logger LOGGER_ = Logger.getLogger(ForwardLink.class);
 
 	/**
 	 * the {@link IndexedPropertyChain} in the existential restriction
@@ -140,6 +143,8 @@ public class ForwardLink extends AbstractConclusion {
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
 			ModifiableLinkRule<BackwardLink> {
 
+		private static final String NAME = "ForwardLink BackwardLink Composition";
+
 		/**
 		 * the record that stores all {@link ForwardLink}s produced in the
 		 * {@link Context} in which this rule is saved; it stores every
@@ -153,32 +158,17 @@ public class ForwardLink extends AbstractConclusion {
 					3);
 		}
 
-		/**
-		 * Updates this rule with the input {@link ForwardLink}.
-		 * 
-		 * @param link
-		 *            a {@link ForwardLink} that should be taken into account in
-		 *            this rule
-		 * @return {@code true} if the rule has changed as a result of this
-		 *         operation
-		 */
-		private boolean addForwardLink(ForwardLink link) {
-			return forwardLinksByObjectProperty_.add(link.relation_,
-					link.target_);
-		}
-
-		private boolean removeForwardLink(ForwardLink link) {
-			return forwardLinksByObjectProperty_.remove(link.relation_,
-					link.target_);
-		}
-
-		private boolean containsForwardLink(ForwardLink link) {
-			return forwardLinksByObjectProperty_.contains(link.relation_,
-					link.target_);
+		@Override
+		public String getName() {
+			return NAME;
 		}
 
 		@Override
 		public void apply(SaturationState.Writer engine, BackwardLink link) {
+
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + link);
+			}
 
 			/* compose the link with all forward links */
 			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
@@ -205,6 +195,36 @@ public class ForwardLink extends AbstractConclusion {
 
 		}
 
+		@Override
+		public void accept(RuleApplicationVisitor visitor, Writer writer,
+				BackwardLink backwardLink) {
+			visitor.visit(this, writer, backwardLink);
+		}
+
+		/**
+		 * Updates this rule with the input {@link ForwardLink}.
+		 * 
+		 * @param link
+		 *            a {@link ForwardLink} that should be taken into account in
+		 *            this rule
+		 * @return {@code true} if the rule has changed as a result of this
+		 *         operation
+		 */
+		private boolean addForwardLink(ForwardLink link) {
+			return forwardLinksByObjectProperty_.add(link.relation_,
+					link.target_);
+		}
+
+		private boolean removeForwardLink(ForwardLink link) {
+			return forwardLinksByObjectProperty_.remove(link.relation_,
+					link.target_);
+		}
+
+		private boolean containsForwardLink(ForwardLink link) {
+			return forwardLinksByObjectProperty_.contains(link.relation_,
+					link.target_);
+		}
+
 		private static Matcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>(
 				ThisBackwardLinkRule.class);
 
@@ -220,10 +240,5 @@ public class ForwardLink extends AbstractConclusion {
 			}
 		};
 
-		@Override
-		public void accept(RuleApplicationVisitor visitor, Writer writer,
-				BackwardLink backwardLink) {
-			visitor.visit(this, writer, backwardLink);
-		}
 	}
 }

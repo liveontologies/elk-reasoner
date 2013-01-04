@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -49,8 +50,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 public class Propagation extends AbstractConclusion {
 
 	// logger for this class
-	// private static final Logger LOGGER_ =
-	// Logger.getLogger(Propagation.class);
+	private static final Logger LOGGER_ = Logger.getLogger(Propagation.class);
 
 	private final IndexedPropertyChain relation_;
 
@@ -117,12 +117,35 @@ public class Propagation extends AbstractConclusion {
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
 			ModifiableLinkRule<BackwardLink> {
 
+		private static final String NAME = "Propagation Over BackwardLink";
+
 		private final Multimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty_;
 
 		ThisBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
 			super(tail);
 			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
 					1);
+		}
+
+		@Override
+		public String getName() {
+			return NAME;
+		}
+
+		@Override
+		public void apply(SaturationState.Writer engine, BackwardLink link) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + link);
+			}
+			for (IndexedClassExpression carry : propagationsByObjectProperty_
+					.get(link.getRelation()))
+				engine.produce(link.getSource(), new NegativeSubsumer(carry));
+		}
+
+		@Override
+		public void accept(RuleApplicationVisitor visitor, Writer writer,
+				BackwardLink backwardLink) {
+			visitor.visit(this, writer, backwardLink);
 		}
 
 		private boolean addPropagationByObjectProperty(
@@ -145,13 +168,6 @@ public class Propagation extends AbstractConclusion {
 					conclusion);
 		}
 
-		@Override
-		public void apply(SaturationState.Writer engine, BackwardLink link) {
-			for (IndexedClassExpression carry : propagationsByObjectProperty_
-					.get(link.getRelation()))
-				engine.produce(link.getSource(), new NegativeSubsumer(carry));
-		}
-
 		private static Matcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>(
 				ThisBackwardLinkRule.class);
 
@@ -164,10 +180,5 @@ public class Propagation extends AbstractConclusion {
 			}
 		};
 
-		@Override
-		public void accept(RuleApplicationVisitor visitor, Writer writer,
-				BackwardLink backwardLink) {
-			visitor.visit(this, writer, backwardLink);
-		}
 	}
 }

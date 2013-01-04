@@ -148,7 +148,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 
 	@Override
 	public void visit(
-			Contradiction.BottomBackwardLinkRule bottomBackwardLinkRule,
+			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
 			SaturationState.Writer writer, BackwardLink backwardLink) {
 		timer_.timeContradictionBottomBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);

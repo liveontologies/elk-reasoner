@@ -137,7 +137,7 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 
 	@Override
 	public void visit(
-			Contradiction.BottomBackwardLinkRule bottomBackwardLinkRule,
+			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
 			SaturationState.Writer writer, BackwardLink backwardLink) {
 		counter_.countContradictionBottomBackwardLinkRule++;
 		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);

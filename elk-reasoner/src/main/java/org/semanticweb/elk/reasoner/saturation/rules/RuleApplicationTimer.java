@@ -81,7 +81,7 @@ public class RuleApplicationTimer {
 	int timePropagationBackwardLinkRule;
 
 	/**
-	 * timer for {@link Contradiction.BottomBackwardLinkRule}
+	 * timer for {@link Contradiction.ContradictionBackwardLinkRule}
 	 */
 	int timeContradictionBottomBackwardLinkRule;
 

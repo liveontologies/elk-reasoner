@@ -60,35 +60,41 @@ public class DirectIndexUpdater implements IndexUpdater {
 	}
 
 	@Override
-	public boolean add(IndexedClassExpression target,
+	public void add(IndexedClassExpression target, ChainableRule<Context> rule) {
+		rule.addTo(target.getCompositionRuleChain());
+	}
+
+	@Override
+	public void remove(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		return rule.addTo(target.getCompositionRuleChain());
+		if (!rule.removeFrom(target.getCompositionRuleChain()))
+			throw new ElkIndexingException("Cannot remove composition rule "
+					+ rule.getName() + " for " + target);
 	}
 
 	@Override
-	public boolean remove(IndexedClassExpression target,
-			ChainableRule<Context> rule) {
-		return rule.removeFrom(target.getCompositionRuleChain());
+	public void add(ChainableRule<Context> rule) {
+		rule.addTo(ontIndex_.getContextInitRuleChain());
 	}
 
 	@Override
-	public boolean add(ChainableRule<Context> rule) {
-		return rule.addTo(ontIndex_.getContextInitRuleChain());
+	public void remove(ChainableRule<Context> rule) {
+		if (!rule.removeFrom(ontIndex_.getContextInitRuleChain()))
+			throw new ElkIndexingException(
+					"Cannot remove context initialization rule "
+							+ rule.getName());
 	}
 
 	@Override
-	public boolean remove(ChainableRule<Context> rule) {
-		return rule.removeFrom(ontIndex_.getContextInitRuleChain());
+	public void add(IndexedObject object) {
+		object.accept(ontIndex_.getIndexedObjectCache().inserter);
 	}
 
 	@Override
-	public boolean add(IndexedObject object) {
-		return object.accept(ontIndex_.getIndexedObjectCache().inserter);
-	}
-
-	@Override
-	public boolean remove(IndexedObject object) {
-		return object.accept(ontIndex_.getIndexedObjectCache().deletor);
+	public void remove(IndexedObject object) {
+		if (!object.accept(ontIndex_.getIndexedObjectCache().deletor))
+			throw new ElkIndexingException(
+					"Cannot remove indexed object from the cache " + object);
 	}
 
 }

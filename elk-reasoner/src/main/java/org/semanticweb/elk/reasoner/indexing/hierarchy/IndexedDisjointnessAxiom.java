@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
@@ -49,6 +50,9 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * 
  */
 public class IndexedDisjointnessAxiom extends IndexedAxiom {
+
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(IndexedDisjointnessAxiom.class);
 
 	/**
 	 * {@link IndexedClassExpression}s that have at least two equal occurrences
@@ -167,6 +171,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
+		public static final String NAME = "DisjointClasses Introduction";
+
 		/**
 		 * Set of relevant {@link IndexedDisjointnessAxiom}s in which the
 		 * member, for which this rule is registered, appears.
@@ -184,6 +190,11 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
+		public String getName() {
+			return NAME;
+		}
+
+		@Override
 		public void accept(RuleApplicationVisitor visitor,
 				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
@@ -191,6 +202,9 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public void apply(SaturationState.Writer writer, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + context);
+			}
 			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
 				writer.produce(context, new DisjointnessAxiom(disAxiom));
 		}
@@ -239,6 +253,9 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	public static class ThisContradictionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
+
+		public static final String NAME = "DisjointClasses Contradiction Introduction";
+
 		/**
 		 * The number of {@link IndexedDisjointnessAxiom}s in which the
 		 * {@link IndexedClassExpression}, for which this rule is registered,
@@ -257,12 +274,16 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(SaturationState.Writer writer, Context context) {
-			writer.produce(context, Contradiction.getInstance());
+		public String getName() {
+			return NAME;
 		}
 
-		protected boolean isEmpty() {
-			return this.contradictionCounter == 0;
+		@Override
+		public void apply(SaturationState.Writer writer, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + context);
+			}
+			writer.produce(context, Contradiction.getInstance());
 		}
 
 		@Override
@@ -285,6 +306,16 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return this.contradictionCounter != 0;
 		}
 
+		@Override
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationState.Writer writer, Context context) {
+			visitor.visit(this, writer, context);
+		}
+
+		protected boolean isEmpty() {
+			return this.contradictionCounter == 0;
+		}
+
 		private static Matcher<ChainableRule<Context>, ThisContradictionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisContradictionRule>(
 				ThisContradictionRule.class);
 
@@ -294,12 +325,6 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 				return new ThisContradictionRule(tail);
 			}
 		};
-
-		@Override
-		public void accept(RuleApplicationVisitor visitor,
-				SaturationState.Writer writer, Context context) {
-			visitor.visit(this, writer, context);
-		}
 
 	}
 

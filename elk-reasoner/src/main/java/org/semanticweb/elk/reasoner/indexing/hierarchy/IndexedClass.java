@@ -139,6 +139,8 @@ public class IndexedClass extends IndexedClassEntity {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
+		public static final String NAME = "owl:Thing Introduction";
+
 		private OwlThingContextInitializationRule(ChainableRule<Context> tail) {
 			super(tail);
 		}
@@ -148,12 +150,15 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		@Override
+		public String getName() {
+			return NAME;
+		}
+
+		@Override
 		public void apply(SaturationState.Writer writer, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying owl:Thing context init rule to "
-						+ context.getRoot());
+				LOGGER_.trace("Applying " + NAME + " to " + context);
 			}
-
 			writer.produce(context, new PositiveSubsumer(writer.getOwlThing()));
 		}
 
@@ -190,5 +195,6 @@ public class IndexedClass extends IndexedClassEntity {
 				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
+
 	}
 }

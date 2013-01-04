@@ -35,19 +35,19 @@ import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
  */
 interface IndexUpdater {
 
-	public boolean add(final IndexedClassExpression target,
+	public void add(final IndexedClassExpression target,
 			final ChainableRule<Context> rule);
 
-	public boolean remove(final IndexedClassExpression target,
+	public void remove(final IndexedClassExpression target,
 			final ChainableRule<Context> rule);
 
-	public boolean add(final ChainableRule<Context> rule);
+	public void add(final ChainableRule<Context> rule);
 
-	public boolean remove(final ChainableRule<Context> rule);
+	public void remove(final ChainableRule<Context> rule);
 
-	public boolean add(IndexedObject object);
+	public void add(IndexedObject object);
 
-	public boolean remove(IndexedObject object);
+	public void remove(IndexedObject object);
 
 	public void addClass(ElkClass newClass);
 

@@ -80,13 +80,18 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	 *            removed from this {@link IndexedObjectCache}
 	 */
 	public void subtract(IndexedObjectCache other) {
-		for (IndexedClassExpression ice : other.indexedClassExpressionLookup) {
-			ice.accept(deletor);
-		}	
+		for (IndexedClassExpression ice : other.indexedClassExpressionLookup)
+			if (!ice.accept(deletor))
+				throw new ElkIndexingException(
+						"Cannot remove indexed object from the cache " + ice);
 		for (IndexedPropertyChain ipc : other.indexedPropertyChainLookup)
-			ipc.accept(deletor);
+			if (!ipc.accept(deletor))
+				throw new ElkIndexingException(
+						"Cannot remove indexed object from the cache " + ipc);
 		for (IndexedAxiom ax : other.indexedAxiomLookup)
-			ax.accept(deletor);
+			if (!ax.accept(deletor))
+				throw new ElkIndexingException(
+						"Cannot remove indexed object from the cache " + ax);
 		// the counters should be subtracted during deletion
 	}
 
@@ -209,7 +214,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		@Override
 		public Boolean visit(IndexedSubClassOfAxiom axiom) {
 			// caching not supported
-			return false;
+			return true;
 		}
 
 		@Override
@@ -269,7 +274,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		@Override
 		public Boolean visit(IndexedSubClassOfAxiom axiom) {
 			// caching not supported
-			return false;
+			return true;
 		}
 
 		@Override

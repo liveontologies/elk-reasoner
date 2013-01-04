@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction.BottomBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction.ContradictionBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -72,7 +72,7 @@ public interface RuleApplicationVisitor {
 	void visit(Propagation.ThisBackwardLinkRule thisBackwardLinkRule,
 			SaturationState.Writer writer, BackwardLink backwardLink);
 
-	void visit(BottomBackwardLinkRule bottomBackwardLinkRule, SaturationState.Writer writer,
+	void visit(ContradictionBackwardLinkRule bottomBackwardLinkRule, SaturationState.Writer writer,
 			BackwardLink backwardLink);
 
 }

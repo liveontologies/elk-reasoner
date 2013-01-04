@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -37,11 +38,14 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * @author Pavel Klinov
- * @author "Yevgeny Kazakov"
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
  */
 public class Contradiction extends AbstractConclusion {
+
+	private static final Logger LOGGER_ = Logger.getLogger(Contradiction.class);
 
 	private static Contradiction INSTANCE_ = new Contradiction();
 
@@ -57,7 +61,7 @@ public class Contradiction extends AbstractConclusion {
 	public void deapply(SaturationState.Writer engine, Context context) {
 		propagateThroughBackwardLinks(engine, context);
 		context.getBackwardLinkRuleChain().remove(
-				BottomBackwardLinkRule.MATCHER_);
+				ContradictionBackwardLinkRule.MATCHER_);
 	}
 
 	@Override
@@ -65,8 +69,8 @@ public class Contradiction extends AbstractConclusion {
 		propagateThroughBackwardLinks(engine, context);
 		// register the backward link rule for propagation of bottom
 		context.getBackwardLinkRuleChain().getCreate(
-				BottomBackwardLinkRule.MATCHER_,
-				BottomBackwardLinkRule.FACTORY_);
+				ContradictionBackwardLinkRule.MATCHER_,
+				ContradictionBackwardLinkRule.FACTORY_);
 	}
 
 	private void propagateThroughBackwardLinks(SaturationState.Writer engine,
@@ -96,36 +100,47 @@ public class Contradiction extends AbstractConclusion {
 	}
 
 	/**
-	 * A backward link rule to propagate bottom through any new backward links
+	 * A backward link rule to propagate contradiction through any new backward
+	 * links
 	 */
-	public static class BottomBackwardLinkRule extends
+	public static class ContradictionBackwardLinkRule extends
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
 			ModifiableLinkRule<BackwardLink> {
 
-		BottomBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
+		private static final String NAME = "Contradiction Existential Propagation";
+
+		ContradictionBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
 			super(tail);
 		}
 
 		@Override
-		public void apply(SaturationState.Writer engine, BackwardLink link) {
-			engine.produce(link.getSource(), Contradiction.getInstance());
+		public String getName() {
+			return NAME;
 		}
 
-		private static final Matcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>(
-				BottomBackwardLinkRule.class);
-
-		private static final ReferenceFactory<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, BottomBackwardLinkRule>() {
-			@Override
-			public BottomBackwardLinkRule create(
-					ModifiableLinkRule<BackwardLink> tail) {
-				return new BottomBackwardLinkRule(tail);
+		@Override
+		public void apply(SaturationState.Writer engine, BackwardLink link) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + link);
 			}
-		};
+			engine.produce(link.getSource(), Contradiction.getInstance());
+		}
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
 				SaturationState.Writer writer, BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}
+
+		private static final Matcher<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule>(
+				ContradictionBackwardLinkRule.class);
+
+		private static final ReferenceFactory<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule>() {
+			@Override
+			public ContradictionBackwardLinkRule create(
+					ModifiableLinkRule<BackwardLink> tail) {
+				return new ContradictionBackwardLinkRule(tail);
+			}
+		};
 	}
 }

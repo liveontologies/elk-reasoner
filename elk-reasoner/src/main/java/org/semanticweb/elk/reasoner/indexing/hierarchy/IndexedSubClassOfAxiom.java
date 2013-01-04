@@ -95,6 +95,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
+		private static final String NAME = "SubClassOf Expansion";
+
 		/**
 		 * Correctness of axioms deletions requires that
 		 * toldSuperClassExpressions is a List.
@@ -118,43 +120,20 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			toldSuperClassExpressions_.add(ice);
 		}
 
-		protected boolean addToldSuperClassExpression(
-				IndexedClassExpression superClassExpression) {
-			return toldSuperClassExpressions_.add(superClassExpression);
-		}
-
-		/**
-		 * @param superClassExpression
-		 * @return true if successfully removed
-		 */
-		protected boolean removeToldSuperClassExpression(
-				IndexedClassExpression superClassExpression) {
-			return toldSuperClassExpressions_.remove(superClassExpression);
-		}
-
-		/**
-		 * @return {@code true} if this rule never does anything
-		 */
-		private boolean isEmpty() {
-			return toldSuperClassExpressions_.isEmpty();
+		@Override
+		public String getName() {
+			return NAME;
 		}
 
 		@Override
 		public void apply(SaturationState.Writer writer, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + context);
+			}
 			for (IndexedClassExpression implied : toldSuperClassExpressions_) {
 				writer.produce(context, new PositiveSubsumer(implied));
 			}
 		}
-
-		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
-				ThisCompositionRule.class);
-
-		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule create(ChainableRule<Context> tail) {
-				return new ThisCompositionRule(tail);
-			}
-		};
 
 		@Override
 		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
@@ -202,6 +181,38 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
+
+		protected boolean addToldSuperClassExpression(
+				IndexedClassExpression superClassExpression) {
+			return toldSuperClassExpressions_.add(superClassExpression);
+		}
+
+		/**
+		 * @param superClassExpression
+		 * @return true if successfully removed
+		 */
+		protected boolean removeToldSuperClassExpression(
+				IndexedClassExpression superClassExpression) {
+			return toldSuperClassExpressions_.remove(superClassExpression);
+		}
+
+		/**
+		 * @return {@code true} if this rule never does anything
+		 */
+		private boolean isEmpty() {
+			return toldSuperClassExpressions_.isEmpty();
+		}
+
+		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+				ThisCompositionRule.class);
+
+		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule create(ChainableRule<Context> tail) {
+				return new ThisCompositionRule(tail);
+			}
+		};
+
 	}
 
 }

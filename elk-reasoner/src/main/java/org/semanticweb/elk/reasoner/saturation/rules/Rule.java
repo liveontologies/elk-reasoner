@@ -46,4 +46,9 @@ public interface Rule<E> {
 	 */
 	public void apply(SaturationState.Writer engine, E element);
 
+	/**
+	 * @return the name of this rule
+	 */
+	public String getName();
+
 }

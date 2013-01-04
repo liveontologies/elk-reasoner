@@ -80,7 +80,7 @@ public class RuleApplicationCounter {
 	int countPropagationBackwardLinkRule;
 
 	/**
-	 * counter for {@link Contradiction.BottomBackwardLinkRule}
+	 * counter for {@link Contradiction.ContradictionBackwardLinkRule}
 	 */
 	int countContradictionBottomBackwardLinkRule;
 

@@ -63,6 +63,7 @@ public class RuleStatistics {
 		ruleTimer.add(stats.ruleTimer);
 	}
 
+	// TODO: can use rule names for printing
 	public void print(Logger logger) {
 		if (!logger.isDebugEnabled() || addCounter <= 0)
 			return;

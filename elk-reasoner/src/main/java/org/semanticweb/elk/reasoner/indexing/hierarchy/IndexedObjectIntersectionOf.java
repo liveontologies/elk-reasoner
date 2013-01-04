@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
@@ -52,6 +53,10 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * 
  */
 public class IndexedObjectIntersectionOf extends IndexedClassExpression {
+
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(IndexedObjectIntersectionOf.class);
+
 	/**
 	 * The conjunction has only two conjuncts. To ensure uniqueness of a
 	 * conjunction for the conjuncts, the conjuncts are sorted according to the
@@ -134,6 +139,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
+		private static final String NAME = "ObjectIntersectionOf Introduction";
+
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
 		private ThisCompositionRule(ChainableRule<Context> tail) {
@@ -148,52 +155,22 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			this.conjunctionsByConjunct_.put(conjunct, conjunction);
 		}
 
-		private boolean addConjunctionByConjunct(
-				IndexedObjectIntersectionOf conjunction,
-				IndexedClassExpression conjunct) {
-			Object previous = conjunctionsByConjunct_
-					.put(conjunct, conjunction);
-
-			if (previous == null)
-				return true;
-
-			if (previous != conjunction)
-				throw new ElkRuntimeException(
-						"Cannot index different conjunctions with the same conjuncts: "
-								+ conjunction + "; " + previous);
-			return false;
-		}
-
-		private boolean removeConjunctionByConjunct(
-				IndexedClassExpression conjunct) {
-			return conjunctionsByConjunct_.remove(conjunct) != null;
-		}
-
-		/**
-		 * @return {@code true} if this rule never does anything
-		 */
-		private boolean isEmpty() {
-			return conjunctionsByConjunct_.isEmpty();
+		@Override
+		public String getName() {
+			return NAME;
 		}
 
 		@Override
 		public void apply(SaturationState.Writer writer, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + context);
+			}
 			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 					conjunctionsByConjunct_.keySet(), context.getSubsumers()))
 				writer.produce(context, new NegativeSubsumer(
 						conjunctionsByConjunct_.get(common)));
 
 		}
-
-		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
-				ThisCompositionRule.class);
-
-		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule create(ChainableRule<Context> tail) {
-				return new ThisCompositionRule(tail);
-			}
-		};
 
 		@Override
 		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
@@ -235,5 +212,44 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 				SaturationState.Writer writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
+
+		private boolean addConjunctionByConjunct(
+				IndexedObjectIntersectionOf conjunction,
+				IndexedClassExpression conjunct) {
+			Object previous = conjunctionsByConjunct_
+					.put(conjunct, conjunction);
+
+			if (previous == null)
+				return true;
+
+			if (previous != conjunction)
+				throw new ElkRuntimeException(
+						"Cannot index different conjunctions with the same conjuncts: "
+								+ conjunction + "; " + previous);
+			return false;
+		}
+
+		private boolean removeConjunctionByConjunct(
+				IndexedClassExpression conjunct) {
+			return conjunctionsByConjunct_.remove(conjunct) != null;
+		}
+
+		/**
+		 * @return {@code true} if this rule never does anything
+		 */
+		private boolean isEmpty() {
+			return conjunctionsByConjunct_.isEmpty();
+		}
+
+		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+				ThisCompositionRule.class);
+
+		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+			@Override
+			public ThisCompositionRule create(ChainableRule<Context> tail) {
+				return new ThisCompositionRule(tail);
+			}
+		};
+
 	}
 }

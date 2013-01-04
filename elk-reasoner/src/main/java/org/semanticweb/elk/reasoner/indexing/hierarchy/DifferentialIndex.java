@@ -269,13 +269,13 @@ public class DifferentialIndex {
 		removedClasses_.add(oldClass);
 	}
 
-	boolean addIndexedObject(IndexedObject iobj) {
-		return iobj.accept(todoDeletions_.deletor)
-				|| iobj.accept(mainIndex_.getIndexedObjectCache().inserter);
+	void addIndexedObject(IndexedObject iobj) {
+		if (!iobj.accept(todoDeletions_.deletor))
+			iobj.accept(mainIndex_.getIndexedObjectCache().inserter);
 	}
 
-	boolean removeIndexedObject(IndexedObject iobj) {
-		return iobj.accept(todoDeletions_.inserter);
+	void removeIndexedObject(IndexedObject iobj) {
+		iobj.accept(todoDeletions_.inserter);
 	}
 
 	void addNamedIndividual(ElkNamedIndividual newIndividual) {
@@ -286,45 +286,31 @@ public class DifferentialIndex {
 		removedIndividuals_.add(newIndividual);
 	}
 
-	boolean registerAddedContextInitRule(ChainableRule<Context> rule) {
-		return rule.addTo(getAddedContextInitRuleChain());
+	void registerAddedContextInitRule(ChainableRule<Context> rule) {
+		rule.addTo(getAddedContextInitRuleChain());
 	}
 
-	boolean registerRemovedContextInitRule(ChainableRule<Context> rule) {
-		return rule.removeFrom(getAddedContextInitRuleChain())
-				|| (rule.removeFrom(mainIndex_.getContextInitRuleChain()) && rule
-						.addTo(getRemovedContextInitRuleChain()));
+	void registerRemovedContextInitRule(ChainableRule<Context> rule) {
+		if (!rule.removeFrom(getAddedContextInitRuleChain())) {
+			if (!rule.removeFrom(mainIndex_.getContextInitRuleChain()))
+				throw new ElkIndexingException(
+						"Cannot remove context initialization rule "
+								+ rule.getName());
+			rule.addTo(getRemovedContextInitRuleChain());
+		}
 	}
 
-	/**
-	 * Get the object assigned to the given indexed class expression for storing
-	 * index additions, or assign a new one if no such object has been assigned.
-	 * 
-	 * @param target
-	 *            the indexed class expressions for which to find the changes
-	 *            additions object
-	 * @return the object which contains all index additions for the given
-	 *         indexed class expression
-	 */
-	boolean registerAddedContextRule(IndexedClassExpression target,
+	void registerAddedContextRule(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		return rule.addTo(getAddedContextRuleChain(target));
+		rule.addTo(getAddedContextRuleChain(target));
 	}
 
-	/**
-	 * Get the object assigned to the given indexed class expression for storing
-	 * index deletions, or assign a new one if no such object has been assigned.
-	 * 
-	 * @param target
-	 *            the indexed class expressions for which to find the changes
-	 *            deletions object
-	 * @return the object which contains all index deletions for the given
-	 *         indexed class expression
-	 */
-	boolean registerRemovedContextRule(IndexedClassExpression target,
+	void registerRemovedContextRule(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		return rule.removeFrom(getAddedContextRuleChain(target))
-				|| (rule.removeFrom(target.getCompositionRuleChain()) && rule
-						.addTo(getRemovedContextRuleChain(target)));
+		if (!rule.removeFrom(getAddedContextRuleChain(target)))
+			if (!rule.removeFrom(target.getCompositionRuleChain()))
+				throw new ElkIndexingException("Cannot remove context rule "
+						+ rule.getName() + " for " + target);
+		rule.addTo(getRemovedContextRuleChain(target));
 	}
 }

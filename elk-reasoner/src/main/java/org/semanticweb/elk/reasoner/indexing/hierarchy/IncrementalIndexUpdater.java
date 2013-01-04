@@ -66,34 +66,33 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	}
 
 	@Override
-	public boolean add(IndexedClassExpression target,
+	public void add(IndexedClassExpression target, ChainableRule<Context> rule) {
+		differentialIndex_.registerAddedContextRule(target, rule);
+	}
+
+	@Override
+	public void remove(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		return differentialIndex_.registerAddedContextRule(target, rule);
+		differentialIndex_.registerRemovedContextRule(target, rule);
 	}
 
 	@Override
-	public boolean remove(IndexedClassExpression target,
-			ChainableRule<Context> rule) {
-		return differentialIndex_.registerRemovedContextRule(target, rule);
+	public void add(ChainableRule<Context> rule) {
+		differentialIndex_.registerAddedContextInitRule(rule);
 	}
 
 	@Override
-	public boolean add(ChainableRule<Context> rule) {
-		return differentialIndex_.registerAddedContextInitRule(rule);
+	public void remove(ChainableRule<Context> rule) {
+		differentialIndex_.registerRemovedContextInitRule(rule);
 	}
 
 	@Override
-	public boolean remove(ChainableRule<Context> rule) {
-		return differentialIndex_.registerRemovedContextInitRule(rule);
+	public void add(IndexedObject object) {
+		differentialIndex_.addIndexedObject(object);
 	}
 
 	@Override
-	public boolean add(IndexedObject object) {
-		return differentialIndex_.addIndexedObject(object);
-	}
-
-	@Override
-	public boolean remove(IndexedObject object) {
-		return differentialIndex_.removeIndexedObject(object);
+	public void remove(IndexedObject object) {
+		differentialIndex_.removeIndexedObject(object);
 	}
 }
