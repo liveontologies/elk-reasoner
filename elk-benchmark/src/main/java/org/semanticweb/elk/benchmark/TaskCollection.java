@@ -24,20 +24,12 @@ package org.semanticweb.elk.benchmark;
  * #L%
  */
 
-import org.junit.Test;
-
 /**
- * Integration test which expects a single task to run (parameters passed as
- * System properties)
- * 
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public class SingleTaskBenchmarking {
+public interface TaskCollection {
 
-	@Test
-	public void testRun() throws Exception {
-		BenchmarkUtils.run();
-	}
+	public Iterable<Task> getTasks() throws TaskException;
 }

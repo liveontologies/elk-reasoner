@@ -36,4 +36,6 @@ public class Constants {
 	public static final String WARM_UPS = "task.warm-ups";
 	public static final String RUNS = "task.runs";
 	public static final String TASK_PARAMS = "task.parameters";
+	public static final String SOURCE = "task.ontology";
+	
 }

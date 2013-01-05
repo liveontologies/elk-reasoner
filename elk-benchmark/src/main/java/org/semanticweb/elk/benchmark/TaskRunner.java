@@ -38,21 +38,15 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  */
 public class TaskRunner {
 
-	protected final Task task;
 	protected final int warmups;
 	protected final int runs;
 	
-	protected TaskRunner(Task task, int warmups, int runs) {
-		this.task = task;
+	protected TaskRunner(int warmups, int runs) {
 		this.warmups = warmups;
 		this.runs = runs;
 	}
 	
-	public void run() throws TaskException {
-		run(task);
-	}
-	
-	protected void run(Task task) throws TaskException {
+	public void run(Task task) throws TaskException {
 		ElkTimer timer = ElkTimer.getNamedTimer(task.getName());
 		
 		for (int i = 0; i < warmups; i++) {
@@ -68,8 +62,7 @@ public class TaskRunner {
 			task.prepare();
 			
 			timer.start();
-			task.run();
-			
+			task.run();			
 			timer.stop();
 			
 			long wallRuntime = (timer.getTotalWallTime() - wallTimeElapsed)/1000000;

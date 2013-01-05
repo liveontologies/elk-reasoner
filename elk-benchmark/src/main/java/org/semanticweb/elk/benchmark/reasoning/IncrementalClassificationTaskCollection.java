@@ -8,7 +8,7 @@ package org.semanticweb.elk.benchmark.reasoning;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,23 +24,31 @@ package org.semanticweb.elk.benchmark.reasoning;
  * #L%
  */
 
-import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
+import java.util.Arrays;
+
 import org.semanticweb.elk.benchmark.Task;
-import org.semanticweb.elk.benchmark.TaskFactory;
+import org.semanticweb.elk.benchmark.TaskCollection;
+import org.semanticweb.elk.benchmark.TaskException;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class AllFilesClassificationTask extends AllFilesTaskCollection {
+public class IncrementalClassificationTaskCollection implements TaskCollection {
 
-	public AllFilesClassificationTask(String[] args) {
-		super(args);
+	private final IncrementalClassificationTask icTask_;
+	private final RandomWalkIncrementalClassificationTask randomWalkTask_;
+	
+	
+	public IncrementalClassificationTaskCollection(String[] args) {
+		icTask_ = new IncrementalClassificationTask(args);
+		randomWalkTask_ = new RandomWalkIncrementalClassificationTask(args);
 	}
-
+	
 	@Override
-	public Task instantiateSubTask(String[] args) {
-		return TaskFactory.createTask(ClassificationTask.class.getName(), args);
+	public Iterable<Task> getTasks() throws TaskException {
+		return Arrays.asList(icTask_, randomWalkTask_);
 	}
+
 }
