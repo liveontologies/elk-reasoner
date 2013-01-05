@@ -34,7 +34,7 @@ import java.util.Collection;
  *
  * pavel.klinov@uni-ulm.de
  */
-public abstract class AllFilesMultiTask implements MultiTask {
+public abstract class AllFilesMultiTask implements TaskCollection {
 
 	private final String[] args_;
 	
@@ -43,21 +43,7 @@ public abstract class AllFilesMultiTask implements MultiTask {
 	}
 	
 	@Override
-	public abstract String getName();
-
-	@Override
-	public void prepare() throws TaskException {
-		//TODO prepare all subtasks
-	}
-
-	@Override
-	public Result run() throws TaskException {
-		// TODO run all sub tasks
-		return null;
-	}
-
-	@Override
-	public Iterable<Task> getSubTasks() throws TaskException {
+	public Iterable<Task> getTasks() throws TaskException {
 		File dir = BenchmarkUtils.getFile(args_[0]);
 		Collection<Task> tasks = new ArrayList<Task>();
 		String[] taskArgs = new String[args_.length];

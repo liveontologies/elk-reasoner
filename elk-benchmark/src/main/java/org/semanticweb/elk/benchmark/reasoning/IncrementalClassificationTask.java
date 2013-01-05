@@ -80,7 +80,7 @@ public class IncrementalClassificationTask implements Task {
 
 	public IncrementalClassificationTask(String[] args) {
 		ontologyFile_ = args[0];
-		axiomsToChange_ = Integer.valueOf(args[1]);
+		axiomsToChange_ = args.length > 2 ? Integer.valueOf(args[2]) : -1;
 		reasonerConfig_ = getConfig(args);
 	}
 
@@ -174,9 +174,9 @@ public class IncrementalClassificationTask implements Task {
 	private ReasonerConfiguration getConfig(String[] args) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
 
-		if (args.length > 2) {
+		if (args.length > 1) {
 			config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
-					args[2]);
+					args[1]);
 		}
 
 		return config;
@@ -248,14 +248,15 @@ public class IncrementalClassificationTask implements Task {
 	 * can return a smaller subset than requested because one axiom can be randomly picked more than once
 	 */
 	private Set<ElkAxiom> getRandomSubset(List<ElkAxiom> axioms, Random rnd) {
-		Set<ElkAxiom> subset = new ArrayHashSet<ElkAxiom>(axiomsToChange_); 
+		int size = axiomsToChange_ > 0 ? axiomsToChange_ : Math.max(1, axioms.size() / 100);
+		Set<ElkAxiom> subset = new ArrayHashSet<ElkAxiom>(size); 
 		
-		if (axiomsToChange_ >= axioms.size()) {
+		if (size >= axioms.size()) {
 			subset.addAll(axioms); 
 		}
 		else {
-			for (int i = 0; i < axiomsToChange_; i++) {
-				ElkAxiom axiom = axioms.get(rnd.nextInt(axiomsToChange_)); 
+			for (int i = 0; i < size; i++) {
+				ElkAxiom axiom = axioms.get(rnd.nextInt(size)); 
 				
 				subset.add(axiom);
 			}

@@ -36,25 +36,22 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class MultiTaskRunner extends TaskRunner {
+public class TaskCollectionRunner {
 
-	private static final Logger LOGGER_ = Logger.getLogger(MultiTask.class);	
+	private static final Logger LOGGER_ = Logger.getLogger(TaskCollectionRunner.class);	
 	
-	protected MultiTaskRunner(MultiTask task, int warmups, int runs) {
-		super(task, warmups, runs);
+	private final TaskRunner runner_;
+	
+	protected TaskCollectionRunner(int warmups, int runs) {
+		runner_ = new TaskRunner(warmups, runs);
 	}
 
-	private MultiTask getTask() {
-		return (MultiTask) task;
-	}
-
-	@Override
-	public void run() throws TaskException {
-		for (Task nextTask : getTask().getSubTasks()) {
-			run(nextTask);
+	public void run(TaskCollection collection) throws TaskException {
+		for (Task nextTask : collection.getTasks()) {
+			runner_.run(nextTask);
 		}
 		
-		for (Task nextTask : getTask().getSubTasks()) {
+		for (Task nextTask : collection.getTasks()) {
 			ElkTimer.getNamedTimer(nextTask.getName()).log(LOGGER_, Level.INFO);
 		}
 	}

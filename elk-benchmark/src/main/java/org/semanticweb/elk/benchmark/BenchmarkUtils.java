@@ -29,6 +29,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+
 /**
  * A bunch of utility methods for benchmarking, e.g., instantiating tasks, etc.
  * 
@@ -78,38 +80,54 @@ public class BenchmarkUtils {
 	 * A macro method, reads system properties, instantiates the task and runs
 	 * it
 	 */
-	public static void run() throws Exception {
+	public static void runTask() throws Exception {
 		Map<String, String> propMap = BenchmarkUtils
 				.getSystemProperties(new String[] { Constants.TASK_CLASS_NAME,
 						Constants.WARM_UPS, Constants.RUNS,
 						Constants.TASK_PARAMS });
 		// First, need to instantiate the task
-		Task task = TaskFactory.create(propMap
+		Task task = TaskFactory.createTask(propMap
 				.get(Constants.TASK_CLASS_NAME), BenchmarkUtils
 				.getCommaSeparatedParameter(Constants.TASK_PARAMS));
-		TaskRunner runner = new TaskRunner(task, Integer.valueOf(propMap
+		TaskRunner runner = new TaskRunner(Integer.valueOf(propMap
 				.get(Constants.WARM_UPS)), Integer.valueOf(propMap
 				.get(Constants.RUNS)));
 
-		runner.run();
+		runner.run(task);
 	}
 	
+	public static void runTask(String taskClass, int warmups, int runs, String[] params) throws Exception {
+		Task task = TaskFactory.createTask(taskClass, params);
+		TaskRunner runner = new TaskRunner(warmups, runs);
+
+		runner.run(task);
+	}	
+
 	/*
-	 * A macro method, reads system properties, instantiates the task and runs it
+	 * A macro method, reads system properties, instantiates the task collection
+	 * and runs it
 	 */
-	public static void multiRun() throws Exception {
+	public static void runTaskCollection() throws Exception {
 		Map<String, String> propMap = BenchmarkUtils
 				.getSystemProperties(new String[] { Constants.TASK_CLASS_NAME,
 						Constants.WARM_UPS, Constants.RUNS,
 						Constants.TASK_PARAMS });
 
-		MultiTask task = (MultiTask) TaskFactory.create(propMap.get(Constants.TASK_CLASS_NAME), BenchmarkUtils
+		TaskCollection collection = TaskFactory.createTaskCollection(propMap
+				.get(Constants.TASK_CLASS_NAME), BenchmarkUtils
 				.getCommaSeparatedParameter(Constants.TASK_PARAMS));
-		TaskRunner runner = new MultiTaskRunner(task, Integer.valueOf(propMap
+		TaskCollectionRunner runner = new TaskCollectionRunner(Integer.valueOf(propMap
 				.get(Constants.WARM_UPS)), Integer.valueOf(propMap
 				.get(Constants.RUNS)));
 
-		runner.run();
+		runner.run(collection);
+	}
+	
+	public static void runTaskCollection(String taskClass, int warmups, int runs, String[] params) throws Exception {
+		TaskCollection collection = TaskFactory.createTaskCollection(taskClass, params);
+		TaskCollectionRunner runner = new TaskCollectionRunner(warmups, runs);
+
+		runner.run(collection);
 	}	
 
 	public static File getFile(String path) {
@@ -120,5 +138,15 @@ public class BenchmarkUtils {
 		}
 
 		return new File(path);
+	}
+	
+	public static ReasonerConfiguration getReasonerConfiguration(String[] args) {
+		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
+		
+		if (args.length > 1) {
+			config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, args[1]);
+		}
+		
+		return config;
 	}
 }

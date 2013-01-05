@@ -74,11 +74,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesMultiTask 
 		config_ = getConfig(args);		
 	}
 
-	@Override
-	public String getName() {
-		return "All files incremental classification";
-	}
-	
+
 	private ReasonerConfiguration getConfig(String[] args) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
 

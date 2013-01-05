@@ -58,7 +58,7 @@ public class ClassificationTask implements Task {
 	
 	public ClassificationTask(String[] args) {
 		ontologyFile_ = args[0];
-		reasonerConfig_ = getConfig(args);
+		reasonerConfig_ = BenchmarkUtils.getReasonerConfiguration(args);
 	}
 	
 	@Override
@@ -79,16 +79,6 @@ public class ClassificationTask implements Task {
 		} catch (Exception e) {
 			throw new TaskException(e);
 		}
-	}
-
-	private ReasonerConfiguration getConfig(String[] args) {
-		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
-		
-		if (args.length > 1) {
-			config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, args[1]);
-		}
-		
-		return config;
 	}
 
 	@Override

@@ -43,13 +43,8 @@ public class AllFilesIncrementalClassificationTask extends AllFilesMultiTask {
 	}
 
 	@Override
-	public String getName() {
-		return "Multi incremental classification";
-	}
-
-	@Override
 	public Task instantiateSubTask(String[] args) {
-		return TaskFactory.create(
+		return TaskFactory.createTask(
 				IncrementalClassificationTask.class.getName(), args);
 	}
 
