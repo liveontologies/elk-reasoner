@@ -85,8 +85,7 @@ public class ConsistencyChecking
 			Collection<SaturationJob<IndexedClassEntity>> inputJobs,
 			ConsistencyMonitor consistencyMonitor,
 			ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>> saturationFactory,
-			ComputationExecutor executor,
-			int maxWorkers,
+			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputJobs, saturationFactory, executor, maxWorkers,
 				progressMonitor);
@@ -113,16 +112,13 @@ public class ConsistencyChecking
 	 */
 	public ConsistencyChecking(Collection<IndexedClassEntity> inputEntities,
 			ConsistencyMonitor consistencyMonitor,
-			SaturationState saturationState,
-			ComputationExecutor executor,
-			int maxWorkers,
-			ProgressMonitor progressMonitor) {
+			SaturationState saturationState, ComputationExecutor executor,
+			int maxWorkers, ProgressMonitor progressMonitor) {
 		this(
 				new TodoJobs(inputEntities, consistencyMonitor),
 				consistencyMonitor,
 				new ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>(
-						saturationState,
-						maxWorkers,
+						saturationState, maxWorkers,
 						new ThisClassExpressionSaturationListener(
 								consistencyMonitor)), executor, maxWorkers,
 				progressMonitor);
@@ -138,12 +134,16 @@ public class ConsistencyChecking
 	public static Collection<IndexedClassEntity> getTestEntities(
 			final OntologyIndex ontologyIndex) {
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
 			/*
 			 * if the ontology does not have any positive occurrence of bottom,
 			 * everything is always consistent
 			 */
 			return Collections.emptySet();
 		} else {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("owl:Nothing occurs positively");
 			/*
 			 * first consistency is checked for {@code owl:Thing}, then for the
 			 * individuals in the ontology
@@ -180,7 +180,8 @@ public class ConsistencyChecking
 	 *            the indexed representation of the ontology
 	 */
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex, SaturationState saturationState) {
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
+			SaturationState saturationState) {
 		this(getTestEntities(ontologyIndex), new ConsistencyMonitor(),
 				saturationState, executor, maxWorkers, progressMonitor);
 	}

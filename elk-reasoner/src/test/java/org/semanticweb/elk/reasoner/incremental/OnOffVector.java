@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +22,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
+import java.util.Iterator;
 import java.util.Vector;
 
 /**
@@ -65,6 +67,15 @@ public class OnOffVector<T> extends Vector<T> {
 	}
 
 	/**
+	 * Sets the status of all elements to "on"
+	 */
+	public void setAllOn() {
+		for (int i = 0; i < onOffValues_.size(); i++) {
+			onOffValues_.set(i, true);
+		}
+	}
+
+	/**
 	 * Changes the on-off value of the element with the given index to the
 	 * complementary one.
 	 * 
@@ -75,6 +86,52 @@ public class OnOffVector<T> extends Vector<T> {
 		boolean result = onOffValues_.get(index);
 		onOffValues_.set(index, !result);
 		return result;
+	}
+
+	/**
+	 * @return the elements for which the flag is "on"
+	 */
+	public Iterable<T> getOnElements() {
+		return new Iterable<T>() {
+
+			public Iterator<T> iterator() {
+				return new Iterator<T>() {
+
+					int nextOnIndex = 0;
+
+					{
+						findNextOnIndex();
+					}
+
+					private void findNextOnIndex() {
+						for (; nextOnIndex < onOffValues_.size(); nextOnIndex++) {
+							if (onOffValues_.get(nextOnIndex))
+								break;
+						}
+					}
+
+					@Override
+					public boolean hasNext() {
+						return nextOnIndex < onOffValues_.size();
+					}
+
+					@Override
+					public T next() {
+						T result = get(nextOnIndex);
+						nextOnIndex++;
+						findNextOnIndex();
+						return result;
+					}
+
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException(
+								"Removal of elements not supported!");
+					}
+
+				};
+			}
+		};
 	}
 
 }

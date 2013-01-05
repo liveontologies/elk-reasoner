@@ -30,6 +30,8 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -67,6 +69,7 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.io.URLTestIO;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * @author "Yevgeny Kazakov"
@@ -134,12 +137,13 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 
 		// use random seed
 		long seed = System.currentTimeMillis();
-		seed = 123;		
 
-		String taxonomyHash;
-
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
 				new SimpleStageExecutor(), 1);
+		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
+				new SimpleStageExecutor(), 1);
+		standardReasoner.setIncrementalMode(false);
+		incrementalReasoner.setIncrementalMode(true);
 		TrackingChangesLoader.setSeed(seed);
 
 		try {
@@ -149,32 +153,73 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 			InputStream stream = manifest.getInput().getInputStream();
 			OntologyLoader fileLoader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), stream);
-			reasoner.registerOntologyLoader(new TrackingOntologyLoader(
-					fileLoader, changingAxioms, staticAxioms));
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
-			taxonomyHash = TaxonomyPrinter.getHashString(getTaxonomy(reasoner));
+			incrementalReasoner
+					.registerOntologyLoader(new TrackingOntologyLoader(
+							fileLoader, changingAxioms, staticAxioms));
+			incrementalReasoner
+					.registerOntologyChangesLoader(new EmptyChangesLoader());
+			final String originalTaxonomyHash = TaxonomyPrinter
+					.getHashString(getTaxonomy(incrementalReasoner));
+
 			if (LOGGER_.isDebugEnabled())
-				LOGGER_.debug("Taxonomy hash code: " + taxonomyHash);
+				LOGGER_.debug("Original taxonomy hash code: "
+						+ originalTaxonomyHash);
 
 			if (LOGGER_.isInfoEnabled())
 				LOGGER_.info("Running " + ROUNDS + " rounds with " + ITERATIONS
 						+ " random changes");
-			reasoner.setIncrementalMode(true);
+			incrementalReasoner.setIncrementalMode(true);
 			int changeSize = INITIAL_CHANGES_SIZE;
 
 			for (int j = 0; j < ROUNDS; j++) {
 				if (LOGGER_.isInfoEnabled())
 					LOGGER_.info("Generating " + ITERATIONS
 							+ " changes of size: " + changeSize);
+				changingAxioms.setAllOn();
+
+				taxonomyHashHistory.add(originalTaxonomyHash);
 				for (int i = 0; i < ITERATIONS; i++) {
+					incrementalReasoner
+							.registerOntologyChangesLoader(new TrackingChangesLoader(
+									changingAxioms, changesHistory, changeSize));
+					String taxonomyHash = TaxonomyPrinter
+							.getHashString(getTaxonomy(incrementalReasoner));
 					taxonomyHashHistory.add(taxonomyHash);
-					reasoner.registerOntologyChangesLoader(new TrackingChangesLoader(
-							changingAxioms, changesHistory, changeSize));
-					taxonomyHash = TaxonomyPrinter
-							.getHashString(getTaxonomy(reasoner));
 					if (LOGGER_.isDebugEnabled())
-						LOGGER_.debug("Taxonomy hash code for round " + j
-								+ " iteration " + i + ": " + taxonomyHash);
+						LOGGER_.debug("Taxonomy hash code for round " + (j + 1)
+								+ " iteration " + (i + 1) + ": " + taxonomyHash);
+				}
+
+				if (LOGGER_.isInfoEnabled())
+					LOGGER_.info("Checking the final taxonomy");
+
+				String finalTaxonomyHash = taxonomyHashHistory.pollLast();
+				standardReasoner.registerOntologyLoader(new TestAxiomLoader(
+						Operations.concat(changingAxioms.getOnElements(),
+								staticAxioms)));
+				standardReasoner
+						.registerOntologyChangesLoader(new EmptyChangesLoader());
+				standardReasoner.setIncrementalMode(false);
+				String expectedTaxonomyHash = TaxonomyPrinter
+						.getHashString(getTaxonomy(standardReasoner));
+
+				try {
+					assertEquals("Seed " + seed, expectedTaxonomyHash,
+							finalTaxonomyHash);
+				} catch (AssertionError e) {
+					try {
+						Writer writer = new OutputStreamWriter(System.out);
+						TaxonomyPrinter.dumpClassTaxomomy(
+								getTaxonomy(standardReasoner), writer, false);
+						TaxonomyPrinter
+								.dumpClassTaxomomy(
+										getTaxonomy(incrementalReasoner),
+										writer, false);
+						writer.flush();
+						throw e;
+					} catch (IOException ioe) {
+						ioe.printStackTrace();
+					}
 				}
 
 				if (LOGGER_.isInfoEnabled())
@@ -184,10 +229,11 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 					String expectedHash = taxonomyHashHistory.pollLast();
 					if (change == null)
 						break;
-					reasoner.registerOntologyChangesLoader(new ReversesChangeLoader(
-							change));
-					taxonomyHash = TaxonomyPrinter
-							.getHashString(getTaxonomy(reasoner));
+					incrementalReasoner
+							.registerOntologyChangesLoader(new ReversesChangeLoader(
+									change));
+					String taxonomyHash = TaxonomyPrinter
+							.getHashString(getTaxonomy(incrementalReasoner));
 					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
 				}
 				// doubling the change size every round
@@ -195,7 +241,8 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 			}
 
 		} finally {
-			reasoner.shutdown();
+			incrementalReasoner.shutdown();
+			standardReasoner.shutdown();
 		}
 	}
 

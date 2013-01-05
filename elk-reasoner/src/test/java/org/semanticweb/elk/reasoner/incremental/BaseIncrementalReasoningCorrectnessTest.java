@@ -109,8 +109,6 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	 */
 	@Test
 	public void incrementalReasoning() throws ElkException {
-		TestChangesLoader initialLoader1 = new TestChangesLoader();
-		TestChangesLoader initialLoader2 = new TestChangesLoader();
 		// TODO tweak TestChangesLoader to be able to use one loader for several
 		// reasoners
 		TestChangesLoader changeLoader1 = new TestChangesLoader();
@@ -119,31 +117,30 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 				new SimpleStageExecutor(), 1);
 		Reasoner incrementalReasoner = new ReasonerFactory().createReasoner();
 
-		standardReasoner.registerOntologyLoader(initialLoader1);
+		standardReasoner.registerOntologyLoader(new TestAxiomLoader(axioms));
 		standardReasoner.registerOntologyChangesLoader(changeLoader1);
-		incrementalReasoner.registerOntologyLoader(initialLoader2);
+		incrementalReasoner
+				.registerOntologyLoader(new TestAxiomLoader(axioms));
 		incrementalReasoner.registerOntologyChangesLoader(changeLoader2);
 
 		standardReasoner.setIncrementalMode(false);
 		incrementalReasoner.setIncrementalMode(true);
-		// initial load
-		add(initialLoader1, axioms);
-		add(initialLoader2, axioms);
 		// initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-		long seed = /*1353518711098L;*/System.currentTimeMillis();
+		long seed = /* 1353518711098L; */System.currentTimeMillis();
 		Random rnd = new Random(seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
 			// delete some axioms
 			standardReasoner.setIncrementalMode(false);
-			
+
 			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
 
-			/*for (ElkAxiom del : deleted) {
-				System.err.println(OwlFunctionalStylePrinter.toString(del));
-			}*/
+			/*
+			 * for (ElkAxiom del : deleted) {
+			 * System.err.println(OwlFunctionalStylePrinter.toString(del)); }
+			 */
 
 			// incremental changes
 			changeLoader1.clear();
@@ -152,7 +149,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 			remove(changeLoader2, deleted);
 
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
-			
+
 			standardReasoner.setIncrementalMode(false);
 			// add the axioms back
 			changeLoader1.clear();

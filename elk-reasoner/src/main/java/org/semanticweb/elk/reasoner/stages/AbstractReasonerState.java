@@ -63,7 +63,7 @@ public abstract class AbstractReasonerState {
 			.getLogger(AbstractReasonerState.class);
 
 	final ReasonerConfiguration config_;
-	
+
 	final SaturationState saturationState;
 
 	/**
@@ -114,12 +114,17 @@ public abstract class AbstractReasonerState {
 	 * {@code true} if the reasoner is interrupted
 	 */
 	private volatile boolean isInterrupted_ = false;
-	/**
-	 * {@code true} if all stages have been reseted after changes
-	 */
-	final OntologyIndex ontologyIndex;
 
+	/**
+	 * the cache for indexed objects
+	 */
 	private final IndexedObjectCache objectCache_;
+
+	/**
+	 * the current ontology index
+	 */
+	OntologyIndex ontologyIndex;
+
 	/**
 	 * {@code true} if the current ontology is inconsistent
 	 */
@@ -167,6 +172,8 @@ public abstract class AbstractReasonerState {
 	 * Reset the loading stage and all subsequent stages
 	 */
 	private void resetLoading() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("Reset loading");
 		if (this.ontologyLoader_ != null) {
 			this.ontologyLoader_.dispose();
 			this.ontologyLoader_ = null;
@@ -174,7 +181,8 @@ public abstract class AbstractReasonerState {
 
 		if (doneLoading) {
 			doneLoading = false;
-			ontologyIndex.clear();
+			objectCache_.clear();
+			ontologyIndex = new OntologyIndexImpl(objectCache_);
 		}
 
 		resetChangesLoading();
@@ -187,6 +195,8 @@ public abstract class AbstractReasonerState {
 	 * FIXME get rid of this proliferation of boolean flags
 	 */
 	private void resetChangesLoading() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("Reset changes loading");
 		if (doneChangeLoading) {
 			doneChangeLoading = false;
 			doneContextReset = false;
@@ -202,12 +212,16 @@ public abstract class AbstractReasonerState {
 	}
 
 	public void registerOntologyLoader(OntologyLoader ontologyLoader) {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("Registering ontology loader");
 		resetLoading();
 		this.ontologyLoader_ = ontologyLoader.getLoader(ontologyIndex
 				.getAxiomInserter());
 	}
 
 	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("Registering ontology changes loader");
 		resetChangesLoading();
 
 		changesLoader_ = changesLoader;
@@ -439,6 +453,7 @@ public abstract class AbstractReasonerState {
 	}
 
 	protected boolean useIncrementalTaxonomy() {
-		return config_.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY);
+		return config_
+				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY);
 	}
 }

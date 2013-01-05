@@ -70,7 +70,6 @@ public class BaseIncrementalClassificationCorrectnessTest
 		super(testManifest);
 	}
 
-	@SuppressWarnings("finally")
 	@Override
 	protected void correctnessCheck(Reasoner standardReasoner,
 			Reasoner incrementalReasoner, long seed) throws ElkException {
@@ -93,10 +92,9 @@ public class BaseIncrementalClassificationCorrectnessTest
 				TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
 				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
 				writer.flush();
+				throw e;
 			} catch (IOException ioe) {
 				ioe.printStackTrace();
-			} finally {
-				throw e;
 			}
 		}
 	}

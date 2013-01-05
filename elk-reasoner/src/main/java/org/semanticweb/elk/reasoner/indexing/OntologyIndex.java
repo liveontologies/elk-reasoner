@@ -153,11 +153,6 @@ public interface OntologyIndex {
 	ElkAxiomProcessor getAxiomDeleter();
 
 	/**
-	 * Erase all information from this {@link OntologyIndex}
-	 */
-	void clear();
-
-	/**
 	 * @return a {@link Chain} view of context initialization rules assigned to
 	 *         this {@link OntologyIndex}; it can be used for inserting new
 	 *         rules or deleting existing ones
