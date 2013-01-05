@@ -68,8 +68,7 @@ public class TaskRunner {
 			task.prepare();
 			
 			timer.start();
-			task.run();
-			
+			task.run();			
 			timer.stop();
 			
 			long wallRuntime = (timer.getTotalWallTime() - wallTimeElapsed)/1000000;
