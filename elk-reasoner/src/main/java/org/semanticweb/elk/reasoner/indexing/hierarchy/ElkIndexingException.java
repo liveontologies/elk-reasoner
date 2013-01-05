@@ -23,11 +23,12 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.util.OwlObjectNameVisitor;
 
 /**
+ * An exception to signal indexing problems
+ * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
 public class ElkIndexingException extends ElkRuntimeException {
@@ -47,11 +48,6 @@ public class ElkIndexingException extends ElkRuntimeException {
 
 	public ElkIndexingException(Throwable cause) {
 		super(cause);
-	}
-
-	protected ElkIndexingException(ElkObject elkObject) {
-		this("ELK does not support " + OwlObjectNameVisitor.getName(elkObject)
-				+ ".");
 	}
 
 }

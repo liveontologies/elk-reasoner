@@ -294,9 +294,9 @@ public class DifferentialIndex {
 		if (!rule.removeFrom(getAddedContextInitRuleChain())) {
 			rule.addTo(getRemovedContextInitRuleChain());
 			if (!rule.removeFrom(mainIndex_.getContextInitRuleChain()))
-				throw new ElkIndexingException(
+				throw new ElkUnexpectedIndexingException(
 						"Cannot remove context initialization rule "
-								+ rule.getName());			
+								+ rule.getName());
 		}
 	}
 
@@ -310,8 +310,9 @@ public class DifferentialIndex {
 		if (!rule.removeFrom(getAddedContextRuleChain(target))) {
 			rule.addTo(getRemovedContextRuleChain(target));
 			if (!rule.removeFrom(target.getCompositionRuleChain()))
-				throw new ElkIndexingException("Cannot remove context rule "
-						+ rule.getName() + " for " + target);			
+				throw new ElkUnexpectedIndexingException(
+						"Cannot remove context rule " + rule.getName()
+								+ " for " + target);
 		}
 	}
 }

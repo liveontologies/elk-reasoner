@@ -82,15 +82,15 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	public void subtract(IndexedObjectCache other) {
 		for (IndexedClassExpression ice : other.indexedClassExpressionLookup)
 			if (!ice.accept(deletor))
-				throw new ElkIndexingException(
+				throw new ElkUnexpectedIndexingException(
 						"Cannot remove indexed object from the cache " + ice);
 		for (IndexedPropertyChain ipc : other.indexedPropertyChainLookup)
 			if (!ipc.accept(deletor))
-				throw new ElkIndexingException(
+				throw new ElkUnexpectedIndexingException(
 						"Cannot remove indexed object from the cache " + ipc);
 		for (IndexedAxiom ax : other.indexedAxiomLookup)
 			if (!ax.accept(deletor))
-				throw new ElkIndexingException(
+				throw new ElkUnexpectedIndexingException(
 						"Cannot remove indexed object from the cache " + ax);
 		// the counters should be subtracted during deletion
 	}

@@ -65,6 +65,7 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
  * {@link IndexingException} on all arguments.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
 public abstract class AbstractIndexObjectConverter implements
@@ -72,167 +73,180 @@ public abstract class AbstractIndexObjectConverter implements
 		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain>,
 		ElkIndividualVisitor<IndexedIndividual> {
 
+	protected IndexedClassExpression defaultVisit(ElkClassExpression expression) {
+		throw new ElkIndexingUnsupportedException(expression);
+	}
+
+	protected IndexedPropertyChain defaultVisit(
+			ElkSubObjectPropertyExpression expression) {
+		throw new ElkIndexingUnsupportedException(expression);
+	}
+
+	protected IndexedIndividual defaultVisit(ElkIndividual expression) {
+		throw new ElkIndexingUnsupportedException(expression);
+	}
+
 	@Override
 	public IndexedClassExpression visit(ElkClass elkClass) {
-		throw new ElkIndexingException(elkClass);
+		return defaultVisit(elkClass);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
-		throw new ElkIndexingException(elkObjectAllValuesFrom);
+		return defaultVisit(elkObjectAllValuesFrom);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectComplementOf elkObjectComplementOf) {
-		throw new ElkIndexingException(elkObjectComplementOf);
+		return defaultVisit(elkObjectComplementOf);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectExactCardinality elkObjectExactCardinality) {
-		throw new ElkIndexingException(elkObjectExactCardinality);
+		return defaultVisit(elkObjectExactCardinality);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectExactCardinalityQualified elkObjectExactCardinalityQualified) {
-		throw new ElkIndexingException(elkObjectExactCardinalityQualified);
+		return defaultVisit(elkObjectExactCardinalityQualified);
 	}
 
 	@Override
 	public IndexedClassExpression visit(ElkObjectHasSelf elkObjectHasSelf) {
-		throw new ElkIndexingException(elkObjectHasSelf);
+		return defaultVisit(elkObjectHasSelf);
 	}
 
 	@Override
 	public IndexedClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
-		throw new ElkIndexingException(elkObjectHasValue);
+		return defaultVisit(elkObjectHasValue);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
-		throw new ElkIndexingException(elkObjectIntersectionOf);
+		return defaultVisit(elkObjectIntersectionOf);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectMaxCardinality elkObjectMaxCardinality) {
-		throw new ElkIndexingException(elkObjectMaxCardinality);
+		return defaultVisit(elkObjectMaxCardinality);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectMaxCardinalityQualified elkObjectMaxCardinalityQualified) {
-		throw new ElkIndexingException(elkObjectMaxCardinalityQualified);
+		return defaultVisit(elkObjectMaxCardinalityQualified);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectMinCardinality elkObjectMinCardinality) {
-		throw new ElkIndexingException(elkObjectMinCardinality);
+		return defaultVisit(elkObjectMinCardinality);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectMinCardinalityQualified elkObjectMinCardinalityQualified) {
-		throw new ElkIndexingException(elkObjectMinCardinalityQualified);
+		return defaultVisit(elkObjectMinCardinalityQualified);
 	}
 
 	@Override
 	public IndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
-		throw new ElkIndexingException(elkObjectOneOf);
+		return defaultVisit(elkObjectOneOf);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-		throw new ElkIndexingException(elkObjectSomeValuesFrom);
+		return defaultVisit(elkObjectSomeValuesFrom);
 	}
 
 	@Override
 	public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
-		throw new ElkIndexingException(elkObjectUnionOf);
+		return defaultVisit(elkObjectUnionOf);
 	}
 
 	@Override
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
-		throw new ElkIndexingException(elkDataHasValue);
+		return defaultVisit(elkDataHasValue);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkDataMaxCardinality elkDataMaxCardinality) {
-		throw new ElkIndexingException(elkDataMaxCardinality);
+		return defaultVisit(elkDataMaxCardinality);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkDataMaxCardinalityQualified elkDataMaxCardinalityQualified) {
-		throw new ElkIndexingException(elkDataMaxCardinalityQualified);
+		return defaultVisit(elkDataMaxCardinalityQualified);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkDataMinCardinality elkDataMinCardinality) {
-		throw new ElkIndexingException(elkDataMinCardinality);
+		return defaultVisit(elkDataMinCardinality);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkDataMinCardinalityQualified elkDataMinCardinalityQualified) {
-		throw new ElkIndexingException(elkDataMinCardinalityQualified);
+		return defaultVisit(elkDataMinCardinalityQualified);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkDataExactCardinality elkDataExactCardinality) {
-		throw new ElkIndexingException(elkDataExactCardinality);
+		return defaultVisit(elkDataExactCardinality);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkDataExactCardinalityQualified elkDataExactCardinalityQualified) {
-		throw new ElkIndexingException(elkDataExactCardinalityQualified);
+		return defaultVisit(elkDataExactCardinalityQualified);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkDataSomeValuesFrom elkDataSomeValuesFrom) {
-		throw new ElkIndexingException(elkDataSomeValuesFrom);
+		return defaultVisit(elkDataSomeValuesFrom);
 	}
 
 	@Override
 	public IndexedClassExpression visit(
 			ElkDataAllValuesFrom elkDataAllValuesFrom) {
-		throw new ElkIndexingException(elkDataAllValuesFrom);
+		return defaultVisit(elkDataAllValuesFrom);
 	}
 
 	@Override
-	public IndexedObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
-		throw new ElkIndexingException(elkObjectInverseOf);
+	public IndexedPropertyChain visit(ElkObjectInverseOf elkObjectInverseOf) {
+		return defaultVisit(elkObjectInverseOf);
 	}
 
 	@Override
 	public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
-		throw new ElkIndexingException(elkObjectProperty);
+		return defaultVisit(elkObjectProperty);
 	}
 
 	@Override
 	public IndexedPropertyChain visit(
 			ElkObjectPropertyChain elkObjectPropertyChain) {
-		throw new ElkIndexingException(elkObjectPropertyChain);
+		return defaultVisit(elkObjectPropertyChain);
 	}
 
 	@Override
 	public IndexedIndividual visit(ElkAnonymousIndividual elkAnonymousIndividual) {
-		throw new ElkIndexingException(elkAnonymousIndividual);
+		return defaultVisit(elkAnonymousIndividual);
 	}
 
 	@Override
 	public IndexedIndividual visit(ElkNamedIndividual elkNamedIndividual) {
-		throw new ElkIndexingException(elkNamedIndividual);
+		return defaultVisit(elkNamedIndividual);
 	}
 }

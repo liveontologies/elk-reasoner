@@ -224,7 +224,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 				LOGGER_.trace("indexing "
 						+ OwlFunctionalStylePrinter.toString(elkAxiom)
 						+ " with multiplicity = " + multiplicity);
-		} catch (ElkIndexingException e) {
+		} catch (ElkIndexingUnsupportedException e) {
 			if (LOGGER_.isEnabledFor(Level.WARN))
 				LOGGER_.warn(new ElkMessage(e.getMessage()
 						+ " Axiom ignored:\n"
