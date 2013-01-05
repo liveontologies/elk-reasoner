@@ -65,17 +65,14 @@ import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
  * @author "Yevgeny Kazakov"
  * 
- * @param <EO>
- * @param <AO>
  */
 @RunWith(PolySuite.class)
-public class RandomWalkIncrementalClassificationCorrectnessTest<EO extends TestOutput, AO extends TestOutput> {
+public class RandomWalkIncrementalClassificationCorrectnessTest {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger
@@ -96,10 +93,10 @@ public class RandomWalkIncrementalClassificationCorrectnessTest<EO extends TestO
 	 */
 	static int INITIAL_CHANGES_SIZE = 5;
 
-	protected final ReasoningTestManifest<EO, AO> manifest;
+	protected final ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> manifest;
 
 	public RandomWalkIncrementalClassificationCorrectnessTest(
-			ReasoningTestManifest<EO, AO> testManifest) {
+			ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
 		manifest = testManifest;
 	}
 
