@@ -68,8 +68,9 @@ public class DirectIndexUpdater implements IndexUpdater {
 	public void remove(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
 		if (!rule.removeFrom(target.getCompositionRuleChain()))
-			throw new ElkIndexingException("Cannot remove composition rule "
-					+ rule.getName() + " for " + target);
+			throw new ElkUnexpectedIndexingException(
+					"Cannot remove composition rule " + rule.getName()
+							+ " for " + target);
 	}
 
 	@Override
@@ -80,7 +81,7 @@ public class DirectIndexUpdater implements IndexUpdater {
 	@Override
 	public void remove(ChainableRule<Context> rule) {
 		if (!rule.removeFrom(ontIndex_.getContextInitRuleChain()))
-			throw new ElkIndexingException(
+			throw new ElkUnexpectedIndexingException(
 					"Cannot remove context initialization rule "
 							+ rule.getName());
 	}
@@ -93,7 +94,7 @@ public class DirectIndexUpdater implements IndexUpdater {
 	@Override
 	public void remove(IndexedObject object) {
 		if (!object.accept(ontIndex_.getIndexedObjectCache().deletor))
-			throw new ElkIndexingException(
+			throw new ElkUnexpectedIndexingException(
 					"Cannot remove indexed object from the cache " + object);
 	}
 

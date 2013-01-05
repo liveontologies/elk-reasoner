@@ -100,7 +100,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 
 	@Override
 	protected Void defaultLogicalVisit(ElkAxiom axiom) {
-		throw new ElkIndexingException(axiom);
+		throw new ElkIndexingUnsupportedException(axiom);
 	}
 
 	/*

@@ -84,7 +84,7 @@ public class DifferentialIndex {
 	private final Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
 
-	private final ElkAxiomIndexerVisitor axiomInserter_, axiomDeleter_;
+	private final ElkAxiomProcessor axiomInserter_, axiomDeleter_;
 
 	public DifferentialIndex(OntologyIndex mainIndex,
 			IndexedObjectCache objectCache, IndexedClass owlNothing) {
@@ -292,11 +292,11 @@ public class DifferentialIndex {
 
 	void registerRemovedContextInitRule(ChainableRule<Context> rule) {
 		if (!rule.removeFrom(getAddedContextInitRuleChain())) {
+			rule.addTo(getRemovedContextInitRuleChain());
 			if (!rule.removeFrom(mainIndex_.getContextInitRuleChain()))
-				throw new ElkIndexingException(
+				throw new ElkUnexpectedIndexingException(
 						"Cannot remove context initialization rule "
 								+ rule.getName());
-			rule.addTo(getRemovedContextInitRuleChain());
 		}
 	}
 
@@ -307,10 +307,12 @@ public class DifferentialIndex {
 
 	void registerRemovedContextRule(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		if (!rule.removeFrom(getAddedContextRuleChain(target)))
+		if (!rule.removeFrom(getAddedContextRuleChain(target))) {
+			rule.addTo(getRemovedContextRuleChain(target));
 			if (!rule.removeFrom(target.getCompositionRuleChain()))
-				throw new ElkIndexingException("Cannot remove context rule "
-						+ rule.getName() + " for " + target);
-		rule.addTo(getRemovedContextRuleChain(target));
+				throw new ElkUnexpectedIndexingException(
+						"Cannot remove context rule " + rule.getName()
+								+ " for " + target);
+		}
 	}
 }

@@ -40,13 +40,12 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 
 public class OntologyIndexImpl implements OntologyIndex {
 
-	private IndexedClass indexedOwlThing;
-	private IndexedClass indexedOwlNothing;
+	private IndexedClass indexedOwlThing, indexedOwlNothing;
 
 	private final IndexedObjectCache objectCache_;
 	private final IndexObjectConverter elkObjectIndexer_;
-	private final ElkAxiomIndexerVisitor directAxiomInserter_;
-	private final ElkAxiomIndexerVisitor directAxiomDeleter_;
+	private final ElkAxiomIndexerVisitor directAxiomInserter_,
+			directAxiomDeleter_;
 
 	private ChainableRule<Context> contextInitRules_ = null;
 
