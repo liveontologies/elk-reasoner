@@ -37,6 +37,7 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
@@ -100,12 +101,13 @@ public class BaseIncrementalClassificationCorrectnessTest
 		}
 	}
 
-	private Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner) {
+	private Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner)
+			throws ElkException {
 		Taxonomy<ElkClass> result = null;
 
 		try {
 			result = reasoner.getTaxonomy();
-		} catch (ElkException e) {
+		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
 
 			result = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;

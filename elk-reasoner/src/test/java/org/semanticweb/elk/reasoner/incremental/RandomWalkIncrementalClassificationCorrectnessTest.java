@@ -50,6 +50,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
@@ -141,7 +142,6 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 
 		try {
 
-			// INITIAL LOADING
 			if (LOGGER_.isInfoEnabled())
 				LOGGER_.info("Initial load of test axioms");
 			InputStream stream = manifest.getInput().getInputStream();
@@ -170,6 +170,8 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 							changingAxioms, changesHistory, changeSize));
 					taxonomyHash = TaxonomyPrinter
 							.getHashString(getTaxonomy(reasoner));
+					if (LOGGER_.isDebugEnabled())
+						LOGGER_.debug("Taxonomy hash code for iteration " + i + ": " + taxonomyHash);
 				}
 
 				if (LOGGER_.isInfoEnabled())
@@ -196,12 +198,13 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 	}
 
 	// TODO: perhaps add such a method to the reasoner interface?
-	private Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner) {
+	private Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner)
+			throws ElkException {
 		Taxonomy<ElkClass> result = null;
 
 		try {
 			result = reasoner.getTaxonomy();
-		} catch (ElkException e) {
+		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
 
 			result = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
