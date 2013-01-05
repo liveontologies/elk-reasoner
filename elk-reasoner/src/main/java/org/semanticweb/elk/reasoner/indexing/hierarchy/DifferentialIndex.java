@@ -84,7 +84,7 @@ public class DifferentialIndex {
 	private final Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
 
-	private final ElkAxiomIndexerVisitor axiomInserter_, axiomDeleter_;
+	private final ElkAxiomProcessor axiomInserter_, axiomDeleter_;
 
 	public DifferentialIndex(OntologyIndex mainIndex,
 			IndexedObjectCache objectCache, IndexedClass owlNothing) {
