@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -48,7 +49,7 @@ public class TrackingChangesLoader implements ChangesLoader {
 	 * @param seed
 	 *            the seed to be used for generating of random changes
 	 */
-	public static void setSeed(int seed) {
+	public static void setSeed(long seed) {
 		RANDOM_.setSeed(seed);
 	}
 
@@ -106,7 +107,7 @@ public class TrackingChangesLoader implements ChangesLoader {
 					// axiom; the status is flip
 					if (changingAxioms_.flipOnOff(index)) {
 						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace("removing " + index + ":"
+							LOGGER_.trace("removing axiom " + index + ": "
 									+ OwlFunctionalStylePrinter.toString(axiom));
 						change_.registerDeletion(axiom);
 						axiomDeleter.visit(axiom);
@@ -115,7 +116,7 @@ public class TrackingChangesLoader implements ChangesLoader {
 									.notify(new SimpleElkAxiomChange(axiom, -1));
 					} else {
 						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace("adding " + index + ":"
+							LOGGER_.trace("adding axiom " + index + ": "
 									+ OwlFunctionalStylePrinter.toString(axiom));
 						change_.registerAddition(axiom);
 						axiomInserter.visit(axiom);

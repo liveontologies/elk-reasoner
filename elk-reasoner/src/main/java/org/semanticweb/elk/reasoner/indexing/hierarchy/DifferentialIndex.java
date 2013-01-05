@@ -292,11 +292,11 @@ public class DifferentialIndex {
 
 	void registerRemovedContextInitRule(ChainableRule<Context> rule) {
 		if (!rule.removeFrom(getAddedContextInitRuleChain())) {
+			rule.addTo(getRemovedContextInitRuleChain());
 			if (!rule.removeFrom(mainIndex_.getContextInitRuleChain()))
 				throw new ElkIndexingException(
 						"Cannot remove context initialization rule "
-								+ rule.getName());
-			rule.addTo(getRemovedContextInitRuleChain());
+								+ rule.getName());			
 		}
 	}
 
@@ -307,10 +307,11 @@ public class DifferentialIndex {
 
 	void registerRemovedContextRule(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		if (!rule.removeFrom(getAddedContextRuleChain(target)))
+		if (!rule.removeFrom(getAddedContextRuleChain(target))) {
+			rule.addTo(getRemovedContextRuleChain(target));
 			if (!rule.removeFrom(target.getCompositionRuleChain()))
 				throw new ElkIndexingException("Cannot remove context rule "
-						+ rule.getName() + " for " + target);
-		rule.addTo(getRemovedContextRuleChain(target));
+						+ rule.getName() + " for " + target);			
+		}
 	}
 }

@@ -134,11 +134,13 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 
 		// use random seed
 		long seed = System.currentTimeMillis();
+		seed = 123;		
 
 		String taxonomyHash;
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 				new SimpleStageExecutor(), 1);
+		TrackingChangesLoader.setSeed(seed);
 
 		try {
 
@@ -171,7 +173,8 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 					taxonomyHash = TaxonomyPrinter
 							.getHashString(getTaxonomy(reasoner));
 					if (LOGGER_.isDebugEnabled())
-						LOGGER_.debug("Taxonomy hash code for iteration " + i + ": " + taxonomyHash);
+						LOGGER_.debug("Taxonomy hash code for round " + j
+								+ " iteration " + i + ": " + taxonomyHash);
 				}
 
 				if (LOGGER_.isInfoEnabled())
@@ -192,7 +195,6 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 			}
 
 		} finally {
-
 			reasoner.shutdown();
 		}
 	}

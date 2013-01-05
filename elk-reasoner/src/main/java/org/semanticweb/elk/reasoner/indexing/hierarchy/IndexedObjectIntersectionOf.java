@@ -226,12 +226,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			if (previous == null)
 				return true;
 
-			// FIXME: check when *same* conjunctions can be indexed twice; this should happen as well
-			if (previous != conjunction)
-				throw new ElkRuntimeException(
-						"Cannot index different conjunctions with the same conjuncts: "
-								+ conjunction + "; " + previous);
-			return false;
+			throw new ElkRuntimeException("Conjunction " + conjunction
+					+ "is already indexed: " + previous);
 		}
 
 		private boolean removeConjunctionByConjunct(
