@@ -28,7 +28,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.semanticweb.elk.benchmark.AllFilesMultiTask;
+import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
 import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
@@ -61,7 +61,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalClassificationMultiDeltasTask extends AllFilesMultiTask {
+public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollection {
 
 	private static String ADDITION_SUFFIX = "delta-plus";
 	private static String DELETION_SUFFIX = "delta-minus";	

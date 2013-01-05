@@ -34,11 +34,11 @@ import java.util.Collection;
  *
  * pavel.klinov@uni-ulm.de
  */
-public abstract class AllFilesMultiTask implements TaskCollection {
+public abstract class AllFilesTaskCollection implements TaskCollection {
 
 	private final String[] args_;
 	
-	public AllFilesMultiTask(String[] args) {
+	public AllFilesTaskCollection(String[] args) {
 		args_ = args;
 	}
 	
