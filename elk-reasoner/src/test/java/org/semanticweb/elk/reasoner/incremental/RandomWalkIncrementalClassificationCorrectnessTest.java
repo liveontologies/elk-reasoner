@@ -139,10 +139,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 		long seed = System.currentTimeMillis();
 
 		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
-				new SimpleStageExecutor(), 1);
-		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
-				new SimpleStageExecutor(), 1);
-		standardReasoner.setIncrementalMode(false);
+				new SimpleStageExecutor(), 1);		
 		incrementalReasoner.setIncrementalMode(true);
 		TrackingChangesLoader.setSeed(seed);
 
@@ -194,6 +191,10 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 					LOGGER_.info("Checking the final taxonomy");
 
 				String finalTaxonomyHash = taxonomyHashHistory.pollLast();
+				
+				Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
+						new SimpleStageExecutor(), 1);
+				standardReasoner.setIncrementalMode(false);
 				standardReasoner.registerOntologyLoader(new TestAxiomLoader(
 						Operations.concat(changingAxioms.getOnElements(),
 								staticAxioms)));
@@ -216,11 +217,13 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 										getTaxonomy(incrementalReasoner),
 										writer, false);
 						writer.flush();
+						standardReasoner.shutdown();
 						throw e;
 					} catch (IOException ioe) {
 						ioe.printStackTrace();
 					}
 				}
+				standardReasoner.shutdown();
 
 				if (LOGGER_.isInfoEnabled())
 					LOGGER_.info("Reverting the changes");
@@ -241,8 +244,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 			}
 
 		} finally {
-			incrementalReasoner.shutdown();
-			standardReasoner.shutdown();
+			incrementalReasoner.shutdown();			
 		}
 	}
 
