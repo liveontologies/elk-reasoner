@@ -142,6 +142,9 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			boolean changed = false;
 
 			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace("Adding " + ice + " (hash: " + ice.hashCode()
+							+ ")" + " to " + NAME);
 				changed |= rule.addToldSuperClassExpression(ice);
 			}
 
@@ -157,6 +160,9 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 			if (rule != null) {
 				for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace("Removing " + ice + " (hash: "
+								+ ice.hashCode() + ")" + " from " + NAME);
 					changed |= rule.removeToldSuperClassExpression(ice);
 				}
 
@@ -164,8 +170,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 					ruleChain.remove(ThisCompositionRule.MATCHER_);
 
 					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace("Removed SubClassOf rule, superclasses: "
-								+ toldSuperClassExpressions_);
+						LOGGER_.trace(NAME + ": removed");
 					}
 
 					return true;

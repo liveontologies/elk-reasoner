@@ -64,9 +64,9 @@ public class OntologyIndexImpl implements OntologyIndex {
 				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 
 		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
-				indexedOwlThing_, new DirectIndexUpdater(this), true);
+				indexedOwlNothing_, new DirectIndexUpdater(this), true);
 		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
-				getIndexedOwlNothing(), new DirectIndexUpdater(this), false);
+				indexedOwlNothing_, new DirectIndexUpdater(this), false);
 
 	}
 

@@ -104,6 +104,12 @@ public class IndexedClass extends IndexedClassEntity {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(this + " (hash: " + this.hashCode() + ")"
+					+ " updated occurrences: " + occurrenceNo + "; "
+					+ positiveOccurrenceNo + "; " + negativeOccurrenceNo);
+		// TODO: fail if occurrences become negative
+
 		if (occurrenceNo == 0 && increment < 0) {
 			indexUpdater.removeClass(elkClass);
 		}

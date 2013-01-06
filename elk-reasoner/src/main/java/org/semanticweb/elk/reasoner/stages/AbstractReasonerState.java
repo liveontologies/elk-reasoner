@@ -305,6 +305,8 @@ public abstract class AbstractReasonerState {
 	 * ontology.
 	 */
 	public void reset() {
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info("Reset data");
 		resetLoading();
 		ruleAndConclusionStats.reset();
 	}

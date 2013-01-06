@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
@@ -46,6 +47,10 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
  */
 public class IndexedObjectCache implements IndexedObjectFilter {
 
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IndexedObjectCache.class);
+
 	protected final KeyEntryHashSet<IndexedClassExpression> indexedClassExpressionLookup;
 	protected final KeyEntryHashSet<IndexedPropertyChain> indexedPropertyChainLookup;
 	protected final KeyEntryHashSet<IndexedAxiom> indexedAxiomLookup;
@@ -63,6 +68,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	public void clear() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("Clear cache");
 		indexedClassExpressionLookup.clear();
 		indexedPropertyChainLookup.clear();
 		indexedAxiomLookup.clear();
@@ -166,6 +173,9 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	protected final IndexedObjectVisitor<Boolean> inserter = new IndexedObjectVisitor<Boolean>() {
 		@Override
 		public Boolean visit(IndexedClass element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element + " (hash: "
+						+ element.hashCode() + ")");
 			if (indexedClassExpressionLookup.add(element)) {
 				indexedClassCount++;
 				return true;
@@ -226,6 +236,9 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	protected final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
 		@Override
 		public Boolean visit(IndexedClass element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element + " (hash: "
+						+ element.hashCode() + ")");
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedClassCount--;
 				return true;

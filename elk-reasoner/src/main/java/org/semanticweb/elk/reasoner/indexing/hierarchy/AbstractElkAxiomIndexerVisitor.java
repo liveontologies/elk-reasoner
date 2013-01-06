@@ -238,6 +238,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			indexDisjointClassExpressions(axiom.getClassExpressions());
 			return null;
 		}
+		// FIXME: this binarization creates two axioms for every pair
 		// otherwise, apply binarization and convert to subclass axioms
 		for (final ElkClassExpression member : members) {
 			boolean selfFound = false; // true when otherMember = member
