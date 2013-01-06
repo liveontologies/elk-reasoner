@@ -42,9 +42,8 @@ import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
  */
 public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
-	public ContextCleaningFactory(final SaturationState saturationState,
-			boolean trackModifiedContexts) {
-		super(saturationState, trackModifiedContexts);
+	public ContextCleaningFactory(final SaturationState saturationState) {
+		super(saturationState, /*trackModifiedContexts*/false);
 	}
 
 	@Override

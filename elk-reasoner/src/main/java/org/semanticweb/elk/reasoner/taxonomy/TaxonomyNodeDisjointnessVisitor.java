@@ -44,6 +44,12 @@ public class TaxonomyNodeDisjointnessVisitor<T extends ElkObject> implements
 		// Check that nodes are disjoint
 		for (T member : node.getMembers()) {
 			if (node != node.getTaxonomy().getNode(member)) {
+				
+				/*TaxonomyNode<T> other = node.getTaxonomy().getNode(member);
+				
+				System.out.println(node.getMembers() + " " + (node == node.getTaxonomy().getBottomNode()));
+				System.out.println(other.getMembers() + " " + (other == other.getTaxonomy().getBottomNode()));*/
+				
 				throw new InvalidTaxonomyException(
 						"Invalid taxonomy: looks like the object "
 								+ OwlFunctionalStylePrinter.toString(member)

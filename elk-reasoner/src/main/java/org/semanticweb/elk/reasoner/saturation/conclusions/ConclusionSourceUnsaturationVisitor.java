@@ -37,8 +37,8 @@ public class ConclusionSourceUnsaturationVisitor implements
 
 	private final SaturationState.Writer writer_;
 
-	public ConclusionSourceUnsaturationVisitor(SaturationState.Writer engine) {
-		this.writer_ = engine;
+	public ConclusionSourceUnsaturationVisitor(SaturationState.Writer writer) {
+		this.writer_ = writer;
 	}
 
 	Boolean mark(Conclusion conclusion, Context context) {

@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.taxonomy.InvalidTaxonomyException;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyAcyclicityAndReductionValidator;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyLinkConsistencyVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNodeDisjointnessVisitor;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNodeIndexConsistencyVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyValidator;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
@@ -85,7 +86,7 @@ class IncrementalClassTaxonomyComputationStage extends
 		// currently this is cleaned during the taxonomy cleaning stage, but this stage might not
 		// be executed at all; also, the non saturated contexts are not cleaned at all during
 		// incremental consistency checking. Something needs to be done about it.
-		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
+		//reasoner.saturationState.getWriter().clearNotSaturatedContexts();
 
 		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
 				.getIndexedClasses();
@@ -162,9 +163,11 @@ class IncrementalClassTaxonomyComputationStage extends
 			
 			try {
 				if (taxonomy != null) {
+										
 					TaxonomyValidator<ElkClass> validator = new BasicTaxonomyValidator<ElkClass>()
 							.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>())
-							.add(new TaxonomyLinkConsistencyVisitor<ElkClass>());
+							.add(new TaxonomyLinkConsistencyVisitor<ElkClass>())
+							.add(new TaxonomyNodeIndexConsistencyVisitor<ElkClass>());
 
 					validator.validate(taxonomy);
 

@@ -57,6 +57,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
@@ -139,7 +140,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 		long seed = System.currentTimeMillis();
 
 		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
-				new SimpleStageExecutor(), 1);		
+				new PostProcessingStageExecutor(), 1);		
 		incrementalReasoner.setIncrementalMode(true);
 		TrackingChangesLoader.setSeed(seed);
 

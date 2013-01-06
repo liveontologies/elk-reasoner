@@ -94,6 +94,7 @@ public class OnOffVector<T> extends Vector<T> {
 	public Iterable<T> getOnElements() {
 		return new Iterable<T>() {
 
+			@Override
 			public Iterator<T> iterator() {
 				return new Iterator<T>() {
 

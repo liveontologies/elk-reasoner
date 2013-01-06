@@ -101,10 +101,10 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 		super.initComputation();
 
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
-				reasoner.saturationState, true);
+				reasoner.saturationState);
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Contexts to be cleaned: "
+		if (LOGGER_.isDebugEnabled()) {
+			LOGGER_.debug("Contexts to be cleaned: "
 					+ reasoner.saturationState.getNotSaturatedContexts());
 		}
 
@@ -136,8 +136,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 
 		@Override
 		public void execute() throws ElkException {
-			for (IndexedClassExpression ice : reasoner.saturationState
-					.getNotSaturatedContexts()) {
+			for (IndexedClassExpression ice : reasoner.saturationState.getNotSaturatedContexts()) {
 				if (ice.getContext().getSubsumers().size() > 0) {
 					LOGGER_.error("Context not cleaned: " + ice + "!" + "\n"
 							+ ice.getContext().getSubsumers().size()

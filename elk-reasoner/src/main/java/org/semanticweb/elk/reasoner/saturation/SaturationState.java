@@ -207,6 +207,11 @@ public class SaturationState {
 			if (context.setSaturated(false)) {
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace(context + ": marked as non-saturated");
+				
+				if (notSaturatedContexts_.contains(context.getRoot())) {
+					System.err.println("context " + context + " is already unsaturated!");
+				}
+				
 //				Thread.dumpStack();
 				notSaturatedContexts_.add(context.getRoot());
 			}

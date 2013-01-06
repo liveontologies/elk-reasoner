@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -219,6 +220,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 */
 			R root = initiatorJob.getInput();
 			Context saturation = root.getContext();
+			
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
@@ -233,6 +235,15 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				listener.notifyFinished(initiatorJob);
 				return;
 			}
+			///FIXME Remove when fixed!
+			for (IndexedClassExpression ice : saturation.getSubsumers()) {
+				if (ice instanceof IndexedClass) {
+					if (((IndexedClass)ice).getElkClass() == PredefinedElkClass.OWL_NOTHING) {
+						throw new RuntimeException("Context " + root + " must be marked as inconsistent!");
+					}
+				}
+			}
+			///FIXME
 			/*
 			 * Otherwise, to perform the transitive reduction, we need to
 			 * compute the saturation for every derived indexed super-class of
@@ -325,11 +336,14 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		private void updateTransitiveReductionOutput(
 				TransitiveReductionOutputEquivalentDirect<R> output,
 				IndexedClass candidate, Context candidateSaturation) {
+			
 			R root = output.root;
+
 			if (candidate == root) {
 				output.equivalent.add(candidate.getElkClass());
 				return;
 			}
+			
 			Set<IndexedClassExpression> candidateSupers = candidateSaturation
 					.getSubsumers();
 			/*

@@ -71,7 +71,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
 
-	final static int REPEAT_NUMBER = 5;
+	final static int REPEAT_NUMBER = 1;
 	final static double DELETE_RATIO = 0.2;
 
 	protected final ReasoningTestManifest<EO, AO> manifest;
@@ -128,7 +128,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		// initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-		long seed = /* 1353518711098L; */System.currentTimeMillis();
+		long seed = 12345;// /* 1353518711098L; */System.currentTimeMillis();
 		Random rnd = new Random(seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
@@ -147,6 +147,8 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 			changeLoader2.clear();
 			remove(changeLoader1, deleted);
 			remove(changeLoader2, deleted);
+			
+			System.out.println("===DELETIONS===");
 
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 
@@ -156,6 +158,8 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 			changeLoader2.clear();
 			add(changeLoader1, deleted);
 			add(changeLoader2, deleted);
+			
+			System.out.println("===ADDITIONS===");
 
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}

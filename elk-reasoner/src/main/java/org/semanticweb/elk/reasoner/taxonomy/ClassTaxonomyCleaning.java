@@ -32,6 +32,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
@@ -80,7 +81,12 @@ class ClassTaxonomyCleaningFactory implements
 
 			@Override
 			public void submit(ElkClass elkClass) {
-
+				///TODO Decide if this is a normal situation
+				if (elkClass == PredefinedElkClass.OWL_NOTHING){
+					System.out.println("Removing owl:Nothing!!!");
+					return;
+				}
+				
 				if (classTaxonomy_.getBottomNode().getMembers()
 						.remove(elkClass)) {
 					return;
