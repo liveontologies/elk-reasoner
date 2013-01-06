@@ -71,7 +71,12 @@ public class RuleApplicationFactory implements
 	 * The {@link RuleAndConclusionStatistics} aggregated for all workers
 	 */
 	private final RuleAndConclusionStatistics aggregatedStats_;
-
+	/**
+	 * If true, the factory will keep track of contexts which get modified
+	 * during saturation. This is needed, for example, for cleaning contexts
+	 * modified during de-saturation or for cleaning taxonomy nodes which
+	 * correspond to modified contexts (during saturation or de-saturation)
+	 */
 	private final boolean trackModifiedContexts_;
 
 	public RuleApplicationFactory(final SaturationState saturationState) {
