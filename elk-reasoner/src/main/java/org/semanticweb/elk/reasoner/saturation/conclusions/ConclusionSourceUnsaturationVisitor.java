@@ -35,14 +35,14 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class ConclusionSourceUnsaturationVisitor implements
 		ConclusionVisitor<Boolean> {
 
-	private final SaturationState.Writer engine_;
+	private final SaturationState.Writer writer_;
 
 	public ConclusionSourceUnsaturationVisitor(SaturationState.Writer engine) {
-		this.engine_ = engine;
+		this.writer_ = engine;
 	}
 
 	Boolean mark(Conclusion conclusion, Context context) {
-		engine_.markAsNotSaturated(conclusion.getSourceContext(context));
+		writer_.markAsNotSaturated(conclusion.getSourceContext(context));
 		return true;
 	}
 
