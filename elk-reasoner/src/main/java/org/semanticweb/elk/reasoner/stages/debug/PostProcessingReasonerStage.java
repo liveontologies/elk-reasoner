@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.stages;
+package org.semanticweb.elk.reasoner.stages.debug;
 /*
  * #%L
  * ELK Reasoner
@@ -26,6 +26,8 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
 import java.util.Collections;
+
+import org.semanticweb.elk.reasoner.stages.ReasonerStage;
 
 /**
  * An extension of the base interface to specify stages to be executed after

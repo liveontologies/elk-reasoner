@@ -32,6 +32,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * @author Pavel Klinov
@@ -54,16 +55,20 @@ public class IncrementalContextInitializationStage extends
 	private int maxContexts_;
 
 	private final ReasonerStage dependency_;
+	
+	private final boolean initRemovedContexts_;
+	
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
 	private Iterator<IndexedClassExpression> todo = null;
 
 	public IncrementalContextInitializationStage(
-			AbstractReasonerState reasoner, ReasonerStage dependency) {
+			AbstractReasonerState reasoner, ReasonerStage dependency, boolean initRemovedContexts) {
 		super(reasoner);
 
 		this.dependency_ = dependency;
+		this.initRemovedContexts_ = initRemovedContexts;
 	}
 
 	@Override
@@ -93,7 +98,7 @@ public class IncrementalContextInitializationStage extends
 				if (!todo.hasNext())
 					break;
 				IndexedClassExpression ice = todo.next();
-
+				
 				if (ice.getContext() != null) {
 					reasoner.saturationState.getWriter().initContext(
 							ice.getContext());
@@ -115,11 +120,24 @@ public class IncrementalContextInitializationStage extends
 	@Override
 	void initComputation() {
 		super.initComputation();
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Contexts to be initialized: " + reasoner.saturationState.getNotSaturatedContexts());
-		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();
-		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts()
-				.size();
+		
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Live contexts to be initialized: " + reasoner.saturationState.getNotSaturatedContexts());
+			
+			if (initRemovedContexts_) {
+				LOGGER_.trace("Dead to be initialized: " + reasoner.saturationState.getContextsToBeRemoved());
+			}
+		}
+		
+		if (initRemovedContexts_) {
+			todo = Operations.concat(reasoner.saturationState.getNotSaturatedContexts(), reasoner.saturationState.getContextsToBeRemoved()).iterator();
+			maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size() + reasoner.saturationState.getContextsToBeRemoved().size();	
+		}
+		else {
+			todo = reasoner.saturationState.getNotSaturatedContexts().iterator();	
+			maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size();
+		}
+		
 		initContexts_ = 0;
 	}
 

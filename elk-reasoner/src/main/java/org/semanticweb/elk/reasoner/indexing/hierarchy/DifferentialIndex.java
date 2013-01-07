@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -130,6 +131,10 @@ public class DifferentialIndex {
 	 */
 	public List<ElkClass> getRemovedClasses() {
 		return this.removedClasses_;
+	}
+	
+	public Collection<IndexedClassExpression> getRemovedClassExpressions() {
+		return todoDeletions_.indexedClassExpressionLookup;
 	}
 
 	public List<ElkNamedIndividual> getRemovedIndividuals() {

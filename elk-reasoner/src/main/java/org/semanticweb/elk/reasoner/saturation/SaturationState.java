@@ -62,16 +62,25 @@ public class SaturationState {
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
-	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
+	public final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
 
 	/**
 	 * The queue of all contexts for which computation of the closure under
 	 * inference rules has not yet been finished.
 	 */
 	private final Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
+	
+	/**
+	 * Kept because still need to be cleaned to avoid broken backward links
+	 */
+	private final Queue<IndexedClassExpression> removedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 
 	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
 		return notSaturatedContexts_;
+	}
+	
+	public Collection<IndexedClassExpression> getContextsToBeRemoved() {
+		return removedContexts_;
 	}
 
 	private static final ContextCreationListener DUMMY_LISTENER = new ContextCreationListener() {
@@ -169,18 +178,16 @@ public class SaturationState {
 
 		public void produce(Context context, Conclusion conclusion) {
 			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context + ": new conclusion " + conclusion);
+				LOGGER_.trace(context + ": " + context.getRoot().hashCode() + ": new conclusion " + conclusion);
+
 			if (context.addToDo(conclusion)) {
-
-				// debugCheck(context, item);
-
 				// context was activated
 				activeContexts_.add(context);
-				// LOGGER_.trace(context.getRoot() + " was activated!");
 			}
 		}
 
 		public Context getCreateContext(IndexedClassExpression root) {
+			
 			if (root.getContext() == null) {
 				Context context = new ContextImpl(root);
 				if (root.setContext(context)) {
@@ -207,13 +214,13 @@ public class SaturationState {
 			if (context.setSaturated(false)) {
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace(context + ": marked as non-saturated");
-				
-				if (notSaturatedContexts_.contains(context.getRoot())) {
-					System.err.println("context " + context + " is already unsaturated!");
-				}
-				
-//				Thread.dumpStack();
 				notSaturatedContexts_.add(context.getRoot());
+			}
+		}
+		
+		public void markForRemoval(Context context) {
+			if (context.setSaturated(false)) {
+				removedContexts_.add(context.getRoot());
 			}
 		}
 
@@ -223,21 +230,12 @@ public class SaturationState {
 			notSaturatedContexts_.clear();
 		}
 
-		/*
-		 * private boolean debugCheck(Context context, Conclusion conclusion) {
-		 * if (context.getRoot() instanceof IndexedClass) { ElkClass cl =
-		 * ((IndexedClass) context.getRoot()).getElkClass();
-		 * 
-		 * if (cl.getIri().toString().equals(
-		 * "<http://www.co-ode.org/ontologies/galen#CoracohumeralLigament>")) {
-		 * 
-		 * System.out.println("!!!PRODUCED!!! " + conclusion + " saturated? " +
-		 * context.isSaturated());
-		 * 
-		 * return true; } }
-		 * 
-		 * return false; }
-		 */
+		
+		public void clearContextsToBeRemoved() {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Clear contexts to be removed");
+			removedContexts_.clear();
+		}
 	}
 
 	/**

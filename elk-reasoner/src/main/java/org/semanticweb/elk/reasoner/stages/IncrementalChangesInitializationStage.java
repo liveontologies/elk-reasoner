@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -121,10 +122,22 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		 * if this stage is completed successfully, the corresponding
 		 * incremental part of the index is not needed anymore
 		 */
-		if (deletions_)
+		if (deletions_) {
+			SaturationState.Writer writer = reasoner.saturationState.getWriter();
+			//Contexts for removed classes must also be properly cleaned to not leave any broken backward links
+			for (IndexedClassExpression removed : reasoner.incrementalState.diffIndex.getRemovedClassExpressions()) {
+				if (removed.getContext() != null) {
+					
+					writer.markForRemoval(removed.getContext());
+				}
+			}
+			
 			reasoner.incrementalState.diffIndex.clearDeletedRules();
-		else
+		}
+		else {
 			reasoner.incrementalState.diffIndex.commitAddedRules();
+		}
+		
 		reasoner.incrementalState.setStageStatus(stage(), true);
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 	}

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -30,6 +31,8 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
+import org.semanticweb.elk.reasoner.stages.debug.ContextSaturationFlagCheckingStage;
+import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
 
 /**
  * Reverts inferences
@@ -37,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
  * @author Pavel Klinov
  * 
  */
-class IncrementalDeSaturationStage extends AbstractReasonerStage {
+class IncrementalDeSaturationStage extends AbstractReasonerStage implements PostProcessingReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
@@ -83,9 +86,10 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.DESATURATION, true);
 		
-		LOGGER_.info("Number of affected contexts " + reasoner.saturationState.getNotSaturatedContexts().size());
+		if (LOGGER_.isDebugEnabled()) {
+			LOGGER_.debug("Number of modified contexts " + reasoner.saturationState.getNotSaturatedContexts().size());
+		}		
 	}
-	
 	
 
 	@Override
@@ -106,4 +110,12 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 		if (desaturation_ != null)
 			desaturation_.printStatistics();
 	}
+	
+	@Override
+	public Collection<ReasonerStage> getPostProcessingStages() {
+		return Arrays.<ReasonerStage> asList(
+				new ContextSaturationFlagCheckingStage(reasoner.ontologyIndex
+						.getIndexedClassExpressions(), reasoner.saturationState
+						.getNotSaturatedContexts()));
+	}	
 }

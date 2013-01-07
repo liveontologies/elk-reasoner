@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.stages.debug;
 /*
  * #%L
  * ELK Reasoner
@@ -24,34 +24,37 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * #L%
  */
 
-import java.util.List;
-
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.ReasonerStage;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TaxonomyNodeIndexConsistencyVisitor<T extends ElkObject> implements
-		TaxonomyNodeVisitor<T> {
+public class PostProcessingStageExecutor extends LoggingStageExecutor {
 
 	@Override
-	public void visit(TaxonomyNode<T> node, List<TaxonomyNode<T>> pathFromStart) {
+	public void complete(ReasonerStage stage) throws ElkException {
+		super.complete(stage);
 		
-		if (!node.getMembers().contains(node.getCanonicalMember())) {
-			throw new InvalidTaxonomyException("Canonical member is not a member? " + node.getCanonicalMember() + ", members: " + node.getMembers());
-		}
-		
-		for (T obj : node.getMembers()) {
-			TaxonomyNode<T> n = node.getTaxonomy().getNode(obj);
+		if (stage instanceof PostProcessingReasonerStage) {
 
-			if (n != node) {
-				throw new InvalidTaxonomyException(
-						"Invalid taxonomy node index at object " + obj);
+			if (LOGGER_.isInfoEnabled()) {
+				LOGGER_.info("Starting post processing...");
+			}
+
+			for (ReasonerStage ppStage : ((PostProcessingReasonerStage) stage)
+					.getPostProcessingStages()) {
+				super.complete(ppStage);
+			}
+
+			if (LOGGER_.isInfoEnabled()) {
+				LOGGER_.info("Post processing finished");
 			}
 		}
 	}
 
+	
 }

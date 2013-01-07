@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -37,6 +36,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.stages.debug.BasePostProcessingStage;
+import org.semanticweb.elk.reasoner.stages.debug.ContextSaturationFlagCheckingStage;
+import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
 
 /**
  * @author Pavel Klinov
@@ -71,7 +73,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 	public List<ReasonerStage> getDependencies() {
 		return Arrays
 				.asList((ReasonerStage) new IncrementalContextInitializationStage(
-						reasoner, new IncrementalDeSaturationStage(reasoner)));
+						reasoner, new IncrementalDeSaturationStage(reasoner), true));
 	}
 
 	@Override
@@ -94,19 +96,17 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 
 		reasoner.incrementalState.setStageStatus(
 				IncrementalStages.CONTEXT_CLEANING, true);
+		
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-
+		
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
 				reasoner.saturationState);
 
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Contexts to be cleaned: "
-					+ reasoner.saturationState.getNotSaturatedContexts());
-		}
+		System.out.println(reasoner.saturationState.activeContexts_);
 
 		cleaning_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.getProcessExecutor(), workerNo,
@@ -119,15 +119,27 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 			cleaning_.printStatistics();
 	}
 
+
+	///////////////////////////////////////////////////////////////////////////////////
+	/*
+	 * POST PROCESSING, FOR DEBUGGING ONLY
+	*/
+	//////////////////////////////////////////////////////////////////////////////////
+
 	@Override
 	public Collection<ReasonerStage> getPostProcessingStages() {
-		return Collections.<ReasonerStage> singleton(new CheckCleaningStage());
+		return Arrays.<ReasonerStage> asList(
+				new CheckCleaningStage(),
+				new ContextSaturationFlagCheckingStage(reasoner.ontologyIndex
+						.getIndexedClassExpressions(), reasoner.saturationState
+						.getNotSaturatedContexts()));
 	}
 
+	
 	/**
 	 * Used to check that all unsaturated contexts have been cleaned
 	 */
-	private class CheckCleaningStage extends BaseReasonerStage {
+	private class CheckCleaningStage extends BasePostProcessingStage {
 
 		@Override
 		public String getName() {
@@ -138,11 +150,12 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 		public void execute() throws ElkException {
 			for (IndexedClassExpression ice : reasoner.saturationState.getNotSaturatedContexts()) {
 				if (ice.getContext().getSubsumers().size() > 0) {
-					LOGGER_.error("Context not cleaned: " + ice + "!" + "\n"
+					LOGGER_.error("Context not cleaned: " + ice + ": " + ice.hashCode() + "\n"
 							+ ice.getContext().getSubsumers().size()
 							+ " subsumers: " + ice.getContext().getSubsumers());
 				}
 			}
 		}
 	}
+	
 }
