@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
@@ -45,6 +46,9 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 abstract public class IndexedClassExpression extends IndexedObject implements
 		Comparable<IndexedClassExpression> {
 
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(IndexedClassExpression.class);
+
 	/**
 	 * The first composition rule assigned to this
 	 * {@link IndexedClassExpression}
@@ -64,6 +68,17 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * first time.
 	 */
 	int negativeOccurrenceNo = 0;
+
+	// TODO: replace pointers to contexts by a mapping
+
+	/** Hash code for this object. */
+	private final int hashCode_ = HashGenerator.generateNextHashCode();
+
+	/**
+	 * /** the reference to a {@link Context} assigned to this
+	 * {@link IndexedClassExpression}
+	 */
+	private volatile Context context_ = null;
 
 	/**
 	 * This method should always return true apart from intermediate steps
@@ -92,13 +107,39 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 		return positiveOccurrenceNo > 0;
 	}
 
-	// TODO: replace pointers to contexts by a mapping
+	/**
+	 * @return the string representation for the occurrence numbers of this
+	 *         {@link IndexedClassExpression}
+	 */
+	public String printOccurrenceNumbers() {
+		return "[pos=" + positiveOccurrenceNo + "; neg="
+				+ +negativeOccurrenceNo + "]";
+	}
 
 	/**
-	 * /** the reference to a {@link Context} assigned to this
-	 * {@link IndexedClassExpression}
+	 * verifies that occurrence numbers are not negative
 	 */
-	private volatile Context context_ = null;
+	public void checkOccurrenceNumbers() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(toStringId() + " occurences: "
+					+ printOccurrenceNumbers());
+		if (positiveOccurrenceNo < 0 || negativeOccurrenceNo < 0)
+			throw new ElkUnexpectedIndexingException(toStringId()
+					+ " has a negative occurrence: " + printOccurrenceNumbers());
+	}
+
+	/**
+	 * Non-recursively. The recursion is implemented in indexing visitors.
+	 */
+	abstract void updateOccurrenceNumbers(IndexUpdater updater, int increment,
+			int positiveIncrement, int negativeIncrement);
+
+	void updateAndCheckOccurrenceNumbers(IndexUpdater updater, int increment,
+			int positiveIncrement, int negativeIncrement) {
+		updateOccurrenceNumbers(updater, increment, positiveIncrement,
+				negativeIncrement);
+		checkOccurrenceNumbers();
+	}
 
 	/**
 	 * @return The corresponding context, null if none was assigned.
@@ -136,9 +177,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 				context_ = null;
 			}
 	}
-
-	/** Hash code for this object. */
-	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	/**
 	 * Get an integer hash code to be used for this object.
@@ -202,12 +240,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	public <O> O accept(IndexedObjectVisitor<O> visitor) {
 		return accept((IndexedClassExpressionVisitor<O>) visitor);
 	}
-
-	/**
-	 * Non-recursively. The recursion is implemented in indexing visitors.
-	 */
-	abstract void updateOccurrenceNumbers(IndexUpdater updater, int increment,
-			int positiveIncrement, int negativeIncrement);
 
 	/**
 	 * 
