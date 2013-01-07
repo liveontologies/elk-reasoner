@@ -177,8 +177,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		if (indexUpdater_ == null)
 			throw new NullPointerException("indexUpdater not provided!");
 
-		owlNothing_.updateOccurrenceNumbers(indexUpdater_, multiplicity,
-				multiplicity, 0);
+		owlNothing_.updateAndCheckOccurrenceNumbers(indexUpdater_,
+				multiplicity, multiplicity, 0);
 
 		List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
 				disjointClasses.size());
@@ -256,7 +256,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			if (!ice.occurs() && increment > 0)
 				indexUpdater_.add(ice);
 
-			ice.updateOccurrenceNumbers(indexUpdater_, increment,
+			ice.updateAndCheckOccurrenceNumbers(indexUpdater_, increment,
 					positiveIncrement, negativeIncrement);
 
 			if (!ice.occurs() && increment < 0)

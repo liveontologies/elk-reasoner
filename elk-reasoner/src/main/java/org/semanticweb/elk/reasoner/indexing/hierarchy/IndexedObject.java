@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -39,6 +40,15 @@ public abstract class IndexedObject {
 
 	@Override
 	public abstract String toString();
+
+	/**
+	 * @return the string, which can be used to identify this object modulo
+	 *         "=="; this is not guaranteed to be a unique representation but
+	 *         should be sufficient in practice; use only for debugging
+	 */
+	public String toStringId() {
+		return toString() + "[" + hashCode() + "]";
+	}
 
 	public abstract <O> O accept(IndexedObjectVisitor<O> visitor);
 

@@ -104,12 +104,6 @@ public class IndexedClass extends IndexedClassEntity {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + " (hash: " + this.hashCode() + ")"
-					+ " updated occurrences: " + occurrenceNo + "; "
-					+ positiveOccurrenceNo + "; " + negativeOccurrenceNo);
-		// TODO: fail if occurrences become negative
-
 		if (occurrenceNo == 0 && increment < 0) {
 			indexUpdater.removeClass(elkClass);
 		}
@@ -118,6 +112,23 @@ public class IndexedClass extends IndexedClassEntity {
 				&& elkClass.equals(PredefinedElkClass.OWL_THING)) {
 			indexUpdater.remove(new OwlThingContextInitializationRule());
 		}
+	}
+
+	@Override
+	public String printOccurrenceNumbers() {
+		return "[all=" + occurrenceNo + "; pos=" + positiveOccurrenceNo
+				+ "; neg=" + +negativeOccurrenceNo + "]";
+	}
+
+	@Override
+	public void checkOccurrenceNumbers() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(toStringId() + " occurences: "
+					+ printOccurrenceNumbers());
+		if (occurrenceNo < 0 || positiveOccurrenceNo < 0
+				|| negativeOccurrenceNo < 0)
+			throw new ElkUnexpectedIndexingException(toStringId()
+					+ " has a negative occurrence: " + printOccurrenceNumbers());
 	}
 
 	@Override

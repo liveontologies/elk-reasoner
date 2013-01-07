@@ -112,6 +112,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 
+		checkOccurrenceNumbers();
+
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
 			indexUpdater.remove(firstConjunct_, new ThisCompositionRule(

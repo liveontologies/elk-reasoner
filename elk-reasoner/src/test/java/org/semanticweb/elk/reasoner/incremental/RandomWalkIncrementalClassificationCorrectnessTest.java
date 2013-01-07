@@ -86,17 +86,13 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	/**
-	 * how many test rounds is used
+	 * the maximum number of rounds used
 	 */
-	static int ROUNDS = 5;
+	static int MAX_ROUNDS = 5;
 	/**
 	 * how many changes are generated in every round
 	 */
 	static int ITERATIONS = 5;
-	/**
-	 * initial change size; will double with every round
-	 */
-	static int INITIAL_CHANGES_SIZE = 5;
 
 	protected final ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> manifest;
 
@@ -140,7 +136,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 		long seed = System.currentTimeMillis();
 
 		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
-				new PostProcessingStageExecutor(), 1);		
+				new PostProcessingStageExecutor(), 1);
 		incrementalReasoner.setIncrementalMode(true);
 		TrackingChangesLoader.setSeed(seed);
 
@@ -156,6 +152,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 							fileLoader, changingAxioms, staticAxioms));
 			incrementalReasoner
 					.registerOntologyChangesLoader(new EmptyChangesLoader());
+			incrementalReasoner.setIncrementalMode(true);
 			final String originalTaxonomyHash = TaxonomyPrinter
 					.getHashString(getTaxonomy(incrementalReasoner));
 
@@ -163,13 +160,16 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 				LOGGER_.debug("Original taxonomy hash code: "
 						+ originalTaxonomyHash);
 
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("Running " + ROUNDS + " rounds with " + ITERATIONS
-						+ " random changes");
-			incrementalReasoner.setIncrementalMode(true);
-			int changeSize = INITIAL_CHANGES_SIZE;
+			int changingAxiomsCount = changingAxioms.size();
+			int rounds = getNumberOfRounds(changingAxiomsCount);
 
-			for (int j = 0; j < ROUNDS; j++) {
+			if (LOGGER_.isInfoEnabled())
+				LOGGER_.info("Running " + rounds + " rounds with " + ITERATIONS
+						+ " random changes");
+
+			int changeSize = getInitialChangeSize(changingAxiomsCount);
+
+			for (int j = 0; j < rounds; j++) {
 				if (LOGGER_.isInfoEnabled())
 					LOGGER_.info("Generating " + ITERATIONS
 							+ " changes of size: " + changeSize);
@@ -192,9 +192,9 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 					LOGGER_.info("Checking the final taxonomy");
 
 				String finalTaxonomyHash = taxonomyHashHistory.pollLast();
-				
-				Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
-						new SimpleStageExecutor(), 1);
+
+				Reasoner standardReasoner = TestReasonerUtils
+						.createTestReasoner(new SimpleStageExecutor(), 1);
 				standardReasoner.setIncrementalMode(false);
 				standardReasoner.registerOntologyLoader(new TestAxiomLoader(
 						Operations.concat(changingAxioms.getOnElements(),
@@ -245,8 +245,24 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 			}
 
 		} finally {
-			incrementalReasoner.shutdown();			
+			incrementalReasoner.shutdown();
 		}
+	}
+
+	private int getInitialChangeSize(int changingAxiomsCount) {
+		// the changes size will double with every iteration;
+		// we find a good starting size
+		int result = changingAxiomsCount >> MAX_ROUNDS;
+		if (result == 0)
+			result = 1;
+		return result;
+	}
+
+	private int getNumberOfRounds(int changingAxiomsCount) {
+		// we perform a logarithmic number of rounds in the number
+		// of changed axioms, unless it is larger than MAX_ROUND
+		return Math.min(MAX_ROUNDS,
+				2 * (31 - Integer.numberOfLeadingZeros(changingAxiomsCount)));
 	}
 
 	// TODO: perhaps add such a method to the reasoner interface?

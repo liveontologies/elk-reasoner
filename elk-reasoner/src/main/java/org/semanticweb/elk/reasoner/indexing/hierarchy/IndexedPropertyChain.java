@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -52,6 +53,23 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  */
 public abstract class IndexedPropertyChain extends IndexedObject {
+
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(IndexedPropertyChain.class);
+
+	/**
+	 * This counts how often this object occurred in the ontology.
+	 */
+	int occurrenceNo = 0;
+
+	/** Hash code for this object. */
+	private final int hashCode_ = HashGenerator.generateNextHashCode();
+
+	/**
+	 * The {@link SaturatedPropertyChain} object assigned to this
+	 * {@link IndexedPropertyChain}
+	 */
+	private volatile SaturatedPropertyChain saturated_ = null;
 
 	/**
 	 * All told super object properties of this
@@ -158,17 +176,6 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 	}
 
 	/**
-	 * This counts how often this object occurred in the ontology.
-	 */
-	int occurrenceNo = 0;
-
-	/**
-	 * The {@link SaturatedPropertyChain} object assigned to this
-	 * {@link IndexedPropertyChain}
-	 */
-	private volatile SaturatedPropertyChain saturated_ = null;
-
-	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
 	abstract void updateOccurrenceNumber(int increment);
@@ -176,6 +183,31 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 	@Override
 	public boolean occurs() {
 		return occurrenceNo > 0;
+	}
+
+	/**
+	 * @return the string representation for the occurrence numbers of this
+	 *         {@link IndexedClassExpression}
+	 */
+	public String printOccurrenceNumbers() {
+		return "[all=" + occurrenceNo + "]";
+	}
+
+	/**
+	 * verifies that occurrence numbers are not negative
+	 */
+	public void checkOccurrenceNumbers() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(toStringId() + " occurences: "
+					+ printOccurrenceNumbers());
+		if (occurrenceNo < 0)
+			throw new ElkUnexpectedIndexingException(toStringId()
+					+ " has a negative occurrence: " + printOccurrenceNumbers());
+	}
+
+	public void updateAndCheckOccurrenceNumbers(int increment) {
+		updateOccurrenceNumber(increment);
+		checkOccurrenceNumbers();
 	}
 
 	/**
@@ -226,9 +258,6 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 				saturated_ = null;
 			}
 	}
-
-	/** Hash code for this object. */
-	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	/**
 	 * Get an integer hash code to be used for this object.
