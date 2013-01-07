@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -73,8 +74,8 @@ class ContextInitializationFactory
 		implements
 		InputProcessorFactory<IndexedClassExpression, InputProcessor<IndexedClassExpression>> {
 
-	// private static final Logger LOGGER_ =
-	// Logger.getLogger(ContextInitializationFactory.class);
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState.Writer saturationStateWriter_;
 	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
@@ -113,6 +114,11 @@ class ContextInitializationFactory
 
 					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
 							indexChanges_.keySet(), context.getSubsumers())) {
+
+						if (LOGGER_.isTraceEnabled())
+							LOGGER_.trace(context + ": applying rules for "
+									+ changedICE);
+
 						// applying the changed rules for this class expression
 						LinkRule<Context> nextLocalRule = indexChanges_
 								.get(changedICE);

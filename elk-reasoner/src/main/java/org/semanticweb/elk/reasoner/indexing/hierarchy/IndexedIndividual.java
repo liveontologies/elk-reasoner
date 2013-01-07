@@ -88,7 +88,7 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		return "ObjectOneOf(<"
 				+ elkNamedIndividual_.getIri().getFullIriAsString() + ">)";
 	}

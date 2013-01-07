@@ -127,7 +127,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		return "ObjectIntersectionOf(" + this.firstConjunct_ + ' '
 				+ this.secondConjunct_ + ')';
 	}

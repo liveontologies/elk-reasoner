@@ -198,10 +198,9 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 	 */
 	public void checkOccurrenceNumbers() {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(toStringId() + " occurences: "
-					+ printOccurrenceNumbers());
+			LOGGER_.trace(this + " occurences: " + printOccurrenceNumbers());
 		if (occurrenceNo < 0)
-			throw new ElkUnexpectedIndexingException(toStringId()
+			throw new ElkUnexpectedIndexingException(this
 					+ " has a negative occurrence: " + printOccurrenceNumbers());
 	}
 

@@ -121,10 +121,10 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 */
 	public void checkOccurrenceNumbers() {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(toStringId() + " occurences: "
+			LOGGER_.trace(toString() + " occurences: "
 					+ printOccurrenceNumbers());
 		if (positiveOccurrenceNo < 0 || negativeOccurrenceNo < 0)
-			throw new ElkUnexpectedIndexingException(toStringId()
+			throw new ElkUnexpectedIndexingException(toString()
 					+ " has a negative occurrence: " + printOccurrenceNumbers());
 	}
 

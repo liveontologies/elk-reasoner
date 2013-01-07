@@ -176,7 +176,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 * @return String representation.
 	 */
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		return '<' + getElkObjectProperty().getIri().getFullIriAsString() + '>';
 	}
 

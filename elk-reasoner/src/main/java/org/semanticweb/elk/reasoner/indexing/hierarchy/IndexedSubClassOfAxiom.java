@@ -68,7 +68,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		return "SubClassOf(" + this.subClass_ + ' ' + this.superClass_ + ')';
 	}
 
@@ -143,8 +143,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
 				if (LOGGER_.isTraceEnabled())
-					LOGGER_.trace("Adding " + ice + " (hash: " + ice.hashCode()
-							+ ")" + " to " + NAME);
+					LOGGER_.trace("Adding " + ice.toString() + " to " + NAME);
 				changed |= rule.addToldSuperClassExpression(ice);
 			}
 
@@ -161,8 +160,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			if (rule != null) {
 				for (IndexedClassExpression ice : toldSuperClassExpressions_) {
 					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace("Removing " + ice + " (hash: "
-								+ ice.hashCode() + ")" + " from " + NAME);
+						LOGGER_.trace("Removing " + ice.toString() + " from "
+								+ NAME);
 					changed |= rule.removeToldSuperClassExpression(ice);
 				}
 

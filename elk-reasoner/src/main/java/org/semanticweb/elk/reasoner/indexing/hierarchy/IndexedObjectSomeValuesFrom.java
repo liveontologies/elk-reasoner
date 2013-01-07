@@ -114,7 +114,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		return "ObjectSomeValuesFrom(" + this.property + ' ' + this.filler
 				+ ')';
 	}

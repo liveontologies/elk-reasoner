@@ -38,16 +38,15 @@ public abstract class IndexedObject {
 	 */
 	public abstract boolean occurs();
 
-	@Override
-	public abstract String toString();
-
 	/**
-	 * @return the string, which can be used to identify this object modulo
-	 *         "=="; this is not guaranteed to be a unique representation but
-	 *         should be sufficient in practice; use only for debugging
+	 * @return a structural string representation of the object
 	 */
-	public String toStringId() {
-		return toString() + "[" + hashCode() + "]";
+	abstract String toStringStructural();
+
+	@Override
+	public String toString() {
+		// use in debugging to identify the object uniquely (more or less)
+		return toStringStructural() + "#" + hashCode();
 	}
 
 	public abstract <O> O accept(IndexedObjectVisitor<O> visitor);

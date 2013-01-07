@@ -100,7 +100,7 @@ public class TaxonomyPrinter {
 	 *             If an I/O error occurs
 	 */
 	public static void dumpClassTaxomomy(Taxonomy<ElkClass> taxonomy,
-			Appendable writer, boolean addHash) throws IOException {
+			Writer writer, boolean addHash) throws IOException {
 		writer.append("Ontology(\n");
 		processTaxomomy(taxonomy, writer);
 		writer.append(")\n");
@@ -108,6 +108,7 @@ public class TaxonomyPrinter {
 		if (addHash) {
 			writer.append("\n# Hash code: " + getHashString(taxonomy) + "\n");
 		}
+		writer.flush();
 	}
 
 	/**

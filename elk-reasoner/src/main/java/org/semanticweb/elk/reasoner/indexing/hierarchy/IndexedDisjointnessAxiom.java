@@ -130,7 +130,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		List<IndexedClassExpression> members = new LinkedList<IndexedClassExpression>();
 		for (IndexedClassExpression inconsistentMember : inconsistentMembers_) {
 			// each inconsistent member is added two times

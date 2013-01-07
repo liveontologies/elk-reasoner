@@ -271,16 +271,14 @@ public class DifferentialIndex {
 
 	void addIndexedObject(IndexedObject iobj) {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Adding: " + iobj + " (hash: " + iobj.hashCode()
-					+ ")");
+			LOGGER_.trace("Adding: " + iobj);
 		if (!iobj.accept(todoDeletions_.deletor))
 			iobj.accept(mainIndex_.getIndexedObjectCache().inserter);
 	}
 
 	void removeIndexedObject(IndexedObject iobj) {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("To remove: " + iobj + " (hash: " + iobj.hashCode()
-					+ ")");
+			LOGGER_.trace("To remove: " + iobj);
 		iobj.accept(todoDeletions_.inserter);
 	}
 

@@ -174,8 +174,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		@Override
 		public Boolean visit(IndexedClass element) {
 			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element + " (hash: "
-						+ element.hashCode() + ")");
+				LOGGER_.trace("Adding " + element);
 			if (indexedClassExpressionLookup.add(element)) {
 				indexedClassCount++;
 				return true;
@@ -237,8 +236,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		@Override
 		public Boolean visit(IndexedClass element) {
 			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element + " (hash: "
-						+ element.hashCode() + ")");
+				LOGGER_.trace("Removing " + element);
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedClassCount--;
 				return true;

@@ -39,6 +39,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +52,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -134,6 +136,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 
 		// use random seed
 		long seed = System.currentTimeMillis();
+		seed = 124;
 
 		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
 				new PostProcessingStageExecutor(), 1);
@@ -186,6 +189,13 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 					if (LOGGER_.isDebugEnabled())
 						LOGGER_.debug("Taxonomy hash code for round " + (j + 1)
 								+ " iteration " + (i + 1) + ": " + taxonomyHash);
+
+					printCurrentAxioms(changingAxioms, staticAxioms);
+
+					if (LOGGER_.isTraceEnabled()) {
+						LOGGER_.trace("======= Current Taxonomy =======");
+						printTaxonomy(getTaxonomy(incrementalReasoner));
+					}
 				}
 
 				if (LOGGER_.isInfoEnabled())
@@ -209,20 +219,12 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 					assertEquals("Seed " + seed, expectedTaxonomyHash,
 							finalTaxonomyHash);
 				} catch (AssertionError e) {
-					try {
-						Writer writer = new OutputStreamWriter(System.out);
-						TaxonomyPrinter.dumpClassTaxomomy(
-								getTaxonomy(standardReasoner), writer, false);
-						TaxonomyPrinter
-								.dumpClassTaxomomy(
-										getTaxonomy(incrementalReasoner),
-										writer, false);
-						writer.flush();
-						standardReasoner.shutdown();
-						throw e;
-					} catch (IOException ioe) {
-						ioe.printStackTrace();
-					}
+					LOGGER_.info("======= Current Taxonomy =======");
+					printTaxonomy(getTaxonomy(incrementalReasoner));
+					LOGGER_.info("====== Expected Taxonomy =======");
+					printTaxonomy(getTaxonomy(standardReasoner));
+					standardReasoner.shutdown();
+					throw e;
 				}
 				standardReasoner.shutdown();
 
@@ -238,6 +240,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 									change));
 					String taxonomyHash = TaxonomyPrinter
 							.getHashString(getTaxonomy(incrementalReasoner));
+
 					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
 				}
 				// doubling the change size every round
@@ -263,6 +266,28 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 		// of changed axioms, unless it is larger than MAX_ROUND
 		return Math.min(MAX_ROUNDS,
 				2 * (31 - Integer.numberOfLeadingZeros(changingAxiomsCount)));
+	}
+
+	private void printCurrentAxioms(OnOffVector<ElkAxiom> changingAxioms,
+			Iterable<ElkAxiom> staticAxioms) {
+		if (LOGGER_.isTraceEnabled()) {
+			for (ElkAxiom axiom : changingAxioms.getOnElements())
+				LOGGER_.trace("Current axiom: "
+						+ OwlFunctionalStylePrinter.toString(axiom));
+			for (ElkAxiom axiom : staticAxioms)
+				LOGGER_.trace("Current axiom: "
+						+ OwlFunctionalStylePrinter.toString(axiom));
+		}
+	}
+
+	private void printTaxonomy(Taxonomy<ElkClass> taxonomy) {
+		try {
+			Writer writer = new OutputStreamWriter(System.out);
+			TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+			writer.flush();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
 	}
 
 	// TODO: perhaps add such a method to the reasoner interface?

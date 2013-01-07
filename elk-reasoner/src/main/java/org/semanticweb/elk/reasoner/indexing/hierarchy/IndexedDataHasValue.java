@@ -74,7 +74,7 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		return "DataHasValue(" + '<'
 				+ this.property.getIri().getFullIriAsString() + "> \""
 				+ this.filler.getLexicalForm() + "\"^^<"

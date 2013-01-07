@@ -348,6 +348,7 @@ public abstract class AbstractReasonerState {
 	 */
 	public boolean isInconsistent() throws ElkException {
 
+		saturationState.getWriter().clearNotSaturatedContexts();
 		ReasonerStage stage = incrementalState == null ? new ConsistencyCheckingStage(
 				this) : new IncrementalConsistencyCheckingStage(this);
 
@@ -395,8 +396,8 @@ public abstract class AbstractReasonerState {
 	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
-
-		if (incrementalState != null) {
+		
+		if (incrementalState != null) {			
 			getStageExecutor().complete(
 					new IncrementalClassTaxonomyComputationStage(this));
 		} else {

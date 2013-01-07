@@ -123,7 +123,7 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		return "ObjectPropertyChain(" + this.leftProperty_ + ' '
 				+ this.rightProperty_ + ')';
 	}

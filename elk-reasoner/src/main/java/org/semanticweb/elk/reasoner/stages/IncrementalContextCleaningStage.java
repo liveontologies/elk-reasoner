@@ -138,7 +138,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 		public void execute() throws ElkException {
 			for (IndexedClassExpression ice : reasoner.saturationState.getNotSaturatedContexts()) {
 				if (ice.getContext().getSubsumers().size() > 0) {
-					LOGGER_.error("Context not cleaned: " + ice + "!" + "\n"
+					LOGGER_.error("Context not cleaned: " + ice.toString() + "!" + "\n"
 							+ ice.getContext().getSubsumers().size()
 							+ " subsumers: " + ice.getContext().getSubsumers());
 				}
