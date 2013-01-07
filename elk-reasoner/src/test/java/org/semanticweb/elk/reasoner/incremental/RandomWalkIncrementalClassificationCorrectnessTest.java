@@ -39,7 +39,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,7 +135,6 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 
 		// use random seed
 		long seed = System.currentTimeMillis();
-		seed = 124;
 
 		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
 				new PostProcessingStageExecutor(), 1);
