@@ -83,7 +83,7 @@ class ClassTaxonomyCleaningFactory implements
 			public void submit(ElkClass elkClass) {
 				///TODO Decide if this is a normal situation
 				if (elkClass == PredefinedElkClass.OWL_NOTHING){
-					System.out.println("Removing owl:Nothing!!!");
+					System.err.println("Removing owl:Nothing!!!");
 					return;
 				}
 				

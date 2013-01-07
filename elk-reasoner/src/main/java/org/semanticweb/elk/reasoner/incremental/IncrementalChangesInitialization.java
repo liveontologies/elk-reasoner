@@ -101,35 +101,31 @@ class ContextInitializationFactory
 			@Override
 			protected void process(IndexedClassExpression ice) {
 				Context context = ice.getContext();
+				if (context == null)
+					return;
 
-				if (context != null) {
+				// apply all changed global context rules
+				LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
+				while (nextGlobalRule != null) {
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace(context + ": applying rule "
+								+ nextGlobalRule.getName());
+					nextGlobalRule.accept(ruleAppVisitor_,
+							saturationStateWriter_, context);
+					nextGlobalRule = nextGlobalRule.next();
+				}
 
-					LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
-					while (nextGlobalRule != null) {
-						// apply all changed global context rules
-						nextGlobalRule.accept(ruleAppVisitor_,
+				for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
+						indexChanges_.keySet(), context.getSubsumers())) {
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace(context + ": applying rules for "
+								+ changedICE);
+					LinkRule<Context> nextLocalRule = indexChanges_
+							.get(changedICE);
+					while (nextLocalRule != null) {
+						nextLocalRule.accept(ruleAppVisitor_,
 								saturationStateWriter_, context);
-						nextGlobalRule = nextGlobalRule.next();
-					}
-
-					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
-							indexChanges_.keySet(), context.getSubsumers())) {
-
-						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace(context + ": applying rules for "
-									+ changedICE);
-
-						// applying the changed rules for this class expression
-						
-						System.out.println("INIT CHANGES FOR " + changedICE);
-						
-						LinkRule<Context> nextLocalRule = indexChanges_
-								.get(changedICE);
-						while (nextLocalRule != null) {
-							nextLocalRule.accept(ruleAppVisitor_,
-									saturationStateWriter_, context);
-							nextLocalRule = nextLocalRule.next();
-						}
+						nextLocalRule = nextLocalRule.next();
 					}
 				}
 			}

@@ -254,9 +254,4 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 */
 	public abstract void accept(DecompositionRuleApplicationVisitor visitor,
 			SaturationState.Writer writer, Context context);
-	
-	public void printOccurenceNumbers() {
-		 System.out.println(positiveOccurrenceNo + ", " + negativeOccurrenceNo);
-	}
-
 }

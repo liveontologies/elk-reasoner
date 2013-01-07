@@ -348,7 +348,6 @@ public abstract class AbstractReasonerState {
 	 */
 	public boolean isInconsistent() throws ElkException {
 
-		saturationState.getWriter().clearNotSaturatedContexts();
 		ReasonerStage stage = incrementalState == null ? new ConsistencyCheckingStage(
 				this) : new IncrementalConsistencyCheckingStage(this);
 

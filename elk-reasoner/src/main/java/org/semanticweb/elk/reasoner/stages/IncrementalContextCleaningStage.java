@@ -107,7 +107,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
 				reasoner.saturationState);
 
-		System.out.println(reasoner.saturationState.activeContexts_);
+//		System.out.println(reasoner.saturationState.activeContexts_);
 
 		cleaning_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.getProcessExecutor(), workerNo,
