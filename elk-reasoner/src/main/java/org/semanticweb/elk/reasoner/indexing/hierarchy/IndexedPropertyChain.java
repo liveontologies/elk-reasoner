@@ -205,7 +205,7 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 					+ " has a negative occurrence: " + printOccurrenceNumbers());
 	}
 
-	void updateAndCheckOccurrenceNumbers(int increment) {
+	public void updateAndCheckOccurrenceNumbers(int increment) {
 		updateOccurrenceNumber(increment);
 		checkOccurrenceNumbers();
 	}
