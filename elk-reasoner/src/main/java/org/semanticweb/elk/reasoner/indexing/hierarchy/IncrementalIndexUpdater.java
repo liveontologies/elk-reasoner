@@ -47,7 +47,6 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 
 	@Override
 	public void addClass(ElkClass newClass) {
-		differentialIndex_.addClass(newClass);
 	}
 
 	@Override
@@ -57,7 +56,6 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 
 	@Override
 	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
-		differentialIndex_.addNamedIndividual(newIndividual);
 	}
 
 	@Override

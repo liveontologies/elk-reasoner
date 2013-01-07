@@ -52,10 +52,6 @@ import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
  */
 public class ContextImpl implements Context {
 
-	// logger for this class
-	// private static final Logger LOGGER_ =
-	// Logger.getLogger(ContextImpl.class);
-
 	/**
 	 * the root {@link IndexedClassExpression} for which the {@link #subsumers_}
 	 * are computed

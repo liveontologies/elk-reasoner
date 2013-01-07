@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -55,15 +56,12 @@ public class DifferentialIndex {
 			.getLogger(DifferentialIndex.class);
 
 	/**
-	 * The list of {@link ElkClass}es to be added to, respectively removed from
-	 * the signature of the ontology; the new signature is obtained by adding
-	 * {@link #addedClasses_} and removing {@link #removedClasses_} in this
-	 * particular order; these sets are not necessarily disjoint.
+	 * The list of {@link ElkClass}es to be removed from
+	 * the signature of the ontology; 
 	 */
-	private final List<ElkClass> addedClasses_, removedClasses_;
+	private final List<ElkClass> removedClasses_;
 
-	private final List<ElkNamedIndividual> addedIndividuals_,
-			removedIndividuals_;
+	private final List<ElkNamedIndividual> removedIndividuals_;
 
 	private final OntologyIndex mainIndex_;
 
@@ -88,9 +86,7 @@ public class DifferentialIndex {
 
 	public DifferentialIndex(OntologyIndex mainIndex,
 			IndexedObjectCache objectCache, IndexedClass owlNothing) {
-		this.addedClasses_ = new ArrayList<ElkClass>(127);
 		this.removedClasses_ = new ArrayList<ElkClass>(127);
-		this.addedIndividuals_ = new ArrayList<ElkNamedIndividual>();
 		this.removedIndividuals_ = new ArrayList<ElkNamedIndividual>();
 		this.todoDeletions_ = new IndexedObjectCache();
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
@@ -130,23 +126,15 @@ public class DifferentialIndex {
 	}
 
 	/**
-	 * @return the list of ELK classes to be added to the signature of the
-	 *         ontology
-	 */
-	public List<ElkClass> getAddedClasses() {
-		return this.addedClasses_;
-	}
-
-	/**
 	 * @return the list of ELK classes to be removed from the signature of the
 	 *         ontology
 	 */
 	public List<ElkClass> getRemovedClasses() {
 		return this.removedClasses_;
 	}
-
-	public List<ElkNamedIndividual> getAddedIndividuals() {
-		return this.addedIndividuals_;
+	
+	public Collection<IndexedClassExpression> getRemovedClassExpressions() {
+		return todoDeletions_.indexedClassExpressionLookup;
 	}
 
 	public List<ElkNamedIndividual> getRemovedIndividuals() {
@@ -198,9 +186,7 @@ public class DifferentialIndex {
 	}
 
 	public void clearSignatureChanges() {
-		addedClasses_.clear();
 		removedClasses_.clear();
-		addedIndividuals_.clear();
 		removedIndividuals_.clear();
 	}
 
@@ -261,10 +247,6 @@ public class DifferentialIndex {
 				removedContextRuleHeadByClassExpressions_, target);
 	}
 
-	void addClass(ElkClass newClass) {
-		addedClasses_.add(newClass);
-	}
-
 	void removeClass(ElkClass oldClass) {
 		removedClasses_.add(oldClass);
 	}
@@ -280,10 +262,6 @@ public class DifferentialIndex {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("To remove: " + iobj);
 		iobj.accept(todoDeletions_.inserter);
-	}
-
-	void addNamedIndividual(ElkNamedIndividual newIndividual) {
-		addedIndividuals_.add(newIndividual);
 	}
 
 	void removeNamedIndividual(ElkNamedIndividual newIndividual) {

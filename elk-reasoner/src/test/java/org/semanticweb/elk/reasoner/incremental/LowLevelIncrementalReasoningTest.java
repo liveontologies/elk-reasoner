@@ -50,6 +50,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
@@ -59,6 +60,7 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.debug.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
@@ -409,6 +411,59 @@ public class LowLevelIncrementalReasoningTest {
 		}
 	}
 
+	
+/*	@Test
+	public void testDeleteFromInconsistent() throws ElkException, IOException {
+		InputStream stream = null;
+		String toDelete = "Prefix( : = <http://example.org/> ) \n"
+				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> ) Ontology(\n"
+				+ "SubClassOf(ObjectSomeValuesFrom(:S :B) :A) \n"
+				+ "SubClassOf(:C ObjectSomeValuesFrom(:T :B)) \n" + ")";
+
+		try {
+			stream = getClass().getClassLoader().getResourceAsStream(
+					"classification_test_input/Inconsistent.owl");
+
+			List<ElkAxiom> ontology = loadAxioms(stream);
+			List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
+			TestChangesLoader initialLoader = new TestChangesLoader();
+			TestChangesLoader changeLoader = new TestChangesLoader();
+
+			Reasoner reasoner = TestReasonerUtils
+					.createTestReasoner(new PostProcessingStageExecutor(), 1);
+
+			reasoner.setIncrementalMode(false);
+			reasoner.registerOntologyLoader(initialLoader);
+			reasoner.registerOntologyChangesLoader(changeLoader);
+
+			for (ElkAxiom axiom : ontology) {
+				initialLoader.add(axiom);
+			}
+
+			try {
+				reasoner.getTaxonomy();
+			} catch (ElkInconsistentOntologyException e) {
+				System.out.println("Inconsistent, as it should be");
+			}
+
+			// System.out.println("===========================================");
+
+			reasoner.setIncrementalMode(true);
+
+			for (ElkAxiom del : deletions) {
+				changeLoader.remove(del);
+			}
+
+			reasoner.getTaxonomy();
+
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
+	}	*/
+	
+	
+	
+	
 	@Test
 	public void testDuplicateSubclassAxioms() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils
@@ -499,6 +554,60 @@ public class LowLevelIncrementalReasoningTest {
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(b)));
 	}
+	
+	/*
+	 * Tests to check whether we can leave a context for a removed class. Here R
+	 * some B is removed from the index after the first delete but B still
+	 * references it via a backward link. Thus, during the 2nd delete, C is
+	 * removed from (R some B)'s context but D is left there because its changes
+	 * didn't get initialized (since it's not in the index). We should check
+	 * that all contexts to be clean actually are cleaned and throw an error in
+	 * this case.
+	 */
+	@Test
+	public void testCleanObsoleteContexts() throws ElkException {
+		Reasoner reasoner = TestReasonerUtils
+				.createTestReasoner(new PostProcessingStageExecutor(), 1);
+		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
+
+		reasoner.setIncrementalMode(false);
+		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
+
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
+		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(":S"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(":R"));
+		ElkSubClassOfAxiom axiom1 = objectFactory.getSubClassOfAxiom(a, objectFactory.getObjectSomeValuesFrom(s, objectFactory.getObjectSomeValuesFrom(r, b))); 
+		ElkSubClassOfAxiom axiom2 = objectFactory.getSubClassOfAxiom(c, d);
+		ElkSubClassOfAxiom axiom3 = objectFactory.getSubClassOfAxiom(b, c);
+
+		loader.add(axiom1)
+				.add(objectFactory.getSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(r, c), c))
+				.add(axiom2)
+				.add(axiom3);		
+
+		reasoner.getTaxonomy();
+
+		loader.clear();
+		reasoner.setIncrementalMode(true);
+
+		changeLoader.remove(axiom1);
+
+		System.out.println("===========================================");
+
+		reasoner.getTaxonomy();
+		
+		changeLoader.clear();
+		changeLoader.remove(axiom2).remove(axiom3);
+		
+		System.out.println("===========================================");
+		
+		reasoner.getTaxonomy();
+	}	
 
 	@Test
 	public void testDeleteBinaryDisjointness() throws ElkException {

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.stages;
+package org.semanticweb.elk.reasoner.stages.debug;
 /*
  * #%L
  * ELK Reasoner
@@ -24,35 +24,39 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import java.util.Collections;
+
+import org.semanticweb.elk.reasoner.stages.ReasonerStage;
 
 /**
+ * An empty base class for stages used for post processing
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class PostProcessingStageExecutor extends LoggingStageExecutor {
+public abstract class BasePostProcessingStage implements ReasonerStage {
 
 	@Override
-	public void complete(ReasonerStage stage) throws ElkException {
-		super.complete(stage);
-		
-		if (stage instanceof PostProcessingReasonerStage) {
-
-			if (LOGGER_.isInfoEnabled()) {
-				LOGGER_.info("Starting post processing...");
-			}
-
-			for (ReasonerStage ppStage : ((PostProcessingReasonerStage) stage)
-					.getPostProcessingStages()) {
-				super.complete(ppStage);
-			}
-
-			if (LOGGER_.isInfoEnabled()) {
-				LOGGER_.info("Post processing finished");
-			}
-		}
+	public boolean done() {
+		return false;
 	}
 
-	
+	@Override
+	public Iterable<ReasonerStage> getDependencies() {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return false;
+	}
+
+	@Override
+	public void clearInterrupt() {
+	}
+
+	@Override
+	public void printInfo() {
+	}	
 }

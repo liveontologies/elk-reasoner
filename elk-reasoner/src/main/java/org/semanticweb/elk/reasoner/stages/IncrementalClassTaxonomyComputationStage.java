@@ -33,19 +33,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.taxonomy.BasicTaxonomyValidator;
+import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
+import org.semanticweb.elk.reasoner.stages.debug.ValidateTaxonomyStage;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
-import org.semanticweb.elk.reasoner.taxonomy.InvalidTaxonomyException;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyAcyclicityAndReductionValidator;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyLinkConsistencyVisitor;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNodeDisjointnessVisitor;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNodeIndexConsistencyVisitor;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyValidator;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
@@ -80,13 +73,10 @@ class IncrementalClassTaxonomyComputationStage extends
 	@Override
 	void initComputation() {
 		super.initComputation();
-		if (LOGGER_.isInfoEnabled())
+		
+		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		// TODO: at some point we need to clear non-saturated contexts when everything is fine
-		// currently this is cleaned during the taxonomy cleaning stage, but this stage might not
-		// be executed at all; also, the non saturated contexts are not cleaned at all during
-		// incremental consistency checking. Something needs to be done about it.
-		//reasoner.saturationState.getWriter().clearNotSaturatedContexts();
+		}
 
 		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
 				.getIndexedClasses();
@@ -142,44 +132,10 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	}
 
+	
+	
 	@Override
 	public Collection<ReasonerStage> getPostProcessingStages() {
-		return Collections.<ReasonerStage>singleton(new CheckTaxonomyStage());
-	}
-	
-	/**
-	 * Used to check validity of the computed taxonomy
-	 */
-	private class CheckTaxonomyStage extends BaseReasonerStage {
-
-		@Override
-		public String getName() {
-			return "Checking validity of class taxonomy";
-		}
-
-		@Override
-		public void execute() throws ElkException {
-			Taxonomy<ElkClass> taxonomy = reasoner.taxonomy;
-			
-			try {
-				if (taxonomy != null) {
-										
-					TaxonomyValidator<ElkClass> validator = new BasicTaxonomyValidator<ElkClass>()
-							.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>())
-							.add(new TaxonomyLinkConsistencyVisitor<ElkClass>())
-							.add(new TaxonomyNodeIndexConsistencyVisitor<ElkClass>());
-
-					validator.validate(taxonomy);
-
-					new TaxonomyAcyclicityAndReductionValidator<ElkClass>()
-							.validate(taxonomy);
-				}
-			} catch (InvalidTaxonomyException e) {
-				LOGGER_.error("Invalid taxonomy", e);
-				
-				throw e;
-			}
-		}
-	}
-	
+		return Collections.<ReasonerStage>singleton(new ValidateTaxonomyStage(reasoner.taxonomy));
+	}	
 }

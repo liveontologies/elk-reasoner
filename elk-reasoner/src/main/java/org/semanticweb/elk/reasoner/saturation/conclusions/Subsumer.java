@@ -61,7 +61,7 @@ public abstract class Subsumer implements Conclusion {
 
 	@Override
 	public String toString() {
-		return expression.toString();
+		return expression.toString() + ": " + expression.hashCode();
 	}
 
 	protected void applyCompositionRules(SaturationState.Writer writer,

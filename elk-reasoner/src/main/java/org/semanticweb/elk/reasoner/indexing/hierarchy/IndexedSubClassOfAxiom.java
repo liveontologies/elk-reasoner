@@ -128,7 +128,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		@Override
 		public void apply(SaturationState.Writer writer, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
+				LOGGER_.trace("Applying " + toString() + " to " + context);
 			}
 			for (IndexedClassExpression implied : toldSuperClassExpressions_) {
 				writer.produce(context, new PositiveSubsumer(implied));
@@ -206,6 +206,13 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		private boolean isEmpty() {
 			return toldSuperClassExpressions_.isEmpty();
 		}
+
+		
+		@Override
+		public String toString() {
+			return getName() + ": " + toldSuperClassExpressions_;
+		}
+
 
 		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);

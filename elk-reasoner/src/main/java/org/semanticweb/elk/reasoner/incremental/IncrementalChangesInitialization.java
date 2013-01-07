@@ -120,6 +120,9 @@ class ContextInitializationFactory
 									+ changedICE);
 
 						// applying the changed rules for this class expression
+						
+						System.out.println("INIT CHANGES FOR " + changedICE);
+						
 						LinkRule<Context> nextLocalRule = indexChanges_
 								.get(changedICE);
 						while (nextLocalRule != null) {
