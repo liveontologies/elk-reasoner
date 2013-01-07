@@ -125,6 +125,7 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 		if (deletions_) {
 			SaturationState.Writer writer = reasoner.saturationState.getWriter();
 			//Contexts for removed classes must also be properly cleaned to not leave any broken backward links
+			//TODO Perhaps its cleaner to do this thing inside the computation (to make it interruptable, etc.)
 			for (IndexedClassExpression removed : reasoner.incrementalState.diffIndex.getRemovedClassExpressions()) {
 				if (removed.getContext() != null) {
 					
