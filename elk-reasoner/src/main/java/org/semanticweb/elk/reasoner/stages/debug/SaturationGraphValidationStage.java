@@ -9,8 +9,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -55,7 +53,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	}
 
 	@Override
-	public void execute() throws ElkException {
+	public void execute() {
 		// starting from indexed class expressions
 		for (IndexedClassExpression ice : index_.getIndexedClassExpressions()) {
 			iceValidator_.add(ice);
@@ -76,12 +74,23 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		private final Set<IndexedClassExpression> cache_ = new ArrayHashSet<IndexedClassExpression>();
 
-		void add(IndexedClassExpression ice) {
+		boolean add(IndexedClassExpression ice) {
 			if (cache_.add(ice)) {
 				toValidate_.add(ice);
+				return true;
 			}
+			return false;
 		}
 
+		void checkNew(IndexedClassExpression ice) {
+			if (add(ice))
+				LOGGER_.error("Unexpected reachable class expression: " + ice);
+		}
+
+		/**
+		 * @return {@code true} if something new has been validated, otherwise
+		 *         returns {@code false}
+		 */
 		boolean validate() {
 			if (toValidate_.isEmpty())
 				return false;
@@ -101,12 +110,14 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 			// this is the main check
 			if (!ice.occurs()) {
-				throw new ElkRuntimeException("Dead class expression detected "
-						+ ice);
+				LOGGER_.error("Dead class expression: " + ice);
 			}
 
 			// validating context
-			contextValidator_.add(ice.getContext());
+			Context context = ice.getContext();
+			if (context != null) {
+				contextValidator_.add(context);
+			}
 
 			// validating context rules
 			LinkRule<Context> rule = ice.getCompositionRuleHead();
@@ -129,11 +140,15 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		private final Set<Context> cache_ = new ArrayHashSet<Context>();
 
 		void add(Context context) {
-			if (context != null && cache_.add(context)) {
+			if (cache_.add(context)) {
 				toValidate_.add(context);
 			}
 		}
 
+		/**
+		 * @return {@code true} if something new has been validated, otherwise
+		 *         returns {@code false}
+		 */
 		boolean validate() {
 			if (toValidate_.isEmpty())
 				return false;
@@ -152,9 +167,15 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				LOGGER_.trace("Validating context for " + context.getRoot());
 			}
 
+			// validating the root
+			IndexedClassExpression root = context.getRoot();
+			iceValidator_.checkNew(root);
+			if (root.getContext() != context)
+				LOGGER_.error("Invalid root for " + context);
+
 			// validating subsumers recursively
 			for (IndexedClassExpression subsumer : context.getSubsumers()) {
-				iceValidator_.add(subsumer);
+				iceValidator_.checkNew(subsumer);
 			}
 
 			// validating backward links
@@ -194,12 +215,11 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			for (IndexedDisjointnessAxiom axiom : thisCompositionRule
 					.getDisjointnessAxioms()) {
 				if (!axiom.occurs()) {
-					throw new ElkRuntimeException(
-							"Dead disjointness axiom detected " + axiom);
+					LOGGER_.error("Dead disjointness axiom: " + axiom);
 				}
 
 				for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
-					iceValidator_.add(ice);
+					iceValidator_.checkNew(ice);
 				}
 			}
 
@@ -211,8 +231,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				Writer writer, Context context) {
 			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : thisCompositionRule
 					.getConjunctionsByConjunct().entrySet()) {
-				iceValidator_.add(entry.getKey());
-				iceValidator_.add(entry.getValue());
+				iceValidator_.checkNew(entry.getKey());
+				iceValidator_.checkNew(entry.getValue());
 			}
 		}
 
@@ -222,7 +242,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				Writer writer, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getToldSuperclasses()) {
-				iceValidator_.add(ice);
+				iceValidator_.checkNew(ice);
 			}
 
 		}
@@ -233,7 +253,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				Writer writer, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getNegativeExistentials()) {
-				iceValidator_.add(ice);
+				iceValidator_.checkNew(ice);
 			}
 		}
 
@@ -264,7 +284,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 					.getPropagationsByObjectProperty().keySet()) {
 				for (IndexedClassExpression ice : thisBackwardLinkRule
 						.getPropagationsByObjectProperty().get(prop)) {
-					iceValidator_.add(ice);
+					iceValidator_.checkNew(ice);
 				}
 			}
 		}
