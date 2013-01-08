@@ -42,6 +42,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounterVisit
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
+import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
+import org.semanticweb.elk.reasoner.stages.debug.SaturationGraphValidationStage;
 
 /**
  * Reverts inferences
@@ -50,7 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
  * @author "Yevgeny Kazakov"
  * 
  */
-class IncrementalChangesInitializationStage extends AbstractReasonerStage {
+class IncrementalChangesInitializationStage extends AbstractReasonerStage implements PostProcessingReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -195,4 +197,21 @@ class IncrementalChangesInitializationStage extends AbstractReasonerStage {
 	public void printInfo() {
 		// TODO Auto-generated method stub
 	}
+	
+	// /////////////////////////////////////////////////////////////////////////////////
+	/*
+	 * POST PROCESSING, FOR DEBUGGING ONLY
+	 */
+	// ////////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public Collection<ReasonerStage> getPostProcessingStages() {
+		if (!deletions_) {
+			return Arrays.<ReasonerStage> asList(
+					new SaturationGraphValidationStage(reasoner.ontologyIndex));
+		}
+		else {
+			return Arrays.<ReasonerStage> asList();	
+		}
+	}	
 }

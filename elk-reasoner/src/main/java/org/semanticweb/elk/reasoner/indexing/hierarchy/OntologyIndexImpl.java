@@ -125,6 +125,11 @@ public class OntologyIndexImpl implements OntologyIndex {
 	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
 		return objectCache_.indexedClassExpressionLookup;
 	}
+	
+	@Override
+	public Collection<IndexedAxiom> getIndexedAxioms() {
+		return objectCache_.indexedAxiomLookup;
+	}
 
 	@Override
 	public Collection<IndexedClass> getIndexedClasses() {

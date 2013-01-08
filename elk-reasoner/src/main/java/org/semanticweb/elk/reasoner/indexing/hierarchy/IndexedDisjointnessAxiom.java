@@ -189,6 +189,10 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			disjointnessAxioms_.add(axiom);
 		}
 
+		public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
+			return disjointnessAxioms_;
+		}
+		
 		@Override
 		public String getName() {
 			return NAME;

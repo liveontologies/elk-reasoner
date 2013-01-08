@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -120,6 +121,10 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			toldSuperClassExpressions_.add(ice);
 		}
 
+		public Collection<IndexedClassExpression> getToldSuperclasses() {
+			return toldSuperClassExpressions_;
+		}
+		
 		@Override
 		public String getName() {
 			return NAME;

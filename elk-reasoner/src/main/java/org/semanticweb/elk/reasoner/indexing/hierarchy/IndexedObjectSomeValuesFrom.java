@@ -160,6 +160,10 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			this.negExistentials_.add(negExistential);
 		}
 
+		public Collection<IndexedObjectSomeValuesFrom> getNegativeExistentials() {
+			return negExistentials_;
+		}
+		
 		@Override
 		public String getName() {
 			return NAME;

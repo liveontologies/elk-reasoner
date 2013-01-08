@@ -165,6 +165,10 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		public String getName() {
 			return NAME;
 		}
+		
+		public Map<IndexedClassExpression, IndexedObjectIntersectionOf> getConjunctionsByConjunct() {
+			return conjunctionsByConjunct_;
+		}
 
 		@Override
 		public void apply(SaturationState.Writer writer, Context context) {

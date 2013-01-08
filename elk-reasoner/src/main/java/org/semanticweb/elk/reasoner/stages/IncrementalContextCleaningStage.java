@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.stages.debug.BasePostProcessingStage;
 import org.semanticweb.elk.reasoner.stages.debug.ContextSaturationFlagCheckingStage;
 import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
+import org.semanticweb.elk.reasoner.stages.debug.SaturationGraphValidationStage;
 
 /**
  * @author Pavel Klinov
@@ -132,7 +133,8 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 				new CheckCleaningStage(),
 				new ContextSaturationFlagCheckingStage(reasoner.ontologyIndex
 						.getIndexedClassExpressions(), reasoner.saturationState
-						.getNotSaturatedContexts()));
+						.getNotSaturatedContexts()),
+				new SaturationGraphValidationStage(reasoner.ontologyIndex));
 	}
 
 	/**

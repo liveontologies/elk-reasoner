@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
@@ -163,5 +164,7 @@ public interface OntologyIndex {
 	 * @return the {@link IndexedObjectCache} associated with this index
 	 */
 	IndexedObjectCache getIndexedObjectCache();
+	
+	Collection<IndexedAxiom> getIndexedAxioms();
 
 }

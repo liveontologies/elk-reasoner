@@ -126,6 +126,10 @@ public class Propagation extends AbstractConclusion {
 			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
 					1);
 		}
+		
+		public Multimap<IndexedPropertyChain, IndexedClassExpression> getPropagationsByObjectProperty() {
+			return propagationsByObjectProperty_;
+		}
 
 		@Override
 		public String getName() {
