@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.AxiomChangeListener;
 import org.semanticweb.elk.loading.ChangesLoader;
@@ -37,14 +39,17 @@ import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -199,6 +204,12 @@ public abstract class AbstractReasonerState {
 			LOGGER_.trace("Reset changes loading");
 		if (doneChangeLoading) {
 			doneChangeLoading = false;
+			resetSaturation();
+		}
+	}
+
+	public void resetSaturation() {
+		if (doneContextReset) {
 			doneContextReset = false;
 			doneConsistencyCheck = false;
 			doneClassSaturation = false;
@@ -395,8 +406,8 @@ public abstract class AbstractReasonerState {
 	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
-		
-		if (incrementalState != null) {			
+
+		if (incrementalState != null) {
 			getStageExecutor().complete(
 					new IncrementalClassTaxonomyComputationStage(this));
 		} else {
@@ -407,6 +418,19 @@ public abstract class AbstractReasonerState {
 		}
 
 		return taxonomy;
+	}
+
+	public Map<IndexedClassExpression, Context> getContextMap() {
+		final Map<IndexedClassExpression, Context> result = new ArrayHashMap<IndexedClassExpression, Context>(
+				1024);
+		for (IndexedClassExpression ice : ontologyIndex
+				.getIndexedClassExpressions()) {
+			Context context = ice.getContext();
+			if (context == null)
+				continue;
+			result.put(ice, context);
+		}
+		return result;
 	}
 
 	/**
