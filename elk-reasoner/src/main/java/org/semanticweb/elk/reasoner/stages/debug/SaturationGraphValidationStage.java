@@ -76,7 +76,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 			
 			// this is the main check
-			if (!index_.getIndexedClassExpressions().contains(ice)) {
+			if (!ice.occurs()) {
 				throw new ElkRuntimeException("Dead class expression detected " + ice);
 			}
 			
@@ -147,7 +147,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public void visit(IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
 				Writer writer, Context context) {
 			for (IndexedDisjointnessAxiom axiom : thisCompositionRule.getDisjointnessAxioms()) {
-				if (!index_.getIndexedAxioms().contains(axiom)) {
+				if (!axiom.occurs()) {
 					throw new ElkRuntimeException("Dead disjointness axiom detected " + axiom);
 				}
 				
