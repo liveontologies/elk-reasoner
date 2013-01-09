@@ -116,7 +116,7 @@ public class RandomWalkIncrementalClassificationRunner {
 				}
 				
 				if (hook != null) {
-					hook.hook(reasoner, changingAxioms, staticAxioms);
+					hook.apply(reasoner, changingAxioms, staticAxioms);
 				}
 			}
 

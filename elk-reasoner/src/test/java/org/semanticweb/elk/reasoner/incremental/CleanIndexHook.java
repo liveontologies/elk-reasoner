@@ -25,13 +25,14 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			.getLogger(CleanIndexHook.class);
 
 	@Override
-	public void hook(Reasoner reasoner, OnOffVector<ElkAxiom> changingAxioms,
+	public void apply(Reasoner reasoner, OnOffVector<ElkAxiom> changingAxioms,
 			List<ElkAxiom> staticAxioms) throws ElkException {
-		hook(reasoner,
+		clearIndexTest(reasoner,
 				Operations.concat(changingAxioms.getOnElements(), staticAxioms));
 	}
 
-	public void hook(Reasoner reasoner, Iterable<ElkAxiom> axioms) {
+	public static void clearIndexTest(Reasoner reasoner,
+			Iterable<ElkAxiom> axioms) {
 		int size = getIndexSize(reasoner);
 
 		if (LOGGER_.isDebugEnabled()) {
@@ -78,7 +79,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 		reasoner.setIncrementalMode(true);
 	}
 
-	private int getIndexSize(Reasoner reasoner) {
+	private static int getIndexSize(Reasoner reasoner) {
 		int cnt = 0;
 
 		for (IndexedClassExpression ice : reasoner.getIndexedClassExpressions()) {

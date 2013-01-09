@@ -16,7 +16,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
  */
 public interface RandomWalkTestHook {
 
-	public void hook(Reasoner reasoner,
+	public void apply(Reasoner reasoner,
 			final OnOffVector<ElkAxiom> changingAxioms,
 			final List<ElkAxiom> staticAxioms) throws ElkException;
 }
