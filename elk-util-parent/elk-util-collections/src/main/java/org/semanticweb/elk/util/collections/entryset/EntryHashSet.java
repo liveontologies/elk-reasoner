@@ -320,9 +320,8 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 					buckets[i] = next;
 				else
 					prev.setNext(next);
-				if (buckets.length >= 2 * minsize)
-					if (size-- <= undersize)
-						resize((int) buckets.length / 2);
+				if (size-- <= undersize && buckets.length >= 2 * minsize)
+					resize((int) buckets.length / 2);
 				return r;
 			}
 			prev = r;
