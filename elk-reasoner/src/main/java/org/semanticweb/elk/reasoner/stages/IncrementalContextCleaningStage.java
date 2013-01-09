@@ -182,7 +182,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 					for (Context target : backwardLinks.get(ipc))
 						if (cleanedContexts.contains(target))
 							LOGGER_.error("Backward link in " + context
-									+ "via property " + ipc
+									+ " via property " + ipc
 									+ " to cleaned context " + target);
 				}
 			}
