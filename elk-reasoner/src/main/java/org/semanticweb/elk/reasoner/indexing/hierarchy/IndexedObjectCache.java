@@ -87,10 +87,14 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	 *            removed from this {@link IndexedObjectCache}
 	 */
 	public void subtract(IndexedObjectCache other) {
-		for (IndexedClassExpression ice : other.indexedClassExpressionLookup)
+		for (IndexedClassExpression ice : other.indexedClassExpressionLookup) {
+			if (ice.getCompositionRuleHead() != null)
+				throw new ElkUnexpectedIndexingException(
+						"Deleting object with registered rules: " + ice);
 			if (!ice.accept(deletor))
 				throw new ElkUnexpectedIndexingException(
 						"Cannot remove indexed object from the cache " + ice);
+		}
 		for (IndexedPropertyChain ipc : other.indexedPropertyChainLookup)
 			if (!ipc.accept(deletor))
 				throw new ElkUnexpectedIndexingException(
