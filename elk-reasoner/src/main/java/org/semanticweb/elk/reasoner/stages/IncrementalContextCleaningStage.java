@@ -28,18 +28,23 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.stages.debug.BasePostProcessingStage;
 import org.semanticweb.elk.reasoner.stages.debug.ContextSaturationFlagCheckingStage;
 import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
 import org.semanticweb.elk.reasoner.stages.debug.SaturationGraphValidationStage;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * @author Pavel Klinov
@@ -108,7 +113,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
 				reasoner.saturationState);
 
-//		System.out.println(reasoner.saturationState.activeContexts_);
+		// System.out.println(reasoner.saturationState.activeContexts_);
 
 		cleaning_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.getProcessExecutor(), workerNo,
@@ -149,15 +154,40 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 
 		@Override
 		public void execute() throws ElkException {
+			Set<Context> cleanedContexts = new ArrayHashSet<Context>(1024);
+			// checking subsumers of cleaned contexts
 			for (IndexedClassExpression ice : reasoner.saturationState
 					.getNotSaturatedContexts()) {
+				Context context = ice.getContext();
+				if (context == null) {
+					LOGGER_.error("Context removed for " + ice);
+					continue;
+				}
+				cleanedContexts.add(context);
 				if (ice.getContext().getSubsumers().size() > 0) {
 					LOGGER_.error("Context not cleaned: " + ice.toString()
 							+ "\n" + ice.getContext().getSubsumers().size()
 							+ " subsumers: " + ice.getContext().getSubsumers());
 				}
 			}
+			// checking backward links
+			for (IndexedClassExpression ice : reasoner
+					.getIndexedClassExpressions()) {
+				Context context = ice.getContext();
+				if (context == null)
+					continue;
+				Multimap<IndexedPropertyChain, Context> backwardLinks = context
+						.getBackwardLinksByObjectProperty();
+				for (IndexedPropertyChain ipc : backwardLinks.keySet()) {
+					for (Context target : backwardLinks.get(ipc))
+						if (cleanedContexts.contains(target))
+							LOGGER_.error("Backward link in " + context
+									+ "via property " + ipc
+									+ " to cleaned context " + target);
+				}
+			}
 		}
+
 	}
 
 }
