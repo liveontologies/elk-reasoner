@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
 import org.semanticweb.elk.reasoner.stages.debug.ContextSaturationFlagCheckingStage;
 import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
@@ -99,7 +100,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage implements Post
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				new RuleDeapplicationFactory(reasoner.saturationState, true));
+				new RuleDeapplicationFactory(reasoner.saturationState, true), ContextModificationListener.DUMMY);
 	}
 
 	@Override

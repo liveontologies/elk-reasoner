@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 
 /**
@@ -98,7 +99,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				new RuleApplicationFactory(reasoner.saturationState, true));
+				new RuleApplicationFactory(reasoner.saturationState, true), ContextModificationListener.DUMMY);
 	}
 
 	@Override

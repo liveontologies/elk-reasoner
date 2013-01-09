@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
@@ -115,7 +116,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 
 		cleaning_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), cleaningFactory);
+				reasoner.getProgressMonitor(), cleaningFactory, ContextModificationListener.DUMMY);
 	}
 
 	@Override

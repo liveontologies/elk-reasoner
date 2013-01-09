@@ -34,4 +34,11 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface ContextCreationListener {
 
 	public void notifyContextCreation(Context newContext);
+	
+	public static final ContextCreationListener DUMMY = new ContextCreationListener() {
+		
+		@Override
+		public void notifyContextCreation(Context newContext) {
+		}
+	};
 }

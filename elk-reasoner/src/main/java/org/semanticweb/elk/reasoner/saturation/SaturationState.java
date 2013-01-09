@@ -83,20 +83,13 @@ public class SaturationState {
 		return removedContexts_;
 	}
 
-	private static final ContextCreationListener DUMMY_LISTENER = new ContextCreationListener() {
-		@Override
-		public void notifyContextCreation(Context newContext) {
-			// Dummy listener, which does not do anything
-		}
-	};
-
 	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
 
-	private final Writer defaultWriter_ = new Writer(DUMMY_LISTENER,
+	private final Writer defaultWriter_ = new Writer(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
 			DEFAULT_INIT_RULE_APP_VISITOR);
 
 	private final Writer defaultSaturationCheckingWriter_ = new SaturationCheckingWriter(
-			DUMMY_LISTENER, DEFAULT_INIT_RULE_APP_VISITOR);
+			ContextCreationListener.DUMMY, DEFAULT_INIT_RULE_APP_VISITOR);
 
 	public SaturationState(OntologyIndex index) {
 		ontologyIndex_ = index;
@@ -130,8 +123,15 @@ public class SaturationState {
 	 */
 	public Writer getWriter(ContextCreationListener contextCreationListener,
 			RuleApplicationVisitor ruleAppVisitor) {
-		return new Writer(contextCreationListener, ruleAppVisitor);
+		return new Writer(contextCreationListener, ContextModificationListener.DUMMY, ruleAppVisitor);
 	}
+	
+	public Writer getWriter(ContextCreationListener contextCreationListener,
+			ContextModificationListener contextModificationListener,
+			RuleApplicationVisitor ruleAppVisitor) {
+		return new Writer(contextCreationListener, contextModificationListener,
+				ruleAppVisitor);
+	}	
 
 	public Writer getSaturationCheckingWriter(
 			ContextCreationListener contextCreationListener,
@@ -155,12 +155,16 @@ public class SaturationState {
 	public class Writer {
 
 		private final ContextCreationListener contextCreationListener_;
+		
+		private final ContextModificationListener contextModificationListener_;
 
 		private final RuleApplicationVisitor initRuleAppVisitor_;
 
 		private Writer(ContextCreationListener contextCreationListener,
-				RuleApplicationVisitor ruleAppVisitor) {
+						ContextModificationListener contextSaturationListener,
+						RuleApplicationVisitor ruleAppVisitor) {
 			this.contextCreationListener_ = contextCreationListener;
+			this.contextModificationListener_ = contextSaturationListener;
 			this.initRuleAppVisitor_ = ruleAppVisitor;
 		}
 
@@ -205,7 +209,6 @@ public class SaturationState {
 					.getContextInitRuleHead();
 			while (initRule != null) {
 				initRule.accept(initRuleAppVisitor_, this, context);
-				// initRule.apply(this, context);
 				initRule = initRule.next();
 			}
 		}
@@ -215,7 +218,11 @@ public class SaturationState {
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace(context + ": marked as non-saturated");
 				notSaturatedContexts_.add(context.getRoot());
+				contextModificationListener_.notifyContextModification(context);
 			}
+			/*else {
+				LOGGER_.trace(context + " is already saturated");
+			}*/
 		}
 		
 		public void markForRemoval(Context context) {
@@ -249,11 +256,16 @@ public class SaturationState {
 		private SaturationCheckingWriter(
 				ContextCreationListener contextCreationListener,
 				RuleApplicationVisitor ruleAppVisitor) {
-			super(contextCreationListener, ruleAppVisitor);
+			super(contextCreationListener, ContextModificationListener.DUMMY, ruleAppVisitor);
 		}
 
 		@Override
 		public void produce(Context context, Conclusion conclusion) {
+			
+			if (context.getRoot().toString().startsWith("<test:trunk>")) {
+				System.out.println("Saturated? " + context.isSaturated());
+			}
+			
 			if (conclusion.getSourceContext(context).isSaturated())
 				return;
 			super.produce(context, conclusion);

@@ -26,8 +26,9 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 
 /**
  * Creates an engine which works as the de-application engine except that it
@@ -43,38 +44,45 @@ import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
 	public ContextCleaningFactory(final SaturationState saturationState) {
-		super(saturationState, /*trackModifiedContexts*/false);
+		super(saturationState, false);
 	}
 
 	@Override
-	public Engine getEngine() {
-		return new Engine();
+	public CleaningEngine getEngine() {
+		return new CleaningEngine();
 	}
 
 	@Override
-	public Engine getEngine(ContextCreationListener listener) {
-		return new Engine(listener);
+	public CleaningEngine getEngine(ContextCreationListener listener) {
+		return new CleaningEngine(listener);
 	}
+	
+	@Override
+	public CleaningEngine getEngine(ContextCreationListener listener,
+			ContextModificationListener modListener) {
+		//we ignore the modification listener for cleaning but still must instantiate the right engine
+		return new CleaningEngine(listener);
+	}	
 
 	/**
 	 * A {@link RuleDeapplicationFactory} that uses a
 	 * {@link SaturationState.Writer} that does not produce conclusions if their
 	 * source is marked as saturated.
 	 */
-	public class Engine extends RuleDeapplicationFactory.Engine {
+	public class CleaningEngine extends RuleDeapplicationFactory.Engine {
 
-		protected Engine() {
+		protected CleaningEngine() {
 			super(saturationState.getSaturationCheckingWriter());
 		}
 
-		protected Engine(final ContextCreationListener listener) {
+		protected CleaningEngine(final ContextCreationListener listener) {
 			this(listener, new RuleAndConclusionStatistics());
 		}
 
-		protected Engine(final ContextCreationListener listener,
+		protected CleaningEngine(final ContextCreationListener listener,
 				final RuleAndConclusionStatistics factoryStats) {
 			super(saturationState.getSaturationCheckingWriter(
-					getEngineListener(listener, factoryStats),
+					getEngineContextCreationListener(listener, factoryStats),
 					getEngineCompositionRuleApplicationVisitor(factoryStats)),
 					factoryStats);
 		}

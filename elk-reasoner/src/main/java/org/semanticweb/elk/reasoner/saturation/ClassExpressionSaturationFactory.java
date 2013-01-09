@@ -268,6 +268,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 					shapshotContextsFinished + 1)) {
 				Context nextContext = nonSaturatedContexts_.poll();
 				nextContext.setSaturated(true);
+				
+				/*if (LOGGER_.isTraceEnabled()) { 
+					LOGGER_.trace("Marking " + nextContext + " as saturated");
+				}*/
 			}
 		}
 		for (;;) {
@@ -293,8 +297,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				Context rootSaturation = root.getContext();
 				rootSaturation.setSaturated(true);
 				nextJob.setOutput(rootSaturation);
-				if (LOGGER_.isTraceEnabled())
+				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": saturation finished");
+					//LOGGER_.trace(rootSaturation.isSaturated());
+				}
 				localStatistics.jobsProcessedNo++;
 				listener_.notifyFinished(nextJob);
 			}

@@ -44,12 +44,14 @@ public class ClassExpressionNoInputSaturation
 		extends
 		ReasonerComputation<IndexedClassExpression, ClassExpressionNoInputSaturationFactory> {
 
-	public ClassExpressionNoInputSaturation(ComputationExecutor executor,
-			int maxWorkers, ProgressMonitor progressMonitor,
-			RuleApplicationFactory ruleAppFactory) {
+	public ClassExpressionNoInputSaturation(final ComputationExecutor executor,
+			final int maxWorkers,
+			final ProgressMonitor progressMonitor,
+			final RuleApplicationFactory ruleAppFactory,
+			final ContextModificationListener contextModificationListener) {
 
 		super(Collections.<IndexedClassExpression> emptyList(),
-				new ClassExpressionNoInputSaturationFactory(ruleAppFactory),
+				new ClassExpressionNoInputSaturationFactory(ruleAppFactory, contextModificationListener),
 				executor, maxWorkers, progressMonitor);
 	}
 
@@ -75,11 +77,15 @@ class ClassExpressionNoInputSaturationFactory
 			.getLogger(ClassExpressionNoInputSaturationFactory.class);	
 
 	private final RuleApplicationFactory ruleAppFactory_;
+	
+	private final ContextModificationListener contextModificationListener_;
 
 	public ClassExpressionNoInputSaturationFactory(
-			RuleApplicationFactory ruleAppFactory) {
+			final RuleApplicationFactory ruleAppFactory,
+			final ContextModificationListener contextModificationListener) {
 
 		ruleAppFactory_ = ruleAppFactory;
+		contextModificationListener_ = contextModificationListener;
 	}
 
 	@Override
@@ -113,7 +119,7 @@ class ClassExpressionNoInputSaturationFactory
 
 		@Override
 		public void process() throws InterruptedException {
-			ruleAppFactory_.getEngine().process();
+			ruleAppFactory_.getEngine(ContextCreationListener.DUMMY, contextModificationListener_).process();
 		}
 
 		@Override
