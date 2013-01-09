@@ -48,15 +48,17 @@ public class RandomWalkIncrementalClassificationRunner {
 	
 	public void run(final Reasoner reasoner,
 			final OnOffVector<ElkAxiom> changingAxioms,
-			final List<ElkAxiom> staticAxioms
+			final List<ElkAxiom> staticAxioms,
+			final long seed
 			) throws ElkException,
 			InterruptedException, IOException {
-		run(reasoner, changingAxioms, staticAxioms, null);
+		run(reasoner, changingAxioms, staticAxioms, seed, null);
 	}
 
 	public void run(final Reasoner reasoner,
 			final OnOffVector<ElkAxiom> changingAxioms,
 			final List<ElkAxiom> staticAxioms,
+			final long seed,
 			final RandomWalkTestHook hook) throws ElkException,
 			InterruptedException, IOException {
 
@@ -64,9 +66,6 @@ public class RandomWalkIncrementalClassificationRunner {
 		Deque<IncrementalChange> changesHistory = new LinkedList<IncrementalChange>();
 		// for storing taxonomy hash history
 		Deque<String> taxonomyHashHistory = new LinkedList<String>();
-
-		// use random seed
-		long seed = System.currentTimeMillis();
 
 		reasoner.setIncrementalMode(true);
 		TrackingChangesLoader.setSeed(seed);

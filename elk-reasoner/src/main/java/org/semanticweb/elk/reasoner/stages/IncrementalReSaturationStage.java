@@ -28,21 +28,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 
 /**
+ * TODO docs
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
 public class IncrementalReSaturationStage extends AbstractReasonerStage {
 
-	// logger for this class
-	//private static final Logger LOGGER_ = Logger.getLogger(IncrementalReSaturationStage.class);
-
-	private ClassExpressionSaturation<IndexedClassExpression> saturation_ = null;
+	private ClassExpressionNoInputSaturation saturation_ = null;
+	
 	public IncrementalReSaturationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
@@ -94,13 +93,12 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		RuleApplicationFactory appFactory = new RuleApplicationFactory(reasoner.saturationState, true);
 		
-		saturation_ = new ClassExpressionSaturation<IndexedClassExpression>(
+		saturation_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				appFactory);
+				new RuleApplicationFactory(reasoner.saturationState, true));
 	}
 
 	@Override

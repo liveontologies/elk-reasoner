@@ -96,7 +96,9 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	protected void markAllContextsAsSaturated() {
 		for (IndexedClassExpression ice : reasoner.saturationState
 				.getNotSaturatedContexts()) {
-			ice.getContext().setSaturated(true);
+			if (ice.getContext() != null) {
+				ice.getContext().setSaturated(true);
+			}
 		}		
 	}
 }
