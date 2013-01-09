@@ -124,7 +124,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 			// let the runner run..
 			new RandomWalkIncrementalClassificationRunner(MAX_ROUNDS,
 					ITERATIONS).run(incrementalReasoner, changingAxioms,
-					staticAxioms);
+					staticAxioms, new CleanIndexHook());
 
 		} finally {
 			incrementalReasoner.shutdown();

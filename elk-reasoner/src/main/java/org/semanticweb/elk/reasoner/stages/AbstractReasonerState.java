@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -45,6 +47,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
@@ -419,6 +422,20 @@ public abstract class AbstractReasonerState {
 
 		return taxonomy;
 	}
+	
+	public Taxonomy<ElkClass> getTaxonomyQuietly() {
+		Taxonomy<ElkClass> result = null;
+
+		try {
+			result = getTaxonomy();
+		} catch (ElkException e) {
+			LOGGER_.info("Ontology is inconsistent");
+
+			result = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
+		}
+
+		return result;
+	}	
 
 	public Map<IndexedClassExpression, Context> getContextMap() {
 		final Map<IndexedClassExpression, Context> result = new ArrayHashMap<IndexedClassExpression, Context>(
@@ -481,5 +498,15 @@ public abstract class AbstractReasonerState {
 	protected boolean useIncrementalTaxonomy() {
 		return config_
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY);
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////
+	/*
+	 * SOME DEBUG METHODS, FIXME: REMOVE
+	 */
+	//////////////////////////////////////////////////////////////////
+	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
+		return ontologyIndex == null ? Collections.<IndexedClassExpression>emptyList() : ontologyIndex.getIndexedClassExpressions();
 	}
 }

@@ -18,11 +18,9 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.Operations;
@@ -47,10 +45,19 @@ public class RandomWalkIncrementalClassificationRunner {
 		maxRounds_ = rounds;
 		iterations_ = iter;
 	}
+	
+	public void run(final Reasoner reasoner,
+			final OnOffVector<ElkAxiom> changingAxioms,
+			final List<ElkAxiom> staticAxioms
+			) throws ElkException,
+			InterruptedException, IOException {
+		run(reasoner, changingAxioms, staticAxioms, null);
+	}
 
 	public void run(final Reasoner reasoner,
 			final OnOffVector<ElkAxiom> changingAxioms,
-			final List<ElkAxiom> staticAxioms) throws ElkException,
+			final List<ElkAxiom> staticAxioms,
+			final RandomWalkTestHook hook) throws ElkException,
 			InterruptedException, IOException {
 
 		// for storing change history
@@ -68,7 +75,7 @@ public class RandomWalkIncrementalClassificationRunner {
 		reasoner.setIncrementalMode(true);
 		
 		final String originalTaxonomyHash = TaxonomyPrinter
-				.getHashString(getTaxonomy(reasoner));
+				.getHashString(reasoner.getTaxonomyQuietly());
 
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("Original taxonomy hash code: "
@@ -91,10 +98,11 @@ public class RandomWalkIncrementalClassificationRunner {
 
 			taxonomyHashHistory.add(originalTaxonomyHash);
 			for (int i = 0; i < iterations_; i++) {
+				//all random changes happen inside the tracking change loader
 				reasoner.registerOntologyChangesLoader(new TrackingChangesLoader(
 						changingAxioms, changesHistory, changeSize));
 				String taxonomyHash = TaxonomyPrinter
-						.getHashString(getTaxonomy(reasoner));
+						.getHashString(reasoner.getTaxonomyQuietly());
 				taxonomyHashHistory.add(taxonomyHash);
 				if (LOGGER_.isDebugEnabled())
 					LOGGER_.debug("Taxonomy hash code for round " + (j + 1)
@@ -104,7 +112,11 @@ public class RandomWalkIncrementalClassificationRunner {
 
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace("======= Current Taxonomy =======");
-					printTaxonomy(getTaxonomy(reasoner));
+					printTaxonomy(reasoner.getTaxonomyQuietly());
+				}
+				
+				if (hook != null) {
+					hook.hook(reasoner, changingAxioms, staticAxioms);
 				}
 			}
 
@@ -123,16 +135,16 @@ public class RandomWalkIncrementalClassificationRunner {
 					.registerOntologyChangesLoader(new EmptyChangesLoader());
 			standardReasoner.setIncrementalMode(false);
 			String expectedTaxonomyHash = TaxonomyPrinter
-					.getHashString(getTaxonomy(standardReasoner));
+					.getHashString(standardReasoner.getTaxonomyQuietly());
 
 			try {
 				assertEquals("Seed " + seed, expectedTaxonomyHash,
 						finalTaxonomyHash);
 			} catch (AssertionError e) {
 				LOGGER_.info("======= Current Taxonomy =======");
-				printTaxonomy(getTaxonomy(reasoner));
+				printTaxonomy(reasoner.getTaxonomyQuietly());
 				LOGGER_.info("====== Expected Taxonomy =======");
-				printTaxonomy(getTaxonomy(standardReasoner));
+				printTaxonomy(standardReasoner.getTaxonomyQuietly());
 				standardReasoner.shutdown();
 				throw e;
 			}
@@ -148,7 +160,7 @@ public class RandomWalkIncrementalClassificationRunner {
 				reasoner.registerOntologyChangesLoader(new ReversesChangeLoader(
 						change));
 				String taxonomyHash = TaxonomyPrinter
-						.getHashString(getTaxonomy(reasoner));
+						.getHashString(reasoner.getTaxonomyQuietly());
 
 				assertEquals("Seed " + seed, expectedHash, taxonomyHash);
 			}
@@ -194,21 +206,4 @@ public class RandomWalkIncrementalClassificationRunner {
 			ioe.printStackTrace();
 		}
 	}
-
-	// TODO: perhaps add such a method to the reasoner interface?
-	private Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner)
-			throws ElkException {
-		Taxonomy<ElkClass> result = null;
-
-		try {
-			result = reasoner.getTaxonomy();
-		} catch (ElkInconsistentOntologyException e) {
-			LOGGER_.info("Ontology is inconsistent");
-
-			result = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
-		}
-
-		return result;
-	}
-
 }
