@@ -42,8 +42,8 @@ public class SaturatedPropertyChainCheckingStage extends
 
 	private final OntologyIndex index_;
 
-	public SaturatedPropertyChainCheckingStage(final OntologyIndex index) {
-		this.index_ = index;
+	public SaturatedPropertyChainCheckingStage(AbstractReasonerState reasoner) {
+		this.index_ = reasoner.ontologyIndex;
 	}
 
 	@Override

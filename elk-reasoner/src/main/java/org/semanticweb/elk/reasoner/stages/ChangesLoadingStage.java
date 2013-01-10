@@ -87,17 +87,4 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	public void printInfo() {
 	}
 
-	// ///////////////////////////////////////////////////////////////////////////////
-	/*
-	 * POST PROCESSING, FOR DEBUGGING ONLY
-	 */
-	// ////////////////////////////////////////////////////////////////////////////////
-
-	/*@Override
-	public Collection<ReasonerStage> getPostProcessingStages() {
-		return Arrays
-				.<ReasonerStage> asList(new SaturatedPropertyChainCheckingStage(
-						reasoner.ontologyIndex));
-	}*/
-
 }

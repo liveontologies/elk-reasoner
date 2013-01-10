@@ -38,12 +38,12 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-abstract class IncrementalContextInitializationStage extends
+abstract class BaseIncrementalContextInitializationStage extends
 		AbstractReasonerStage {
 
 	// logger for this class
 	static final Logger LOGGER_ = Logger
-			.getLogger(IncrementalContextInitializationStage.class);
+			.getLogger(BaseIncrementalContextInitializationStage.class);
 	/**
 	 * The counter for deleted contexts
 	 */
@@ -58,10 +58,8 @@ abstract class IncrementalContextInitializationStage extends
 	 */
 	protected Iterator<IndexedClassExpression> todo = null;
 
-	public IncrementalContextInitializationStage(AbstractReasonerState reasoner) {
+	public BaseIncrementalContextInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
-
-		// this.initRemovedContexts_ = initRemovedContexts;
 	}
 
 	@Override
@@ -75,11 +73,6 @@ abstract class IncrementalContextInitializationStage extends
 		return reasoner.incrementalState
 				.getStageStatus(stage());
 	}
-
-	/*@Override
-	public List<ReasonerStage> getDependencies() {
-		return Collections.emptyList();
-	}*/
 
 	@Override
 	public void execute() throws ElkInterruptedException {
@@ -111,30 +104,6 @@ abstract class IncrementalContextInitializationStage extends
 		reasoner.doneContextReset = true;
 	}
 
-	/*@Override
-	void initComputation() {
-		super.initComputation();
-		
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Live contexts to be initialized: " + reasoner.saturationState.getNotSaturatedContexts());
-			
-			if (initRemovedContexts_) {
-				LOGGER_.trace("Dead to be initialized: " + reasoner.saturationState.getContextsToBeRemoved());
-			}
-		}
-		
-		if (initRemovedContexts_) {
-			todo = Operations.concat(reasoner.saturationState.getNotSaturatedContexts(), reasoner.saturationState.getContextsToBeRemoved()).iterator();
-			maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size() + reasoner.saturationState.getContextsToBeRemoved().size();	
-		}
-		else {
-			todo = reasoner.saturationState.getNotSaturatedContexts().iterator();	
-			maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size();
-		}
-		
-		initContexts_ = 0;
-	}*/
-
 	@Override
 	public void printInfo() {
 		if (initContexts_ > 0 && LOGGER_.isDebugEnabled())
@@ -150,7 +119,7 @@ abstract class IncrementalContextInitializationStage extends
  *
  * pavel.klinov@uni-ulm.de
  */
-class InitializeContextsAfterDesaturation extends IncrementalContextInitializationStage {
+class InitializeContextsAfterDesaturation extends BaseIncrementalContextInitializationStage {
 
 	public InitializeContextsAfterDesaturation(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -188,7 +157,7 @@ class InitializeContextsAfterDesaturation extends IncrementalContextInitializati
  *
  * pavel.klinov@uni-ulm.de
  */
-class InitializeContextsAfterCleaning extends IncrementalContextInitializationStage {
+class InitializeContextsAfterCleaning extends BaseIncrementalContextInitializationStage {
 
 	public InitializeContextsAfterCleaning(AbstractReasonerState reasoner) {
 		super(reasoner);

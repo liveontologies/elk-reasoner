@@ -24,7 +24,13 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -35,13 +41,18 @@ import org.semanticweb.elk.util.collections.Multimap;
  */
 public class PostProcessingStageExecutor extends LoggingStageExecutor {
 
-	static final Multimap<String, ReasonerStage> postProcesingMap = new HashListMultimap<String, ReasonerStage>();
+	static final Multimap<Class<?>, Class<?>> postProcesingMap = new HashListMultimap<Class<?>, Class<?>>();
 	
 	/*
 	 * STATIC INT
 	 */
 	static {
-		//TODO init post processing map
+		//init post processing map
+		postProcesingMap.add(ChangesLoadingStage.class, SaturatedPropertyChainCheckingStage.class);
+		postProcesingMap.add(IncrementalDeSaturationStage.class, ContextSaturationFlagCheckingStage.class);
+		postProcesingMap.add(IncrementalContextCleaningStage.class, CheckCleaningStage.class);
+		postProcesingMap.add(IncrementalAdditionInitializationStage.class, SaturationGraphValidationStage.class);		
+		postProcesingMap.add(IncrementalClassTaxonomyComputationStage.class, ValidateTaxonomyStage.class);
 	}
 	
 	@Override
@@ -52,8 +63,12 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 			LOGGER_.info("Starting post processing...");
 		}
 		
-		for (ReasonerStage ppStage : postProcesingMap.get(stage.getName())) {
-			super.complete(ppStage);
+		try {
+			for (ReasonerStage ppStage : instantiate(postProcesingMap.get(stage.getClass()), ((AbstractReasonerStage)stage).reasoner)) {
+				super.complete(ppStage);
+			}
+		} catch (Exception e) {
+			throw new ElkRuntimeException(e);
 		}
 		
 		if (LOGGER_.isInfoEnabled()) {
@@ -62,5 +77,17 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 
 	}
 
+	private Collection<ReasonerStage> instantiate(Collection<Class<?>> collection, AbstractReasonerState reasoner) throws Exception {
+		List<ReasonerStage> stages = new ArrayList<ReasonerStage>(1);
+		
+		for (Class<?> stageClass : collection) {
+			Constructor<?> constructor = stageClass.getConstructor(AbstractReasonerState.class);
+			ReasonerStage stage = (ReasonerStage) constructor.newInstance(reasoner);
+			
+			stages.add(stage);
+		}
+		
+		return stages;
+	}
 	
 }

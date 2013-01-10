@@ -105,12 +105,4 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 		if (desaturation_ != null)
 			desaturation_.printStatistics();
 	}
-	
-	/*@Override
-	public Collection<ReasonerStage> getPostProcessingStages() {
-		return Arrays.<ReasonerStage> asList(
-				new ContextSaturationFlagCheckingStage(reasoner.ontologyIndex
-						.getIndexedClassExpressions(), reasoner.saturationState
-						.getNotSaturatedContexts()));
-	}*/	
 }

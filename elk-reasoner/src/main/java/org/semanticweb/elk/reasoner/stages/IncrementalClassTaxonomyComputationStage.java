@@ -129,10 +129,4 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	}
 
-	
-	
-	/*@Override
-	public Collection<ReasonerStage> getPostProcessingStages() {
-		return Collections.<ReasonerStage>singleton(new ValidateTaxonomyStage(reasoner.taxonomy));
-	}*/	
 }

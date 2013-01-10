@@ -48,11 +48,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
  * @author "Yevgeny Kazakov"
  * 
  */
-abstract class IncrementalChangesInitializationStage extends AbstractReasonerStage {
+abstract class BaseIncrementalChangesInitializationStage extends AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
-			.getLogger(IncrementalChangesInitializationStage.class);
+			.getLogger(BaseIncrementalChangesInitializationStage.class);
 	
 	static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
 	static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
@@ -61,7 +61,7 @@ abstract class IncrementalChangesInitializationStage extends AbstractReasonerSta
 
 	protected final RuleAndConclusionStatistics stageStatistics_ = new RuleAndConclusionStatistics();
 
-	IncrementalChangesInitializationStage(AbstractReasonerState reasoner) {
+	BaseIncrementalChangesInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -82,12 +82,6 @@ abstract class IncrementalChangesInitializationStage extends AbstractReasonerSta
 	public boolean done() {
 		return reasoner.incrementalState.getStageStatus(stage());
 	}
-
-	/*@Override
-	public List<ReasonerStage> getDependencies() {
-		return dependency_ != null ? Arrays.asList(dependency_) : Collections
-				.<ReasonerStage> emptyList();
-	}*/
 
 	@Override
 	public void execute() throws ElkInterruptedException {
@@ -117,37 +111,6 @@ abstract class IncrementalChangesInitializationStage extends AbstractReasonerSta
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 	}
 
-	/*@Override
-	void initComputation() {
-		super.initComputation();
-
-		DifferentialIndex diffIndex = reasoner.incrementalState.diffIndex;
-		ChainableRule<Context> changedInitRules = null;
-		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Collection<IndexedClassExpression> inputs = Collections.emptyList();
-		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(stageStatistics_
-				.getRuleStatistics());
-
-		if (deletions_) {
-			changedInitRules = diffIndex.getRemovedContextInitRules();
-			changedRulesByCE = diffIndex
-					.getRemovedContextRulesByClassExpressions();
-		} else {
-			changedInitRules = diffIndex.getAddedContextInitRules();
-			changedRulesByCE = diffIndex
-					.getAddedContextRulesByClassExpressions();
-		}
-
-		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
-			inputs = reasoner.ontologyIndex.getIndexedClassExpressions();
-		}
-
-		initialization_ = new IncrementalChangesInitialization(inputs,
-				changedInitRules, changedRulesByCE, reasoner.saturationState,
-				reasoner.getProcessExecutor(), ruleAppVisitor, workerNo,
-				reasoner.getProgressMonitor());
-	}*/
-
 	protected abstract void postExecute();
 
 
@@ -172,30 +135,13 @@ abstract class IncrementalChangesInitializationStage extends AbstractReasonerSta
 	public void printInfo() {
 		// TODO Auto-generated method stub
 	}
-	
-	// /////////////////////////////////////////////////////////////////////////////////
-	/*
-	 * POST PROCESSING, FOR DEBUGGING ONLY
-	 */
-	// ////////////////////////////////////////////////////////////////////////////////
-
-	/*@Override
-	public Collection<ReasonerStage> getPostProcessingStages() {
-		if (!deletions_) {
-			return Arrays.<ReasonerStage> asList(
-					new SaturationGraphValidationStage(reasoner.ontologyIndex));
-		}
-		else {
-			return Arrays.<ReasonerStage> asList();	
-		}
-	}*/	
 }
 
 /**
  * 
  * 
  */
-class IncrementalAdditionInitializationStage extends IncrementalChangesInitializationStage {
+class IncrementalAdditionInitializationStage extends BaseIncrementalChangesInitializationStage {
 
 	IncrementalAdditionInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -247,7 +193,7 @@ class IncrementalAdditionInitializationStage extends IncrementalChangesInitializ
  * 
  * 
  */
-class IncrementalDeletionInitializationStage extends IncrementalChangesInitializationStage {
+class IncrementalDeletionInitializationStage extends BaseIncrementalChangesInitializationStage {
 
 	IncrementalDeletionInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);

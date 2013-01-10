@@ -46,8 +46,8 @@ public class ValidateTaxonomyStage extends BasePostProcessingStage {
 
 	private final Taxonomy<ElkClass> taxonomy_;
 	
-	public ValidateTaxonomyStage(Taxonomy<ElkClass> t) {
-		taxonomy_ = t;
+	public ValidateTaxonomyStage(AbstractReasonerState reasoner) {
+		taxonomy_ = reasoner.taxonomy;
 	}
 	
 	@Override

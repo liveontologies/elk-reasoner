@@ -46,9 +46,9 @@ public class ContextSaturationFlagCheckingStage extends BasePostProcessingStage 
 	private final Collection<IndexedClassExpression> classes_;
 	private final Collection<IndexedClassExpression> nonSaturated_;
 	
-	public ContextSaturationFlagCheckingStage(Collection<IndexedClassExpression> classes, Collection<IndexedClassExpression> ns) {
-		classes_ = classes;
-		nonSaturated_ = ns;
+	public ContextSaturationFlagCheckingStage(AbstractReasonerState reasoner) {
+		classes_ = reasoner.ontologyIndex.getIndexedClassExpressions();
+		nonSaturated_ = reasoner.saturationState.getNotSaturatedContexts();
 	}
 	
 	
