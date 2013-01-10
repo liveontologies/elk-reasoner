@@ -23,10 +23,13 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
+import org.semanticweb.elk.reasoner.stages.debug.SaturatedPropertyChainCheckingStage;
 
 /**
  * A {@link ReasonerStage} during which ontology changes are applied to the
@@ -35,7 +38,8 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ChangesLoadingStage extends AbstractReasonerStage {
+public class ChangesLoadingStage extends AbstractReasonerStage implements
+		PostProcessingReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -65,7 +69,7 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	public void execute() throws ElkException {
 		initComputation();
 		Loader changesLoader = reasoner.getChangesLoader();
-		
+
 		if (changesLoader == null)
 			LOGGER_.warn("Ontology changes loader is not registered. No changes will be loaded!");
 		else {
@@ -79,12 +83,25 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 				changesLoader.dispose();
 			}
 		}
-		
+
 		reasoner.doneChangeLoading = true;
 	}
 
 	@Override
 	public void printInfo() {
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	/*
+	 * POST PROCESSING, FOR DEBUGGING ONLY
+	 */
+	// ////////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public Collection<ReasonerStage> getPostProcessingStages() {
+		return Arrays
+				.<ReasonerStage> asList(new SaturatedPropertyChainCheckingStage(
+						reasoner.ontologyIndex));
 	}
 
 }
