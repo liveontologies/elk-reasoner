@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
@@ -41,6 +42,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectsCreator;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
 
 /**
  * Tests for saturation of indexed property chains
@@ -51,6 +53,58 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  */
 public class IndexedPropertyChainSaturationTest {
 
+	/*
+	 * Declaration(ObjectProperty(:R1))
+Declaration(ObjectProperty(:R2))
+Declaration(ObjectProperty(:R3))
+
+SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2) :R1)
+SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2) :R3)
+SubObjectPropertyOf(ObjectPropertyChain(:R1 :R3) :R1)
+SubObjectPropertyOf(ObjectPropertyChain(:R1 :R3) :R3)
+SubObjectPropertyOf(ObjectPropertyChain(:R2 :R3) :R1)
+SubObjectPropertyOf(ObjectPropertyChain(:R2 :R3) :R3)
+SubObjectPropertyOf(:R1 :R2)
+SubObjectPropertyOf(:R2 :R3)
+	 */
+	@Test
+	public void testPropertyCompositionSymmetry() {
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		
+		IndexedObjectProperty R1 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/R1")), new IndexedPropertyChain[]{}, new IndexedObjectProperty[]{}, false);		
+		IndexedObjectProperty R2 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/R2")), new IndexedPropertyChain[]{R1}, new IndexedObjectProperty[]{}, false);
+		IndexedObjectProperty R3 = IndexedObjectsCreator.createIndexedObjectProperty(factory.getObjectProperty(new ElkFullIri("http://test.com/R3")), new IndexedPropertyChain[]{R2}, new IndexedObjectProperty[]{}, false);
+		
+		IndexedPropertyChain R1R2 = IndexedObjectsCreator.createIndexedChain(R1, R2, new IndexedObjectProperty[]{R1, R3});
+		IndexedPropertyChain R1R3 = IndexedObjectsCreator.createIndexedChain(R1, R3, new IndexedObjectProperty[]{R1, R3});
+		IndexedPropertyChain R2R3 = IndexedObjectsCreator.createIndexedChain(R2, R3, new IndexedObjectProperty[]{R1, R3});
+		
+		List<IndexedPropertyChain> chains = Arrays.asList(R1, R2, R3, R1R2, R1R3, R2R3);
+		
+		AsymmetricCompositionHook hook = new AsymmetricCompositionHook() {
+
+			@Override
+			public void error(IndexedPropertyChain left,
+					IndexedPropertyChain right,
+					IndexedPropertyChain composition,
+					IndexedPropertyChain computed) {
+				Assert.fail("Composition " + left + " o "
+						+ right + " => " + composition
+						+ " is computed for " + (left == computed ? left : right) + " but not for "
+						+ (left == computed ? right : left));				
+			}
+		};
+		
+		for (int i = 1; i < 10; i++) {
+			Collections.shuffle(chains);
+			
+			for (IndexedPropertyChain chain : chains) {
+				VerifySymmetricPropertySaturation.testLeftCompositions(chain, hook);
+				VerifySymmetricPropertySaturation.testRightCompositions(chain, hook);
+			}
+		}
+	}
+	
 	/**
 	 * R is composable with itself, this test checks that
 	 * computation of compositionsByLeftSubProperty and compositionsByRightSubProperty

@@ -167,10 +167,7 @@ public class SaturatedPropertyChain {
 
 	/**
 	 * @return A multimap from R to S such that ObjectPropertyChain(R, root)
-	 *         implies S, null if empty. Computed in the
-	 *         {@link ObjectPropertyCompositionsPrecomputationStage} which
-	 *         already expands premises of complex property inclusions under
-	 *         property hierarchies
+	 *         implies S, null if empty. 
 	 */
 	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByLeftSubProperty() {
 		return compositionsByLeftSubProperty;
@@ -178,10 +175,7 @@ public class SaturatedPropertyChain {
 
 	/**
 	 * @return A multimap from R to S such that ObjectPropertyChain(root, R)
-	 *         implies S, null if empty. Computed in the
-	 *         {@link ObjectPropertyCompositionsPrecomputationStage} which
-	 *         already expands premises of complex property inclusions under
-	 *         property hierarchies
+	 *         implies S, null if empty. 
 	 */
 	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByRightSubProperty() {
 		return compositionsByRightSubProperty;

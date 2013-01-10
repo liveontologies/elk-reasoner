@@ -1,44 +1,38 @@
-package org.semanticweb.elk.reasoner.stages.debug;
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.saturation.properties;
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
- * Checking invariants for {@code SaturatedPropertyChain}s
+ * @author Pavel Klinov
  * 
- * @author "Yevgeny Kazakov"
- * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class SaturatedPropertyChainCheckingStage extends
-		BasePostProcessingStage {
-
-	private static final Logger LOGGER_ = Logger
-			.getLogger(SaturatedPropertyChainCheckingStage.class);
-
-	private final OntologyIndex index_;
-
-	public SaturatedPropertyChainCheckingStage(final OntologyIndex index) {
-		this.index_ = index;
-	}
-
-	@Override
-	public String getName() {
-		return "Checking Saturation for Properties";
-	}
-
-	@Override
-	public void execute() throws ElkException {
-
-		for (IndexedPropertyChain ipc : index_.getIndexedPropertyChains()) {
-			testLeftCompositions(ipc);
-			testRightCompositions(ipc);
-		}
-
-	}
+public class VerifySymmetricPropertySaturation {
 
 	/**
 	 * checking that all compositions of this property to the left are computed
@@ -46,7 +40,7 @@ public class SaturatedPropertyChainCheckingStage extends
 	 * 
 	 * @param ipc
 	 */
-	static void testLeftCompositions(IndexedPropertyChain ipc) {
+	public static void testLeftCompositions(IndexedPropertyChain ipc, AsymmetricCompositionHook hook) {
 		SaturatedPropertyChain saturation = ipc.getSaturated();
 		Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeft = saturation
 				.getCompositionsByLeftSubProperty();
@@ -59,10 +53,9 @@ public class SaturatedPropertyChainCheckingStage extends
 				Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRight = leftSaturation
 						.getCompositionsByRightSubProperty();
 				if (compositionsByRight == null
-						|| !compositionsByRight.contains(ipc, composition))
-					LOGGER_.error("Composition " + left + " o " + ipc + " => "
-							+ composition + " is computed for " + ipc
-							+ " but not for " + left);
+						|| !compositionsByRight.contains(ipc, composition)) {
+					hook.error(left, ipc, composition, ipc);
+				}
 			}
 		}
 	}
@@ -73,7 +66,7 @@ public class SaturatedPropertyChainCheckingStage extends
 	 * 
 	 * @param ipc
 	 */
-	static void testRightCompositions(IndexedPropertyChain ipc) {
+	public static void testRightCompositions(IndexedPropertyChain ipc, AsymmetricCompositionHook hook) {
 		SaturatedPropertyChain saturation = ipc.getSaturated();
 		Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRight = saturation
 				.getCompositionsByRightSubProperty();
@@ -86,12 +79,17 @@ public class SaturatedPropertyChainCheckingStage extends
 				Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeft = rightSaturation
 						.getCompositionsByLeftSubProperty();
 				if (compositionsByLeft == null
-						|| !compositionsByLeft.contains(ipc, composition))
-					LOGGER_.error("Composition " + ipc + " o " + right + " => "
-							+ composition + " is computed for " + ipc
-							+ " but not for " + right);
+						|| !compositionsByLeft.contains(ipc, composition)) {
+					hook.error(ipc, right, composition, ipc);
+				}
 			}
 		}
-
+	}
+	
+	public interface AsymmetricCompositionHook {
+		
+		public void error(IndexedPropertyChain left, IndexedPropertyChain right, IndexedPropertyChain composition, IndexedPropertyChain computed);
 	}
 }
+
+

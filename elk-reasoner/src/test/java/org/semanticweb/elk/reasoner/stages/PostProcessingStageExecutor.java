@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.stages.debug;
+package org.semanticweb.elk.reasoner.stages;
 /*
  * #%L
  * ELK Reasoner
@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.stages.debug;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.ReasonerStage;
+import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * @author Pavel Klinov
@@ -35,25 +35,31 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStage;
  */
 public class PostProcessingStageExecutor extends LoggingStageExecutor {
 
+	static final Multimap<String, ReasonerStage> postProcesingMap = new HashListMultimap<String, ReasonerStage>();
+	
+	/*
+	 * STATIC INT
+	 */
+	static {
+		//TODO init post processing map
+	}
+	
 	@Override
 	public void complete(ReasonerStage stage) throws ElkException {
 		super.complete(stage);
 		
-		if (stage instanceof PostProcessingReasonerStage) {
-
-			if (LOGGER_.isInfoEnabled()) {
-				LOGGER_.info("Starting post processing...");
-			}
-
-			for (ReasonerStage ppStage : ((PostProcessingReasonerStage) stage)
-					.getPostProcessingStages()) {
-				super.complete(ppStage);
-			}
-
-			if (LOGGER_.isInfoEnabled()) {
-				LOGGER_.info("Post processing finished");
-			}
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Starting post processing...");
 		}
+		
+		for (ReasonerStage ppStage : postProcesingMap.get(stage.getName())) {
+			super.complete(ppStage);
+		}
+		
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Post processing finished");
+		}
+
 	}
 
 	

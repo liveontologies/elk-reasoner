@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.stages.debug.PostProcessingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 
 /**
  * The main factory to instantiate {@link Reasoner}
@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.stages.debug.PostProcessingStageExecutor;
 public class ReasonerFactory {
 
 	final static Logger LOGGER_ = Logger.getLogger(ReasonerFactory.class);
-	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new PostProcessingStageExecutor();
+	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new SimpleStageExecutor();
 
 	public Reasoner createReasoner() {
 		return createReasoner(DEFAULT_STAGE_EXECUTOR,

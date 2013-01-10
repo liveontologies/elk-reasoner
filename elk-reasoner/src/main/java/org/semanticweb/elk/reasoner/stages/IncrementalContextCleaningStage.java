@@ -25,39 +25,25 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
-import org.semanticweb.elk.reasoner.stages.debug.BasePostProcessingStage;
-import org.semanticweb.elk.reasoner.stages.debug.ContextSaturationFlagCheckingStage;
-import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
-import org.semanticweb.elk.reasoner.stages.debug.SaturationGraphValidationStage;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalContextCleaningStage extends AbstractReasonerStage
-		implements PostProcessingReasonerStage {
+public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(IncrementalContextCleaningStage.class);
+	//private static final Logger LOGGER_ = Logger
+	//		.getLogger(IncrementalContextCleaningStage.class);
 
 	private ClassExpressionNoInputSaturation cleaning_ = null;
 
@@ -78,10 +64,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new IncrementalContextInitializationStage(
-						reasoner, new IncrementalDeSaturationStage(reasoner),
-						true));
+		return Collections.<ReasonerStage>singletonList(new InitializeContextsAfterDesaturation(reasoner));
 	}
 
 	@Override
@@ -131,7 +114,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 	 */
 	// ////////////////////////////////////////////////////////////////////////////////
 
-	@Override
+	/*@Override
 	public Collection<ReasonerStage> getPostProcessingStages() {
 		return Arrays.<ReasonerStage> asList(
 				new CheckCleaningStage(),
@@ -139,12 +122,12 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 						.getIndexedClassExpressions(), reasoner.saturationState
 						.getNotSaturatedContexts()),
 				new SaturationGraphValidationStage(reasoner.ontologyIndex));
-	}
+	}*/
 
 	/**
 	 * Used to check that all unsaturated contexts have been cleaned
 	 */
-	private class CheckCleaningStage extends BasePostProcessingStage {
+	/*private class CheckCleaningStage extends BasePostProcessingStage {
 
 		@Override
 		public String getName() {
@@ -187,6 +170,6 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 			}
 		}
 
-	}
+	}*/
 
 }

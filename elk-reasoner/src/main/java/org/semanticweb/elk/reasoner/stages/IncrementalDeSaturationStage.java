@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -31,8 +30,6 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
-import org.semanticweb.elk.reasoner.stages.debug.ContextSaturationFlagCheckingStage;
-import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
 
 /**
  * Reverts inferences
@@ -40,7 +37,7 @@ import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
  * @author Pavel Klinov
  * 
  */
-class IncrementalDeSaturationStage extends AbstractReasonerStage implements PostProcessingReasonerStage {
+class IncrementalDeSaturationStage extends AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
@@ -63,7 +60,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage implements Post
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new IncrementalChangesInitializationStage(reasoner, true, new IncrementalCompletionStage(reasoner)));
+		return Arrays.asList((ReasonerStage) new IncrementalDeletionInitializationStage(reasoner));
 	}
 
 	@Override
@@ -109,11 +106,11 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage implements Post
 			desaturation_.printStatistics();
 	}
 	
-	@Override
+	/*@Override
 	public Collection<ReasonerStage> getPostProcessingStages() {
 		return Arrays.<ReasonerStage> asList(
 				new ContextSaturationFlagCheckingStage(reasoner.ontologyIndex
 						.getIndexedClassExpressions(), reasoner.saturationState
 						.getNotSaturatedContexts()));
-	}	
+	}*/	
 }

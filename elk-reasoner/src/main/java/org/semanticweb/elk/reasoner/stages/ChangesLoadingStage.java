@@ -23,13 +23,10 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
-import org.semanticweb.elk.reasoner.stages.debug.SaturatedPropertyChainCheckingStage;
 
 /**
  * A {@link ReasonerStage} during which ontology changes are applied to the
@@ -38,8 +35,7 @@ import org.semanticweb.elk.reasoner.stages.debug.SaturatedPropertyChainCheckingS
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ChangesLoadingStage extends AbstractReasonerStage implements
-		PostProcessingReasonerStage {
+public class ChangesLoadingStage extends AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -97,11 +93,11 @@ public class ChangesLoadingStage extends AbstractReasonerStage implements
 	 */
 	// ////////////////////////////////////////////////////////////////////////////////
 
-	@Override
+	/*@Override
 	public Collection<ReasonerStage> getPostProcessingStages() {
 		return Arrays
 				.<ReasonerStage> asList(new SaturatedPropertyChainCheckingStage(
 						reasoner.ontologyIndex));
-	}
+	}*/
 
 }

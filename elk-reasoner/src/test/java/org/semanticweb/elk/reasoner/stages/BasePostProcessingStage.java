@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.stages.debug;
+package org.semanticweb.elk.reasoner.stages;
 /*
  * #%L
  * ELK Reasoner
@@ -24,29 +24,18 @@ package org.semanticweb.elk.reasoner.stages.debug;
  * #L%
  */
 
-import java.util.Collection;
 import java.util.Collections;
 
 import org.semanticweb.elk.reasoner.stages.ReasonerStage;
 
 /**
- * An extension of the base interface to specify stages to be executed after
- * processing.
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- */
-public interface PostProcessingReasonerStage extends ReasonerStage {
-
-	public Collection<ReasonerStage> getPostProcessingStages();
-}
-
-/**
  * An empty base class for stages used for post processing
  * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
  */
-abstract class BaseReasonerStage implements ReasonerStage {
+public abstract class BasePostProcessingStage implements ReasonerStage {
 
 	@Override
 	public boolean done() {

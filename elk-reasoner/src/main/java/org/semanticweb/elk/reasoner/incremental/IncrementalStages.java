@@ -49,11 +49,20 @@ public enum IncrementalStages {
 		
 	},
 	
-	CONTEXT_INIT {
+	CONTEXT_AFTER_DEL_INIT {
 
 		@Override
 		public String toString() {
-			return "Incremental Context Initialization";
+			return "Post-Deletion Context Initialization";
+		}
+		
+	},	
+	
+	CONTEXT_AFTER_CLEAN_INIT {
+
+		@Override
+		public String toString() {
+			return "Post-Cleaning Context Initialization";
 		}
 		
 	},	

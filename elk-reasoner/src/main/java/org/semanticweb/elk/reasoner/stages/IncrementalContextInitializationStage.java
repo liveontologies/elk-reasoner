@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
@@ -39,53 +38,48 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalContextInitializationStage extends
+abstract class IncrementalContextInitializationStage extends
 		AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalContextInitializationStage.class);
 	/**
 	 * The counter for deleted contexts
 	 */
-	private int initContexts_;
+	protected int initContexts_;
 	/**
 	 * The number of contexts
 	 */
-	private int maxContexts_;
-
-	private final ReasonerStage dependency_;
-	
-	private final boolean initRemovedContexts_;
+	protected int maxContexts_;
 	
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
-	private Iterator<IndexedClassExpression> todo = null;
+	protected Iterator<IndexedClassExpression> todo = null;
 
-	public IncrementalContextInitializationStage(
-			AbstractReasonerState reasoner, ReasonerStage dependency, boolean initRemovedContexts) {
+	public IncrementalContextInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 
-		this.dependency_ = dependency;
-		this.initRemovedContexts_ = initRemovedContexts;
+		// this.initRemovedContexts_ = initRemovedContexts;
 	}
 
 	@Override
 	public String getName() {
-		return IncrementalStages.CONTEXT_INIT.toString();
+		return stage().toString();
 	}
+
 
 	@Override
 	public boolean done() {
 		return reasoner.incrementalState
-				.getStageStatus(IncrementalStages.CONTEXT_INIT);
+				.getStageStatus(stage());
 	}
 
-	@Override
+	/*@Override
 	public List<ReasonerStage> getDependencies() {
-		return Collections.singletonList(dependency_);
-	}
+		return Collections.emptyList();
+	}*/
 
 	@Override
 	public void execute() throws ElkInterruptedException {
@@ -117,7 +111,7 @@ public class IncrementalContextInitializationStage extends
 		reasoner.doneContextReset = true;
 	}
 
-	@Override
+	/*@Override
 	void initComputation() {
 		super.initComputation();
 		
@@ -139,11 +133,87 @@ public class IncrementalContextInitializationStage extends
 		}
 		
 		initContexts_ = 0;
-	}
+	}*/
 
 	@Override
 	public void printInfo() {
 		if (initContexts_ > 0 && LOGGER_.isDebugEnabled())
 			LOGGER_.debug("Contexts init:" + initContexts_);
+	}
+	
+	protected abstract IncrementalStages stage();
+}
+
+/**
+ * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
+class InitializeContextsAfterDesaturation extends IncrementalContextInitializationStage {
+
+	public InitializeContextsAfterDesaturation(AbstractReasonerState reasoner) {
+		super(reasoner);
+	}
+
+	@Override
+	protected IncrementalStages stage() {
+		return IncrementalStages.CONTEXT_AFTER_DEL_INIT;
+	}
+	
+	@Override
+	void initComputation() {
+		super.initComputation();
+		
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Initializing contexts with deleted conclusions: " + reasoner.saturationState.getNotSaturatedContexts());
+			LOGGER_.trace("Initializing contexts which will be removed: " + reasoner.saturationState.getContextsToBeRemoved());
+		}
+		
+		todo = Operations.concat(reasoner.saturationState.getNotSaturatedContexts(), reasoner.saturationState.getContextsToBeRemoved()).iterator();
+		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size() + reasoner.saturationState.getContextsToBeRemoved().size();	
+		
+		initContexts_ = 0;
+	}
+
+	@Override
+	public Iterable<ReasonerStage> getDependencies() {
+		return Collections.<ReasonerStage>singleton(new IncrementalDeSaturationStage(reasoner));
+	}	
+}
+
+/**
+ * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
+class InitializeContextsAfterCleaning extends IncrementalContextInitializationStage {
+
+	public InitializeContextsAfterCleaning(AbstractReasonerState reasoner) {
+		super(reasoner);
+	}
+	
+	@Override
+	protected IncrementalStages stage() {
+		return IncrementalStages.CONTEXT_AFTER_CLEAN_INIT;
+	}
+	
+	@Override
+	void initComputation() {
+		super.initComputation();
+		
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Cleaned contexts to be initialized: " + reasoner.saturationState.getNotSaturatedContexts());
+		}
+		
+		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();	
+		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size();
+		initContexts_ = 0;
+	}
+	
+	@Override
+	public Iterable<ReasonerStage> getDependencies() {
+		return Collections.<ReasonerStage>singleton(new IncrementalContextCleaningStage(reasoner));
 	}
 }

@@ -42,13 +42,13 @@ public class IndexedObjectsCreator {
 		IndexedObjectProperty property = new IndexedObjectProperty(prop);
 
 		for (IndexedPropertyChain sub : toldSubs) {
-			property.addToldSubObjectProperty(sub);
+			property.addToldSubPropertyChain(sub);
 			sub.addToldSuperObjectProperty(property);
 		}
 
 		for (IndexedObjectProperty sup : toldSupers) {
 			property.addToldSuperObjectProperty(sup);
-			sup.addToldSubObjectProperty(property);
+			sup.addToldSubPropertyChain(property);
 		}
 		
 		if (reflexive) {
@@ -66,7 +66,7 @@ public class IndexedObjectsCreator {
 
 		for (IndexedObjectProperty sup : toldSupers) {
 			chain.addToldSuperObjectProperty(sup);
-			sup.addToldSubObjectProperty(chain);
+			sup.addToldSubPropertyChain(chain);
 		}
 		
 		left.addLeftChain(chain);
@@ -74,10 +74,5 @@ public class IndexedObjectsCreator {
 
 		return chain;
 	}
-	
-	/*public static void addToldSuperProperties(IndexedPropertyChain chain, IndexedObjectProperty[] props) {
-		for (IndexedObjectProperty superProp : props) {
-			chain.addToldSuperObjectProperty(superProp);
-		}
-	}*/
+
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.stages.debug;
+package org.semanticweb.elk.reasoner.stages;
 /*
  * #%L
  * ELK Reasoner

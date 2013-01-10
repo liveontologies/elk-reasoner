@@ -59,12 +59,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		// these two stages both modify the shared saturation state
-		return Arrays.asList(
-					// this initializes fully cleaned contexts (should execute cleaning first)
-					(ReasonerStage) new IncrementalContextInitializationStage(reasoner, new IncrementalContextCleaningStage(reasoner), false),
-					// this initializes changes for additions
-					(ReasonerStage) new IncrementalChangesInitializationStage(reasoner, false));
+		return Arrays.asList((ReasonerStage) new IncrementalAdditionInitializationStage(reasoner));
 	}
 
 	@Override

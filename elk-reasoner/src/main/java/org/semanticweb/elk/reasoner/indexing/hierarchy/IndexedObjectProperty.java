@@ -132,7 +132,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		return reflexiveAxiomOccurrenceNo > 0;
 	}
 
-	protected void addToldSubObjectProperty(
+	protected void addToldSubPropertyChain(
 			IndexedPropertyChain subObjectProperty) {
 		if (toldSubProperties == null)
 			toldSubProperties = new ArrayList<IndexedPropertyChain>(1);

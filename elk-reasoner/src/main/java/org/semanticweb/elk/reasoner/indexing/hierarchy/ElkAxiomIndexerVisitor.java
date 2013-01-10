@@ -157,7 +157,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		if (multiplicity == 1) {
 			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
-			superIndexedProperty.addToldSubObjectProperty(subIndexedProperty);
+			superIndexedProperty.addToldSubPropertyChain(subIndexedProperty);
 		} else {
 			subIndexedProperty
 					.removeToldSuperObjectProperty(superIndexedProperty);

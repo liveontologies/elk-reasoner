@@ -28,7 +28,6 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,8 +35,6 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.stages.debug.PostProcessingReasonerStage;
-import org.semanticweb.elk.reasoner.stages.debug.ValidateTaxonomyStage;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
 import org.semanticweb.elk.util.collections.Operations;
@@ -49,7 +46,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  *         pavel.klinov@uni-ulm.de
  */
 class IncrementalClassTaxonomyComputationStage extends
-		ClassTaxonomyComputationStage implements PostProcessingReasonerStage {
+		ClassTaxonomyComputationStage {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalClassTaxonomyComputationStage.class);
@@ -134,8 +131,8 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	
 	
-	@Override
+	/*@Override
 	public Collection<ReasonerStage> getPostProcessingStages() {
 		return Collections.<ReasonerStage>singleton(new ValidateTaxonomyStage(reasoner.taxonomy));
-	}	
+	}*/	
 }
