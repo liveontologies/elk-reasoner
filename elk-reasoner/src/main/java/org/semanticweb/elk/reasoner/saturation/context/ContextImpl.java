@@ -305,4 +305,11 @@ public class ContextImpl implements Context {
 		return root_.toString();
 	}
 
+	@Override
+	public boolean isEmpty() {
+		return (subsumers_ == null || subsumers_.isEmpty())
+				&& (backwardLinksByObjectProperty_ == null || backwardLinksByObjectProperty_
+						.isEmpty()) && getBackwardLinkRuleHead() == null;
+	}
+
 }

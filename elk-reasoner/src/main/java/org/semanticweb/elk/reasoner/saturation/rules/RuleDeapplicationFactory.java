@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
@@ -55,14 +56,14 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		super(saturationState, trackModifiedContexts);
 	}
 
-	@Override
+	/*@Override
 	public Engine getEngine() {
 		return new Engine();
-	}
+	}*/
 
 	@Override
-	public Engine getEngine(ContextCreationListener listener) {
-		return new Engine(listener);
+	public Engine getEngine(ContextCreationListener listener, ContextModificationListener modListener) {
+		return new Engine(listener, modListener);
 	}
 
 	/**
@@ -74,8 +75,8 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 			super();
 		}
 
-		protected Engine(ContextCreationListener listener) {
-			super(listener);
+		protected Engine(ContextCreationListener listener, ContextModificationListener modListener) {
+			super(listener, modListener);
 		}
 
 		protected Engine(SaturationState.Writer saturationStateWriter,

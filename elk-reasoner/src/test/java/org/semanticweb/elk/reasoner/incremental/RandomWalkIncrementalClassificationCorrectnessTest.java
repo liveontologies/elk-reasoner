@@ -40,6 +40,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
+import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
@@ -106,8 +107,10 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 		List<ElkAxiom> staticAxioms = new ArrayList<ElkAxiom>();
 		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
 				new PostProcessingStageExecutor(), 1);
+		long seed = System.currentTimeMillis();
 
 		incrementalReasoner.setIncrementalMode(true);
+		
 
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Initial load of test axioms");
@@ -124,9 +127,12 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 			// let the runner run..
 			new RandomWalkIncrementalClassificationRunner(MAX_ROUNDS,
 					ITERATIONS).run(incrementalReasoner, changingAxioms,
-					staticAxioms, new CleanIndexHook());
+					staticAxioms, seed, new CleanIndexHook());
 
-		} finally {
+		} catch (Exception e) {
+			throw new ElkRuntimeException("Seed " + seed, e);
+		}
+		finally {
 			incrementalReasoner.shutdown();
 		}
 	}

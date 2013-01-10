@@ -73,7 +73,7 @@ public class ConclusionSourceUnsaturationVisitor implements
 
 	@Override
 	public Boolean visit(Propagation propagation, Context context) {
-		return mark(propagation, context);
+		return false;//mark(propagation, context);
 	}
 
 	@Override

@@ -35,7 +35,8 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
@@ -58,7 +59,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalContextCleaningStage.class);
 
-	private ClassExpressionSaturation<IndexedClassExpression> cleaning_ = null;
+	private ClassExpressionNoInputSaturation cleaning_ = null;
 
 	public IncrementalContextCleaningStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -113,11 +114,9 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
 				reasoner.saturationState);
 
-		// System.out.println(reasoner.saturationState.activeContexts_);
-
-		cleaning_ = new ClassExpressionSaturation<IndexedClassExpression>(
+		cleaning_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), cleaningFactory);
+				reasoner.getProgressMonitor(), cleaningFactory, ContextModificationListener.DUMMY);
 	}
 
 	@Override
@@ -182,7 +181,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage
 					for (Context target : backwardLinks.get(ipc))
 						if (cleanedContexts.contains(target))
 							LOGGER_.error("Backward link in " + context
-									+ "via property " + ipc
+									+ " via property " + ipc
 									+ " to cleaned context " + target);
 				}
 			}

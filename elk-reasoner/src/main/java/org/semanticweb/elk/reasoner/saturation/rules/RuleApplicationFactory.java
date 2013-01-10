@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.BasicDecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
@@ -75,28 +76,33 @@ public class RuleApplicationFactory implements
 	 * If true, the factory will keep track of contexts which get modified
 	 * during saturation. This is needed, for example, for cleaning contexts
 	 * modified during de-saturation or for cleaning taxonomy nodes which
-	 * correspond to modified contexts (during saturation or de-saturation)
+	 * correspond to modified contexts (during de-saturation and re-saturation)
 	 */
 	private final boolean trackModifiedContexts_;
-
+	
 	public RuleApplicationFactory(final SaturationState saturationState) {
 		this(saturationState, false);
 	}
 
 	public RuleApplicationFactory(final SaturationState saturationState,
-			boolean trackModifiedContexts) {
+			final boolean trackModifiedContexts) {
 		this.aggregatedStats_ = new RuleAndConclusionStatistics();
 		this.saturationState = saturationState;
-		this.trackModifiedContexts_ = trackModifiedContexts;
+		this.trackModifiedContexts_ = true;
 	}
 
 	@Override
 	public Engine getEngine() {
-		return new Engine();
+		return null;//new Engine();
 	}
 
 	public Engine getEngine(ContextCreationListener listener) {
 		return new Engine(listener);
+	}
+
+	public Engine getEngine(ContextCreationListener listener,
+			ContextModificationListener modListener) {
+		return new Engine(listener, modListener);
 	}
 
 	@Override
@@ -108,7 +114,7 @@ public class RuleApplicationFactory implements
 		return aggregatedStats_;
 	}
 
-	static ContextCreationListener getEngineListener(
+	static ContextCreationListener getEngineContextCreationListener(
 			final ContextCreationListener listener,
 			final RuleAndConclusionStatistics factoryStats) {
 		return new ContextCreationListener() {
@@ -192,16 +198,30 @@ public class RuleApplicationFactory implements
 			this(saturationState.getWriter());
 		}
 
+		protected Engine(final ContextCreationListener listener) {
+			this(listener, new RuleAndConclusionStatistics());
+		}
+		
+		protected Engine(final ContextCreationListener listener, final ContextModificationListener modListener) {
+			this(listener, modListener, new RuleAndConclusionStatistics());
+		}
+
 		protected Engine(final ContextCreationListener listener,
 				final RuleAndConclusionStatistics factoryStats) {
 			this(saturationState.getWriter(
-					getEngineListener(listener, factoryStats),
+					getEngineContextCreationListener(listener, factoryStats),
 					getEngineCompositionRuleApplicationVisitor(factoryStats)),
 					factoryStats);
 		}
 
-		protected Engine(final ContextCreationListener listener) {
-			this(listener, new RuleAndConclusionStatistics());
+		protected Engine(final ContextCreationListener listener,
+				final ContextModificationListener modListener,
+				final RuleAndConclusionStatistics factoryStats) {
+			this(saturationState.getWriter(
+					getEngineContextCreationListener(listener, factoryStats),
+					modListener,
+					getEngineCompositionRuleApplicationVisitor(factoryStats)),
+					factoryStats);
 		}
 
 		@Override

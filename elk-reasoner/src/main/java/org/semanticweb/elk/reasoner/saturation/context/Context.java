@@ -263,5 +263,11 @@ public interface Context {
 	 *         {@link Context}
 	 */
 	public boolean setSaturated(boolean saturated);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isEmpty();
 
 }

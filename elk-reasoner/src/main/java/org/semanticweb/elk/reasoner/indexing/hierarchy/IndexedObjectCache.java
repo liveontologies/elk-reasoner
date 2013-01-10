@@ -236,11 +236,27 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		}
 	};
 
+	
 	protected final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
+		
+		private void checkContext(IndexedClassExpression removed) {
+			/*if (LOGGER_.isDebugEnabled()) {
+				Context context = removed.getContext();
+
+				if (context != null && !context.isEmpty()) {
+					LOGGER_.error("Non empty context for removed ICE: "
+							+ removed);
+				}
+			}*/
+		}
+		
 		@Override
 		public Boolean visit(IndexedClass element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
+			
+			checkContext(element);
+			
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedClassCount--;
 				return true;
@@ -259,16 +275,22 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
+			checkContext(element);
+			
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
+			checkContext(element);
+			
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedDataHasValue element) {
+			checkContext(element);
+			
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 

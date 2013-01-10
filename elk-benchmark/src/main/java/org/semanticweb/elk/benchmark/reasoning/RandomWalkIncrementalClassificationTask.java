@@ -110,9 +110,11 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 	@Override
 	public Result run() throws TaskException {
 
+		long seed = System.currentTimeMillis();
+		
 		try {
 			new RandomWalkIncrementalClassificationRunner(ROUNDS, ITERATIONS)
-					.run(reasoner_, changingAxioms_, staticAxioms_);
+					.run(reasoner_, changingAxioms_, staticAxioms_, seed);
 		} catch (Exception e) {
 			throw new TaskException(e);
 		} finally {
