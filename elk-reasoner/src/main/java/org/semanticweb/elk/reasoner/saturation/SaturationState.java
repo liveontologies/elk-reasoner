@@ -69,7 +69,7 @@ public class SaturationState {
 	 * inference rules has not yet been finished.
 	 */
 	private final Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
-	
+
 	/**
 	 * Kept because still need to be cleaned to avoid broken backward links
 	 */
@@ -78,7 +78,7 @@ public class SaturationState {
 	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
 		return notSaturatedContexts_;
 	}
-	
+
 	public Collection<IndexedClassExpression> getContextsToBeRemoved() {
 		return removedContexts_;
 	}
@@ -192,7 +192,7 @@ public class SaturationState {
 
 		public void produce(Context context, Conclusion conclusion) {
 			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context + ": " + context.getRoot().hashCode() + ": new conclusion " + conclusion);
+				LOGGER_.trace(context + ": new conclusion " + conclusion);
 
 			if (context.addToDo(conclusion)) {
 				// context was activated
@@ -201,7 +201,7 @@ public class SaturationState {
 		}
 
 		public Context getCreateContext(IndexedClassExpression root) {
-			
+
 			if (root.getContext() == null) {
 				Context context = new ContextImpl(root);
 				if (root.setContext(context)) {
@@ -254,7 +254,7 @@ public class SaturationState {
 				return false;
 			}
 		}
-		
+
 		public void markForRemoval(Context context) {
 			if (context.setSaturated(false)) {
 				removedContexts_.add(context.getRoot());
@@ -267,7 +267,6 @@ public class SaturationState {
 			notSaturatedContexts_.clear();
 		}
 
-		
 		public void clearContextsToBeRemoved() {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Clear contexts to be removed");
