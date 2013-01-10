@@ -42,8 +42,10 @@ public class ConclusionSourceUnsaturationVisitor implements
 	}
 
 	Boolean mark(Conclusion conclusion, Context context) {
-		writer_.markAsNotSaturated(conclusion.getSourceContext(context));
-		return true;
+		Context sourceContext = conclusion.getSourceContext(context);
+
+		return sourceContext != null ? writer_
+				.markAsNotSaturated(sourceContext) : false;
 	}
 
 	@Override
@@ -73,7 +75,7 @@ public class ConclusionSourceUnsaturationVisitor implements
 
 	@Override
 	public Boolean visit(Propagation propagation, Context context) {
-		return false;//mark(propagation, context);
+		return mark(propagation, context);
 	}
 
 	@Override

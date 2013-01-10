@@ -213,12 +213,17 @@ public class SaturationState {
 			}
 		}
 
-		public void markAsNotSaturated(Context context) {
+		public boolean markAsNotSaturated(Context context) {
 			if (context.setSaturated(false)) {
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace(context + ": marked as non-saturated");
 				notSaturatedContexts_.add(context.getRoot());
 				contextModificationListener_.notifyContextModification(context);
+				
+				return true;
+			}
+			else {
+				return false;
 			}
 			/*else {
 				LOGGER_.trace(context + " is already saturated");
@@ -261,14 +266,11 @@ public class SaturationState {
 
 		@Override
 		public void produce(Context context, Conclusion conclusion) {
+			Context sourceContext = conclusion.getSourceContext(context);
 			
-			if (context.getRoot().toString().startsWith("<test:trunk>")) {
-				System.out.println("Saturated? " + context.isSaturated());
+			if (sourceContext == null || !sourceContext.isSaturated()) {
+				super.produce(context, conclusion);	
 			}
-			
-			if (conclusion.getSourceContext(context).isSaturated())
-				return;
-			super.produce(context, conclusion);
 		}
 	}
 

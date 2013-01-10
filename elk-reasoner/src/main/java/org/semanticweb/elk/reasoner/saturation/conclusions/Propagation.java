@@ -84,6 +84,13 @@ public class Propagation extends AbstractConclusion {
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
 	}
+	
+	
+
+	@Override
+	public Context getSourceContext(Context contextWhereStored) {
+		return null;
+	}
 
 	public boolean addToContextBackwardLinkRule(Context context) {
 		return context

@@ -37,5 +37,10 @@ public interface Conclusion {
 
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context);
 	
+	/**
+	 * 
+	 * @param contextWhereStored
+	 * @return The context which this conclusion is logically relevant for, or {@code null} if none
+	 */
 	public Context getSourceContext(Context contextWhereStored);
 }
