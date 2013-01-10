@@ -210,18 +210,19 @@ public class RuleApplicationFactory implements
 				final RuleAndConclusionStatistics factoryStats) {
 			this(saturationState.getWriter(
 					getEngineContextCreationListener(listener, factoryStats),
-					getEngineCompositionRuleApplicationVisitor(factoryStats)),
+					getEngineCompositionRuleApplicationVisitor(factoryStats), trackModifiedContexts_),
 					factoryStats);
 		}
 
 		protected Engine(final ContextCreationListener listener,
-				final ContextModificationListener modListener,
+				final ContextModificationListener modificationListener,
 				final RuleAndConclusionStatistics factoryStats) {
 			this(saturationState.getWriter(
 					getEngineContextCreationListener(listener, factoryStats),
-					modListener,
-					getEngineCompositionRuleApplicationVisitor(factoryStats)),
-					factoryStats);
+					modificationListener,
+					getEngineCompositionRuleApplicationVisitor(factoryStats), trackModifiedContexts_),
+					factoryStats
+					);
 		}
 
 		@Override

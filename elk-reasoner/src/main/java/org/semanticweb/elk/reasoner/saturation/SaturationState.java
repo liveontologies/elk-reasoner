@@ -86,7 +86,7 @@ public class SaturationState {
 	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
 
 	private final Writer defaultWriter_ = new Writer(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
-			DEFAULT_INIT_RULE_APP_VISITOR);
+			DEFAULT_INIT_RULE_APP_VISITOR, false);
 
 	private final Writer defaultSaturationCheckingWriter_ = new SaturationCheckingWriter(
 			ContextCreationListener.DUMMY, DEFAULT_INIT_RULE_APP_VISITOR);
@@ -122,15 +122,15 @@ public class SaturationState {
 	 *         {@link ContextCreationListener}
 	 */
 	public Writer getWriter(ContextCreationListener contextCreationListener,
-			RuleApplicationVisitor ruleAppVisitor) {
-		return new Writer(contextCreationListener, ContextModificationListener.DUMMY, ruleAppVisitor);
+			RuleApplicationVisitor ruleAppVisitor, boolean trackNewContextsAsUnsaturated) {
+		return new Writer(contextCreationListener, ContextModificationListener.DUMMY, ruleAppVisitor, trackNewContextsAsUnsaturated);
 	}
 	
 	public Writer getWriter(ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
-			RuleApplicationVisitor ruleAppVisitor) {
+			RuleApplicationVisitor ruleAppVisitor, boolean trackNewContextsAsUnsaturated) {
 		return new Writer(contextCreationListener, contextModificationListener,
-				ruleAppVisitor);
+				ruleAppVisitor, trackNewContextsAsUnsaturated);
 	}	
 
 	public Writer getSaturationCheckingWriter(
@@ -153,7 +153,15 @@ public class SaturationState {
 	 * 
 	 */
 	public class Writer {
-
+		/**
+		 * If set to true, the writer will put all newly created contexts to
+		 * {@link notSaturatedContexts_} This is important if saturation of a
+		 * new context has been interrupted for some reason, e.g. inconsistency.
+		 * Then we'll need to store all such contexts to be able to complete
+		 * their saturation later.
+		 */
+		private final boolean trackNewContextsAsUnsaturated_;
+		
 		private final ContextCreationListener contextCreationListener_;
 		
 		private final ContextModificationListener contextModificationListener_;
@@ -162,10 +170,12 @@ public class SaturationState {
 
 		private Writer(ContextCreationListener contextCreationListener,
 						ContextModificationListener contextSaturationListener,
-						RuleApplicationVisitor ruleAppVisitor) {
+						RuleApplicationVisitor ruleAppVisitor,
+						boolean trackNewContextsAsUnsaturated) {
 			this.contextCreationListener_ = contextCreationListener;
 			this.contextModificationListener_ = contextSaturationListener;
 			this.initRuleAppVisitor_ = ruleAppVisitor;
+			this.trackNewContextsAsUnsaturated_ = trackNewContextsAsUnsaturated;
 		}
 
 		public IndexedClassExpression getOwlThing() {
@@ -198,7 +208,18 @@ public class SaturationState {
 					initContext(context);
 					contextCreationListener_.notifyContextCreation(context);
 				}
+				
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace(context.getRoot() + ": context created");
+				}
+				
+				if (trackNewContextsAsUnsaturated_) {
+					markAsNotSaturatedInternal(context);
+				}
+				
+				
 			}
+			
 			return root.getContext();
 		}
 
@@ -213,21 +234,25 @@ public class SaturationState {
 			}
 		}
 
+		private void markAsNotSaturatedInternal(Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(context + ": marked as non-saturated");
+			}
+			
+			notSaturatedContexts_.add(context.getRoot());
+			contextModificationListener_.notifyContextModification(context);
+		}
+		
 		public boolean markAsNotSaturated(Context context) {
 			if (context.setSaturated(false)) {
-				if (LOGGER_.isTraceEnabled())
-					LOGGER_.trace(context + ": marked as non-saturated");
-				notSaturatedContexts_.add(context.getRoot());
-				contextModificationListener_.notifyContextModification(context);
+				markAsNotSaturatedInternal(context);
 				
 				return true;
 			}
 			else {
+				//LOGGER_.trace(context + " is already saturated");
 				return false;
 			}
-			/*else {
-				LOGGER_.trace(context + " is already saturated");
-			}*/
 		}
 		
 		public void markForRemoval(Context context) {
@@ -261,7 +286,7 @@ public class SaturationState {
 		private SaturationCheckingWriter(
 				ContextCreationListener contextCreationListener,
 				RuleApplicationVisitor ruleAppVisitor) {
-			super(contextCreationListener, ContextModificationListener.DUMMY, ruleAppVisitor);
+			super(contextCreationListener, ContextModificationListener.DUMMY, ruleAppVisitor, false);
 		}
 
 		@Override

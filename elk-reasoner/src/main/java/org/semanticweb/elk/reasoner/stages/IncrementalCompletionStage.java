@@ -28,8 +28,8 @@ import java.util.Arrays;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 
@@ -51,7 +51,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	// logger for this class
 	//private static final Logger LOGGER_ = Logger.getLogger(IncrementalCompletionStage.class);
 	
-	private ClassExpressionSaturation<IndexedClassExpression> completion_ = null;
+	private ClassExpressionNoInputSaturation completion_ = null;
 
 	@Override
 	public String getName() {
@@ -104,14 +104,13 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-
-		RuleApplicationFactory appFactory = new RuleApplicationFactory(reasoner.saturationState);
 		
-		completion_ = new ClassExpressionSaturation<IndexedClassExpression>(
+		completion_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(),
 				workerNo,
 				reasoner.getProgressMonitor(),
-				appFactory);
+				new RuleApplicationFactory(reasoner.saturationState),
+				ContextModificationListener.DUMMY);
 	}	
 	
 	@Override
