@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.AbstractCollection;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -98,25 +97,6 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 				executor, maxWorkers, progressMonitor);
 	}	
 	
-	/*
-	 * Does NOT take inputs, assumes the saturation state has been initialized so the computation can carry on.
-	 */
-	public ClassExpressionSaturation(
-			ComputationExecutor executor,
-			int maxWorkers,
-			ProgressMonitor progressMonitor,
-			RuleApplicationFactory ruleAppFactory
-			) {
-		super(
-				new TodoJobs<I>(Collections.<I>emptyList()),
-				new ClassExpressionSaturationFactory<SaturationJob<I>>(
-						ruleAppFactory,
-						maxWorkers,
-						null/*not going to be used since there're no input jobs*/),
-				executor, maxWorkers, progressMonitor);
-	}	
-	
-
 	/**
 	 * Print statistics about the saturation computation
 	 */
