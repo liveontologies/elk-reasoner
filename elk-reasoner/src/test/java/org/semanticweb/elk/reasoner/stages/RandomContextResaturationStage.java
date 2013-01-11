@@ -81,7 +81,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 	private void initContexts(Collection<IndexedClassExpression> contexts) {
 		for (IndexedClassExpression ice : contexts) {
 			if (ice.getContext() != null) {
-				reasoner.saturationState.getWriter().initContext(ice.getContext());
+				reasoner.saturationState.getExtendedWriter().initContext(ice.getContext());
 			}
 		}
 	}

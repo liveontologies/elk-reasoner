@@ -87,7 +87,7 @@ abstract class BaseIncrementalContextInitializationStage extends
 				IndexedClassExpression ice = todo.next();
 				
 				if (ice.getContext() != null) {
-					reasoner.saturationState.getWriter().initContext(
+					reasoner.saturationState.getExtendedWriter().initContext(
 							ice.getContext());
 				}
 

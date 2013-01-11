@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 
 /**
  * A rule that can be applied to elements of a particular type within a
- * {@link SaturationState.Writer}.
+ * {@link SaturationState.AbstractWriter}.
  * 
  * @author "Yevgeny Kazakov"
  * 

@@ -119,7 +119,7 @@ class ClassExpressionNoInputSaturationFactory
 
 		@Override
 		public void process() throws InterruptedException {
-			ruleAppFactory_.getEngine(ContextCreationListener.DUMMY, contextModificationListener_).process();
+			ruleAppFactory_.getDefaultEngine(ContextCreationListener.DUMMY, contextModificationListener_).process();
 		}
 
 		@Override

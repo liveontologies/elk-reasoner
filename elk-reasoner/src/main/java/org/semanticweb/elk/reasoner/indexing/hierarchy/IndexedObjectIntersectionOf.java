@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -133,9 +132,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor,
-			Writer writer, Context context) {
-		visitor.visit(this, writer, context);
+	public void accept(DecompositionRuleApplicationVisitor visitor, Context context) {
+		visitor.visit(this, context);
 	}
 
 	/**

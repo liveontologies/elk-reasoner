@@ -376,14 +376,14 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 	public class Engine implements InputProcessor<J> {
 
-		private final RuleApplicationFactory.Engine ruleApplicationEngine_ = ruleApplicationFactory_
-				.getEngine(new ContextCreationListener() {
+		private final RuleApplicationFactory.BaseEngine ruleApplicationEngine_ = ruleApplicationFactory_
+				.getDefaultEngine(new ContextCreationListener() {
 					@Override
 					public void notifyContextCreation(Context newContext) {
 						nonSaturatedContexts_.add(newContext);
 						countContextsCreated_.incrementAndGet();
 					}
-				});
+				}, ContextModificationListener.DUMMY);
 
 		private final ThisStatistics stats_ = new ThisStatistics();
 

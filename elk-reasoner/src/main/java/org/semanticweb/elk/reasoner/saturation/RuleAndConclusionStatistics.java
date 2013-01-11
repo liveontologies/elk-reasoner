@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 
 /**
@@ -47,12 +46,12 @@ public class RuleAndConclusionStatistics {
 	public int countCreatedContexts;
 	/**
 	 * the number of times a context has been processed using
-	 * {@link Engine#process(Context)}
+	 * {@link DeapplicationEngine#process(Context)}
 	 */
 	public int contContextProcess;
 
 	/**
-	 * the time spent within {@link Engine#process()}
+	 * the time spent within {@link DeapplicationEngine#process()}
 	 */
 	public long timeContextProcess;
 

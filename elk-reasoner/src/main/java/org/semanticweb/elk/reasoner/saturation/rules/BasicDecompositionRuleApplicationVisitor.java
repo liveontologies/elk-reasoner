@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
 /*
  * #%L
@@ -23,12 +23,13 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
 /**
  * Performs decomposition of all sorts of indexed class expressions
@@ -37,15 +38,17 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class BasicDecompositionRuleApplicationVisitor implements
+abstract class BasicDecompositionRuleApplicationVisitor implements
 		DecompositionRuleApplicationVisitor {
 
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(BasicDecompositionRuleApplicationVisitor.class);
-
+	
 	@Override
-	public void visit(IndexedClass ice, Writer writer, Context context) {
-		if (ice == writer.getOwlNothing()) {
+	public void visit(IndexedClass ice, Context context) {
+		Writer writer = getSaturationStateWriter();
+		
+		if (ice == getSaturationStateWriter().getOwlNothing()) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Producing contradiction for "
 						+ context.getRoot());
@@ -55,22 +58,18 @@ public class BasicDecompositionRuleApplicationVisitor implements
 	}
 
 	@Override
-	public void visit(IndexedDataHasValue ice, Writer writer, Context context) {
+	public void visit(IndexedDataHasValue ice, Context context) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void visit(IndexedObjectIntersectionOf ice, Writer writer,
-			Context context) {
+	public void visit(IndexedObjectIntersectionOf ice, Context context) {
+		Writer writer = getSaturationStateWriter();
+		
 		writer.produce(context, new PositiveSubsumer(ice.getFirstConjunct()));
 		writer.produce(context, new PositiveSubsumer(ice.getSecondConjunct()));
 	}
 
-	@Override
-	public void visit(IndexedObjectSomeValuesFrom ice, Writer writer,
-			Context context) {
-		writer.produce(writer.getCreateContext(ice.getFiller()),
-				new BackwardLink(context, ice.getRelation()));
-	}
+	protected abstract Writer getSaturationStateWriter();
 
 }

@@ -93,6 +93,8 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 	void initComputation() {
 		super.initComputation();
 
+		//System.out.println(reasoner.saturationState.activeContexts_);
+		
 		desaturation_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(),
 				workerNo,

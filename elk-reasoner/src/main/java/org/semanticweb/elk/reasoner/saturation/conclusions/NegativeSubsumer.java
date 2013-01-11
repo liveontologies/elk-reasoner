@@ -53,7 +53,7 @@ public class NegativeSubsumer extends Subsumer {
 	public void deapply(SaturationState.Writer writer, Context context,
 			RuleApplicationVisitor ruleAppVisitor,
 			DecompositionRuleApplicationVisitor decompVisitor) {
-		expression.accept(decompVisitor, writer, context);
+		expression.accept(decompVisitor, context);
 		applyCompositionRules(writer, context, ruleAppVisitor);
 	}
 

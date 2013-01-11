@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -33,21 +34,23 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
+ * Applies decomposition rules for {@link IndexedClassExpression}s.
+ * 
+ * This visitor does not take any {@link SaturationState.Writer} but is rather
+ * supposed to encapsulate it. Then it's easier to use restricted writers, e.g.
+ * those which can't create new contexts, in subclasses
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
 public interface DecompositionRuleApplicationVisitor {
 
-	public void visit(IndexedClass ice, SaturationState.Writer writer,
-			Context context);
+	public void visit(IndexedClass ice, Context context);
 
-	public void visit(IndexedObjectIntersectionOf ice,
-			SaturationState.Writer writer, Context context);
+	public void visit(IndexedObjectIntersectionOf ice, Context context);
 
-	public void visit(IndexedObjectSomeValuesFrom ice,
-			SaturationState.Writer writer, Context context);
+	public void visit(IndexedObjectSomeValuesFrom ice, Context context);
 
-	public void visit(IndexedDataHasValue ice, SaturationState.Writer writer,
-			Context context);
+	public void visit(IndexedDataHasValue ice, Context context);
 }

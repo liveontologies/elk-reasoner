@@ -13,5 +13,5 @@ package org.semanticweb.elk;
  */
 public class RandomSeedProvider {
 
-	public static long VALUE = /*1357905818037L;*/System.currentTimeMillis();
+	public static long VALUE = System.currentTimeMillis();
 }

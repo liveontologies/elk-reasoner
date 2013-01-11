@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
@@ -252,6 +251,5 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * 
 	 * @param visitor
 	 */
-	public abstract void accept(DecompositionRuleApplicationVisitor visitor,
-			SaturationState.Writer writer, Context context);
+	public abstract void accept(DecompositionRuleApplicationVisitor visitor, 	Context context);
 }

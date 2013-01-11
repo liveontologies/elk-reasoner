@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 
 /**
@@ -48,43 +47,23 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	}
 
 	@Override
-	public CleaningEngine getEngine() {
+	public DeapplicationEngine getDefaultEngine(
+			ContextCreationListener listener,
+			ContextModificationListener modificationListener) {
 		return new CleaningEngine();
 	}
 
-	@Override
-	public CleaningEngine getEngine(ContextCreationListener listener) {
-		return new CleaningEngine(listener);
-	}
-	
-	@Override
-	public CleaningEngine getEngine(ContextCreationListener listener,
-			ContextModificationListener modListener) {
-		//we ignore the modification listener for cleaning but still must instantiate the right engine
-		return new CleaningEngine(listener);
-	}	
+
 
 	/**
 	 * A {@link RuleDeapplicationFactory} that uses a
 	 * {@link SaturationState.Writer} that does not produce conclusions if their
 	 * source is marked as saturated.
 	 */
-	public class CleaningEngine extends RuleDeapplicationFactory.Engine {
+	public class CleaningEngine extends RuleDeapplicationFactory.DeapplicationEngine {
 
 		protected CleaningEngine() {
 			super(saturationState.getSaturationCheckingWriter());
-		}
-
-		protected CleaningEngine(final ContextCreationListener listener) {
-			this(listener, new RuleAndConclusionStatistics());
-		}
-
-		protected CleaningEngine(final ContextCreationListener listener,
-				final RuleAndConclusionStatistics factoryStats) {
-			super(saturationState.getSaturationCheckingWriter(
-					getEngineContextCreationListener(listener, factoryStats),
-					getEngineCompositionRuleApplicationVisitor(factoryStats)),
-					factoryStats);
 		}
 	}
 }
