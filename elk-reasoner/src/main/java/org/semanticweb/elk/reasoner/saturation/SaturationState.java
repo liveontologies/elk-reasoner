@@ -292,7 +292,7 @@ public class SaturationState {
 		public void produce(Context context, Conclusion conclusion) {
 			Context sourceContext = conclusion.getSourceContext(context);
 			
-			if (sourceContext == null || !sourceContext.isSaturated()) {
+			if (sourceContext != null && !sourceContext.isSaturated()) {
 				super.produce(context, conclusion);	
 			}
 		}

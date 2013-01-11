@@ -56,11 +56,6 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		super(saturationState, trackModifiedContexts);
 	}
 
-	/*@Override
-	public Engine getEngine() {
-		return new Engine();
-	}*/
-
 	@Override
 	public Engine getEngine(ContextCreationListener listener, ContextModificationListener modListener) {
 		return new Engine(listener, modListener);
