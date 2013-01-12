@@ -60,6 +60,7 @@ class ReducingCompositionClosure extends CompositionClosure {
 		}
 	}
 
+	@Override
 	public void applyTo(Collection<IndexedPropertyChain> currentCompositions) {
 		super.applyTo(currentCompositions);
 		currentCompositions.removeAll(toRemove);
