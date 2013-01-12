@@ -28,7 +28,6 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -137,9 +136,8 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor,
-			Writer writer, Context context) {
-		visitor.visit(this, writer, context);
+	public void accept(DecompositionRuleApplicationVisitor visitor, Context context) {
+		visitor.visit(this, context);
 	}
 
 	@Override

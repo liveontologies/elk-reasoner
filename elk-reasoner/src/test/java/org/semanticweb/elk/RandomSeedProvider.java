@@ -1,15 +1,14 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.rules;
-
+package org.semanticweb.elk;
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,19 +24,15 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 
 /**
- * @author Pavel Klinov
+ * Provides seed to all randomized tests
  * 
- *         pavel.klinov@uni-ulm.de
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public interface ReversibleRule<E> extends Rule<E> {
+public class RandomSeedProvider {
 
-	/**
-	 * 
-	 * @param writer
-	 * @param element
-	 */
-	public void deapply(SaturationState.Writer writer, E element);
+	public static long VALUE = System.currentTimeMillis();
 }

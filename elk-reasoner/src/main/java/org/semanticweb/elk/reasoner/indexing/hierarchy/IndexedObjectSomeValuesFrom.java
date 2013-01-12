@@ -31,7 +31,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -121,8 +120,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	@Override
 	public void accept(DecompositionRuleApplicationVisitor visitor,
-			Writer writer, Context context) {
-		visitor.visit(this, writer, context);
+			Context context) {
+		visitor.visit(this, context);
 	}
 
 	public static void generatePropagations(SaturationState.Writer writer,
@@ -163,7 +162,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		public Collection<IndexedObjectSomeValuesFrom> getNegativeExistentials() {
 			return negExistentials_;
 		}
-		
+
 		@Override
 		public String getName() {
 			return NAME;

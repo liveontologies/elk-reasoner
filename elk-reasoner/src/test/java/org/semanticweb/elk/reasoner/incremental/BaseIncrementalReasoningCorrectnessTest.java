@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -52,7 +53,6 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
@@ -117,7 +117,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		TestChangesLoader changeLoader2 = new TestChangesLoader();
 		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
 				new SimpleStageExecutor(), 1);
-		Reasoner incrementalReasoner = new ReasonerFactory().createReasoner(new PostProcessingStageExecutor());
+		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(new PostProcessingStageExecutor(), 1);
 
 		standardReasoner.registerOntologyLoader(new TestAxiomLoader(axioms));
 		standardReasoner.registerOntologyChangesLoader(changeLoader1);
@@ -130,7 +130,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		// initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-		long seed = System.currentTimeMillis();
+		long seed = RandomSeedProvider.VALUE;//System.currentTimeMillis();
 		Random rnd = new Random(seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {

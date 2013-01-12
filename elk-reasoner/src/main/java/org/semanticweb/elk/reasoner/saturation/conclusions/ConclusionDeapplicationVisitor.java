@@ -27,6 +27,12 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
+/**
+ * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
 public class ConclusionDeapplicationVisitor implements
 		ConclusionVisitor<Boolean> {
 

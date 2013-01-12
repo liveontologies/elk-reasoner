@@ -25,10 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeapplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeletionVisitor;
@@ -47,51 +49,49 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
  */
 public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
-	public RuleDeapplicationFactory(final SaturationState saturationState) {
-		super(saturationState);
-	}
-
 	public RuleDeapplicationFactory(final SaturationState saturationState,
 			boolean trackModifiedContexts) {
 		super(saturationState, trackModifiedContexts);
 	}
 
-	/*@Override
-	public Engine getEngine() {
-		return new Engine();
-	}*/
-
 	@Override
-	public Engine getEngine(ContextCreationListener listener, ContextModificationListener modListener) {
-		return new Engine(listener, modListener);
+	public DeapplicationEngine getDefaultEngine(
+			ContextCreationListener listener,
+			ContextModificationListener modListener) {
+		return new DeapplicationEngine(modListener);
 	}
 
 	/**
 	 * 
 	 */
-	public class Engine extends RuleApplicationFactory.Engine {
+	public class DeapplicationEngine extends RuleApplicationFactory.BaseEngine {
 
-		protected Engine() {
-			super();
+		private final SaturationState.Writer writer_;
+		
+		protected DeapplicationEngine(ContextModificationListener listener) {
+			super(new RuleAndConclusionStatistics());
+			
+			writer_ = saturationState.getWriter(listener);
 		}
 
-		protected Engine(ContextCreationListener listener, ContextModificationListener modListener) {
-			super(listener, modListener);
-		}
-
-		protected Engine(SaturationState.Writer saturationStateWriter,
+		protected DeapplicationEngine(SaturationState.Writer saturationStateWriter,
 				RuleAndConclusionStatistics factoryStats) {
-			super(saturationStateWriter, factoryStats);
+			super(factoryStats);
+			
+			writer_ = saturationStateWriter;
 		}
 
-		protected Engine(SaturationState.Writer saturationStateWriter) {
-			super(saturationStateWriter);
+		protected DeapplicationEngine(SaturationState.Writer saturationStateWriter) {
+			super(new RuleAndConclusionStatistics());
+			
+			writer_ = saturationStateWriter;
 		}
 
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
 				SaturationState.Writer saturationStateWriter,
 				RuleAndConclusionStatistics localStatistics) {
+			
 			return new CombinedConclusionVisitor(
 					new CombinedConclusionVisitor(
 							new ConclusionOccurranceCheckingVisitor(),
@@ -99,9 +99,26 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 									new ConclusionDeapplicationVisitor(
 											saturationStateWriter,
 											getEngineCompositionRuleApplicationVisitor(localStatistics),
-											getEngineDecompositionRuleApplicationVisitor(localStatistics)),
+											getEngineDecompositionRuleApplicationVisitor(
+													getDecompositionRuleApplicationVisitor(),
+													localStatistics)),
 									localStatistics)),
 					new ConclusionDeletionVisitor());
+		}
+
+		@Override
+		public void submit(IndexedClassExpression job) {
+		}
+
+		@Override
+		protected Writer getSaturationStateWriter() {
+			return writer_;
+		}
+
+		@Override
+		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
+			//this decomposition visitor takes the basic writer which cannot create new contexts
+			return new BackwardDecompositionRuleApplicationVisitor(writer_);
 		}
 	}
 

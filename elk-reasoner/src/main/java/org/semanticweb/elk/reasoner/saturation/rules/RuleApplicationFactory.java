@@ -23,12 +23,13 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.BasicDecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
@@ -39,9 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVis
 import org.semanticweb.elk.reasoner.saturation.conclusions.PreprocessedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.TimedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
@@ -52,10 +51,10 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
  * @author Frantisek Simancik
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
+ * @author Pavel Klinov
  * 
  */
-public class RuleApplicationFactory implements
-		InputProcessorFactory<IndexedClassExpression, Engine> {
+public class RuleApplicationFactory {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger
@@ -91,21 +90,15 @@ public class RuleApplicationFactory implements
 		this.trackModifiedContexts_ = true;
 	}
 
-	@Override
-	public Engine getEngine() {
-		return null;//new Engine();
-	}
-
-	public Engine getEngine(ContextCreationListener listener) {
-		return new Engine(listener);
-	}
-
-	public Engine getEngine(ContextCreationListener listener,
+	/*
+	 * This method is supposed to be overridden in subclasses
+	 */
+	public BaseEngine getDefaultEngine(ContextCreationListener listener,
 			ContextModificationListener modListener) {
-		return new Engine(listener, modListener);
+		return new DefaultEngine(listener, modListener);
 	}
 
-	@Override
+	//@Override
 	public void finish() {
 		aggregatedStats_.check(LOGGER_);
 	}
@@ -150,8 +143,8 @@ public class RuleApplicationFactory implements
 	}
 
 	static DecompositionRuleApplicationVisitor getEngineDecompositionRuleApplicationVisitor(
+			DecompositionRuleApplicationVisitor decompRuleAppVisitor,
 			RuleAndConclusionStatistics localStatistics) {
-		DecompositionRuleApplicationVisitor decompRuleAppVisitor = new BasicDecompositionRuleApplicationVisitor();
 		RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 
 		if (COLLECT_RULE_COUNTS) {
@@ -166,78 +159,44 @@ public class RuleApplicationFactory implements
 
 		return decompRuleAppVisitor;
 	}
+	
 
 	/**
-	 * 
+	 * This engine has all the functionality for applying rules but needs to be
+	 * extended if new contexts may need to be created
 	 */
-	public class Engine implements InputProcessor<IndexedClassExpression>,
+	public abstract class BaseEngine implements InputProcessor<IndexedClassExpression>,
 			RuleEngine {
 
-		private final SaturationState.Writer saturationStateWriter_;
-
-		private final ConclusionVisitor<?> conclusionProcessor_;
+		private ConclusionVisitor<?> conclusionProcessor_;
 
 		/**
 		 * Local {@link ThisStatistics} created for every worker
 		 */
 		protected final RuleAndConclusionStatistics localStatistics;
 
-		protected Engine(SaturationState.Writer saturationStateWriter,
-				RuleAndConclusionStatistics localStatistics) {
-			this.conclusionProcessor_ = getConclusionProcessor(
-					saturationStateWriter, localStatistics);
-			this.saturationStateWriter_ = saturationStateWriter;
+		protected BaseEngine(RuleAndConclusionStatistics localStatistics) {
 			this.localStatistics = localStatistics;
 		}
 
-		protected Engine(SaturationState.Writer saturationStateWriter) {
-			this(saturationStateWriter, new RuleAndConclusionStatistics());
-		}
-
-		protected Engine() {
-			this(saturationState.getWriter());
-		}
-
-		protected Engine(final ContextCreationListener listener) {
-			this(listener, new RuleAndConclusionStatistics());
-		}
-		
-		protected Engine(final ContextCreationListener listener, final ContextModificationListener modListener) {
-			this(listener, modListener, new RuleAndConclusionStatistics());
-		}
-
-		protected Engine(final ContextCreationListener listener,
-				final RuleAndConclusionStatistics factoryStats) {
-			this(saturationState.getWriter(
-					getEngineContextCreationListener(listener, factoryStats),
-					getEngineCompositionRuleApplicationVisitor(factoryStats), trackModifiedContexts_),
-					factoryStats);
-		}
-
-		protected Engine(final ContextCreationListener listener,
-				final ContextModificationListener modificationListener,
-				final RuleAndConclusionStatistics factoryStats) {
-			this(saturationState.getWriter(
-					getEngineContextCreationListener(listener, factoryStats),
-					modificationListener,
-					getEngineCompositionRuleApplicationVisitor(factoryStats), trackModifiedContexts_),
-					factoryStats
-					);
-		}
-
-		@Override
-		public void submit(IndexedClassExpression job) {
-			saturationStateWriter_.getCreateContext(job);
-		}
+		protected abstract SaturationState.Writer getSaturationStateWriter();
 
 		@Override
 		public void process() {
 			localStatistics.timeContextProcess -= CachedTimeThread.currentTimeMillis;
+			
+			Writer writer = getSaturationStateWriter();
+			
+			if (conclusionProcessor_ == null) {
+				conclusionProcessor_ = getConclusionProcessor(writer, localStatistics);
+			}
+			
+			
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
 
-				Context nextContext = saturationStateWriter_.pollForContext();
+				Context nextContext = writer.pollForContext();
 
 				if (nextContext == null) {
 					break;
@@ -245,6 +204,7 @@ public class RuleApplicationFactory implements
 					process(nextContext);
 				}
 			}
+			
 			localStatistics.timeContextProcess += CachedTimeThread.currentTimeMillis;
 		}
 
@@ -264,6 +224,7 @@ public class RuleApplicationFactory implements
 			localStatistics.contContextProcess++;
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
+				
 				if (conclusion == null)
 					return;
 				conclusion.accept(conclusionProcessor_, context);
@@ -300,7 +261,7 @@ public class RuleApplicationFactory implements
 		 * wrapped in some other code.
 		 * 
 		 * @param saturationStateWriter
-		 *            the {@link SaturationState.Writer} using which one can
+		 *            the {@link SaturationState.AbstractWriter} using which one can
 		 *            produce new {@link Conclusion}s in {@link Context}s
 		 * @param localStatistics
 		 *            the object accumulating local statistics for this worker
@@ -317,22 +278,23 @@ public class RuleApplicationFactory implements
 							new ConclusionApplicationVisitor(
 									saturationStateWriter,
 									getEngineCompositionRuleApplicationVisitor(localStatistics),
-									getEngineDecompositionRuleApplicationVisitor(localStatistics)),
-							localStatistics));
+									getEngineDecompositionRuleApplicationVisitor(
+											getDecompositionRuleApplicationVisitor(),
+											localStatistics)), localStatistics));
 		}
 
 		/**
 		 * Returns the final {@link ConclusionVisitor} that is used by this
-		 * {@link Engine} for processing {@code Conclusion}s within
+		 * {@link DefaultEngine} for processing {@code Conclusion}s within
 		 * {@link Context}s
 		 * 
 		 * @param saturationStateWriter
-		 *            the {@link SaturationState.Writer} using which one can
+		 *            the {@link SaturationState.AbstractWriter} using which one can
 		 *            produce new {@link Conclusion}s in {@link Context}s
 		 * @param localStatistics
 		 *            the object accumulating local statistics for this worker
 		 * @return the final {@link ConclusionVisitor} that is used by this
-		 *         {@link Engine} for processing {@code Conclusion}s within
+		 *         {@link DefaultEngine} for processing {@code Conclusion}s within
 		 *         {@link Context}s
 		 */
 		protected ConclusionVisitor<?> getConclusionProcessor(
@@ -356,6 +318,60 @@ public class RuleApplicationFactory implements
 						result);
 			else
 				return result;
+		}
+		
+		protected abstract DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor();
+	}
+	
+	
+	/**
+	 * Default rule application engine which can create new contexts via
+	 * {@link SaturationState.ExtendedWriter} (either directly when a new
+	 * {@link IndexedClassExpression} is submitted or during decomposition
+	 */
+	public class DefaultEngine extends BaseEngine {
+
+		private final SaturationState.ExtendedWriter saturationStateWriter_;
+
+		protected DefaultEngine(SaturationState.ExtendedWriter saturationStateWriter,
+				RuleAndConclusionStatistics localStatistics) {
+			super(localStatistics);
+			this.saturationStateWriter_ = saturationStateWriter;
+		}
+
+		protected DefaultEngine(final ContextCreationListener listener, final ContextModificationListener modListener) {
+			this(listener, modListener, new RuleAndConclusionStatistics());
+		}
+
+		protected DefaultEngine(final ContextCreationListener listener,
+				final ContextModificationListener modificationListener,
+				final RuleAndConclusionStatistics factoryStats) {
+			this(saturationState.getExtendedWriter(
+					getEngineContextCreationListener(listener, factoryStats),
+					modificationListener,
+					getEngineCompositionRuleApplicationVisitor(factoryStats), trackModifiedContexts_),
+					factoryStats
+					);
+		}
+
+		@Override
+		public void submit(IndexedClassExpression job) {
+			saturationStateWriter_.getCreateContext(job);
+		}
+
+		@Override
+		protected ExtendedWriter getSaturationStateWriter() {
+			return saturationStateWriter_;
+		}
+
+		@Override
+		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
+			//here we need an extended writer to pass to the decomposer which can create new contexts
+			DecompositionRuleApplicationVisitor visitor = new ForwardDecompositionRuleApplicationVisitor(
+					saturationStateWriter_);
+
+			return getEngineDecompositionRuleApplicationVisitor(visitor,
+					localStatistics);
 		}
 	}
 

@@ -25,7 +25,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -71,29 +70,29 @@ public class DecompositionRuleApplicationCounterVisitor implements
 	}
 
 	@Override
-	public void visit(IndexedClass ice, Writer writer, Context context) {
+	public void visit(IndexedClass ice, Context context) {
 		counter_.countIndexedClass++;
-		visitor_.visit(ice, writer, context);
+		visitor_.visit(ice, context);
 	}
 
 	@Override
-	public void visit(IndexedObjectIntersectionOf ice, Writer writer,
+	public void visit(IndexedObjectIntersectionOf ice,
 			Context context) {
 		counter_.countIndexedObjectIntersectionOf++;
-		visitor_.visit(ice, writer, context);
+		visitor_.visit(ice, context);
 	}
 
 	@Override
-	public void visit(IndexedObjectSomeValuesFrom ice, Writer writer,
+	public void visit(IndexedObjectSomeValuesFrom ice,
 			Context context) {
 		counter_.countIndexedObjectSomeValuesFrom++;
-		visitor_.visit(ice, writer, context);
+		visitor_.visit(ice, context);
 	}
 
 	@Override
-	public void visit(IndexedDataHasValue ice, Writer writer, Context context) {
+	public void visit(IndexedDataHasValue ice, Context context) {
 		counter_.countIndexedDataHasValue++;
-		visitor_.visit(ice, writer, context);
+		visitor_.visit(ice, context);
 	}
 
 }

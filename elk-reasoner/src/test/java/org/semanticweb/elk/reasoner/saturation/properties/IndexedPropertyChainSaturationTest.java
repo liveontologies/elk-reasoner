@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
@@ -53,21 +54,9 @@ import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropert
  */
 public class IndexedPropertyChainSaturationTest {
 
-	/*
-	 * Declaration(ObjectProperty(:R1))
-Declaration(ObjectProperty(:R2))
-Declaration(ObjectProperty(:R3))
-
-SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2) :R1)
-SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2) :R3)
-SubObjectPropertyOf(ObjectPropertyChain(:R1 :R3) :R1)
-SubObjectPropertyOf(ObjectPropertyChain(:R1 :R3) :R3)
-SubObjectPropertyOf(ObjectPropertyChain(:R2 :R3) :R1)
-SubObjectPropertyOf(ObjectPropertyChain(:R2 :R3) :R3)
-SubObjectPropertyOf(:R1 :R2)
-SubObjectPropertyOf(:R2 :R3)
-	 */
+	
 	@Test
+	@Ignore 
 	public void testPropertyCompositionSymmetry() {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		

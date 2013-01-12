@@ -25,7 +25,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
@@ -64,32 +63,32 @@ public class DecompositionRuleApplicationTimerVisitor implements
 	}
 
 	@Override
-	public void visit(IndexedClass ice, Writer writer, Context context) {
+	public void visit(IndexedClass ice, Context context) {
 		timer_.timeIndexedClass -= CachedTimeThread.currentTimeMillis;
-		visitor_.visit(ice, writer, context);
+		visitor_.visit(ice, context);
 		timer_.timeIndexedClass += CachedTimeThread.currentTimeMillis;
 	}
 
 	@Override
-	public void visit(IndexedObjectIntersectionOf ice, Writer writer,
+	public void visit(IndexedObjectIntersectionOf ice,
 			Context context) {
 		timer_.timeIndexedObjectIntersectionOf -= CachedTimeThread.currentTimeMillis;
-		visitor_.visit(ice, writer, context);
+		visitor_.visit(ice, context);
 		timer_.timeIndexedObjectIntersectionOf += CachedTimeThread.currentTimeMillis;
 	}
 
 	@Override
-	public void visit(IndexedObjectSomeValuesFrom ice, Writer writer,
+	public void visit(IndexedObjectSomeValuesFrom ice,
 			Context context) {
 		timer_.timeIndexedObjectSomeValuesFrom -= CachedTimeThread.currentTimeMillis;
-		visitor_.visit(ice, writer, context);
+		visitor_.visit(ice, context);
 		timer_.timeIndexedObjectSomeValuesFrom += CachedTimeThread.currentTimeMillis;
 	}
 
 	@Override
-	public void visit(IndexedDataHasValue ice, Writer writer, Context context) {
+	public void visit(IndexedDataHasValue ice, Context context) {
 		timer_.timeIndexedDataHasValue -= CachedTimeThread.currentTimeMillis;
-		visitor_.visit(ice, writer, context);
+		visitor_.visit(ice, context);
 		timer_.timeIndexedDataHasValue += CachedTimeThread.currentTimeMillis;
 	}
 

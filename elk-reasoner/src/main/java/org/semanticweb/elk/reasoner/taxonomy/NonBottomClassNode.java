@@ -114,6 +114,10 @@ class NonBottomClassNode implements
 		this.directSuperNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 		this.directInstanceNodes_ = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>();
 		Collections.sort(this.members_, Comparators.ELK_CLASS_COMPARATOR);
+		
+		/*if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Creating a satisfiable node for " + members);
+		}*/
 	}
 
 	/**
