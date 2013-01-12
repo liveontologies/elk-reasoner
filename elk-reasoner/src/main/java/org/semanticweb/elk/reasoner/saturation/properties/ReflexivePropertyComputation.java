@@ -49,7 +49,7 @@ public class ReflexivePropertyComputation
 				maxWorkers, progressMonitor);
 	}
 
-	private ReflexivePropertyComputation(
+	ReflexivePropertyComputation(
 			Collection<? extends IndexedObjectProperty> inputs,
 			ReflexivePropertyComputationFactory inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers,
