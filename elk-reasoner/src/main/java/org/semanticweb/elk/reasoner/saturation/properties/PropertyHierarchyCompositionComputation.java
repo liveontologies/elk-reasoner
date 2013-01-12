@@ -47,7 +47,7 @@ public class PropertyHierarchyCompositionComputation
 				maxWorkers, progressMonitor);
 	}
 
-	private PropertyHierarchyCompositionComputation(
+	PropertyHierarchyCompositionComputation(
 			Collection<? extends IndexedPropertyChain> inputs,
 			PropertyHierarchyCompositionComputationFactory inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers,
