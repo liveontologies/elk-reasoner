@@ -56,8 +56,8 @@ public class DifferentialIndex {
 			.getLogger(DifferentialIndex.class);
 
 	/**
-	 * The list of {@link ElkClass}es to be removed from
-	 * the signature of the ontology; 
+	 * The list of {@link ElkClass}es to be removed from the signature of the
+	 * ontology;
 	 */
 	private final List<ElkClass> removedClasses_;
 
@@ -132,7 +132,7 @@ public class DifferentialIndex {
 	public List<ElkClass> getRemovedClasses() {
 		return this.removedClasses_;
 	}
-	
+
 	public Collection<IndexedClassExpression> getRemovedClassExpressions() {
 		return todoDeletions_.indexedClassExpressionLookup;
 	}
@@ -296,5 +296,15 @@ public class DifferentialIndex {
 						"Cannot remove context rule " + rule.getName()
 								+ " for " + target);
 		}
+	}
+
+	void addReflexiveProperty(IndexedObjectProperty property) {
+		mainIndex_.addReflexiveProperty(property);
+	}
+
+	void removeReflexiveProperty(IndexedObjectProperty property) {
+		if (!mainIndex_.removeReflexiveProperty(property))
+			throw new ElkUnexpectedIndexingException(
+					"Cannot remove reflexivity of object property " + property);
 	}
 }

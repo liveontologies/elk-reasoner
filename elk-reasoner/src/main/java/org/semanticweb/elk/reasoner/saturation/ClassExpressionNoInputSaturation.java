@@ -33,6 +33,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
+// TODO: create a ReasonerComputation which requires no input
 /**
  * A {@link ReasonerComputation} that continues saturation based on what's
  * currently initialized in the {@link RuleApplicationFactory}

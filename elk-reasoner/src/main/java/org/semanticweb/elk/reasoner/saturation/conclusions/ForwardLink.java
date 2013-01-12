@@ -157,7 +157,7 @@ public class ForwardLink extends AbstractConclusion {
 			this.forwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>(
 					3);
 		}
-		
+
 		public Multimap<IndexedPropertyChain, Context> getForwardLinksByObjectProperty() {
 			return forwardLinksByObjectProperty_;
 		}

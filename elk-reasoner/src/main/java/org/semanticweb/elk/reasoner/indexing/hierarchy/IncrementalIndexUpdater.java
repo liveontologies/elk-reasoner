@@ -93,4 +93,15 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 	public void remove(IndexedObject object) {
 		differentialIndex_.removeIndexedObject(object);
 	}
+
+	@Override
+	public void addReflexiveProperty(IndexedObjectProperty property) {
+		differentialIndex_.addReflexiveProperty(property);
+	}
+
+	@Override
+	public void removeReflexiveProperty(IndexedObjectProperty property) {
+		differentialIndex_.removeReflexiveProperty(property);
+
+	}
 }

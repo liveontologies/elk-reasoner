@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -35,8 +36,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 
 /**
  * Completes saturation of all contexts which are not saturated at this point.
- * Useful, for example, to continue saturation after the ontology was proved inconsistent
- * and all workers have stopped, possibly in the middle of saturation.
+ * Useful, for example, to continue saturation after the ontology was proved
+ * inconsistent and all workers have stopped, possibly in the middle of
+ * saturation.
  * 
  * @author Pavel Klinov
  * 
@@ -49,8 +51,9 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	}
 
 	// logger for this class
-	//private static final Logger LOGGER_ = Logger.getLogger(IncrementalCompletionStage.class);
-	
+	// private static final Logger LOGGER_ =
+	// Logger.getLogger(IncrementalCompletionStage.class);
+
 	private ClassExpressionNoInputSaturation completion_ = null;
 
 	@Override
@@ -60,12 +63,16 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(IncrementalStages.COMPLETION);
+		return reasoner.incrementalState
+				.getStageStatus(IncrementalStages.COMPLETION);
 	}
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ChangesLoadingStage(reasoner));
+		return Arrays
+				.asList((ReasonerStage) new PropertyHierarchyCompositionComputationStage(
+						reasoner), (ReasonerStage) new ChangesLoadingStage(
+						reasoner));
 	}
 
 	@Override
@@ -73,7 +80,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 		if (completion_ == null) {
 			initComputation();
 		}
-		
+
 		progressMonitor.start(getName());
 
 		try {
@@ -86,7 +93,8 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 
-		reasoner.incrementalState.setStageStatus(IncrementalStages.COMPLETION, true);
+		reasoner.incrementalState.setStageStatus(IncrementalStages.COMPLETION,
+				true);
 		markAllContextsAsSaturated();
 		/*
 		 * TODO: at some point we need to clear non-saturated contexts when
@@ -96,7 +104,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 		 * consistency checking. Something needs to be done about it.
 		 */
 		SaturationState.Writer writer = reasoner.saturationState.getWriter();
-		
+
 		writer.clearNotSaturatedContexts();
 		writer.clearContextsToBeRemoved();
 	}
@@ -104,15 +112,14 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-		
+
 		completion_ = new ClassExpressionNoInputSaturation(
-				reasoner.getProcessExecutor(),
-				workerNo,
-				reasoner.getProgressMonitor(),
-				new RuleApplicationFactory(reasoner.saturationState),
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor(), new RuleApplicationFactory(
+						reasoner.saturationState),
 				ContextModificationListener.DUMMY);
-	}	
-	
+	}
+
 	@Override
 	public void printInfo() {
 		// TODO Auto-generated method stub

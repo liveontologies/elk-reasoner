@@ -98,6 +98,19 @@ public abstract class AbstractReasonerState {
 	 */
 	boolean doneChangeLoading = false;
 	/**
+	 * {@code true} if the assignment of saturations to properties has been reset
+	 */
+	boolean donePropertySaturationReset = true;
+	/**
+	 * {@code true} if entailed reflexive properties have been computed
+	 */
+	boolean donePropertyReflexivityComputation = false;
+	/**
+	 * {@code true} if property hierarchy and compositions have been computed
+	 */
+	boolean donePropertyHierarchyCompositionComputation = false;
+
+	/**
 	 * {@code true} if the assignment of contexts to class expressions has been
 	 * reset
 	 */
@@ -207,6 +220,15 @@ public abstract class AbstractReasonerState {
 			LOGGER_.trace("Reset changes loading");
 		if (doneChangeLoading) {
 			doneChangeLoading = false;
+			resetPropoertySaturation();
+		}
+	}
+
+	public void resetPropoertySaturation() {
+		if (donePropertySaturationReset) {
+			donePropertySaturationReset = false;
+			donePropertyReflexivityComputation = false;
+			donePropertyHierarchyCompositionComputation = false;
 			resetSaturation();
 		}
 	}
@@ -422,7 +444,7 @@ public abstract class AbstractReasonerState {
 
 		return taxonomy;
 	}
-	
+
 	public Taxonomy<ElkClass> getTaxonomyQuietly() {
 		Taxonomy<ElkClass> result = null;
 
@@ -435,7 +457,7 @@ public abstract class AbstractReasonerState {
 		}
 
 		return result;
-	}	
+	}
 
 	public Map<IndexedClassExpression, Context> getContextMap() {
 		final Map<IndexedClassExpression, Context> result = new ArrayHashMap<IndexedClassExpression, Context>(
@@ -499,14 +521,15 @@ public abstract class AbstractReasonerState {
 		return config_
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY);
 	}
-	
-	
-	//////////////////////////////////////////////////////////////////
+
+	// ////////////////////////////////////////////////////////////////
 	/*
 	 * SOME DEBUG METHODS, FIXME: REMOVE
 	 */
-	//////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////
 	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
-		return ontologyIndex == null ? Collections.<IndexedClassExpression>emptyList() : ontologyIndex.getIndexedClassExpressions();
+		return ontologyIndex == null ? Collections
+				.<IndexedClassExpression> emptyList() : ontologyIndex
+				.getIndexedClassExpressions();
 	}
 }

@@ -132,6 +132,13 @@ public interface OntologyIndex {
 	Collection<IndexedObjectProperty> getIndexedObjectProperties();
 
 	/**
+	 * @return the {@link IndexedObjectProperty}s for all
+	 *         {@link ElkObjectProperty}s occurring in the reflexivity axioms of
+	 *         the ontology.
+	 */
+	Collection<IndexedObjectProperty> getReflexiveObjectProperties();
+
+	/**
 	 * @return the first context initialization rule assigned to this
 	 *         {@link OntologyIndex}, or {@code null} if there no such rules;
 	 *         all other rules can be obtained by traversing over
@@ -153,6 +160,10 @@ public interface OntologyIndex {
 	 */
 	ElkAxiomProcessor getAxiomDeleter();
 
+	boolean addReflexiveProperty(IndexedObjectProperty property);
+
+	boolean removeReflexiveProperty(IndexedObjectProperty property);
+
 	/**
 	 * @return a {@link Chain} view of context initialization rules assigned to
 	 *         this {@link OntologyIndex}; it can be used for inserting new
@@ -164,7 +175,7 @@ public interface OntologyIndex {
 	 * @return the {@link IndexedObjectCache} associated with this index
 	 */
 	IndexedObjectCache getIndexedObjectCache();
-	
+
 	Collection<IndexedAxiom> getIndexedAxioms();
 
 }

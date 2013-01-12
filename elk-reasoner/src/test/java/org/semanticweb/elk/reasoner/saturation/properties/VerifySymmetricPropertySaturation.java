@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -40,20 +41,20 @@ public class VerifySymmetricPropertySaturation {
 	 * 
 	 * @param ipc
 	 */
-	public static void testLeftCompositions(IndexedPropertyChain ipc, AsymmetricCompositionHook hook) {
+	public static void testLeftCompositions(IndexedPropertyChain ipc,
+			AsymmetricCompositionHook hook) {
 		SaturatedPropertyChain saturation = ipc.getSaturated();
+		if (saturation == null)
+			return;
 		Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeft = saturation
 				.getCompositionsByLeftSubProperty();
-		if (compositionsByLeft == null)
-			return;
 		for (IndexedPropertyChain left : compositionsByLeft.keySet()) {
 			for (IndexedPropertyChain composition : compositionsByLeft
 					.get(left)) {
 				SaturatedPropertyChain leftSaturation = left.getSaturated();
 				Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRight = leftSaturation
 						.getCompositionsByRightSubProperty();
-				if (compositionsByRight == null
-						|| !compositionsByRight.contains(ipc, composition)) {
+				if (!compositionsByRight.contains(ipc, composition)) {
 					hook.error(left, ipc, composition, ipc);
 				}
 			}
@@ -66,30 +67,30 @@ public class VerifySymmetricPropertySaturation {
 	 * 
 	 * @param ipc
 	 */
-	public static void testRightCompositions(IndexedPropertyChain ipc, AsymmetricCompositionHook hook) {
+	public static void testRightCompositions(IndexedPropertyChain ipc,
+			AsymmetricCompositionHook hook) {
 		SaturatedPropertyChain saturation = ipc.getSaturated();
+		if (saturation == null)
+			return;
 		Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRight = saturation
 				.getCompositionsByRightSubProperty();
-		if (compositionsByRight == null)
-			return;
 		for (IndexedPropertyChain right : compositionsByRight.keySet()) {
 			for (IndexedPropertyChain composition : compositionsByRight
 					.get(right)) {
 				SaturatedPropertyChain rightSaturation = right.getSaturated();
 				Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeft = rightSaturation
 						.getCompositionsByLeftSubProperty();
-				if (compositionsByLeft == null
-						|| !compositionsByLeft.contains(ipc, composition)) {
+				if (!compositionsByLeft.contains(ipc, composition)) {
 					hook.error(ipc, right, composition, ipc);
 				}
 			}
 		}
 	}
-	
+
 	public interface AsymmetricCompositionHook {
-		
-		public void error(IndexedPropertyChain left, IndexedPropertyChain right, IndexedPropertyChain composition, IndexedPropertyChain computed);
+
+		public void error(IndexedPropertyChain left,
+				IndexedPropertyChain right, IndexedPropertyChain composition,
+				IndexedPropertyChain computed);
 	}
 }
-
-

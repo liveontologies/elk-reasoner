@@ -42,8 +42,6 @@ import java.util.concurrent.BlockingQueue;
  * 
  * @param <I>
  *            the type of the input to be processed.
- * @param <P>
- *            the type of the processor for the input
  * @param <F>
  *            the type of the factory for the input processors
  */

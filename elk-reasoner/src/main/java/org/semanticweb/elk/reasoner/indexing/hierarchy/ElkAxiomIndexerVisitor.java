@@ -196,7 +196,17 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
 				.accept(positiveIndexer);
 
+		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
+				&& multiplicity > 0)
+			// first occurrence of reflexivity axiom
+			indexUpdater_.addReflexiveProperty(indexedReflexiveProperty);
+
 		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity;
+
+		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
+				&& multiplicity < 0)
+			// no occurrence of reflexivity axiom
+			indexUpdater_.removeReflexiveProperty(indexedReflexiveProperty);
 	}
 
 	@Override

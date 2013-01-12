@@ -99,7 +99,8 @@ public class BackwardLink implements Conclusion {// extends AbstractConclusion {
 		 * convert backward link to a forward link if it can potentially be
 		 * composed
 		 */
-		if (!relation_.getSaturated().getLeftComposableProperties().isEmpty()) {
+		if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
+				.isEmpty()) {
 			writer.produce(source_, new ForwardLink(relation_, context));
 		}
 	}

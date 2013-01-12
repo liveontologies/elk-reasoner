@@ -98,4 +98,16 @@ public class DirectIndexUpdater implements IndexUpdater {
 					"Cannot remove indexed object from the cache " + object);
 	}
 
+	@Override
+	public void addReflexiveProperty(IndexedObjectProperty property) {
+		ontIndex_.addReflexiveProperty(property);
+	}
+
+	@Override
+	public void removeReflexiveProperty(IndexedObjectProperty property) {
+		if (!ontIndex_.removeReflexiveProperty(property))
+			throw new ElkUnexpectedIndexingException(
+					"Cannot remove reflexivity of object property " + property);
+	}
+
 }

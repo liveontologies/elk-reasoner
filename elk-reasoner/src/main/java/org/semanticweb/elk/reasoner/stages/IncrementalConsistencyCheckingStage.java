@@ -61,7 +61,7 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 	void initComputation() {
 		super.initComputation();
 		
-		this.computation_ = new ConsistencyChecking(
+		this.computation = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex, reasoner.saturationState);
 		if (LOGGER_.isInfoEnabled())

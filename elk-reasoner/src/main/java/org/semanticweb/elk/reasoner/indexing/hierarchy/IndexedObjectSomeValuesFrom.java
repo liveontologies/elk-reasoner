@@ -198,7 +198,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 				// TODO: create a composition rule to deal with reflexivity
 				// propagating to the this context if relation is reflexive
-				if (relation.getSaturated().isReflexive())
+				if (relation.getSaturated().isDerivedReflexive())
 					writer.produce(context, new NegativeSubsumer(e));
 			}
 		}

@@ -157,25 +157,18 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * 
 	 * @return {@code true} if the operation succeeded.
 	 */
-	public boolean setContext(Context context) {
+	public synchronized boolean setContext(Context context) {
 		if (context_ != null)
 			return false;
-		synchronized (this) {
-			if (context_ != null)
-				return false;
-			context_ = context;
-		}
+		context_ = context;
 		return true;
 	}
 
 	/**
 	 * Resets the corresponding context to null.
 	 */
-	public void resetContext() {
-		if (context_ != null)
-			synchronized (this) {
-				context_ = null;
-			}
+	public synchronized void resetContext() {
+		context_ = null;
 	}
 
 	/**

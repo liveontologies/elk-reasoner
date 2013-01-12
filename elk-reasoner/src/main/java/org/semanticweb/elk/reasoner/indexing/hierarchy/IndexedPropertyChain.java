@@ -33,7 +33,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
-import org.semanticweb.elk.reasoner.saturation.properties.IndexedPropertyChainSaturation;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -52,7 +51,8 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class IndexedPropertyChain extends IndexedObject {
+public abstract class IndexedPropertyChain extends IndexedObject implements
+		Comparable<IndexedPropertyChain> {
 
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(IndexedPropertyChain.class);
@@ -86,8 +86,7 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 
 	/**
 	 * @return All told super object properties of this
-	 *         {@link IndexedBinaryPropertyChain}, or {@code null} if none is
-	 *         assigned
+	 *         {@link IndexedBinaryPropertyChain}
 	 */
 	public List<IndexedObjectProperty> getToldSuperProperties() {
 		return toldSuperProperties_ == null ? Collections
@@ -95,19 +94,12 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 	}
 
 	/**
-	 * @return All told sub object properties of this
-	 *         {@link IndexedBinaryPropertyChain}, or {@code null} if none is
-	 *         assigned
-	 */
-	public abstract List<IndexedPropertyChain> getToldSubProperties();
-
-	/**
 	 * @return All {@link IndexedBinaryPropertyChain}s in which this
-	 *         {@link IndexedPropertyChain} occurs on right, or {@code null} if
-	 *         none is assigned
+	 *         {@link IndexedPropertyChain} occurs on right
 	 */
 	public Collection<IndexedBinaryPropertyChain> getRightChains() {
-		return rightChains_;
+		return rightChains_ == null ? Collections
+				.<IndexedBinaryPropertyChain> emptySet() : rightChains_;
 	}
 
 	/**
@@ -211,24 +203,10 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 
 	/**
 	 * @return The corresponding {@code SaturatedObjecProperty} assigned to this
-	 *         {@link IndexedPropertyChain}, or {@code null} if none was
-	 *         assigned.
+	 *         {@link IndexedPropertyChain} or {@code null} if none is assigned
 	 */
 	public SaturatedPropertyChain getSaturated() {
-		return getSaturated(true);
-	}
-
-	/**
-	 * If the parameter is set to false, the saturation object will be returned
-	 * "as is", i.e. possibly null or not yet populated. Otherwise, saturation
-	 * will be triggered automatically.
-	 * 
-	 * @param saturate
-	 * @return
-	 */
-	public SaturatedPropertyChain getSaturated(boolean saturate) {
-		return saturate && (saturated_ == null || !saturated_.isComputed()) ? saturate()
-				: saturated_;
+		return saturated_;
 	}
 
 	/**
@@ -240,22 +218,22 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 	 *            {@link IndexedClassExpression}
 	 * 
 	 * @return {@code true} if the operation succeeded. If this method is called
-	 *         for the same object from different threads with at the same time
-	 *         with non-null arguments, only one call returns {@code true}.
+	 *         for the same object from different threads at the same time with
+	 *         non-null arguments, only one call returns {@code true}.
 	 */
-	public synchronized void setSaturated(
+	public synchronized boolean setSaturated(
 			SaturatedPropertyChain saturatedObjectProperty) {
+		if (saturated_ != null)
+			return false;
 		saturated_ = saturatedObjectProperty;
+		return true;
 	}
 
 	/**
 	 * Resets the corresponding {@code SaturatedObjecProperty} to {@code null}.
 	 */
-	public void resetSaturated() {
-		if (saturated_ != null)
-			synchronized (this) {
-				saturated_ = null;
-			}
+	public synchronized void resetSaturated() {
+		saturated_ = null;
 	}
 
 	/**
@@ -268,13 +246,19 @@ public abstract class IndexedPropertyChain extends IndexedObject {
 		return hashCode_;
 	}
 
-	private SaturatedPropertyChain saturate() {
-		SaturatedPropertyChain saturated = IndexedPropertyChainSaturation
-				.saturate(this);
-
-		setSaturated(saturated);
-
-		return saturated;
+	@Override
+	public int compareTo(IndexedPropertyChain o) {
+		if (this == o)
+			return 0;
+		else if (this.hashCode_ == o.hashCode_) {
+			/*
+			 * hash code collision for different elements should happen very
+			 * rarely; in this case we rely on the unique string representation
+			 * of indexed objects to compare them
+			 */
+			return this.toString().compareTo(o.toString());
+		} else
+			return (this.hashCode_ < o.hashCode_ ? -1 : 1);
 	}
 
 	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);

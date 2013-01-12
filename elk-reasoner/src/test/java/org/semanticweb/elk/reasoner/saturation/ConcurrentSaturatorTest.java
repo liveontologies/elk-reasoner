@@ -35,6 +35,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -72,18 +73,24 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		IndexedClassExpression A = ontologyIndex.getIndexed(a);
 		IndexedClassExpression D = ontologyIndex.getIndexed(d);
+		IndexedPropertyChain R = ontologyIndex.getIndexed(r);
+
+		final TestPropertySaturation propertySaturation = new TestPropertySaturation(
+				executor, 16, ontologyIndex);
 
 		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
 
+		propertySaturation.start();
+		propertySaturation.submit(R);
+		propertySaturation.finish();
+
 		classExpressionSaturation.start();
 		classExpressionSaturation
 				.submit(new SaturationJob<IndexedClassExpression>(A));
-
 		classExpressionSaturation.finish();
 
-		assertTrue("A contains D", A.getContext().getSubsumers()
-				.contains(D));
+		assertTrue("A contains D", A.getContext().getSubsumers().contains(D));
 
 	}
 
@@ -111,14 +118,14 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression I = ontologyIndex.getIndexed(objectFactory
 				.getObjectIntersectionOf(b, c));
 
-//		assertTrue("A SubClassOf B",
-//				A.getToldSuperClassExpressions().contains(B));
-//		assertTrue("A SubClassOf C",
-//				A.getToldSuperClassExpressions().contains(C));
-//		assertFalse("A SubClassOf D", A.getToldSuperClassExpressions()
-//				.contains(D));
-//		assertTrue("I SubClassOf D",
-//				I.getToldSuperClassExpressions().contains(D));
+		// assertTrue("A SubClassOf B",
+		// A.getToldSuperClassExpressions().contains(B));
+		// assertTrue("A SubClassOf C",
+		// A.getToldSuperClassExpressions().contains(C));
+		// assertFalse("A SubClassOf D", A.getToldSuperClassExpressions()
+		// .contains(D));
+		// assertTrue("I SubClassOf D",
+		// I.getToldSuperClassExpressions().contains(D));
 
 		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, ontologyIndex);
@@ -129,16 +136,11 @@ public class ConcurrentSaturatorTest extends TestCase {
 		classExpressionSaturation.finish();
 		Context context = A.getContext();
 
-		assertTrue("A contains A",
-				context.getSubsumers().contains(A));
-		assertTrue("A contains B",
-				context.getSubsumers().contains(B));
-		assertTrue("A contains C",
-				context.getSubsumers().contains(C));
-		assertTrue("A contains I",
-				context.getSubsumers().contains(I));
-		assertTrue("A contains D",
-				context.getSubsumers().contains(D));
+		assertTrue("A contains A", context.getSubsumers().contains(A));
+		assertTrue("A contains B", context.getSubsumers().contains(B));
+		assertTrue("A contains C", context.getSubsumers().contains(C));
+		assertTrue("A contains I", context.getSubsumers().contains(I));
+		assertTrue("A contains D", context.getSubsumers().contains(D));
 	}
 
 }

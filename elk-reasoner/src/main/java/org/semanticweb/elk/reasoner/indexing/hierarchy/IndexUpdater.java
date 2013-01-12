@@ -53,7 +53,12 @@ interface IndexUpdater {
 
 	public void removeClass(ElkClass oldClass);
 
+	public void addReflexiveProperty(IndexedObjectProperty property);
+
+	public void removeReflexiveProperty(IndexedObjectProperty property);
+
 	public void addNamedIndividual(ElkNamedIndividual newIndividual);
 
 	public void removeNamedIndividual(ElkNamedIndividual newIndividual);
+
 }

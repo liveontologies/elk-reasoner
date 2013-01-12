@@ -44,7 +44,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	protected ConsistencyChecking computation_ = null;
+	protected ConsistencyChecking computation = null;
 
 	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -62,45 +62,46 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(
-				(ReasonerStage) new OntologyLoadingStage(reasoner),
-				(ReasonerStage) new ChangesLoadingStage(reasoner),
-				(ReasonerStage) new ContextInitializationStage(reasoner));		
+		return Arrays
+				.asList((ReasonerStage) new PropertyHierarchyCompositionComputationStage(
+						reasoner),
+						(ReasonerStage) new ContextInitializationStage(reasoner));
 	}
 
 	@Override
 	public void execute() throws ElkInterruptedException {
-		if (computation_ == null)
+		if (computation == null)
 			initComputation();
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
-				computation_.process();
+				computation.process();
 				if (!interrupted())
 					break;
 			}
 		} finally {
 			progressMonitor.finish();
 		}
-		
-		reasoner.inconsistentOntology = computation_.isInconsistent();
+
+		reasoner.inconsistentOntology = computation.isInconsistent();
 		reasoner.doneConsistencyCheck = true;
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		this.computation_ = new ConsistencyChecking(
+		this.computation = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.ontologyIndex, reasoner.saturationState);
+				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
+				reasoner.saturationState);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
 
 	@Override
 	public void printInfo() {
-		if (computation_ != null)
-			computation_.printStatistics();
+		if (computation != null)
+			computation.printStatistics();
 	}
 
 }

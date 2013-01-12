@@ -75,6 +75,10 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 		return result;
 	}
 
+	public Collection<Value> getOld(Object key) {
+		return super.get(key);
+	}
+
 	@Override
 	public boolean remove(Object key, Object value) {
 		Collection<Value> record = super.get(key);

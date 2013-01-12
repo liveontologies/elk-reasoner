@@ -24,7 +24,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.AbstractCollection;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
@@ -34,6 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -48,6 +51,8 @@ public class OntologyIndexImpl implements OntologyIndex {
 			directAxiomDeleter_;
 
 	private ChainableRule<Context> contextInitRules_ = null;
+
+	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
 
 	public OntologyIndexImpl(IndexedObjectCache objectCache) {
 		objectCache_ = objectCache;
@@ -68,6 +73,8 @@ public class OntologyIndexImpl implements OntologyIndex {
 		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
 				indexedOwlNothing_, new DirectIndexUpdater(this), false);
 
+		this.reflexiveObjectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
+				64);
 	}
 
 	public OntologyIndexImpl() {
@@ -125,7 +132,7 @@ public class OntologyIndexImpl implements OntologyIndex {
 	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
 		return objectCache_.indexedClassExpressionLookup;
 	}
-	
+
 	@Override
 	public Collection<IndexedAxiom> getIndexedAxioms() {
 		return objectCache_.indexedAxiomLookup;
@@ -188,6 +195,22 @@ public class OntologyIndexImpl implements OntologyIndex {
 	}
 
 	@Override
+	public Collection<IndexedObjectProperty> getReflexiveObjectProperties() {
+		return Collections.unmodifiableCollection(reflexiveObjectProperties_);
+	}
+
+	@Override
+	public boolean addReflexiveProperty(IndexedObjectProperty property) {
+		return reflexiveObjectProperties_.add(property);
+
+	}
+
+	@Override
+	public boolean removeReflexiveProperty(IndexedObjectProperty property) {
+		return reflexiveObjectProperties_.remove(property);
+	}
+
+	@Override
 	public ElkAxiomProcessor getAxiomInserter() {
 		return directAxiomInserter_;
 	}
@@ -206,4 +229,5 @@ public class OntologyIndexImpl implements OntologyIndex {
 	public IndexedClass getIndexedOwlNothing() {
 		return indexedOwlNothing_;
 	}
+
 }

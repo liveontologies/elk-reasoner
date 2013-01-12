@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -46,8 +47,8 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 * Collections of all binary role chains in which this
 	 * {@link IndexedBinaryPropertyChain} occurs on the left.
 	 */
-	private Collection<IndexedBinaryPropertyChain> leftChains_;	
-	
+	private Collection<IndexedBinaryPropertyChain> leftChains_;
+
 	/**
 	 * Correctness of axioms deletions requires that toldSubProperties is a
 	 * List.
@@ -74,21 +75,22 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	}
 
 	/**
-	 * @return All told sub object properties of this object property, possibly
-	 *         {@code null}.
+	 * @return All told sub object properties of this object property
 	 */
-	@Override
 	public List<IndexedPropertyChain> getToldSubProperties() {
-		return toldSubProperties;
+		return toldSubProperties == null ? Collections
+				.<IndexedPropertyChain> emptyList() : Collections
+				.<IndexedPropertyChain> unmodifiableList(toldSubProperties);
 	}
 
 	/**
 	 * @return All {@link IndexedBinaryPropertyChain}s in which this
-	 *         {@link IndexedPropertyChain} occurs on the left, or {@code null}
-	 *         if none is assigned
+	 *         {@link IndexedPropertyChain} occurs on the left
 	 */
 	public Collection<IndexedBinaryPropertyChain> getLeftChains() {
-		return leftChains_;
+		return leftChains_ == null ? Collections
+				.<IndexedBinaryPropertyChain> emptySet() : Collections
+				.unmodifiableCollection(leftChains_);
 	}
 
 	/**
@@ -123,10 +125,10 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		}
 		return success;
 	}
-	
-	
+
 	/**
-	 * @return {@code true} if this object property occurs in a reflexivity axiom.
+	 * @return {@code true} if this object property occurs in a reflexivity
+	 *         axiom.
 	 */
 	public boolean isToldReflexive() {
 		return reflexiveAxiomOccurrenceNo > 0;
@@ -181,7 +183,8 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	}
 
 	@Override
-	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor, P parameter) {
+	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor,
+			P parameter) {
 		return visitor.visit(this, parameter);
 	}
 }
