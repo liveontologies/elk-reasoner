@@ -220,11 +220,11 @@ public abstract class AbstractReasonerState {
 			LOGGER_.trace("Reset changes loading");
 		if (doneChangeLoading) {
 			doneChangeLoading = false;
-			resetPropoertySaturation();
+			resetPropertySaturation();
 		}
 	}
 
-	public void resetPropoertySaturation() {
+	public void resetPropertySaturation() {
 		if (donePropertySaturationReset) {
 			donePropertySaturationReset = false;
 			donePropertyReflexivityComputation = false;

@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
- * A {@link ReasonerComputation} that computes relevant sub-properties anc composition maps
+ * A {@link ReasonerComputation} that computes relevant sub-properties and composition maps
  * 
  * @author Yevgeny Kazakov
  * 
