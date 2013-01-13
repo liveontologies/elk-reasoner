@@ -215,18 +215,24 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 * 
 	 * @param saturatedObjectProperty
 	 *            assign the given {@link SaturatedPropertyChain} to this
-	 *            {@link IndexedClassExpression}
+	 *            {@link IndexedPropertyChain}
 	 * 
-	 * @return {@code true} if the operation succeeded. If this method is called
-	 *         for the same object from different threads at the same time with
-	 *         non-null arguments, only one call returns {@code true}.
+	 * @return the previous {@link SaturatedPropertyChain} assigned to this
+	 *         {@link IndexedPropertyChain} or {@code null} if none was
+	 *         assigned.
 	 */
-	public synchronized boolean setSaturated(
+	public synchronized SaturatedPropertyChain setSaturated(
 			SaturatedPropertyChain saturatedObjectProperty) {
 		if (saturated_ != null)
-			return false;
+			return saturated_;
+		if (saturatedObjectProperty == null)
+			throw new ElkUnexpectedIndexingException(this
+					+ ": cannot assign null saturation");
 		saturated_ = saturatedObjectProperty;
-		return true;
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace(this + ": saturation assinged");
+		}
+		return null;
 	}
 
 	/**
@@ -234,6 +240,9 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 */
 	public synchronized void resetSaturated() {
 		saturated_ = null;
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace(this + ": saturation removed");
+		}
 	}
 
 	/**

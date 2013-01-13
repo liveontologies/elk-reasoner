@@ -143,7 +143,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 
 	/**
 	 * @param subObjectProperty
-	 * @return true if succesfully removed
+	 * @return {@code true} if successfully removed
 	 */
 	protected boolean removeToldSubObjectProperty(
 			IndexedPropertyChain subObjectProperty) {
@@ -171,11 +171,9 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	}
 
 	/**
-	 * Represent the object's ElkObjectProperty as a string. This implementation
-	 * reflects the fact that we generally consider only one
-	 * IndexedObjectProperty for each ElkObjectPropertyExpression.
 	 * 
-	 * @return String representation.
+	 * @return The string representation of the {@link ElkObjectProperty}
+	 *         corresponding to this object.
 	 */
 	@Override
 	public String toStringStructural() {

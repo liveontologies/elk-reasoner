@@ -327,7 +327,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			if (!ipc.occurs() && increment > 0)
 				indexUpdater_.add(ipc);
 
-			ipc.updateOccurrenceNumber(increment);
+			ipc.updateAndCheckOccurrenceNumbers(increment);
 
 			if (!ipc.occurs() && increment < 0)
 				indexUpdater_.remove(ipc);

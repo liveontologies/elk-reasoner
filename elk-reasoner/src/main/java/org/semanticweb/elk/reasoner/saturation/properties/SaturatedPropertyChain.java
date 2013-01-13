@@ -102,6 +102,16 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
+	 * Clear all derived information for this {@link SaturatedPropertyChain}
+	 */
+	public void clear() {
+		isDerivedReflexive_ = false;
+		derivedSubProperties = null;
+		compositionsByLeftSubProperty = null;
+		compositionsByRightSubProperty = null;
+	}
+
+	/**
 	 * @return All sub-properties R of root including root itself. Computed in
 	 *         the {@link ObjectPropertyHierarchyComputationStage}.
 	 */
@@ -152,15 +162,22 @@ public class SaturatedPropertyChain {
 		return true;
 	}
 
-	static SaturatedPropertyChain getCreate(IndexedPropertyChain ipc) {
-		synchronized (ipc) {
-			SaturatedPropertyChain saturated = ipc.getSaturated();
-			if (saturated == null) {
-				saturated = new SaturatedPropertyChain(ipc);
-				ipc.setSaturated(saturated);
-			}
-			return saturated;
+	/**
+	 * @param ipc
+	 *            the {@link IndexedPropertyChain} for which to retrieve the
+	 *            assigned {@link SaturatedPropertyChain}
+	 * @return the {@link SaturatedPropertyChain} assigned to the given
+	 *         {@link IndexedPropertyChain} creating new assignment if necessary
+	 */
+	public static SaturatedPropertyChain getCreate(IndexedPropertyChain ipc) {
+		SaturatedPropertyChain saturated = ipc.getSaturated();
+		if (saturated == null) {
+			saturated = new SaturatedPropertyChain(ipc);
+			SaturatedPropertyChain previous = ipc.setSaturated(saturated);
+			if (previous != null)
+				return previous;
 		}
+		return saturated;
 	}
 
 	/**
@@ -170,7 +187,7 @@ public class SaturatedPropertyChain {
 	 * @param ipc
 	 * @return
 	 */
-	static boolean isRelevant(IndexedPropertyChain ipc) {
+	public static boolean isRelevant(IndexedPropertyChain ipc) {
 		return !REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
 				|| ipc.accept(TOLD_SUPER_PROPERRTY_CHECKER_);
 	}

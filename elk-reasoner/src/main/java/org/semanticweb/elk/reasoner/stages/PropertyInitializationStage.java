@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,9 +33,8 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
 //TODO: add progress monitor, make concurrent if possible
 
 /**
- * A {@link ReasonerStage} which purpose is to ensure that no
- * {@link SaturatedPropertyChain} is assigned to {@link IndexedPropertyChain}s
- * of the current ontology
+ * A {@link ReasonerStage} which deletes all derived information from
+ * {@link SaturatedPropertyChain} assigned to {@link IndexedPropertyChain}s
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -48,11 +48,15 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The counter for deleted saturations
 	 */
-	private int deletedSaturations_;
+	private int clearedSaturations_;
+	/**
+	 * The progress counter
+	 */
+	private int progress_;
 	/**
 	 * The number of contexts
 	 */
-	private int maxSaturations_;
+	private int maxProgress_;
 
 	/**
 	 * The state of the iterator of the input to be processed
@@ -88,9 +92,12 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 				if (!todo.hasNext())
 					break;
 				IndexedPropertyChain ipc = todo.next();
-				ipc.resetSaturated();
-				deletedSaturations_++;
-				progressMonitor.report(deletedSaturations_, maxSaturations_);
+				SaturatedPropertyChain saturation = ipc.getSaturated();
+				if (saturation != null) {
+					saturation.clear();
+					clearedSaturations_++;
+				}
+				progressMonitor.report(++progress_, maxProgress_);
 				if (interrupted())
 					continue;
 			}
@@ -104,15 +111,15 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	void initComputation() {
 		super.initComputation();
 		todo = reasoner.ontologyIndex.getIndexedPropertyChains().iterator();
-		maxSaturations_ = reasoner.ontologyIndex.getIndexedPropertyChains()
-				.size();
-		deletedSaturations_ = 0;
+		maxProgress_ = reasoner.ontologyIndex.getIndexedPropertyChains().size();
+		progress_ = 0;
+		clearedSaturations_ = 0;
 	}
 
 	@Override
 	public void printInfo() {
-		if (deletedSaturations_ > 0 && LOGGER_.isDebugEnabled())
-			LOGGER_.debug("Saturations deleted:" + deletedSaturations_);
+		if (clearedSaturations_ > 0 && LOGGER_.isDebugEnabled())
+			LOGGER_.debug("Saturations cleared: " + clearedSaturations_);
 	}
 
 }

@@ -117,12 +117,12 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		TestChangesLoader changeLoader2 = new TestChangesLoader();
 		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
 				new SimpleStageExecutor(), 1);
-		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(new PostProcessingStageExecutor(), 1);
+		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
+				new PostProcessingStageExecutor(), 1);
 
 		standardReasoner.registerOntologyLoader(new TestAxiomLoader(axioms));
 		standardReasoner.registerOntologyChangesLoader(changeLoader1);
-		incrementalReasoner
-				.registerOntologyLoader(new TestAxiomLoader(axioms));
+		incrementalReasoner.registerOntologyLoader(new TestAxiomLoader(axioms));
 		incrementalReasoner.registerOntologyChangesLoader(changeLoader2);
 
 		standardReasoner.setIncrementalMode(false);
@@ -130,7 +130,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		// initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-		long seed = RandomSeedProvider.VALUE;//System.currentTimeMillis();
+		long seed = RandomSeedProvider.VALUE;// System.currentTimeMillis();
 		Random rnd = new Random(seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
@@ -139,19 +139,20 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 
 			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
 
-			
-			for (ElkAxiom del : deleted) {
-				System.err.println(OwlFunctionalStylePrinter.toString(del));
-			}
-			 
+			if (LOGGER_.isTraceEnabled())
+				for (ElkAxiom del : deleted) {
+					LOGGER_.trace(OwlFunctionalStylePrinter.toString(del)
+							+ ": deleted");
+				}
 
 			// incremental changes
 			changeLoader1.clear();
 			changeLoader2.clear();
 			remove(changeLoader1, deleted);
 			remove(changeLoader2, deleted);
-			
-			System.out.println("===DELETIONS===");
+
+			if (LOGGER_.isInfoEnabled())
+				LOGGER_.info("===DELETIONS===");
 
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 
@@ -161,8 +162,9 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 			changeLoader2.clear();
 			add(changeLoader1, deleted);
 			add(changeLoader2, deleted);
-			
-			System.out.println("===ADDITIONS===");
+
+			if (LOGGER_.isInfoEnabled())
+				LOGGER_.info("===ADDITIONS===");
 
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}

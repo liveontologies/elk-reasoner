@@ -94,7 +94,9 @@ public class BaseIncrementalClassificationCorrectnessTest
 		} catch (AssertionError e) {
 			try {
 				Writer writer = new OutputStreamWriter(System.out);
+				System.out.println("======= Expected Taxonomy =======");
 				TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
+				System.out.println("======= Incremental Taxonomy =======");
 				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
 				writer.flush();
 				throw e;

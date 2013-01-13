@@ -110,7 +110,6 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 		long seed = System.currentTimeMillis();
 
 		incrementalReasoner.setIncrementalMode(true);
-		
 
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Initial load of test axioms");
@@ -125,18 +124,21 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 							fileLoader, changingAxioms, staticAxioms));
 			incrementalReasoner.loadOntology();
 			// let the runner run..
+			// TODO: CleanIndexHook is not safe with RandomWalk test
+			// because it removes role axioms as well!
+//			new RandomWalkIncrementalClassificationRunner(MAX_ROUNDS,
+//					ITERATIONS).run(incrementalReasoner, changingAxioms,
+//					staticAxioms, seed, new CleanIndexHook());
 			new RandomWalkIncrementalClassificationRunner(MAX_ROUNDS,
 					ITERATIONS).run(incrementalReasoner, changingAxioms,
-					staticAxioms, seed, new CleanIndexHook());
+					staticAxioms, seed);
 
 		} catch (Exception e) {
 			throw new ElkRuntimeException("Seed " + seed, e);
-		}
-		finally {
+		} finally {
 			incrementalReasoner.shutdown();
 		}
 	}
-	
 
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,

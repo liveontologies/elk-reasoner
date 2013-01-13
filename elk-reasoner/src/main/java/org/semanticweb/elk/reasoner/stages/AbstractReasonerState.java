@@ -98,7 +98,8 @@ public abstract class AbstractReasonerState {
 	 */
 	boolean doneChangeLoading = false;
 	/**
-	 * {@code true} if the assignment of saturations to properties has been reset
+	 * {@code true} if the assignment of saturations to properties has been
+	 * reset
 	 */
 	boolean donePropertySaturationReset = true;
 	/**
@@ -109,7 +110,6 @@ public abstract class AbstractReasonerState {
 	 * {@code true} if property hierarchy and compositions have been computed
 	 */
 	boolean donePropertyHierarchyCompositionComputation = false;
-
 	/**
 	 * {@code true} if the assignment of contexts to class expressions has been
 	 * reset
@@ -207,6 +207,7 @@ public abstract class AbstractReasonerState {
 		}
 
 		resetChangesLoading();
+		resetPropertySaturation();
 		registerOntologyChangesLoader(null);
 	}
 
@@ -220,7 +221,10 @@ public abstract class AbstractReasonerState {
 			LOGGER_.trace("Reset changes loading");
 		if (doneChangeLoading) {
 			doneChangeLoading = false;
-			resetPropertySaturation();
+			resetSaturation();
+			// TODO: currently it is assumed that changes do not have property
+			// axioms
+			// resetPropertySaturation();
 		}
 	}
 
