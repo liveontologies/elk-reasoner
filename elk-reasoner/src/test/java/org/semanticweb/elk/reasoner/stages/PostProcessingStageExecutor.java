@@ -52,7 +52,21 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 		postProcesingMap.add(IncrementalDeSaturationStage.class, ContextSaturationFlagCheckingStage.class);
 		postProcesingMap.add(IncrementalContextCleaningStage.class, CheckCleaningStage.class);
 		postProcesingMap.add(IncrementalAdditionInitializationStage.class, SaturationGraphValidationStage.class);
-		postProcesingMap.add(IncrementalReSaturationStage.class, RandomContextResaturationStage.class);
+		/*
+		 * this phase is commented because it uses cleaning to clean up randomly
+		 * picked contexts. Cleaning never deletes anything from other contexts,
+		 * which could be back-linked from the cleaned ones. However, there's no
+		 * guarantee that cleaned contexts, once re-saturated, will have exactly
+		 * the same (complex) subsumers as before cleaning. Therefore,
+		 * non-cleaned contexts linked from the cleaned (and re-saturated) ones
+		 * may end up with (complex) subsumers which seemingly have come from
+		 * nowhere.
+		 * 
+		 * A solution would to be de-saturate randomly picked contexts, then
+		 * clean all modified ones, and re-saturate. I.e. do exactly what we do
+		 * in the standard chain of incremental reasoning stages.
+		 */
+		//postProcesingMap.add(IncrementalReSaturationStage.class, RandomContextResaturationStage.class);
 		postProcesingMap.add(IncrementalClassTaxonomyComputationStage.class, ValidateTaxonomyStage.class);
 	}
 	
