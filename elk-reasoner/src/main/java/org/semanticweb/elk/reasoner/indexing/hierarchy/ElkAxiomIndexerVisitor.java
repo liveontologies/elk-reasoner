@@ -277,13 +277,6 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		@Override
 		public IndexedClass visit(IndexedClass element) {
-			// if (element
-			// .getElkClass()
-			// .getIri()
-			// .toString()
-			// .equals("<http://www.co-ode.org/ontologies/galen#Spermatozoa>"))
-			System.err.println("Indexing " + element + "("
-					+ element.getElkClass().getIri() + ")");
 			return update(objectCache_.visit(element));
 		}
 

@@ -118,10 +118,7 @@ class IncrementalClassTaxonomyComputationStage extends
 				}
 
 			};
-
 			
-			//System.out.println("Classes to be updated in the taxonomy: " + modified);
-
 			computation_ = new ClassTaxonomyComputation(modified,
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.ontologyIndex, reasoner.taxonomy);
