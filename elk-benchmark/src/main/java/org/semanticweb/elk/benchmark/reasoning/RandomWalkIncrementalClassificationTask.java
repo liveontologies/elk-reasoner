@@ -44,7 +44,7 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalClassificationRunner;
 import org.semanticweb.elk.reasoner.incremental.TrackingOntologyLoader;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 
 /**
  * TODO docs
@@ -97,7 +97,7 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 			changingAxioms_ = new OnOffVector<ElkAxiom>(128);
 			staticAxioms_ = new ArrayList<ElkAxiom>();
 			reasoner_ = TestReasonerUtils.createTestReasoner(
-					new LoggingStageExecutor(), reasonerConfig_);
+					new PostProcessingStageExecutor(), reasonerConfig_);
 			OntologyLoader fileLoader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), ontologyFile);
 			reasoner_.registerOntologyLoader(new TrackingOntologyLoader(
