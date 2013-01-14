@@ -34,8 +34,8 @@ public class CompositionClosureTest {
 	 * @throws InterruptedException
 	 */
 	@Test
-	public void testReplaceByToldSuperProperties() throws ElkException,
-			InterruptedException {
+	public void testReplaceByToldSuperPropertiesAndEliminateImplied()
+			throws ElkException, InterruptedException {
 		if (!SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES)
 			return;
 
@@ -55,15 +55,25 @@ public class CompositionClosureTest {
 				":h2"));
 		ElkObjectProperty h3 = objectFactory.getObjectProperty(new ElkFullIri(
 				":h3"));
+		ElkObjectProperty h4 = objectFactory.getObjectProperty(new ElkFullIri(
+				":h4"));
+		ElkObjectProperty h5 = objectFactory.getObjectProperty(new ElkFullIri(
+				":h5"));
 		ElkObjectPropertyChain ros = objectFactory
 				.getObjectPropertyChain(Arrays.asList(r, s));
 
 		objectFactory.getSubObjectPropertyOfAxiom(ros, h1).accept(indexer);
 		objectFactory.getSubObjectPropertyOfAxiom(ros, h2).accept(indexer);
-		objectFactory.getSubObjectPropertyOfAxiom(h1, h3).accept(indexer);
+		objectFactory.getSubObjectPropertyOfAxiom(ros, h3).accept(indexer);
+
+		objectFactory.getSubObjectPropertyOfAxiom(h3, h4).accept(indexer);
+		objectFactory.getSubObjectPropertyOfAxiom(h4, h2).accept(indexer);
+		objectFactory.getSubObjectPropertyOfAxiom(h2, h5).accept(indexer);
+		objectFactory.getSubObjectPropertyOfAxiom(h5, h1).accept(indexer);
 
 		IndexedPropertyChain ih1 = index.getIndexed(h1);
 		IndexedPropertyChain ih2 = index.getIndexed(h2);
+		IndexedPropertyChain ih3 = index.getIndexed(h3);
 		IndexedBinaryPropertyChain iros = (IndexedBinaryPropertyChain) index
 				.getIndexed(ros);
 
@@ -74,22 +84,36 @@ public class CompositionClosureTest {
 
 		closure.applyTo(compositions);
 
-		// testing that compositions = [h1, h2]
+		// testing that compositions = [h1, h2, h3]
 
 		// System.err.println(compositions);
 
 		assertTrue(compositions.contains(ih1));
 		assertTrue(compositions.contains(ih2));
-		assertEquals(compositions.size(), 2);
+		assertTrue(compositions.contains(ih3));
+		assertEquals(3, compositions.size());
+
+		compositions.clear();
+
+		// use the same example with elimination of implied properties
+		CompositionClosure reducingClosure = new ReducingCompositionClosure(
+				iros);
+
+		reducingClosure.applyTo(compositions);
+
+		// testing that compositions = [h3] because h3 => h2 => h1
+
+		// System.err.println(compositions);
+
+		assertTrue(compositions.contains(ih3));
+		assertEquals(1, compositions.size());
 
 	}
 
 	@Test
-	public void testEliminateImpliedCompositions() throws ElkException,
+	public void testEquivalentProperties() throws ElkException,
 			InterruptedException {
 		if (!SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES)
-			return;
-		if (!SaturatedPropertyChain.ELIMINATE_IMPLIED_COMPOSITIONS)
 			return;
 
 		OntologyIndex index = new OntologyIndexImpl();
@@ -145,7 +169,7 @@ public class CompositionClosureTest {
 		// System.err.println(compositions);
 
 		assertTrue(compositions.contains(ih1));
-		assertEquals(compositions.size(), 2);
+		assertEquals(2, compositions.size());
 		assertTrue(compositions.contains(ih2) || compositions.contains(ih3));
 
 	}

@@ -49,13 +49,10 @@ class ReducingCompositionClosure extends CompositionClosure {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(SubPropertyExplorer.class);
 
-	final Set<IndexedPropertyChain> rootSubProperties;
 	final Set<IndexedPropertyChain> toRemove;
 
 	ReducingCompositionClosure(IndexedBinaryPropertyChain root) {
 		super(root);
-		this.rootSubProperties = SubPropertyExplorer
-				.getSetRelevantSubProperties(root);
 		toRemove = new HashSet<IndexedPropertyChain>();
 		Iterator<? extends IndexedPropertyChain> compositionIterator = relevantCompositions
 				.iterator();
@@ -79,13 +76,20 @@ class ReducingCompositionClosure extends CompositionClosure {
 
 	@Override
 	public void applyTo(Collection<IndexedPropertyChain> currentCompositions) {
-		if (!rootSubProperties.isEmpty())
-			for (IndexedPropertyChain current : currentCompositions) {
-				if (rootSubProperties.contains(current))
-					// the root is already implied by some current compositions
-					return;
-			}
-		super.applyTo(currentCompositions);
+		for (IndexedPropertyChain relevant : relevantCompositions) {
+			Set<IndexedPropertyChain> subProperties = SubPropertyExplorer
+					.getSetRelevantSubProperties(relevant);
+			// add this composition unless it already implied by a current
+			// composition
+			boolean addThis = true;
+			for (IndexedPropertyChain current : currentCompositions)
+				if (subProperties.contains(current)) {
+					addThis = false;
+					break;
+				}
+			if (addThis)
+				currentCompositions.add(relevant);
+		}
 		currentCompositions.removeAll(toRemove);
 	}
 }

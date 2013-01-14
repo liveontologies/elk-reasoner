@@ -23,6 +23,8 @@
 
 package org.semanticweb.elk.reasoner.saturation.properties;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 
@@ -112,6 +114,26 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
+	 * @return {@code true} if there is no derived information in this
+	 *         {@link SaturatedPropertyChain}, that is, its state is the same as
+	 *         after applying {{@link #clear()}
+	 */
+	public boolean isClear() {
+		return isDerivedReflexive_ == false && derivedSubProperties == null
+				&& compositionsByLeftSubProperty == null
+				&& compositionsByRightSubProperty == null;
+	}
+
+	public SaturatedPropertyChain clone() {
+		SaturatedPropertyChain result = new SaturatedPropertyChain(root);
+		result.isDerivedReflexive_ = this.isDerivedReflexive_;
+		result.derivedSubProperties = this.derivedSubProperties;
+		result.compositionsByLeftSubProperty = this.compositionsByLeftSubProperty;
+		result.compositionsByRightSubProperty = this.compositionsByRightSubProperty;
+		return result;
+	}
+
+	/**
 	 * @return All sub-properties R of root including root itself. Computed in
 	 *         the {@link ObjectPropertyHierarchyComputationStage}.
 	 */
@@ -190,6 +212,46 @@ public class SaturatedPropertyChain {
 	public static boolean isRelevant(IndexedPropertyChain ipc) {
 		return !REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
 				|| ipc.accept(TOLD_SUPER_PROPERRTY_CHECKER_);
+	}
+
+	/**
+	 * Prints differences with other {@link SaturatedPropertyChain}
+	 * 
+	 * @param other
+	 *            the {@link SaturatedPropertyChain} with which to compare this
+	 *            {@link SaturatedPropertyChain}
+	 * @throws IOException
+	 */
+	public void dumpDiff(SaturatedPropertyChain other, Writer writer)
+			throws IOException {
+
+		// comparing roots
+		if (this.root != other.root)
+			writer.append("this root: " + root + "; other root: " + other.root
+					+ "\n");
+		// comparing reflexivity flags
+		if (this.isDerivedReflexive_ != other.isDerivedReflexive_)
+			writer.append(root + ": this reflexive: "
+					+ this.isDerivedReflexive_ + "; other relfexive: "
+					+ other.isDerivedReflexive_ + "\n");
+		// comparing derived sub-properties
+		Operations.dumpDiff(this.getSubProperties(), other.getSubProperties(),
+				writer, root + ": this sub-property not in other: ");
+		Operations.dumpDiff(other.getSubProperties(), this.getSubProperties(),
+				writer, root + ": other sub-property not in this: ");
+		// comparing derived compositions
+		Operations.dumpDiff(this.getCompositionsByLeftSubProperty(),
+				other.getCompositionsByLeftSubProperty(), writer, root
+						+ ": this left composition not in other: ");
+		Operations.dumpDiff(other.getCompositionsByLeftSubProperty(),
+				this.getCompositionsByLeftSubProperty(), writer, root
+						+ ": other left composition not in this: ");
+		Operations.dumpDiff(this.getCompositionsByRightSubProperty(),
+				other.getCompositionsByRightSubProperty(), writer, root
+						+ ": this right composition not in other: ");
+		Operations.dumpDiff(other.getCompositionsByRightSubProperty(),
+				this.getCompositionsByRightSubProperty(), writer, root
+						+ ": other right composition not in this: ");
 	}
 
 	/**

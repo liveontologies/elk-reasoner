@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.util.collections;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +32,12 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+/**
+ * Some useful static methods for collections
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class Operations {
 
 	public static final Multimap<?, ?> EMPTY_MULTIMAP = new Multimap<Object, Object>() {
@@ -379,4 +387,45 @@ public class Operations {
 		};
 
 	}
+
+	/**
+	 * Prints key-value entries present in the first {@link Multimap} but not in
+	 * the second {@link Multimap} using the given {@link Writer} and prefixing
+	 * all messages with a given prefix.
+	 * 
+	 * @param first
+	 * @param second
+	 * @param writer
+	 * @param prefix
+	 * @throws IOException
+	 */
+	public static <K, V> void dumpDiff(Multimap<K, V> first,
+			Multimap<K, V> second, Writer writer, String prefix)
+			throws IOException {
+		for (K key : first.keySet()) {
+			Collection<V> firstValues = first.get(key);
+			Collection<V> secondValues = second.get(key);
+			dumpDiff(firstValues, secondValues, writer, prefix + key + "->");
+		}
+
+	}
+
+	/**
+	 * Prints the elements present in the first {@link Collection} but not in
+	 * the second {@link Collection} using the given {@link Writer} and
+	 * prefixing all messages with a given prefix.
+	 * 
+	 * @param first
+	 * @param second
+	 * @param writer
+	 * @param prefix
+	 * @throws IOException
+	 */
+	public static <T> void dumpDiff(Collection<T> first, Collection<T> second,
+			Writer writer, String prefix) throws IOException {
+		for (T element : first)
+			if (!second.contains(element))
+				writer.append(prefix + element + "\n");
+	}
+
 }
