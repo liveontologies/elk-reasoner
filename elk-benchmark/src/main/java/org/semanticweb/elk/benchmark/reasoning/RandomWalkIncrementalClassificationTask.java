@@ -62,9 +62,9 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 	private Reasoner reasoner_;
 	private final String ontologyFile_;
 	private final ReasonerConfiguration reasonerConfig_;
-	private OnOffVector<ElkAxiom> changingAxioms_ = new OnOffVector<ElkAxiom>(128);
+	private OnOffVector<ElkAxiom> changingAxioms_ = null;
 	// other axioms that do not change
-	private List<ElkAxiom> staticAxioms_ = new ArrayList<ElkAxiom>();
+	private List<ElkAxiom> staticAxioms_ = null;
 	
 	/**
 	 * how many test rounds is used
@@ -94,6 +94,8 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 		try {
 			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
 			
+			changingAxioms_ = new OnOffVector<ElkAxiom>(128);
+			staticAxioms_ = new ArrayList<ElkAxiom>();
 			reasoner_ = TestReasonerUtils.createTestReasoner(
 					new LoggingStageExecutor(), reasonerConfig_);
 			OntologyLoader fileLoader = new Owl2StreamLoader(

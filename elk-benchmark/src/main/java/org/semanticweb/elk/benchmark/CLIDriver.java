@@ -42,6 +42,7 @@ public class CLIDriver {
 	 */
 	public static void main(String[] args) throws Exception {
 		//BenchmarkUtils.runTask();
-		BenchmarkUtils.runTaskCollection();
+		//BenchmarkUtils.runTaskCollection();
+		//FIXME Adapt to the new benchmarking
 	}
 }

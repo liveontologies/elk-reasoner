@@ -82,10 +82,15 @@ public class BenchmarkTest {
 	public void incrementalClassificationRandomWalk() throws Exception {
 		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName_.getMethodName()));
 		
-		BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
-				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
-				Integer.valueOf(System.getProperty(Constants.RUNS)),
-				new String[]{System.getProperty("incremental.ontology")});
+		try {
+			BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
+					Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
+					Integer.valueOf(System.getProperty(Constants.RUNS)),
+					new String[]{System.getProperty("incremental.ontology")});
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Test
