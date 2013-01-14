@@ -84,8 +84,7 @@ public class DifferentialIndex {
 
 	private final ElkAxiomProcessor axiomInserter_, axiomDeleter_;
 
-	public DifferentialIndex(OntologyIndex mainIndex,
-			IndexedObjectCache objectCache, IndexedClass owlNothing) {
+	public DifferentialIndex(OntologyIndex mainIndex, IndexedClass owlNothing) {
 		this.removedClasses_ = new ArrayList<ElkClass>(127);
 		this.removedIndividuals_ = new ArrayList<ElkNamedIndividual>();
 		this.todoDeletions_ = new IndexedObjectCache();
@@ -93,10 +92,12 @@ public class DifferentialIndex {
 				127);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
-		this.axiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
-				owlNothing, new IncrementalIndexUpdater(this), true);
-		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
-				owlNothing, new IncrementalIndexUpdater(this), false);
+		this.axiomInserter_ = new ElkAxiomIndexerVisitor(
+				mainIndex.getIndexedObjectCache(), owlNothing,
+				new IncrementalIndexUpdater(this), true);
+		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(
+				mainIndex.getIndexedObjectCache(), owlNothing,
+				new IncrementalIndexUpdater(this), false);
 		this.mainIndex_ = mainIndex;
 	}
 

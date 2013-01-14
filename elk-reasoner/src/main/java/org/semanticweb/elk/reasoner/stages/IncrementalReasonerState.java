@@ -30,7 +30,6 @@ import java.util.EnumMap;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 
 /**
  * Stores all data structures, e.g., the differential index, to maintain the
@@ -47,9 +46,8 @@ public class IncrementalReasonerState {
 	final EnumMap<IncrementalStages, Boolean> stageStatusMap = new EnumMap<IncrementalStages, Boolean>(
 			IncrementalStages.class);
 
-	IncrementalReasonerState(IndexedObjectCache objectCache,
-			OntologyIndex ontIndex) {
-		diffIndex = new DifferentialIndex(ontIndex, objectCache,
+	IncrementalReasonerState(OntologyIndex ontIndex) {
+		diffIndex = new DifferentialIndex(ontIndex,
 				ontIndex.getIndexedOwlNothing());
 
 		initStageStatuses();
