@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.collections.Operations;
@@ -64,7 +66,9 @@ public class CleanIndexHook implements RandomWalkTestHook {
 		TestChangesLoader loader = new TestChangesLoader();
 
 		for (ElkAxiom axiom : axioms) {
-			loader.remove(axiom);
+			if (axiom instanceof ElkClassAxiom || axiom instanceof ElkObjectPropertyDomainAxiom) {
+				loader.remove(axiom);
+			}
 		}
 
 		if (LOGGER_.isDebugEnabled()) {
@@ -85,7 +89,9 @@ public class CleanIndexHook implements RandomWalkTestHook {
 		loader.clear();
 
 		for (ElkAxiom axiom : axioms) {
-			loader.add(axiom);
+			if (axiom instanceof ElkClassAxiom || axiom instanceof ElkObjectPropertyDomainAxiom) {
+				loader.add(axiom);
+			}
 		}
 
 		reasoner.registerOntologyChangesLoader(loader);
