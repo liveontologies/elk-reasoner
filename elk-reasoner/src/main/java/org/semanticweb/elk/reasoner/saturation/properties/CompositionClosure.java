@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,30 +30,51 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
+/**
+ * This object is used to apply a new entailed composition to the set of
+ * computed compositions of {@link IndexedPropertyChain}s. Depending on the
+ * value of the parameters
+ * {@link SaturatedPropertyChain#REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES} a set
+ * of relevant compositions is computed for the given root composition, which
+ * can be used to extend several sets of compositions. Caching the set of
+ * relevant compositions can be useful since the given compositions can
+ * potentially be added to several pairs of {@link IndexedPropertyChain}s.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 class CompositionClosure {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(CompositionClosure.class);
 
-	protected final Collection<IndexedPropertyChain> compositions;
+	protected final Collection<IndexedPropertyChain> relevantCompositions;
 
-	CompositionClosure(IndexedBinaryPropertyChain composition) {
-		if (SaturatedPropertyChain.isRelevant(composition))
-			compositions = Collections
-					.<IndexedPropertyChain> singleton(composition);
+	CompositionClosure(IndexedBinaryPropertyChain root) {
+		if (SaturatedPropertyChain.isRelevant(root))
+			relevantCompositions = Collections
+					.<IndexedPropertyChain> singleton(root);
 		else {
-			compositions = new LinkedList<IndexedPropertyChain>();
-			for (IndexedPropertyChain relevantSuperProperty : SuperPropertyExplorer
-					.getRelevantSuperProperties(composition))
-				compositions.add(relevantSuperProperty);
+			relevantCompositions = new LinkedList<IndexedPropertyChain>();
+			relevantCompositions.addAll(root.getToldSuperProperties());
 		}
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Composition closure: " + compositions);
+			LOGGER_.trace(root + " relevant compositions: "
+					+ relevantCompositions);
 	}
 
+	/**
+	 * Extends the given {@link Collection} of {@link IndexedPropertyChain} with
+	 * the relevant compositions of this {@link CompositionClosure} to the
+	 * 
+	 * 
+	 * @param currentCompositions
+	 *            the {@link Collection} of {@link IndexedPropertyChain} to be
+	 *            extended
+	 */
 	public void applyTo(Collection<IndexedPropertyChain> currentCompositions) {
-		currentCompositions.addAll(compositions);
+		currentCompositions.addAll(relevantCompositions);
 	}
 
 }

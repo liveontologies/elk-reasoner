@@ -90,7 +90,8 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 */
 	public List<IndexedObjectProperty> getToldSuperProperties() {
 		return toldSuperProperties_ == null ? Collections
-				.<IndexedObjectProperty> emptyList() : toldSuperProperties_;
+				.<IndexedObjectProperty> emptyList() : Collections
+				.unmodifiableList(toldSuperProperties_);
 	}
 
 	/**
@@ -99,7 +100,8 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 */
 	public Collection<IndexedBinaryPropertyChain> getRightChains() {
 		return rightChains_ == null ? Collections
-				.<IndexedBinaryPropertyChain> emptySet() : rightChains_;
+				.<IndexedBinaryPropertyChain> emptySet() : Collections
+				.unmodifiableCollection(rightChains_);
 	}
 
 	/**
