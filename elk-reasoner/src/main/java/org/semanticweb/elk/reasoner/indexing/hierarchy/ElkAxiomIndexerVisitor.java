@@ -63,7 +63,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
 	 */
-	private final IndexedObjectCache objectCache;
+	private final IndexedObjectCache objectCache_;
 
 	/**
 	 * 1 if adding axioms, -1 if removing axioms
@@ -99,7 +99,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 */
 	public ElkAxiomIndexerVisitor(IndexedObjectCache objectCache,
 			IndexedClass owlNothing, IndexUpdater updater, boolean insert) {
-		this.objectCache = objectCache;
+		this.objectCache_ = objectCache;
 		this.owlNothing_ = owlNothing;
 		this.indexUpdater_ = updater;
 		this.multiplicity = insert ? 1 : -1;
@@ -277,29 +277,29 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		@Override
 		public IndexedClass visit(IndexedClass element) {
-			return update(objectCache.visit(element));
+			return update(objectCache_.visit(element));
 		}
 
 		@Override
 		public IndexedIndividual visit(IndexedIndividual element) {
-			return update(objectCache.visit(element));
+			return update(objectCache_.visit(element));
 		}
 
 		@Override
 		public IndexedObjectIntersectionOf visit(
 				IndexedObjectIntersectionOf element) {
-			return update(objectCache.visit(element));
+			return update(objectCache_.visit(element));
 		}
 
 		@Override
 		public IndexedObjectSomeValuesFrom visit(
 				IndexedObjectSomeValuesFrom element) {
-			return update(objectCache.visit(element));
+			return update(objectCache_.visit(element));
 		}
 
 		@Override
 		public IndexedDataHasValue visit(IndexedDataHasValue element) {
-			return update(objectCache.visit(element));
+			return update(objectCache_.visit(element));
 		}
 
 	}
@@ -337,13 +337,13 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		@Override
 		public IndexedObjectProperty visit(IndexedObjectProperty element) {
-			return update(objectCache.visit(element));
+			return update(objectCache_.visit(element));
 		}
 
 		@Override
 		public IndexedBinaryPropertyChain visit(
 				IndexedBinaryPropertyChain element) {
-			return update(objectCache.visit(element));
+			return update(objectCache_.visit(element));
 		}
 
 	}
@@ -379,12 +379,12 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		@Override
 		public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom axiom) {
-			return update(objectCache.visit(axiom));
+			return update(objectCache_.visit(axiom));
 		}
 
 		@Override
 		public IndexedDisjointnessAxiom visit(IndexedDisjointnessAxiom axiom) {
-			return update(objectCache.visit(axiom));
+			return update(objectCache_.visit(axiom));
 		}
 
 	}

@@ -176,14 +176,12 @@ public abstract class AbstractReasonerState {
 		this.saturationState = new SaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new RuleAndConclusionStatistics();
 		this.config_ = config;
-		this.incrementalState = new IncrementalReasonerState(objectCache_,
-				ontologyIndex);
+		this.incrementalState = new IncrementalReasonerState(ontologyIndex);
 	}
 
 	public void setIncrementalMode(boolean set) {
 		if (set && incrementalState == null) {
-			incrementalState = new IncrementalReasonerState(objectCache_,
-					ontologyIndex);
+			incrementalState = new IncrementalReasonerState(ontologyIndex);
 		} else if (!set) {
 			incrementalState = null;
 		}
@@ -442,8 +440,7 @@ public abstract class AbstractReasonerState {
 		} else {
 			getStageExecutor()
 					.complete(new ClassTaxonomyComputationStage(this));
-			this.incrementalState = new IncrementalReasonerState(objectCache_,
-					ontologyIndex);
+			this.incrementalState = new IncrementalReasonerState(ontologyIndex);
 		}
 
 		return taxonomy;
