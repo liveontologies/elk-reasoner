@@ -43,10 +43,12 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -469,6 +471,19 @@ public abstract class AbstractReasonerState {
 			if (context == null)
 				continue;
 			result.put(ice, context);
+		}
+		return result;
+	}
+
+	public Map<IndexedPropertyChain, SaturatedPropertyChain> getPropertySaturationMap() {
+		final Map<IndexedPropertyChain, SaturatedPropertyChain> result = new ArrayHashMap<IndexedPropertyChain, SaturatedPropertyChain>(
+				256);
+		for (IndexedPropertyChain ipc : ontologyIndex
+				.getIndexedPropertyChains()) {
+			SaturatedPropertyChain saturation = ipc.getSaturated();
+			if (saturation == null)
+				continue;
+			result.put(ipc, saturation);
 		}
 		return result;
 	}

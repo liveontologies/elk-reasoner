@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -30,6 +31,18 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
+/**
+ * This object is used to apply a new entailed composition to the set of
+ * computed compositions of {@link IndexedPropertyChain}s in case the parameter
+ * {@link SaturatedPropertyChain#ELIMINATE_IMPLIED_COMPOSITIONS} is set. In this
+ * case the set of relevant compositions for the given root composition is
+ * reduced according to sub-property relation.
+ * 
+ * @see CompositionClosure
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 class ReducingCompositionClosure extends CompositionClosure {
 
 	// logger for this class
@@ -38,16 +51,16 @@ class ReducingCompositionClosure extends CompositionClosure {
 
 	final Set<IndexedPropertyChain> toRemove;
 
-	ReducingCompositionClosure(IndexedBinaryPropertyChain composition) {
-		super(composition);
+	ReducingCompositionClosure(IndexedBinaryPropertyChain root) {
+		super(root);
 		toRemove = new HashSet<IndexedPropertyChain>();
-		Iterator<IndexedPropertyChain> compositionIterator = compositions
+		Iterator<? extends IndexedPropertyChain> compositionIterator = relevantCompositions
 				.iterator();
 		while (compositionIterator.hasNext()) {
 			IndexedPropertyChain next = compositionIterator.next();
-			if (toRemove.contains(next))
+			if (toRemove.contains(next)) {
 				compositionIterator.remove();
-			else {
+			} else {
 				Set<IndexedPropertyChain> candidateSupers = SuperPropertyExplorer
 						.getRelevantSuperProperties(next);
 				candidateSupers.remove(next);
@@ -56,13 +69,27 @@ class ReducingCompositionClosure extends CompositionClosure {
 		}
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("To remove: " + toRemove);
-			LOGGER_.trace("Reduced composition closure: " + compositions);
+			LOGGER_.trace("Reduced composition closure: "
+					+ relevantCompositions);
 		}
 	}
 
 	@Override
 	public void applyTo(Collection<IndexedPropertyChain> currentCompositions) {
-		super.applyTo(currentCompositions);
+		for (IndexedPropertyChain relevant : relevantCompositions) {
+			Set<IndexedPropertyChain> subProperties = SubPropertyExplorer
+					.getSetRelevantSubProperties(relevant);
+			// add this composition unless it already implied by a current
+			// composition
+			boolean addThis = true;
+			for (IndexedPropertyChain current : currentCompositions)
+				if (subProperties.contains(current)) {
+					addThis = false;
+					break;
+				}
+			if (addThis)
+				currentCompositions.add(relevant);
+		}
 		currentCompositions.removeAll(toRemove);
 	}
 }
