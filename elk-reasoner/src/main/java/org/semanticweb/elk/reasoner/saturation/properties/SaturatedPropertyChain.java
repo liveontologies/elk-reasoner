@@ -124,6 +124,7 @@ public class SaturatedPropertyChain {
 				&& compositionsByRightSubProperty == null;
 	}
 
+	@Override
 	public SaturatedPropertyChain clone() {
 		SaturatedPropertyChain result = new SaturatedPropertyChain(root);
 		result.isDerivedReflexive_ = this.isDerivedReflexive_;
