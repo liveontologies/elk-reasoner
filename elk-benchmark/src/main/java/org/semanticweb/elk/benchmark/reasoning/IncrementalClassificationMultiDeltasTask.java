@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.junit.Assert;
 import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
 import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
@@ -48,6 +49,7 @@ import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -67,7 +69,10 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	private static String DELETION_SUFFIX = "delta-minus";	
 	
 	private Reasoner reasoner_;
+	private Reasoner standardReasoner_;
 	private final ReasonerConfiguration config_;
+	
+	static final boolean CHECK_CORRECTNESS = false;
 	
 	public IncrementalClassificationMultiDeltasTask(String[] args) {
 		super(args);
@@ -90,8 +95,6 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	public Task instantiateSubTask(String[] args) {
 		if (reasoner_ == null) {
 			// initial classification, argument is the first ontology
-			reasoner_ = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), config_);
-			
 			return new ClassifyFirstTime(args[0]);
 		}
 		else {
@@ -140,20 +143,30 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	@Override
 	public void dispose() {
 		try {
-			reasoner_.shutdown();
+			if (reasoner_ != null) reasoner_.shutdown();
+			if (standardReasoner_ != null) standardReasoner_.shutdown();
 		} catch (InterruptedException e) {
 		}
 	}
 
 	
-	
-
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
 	private class ClassifyFirstTime implements Task {
 
 		private final File ontologyFile_;
 		
 		ClassifyFirstTime(String file) {
 			ontologyFile_ = new File(file);
+			reasoner_ = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), config_);
+			
+			if (CHECK_CORRECTNESS) {
+				standardReasoner_ = new ReasonerFactory().createReasoner(new SimpleStageExecutor(), config_);
+			}
 		}
 		
 		@Override
@@ -164,17 +177,39 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		@Override
 		public void prepare() throws TaskException {
 			
-			//System.out.println("classifying first time");
+			//System.out.println("classifying first time");			
+			load(reasoner_);
 			
+			if (CHECK_CORRECTNESS) {
+				load(standardReasoner_);
+			}
+		}
+
+		@Override
+		public Result run() throws TaskException {
+			Taxonomy<ElkClass> incrementalTaxonomy = reasoner_.getTaxonomyQuietly();
+			
+			if (CHECK_CORRECTNESS) {
+				Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
+						.getTaxonomyQuietly();
+
+				Assert.assertEquals(TaxonomyHasher.hash(incrementalTaxonomy),
+						TaxonomyHasher.hash(standardTaxonomy));
+			}
+			
+			return null;
+		}
+		
+		private void load(Reasoner reasoner) throws TaskException {
 			InputStream stream = null;
 			
 			try {
 				stream = new FileInputStream(ontologyFile_);
-				reasoner_.setIncrementalMode(false);
-				reasoner_.registerOntologyLoader(new Owl2StreamLoader(
+				reasoner.setIncrementalMode(false);
+				reasoner.registerOntologyLoader(new Owl2StreamLoader(
 						new Owl2FunctionalStyleParserFactory(), stream));
-				reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
-				reasoner_.loadOntology();
+				reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
+				reasoner.loadOntology();
 			} catch (Exception e) {
 				throw new TaskException(e);
 			}
@@ -184,26 +219,16 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		}
 
 		@Override
-		public Result run() throws TaskException {
-			try {
-				reasoner_.getTaxonomy();
-			} catch (ElkException e) {
-				throw new TaskException(e);
-			}
-			finally {
-				/*try {
-					reasoner_.shutdown();
-				} catch (InterruptedException e) {}*/
-			}
-			
-			return null;
-		}
-
-		@Override
 		public void dispose() {
 		}
 	}
 	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
 	private class ClassifyIncrementally implements Task {
 
 		private final File deltaDir_;
@@ -223,6 +248,17 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 			//System.out.println("classifying nth time");
 			
 			// load positive and negative deltas
+			reasoner_.setIncrementalMode(true);
+			
+			loadChanges(reasoner_);
+			
+			if (CHECK_CORRECTNESS) {
+				standardReasoner_.setIncrementalMode(false);
+				loadChanges(standardReasoner_);
+			}
+		}
+		
+		private void loadChanges(Reasoner reasoner) throws TaskException {
 			final TestChangesLoader loader = new TestChangesLoader();
 			
 			load(ADDITION_SUFFIX, new ElkAxiomProcessor() {
@@ -241,8 +277,13 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 				}
 			});
 			
-			reasoner_.setIncrementalMode(true);
-			reasoner_.registerOntologyChangesLoader(loader);
+			try {
+				
+				reasoner.registerOntologyChangesLoader(loader);
+				reasoner.loadChanges();			
+			} catch (ElkException e) {
+				throw new TaskException(e);
+			}
 		}
 
 		private void load(final String suffix, final ElkAxiomProcessor elkAxiomProcessor) throws TaskException {
@@ -282,18 +323,14 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 
 		@Override
 		public Result run() throws TaskException {
-			try {
-				Taxonomy<ElkClass> t = reasoner_.getTaxonomy();
-				
-				System.out.println(TaxonomyHasher.hash(t));
-				
-			} catch (ElkException e) {
-				throw new TaskException(e);
-			}
-			finally {
-				/*try {
-					reasoner_.shutdown();
-				} catch (InterruptedException e) {}*/
+			Taxonomy<ElkClass> incrementalTaxonomy = reasoner_.getTaxonomyQuietly();
+			
+			if (CHECK_CORRECTNESS) {
+				Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
+						.getTaxonomyQuietly();
+
+				Assert.assertEquals(TaxonomyHasher.hash(incrementalTaxonomy),
+						TaxonomyHasher.hash(standardTaxonomy));
 			}
 			
 			return null;
