@@ -100,4 +100,12 @@ public class ClassificationTask implements Task {
 		return null;
 	}
 
+	@Override
+	public void dispose() {
+		try {
+			reasoner_.shutdown();
+		} catch (InterruptedException e) {
+		}
+	}
+
 }

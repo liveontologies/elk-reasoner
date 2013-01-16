@@ -317,4 +317,13 @@ public class IncrementalClassificationTask implements Task {
 		
 		return result;
 	}	
+	
+	@Override
+	public void dispose() {
+		try {
+			standardReasoner_.shutdown();
+			incrementalReasoner_.shutdown();
+		} catch (InterruptedException e) {
+		}
+	}	
 }

@@ -273,7 +273,13 @@ public abstract class AbstractReasonerState {
 				public void notify(ElkAxiomChange change) {
 
 					if (!incrementalChange(change)) {
+						if (LOGGER_.isInfoEnabled()) {
+							LOGGER_.info("The axiom change " + change + " cannot be accommodated incrementally");
+						}
+						
 						incrementalState = null;
+						
+						//throw new RuntimeException(change.toString());
 					}
 
 					resetChangesLoading();
@@ -284,9 +290,11 @@ public abstract class AbstractReasonerState {
 
 	private boolean incrementalChange(ElkAxiomChange change) {
 		ElkAxiom axiom = change.getAxiom();
-		// FIXME Here we should determine if the axiom is in the supported
-		// fragment
-		// if not, the method should return true
+		/*
+		 * FIXME Here we determine if the change can be accommodated
+		 * incrementally. In principle, we should have a hook inside the indexer
+		 * to accomplish this
+		 */
 		return !(axiom instanceof ElkPropertyAxiom<?>);
 	}
 

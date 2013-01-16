@@ -50,5 +50,10 @@ public class IncrementalClassificationTaskCollection implements TaskCollection {
 	public Iterable<Task> getTasks() throws TaskException {
 		return Arrays.asList(icTask_, randomWalkTask_);
 	}
+	
+	@Override
+	public void dispose() {
+	}
+	
 
 }

@@ -78,9 +78,9 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	private ReasonerConfiguration getConfig(String[] args) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
 
-		if (args.length > 2) {
+		if (args.length > 1) {
 			config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
-					args[2]);
+					args[1]);
 		}
 
 		return config;
@@ -137,6 +137,16 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		return result;
 	}
 
+	@Override
+	public void dispose() {
+		try {
+			reasoner_.shutdown();
+		} catch (InterruptedException e) {
+		}
+	}
+
+	
+	
 
 	private class ClassifyFirstTime implements Task {
 
@@ -153,6 +163,9 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 
 		@Override
 		public void prepare() throws TaskException {
+			
+			//System.out.println("classifying first time");
+			
 			InputStream stream = null;
 			
 			try {
@@ -178,12 +191,16 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 				throw new TaskException(e);
 			}
 			finally {
-				try {
+				/*try {
 					reasoner_.shutdown();
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) {}*/
 			}
 			
 			return null;
+		}
+
+		@Override
+		public void dispose() {
 		}
 	}
 	
@@ -202,6 +219,9 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 
 		@Override
 		public void prepare() throws TaskException {
+			
+			//System.out.println("classifying nth time");
+			
 			// load positive and negative deltas
 			final TestChangesLoader loader = new TestChangesLoader();
 			
@@ -271,12 +291,16 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 				throw new TaskException(e);
 			}
 			finally {
-				try {
+				/*try {
 					reasoner_.shutdown();
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) {}*/
 			}
 			
 			return null;
+		}
+
+		@Override
+		public void dispose() {
 		}	
 	}
 }

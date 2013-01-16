@@ -69,6 +69,11 @@ public abstract class AllFilesTaskCollection implements TaskCollection {
 	protected File[] sortFiles(File[] listFiles) {
 		return listFiles;
 	}
+	
+	@Override
+	public void dispose() {
+	}
+	
 
 	public abstract Task instantiateSubTask(String[] args);
 }

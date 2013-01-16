@@ -72,6 +72,8 @@ public class TaskRunner {
 			wallTimeElapsed = timer.getTotalWallTime();
 		}
 		
+		task.dispose();
+		
 		System.out.println("Average running time: " + timer.getAvgWallTime() / 1000000 + " ms");
 	}
 }

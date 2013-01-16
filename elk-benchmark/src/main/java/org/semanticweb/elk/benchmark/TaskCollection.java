@@ -32,4 +32,5 @@ package org.semanticweb.elk.benchmark;
 public interface TaskCollection {
 
 	public Iterable<Task> getTasks() throws TaskException;
+	public void dispose();
 }

@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.benchmark;
 
+import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationMultiDeltasTask;
+
 
 
 /**
@@ -41,8 +43,9 @@ public class CLIDriver {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		//BenchmarkUtils.runTask();
-		//BenchmarkUtils.runTaskCollection();
-		//FIXME Adapt to the new benchmarking
+		BenchmarkUtils.runTaskCollection(IncrementalClassificationMultiDeltasTask.class.getName(),
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
+				Integer.valueOf(System.getProperty(Constants.RUNS)),
+				new String[]{System.getProperty("folder")});
 	}
 }

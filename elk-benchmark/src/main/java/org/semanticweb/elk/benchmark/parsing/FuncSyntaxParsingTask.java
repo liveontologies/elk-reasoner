@@ -95,4 +95,9 @@ public class FuncSyntaxParsingTask implements Task {
 	@Override
 	public void prepare() throws TaskException {		
 	}
+	
+	@Override
+	public void dispose() {
+	}
+	
 }

@@ -54,5 +54,7 @@ public class TaskCollectionRunner {
 		for (Task nextTask : collection.getTasks()) {
 			ElkTimer.getNamedTimer(nextTask.getName()).log(LOGGER_, Level.INFO);
 		}
+		
+		collection.dispose();
 	}
 }
