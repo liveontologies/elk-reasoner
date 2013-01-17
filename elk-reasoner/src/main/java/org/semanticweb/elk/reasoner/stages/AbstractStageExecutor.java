@@ -37,7 +37,5 @@ public abstract class AbstractStageExecutor extends SimpleInterrupter implements
 
 	}
 
-	// FIXME Perhaps should be protected but then it won't be possible to create
-	// a wrapper around this interface in another package
-	public abstract void execute(ReasonerStage stage) throws ElkException;
+	protected abstract void execute(ReasonerStage stage) throws ElkException;
 }
