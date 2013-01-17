@@ -81,9 +81,7 @@ class ClassTaxonomyCleaningFactory implements
 
 			@Override
 			public void submit(ElkClass elkClass) {
-				///TODO Decide if this is a normal situation
 				if (elkClass == PredefinedElkClass.OWL_NOTHING){
-					System.err.println("Removing owl:Nothing!!!");
 					return;
 				}
 				

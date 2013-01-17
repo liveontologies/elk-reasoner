@@ -71,10 +71,6 @@ class IncrementalClassTaxonomyComputationStage extends
 	void initComputation() {
 		super.initComputation();
 		
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		}
-
 		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
 				.getIndexedClasses();
 		

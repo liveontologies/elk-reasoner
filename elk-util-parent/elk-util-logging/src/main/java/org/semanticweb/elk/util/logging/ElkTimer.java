@@ -181,6 +181,9 @@ public class ElkTimer {
 		currentStartWallTime = -1;
 		totalCpuTime = 0;
 		totalWallTime = 0;
+		measurements = 0;
+		isRunning = false;
+		threadCount = 0;
 	}
 
 	/**

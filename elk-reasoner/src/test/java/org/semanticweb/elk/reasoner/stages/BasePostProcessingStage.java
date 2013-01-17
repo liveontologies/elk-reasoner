@@ -26,8 +26,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collections;
 
-import org.semanticweb.elk.reasoner.stages.ReasonerStage;
-
 /**
  * An empty base class for stages used for post processing
  * 

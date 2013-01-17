@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory.DeapplicationEngine;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 
 /**

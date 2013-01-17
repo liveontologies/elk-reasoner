@@ -33,6 +33,8 @@ public class TaskCollectionRunner2 {
 		for (Task task : collection.getTasks()) {
 			ElkTimer timer = ElkTimer.getNamedTimer(task.getName());
 			
+			System.err.println("Running " + task.getName());
+			
 			task.prepare();
 			timer.start();
 			task.run();
@@ -57,8 +59,8 @@ public class TaskCollectionRunner2 {
 			runOnce(collection);
 		}
 		
-		for (Task nextTask : collection.getTasks()) {
-			ElkTimer.getNamedTimer(nextTask.getName()).log(LOGGER_, Level.INFO);
+		for (ElkTimer timer : ElkTimer.getNamedTimers()) {
+			timer.log(LOGGER_, Level.INFO);
 		}
 		
 		collection.dispose();

@@ -48,7 +48,6 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -73,6 +72,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	private final ReasonerConfiguration config_;
 	
 	static final boolean CHECK_CORRECTNESS = false;
+	static final boolean INCREMENTAL_RUNS = true;
 	
 	public IncrementalClassificationMultiDeltasTask(String[] args) {
 		super(args);
@@ -100,12 +100,15 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		}
 		
 		if (source.isFile()) {
+			if (reasoner_ != null || standardReasoner_ != null) {
+				dispose();
+			}
 			// initial classification, argument is the first ontology
 			return new ClassifyFirstTime(args[0]);
 		}
 		else {
 			//incremental classification, argument is a folder with the positive and the negative delta
-			return new ClassifyIncrementally(args[0]);
+			return INCREMENTAL_RUNS ? new ClassifyIncrementally(args[0]) : new ClassifyNonIncrementally(args[0]);
 		}
 	}
 	
@@ -151,10 +154,12 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		try {
 			if (reasoner_ != null) {
 				reasoner_.shutdown();
+				reasoner_ = null;
 			}
 			
 			if (standardReasoner_ != null) {
 				standardReasoner_.shutdown();
+				standardReasoner_ = null;
 			}
 		} catch (InterruptedException e) {
 		}
@@ -188,7 +193,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		@Override
 		public void prepare() throws TaskException {
 			//always start with a new reasoner
-			reasoner_ = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), config_);			
+			reasoner_ = new ReasonerFactory().createReasoner(new TimingStageExecutor(new SimpleStageExecutor()), config_);			
 			load(reasoner_);
 			
 			if (CHECK_CORRECTNESS) {
@@ -251,7 +256,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		
 		@Override
 		public String getName() {
-			return "Classify incrementally: " + deltaDir_.getName();
+			return "Classify incrementally";
 		}
 
 		@Override
@@ -268,7 +273,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 			}
 		}
 		
-		private void loadChanges(Reasoner reasoner) throws TaskException {
+		protected void loadChanges(Reasoner reasoner) throws TaskException {
 			final TestChangesLoader loader = new TestChangesLoader();
 			
 			load(ADDITION_SUFFIX, new ElkAxiomProcessor() {
@@ -349,5 +354,31 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		@Override
 		public void dispose() {
 		}	
+	}
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private class ClassifyNonIncrementally extends ClassifyIncrementally {
+
+		ClassifyNonIncrementally(String dir) {
+			super(dir);
+		}
+
+		@Override
+		public String getName() {
+			return "Classify from scratch";
+		}
+
+		@Override
+		public void prepare() throws TaskException {
+			reasoner_.setIncrementalMode(false);
+			loadChanges(reasoner_);
+			reasoner_.setIncrementalMode(false);
+		}
+		
 	}
 }

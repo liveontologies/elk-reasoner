@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
 /**
@@ -36,10 +35,6 @@ import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
  * 
  */
 class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(IncrementalConsistencyCheckingStage.class);
 
 	public IncrementalConsistencyCheckingStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -64,8 +59,6 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 		this.computation = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex, reasoner.saturationState);
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
 	}
 
 }
