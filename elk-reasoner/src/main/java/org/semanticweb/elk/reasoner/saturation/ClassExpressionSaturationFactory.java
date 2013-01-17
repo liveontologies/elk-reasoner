@@ -115,8 +115,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 */
 	private final int threshold_;
 	/**
-	 * {@code true} if any worker is blocked from submitting the jobs because
-	 * threshold is exceeded.
+	 * {@code true} if some worker could be blocked from submitting the jobs
+	 * because threshold is exceeded.
 	 */
 	private volatile boolean workersWaiting_ = false;
 	/**
@@ -348,13 +348,21 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				if (ruleApplicationFactory_.getApproximateContextNumber()
 						- snapshotCountContextsProcessed > threshold_) {
 					synchronized (countContextsProcessed_) {
-						if (countContextsProcessed_.get() > snapshotCountContextsProcessed)
-							/*
-							 * new contexts were processed meanwhile -- we need
-							 * to check again if we can submit a new job
-							 */
-							continue;
 						workersWaiting_ = true;
+						/*
+						 * it is important to set waiting workers before
+						 * checking processed contexts counters because it is
+						 * tested in the other order when waking up the workers
+						 */
+						if (countContextsProcessed_.get() > snapshotCountContextsProcessed) {
+							/*
+							 * new contexts were processed meanwhile; all
+							 * workers should be notified
+							 */
+							workersWaiting_ = false;
+							countContextsProcessed_.notifyAll();
+							continue;
+						}
 						countContextsProcessed_.wait();
 						continue;
 					}
