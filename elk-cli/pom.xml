@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.3.1-SNAPSHOT</version>
+		<version>0.3.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -19,51 +19,51 @@
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-logging</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-io</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owl-model</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owl-implementation</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-owl-parsing-javacc</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-reasoner</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.2-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-reasoner</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.2-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-testing</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.2-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.elk</groupId>
 			<artifactId>elk-util-concurrent</artifactId>
-			<version>0.3.1-SNAPSHOT</version>
+			<version>0.3.2-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
