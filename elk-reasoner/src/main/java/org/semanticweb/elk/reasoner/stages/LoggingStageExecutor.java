@@ -34,38 +34,11 @@ import org.semanticweb.elk.util.logging.Statistics;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class LoggingStageExecutor extends AbstractStageExecutor {/*extends SimpleInterrupter implements
-		ReasonerStageExecutor {*/
+public class LoggingStageExecutor extends AbstractStageExecutor {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(LoggingStageExecutor.class);
-
-	/*@Override
-	public void complete(ReasonerStage stage) throws ElkException {
-		if (!stage.done()) {
-			if (LOGGER_.isDebugEnabled())
-				LOGGER_.debug(stage.getName() + " stage:");
-			for (ReasonerStage dependentStage : stage.getDependencies()) {
-				complete(dependentStage);
-			}
-			Statistics.logOperationStart(stage.getName(), LOGGER_);
-			registerCurrentThreadToInterrupt();
-			try {
-				stage.execute();
-			} catch (ElkInterruptedException e) {
-				LOGGER_.debug(stage.getName() + " was interrupted.");
-				throw e;
-			} finally {
-				clearThreadToInterrupt();
-				Statistics.logOperationFinish(stage.getName(), LOGGER_);
-				Statistics.logMemoryUsage(LOGGER_);
-				stage.printInfo();
-			}
-			if (LOGGER_.isDebugEnabled())
-				LOGGER_.debug(stage.getName() + " done.");
-		}
-	}*/
 
 	@Override
 	public void execute(ReasonerStage stage) throws ElkException {
