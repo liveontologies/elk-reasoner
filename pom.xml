@@ -32,9 +32,9 @@
 	</modules>
 
 	<scm>
-		<connection>scm:svn:http://elk-reasoner.googlecode.com/svn/trunk/</connection>
-		<developerConnection>scm:svn:https://elk-reasoner.googlecode.com/svn/trunk/</developerConnection>
-		<url>http://elk-reasoner.googlecode.com/svn/trunk/</url>
+		<connection>scm:git:https://code.google.com/p/elk-reasoner/</connection>
+		<developerConnection>scm:git:git@github.com:klinovp/elk.git</developerConnection>
+		<url>http://elk-reasoner.googlecode.com/git/</url>
 	</scm>
 
 	<licenses>
@@ -104,7 +104,7 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.10</version>
+				<version>4.11</version>
 			</dependency>
 			<dependency>
 				<groupId>log4j</groupId>
@@ -168,7 +168,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<owlapi.version>3.4</owlapi.version>
+		<owlapi.version>3.4.2</owlapi.version>
 		<protege.version>4.1.0</protege.version>
 		<java.required.version>1.6</java.required.version>
 		<!-- TODO: get current year automatically -->
@@ -340,7 +340,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
 				<configuration>
-					<tagBase>https://elk-reasoner.googlecode.com/svn/tags</tagBase>
+					<tagNameFormat>v@{project.version}</tagNameFormat>
+					<pushChanges>false</pushChanges>
+					<localCheckout>true</localCheckout>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 				</configuration>
 			</plugin>
