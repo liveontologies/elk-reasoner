@@ -445,6 +445,15 @@ public class ElkTimer {
 		return getNamedTimer(timerName, RECORD_ALL, Thread.currentThread()
 				.getId());
 	}
+	
+	/**
+	 * Returns all registered timers
+	 * 
+	 * @return
+	 */
+	public static Iterable<ElkTimer> getNamedTimers() {
+		return registeredTimers.keySet();
+	}
 
 	/**
 	 * Get a timer of the given string name and todos for the current thread. If

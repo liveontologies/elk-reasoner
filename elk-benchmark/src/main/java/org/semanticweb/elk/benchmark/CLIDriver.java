@@ -43,7 +43,7 @@ public class CLIDriver {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		BenchmarkUtils.runTaskCollection(IncrementalClassificationMultiDeltasTask.class.getName(),
+		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltasTask.class.getName(),
 				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
 				Integer.valueOf(System.getProperty(Constants.RUNS)),
 				new String[]{System.getProperty("folder")});

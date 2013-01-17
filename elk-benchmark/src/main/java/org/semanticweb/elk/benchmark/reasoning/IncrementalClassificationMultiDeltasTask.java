@@ -92,8 +92,14 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	}	
 
 	@Override
-	public Task instantiateSubTask(String[] args) {
-		if (reasoner_ == null) {
+	public Task instantiateSubTask(String[] args) throws TaskException {
+		File source = new File(args[0]);
+		
+		if (!source.exists()) {
+			throw new TaskException("Wrong source file/dir " + args[0]);
+		}
+		
+		if (source.isFile()) {
 			// initial classification, argument is the first ontology
 			return new ClassifyFirstTime(args[0]);
 		}
@@ -143,14 +149,20 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	@Override
 	public void dispose() {
 		try {
-			if (reasoner_ != null) reasoner_.shutdown();
-			if (standardReasoner_ != null) standardReasoner_.shutdown();
+			if (reasoner_ != null) {
+				reasoner_.shutdown();
+			}
+			
+			if (standardReasoner_ != null) {
+				standardReasoner_.shutdown();
+			}
 		} catch (InterruptedException e) {
 		}
 	}
 
 	
 	/**
+	 * Classifies the initial version of the ontology
 	 * 
 	 * @author Pavel Klinov
 	 *
@@ -162,7 +174,6 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		
 		ClassifyFirstTime(String file) {
 			ontologyFile_ = new File(file);
-			reasoner_ = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), config_);
 			
 			if (CHECK_CORRECTNESS) {
 				standardReasoner_ = new ReasonerFactory().createReasoner(new SimpleStageExecutor(), config_);
@@ -176,8 +187,8 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 
 		@Override
 		public void prepare() throws TaskException {
-			
-			//System.out.println("classifying first time");			
+			//always start with a new reasoner
+			reasoner_ = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), config_);			
 			load(reasoner_);
 			
 			if (CHECK_CORRECTNESS) {
@@ -224,6 +235,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	}
 	
 	/**
+	 * Applies the deltas for the next version
 	 * 
 	 * @author Pavel Klinov
 	 *
@@ -244,8 +256,6 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 
 		@Override
 		public void prepare() throws TaskException {
-			
-			//System.out.println("classifying nth time");
 			
 			// load positive and negative deltas
 			reasoner_.setIncrementalMode(true);

@@ -75,5 +75,5 @@ public abstract class AllFilesTaskCollection implements TaskCollection {
 	}
 	
 
-	public abstract Task instantiateSubTask(String[] args);
+	public abstract Task instantiateSubTask(String[] args) throws TaskException;
 }

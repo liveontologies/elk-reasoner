@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.logging.ElkTimer;
 
 /**
- * The only reason this class exists is because sometimes it's convenient to
- * finish w/ one task before preparing the next one.
+ * Runs every sub-task the specified number of times, then proceeds to the next
+ * task, and so on
  * 
  * @author Pavel Klinov
  * 

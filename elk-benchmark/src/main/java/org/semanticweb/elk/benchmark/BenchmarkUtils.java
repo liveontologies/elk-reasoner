@@ -128,6 +128,13 @@ public class BenchmarkUtils {
 		TaskCollectionRunner runner = new TaskCollectionRunner(warmups, runs);
 
 		runner.run(collection);
+	}
+	
+	public static void runTaskCollection2(String taskClass, int warmups, int runs, String[] params) throws Exception {
+		TaskCollection collection = TaskFactory.createTaskCollection(taskClass, params);
+		TaskCollectionRunner2 runner = new TaskCollectionRunner2(warmups, runs);
+
+		runner.run(collection);
 	}	
 
 	public static File getFile(String path) {
