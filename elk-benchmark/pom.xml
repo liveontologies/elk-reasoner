@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.3.2-SNAPSHOT</version>
+		<version>0.4.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -52,11 +52,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.elk</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-reasoner</artifactId>
-			<version>0.3.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>test-jar</type>
-		</dependency>		
+		</dependency>
 	</dependencies>
 
 </project>

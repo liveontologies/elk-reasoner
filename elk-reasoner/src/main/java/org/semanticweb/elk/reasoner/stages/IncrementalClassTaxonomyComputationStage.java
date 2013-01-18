@@ -64,30 +64,31 @@ class IncrementalClassTaxonomyComputationStage extends
 	@Override
 	public List<ReasonerStage> getDependencies() {
 		return Arrays
-				.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(reasoner));
+				.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(
+						reasoner));
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		
+
 		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
 				.getIndexedClasses();
-		
+
 		if (!reasoner.useIncrementalTaxonomy()) {
 			reasoner.taxonomy = null;
 		}
-		
+
 		if (reasoner.taxonomy == null) {
-			
+
 			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("Using non-incremental taxonomy");			
-			
-			computation_ = new ClassTaxonomyComputation(indexedClasses,
-					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.ontologyIndex);
+				LOGGER_.info("Using non-incremental taxonomy");
+
+			computation_ = new ClassTaxonomyComputation(Operations.split(
+					indexedClasses, 128), reasoner.getProcessExecutor(),
+					workerNo, progressMonitor, reasoner.ontologyIndex);
 		} else {
-			
+
 			Collection<IndexedClass> modified = new AbstractSet<IndexedClass>() {
 
 				@Override
@@ -114,10 +115,10 @@ class IncrementalClassTaxonomyComputationStage extends
 				}
 
 			};
-			
-			computation_ = new ClassTaxonomyComputation(modified,
-					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.ontologyIndex, reasoner.taxonomy);
+
+			computation_ = new ClassTaxonomyComputation(Operations.split(
+					modified, 64), reasoner.getProcessExecutor(), workerNo,
+					progressMonitor, reasoner.ontologyIndex, reasoner.taxonomy);
 		}
 
 	}
