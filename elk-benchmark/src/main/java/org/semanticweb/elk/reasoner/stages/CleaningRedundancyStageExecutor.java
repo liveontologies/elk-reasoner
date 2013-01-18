@@ -73,8 +73,8 @@ public class CleaningRedundancyStageExecutor extends SimpleStageExecutor {
 			}
 			
 			if (cleanedCount > 0) {
-				metrics_.updateIntegerMetric(CLEANED_CONTEXT_COUNT, cleanedCount);
-				metrics_.updateIntegerMetric(RESATURATED_TO_THE_SAME_STATE, sameCount);
+				metrics_.updateLongMetric(CLEANED_CONTEXT_COUNT, cleanedCount);
+				metrics_.updateLongMetric(RESATURATED_TO_THE_SAME_STATE, sameCount);
 			}
 			
 			System.err.println(cleanedCount + " contexts cleaned, " + sameCount + " are the same after re-saturation");

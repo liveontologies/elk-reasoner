@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
-import org.semanticweb.elk.reasoner.stages.CleaningRedundancyStageExecutor;
+import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 
 /**
  * Incrementally classifies an ontology wrt multiple deltas. Expects a folder
@@ -60,8 +60,10 @@ import org.semanticweb.elk.reasoner.stages.CleaningRedundancyStageExecutor;
  */
 public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollection {
 
-	private static String ADDITION_SUFFIX = "delta-plus";
-	private static String DELETION_SUFFIX = "delta-minus";	
+	private static final String ADDITION_SUFFIX = "delta-plus";
+	private static final String DELETION_SUFFIX = "delta-minus";
+	public static final String DELETED_AXIOM_COUNT = "deleted-axioms.count";
+	public static final String ADDED_AXIOM_COUNT = "added-axioms.count";
 	
 	protected Reasoner reasoner_;
 	protected final ReasonerConfiguration config_;
@@ -192,13 +194,15 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		@Override
 		public void prepare() throws TaskException {
 			//always start with a new reasoner
-			reasoner_ = new ReasonerFactory().createReasoner(new CleaningRedundancyStageExecutor(metrics_)/*new TimingStageExecutor(new SimpleStageExecutor())*/, config_);			
+			reasoner_ = new ReasonerFactory().createReasoner(new RuleAndConclusionCountMeasuringExecutor(metrics_)/*new TimingStageExecutor(new SimpleStageExecutor())*/, config_);			
 			load(reasoner_);
 		}
 
 		@Override
 		public void run() throws TaskException {
 			reasoner_.getTaxonomyQuietly();
+			//only incremental runs count
+			metrics_.reset();
 		}
 		
 		protected void load(Reasoner reasoner) throws TaskException {
@@ -265,6 +269,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 				@Override
 				public void visit(ElkAxiom elkAxiom) {
 					loader.add(elkAxiom);
+					metrics_.updateLongMetric(ADDED_AXIOM_COUNT, 1);
 				}
 			});
 			
@@ -273,6 +278,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 				@Override
 				public void visit(ElkAxiom elkAxiom) {
 					loader.remove(elkAxiom);
+					metrics_.updateLongMetric(DELETED_AXIOM_COUNT, 1);
 				}
 			});
 			
@@ -323,6 +329,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		@Override
 		public void run() throws TaskException {
 			reasoner_.getTaxonomyQuietly();
+			metrics_.incrementRunCount();
 		}
 
 		@Override

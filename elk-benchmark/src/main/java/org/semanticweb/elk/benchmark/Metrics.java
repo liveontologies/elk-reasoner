@@ -64,9 +64,12 @@ public class Metrics {
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
+		String delim = System.getProperty("line.separator");
+		
+		buffer.append("Run count: " + runCount).append(delim);
 		
 		for (Map.Entry<String, String> entry : metricMap_.entrySet()) {
-			buffer.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
+			buffer.append(entry.getKey()).append(" : ").append(entry.getValue()).append(delim);
 		}
 		
 		return buffer.toString();
