@@ -4,8 +4,7 @@
 package org.semanticweb.elk.benchmark;
 
 import java.util.Map;
-
-import org.semanticweb.elk.util.collections.ArrayHashMap;
+import java.util.TreeMap;
 
 /**
  * @author Pavel Klinov
@@ -15,7 +14,7 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
 public class Metrics {
 
 	private int runCount = 0;
-	private final Map<String, String> metricMap_ = new ArrayHashMap<String, String>();
+	private final Map<String, String> metricMap_ = new TreeMap<String, String>();
 	
 	public void incrementRunCount() {
 		runCount++;
@@ -29,14 +28,14 @@ public class Metrics {
 		return metricMap_;
 	}
 	
-	public int updateIntegerMetric(String metric, int delta) {
+	public long updateLongMetric(String metric, long delta) {
 		String value = metricMap_.get(metric);
-		int intValue = value == null ? 0 : Integer.valueOf(value);
+		long longValue = value == null ? 0 : Long.valueOf(value);
 		
-		intValue += delta;
-		metricMap_.put(metric, String.valueOf(intValue));
+		longValue += delta;
+		metricMap_.put(metric, String.valueOf(longValue));
 		
-		return intValue;
+		return longValue;
 	}
 	
 	public double updateDoubleMetric(String metric, double delta) {
