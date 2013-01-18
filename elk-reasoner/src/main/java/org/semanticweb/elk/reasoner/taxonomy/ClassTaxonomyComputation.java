@@ -44,9 +44,9 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ClassTaxonomyComputation
 		extends
-		ReasonerComputation<IndexedClass, ClassTaxonomyComputationFactory> {
+		ReasonerComputation<Collection<IndexedClass>, ClassTaxonomyComputationFactory> {
 
-	public ClassTaxonomyComputation(Collection<IndexedClass> inputs,
+	public ClassTaxonomyComputation(Collection<Collection<IndexedClass>> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
 			UpdateableTaxonomy<ElkClass> partialTaxonomy) {
@@ -55,7 +55,7 @@ public class ClassTaxonomyComputation
 				progressMonitor);
 	}
 
-	public ClassTaxonomyComputation(Collection<IndexedClass> inputs,
+	public ClassTaxonomyComputation(Collection<Collection<IndexedClass>> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
 		this(inputs, executor, maxWorkers, progressMonitor, ontologyIndex,

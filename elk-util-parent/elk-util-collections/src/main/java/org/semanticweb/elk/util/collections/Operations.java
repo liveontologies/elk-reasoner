@@ -25,10 +25,12 @@ package org.semanticweb.elk.util.collections;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.AbstractCollection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -117,6 +119,14 @@ public class Operations {
 		};
 	}
 
+	/**
+	 * Concatenates several {@link Iterable}s into one
+	 * 
+	 * @param input
+	 *            the {@link Iterable} of {@link Iterable}s to be concatenated
+	 * @return {@link Iterable} consisting of all elements found in input
+	 *         {@link Iterable}s
+	 */
 	public static <T> Iterable<T> concat(
 			final Iterable<? extends Iterable<? extends T>> input) {
 		assert input != null;
@@ -165,6 +175,84 @@ public class Operations {
 						}
 					}
 				};
+			}
+		};
+	}
+
+	/**
+	 * Splits the input {@link Iterable} on batches with at most given number of
+	 * elements.
+	 * 
+	 * @param elements
+	 *            the {@link Iterable} to be split
+	 * @param batchSize
+	 *            the maximal number of elements in batches
+	 * @return a {@link Iterable} of batches containing elements from the input
+	 *         collection
+	 * @see #concat(Iterable)
+	 */
+	public static <T> Iterable<Collection<T>> split(
+			final Iterable<? extends T> elements, final int batchSize) {
+		return new Iterable<Collection<T>>() {
+
+			@Override
+			public Iterator<Collection<T>> iterator() {
+				return new Iterator<Collection<T>>() {
+
+					final Iterator<? extends T> elementsIterator = elements
+							.iterator();
+
+					@Override
+					public boolean hasNext() {
+						return elementsIterator.hasNext();
+					}
+
+					@Override
+					public Collection<T> next() {
+						final List<T> nextBatch = new ArrayList<T>(batchSize);
+						int count = 0;
+						while (count++ < batchSize
+								&& elementsIterator.hasNext()) {
+							nextBatch.add(elementsIterator.next());
+						}
+						return nextBatch;
+					}
+
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException(
+								"Deletion is not supported");
+					}
+				};
+			}
+		};
+	}
+
+	/**
+	 * Splits the input {@link Collection} on batches with at most given number
+	 * of elements.
+	 * 
+	 * @param elements
+	 *            the {@link Collection} to be split
+	 * @param batchSize
+	 *            the maximal number of elements in batches
+	 * @return a {@link Collection} of batches containing elements from the
+	 *         input collection
+	 */
+	public static <T> Collection<Collection<T>> split(
+			final Collection<? extends T> elements, final int batchSize) {
+		return new AbstractCollection<Collection<T>>() {
+
+			@Override
+			public Iterator<Collection<T>> iterator() {
+				return split((Iterable<? extends T>) elements, batchSize)
+						.iterator();
+			}
+
+			@Override
+			public int size() {
+				// rounding up
+				return (elements.size() + batchSize - 1) / batchSize;
 			}
 		};
 	}

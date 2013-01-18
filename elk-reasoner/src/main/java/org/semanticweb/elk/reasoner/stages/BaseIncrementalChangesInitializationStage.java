@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounterVisit
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * Reverts inferences
@@ -48,12 +49,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
  * @author "Yevgeny Kazakov"
  * 
  */
-abstract class BaseIncrementalChangesInitializationStage extends AbstractReasonerStage {
+abstract class BaseIncrementalChangesInitializationStage extends
+		AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(BaseIncrementalChangesInitializationStage.class);
-	
+
 	static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
 	static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
 
@@ -65,13 +67,12 @@ abstract class BaseIncrementalChangesInitializationStage extends AbstractReasone
 		super(reasoner);
 	}
 
-
 	protected abstract IncrementalStages stage();
-	
-	/*private IncrementalStages stage() {
-		return deletions_ ? IncrementalStages.DELETIONS_INIT
-				: IncrementalStages.ADDITIONS_INIT;
-	}*/
+
+	/*
+	 * private IncrementalStages stage() { return deletions_ ?
+	 * IncrementalStages.DELETIONS_INIT : IncrementalStages.ADDITIONS_INIT; }
+	 */
 
 	@Override
 	public String getName() {
@@ -102,17 +103,16 @@ abstract class BaseIncrementalChangesInitializationStage extends AbstractReasone
 		}
 		/*
 		 * if this stage is completed successfully, the corresponding
-		 * incremental part of the index is not needed anymore.
-		 * The subclasses will commit it and clear it.
+		 * incremental part of the index is not needed anymore. The subclasses
+		 * will commit it and clear it.
 		 */
 		postExecute();
-		
+
 		reasoner.incrementalState.setStageStatus(stage(), true);
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 	}
 
 	protected abstract void postExecute();
-
 
 	protected RuleApplicationVisitor getRuleApplicationVisitor(
 			RuleStatistics ruleStatistics) {
@@ -141,7 +141,8 @@ abstract class BaseIncrementalChangesInitializationStage extends AbstractReasone
  * 
  * 
  */
-class IncrementalAdditionInitializationStage extends BaseIncrementalChangesInitializationStage {
+class IncrementalAdditionInitializationStage extends
+		BaseIncrementalChangesInitializationStage {
 
 	IncrementalAdditionInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -149,7 +150,9 @@ class IncrementalAdditionInitializationStage extends BaseIncrementalChangesIniti
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Collections.<ReasonerStage>singleton(new InitializeContextsAfterCleaning(reasoner));
+		return Collections
+				.<ReasonerStage> singleton(new InitializeContextsAfterCleaning(
+						reasoner));
 	}
 
 	@Override
@@ -164,7 +167,8 @@ class IncrementalAdditionInitializationStage extends BaseIncrementalChangesIniti
 		DifferentialIndex diffIndex = reasoner.incrementalState.diffIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Collection<IndexedClassExpression> inputs = Collections.emptyList();
+		Collection<Collection<IndexedClassExpression>> inputs = Collections
+				.emptyList();
 		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(stageStatistics_
 				.getRuleStatistics());
 
@@ -172,28 +176,29 @@ class IncrementalAdditionInitializationStage extends BaseIncrementalChangesIniti
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
 
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
-			inputs = reasoner.ontologyIndex.getIndexedClassExpressions();
+			inputs = Operations.split(
+					reasoner.ontologyIndex.getIndexedClassExpressions(), 128);
 		}
 
 		initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				reasoner.getProcessExecutor(), ruleAppVisitor, workerNo,
 				reasoner.getProgressMonitor());
-	}	
-	
+	}
+
 	@Override
 	protected void postExecute() {
 		reasoner.incrementalState.diffIndex.commitAddedRules();
 	}
-	
-}
 
+}
 
 /**
  * 
  * 
  */
-class IncrementalDeletionInitializationStage extends BaseIncrementalChangesInitializationStage {
+class IncrementalDeletionInitializationStage extends
+		BaseIncrementalChangesInitializationStage {
 
 	IncrementalDeletionInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -201,7 +206,9 @@ class IncrementalDeletionInitializationStage extends BaseIncrementalChangesIniti
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Collections.<ReasonerStage>singleton(new IncrementalCompletionStage(reasoner));
+		return Collections
+				.<ReasonerStage> singleton(new IncrementalCompletionStage(
+						reasoner));
 	}
 
 	@Override
@@ -216,7 +223,8 @@ class IncrementalDeletionInitializationStage extends BaseIncrementalChangesIniti
 		DifferentialIndex diffIndex = reasoner.incrementalState.diffIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Collection<IndexedClassExpression> inputs = Collections.emptyList();
+		Collection<Collection<IndexedClassExpression>> inputs = Collections
+				.emptyList();
 		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(stageStatistics_
 				.getRuleStatistics());
 
@@ -224,28 +232,32 @@ class IncrementalDeletionInitializationStage extends BaseIncrementalChangesIniti
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
 
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
-			inputs = reasoner.ontologyIndex.getIndexedClassExpressions();
+			inputs = Operations.split(
+					reasoner.ontologyIndex.getIndexedClassExpressions(), 128);
 		}
-		
+
 		initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				reasoner.getProcessExecutor(), ruleAppVisitor, workerNo,
 				reasoner.getProgressMonitor());
-	}	
-	
+	}
+
 	@Override
 	protected void postExecute() {
 		SaturationState.Writer writer = reasoner.saturationState.getWriter();
-		//Contexts for removed classes must also be properly cleaned to not leave any broken backward links
-		//TODO Perhaps its cleaner to do this thing inside the computation (to make it interruptable, etc.)
-		for (IndexedClassExpression removed : reasoner.incrementalState.diffIndex.getRemovedClassExpressions()) {
+		// Contexts for removed classes must also be properly cleaned to not
+		// leave any broken backward links
+		// TODO Perhaps its cleaner to do this thing inside the computation (to
+		// make it interruptable, etc.)
+		for (IndexedClassExpression removed : reasoner.incrementalState.diffIndex
+				.getRemovedClassExpressions()) {
 			if (removed.getContext() != null) {
-				
+
 				writer.markForRemoval(removed.getContext());
 			}
 		}
-		
+
 		reasoner.incrementalState.diffIndex.clearDeletedRules();
 	}
-	
+
 }

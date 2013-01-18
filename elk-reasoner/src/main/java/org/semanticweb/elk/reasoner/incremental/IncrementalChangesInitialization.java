@@ -55,10 +55,10 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  */
 public class IncrementalChangesInitialization
 		extends
-		ReasonerComputation<IndexedClassExpression, ContextInitializationFactory> {
+		ReasonerComputation<Collection<IndexedClassExpression>, ContextInitializationFactory> {
 
 	public IncrementalChangesInitialization(
-			Collection<IndexedClassExpression> inputs,
+			Collection<Collection<IndexedClassExpression>> inputs,
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
 			SaturationState state, ComputationExecutor executor,
@@ -72,7 +72,7 @@ public class IncrementalChangesInitialization
 
 class ContextInitializationFactory
 		implements
-		InputProcessorFactory<IndexedClassExpression, InputProcessor<IndexedClassExpression>> {
+		InputProcessorFactory<Collection<IndexedClassExpression>, InputProcessor<Collection<IndexedClassExpression>>> {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ContextInitializationFactory.class);
@@ -94,38 +94,41 @@ class ContextInitializationFactory
 	}
 
 	@Override
-	public InputProcessor<IndexedClassExpression> getEngine() {
+	public InputProcessor<Collection<IndexedClassExpression>> getEngine() {
 
-		return new BaseInputProcessor<IndexedClassExpression>() {
+		return new BaseInputProcessor<Collection<IndexedClassExpression>>() {
 
 			@Override
-			protected void process(IndexedClassExpression ice) {
-				Context context = ice.getContext();
-				if (context == null)
-					return;
+			protected void process(Collection<IndexedClassExpression> input) {
+				for (IndexedClassExpression ice : input) {
+					Context context = ice.getContext();
+					if (context == null)
+						continue;
 
-				// apply all changed global context rules
-				LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
-				while (nextGlobalRule != null) {
-					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace(context + ": applying rule "
-								+ nextGlobalRule.getName());
-					nextGlobalRule.accept(ruleAppVisitor_,
-							saturationStateWriter_, context);
-					nextGlobalRule = nextGlobalRule.next();
-				}
-
-				for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
-						indexChanges_.keySet(), context.getSubsumers())) {
-					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace(context + ": applying rules for "
-								+ changedICE);
-					LinkRule<Context> nextLocalRule = indexChanges_
-							.get(changedICE);
-					while (nextLocalRule != null) {
-						nextLocalRule.accept(ruleAppVisitor_,
+					// apply all changed global context rules
+					LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
+					while (nextGlobalRule != null) {
+						if (LOGGER_.isTraceEnabled())
+							LOGGER_.trace(context + ": applying rule "
+									+ nextGlobalRule.getName());
+						nextGlobalRule.accept(ruleAppVisitor_,
 								saturationStateWriter_, context);
-						nextLocalRule = nextLocalRule.next();
+						nextGlobalRule = nextGlobalRule.next();
+					}
+
+					// apply all changed rules for indexed class expressions
+					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
+							indexChanges_.keySet(), context.getSubsumers())) {
+						if (LOGGER_.isTraceEnabled())
+							LOGGER_.trace(context + ": applying rules for "
+									+ changedICE);
+						LinkRule<Context> nextLocalRule = indexChanges_
+								.get(changedICE);
+						while (nextLocalRule != null) {
+							nextLocalRule.accept(ruleAppVisitor_,
+									saturationStateWriter_, context);
+							nextLocalRule = nextLocalRule.next();
+						}
 					}
 				}
 			}

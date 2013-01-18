@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * A {@link ReasonerStage} during which the class taxonomy of the current
@@ -80,10 +81,11 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		
+
 		reasoner.taxonomy = computation_.getTaxonomy();
 		reasoner.doneClassTaxonomy = true;
-		reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
+		reasoner.ruleAndConclusionStats.add(computation_
+				.getRuleAndConclusionStatistics());
 	}
 
 	@Override
@@ -91,8 +93,8 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		super.initComputation();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		this.computation_ = new ClassTaxonomyComputation(
-				reasoner.ontologyIndex.getIndexedClasses(),
+		this.computation_ = new ClassTaxonomyComputation(Operations.split(
+				reasoner.ontologyIndex.getIndexedClasses(), 64),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
 				reasoner.ontologyIndex);
 	}

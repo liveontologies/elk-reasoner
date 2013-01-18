@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -48,15 +49,15 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
  * The factory for engines that concurrently construct a {@link Taxonomy}. The
- * jobs are submitted using the method {@link Engine#submit(IndexedClass)},
- * which require the computation of the {@link Node} for the input
- * {@link IndexedClass}.
+ * jobs are submitted using the method {@link Engine#submit(Collection)}, which
+ * require the computation of the {@link Node} for the input {@link Collection}
+ * of {@link IndexedClass}.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
 public class ClassTaxonomyComputationFactory implements
-		InputProcessorFactory<IndexedClass, Engine> {
+		InputProcessorFactory<Collection<IndexedClass>, Engine> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -149,11 +150,16 @@ public class ClassTaxonomyComputationFactory implements
 		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
-			
-			/*LOGGER_.trace("Getting/creating node for " + output.getRoot() + ", eqs: " + output.getEquivalent());
-			LOGGER_.trace("Context subsumers: " + output.getRoot().getContext().getSubsumers());
-			LOGGER_.trace("Context saturated? " + output.getRoot().getContext().isSaturated());*/
-			
+
+			/*
+			 * LOGGER_.trace("Getting/creating node for " + output.getRoot() +
+			 * ", eqs: " + output.getEquivalent());
+			 * LOGGER_.trace("Context subsumers: " +
+			 * output.getRoot().getContext().getSubsumers());
+			 * LOGGER_.trace("Context saturated? " +
+			 * output.getRoot().getContext().isSaturated());
+			 */
+
 			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
 
@@ -275,7 +281,7 @@ public class ClassTaxonomyComputationFactory implements
 	/**
 	 * 
 	 */
-	public class Engine implements InputProcessor<IndexedClass> {
+	public class Engine implements InputProcessor<Collection<IndexedClass>> {
 
 		/**
 		 * The transitive reduction engine used in the taxonomy construction
@@ -288,12 +294,14 @@ public class ClassTaxonomyComputationFactory implements
 		}
 
 		@Override
-		public final void submit(IndexedClass job) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(job + ": taxonomy construction started");
+		public final void submit(Collection<IndexedClass> input) {
+			for (IndexedClass ic : input) {
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace(ic + ": taxonomy construction started");
+				}
+				transitiveReductionEngine
+						.submit(new TransitiveReductionJob<IndexedClass>(ic));
 			}
-			transitiveReductionEngine
-					.submit(new TransitiveReductionJob<IndexedClass>(job));
 		}
 
 		@Override
