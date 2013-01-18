@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.benchmark.reasoning;
+package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.stages.AbstractStageExecutor;
@@ -19,7 +19,7 @@ public class TimingStageExecutor extends AbstractStageExecutor {
 
 	private final AbstractStageExecutor executor_;
 	
-	TimingStageExecutor(final AbstractStageExecutor executor) {
+	public TimingStageExecutor(final AbstractStageExecutor executor) {
 		executor_ = executor;
 	}
 

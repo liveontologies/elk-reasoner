@@ -44,8 +44,12 @@ public class CLIDriver {
 	 */
 	public static void main(String[] args) throws Exception {
 		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltasTask.class.getName(),
+				Integer.valueOf("0"),
+				Integer.valueOf("1"),
+				new String[]{"/home/pavel/ulm/data/go/incremental"});
+		/*BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
 				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
 				Integer.valueOf(System.getProperty(Constants.RUNS)),
-				new String[]{System.getProperty("folder")});
+				new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl"});*/
 	}
 }

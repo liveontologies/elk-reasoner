@@ -28,7 +28,6 @@ package org.semanticweb.elk.benchmark.reasoning;
 import java.io.File;
 
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
-import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
@@ -82,7 +81,7 @@ public class ClassificationTask implements Task {
 	}
 
 	@Override
-	public Result run() throws TaskException {
+	public void run() throws TaskException {
 		try {
 			Taxonomy<ElkClass> t = reasoner_.getTaxonomy();
 			
@@ -96,8 +95,6 @@ public class ClassificationTask implements Task {
 				reasoner_.shutdown();
 			} catch (InterruptedException e) {}
 		}
-		
-		return null;
 	}
 
 	@Override

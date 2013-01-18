@@ -28,9 +28,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.junit.Assert;
 import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
-import org.semanticweb.elk.benchmark.Result;
+import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.io.IOUtils;
@@ -38,7 +37,6 @@ import org.semanticweb.elk.loading.EmptyChangesLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
@@ -48,9 +46,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.stages.CleaningRedundancyStageExecutor;
 
 /**
  * Incrementally classifies an ontology wrt multiple deltas. Expects a folder
@@ -67,18 +63,14 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	private static String ADDITION_SUFFIX = "delta-plus";
 	private static String DELETION_SUFFIX = "delta-minus";	
 	
-	private Reasoner reasoner_;
-	private Reasoner standardReasoner_;
-	private final ReasonerConfiguration config_;
-	
-	static final boolean CHECK_CORRECTNESS = false;
-	static final boolean INCREMENTAL_RUNS = true;
+	protected Reasoner reasoner_;
+	protected final ReasonerConfiguration config_;
+	protected final Metrics metrics_ = new Metrics();
 	
 	public IncrementalClassificationMultiDeltasTask(String[] args) {
 		super(args);
 		config_ = getConfig(args);		
 	}
-
 
 	private ReasonerConfiguration getConfig(String[] args) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
@@ -100,19 +92,29 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		}
 		
 		if (source.isFile()) {
-			if (reasoner_ != null || standardReasoner_ != null) {
+			if (reasoner_ != null) {
 				dispose();
 			}
 			// initial classification, argument is the first ontology
-			return new ClassifyFirstTime(args[0]);
+			return getFirstTimeClassificationTask(source);
 		}
 		else {
 			//incremental classification, argument is a folder with the positive and the negative delta
-			return INCREMENTAL_RUNS ? new ClassifyIncrementally(args[0]) : new ClassifyNonIncrementally(args[0]);
+			return getIncrementalClassificationTask(source);
 		}
 	}
 	
 	
+	protected Task getFirstTimeClassificationTask(File source) {
+		return new ClassifyFirstTime(source);
+	}
+
+
+	protected Task getIncrementalClassificationTask(File source) {
+		return new ClassifyIncrementally(source);
+	}
+
+
 	@Override
 	protected File[] sortFiles(File[] files) {
 		//There should be one file and multiple dirs.
@@ -151,16 +153,14 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 
 	@Override
 	public void dispose() {
+		
+		System.err.println(metrics_.toString());
+		
 		try {
 			if (reasoner_ != null) {
 				reasoner_.shutdown();
 				reasoner_ = null;
-			}
-			
-			if (standardReasoner_ != null) {
-				standardReasoner_.shutdown();
-				standardReasoner_ = null;
-			}
+			}			
 		} catch (InterruptedException e) {
 		}
 	}
@@ -173,16 +173,12 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	private class ClassifyFirstTime implements Task {
+	protected class ClassifyFirstTime implements Task {
 
 		private final File ontologyFile_;
 		
-		ClassifyFirstTime(String file) {
-			ontologyFile_ = new File(file);
-			
-			if (CHECK_CORRECTNESS) {
-				standardReasoner_ = new ReasonerFactory().createReasoner(new SimpleStageExecutor(), config_);
-			}
+		ClassifyFirstTime(File file) {
+			ontologyFile_ = file;
 		}
 		
 		@Override
@@ -193,30 +189,16 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		@Override
 		public void prepare() throws TaskException {
 			//always start with a new reasoner
-			reasoner_ = new ReasonerFactory().createReasoner(new TimingStageExecutor(new SimpleStageExecutor()), config_);			
+			reasoner_ = new ReasonerFactory().createReasoner(new CleaningRedundancyStageExecutor(metrics_)/*new TimingStageExecutor(new SimpleStageExecutor())*/, config_);			
 			load(reasoner_);
-			
-			if (CHECK_CORRECTNESS) {
-				load(standardReasoner_);
-			}
 		}
 
 		@Override
-		public Result run() throws TaskException {
-			Taxonomy<ElkClass> incrementalTaxonomy = reasoner_.getTaxonomyQuietly();
-			
-			if (CHECK_CORRECTNESS) {
-				Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
-						.getTaxonomyQuietly();
-
-				Assert.assertEquals(TaxonomyHasher.hash(incrementalTaxonomy),
-						TaxonomyHasher.hash(standardTaxonomy));
-			}
-			
-			return null;
+		public void run() throws TaskException {
+			reasoner_.getTaxonomyQuietly();
 		}
 		
-		private void load(Reasoner reasoner) throws TaskException {
+		protected void load(Reasoner reasoner) throws TaskException {
 			InputStream stream = null;
 			
 			try {
@@ -246,12 +228,12 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	private class ClassifyIncrementally implements Task {
+	protected class ClassifyIncrementally implements Task {
 
 		private final File deltaDir_;
 		
-		ClassifyIncrementally(String dir) {
-			deltaDir_ = new File(dir);
+		ClassifyIncrementally(File dir) {
+			deltaDir_ = dir;
 		}
 		
 		@Override
@@ -261,16 +243,10 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 
 		@Override
 		public void prepare() throws TaskException {
-			
 			// load positive and negative deltas
 			reasoner_.setIncrementalMode(true);
 			
 			loadChanges(reasoner_);
-			
-			if (CHECK_CORRECTNESS) {
-				standardReasoner_.setIncrementalMode(false);
-				loadChanges(standardReasoner_);
-			}
 		}
 		
 		protected void loadChanges(Reasoner reasoner) throws TaskException {
@@ -337,48 +313,12 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		}
 
 		@Override
-		public Result run() throws TaskException {
-			Taxonomy<ElkClass> incrementalTaxonomy = reasoner_.getTaxonomyQuietly();
-			
-			if (CHECK_CORRECTNESS) {
-				Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
-						.getTaxonomyQuietly();
-
-				Assert.assertEquals(TaxonomyHasher.hash(incrementalTaxonomy),
-						TaxonomyHasher.hash(standardTaxonomy));
-			}
-			
-			return null;
+		public void run() throws TaskException {
+			reasoner_.getTaxonomyQuietly();
 		}
 
 		@Override
 		public void dispose() {
 		}	
-	}
-	
-	/**
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
-	 */
-	private class ClassifyNonIncrementally extends ClassifyIncrementally {
-
-		ClassifyNonIncrementally(String dir) {
-			super(dir);
-		}
-
-		@Override
-		public String getName() {
-			return "Classify from scratch";
-		}
-
-		@Override
-		public void prepare() throws TaskException {
-			reasoner_.setIncrementalMode(false);
-			loadChanges(reasoner_);
-			reasoner_.setIncrementalMode(false);
-		}
-		
 	}
 }

@@ -32,7 +32,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
-import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.io.IOUtils;
@@ -183,7 +182,7 @@ public class IncrementalClassificationTask implements Task {
 	}
 
 	@Override
-	public Result run() throws TaskException {
+	public void run() throws TaskException {
 		
 		try {
 			TestChangesLoader changeLoader1 = new TestChangesLoader();
@@ -240,8 +239,6 @@ public class IncrementalClassificationTask implements Task {
 			} catch (InterruptedException e) {
 			}
 		}
-
-		return null;
 	}
 
 	/*

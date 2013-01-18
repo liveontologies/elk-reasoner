@@ -37,6 +37,6 @@ public interface Task {
 
 	public String getName();
 	public void prepare() throws TaskException;
-	public Result run() throws TaskException;
+	public void run() throws TaskException;
 	public void dispose();
 }

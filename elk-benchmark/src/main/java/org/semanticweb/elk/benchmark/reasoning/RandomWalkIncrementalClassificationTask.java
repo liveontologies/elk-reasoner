@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
-import org.semanticweb.elk.benchmark.Result;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
@@ -110,8 +109,7 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 	}
 
 	@Override
-	public Result run() throws TaskException {
-
+	public void run() throws TaskException {
 		long seed = System.currentTimeMillis();
 		
 		try {
@@ -125,8 +123,6 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 			} catch (InterruptedException e) {
 			}
 		}
-
-		return null;
 	}
 
 	@Override
