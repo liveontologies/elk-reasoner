@@ -73,5 +73,10 @@ public class DecompositionRuleApplicationCounter {
 		countIndexedObjectSomeValuesFrom += counter.countIndexedObjectSomeValuesFrom;
 		countIndexedDataHasValue += counter.countIndexedDataHasValue;
 	}
+	
+	public long getTotalRuleAppCount() {
+		return countIndexedClass + countIndexedObjectIntersectionOf
+				+ countIndexedObjectSomeValuesFrom + countIndexedDataHasValue;
+	}
 
 }

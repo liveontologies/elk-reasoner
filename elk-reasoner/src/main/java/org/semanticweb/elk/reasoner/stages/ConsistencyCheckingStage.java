@@ -87,6 +87,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 		reasoner.inconsistentOntology = computation.isInconsistent();
 		reasoner.doneConsistencyCheck = true;
+		reasoner.ruleAndConclusionStats.add(computation.getRuleAndConclusionStatistics());
 	}
 
 	@Override

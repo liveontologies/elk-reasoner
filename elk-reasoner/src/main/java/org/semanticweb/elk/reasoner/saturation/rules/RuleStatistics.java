@@ -156,4 +156,7 @@ public class RuleStatistics {
 				/ addCounter + " ms");
 	}
 
+	public long getTotalRuleAppCount() {
+		return ruleCounter.getTotalRuleAppCount() + decompositionRuleCounter.getTotalRuleAppCount();
+	}
 }

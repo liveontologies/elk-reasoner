@@ -82,6 +82,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 		}
 		
 		reasoner.incrementalState.setStageStatus(IncrementalStages.DESATURATION, true);
+		reasoner.ruleAndConclusionStats.add(desaturation_.getRuleAndConclusionStatistics());
 		
 		if (LOGGER_.isDebugEnabled()) {
 			LOGGER_.debug("Number of modified contexts " + reasoner.saturationState.getNotSaturatedContexts().size());
@@ -92,9 +93,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
-
-		//System.out.println(reasoner.saturationState.activeContexts_);
-		
+	
 		desaturation_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(),
 				workerNo,

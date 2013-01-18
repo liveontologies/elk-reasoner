@@ -95,6 +95,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 		reasoner.incrementalState.setStageStatus(IncrementalStages.COMPLETION,
 				true);
+		reasoner.ruleAndConclusionStats.add(completion_.getRuleAndConclusionStatistics());
 		markAllContextsAsSaturated();
 		/*
 		 * TODO: at some point we need to clear non-saturated contexts when

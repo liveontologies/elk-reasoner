@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.util.collections.Operations;
@@ -124,6 +125,10 @@ public class ConsistencyChecking
 				progressMonitor);
 	}
 
+	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
+		return inputProcessorFactory.getRuleAndConclusionStatistics();
+	}	
+	
 	/**
 	 * @param ontologyIndex
 	 *            the representation of the ontology

@@ -116,4 +116,15 @@ public class RuleApplicationCounter {
 		countContradictionBottomBackwardLinkRule += counter.countContradictionBottomBackwardLinkRule;
 	}
 
+	public long getTotalRuleAppCount() {
+		return countOwlThingContextInitializationRule
+				+ countDisjointnessAxiomCompositionRule
+				+ countDisjointnessAxiomContradictionRule
+				+ countObjectIntersectionOfCompositionRule
+				+ countSubClassOfAxiomCompositionRule
+				+ countObjectSomeValuesFromCompositionRule
+				+ countForwardLinkBackwardLinkRule
+				+ countPropagationBackwardLinkRule
+				+ countContradictionBottomBackwardLinkRule;
+	}
 }

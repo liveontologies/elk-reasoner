@@ -98,4 +98,10 @@ public class ConclusionCounter {
 		this.countDisjointnessAxioms += counter.countDisjointnessAxioms;
 	}
 
+	public long getTotalCount() {
+		return countNegativeSubsumers + countPositiveSubsumers
+				+ countBackwardLinks + countForwardLinks + countContradictions
+				+ countPropagations + countDisjointnessAxioms;
+	}
+
 }
