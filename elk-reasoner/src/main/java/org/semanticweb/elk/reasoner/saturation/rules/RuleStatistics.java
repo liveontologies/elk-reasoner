@@ -141,7 +141,7 @@ public class RuleStatistics {
 					+ " ms)");
 
 		logger.debug("Total rule time: "
-				+ (ruleCounter.countContradictionBottomBackwardLinkRule
+				+ (ruleTimer.timeContradictionBottomBackwardLinkRule
 						+ ruleTimer.timeDisjointnessAxiomCompositionRule
 						+ ruleTimer.timeDisjointnessAxiomContradictionRule
 						+ ruleTimer.timeForwardLinkBackwardLinkRule
