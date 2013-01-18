@@ -33,7 +33,7 @@ import org.semanticweb.elk.util.concurrent.computation.FailingInterrupter;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class TestStageExecutor extends FailingInterrupter implements
+public class FailingOnInterruptStageExecutor extends FailingInterrupter implements
 		ReasonerStageExecutor {
 
 	@Override

@@ -53,7 +53,7 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
+import org.semanticweb.elk.reasoner.stages.FailingOnInterruptStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -174,7 +174,7 @@ public class TaxonomyIOTest {
 
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(resource);
-			Reasoner reasoner = TestReasonerUtils.createTestReasoner(new TestStageExecutor(), 1); 
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(new FailingOnInterruptStageExecutor(), 1); 
 			
 			reasoner.registerOntologyLoader(new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), stream));
