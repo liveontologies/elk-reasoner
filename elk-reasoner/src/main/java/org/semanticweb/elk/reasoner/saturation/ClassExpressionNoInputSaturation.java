@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.BaseEngine;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -38,7 +39,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * A {@link ReasonerComputation} that continues saturation based on what's
  * currently initialized in the {@link RuleApplicationFactory}
  * 
- * @author Yevgeny Kazakov
+ * @author Pavel Klinov
  * 
  */
 public class ClassExpressionNoInputSaturation
@@ -120,11 +121,20 @@ class ClassExpressionNoInputSaturationFactory
 
 		@Override
 		public void process() throws InterruptedException {
-			ruleAppFactory_.getDefaultEngine(ContextCreationListener.DUMMY, contextModificationListener_).process();
+			BaseEngine engine = ruleAppFactory_.getDefaultEngine(ContextCreationListener.DUMMY, contextModificationListener_);
+			
+			try {
+				engine.process();
+			}
+			finally {
+				engine.finish();
+			}
 		}
 
 		@Override
 		public void finish() {
+			ruleAppFactory_.finish();
+			//System.err.println(ruleAppFactory_.getStatistics().getRuleStatistics().getTotalRuleAppCount());
 		}
 
 	}
