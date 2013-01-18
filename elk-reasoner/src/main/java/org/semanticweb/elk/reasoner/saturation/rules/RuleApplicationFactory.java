@@ -60,9 +60,9 @@ public class RuleApplicationFactory {
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_CONCLUSION_COUNTS = true;//LOGGER_.isDebugEnabled();
 	static final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_RULE_COUNTS = true;//LOGGER_.isDebugEnabled();
 	static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
 
 	final SaturationState saturationState;
@@ -98,7 +98,6 @@ public class RuleApplicationFactory {
 		return new DefaultEngine(listener, modListener);
 	}
 
-	//@Override
 	public void finish() {
 		aggregatedStats_.check(LOGGER_);
 	}
@@ -191,7 +190,6 @@ public class RuleApplicationFactory {
 				conclusionProcessor_ = getConclusionProcessor(writer, localStatistics);
 			}
 			
-			
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
@@ -211,6 +209,9 @@ public class RuleApplicationFactory {
 		@Override
 		public void finish() {
 			aggregatedStats_.add(localStatistics);
+			
+			//System.err.println(aggregatedStats_.getRuleStatistics().getTotalRuleAppCount());
+			
 			localStatistics.reset();
 		}
 
@@ -343,14 +344,14 @@ public class RuleApplicationFactory {
 			this(listener, modListener, new RuleAndConclusionStatistics());
 		}
 
-		protected DefaultEngine(final ContextCreationListener listener,
+		private DefaultEngine(final ContextCreationListener listener,
 				final ContextModificationListener modificationListener,
-				final RuleAndConclusionStatistics factoryStats) {
+				final RuleAndConclusionStatistics localStatistics) {
 			this(saturationState.getExtendedWriter(
-					getEngineContextCreationListener(listener, factoryStats),
+					getEngineContextCreationListener(listener, localStatistics),
 					modificationListener,
-					getEngineCompositionRuleApplicationVisitor(factoryStats), trackModifiedContexts_),
-					factoryStats
+					getEngineCompositionRuleApplicationVisitor(localStatistics), trackModifiedContexts_),
+					localStatistics
 					);
 		}
 
