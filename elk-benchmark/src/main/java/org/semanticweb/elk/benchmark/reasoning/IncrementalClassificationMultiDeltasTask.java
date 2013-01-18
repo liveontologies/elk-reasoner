@@ -152,9 +152,12 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	}
 
 	@Override
+	public Metrics getMetrics() {
+		return metrics_;
+	}	
+	
+	@Override
 	public void dispose() {
-		
-		System.err.println(metrics_.toString());
 		
 		try {
 			if (reasoner_ != null) {
@@ -218,6 +221,11 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 
 		@Override
 		public void dispose() {
+		}
+
+		@Override
+		public Metrics getMetrics() {
+			return metrics_;
 		}
 	}
 	
@@ -320,5 +328,10 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		@Override
 		public void dispose() {
 		}	
+		
+		@Override
+		public Metrics getMetrics() {
+			return metrics_;
+		}
 	}
 }

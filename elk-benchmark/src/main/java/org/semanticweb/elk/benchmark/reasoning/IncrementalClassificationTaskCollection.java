@@ -26,6 +26,7 @@ package org.semanticweb.elk.benchmark.reasoning;
 
 import java.util.Arrays;
 
+import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskCollection;
 import org.semanticweb.elk.benchmark.TaskException;
@@ -53,6 +54,12 @@ public class IncrementalClassificationTaskCollection implements TaskCollection {
 	
 	@Override
 	public void dispose() {
+	}
+
+	@Override
+	public Metrics getMetrics() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 

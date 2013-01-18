@@ -28,6 +28,7 @@ package org.semanticweb.elk.benchmark.reasoning;
 import java.io.File;
 
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
+import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
@@ -103,6 +104,12 @@ public class ClassificationTask implements Task {
 			reasoner_.shutdown();
 		} catch (InterruptedException e) {
 		}
+	}
+
+	@Override
+	public Metrics getMetrics() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

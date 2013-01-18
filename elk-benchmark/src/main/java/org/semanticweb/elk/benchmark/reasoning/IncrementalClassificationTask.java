@@ -32,6 +32,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
+import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.io.IOUtils;
@@ -322,5 +323,11 @@ public class IncrementalClassificationTask implements Task {
 			incrementalReasoner_.shutdown();
 		} catch (InterruptedException e) {
 		}
+	}
+
+	@Override
+	public Metrics getMetrics() {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 }

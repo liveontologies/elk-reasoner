@@ -64,5 +64,7 @@ public class TaskCollectionRunner2 {
 		}
 		
 		collection.dispose();
+		
+		System.err.println(collection.getMetrics());
 	}	
 }

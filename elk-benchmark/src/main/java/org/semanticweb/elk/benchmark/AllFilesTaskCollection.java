@@ -74,6 +74,11 @@ public abstract class AllFilesTaskCollection implements TaskCollection {
 	public void dispose() {
 	}
 	
-
+	@Override
+	public Metrics getMetrics() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public abstract Task instantiateSubTask(String[] args) throws TaskException;
 }

@@ -39,4 +39,5 @@ public interface Task {
 	public void prepare() throws TaskException;
 	public void run() throws TaskException;
 	public void dispose();
+	public Metrics getMetrics();
 }
