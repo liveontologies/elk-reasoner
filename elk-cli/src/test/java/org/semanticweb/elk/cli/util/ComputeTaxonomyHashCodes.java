@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
+import org.semanticweb.elk.reasoner.stages.FailingOnInterruptStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -125,7 +125,7 @@ public class ComputeTaxonomyHashCodes {
 			System.err.println(ontFile.getName());
 
 			Reasoner reasoner = reasonerFactory.createReasoner(
-					new TestStageExecutor(), configuraion);
+					new FailingOnInterruptStageExecutor(), configuraion);
 			reasoner.registerOntologyLoader(new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), ontFile));
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
