@@ -25,9 +25,13 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
+import java.util.AbstractCollection;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.text.AbstractWriter;
 
@@ -37,7 +41,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -61,6 +64,12 @@ public class SaturationState {
 	private final IndexedClassExpression owlThing_, owlNothing_;
 
 	/**
+	 * the reference to the first context in the link list of contexts
+	 */
+	private final AtomicReference<ContextImpl> firstContext = new AtomicReference<ContextImpl>(
+			null);
+
+	/**
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
@@ -76,6 +85,55 @@ public class SaturationState {
 	 * Kept because still need to be cleaned to avoid broken backward links
 	 */
 	private final Queue<IndexedClassExpression> removedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
+
+	/**
+	 * @return the {@link Collection} of {@link Context} stored in this
+	 *         {@link SaturationState}
+	 */
+	public Collection<Context> getContexts() {
+		return new AbstractCollection<Context>() {
+
+			@Override
+			public Iterator<Context> iterator() {
+				return new Iterator<Context>() {
+
+					ContextImpl next = firstContext.get();
+
+					@Override
+					public boolean hasNext() {
+						return next != null;
+					}
+
+					@Override
+					public Context next() {
+						if (next == null)
+							throw new NoSuchElementException("No next context");
+						Context result = next;
+						next = next.next;
+						return result;
+					}
+
+					@Override
+					public void remove() {
+						throw new NoSuchElementException(
+								"Removal not supported");
+					}
+
+				};
+			}
+
+			@Override
+			public int size() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+		};
+	}
+
+	public void resetFirstContext() {
+		firstContext.set(null);
+	}
 
 	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
 		return notSaturatedContexts_;
@@ -100,13 +158,14 @@ public class SaturationState {
 	}
 
 	/**
-	 * @return an {@link AbstractWriter} for modifying this {@link SaturationState}. The
-	 *         methods of this {@link AbstractWriter} are thread safe
+	 * @return an {@link AbstractWriter} for modifying this
+	 *         {@link SaturationState}. The methods of this
+	 *         {@link AbstractWriter} are thread safe
 	 */
 	public Writer getWriter() {
 		return defaultWriter_;
 	}
-	
+
 	public ExtendedWriter getExtendedWriter() {
 		return defaultWriter_;
 	}
@@ -116,23 +175,28 @@ public class SaturationState {
 	}
 
 	/**
-	 * Creates a new {@link ExtendedWriter} for modifying this {@link SaturationState}
-	 * associated with the given {@link ContextCreationListener}. If
-	 * {@link ContextCreationListener} is not thread safe, the calls of the
-	 * methods for the same {@link AbstractWriter} should be synchronized
+	 * Creates a new {@link ExtendedWriter} for modifying this
+	 * {@link SaturationState} associated with the given
+	 * {@link ContextCreationListener}. If {@link ContextCreationListener} is
+	 * not thread safe, the calls of the methods for the same
+	 * {@link AbstractWriter} should be synchronized
 	 * 
 	 */
-	public ExtendedWriter getExtendedWriter(ContextCreationListener contextCreationListener,
+	public ExtendedWriter getExtendedWriter(
+			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
-			RuleApplicationVisitor ruleAppVisitor, boolean trackNewContextsAsUnsaturated) {
-		return new ContextCreatingWriter(contextCreationListener, contextModificationListener, ruleAppVisitor, trackNewContextsAsUnsaturated);
+			RuleApplicationVisitor ruleAppVisitor,
+			boolean trackNewContextsAsUnsaturated) {
+		return new ContextCreatingWriter(contextCreationListener,
+				contextModificationListener, ruleAppVisitor,
+				trackNewContextsAsUnsaturated);
 	}
-	
-	public Writer getWriter(ContextModificationListener contextModificationListener) {
+
+	public Writer getWriter(
+			ContextModificationListener contextModificationListener) {
 		return new BasicWriter(contextModificationListener);
 	}
 
-	
 	/**
 	 * Functions that can write the saturation state are grouped here. With
 	 * every {@link Writer} one can register a {@link ContextCreationListener}
@@ -146,7 +210,7 @@ public class SaturationState {
 	 * 
 	 */
 	public interface Writer {
-		
+
 		public IndexedClassExpression getOwlThing();
 
 		public IndexedClassExpression getOwlNothing();
@@ -163,7 +227,7 @@ public class SaturationState {
 
 		public void clearContextsToBeRemoved();
 	}
-	
+
 	/**
 	 * The extended writer for situations when new contexts may need to be
 	 * created/initialized
@@ -173,18 +237,18 @@ public class SaturationState {
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	public interface ExtendedWriter extends Writer {
-		
+
 		public Context getCreateContext(IndexedClassExpression root);
 
 		public void initContext(Context context);
 	}
-	
+
 	/**
 	 * 
 	 * 
 	 */
 	class BasicWriter implements Writer {
-		
+
 		private final ContextModificationListener contextModificationListener_;
 
 		private BasicWriter(
@@ -222,20 +286,19 @@ public class SaturationState {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace(context + ": marked as non-saturated");
 			}
-			
+
 			notSaturatedContexts_.add(context.getRoot());
 			contextModificationListener_.notifyContextModification(context);
 		}
-		
+
 		@Override
 		public boolean markAsNotSaturated(Context context) {
 			if (context.setSaturated(false)) {
 				markAsNotSaturatedInternal(context);
-				
+
 				return true;
-			}
-			else {
-				//LOGGER_.trace(context + " is already saturated");
+			} else {
+				// LOGGER_.trace(context + " is already saturated");
 				return false;
 			}
 		}
@@ -265,13 +328,13 @@ public class SaturationState {
 	/**
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	class ContextCreatingWriter extends BasicWriter implements ExtendedWriter {
-		
-		private final RuleApplicationVisitor initRuleAppVisitor_;		
-		
+
+		private final RuleApplicationVisitor initRuleAppVisitor_;
+
 		/**
 		 * If set to true, the writer will put all newly created contexts to
 		 * {@link notSaturatedContexts_} This is important if saturation of a
@@ -280,41 +343,57 @@ public class SaturationState {
 		 * their saturation later.
 		 */
 		private final boolean trackNewContextsAsUnsaturated_;
-		
+
 		private final ContextCreationListener contextCreationListener_;
 
-		
-		private ContextCreatingWriter(ContextCreationListener contextCreationListener,
+		private ContextCreatingWriter(
+				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextSaturationListener,
 				RuleApplicationVisitor ruleAppVisitor,
 				boolean trackNewContextsAsUnsaturated) {
 			super(contextSaturationListener);
-			
+
 			this.contextCreationListener_ = contextCreationListener;
 			this.initRuleAppVisitor_ = ruleAppVisitor;
 			this.trackNewContextsAsUnsaturated_ = trackNewContextsAsUnsaturated;
-		}		
-		
+		}
+
 		@Override
 		public Context getCreateContext(IndexedClassExpression root) {
 
-			if (root.getContext() == null) {
-				Context context = new ContextImpl(root);
-				if (root.setContext(context)) {
-					initContext(context);
-					contextCreationListener_.notifyContextCreation(context);
-				}
-				
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(context.getRoot() + ": context created");
-				}
-				
-				if (trackNewContextsAsUnsaturated_) {
-					markAsNotSaturatedInternal(context);
+			Context context = root.getContext();
+			if (context != null)
+				return context;
+			// else try to assign a new context
+			ContextImpl newContext = new ContextImpl(root);
+			if (!root.setContext(newContext))
+				// the context is already assigned meanwhile
+				return root.getContext();
+			// else the context is new
+			initContext(newContext);
+			contextCreationListener_.notifyContextCreation(newContext);
+
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(newContext.getRoot() + ": context created");
+			}
+
+			if (trackNewContextsAsUnsaturated_) {
+				markAsNotSaturatedInternal(newContext);
+			}
+
+			/* linking contexts */
+			for (;;) {
+				ContextImpl oldHead = firstContext.get();
+				if (firstContext.compareAndSet(oldHead, newContext)) {
+					if (oldHead != null) {
+						newContext.next = oldHead;
+						oldHead.previous = newContext;
+					}
+					break;
 				}
 			}
-			
-			return root.getContext();
+
+			return newContext;
 		}
 
 		@Override
@@ -327,9 +406,9 @@ public class SaturationState {
 				initRule.accept(initRuleAppVisitor_, this, context);
 				initRule = initRule.next();
 			}
-		}		
+		}
 	}
-	
+
 	/**
 	 * A {@link Writer} that does not produce conclusions if their source
 	 * context is already saturated.
@@ -345,9 +424,9 @@ public class SaturationState {
 		@Override
 		public void produce(Context context, Conclusion conclusion) {
 			Context sourceContext = conclusion.getSourceContext(context);
-			
+
 			if (sourceContext == null || !sourceContext.isSaturated()) {
-				super.produce(context, conclusion);	
+				super.produce(context, conclusion);
 			}
 		}
 	}

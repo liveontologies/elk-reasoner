@@ -167,8 +167,7 @@ class IncrementalAdditionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.incrementalState.diffIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Collection<Collection<IndexedClassExpression>> inputs = Collections
-				.emptyList();
+		Collection<Collection<Context>> inputs = Collections.emptyList();
 		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(stageStatistics_
 				.getRuleStatistics());
 
@@ -176,8 +175,10 @@ class IncrementalAdditionInitializationStage extends
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
 
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
-			inputs = Operations.split(
-					reasoner.ontologyIndex.getIndexedClassExpressions(), 128);
+			// inputs = Operations.split(
+			// reasoner.ontologyIndex.getIndexedClassExpressions(), 128);
+			inputs = Operations.split(reasoner.saturationState.getContexts(),
+					128);
 		}
 
 		initialization_ = new IncrementalChangesInitialization(inputs,
@@ -223,8 +224,7 @@ class IncrementalDeletionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.incrementalState.diffIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Collection<Collection<IndexedClassExpression>> inputs = Collections
-				.emptyList();
+		Collection<Collection<Context>> inputs = Collections.emptyList();
 		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(stageStatistics_
 				.getRuleStatistics());
 
@@ -232,8 +232,10 @@ class IncrementalDeletionInitializationStage extends
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
 
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
-			inputs = Operations.split(
-					reasoner.ontologyIndex.getIndexedClassExpressions(), 128);
+			// inputs = Operations.split(
+			// reasoner.ontologyIndex.getIndexedClassExpressions(), 128);
+			inputs = Operations.split(reasoner.saturationState.getContexts(),
+					128);
 		}
 
 		initialization_ = new IncrementalChangesInitialization(inputs,

@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
@@ -92,6 +93,9 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			if (ice.getCompositionRuleHead() != null)
 				throw new ElkUnexpectedIndexingException(
 						"Deleting object with registered rules: " + ice);
+			Context context = ice.getContext();
+			if (context != null)
+				context.removeLinks();
 			if (!ice.accept(deletor))
 				throw new ElkUnexpectedIndexingException(
 						"Cannot remove indexed object from the cache " + ice);
@@ -261,23 +265,10 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 	protected final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
 
-		private void checkContext(IndexedClassExpression removed) {
-			/*
-			 * if (LOGGER_.isDebugEnabled()) { Context context =
-			 * removed.getContext();
-			 * 
-			 * if (context != null && !context.isEmpty()) {
-			 * LOGGER_.error("Non empty context for removed ICE: " + removed); }
-			 * }
-			 */
-		}
-
 		@Override
 		public Boolean visit(IndexedClass element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-
-			checkContext(element);
 
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedClassCount--;
@@ -290,7 +281,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedIndividual element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-			
+
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedIndividualCount--;
 				return true;
@@ -302,8 +293,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedObjectIntersectionOf element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-			
-			checkContext(element);
 
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
@@ -312,8 +301,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-			
-			checkContext(element);
 
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
@@ -322,8 +309,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedDataHasValue element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-			
-			checkContext(element);
 
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
@@ -332,7 +317,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedObjectProperty element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-			
+
 			if (indexedPropertyChainLookup.removeEntry(element) != null) {
 				indexedObjectPropertyCount--;
 				return true;
@@ -344,7 +329,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedBinaryPropertyChain element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-			
+
 			return indexedPropertyChainLookup.removeEntry(element) != null;
 		}
 
@@ -358,7 +343,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedDisjointnessAxiom axiom) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + axiom);
-			
+
 			return indexedAxiomLookup.removeEntry(axiom) != null;
 		}
 	};

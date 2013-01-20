@@ -26,7 +26,6 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
@@ -36,6 +35,7 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalen
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalentDirect;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
@@ -87,19 +87,21 @@ public class InstanceTaxonomyComputationFactory implements
 	 * that have been made before. For this to work, the taxonomy object must
 	 * originate from an earlier run of this engine on the same ontology.
 	 * 
-	 * @param ontologyIndex
-	 *            the ontology index for which the engine is created
+	 * @param saturationState
+	 *            the saturation state of the reasoner
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 * @param partialTaxonomy
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
-	public InstanceTaxonomyComputationFactory(OntologyIndex ontologyIndex,
-			int maxWorkers, UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
+	public InstanceTaxonomyComputationFactory(
+			SaturationState saturationState,
+			int maxWorkers,
+			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>(
-				ontologyIndex, maxWorkers,
+				saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
 		this.topNode_ = (NonBottomClassNode) partialTaxonomy.getTopNode();
@@ -139,8 +141,9 @@ public class InstanceTaxonomyComputationFactory implements
 				TransitiveReductionOutputEquivalentDirect<IndexedIndividual> output) {
 
 			// only supports singleton individuals
-			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_.getCreateIndividualNode(Collections
-					.singleton(output.getRoot().getElkNamedIndividual()));
+			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
+					.getCreateIndividualNode(Collections.singleton(output
+							.getRoot().getElkNamedIndividual()));
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
@@ -184,7 +187,8 @@ public class InstanceTaxonomyComputationFactory implements
 	 * @param typeNode
 	 *            the node that should be the super-node of the first node
 	 */
-	private static void assignDirectTypeNode(UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
+	private static void assignDirectTypeNode(
+			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
 			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
 		instanceNode.addDirectTypeNode(typeNode);
 		/*

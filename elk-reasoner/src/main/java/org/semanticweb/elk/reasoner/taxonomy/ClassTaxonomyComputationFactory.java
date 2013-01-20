@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
@@ -39,6 +38,7 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalen
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -88,19 +88,19 @@ public class ClassTaxonomyComputationFactory implements
 	 * that have been made before. For this to work, the taxonomy object must
 	 * originate from an earlier run of this engine on the same ontology.
 	 * 
-	 * @param ontologyIndex
-	 *            the ontology index for which the engine is created
+	 * @param saturationState
+	 *            the saturation state of the reasoner
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 * @param partialTaxonomy
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
-	public ClassTaxonomyComputationFactory(OntologyIndex ontologyIndex,
+	public ClassTaxonomyComputationFactory(SaturationState saturationState,
 			int maxWorkers, UpdateableTaxonomy<ElkClass> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>(
-				ontologyIndex, maxWorkers,
+				saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
 		this.topNodeRef_ = new AtomicReference<UpdateableTaxonomyNode<ElkClass>>();
@@ -109,14 +109,14 @@ public class ClassTaxonomyComputationFactory implements
 	/**
 	 * Create a new class taxonomy engine for the input ontology index.
 	 * 
-	 * @param ontologyIndex
-	 *            the ontology index for which the engine is created
+	 * @param saturationState
+	 *            the saturation state of the reasoner
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */
-	public ClassTaxonomyComputationFactory(OntologyIndex ontologyIndex,
+	public ClassTaxonomyComputationFactory(SaturationState saturationState,
 			int maxWorkers) {
-		this(ontologyIndex, maxWorkers, new ConcurrentTaxonomy());
+		this(saturationState, maxWorkers, new ConcurrentTaxonomy());
 	}
 
 	/**

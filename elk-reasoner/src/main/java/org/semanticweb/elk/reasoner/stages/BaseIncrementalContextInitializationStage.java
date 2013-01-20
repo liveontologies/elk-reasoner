@@ -52,13 +52,14 @@ abstract class BaseIncrementalContextInitializationStage extends
 	 * The number of contexts
 	 */
 	protected int maxContexts_;
-	
+
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
 	protected Iterator<IndexedClassExpression> todo = null;
 
-	public BaseIncrementalContextInitializationStage(AbstractReasonerState reasoner) {
+	public BaseIncrementalContextInitializationStage(
+			AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -67,11 +68,9 @@ abstract class BaseIncrementalContextInitializationStage extends
 		return stage().toString();
 	}
 
-
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState
-				.getStageStatus(stage());
+		return reasoner.incrementalState.getStageStatus(stage());
 	}
 
 	@Override
@@ -85,7 +84,7 @@ abstract class BaseIncrementalContextInitializationStage extends
 				if (!todo.hasNext())
 					break;
 				IndexedClassExpression ice = todo.next();
-				
+
 				if (ice.getContext() != null) {
 					reasoner.saturationState.getExtendedWriter().initContext(
 							ice.getContext());
@@ -109,17 +108,18 @@ abstract class BaseIncrementalContextInitializationStage extends
 		if (initContexts_ > 0 && LOGGER_.isDebugEnabled())
 			LOGGER_.debug("Contexts init:" + initContexts_);
 	}
-	
+
 	protected abstract IncrementalStages stage();
 }
 
 /**
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-class InitializeContextsAfterDesaturation extends BaseIncrementalContextInitializationStage {
+class InitializeContextsAfterDesaturation extends
+		BaseIncrementalContextInitializationStage {
 
 	public InitializeContextsAfterDesaturation(AbstractReasonerState reasoner) {
 		super(reasoner);
@@ -129,60 +129,73 @@ class InitializeContextsAfterDesaturation extends BaseIncrementalContextInitiali
 	protected IncrementalStages stage() {
 		return IncrementalStages.CONTEXT_AFTER_DEL_INIT;
 	}
-	
+
 	@Override
 	void initComputation() {
 		super.initComputation();
-		
+
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Initializing contexts with deleted conclusions: " + reasoner.saturationState.getNotSaturatedContexts());
-			LOGGER_.trace("Initializing contexts which will be removed: " + reasoner.saturationState.getContextsToBeRemoved());
+			LOGGER_.trace("Initializing contexts with deleted conclusions: "
+					+ reasoner.saturationState.getNotSaturatedContexts());
+			LOGGER_.trace("Initializing contexts which will be removed: "
+					+ reasoner.saturationState.getContextsToBeRemoved());
 		}
-		
-		todo = Operations.concat(reasoner.saturationState.getNotSaturatedContexts(), reasoner.saturationState.getContextsToBeRemoved()).iterator();
-		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size() + reasoner.saturationState.getContextsToBeRemoved().size();	
-		
+
+		todo = Operations.concat(
+				reasoner.saturationState.getNotSaturatedContexts(),
+				reasoner.saturationState.getContextsToBeRemoved()).iterator();
+		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts()
+				.size()
+				+ reasoner.saturationState.getContextsToBeRemoved().size();
+
 		initContexts_ = 0;
 	}
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Collections.<ReasonerStage>singleton(new IncrementalDeSaturationStage(reasoner));
-	}	
+		return Collections
+				.<ReasonerStage> singleton(new IncrementalDeSaturationStage(
+						reasoner));
+	}
 }
 
 /**
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-class InitializeContextsAfterCleaning extends BaseIncrementalContextInitializationStage {
+class InitializeContextsAfterCleaning extends
+		BaseIncrementalContextInitializationStage {
 
 	public InitializeContextsAfterCleaning(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
-	
+
 	@Override
 	protected IncrementalStages stage() {
 		return IncrementalStages.CONTEXT_AFTER_CLEAN_INIT;
 	}
-	
+
 	@Override
 	void initComputation() {
 		super.initComputation();
-		
+
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Cleaned contexts to be initialized: " + reasoner.saturationState.getNotSaturatedContexts());
+			LOGGER_.trace("Cleaned contexts to be initialized: "
+					+ reasoner.saturationState.getNotSaturatedContexts());
 		}
-		
-		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();	
-		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts().size();
+
+		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();
+		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts()
+				.size();
 		initContexts_ = 0;
 	}
-	
+
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Collections.<ReasonerStage>singleton(new IncrementalContextCleaningStage(reasoner));
+		return Collections
+				.<ReasonerStage> singleton(new IncrementalContextCleaningStage(
+						reasoner));
 	}
 }

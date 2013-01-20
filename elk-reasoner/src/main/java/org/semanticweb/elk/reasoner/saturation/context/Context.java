@@ -263,11 +263,17 @@ public interface Context {
 	 *         {@link Context}
 	 */
 	public boolean setSaturated(boolean saturated);
-	
+
 	/**
 	 * 
 	 * @return
 	 */
 	public boolean isEmpty();
+
+	/**
+	 * removes links to the next and previous contexts, effectively removing
+	 * this {@link Context} from the chain of contexts
+	 */
+	public void removeLinks(); // TODO: find a way to hide this
 
 }

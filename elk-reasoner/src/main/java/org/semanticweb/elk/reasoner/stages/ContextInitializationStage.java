@@ -102,6 +102,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	@Override
 	void initComputation() {
 		super.initComputation();
+		reasoner.saturationState.resetFirstContext();
 		todo = reasoner.ontologyIndex.getIndexedClassExpressions().iterator();
 		maxContexts_ = reasoner.ontologyIndex.getIndexedClassExpressions()
 				.size();

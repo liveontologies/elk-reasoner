@@ -116,7 +116,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			this.computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.ontologyIndex, reasoner.instanceTaxonomy);
+					reasoner.saturationState, reasoner.instanceTaxonomy);
 		}
 
 		if (LOGGER_.isInfoEnabled())

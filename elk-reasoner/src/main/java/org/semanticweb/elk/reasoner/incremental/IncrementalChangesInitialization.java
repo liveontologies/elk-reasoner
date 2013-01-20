@@ -53,12 +53,11 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class IncrementalChangesInitialization
-		extends
-		ReasonerComputation<Collection<IndexedClassExpression>, ContextInitializationFactory> {
+public class IncrementalChangesInitialization extends
+		ReasonerComputation<Collection<Context>, ContextInitializationFactory> {
 
 	public IncrementalChangesInitialization(
-			Collection<Collection<IndexedClassExpression>> inputs,
+			Collection<Collection<Context>> inputs,
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
 			SaturationState state, ComputationExecutor executor,
@@ -72,7 +71,7 @@ public class IncrementalChangesInitialization
 
 class ContextInitializationFactory
 		implements
-		InputProcessorFactory<Collection<IndexedClassExpression>, InputProcessor<Collection<IndexedClassExpression>>> {
+		InputProcessorFactory<Collection<Context>, InputProcessor<Collection<Context>>> {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ContextInitializationFactory.class);
@@ -94,17 +93,13 @@ class ContextInitializationFactory
 	}
 
 	@Override
-	public InputProcessor<Collection<IndexedClassExpression>> getEngine() {
+	public InputProcessor<Collection<Context>> getEngine() {
 
-		return new BaseInputProcessor<Collection<IndexedClassExpression>>() {
+		return new BaseInputProcessor<Collection<Context>>() {
 
 			@Override
-			protected void process(Collection<IndexedClassExpression> input) {
-				for (IndexedClassExpression ice : input) {
-					Context context = ice.getContext();
-					if (context == null)
-						continue;
-
+			protected void process(Collection<Context> input) {
+				for (Context context : input) {					
 					// apply all changed global context rules
 					LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
 					while (nextGlobalRule != null) {

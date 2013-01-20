@@ -218,8 +218,8 @@ class ConcurrentTaxonomy implements IndividualClassTaxonomy {
 
 		allClassNodes_.add(node);
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("node created: " + node);
-		}
+			LOGGER_.trace("node created: " + node);			
+		}		
 		for (ElkClass member : members) {
 			if (member != canonical)
 				classNodeLookup_.put(getKey(member), node);

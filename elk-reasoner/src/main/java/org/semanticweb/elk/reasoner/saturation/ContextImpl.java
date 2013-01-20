@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.context;
+package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -58,6 +59,12 @@ public class ContextImpl implements Context {
 	 * 
 	 */
 	private final IndexedClassExpression root_;
+
+	/**
+	 * references to the next and previous contexts so that the contexts can be
+	 * chained
+	 */
+	volatile ContextImpl next, previous;
 
 	/**
 	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
@@ -113,6 +120,14 @@ public class ContextImpl implements Context {
 	@Override
 	public IndexedClassExpression getRoot() {
 		return root_;
+	}
+	
+	@Override
+	public void removeLinks() {
+		if (previous != null && next != null) {
+			previous.next = next;
+			next.previous = previous;
+		}
 	}
 
 	@Override
@@ -183,7 +198,8 @@ public class ContextImpl implements Context {
 		else if (inconsistency == true)
 			// nothing changes
 			return false;
-		else // inconsistency == false;
+		else
+			// inconsistency == false;
 			inconsistency = true;
 		disjointnessAxioms_.put(disjointnessAxiom, inconsistency);
 		return true;

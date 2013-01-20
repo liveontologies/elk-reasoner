@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
@@ -110,21 +109,21 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * Creating a new transitive reduction engine for the input ontology index
 	 * and a listener for executing callback functions.
 	 * 
-	 * @param ontologyIndex
-	 *            the ontology index for which the engine is created
+	 * @param saturationState
+	 *            the saturation state of the reasoner
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 * @param listener
 	 *            the listener object implementing callback functions for this
 	 *            engine
 	 */
-	public TransitiveReductionFactory(OntologyIndex ontologyIndex,
+	public TransitiveReductionFactory(SaturationState saturationState,
 			int maxWorkers, TransitiveReductionListener<J> listener) {
 		this.listener = listener;
 		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
 		this.jobsWithSaturatedRoot = new ConcurrentLinkedQueue<J>();
 		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
-				new SaturationState(ontologyIndex), maxWorkers,
+				saturationState, maxWorkers,
 				new ThisClassExpressionSaturationListener());
 	}
 
@@ -144,10 +143,10 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	public void printStatistics() {
 		saturationFactory.printStatistics();
 	}
-	
+
 	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
 		return saturationFactory.getRuleAndConclusionStatistics();
-	}	
+	}
 
 	/**
 	 * The listener class used for the class expression saturation engine, which
@@ -219,7 +218,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 */
 			R root = initiatorJob.getInput();
 			Context saturation = root.getContext();
-			
+
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
@@ -326,14 +325,14 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		private void updateTransitiveReductionOutput(
 				TransitiveReductionOutputEquivalentDirect<R> output,
 				IndexedClass candidate, Context candidateSaturation) {
-			
+
 			R root = output.root;
 
 			if (candidate == root) {
 				output.equivalent.add(candidate.getElkClass());
 				return;
 			}
-			
+
 			Set<IndexedClassExpression> candidateSupers = candidateSaturation
 					.getSubsumers();
 			/*
@@ -446,7 +445,5 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		}
 
 	}
-
-
 
 }

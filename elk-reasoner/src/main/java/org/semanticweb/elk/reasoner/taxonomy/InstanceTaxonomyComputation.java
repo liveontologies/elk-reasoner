@@ -28,8 +28,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -47,19 +47,22 @@ public class InstanceTaxonomyComputation
 		extends
 		ReasonerComputation<IndexedIndividual, InstanceTaxonomyComputationFactory> {
 
-	public InstanceTaxonomyComputation(Collection<IndexedIndividual> inputs,
-			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
+	public InstanceTaxonomyComputation(
+			Collection<IndexedIndividual> inputs,
+			ComputationExecutor executor,
+			int maxWorkers,
+			ProgressMonitor progressMonitor,
+			SaturationState saturationState,
 			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
-		super(inputs, new InstanceTaxonomyComputationFactory(ontologyIndex,
+		super(inputs, new InstanceTaxonomyComputationFactory(saturationState,
 				maxWorkers, partialTaxonomy), executor, maxWorkers,
 				progressMonitor);
 	}
 
 	public InstanceTaxonomyComputation(Collection<IndexedIndividual> inputs,
 			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(inputs, executor, maxWorkers, progressMonitor, ontologyIndex,
+			ProgressMonitor progressMonitor, SaturationState saturationState) {
+		this(inputs, executor, maxWorkers, progressMonitor, saturationState,
 				new ConcurrentTaxonomy());
 	}
 

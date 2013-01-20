@@ -96,6 +96,12 @@ public class DirectIndexUpdater implements IndexUpdater {
 		if (!object.accept(ontIndex_.getIndexedObjectCache().deletor))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove indexed object from the cache " + object);
+		if (object instanceof IndexedClassExpression) {
+			IndexedClassExpression ice = (IndexedClassExpression) object;
+			Context context = ice.getContext();
+			if (context != null)
+				context.removeLinks();
+		}
 	}
 
 	@Override

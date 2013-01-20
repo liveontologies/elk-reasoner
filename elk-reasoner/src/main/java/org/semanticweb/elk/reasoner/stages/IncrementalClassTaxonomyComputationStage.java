@@ -86,7 +86,7 @@ class IncrementalClassTaxonomyComputationStage extends
 
 			computation_ = new ClassTaxonomyComputation(Operations.split(
 					indexedClasses, 128), reasoner.getProcessExecutor(),
-					workerNo, progressMonitor, reasoner.ontologyIndex);
+					workerNo, progressMonitor, reasoner.saturationState);
 		} else {
 
 			Collection<IndexedClass> modified = new AbstractSet<IndexedClass>() {
@@ -118,7 +118,7 @@ class IncrementalClassTaxonomyComputationStage extends
 
 			computation_ = new ClassTaxonomyComputation(Operations.split(
 					modified, 64), reasoner.getProcessExecutor(), workerNo,
-					progressMonitor, reasoner.ontologyIndex, reasoner.taxonomy);
+					progressMonitor, reasoner.saturationState, reasoner.taxonomy);
 		}
 
 	}
