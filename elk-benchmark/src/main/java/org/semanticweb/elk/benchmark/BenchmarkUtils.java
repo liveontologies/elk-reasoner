@@ -100,7 +100,12 @@ public class BenchmarkUtils {
 		Task task = TaskFactory.createTask(taskClass, params);
 		TaskRunner runner = new TaskRunner(warmups, runs);
 
-		runner.run(task);
+		try {
+			runner.run(task);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}	
 
 	/*
@@ -127,14 +132,24 @@ public class BenchmarkUtils {
 		TaskCollection collection = TaskFactory.createTaskCollection(taskClass, params);
 		TaskCollectionRunner runner = new TaskCollectionRunner(warmups, runs);
 
-		runner.run(collection);
+		try {
+			runner.run(collection);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 	
 	public static void runTaskCollection2(String taskClass, int warmups, int runs, String[] params) throws Exception {
 		TaskCollection collection = TaskFactory.createTaskCollection(taskClass, params);
 		TaskCollectionRunner2 runner = new TaskCollectionRunner2(warmups, runs);
 
-		runner.run(collection);
+		try {
+			runner.run(collection);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}	
 
 	public static File getFile(String path) {
