@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
@@ -107,7 +108,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 		List<ElkAxiom> staticAxioms = new ArrayList<ElkAxiom>();
 		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
 				new PostProcessingStageExecutor(), 1);
-		long seed = System.currentTimeMillis();
+		long seed = RandomSeedProvider.VALUE;
 
 		incrementalReasoner.setIncrementalMode(true);
 
