@@ -78,7 +78,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	@Override
 	public void execute() throws ElkException {
 
-		if (reasoner.taxonomy == null) {
+		if (reasoner.classTaxonomyState.taxonomy == null) {
 			// perhaps an inconsistency has been detected?
 			// exit
 			return;
@@ -123,7 +123,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			LOGGER_.trace("Taxonomy nodes to be cleaned: " + inputs);
 		}
 
-		cleaning_ = new ClassTaxonomyCleaning(inputs, reasoner.taxonomy,
+		cleaning_ = new ClassTaxonomyCleaning(inputs, reasoner.classTaxonomyState.taxonomy,
 				reasoner.getProcessExecutor(), workerNo, progressMonitor);
 	}
 

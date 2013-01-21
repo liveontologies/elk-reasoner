@@ -53,7 +53,6 @@ import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -152,10 +151,13 @@ public abstract class AbstractReasonerState {
 	 * {@code true} if the current ontology is inconsistent
 	 */
 	boolean inconsistentOntology = false;
+	
 	/**
 	 * Taxonomy that stores (partial) classification
 	 */
-	UpdateableTaxonomy<ElkClass> taxonomy = null;
+	//UpdateableTaxonomy<ElkClass> taxonomy = null;
+	
+	final TaxonomyState<ElkClass> classTaxonomyState = new TaxonomyState<ElkClass>();
 
 	/**
 	 * Taxonomy that stores (partial) classification and (partial) realization
@@ -453,7 +455,7 @@ public abstract class AbstractReasonerState {
 			this.incrementalState = new IncrementalReasonerState(ontologyIndex);
 		}
 
-		return taxonomy;
+		return classTaxonomyState.taxonomy;//taxonomy;
 	}
 
 	public Taxonomy<ElkClass> getTaxonomyQuietly() {

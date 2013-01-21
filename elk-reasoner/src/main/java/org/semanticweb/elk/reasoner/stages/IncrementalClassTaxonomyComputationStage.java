@@ -76,10 +76,10 @@ class IncrementalClassTaxonomyComputationStage extends
 				.getIndexedClasses();
 
 		if (!reasoner.useIncrementalTaxonomy()) {
-			reasoner.taxonomy = null;
+			reasoner.classTaxonomyState.taxonomy = null;
 		}
 
-		if (reasoner.taxonomy == null) {
+		if (reasoner.classTaxonomyState.taxonomy == null) {
 
 			if (LOGGER_.isInfoEnabled())
 				LOGGER_.info("Using non-incremental taxonomy");
@@ -99,7 +99,7 @@ class IncrementalClassTaxonomyComputationStage extends
 
 								@Override
 								public boolean holds(IndexedClass clazz) {
-									UpdateableNode<ElkClass> node = reasoner.taxonomy
+									UpdateableNode<ElkClass> node = reasoner.classTaxonomyState.taxonomy
 											.getUpdateableNode(clazz
 													.getElkClass());
 
@@ -118,7 +118,7 @@ class IncrementalClassTaxonomyComputationStage extends
 
 			computation_ = new ClassTaxonomyComputation(Operations.split(
 					modified, 64), reasoner.getProcessExecutor(), workerNo,
-					progressMonitor, reasoner.saturationState, reasoner.taxonomy);
+					progressMonitor, reasoner.saturationState, reasoner.classTaxonomyState.taxonomy);
 		}
 
 	}
