@@ -55,11 +55,7 @@ public class DifferentialIndex {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(DifferentialIndex.class);
 
-	/**
-	 * The list of {@link ElkClass}es to be removed from the signature of the
-	 * ontology;
-	 */
-	private final List<ElkClass> removedClasses_;
+	private final List<ElkClass> addedClasses_;
 
 	private final List<ElkNamedIndividual> removedIndividuals_;
 
@@ -85,7 +81,7 @@ public class DifferentialIndex {
 	private final ElkAxiomProcessor axiomInserter_, axiomDeleter_;
 
 	public DifferentialIndex(OntologyIndex mainIndex, IndexedClass owlNothing) {
-		this.removedClasses_ = new ArrayList<ElkClass>(127);
+		this.addedClasses_ = new ArrayList<ElkClass>(127);
 		this.removedIndividuals_ = new ArrayList<ElkNamedIndividual>();
 		this.todoDeletions_ = new IndexedObjectCache();
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
@@ -126,12 +122,8 @@ public class DifferentialIndex {
 		return this.removedContextRuleHeadByClassExpressions_;
 	}
 
-	/**
-	 * @return the list of ELK classes to be removed from the signature of the
-	 *         ontology
-	 */
-	public List<ElkClass> getRemovedClasses() {
-		return this.removedClasses_;
+	public List<ElkClass> getAddedClasses() {
+		return this.addedClasses_;
 	}
 
 	public Collection<IndexedClassExpression> getRemovedClassExpressions() {
@@ -187,7 +179,7 @@ public class DifferentialIndex {
 	}
 
 	public void clearSignatureChanges() {
-		removedClasses_.clear();
+		addedClasses_.clear();
 		removedIndividuals_.clear();
 	}
 
@@ -248,8 +240,8 @@ public class DifferentialIndex {
 				removedContextRuleHeadByClassExpressions_, target);
 	}
 
-	void removeClass(ElkClass oldClass) {
-		removedClasses_.add(oldClass);
+	void addClass(ElkClass newClass) {
+		addedClasses_.add(newClass);
 	}
 
 	void addIndexedObject(IndexedObject iobj) {

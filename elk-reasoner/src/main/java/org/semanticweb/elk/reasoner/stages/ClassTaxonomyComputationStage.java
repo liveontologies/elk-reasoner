@@ -83,6 +83,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		}
 
 		reasoner.classTaxonomyState.taxonomy = computation_.getTaxonomy();
+		reasoner.classTaxonomyState.classesForModifiedNodes.clear();
 		reasoner.doneClassTaxonomy = true;
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());

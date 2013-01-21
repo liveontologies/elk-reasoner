@@ -412,58 +412,6 @@ public class LowLevelIncrementalReasoningTest {
 	}
 
 	
-/*	@Test
-	public void testDeleteFromInconsistent() throws ElkException, IOException {
-		InputStream stream = null;
-		String toDelete = "Prefix( : = <http://example.org/> ) \n"
-				+ "Prefix( owl: = <http://www.w3.org/2002/07/owl#> ) Ontology(\n"
-				+ "SubClassOf(ObjectSomeValuesFrom(:S :B) :A) \n"
-				+ "SubClassOf(:C ObjectSomeValuesFrom(:T :B)) \n" + ")";
-
-		try {
-			stream = getClass().getClassLoader().getResourceAsStream(
-					"classification_test_input/Inconsistent.owl");
-
-			List<ElkAxiom> ontology = loadAxioms(stream);
-			List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
-			TestChangesLoader initialLoader = new TestChangesLoader();
-			TestChangesLoader changeLoader = new TestChangesLoader();
-
-			Reasoner reasoner = TestReasonerUtils
-					.createTestReasoner(new PostProcessingStageExecutor(), 1);
-
-			reasoner.setIncrementalMode(false);
-			reasoner.registerOntologyLoader(initialLoader);
-			reasoner.registerOntologyChangesLoader(changeLoader);
-
-			for (ElkAxiom axiom : ontology) {
-				initialLoader.add(axiom);
-			}
-
-			try {
-				reasoner.getTaxonomy();
-			} catch (ElkInconsistentOntologyException e) {
-				System.out.println("Inconsistent, as it should be");
-			}
-
-			// System.out.println("===========================================");
-
-			reasoner.setIncrementalMode(true);
-
-			for (ElkAxiom del : deletions) {
-				changeLoader.remove(del);
-			}
-
-			reasoner.getTaxonomy();
-
-		} finally {
-			IOUtils.closeQuietly(stream);
-		}
-	}	*/
-	
-	
-	
-	
 	@Test
 	public void testDuplicateSubclassAxioms() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils
@@ -662,56 +610,52 @@ public class LowLevelIncrementalReasoningTest {
 
 	@Test
 	public void testDeleteNaryDisjointness() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
-		TestChangesLoader loader = new TestChangesLoader();
-		TestChangesLoader changeLoader = new TestChangesLoader();
+		try {
+			Reasoner reasoner = TestReasonerUtils
+					.createTestReasoner(new LoggingStageExecutor());
+			TestChangesLoader loader = new TestChangesLoader();
+			TestChangesLoader changeLoader = new TestChangesLoader();
 
-		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
-		reasoner.registerOntologyChangesLoader(changeLoader);
+			reasoner.setIncrementalMode(false);
+			reasoner.registerOntologyLoader(loader);
+			reasoner.registerOntologyChangesLoader(changeLoader);
 
-		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
-		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
-		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
-		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
-		ElkAxiom disjABCD = objectFactory.getDisjointClassesAxiom(Arrays
-				.asList(a, b, c, d));
-		ElkAxiom disjACBD = objectFactory.getDisjointClassesAxiom(Arrays
-				.asList(a, c, b, d));
+			ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+			ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+			ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+			ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
+			ElkAxiom disjABCD = objectFactory.getDisjointClassesAxiom(Arrays
+					.asList(a, b, c, d));
+			ElkAxiom disjACBD = objectFactory.getDisjointClassesAxiom(Arrays
+					.asList(a, c, b, d));
 
-		loader.add(objectFactory.getSubClassOfAxiom(a, b))
-				.add(objectFactory.getSubClassOfAxiom(a, c))
-				.add(objectFactory.getSubClassOfAxiom(c, d)).add(disjABCD)
-				.add(disjACBD);
+			loader.add(objectFactory.getSubClassOfAxiom(a, b))
+					.add(objectFactory.getSubClassOfAxiom(a, c))
+					.add(objectFactory.getSubClassOfAxiom(c, d)).add(disjABCD)
+					.add(disjACBD);
 
-		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+			Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
-		// clearly, A is unsatisfiable
-		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
+			// clearly, A is unsatisfiable
+			assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
-		// now delete one disjointness, A should is still unsatisfiable
-		// loader.clear();
+			// now delete one disjointness, A should is still unsatisfiable
+			reasoner.setIncrementalMode(true);
+			// reasoner.registerOntologyChangesLoader(loader);
 
-		reasoner.setIncrementalMode(true);
-		// reasoner.registerOntologyChangesLoader(loader);
+			changeLoader.remove(disjABCD);
+			taxonomy = reasoner.getTaxonomy();
 
-		changeLoader.remove(disjABCD);
+			assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
-		// System.out.println("===========================================");
+			// now delete the other disjointness, A should is become satisfiable
+			changeLoader.remove(disjACBD);
+			taxonomy = reasoner.getTaxonomy();
 
-		taxonomy = reasoner.getTaxonomy();
-
-		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
-
-		// now delete the other disjointness, A should is become satisfiable
-		changeLoader.remove(disjACBD);
-
-		// System.out.println("===========================================");
-
-		taxonomy = reasoner.getTaxonomy();
-
-		assertFalse(taxonomy.getNode(a) == taxonomy.getBottomNode());
+			assertFalse(taxonomy.getNode(a) == taxonomy.getBottomNode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test

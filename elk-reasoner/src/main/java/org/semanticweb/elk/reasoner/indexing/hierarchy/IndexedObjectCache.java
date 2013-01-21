@@ -68,6 +68,10 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		indexedAxiomLookup = new KeyEntryHashSet<IndexedAxiom>(
 				new IndexedAxiomViewFactory(), 1024);
 	}
+	
+	public IndexObjectConverter getIndexObjectConverter() {
+		return new IndexObjectConverter(this, this);
+	}
 
 	public void clear() {
 		if (LOGGER_.isTraceEnabled())

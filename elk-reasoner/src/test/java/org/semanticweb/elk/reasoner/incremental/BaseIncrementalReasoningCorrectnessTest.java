@@ -139,9 +139,9 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 
 			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
 
-			if (LOGGER_.isTraceEnabled())
+			//if (LOGGER_.isTraceEnabled())
 				for (ElkAxiom del : deleted) {
-					LOGGER_.trace(OwlFunctionalStylePrinter.toString(del)
+					LOGGER_.info(OwlFunctionalStylePrinter.toString(del)
 							+ ": deleted");
 				}
 

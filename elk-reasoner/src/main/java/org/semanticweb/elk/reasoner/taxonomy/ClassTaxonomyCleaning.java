@@ -35,6 +35,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.stages.TaxonomyState;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -49,30 +51,30 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  *         pavel.klinov@uni-ulm.de
  */
 public class ClassTaxonomyCleaning extends
-		ReasonerComputation<ElkClass, ClassTaxonomyCleaningFactory> {
+		ReasonerComputation<IndexedClass, ClassTaxonomyCleaningFactory> {
 
-	public ClassTaxonomyCleaning(Collection<? extends ElkClass> inputs,
-			UpdateableTaxonomy<ElkClass> classTaxonomy,
+	public ClassTaxonomyCleaning(Collection<IndexedClass> inputs,
+			TaxonomyState taxonomyState,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		super(inputs, new ClassTaxonomyCleaningFactory(classTaxonomy),
+		super(inputs, new ClassTaxonomyCleaningFactory(taxonomyState),
 				executor, maxWorkers, progressMonitor);
 	}
 
 }
 
 class ClassTaxonomyCleaningFactory implements
-		InputProcessorFactory<ElkClass, InputProcessor<ElkClass>> {
+		InputProcessorFactory<IndexedClass, InputProcessor<IndexedClass>> {
 
-	private final UpdateableTaxonomy<ElkClass> classTaxonomy_;
+	private final TaxonomyState classTaxonomyState_;
 
-	ClassTaxonomyCleaningFactory(UpdateableTaxonomy<ElkClass> taxonomy) {
-		classTaxonomy_ = taxonomy;
+	ClassTaxonomyCleaningFactory(final TaxonomyState classTaxonomyState) {
+		classTaxonomyState_ = classTaxonomyState;
 	}
 
 	@Override
-	public InputProcessor<ElkClass> getEngine() {
-		return new InputProcessor<ElkClass>() {
+	public InputProcessor<IndexedClass> getEngine() {
+		return new InputProcessor<IndexedClass>() {
 
 			/**
 			 * Temporary queue of nodes that should be removed from the taxonomy
@@ -80,17 +82,24 @@ class ClassTaxonomyCleaningFactory implements
 			private final Queue<UpdateableTaxonomyNode<ElkClass>> toRemove = new ConcurrentLinkedQueue<UpdateableTaxonomyNode<ElkClass>>();
 
 			@Override
-			public void submit(ElkClass elkClass) {
+			public void submit(IndexedClass indexedClass) {
+				ElkClass elkClass = indexedClass.getElkClass();
+				UpdateableTaxonomy<ElkClass> taxonomy = classTaxonomyState_.getTaxonomy();
+				TaxonomyState.Writer writer = classTaxonomyState_.getWriter();
+				
 				if (elkClass == PredefinedElkClass.OWL_NOTHING){
+					writer.markClassesForModifiedNode(taxonomy.getBottomNode());
 					return;
 				}
 				
-				if (classTaxonomy_.getBottomNode().getMembers()
+				if (taxonomy.getBottomNode().getMembers()
 						.remove(elkClass)) {
+					writer.markClassesForModifiedNode(taxonomy.getBottomNode());
+					writer.markClassForModifiedNode(elkClass);
 					return;
 				}
 
-				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy_
+				UpdateableTaxonomyNode<ElkClass> node = taxonomy
 						.getUpdateableNode(elkClass);
 
 				if (node == null) {
@@ -99,6 +108,7 @@ class ClassTaxonomyCleaningFactory implements
 				
 				if (node.trySetModified(true)) {
 					toRemove.add(node);
+					writer.markClassesForModifiedNode(node);
 				}
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
@@ -106,12 +116,13 @@ class ClassTaxonomyCleaningFactory implements
 							.getDirectUpdateableSubNodes()) {
 						if (subNode.trySetModified(true)) {
 							toRemove.add(subNode);
+							writer.markClassesForModifiedNode(subNode);
 						}
 					}
 				}
 				
 				// remove node from the taxonomy
-				classTaxonomy_.removeNode(node);
+				taxonomy.removeNode(node);
 			}
 
 			@Override
@@ -142,7 +153,6 @@ class ClassTaxonomyCleaningFactory implements
 
 			@Override
 			public void finish() {
-				// TODO Auto-generated method stub
 			}
 
 		};
@@ -150,7 +160,5 @@ class ClassTaxonomyCleaningFactory implements
 
 	@Override
 	public void finish() {
-		// TODO Auto-generated method stub
-
 	}
 }

@@ -140,7 +140,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * the cache for indexed objects
 	 */
-	private final IndexedObjectCache objectCache_;
+	final IndexedObjectCache objectCache_;
 
 	/**
 	 * the current ontology index
@@ -157,7 +157,7 @@ public abstract class AbstractReasonerState {
 	 */
 	//UpdateableTaxonomy<ElkClass> taxonomy = null;
 	
-	final TaxonomyState<ElkClass> classTaxonomyState = new TaxonomyState<ElkClass>();
+	final TaxonomyState classTaxonomyState = new TaxonomyState();
 
 	/**
 	 * Taxonomy that stores (partial) classification and (partial) realization

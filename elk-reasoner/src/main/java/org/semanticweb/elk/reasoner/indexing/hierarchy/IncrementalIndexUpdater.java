@@ -47,11 +47,11 @@ public class IncrementalIndexUpdater implements IndexUpdater {
 
 	@Override
 	public void addClass(ElkClass newClass) {
+		differentialIndex_.addClass(newClass);
 	}
 
 	@Override
 	public void removeClass(ElkClass oldClass) {
-		differentialIndex_.removeClass(oldClass);
 	}
 
 	@Override
