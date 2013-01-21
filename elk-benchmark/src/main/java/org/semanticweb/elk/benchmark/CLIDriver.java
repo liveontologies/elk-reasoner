@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.benchmark;
 
-import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationMultiDeltasTask;
+import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationMultiDeltas;
 
 
 
@@ -43,7 +43,7 @@ public class CLIDriver {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltasTask.class.getName(),
+		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
 				Integer.valueOf("0"),
 				Integer.valueOf("1"),
 				new String[]{"/home/pavel/ulm/data/go/incremental"});

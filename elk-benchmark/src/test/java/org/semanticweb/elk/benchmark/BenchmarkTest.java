@@ -36,6 +36,7 @@ import org.junit.rules.TestName;
 import org.semanticweb.elk.benchmark.reasoning.AllFilesClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.AllFilesIncrementalClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.ClassificationTask;
+import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationMultiDeltas;
 import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificationTask;
 
 /**
@@ -80,19 +81,26 @@ public class BenchmarkTest {
 	
 	@Test
 	public void incrementalClassificationRandomWalk() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName_.getMethodName()));
-		
-		try {
-			BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
-					Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
-					Integer.valueOf(System.getProperty(Constants.RUNS)),
-					new String[]{System.getProperty("incremental.ontology")});
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Assume.assumeTrue(testsToRun_ == null
+				|| testsToRun_.contains(testName_.getMethodName()));
+
+		BenchmarkUtils.runTask(
+				RandomWalkIncrementalClassificationTask.class.getName(),
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
+				Integer.valueOf(System.getProperty(Constants.RUNS)),
+				new String[] { System.getProperty("incremental.ontology") });
 	}
 
+	@Test
+	public void incrementalClassificationMultiDeltas() throws Exception {
+		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName_.getMethodName()));
+		
+		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
+				Integer.valueOf(System.getProperty(Constants.RUNS)),
+				new String[]{System.getProperty("incremental.dir")});
+	}	
+	
 	@Test
 	public void incrementalClassificationAll() throws Exception {
 		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName_.getMethodName()));

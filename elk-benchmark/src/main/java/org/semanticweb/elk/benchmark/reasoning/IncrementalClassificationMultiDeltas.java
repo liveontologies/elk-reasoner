@@ -58,7 +58,7 @@ import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecut
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollection {
+public class IncrementalClassificationMultiDeltas extends AllFilesTaskCollection {
 
 	private static final String ADDITION_SUFFIX = "delta-plus";
 	private static final String DELETION_SUFFIX = "delta-minus";
@@ -69,7 +69,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 	protected final ReasonerConfiguration config_;
 	protected final Metrics metrics_ = new Metrics();
 	
-	public IncrementalClassificationMultiDeltasTask(String[] args) {
+	public IncrementalClassificationMultiDeltas(String[] args) {
 		super(args);
 		config_ = getConfig(args);		
 	}
@@ -194,7 +194,7 @@ public class IncrementalClassificationMultiDeltasTask extends AllFilesTaskCollec
 		@Override
 		public void prepare() throws TaskException {
 			//always start with a new reasoner
-			reasoner_ = new ReasonerFactory().createReasoner(new RuleAndConclusionCountMeasuringExecutor(metrics_)/*new TimingStageExecutor(new SimpleStageExecutor())*/, config_);			
+			reasoner_ = new ReasonerFactory().createReasoner(new RuleAndConclusionCountMeasuringExecutor(metrics_)/*new TimingStageExecutor(new SimpleStageExecutor())*/, config_);	
 			load(reasoner_);
 		}
 
