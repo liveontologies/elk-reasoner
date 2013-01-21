@@ -151,15 +151,6 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 
-			/*
-			 * LOGGER_.trace("Getting/creating node for " + output.getRoot() +
-			 * ", eqs: " + output.getEquivalent());
-			 * LOGGER_.trace("Context subsumers: " +
-			 * output.getRoot().getContext().getSubsumers());
-			 * LOGGER_.trace("Context saturated? " +
-			 * output.getRoot().getContext().isSaturated());
-			 */
-
 			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
 
