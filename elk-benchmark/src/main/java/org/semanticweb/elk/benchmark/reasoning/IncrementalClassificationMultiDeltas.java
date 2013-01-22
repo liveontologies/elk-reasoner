@@ -250,7 +250,7 @@ public class IncrementalClassificationMultiDeltas extends AllFilesTaskCollection
 		
 		@Override
 		public String getName() {
-			return "Classify incrementally";
+			return "Classify incrementally " + deltaDir_.getName();
 		}
 
 		@Override
@@ -263,29 +263,31 @@ public class IncrementalClassificationMultiDeltas extends AllFilesTaskCollection
 		
 		protected void loadChanges(Reasoner reasoner) throws TaskException {
 			final TestChangesLoader loader = new TestChangesLoader();
-			
-			load(ADDITION_SUFFIX, new ElkAxiomProcessor() {
-				
-				@Override
-				public void visit(ElkAxiom elkAxiom) {
-					loader.add(elkAxiom);
-					metrics_.updateLongMetric(ADDED_AXIOM_COUNT, 1);
-				}
-			});
-			
-			load(DELETION_SUFFIX, new ElkAxiomProcessor() {
-				
-				@Override
-				public void visit(ElkAxiom elkAxiom) {
-					loader.remove(elkAxiom);
-					metrics_.updateLongMetric(DELETED_AXIOM_COUNT, 1);
-				}
-			});
-			
+
+			reasoner.registerOntologyChangesLoader(loader);
+
 			try {
-				
-				reasoner.registerOntologyChangesLoader(loader);
-				reasoner.loadChanges();			
+				load(ADDITION_SUFFIX, new ElkAxiomProcessor() {
+
+					@Override
+					public void visit(ElkAxiom elkAxiom) {
+						loader.add(elkAxiom);
+						metrics_.updateLongMetric(ADDED_AXIOM_COUNT, 1);
+					}
+				});
+
+				load(DELETION_SUFFIX, new ElkAxiomProcessor() {
+
+					@Override
+					public void visit(ElkAxiom elkAxiom) {
+						loader.remove(elkAxiom);
+						metrics_.updateLongMetric(DELETED_AXIOM_COUNT, 1);
+					}
+				});
+
+				reasoner.loadChanges();
+				loader.clear();
+
 			} catch (ElkException e) {
 				throw new TaskException(e);
 			}
