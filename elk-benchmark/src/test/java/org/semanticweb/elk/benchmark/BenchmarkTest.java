@@ -37,6 +37,7 @@ import org.semanticweb.elk.benchmark.reasoning.AllFilesClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.AllFilesIncrementalClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.ClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationMultiDeltas;
+import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificationTask;
 
 /**
@@ -78,6 +79,18 @@ public class BenchmarkTest {
 				Integer.valueOf(System.getProperty(Constants.RUNS)),
 				new String[]{System.getProperty("classification.dir")});
 	}
+
+	@Test
+	public void incrementalClassification() throws Exception {
+		Assume.assumeTrue(testsToRun_ == null
+				|| testsToRun_.contains(testName_.getMethodName()));
+
+		BenchmarkUtils.runTask(
+				IncrementalClassificationTask.class.getName(),
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
+				Integer.valueOf(System.getProperty(Constants.RUNS)),
+				new String[] { System.getProperty("incremental.ontology"), "1" });
+	}	
 	
 	@Test
 	public void incrementalClassificationRandomWalk() throws Exception {
