@@ -54,7 +54,7 @@ public class TestChangesLoader implements ChangesLoader, OntologyLoader {
 
 	public TestChangesLoader add(final ElkAxiom axiom) {
 		if (listener_ != null) {
-			listener_.notify(new SimpleElkAxiomChange(axiom, -1));
+			listener_.notify(new SimpleElkAxiomChange(axiom, 1));
 		}
 		axioms_.add(axiom);
 		changes_.add(true);
