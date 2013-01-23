@@ -46,7 +46,7 @@ public class CLIDriver {
 		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
 				Integer.valueOf("0"),
 				Integer.valueOf("1"),
-				new String[]{"/home/pavel/ulm/data/snomed/incremental"});
+				new String[]{"/home/pavel/ulm/data/snomed/incremental-10"});
 		/*BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
 				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
 				Integer.valueOf(System.getProperty(Constants.RUNS)),

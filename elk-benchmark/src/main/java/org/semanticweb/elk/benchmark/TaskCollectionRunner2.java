@@ -86,6 +86,9 @@ public class TaskCollectionRunner2 {
 		
 		collection.dispose();
 		
-		System.err.println(collection.getMetrics());
+		if (collection.getMetrics() != null) {
+			System.err.println(collection.getMetrics());
+			collection.getMetrics().printAverages(LOGGER_, Level.WARN);
+		}
 	}	
 }

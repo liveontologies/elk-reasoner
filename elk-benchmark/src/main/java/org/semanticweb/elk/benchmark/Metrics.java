@@ -27,6 +27,9 @@ package org.semanticweb.elk.benchmark;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+
 /**
  * @author Pavel Klinov
  *
@@ -96,5 +99,29 @@ public class Metrics {
 		return buffer.toString();
 	}
 	
+	/**
+	 * Tries to average all metrics which can be converted to numbers
+	 * @param logger
+	 */
+	public void printAverages(final Logger logger, Priority level) {
+		StringBuffer buffer = new StringBuffer();
+		String delim = System.getProperty("line.separator");
+		
+		buffer.append("Run count: " + runCount).append(delim);
+		
+		for (Map.Entry<String, String> entry : metricMap_.entrySet()) {
+			String value = entry.getValue();
+			
+			try {
+				Double numValue = Double.valueOf(value);
+				
+				buffer.append("Average " + entry.getKey()).append(" : ").append(String.format("%.3g%n", numValue/runCount)).append(delim);
+			} catch (NumberFormatException e) {
+				buffer.append(entry.getKey()).append(" : ").append(entry.getValue()).append(delim);
+			}
+		}
+		
+		logger.log(level, buffer.toString());
+	}
 	
 }
