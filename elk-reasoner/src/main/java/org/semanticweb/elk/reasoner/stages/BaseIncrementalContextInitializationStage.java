@@ -154,7 +154,7 @@ class InitializeContextsAfterDesaturation extends
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
 		return Collections
-				.<ReasonerStage> singleton(new IncrementalDeSaturationStage(
+				.<ReasonerStage> singleton(new IncrementalDeletionStage(
 						reasoner));
 	}
 }

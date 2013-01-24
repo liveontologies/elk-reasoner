@@ -49,12 +49,12 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public String getName() {
-		return IncrementalStages.SATURATION.toString();
+		return IncrementalStages.ADDITION.toString();
 	}
 
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(IncrementalStages.SATURATION);
+		return reasoner.incrementalState.getStageStatus(IncrementalStages.ADDITION);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 		
-		reasoner.incrementalState.setStageStatus(IncrementalStages.SATURATION, true);
+		reasoner.incrementalState.setStageStatus(IncrementalStages.ADDITION, true);
 		reasoner.ruleAndConclusionStats.add(saturation_.getRuleAndConclusionStatistics());
 		
 		markAllContextsAsSaturated();		

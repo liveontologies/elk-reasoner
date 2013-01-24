@@ -37,25 +37,25 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
  * @author Pavel Klinov
  * 
  */
-class IncrementalDeSaturationStage extends AbstractReasonerStage {
+class IncrementalDeletionStage extends AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeSaturationStage.class);
+	private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeletionStage.class);
 
 	private ClassExpressionNoInputSaturation desaturation_ = null;
 
-	public IncrementalDeSaturationStage(AbstractReasonerState reasoner) {
+	public IncrementalDeletionStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
 	@Override
 	public String getName() {
-		return IncrementalStages.DESATURATION.toString();
+		return IncrementalStages.DELETION.toString();
 	}
 
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(IncrementalStages.DESATURATION);
+		return reasoner.incrementalState.getStageStatus(IncrementalStages.DELETION);
 	}
 
 	@Override
@@ -81,7 +81,7 @@ class IncrementalDeSaturationStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 		
-		reasoner.incrementalState.setStageStatus(IncrementalStages.DESATURATION, true);
+		reasoner.incrementalState.setStageStatus(IncrementalStages.DELETION, true);
 		reasoner.ruleAndConclusionStats.add(desaturation_.getRuleAndConclusionStatistics());
 		
 		if (LOGGER_.isDebugEnabled()) {

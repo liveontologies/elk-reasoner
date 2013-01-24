@@ -49,7 +49,7 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 	static {
 		//init post processing map
 		postProcesingMap.add(PropertyHierarchyCompositionComputationStage.class, SaturatedPropertyChainCheckingStage.class);
-		postProcesingMap.add(IncrementalDeSaturationStage.class, ContextSaturationFlagCheckingStage.class);
+		postProcesingMap.add(IncrementalDeletionStage.class, ContextSaturationFlagCheckingStage.class);
 		postProcesingMap.add(IncrementalContextCleaningStage.class, CheckCleaningStage.class);
 		postProcesingMap.add(IncrementalAdditionInitializationStage.class, SaturationGraphValidationStage.class);
 		/*

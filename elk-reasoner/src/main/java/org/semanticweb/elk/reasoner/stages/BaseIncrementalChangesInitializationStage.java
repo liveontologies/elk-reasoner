@@ -26,13 +26,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -52,12 +51,11 @@ import org.semanticweb.elk.util.collections.Operations;
 abstract class BaseIncrementalChangesInitializationStage extends
 		AbstractReasonerStage {
 
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(BaseIncrementalChangesInitializationStage.class);
+	/*private static final Logger LOGGER_ = Logger
+			.getLogger(BaseIncrementalChangesInitializationStage.class);*/
 
-	static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_RULE_COUNTS = true;//LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_RULE_TIMES = true;//LOGGER_.isDebugEnabled();
 
 	protected IncrementalChangesInitialization initialization_ = null;
 
@@ -68,11 +66,6 @@ abstract class BaseIncrementalChangesInitializationStage extends
 	}
 
 	protected abstract IncrementalStages stage();
-
-	/*
-	 * private IncrementalStages stage() { return deletions_ ?
-	 * IncrementalStages.DELETIONS_INIT : IncrementalStages.ADDITIONS_INIT; }
-	 */
 
 	@Override
 	public String getName() {

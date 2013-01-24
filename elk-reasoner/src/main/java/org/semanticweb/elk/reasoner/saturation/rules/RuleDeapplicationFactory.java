@@ -71,7 +71,9 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		protected DeapplicationEngine(ContextModificationListener listener) {
 			super(new SaturationStatistics());
 			
-			writer_ = saturationState.getWriter(listener);
+			writer_ = saturationState
+					.getWriter(getEngineContextModificationListener(listener,
+							localStatistics.getContextStatistics()));
 		}
 
 		protected DeapplicationEngine(SaturationState.Writer saturationStateWriter,

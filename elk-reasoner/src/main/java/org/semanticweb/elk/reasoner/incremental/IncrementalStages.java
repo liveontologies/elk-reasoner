@@ -67,20 +67,20 @@ public enum IncrementalStages {
 		
 	},	
 	
-	DESATURATION {
+	DELETION {
 
 		@Override
 		public String toString() {
-			return "Incremental Desaturation";
+			return "Incremental Deletion";
 		}
 		
 	},
 	
-	SATURATION {
+	ADDITION {
 
 		@Override
 		public String toString() {
-			return "Incremental Re-saturation";
+			return "Incremental Addition";
 		}
 		
 	},	
