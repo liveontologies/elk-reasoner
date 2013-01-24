@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
@@ -69,20 +69,20 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		private final SaturationState.Writer writer_;
 		
 		protected DeapplicationEngine(ContextModificationListener listener) {
-			super(new RuleAndConclusionStatistics());
+			super(new SaturationStatistics());
 			
 			writer_ = saturationState.getWriter(listener);
 		}
 
 		protected DeapplicationEngine(SaturationState.Writer saturationStateWriter,
-				RuleAndConclusionStatistics factoryStats) {
+				SaturationStatistics factoryStats) {
 			super(factoryStats);
 			
 			writer_ = saturationStateWriter;
 		}
 
 		protected DeapplicationEngine(SaturationState.Writer saturationStateWriter) {
-			super(new RuleAndConclusionStatistics());
+			super(new SaturationStatistics());
 			
 			writer_ = saturationStateWriter;
 		}
@@ -90,7 +90,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
 				SaturationState.Writer saturationStateWriter,
-				RuleAndConclusionStatistics localStatistics) {
+				SaturationStatistics localStatistics) {
 			
 			return new CombinedConclusionVisitor(
 					new CombinedConclusionVisitor(

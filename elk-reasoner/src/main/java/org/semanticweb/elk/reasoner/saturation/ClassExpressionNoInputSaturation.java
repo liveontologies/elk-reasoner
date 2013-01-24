@@ -65,7 +65,7 @@ public class ClassExpressionNoInputSaturation
 		inputProcessorFactory.printStatistics();
 	}
 
-	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
+	public SaturationStatistics getRuleAndConclusionStatistics() {
 		return inputProcessorFactory.getRuleAndConclusionStatistics();
 	}
 
@@ -99,15 +99,15 @@ class ClassExpressionNoInputSaturationFactory
 	public void finish() {
 	}
 
-	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
-		return ruleAppFactory_.getStatistics();
+	public SaturationStatistics getRuleAndConclusionStatistics() {
+		return ruleAppFactory_.getSaturationStatistics();
 	}
 
 	/**
 	 * Print statistics about the saturation
 	 */
 	public void printStatistics() {
-		ruleAppFactory_.getStatistics().print(LOGGER_);
+		ruleAppFactory_.getSaturationStatistics().print(LOGGER_);
 	}
 
 	class Engine implements InputProcessor<IndexedClassExpression> {

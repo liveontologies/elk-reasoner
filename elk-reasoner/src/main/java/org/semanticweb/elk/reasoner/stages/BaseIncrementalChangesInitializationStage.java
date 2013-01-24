@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
@@ -61,7 +61,7 @@ abstract class BaseIncrementalChangesInitializationStage extends
 
 	protected IncrementalChangesInitialization initialization_ = null;
 
-	protected final RuleAndConclusionStatistics stageStatistics_ = new RuleAndConclusionStatistics();
+	protected final SaturationStatistics stageStatistics_ = new SaturationStatistics();
 
 	BaseIncrementalChangesInitializationStage(AbstractReasonerState reasoner) {
 		super(reasoner);

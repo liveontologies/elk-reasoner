@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVis
 import org.semanticweb.elk.reasoner.saturation.conclusions.PreprocessedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.TimedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
@@ -68,9 +69,9 @@ public class RuleApplicationFactory {
 	final SaturationState saturationState;
 
 	/**
-	 * The {@link RuleAndConclusionStatistics} aggregated for all workers
+	 * The {@link SaturationStatistics} aggregated for all workers
 	 */
-	private final RuleAndConclusionStatistics aggregatedStats_;
+	private final SaturationStatistics aggregatedStats_;
 	/**
 	 * If true, the factory will keep track of contexts which get modified
 	 * during saturation. This is needed, for example, for cleaning contexts
@@ -85,7 +86,7 @@ public class RuleApplicationFactory {
 
 	public RuleApplicationFactory(final SaturationState saturationState,
 			final boolean trackModifiedContexts) {
-		this.aggregatedStats_ = new RuleAndConclusionStatistics();
+		this.aggregatedStats_ = new SaturationStatistics();
 		this.saturationState = saturationState;
 		this.trackModifiedContexts_ = true;
 	}
@@ -102,21 +103,34 @@ public class RuleApplicationFactory {
 		aggregatedStats_.check(LOGGER_);
 	}
 
-	public RuleAndConclusionStatistics getStatistics() {
+	public SaturationStatistics getSaturationStatistics() {
 		return aggregatedStats_;
 	}
 
+	
 	static ContextCreationListener getEngineContextCreationListener(
 			final ContextCreationListener listener,
-			final RuleAndConclusionStatistics factoryStats) {
+			final ContextStatistics contextStats) {
 		return new ContextCreationListener() {
 			@Override
 			public void notifyContextCreation(Context newContext) {
-				factoryStats.countCreatedContexts++;
+				contextStats.countCreatedContexts++;
 				listener.notifyContextCreation(newContext);
 			}
 		};
 	}
+	
+	static ContextModificationListener getEngineContextModificationListener(
+			final ContextModificationListener listener,
+			final ContextStatistics contextStats) {
+		return new ContextModificationListener() {
+			@Override
+			public void notifyContextModification(Context context) {
+				contextStats.countModifiedContexts++;
+				listener.notifyContextModification(context);
+			}
+		};
+	}	
 
 	/**
 	 * 
@@ -124,7 +138,7 @@ public class RuleApplicationFactory {
 	 * @return
 	 */
 	static RuleApplicationVisitor getEngineCompositionRuleApplicationVisitor(
-			RuleAndConclusionStatistics localStatistics) {
+			SaturationStatistics localStatistics) {
 		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
 		RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 
@@ -143,7 +157,7 @@ public class RuleApplicationFactory {
 
 	static DecompositionRuleApplicationVisitor getEngineDecompositionRuleApplicationVisitor(
 			DecompositionRuleApplicationVisitor decompRuleAppVisitor,
-			RuleAndConclusionStatistics localStatistics) {
+			SaturationStatistics localStatistics) {
 		RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 
 		if (COLLECT_RULE_COUNTS) {
@@ -170,19 +184,22 @@ public class RuleApplicationFactory {
 		private ConclusionVisitor<?> conclusionProcessor_;
 
 		/**
-		 * Local {@link ThisStatistics} created for every worker
+		 * Local {@link SaturationStatistics} created for every worker
 		 */
-		protected final RuleAndConclusionStatistics localStatistics;
+		protected final SaturationStatistics localStatistics;
+		
+		protected final ContextStatistics localContextStatistics;
 
-		protected BaseEngine(RuleAndConclusionStatistics localStatistics) {
+		protected BaseEngine(SaturationStatistics localStatistics) {
 			this.localStatistics = localStatistics;
+			this.localContextStatistics = localStatistics.getContextStatistics();
 		}
 
 		protected abstract SaturationState.Writer getSaturationStateWriter();
 
 		@Override
 		public void process() {
-			localStatistics.timeContextProcess -= CachedTimeThread.currentTimeMillis;
+			localContextStatistics.timeContextProcess -= CachedTimeThread.currentTimeMillis;
 			
 			Writer writer = getSaturationStateWriter();
 			
@@ -203,15 +220,12 @@ public class RuleApplicationFactory {
 				}
 			}
 			
-			localStatistics.timeContextProcess += CachedTimeThread.currentTimeMillis;
+			localContextStatistics.timeContextProcess += CachedTimeThread.currentTimeMillis;
 		}
 
 		@Override
 		public void finish() {
 			aggregatedStats_.add(localStatistics);
-			
-			//System.err.println(aggregatedStats_.getRuleStatistics().getTotalRuleAppCount());
-			
 			localStatistics.reset();
 		}
 
@@ -222,7 +236,7 @@ public class RuleApplicationFactory {
 		 *            the context in which to process the scheduled items
 		 */
 		protected void process(Context context) {
-			localStatistics.contContextProcess++;
+			localContextStatistics.countProcessedContexts++;
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
 				
@@ -246,7 +260,7 @@ public class RuleApplicationFactory {
 		 */
 		protected ConclusionVisitor<Boolean> filterRuleConclusionProcessor(
 				ConclusionVisitor<Boolean> ruleProcessor,
-				RuleAndConclusionStatistics localStatistics) {
+				SaturationStatistics localStatistics) {
 			if (COLLECT_CONCLUSION_COUNTS) {
 				return new PreprocessedConclusionVisitor<Boolean>(
 						new CountingConclusionVisitor(localStatistics
@@ -271,7 +285,7 @@ public class RuleApplicationFactory {
 		 */
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
 				SaturationState.Writer saturationStateWriter,
-				RuleAndConclusionStatistics localStatistics) {
+				SaturationStatistics localStatistics) {
 
 			return new CombinedConclusionVisitor(
 					new ConclusionInsertionVisitor(),
@@ -300,7 +314,7 @@ public class RuleApplicationFactory {
 		 */
 		protected ConclusionVisitor<?> getConclusionProcessor(
 				SaturationState.Writer saturationStateWriter,
-				RuleAndConclusionStatistics localStatistics) {
+				SaturationStatistics localStatistics) {
 			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(
 					saturationStateWriter, localStatistics);
 			if (trackModifiedContexts_)
@@ -335,21 +349,21 @@ public class RuleApplicationFactory {
 		private final SaturationState.ExtendedWriter saturationStateWriter_;
 
 		protected DefaultEngine(SaturationState.ExtendedWriter saturationStateWriter,
-				RuleAndConclusionStatistics localStatistics) {
+				SaturationStatistics localStatistics) {
 			super(localStatistics);
 			this.saturationStateWriter_ = saturationStateWriter;
 		}
 
 		protected DefaultEngine(final ContextCreationListener listener, final ContextModificationListener modListener) {
-			this(listener, modListener, new RuleAndConclusionStatistics());
+			this(listener, modListener, new SaturationStatistics());
 		}
 
 		private DefaultEngine(final ContextCreationListener listener,
 				final ContextModificationListener modificationListener,
-				final RuleAndConclusionStatistics localStatistics) {
+				final SaturationStatistics localStatistics) {
 			this(saturationState.getExtendedWriter(
-					getEngineContextCreationListener(listener, localStatistics),
-					modificationListener,
+					getEngineContextCreationListener(listener, localStatistics.getContextStatistics()),
+					getEngineContextModificationListener(modificationListener, localStatistics.getContextStatistics()),
 					getEngineCompositionRuleApplicationVisitor(localStatistics), trackModifiedContexts_),
 					localStatistics
 					);

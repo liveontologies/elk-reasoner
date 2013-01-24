@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
-import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
@@ -84,7 +84,7 @@ public abstract class AbstractReasonerState {
 	 * maintain aggregated stats of different kinds produced by different
 	 * computations across multiple stages
 	 */
-	final RuleAndConclusionStatistics ruleAndConclusionStats;
+	final SaturationStatistics ruleAndConclusionStats;
 
 	/**
 	 * 
@@ -178,7 +178,7 @@ public abstract class AbstractReasonerState {
 		this.objectCache_ = new IndexedObjectCache();
 		this.ontologyIndex = new OntologyIndexImpl(objectCache_);
 		this.saturationState = new SaturationState(ontologyIndex);
-		this.ruleAndConclusionStats = new RuleAndConclusionStatistics();
+		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.config_ = config;
 		this.incrementalState = new IncrementalReasonerState(ontologyIndex);
 	}

@@ -53,6 +53,7 @@ public class RuleStatistics {
 		decompositionRuleTimer.reset();
 		ruleCounter.reset();
 		ruleTimer.reset();
+		addCounter = 0;
 	}
 
 	public synchronized void add(RuleStatistics stats) {

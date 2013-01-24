@@ -95,7 +95,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 		inputProcessorFactory.printStatistics();
 	}
 
-	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
+	public SaturationStatistics getRuleAndConclusionStatistics() {
 		return inputProcessorFactory.getRuleAndConclusionStatistics();
 	}
 

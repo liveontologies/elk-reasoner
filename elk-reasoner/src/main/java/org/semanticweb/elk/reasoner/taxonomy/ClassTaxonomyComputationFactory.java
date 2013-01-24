@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalen
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalentDirect;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
-import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
@@ -265,7 +265,7 @@ public class ClassTaxonomyComputationFactory implements
 		transitiveReductionShared_.printStatistics();
 	}
 
-	public RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
+	public SaturationStatistics getRuleAndConclusionStatistics() {
 		return transitiveReductionShared_.getRuleAndConclusionStatistics();
 	}
 

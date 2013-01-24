@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 
 /**
  * A common implementation of {@link ReasonerStage}s for a given reasoner.
@@ -103,7 +103,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		}		
 	}
 	
-	protected RuleAndConclusionStatistics getRuleAndConclusionStatistics() {
+	protected SaturationStatistics getRuleAndConclusionStatistics() {
 		return reasoner.ruleAndConclusionStats;
 	}
 }
