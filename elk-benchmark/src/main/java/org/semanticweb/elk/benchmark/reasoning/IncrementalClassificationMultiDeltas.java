@@ -250,7 +250,7 @@ public class IncrementalClassificationMultiDeltas extends AllFilesTaskCollection
 		
 		@Override
 		public String getName() {
-			return "Classify incrementally " + deltaDir_.getName();
+			return "Classify incrementally";
 		}
 
 		@Override

@@ -115,7 +115,7 @@ public class Metrics {
 			try {
 				Double numValue = Double.valueOf(value);
 				
-				buffer.append("Average " + entry.getKey()).append(" : ").append(String.format("%.3g%n", numValue/runCount)).append(delim);
+				buffer.append("Average " + entry.getKey()).append(" : ").append(String.format("%.2f%n", numValue/runCount)).append(delim);
 			} catch (NumberFormatException e) {
 				buffer.append(entry.getKey()).append(" : ").append(entry.getValue()).append(delim);
 			}

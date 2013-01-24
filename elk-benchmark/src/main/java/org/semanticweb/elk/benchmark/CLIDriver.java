@@ -44,12 +44,11 @@ public class CLIDriver {
 	 */
 	public static void main(String[] args) throws Exception {
 		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
-				Integer.valueOf("0"),
-				Integer.valueOf("1"),
-				new String[]{"/home/pavel/ulm/data/snomed/incremental-10"});
-		/*BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
-				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
-				Integer.valueOf(System.getProperty(Constants.RUNS)),
+				0, 1,
+				new String[]{"/home/pavel/ulm/data/galens/incremental-10"});
+		/*BenchmarkUtils.runTask(ClassificationTask.class.getName(),
+				0,
+				1,
 				new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl"});*/
 	}
 }

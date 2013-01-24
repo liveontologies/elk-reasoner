@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Benchmarking Package
@@ -26,7 +27,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.saturation.RuleAndConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 
 /**
  * Stores total rule and processed conclusion counts after every stage is
@@ -40,7 +41,9 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 		AbstractStageExecutor {
 
 	public static final String RULE_COUNT = "count.rule-applications";
+	public static final String PRODUCED_CONCLUSION_COUNT = "count.produced-conclusions";
 	public static final String UNIQUE_CONCLUSION_COUNT = "count.unique-conclusions";
+	public static final String MODIFIED_CONTEXT_COUNT = "count.modified-contexts";
 
 	private final Metrics metrics_;
 
@@ -51,19 +54,37 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 	@Override
 	protected void execute(ReasonerStage stage) throws ElkException {
 
-		RuleAndConclusionStatistics stats = ((AbstractReasonerStage) stage)
+		SaturationStatistics stats = ((AbstractReasonerStage) stage)
 				.getRuleAndConclusionStatistics();
 
 		stats.reset();
 		stage.execute();
 
-		// System.err.println(stats.getRuleStatistics().getTotalRuleAppCount());
+		/*if (stats.getRuleStatistics().getTotalRuleAppCount() > 0) {
+			metrics_.updateLongMetric(stage.getName() + "." + RULE_COUNT, stats
+					.getRuleStatistics().getTotalRuleAppCount());
+		}*/
+		
+		if (stats.getConclusionStatistics().getProcessedConclusionCounts()
+				.getTotalCount() > 0) {
+			metrics_.updateLongMetric(stage.getName() + "."
+					+ PRODUCED_CONCLUSION_COUNT, stats
+					.getConclusionStatistics().getProcessedConclusionCounts()
+					.getTotalCount());
+		}
 
-		metrics_.updateLongMetric(stage.getName() + "." + RULE_COUNT, stats
-				.getRuleStatistics().getTotalRuleAppCount());
-		metrics_.updateLongMetric(stage.getName() + "."
-				+ UNIQUE_CONCLUSION_COUNT, stats.getConclusionStatistics()
-				.getProcessedConclusionCounts().getTotalCount());
+		if (stats.getConclusionStatistics().getUsedConclusionCounts()
+				.getTotalCount() > 0) {
+			metrics_.updateLongMetric(stage.getName() + "."
+					+ UNIQUE_CONCLUSION_COUNT, stats.getConclusionStatistics()
+					.getUsedConclusionCounts().getTotalCount());
+		}
+
+		if (stats.getContextStatistics().countModifiedContexts > 0) {
+			metrics_.updateLongMetric(stage.getName() + "."
+					+ MODIFIED_CONTEXT_COUNT,
+					stats.getContextStatistics().countModifiedContexts);
+		}
 	}
 
 }

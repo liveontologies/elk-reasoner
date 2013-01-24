@@ -61,7 +61,7 @@ public class CleaningRedundancyStageExecutor extends SimpleStageExecutor {
 		
 		AbstractReasonerStage reasonerStage = (AbstractReasonerStage) stage;
 		
-		if (stage.getClass().equals(IncrementalDeSaturationStage.class)) {
+		if (stage.getClass().equals(IncrementalDeletionStage.class)) {
 			subsumerMap_ = new ArrayHashMap<IndexedClassExpression, Set<IndexedClassExpression>>(1024);
 			//toClean_ = ((AbstractReasonerStage)stage).reasoner.getContextMap();
 			for (IndexedClassExpression ice : reasonerStage.reasoner.ontologyIndex.getIndexedClassExpressions()) {
