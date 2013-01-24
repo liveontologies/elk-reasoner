@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 
 /**
@@ -104,7 +105,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 		 * the non saturated contexts are not cleaned at all during incremental
 		 * consistency checking. Something needs to be done about it.
 		 */
-		SaturationState.Writer writer = reasoner.saturationState.getWriter();
+		SaturationState.Writer writer = reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY);
 
 		writer.clearNotSaturatedContexts();
 		writer.clearContextsToBeRemoved();

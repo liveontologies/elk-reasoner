@@ -32,6 +32,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -56,6 +59,7 @@ abstract class BaseIncrementalChangesInitializationStage extends
 
 	static final boolean COLLECT_RULE_COUNTS = true;//LOGGER_.isDebugEnabled();
 	static final boolean COLLECT_RULE_TIMES = true;//LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_CONCLUSION_COUNTS = true;//LOGGER_.isDebugEnabled();
 
 	protected IncrementalChangesInitialization initialization_ = null;
 
@@ -123,10 +127,18 @@ abstract class BaseIncrementalChangesInitializationStage extends
 
 		return ruleAppVisitor;
 	}
+	
+	protected ConclusionVisitor<?> getConclusionVisitor(
+			ConclusionStatistics conclusionStatistics) {
+
+		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
+				conclusionStatistics.getProducedConclusionCounts())
+				: ConclusionVisitor.DUMMY;
+	}
+	
 
 	@Override
 	public void printInfo() {
-		// TODO Auto-generated method stub
 	}
 }
 
@@ -163,6 +175,8 @@ class IncrementalAdditionInitializationStage extends
 		Collection<Collection<Context>> inputs = Collections.emptyList();
 		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(stageStatistics_
 				.getRuleStatistics());
+		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
+				.getConclusionStatistics());
 
 		changedInitRules = diffIndex.getAddedContextInitRules();
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
@@ -176,7 +190,7 @@ class IncrementalAdditionInitializationStage extends
 
 		initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
-				reasoner.getProcessExecutor(), ruleAppVisitor, workerNo,
+				reasoner.getProcessExecutor(), ruleAppVisitor, conclusionVisitor, workerNo,
 				reasoner.getProgressMonitor());
 	}
 
@@ -220,6 +234,8 @@ class IncrementalDeletionInitializationStage extends
 		Collection<Collection<Context>> inputs = Collections.emptyList();
 		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(stageStatistics_
 				.getRuleStatistics());
+		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
+				.getConclusionStatistics());
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
@@ -233,13 +249,13 @@ class IncrementalDeletionInitializationStage extends
 
 		initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
-				reasoner.getProcessExecutor(), ruleAppVisitor, workerNo,
+				reasoner.getProcessExecutor(), ruleAppVisitor, conclusionVisitor, workerNo,
 				reasoner.getProgressMonitor());
 	}
 
 	@Override
 	protected void postExecute() {
-		SaturationState.Writer writer = reasoner.saturationState.getWriter();
+		SaturationState.Writer writer = reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY);
 		// Contexts for removed classes must also be properly cleaned to not
 		// leave any broken backward links
 		// TODO Perhaps its cleaner to do this thing inside the computation (to

@@ -35,6 +35,7 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyCleaning;
 import org.semanticweb.elk.util.collections.Operations;
 
@@ -101,23 +102,14 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 		reasoner.incrementalState.setStageStatus(
 				IncrementalStages.TAXONOMY_CLEANING, true);
-		//reasoner.incrementalState.diffIndex.clearSignatureChanges();
 		// at this point we're done with unsaturated contexts
-		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
+		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY).clearNotSaturatedContexts();
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
 
-		/*final Collection<ElkClass> removed = reasoner.incrementalState.diffIndex
-				.getRemovedClasses();
-		final Collection<ElkClass> modified = new ContextRootCollection(
-				reasoner.saturationState.getNotSaturatedContexts());
-		Collection<ElkClass> inputs = Operations.getCollection(
-				Operations.concat(removed, modified),
-				removed.size() + modified.size());*/
-		
 		final Collection<IndexedClass> modified = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());
 		final Collection<IndexedClass> removed = new ContextRootCollection(

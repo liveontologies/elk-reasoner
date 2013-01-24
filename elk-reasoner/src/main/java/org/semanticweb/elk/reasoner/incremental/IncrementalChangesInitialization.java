@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
@@ -61,10 +62,11 @@ public class IncrementalChangesInitialization extends
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
 			SaturationState state, ComputationExecutor executor,
-			RuleApplicationVisitor ruleAppVisitor, int maxWorkers,
+			RuleApplicationVisitor ruleAppVisitor,
+			ConclusionVisitor<?> conclusionVisitor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
-				changedGlobalRules, ruleAppVisitor), executor, maxWorkers,
+				changedGlobalRules, ruleAppVisitor, conclusionVisitor), executor, maxWorkers,
 				progressMonitor);
 	}
 }
@@ -85,8 +87,9 @@ class ContextInitializationFactory
 			SaturationState state,
 			Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges,
 			LinkRule<Context> changedGlobalRuleHead,
-			RuleApplicationVisitor ruleAppVisitor) {
-		saturationStateWriter_ = state.getWriter();
+			RuleApplicationVisitor ruleAppVisitor,
+			ConclusionVisitor<?> conclusionVisitor) {
+		saturationStateWriter_ = state.getWriter(conclusionVisitor);
 		indexChanges_ = indexChanges;
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
 		ruleAppVisitor_ = ruleAppVisitor;

@@ -56,7 +56,7 @@ public class SaturationStatistics {
 	}
 
 	public void check(Logger logger) {
-		conclusionsStatistics_.check(logger);
+		contextStatistics_.check(logger);
 		conclusionsStatistics_.check(logger);
 	}
 

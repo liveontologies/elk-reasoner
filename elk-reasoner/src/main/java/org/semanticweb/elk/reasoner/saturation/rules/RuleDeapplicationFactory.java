@@ -71,12 +71,14 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		protected DeapplicationEngine(ContextModificationListener listener) {
 			super(new SaturationStatistics());
 			
-			writer_ = saturationState
-					.getWriter(getEngineContextModificationListener(listener,
-							localStatistics.getContextStatistics()));
+			writer_ = saturationState.getWriter(
+					getEngineContextModificationListener(listener,
+							localStatistics.getContextStatistics()),
+					getEngineConclusionVisitor(localStatistics
+							.getConclusionStatistics()));
 		}
 
-		protected DeapplicationEngine(SaturationState.Writer saturationStateWriter,
+/*		protected DeapplicationEngine(SaturationState.Writer saturationStateWriter,
 				SaturationStatistics factoryStats) {
 			super(factoryStats);
 			
@@ -87,7 +89,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 			super(new SaturationStatistics());
 			
 			writer_ = saturationStateWriter;
-		}
+		}*/
 
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
@@ -100,10 +102,12 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 							filterRuleConclusionProcessor(
 									new ConclusionDeapplicationVisitor(
 											saturationStateWriter,
-											getEngineCompositionRuleApplicationVisitor(localStatistics),
+											getEngineCompositionRuleApplicationVisitor(localStatistics
+													.getRuleStatistics()),
 											getEngineDecompositionRuleApplicationVisitor(
 													getDecompositionRuleApplicationVisitor(),
-													localStatistics)),
+													localStatistics
+															.getRuleStatistics())),
 									localStatistics)),
 					new ConclusionDeletionVisitor());
 		}
@@ -120,7 +124,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		@Override
 		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
 			//this decomposition visitor takes the basic writer which cannot create new contexts
-			return new BackwardDecompositionRuleApplicationVisitor(writer_);
+			return new BackwardDecompositionRuleApplicationVisitor(getSaturationStateWriter());
 		}
 	}
 

@@ -25,15 +25,26 @@ import org.apache.log4j.Logger;
  */
 
 public class ConclusionStatistics {
-
+	
+	/**
+	 * Number of conclusions put to the todo queue
+	 */
+	private final ConclusionCounter producedConclusionCounts_;
+	/**
+	 * Number of conclusions taken from the todo queue and processed
+	 */
 	private final ConclusionCounter processedConclusionCounts_;
+	/**
+	 * Number of unique conclusions saved to contexts
+	 */
 	private final ConclusionCounter usedConclusionCounts_;
 	private final ConclusionTimer conclusionProcessingTimer_;
 	private int addCounter = 0;
 
-	public ConclusionStatistics(ConclusionCounter processedConclusionCounts,
+	public ConclusionStatistics(ConclusionCounter producedConclusionCounter, ConclusionCounter processedConclusionCounts,
 			ConclusionCounter usedConclusionCounts,
 			ConclusionTimer conclusionTimers) {
+		this.producedConclusionCounts_ = producedConclusionCounter;
 		this.processedConclusionCounts_ = processedConclusionCounts;
 		this.usedConclusionCounts_ = usedConclusionCounts;
 		this.conclusionProcessingTimer_ = conclusionTimers;
@@ -41,9 +52,13 @@ public class ConclusionStatistics {
 
 	public ConclusionStatistics() {
 		this(new ConclusionCounter(), new ConclusionCounter(),
-				new ConclusionTimer());
+				new ConclusionCounter(), new ConclusionTimer());
 	}
 
+	public ConclusionCounter getProducedConclusionCounts() {
+		return producedConclusionCounts_;
+	}
+	
 	public ConclusionCounter getProcessedConclusionCounts() {
 		return processedConclusionCounts_;
 	}
@@ -60,12 +75,14 @@ public class ConclusionStatistics {
 	 * Reset all timers to zero.
 	 */
 	public void reset() {
+		producedConclusionCounts_.reset();
 		processedConclusionCounts_.reset();
 		usedConclusionCounts_.reset();
 		conclusionProcessingTimer_.reset();
 	}
 
 	public synchronized void add(ConclusionStatistics stats) {
+		this.producedConclusionCounts_.add(stats.producedConclusionCounts_);
 		this.processedConclusionCounts_.add(stats.processedConclusionCounts_);
 		this.usedConclusionCounts_.add(stats.usedConclusionCounts_);
 		this.conclusionProcessingTimer_.add(stats.conclusionProcessingTimer_);

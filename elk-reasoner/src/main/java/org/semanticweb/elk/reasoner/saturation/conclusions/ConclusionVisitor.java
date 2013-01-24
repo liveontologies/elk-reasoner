@@ -46,4 +46,46 @@ public interface ConclusionVisitor<R> {
 	public R visit(Propagation propagation, Context context);
 
 	public R visit(DisjointnessAxiom disjointnessAxiom, Context context);
+	
+	/**
+	 * A dummy visitor, does nothing
+	 */
+	public static final ConclusionVisitor<?> DUMMY = new ConclusionVisitor<Object>() {
+
+		@Override
+		public Object visit(NegativeSubsumer negSCE, Context context) {
+			return null;
+		}
+
+		@Override
+		public Object visit(PositiveSubsumer posSCE, Context context) {
+			return null;
+		}
+
+		@Override
+		public Object visit(BackwardLink link, Context context) {
+			return null;
+		}
+
+		@Override
+		public Object visit(ForwardLink link, Context context) {
+			return null;
+		}
+
+		@Override
+		public Object visit(Contradiction bot, Context context) {
+			return null;
+		}
+
+		@Override
+		public Object visit(Propagation propagation, Context context) {
+			return null;
+		}
+
+		@Override
+		public Object visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+			return null;
+		}
+		
+	};
 }

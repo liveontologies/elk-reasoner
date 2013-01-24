@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
 
 /**
  * Creates an engine which works as the de-application engine except that it
@@ -63,7 +64,15 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	public class CleaningEngine extends RuleDeapplicationFactory.DeapplicationEngine {
 
 		protected CleaningEngine() {
-			super(saturationState.getSaturationCheckingWriter());
+			//super(saturationState.getSaturationCheckingWriter());
+			super(ContextModificationListener.DUMMY);
+		}
+
+		@Override
+		protected Writer getSaturationStateWriter() {
+			return saturationState
+					.getSaturationCheckingWriter(getEngineConclusionVisitor(localStatistics
+							.getConclusionStatistics()));
 		}
 	}
 }

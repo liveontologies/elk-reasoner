@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
@@ -144,34 +145,40 @@ public class SaturationState {
 	}
 
 	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
-
-	private final ExtendedWriter defaultWriter_ = new ContextCreatingWriter(
-			ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
-			DEFAULT_INIT_RULE_APP_VISITOR, false);
-
-	private final Writer defaultSaturationCheckingWriter_ = new SaturationCheckingWriter();
-
+	
+	/**
+	 * 
+	 * @param index
+	 */
 	public SaturationState(OntologyIndex index) {
 		ontologyIndex_ = index;
 		owlThing_ = index.getIndexedOwlThing();
 		owlNothing_ = index.getIndexedOwlNothing();
 	}
 
+	private ExtendedWriter getDefaultWriter(final ConclusionVisitor<?> conclusionVisitor) {
+		return new ContextCreatingWriter(
+				ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
+				DEFAULT_INIT_RULE_APP_VISITOR, conclusionVisitor, false);
+	}
+	
 	/**
-	 * @return an {@link AbstractWriter} for modifying this
+	 * @param visitor a {@link ConclusionVisitor} which will be invoked for each produced {@link Conclusion}
+	 * 
+	 * @return an {@link Writer} for modifying this
 	 *         {@link SaturationState}. The methods of this
-	 *         {@link AbstractWriter} are thread safe
+	 *         {@link Writer} are thread safe
 	 */
-	public Writer getWriter() {
-		return defaultWriter_;
+	public Writer getWriter(ConclusionVisitor<?> conclusionVisitor) {
+		return getDefaultWriter(conclusionVisitor);
 	}
 
-	public ExtendedWriter getExtendedWriter() {
-		return defaultWriter_;
+	public ExtendedWriter getExtendedWriter(ConclusionVisitor<?> conclusionVisitor) {
+		return getDefaultWriter(conclusionVisitor);
 	}
 
-	public Writer getSaturationCheckingWriter() {
-		return defaultSaturationCheckingWriter_;
+	public Writer getSaturationCheckingWriter(ConclusionVisitor<?> conclusionVisitor) {
+		return new SaturationCheckingWriter(conclusionVisitor);
 	}
 
 	/**
@@ -186,15 +193,16 @@ public class SaturationState {
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
 			RuleApplicationVisitor ruleAppVisitor,
+			ConclusionVisitor<?> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated) {
 		return new ContextCreatingWriter(contextCreationListener,
-				contextModificationListener, ruleAppVisitor,
+				contextModificationListener, ruleAppVisitor, conclusionVisitor,
 				trackNewContextsAsUnsaturated);
 	}
 
 	public Writer getWriter(
-			ContextModificationListener contextModificationListener) {
-		return new BasicWriter(contextModificationListener);
+			ContextModificationListener contextModificationListener, ConclusionVisitor<?> conclusionVisitor) {
+		return new BasicWriter(contextModificationListener, conclusionVisitor);
 	}
 
 	/**
@@ -249,11 +257,15 @@ public class SaturationState {
 	 */
 	class BasicWriter implements Writer {
 
+		private final ConclusionVisitor<?> producedConclusionVisitor_;
+		
 		private final ContextModificationListener contextModificationListener_;
 
 		private BasicWriter(
-				ContextModificationListener contextSaturationListener) {
+				ContextModificationListener contextSaturationListener,
+				ConclusionVisitor<?> conclusionVisitor) {
 			this.contextModificationListener_ = contextSaturationListener;
+			this.producedConclusionVisitor_ = conclusionVisitor;
 		}
 
 		@Override
@@ -275,7 +287,9 @@ public class SaturationState {
 		public void produce(Context context, Conclusion conclusion) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(context + ": new conclusion " + conclusion);
-
+			// this may be necessary, e.g., for counting produced conclusions
+			conclusion.accept(producedConclusionVisitor_, context);
+			
 			if (context.addToDo(conclusion)) {
 				// context was activated
 				activeContexts_.add(context);
@@ -348,10 +362,11 @@ public class SaturationState {
 
 		private ContextCreatingWriter(
 				ContextCreationListener contextCreationListener,
-				ContextModificationListener contextSaturationListener,
+				ContextModificationListener contextModificationListener,
 				RuleApplicationVisitor ruleAppVisitor,
+				ConclusionVisitor<?> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
-			super(contextSaturationListener);
+			super(contextModificationListener, conclusionVisitor);
 
 			this.contextCreationListener_ = contextCreationListener;
 			this.initRuleAppVisitor_ = ruleAppVisitor;
@@ -417,8 +432,8 @@ public class SaturationState {
 	 * 
 	 */
 	private class SaturationCheckingWriter extends BasicWriter {
-		private SaturationCheckingWriter() {
-			super(ContextModificationListener.DUMMY);
+		private SaturationCheckingWriter(ConclusionVisitor<?> conclusionVisitor) {
+			super(ContextModificationListener.DUMMY, conclusionVisitor);
 		}
 
 		@Override

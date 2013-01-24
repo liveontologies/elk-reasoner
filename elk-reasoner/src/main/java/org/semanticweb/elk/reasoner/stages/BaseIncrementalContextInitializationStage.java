@@ -31,6 +31,11 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -44,6 +49,11 @@ abstract class BaseIncrementalContextInitializationStage extends
 	// logger for this class
 	static final Logger LOGGER_ = Logger
 			.getLogger(BaseIncrementalContextInitializationStage.class);
+
+	static final boolean COLLECT_CONCLUSION_COUNTS = true;// LOGGER_.isDebugEnabled();
+
+	protected final SaturationStatistics stageStatistics_ = new SaturationStatistics();
+
 	/**
 	 * The counter for deleted contexts
 	 */
@@ -73,11 +83,26 @@ abstract class BaseIncrementalContextInitializationStage extends
 		return reasoner.incrementalState.getStageStatus(stage());
 	}
 
+	protected ConclusionVisitor<?> getConclusionVisitor(
+			ConclusionStatistics conclusionStatistics) {
+
+		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
+				conclusionStatistics.getProducedConclusionCounts())
+				: ConclusionVisitor.DUMMY;
+	}
+
 	@Override
 	public void execute() throws ElkInterruptedException {
 
-		if (todo == null)
+		final ConclusionVisitor<?> visitor = getConclusionVisitor(stageStatistics_
+				.getConclusionStatistics());
+		final SaturationState.ExtendedWriter writer = reasoner.saturationState
+				.getExtendedWriter(visitor);
+
+		if (todo == null) {
 			initComputation();
+		}
+
 		try {
 			progressMonitor.start(getName());
 			for (;;) {
@@ -86,8 +111,7 @@ abstract class BaseIncrementalContextInitializationStage extends
 				IndexedClassExpression ice = todo.next();
 
 				if (ice.getContext() != null) {
-					reasoner.saturationState.getExtendedWriter().initContext(
-							ice.getContext());
+					writer.initContext(ice.getContext());
 				}
 
 				initContexts_++;
