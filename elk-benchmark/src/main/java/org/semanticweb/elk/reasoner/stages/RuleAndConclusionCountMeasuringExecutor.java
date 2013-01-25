@@ -41,6 +41,7 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 		AbstractStageExecutor {
 
 	public static final String RULE_COUNT = "count.rule-applications";
+	public static final String NEW_CONTEXT_COUNT = "count.new-contexts";
 	public static final String PRODUCED_CONCLUSION_COUNT = "count.produced-conclusions";
 	public static final String UNIQUE_CONCLUSION_COUNT = "count.unique-conclusions";
 	public static final String MODIFIED_CONTEXT_COUNT = "count.modified-contexts";
@@ -60,11 +61,10 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 		stats.reset();
 		stage.execute();
 
-		/*if (stats.getRuleStatistics().getTotalRuleAppCount() > 0) {
-			metrics_.updateLongMetric(stage.getName() + "." + RULE_COUNT, stats
-					.getRuleStatistics().getTotalRuleAppCount());
-		}*/
-		
+		if (stats.getContextStatistics().countCreatedContexts > 0) {
+			metrics_.updateLongMetric(stage.getName() + "." + NEW_CONTEXT_COUNT,
+					stats.getContextStatistics().countCreatedContexts);
+		}		
 		
 		if (stats.getConclusionStatistics().getProducedConclusionCounts()
 				.getTotalCount() > 0) {

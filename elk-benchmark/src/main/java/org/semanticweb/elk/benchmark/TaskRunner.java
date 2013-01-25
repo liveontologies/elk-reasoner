@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.benchmark;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.logging.ElkTimer;
 
 
@@ -38,6 +40,9 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  */
 public class TaskRunner {
 
+	private static final Logger LOGGER_ = Logger
+			.getLogger(TaskRunner.class);
+	
 	protected final int warmups;
 	protected final int runs;
 	
@@ -48,6 +53,7 @@ public class TaskRunner {
 	
 	public void run(Task task) throws TaskException {
 		ElkTimer timer = ElkTimer.getNamedTimer(task.getName());
+		Metrics metrics = task.getMetrics();
 		
 		for (int i = 0; i < warmups; i++) {
 			System.out.println("Warm-up run #" + i);
@@ -70,10 +76,16 @@ public class TaskRunner {
 			System.out.println("... finished in " + wallRuntime  + " ms");
 			
 			wallTimeElapsed = timer.getTotalWallTime();
+			
+			if (metrics != null) {
+				metrics.incrementRunCount();
+			}
 		}
 		
 		task.dispose();
 		
 		System.out.println("Average running time: " + timer.getAvgWallTime() / 1000000 + " ms");
+		
+		metrics.printAverages(LOGGER_, Level.INFO);
 	}
 }

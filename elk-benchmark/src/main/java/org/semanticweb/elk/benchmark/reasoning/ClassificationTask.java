@@ -39,7 +39,7 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -55,6 +55,7 @@ public class ClassificationTask implements Task {
 	private Reasoner reasoner_;
 	private final String ontologyFile_;
 	private final ReasonerConfiguration reasonerConfig_;
+	private final Metrics metrics_ = new Metrics();
 	
 	public ClassificationTask(String[] args) {
 		ontologyFile_ = args[0];
@@ -71,7 +72,8 @@ public class ClassificationTask implements Task {
 		try {
 			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
 			
-			reasoner_ = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), reasonerConfig_);
+			metrics_.reset();
+			reasoner_ = new ReasonerFactory().createReasoner(new /*RuleAndConclusionCountMeasuringExecutor(metrics_)*/SimpleStageExecutor(), reasonerConfig_);
 			reasoner_.registerOntologyLoader(new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(), ontologyFile));
 			reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
@@ -108,8 +110,7 @@ public class ClassificationTask implements Task {
 
 	@Override
 	public Metrics getMetrics() {
-		// TODO Auto-generated method stub
-		return null;
+		return metrics_;
 	}
 
 }
