@@ -86,6 +86,8 @@ public class TaskRunner {
 		
 		System.out.println("Average running time: " + timer.getAvgWallTime() / 1000000 + " ms");
 		
-		metrics.printAverages(LOGGER_, Level.INFO);
+		if (metrics != null) {
+			metrics.printAverages(LOGGER_, Level.INFO);
+		}
 	}
 }
