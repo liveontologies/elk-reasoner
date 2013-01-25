@@ -46,7 +46,8 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
-import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
+import org.semanticweb.elk.reasoner.stages.TimingStageExecutor;
 
 /**
  * Incrementally classifies an ontology wrt multiple deltas. Expects a folder
@@ -194,7 +195,7 @@ public class IncrementalClassificationMultiDeltas extends AllFilesTaskCollection
 		@Override
 		public void prepare() throws TaskException {
 			//always start with a new reasoner
-			reasoner_ = new ReasonerFactory().createReasoner(new RuleAndConclusionCountMeasuringExecutor(metrics_)/*new TimingStageExecutor(new SimpleStageExecutor())*/, config_);	
+			reasoner_ = new ReasonerFactory().createReasoner(/*new RuleAndConclusionCountMeasuringExecutor(metrics_)*/new TimingStageExecutor(new SimpleStageExecutor()), config_);	
 			load(reasoner_);
 		}
 

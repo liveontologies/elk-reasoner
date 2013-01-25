@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
+import org.semanticweb.elk.reasoner.stages.TimingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -73,7 +74,7 @@ public class ClassificationTask implements Task {
 			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
 			
 			metrics_.reset();
-			reasoner_ = new ReasonerFactory().createReasoner(new /*RuleAndConclusionCountMeasuringExecutor(metrics_)*/SimpleStageExecutor(), reasonerConfig_);
+			reasoner_ = new ReasonerFactory().createReasoner(new /*RuleAndConclusionCountMeasuringExecutor(metrics_)*/TimingStageExecutor(new SimpleStageExecutor()), reasonerConfig_);
 			reasoner_.registerOntologyLoader(new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(), ontologyFile));
 			reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
