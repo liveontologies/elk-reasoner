@@ -124,7 +124,9 @@ abstract class BaseIncrementalContextInitializationStage extends
 		} finally {
 			progressMonitor.finish();
 		}
+		
 		reasoner.doneContextReset = true;
+		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 	}
 
 	@Override
