@@ -50,7 +50,7 @@ abstract class BaseIncrementalContextInitializationStage extends
 	static final Logger LOGGER_ = Logger
 			.getLogger(BaseIncrementalContextInitializationStage.class);
 
-	static final boolean COLLECT_CONCLUSION_COUNTS = true;// LOGGER_.isDebugEnabled();
+	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
 
 	protected final SaturationStatistics stageStatistics_ = new SaturationStatistics();
 
