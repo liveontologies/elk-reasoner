@@ -65,11 +65,12 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 					.getRuleStatistics().getTotalRuleAppCount());
 		}*/
 		
-		if (stats.getConclusionStatistics().getProcessedConclusionCounts()
+		
+		if (stats.getConclusionStatistics().getProducedConclusionCounts()
 				.getTotalCount() > 0) {
 			metrics_.updateLongMetric(stage.getName() + "."
 					+ PRODUCED_CONCLUSION_COUNT, stats
-					.getConclusionStatistics().getProcessedConclusionCounts()
+					.getConclusionStatistics().getProducedConclusionCounts()
 					.getTotalCount());
 		}
 
