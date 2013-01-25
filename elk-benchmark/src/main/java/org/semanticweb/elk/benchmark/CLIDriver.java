@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.benchmark;
 
-import org.semanticweb.elk.benchmark.reasoning.ClassificationTask;
+import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationMultiDeltas;
 
 
 
@@ -43,12 +43,12 @@ public class CLIDriver {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		/*BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
-				0, 1,
-				new String[]{"/home/pavel/ulm/data/galens/incremental-1"});*/
-		BenchmarkUtils.runTask(ClassificationTask.class.getName(),
+		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
+				0, 2,
+				new String[]{"/home/pavel/ulm/data/go/incremental"});
+		/*BenchmarkUtils.runTask(ClassificationTask.class.getName(),
 				0,
 				1,
-				new String[]{"/home/pavel/ulm/data/go/svn/fss/go.rlast.fss.owl"});
+				new String[]{"/home/pavel/ulm/data/go/svn/fss/go.rlast.fss.owl"});*/
 	}
 }

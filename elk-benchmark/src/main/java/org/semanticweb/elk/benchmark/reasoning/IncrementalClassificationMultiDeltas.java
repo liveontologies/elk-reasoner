@@ -201,8 +201,6 @@ public class IncrementalClassificationMultiDeltas extends AllFilesTaskCollection
 		@Override
 		public void run() throws TaskException {
 			reasoner_.getTaxonomyQuietly();
-			//only incremental runs count
-			metrics_.reset();
 		}
 		
 		protected void load(Reasoner reasoner) throws TaskException {

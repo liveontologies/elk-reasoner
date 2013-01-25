@@ -71,6 +71,7 @@ public class TaskCollectionRunner2 {
 		}
 		
 		for (ElkTimer timer : ElkTimer.getNamedTimers()) {
+			collection.getMetrics().reset();
 			timer.reset();
 		}
 		
