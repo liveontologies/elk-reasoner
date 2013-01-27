@@ -34,7 +34,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
@@ -257,13 +256,12 @@ class IncrementalDeletionInitializationStage extends
 				.getRuleStatistics());
 		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
 				.getConclusionStatistics());
-
+		
 		changedInitRules = diffIndex.getRemovedContextInitRules();
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
 
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
-			// inputs = Operations.split(
-			// reasoner.ontologyIndex.getIndexedClassExpressions(), 128);
+
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					128);
 		}
@@ -276,16 +274,25 @@ class IncrementalDeletionInitializationStage extends
 
 	@Override
 	protected void postExecute() {
-		SaturationState.Writer writer = reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY);
-		// Contexts for removed classes must also be properly cleaned to not
-		// leave any broken backward links
-		// TODO Perhaps its cleaner to do this thing inside the computation (to
-		// make it interruptable, etc.)
-		for (IndexedClassExpression removed : reasoner.incrementalState.diffIndex
-				.getRemovedClassExpressions()) {
-			if (removed.getContext() != null) {
+		//initializing contexts which will be removed
+		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
+				.getConclusionStatistics());
 
-				writer.markForRemoval(removed.getContext());
+		final ExtendedWriter writer = reasoner.saturationState
+				.getExtendedWriter(conclusionVisitor);
+
+		for (IndexedClassExpression ice : reasoner.incrementalState.diffIndex
+				.getRemovedClassExpressions()) {
+
+			if (ice.getContext() != null) {
+				writer.initContext(ice.getContext());
+				/*
+				 * TODO This is only needed to clean the taxonomy afterwards
+				 * It's better to delete these nodes from the taxonomy
+				 * immediately and get rid of tracking the removed contexts in
+				 * the saturation state
+				 */
+				writer.markForRemoval(ice.getContext());
 			}
 		}
 

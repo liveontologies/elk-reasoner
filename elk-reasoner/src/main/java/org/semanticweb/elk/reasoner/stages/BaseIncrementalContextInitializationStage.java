@@ -36,7 +36,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
-import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * @author Pavel Klinov
@@ -144,10 +143,10 @@ abstract class BaseIncrementalContextInitializationStage extends
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class InitializeContextsAfterDesaturation extends
+class InitializeContextsAfterDeletions extends
 		BaseIncrementalContextInitializationStage {
 
-	public InitializeContextsAfterDesaturation(AbstractReasonerState reasoner) {
+	public InitializeContextsAfterDeletions(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -167,12 +166,9 @@ class InitializeContextsAfterDesaturation extends
 					+ reasoner.saturationState.getContextsToBeRemoved());
 		}
 
-		todo = Operations.concat(
-				reasoner.saturationState.getNotSaturatedContexts(),
-				reasoner.saturationState.getContextsToBeRemoved()).iterator();
+		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();
 		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts()
-				.size()
-				+ reasoner.saturationState.getContextsToBeRemoved().size();
+				.size();
 
 		initContexts_ = 0;
 	}

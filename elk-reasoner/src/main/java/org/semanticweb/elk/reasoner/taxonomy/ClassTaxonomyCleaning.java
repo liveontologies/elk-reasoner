@@ -103,6 +103,7 @@ class ClassTaxonomyCleaningFactory implements
 						.getUpdateableNode(elkClass);
 
 				if (node == null) {
+					writer.markClassForModifiedNode(elkClass);
 					return;
 				}
 				

@@ -145,12 +145,6 @@ public class DifferentialIndex {
 		removedContextInitRules_ = null;
 		removedContextRuleHeadByClassExpressions_.clear();
 		mainIndex_.getIndexedObjectCache().subtract(todoDeletions_);
-		/*
-		for (IndexedClassExpression ice : todoDeletions_.indexedClassExpressionLookup) {
-			System.out.println("RESET CONTEXT FOR " + ice);
-			ice.resetContext();
-		}*/
-		
 		todoDeletions_.clear();
 	}
 

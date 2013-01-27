@@ -74,7 +74,7 @@ public class SaturationState {
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
-	public final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
+	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
 
 	/**
 	 * The queue of all contexts for which computation of the closure under

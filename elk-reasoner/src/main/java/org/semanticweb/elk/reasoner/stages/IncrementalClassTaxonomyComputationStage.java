@@ -95,38 +95,8 @@ class IncrementalClassTaxonomyComputationStage extends
 					indexedClasses, 128), reasoner.getProcessExecutor(),
 					workerNo, progressMonitor, reasoner.saturationState);
 		} else {
-
-			/*Collection<IndexedClass> modified = new AbstractSet<IndexedClass>() {
-
-				@Override
-				public Iterator<IndexedClass> iterator() {
-					return Operations.filter(
-							reasoner.ontologyIndex.getIndexedClasses(),
-							new Condition<IndexedClass>() {
-
-								@Override
-								public boolean holds(IndexedClass clazz) {
-									UpdateableNode<ElkClass> node = reasoner.classTaxonomyState.taxonomy
-											.getUpdateableNode(clazz
-													.getElkClass());
-
-									return node == null || node.isModified();
-								}
-							}).iterator();
-				}
-
-				@Override
-				public int size() {
-					// TODO: this is only an upper bound; calculate exactly
-					return indexedClasses.size();
-				}
-
-			};*/
 			//classes which correspond to changed nodes in the taxonomy
-			//*plus* new classes
-			/*final Iterable<ElkClass> modifiedClassesIter = Operations.concat(
-					reasoner.classTaxonomyState.classesForModifiedNodes,
-					reasoner.incrementalState.diffIndex.getAddedClasses());*/
+			//they must include new classes
 			final Iterable<ElkClass> modifiedClassesIter = reasoner.classTaxonomyState.classesForModifiedNodes;
 			final IndexObjectConverter converter = reasoner.objectCache_
 					.getIndexObjectConverter();

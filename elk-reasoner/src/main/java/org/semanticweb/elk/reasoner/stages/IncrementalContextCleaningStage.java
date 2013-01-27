@@ -64,7 +64,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Collections.<ReasonerStage>singletonList(new InitializeContextsAfterDesaturation(reasoner));
+		return Collections.<ReasonerStage>singletonList(new InitializeContextsAfterDeletions(reasoner));
 	}
 
 	@Override
