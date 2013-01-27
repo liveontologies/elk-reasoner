@@ -207,6 +207,9 @@ public abstract class AbstractReasonerState {
 			objectCache_.clear();
 			ontologyIndex = new OntologyIndexImpl(objectCache_);
 		}
+		/*else {
+			if (objectCache_.size() > 2) throw new RuntimeException();
+		}*/
 
 		resetChangesLoading();
 		resetPropertySaturation();

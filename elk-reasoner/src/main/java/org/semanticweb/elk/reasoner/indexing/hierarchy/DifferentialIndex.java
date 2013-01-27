@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -36,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
@@ -55,7 +57,7 @@ public class DifferentialIndex {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(DifferentialIndex.class);
 
-	private final List<ElkClass> addedClasses_;
+	private final Set<ElkClass> addedClasses_;
 
 	private final List<ElkNamedIndividual> removedIndividuals_;
 
@@ -81,7 +83,7 @@ public class DifferentialIndex {
 	private final ElkAxiomProcessor axiomInserter_, axiomDeleter_;
 
 	public DifferentialIndex(OntologyIndex mainIndex, IndexedClass owlNothing) {
-		this.addedClasses_ = new ArrayList<ElkClass>(127);
+		this.addedClasses_ = new ArrayHashSet<ElkClass>(127);
 		this.removedIndividuals_ = new ArrayList<ElkNamedIndividual>();
 		this.todoDeletions_ = new IndexedObjectCache();
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
@@ -122,7 +124,7 @@ public class DifferentialIndex {
 		return this.removedContextRuleHeadByClassExpressions_;
 	}
 
-	public List<ElkClass> getAddedClasses() {
+	public Collection<ElkClass> getAddedClasses() {
 		return this.addedClasses_;
 	}
 
@@ -143,6 +145,12 @@ public class DifferentialIndex {
 		removedContextInitRules_ = null;
 		removedContextRuleHeadByClassExpressions_.clear();
 		mainIndex_.getIndexedObjectCache().subtract(todoDeletions_);
+		/*
+		for (IndexedClassExpression ice : todoDeletions_.indexedClassExpressionLookup) {
+			System.out.println("RESET CONTEXT FOR " + ice);
+			ice.resetContext();
+		}*/
+		
 		todoDeletions_.clear();
 	}
 
@@ -243,12 +251,17 @@ public class DifferentialIndex {
 	void addClass(ElkClass newClass) {
 		addedClasses_.add(newClass);
 	}
+	
+	void removeClass(ElkClass newClass) {
+		addedClasses_.remove(newClass);
+	}
 
 	void addIndexedObject(IndexedObject iobj) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("Adding: " + iobj);
 		if (!iobj.accept(todoDeletions_.deletor))
 			iobj.accept(mainIndex_.getIndexedObjectCache().inserter);
+		
 	}
 
 	void removeIndexedObject(IndexedObject iobj) {

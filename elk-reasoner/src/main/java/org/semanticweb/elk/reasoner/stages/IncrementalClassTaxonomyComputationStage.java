@@ -124,9 +124,10 @@ class IncrementalClassTaxonomyComputationStage extends
 			};*/
 			//classes which correspond to changed nodes in the taxonomy
 			//*plus* new classes
-			final Iterable<ElkClass> modifiedClassesIter = Operations.concat(
+			/*final Iterable<ElkClass> modifiedClassesIter = Operations.concat(
 					reasoner.classTaxonomyState.classesForModifiedNodes,
-					reasoner.incrementalState.diffIndex.getAddedClasses());
+					reasoner.incrementalState.diffIndex.getAddedClasses());*/
+			final Iterable<ElkClass> modifiedClassesIter = reasoner.classTaxonomyState.classesForModifiedNodes;
 			final IndexObjectConverter converter = reasoner.objectCache_
 					.getIndexObjectConverter();
 
@@ -179,17 +180,12 @@ class IncrementalClassTaxonomyComputationStage extends
 				public int size() {
 					// TODO: this is only an upper bound; calculate exactly
 					return reasoner.classTaxonomyState.classesForModifiedNodes
-							.size()
-							+ reasoner.incrementalState.diffIndex
-									.getAddedClasses().size();
+							.size();
+							//+ reasoner.incrementalState.diffIndex.getAddedClasses().size();
 				}
 
 			};
 			
-			//System.out.println(reasoner.incrementalState.diffIndex.getAddedClasses());
-			//System.out.println(reasoner.classTaxonomyState.classesForModifiedNodes);
-			//System.out.println(modified);
-
 			computation_ = new ClassTaxonomyComputation(Operations.split(
 					modified, 64), reasoner.getProcessExecutor(), workerNo,
 					progressMonitor, reasoner.saturationState, reasoner.classTaxonomyState.taxonomy);

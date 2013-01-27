@@ -39,11 +39,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class IncrementalReSaturationStage extends AbstractReasonerStage {
+public class IncrementalAdditionStage extends AbstractReasonerStage {
 
 	private ClassExpressionNoInputSaturation saturation_ = null;
 	
-	public IncrementalReSaturationStage(AbstractReasonerState reasoner) {
+	public IncrementalAdditionStage(AbstractReasonerState reasoner) {
 		super(reasoner);
 	}
 
@@ -68,6 +68,8 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 			initComputation();
 		}
 		
+		//System.out.println("Active contexts: " + reasoner.saturationState.activeContexts_);
+		
 		progressMonitor.start(getName());
 		
 		try {
@@ -83,7 +85,13 @@ public class IncrementalReSaturationStage extends AbstractReasonerStage {
 		reasoner.incrementalState.setStageStatus(IncrementalStages.ADDITION, true);
 		reasoner.ruleAndConclusionStats.add(saturation_.getRuleAndConclusionStatistics());
 		
-		markAllContextsAsSaturated();		
+		markAllContextsAsSaturated();	
+		///FIXME
+		/*for (IndexedClass ic : reasoner.ontologyIndex.getIndexedClasses()) {
+			if (ic.getContext() != null) 
+				
+			System.out.println(ic + ": " + ic.getContext().getSubsumers());
+		}*/
 	}
 	
 	

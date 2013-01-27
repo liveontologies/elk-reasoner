@@ -51,6 +51,7 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 		postProcesingMap.add(PropertyHierarchyCompositionComputationStage.class, SaturatedPropertyChainCheckingStage.class);
 		postProcesingMap.add(IncrementalDeletionStage.class, ContextSaturationFlagCheckingStage.class);
 		postProcesingMap.add(IncrementalContextCleaningStage.class, CheckCleaningStage.class);
+		postProcesingMap.add(IncrementalContextCleaningStage.class, SaturationGraphValidationStage.class);
 		postProcesingMap.add(IncrementalAdditionInitializationStage.class, SaturationGraphValidationStage.class);
 		/*
 		 * this phase is commented because it uses cleaning to clean up randomly

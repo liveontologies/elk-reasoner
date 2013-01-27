@@ -77,7 +77,7 @@ public class CleaningRedundancyStageExecutor extends SimpleStageExecutor {
 		
 		super.execute(stage);
 		
-		if (stage.getClass().equals(IncrementalReSaturationStage.class)) {
+		if (stage.getClass().equals(IncrementalAdditionStage.class)) {
 			//Map<IndexedClassExpression, Context> resaturatedContexts = ((AbstractReasonerStage)stage).reasoner.getContextMap();
 			//how many are exactly the same (wrt atomic subsumers)?
 			int sameCount = 0;

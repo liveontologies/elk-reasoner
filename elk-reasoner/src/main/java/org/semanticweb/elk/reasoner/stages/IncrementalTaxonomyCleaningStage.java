@@ -120,7 +120,8 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		
 
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Taxonomy nodes to be cleaned: " + inputs);
+			LOGGER_.trace("Taxonomy nodes to be cleaned for modified contexts: " + modified);
+			LOGGER_.trace("Taxonomy nodes to be cleaned for removed contexts: " + removed);
 		}
 
 		cleaning_ = new ClassTaxonomyCleaning(inputs,

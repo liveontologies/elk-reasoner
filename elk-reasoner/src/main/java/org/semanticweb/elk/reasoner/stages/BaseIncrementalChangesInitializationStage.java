@@ -27,11 +27,15 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -178,13 +182,28 @@ class IncrementalAdditionInitializationStage extends
 				.getRuleStatistics());
 		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
 				.getConclusionStatistics());
+		// first, create and init contexts for new classes
+		final IndexObjectConverter converter = reasoner.objectCache_
+				.getIndexObjectConverter();
+		final ExtendedWriter writer = reasoner.saturationState.getExtendedWriter(conclusionVisitor);
+		
+		for (ElkClass newClass : reasoner.incrementalState.diffIndex.getAddedClasses()) {
+			IndexedClass ic = (IndexedClass) converter.visit(newClass);
+			
+			if (ic.getContext() == null ) {
+				writer.getCreateContext(ic);
+			}
+			else {
+				//TODO Figure out why some added classes have contexts
+				//This happens when class is removed and then re-added
+				//throw new RuntimeException(ic + ": " + ic.getContext().getSubsumers());
+			}
+		}
 
 		changedInitRules = diffIndex.getAddedContextInitRules();
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
 
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
-			// inputs = Operations.split(
-			// reasoner.ontologyIndex.getIndexedClassExpressions(), 128);
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					128);
 		}
@@ -198,6 +217,7 @@ class IncrementalAdditionInitializationStage extends
 	@Override
 	protected void postExecute() {
 		reasoner.incrementalState.diffIndex.commitAddedRules();
+		reasoner.incrementalState.diffIndex.clearSignatureChanges();
 	}
 
 }

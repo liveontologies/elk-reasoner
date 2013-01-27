@@ -61,6 +61,9 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	protected int indexedObjectPropertyCount = 0;
 
 	public IndexedObjectCache() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("Creating new cache");
+		
 		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
 				new IndexedClassExpressionViewFactory(), 1024);
 		indexedPropertyChainLookup = new KeyEntryHashSet<IndexedPropertyChain>(
@@ -84,6 +87,17 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		indexedObjectPropertyCount = 0;
 	}
 
+	public long size() {
+		return indexedClassCount + indexedIndividualCount
+				+ indexedObjectPropertyCount;
+	}
+	
+	public boolean isEmpty() {
+		return indexedClassExpressionLookup.isEmpty()
+				&& indexedPropertyChainLookup.isEmpty()
+				&& indexedAxiomLookup.isEmpty();
+	}
+	
 	/**
 	 * Remove all object of the given {@link IndexedObjectCache} from this
 	 * {@link IndexedObjectCache}

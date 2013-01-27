@@ -74,6 +74,69 @@ public class LowLevelIncrementalReasoningTest {
 
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
+/*	@Test
+	public void testTmp() throws ElkException {
+		Reasoner reasoner = TestReasonerUtils
+				.createTestReasoner(new LoggingStageExecutor());
+		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
+
+		reasoner.setIncrementalMode(false);
+		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
+
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		ElkAxiom axAsubB = objectFactory.getSubClassOfAxiom(a, b);
+		
+		loader.add(axAsubB).add(objectFactory.getSubClassOfAxiom(objectFactory.getOwlThing(), c));
+
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+		loader.clear();
+
+		reasoner.setIncrementalMode(true);
+
+		changeLoader.remove(axAsubB);
+
+		taxonomy = reasoner.getTaxonomy();
+		
+		changeLoader.clear();
+		changeLoader.add(axAsubB);
+		
+		taxonomy = reasoner.getTaxonomy();
+	}		
+*/	
+	@Test
+	public void testNewClass() throws ElkException {
+		Reasoner reasoner = TestReasonerUtils
+				.createTestReasoner(new LoggingStageExecutor());
+		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
+
+		reasoner.setIncrementalMode(false);
+		reasoner.registerOntologyLoader(loader);
+		reasoner.registerOntologyChangesLoader(changeLoader);
+
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+
+		loader.add(objectFactory.getSubClassOfAxiom(a, b));
+
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+		loader.clear();
+
+		reasoner.setIncrementalMode(true);
+
+		changeLoader.add(objectFactory.getSubClassOfAxiom(c, b));
+
+		taxonomy = reasoner.getTaxonomy();
+
+		assertTrue(taxonomy.getNode(c).getDirectSuperNodes()
+				.contains(taxonomy.getNode(b)));
+	}	
+	
 	@Test
 	public void testBasicDeletion() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils

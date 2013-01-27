@@ -74,7 +74,7 @@ public class SaturationState {
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
-	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
+	public final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
 
 	/**
 	 * The queue of all contexts for which computation of the closure under
@@ -159,7 +159,7 @@ public class SaturationState {
 	private ExtendedWriter getDefaultWriter(final ConclusionVisitor<?> conclusionVisitor) {
 		return new ContextCreatingWriter(
 				ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
-				DEFAULT_INIT_RULE_APP_VISITOR, conclusionVisitor, false);
+				DEFAULT_INIT_RULE_APP_VISITOR, conclusionVisitor, true);
 	}
 	
 	/**
@@ -415,6 +415,7 @@ public class SaturationState {
 		public void initContext(Context context) {
 			produce(context, new PositiveSubsumer(context.getRoot()));
 			// apply all context initialization rules
+			
 			LinkRule<Context> initRule = ontologyIndex_
 					.getContextInitRuleHead();
 			while (initRule != null) {
