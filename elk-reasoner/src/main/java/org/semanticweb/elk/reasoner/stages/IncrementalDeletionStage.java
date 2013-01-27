@@ -84,8 +84,8 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 		reasoner.incrementalState.setStageStatus(IncrementalStages.DELETION, true);
 		reasoner.ruleAndConclusionStats.add(desaturation_.getRuleAndConclusionStatistics());
 		
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Number of modified contexts " + reasoner.saturationState.getNotSaturatedContexts().size());
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Number of modified contexts " + reasoner.saturationState.getNotSaturatedContexts().size());
 		}		
 	}
 	
