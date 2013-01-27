@@ -116,7 +116,7 @@ public class SaturationState {
 
 					@Override
 					public void remove() {
-						throw new NoSuchElementException(
+						throw new UnsupportedOperationException(
 								"Removal not supported");
 					}
 
