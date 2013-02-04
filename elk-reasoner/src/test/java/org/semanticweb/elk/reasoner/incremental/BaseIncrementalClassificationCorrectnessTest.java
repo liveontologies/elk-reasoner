@@ -37,11 +37,9 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
-import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -76,14 +74,14 @@ public class BaseIncrementalClassificationCorrectnessTest
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("======= Computing Expected Taxonomy =======");
 
-		Taxonomy<ElkClass> expected = getTaxonomy(standardReasoner);
+		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomyQuietly();
 
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("======= Computing Incremental Taxonomy =======");
 
 		Taxonomy<ElkClass> incremental;
 		try {
-			incremental = getTaxonomy(incrementalReasoner);
+			incremental = incrementalReasoner.getTaxonomyQuietly();
 		} catch (Exception e) {
 			throw new RuntimeException("Seed: " + seed, e);
 		}
@@ -104,21 +102,6 @@ public class BaseIncrementalClassificationCorrectnessTest
 				ioe.printStackTrace();
 			}
 		}
-	}
-
-	private Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner)
-			throws ElkException {
-		Taxonomy<ElkClass> result = null;
-
-		try {
-			result = reasoner.getTaxonomy();
-		} catch (ElkInconsistentOntologyException e) {
-			LOGGER_.info("Ontology is inconsistent");
-
-			result = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
-		}
-
-		return result;
 	}
 
 	@Config
