@@ -26,6 +26,7 @@ import java.util.Queue;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.loading.AxiomChangeListener;
 import org.semanticweb.elk.loading.ChangesLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
@@ -40,7 +41,7 @@ public class TrackingChangesLoader implements ChangesLoader {
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(TrackingChangesLoader.class);
 
-	private final static Random RANDOM_ = new Random(123);
+	private final static Random RANDOM_ = new Random(RandomSeedProvider.VALUE);
 
 	/**
 	 * Setting seed for generating random changes (so that the results can be
