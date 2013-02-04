@@ -49,10 +49,6 @@ import org.semanticweb.elk.testing.TestInput;
 public class CLIDiffClassificationCorrectnessTest extends
 		DiffClassificationCorrectnessTest {
 
-	/*static final String[] IGNORE_LIST = { "DisjointSelf.owl",
-			"AssertionDisjoint.owl", "Disjoint.owl", "DisjointSelf.owl",
-			"ReflexiveRole.owl", "kangaroo.owl" };*/
-	
 	static final String[] IGNORE_LIST = {};	
 
 	static {
