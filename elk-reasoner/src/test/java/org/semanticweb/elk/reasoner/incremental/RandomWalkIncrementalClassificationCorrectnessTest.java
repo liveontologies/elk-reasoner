@@ -151,7 +151,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 		return ConfigurationUtils
 				.loadFileBasedTestConfiguration(
 						INPUT_DATA_LOCATION,
-						BaseIncrementalClassificationCorrectnessTest.class,
+						IncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
 						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>() {

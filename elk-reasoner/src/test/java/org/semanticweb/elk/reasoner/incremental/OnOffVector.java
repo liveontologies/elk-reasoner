@@ -74,6 +74,15 @@ public class OnOffVector<T> extends Vector<T> {
 			onOffValues_.set(i, true);
 		}
 	}
+	
+	/**
+	 * Sets the status of all elements to "off"
+	 */
+	public void setAllOff() {
+		for (int i = 0; i < onOffValues_.size(); i++) {
+			onOffValues_.set(i, false);
+		}
+	}
 
 	/**
 	 * Changes the on-off value of the element with the given index to the

@@ -30,12 +30,9 @@ import static org.junit.Assume.assumeTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -46,20 +43,13 @@ import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
-import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * @author Pavel Klinov
@@ -67,8 +57,10 @@ import org.semanticweb.elk.testing.TestOutput;
  *         pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
-public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOutput, AO extends TestOutput> {
+public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends TestOutput, AO extends TestOutput> {
 
+	protected enum CHANGE {ADD, DELETE};
+	
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
@@ -77,7 +69,8 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	final static double DELETE_RATIO = 0.2;
 
 	protected final ReasoningTestManifest<EO, AO> manifest;
-	protected List<ElkAxiom> axioms;
+	protected List<T> staticAxioms = null;
+	protected OnOffVector<T> changingAxioms = null;
 
 	public BaseIncrementalReasoningCorrectnessTest(
 			ReasoningTestManifest<EO, AO> testManifest) {
@@ -92,7 +85,9 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 
 		try {
 			stream = manifest.getInput().getInputStream();
-			axioms = loadAxioms(stream);
+			staticAxioms = new ArrayList<T>(15);
+			changingAxioms = new OnOffVector<T>(15);
+			loadAxioms(stream, staticAxioms, changingAxioms);
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
@@ -111,9 +106,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 	 */
 	@Test
 	public void incrementalReasoning() throws ElkException {
-		// TODO tweak TestChangesLoader to be able to use one loader for several
-		// reasoners
-		TestChangesLoader changeLoader1 = new TestChangesLoader();
+		/*TestChangesLoader changeLoader1 = new TestChangesLoader();
 		TestChangesLoader changeLoader2 = new TestChangesLoader();
 		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
 				new SimpleStageExecutor(), 1);
@@ -126,6 +119,13 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		incrementalReasoner.registerOntologyChangesLoader(changeLoader2);
 
 		standardReasoner.setIncrementalMode(false);
+		incrementalReasoner.setIncrementalMode(true);*/
+		changingAxioms.setAllOn();
+		
+		Reasoner standardReasoner = getReasoner(Operations.concat(staticAxioms, changingAxioms.getOnElements()));
+		Reasoner incrementalReasoner = getReasoner(Operations.concat(staticAxioms, changingAxioms.getOnElements()));
+		
+		standardReasoner.setIncrementalMode(false);
 		incrementalReasoner.setIncrementalMode(true);
 		// initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
@@ -134,23 +134,25 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		Random rnd = new Random(seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
+			changingAxioms.setAllOff();
 			// delete some axioms
 			standardReasoner.setIncrementalMode(false);
 
-			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
+			randomFlip(changingAxioms, rnd, DELETE_RATIO);
 
 			if (LOGGER_.isTraceEnabled()) {
-				for (ElkAxiom del : deleted) {
-					LOGGER_.trace(OwlFunctionalStylePrinter.toString(del)
-							+ ": deleted");
+				for (T del : changingAxioms.getOnElements()) {
+					dumpChangeToLog(del);
 				}
 			}
 
 			// incremental changes
-			changeLoader1.clear();
+			/*changeLoader1.clear();
 			changeLoader2.clear();
 			remove(changeLoader1, deleted);
-			remove(changeLoader2, deleted);
+			remove(changeLoader2, deleted);*/
+			applyChanges(standardReasoner, changingAxioms.getOnElements(), CHANGE.DELETE);
+			applyChanges(incrementalReasoner, changingAxioms.getOnElements(), CHANGE.DELETE);
 
 			if (LOGGER_.isInfoEnabled())
 				LOGGER_.info("===DELETIONS===");
@@ -159,10 +161,12 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 
 			standardReasoner.setIncrementalMode(false);
 			// add the axioms back
-			changeLoader1.clear();
+			/*changeLoader1.clear();
 			changeLoader2.clear();
 			add(changeLoader1, deleted);
-			add(changeLoader2, deleted);
+			add(changeLoader2, deleted);*/
+			applyChanges(standardReasoner, changingAxioms.getOnElements(), CHANGE.ADD);
+			applyChanges(incrementalReasoner, changingAxioms.getOnElements(), CHANGE.ADD);			
 
 			if (LOGGER_.isInfoEnabled())
 				LOGGER_.info("===ADDITIONS===");
@@ -171,7 +175,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		}
 	}
 
-	private void add(TestChangesLoader loader, Collection<ElkAxiom> axiomList) {
+/*	private void add(TestChangesLoader loader, Collection<ElkAxiom> axiomList) {
 		for (ElkAxiom axiom : axiomList) {
 			loader.add(axiom);
 		}
@@ -181,31 +185,33 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		for (ElkAxiom axiom : axiomList) {
 			loader.remove(axiom);
 		}
-	}
+	}*/
 
-	protected Set<ElkAxiom> getRandomSubset(List<ElkAxiom> axioms, Random rnd,
-			double fraction) {
+	protected abstract void applyChanges(Reasoner reasoner, Iterable<T> changes, CHANGE type);
+
+	protected void randomFlip(OnOffVector<T> axioms, Random rnd, double fraction) {
 		Collections.shuffle(axioms, rnd);
 
-		Set<ElkAxiom> subset = new HashSet<ElkAxiom>();
+		int flipped = 0;
 
 		for (int i = 0; i < axioms.size()
-				&& subset.size() <= fraction * axioms.size(); i++) {
-			ElkAxiom axiom = axioms.get(i);
-
-			if (!filterAxiom(axiom)) {
-				subset.add(axiom);
-			}
+				&& flipped <= fraction * axioms.size(); i++) {
+			axioms.flipOnOff(i);
+			flipped++;
 		}
-
-		return subset;
 	}
 
 	protected boolean filterAxiom(ElkAxiom axiom) {
 		return !(axiom instanceof ElkClassAxiom);
 	}
 
-	protected List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
+	protected abstract void dumpChangeToLog(T change);
+	
+	protected abstract void loadAxioms(InputStream stream, List<T> staticAxioms, OnOffVector<T> changingAxioms) throws IOException, Owl2ParseException;
+	
+	protected abstract Reasoner getReasoner(Iterable<T> axioms);
+	
+	/*protected OnOffVector<T> loadAxioms(InputStream stream) throws IOException,
 			Owl2ParseException {
 		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
 				.getParser(stream);
@@ -224,7 +230,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		});
 
 		return axioms;
-	}
+	}*/
 
 	protected abstract void correctnessCheck(Reasoner standardReasoner,
 			Reasoner incrementalReasoner, long seed) throws ElkException;
