@@ -111,8 +111,9 @@ public abstract class RandomWalkIncrementalClassificationRunner<T> {
 			for (int i = 0; i < iterations_; i++) {
 				loadChanges(reasoner, tracker.generateNextChange());
 				
-				String taxonomyHash = TaxonomyPrinter
-						.getHashString(reasoner.getTaxonomyQuietly());
+				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
+				String taxonomyHash = TaxonomyPrinter.getHashString(taxonomy);
+				
 				taxonomyHashHistory.add(taxonomyHash);
 				
 				if (LOGGER_.isDebugEnabled()) {
@@ -124,7 +125,7 @@ public abstract class RandomWalkIncrementalClassificationRunner<T> {
 
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace("======= Current Taxonomy =======");
-					printTaxonomy(reasoner.getTaxonomyQuietly());
+					printTaxonomy(taxonomy);
 				}
 				
 				/*if (hook != null) {
@@ -141,15 +142,6 @@ public abstract class RandomWalkIncrementalClassificationRunner<T> {
 					Operations.concat(changingAxioms.getOnElements(),
 							staticAxioms));
 
-			/*Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
-					new SimpleStageExecutor(), 1);
-			standardReasoner.setIncrementalMode(false);
-			standardReasoner.registerOntologyLoader(new TestAxiomLoader(
-					Operations.concat(changingAxioms.getOnElements(),
-							staticAxioms)));
-			standardReasoner
-					.registerOntologyChangesLoader(new EmptyChangesLoader());
-			standardReasoner.setIncrementalMode(false);*/
 			String expectedTaxonomyHash = TaxonomyPrinter
 					.getHashString(standardReasoner.getTaxonomyQuietly());
 
@@ -179,8 +171,7 @@ public abstract class RandomWalkIncrementalClassificationRunner<T> {
 				}
 				
 				revertChanges(reasoner, change);
-				/*reasoner.registerOntologyChangesLoader(new ReversesChangeLoader(
-						change));*/
+				
 				String taxonomyHash = TaxonomyPrinter
 						.getHashString(reasoner.getTaxonomyQuietly());
 
@@ -217,11 +208,10 @@ public abstract class RandomWalkIncrementalClassificationRunner<T> {
 	}
 
 	private void printCurrentAxioms(Iterable<T> axioms) {
-		if (LOGGER_.isTraceEnabled()) {
+		if (LOGGER_.isInfoEnabled()) {
 			for (T axiom : axioms) {
 				printAxiom(axiom);
 			}
-/*				*/
 		}
 	}
 

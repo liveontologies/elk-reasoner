@@ -113,7 +113,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 		// other axioms that do not change
 		List<ElkAxiom> staticAxioms = new ArrayList<ElkAxiom>();
 		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
-				new PostProcessingStageExecutor(), 1);
+				new PostProcessingStageExecutor());
 		long seed = RandomSeedProvider.VALUE;
 
 		incrementalReasoner.setIncrementalMode(true);
