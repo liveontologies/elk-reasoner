@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
+import org.semanticweb.elk.loading.EmptyChangesLoader;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
@@ -47,12 +48,15 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.incremental.IncrementalChangeLoader.DIRECTION;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -134,9 +138,8 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 			// new RandomWalkIncrementalClassificationRunner(MAX_ROUNDS,
 			// ITERATIONS).run(incrementalReasoner, changingAxioms,
 			// staticAxioms, seed, new CleanIndexHook());
-			new RandomWalkIncrementalClassificationRunner(MAX_ROUNDS,
-					ITERATIONS).run(incrementalReasoner, changingAxioms,
-					staticAxioms, seed);
+			new BasicRandomWalkRunner(MAX_ROUNDS, ITERATIONS).run(
+					incrementalReasoner, changingAxioms, staticAxioms, seed);
 
 		} catch (Exception e) {
 			throw new ElkRuntimeException("Seed " + seed, e);
@@ -165,4 +168,46 @@ public class RandomWalkIncrementalClassificationCorrectnessTest {
 						});
 	}
 
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	public static final class BasicRandomWalkRunner extends RandomWalkIncrementalClassificationRunner<ElkAxiom> {
+
+		public BasicRandomWalkRunner(int rounds, int iter) {
+			super(rounds, iter);
+		}
+
+		@Override
+		protected Reasoner createReasoner(Iterable<ElkAxiom> axioms) {
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(new SimpleStageExecutor());
+			
+			reasoner.setIncrementalMode(false);
+			reasoner.registerOntologyLoader(new TestAxiomLoader(axioms));
+			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
+			
+			return reasoner;
+		}
+
+		@Override
+		protected void loadChanges(final Reasoner reasoner,
+				final IncrementalChange<ElkAxiom> change) {
+			reasoner.registerOntologyChangesLoader(new IncrementalChangeLoader(change, DIRECTION.FORWARD));
+		}
+
+		@Override
+		protected void printAxiom(ElkAxiom axiom) {
+			LOGGER_.trace("Current axiom: "
+					+ OwlFunctionalStylePrinter.toString(axiom));
+		}
+
+		@Override
+		protected void revertChanges(Reasoner reasoner,
+				IncrementalChange<ElkAxiom> change) {
+			reasoner.registerOntologyChangesLoader(new IncrementalChangeLoader(change, DIRECTION.BACKWARD));
+		}
+		
+	}
 }

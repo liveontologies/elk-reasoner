@@ -34,14 +34,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.Operations;
@@ -53,7 +48,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class RandomWalkIncrementalClassificationRunner {
+public abstract class RandomWalkIncrementalClassificationRunner<T> {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(RandomWalkIncrementalClassificationRunner.class);
@@ -68,8 +63,8 @@ public class RandomWalkIncrementalClassificationRunner {
 	}
 	
 	public void run(final Reasoner reasoner,
-			final OnOffVector<ElkAxiom> changingAxioms,
-			final List<ElkAxiom> staticAxioms,
+			final OnOffVector<T> changingAxioms,
+			final List<T> staticAxioms,
 			final long seed
 			) throws ElkException,
 			InterruptedException, IOException {
@@ -77,21 +72,15 @@ public class RandomWalkIncrementalClassificationRunner {
 	}
 
 	public void run(final Reasoner reasoner,
-			final OnOffVector<ElkAxiom> changingAxioms,
-			final List<ElkAxiom> staticAxioms,
+			final OnOffVector<T> changingAxioms,
+			final List<T> staticAxioms,
 			final long seed,
 			final RandomWalkTestHook hook) throws ElkException,
 			InterruptedException, IOException {
 
-		// for storing change history
-		Deque<IncrementalChange> changesHistory = new LinkedList<IncrementalChange>();
 		// for storing taxonomy hash history
 		Deque<String> taxonomyHashHistory = new LinkedList<String>();
 
-		reasoner.setIncrementalMode(true);
-		TrackingChangesLoader.setSeed(seed);
-
-		reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 		reasoner.setIncrementalMode(true);
 		
 		final String originalTaxonomyHash = TaxonomyPrinter
@@ -109,6 +98,8 @@ public class RandomWalkIncrementalClassificationRunner {
 					+ " random changes");
 
 		int changeSize = getInitialChangeSize(changingAxiomsCount);
+		//this tracker is responsible for generating random changes
+		IncrementalChangeTracker<T> tracker = new IncrementalChangeTracker<T>(changingAxioms, changeSize);
 
 		for (int j = 0; j < rounds; j++) {
 			if (LOGGER_.isInfoEnabled())
@@ -118,34 +109,39 @@ public class RandomWalkIncrementalClassificationRunner {
 
 			taxonomyHashHistory.add(originalTaxonomyHash);
 			for (int i = 0; i < iterations_; i++) {
-				//all random changes happen inside the tracking change loader
-				reasoner.registerOntologyChangesLoader(new TrackingChangesLoader(
-						changingAxioms, changesHistory, changeSize));
+				loadChanges(reasoner, tracker.generateNextChange());
+				
 				String taxonomyHash = TaxonomyPrinter
 						.getHashString(reasoner.getTaxonomyQuietly());
 				taxonomyHashHistory.add(taxonomyHash);
-				if (LOGGER_.isDebugEnabled())
+				
+				if (LOGGER_.isDebugEnabled()) {
 					LOGGER_.debug("Taxonomy hash code for round " + (j + 1)
 							+ " iteration " + (i + 1) + ": " + taxonomyHash);
+				}
 
-				printCurrentAxioms(changingAxioms, staticAxioms);
+				printCurrentAxioms(Operations.concat(changingAxioms.getOnElements(), staticAxioms));
 
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace("======= Current Taxonomy =======");
 					printTaxonomy(reasoner.getTaxonomyQuietly());
 				}
 				
-				if (hook != null) {
+				/*if (hook != null) {
 					hook.apply(reasoner, changingAxioms, staticAxioms);
-				}
+				}*/
 			}
 
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("Checking the final taxonomy");
+			if (LOGGER_.isDebugEnabled()) {
+				LOGGER_.debug("Checking the final taxonomy");
+			}
 
 			String finalTaxonomyHash = taxonomyHashHistory.pollLast();
+			Reasoner standardReasoner = createReasoner(
+					Operations.concat(changingAxioms.getOnElements(),
+							staticAxioms));
 
-			Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
+			/*Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
 					new SimpleStageExecutor(), 1);
 			standardReasoner.setIncrementalMode(false);
 			standardReasoner.registerOntologyLoader(new TestAxiomLoader(
@@ -153,7 +149,7 @@ public class RandomWalkIncrementalClassificationRunner {
 							staticAxioms)));
 			standardReasoner
 					.registerOntologyChangesLoader(new EmptyChangesLoader());
-			standardReasoner.setIncrementalMode(false);
+			standardReasoner.setIncrementalMode(false);*/
 			String expectedTaxonomyHash = TaxonomyPrinter
 					.getHashString(standardReasoner.getTaxonomyQuietly());
 
@@ -161,33 +157,48 @@ public class RandomWalkIncrementalClassificationRunner {
 				assertEquals("Seed " + seed, expectedTaxonomyHash,
 						finalTaxonomyHash);
 			} catch (AssertionError e) {
-				LOGGER_.info("======= Current Taxonomy =======");
+				LOGGER_.debug("======= Current Taxonomy =======");
 				printTaxonomy(reasoner.getTaxonomyQuietly());
-				LOGGER_.info("====== Expected Taxonomy =======");
+				LOGGER_.debug("====== Expected Taxonomy =======");
 				printTaxonomy(standardReasoner.getTaxonomyQuietly());
 				standardReasoner.shutdown();
 				throw e;
 			}
 			standardReasoner.shutdown();
 
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("Reverting the changes");
+			if (LOGGER_.isDebugEnabled()) {
+				LOGGER_.debug("Reverting the changes");
+			}
+			
 			for (;;) {
-				IncrementalChange change = changesHistory.pollLast();
+				IncrementalChange<T> change = tracker.getChangeHistory().pollLast();
 				String expectedHash = taxonomyHashHistory.pollLast();
-				if (change == null)
+				
+				if (change == null) {
 					break;
-				reasoner.registerOntologyChangesLoader(new ReversesChangeLoader(
-						change));
+				}
+				
+				revertChanges(reasoner, change);
+				/*reasoner.registerOntologyChangesLoader(new ReversesChangeLoader(
+						change));*/
 				String taxonomyHash = TaxonomyPrinter
 						.getHashString(reasoner.getTaxonomyQuietly());
 
 				assertEquals("Seed " + seed, expectedHash, taxonomyHash);
 			}
+			
 			// doubling the change size every round
 			changeSize *= 2;
 		}
 	}
+
+	protected abstract void revertChanges(Reasoner reasoner, IncrementalChange<T> change);
+
+	protected abstract Reasoner createReasoner(Iterable<T> axioms);
+
+	protected abstract void loadChanges(Reasoner reasoner, IncrementalChange<T> change);
+	
+	protected abstract void printAxiom(T axiom);
 
 	private int getInitialChangeSize(int changingAxiomsCount) {
 		// the changes size will double with every iteration;
@@ -205,15 +216,12 @@ public class RandomWalkIncrementalClassificationRunner {
 				2 * (31 - Integer.numberOfLeadingZeros(changingAxiomsCount)));
 	}
 
-	private void printCurrentAxioms(OnOffVector<ElkAxiom> changingAxioms,
-			Iterable<ElkAxiom> staticAxioms) {
+	private void printCurrentAxioms(Iterable<T> axioms) {
 		if (LOGGER_.isTraceEnabled()) {
-			for (ElkAxiom axiom : changingAxioms.getOnElements())
-				LOGGER_.trace("Current axiom: "
-						+ OwlFunctionalStylePrinter.toString(axiom));
-			for (ElkAxiom axiom : staticAxioms)
-				LOGGER_.trace("Current axiom: "
-						+ OwlFunctionalStylePrinter.toString(axiom));
+			for (T axiom : axioms) {
+				printAxiom(axiom);
+			}
+/*				*/
 		}
 	}
 

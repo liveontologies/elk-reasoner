@@ -21,15 +21,9 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
 /**
  * An axiom change represented by (possibly overlapping) list of additions and
@@ -38,18 +32,18 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class IncrementalChange {
+public class IncrementalChange<T> {
 
-	private final List<ElkAxiom> additions_;
-	private final List<ElkAxiom> deletions_;
+	private final List<T> additions_;
+	private final List<T> deletions_;
 
-	public IncrementalChange(List<ElkAxiom> additions, List<ElkAxiom> deletions) {
+	public IncrementalChange(List<T> additions, List<T> deletions) {
 		this.additions_ = additions;
 		this.deletions_ = deletions;
 	}
 
 	public IncrementalChange() {
-		this(new ArrayList<ElkAxiom>(), new ArrayList<ElkAxiom>());
+		this(new ArrayList<T>(), new ArrayList<T>());
 	}
 
 	public void clear() {
@@ -57,24 +51,24 @@ public class IncrementalChange {
 		deletions_.clear();
 	}
 
-	public List<ElkAxiom> getAdditions() {
+	public List<T> getAdditions() {
 		return Collections.unmodifiableList(this.additions_);
 	}
 
-	public List<ElkAxiom> getDeletions() {
+	public List<T> getDeletions() {
 		return Collections.unmodifiableList(this.deletions_);
 	}
 
-	public void registerAddition(ElkAxiom axiom) {
+	public void registerAddition(T axiom) {
 		this.additions_.add(axiom);
 	}
 
-	public void registerDeletion(ElkAxiom axiom) {
+	public void registerDeletion(T axiom) {
 		this.deletions_.add(axiom);
 	}
 
 	// TODO: move to OwlFunctionalStylePrinter
-	static void dumpAxiomsToFile(Iterable<ElkAxiom> axioms, String fileName)
+/*	static void dumpAxiomsToFile(Iterable<ElkAxiom> axioms, String fileName)
 			throws IOException {
 		FileWriter fstream = new FileWriter(fileName);
 		BufferedWriter writer = new BufferedWriter(fstream);
@@ -93,6 +87,6 @@ public class IncrementalChange {
 
 	public void dumpDeletionsToFile(String fileName) throws IOException {
 		dumpAxiomsToFile(deletions_, fileName);
-	}
+	}*/
 
 }

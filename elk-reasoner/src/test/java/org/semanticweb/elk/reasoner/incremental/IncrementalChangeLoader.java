@@ -33,23 +33,34 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
-public class ReversesChangeLoader implements ChangesLoader {
+/**
+ * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
+public class IncrementalChangeLoader implements ChangesLoader {
 
+	public enum DIRECTION {FORWARD, BACKWARD};
+	
 	protected static final Logger LOGGER_ = Logger
-			.getLogger(TrackingChangesLoader.class);
+			.getLogger(IncrementalChangeLoader.class);
 
 	/**
 	 * The change to be used by this {@link ChangesLoader}
 	 */
-	private final IncrementalChange change_;
+	private final IncrementalChange<ElkAxiom> change_;
 
 	/**
 	 * change listener if any is needed
 	 */
 	private AxiomChangeListener listener_;
 
-	public ReversesChangeLoader(IncrementalChange change) {
+	private final DIRECTION dir_;
+
+	public IncrementalChangeLoader(IncrementalChange<ElkAxiom> change, DIRECTION dir) {
 		this.change_ = change;
+		this.dir_ = dir;
 	}
 
 	@Override
@@ -65,31 +76,53 @@ public class ReversesChangeLoader implements ChangesLoader {
 
 			@Override
 			public void load() throws ElkLoadingException {
-				// first add back the deleted axioms, then remove the added
-				// axioms
+
 				while (deletions_.hasNext()) {
 					if (Thread.currentThread().isInterrupted())
 						break;
 					ElkAxiom axiom = deletions_.next();
-					axiomInserter.visit(axiom);
-					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace("adding: "
-								+ OwlFunctionalStylePrinter.toString(axiom));
-					if (listener_ != null)
-						listener_.notify(new SimpleElkAxiomChange(axiom, 1));
+					
+					switch (dir_) {
+					case FORWARD:
+						delete(axiom);
+						break;
+					case BACKWARD:
+						add(axiom);
+					}
 				}
 				while (additions_.hasNext()) {
 					if (Thread.currentThread().isInterrupted())
 						break;
 					ElkAxiom axiom = additions_.next();
-					axiomDeleter.visit(axiom);
-					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace("removing: "
-								+ OwlFunctionalStylePrinter.toString(axiom));
-					if (listener_ != null)
-						listener_.notify(new SimpleElkAxiomChange(axiom, -1));
+					
+					switch (dir_) {
+					case FORWARD:
+						add(axiom);
+						break;
+					case BACKWARD:
+						delete(axiom);
+					}
 				}
-
+			}
+			
+			private void add(ElkAxiom axiom) {
+				axiomInserter.visit(axiom);
+				
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace("adding: "
+							+ OwlFunctionalStylePrinter.toString(axiom));
+				if (listener_ != null)
+					listener_.notify(new SimpleElkAxiomChange(axiom, 1));
+			}
+			
+			private void delete(ElkAxiom axiom) {
+				axiomDeleter.visit(axiom);
+				
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace("deleting: "
+							+ OwlFunctionalStylePrinter.toString(axiom));
+				if (listener_ != null)
+					listener_.notify(new SimpleElkAxiomChange(axiom, 1));
 			}
 
 			@Override
