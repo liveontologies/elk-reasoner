@@ -130,7 +130,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 		// initial correctness check
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
-		long seed = RandomSeedProvider.VALUE;// System.currentTimeMillis();
+		long seed = RandomSeedProvider.VALUE;
 		Random rnd = new Random(seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
@@ -139,11 +139,12 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<EO extends TestOut
 
 			Set<ElkAxiom> deleted = getRandomSubset(axioms, rnd, DELETE_RATIO);
 
-			//if (LOGGER_.isTraceEnabled())
+			if (LOGGER_.isTraceEnabled()) {
 				for (ElkAxiom del : deleted) {
-					LOGGER_.info(OwlFunctionalStylePrinter.toString(del)
+					LOGGER_.trace(OwlFunctionalStylePrinter.toString(del)
 							+ ": deleted");
 				}
+			}
 
 			// incremental changes
 			changeLoader1.clear();
