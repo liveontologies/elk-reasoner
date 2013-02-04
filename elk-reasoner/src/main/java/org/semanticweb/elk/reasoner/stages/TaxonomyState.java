@@ -68,8 +68,10 @@ public class TaxonomyState {
 		}
 
 		public void markClassesForModifiedNode(final Node<ElkClass> node) {
-			for (ElkClass clazz : node.getMembers()) {
-				markClassForModifiedNode(clazz);
+			synchronized (node) {
+				for (ElkClass clazz : node.getMembers()) {
+					markClassForModifiedNode(clazz);
+				}
 			}
 		}
 

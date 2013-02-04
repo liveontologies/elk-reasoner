@@ -41,8 +41,6 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
@@ -106,20 +104,6 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 	 */
 	@Test
 	public void incrementalReasoning() throws ElkException {
-		/*TestChangesLoader changeLoader1 = new TestChangesLoader();
-		TestChangesLoader changeLoader2 = new TestChangesLoader();
-		Reasoner standardReasoner = TestReasonerUtils.createTestReasoner(
-				new SimpleStageExecutor(), 1);
-		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
-				new PostProcessingStageExecutor(), 1);
-
-		standardReasoner.registerOntologyLoader(new TestAxiomLoader(axioms));
-		standardReasoner.registerOntologyChangesLoader(changeLoader1);
-		incrementalReasoner.registerOntologyLoader(new TestAxiomLoader(axioms));
-		incrementalReasoner.registerOntologyChangesLoader(changeLoader2);
-
-		standardReasoner.setIncrementalMode(false);
-		incrementalReasoner.setIncrementalMode(true);*/
 		changingAxioms.setAllOn();
 		
 		Reasoner standardReasoner = getReasoner(Operations.concat(staticAxioms, changingAxioms.getOnElements()));
@@ -147,10 +131,6 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 			}
 
 			// incremental changes
-			/*changeLoader1.clear();
-			changeLoader2.clear();
-			remove(changeLoader1, deleted);
-			remove(changeLoader2, deleted);*/
 			applyChanges(standardReasoner, changingAxioms.getOnElements(), CHANGE.DELETE);
 			applyChanges(incrementalReasoner, changingAxioms.getOnElements(), CHANGE.DELETE);
 
@@ -161,10 +141,6 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 
 			standardReasoner.setIncrementalMode(false);
 			// add the axioms back
-			/*changeLoader1.clear();
-			changeLoader2.clear();
-			add(changeLoader1, deleted);
-			add(changeLoader2, deleted);*/
 			applyChanges(standardReasoner, changingAxioms.getOnElements(), CHANGE.ADD);
 			applyChanges(incrementalReasoner, changingAxioms.getOnElements(), CHANGE.ADD);			
 
@@ -174,20 +150,6 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}
 	}
-
-/*	private void add(TestChangesLoader loader, Collection<ElkAxiom> axiomList) {
-		for (ElkAxiom axiom : axiomList) {
-			loader.add(axiom);
-		}
-	}
-
-	private void remove(TestChangesLoader loader, Collection<ElkAxiom> axiomList) {
-		for (ElkAxiom axiom : axiomList) {
-			loader.remove(axiom);
-		}
-	}*/
-
-	protected abstract void applyChanges(Reasoner reasoner, Iterable<T> changes, CHANGE type);
 
 	protected void randomFlip(OnOffVector<T> axioms, Random rnd, double fraction) {
 		Collections.shuffle(axioms, rnd);
@@ -201,36 +163,13 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 		}
 	}
 
-	protected boolean filterAxiom(ElkAxiom axiom) {
-		return !(axiom instanceof ElkClassAxiom);
-	}
-
+	protected abstract void applyChanges(Reasoner reasoner, Iterable<T> changes, CHANGE type);	
+	
 	protected abstract void dumpChangeToLog(T change);
 	
 	protected abstract void loadAxioms(InputStream stream, List<T> staticAxioms, OnOffVector<T> changingAxioms) throws IOException, Owl2ParseException;
 	
 	protected abstract Reasoner getReasoner(Iterable<T> axioms);
-	
-	/*protected OnOffVector<T> loadAxioms(InputStream stream) throws IOException,
-			Owl2ParseException {
-		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
-				.getParser(stream);
-		final List<ElkAxiom> axioms = new ArrayList<ElkAxiom>();
-
-		parser.accept(new Owl2ParserAxiomProcessor() {
-
-			@Override
-			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
-			}
-
-			@Override
-			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-				axioms.add(elkAxiom);
-			}
-		});
-
-		return axioms;
-	}*/
 
 	protected abstract void correctnessCheck(Reasoner standardReasoner,
 			Reasoner incrementalReasoner, long seed) throws ElkException;

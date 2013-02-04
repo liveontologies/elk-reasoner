@@ -92,11 +92,17 @@ class ClassTaxonomyCleaningFactory implements
 					return;
 				}
 				
-				if (taxonomy.getBottomNode().getMembers()
-						.remove(elkClass)) {
-					writer.markClassesForModifiedNode(taxonomy.getBottomNode());
-					writer.markClassForModifiedNode(elkClass);
-					return;
+				/*
+				 * shouldn't modify the set of members and iterate over them (to
+				 * mark as modified) at the same time
+				 */
+				synchronized (taxonomy.getBottomNode()) {
+					if (taxonomy.getBottomNode().getMembers().remove(elkClass)) {
+						writer.markClassesForModifiedNode(taxonomy
+								.getBottomNode());
+						writer.markClassForModifiedNode(elkClass);
+						return;
+					}
 				}
 
 				UpdateableTaxonomyNode<ElkClass> node = taxonomy

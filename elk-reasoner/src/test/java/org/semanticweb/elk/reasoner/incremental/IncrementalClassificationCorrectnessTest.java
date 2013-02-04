@@ -43,7 +43,7 @@ import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
@@ -181,11 +181,11 @@ public class IncrementalClassificationCorrectnessTest
 
 			@Override
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-				if (elkAxiom instanceof ElkPropertyAxiom<?>) {
-					staticAxioms.add(elkAxiom);
+				if (elkAxiom instanceof ElkClassAxiom) {
+					changingAxioms.add(elkAxiom);
 				}
 				else {
-					changingAxioms.add(elkAxiom);
+					staticAxioms.add(elkAxiom);
 				}
 			}
 		});
