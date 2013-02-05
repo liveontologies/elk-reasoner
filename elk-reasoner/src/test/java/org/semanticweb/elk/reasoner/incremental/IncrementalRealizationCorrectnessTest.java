@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.owl.interfaces.ElkAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -51,10 +52,10 @@ import org.semanticweb.elk.testing.PolySuite;
  *         pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
-public class IncrementalClassificationCorrectnessTest extends
-		BaseIncrementalClassificationCorrectnessTest<ElkAxiom> {
+public class IncrementalRealizationCorrectnessTest extends
+		BaseIncrementalRealizationCorrectnessTest<ElkAxiom> {
 
-	public IncrementalClassificationCorrectnessTest(
+	public IncrementalRealizationCorrectnessTest(
 			ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
@@ -88,7 +89,7 @@ public class IncrementalClassificationCorrectnessTest extends
 
 			@Override
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-				if (elkAxiom instanceof ElkClassAxiom) {
+				if (elkAxiom instanceof ElkClassAxiom || elkAxiom instanceof ElkAssertionAxiom) {
 					changingAxioms.add(elkAxiom);
 				}
 				else {

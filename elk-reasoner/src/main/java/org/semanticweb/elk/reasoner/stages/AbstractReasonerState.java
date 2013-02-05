@@ -475,7 +475,7 @@ public abstract class AbstractReasonerState {
 		return result;
 	}
 	
-	public Taxonomy<ElkClass> getInstanceTaxonomyQuietly() {
+	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly() {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> result = null;
 
 		try {

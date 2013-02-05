@@ -45,7 +45,8 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
-import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalClassificationCorrectnessTest;
+import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalClassificationRunner;
+import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO;
 import org.semanticweb.elk.reasoner.incremental.TrackingOntologyLoader;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 
@@ -119,8 +120,8 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 		long seed = System.currentTimeMillis();
 
 		try {
-			new RandomWalkIncrementalClassificationCorrectnessTest.BasicRandomWalkRunner(
-					ROUNDS, ITERATIONS).run(reasoner_, changingAxioms_,
+			new RandomWalkIncrementalClassificationRunner<ElkAxiom>(
+					ROUNDS, ITERATIONS, new RandomWalkRunnerIO.ElkAPIBasedIO()).run(reasoner_, changingAxioms_,
 					staticAxioms_, seed);
 		} catch (Exception e) {
 			throw new TaskException(e);
