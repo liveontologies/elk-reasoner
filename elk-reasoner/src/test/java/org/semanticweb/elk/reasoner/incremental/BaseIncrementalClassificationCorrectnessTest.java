@@ -82,12 +82,7 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("======= Computing Incremental Taxonomy =======");
 
-		Taxonomy<ElkClass> incremental;
-		try {
-			incremental = incrementalReasoner.getTaxonomyQuietly();
-		} catch (Exception e) {
-			throw new RuntimeException("Seed: " + seed, e);
-		}
+		Taxonomy<ElkClass> incremental = incrementalReasoner.getTaxonomyQuietly();
 
 		try {
 			assertEquals("Seed " + seed, TaxonomyHasher.hash(expected),
