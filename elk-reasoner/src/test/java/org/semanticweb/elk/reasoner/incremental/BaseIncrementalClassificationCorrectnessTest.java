@@ -52,6 +52,9 @@ import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
+ * Implements the correctness check based on comparing expected and obtained
+ * class taxonomies. Subclasses still need to provide methods to load changes
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
@@ -103,9 +106,7 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 			}
 		}
 	}
-	
-	
-	
+
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {

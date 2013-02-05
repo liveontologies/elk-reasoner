@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -34,15 +35,20 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
+ * Loads sets of added and removed axioms in the reasoner. Can do so in the
+ * forward way, i.e., added axioms are added and removed are removed, or the
+ * reverse way to undo the changes
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class IncrementalChangeLoader implements ChangesLoader {
 
-	public enum DIRECTION {FORWARD, BACKWARD};
-	
+	public enum DIRECTION {
+		FORWARD, BACKWARD
+	};
+
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalChangeLoader.class);
 
@@ -58,7 +64,8 @@ public class IncrementalChangeLoader implements ChangesLoader {
 
 	private final DIRECTION dir_;
 
-	public IncrementalChangeLoader(IncrementalChange<ElkAxiom> change, DIRECTION dir) {
+	public IncrementalChangeLoader(IncrementalChange<ElkAxiom> change,
+			DIRECTION dir) {
 		this.change_ = change;
 		this.dir_ = dir;
 	}
@@ -81,7 +88,7 @@ public class IncrementalChangeLoader implements ChangesLoader {
 					if (Thread.currentThread().isInterrupted())
 						break;
 					ElkAxiom axiom = deletions_.next();
-					
+
 					switch (dir_) {
 					case FORWARD:
 						delete(axiom);
@@ -94,7 +101,7 @@ public class IncrementalChangeLoader implements ChangesLoader {
 					if (Thread.currentThread().isInterrupted())
 						break;
 					ElkAxiom axiom = additions_.next();
-					
+
 					switch (dir_) {
 					case FORWARD:
 						add(axiom);
@@ -104,20 +111,20 @@ public class IncrementalChangeLoader implements ChangesLoader {
 					}
 				}
 			}
-			
+
 			private void add(ElkAxiom axiom) {
 				axiomInserter.visit(axiom);
-				
+
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace("adding: "
 							+ OwlFunctionalStylePrinter.toString(axiom));
 				if (listener_ != null)
 					listener_.notify(new SimpleElkAxiomChange(axiom, 1));
 			}
-			
+
 			private void delete(ElkAxiom axiom) {
 				axiomDeleter.visit(axiom);
-				
+
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace("deleting: "
 							+ OwlFunctionalStylePrinter.toString(axiom));

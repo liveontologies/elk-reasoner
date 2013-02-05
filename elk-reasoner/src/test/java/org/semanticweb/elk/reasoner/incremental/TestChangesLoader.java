@@ -38,6 +38,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
+ * A simple {@link ChangesLoader} which internally keeps sets of axioms to be
+ * added or removed
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
