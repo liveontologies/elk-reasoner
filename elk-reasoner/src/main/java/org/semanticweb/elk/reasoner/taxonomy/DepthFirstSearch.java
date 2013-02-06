@@ -25,16 +25,15 @@ package org.semanticweb.elk.reasoner.taxonomy;
  */
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
-import org.semanticweb.elk.util.collections.ArraySet;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
- * Implementation of the depth-first search
+ * A simple implementation of the depth-first search
  * 
  * @author Pavel Klinov
  * 
@@ -61,29 +60,28 @@ public class DepthFirstSearch<T extends ElkObject> {
 
 	public void run(TaxonomyNode<T> start, Direction dir,
 			TaxonomyNodeVisitor<T> visitor) {
-		List<TaxonomyNode<T>> path = new ArraySet<TaxonomyNode<T>>();
-		Set<TaxonomyNode<T>> pathSet = new HashSet<TaxonomyNode<T>>();
+		LinkedList<TaxonomyNode<T>> path = new LinkedList<TaxonomyNode<T>>();
+		Set<TaxonomyNode<T>> pathSet = new ArrayHashSet<TaxonomyNode<T>>();
 
 		run(start, dir, visitor, path, pathSet);
 	}
 
 	private void run(TaxonomyNode<T> node, Direction dir,
-			TaxonomyNodeVisitor<T> visitor, List<TaxonomyNode<T>> path,
+			TaxonomyNodeVisitor<T> visitor, LinkedList<TaxonomyNode<T>> path,
 			Set<TaxonomyNode<T>> pathSet) {
 		visitor.visit(node, path);
 
-		if (pathSet.contains(node)) {
+		if (!pathSet.add(node)) {
 			return;
 		}
 		
-		path.add(node);
-		pathSet.add(node);		
+		path.add(node);	
 		// now go depth-first
 		for (TaxonomyNode<T> subNode : getSuccessors(node, dir)) {
 			run(subNode, dir, visitor, path, pathSet);
 		}
 		
-		path.remove(path.size() - 1);
+		path.removeLast(/*path.size() - 1*/);
 		pathSet.remove(node);		
 	}
 
