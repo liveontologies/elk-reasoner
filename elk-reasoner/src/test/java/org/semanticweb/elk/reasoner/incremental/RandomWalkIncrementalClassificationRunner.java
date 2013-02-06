@@ -221,9 +221,9 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	}
 
 	private void printCurrentAxioms(Iterable<T> axioms) {
-		if (LOGGER_.isInfoEnabled()) {
+		if (LOGGER_.isDebugEnabled()) {
 			for (T axiom : axioms) {
-				io_.printAxiom(axiom, LOGGER_, Level.INFO);
+				io_.printAxiom(axiom, LOGGER_, Level.DEBUG);
 			}
 		}
 	}
