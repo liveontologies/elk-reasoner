@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.stages;
  */
 
 import java.util.AbstractCollection;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -53,8 +52,9 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	private ClassTaxonomyCleaning cleaning_ = null;
 
-	public IncrementalTaxonomyCleaningStage(ReasonerStageManager manager) {
-		super(manager);
+	public IncrementalTaxonomyCleaningStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -66,11 +66,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	public boolean done() {
 		return reasoner.incrementalState
 				.getStageStatus(IncrementalStages.TAXONOMY_CLEANING);
-	}
-
-	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays.asList(manager.incrementalConsistencyCheckingStage);
 	}
 
 	@Override

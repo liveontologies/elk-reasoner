@@ -69,8 +69,8 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	private SaturationState.ExtendedWriter writer_;
 
 	public AbstractIncrementalContextInitializationStage(
-			ReasonerStageManager manager) {
-		super(manager);
+			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override

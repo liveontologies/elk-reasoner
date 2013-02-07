@@ -22,8 +22,6 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Collections;
-
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 
 /**
@@ -35,8 +33,9 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 class InitializeContextsAfterDeletionsStage extends
 		AbstractIncrementalContextInitializationStage {
 
-	public InitializeContextsAfterDeletionsStage(ReasonerStageManager manager) {
-		super(manager);
+	public InitializeContextsAfterDeletionsStage(
+			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -72,9 +71,4 @@ class InitializeContextsAfterDeletionsStage extends
 		return true;
 	}
 
-	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Collections
-				.<ReasonerStage> singleton(manager.incrementalDeletionStage);
-	}
 }

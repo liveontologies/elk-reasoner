@@ -55,8 +55,9 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 	private final double RATIO_ = 0.2;
 
-	public RandomContextResaturationStage(ReasonerStageManager manager) {
-		super(manager);
+	public RandomContextResaturationStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -153,7 +154,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public Iterable<ReasonerStage> getDependencies() {
+	public Iterable<ReasonerStage> getPreStages() {
 		return Collections.emptyList();
 	}
 

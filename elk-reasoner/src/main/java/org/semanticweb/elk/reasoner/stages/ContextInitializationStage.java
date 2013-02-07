@@ -58,8 +58,9 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	 */
 	private Iterator<IndexedClassExpression> todo_ = null;
 
-	public ContextInitializationStage(ReasonerStageManager manager) {
-		super(manager);
+	public ContextInitializationStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -73,7 +74,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public List<ReasonerStage> getDependencies() {
+	public List<ReasonerStage> getPreStages() {
 		return Collections.emptyList();
 	}
 

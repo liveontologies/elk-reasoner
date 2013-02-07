@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,53 +24,94 @@ package org.semanticweb.elk.reasoner.stages;
 
 public class ReasonerStageManager {
 
-	final AbstractReasonerState reasoner;
-
-	final ReasonerStage changesLoadingStage;
-	final ReasonerStage classSaturationStage;
-	final ReasonerStage classTaxonomyComputationStage;
-	final ReasonerStage consistencyCheckingStage;
-	final ReasonerStage contextInitializationStage;
-	final ReasonerStage incrementalAdditionStage;
-	final ReasonerStage incrementalAdditionInitializationStage;
-	final ReasonerStage incrementalCompletionStage;
-	final ReasonerStage incrementalClassTaxonomyComputationStage;
-	final ReasonerStage incrementalConsistencyCheckingStage;
-	final ReasonerStage incrementalContextCleaningStage;
-	final ReasonerStage incrementalDeletionStage;
-	final ReasonerStage incrementalDeletionInitializationStage;
-	final ReasonerStage incrementalTaxonomyCleaningStage;
-	final ReasonerStage initializeContextsAfterDeletionsStage;
-	final ReasonerStage initializeContextsAfterCleaningStage;
-	final ReasonerStage instanceTaxonomyComputationStage;
-	final ReasonerStage ontologyLoadingStage;
-	final ReasonerStage propertyHierarchyCompositionComputationStage;
-	final ReasonerStage propertyInitializationStage;
-	final ReasonerStage propertyReflexivityComputationStage;
+	final AbstractReasonerStage ontologyLoadingStage, changesLoadingStage,
+			propertyInitializationStage, propertyReflexivityComputationStage,
+			propertyHierarchyCompositionComputationStage,
+			contextInitializationStage, consistencyCheckingStage,
+			classSaturationStage, classTaxonomyComputationStage,
+			incrementalCompletionStage, incrementalDeletionInitializationStage,
+			incrementalDeletionStage, initializeContextsAfterDeletionsStage,
+			incrementalContextCleaningStage,
+			initializeContextsAfterCleaningStage,
+			incrementalAdditionInitializationStage, incrementalAdditionStage,
+			incrementalConsistencyCheckingStage,
+			incrementalTaxonomyCleaningStage,
+			incrementalClassTaxonomyComputationStage,
+			instanceTaxonomyComputationStage;
 
 	ReasonerStageManager(AbstractReasonerState reasoner) {
-		this.reasoner = reasoner;
 
-		this.changesLoadingStage = new ChangesLoadingStage(this);
-		this.classSaturationStage = new ClassSaturationStage(this);
-		this.classTaxonomyComputationStage = new ClassTaxonomyComputationStage(this);
-		this.consistencyCheckingStage = new ConsistencyCheckingStage(this);
-		this.contextInitializationStage = new ContextInitializationStage(this);
-		this.incrementalAdditionStage = new IncrementalAdditionStage(this);
-		this.incrementalAdditionInitializationStage = new IncrementalAdditionInitializationStage(this);
-		this.incrementalCompletionStage = new IncrementalCompletionStage(this);
-		this.incrementalClassTaxonomyComputationStage = new IncrementalClassTaxonomyComputationStage(this);
-		this.incrementalConsistencyCheckingStage = new IncrementalConsistencyCheckingStage(this);
-		this.incrementalContextCleaningStage = new IncrementalContextCleaningStage(this);
-		this.incrementalDeletionStage = new IncrementalDeletionStage(this);
-		this.incrementalDeletionInitializationStage = new IncrementalDeletionInitializationStage(this);
-		this.incrementalTaxonomyCleaningStage = new IncrementalTaxonomyCleaningStage(this);
-		this.initializeContextsAfterDeletionsStage = new InitializeContextsAfterDeletionsStage(this);
-		this.initializeContextsAfterCleaningStage = new InitializeContextsAfterCleaningStage(this);
-		this.instanceTaxonomyComputationStage = new InstanceTaxonomyComputationStage(this);
-		this.ontologyLoadingStage = new OntologyLoadingStage(this);
-		this.propertyHierarchyCompositionComputationStage = new PropertyHierarchyCompositionComputationStage(this);
-		this.propertyInitializationStage = new PropertyInitializationStage(this);
-		this.propertyReflexivityComputationStage = new PropertyReflexivityComputationStage(this);
+		// Java will not allow to define stages with cyclic dependencies
+
+		/* Non-Incremental stages */
+
+		this.ontologyLoadingStage = new OntologyLoadingStage(reasoner);
+
+		this.changesLoadingStage = new ChangesLoadingStage(reasoner,
+				ontologyLoadingStage);
+
+		this.propertyInitializationStage = new PropertyInitializationStage(
+				reasoner);
+
+		this.propertyReflexivityComputationStage = new PropertyReflexivityComputationStage(
+				reasoner, ontologyLoadingStage, changesLoadingStage,
+				propertyInitializationStage);
+
+		this.propertyHierarchyCompositionComputationStage = new PropertyHierarchyCompositionComputationStage(
+				reasoner, propertyReflexivityComputationStage);
+
+		this.contextInitializationStage = new ContextInitializationStage(
+				reasoner);
+
+		this.consistencyCheckingStage = new ConsistencyCheckingStage(reasoner,
+				propertyHierarchyCompositionComputationStage,
+				contextInitializationStage, ontologyLoadingStage,
+				changesLoadingStage);
+
+		this.classSaturationStage = new ClassSaturationStage(reasoner,
+				consistencyCheckingStage);
+
+		this.classTaxonomyComputationStage = new ClassTaxonomyComputationStage(
+				reasoner, consistencyCheckingStage);
+
+		/* Incremental stages */
+
+		this.incrementalCompletionStage = new IncrementalCompletionStage(
+				reasoner, propertyHierarchyCompositionComputationStage,
+				changesLoadingStage);
+
+		this.incrementalDeletionInitializationStage = new IncrementalDeletionInitializationStage(
+				reasoner, incrementalCompletionStage);
+
+		this.incrementalDeletionStage = new IncrementalDeletionStage(reasoner,
+				incrementalDeletionInitializationStage);
+
+		this.initializeContextsAfterDeletionsStage = new InitializeContextsAfterDeletionsStage(
+				reasoner, incrementalDeletionStage);
+
+		this.incrementalContextCleaningStage = new IncrementalContextCleaningStage(
+				reasoner, initializeContextsAfterDeletionsStage);
+
+		this.initializeContextsAfterCleaningStage = new InitializeContextsAfterCleaningStage(
+				reasoner, incrementalContextCleaningStage);
+
+		this.incrementalAdditionInitializationStage = new IncrementalAdditionInitializationStage(
+				reasoner, initializeContextsAfterCleaningStage);
+
+		this.incrementalAdditionStage = new IncrementalAdditionStage(reasoner,
+				incrementalAdditionInitializationStage);
+
+		this.incrementalConsistencyCheckingStage = new IncrementalConsistencyCheckingStage(
+				reasoner, incrementalAdditionStage);
+
+		this.incrementalTaxonomyCleaningStage = new IncrementalTaxonomyCleaningStage(
+				reasoner, incrementalConsistencyCheckingStage);
+
+		this.incrementalClassTaxonomyComputationStage = new IncrementalClassTaxonomyComputationStage(
+				reasoner, incrementalTaxonomyCleaningStage);
+
+		this.instanceTaxonomyComputationStage = new InstanceTaxonomyComputationStage(
+				reasoner, classTaxonomyComputationStage);
+
 	}
 }

@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
@@ -47,8 +44,9 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	 */
 	protected ClassTaxonomyComputation computation_ = null;
 
-	public ClassTaxonomyComputationStage(ReasonerStageManager manager) {
-		super(manager);
+	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -59,11 +57,6 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	@Override
 	public boolean done() {
 		return reasoner.doneClassTaxonomy;
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(manager.consistencyCheckingStage);
 	}
 
 	@Override

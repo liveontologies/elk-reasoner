@@ -22,8 +22,6 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Arrays;
-
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputation;
 
@@ -36,8 +34,8 @@ public class PropertyHierarchyCompositionComputationStage extends
 	private PropertyHierarchyCompositionComputation computation_ = null;
 
 	public PropertyHierarchyCompositionComputationStage(
-			ReasonerStageManager manager) {
-		super(manager);
+			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -48,11 +46,6 @@ public class PropertyHierarchyCompositionComputationStage extends
 	@Override
 	public boolean done() {
 		return reasoner.donePropertyHierarchyCompositionComputation;
-	}
-
-	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays.asList(manager.propertyReflexivityComputationStage);
 	}
 
 	@Override

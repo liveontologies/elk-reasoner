@@ -47,14 +47,9 @@ import org.semanticweb.elk.util.collections.Operations;
 class IncrementalAdditionInitializationStage extends
 		AbstractIncrementalChangesInitializationStage {
 
-	public IncrementalAdditionInitializationStage(ReasonerStageManager manager) {
-		super(manager);
-	}
-
-	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Collections
-				.<ReasonerStage> singleton(manager.initializeContextsAfterCleaningStage);
+	public IncrementalAdditionInitializationStage(
+			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override

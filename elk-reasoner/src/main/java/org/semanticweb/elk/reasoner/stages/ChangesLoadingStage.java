@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -43,8 +41,9 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 
 	private Loader changesLoader_;
 
-	public ChangesLoadingStage(ReasonerStageManager manager) {
-		super(manager);
+	public ChangesLoadingStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -55,11 +54,6 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	@Override
 	public boolean done() {
 		return reasoner.doneChangeLoading;
-	}
-
-	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays.asList(manager.ontologyLoadingStage);
 	}
 
 	boolean preExecute() {

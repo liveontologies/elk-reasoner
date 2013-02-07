@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
@@ -46,8 +43,9 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	 */
 	protected ConsistencyChecking computation_ = null;
 
-	public ConsistencyCheckingStage(ReasonerStageManager manager) {
-		super(manager);
+	public ConsistencyCheckingStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -58,14 +56,6 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	@Override
 	public boolean done() {
 		return reasoner.doneConsistencyCheck;
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(
-				manager.propertyHierarchyCompositionComputationStage,
-				manager.contextInitializationStage,
-				manager.ontologyLoadingStage, manager.changesLoadingStage);
 	}
 
 	@Override

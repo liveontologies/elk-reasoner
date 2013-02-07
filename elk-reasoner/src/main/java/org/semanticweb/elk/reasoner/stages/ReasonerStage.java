@@ -51,7 +51,7 @@ public interface ReasonerStage {
 	 * @return the list of stages that are required to be executed before
 	 *         executing this stage; the order of the execution does not matter
 	 */
-	public Iterable<ReasonerStage> getDependencies();
+	public Iterable<? extends ReasonerStage> getPreStages();
 
 	/**
 	 * Performs the execution of this stage; in order to ensure correctness of

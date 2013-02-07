@@ -22,8 +22,6 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Arrays;
-
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.properties.ReflexivePropertyComputation;
 
@@ -34,8 +32,9 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 	 */
 	private ReflexivePropertyComputation computation_ = null;
 
-	public PropertyReflexivityComputationStage(ReasonerStageManager manager) {
-		super(manager);
+	public PropertyReflexivityComputationStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -46,13 +45,6 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 	@Override
 	public boolean done() {
 		return reasoner.donePropertyReflexivityComputation;
-	}
-
-	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays.asList(manager.ontologyLoadingStage,
-				manager.changesLoadingStage,
-				manager.propertyInitializationStage);
 	}
 
 	@Override

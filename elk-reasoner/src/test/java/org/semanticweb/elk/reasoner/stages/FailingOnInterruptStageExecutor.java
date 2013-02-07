@@ -39,7 +39,7 @@ public class FailingOnInterruptStageExecutor extends FailingInterrupter implemen
 	@Override
 	public void complete(ReasonerStage stage) throws ElkException {
 		if (!stage.done()) {
-			for (ReasonerStage dependentStage : stage.getDependencies()) {
+			for (ReasonerStage dependentStage : stage.getPreStages()) {
 				complete(dependentStage);
 			}
 			stage.execute();

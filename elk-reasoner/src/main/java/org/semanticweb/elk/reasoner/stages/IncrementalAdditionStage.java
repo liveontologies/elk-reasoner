@@ -25,9 +25,6 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -44,8 +41,9 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 
 	private ClassExpressionNoInputSaturation saturation_ = null;
 
-	public IncrementalAdditionStage(ReasonerStageManager manager) {
-		super(manager);
+	public IncrementalAdditionStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -57,11 +55,6 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 	public boolean done() {
 		return reasoner.incrementalState
 				.getStageStatus(IncrementalStages.ADDITION);
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(manager.incrementalAdditionInitializationStage);
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public class RestartingTestStageExecutor extends SimpleInterrupter implements
 	public void complete(ReasonerStage stage) throws ElkException {
 		if (!stage.done()) {
 
-			for (ReasonerStage dependentStage : stage.getDependencies()) {
+			for (ReasonerStage dependentStage : stage.getPreStages()) {
 				complete(dependentStage);
 			}
 			registerCurrentThreadToInterrupt();

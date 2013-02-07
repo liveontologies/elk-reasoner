@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
 /**
@@ -36,20 +33,14 @@ import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
  */
 class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 
-	public IncrementalConsistencyCheckingStage(ReasonerStageManager manager) {
-		super(manager);
+	public IncrementalConsistencyCheckingStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
 	public String getName() {
 		return "Incremental Consistency Checking";
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		// TODO: what will happen with the taxonomy? Will it be correctly
-		// updated after several (incremental) consistency tests?
-		return Arrays.asList(manager.incrementalAdditionStage);
 	}
 
 	@Override

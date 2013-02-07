@@ -57,8 +57,8 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 	protected final SaturationStatistics stageStatistics_ = new SaturationStatistics();
 
 	public AbstractIncrementalChangesInitializationStage(
-			ReasonerStageManager manager) {
-		super(manager);
+			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	protected abstract IncrementalStages stage();

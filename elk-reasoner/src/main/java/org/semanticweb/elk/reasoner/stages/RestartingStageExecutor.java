@@ -46,7 +46,7 @@ public class RestartingStageExecutor extends SimpleInterrupter implements
 	public void complete(ReasonerStage stage) throws ElkException {
 		if (!stage.done()) {
 			LOGGER_.debug(stage.getName() + " stage:");
-			for (ReasonerStage dependentStage : stage.getDependencies()) {
+			for (ReasonerStage dependentStage : stage.getPreStages()) {
 				complete(dependentStage);
 			}
 			Statistics.logOperationStart(stage.getName(), LOGGER_);

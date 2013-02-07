@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
@@ -45,8 +42,9 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 
 	private ClassExpressionNoInputSaturation desaturation_ = null;
 
-	public IncrementalDeletionStage(ReasonerStageManager manager) {
-		super(manager);
+	public IncrementalDeletionStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -58,11 +56,6 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 	public boolean done() {
 		return reasoner.incrementalState
 				.getStageStatus(IncrementalStages.DELETION);
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(manager.incrementalDeletionInitializationStage);
 	}
 
 	@Override

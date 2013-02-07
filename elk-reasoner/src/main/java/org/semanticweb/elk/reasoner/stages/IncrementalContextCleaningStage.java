@@ -25,9 +25,6 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Collections;
-import java.util.List;
-
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -47,8 +44,9 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 	private ClassExpressionNoInputSaturation cleaning_ = null;
 
-	public IncrementalContextCleaningStage(ReasonerStageManager manager) {
-		super(manager);
+	public IncrementalContextCleaningStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -60,12 +58,6 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	public boolean done() {
 		return reasoner.incrementalState
 				.getStageStatus(IncrementalStages.CONTEXT_CLEANING);
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Collections
-				.<ReasonerStage> singletonList(manager.initializeContextsAfterDeletionsStage);
 	}
 
 	@Override

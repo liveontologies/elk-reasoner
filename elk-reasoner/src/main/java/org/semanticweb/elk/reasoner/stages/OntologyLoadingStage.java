@@ -37,15 +37,16 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
  */
 public class OntologyLoadingStage extends AbstractReasonerStage {
 
+	public OntologyLoadingStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
+	}
+
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(OntologyLoadingStage.class);
 
 	private Loader ontologyLoader_;
-
-	public OntologyLoadingStage(ReasonerStageManager manager) {
-		super(manager);
-	}
 
 	@Override
 	public String getName() {
@@ -58,7 +59,7 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public Iterable<ReasonerStage> getDependencies() {
+	public Iterable<ReasonerStage> getPreStages() {
 		return Collections.emptyList();
 	}
 

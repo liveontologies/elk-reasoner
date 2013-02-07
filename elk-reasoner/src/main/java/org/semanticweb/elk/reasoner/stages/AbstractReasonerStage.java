@@ -22,6 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -40,7 +44,6 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(AbstractReasonerStage.class);
 
-	final ReasonerStageManager manager;
 	final AbstractReasonerState reasoner;
 
 	/**
@@ -60,14 +63,32 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	ProgressMonitor progressMonitor;
 
 	/**
+	 * Stages that need to be executed before this stage
+	 */
+	final Iterable<? extends ReasonerStage> preStages;
+
+	/**
+	 * Stages that need to be executed after this stage
+	 */
+	final List<ReasonerStage> postStages = new LinkedList<ReasonerStage>();
+
+	/**
 	 * Creates a new reasoner stage for a given reasoner.
 	 * 
 	 * @param reasoner
 	 *            the reasoner for which the reasoner stage is created
 	 */
-	public AbstractReasonerStage(ReasonerStageManager manager) {
-		this.manager = manager;
-		this.reasoner = manager.reasoner;
+	public AbstractReasonerStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		this.reasoner = reasoner;
+		this.preStages = Arrays.asList(preStages);
+		for (AbstractReasonerStage preStage : preStages)
+			preStage.postStages.add(this);
+	}
+
+	@Override
+	public Iterable<? extends ReasonerStage> getPreStages() {
+		return preStages;
 	}
 
 	@Override

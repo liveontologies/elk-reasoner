@@ -22,9 +22,7 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -63,8 +61,9 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	 */
 	private Iterator<IndexedPropertyChain> todo_ = null;
 
-	public PropertyInitializationStage(ReasonerStageManager manager) {
-		super(manager);
+	public PropertyInitializationStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -75,11 +74,6 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	@Override
 	public boolean done() {
 		return reasoner.donePropertySaturationReset;
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Collections.emptyList();
 	}
 
 	@Override

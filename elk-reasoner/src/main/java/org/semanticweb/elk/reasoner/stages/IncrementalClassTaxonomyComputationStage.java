@@ -26,10 +26,8 @@ package org.semanticweb.elk.reasoner.stages;
  */
 
 import java.util.AbstractSet;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -50,18 +48,14 @@ class IncrementalClassTaxonomyComputationStage extends
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalClassTaxonomyComputationStage.class);
 
-	public IncrementalClassTaxonomyComputationStage(ReasonerStageManager manager) {
-		super(manager);
+	public IncrementalClassTaxonomyComputationStage(
+			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
 	public String getName() {
 		return IncrementalStages.TAXONOMY_CONSTRUCTION.toString();
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(manager.incrementalTaxonomyCleaningStage);
 	}
 
 	@Override

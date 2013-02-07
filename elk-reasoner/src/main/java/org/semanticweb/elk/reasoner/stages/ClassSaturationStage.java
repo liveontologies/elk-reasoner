@@ -22,9 +22,6 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
@@ -46,8 +43,9 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	 */
 	private ClassExpressionSaturation<IndexedClass> computation_ = null;
 
-	public ClassSaturationStage(ReasonerStageManager manager) {
-		super(manager);
+	public ClassSaturationStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -58,11 +56,6 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	@Override
 	public boolean done() {
 		return reasoner.doneClassSaturation;
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList(manager.consistencyCheckingStage);
 	}
 
 	@Override
