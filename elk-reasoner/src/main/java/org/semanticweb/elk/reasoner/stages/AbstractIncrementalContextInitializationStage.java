@@ -66,6 +66,8 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	 */
 	protected Iterator<IndexedClassExpression> todo = null;
 
+	private SaturationState.ExtendedWriter writer_;
+
 	public AbstractIncrementalContextInitializationStage(
 			ReasonerStageManager manager) {
 		super(manager);
@@ -90,38 +92,43 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	}
 
 	@Override
-	public void executeStage() throws ElkInterruptedException {
-
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		final ConclusionVisitor<?> visitor = getConclusionVisitor(stageStatistics_
 				.getConclusionStatistics());
-		final SaturationState.ExtendedWriter writer = reasoner.saturationState
-				.getExtendedWriter(visitor);
+		this.writer_ = reasoner.saturationState.getExtendedWriter(visitor);
+		return true;
+	}
 
-		try {
-			progressMonitor.start(getName());
-			for (;;) {
-				if (!todo.hasNext())
-					break;
-				IndexedClassExpression ice = todo.next();
+	@Override
+	public void executeStage() throws ElkInterruptedException {
+		for (;;) {
+			if (!todo.hasNext())
+				break;
+			IndexedClassExpression ice = todo.next();
 
-				if (ice.getContext() != null) {
-					writer.initContext(ice.getContext());
-				}
-
-				initContexts++;
-				progressMonitor.report(initContexts, maxContexts);
-
-				if (interrupted()) {
-					continue;
-				}
+			if (ice.getContext() != null) {
+				writer_.initContext(ice.getContext());
 			}
-		} finally {
-			progressMonitor.finish();
-		}
 
+			initContexts++;
+			progressMonitor.report(initContexts, maxContexts);
+
+			if (spuriousInterrupt()) {
+				continue;
+			}
+		}
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
 		reasoner.doneContextReset = true;
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
-		todo = null;
+		this.writer_ = null;
+		return true;
 	}
 
 	@Override

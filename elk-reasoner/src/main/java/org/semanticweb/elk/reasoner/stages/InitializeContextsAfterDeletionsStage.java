@@ -60,7 +60,6 @@ class InitializeContextsAfterDeletionsStage extends
 				.iterator();
 		this.maxContexts = reasoner.saturationState.getNotSaturatedContexts()
 				.size();
-
 		this.initContexts = 0;
 		return true;
 	}
@@ -70,8 +69,6 @@ class InitializeContextsAfterDeletionsStage extends
 		if (!super.postExecute())
 			return false;
 		this.todo = null;
-		this.maxContexts = 0;
-		this.initContexts = 0;
 		return true;
 	}
 

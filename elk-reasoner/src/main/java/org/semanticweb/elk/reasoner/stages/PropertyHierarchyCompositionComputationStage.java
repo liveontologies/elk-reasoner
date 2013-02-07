@@ -67,23 +67,18 @@ public class PropertyHierarchyCompositionComputationStage extends
 
 	@Override
 	public void executeStage() throws ElkException {
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
+		for (;;) {
+			computation_.process();
+			if (!spuriousInterrupt())
+				break;
 		}
-		reasoner.donePropertyHierarchyCompositionComputation = true;
 	}
 
 	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.donePropertyHierarchyCompositionComputation = true;
 		computation_ = null;
 		return true;
 	}

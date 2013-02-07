@@ -75,27 +75,26 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				initialization_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
+		for (;;) {
+			initialization_.process();
+			if (!spuriousInterrupt())
+				break;
 		}
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
 		/*
 		 * if this stage is completed successfully, the corresponding
 		 * incremental part of the index is not needed anymore. The subclasses
 		 * will commit it and clear it.
 		 */
-		postExecuteStage();
 		reasoner.incrementalState.setStageStatus(stage(), true);
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
+		return true;
 	}
-
-	protected abstract void postExecuteStage();
 
 	protected RuleApplicationVisitor getRuleApplicationVisitor(
 			RuleStatistics ruleStatistics) {

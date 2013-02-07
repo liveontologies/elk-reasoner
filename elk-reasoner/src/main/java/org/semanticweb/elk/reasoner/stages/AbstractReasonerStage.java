@@ -88,7 +88,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	 * @throws ElkInterruptedException
 	 *             if the reasoner was interrupted
 	 */
-	public boolean interrupted() throws ElkInterruptedException {
+	public boolean spuriousInterrupt() throws ElkInterruptedException {
 		boolean result = false;
 		if (Thread.interrupted())
 			result = true;
@@ -140,7 +140,16 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	@Override
 	public void execute() throws ElkException {
 		preExecute();
-		executeStage();
+		progressMonitor.start(getName());
+		try {
+			for (;;) {
+				executeStage();
+				if (!spuriousInterrupt())
+					break;
+			}
+		} finally {
+			progressMonitor.finish();
+		}
 		postExecute();
 	}
 

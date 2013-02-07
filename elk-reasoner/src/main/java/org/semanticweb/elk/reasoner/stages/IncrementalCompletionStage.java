@@ -76,19 +76,30 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
+		completion_ = new ClassExpressionNoInputSaturation(
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor(), new RuleApplicationFactory(
+						reasoner.saturationState),
+				ContextModificationListener.DUMMY);
+		return true;
+	}
+
+	@Override
 	public void executeStage() throws ElkException {
-		progressMonitor.start(getName());
-
-		try {
-			for (;;) {
-				completion_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
+		for (;;) {
+			completion_.process();
+			if (!spuriousInterrupt())
+				break;
 		}
+	}
 
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
 		reasoner.incrementalState.setStageStatus(IncrementalStages.COMPLETION,
 				true);
 		reasoner.ruleAndConclusionStats.add(completion_
@@ -106,24 +117,6 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 		writer.clearNotSaturatedContexts();
 		writer.clearContextsToBeRemoved();
-	}
-
-	@Override
-	boolean preExecute() {
-		if (!super.preExecute())
-			return false;
-		completion_ = new ClassExpressionNoInputSaturation(
-				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), new RuleApplicationFactory(
-						reasoner.saturationState),
-				ContextModificationListener.DUMMY);
-		return true;
-	}
-
-	@Override
-	boolean postExecute() {
-		if (!super.postExecute())
-			return false;
 		completion_ = null;
 		return true;
 	}

@@ -110,17 +110,14 @@ class IncrementalAdditionInitializationStage extends
 		return true;
 	}
 
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		this.initialization_ = null;
-		return true;
-	}
-
-	@Override
-	protected void postExecuteStage() {
 		reasoner.incrementalState.diffIndex.commitAddedRules();
 		reasoner.incrementalState.diffIndex.clearSignatureChanges();
+		return true;
 	}
 
 }

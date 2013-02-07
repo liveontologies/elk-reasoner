@@ -94,11 +94,6 @@ class IncrementalDeletionInitializationStage extends
 		if (!super.postExecute())
 			return false;
 		this.initialization_ = null;
-		return true;
-	}
-
-	@Override
-	protected void postExecuteStage() {
 		// initializing contexts which will be removed
 		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
 				.getConclusionStatistics());
@@ -122,6 +117,8 @@ class IncrementalDeletionInitializationStage extends
 		}
 
 		reasoner.incrementalState.diffIndex.clearDeletedRules();
+
+		return true;
 	}
 
 }

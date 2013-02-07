@@ -67,26 +67,6 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void executeStage() throws ElkInterruptedException {
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-
-		reasoner.classTaxonomyState.taxonomy = computation_.getTaxonomy();
-		reasoner.classTaxonomyState.classesForModifiedNodes.clear();
-		reasoner.doneClassTaxonomy = true;
-		reasoner.ruleAndConclusionStats.add(computation_
-				.getRuleAndConclusionStatistics());
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -100,9 +80,19 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
+	public void executeStage() throws ElkInterruptedException {
+		computation_.process();
+	}
+
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.classTaxonomyState.taxonomy = computation_.getTaxonomy();
+		reasoner.classTaxonomyState.classesForModifiedNodes.clear();
+		reasoner.doneClassTaxonomy = true;
+		reasoner.ruleAndConclusionStats.add(computation_
+				.getRuleAndConclusionStatistics());
 		this.computation_ = null;
 		return true;
 	}

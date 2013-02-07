@@ -74,33 +74,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void executeStage() throws ElkException {
-
-		if (reasoner.classTaxonomyState.taxonomy == null) {
-			// perhaps an inconsistency has been detected?
-			// exit
-			return;
-		}
-
-		progressMonitor.start(getName());
-
-		try {
-			for (;;) {
-				cleaning_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-		reasoner.incrementalState.setStageStatus(
-				IncrementalStages.TAXONOMY_CLEANING, true);
-		// at this point we're done with unsaturated contexts
-		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
-				.clearNotSaturatedContexts();
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -125,9 +98,29 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
+	public void executeStage() throws ElkException {
+
+		if (reasoner.classTaxonomyState.taxonomy == null) {
+			// perhaps an inconsistency has been detected?
+			// exit
+			return;
+		}
+		for (;;) {
+			cleaning_.process();
+			if (!spuriousInterrupt())
+				break;
+		}
+	}
+
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.incrementalState.setStageStatus(
+				IncrementalStages.TAXONOMY_CLEANING, true);
+		// at this point we're done with unsaturated contexts
+		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
+				.clearNotSaturatedContexts();
 		this.cleaning_ = null;
 		return true;
 	}

@@ -78,29 +78,6 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void executeStage() throws ElkInterruptedException {
-		if (todo_ == null)
-			preExecute();
-		try {
-			progressMonitor.start(getName());
-			for (;;) {
-				if (!todo_.hasNext())
-					break;
-				IndexedClassExpression ice = todo_.next();
-				ice.resetContext();
-				deletedContexts_++;
-				progressMonitor.report(deletedContexts_, maxContexts_);
-				if (interrupted())
-					continue;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-		reasoner.doneContextReset = true;
-		todo_ = null;
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -113,12 +90,25 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
+	public void executeStage() throws ElkInterruptedException {
+		for (;;) {
+			if (!todo_.hasNext())
+				break;
+			IndexedClassExpression ice = todo_.next();
+			ice.resetContext();
+			deletedContexts_++;
+			progressMonitor.report(deletedContexts_, maxContexts_);
+			if (spuriousInterrupt())
+				continue;
+		}
+	}
+
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.doneContextReset = true;
 		todo_ = null;
-		maxContexts_ = 0;
-		deletedContexts_ = 0;
 		return true;
 	}
 

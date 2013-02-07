@@ -65,12 +65,6 @@ class IncrementalClassTaxonomyComputationStage extends
 	}
 
 	@Override
-	public void executeStage() throws ElkInterruptedException {
-		super.executeStage();
-		reasoner.incrementalState.diffIndex.clearSignatureChanges();
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -168,6 +162,7 @@ class IncrementalClassTaxonomyComputationStage extends
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.incrementalState.diffIndex.clearSignatureChanges();
 		this.computation_ = null;
 		return true;
 	}

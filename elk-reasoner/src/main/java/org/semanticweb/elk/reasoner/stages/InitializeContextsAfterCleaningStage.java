@@ -67,8 +67,6 @@ class InitializeContextsAfterCleaningStage extends
 		if (!super.postExecute())
 			return false;
 		this.todo = null;
-		this.maxContexts = 0;
-		this.initContexts = 0;
 		return true;
 	}
 

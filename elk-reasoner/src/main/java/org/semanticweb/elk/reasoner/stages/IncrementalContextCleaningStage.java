@@ -69,26 +69,6 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void executeStage() throws ElkInterruptedException {
-		progressMonitor.start(getName());
-
-		try {
-			for (;;) {
-				cleaning_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-
-		reasoner.incrementalState.setStageStatus(
-				IncrementalStages.CONTEXT_CLEANING, true);
-		reasoner.ruleAndConclusionStats.add(cleaning_
-				.getRuleAndConclusionStatistics());
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -102,9 +82,22 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
+	public void executeStage() throws ElkInterruptedException {
+		for (;;) {
+			cleaning_.process();
+			if (!spuriousInterrupt())
+				break;
+		}
+	}
+
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.incrementalState.setStageStatus(
+				IncrementalStages.CONTEXT_CLEANING, true);
+		reasoner.ruleAndConclusionStats.add(cleaning_
+				.getRuleAndConclusionStatistics());
 		cleaning_ = null;
 		return true;
 	}

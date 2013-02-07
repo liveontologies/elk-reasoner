@@ -68,27 +68,6 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		return Arrays.asList(manager.classTaxonomyComputationStage);
 	}
 
-	@Override
-	public void executeStage() throws ElkInterruptedException {
-		if (computation_ == null)
-			preExecute();
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-
-		reasoner.instanceTaxonomy = computation_.getTaxonomy();
-		reasoner.classTaxonomyState.taxonomy = reasoner.instanceTaxonomy;
-		reasoner.doneInstanceTaxonomy = true;
-		computation_ = null;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	boolean preExecute() {
@@ -125,9 +104,21 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		return true;
 	}
 
+	@Override
+	public void executeStage() throws ElkInterruptedException {
+		for (;;) {
+			computation_.process();
+			if (!spuriousInterrupt())
+				break;
+		}
+	}
+
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.instanceTaxonomy = computation_.getTaxonomy();
+		reasoner.classTaxonomyState.taxonomy = reasoner.instanceTaxonomy;
+		reasoner.doneInstanceTaxonomy = true;
 		this.computation_ = null;
 		return true;
 	}

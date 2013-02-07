@@ -41,6 +41,8 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ChangesLoadingStage.class);
 
+	private Loader changesLoader_;
+
 	public ChangesLoadingStage(ReasonerStageManager manager) {
 		super(manager);
 	}
@@ -60,23 +62,30 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 		return Arrays.asList(manager.ontologyLoadingStage);
 	}
 
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
+		this.changesLoader_ = reasoner.getChangesLoader();
+		return true;
+	}
+
 	@Override
 	public void executeStage() throws ElkException {
-		Loader changesLoader = reasoner.getChangesLoader();
-		if (changesLoader == null)
+		if (changesLoader_ == null)
 			LOGGER_.warn("Ontology changes loader is not registered. No changes will be loaded!");
 		else {
-			try {
-				for (;;) {
-					changesLoader.load();
-					if (!interrupted())
-						break;
-				}
-			} finally {
-				changesLoader.dispose();
-			}
+			changesLoader_.load();
 		}
+	}
+
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		if (changesLoader_ != null)
+			this.changesLoader_.dispose();
+		this.changesLoader_ = null;
 		reasoner.doneChangeLoading = true;
+		return true;
 	}
 
 	@Override

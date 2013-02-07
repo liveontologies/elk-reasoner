@@ -66,29 +66,22 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
-		if (!super.postExecute())
-			return false;
-		this.computation_ = null;
-		return true;
+	public void executeStage() throws ElkException {
+		for (;;) {
+			computation_.process();
+			if (!spuriousInterrupt())
+				break;
+		}
 	}
 
 	@Override
-	public void executeStage() throws ElkException {
-		if (computation_ == null)
-			preExecute();
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
 		reasoner.donePropertyReflexivityComputation = true;
 		computation_ = null;
+		this.computation_ = null;
+		return true;
 	}
 
 	@Override

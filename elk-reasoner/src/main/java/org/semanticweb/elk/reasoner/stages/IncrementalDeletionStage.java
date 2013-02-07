@@ -66,30 +66,6 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void executeStage() throws ElkInterruptedException {
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				desaturation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-
-		reasoner.incrementalState.setStageStatus(IncrementalStages.DELETION,
-				true);
-		reasoner.ruleAndConclusionStats.add(desaturation_
-				.getRuleAndConclusionStatistics());
-
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Number of modified contexts "
-					+ reasoner.saturationState.getNotSaturatedContexts().size());
-		}
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -102,9 +78,26 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
+	public void executeStage() throws ElkInterruptedException {
+		for (;;) {
+			desaturation_.process();
+			if (!spuriousInterrupt())
+				break;
+		}
+	}
+
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.incrementalState.setStageStatus(IncrementalStages.DELETION,
+				true);
+		reasoner.ruleAndConclusionStats.add(desaturation_
+				.getRuleAndConclusionStatistics());
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Number of modified contexts "
+					+ reasoner.saturationState.getNotSaturatedContexts().size());
+		}
 		desaturation_ = null;
 		return true;
 	}

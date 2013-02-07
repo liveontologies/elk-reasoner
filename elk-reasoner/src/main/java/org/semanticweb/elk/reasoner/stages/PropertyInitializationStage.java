@@ -83,29 +83,6 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void executeStage() throws ElkInterruptedException {
-		try {
-			progressMonitor.start(getName());
-			for (;;) {
-				if (!todo_.hasNext())
-					break;
-				IndexedPropertyChain ipc = todo_.next();
-				SaturatedPropertyChain saturation = ipc.getSaturated();
-				if (saturation != null) {
-					saturation.clear();
-					clearedSaturations_++;
-				}
-				progressMonitor.report(++progress_, maxProgress_);
-				if (interrupted())
-					continue;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-		reasoner.donePropertySaturationReset = true;
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -117,9 +94,27 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
+	public void executeStage() throws ElkInterruptedException {
+		for (;;) {
+			if (!todo_.hasNext())
+				break;
+			IndexedPropertyChain ipc = todo_.next();
+			SaturatedPropertyChain saturation = ipc.getSaturated();
+			if (saturation != null) {
+				saturation.clear();
+				clearedSaturations_++;
+			}
+			progressMonitor.report(++progress_, maxProgress_);
+			if (spuriousInterrupt())
+				continue;
+		}
+	}
+
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.donePropertySaturationReset = true;
 		todo_ = null;
 		return true;
 	}

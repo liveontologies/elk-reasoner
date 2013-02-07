@@ -65,22 +65,32 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void executeStage() throws ElkInterruptedException {
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		// System.out.println("Active contexts: " +
 		// reasoner.saturationState.activeContexts_);
+		saturation_ = new ClassExpressionNoInputSaturation(
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor(), new RuleApplicationFactory(
+						reasoner.saturationState, true),
+				ContextModificationListener.DUMMY);
+		return true;
+	}
 
-		progressMonitor.start(getName());
-
-		try {
-			for (;;) {
-				saturation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
+	@Override
+	public void executeStage() throws ElkInterruptedException {
+		for (;;) {
+			saturation_.process();
+			if (!spuriousInterrupt())
+				break;
 		}
+	}
 
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
 		reasoner.incrementalState.setStageStatus(IncrementalStages.ADDITION,
 				true);
 		reasoner.ruleAndConclusionStats.add(saturation_
@@ -94,24 +104,6 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 		 * 
 		 * System.out.println(ic + ": " + ic.getContext().getSubsumers()); }
 		 */
-	}
-
-	@Override
-	boolean preExecute() {
-		if (!super.preExecute())
-			return false;
-		saturation_ = new ClassExpressionNoInputSaturation(
-				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), new RuleApplicationFactory(
-						reasoner.saturationState, true),
-				ContextModificationListener.DUMMY);
-		return true;
-	}
-
-	@Override
-	boolean postExecute() {
-		if (!super.postExecute())
-			return false;
 		saturation_ = null;
 		return true;
 	}

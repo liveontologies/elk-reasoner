@@ -66,23 +66,6 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void executeStage() throws ElkInterruptedException {
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-		reasoner.doneClassSaturation = true;
-		reasoner.ruleAndConclusionStats.add(computation_
-				.getRuleAndConclusionStatistics());
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -96,10 +79,18 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	}
 
 	@Override
+	public void executeStage() throws ElkInterruptedException {
+		computation_.process();
+	}
+
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		this.computation_ = null;
+		reasoner.doneClassSaturation = true;
+		reasoner.ruleAndConclusionStats.add(computation_
+				.getRuleAndConclusionStatistics());
 		return true;
 	}
 
