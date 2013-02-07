@@ -38,6 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +55,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalChange;
 import org.semanticweb.elk.reasoner.incremental.IncrementalClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalClassificationRunner;
+import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -158,7 +160,9 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 			incrementalReasoner = new ElkReasoner(ontology, true,
 					new PostProcessingStageExecutor());
 			// let the runner run..
-			new OWLAPIRandomWalkRunner(ontology, incrementalReasoner, MAX_ROUNDS, ITERATIONS).run(
+			RandomWalkRunnerIO<OWLAxiom> io = new OWLAPIBasedIO(ontology, incrementalReasoner);
+			
+			new RandomWalkIncrementalClassificationRunner<OWLAxiom>(MAX_ROUNDS, ITERATIONS, io).run(
 					incrementalReasoner.getInternalReasoner(), changingAxioms, staticAxioms, seed);
 
 		} catch (Exception e) {
@@ -195,19 +199,18 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	public static final class OWLAPIRandomWalkRunner extends RandomWalkIncrementalClassificationRunner<OWLAxiom> {
+	public static final class OWLAPIBasedIO implements RandomWalkRunnerIO<OWLAxiom> {
 
 		private final OWLOntology ontology_;
 		private final ElkReasoner owlapiReasoner_;
 		
-		public OWLAPIRandomWalkRunner(OWLOntology ontology, ElkReasoner owlapiReasoner, int rounds, int iter) {
-			super(rounds, iter);
+		public OWLAPIBasedIO(OWLOntology ontology, ElkReasoner owlapiReasoner) {
 			ontology_ = ontology;
 			owlapiReasoner_ = owlapiReasoner;
 		}
 
 		@Override
-		protected Reasoner createReasoner(Iterable<OWLAxiom> axioms) {
+		public Reasoner createReasoner(Iterable<OWLAxiom> axioms) {
 			Set<OWLAxiom> axSet = new ArrayHashSet<OWLAxiom>();
 			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 			OWLOntology ontology = null;
@@ -229,7 +232,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		}
 
 		@Override
-		protected void loadChanges(final Reasoner reasoner,
+		public void loadChanges(final Reasoner reasoner,
 				final IncrementalChange<OWLAxiom> change) {
 			OWLOntologyManager manager = ontology_.getOWLOntologyManager();
 			List<OWLOntologyChange> changes = new LinkedList<OWLOntologyChange>();
@@ -253,12 +256,12 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		}
 
 		@Override
-		protected void printAxiom(OWLAxiom axiom) {
-			LOGGER_.info("Current axiom: " + axiom);
+		public void printAxiom(OWLAxiom axiom, Logger logger, Level level) {
+			logger.log(level, "Current axiom: " + axiom);
 		}
 
 		@Override
-		protected void revertChanges(Reasoner reasoner,
+		public void revertChanges(Reasoner reasoner,
 				IncrementalChange<OWLAxiom> change) {
 			OWLOntologyManager manager = ontology_.getOWLOntologyManager();
 			List<OWLOntologyChange> changes = new LinkedList<OWLOntologyChange>();

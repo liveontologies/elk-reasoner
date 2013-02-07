@@ -462,7 +462,7 @@ public abstract class AbstractReasonerState {
 			this.incrementalState = new IncrementalReasonerState(ontologyIndex);
 		}
 
-		return classTaxonomyState.taxonomy;// taxonomy;
+		return classTaxonomyState.taxonomy;
 	}
 
 	public Taxonomy<ElkClass> getTaxonomyQuietly() {
@@ -474,6 +474,20 @@ public abstract class AbstractReasonerState {
 			LOGGER_.info("Ontology is inconsistent");
 
 			result = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
+		}
+
+		return result;
+	}
+
+	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly() {
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> result = null;
+
+		try {
+			result = getInstanceTaxonomy();
+		} catch (ElkException e) {
+			LOGGER_.info("Ontology is inconsistent");
+
+			result = PredefinedTaxonomy.INCONSISTENT_INDIVIDUAL_TAXONOMY;
 		}
 
 		return result;

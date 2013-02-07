@@ -23,20 +23,38 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.Iterator;
 
+import org.semanticweb.elk.loading.AxiomChangeListener;
+import org.semanticweb.elk.loading.ChangesLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.incremental.BaseIncrementalReasoningCorrectnessTest.CHANGE;
 
-public class TestAxiomLoader implements OntologyLoader {
+/**
+ * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
+public class TestAxiomLoader implements OntologyLoader, ChangesLoader {
 
 	private final Iterable<ElkAxiom> axioms_;
+	
+	private final CHANGE type_;
 
 	public TestAxiomLoader(Iterable<ElkAxiom> axioms) {
 		this.axioms_ = axioms;
+		type_ = CHANGE.ADD;
+	}
+	
+	public TestAxiomLoader(Iterable<ElkAxiom> axioms, CHANGE type) {
+		this.axioms_ = axioms;
+		type_ = type;
 	}
 
+	//OntologyLoader method
 	@Override
 	public Loader getLoader(final ElkAxiomProcessor axiomLoader) {
 
@@ -58,6 +76,43 @@ public class TestAxiomLoader implements OntologyLoader {
 				// nothing to do
 			}
 
+		};
+	}
+
+	@Override
+	public void registerChangeListener(AxiomChangeListener listener) {
+	}
+	
+	//ChangesLoader method
+	@Override
+	public Loader getLoader(final ElkAxiomProcessor axiomInserter,
+			final ElkAxiomProcessor axiomDeleter) {
+		
+		
+		return new Loader() {
+			
+			private final Iterator<ElkAxiom> axiomIterator = axioms_.iterator();
+
+			@Override
+			public void load() throws ElkLoadingException {
+				
+				while (axiomIterator.hasNext()) {
+					if (Thread.currentThread().isInterrupted())
+						break;
+					switch (type_) {
+					case ADD:
+						axiomInserter.visit(axiomIterator.next());
+						break;
+					case DELETE:
+						axiomDeleter.visit(axiomIterator.next());
+						break;
+					}
+				}
+			}
+
+			@Override
+			public void dispose() {
+			}
 		};
 	}
 

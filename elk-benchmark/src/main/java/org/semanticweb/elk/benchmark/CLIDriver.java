@@ -48,7 +48,7 @@ public class CLIDriver {
 				new String[]{"/home/pavel/ulm/data/go/incremental"});*/
 		BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
 				0,
-				5,
+				1,
 				new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl"});
 	}
 }

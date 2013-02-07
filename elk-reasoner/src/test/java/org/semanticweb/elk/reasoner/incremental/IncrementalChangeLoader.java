@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 /**
  * Loads sets of added and removed axioms in the reasoner. Can do so in the
  * forward way, i.e., added axioms are added and removed are removed, or the
- * reverse way to undo the changes
+ * reverse way to undo the changes.
  * 
  * @author Pavel Klinov
  * 
@@ -83,34 +83,35 @@ public class IncrementalChangeLoader implements ChangesLoader {
 
 			@Override
 			public void load() throws ElkLoadingException {
-
-				while (deletions_.hasNext()) {
-					if (Thread.currentThread().isInterrupted())
-						break;
-					ElkAxiom axiom = deletions_.next();
-
-					switch (dir_) {
-					case FORWARD:
-						delete(axiom);
-						break;
-					case BACKWARD:
-						add(axiom);
-					}
-				}
-				while (additions_.hasNext()) {
-					if (Thread.currentThread().isInterrupted())
-						break;
-					ElkAxiom axiom = additions_.next();
-
-					switch (dir_) {
-					case FORWARD:
-						add(axiom);
-						break;
-					case BACKWARD:
-						delete(axiom);
-					}
+				switch (dir_) {
+				case FORWARD:
+					
+					add(additions_);
+					delete(deletions_);
+					
+					break;
+				case BACKWARD:
+					
+					add(deletions_);
+					delete(additions_);
 				}
 			}
+
+			private void add(Iterator<ElkAxiom> axiomIter) {
+				while (axiomIter.hasNext()) {
+					if (Thread.currentThread().isInterrupted())
+						break;
+					add(axiomIter.next());
+				}
+			}
+			
+			private void delete(Iterator<ElkAxiom> axiomIter) {
+				while (axiomIter.hasNext()) {
+					if (Thread.currentThread().isInterrupted())
+						break;
+					delete(axiomIter.next());
+				}
+			}			
 
 			private void add(ElkAxiom axiom) {
 				axiomInserter.visit(axiom);

@@ -70,7 +70,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class LowLevelIncrementalReasoningTest {
+public class LowLevelIncrementalTBoxTest {
 
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 

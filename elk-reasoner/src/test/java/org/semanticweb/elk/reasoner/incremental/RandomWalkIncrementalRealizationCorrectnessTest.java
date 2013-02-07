@@ -2,14 +2,13 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,45 +28,42 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
-import org.junit.runner.RunWith;
+import org.junit.Ignore;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO.ElkAPIBasedIO;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
-import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
- * @author "Yevgeny Kazakov"
- * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
  */
-@RunWith(PolySuite.class)
-public class RandomWalkIncrementalClassificationCorrectnessTest extends BaseRandomWalkIncrementalCorrectnessTest {
+@Ignore
+public class RandomWalkIncrementalRealizationCorrectnessTest extends
+		BaseRandomWalkIncrementalCorrectnessTest {
 
-	// logger for this class
-	protected static final Logger LOGGER_ = Logger
-			.getLogger(RandomWalkIncrementalClassificationCorrectnessTest.class);
-
-	final static String INPUT_DATA_LOCATION = "classification_test_input";
-
-	public RandomWalkIncrementalClassificationCorrectnessTest(
-			ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
+	final static String INPUT_DATA_LOCATION = "realization_test_input";
+	
+	public RandomWalkIncrementalRealizationCorrectnessTest(
+			ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
 
 	@Override
 	protected RandomWalkIncrementalClassificationRunner<ElkAxiom> getRandomWalkRunner(
 			int rounds, int iterations) {
-		return new RandomWalkIncrementalClassificationRunner<ElkAxiom>(rounds, iterations, new ElkAPIBasedIO());
+		return new RandomWalkIncrementalRealizationRunner<ElkAxiom>(rounds, iterations, new ElkAPIBasedIO());
 	}
-
+	
+	
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {
@@ -77,12 +73,12 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends BaseRand
 						RandomWalkIncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>() {
+						new TestManifestCreator<URLTestIO, InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput>() {
 							@Override
-							public TestManifest<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> create(
+							public TestManifest<URLTestIO, InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>(
+								return new TaxonomyDiffManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput>(
 										input, null);
 							}
 						});
