@@ -78,9 +78,9 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkInterruptedException {
+	public void executeStage() throws ElkInterruptedException {
 		if (todo_ == null)
-			initComputation();
+			preExecute();
 		try {
 			progressMonitor.start(getName());
 			for (;;) {
@@ -101,13 +101,25 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		reasoner.saturationState.resetFirstContext();
 		todo_ = reasoner.ontologyIndex.getIndexedClassExpressions().iterator();
 		maxContexts_ = reasoner.ontologyIndex.getIndexedClassExpressions()
 				.size();
 		deletedContexts_ = 0;
+		return true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		todo_ = null;
+		maxContexts_ = 0;
+		deletedContexts_ = 0;
+		return true;
 	}
 
 	@Override

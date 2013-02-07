@@ -53,13 +53,23 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 
 		this.computation_ = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
 				reasoner.saturationState);
+		return true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		this.computation_ = null;
+		return true;
 	}
 
 }

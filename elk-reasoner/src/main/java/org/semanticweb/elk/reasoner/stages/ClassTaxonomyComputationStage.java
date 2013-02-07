@@ -67,9 +67,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkInterruptedException {
-		if (computation_ == null)
-			initComputation();
+	public void executeStage() throws ElkInterruptedException {
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
@@ -86,18 +84,27 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		reasoner.doneClassTaxonomy = true;
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
-		computation_ = null;
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				reasoner.ontologyIndex.getIndexedClasses(), 64),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
 				reasoner.saturationState);
+		return true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		this.computation_ = null;
+		return true;
 	}
 
 	@Override

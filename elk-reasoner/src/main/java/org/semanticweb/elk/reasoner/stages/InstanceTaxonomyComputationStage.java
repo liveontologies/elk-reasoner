@@ -69,9 +69,9 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkInterruptedException {
+	public void executeStage() throws ElkInterruptedException {
 		if (computation_ == null)
-			initComputation();
+			preExecute();
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
@@ -91,8 +91,9 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	void initComputation() {
-		super.initComputation();
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		if (reasoner.doneClassTaxonomy) {
 			// TODO Think how to get rid of this type cast
 			// it's here b/c our class taxonomy computation outputs
@@ -121,6 +122,14 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		return true;
+	}
+
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		this.computation_ = null;
+		return true;
 	}
 
 	@Override

@@ -76,11 +76,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkException {
-		if (completion_ == null) {
-			initComputation();
-		}
-
+	public void executeStage() throws ElkException {
 		progressMonitor.start(getName());
 
 		try {
@@ -110,18 +106,26 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 		writer.clearNotSaturatedContexts();
 		writer.clearContextsToBeRemoved();
-		completion_ = null;
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
-
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		completion_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), new RuleApplicationFactory(
 						reasoner.saturationState),
 				ContextModificationListener.DUMMY);
+		return true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		completion_ = null;
+		return true;
 	}
 
 	@Override

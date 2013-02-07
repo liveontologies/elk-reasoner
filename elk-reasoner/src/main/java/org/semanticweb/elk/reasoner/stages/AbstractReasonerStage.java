@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -41,6 +42,12 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 
 	final ReasonerStageManager manager;
 	final AbstractReasonerState reasoner;
+
+	/**
+	 * {@code true} if all information required for execution of this
+	 * {@link ReasonerStage} has been initialized
+	 */
+	boolean initialized = false;
 
 	/**
 	 * the maximal number of concurrent workers used in this computation stage
@@ -93,13 +100,48 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	}
 
 	/**
-	 * Initialize the parameters of the computation for this stage. This is
-	 * usually done the first time the stage is executed.
+	 * Initialize the parameters of the computation for this stage; this is the
+	 * first thing to be done before stage is executed
+	 * 
+	 * @return {@code true} if the operation is successful
 	 */
-	void initComputation() {
-		LOGGER_.trace(getName() + ": init computation");
+	boolean preExecute() {
+		if (initialized)
+			return false;
+		LOGGER_.trace(getName() + ": initialized");
 		this.workerNo = reasoner.getNumberOfWorkers();
 		this.progressMonitor = reasoner.getProgressMonitor();
+		return initialized = true;
+	}
+
+	/**
+	 * Clear the parameters of the computation for this stage; this is the last
+	 * thing to be done when the stage is executed *
+	 * 
+	 * @return {@code true} if the operation is successful
+	 */
+	boolean postExecute() {
+		if (!initialized)
+			return false;
+		LOGGER_.trace(getName() + ": clear");
+		this.workerNo = 0;
+		this.progressMonitor = null;
+		initialized = false;
+		return true;
+	}
+
+	/**
+	 * Execute the stage with initialized parameters
+	 * 
+	 * @throws ElkException
+	 */
+	abstract void executeStage() throws ElkException;
+
+	@Override
+	public void execute() throws ElkException {
+		preExecute();
+		executeStage();
+		postExecute();
 	}
 
 	protected void markAllContextsAsSaturated() {

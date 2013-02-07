@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -59,8 +60,9 @@ class IncrementalDeletionInitializationStage extends
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 
 		DifferentialIndex diffIndex = reasoner.incrementalState.diffIndex;
 		ChainableRule<Context> changedInitRules = null;
@@ -80,14 +82,23 @@ class IncrementalDeletionInitializationStage extends
 					128);
 		}
 
-		initialization_ = new IncrementalChangesInitialization(inputs,
+		this.initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				reasoner.getProcessExecutor(), ruleAppVisitor,
 				conclusionVisitor, workerNo, reasoner.getProgressMonitor());
+		return true;
 	}
 
 	@Override
-	protected void postExecute() {
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		this.initialization_ = null;
+		return true;
+	}
+
+	@Override
+	protected void postExecuteStage() {
 		// initializing contexts which will be removed
 		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
 				.getConclusionStatistics());

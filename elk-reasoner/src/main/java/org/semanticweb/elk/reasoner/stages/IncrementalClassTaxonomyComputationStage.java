@@ -65,14 +65,15 @@ class IncrementalClassTaxonomyComputationStage extends
 	}
 
 	@Override
-	public void execute() throws ElkInterruptedException {
-		super.execute();
+	public void executeStage() throws ElkInterruptedException {
+		super.executeStage();
 		reasoner.incrementalState.diffIndex.clearSignatureChanges();
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 
 		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
 				.getIndexedClasses();
@@ -153,13 +154,22 @@ class IncrementalClassTaxonomyComputationStage extends
 				}
 
 			};
-			
-			computation_ = new ClassTaxonomyComputation(Operations.split(
+
+			this.computation_ = new ClassTaxonomyComputation(Operations.split(
 					modified, 64), reasoner.getProcessExecutor(), workerNo,
 					progressMonitor, reasoner.saturationState,
 					reasoner.classTaxonomyState.taxonomy);
 		}
+		return true;
 
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		this.computation_ = null;
+		return true;
 	}
 
 }

@@ -69,9 +69,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkInterruptedException {
-		if (computation_ == null)
-			initComputation();
+	public void executeStage() throws ElkInterruptedException {
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
@@ -87,18 +85,27 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		reasoner.doneConsistencyCheck = true;
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
-		computation_ = null;
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		this.computation_ = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
 				reasoner.saturationState);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		return true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		this.computation_ = null;
+		return true;
 	}
 
 	@Override

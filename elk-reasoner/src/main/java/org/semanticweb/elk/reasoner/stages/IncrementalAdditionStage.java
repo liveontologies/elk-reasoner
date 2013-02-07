@@ -65,11 +65,7 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkInterruptedException {
-		if (saturation_ == null) {
-			initComputation();
-		}
-
+	public void executeStage() throws ElkInterruptedException {
 		// System.out.println("Active contexts: " +
 		// reasoner.saturationState.activeContexts_);
 
@@ -98,18 +94,26 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 		 * 
 		 * System.out.println(ic + ": " + ic.getContext().getSubsumers()); }
 		 */
-		saturation_ = null;
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
-
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		saturation_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), new RuleApplicationFactory(
 						reasoner.saturationState, true),
 				ContextModificationListener.DUMMY);
+		return true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		saturation_ = null;
+		return true;
 	}
 
 	@Override

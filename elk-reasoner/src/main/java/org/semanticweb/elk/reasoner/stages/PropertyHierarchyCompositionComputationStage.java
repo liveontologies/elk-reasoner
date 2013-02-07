@@ -56,17 +56,17 @@ public class PropertyHierarchyCompositionComputationStage extends
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		computation_ = new PropertyHierarchyCompositionComputation(
 				reasoner.ontologyIndex, reasoner.getProcessExecutor(),
 				workerNo, reasoner.getProgressMonitor());
+		return true;
 	}
 
 	@Override
-	public void execute() throws ElkException {
-		if (computation_ == null)
-			initComputation();
+	public void executeStage() throws ElkException {
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
@@ -78,7 +78,14 @@ public class PropertyHierarchyCompositionComputationStage extends
 			progressMonitor.finish();
 		}
 		reasoner.donePropertyHierarchyCompositionComputation = true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
 		computation_ = null;
+		return true;
 	}
 
 	@Override

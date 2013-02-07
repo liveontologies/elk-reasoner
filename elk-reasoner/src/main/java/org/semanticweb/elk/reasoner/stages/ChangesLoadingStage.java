@@ -61,10 +61,8 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkException {
-		initComputation();
+	public void executeStage() throws ElkException {
 		Loader changesLoader = reasoner.getChangesLoader();
-
 		if (changesLoader == null)
 			LOGGER_.warn("Ontology changes loader is not registered. No changes will be loaded!");
 		else {
@@ -78,7 +76,6 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 				changesLoader.dispose();
 			}
 		}
-
 		reasoner.doneChangeLoading = true;
 	}
 

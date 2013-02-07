@@ -61,8 +61,7 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkException {
-		initComputation();
+	public void executeStage() throws ElkException {
 		Loader ontologyLoader = reasoner.getOntologyLoader();
 		if (ontologyLoader == null)
 			LOGGER_.warn("Ontology loader is not registered. No axioms will be loaded!");

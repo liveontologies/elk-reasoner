@@ -66,13 +66,8 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkInterruptedException {
-		if (desaturation_ == null) {
-			initComputation();
-		}
-
+	public void executeStage() throws ElkInterruptedException {
 		progressMonitor.start(getName());
-
 		try {
 			for (;;) {
 				desaturation_.process();
@@ -92,18 +87,26 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 			LOGGER_.trace("Number of modified contexts "
 					+ reasoner.saturationState.getNotSaturatedContexts().size());
 		}
-		desaturation_ = null;
 	}
 
 	@Override
-	void initComputation() {		
-		super.initComputation();
-
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		desaturation_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), new RuleDeapplicationFactory(
 						reasoner.saturationState, true),
 				ContextModificationListener.DUMMY);
+		return true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		desaturation_ = null;
+		return true;
 	}
 
 	@Override

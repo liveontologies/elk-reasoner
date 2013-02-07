@@ -55,11 +55,11 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	/**
 	 * The counter for deleted contexts
 	 */
-	protected int initContexts_;
+	protected int initContexts;
 	/**
 	 * The number of contexts
 	 */
-	protected int maxContexts_;
+	protected int maxContexts;
 
 	/**
 	 * The state of the iterator of the input to be processed
@@ -90,16 +90,12 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	}
 
 	@Override
-	public void execute() throws ElkInterruptedException {
+	public void executeStage() throws ElkInterruptedException {
 
 		final ConclusionVisitor<?> visitor = getConclusionVisitor(stageStatistics_
 				.getConclusionStatistics());
 		final SaturationState.ExtendedWriter writer = reasoner.saturationState
 				.getExtendedWriter(visitor);
-
-		if (todo == null) {
-			initComputation();
-		}
 
 		try {
 			progressMonitor.start(getName());
@@ -112,8 +108,8 @@ abstract class AbstractIncrementalContextInitializationStage extends
 					writer.initContext(ice.getContext());
 				}
 
-				initContexts_++;
-				progressMonitor.report(initContexts_, maxContexts_);
+				initContexts++;
+				progressMonitor.report(initContexts, maxContexts);
 
 				if (interrupted()) {
 					continue;
@@ -130,8 +126,8 @@ abstract class AbstractIncrementalContextInitializationStage extends
 
 	@Override
 	public void printInfo() {
-		if (initContexts_ > 0 && LOGGER_.isDebugEnabled())
-			LOGGER_.debug("Contexts init:" + initContexts_);
+		if (initContexts > 0 && LOGGER_.isDebugEnabled())
+			LOGGER_.debug("Contexts init:" + initContexts);
 	}
 
 	protected abstract IncrementalStages stage();

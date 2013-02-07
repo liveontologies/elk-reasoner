@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -44,18 +45,31 @@ class InitializeContextsAfterCleaningStage extends
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Cleaned contexts to be initialized: "
 					+ reasoner.saturationState.getNotSaturatedContexts());
 		}
 
-		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();
-		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts()
+		this.todo = reasoner.saturationState.getNotSaturatedContexts()
+				.iterator();
+		this.maxContexts = reasoner.saturationState.getNotSaturatedContexts()
 				.size();
-		initContexts_ = 0;
+		this.initContexts = 0;
+		return true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		this.todo = null;
+		this.maxContexts = 0;
+		this.initContexts = 0;
+		return true;
 	}
 
 	@Override

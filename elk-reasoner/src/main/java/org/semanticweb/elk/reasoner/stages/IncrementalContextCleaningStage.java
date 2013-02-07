@@ -69,11 +69,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void execute() throws ElkInterruptedException {
-		if (cleaning_ == null) {
-			initComputation();
-		}
-
+	public void executeStage() throws ElkInterruptedException {
 		progressMonitor.start(getName());
 
 		try {
@@ -90,21 +86,27 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 				IncrementalStages.CONTEXT_CLEANING, true);
 		reasoner.ruleAndConclusionStats.add(cleaning_
 				.getRuleAndConclusionStatistics());
-		cleaning_ = null;
-
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
-
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
 				reasoner.saturationState);
-
-		cleaning_ = new ClassExpressionNoInputSaturation(
+		this.cleaning_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), cleaningFactory,
 				ContextModificationListener.DUMMY);
+		return true;
+	}
+
+	@Override
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		cleaning_ = null;
+		return true;
 	}
 
 	@Override

@@ -56,17 +56,27 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
-		computation_ = new ReflexivePropertyComputation(reasoner.ontologyIndex,
-				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor());
+	boolean preExecute() {
+		if (!super.preExecute())
+			return false;
+		this.computation_ = new ReflexivePropertyComputation(
+				reasoner.ontologyIndex, reasoner.getProcessExecutor(),
+				workerNo, reasoner.getProgressMonitor());
+		return true;
 	}
 
 	@Override
-	public void execute() throws ElkException {
+	boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		this.computation_ = null;
+		return true;
+	}
+
+	@Override
+	public void executeStage() throws ElkException {
 		if (computation_ == null)
-			initComputation();
+			preExecute();
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
