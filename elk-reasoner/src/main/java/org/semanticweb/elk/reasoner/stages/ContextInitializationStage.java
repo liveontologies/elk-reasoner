@@ -22,9 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -69,16 +67,6 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneContextReset;
-	}
-
-	@Override
-	public List<ReasonerStage> getPreStages() {
-		return Collections.emptyList();
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -108,7 +96,6 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.doneContextReset = true;
 		todo_ = null;
 		return true;
 	}

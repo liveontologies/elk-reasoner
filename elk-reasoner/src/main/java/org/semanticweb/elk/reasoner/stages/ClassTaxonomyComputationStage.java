@@ -55,11 +55,6 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneClassTaxonomy;
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -83,7 +78,6 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 			return false;
 		reasoner.classTaxonomyState.taxonomy = computation_.getTaxonomy();
 		reasoner.classTaxonomyState.classesForModifiedNodes.clear();
-		reasoner.doneClassTaxonomy = true;
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
 		this.computation_ = null;

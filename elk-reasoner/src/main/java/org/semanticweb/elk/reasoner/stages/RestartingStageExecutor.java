@@ -44,7 +44,7 @@ public class RestartingStageExecutor extends SimpleInterrupter implements
 
 	@Override
 	public void complete(ReasonerStage stage) throws ElkException {
-		if (!stage.done()) {
+		if (!stage.isCompleted()) {
 			LOGGER_.debug(stage.getName() + " stage:");
 			for (ReasonerStage dependentStage : stage.getPreStages()) {
 				complete(dependentStage);

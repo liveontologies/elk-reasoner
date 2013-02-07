@@ -53,12 +53,6 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.incrementalState
-				.getStageStatus(IncrementalStages.DELETION);
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;

@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Collections;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -54,21 +52,10 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneLoading;
-	}
-
-	@Override
-	public Iterable<ReasonerStage> getPreStages() {
-		return Collections.emptyList();
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		ontologyLoader_ = reasoner.getOntologyLoader();
-		reasoner.doneLoading = true;
 		return true;
 	}
 
@@ -88,7 +75,6 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.doneLoading = true;
 		this.ontologyLoader_ = null;
 		return true;
 	}

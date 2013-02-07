@@ -63,12 +63,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.incrementalState
-				.getStageStatus(IncrementalStages.TAXONOMY_CLEANING);
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;

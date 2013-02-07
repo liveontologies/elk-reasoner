@@ -45,7 +45,7 @@ public interface ReasonerStage {
 	 *         executed: the results of the computation could have been computed
 	 *         by other stages
 	 */
-	public boolean done();
+	public boolean isCompleted();
 
 	/**
 	 * @return the list of stages that are required to be executed before
@@ -58,7 +58,7 @@ public interface ReasonerStage {
 	 * the execution, it is necessary that all staged from the dependencies are
 	 * done. If the execution of this stage has not been interrupted, the
 	 * results for this stage should be computed and the function
-	 * {@link #done()} should return {@code true}.
+	 * {@link #isCompleted()} should return {@code true}.
 	 * 
 	 * @throws ElkException
 	 *             if execution was not successful

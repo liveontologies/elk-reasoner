@@ -149,7 +149,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
+	public boolean isCompleted() {
 		return false;
 	}
 

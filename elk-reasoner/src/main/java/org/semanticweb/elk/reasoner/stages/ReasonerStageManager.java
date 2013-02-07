@@ -51,22 +51,19 @@ public class ReasonerStageManager {
 				ontologyLoadingStage);
 
 		this.propertyInitializationStage = new PropertyInitializationStage(
-				reasoner);
+				reasoner, changesLoadingStage);
 
 		this.propertyReflexivityComputationStage = new PropertyReflexivityComputationStage(
-				reasoner, ontologyLoadingStage, changesLoadingStage,
-				propertyInitializationStage);
+				reasoner, propertyInitializationStage);
 
 		this.propertyHierarchyCompositionComputationStage = new PropertyHierarchyCompositionComputationStage(
 				reasoner, propertyReflexivityComputationStage);
 
 		this.contextInitializationStage = new ContextInitializationStage(
-				reasoner);
+				reasoner, propertyHierarchyCompositionComputationStage);
 
 		this.consistencyCheckingStage = new ConsistencyCheckingStage(reasoner,
-				propertyHierarchyCompositionComputationStage,
-				contextInitializationStage, ontologyLoadingStage,
-				changesLoadingStage);
+				contextInitializationStage);
 
 		this.classSaturationStage = new ClassSaturationStage(reasoner,
 				consistencyCheckingStage);

@@ -56,17 +56,12 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		return "Instance Taxonomy Computation";
 	}
 
-	@Override
-	public boolean done() {
-		return reasoner.doneInstanceTaxonomy;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		if (reasoner.doneClassTaxonomy) {
+		if (reasoner.doneTaxonomy()) {
 			// TODO Think how to get rid of this type cast
 			// it's here b/c our class taxonomy computation outputs
 			// updateable class taxonomy (as it, in principle, should)
@@ -111,7 +106,6 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			return false;
 		reasoner.instanceTaxonomy = computation_.getTaxonomy();
 		reasoner.classTaxonomyState.taxonomy = reasoner.instanceTaxonomy;
-		reasoner.doneInstanceTaxonomy = true;
 		this.computation_ = null;
 		return true;
 	}

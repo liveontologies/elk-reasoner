@@ -69,11 +69,6 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(stage());
-	}
-
-	@Override
 	public void executeStage() throws ElkInterruptedException {
 		for (;;) {
 			initialization_.process();

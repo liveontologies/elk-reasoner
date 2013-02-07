@@ -44,11 +44,6 @@ public class PropertyHierarchyCompositionComputationStage extends
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.donePropertyHierarchyCompositionComputation;
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -71,7 +66,6 @@ public class PropertyHierarchyCompositionComputationStage extends
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.donePropertyHierarchyCompositionComputation = true;
 		computation_ = null;
 		return true;
 	}

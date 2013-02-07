@@ -52,12 +52,6 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.incrementalState
-				.getStageStatus(IncrementalStages.ADDITION);
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;

@@ -43,11 +43,6 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.donePropertyReflexivityComputation;
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -70,7 +65,6 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.donePropertyReflexivityComputation = true;
 		computation_ = null;
 		this.computation_ = null;
 		return true;

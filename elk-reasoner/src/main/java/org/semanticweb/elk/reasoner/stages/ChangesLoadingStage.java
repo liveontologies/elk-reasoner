@@ -51,11 +51,6 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 		return "Loading of Changes";
 	}
 
-	@Override
-	public boolean done() {
-		return reasoner.doneChangeLoading;
-	}
-
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -78,7 +73,6 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 		if (changesLoader_ != null)
 			this.changesLoader_.dispose();
 		this.changesLoader_ = null;
-		reasoner.doneChangeLoading = true;
 		return true;
 	}
 

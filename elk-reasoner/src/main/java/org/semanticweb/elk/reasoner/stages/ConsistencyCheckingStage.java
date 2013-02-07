@@ -54,11 +54,6 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneConsistencyCheck;
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -81,7 +76,6 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		if (!super.postExecute())
 			return false;
 		reasoner.inconsistentOntology = computation_.isInconsistent();
-		reasoner.doneConsistencyCheck = true;
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
 		this.computation_ = null;

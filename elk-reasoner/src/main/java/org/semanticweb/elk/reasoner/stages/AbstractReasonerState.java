@@ -85,53 +85,10 @@ public abstract class AbstractReasonerState {
 	 * computations across multiple stages
 	 */
 	final SaturationStatistics ruleAndConclusionStats;
-
 	/**
 	 * 
 	 */
 	IncrementalReasonerState incrementalState = null;
-	/**
-	 * {@code true} if the ontology is loaded
-	 */
-	boolean doneLoading = false;
-	/**
-	 * {@code true} if the ontology changes are loaded
-	 */
-	boolean doneChangeLoading = false;
-	/**
-	 * {@code true} if the assignment of saturations to properties has been
-	 * reset
-	 */
-	boolean donePropertySaturationReset = true;
-	/**
-	 * {@code true} if entailed reflexive properties have been computed
-	 */
-	boolean donePropertyReflexivityComputation = false;
-	/**
-	 * {@code true} if property hierarchy and compositions have been computed
-	 */
-	boolean donePropertyHierarchyCompositionComputation = false;
-	/**
-	 * {@code true} if the assignment of contexts to class expressions has been
-	 * reset
-	 */
-	boolean doneContextReset = true;
-	/**
-	 * {@code true} if the ontology has been checked for consistency.
-	 */
-	boolean doneConsistencyCheck = false;
-	/**
-	 * {@code true} if saturation for every class of the ontology is computed
-	 */
-	boolean doneClassSaturation = false;
-	/**
-	 * {@code true} if the class taxonomy has been computed
-	 */
-	boolean doneClassTaxonomy = false;
-	/**
-	 * {@code true} if the instance taxonomy has been computed
-	 */
-	boolean doneInstanceTaxonomy = false;
 	/**
 	 * {@code true} if the reasoner is interrupted
 	 */
@@ -205,18 +162,14 @@ public abstract class AbstractReasonerState {
 			this.ontologyLoader_ = null;
 		}
 
-		if (doneLoading) {
-			doneLoading = false;
+		if (stageManager.ontologyLoadingStage.invalidate()) {
 			objectCache_.clear();
 			ontologyIndex = new OntologyIndexImpl(objectCache_);
+			registerOntologyChangesLoader(null);
 		}
 		/*
 		 * else { if (objectCache_.size() > 2) throw new RuntimeException(); }
 		 */
-
-		resetChangesLoading();
-		resetPropertySaturation();
-		registerOntologyChangesLoader(null);
 	}
 
 	/**
@@ -227,35 +180,10 @@ public abstract class AbstractReasonerState {
 	private void resetChangesLoading() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("Reset changes loading");
-		if (doneChangeLoading) {
-			doneChangeLoading = false;
-			resetSaturation();
-			// TODO: currently it is assumed that changes do not have property
-			// axioms
+		if (stageManager.changesLoadingStage.invalidate()) {
+			// TODO: currently it is assumed that changes do not have
+			// property axioms
 			// resetPropertySaturation();
-		}
-	}
-
-	public void resetPropertySaturation() {
-		if (donePropertySaturationReset) {
-			donePropertySaturationReset = false;
-			donePropertyReflexivityComputation = false;
-			donePropertyHierarchyCompositionComputation = false;
-			resetSaturation();
-		}
-	}
-
-	public void resetSaturation() {
-		if (doneContextReset) {
-			doneContextReset = false;
-			doneConsistencyCheck = false;
-			doneClassSaturation = false;
-			doneClassTaxonomy = false;
-			doneInstanceTaxonomy = false;
-
-			if (incrementalState != null) {
-				incrementalState.resetAllStagesStatus();
-			}
 		}
 	}
 
@@ -417,7 +345,7 @@ public abstract class AbstractReasonerState {
 	 * @return {@code true} if the ontology has been checked for consistency.
 	 */
 	public boolean doneConsistencyCheck() {
-		return doneConsistencyCheck;
+		return stageManager.consistencyCheckingStage.isCompleted;
 	}
 
 	/**
@@ -523,7 +451,8 @@ public abstract class AbstractReasonerState {
 	 * @return {@code true} if the class taxonomy has been computed
 	 */
 	public boolean doneTaxonomy() {
-		return doneClassTaxonomy;
+		return stageManager.classTaxonomyComputationStage.isCompleted
+				|| stageManager.incrementalClassTaxonomyComputationStage.isCompleted;
 	}
 
 	/**
@@ -549,7 +478,7 @@ public abstract class AbstractReasonerState {
 	 * @return {@code true} if the instance taxonomy has been computed
 	 */
 	public boolean doneInstanceTaxonomy() {
-		return doneInstanceTaxonomy;
+		return stageManager.instanceTaxonomyComputationStage.isCompleted;
 	}
 
 	/**

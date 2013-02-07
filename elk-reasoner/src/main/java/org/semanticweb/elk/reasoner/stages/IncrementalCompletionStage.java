@@ -62,12 +62,6 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.incrementalState
-				.getStageStatus(IncrementalStages.COMPLETION);
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;

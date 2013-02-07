@@ -72,11 +72,6 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.donePropertySaturationReset;
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -108,7 +103,6 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.donePropertySaturationReset = true;
 		todo_ = null;
 		return true;
 	}

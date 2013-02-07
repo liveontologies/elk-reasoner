@@ -55,12 +55,6 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.incrementalState
-				.getStageStatus(IncrementalStages.CONTEXT_CLEANING);
-	}
-
-	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;

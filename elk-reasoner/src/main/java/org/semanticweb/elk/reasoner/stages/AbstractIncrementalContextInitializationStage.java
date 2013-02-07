@@ -78,11 +78,6 @@ abstract class AbstractIncrementalContextInitializationStage extends
 		return stage().toString();
 	}
 
-	@Override
-	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(stage());
-	}
-
 	protected ConclusionVisitor<?> getConclusionVisitor(
 			ConclusionStatistics conclusionStatistics) {
 
@@ -125,7 +120,6 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.doneContextReset = true;
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 		this.writer_ = null;
 		return true;

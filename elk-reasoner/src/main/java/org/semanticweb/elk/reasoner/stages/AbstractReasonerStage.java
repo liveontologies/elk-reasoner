@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -53,6 +54,12 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	boolean initialized = false;
 
 	/**
+	 * {@code true} if the stage does not require execution, i.e., if it is
+	 * already executed
+	 */
+	boolean isCompleted = false;
+
+	/**
 	 * the maximal number of concurrent workers used in this computation stage
 	 */
 	int workerNo;
@@ -70,7 +77,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	/**
 	 * Stages that need to be executed after this stage
 	 */
-	final List<ReasonerStage> postStages = new LinkedList<ReasonerStage>();
+	final List<AbstractReasonerStage> postStages = new LinkedList<AbstractReasonerStage>();
 
 	/**
 	 * Creates a new reasoner stage for a given reasoner.
@@ -84,6 +91,11 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		this.preStages = Arrays.asList(preStages);
 		for (AbstractReasonerStage preStage : preStages)
 			preStage.postStages.add(this);
+	}
+
+	@Override
+	public boolean isCompleted() {
+		return isCompleted;
 	}
 
 	@Override
@@ -144,7 +156,8 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	boolean postExecute() {
 		if (!initialized)
 			return false;
-		LOGGER_.trace(getName() + ": clear");
+		LOGGER_.trace(getName() + ": done");
+		this.isCompleted = true;
 		this.workerNo = 0;
 		this.progressMonitor = null;
 		initialized = false;
@@ -172,6 +185,33 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 			progressMonitor.finish();
 		}
 		postExecute();
+	}
+
+	/**
+	 * Marks this {@link AbstractReasonerStage} and all dependent stages as not
+	 * completed; this will require their execution next time
+	 * 
+	 * @return {@code true} if this stage is invalidated or {@code false} if
+	 *         this stage was already invalidated before the call
+	 */
+	boolean invalidate() {
+		if (!isCompleted)
+			return false;
+		Queue<AbstractReasonerStage> toInvalidate = new LinkedList<AbstractReasonerStage>();
+		toInvalidate.add(this);
+		for (;;) {
+			AbstractReasonerStage stage = toInvalidate.poll();
+			if (stage == null)
+				return true;
+			if (stage.isCompleted) {
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace(stage.getName() + ": invalidated");
+				stage.isCompleted = false;
+				for (AbstractReasonerStage postStage : stage.postStages) {
+					toInvalidate.add(postStage);
+				}
+			}
+		}
 	}
 
 	protected void markAllContextsAsSaturated() {
