@@ -53,8 +53,8 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	private ClassTaxonomyCleaning cleaning_ = null;
 
-	public IncrementalTaxonomyCleaningStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public IncrementalTaxonomyCleaningStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -70,9 +70,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new IncrementalConsistencyCheckingStage(
-						reasoner));
+		return Arrays.asList(manager.incrementalConsistencyCheckingStage);
 	}
 
 	@Override
@@ -103,7 +101,9 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		reasoner.incrementalState.setStageStatus(
 				IncrementalStages.TAXONOMY_CLEANING, true);
 		// at this point we're done with unsaturated contexts
-		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY).clearNotSaturatedContexts();
+		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
+				.clearNotSaturatedContexts();
+		cleaning_ = null;
 	}
 
 	@Override
@@ -117,11 +117,12 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		Collection<IndexedClass> inputs = Operations.getCollection(
 				Operations.concat(removed, modified),
 				removed.size() + modified.size());
-		
 
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Taxonomy nodes to be cleaned for modified contexts: " + modified);
-			LOGGER_.trace("Taxonomy nodes to be cleaned for removed contexts: " + removed);
+			LOGGER_.trace("Taxonomy nodes to be cleaned for modified contexts: "
+					+ modified);
+			LOGGER_.trace("Taxonomy nodes to be cleaned for removed contexts: "
+					+ removed);
 		}
 
 		cleaning_ = new ClassTaxonomyCleaning(inputs,
@@ -162,7 +163,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 							IndexedClassExpression expr = iter_.next();
 
 							if (expr instanceof IndexedClass) {
-								curr_ = ((IndexedClass) expr);//.getElkClass();
+								curr_ = ((IndexedClass) expr);// .getElkClass();
 							}
 						}
 					}

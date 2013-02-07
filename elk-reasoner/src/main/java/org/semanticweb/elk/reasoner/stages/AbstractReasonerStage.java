@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -34,6 +35,11 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
  */
 abstract class AbstractReasonerStage implements ReasonerStage {
 
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(AbstractReasonerStage.class);
+
+	final ReasonerStageManager manager;
 	final AbstractReasonerState reasoner;
 
 	/**
@@ -52,8 +58,9 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	 * @param reasoner
 	 *            the reasoner for which the reasoner stage is created
 	 */
-	public AbstractReasonerStage(AbstractReasonerState reasoner) {
-		this.reasoner = reasoner;
+	public AbstractReasonerStage(ReasonerStageManager manager) {
+		this.manager = manager;
+		this.reasoner = manager.reasoner;
 	}
 
 	@Override
@@ -90,6 +97,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	 * usually done the first time the stage is executed.
 	 */
 	void initComputation() {
+		LOGGER_.trace(getName() + ": init computation");
 		this.workerNo = reasoner.getNumberOfWorkers();
 		this.progressMonitor = reasoner.getProgressMonitor();
 	}
@@ -100,9 +108,9 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 			if (ice.getContext() != null) {
 				ice.getContext().setSaturated(true);
 			}
-		}		
+		}
 	}
-	
+
 	protected SaturationStatistics getRuleAndConclusionStatistics() {
 		return reasoner.ruleAndConclusionStats;
 	}

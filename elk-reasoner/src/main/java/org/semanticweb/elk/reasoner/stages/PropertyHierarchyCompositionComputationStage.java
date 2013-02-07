@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -35,8 +36,8 @@ public class PropertyHierarchyCompositionComputationStage extends
 	private PropertyHierarchyCompositionComputation computation_ = null;
 
 	public PropertyHierarchyCompositionComputationStage(
-			AbstractReasonerState reasoner) {
-		super(reasoner);
+			ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -51,9 +52,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new PropertyReflexivityComputationStage(
-						reasoner));
+		return Arrays.asList(manager.propertyReflexivityComputationStage);
 	}
 
 	@Override
@@ -79,6 +78,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 			progressMonitor.finish();
 		}
 		reasoner.donePropertyHierarchyCompositionComputation = true;
+		computation_ = null;
 	}
 
 	@Override

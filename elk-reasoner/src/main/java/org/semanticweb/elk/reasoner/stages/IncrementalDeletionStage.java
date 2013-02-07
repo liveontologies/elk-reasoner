@@ -40,12 +40,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
 class IncrementalDeletionStage extends AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(IncrementalDeletionStage.class);
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IncrementalDeletionStage.class);
 
 	private ClassExpressionNoInputSaturation desaturation_ = null;
 
-	public IncrementalDeletionStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public IncrementalDeletionStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -55,12 +56,13 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(IncrementalStages.DELETION);
+		return reasoner.incrementalState
+				.getStageStatus(IncrementalStages.DELETION);
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new IncrementalDeletionInitializationStage(reasoner));
+		return Arrays.asList(manager.incrementalDeletionInitializationStage);
 	}
 
 	@Override
@@ -68,9 +70,9 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 		if (desaturation_ == null) {
 			initComputation();
 		}
-		
+
 		progressMonitor.start(getName());
-		
+
 		try {
 			for (;;) {
 				desaturation_.process();
@@ -80,25 +82,28 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		
-		reasoner.incrementalState.setStageStatus(IncrementalStages.DELETION, true);
-		reasoner.ruleAndConclusionStats.add(desaturation_.getRuleAndConclusionStatistics());
-		
+
+		reasoner.incrementalState.setStageStatus(IncrementalStages.DELETION,
+				true);
+		reasoner.ruleAndConclusionStats.add(desaturation_
+				.getRuleAndConclusionStatistics());
+
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Number of modified contexts " + reasoner.saturationState.getNotSaturatedContexts().size());
-		}		
+			LOGGER_.trace("Number of modified contexts "
+					+ reasoner.saturationState.getNotSaturatedContexts().size());
+		}
+		desaturation_ = null;
 	}
-	
 
 	@Override
-	void initComputation() {
+	void initComputation() {		
 		super.initComputation();
-	
+
 		desaturation_ = new ClassExpressionNoInputSaturation(
-				reasoner.getProcessExecutor(),
-				workerNo,
-				reasoner.getProgressMonitor(),
-				new RuleDeapplicationFactory(reasoner.saturationState, true), ContextModificationListener.DUMMY);
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor(), new RuleDeapplicationFactory(
+						reasoner.saturationState, true),
+				ContextModificationListener.DUMMY);
 	}
 
 	@Override

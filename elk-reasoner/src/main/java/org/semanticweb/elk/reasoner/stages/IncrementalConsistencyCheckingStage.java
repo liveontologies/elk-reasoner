@@ -36,8 +36,8 @@ import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
  */
 class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 
-	public IncrementalConsistencyCheckingStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public IncrementalConsistencyCheckingStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -47,18 +47,19 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		// TODO: what will happen with the taxonomy? Will it be correctly updated after several (incremental) consistency tests?
-		return Arrays.asList((ReasonerStage) new IncrementalAdditionStage(reasoner));		
+		// TODO: what will happen with the taxonomy? Will it be correctly
+		// updated after several (incremental) consistency tests?
+		return Arrays.asList(manager.incrementalAdditionStage);
 	}
-
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		
-		this.computation = new ConsistencyChecking(
+
+		this.computation_ = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.ontologyIndex, reasoner.saturationState);
+				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
+				reasoner.saturationState);
 	}
 
 }

@@ -56,10 +56,10 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
-	private Iterator<IndexedClassExpression> todo = null;
+	private Iterator<IndexedClassExpression> todo_ = null;
 
-	public ContextInitializationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public ContextInitializationStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -79,14 +79,14 @@ class ContextInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() throws ElkInterruptedException {
-		if (todo == null)
+		if (todo_ == null)
 			initComputation();
 		try {
 			progressMonitor.start(getName());
 			for (;;) {
-				if (!todo.hasNext())
+				if (!todo_.hasNext())
 					break;
-				IndexedClassExpression ice = todo.next();
+				IndexedClassExpression ice = todo_.next();
 				ice.resetContext();
 				deletedContexts_++;
 				progressMonitor.report(deletedContexts_, maxContexts_);
@@ -97,13 +97,14 @@ class ContextInitializationStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 		reasoner.doneContextReset = true;
+		todo_ = null;
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
 		reasoner.saturationState.resetFirstContext();
-		todo = reasoner.ontologyIndex.getIndexedClassExpressions().iterator();
+		todo_ = reasoner.ontologyIndex.getIndexedClassExpressions().iterator();
 		maxContexts_ = reasoner.ontologyIndex.getIndexedClassExpressions()
 				.size();
 		deletedContexts_ = 0;

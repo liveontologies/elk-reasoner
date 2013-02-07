@@ -42,13 +42,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 	// logger for this class
-	//private static final Logger LOGGER_ = Logger
-	//		.getLogger(IncrementalContextCleaningStage.class);
+	// private static final Logger LOGGER_ = Logger
+	// .getLogger(IncrementalContextCleaningStage.class);
 
 	private ClassExpressionNoInputSaturation cleaning_ = null;
 
-	public IncrementalContextCleaningStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public IncrementalContextCleaningStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -64,7 +64,8 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Collections.<ReasonerStage>singletonList(new InitializeContextsAfterDeletions(reasoner));
+		return Collections
+				.<ReasonerStage> singletonList(manager.initializeContextsAfterDeletionsStage);
 	}
 
 	@Override
@@ -87,8 +88,9 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 		reasoner.incrementalState.setStageStatus(
 				IncrementalStages.CONTEXT_CLEANING, true);
-		reasoner.ruleAndConclusionStats.add(cleaning_.getRuleAndConclusionStatistics());
-
+		reasoner.ruleAndConclusionStats.add(cleaning_
+				.getRuleAndConclusionStatistics());
+		cleaning_ = null;
 
 	}
 
@@ -101,7 +103,8 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
 		cleaning_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), cleaningFactory, ContextModificationListener.DUMMY);
+				reasoner.getProgressMonitor(), cleaningFactory,
+				ContextModificationListener.DUMMY);
 	}
 
 	@Override

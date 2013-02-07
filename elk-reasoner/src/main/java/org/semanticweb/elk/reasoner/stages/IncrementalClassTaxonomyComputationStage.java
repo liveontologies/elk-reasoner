@@ -50,9 +50,8 @@ class IncrementalClassTaxonomyComputationStage extends
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalClassTaxonomyComputationStage.class);
 
-	public IncrementalClassTaxonomyComputationStage(
-			AbstractReasonerState reasoner) {
-		super(reasoner);
+	public IncrementalClassTaxonomyComputationStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -62,12 +61,8 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new IncrementalTaxonomyCleaningStage(
-						reasoner));
+		return Arrays.asList(manager.incrementalTaxonomyCleaningStage);
 	}
-	
-	
 
 	@Override
 	public void execute() throws ElkInterruptedException {
@@ -95,22 +90,23 @@ class IncrementalClassTaxonomyComputationStage extends
 					indexedClasses, 128), reasoner.getProcessExecutor(),
 					workerNo, progressMonitor, reasoner.saturationState);
 		} else {
-			//classes which correspond to changed nodes in the taxonomy
-			//they must include new classes
+			// classes which correspond to changed nodes in the taxonomy
+			// they must include new classes
 			final Iterable<ElkClass> modifiedClassesIter = reasoner.classTaxonomyState.classesForModifiedNodes;
 			final IndexObjectConverter converter = reasoner.objectCache_
 					.getIndexObjectConverter();
 
-			//let's convert to indexed objects and filter out removed classes
+			// let's convert to indexed objects and filter out removed classes
 			Collection<IndexedClass> modified = new AbstractSet<IndexedClass>() {
 
 				@Override
 				public Iterator<IndexedClass> iterator() {
 					return new Iterator<IndexedClass>() {
 
-						final Iterator<ElkClass> iter_ = modifiedClassesIter.iterator();
+						final Iterator<ElkClass> iter_ = modifiedClassesIter
+								.iterator();
 						IndexedClass curr_ = null;
-						
+
 						@Override
 						public boolean hasNext() {
 							if (curr_ != null) {
@@ -118,8 +114,9 @@ class IncrementalClassTaxonomyComputationStage extends
 							} else {
 								while (curr_ == null && iter_.hasNext()) {
 									ElkClass elkClass = iter_.next();
-									IndexedClass indexedClass = (IndexedClass) elkClass.accept(converter);
-									
+									IndexedClass indexedClass = (IndexedClass) elkClass
+											.accept(converter);
+
 									if (indexedClass.occurs()) {
 										curr_ = indexedClass;
 									}
@@ -142,7 +139,7 @@ class IncrementalClassTaxonomyComputationStage extends
 						public void remove() {
 							throw new UnsupportedOperationException();
 						}
-						
+
 					};
 				}
 
@@ -151,14 +148,16 @@ class IncrementalClassTaxonomyComputationStage extends
 					// TODO: this is only an upper bound; calculate exactly
 					return reasoner.classTaxonomyState.classesForModifiedNodes
 							.size();
-							//+ reasoner.incrementalState.diffIndex.getAddedClasses().size();
+					// +
+					// reasoner.incrementalState.diffIndex.getAddedClasses().size();
 				}
 
 			};
 			
 			computation_ = new ClassTaxonomyComputation(Operations.split(
 					modified, 64), reasoner.getProcessExecutor(), workerNo,
-					progressMonitor, reasoner.saturationState, reasoner.classTaxonomyState.taxonomy);
+					progressMonitor, reasoner.saturationState,
+					reasoner.classTaxonomyState.taxonomy);
 		}
 
 	}

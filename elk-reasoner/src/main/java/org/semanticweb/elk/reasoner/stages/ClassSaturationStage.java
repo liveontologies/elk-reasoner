@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -45,8 +46,8 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	 */
 	private ClassExpressionSaturation<IndexedClass> computation_ = null;
 
-	public ClassSaturationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public ClassSaturationStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -61,8 +62,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ConsistencyCheckingStage(
-				reasoner));
+		return Arrays.asList(manager.consistencyCheckingStage);
 	}
 
 	@Override
@@ -79,9 +79,11 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		
+
 		reasoner.doneClassSaturation = true;
-		reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
+		reasoner.ruleAndConclusionStats.add(computation_
+				.getRuleAndConclusionStatistics());
+		computation_ = null;
 	}
 
 	@Override

@@ -1,8 +1,4 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -25,16 +21,28 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-/**
- * An empty base class for stages used for post processing
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- */
-public abstract class BasePostProcessingStage implements PostProcessingStage {
+import org.semanticweb.elk.owl.exceptions.ElkException;
 
-	@Override
-	public void printInfo() {
-	}
+public interface PostProcessingStage {
+
+	/**
+	 * @return a string identifier of this stage
+	 */
+	public String getName();
+
+	/**
+	 * Performs the execution of this stage.
+	 * 
+	 * @throws ElkException
+	 *             if execution was not successful
+	 */
+	public void execute() throws ElkException;
+
+	/**
+	 * Prints detailed information about the (progress) of this stage. This
+	 * function can be used to print statistics after this stage is executed or
+	 * interrupted.
+	 */
+	public void printInfo();
+
 }

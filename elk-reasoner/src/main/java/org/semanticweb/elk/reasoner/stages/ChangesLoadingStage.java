@@ -41,8 +41,8 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ChangesLoadingStage.class);
 
-	public ChangesLoadingStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public ChangesLoadingStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -57,8 +57,7 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new OntologyLoadingStage(reasoner));
+		return Arrays.asList(manager.ontologyLoadingStage);
 	}
 
 	@Override

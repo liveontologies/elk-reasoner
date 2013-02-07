@@ -54,9 +54,9 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 	
 	private final double RATIO_ = 0.2;
 	
-	public RandomContextResaturationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
-	}
+	public RandomContextResaturationStage(ReasonerStageManager manager) {
+		super(manager);
+	}	
 	
 	@Override
 	public String getName() {

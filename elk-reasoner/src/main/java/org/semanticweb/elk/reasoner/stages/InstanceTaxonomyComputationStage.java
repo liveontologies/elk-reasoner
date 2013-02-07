@@ -49,8 +49,8 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	 */
 	private InstanceTaxonomyComputation computation_ = null;
 
-	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public InstanceTaxonomyComputationStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -65,8 +65,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ClassTaxonomyComputationStage(
-				reasoner));
+		return Arrays.asList(manager.classTaxonomyComputationStage);
 	}
 
 	@Override
@@ -87,6 +86,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		reasoner.instanceTaxonomy = computation_.getTaxonomy();
 		reasoner.classTaxonomyState.taxonomy = reasoner.instanceTaxonomy;
 		reasoner.doneInstanceTaxonomy = true;
+		computation_ = null;
 	}
 
 	@SuppressWarnings("unchecked")

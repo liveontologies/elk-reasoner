@@ -41,8 +41,8 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(OntologyLoadingStage.class);
 
-	public OntologyLoadingStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public OntologyLoadingStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -85,11 +85,10 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	 */
 	// ////////////////////////////////////////////////////////////////////////////////
 
-	/*@Override
-	public Collection<ReasonerStage> getPostProcessingStages() {
-		return Arrays
-				.<ReasonerStage> asList(new SaturatedPropertyChainCheckingStage(
-						reasoner.ontologyIndex));
-	}*/
+	/*
+	 * @Override public Collection<ReasonerStage> getPostProcessingStages() {
+	 * return Arrays .<ReasonerStage> asList(new
+	 * SaturatedPropertyChainCheckingStage( reasoner.ontologyIndex)); }
+	 */
 
 }

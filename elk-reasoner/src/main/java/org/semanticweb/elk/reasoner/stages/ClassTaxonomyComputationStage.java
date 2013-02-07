@@ -47,8 +47,8 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	 */
 	protected ClassTaxonomyComputation computation_ = null;
 
-	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public ClassTaxonomyComputationStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -63,8 +63,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ConsistencyCheckingStage(
-				reasoner));
+		return Arrays.asList(manager.consistencyCheckingStage);
 	}
 
 	@Override
@@ -87,6 +86,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		reasoner.doneClassTaxonomy = true;
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
+		computation_ = null;
 	}
 
 	@Override

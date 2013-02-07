@@ -61,10 +61,10 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
-	private Iterator<IndexedPropertyChain> todo = null;
+	private Iterator<IndexedPropertyChain> todo_ = null;
 
-	public PropertyInitializationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public PropertyInitializationStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -84,14 +84,14 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public void execute() throws ElkInterruptedException {
-		if (todo == null)
+		if (todo_ == null)
 			initComputation();
 		try {
 			progressMonitor.start(getName());
 			for (;;) {
-				if (!todo.hasNext())
+				if (!todo_.hasNext())
 					break;
-				IndexedPropertyChain ipc = todo.next();
+				IndexedPropertyChain ipc = todo_.next();
 				SaturatedPropertyChain saturation = ipc.getSaturated();
 				if (saturation != null) {
 					saturation.clear();
@@ -105,12 +105,13 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 		reasoner.donePropertySaturationReset = true;
+		todo_ = null;
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		todo = reasoner.ontologyIndex.getIndexedPropertyChains().iterator();
+		todo_ = reasoner.ontologyIndex.getIndexedPropertyChains().iterator();
 		maxProgress_ = reasoner.ontologyIndex.getIndexedPropertyChains().size();
 		progress_ = 0;
 		clearedSaturations_ = 0;

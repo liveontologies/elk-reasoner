@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,23 +37,29 @@ import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class PostProcessingStageExecutor extends LoggingStageExecutor {
 
 	static final Multimap<Class<?>, Class<?>> postProcesingMap = new HashListMultimap<Class<?>, Class<?>>();
-	
+
 	/*
 	 * STATIC INT
 	 */
 	static {
-		//init post processing map
-		postProcesingMap.add(PropertyHierarchyCompositionComputationStage.class, SaturatedPropertyChainCheckingStage.class);
-		postProcesingMap.add(IncrementalDeletionStage.class, ContextSaturationFlagCheckingStage.class);
-		postProcesingMap.add(IncrementalContextCleaningStage.class, CheckCleaningStage.class);
-		postProcesingMap.add(IncrementalContextCleaningStage.class, SaturationGraphValidationStage.class);
-		postProcesingMap.add(IncrementalAdditionInitializationStage.class, SaturationGraphValidationStage.class);
+		// init post processing map
+		postProcesingMap.add(
+				PropertyHierarchyCompositionComputationStage.class,
+				SaturatedPropertyChainCheckingStage.class);
+		postProcesingMap.add(IncrementalDeletionStage.class,
+				ContextSaturationFlagCheckingStage.class);
+		postProcesingMap.add(IncrementalContextCleaningStage.class,
+				CheckCleaningStage.class);
+		postProcesingMap.add(IncrementalContextCleaningStage.class,
+				SaturationGraphValidationStage.class);
+		postProcesingMap.add(IncrementalAdditionInitializationStage.class,
+				SaturationGraphValidationStage.class);
 		/*
 		 * this phase is commented because it uses cleaning to clean up randomly
 		 * picked contexts. Cleaning never deletes anything from other contexts,
@@ -67,43 +74,52 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 		 * clean all modified ones, and re-saturate. I.e. do exactly what we do
 		 * in the standard chain of incremental reasoning stages.
 		 */
-		//postProcesingMap.add(IncrementalReSaturationStage.class, RandomContextResaturationStage.class);
-		postProcesingMap.add(IncrementalClassTaxonomyComputationStage.class, ValidateTaxonomyStage.class);
+		// postProcesingMap.add(IncrementalReSaturationStage.class,
+		// RandomContextResaturationStage.class);
+		postProcesingMap.add(IncrementalClassTaxonomyComputationStage.class,
+				ValidateTaxonomyStage.class);
 	}
-	
+
 	@Override
 	public void complete(ReasonerStage stage) throws ElkException {
 		super.complete(stage);
-		
+
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Starting post processing...");
 		}
-		
+
+		// FIXME: get rid of casts
 		try {
-			for (ReasonerStage ppStage : instantiate(postProcesingMap.get(stage.getClass()), ((AbstractReasonerStage)stage).reasoner)) {
-				super.complete(ppStage);
+			for (PostProcessingStage ppStage : instantiate(
+					postProcesingMap.get(stage.getClass()),
+					((AbstractReasonerStage) stage).reasoner)) {
+				ppStage.execute();
 			}
 		} catch (Exception e) {
 			throw new ElkRuntimeException(e);
 		}
-		
+
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Post processing finished");
 		}
 
 	}
 
-	private Collection<ReasonerStage> instantiate(Collection<Class<?>> collection, AbstractReasonerState reasoner) throws Exception {
-		List<ReasonerStage> stages = new ArrayList<ReasonerStage>(1);
-		
+	private Collection<PostProcessingStage> instantiate(
+			Collection<Class<?>> collection, AbstractReasonerState reasoner)
+			throws Exception {
+		List<PostProcessingStage> stages = new ArrayList<PostProcessingStage>(1);
+
 		for (Class<?> stageClass : collection) {
-			Constructor<?> constructor = stageClass.getConstructor(AbstractReasonerState.class);
-			ReasonerStage stage = (ReasonerStage) constructor.newInstance(reasoner);
-			
+			Constructor<?> constructor = stageClass
+					.getConstructor(AbstractReasonerState.class);
+			PostProcessingStage stage = (PostProcessingStage) constructor
+					.newInstance(reasoner);
+
 			stages.add(stage);
 		}
-		
+
 		return stages;
 	}
-	
+
 }

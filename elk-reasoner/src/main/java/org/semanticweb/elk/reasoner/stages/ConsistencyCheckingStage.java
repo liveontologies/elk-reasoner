@@ -44,10 +44,10 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	protected ConsistencyChecking computation = null;
+	protected ConsistencyChecking computation_ = null;
 
-	public ConsistencyCheckingStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public ConsistencyCheckingStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -62,22 +62,20 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new PropertyHierarchyCompositionComputationStage(
-						reasoner),
-						(ReasonerStage) new ContextInitializationStage(reasoner),
-						(ReasonerStage) new OntologyLoadingStage(reasoner),
-						(ReasonerStage) new ChangesLoadingStage(reasoner));
+		return Arrays.asList(
+				manager.propertyHierarchyCompositionComputationStage,
+				manager.contextInitializationStage,
+				manager.ontologyLoadingStage, manager.changesLoadingStage);
 	}
 
 	@Override
 	public void execute() throws ElkInterruptedException {
-		if (computation == null)
+		if (computation_ == null)
 			initComputation();
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
-				computation.process();
+				computation_.process();
 				if (!interrupted())
 					break;
 			}
@@ -85,15 +83,17 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 			progressMonitor.finish();
 		}
 
-		reasoner.inconsistentOntology = computation.isInconsistent();
+		reasoner.inconsistentOntology = computation_.isInconsistent();
 		reasoner.doneConsistencyCheck = true;
-		reasoner.ruleAndConclusionStats.add(computation.getRuleAndConclusionStatistics());
+		reasoner.ruleAndConclusionStats.add(computation_
+				.getRuleAndConclusionStatistics());
+		computation_ = null;
 	}
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		this.computation = new ConsistencyChecking(
+		this.computation_ = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
 				reasoner.saturationState);
@@ -103,8 +103,8 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		if (computation != null)
-			computation.printStatistics();
+		if (computation_ != null)
+			computation_.printStatistics();
 	}
 
 }

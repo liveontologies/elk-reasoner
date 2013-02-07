@@ -45,8 +45,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
-import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
@@ -151,13 +151,15 @@ public abstract class AbstractReasonerState {
 	 * {@code true} if the current ontology is inconsistent
 	 */
 	boolean inconsistentOntology = false;
-	
+
 	/**
 	 * Taxonomy that stores (partial) classification
 	 */
-	//UpdateableTaxonomy<ElkClass> taxonomy = null;
-	
+	// UpdateableTaxonomy<ElkClass> taxonomy = null;
+
 	final TaxonomyState classTaxonomyState = new TaxonomyState();
+
+	final ReasonerStageManager stageManager;
 
 	/**
 	 * Taxonomy that stores (partial) classification and (partial) realization
@@ -181,6 +183,7 @@ public abstract class AbstractReasonerState {
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.config_ = config;
 		this.incrementalState = new IncrementalReasonerState(ontologyIndex);
+		this.stageManager = new ReasonerStageManager(this);
 	}
 
 	public void setIncrementalMode(boolean set) {
@@ -207,9 +210,9 @@ public abstract class AbstractReasonerState {
 			objectCache_.clear();
 			ontologyIndex = new OntologyIndexImpl(objectCache_);
 		}
-		/*else {
-			if (objectCache_.size() > 2) throw new RuntimeException();
-		}*/
+		/*
+		 * else { if (objectCache_.size() > 2) throw new RuntimeException(); }
+		 */
 
 		resetChangesLoading();
 		resetPropertySaturation();
@@ -279,12 +282,13 @@ public abstract class AbstractReasonerState {
 
 					if (!incrementalChange(change)) {
 						if (LOGGER_.isInfoEnabled()) {
-							LOGGER_.info("The axiom change " + change + " cannot be accommodated incrementally");
+							LOGGER_.info("The axiom change " + change
+									+ " cannot be accommodated incrementally");
 						}
-						
+
 						incrementalState = null;
-						
-						//throw new RuntimeException(change.toString());
+
+						// throw new RuntimeException(change.toString());
 					}
 
 					resetChangesLoading();
@@ -401,8 +405,8 @@ public abstract class AbstractReasonerState {
 	 */
 	public boolean isInconsistent() throws ElkException {
 
-		ReasonerStage stage = incrementalState == null ? new ConsistencyCheckingStage(
-				this) : new IncrementalConsistencyCheckingStage(this);
+		ReasonerStage stage = incrementalState == null ? stageManager.consistencyCheckingStage
+				: stageManager.incrementalConsistencyCheckingStage;
 
 		getStageExecutor().complete(stage);
 
@@ -424,7 +428,7 @@ public abstract class AbstractReasonerState {
 	 */
 	public void loadOntology() throws ElkException {
 		setIncrementalMode(false);
-		getStageExecutor().complete(new OntologyLoadingStage(this));
+		getStageExecutor().complete(stageManager.ontologyLoadingStage);
 	}
 
 	/**
@@ -434,7 +438,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public void loadChanges() throws ElkException {
-		getStageExecutor().complete(new ChangesLoadingStage(this));
+		getStageExecutor().complete(stageManager.changesLoadingStage);
 	}
 
 	/**
@@ -451,14 +455,14 @@ public abstract class AbstractReasonerState {
 
 		if (incrementalState != null) {
 			getStageExecutor().complete(
-					new IncrementalClassTaxonomyComputationStage(this));
+					stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
-			getStageExecutor()
-					.complete(new ClassTaxonomyComputationStage(this));
+			getStageExecutor().complete(
+					stageManager.classTaxonomyComputationStage);
 			this.incrementalState = new IncrementalReasonerState(ontologyIndex);
 		}
 
-		return classTaxonomyState.taxonomy;//taxonomy;
+		return classTaxonomyState.taxonomy;// taxonomy;
 	}
 
 	public Taxonomy<ElkClass> getTaxonomyQuietly() {
@@ -521,7 +525,8 @@ public abstract class AbstractReasonerState {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
-		getStageExecutor().complete(new InstanceTaxonomyComputationStage(this));
+		getStageExecutor().complete(
+				stageManager.instanceTaxonomyComputationStage);
 
 		return instanceTaxonomy;
 	}
@@ -542,7 +547,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	protected OntologyIndex getOntologyIndex() throws ElkException {
-		getStageExecutor().complete(new OntologyLoadingStage(this));
+		getStageExecutor().complete(stageManager.ontologyLoadingStage);
 		return ontologyIndex;
 	}
 

@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Collections;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -42,12 +41,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVis
  * 
  *         pavel.klinov@uni-ulm.de
  */
-abstract class BaseIncrementalContextInitializationStage extends
+abstract class AbstractIncrementalContextInitializationStage extends
 		AbstractReasonerStage {
 
 	// logger for this class
 	static final Logger LOGGER_ = Logger
-			.getLogger(BaseIncrementalContextInitializationStage.class);
+			.getLogger(AbstractIncrementalContextInitializationStage.class);
 
 	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
 
@@ -67,9 +66,9 @@ abstract class BaseIncrementalContextInitializationStage extends
 	 */
 	protected Iterator<IndexedClassExpression> todo = null;
 
-	public BaseIncrementalContextInitializationStage(
-			AbstractReasonerState reasoner) {
-		super(reasoner);
+	public AbstractIncrementalContextInitializationStage(
+			ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -123,9 +122,10 @@ abstract class BaseIncrementalContextInitializationStage extends
 		} finally {
 			progressMonitor.finish();
 		}
-		
+
 		reasoner.doneContextReset = true;
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
+		todo = null;
 	}
 
 	@Override
@@ -135,89 +135,4 @@ abstract class BaseIncrementalContextInitializationStage extends
 	}
 
 	protected abstract IncrementalStages stage();
-}
-
-/**
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- */
-class InitializeContextsAfterDeletions extends
-		BaseIncrementalContextInitializationStage {
-
-	public InitializeContextsAfterDeletions(AbstractReasonerState reasoner) {
-		super(reasoner);
-	}
-
-	@Override
-	protected IncrementalStages stage() {
-		return IncrementalStages.CONTEXT_AFTER_DEL_INIT;
-	}
-
-	@Override
-	void initComputation() {
-		super.initComputation();
-
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Initializing contexts with deleted conclusions: "
-					+ reasoner.saturationState.getNotSaturatedContexts());
-			LOGGER_.trace("Initializing contexts which will be removed: "
-					+ reasoner.saturationState.getContextsToBeRemoved());
-		}
-
-		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();
-		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts()
-				.size();
-
-		initContexts_ = 0;
-	}
-
-	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Collections
-				.<ReasonerStage> singleton(new IncrementalDeletionStage(
-						reasoner));
-	}
-}
-
-/**
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- */
-class InitializeContextsAfterCleaning extends
-		BaseIncrementalContextInitializationStage {
-
-	public InitializeContextsAfterCleaning(AbstractReasonerState reasoner) {
-		super(reasoner);
-	}
-
-	@Override
-	protected IncrementalStages stage() {
-		return IncrementalStages.CONTEXT_AFTER_CLEAN_INIT;
-	}
-
-	@Override
-	void initComputation() {
-		super.initComputation();
-
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Cleaned contexts to be initialized: "
-					+ reasoner.saturationState.getNotSaturatedContexts());
-		}
-
-		todo = reasoner.saturationState.getNotSaturatedContexts().iterator();
-		maxContexts_ = reasoner.saturationState.getNotSaturatedContexts()
-				.size();
-		initContexts_ = 0;
-	}
-
-	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Collections
-				.<ReasonerStage> singleton(new IncrementalContextCleaningStage(
-						reasoner));
-	}
 }

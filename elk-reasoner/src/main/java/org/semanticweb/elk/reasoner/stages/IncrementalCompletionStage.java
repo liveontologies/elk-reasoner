@@ -47,15 +47,15 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
  */
 public class IncrementalCompletionStage extends AbstractReasonerStage {
 
-	public IncrementalCompletionStage(AbstractReasonerState reasoner) {
-		super(reasoner);
-	}
-
 	// logger for this class
 	// private static final Logger LOGGER_ =
 	// Logger.getLogger(IncrementalCompletionStage.class);
 
 	private ClassExpressionNoInputSaturation completion_ = null;
+
+	public IncrementalCompletionStage(ReasonerStageManager manager) {
+		super(manager);
+	}
 
 	@Override
 	public String getName() {
@@ -70,10 +70,9 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 	@Override
 	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new PropertyHierarchyCompositionComputationStage(
-						reasoner), (ReasonerStage) new ChangesLoadingStage(
-						reasoner));
+		return Arrays.asList(
+				manager.propertyHierarchyCompositionComputationStage,
+				manager.changesLoadingStage);
 	}
 
 	@Override
@@ -96,7 +95,8 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 		reasoner.incrementalState.setStageStatus(IncrementalStages.COMPLETION,
 				true);
-		reasoner.ruleAndConclusionStats.add(completion_.getRuleAndConclusionStatistics());
+		reasoner.ruleAndConclusionStats.add(completion_
+				.getRuleAndConclusionStatistics());
 		markAllContextsAsSaturated();
 		/*
 		 * TODO: at some point we need to clear non-saturated contexts when
@@ -105,10 +105,12 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 		 * the non saturated contexts are not cleaned at all during incremental
 		 * consistency checking. Something needs to be done about it.
 		 */
-		SaturationState.Writer writer = reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY);
+		SaturationState.Writer writer = reasoner.saturationState
+				.getWriter(ConclusionVisitor.DUMMY);
 
 		writer.clearNotSaturatedContexts();
 		writer.clearContextsToBeRemoved();
+		completion_ = null;
 	}
 
 	@Override

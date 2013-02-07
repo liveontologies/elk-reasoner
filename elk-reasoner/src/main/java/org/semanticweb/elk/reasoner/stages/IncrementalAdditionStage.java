@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,15 +37,15 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
  * TODO docs
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class IncrementalAdditionStage extends AbstractReasonerStage {
 
 	private ClassExpressionNoInputSaturation saturation_ = null;
-	
-	public IncrementalAdditionStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+
+	public IncrementalAdditionStage(ReasonerStageManager manager) {
+		super(manager);
 	}
 
 	@Override
@@ -54,12 +55,13 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean done() {
-		return reasoner.incrementalState.getStageStatus(IncrementalStages.ADDITION);
+		return reasoner.incrementalState
+				.getStageStatus(IncrementalStages.ADDITION);
 	}
 
 	@Override
 	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new IncrementalAdditionInitializationStage(reasoner));
+		return Arrays.asList(manager.incrementalAdditionInitializationStage);
 	}
 
 	@Override
@@ -67,11 +69,12 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 		if (saturation_ == null) {
 			initComputation();
 		}
-		
-		//System.out.println("Active contexts: " + reasoner.saturationState.activeContexts_);
-		
+
+		// System.out.println("Active contexts: " +
+		// reasoner.saturationState.activeContexts_);
+
 		progressMonitor.start(getName());
-		
+
 		try {
 			for (;;) {
 				saturation_.process();
@@ -81,30 +84,31 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		
-		reasoner.incrementalState.setStageStatus(IncrementalStages.ADDITION, true);
-		reasoner.ruleAndConclusionStats.add(saturation_.getRuleAndConclusionStatistics());
-		
-		markAllContextsAsSaturated();	
-		///FIXME
-		/*for (IndexedClass ic : reasoner.ontologyIndex.getIndexedClasses()) {
-			if (ic.getContext() != null) 
-				
-			System.out.println(ic + ": " + ic.getContext().getSubsumers());
-		}*/
+
+		reasoner.incrementalState.setStageStatus(IncrementalStages.ADDITION,
+				true);
+		reasoner.ruleAndConclusionStats.add(saturation_
+				.getRuleAndConclusionStatistics());
+
+		markAllContextsAsSaturated();
+		// /FIXME
+		/*
+		 * for (IndexedClass ic : reasoner.ontologyIndex.getIndexedClasses()) {
+		 * if (ic.getContext() != null)
+		 * 
+		 * System.out.println(ic + ": " + ic.getContext().getSubsumers()); }
+		 */
+		saturation_ = null;
 	}
-	
-	
 
 	@Override
 	void initComputation() {
 		super.initComputation();
-		
+
 		saturation_ = new ClassExpressionNoInputSaturation(
-				reasoner.getProcessExecutor(),
-				workerNo,
-				reasoner.getProgressMonitor(),
-				new RuleApplicationFactory(reasoner.saturationState, true),
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor(), new RuleApplicationFactory(
+						reasoner.saturationState, true),
 				ContextModificationListener.DUMMY);
 	}
 
