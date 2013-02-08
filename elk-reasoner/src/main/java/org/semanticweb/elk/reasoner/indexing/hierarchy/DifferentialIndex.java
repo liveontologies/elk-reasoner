@@ -22,9 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
@@ -52,16 +49,20 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * @author Pavel Klinov
  * 
  */
-public class DifferentialIndex {
+public class DifferentialIndex extends DirectIndex {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(DifferentialIndex.class);
 
+	/**
+	 * if {@code true} all changes will be applied incrementally; otherwise
+	 * changes are applied directly
+	 */
+	boolean incrementaMode = false;
+
 	private final Set<ElkClass> addedClasses_;
 
-	private final List<ElkNamedIndividual> removedIndividuals_;
-
-	private final OntologyIndex mainIndex_;
+	private final Set<ElkNamedIndividual> addedIndividuals_;
 
 	/**
 	 * object that should be deleted
@@ -82,21 +83,39 @@ public class DifferentialIndex {
 
 	private final ElkAxiomProcessor axiomInserter_, axiomDeleter_;
 
-	public DifferentialIndex(OntologyIndex mainIndex, IndexedClass owlNothing) {
+	public DifferentialIndex(IndexedObjectCache objectCache) {
+		super(objectCache);
 		this.addedClasses_ = new ArrayHashSet<ElkClass>(127);
-		this.removedIndividuals_ = new ArrayList<ElkNamedIndividual>();
+		this.addedIndividuals_ = new ArrayHashSet<ElkNamedIndividual>(127);
 		this.todoDeletions_ = new IndexedObjectCache();
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
 		this.axiomInserter_ = new ElkAxiomIndexerVisitor(
-				mainIndex.getIndexedObjectCache(), owlNothing,
-				new IncrementalIndexUpdater(this), true);
+				getIndexedObjectCache(), indexedOwlNothing,
+				new DifferentialIndexUpdater<DifferentialIndex>(this), true);
 		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(
-				mainIndex.getIndexedObjectCache(), owlNothing,
-				new IncrementalIndexUpdater(this), false);
-		this.mainIndex_ = mainIndex;
+				getIndexedObjectCache(), indexedOwlNothing,
+				new DifferentialIndexUpdater<DifferentialIndex>(this), false);
+	}
+
+	@Override
+	public ElkAxiomProcessor getAxiomInserter() {
+		return axiomInserter_;
+	}
+
+	@Override
+	public ElkAxiomProcessor getAxiomDeleter() {
+		return axiomDeleter_;
+	}
+
+	public ElkAxiomProcessor getDirectAxiomInserter() {
+		return super.getAxiomInserter();
+	}
+
+	public ElkAxiomProcessor getDirectAxiomDeleter() {
+		return super.getAxiomDeleter();
 	}
 
 	public ChainableRule<Context> getAddedContextInitRules() {
@@ -128,12 +147,12 @@ public class DifferentialIndex {
 		return this.addedClasses_;
 	}
 
-	public Collection<IndexedClassExpression> getRemovedClassExpressions() {
-		return todoDeletions_.indexedClassExpressionLookup;
+	public Collection<ElkNamedIndividual> getAddedIndividuals() {
+		return this.addedIndividuals_;
 	}
 
-	public List<ElkNamedIndividual> getRemovedIndividuals() {
-		return this.removedIndividuals_;
+	public Collection<IndexedClassExpression> getRemovedClassExpressions() {
+		return todoDeletions_.indexedClassExpressionLookup;
 	}
 
 	/**
@@ -144,7 +163,7 @@ public class DifferentialIndex {
 	public void clearDeletedRules() {
 		removedContextInitRules_ = null;
 		removedContextRuleHeadByClassExpressions_.clear();
-		mainIndex_.getIndexedObjectCache().subtract(todoDeletions_);
+		getIndexedObjectCache().subtract(todoDeletions_);
 		todoDeletions_.clear();
 	}
 
@@ -158,7 +177,7 @@ public class DifferentialIndex {
 		Chain<ChainableRule<Context>> chain;
 
 		nextRule = addedContextInitRules_;
-		chain = mainIndex_.getContextInitRuleChain();
+		chain = getContextInitRuleChain();
 		while (nextRule != null) {
 			nextRule.addTo(chain);
 			nextRule = nextRule.next();
@@ -182,7 +201,7 @@ public class DifferentialIndex {
 
 	public void clearSignatureChanges() {
 		addedClasses_.clear();
-		removedIndividuals_.clear();
+		addedIndividuals_.clear();
 	}
 
 	public boolean isEmpty() {
@@ -192,14 +211,22 @@ public class DifferentialIndex {
 				&& removedContextRuleHeadByClassExpressions_.isEmpty();
 	}
 
-	public ElkAxiomProcessor getAxiomInserter() {
-		return axiomInserter_;
+	public void setIncrementalMode(boolean mode) {
+		if (this.incrementaMode = mode)
+			// already set
+			return;
+		this.incrementaMode = mode;
+		if (!mode) {
+			clearDeletedRules();
+			commitAddedRules();
+			clearSignatureChanges();
+		}
 	}
 
-	public ElkAxiomProcessor getAxiomDeleter() {
-		return axiomDeleter_;
+	public boolean isIncrementalMode() {
+		return incrementaMode;
 	}
-
+	
 	private Chain<ChainableRule<Context>> getAddedContextInitRuleChain() {
 		return new AbstractChain<ChainableRule<Context>>() {
 
@@ -245,27 +272,31 @@ public class DifferentialIndex {
 	void addClass(ElkClass newClass) {
 		addedClasses_.add(newClass);
 	}
-	
+
 	void removeClass(ElkClass newClass) {
 		addedClasses_.remove(newClass);
+	}
+
+	void addNamedIndividual(ElkNamedIndividual newIndividual) {
+		addedIndividuals_.add(newIndividual);
+	}
+
+	void removeNamedIndividual(ElkNamedIndividual newIndividual) {
+		addedIndividuals_.remove(newIndividual);
 	}
 
 	void addIndexedObject(IndexedObject iobj) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("Adding: " + iobj);
 		if (!iobj.accept(todoDeletions_.deletor))
-			iobj.accept(mainIndex_.getIndexedObjectCache().inserter);
-		
+			iobj.accept(getIndexedObjectCache().inserter);
+
 	}
 
 	void removeIndexedObject(IndexedObject iobj) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("To remove: " + iobj);
 		iobj.accept(todoDeletions_.inserter);
-	}
-
-	void removeNamedIndividual(ElkNamedIndividual newIndividual) {
-		removedIndividuals_.add(newIndividual);
 	}
 
 	void registerAddedContextInitRule(ChainableRule<Context> rule) {
@@ -275,7 +306,7 @@ public class DifferentialIndex {
 	void registerRemovedContextInitRule(ChainableRule<Context> rule) {
 		if (!rule.removeFrom(getAddedContextInitRuleChain())) {
 			rule.addTo(getRemovedContextInitRuleChain());
-			if (!rule.removeFrom(mainIndex_.getContextInitRuleChain()))
+			if (!rule.removeFrom(getContextInitRuleChain()))
 				throw new ElkUnexpectedIndexingException(
 						"Cannot remove context initialization rule "
 								+ rule.getName());
@@ -298,13 +329,13 @@ public class DifferentialIndex {
 		}
 	}
 
-	void addReflexiveProperty(IndexedObjectProperty property) {
-		mainIndex_.addReflexiveProperty(property);
-	}
-
-	void removeReflexiveProperty(IndexedObjectProperty property) {
-		if (!mainIndex_.removeReflexiveProperty(property))
+	@Override
+	public boolean removeReflexiveProperty(IndexedObjectProperty property) {
+		boolean result = super.removeReflexiveProperty(property);
+		if (result = false)
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove reflexivity of object property " + property);
+		return result;
 	}
+
 }

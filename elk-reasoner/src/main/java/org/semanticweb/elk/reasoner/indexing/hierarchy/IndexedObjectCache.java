@@ -63,7 +63,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	public IndexedObjectCache() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("Creating new cache");
-		
+
 		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
 				new IndexedClassExpressionViewFactory(), 1024);
 		indexedPropertyChainLookup = new KeyEntryHashSet<IndexedPropertyChain>(
@@ -71,7 +71,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		indexedAxiomLookup = new KeyEntryHashSet<IndexedAxiom>(
 				new IndexedAxiomViewFactory(), 1024);
 	}
-	
+
 	public IndexObjectConverter getIndexObjectConverter() {
 		return new IndexObjectConverter(this, this);
 	}
@@ -91,13 +91,13 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		return indexedClassCount + indexedIndividualCount
 				+ indexedObjectPropertyCount;
 	}
-	
+
 	public boolean isEmpty() {
 		return indexedClassExpressionLookup.isEmpty()
 				&& indexedPropertyChainLookup.isEmpty()
 				&& indexedAxiomLookup.isEmpty();
 	}
-	
+
 	/**
 	 * Remove all object of the given {@link IndexedObjectCache} from this
 	 * {@link IndexedObjectCache}
@@ -281,7 +281,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		}
 	};
 
-	protected final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
+	final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
 
 		@Override
 		public Boolean visit(IndexedClass element) {

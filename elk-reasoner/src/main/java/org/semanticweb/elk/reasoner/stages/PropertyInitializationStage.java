@@ -75,8 +75,10 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		todo_ = reasoner.ontologyIndex.getIndexedPropertyChains().iterator();
-		maxProgress_ = reasoner.ontologyIndex.getIndexedPropertyChains().size();
+		todo_ = reasoner.ontologyIndex.getIndexedPropertyChains()
+				.iterator();
+		maxProgress_ = reasoner.ontologyIndex.getIndexedPropertyChains()
+				.size();
 		progress_ = 0;
 		clearedSaturations_ = 0;
 		return true;

@@ -156,7 +156,7 @@ class IncrementalClassTaxonomyComputationStage extends
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.differentialIndex.clearSignatureChanges();
+		reasoner.ontologyIndex.clearSignatureChanges();
 		this.computation_ = null;
 		return true;
 	}

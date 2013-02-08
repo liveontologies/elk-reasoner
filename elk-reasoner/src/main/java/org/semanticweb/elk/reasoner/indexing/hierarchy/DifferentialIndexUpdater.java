@@ -37,72 +37,107 @@ import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
  * @author Pavel Klinov
  * 
  */
-public class IncrementalIndexUpdater implements IndexUpdater {
+public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
+		DirectIndexUpdater<I> implements IndexUpdater {
 
-	private final DifferentialIndex differentialIndex_;
-
-	public IncrementalIndexUpdater(DifferentialIndex indexChange_) {
-		this.differentialIndex_ = indexChange_;
+	public DifferentialIndexUpdater(I differentialIndex) {
+		super(differentialIndex);
 	}
 
 	@Override
 	public void addClass(ElkClass newClass) {
-		differentialIndex_.addClass(newClass);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.addClass(newClass);
+		else
+			super.addClass(newClass);
 	}
 
 	@Override
 	public void removeClass(ElkClass oldClass) {
-		differentialIndex_.removeClass(oldClass);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.removeClass(oldClass);
+		else
+			super.removeClass(oldClass);
 	}
 
 	@Override
 	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.addNamedIndividual(newIndividual);
+		else
+			super.addNamedIndividual(newIndividual);
 	}
 
 	@Override
 	public void removeNamedIndividual(ElkNamedIndividual newIndividual) {
-		differentialIndex_.removeNamedIndividual(newIndividual);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.removeNamedIndividual(newIndividual);
+		else
+			super.removeNamedIndividual(newIndividual);
 	}
 
 	@Override
 	public void add(IndexedClassExpression target, ChainableRule<Context> rule) {
-		differentialIndex_.registerAddedContextRule(target, rule);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.registerAddedContextRule(target, rule);
+		else
+			super.add(target, rule);
 	}
 
 	@Override
 	public void remove(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		differentialIndex_.registerRemovedContextRule(target, rule);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.registerRemovedContextRule(target, rule);
+		else
+			super.remove(target, rule);
 	}
 
 	@Override
 	public void add(ChainableRule<Context> rule) {
-		differentialIndex_.registerAddedContextInitRule(rule);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.registerAddedContextInitRule(rule);
+		else
+			super.add(rule);
 	}
 
 	@Override
 	public void remove(ChainableRule<Context> rule) {
-		differentialIndex_.registerRemovedContextInitRule(rule);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.registerRemovedContextInitRule(rule);
+		else
+			super.remove(rule);
 	}
 
 	@Override
 	public void add(IndexedObject object) {
-		differentialIndex_.addIndexedObject(object);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.addIndexedObject(object);
+		else
+			super.add(object);
 	}
 
 	@Override
 	public void remove(IndexedObject object) {
-		differentialIndex_.removeIndexedObject(object);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.removeIndexedObject(object);
+		else
+			super.remove(object);
 	}
 
 	@Override
 	public void addReflexiveProperty(IndexedObjectProperty property) {
-		differentialIndex_.addReflexiveProperty(property);
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.addReflexiveProperty(property);
+		else
+			super.addReflexiveProperty(property);
 	}
 
 	@Override
 	public void removeReflexiveProperty(IndexedObjectProperty property) {
-		differentialIndex_.removeReflexiveProperty(property);
-
+		if (ontologyIndex.incrementaMode)
+			ontologyIndex.removeReflexiveProperty(property);
+		else
+			super.removeReflexiveProperty(property);
 	}
 }

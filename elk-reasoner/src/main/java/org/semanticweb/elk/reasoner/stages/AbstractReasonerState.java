@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -33,10 +32,8 @@ import org.semanticweb.elk.loading.ElkAxiomChange;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkPropertyAxiom;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -45,7 +42,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -96,13 +92,9 @@ public abstract class AbstractReasonerState {
 	 */
 	final IndexedObjectCache objectCache_;
 	/**
-	 * the current ontology index
+	 * the (differential) index for loading of axioms and changes
 	 */
-	final OntologyIndex ontologyIndex;
-	/**
-	 * the differential index for incremental stages
-	 */
-	DifferentialIndex differentialIndex = null;
+	final DifferentialIndex ontologyIndex;
 	/**
 	 * {@code true} if the current ontology is inconsistent
 	 */
@@ -138,7 +130,7 @@ public abstract class AbstractReasonerState {
 	protected AbstractReasonerState(OntologyLoader ontologyLoader,
 			ReasonerConfiguration config) {
 		this.objectCache_ = new IndexedObjectCache();
-		this.ontologyIndex = new OntologyIndexImpl(objectCache_);
+		this.ontologyIndex = new DifferentialIndex(objectCache_);
 		this.saturationState = new SaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.config_ = config;
@@ -147,16 +139,8 @@ public abstract class AbstractReasonerState {
 				.getAxiomInserter());
 	}
 
-	public void setIncrementalMode(boolean set) {
-		if (set == (differentialIndex != null))
-			// already set
-			return;
-		if (set) {
-			differentialIndex = new DifferentialIndex(ontologyIndex,
-					ontologyIndex.getIndexedOwlNothing());
-		} else {
-			differentialIndex = null;
-		}
+	public void setIncrementalMode(boolean mode) {
+		ontologyIndex.setIncrementalMode(mode);
 	}
 
 	/**
@@ -180,32 +164,10 @@ public abstract class AbstractReasonerState {
 
 				@Override
 				public void notify(ElkAxiomChange change) {
-
-					if (!incrementalChange(change)) {
-						if (LOGGER_.isInfoEnabled()) {
-							LOGGER_.info("The axiom change " + change
-									+ " cannot be accommodated incrementally");
-						}
-
-						differentialIndex = null;
-
-						// throw new RuntimeException(change.toString());
-					}
-
 					resetChangesLoading();
 				}
 			});
 		}
-	}
-
-	private boolean incrementalChange(ElkAxiomChange change) {
-		ElkAxiom axiom = change.getAxiom();
-		/*
-		 * FIXME Here we determine if the change can be accommodated
-		 * incrementally. In principle, we should have a hook inside the indexer
-		 * to accomplish this
-		 */
-		return !(axiom instanceof ElkPropertyAxiom<?>);
 	}
 
 	/**
@@ -223,15 +185,8 @@ public abstract class AbstractReasonerState {
 		if (changesLoader_ == null) {
 			return null;
 		}
-
-		if (differentialIndex != null) {
-			return changesLoader_.getLoader(
-					differentialIndex.getAxiomInserter(),
-					differentialIndex.getAxiomDeleter());
-		} else {
-			return changesLoader_.getLoader(ontologyIndex.getAxiomInserter(),
-					ontologyIndex.getAxiomDeleter());
-		}
+		return changesLoader_.getLoader(ontologyIndex.getAxiomInserter(),
+				ontologyIndex.getAxiomDeleter());
 	}
 
 	/**
@@ -295,8 +250,8 @@ public abstract class AbstractReasonerState {
 	 */
 	public boolean isInconsistent() throws ElkException {
 
-		ReasonerStage stage = differentialIndex == null ? stageManager.consistencyCheckingStage
-				: stageManager.incrementalConsistencyCheckingStage;
+		ReasonerStage stage = ontologyIndex.isIncrementalMode() ? stageManager.incrementalConsistencyCheckingStage
+				: stageManager.consistencyCheckingStage;
 
 		getStageExecutor().complete(stage);
 
@@ -336,7 +291,7 @@ public abstract class AbstractReasonerState {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
-		if (differentialIndex != null) {
+		if (ontologyIndex.isIncrementalMode()) {
 			getStageExecutor().complete(
 					stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
@@ -466,8 +421,6 @@ public abstract class AbstractReasonerState {
 	 */
 	// ////////////////////////////////////////////////////////////////
 	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
-		return ontologyIndex == null ? Collections
-				.<IndexedClassExpression> emptyList() : ontologyIndex
-				.getIndexedClassExpressions();
+		return ontologyIndex.getIndexedClassExpressions();
 	}
 }

@@ -101,6 +101,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		}
 	}
 
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;

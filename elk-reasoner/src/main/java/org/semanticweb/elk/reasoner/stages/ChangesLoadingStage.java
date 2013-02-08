@@ -51,6 +51,7 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 		return "Loading of Changes";
 	}
 
+	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
@@ -67,6 +68,7 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 		}
 	}
 
+	@Override
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;

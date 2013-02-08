@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -40,7 +41,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndexUpdater;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 
 public class CompositionClosureTest {
 
@@ -60,8 +61,9 @@ public class CompositionClosureTest {
 		if (!SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES)
 			return;
 
-		OntologyIndex index = new OntologyIndexImpl();
-		DirectIndexUpdater indexUpdater = new DirectIndexUpdater(index);
+		OntologyIndex index = new DirectIndex();
+		DirectIndexUpdater<OntologyIndex> indexUpdater = new DirectIndexUpdater<OntologyIndex>(
+				index);
 		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(
 				index.getIndexedObjectCache(), index.getIndexedOwlNothing(),
 				indexUpdater, true);
@@ -137,8 +139,9 @@ public class CompositionClosureTest {
 		if (!SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES)
 			return;
 
-		OntologyIndex index = new OntologyIndexImpl();
-		DirectIndexUpdater indexUpdater = new DirectIndexUpdater(index);
+		OntologyIndex index = new DirectIndex();
+		DirectIndexUpdater<OntologyIndex> indexUpdater = new DirectIndexUpdater<OntologyIndex>(
+				index);
 		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(
 				index.getIndexedObjectCache(), index.getIndexedOwlNothing(),
 				indexUpdater, true);

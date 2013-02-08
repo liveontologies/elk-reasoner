@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -62,13 +63,14 @@ public class SaturatedPropertyChainCheckingStage extends
 						IndexedPropertyChain right,
 						IndexedPropertyChain composition,
 						IndexedPropertyChain computed) {
-					LOGGER_.error("Composition " + left + " o "
-							+ right + " => " + composition
-							+ " is computed for " + (left == computed ? left : right) + " but not for "
-							+ (left == computed ? right : left));				
+					LOGGER_.error("Composition " + left + " o " + right
+							+ " => " + composition + " is computed for "
+							+ (left == computed ? left : right)
+							+ " but not for "
+							+ (left == computed ? right : left));
 				}
 			};
-			
+
 			VerifySymmetricPropertySaturation.testLeftCompositions(ipc, hook);
 			VerifySymmetricPropertySaturation.testRightCompositions(ipc, hook);
 		}

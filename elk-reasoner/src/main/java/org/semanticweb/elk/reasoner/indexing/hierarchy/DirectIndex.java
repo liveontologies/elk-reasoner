@@ -41,9 +41,9 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
-public class OntologyIndexImpl implements OntologyIndex {
+public class DirectIndex implements OntologyIndex {
 
-	private final IndexedClass indexedOwlThing_, indexedOwlNothing_;
+	final IndexedClass indexedOwlThing, indexedOwlNothing;
 
 	private final IndexedObjectCache objectCache_;
 	private final IndexObjectConverter elkObjectIndexer_;
@@ -54,30 +54,33 @@ public class OntologyIndexImpl implements OntologyIndex {
 
 	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
 
-	public OntologyIndexImpl(IndexedObjectCache objectCache) {
+	public DirectIndex(IndexedObjectCache objectCache) {
 		objectCache_ = objectCache;
 		elkObjectIndexer_ = new IndexObjectConverter(objectCache, objectCache);
 
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
 		ElkAxiomIndexerVisitor tmpIndexer = new ElkAxiomIndexerVisitor(
-				objectCache_, null, new DirectIndexUpdater(this), true);
+				objectCache_, null,
+				new DirectIndexUpdater<OntologyIndex>(this), true);
 
-		this.indexedOwlThing_ = tmpIndexer
+		this.indexedOwlThing = tmpIndexer
 				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
-		this.indexedOwlNothing_ = tmpIndexer
+		this.indexedOwlNothing = tmpIndexer
 				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 
 		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
-				indexedOwlNothing_, new DirectIndexUpdater(this), true);
+				indexedOwlNothing, new DirectIndexUpdater<OntologyIndex>(this),
+				true);
 		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
-				indexedOwlNothing_, new DirectIndexUpdater(this), false);
+				indexedOwlNothing, new DirectIndexUpdater<OntologyIndex>(this),
+				false);
 
 		this.reflexiveObjectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
 				64);
 	}
 
-	public OntologyIndexImpl() {
+	public DirectIndex() {
 		this(new IndexedObjectCache());
 	}
 
@@ -222,12 +225,12 @@ public class OntologyIndexImpl implements OntologyIndex {
 
 	@Override
 	public IndexedClass getIndexedOwlThing() {
-		return indexedOwlThing_;
+		return indexedOwlThing;
 	}
 
 	@Override
 	public IndexedClass getIndexedOwlNothing() {
-		return indexedOwlNothing_;
+		return indexedOwlNothing;
 	}
 
 }

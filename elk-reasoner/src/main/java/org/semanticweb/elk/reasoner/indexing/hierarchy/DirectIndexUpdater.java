@@ -35,12 +35,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class DirectIndexUpdater implements IndexUpdater {
+public class DirectIndexUpdater<I extends OntologyIndex> implements
+		IndexUpdater {
 
-	private final OntologyIndex ontIndex_;
+	final I ontologyIndex;
 
-	public DirectIndexUpdater(OntologyIndex index) {
-		ontIndex_ = index;
+	public DirectIndexUpdater(I index) {
+		ontologyIndex = index;
 	}
 
 	@Override
@@ -75,12 +76,12 @@ public class DirectIndexUpdater implements IndexUpdater {
 
 	@Override
 	public void add(ChainableRule<Context> rule) {
-		rule.addTo(ontIndex_.getContextInitRuleChain());
+		rule.addTo(ontologyIndex.getContextInitRuleChain());
 	}
 
 	@Override
 	public void remove(ChainableRule<Context> rule) {
-		if (!rule.removeFrom(ontIndex_.getContextInitRuleChain()))
+		if (!rule.removeFrom(ontologyIndex.getContextInitRuleChain()))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove context initialization rule "
 							+ rule.getName());
@@ -88,12 +89,12 @@ public class DirectIndexUpdater implements IndexUpdater {
 
 	@Override
 	public void add(IndexedObject object) {
-		object.accept(ontIndex_.getIndexedObjectCache().inserter);
+		object.accept(ontologyIndex.getIndexedObjectCache().inserter);
 	}
 
 	@Override
 	public void remove(IndexedObject object) {
-		if (!object.accept(ontIndex_.getIndexedObjectCache().deletor))
+		if (!object.accept(ontologyIndex.getIndexedObjectCache().deletor))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove indexed object from the cache " + object);
 		if (object instanceof IndexedClassExpression) {
@@ -106,12 +107,12 @@ public class DirectIndexUpdater implements IndexUpdater {
 
 	@Override
 	public void addReflexiveProperty(IndexedObjectProperty property) {
-		ontIndex_.addReflexiveProperty(property);
+		ontologyIndex.addReflexiveProperty(property);
 	}
 
 	@Override
 	public void removeReflexiveProperty(IndexedObjectProperty property) {
-		if (!ontIndex_.removeReflexiveProperty(property))
+		if (!ontologyIndex.removeReflexiveProperty(property))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove reflexivity of object property " + property);
 	}
