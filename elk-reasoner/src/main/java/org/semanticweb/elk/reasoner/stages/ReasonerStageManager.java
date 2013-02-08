@@ -22,6 +22,13 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+/**
+ * Defines all {@link ReasonerStage}s used by the reasoner and dependencies
+ * between them.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class ReasonerStageManager {
 
 	final AbstractReasonerStage ontologyLoadingStage, changesLoadingStage,
@@ -47,11 +54,8 @@ public class ReasonerStageManager {
 
 		this.ontologyLoadingStage = new OntologyLoadingStage(reasoner);
 
-		this.changesLoadingStage = new ChangesLoadingStage(reasoner,
-				ontologyLoadingStage);
-
 		this.propertyInitializationStage = new PropertyInitializationStage(
-				reasoner, changesLoadingStage);
+				reasoner, ontologyLoadingStage);
 
 		this.propertyReflexivityComputationStage = new PropertyReflexivityComputationStage(
 				reasoner, propertyInitializationStage);
@@ -59,8 +63,13 @@ public class ReasonerStageManager {
 		this.propertyHierarchyCompositionComputationStage = new PropertyHierarchyCompositionComputationStage(
 				reasoner, propertyReflexivityComputationStage);
 
+		// FIXME: currently it is assumed that changes do not have
+		// property axioms
+		this.changesLoadingStage = new ChangesLoadingStage(reasoner,
+				propertyHierarchyCompositionComputationStage);
+
 		this.contextInitializationStage = new ContextInitializationStage(
-				reasoner, propertyHierarchyCompositionComputationStage);
+				reasoner, changesLoadingStage);
 
 		this.consistencyCheckingStage = new ConsistencyCheckingStage(reasoner,
 				contextInitializationStage);

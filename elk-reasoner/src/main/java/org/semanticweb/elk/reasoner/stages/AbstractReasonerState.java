@@ -161,17 +161,11 @@ public abstract class AbstractReasonerState {
 
 	/**
 	 * Reset the changes loading stage and all subsequent stages
-	 * 
-	 * FIXME get rid of this proliferation of boolean flags
 	 */
 	private void resetChangesLoading() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("Reset changes loading");
-		if (stageManager.changesLoadingStage.invalidate()) {
-			// TODO: currently it is assumed that changes do not have
-			// property axioms
-			// resetPropertySaturation();
-		}
+		stageManager.changesLoadingStage.invalidate();
 	}
 
 	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
@@ -310,13 +304,6 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * @return {@code true} if the ontology has been checked for consistency.
-	 */
-	public boolean doneConsistencyCheck() {
-		return stageManager.consistencyCheckingStage.isCompleted;
-	}
-
-	/**
 	 * Forces the reasoner to load ontology
 	 * 
 	 * @throws ElkException
@@ -374,6 +361,25 @@ public abstract class AbstractReasonerState {
 		return result;
 	}
 
+	/**
+	 * Compute the inferred taxonomy of the named classes with instances if this
+	 * has not been done yet.
+	 * 
+	 * @return the instance taxonomy implied by the current ontology
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
+			throws ElkException {
+		if (isInconsistent())
+			throw new ElkInconsistentOntologyException();
+
+		getStageExecutor().complete(
+				stageManager.instanceTaxonomyComputationStage);
+
+		return instanceTaxonomy;
+	}
+
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly() {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> result = null;
 
@@ -415,30 +421,18 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
+	 * @return {@code true} if the ontology has been checked for consistency.
+	 */
+	public boolean doneConsistencyCheck() {
+		return stageManager.consistencyCheckingStage.isCompleted;
+	}
+
+	/**
 	 * @return {@code true} if the class taxonomy has been computed
 	 */
 	public boolean doneTaxonomy() {
 		return stageManager.classTaxonomyComputationStage.isCompleted
 				|| stageManager.incrementalClassTaxonomyComputationStage.isCompleted;
-	}
-
-	/**
-	 * Compute the inferred taxonomy of the named classes with instances if this
-	 * has not been done yet.
-	 * 
-	 * @return the instance taxonomy implied by the current ontology
-	 * @throws ElkException
-	 *             if the reasoning process cannot be completed successfully
-	 */
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
-			throws ElkException {
-		if (isInconsistent())
-			throw new ElkInconsistentOntologyException();
-
-		getStageExecutor().complete(
-				stageManager.instanceTaxonomyComputationStage);
-
-		return instanceTaxonomy;
 	}
 
 	/**
