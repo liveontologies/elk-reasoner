@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.ElkUnsupportedReasoningTaskException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.util.logging.ElkMessage;
@@ -91,8 +92,6 @@ public class ElkReasoner implements OWLReasoner {
 	// OWL API related objects
 	private final OWLOntology owlOntology_;
 	private final OWLOntologyManager owlOntologymanager_;
-	/** the ELK reasoner instance used for reasoning */
-	private final Reasoner reasoner_;
 	/** ELK progress monitor implementation to display progress */
 	private final ProgressMonitor elkProgressMonitor_;
 	/**
@@ -110,6 +109,12 @@ public class ElkReasoner implements OWLReasoner {
 	private final ElkConverter elkConverter_;
 	/** the object using which one can load the ontology changes */
 	private OwlChangesLoader ontologyChangesLoader_;
+	/** configurations required for ELK reasoner */
+	private final ReasonerConfiguration config_;
+	private final boolean isAllowFreshEntities;
+	private final ReasonerStageExecutor stageExecutor_;
+	/** the ELK reasoner instance used for reasoning */
+	private Reasoner reasoner_;
 
 	/**
 	 * {@code true} if it is required to reload the whole ontology next time the
@@ -124,12 +129,6 @@ public class ElkReasoner implements OWLReasoner {
 		this.owlOntologymanager_ = ontology.getOWLOntologyManager();
 		this.elkProgressMonitor_ = elkConfig.getProgressMonitor() == null ? new DummyProgressMonitor()
 				: new ElkReasonerProgressMonitor(elkConfig.getProgressMonitor());
-		this.reasoner_ = new ReasonerFactory().createReasoner(stageExecutor,
-				elkConfig.getElkConfiguration());
-		this.reasoner_
-				.setAllowFreshEntities(elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW);
-		this.reasoner_.setProgressMonitor(this.elkProgressMonitor_);
-		;
 		this.isBufferingMode_ = isBufferingMode;
 		this.owlOntologymanager_
 				.addOntologyChangeListener(this.ontologyChangeListener_ = new OntologyChangeListener());
@@ -137,11 +136,14 @@ public class ElkReasoner implements OWLReasoner {
 		this.owlConverter_ = OwlConverter.getInstance();
 		this.elkConverter_ = ElkConverter.getInstance();
 
+		this.config_ = elkConfig.getElkConfiguration();
+		this.stageExecutor_ = stageExecutor;
+		this.isAllowFreshEntities = elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW;
+
+		reCreateReasoner();
 		this.ontologyChangesLoader_ = new OwlChangesLoader(
 				this.elkProgressMonitor_);
 
-		reasoner_.registerOntologyLoader(new OwlOntologyLoader(owlOntology_,
-				this.elkProgressMonitor_));
 		reasoner_.registerOntologyChangesLoader(ontologyChangesLoader_);
 
 		if (isBufferingMode) {
@@ -185,6 +187,19 @@ public class ElkReasoner implements OWLReasoner {
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode) {
 		this(ontology, isBufferingMode, new ElkReasonerConfiguration(),
 				new LoggingStageExecutor());
+	}
+
+	/**
+	 * re-creates a new instance of reasoner for the parameters; required if
+	 * ontology needs to be reloaded, since a reasoner can do initial load only
+	 * once
+	 */
+	private void reCreateReasoner() {
+		this.reasoner_ = new ReasonerFactory().createReasoner(
+				new OwlOntologyLoader(owlOntology_, this.elkProgressMonitor_),
+				stageExecutor_, config_);
+		this.reasoner_.setAllowFreshEntities(isAllowFreshEntities);
+		this.reasoner_.setProgressMonitor(this.elkProgressMonitor_);
 	}
 
 	/**
@@ -264,7 +279,6 @@ public class ElkReasoner implements OWLReasoner {
 		owlOntology_.getOWLOntologyManager().removeOntologyChangeListener(
 				ontologyChangeListener_);
 		try {
-			reasoner_.reset();
 			for (;;) {
 				try {
 					if (!reasoner_.shutdown())
@@ -287,8 +301,7 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 			if (ontologyReloadRequired_) {
-				reasoner_.registerOntologyLoader(new OwlOntologyLoader(
-						owlOntology_, this.elkProgressMonitor_));
+				reCreateReasoner();
 				this.ontologyChangesLoader_ = new OwlChangesLoader(
 						this.elkProgressMonitor_);
 				reasoner_.loadOntology();
@@ -296,7 +309,7 @@ public class ElkReasoner implements OWLReasoner {
 			}
 			// notify the reasoner re: the changes from the listener
 			ontologyChangesLoader_.flush();
-			reasoner_.loadChanges();	
+			reasoner_.loadChanges();
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
@@ -925,7 +938,8 @@ public class ElkReasoner implements OWLReasoner {
 				throws OWLException {
 			for (OWLOntologyChange change : changes) {
 				if (!change.getOntology().equals(owlOntology_)) {
-					LOGGER_.warn("Ignoring the change not applicable to the current ontology: " + change);
+					LOGGER_.warn("Ignoring the change not applicable to the current ontology: "
+							+ change);
 					continue;
 				}
 				if (LOGGER_.isTraceEnabled()) {

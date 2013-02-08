@@ -78,8 +78,6 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.incrementalState.setStageStatus(IncrementalStages.ADDITION,
-				true);
 		reasoner.ruleAndConclusionStats.add(saturation_
 				.getRuleAndConclusionStatistics());
 

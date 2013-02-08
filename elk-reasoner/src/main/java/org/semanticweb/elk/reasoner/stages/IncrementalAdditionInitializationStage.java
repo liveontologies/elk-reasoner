@@ -62,7 +62,7 @@ class IncrementalAdditionInitializationStage extends
 		if (!super.preExecute())
 			return false;
 
-		DifferentialIndex diffIndex = reasoner.incrementalState.diffIndex;
+		DifferentialIndex diffIndex = reasoner.differentialIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
 		Collection<Collection<Context>> inputs = Collections.emptyList();
@@ -76,8 +76,7 @@ class IncrementalAdditionInitializationStage extends
 		final ExtendedWriter writer = reasoner.saturationState
 				.getExtendedWriter(conclusionVisitor);
 
-		for (ElkClass newClass : reasoner.incrementalState.diffIndex
-				.getAddedClasses()) {
+		for (ElkClass newClass : reasoner.differentialIndex.getAddedClasses()) {
 			IndexedClass ic = (IndexedClass) converter.visit(newClass);
 
 			if (ic.getContext() == null) {
@@ -110,8 +109,8 @@ class IncrementalAdditionInitializationStage extends
 		if (!super.postExecute())
 			return false;
 		this.initialization_ = null;
-		reasoner.incrementalState.diffIndex.commitAddedRules();
-		reasoner.incrementalState.diffIndex.clearSignatureChanges();
+		reasoner.differentialIndex.commitAddedRules();
+		reasoner.differentialIndex.clearSignatureChanges();
 		return true;
 	}
 

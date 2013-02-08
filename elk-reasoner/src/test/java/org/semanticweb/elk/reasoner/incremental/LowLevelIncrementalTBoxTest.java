@@ -74,49 +74,46 @@ public class LowLevelIncrementalTBoxTest {
 
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
-/*	@Test
-	public void testTmp() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
-		TestChangesLoader loader = new TestChangesLoader();
-		TestChangesLoader changeLoader = new TestChangesLoader();
+	/*
+	 * @Test public void testTmp() throws ElkException { Reasoner reasoner =
+	 * TestReasonerUtils .createTestReasoner(new LoggingStageExecutor());
+	 * TestChangesLoader loader = new TestChangesLoader(); TestChangesLoader
+	 * changeLoader = new TestChangesLoader();
+	 * 
+	 * reasoner.setIncrementalMode(false);
+	 * reasoner.registerOntologyLoader(loader);
+	 * reasoner.registerOntologyChangesLoader(changeLoader);
+	 * 
+	 * ElkClass a = objectFactory.getClass(new ElkFullIri(":A")); ElkClass b =
+	 * objectFactory.getClass(new ElkFullIri(":B")); ElkClass c =
+	 * objectFactory.getClass(new ElkFullIri(":C")); ElkAxiom axAsubB =
+	 * objectFactory.getSubClassOfAxiom(a, b);
+	 * 
+	 * loader.add(axAsubB).add(objectFactory.getSubClassOfAxiom(objectFactory.
+	 * getOwlThing(), c));
+	 * 
+	 * Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy(); loader.clear();
+	 * 
+	 * reasoner.setIncrementalMode(true);
+	 * 
+	 * changeLoader.remove(axAsubB);
+	 * 
+	 * taxonomy = reasoner.getTaxonomy();
+	 * 
+	 * changeLoader.clear(); changeLoader.add(axAsubB);
+	 * 
+	 * taxonomy = reasoner.getTaxonomy(); }
+	 */
 
-		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
-		reasoner.registerOntologyChangesLoader(changeLoader);
-
-		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
-		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
-		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
-		ElkAxiom axAsubB = objectFactory.getSubClassOfAxiom(a, b);
-		
-		loader.add(axAsubB).add(objectFactory.getSubClassOfAxiom(objectFactory.getOwlThing(), c));
-
-		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
-		loader.clear();
-
-		reasoner.setIncrementalMode(true);
-
-		changeLoader.remove(axAsubB);
-
-		taxonomy = reasoner.getTaxonomy();
-		
-		changeLoader.clear();
-		changeLoader.add(axAsubB);
-		
-		taxonomy = reasoner.getTaxonomy();
-	}		
-*/	
-	
 	@Test
 	public void testBasicDeletion() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
+
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor());
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -151,13 +148,13 @@ public class LowLevelIncrementalTBoxTest {
 
 	@Test
 	public void testDeletePositiveExistential() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor());
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -194,13 +191,13 @@ public class LowLevelIncrementalTBoxTest {
 
 	@Test
 	public void testDeleteAddConjunction() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor(), 1);
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -271,7 +268,7 @@ public class LowLevelIncrementalTBoxTest {
 		taxonomy = reasoner.getTaxonomy();
 
 		assertEquals(1, taxonomy.getNode(a).getDirectSuperNodes().size());
-		
+
 		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
@@ -287,13 +284,13 @@ public class LowLevelIncrementalTBoxTest {
 
 	@Test
 	public void testEquivalence() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor(), 1);
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -358,13 +355,13 @@ public class LowLevelIncrementalTBoxTest {
 
 	@Test
 	public void testNewClassUnsatisfiable() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor());
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -410,11 +407,10 @@ public class LowLevelIncrementalTBoxTest {
 			TestChangesLoader initialLoader = new TestChangesLoader();
 			TestChangesLoader changeLoader = new TestChangesLoader();
 
-			Reasoner reasoner = TestReasonerUtils
-					.createTestReasoner(new LoggingStageExecutor());
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+					initialLoader, new LoggingStageExecutor());
 
 			reasoner.setIncrementalMode(false);
-			reasoner.registerOntologyLoader(initialLoader);
 			reasoner.registerOntologyChangesLoader(changeLoader);
 
 			for (ElkAxiom axiom : ontology) {
@@ -445,16 +441,14 @@ public class LowLevelIncrementalTBoxTest {
 		}
 	}
 
-	
 	@Test
 	public void testDuplicateSubclassAxioms() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor());
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -502,13 +496,13 @@ public class LowLevelIncrementalTBoxTest {
 
 	@Test
 	public void testPropositionalAdditions() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor());
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -536,7 +530,7 @@ public class LowLevelIncrementalTBoxTest {
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(b)));
 	}
-	
+
 	/*
 	 * Tests to check whether we can leave a context for a removed class. Here R
 	 * some B is removed from the index after the first delete but B still
@@ -548,29 +542,34 @@ public class LowLevelIncrementalTBoxTest {
 	 */
 	@Test
 	public void testCleanObsoleteContexts() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new PostProcessingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new PostProcessingStageExecutor(), 1);
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
-		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(":S"));
-		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(":R"));
-		ElkSubClassOfAxiom axiom1 = objectFactory.getSubClassOfAxiom(a, objectFactory.getObjectSomeValuesFrom(s, objectFactory.getObjectSomeValuesFrom(r, b))); 
+		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(
+				":S"));
+		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
+				":R"));
+		ElkSubClassOfAxiom axiom1 = objectFactory.getSubClassOfAxiom(
+				a,
+				objectFactory.getObjectSomeValuesFrom(s,
+						objectFactory.getObjectSomeValuesFrom(r, b)));
 		ElkSubClassOfAxiom axiom2 = objectFactory.getSubClassOfAxiom(c, d);
 		ElkSubClassOfAxiom axiom3 = objectFactory.getSubClassOfAxiom(b, c);
 
 		loader.add(axiom1)
-				.add(objectFactory.getSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(r, c), c))
-				.add(axiom2)
-				.add(axiom3);		
+				.add(objectFactory.getSubClassOfAxiom(
+						objectFactory.getObjectSomeValuesFrom(r, c), c))
+				.add(axiom2).add(axiom3);
 
 		reasoner.getTaxonomy();
 
@@ -582,24 +581,24 @@ public class LowLevelIncrementalTBoxTest {
 		System.out.println("===========================================");
 
 		reasoner.getTaxonomy();
-		
+
 		changeLoader.clear();
 		changeLoader.remove(axiom2).remove(axiom3);
-		
+
 		System.out.println("===========================================");
-		
+
 		reasoner.getTaxonomy();
-	}	
+	}
 
 	@Test
 	public void testDeleteBinaryDisjointness() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor());
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -645,13 +644,13 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testDeleteNaryDisjointness() throws ElkException {
 		try {
-			Reasoner reasoner = TestReasonerUtils
-					.createTestReasoner(new LoggingStageExecutor());
 			TestChangesLoader loader = new TestChangesLoader();
 			TestChangesLoader changeLoader = new TestChangesLoader();
 
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+					new LoggingStageExecutor());
+
 			reasoner.setIncrementalMode(false);
-			reasoner.registerOntologyLoader(loader);
 			reasoner.registerOntologyChangesLoader(changeLoader);
 
 			ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -694,13 +693,13 @@ public class LowLevelIncrementalTBoxTest {
 
 	@Test
 	public void testAddClassRemoveClass() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor());
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -742,13 +741,13 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testPropagations() throws ElkException {
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor(), 1);
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -799,13 +798,13 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testEquivalences() throws ElkException {
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor(), 1);
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass x = objectFactory.getClass(new ElkFullIri(":X"));
@@ -839,13 +838,13 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testEquivalencesPropagations() throws ElkException {
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new LoggingStageExecutor(), 1);
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor(), 1);
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass x = objectFactory.getClass(new ElkFullIri(":X"));
@@ -892,13 +891,13 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testDeleteBackwardLinkAndModifySourceContext()
 			throws ElkException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new LoggingStageExecutor());
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new LoggingStageExecutor());
+
 		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));

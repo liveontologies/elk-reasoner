@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,29 +27,37 @@ package org.semanticweb.elk.reasoner;
 
 import java.util.concurrent.Executors;
 
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class TestReasonerUtils {
 
-	public static Reasoner createTestReasoner(ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		return new Reasoner(stageExecutor, Executors.newSingleThreadExecutor(), config);
+	public static Reasoner createTestReasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
+		return new Reasoner(ontologyLoader, stageExecutor,
+				Executors.newSingleThreadExecutor(), config);
 	}
-	
-	public static Reasoner createTestReasoner(ReasonerStageExecutor stageExecutor) {
-		return new Reasoner(stageExecutor, Executors.newSingleThreadExecutor(), ReasonerConfiguration.getConfiguration());
+
+	public static Reasoner createTestReasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor) {
+		return new Reasoner(ontologyLoader, stageExecutor,
+				Executors.newSingleThreadExecutor(),
+				ReasonerConfiguration.getConfiguration());
 	}
-	
-	public static Reasoner createTestReasoner(ReasonerStageExecutor stageExecutor, int maxWorkers) {
+
+	public static Reasoner createTestReasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor, int maxWorkers) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
-		
-		config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, String.valueOf(maxWorkers));
-		
-		return createTestReasoner(stageExecutor, config);
+
+		config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
+				String.valueOf(maxWorkers));
+
+		return createTestReasoner(ontologyLoader, stageExecutor, config);
 	}
 }

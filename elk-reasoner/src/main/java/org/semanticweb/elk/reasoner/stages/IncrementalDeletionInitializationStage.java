@@ -59,7 +59,7 @@ class IncrementalDeletionInitializationStage extends
 		if (!super.preExecute())
 			return false;
 
-		DifferentialIndex diffIndex = reasoner.incrementalState.diffIndex;
+		DifferentialIndex diffIndex = reasoner.differentialIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
 		Collection<Collection<Context>> inputs = Collections.emptyList();
@@ -96,7 +96,7 @@ class IncrementalDeletionInitializationStage extends
 		final ExtendedWriter writer = reasoner.saturationState
 				.getExtendedWriter(conclusionVisitor);
 
-		for (IndexedClassExpression ice : reasoner.incrementalState.diffIndex
+		for (IndexedClassExpression ice : reasoner.differentialIndex
 				.getRemovedClassExpressions()) {
 
 			if (ice.getContext() != null) {
@@ -111,7 +111,7 @@ class IncrementalDeletionInitializationStage extends
 			}
 		}
 
-		reasoner.incrementalState.diffIndex.clearDeletedRules();
+		reasoner.differentialIndex.clearDeletedRules();
 
 		return true;
 	}

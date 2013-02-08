@@ -86,8 +86,6 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.incrementalState.setStageStatus(IncrementalStages.COMPLETION,
-				true);
 		reasoner.ruleAndConclusionStats.add(completion_
 				.getRuleAndConclusionStatistics());
 		markAllContextsAsSaturated();

@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
@@ -47,8 +48,8 @@ public class ReasonerFactory {
 	final static Logger LOGGER_ = Logger.getLogger(ReasonerFactory.class);
 	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new SimpleStageExecutor();
 
-	public Reasoner createReasoner() {
-		return createReasoner(DEFAULT_STAGE_EXECUTOR,
+	public Reasoner createReasoner(OntologyLoader ontologyLoader) {
+		return createReasoner(ontologyLoader, DEFAULT_STAGE_EXECUTOR,
 				ReasonerConfiguration.getConfiguration());
 	}
 
@@ -59,8 +60,9 @@ public class ReasonerFactory {
 	 * @param stageExecutor
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor) {
-		return createReasoner(stageExecutor,
+	public Reasoner createReasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor) {
+		return createReasoner(ontologyLoader, stageExecutor,
 				ReasonerConfiguration.getConfiguration());
 	}
 
@@ -71,9 +73,9 @@ public class ReasonerFactory {
 	 * @param config
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor,
-			ReasonerConfiguration config) {
-		return new Reasoner(stageExecutor, Executors.newCachedThreadPool(),
-				config);
+	public Reasoner createReasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
+		return new Reasoner(ontologyLoader, stageExecutor,
+				Executors.newCachedThreadPool(), config);
 	}
 }

@@ -105,8 +105,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.incrementalState.setStageStatus(
-				IncrementalStages.TAXONOMY_CLEANING, true);
 		// at this point we're done with unsaturated contexts
 		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
 				.clearNotSaturatedContexts();

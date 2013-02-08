@@ -77,8 +77,6 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.incrementalState.setStageStatus(IncrementalStages.DELETION,
-				true);
 		reasoner.ruleAndConclusionStats.add(desaturation_
 				.getRuleAndConclusionStatistics());
 		if (LOGGER_.isTraceEnabled()) {

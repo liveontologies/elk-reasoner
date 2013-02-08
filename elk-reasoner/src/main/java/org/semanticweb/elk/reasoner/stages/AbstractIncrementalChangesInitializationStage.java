@@ -81,12 +81,6 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		/*
-		 * if this stage is completed successfully, the corresponding
-		 * incremental part of the index is not needed anymore. The subclasses
-		 * will commit it and clear it.
-		 */
-		reasoner.incrementalState.setStageStatus(stage(), true);
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 		return true;
 	}

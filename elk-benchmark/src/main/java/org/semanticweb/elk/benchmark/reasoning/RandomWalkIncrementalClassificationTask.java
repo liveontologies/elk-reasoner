@@ -100,14 +100,15 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 
 			changingAxioms_ = new OnOffVector<ElkAxiom>(128);
 			staticAxioms_ = new ArrayList<ElkAxiom>();
-			reasoner_ = TestReasonerUtils.createTestReasoner(
-					new PostProcessingStageExecutor(), reasonerConfig_);
 			OntologyLoader fileLoader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(
 							new ElkObjectFactoryImpl(new ElkEntityRecycler())),
 					ontologyFile);
-			reasoner_.registerOntologyLoader(new TrackingOntologyLoader(
-					fileLoader, changingAxioms_, staticAxioms_));
+			OntologyLoader trackingLoader = new TrackingOntologyLoader(
+					fileLoader, changingAxioms_, staticAxioms_);
+			reasoner_ = TestReasonerUtils.createTestReasoner(trackingLoader,
+					new PostProcessingStageExecutor(), reasonerConfig_);
+
 			reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
 			reasoner_.loadOntology();
 		} catch (Exception e) {
@@ -120,9 +121,9 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 		long seed = System.currentTimeMillis();
 
 		try {
-			new RandomWalkIncrementalClassificationRunner<ElkAxiom>(
-					ROUNDS, ITERATIONS, new RandomWalkRunnerIO.ElkAPIBasedIO()).run(reasoner_, changingAxioms_,
-					staticAxioms_, seed);
+			new RandomWalkIncrementalClassificationRunner<ElkAxiom>(ROUNDS,
+					ITERATIONS, new RandomWalkRunnerIO.ElkAPIBasedIO()).run(
+					reasoner_, changingAxioms_, staticAxioms_, seed);
 		} catch (Exception e) {
 			throw new TaskException(e);
 		} finally {

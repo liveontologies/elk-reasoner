@@ -60,13 +60,12 @@ public class IncrementalRealizationCorrectnessTest extends
 		super(testManifest);
 	}
 
-	
 	@Override
-	protected void applyChanges(
-			final Reasoner reasoner,
+	protected void applyChanges(final Reasoner reasoner,
 			final Iterable<ElkAxiom> changes,
 			final BaseIncrementalReasoningCorrectnessTest.CHANGE type) {
-		reasoner.registerOntologyChangesLoader(new TestAxiomLoader(changes, type));
+		reasoner.registerOntologyChangesLoader(new TestAxiomLoader(changes,
+				type));
 	}
 
 	@Override
@@ -75,10 +74,11 @@ public class IncrementalRealizationCorrectnessTest extends
 	}
 
 	@Override
-	protected void loadAxioms(InputStream stream, final List<ElkAxiom> staticAxioms,
+	protected void loadAxioms(InputStream stream,
+			final List<ElkAxiom> staticAxioms,
 			final OnOffVector<ElkAxiom> changingAxioms) throws IOException,
 			Owl2ParseException {
-		
+
 		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
 				.getParser(stream);
 		parser.accept(new Owl2ParserAxiomProcessor() {
@@ -89,10 +89,10 @@ public class IncrementalRealizationCorrectnessTest extends
 
 			@Override
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-				if (elkAxiom instanceof ElkClassAxiom || elkAxiom instanceof ElkAssertionAxiom) {
+				if (elkAxiom instanceof ElkClassAxiom
+						|| elkAxiom instanceof ElkAssertionAxiom) {
 					changingAxioms.add(elkAxiom);
-				}
-				else {
+				} else {
 					staticAxioms.add(elkAxiom);
 				}
 			}
@@ -101,11 +101,10 @@ public class IncrementalRealizationCorrectnessTest extends
 
 	@Override
 	protected Reasoner getReasoner(final Iterable<ElkAxiom> axioms) {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new PostProcessingStageExecutor());
-		reasoner.registerOntologyLoader(new TestAxiomLoader(axioms));
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new TestAxiomLoader(axioms), new PostProcessingStageExecutor());
 
 		return reasoner;
-	}	
+	}
 
 }

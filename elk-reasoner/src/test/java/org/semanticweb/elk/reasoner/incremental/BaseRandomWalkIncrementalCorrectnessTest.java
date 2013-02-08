@@ -98,25 +98,24 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		OnOffVector<ElkAxiom> changingAxioms = new OnOffVector<ElkAxiom>(128);
 		// other axioms that do not change
 		List<ElkAxiom> staticAxioms = new ArrayList<ElkAxiom>();
-		Reasoner incrementalReasoner = TestReasonerUtils.createTestReasoner(
-				new PostProcessingStageExecutor());
+		Reasoner incrementalReasoner;
 		long seed = RandomSeedProvider.VALUE;
-
-		incrementalReasoner.setIncrementalMode(true);
 
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Initial load of test axioms");
 		}
 
+		InputStream stream = manifest.getInput().getInputStream();
+		OntologyLoader fileLoader = new Owl2StreamLoader(
+				new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl(
+						new ElkEntityRecycler())), stream);
+		OntologyLoader trackingLoader = new TrackingOntologyLoader(fileLoader,
+				changingAxioms, staticAxioms);
+		incrementalReasoner = TestReasonerUtils.createTestReasoner(
+				trackingLoader, new PostProcessingStageExecutor());
+		incrementalReasoner.setIncrementalMode(true);
+
 		try {
-			InputStream stream = manifest.getInput().getInputStream();
-			OntologyLoader fileLoader = new Owl2StreamLoader(
-					new Owl2FunctionalStyleParserFactory(
-							new ElkObjectFactoryImpl(new ElkEntityRecycler())),
-					stream);
-			incrementalReasoner
-					.registerOntologyLoader(new TrackingOntologyLoader(
-							fileLoader, changingAxioms, staticAxioms));
 			incrementalReasoner.loadOntology();
 			// let the runner run..
 			getRandomWalkRunner(MAX_ROUNDS, ITERATIONS).run(
@@ -129,6 +128,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		}
 	}
 
-	protected abstract RandomWalkIncrementalClassificationRunner<ElkAxiom> getRandomWalkRunner(int rounds, int iterations);
+	protected abstract RandomWalkIncrementalClassificationRunner<ElkAxiom> getRandomWalkRunner(
+			int rounds, int iterations);
 
 }

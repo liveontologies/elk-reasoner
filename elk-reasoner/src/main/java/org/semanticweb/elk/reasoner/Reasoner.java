@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -89,15 +90,16 @@ public class Reasoner extends AbstractReasonerState {
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
 	 * */
-	protected Reasoner(ReasonerStageExecutor stageExecutor,
-			ExecutorService executor, ReasonerConfiguration config) {
-		super(config);
-		
+	protected Reasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor, ExecutorService executor,
+			ReasonerConfiguration config) {
+		super(ontologyLoader, config);
+
 		this.stageExecutor = stageExecutor;
-		this.workerNo = config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
+		this.workerNo = config
+				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
-		reset();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("ELK reasoner was created");
 	}
@@ -170,7 +172,6 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public boolean shutdown(long timeout, TimeUnit unit)
 			throws InterruptedException {
-		reset();
 		if (executor == null)
 			return true;
 		executor.shutdown();

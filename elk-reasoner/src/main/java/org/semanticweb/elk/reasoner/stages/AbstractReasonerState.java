@@ -41,6 +41,7 @@ import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -86,10 +87,6 @@ public abstract class AbstractReasonerState {
 	 */
 	final SaturationStatistics ruleAndConclusionStats;
 	/**
-	 * 
-	 */
-	IncrementalReasonerState incrementalState = null;
-	/**
 	 * {@code true} if the reasoner is interrupted
 	 */
 	private volatile boolean isInterrupted_ = false;
@@ -98,12 +95,14 @@ public abstract class AbstractReasonerState {
 	 * the cache for indexed objects
 	 */
 	final IndexedObjectCache objectCache_;
-
 	/**
 	 * the current ontology index
 	 */
-	OntologyIndex ontologyIndex;
-
+	final OntologyIndex ontologyIndex;
+	/**
+	 * the differential index for incremental stages
+	 */
+	DifferentialIndex differentialIndex = null;
 	/**
 	 * {@code true} if the current ontology is inconsistent
 	 */
@@ -116,6 +115,9 @@ public abstract class AbstractReasonerState {
 
 	final TaxonomyState classTaxonomyState = new TaxonomyState();
 
+	/**
+	 * Defines reasoning stages and dependencies between them
+	 */
 	final ReasonerStageManager stageManager;
 
 	/**
@@ -127,49 +129,34 @@ public abstract class AbstractReasonerState {
 	/**
 	 * The source where the input ontology can be loaded
 	 */
-	private Loader ontologyLoader_;
+	private final Loader ontologyLoader_;
 	/**
 	 * The source where changes in ontology can be loaded
 	 */
 	private ChangesLoader changesLoader_;
 
-	protected AbstractReasonerState(final ReasonerConfiguration config) {
+	protected AbstractReasonerState(OntologyLoader ontologyLoader,
+			ReasonerConfiguration config) {
 		this.objectCache_ = new IndexedObjectCache();
 		this.ontologyIndex = new OntologyIndexImpl(objectCache_);
 		this.saturationState = new SaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.config_ = config;
-		this.incrementalState = new IncrementalReasonerState(ontologyIndex);
 		this.stageManager = new ReasonerStageManager(this);
+		this.ontologyLoader_ = ontologyLoader.getLoader(ontologyIndex
+				.getAxiomInserter());
 	}
 
 	public void setIncrementalMode(boolean set) {
-		if (set && incrementalState == null) {
-			incrementalState = new IncrementalReasonerState(ontologyIndex);
-		} else if (!set) {
-			incrementalState = null;
+		if (set == (differentialIndex != null))
+			// already set
+			return;
+		if (set) {
+			differentialIndex = new DifferentialIndex(ontologyIndex,
+					ontologyIndex.getIndexedOwlNothing());
+		} else {
+			differentialIndex = null;
 		}
-	}
-
-	/**
-	 * Reset the loading stage and all subsequent stages
-	 */
-	private void resetLoading() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Reset loading");
-		if (this.ontologyLoader_ != null) {
-			this.ontologyLoader_.dispose();
-			this.ontologyLoader_ = null;
-		}
-
-		if (stageManager.ontologyLoadingStage.invalidate()) {
-			objectCache_.clear();
-			ontologyIndex = new OntologyIndexImpl(objectCache_);
-			registerOntologyChangesLoader(null);
-		}
-		/*
-		 * else { if (objectCache_.size() > 2) throw new RuntimeException(); }
-		 */
 	}
 
 	/**
@@ -185,14 +172,6 @@ public abstract class AbstractReasonerState {
 			// property axioms
 			// resetPropertySaturation();
 		}
-	}
-
-	public void registerOntologyLoader(OntologyLoader ontologyLoader) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Registering ontology loader");
-		resetLoading();
-		this.ontologyLoader_ = ontologyLoader.getLoader(ontologyIndex
-				.getAxiomInserter());
 	}
 
 	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
@@ -214,7 +193,7 @@ public abstract class AbstractReasonerState {
 									+ " cannot be accommodated incrementally");
 						}
 
-						incrementalState = null;
+						differentialIndex = null;
 
 						// throw new RuntimeException(change.toString());
 					}
@@ -251,10 +230,10 @@ public abstract class AbstractReasonerState {
 			return null;
 		}
 
-		if (incrementalState != null) {
+		if (differentialIndex != null) {
 			return changesLoader_.getLoader(
-					incrementalState.diffIndex.getAxiomInserter(),
-					incrementalState.diffIndex.getAxiomDeleter());
+					differentialIndex.getAxiomInserter(),
+					differentialIndex.getAxiomDeleter());
 		} else {
 			return changesLoader_.getLoader(ontologyIndex.getAxiomInserter(),
 					ontologyIndex.getAxiomDeleter());
@@ -284,17 +263,6 @@ public abstract class AbstractReasonerState {
 	 *         on all potentially long-running operations.
 	 */
 	protected abstract ProgressMonitor getProgressMonitor();
-
-	/**
-	 * Reset the ontology all data. After this, the Reasoner holds an empty
-	 * ontology.
-	 */
-	public void reset() {
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Reset data");
-		resetLoading();
-		ruleAndConclusionStats.reset();
-	}
 
 	/**
 	 * interrupts running reasoning stages
@@ -333,7 +301,7 @@ public abstract class AbstractReasonerState {
 	 */
 	public boolean isInconsistent() throws ElkException {
 
-		ReasonerStage stage = incrementalState == null ? stageManager.consistencyCheckingStage
+		ReasonerStage stage = differentialIndex == null ? stageManager.consistencyCheckingStage
 				: stageManager.incrementalConsistencyCheckingStage;
 
 		getStageExecutor().complete(stage);
@@ -381,13 +349,12 @@ public abstract class AbstractReasonerState {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
-		if (incrementalState != null) {
+		if (differentialIndex != null) {
 			getStageExecutor().complete(
 					stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
 			getStageExecutor().complete(
 					stageManager.classTaxonomyComputationStage);
-			this.incrementalState = new IncrementalReasonerState(ontologyIndex);
 		}
 
 		return classTaxonomyState.taxonomy;
