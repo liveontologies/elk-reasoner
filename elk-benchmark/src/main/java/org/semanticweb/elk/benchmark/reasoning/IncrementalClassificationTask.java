@@ -64,34 +64,35 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class IncrementalClassificationTask implements Task {
 
-	protected final String ontologyFile_;
-	protected final ReasonerConfiguration reasonerConfig_;
-	protected List<ElkAxiom> loadedAxioms_ = null;
-	protected final int axiomsToChange_;
+	protected final String ontologyFileName;
+	protected final ReasonerConfiguration reasonerConfig;
+	protected List<ElkAxiom> loadedAxioms = null;
+	protected final int axiomsToChange;
 
-	protected Reasoner incrementalReasoner_ = null;
+	protected Reasoner incrementalReasoner = null;
 
 	final static int REPEAT_NUMBER = 5;
 
 	public IncrementalClassificationTask(String[] args) {
-		ontologyFile_ = args[0];
-		axiomsToChange_ = args.length > 1 ? Integer.valueOf(args[1]) : -1;
-		reasonerConfig_ = ReasonerConfiguration.getConfiguration();
+		ontologyFileName = args[0];
+		axiomsToChange = args.length > 1 ? Integer.valueOf(args[1]) : -1;
+		reasonerConfig = ReasonerConfiguration.getConfiguration();
 	}
 
 	@Override
 	public String getName() {
 		return "Incremental classification ["
-				+ ontologyFile_.substring(ontologyFile_.lastIndexOf('/')) + "]";
+				+ ontologyFileName.substring(ontologyFileName.lastIndexOf('/'))
+				+ "]";
 	}
 
 	@Override
 	public void prepare() throws TaskException {
-		File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
+		File ontologyFile = BenchmarkUtils.getFile(ontologyFileName);
 
-		loadedAxioms_ = new ArrayList<ElkAxiom>();
-		incrementalReasoner_ = prepareReasoner(ontologyFile, true);
-		incrementalReasoner_.setIncrementalMode(true);
+		loadedAxioms = new ArrayList<ElkAxiom>();
+		incrementalReasoner = prepareReasoner(ontologyFile, true);
+		incrementalReasoner.setIncrementalMode(true);
 	}
 
 	protected Reasoner prepareReasoner(final File ontologyFile,
@@ -117,7 +118,7 @@ public class IncrementalClassificationTask implements Task {
 										axiomLoader.visit(elkAxiom);
 
 										if (passAxiom(elkAxiom)) {
-											loadedAxioms_.add(elkAxiom);
+											loadedAxioms.add(elkAxiom);
 										}
 									}
 								});
@@ -128,7 +129,7 @@ public class IncrementalClassificationTask implements Task {
 			};
 
 			Reasoner reasoner = new ReasonerFactory().createReasoner(loader,
-					new LoggingStageExecutor(), reasonerConfig_);
+					new LoggingStageExecutor(), reasonerConfig);
 
 			reasoner.loadOntology();
 
@@ -171,11 +172,11 @@ public class IncrementalClassificationTask implements Task {
 		Random rnd = new Random(seed);
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
-		incrementalReasoner_.registerOntologyChangesLoader(changeLoader);
+		incrementalReasoner.registerOntologyChangesLoader(changeLoader);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
 			// delete some axioms
-			Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms_, rnd);
+			Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms, rnd);
 
 			/*
 			 * for (ElkAxiom del : deleted) {
@@ -186,13 +187,13 @@ public class IncrementalClassificationTask implements Task {
 			changeLoader.clear();
 
 			remove(changeLoader, deleted);
-			incrementalReasoner_.getTaxonomyQuietly();
+			incrementalReasoner.getTaxonomyQuietly();
 			// add the axioms back
 
 			changeLoader.clear();
 			add(changeLoader, deleted);
 
-			incrementalReasoner_.getTaxonomyQuietly();
+			incrementalReasoner.getTaxonomyQuietly();
 		}
 	}
 
@@ -201,7 +202,7 @@ public class IncrementalClassificationTask implements Task {
 	 * randomly picked more than once
 	 */
 	protected Set<ElkAxiom> getRandomSubset(List<ElkAxiom> axioms, Random rnd) {
-		int size = axiomsToChange_ > 0 ? axiomsToChange_ : Math.max(1,
+		int size = axiomsToChange > 0 ? axiomsToChange : Math.max(1,
 				axioms.size() / 100);
 		Set<ElkAxiom> subset = new ArrayHashSet<ElkAxiom>(size);
 
@@ -233,7 +234,7 @@ public class IncrementalClassificationTask implements Task {
 
 	@Override
 	public void dispose() {
-		shutdown(incrementalReasoner_);
+		shutdown(incrementalReasoner);
 	}
 
 	protected void shutdown(Reasoner reasoner) {

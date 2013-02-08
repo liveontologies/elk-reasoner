@@ -37,15 +37,15 @@ import org.apache.log4j.Priority;
  */
 public class Metrics {
 
-	private int runCount = 0;
+	private int runCount_ = 0;
 	private final Map<String, String> metricMap_ = new TreeMap<String, String>();
 	
 	public void incrementRunCount() {
-		runCount++;
+		runCount_++;
 	}
 	
 	public int getRunsNumber() {
-		return runCount;
+		return runCount_;
 	}
 
 	public Map<String, String> getMetricsMap() {
@@ -73,7 +73,7 @@ public class Metrics {
 	}
 	
 	public void reset() {
-		runCount = 0;
+		runCount_ = 0;
 		metricMap_.clear();
 	}
 	
@@ -90,7 +90,7 @@ public class Metrics {
 		StringBuffer buffer = new StringBuffer();
 		String delim = System.getProperty("line.separator");
 		
-		buffer.append("Run count: " + runCount).append(delim);
+		buffer.append("Run count: " + runCount_).append(delim);
 		
 		for (Map.Entry<String, String> entry : metricMap_.entrySet()) {
 			buffer.append(entry.getKey()).append(" : ").append(entry.getValue()).append(delim);
@@ -107,7 +107,7 @@ public class Metrics {
 		StringBuffer buffer = new StringBuffer();
 		String delim = System.getProperty("line.separator");
 		
-		buffer.append("Run count: " + runCount).append(delim);
+		buffer.append("Run count: " + runCount_).append(delim);
 		
 		for (Map.Entry<String, String> entry : metricMap_.entrySet()) {
 			String value = entry.getValue();
@@ -115,7 +115,7 @@ public class Metrics {
 			try {
 				Double numValue = Double.valueOf(value);
 				
-				buffer.append("Average " + entry.getKey()).append(" : ").append(String.format("%.2f%n", numValue/runCount)).append(delim);
+				buffer.append("Average " + entry.getKey()).append(" : ").append(String.format("%.2f%n", numValue/runCount_)).append(delim);
 			} catch (NumberFormatException e) {
 				buffer.append(entry.getKey()).append(" : ").append(entry.getValue()).append(delim);
 			}

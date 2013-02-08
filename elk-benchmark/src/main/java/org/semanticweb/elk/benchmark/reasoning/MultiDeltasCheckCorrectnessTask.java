@@ -92,7 +92,7 @@ public class MultiDeltasCheckCorrectnessTask extends
 
 		@Override
 		public void run() throws TaskException {
-			Taxonomy<ElkClass> incrementalTaxonomy = reasoner_
+			Taxonomy<ElkClass> incrementalTaxonomy = reasoner
 					.getTaxonomyQuietly();
 			Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
 					.getTaxonomyQuietly();
@@ -125,7 +125,7 @@ public class MultiDeltasCheckCorrectnessTask extends
 
 		@Override
 		public void run() throws TaskException {
-			Taxonomy<ElkClass> incrementalTaxonomy = reasoner_
+			Taxonomy<ElkClass> incrementalTaxonomy = reasoner
 					.getTaxonomyQuietly();
 			Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
 					.getTaxonomyQuietly();

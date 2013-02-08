@@ -35,7 +35,7 @@ public class IncrementalClassificationCorrectnessTask extends
 	public void prepare() throws TaskException {
 		super.prepare();
 		
-		File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
+		File ontologyFile = BenchmarkUtils.getFile(ontologyFileName);
 		
 		standardReasoner_ = prepareReasoner(ontologyFile, true);
 	}
@@ -47,9 +47,9 @@ public class IncrementalClassificationCorrectnessTask extends
 		TestChangesLoader changeLoader2 = new TestChangesLoader();
 
 		standardReasoner_.registerOntologyChangesLoader(changeLoader1);
-		incrementalReasoner_.registerOntologyChangesLoader(changeLoader2);
+		incrementalReasoner.registerOntologyChangesLoader(changeLoader2);
 		// initial correctness check
-		correctnessCheck(standardReasoner_, incrementalReasoner_, -1);
+		correctnessCheck(standardReasoner_, incrementalReasoner, -1);
 
 		long seed = System.currentTimeMillis();
 		Random rnd = new Random(seed);
@@ -58,7 +58,7 @@ public class IncrementalClassificationCorrectnessTask extends
 			// delete some axioms
 			standardReasoner_.setIncrementalMode(false);
 
-			Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms_, rnd);
+			Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms, rnd);
 
 			// incremental changes
 			changeLoader1.clear();
@@ -66,7 +66,7 @@ public class IncrementalClassificationCorrectnessTask extends
 			remove(changeLoader1, deleted);
 			remove(changeLoader2, deleted);
 			
-			correctnessCheck(standardReasoner_, incrementalReasoner_, seed);
+			correctnessCheck(standardReasoner_, incrementalReasoner, seed);
 
 			standardReasoner_.setIncrementalMode(false);
 
@@ -76,7 +76,7 @@ public class IncrementalClassificationCorrectnessTask extends
 			add(changeLoader1, deleted);
 			add(changeLoader2, deleted);
 
-			correctnessCheck(standardReasoner_, incrementalReasoner_, seed);
+			correctnessCheck(standardReasoner_, incrementalReasoner, seed);
 		}
 	}
 	

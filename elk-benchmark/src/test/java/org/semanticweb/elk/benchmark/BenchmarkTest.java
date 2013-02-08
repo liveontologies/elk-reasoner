@@ -48,7 +48,7 @@ import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificati
  */
 public class BenchmarkTest {
 
-	@Rule public TestName testName_ = new TestName();
+	@Rule public TestName testName = new TestName();
 	private static Set<String> testsToRun_ = null;
 
 	@BeforeClass
@@ -62,7 +62,7 @@ public class BenchmarkTest {
 	
 	@Test
 	public void classification() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName_.getMethodName()));
+		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName.getMethodName()));
 		
 		BenchmarkUtils.runTask(ClassificationTask.class.getName(),
 				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
@@ -72,7 +72,7 @@ public class BenchmarkTest {
 	
 	@Test
 	public void classificationAll() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName_.getMethodName()));
+		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName.getMethodName()));
 		
 		BenchmarkUtils.runTaskCollection(AllFilesClassificationTask.class.getName(),
 				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
@@ -83,7 +83,7 @@ public class BenchmarkTest {
 	@Test
 	public void incrementalClassification() throws Exception {
 		Assume.assumeTrue(testsToRun_ == null
-				|| testsToRun_.contains(testName_.getMethodName()));
+				|| testsToRun_.contains(testName.getMethodName()));
 
 		BenchmarkUtils.runTask(
 				IncrementalClassificationTask.class.getName(),
@@ -95,7 +95,7 @@ public class BenchmarkTest {
 	@Test
 	public void incrementalClassificationRandomWalk() throws Exception {
 		Assume.assumeTrue(testsToRun_ == null
-				|| testsToRun_.contains(testName_.getMethodName()));
+				|| testsToRun_.contains(testName.getMethodName()));
 
 		BenchmarkUtils.runTask(
 				RandomWalkIncrementalClassificationTask.class.getName(),
@@ -106,7 +106,7 @@ public class BenchmarkTest {
 
 	@Test
 	public void incrementalClassificationMultiDeltas() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName_.getMethodName()));
+		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName.getMethodName()));
 		
 		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
 				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
@@ -116,7 +116,7 @@ public class BenchmarkTest {
 	
 	@Test
 	public void incrementalClassificationAll() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName_.getMethodName()));
+		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName.getMethodName()));
 		
 		BenchmarkUtils.runTaskCollection(AllFilesIncrementalClassificationTask.class.getName(),
 				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),

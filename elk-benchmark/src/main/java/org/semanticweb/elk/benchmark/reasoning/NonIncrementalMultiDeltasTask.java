@@ -70,8 +70,8 @@ public class NonIncrementalMultiDeltasTask extends
 
 		@Override
 		public void prepare() throws TaskException {
-			reasoner_.setIncrementalMode(false);
-			loadChanges(reasoner_);
+			reasoner.setIncrementalMode(false);
+			loadChanges(reasoner);
 		}
 		
 	}

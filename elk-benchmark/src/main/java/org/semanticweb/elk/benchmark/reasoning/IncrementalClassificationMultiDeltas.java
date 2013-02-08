@@ -71,14 +71,14 @@ public class IncrementalClassificationMultiDeltas extends
 	public static final String DELETED_AXIOM_COUNT = "deleted-axioms.count";
 	public static final String ADDED_AXIOM_COUNT = "added-axioms.count";
 
-	protected Reasoner reasoner_;
+	protected Reasoner reasoner;
 	protected ReasonerStageExecutor stageExecutor;
-	protected final ReasonerConfiguration config_;
-	protected final Metrics metrics_ = new Metrics();
+	protected final ReasonerConfiguration config;
+	protected final Metrics metrics = new Metrics();
 
 	public IncrementalClassificationMultiDeltas(String[] args) {
 		super(args);
-		config_ = getConfig(args);
+		config = getConfig(args);
 	}
 
 	private ReasonerConfiguration getConfig(String[] args) {
@@ -101,7 +101,7 @@ public class IncrementalClassificationMultiDeltas extends
 		}
 
 		if (source.isFile()) {
-			if (reasoner_ != null) {
+			if (reasoner != null) {
 				dispose();
 			}
 			// initial classification, argument is the first ontology
@@ -157,16 +157,16 @@ public class IncrementalClassificationMultiDeltas extends
 
 	@Override
 	public Metrics getMetrics() {
-		return metrics_;
+		return metrics;
 	}
 
 	@Override
 	public void dispose() {
 
 		try {
-			if (reasoner_ != null) {
-				reasoner_.shutdown();
-				reasoner_ = null;
+			if (reasoner != null) {
+				reasoner.shutdown();
+				reasoner = null;
 			}
 		} catch (InterruptedException e) {
 		}
@@ -205,7 +205,7 @@ public class IncrementalClassificationMultiDeltas extends
 
 		@Override
 		public void run() throws TaskException {
-			reasoner_.getTaxonomyQuietly();
+			reasoner.getTaxonomyQuietly();
 		}
 
 		protected void createReasoner() throws TaskException {
@@ -218,12 +218,11 @@ public class IncrementalClassificationMultiDeltas extends
 			try {
 				OntologyLoader loader = new Owl2StreamLoader(
 						new Owl2FunctionalStyleParserFactory(), stream);
-				reasoner_ = new ReasonerFactory().createReasoner(loader,
-						stageExecutor, config_);
-				reasoner_.setIncrementalMode(false);
-				reasoner_
-						.registerOntologyChangesLoader(new EmptyChangesLoader());
-				reasoner_.loadOntology();
+				reasoner = new ReasonerFactory().createReasoner(loader,
+						stageExecutor, config);
+				reasoner.setIncrementalMode(false);
+				reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
+				reasoner.loadOntology();
 			} catch (Exception e) {
 				throw new TaskException(e);
 			} finally {
@@ -237,7 +236,7 @@ public class IncrementalClassificationMultiDeltas extends
 
 		@Override
 		public Metrics getMetrics() {
-			return metrics_;
+			return metrics;
 		}
 	}
 
@@ -264,9 +263,9 @@ public class IncrementalClassificationMultiDeltas extends
 		@Override
 		public void prepare() throws TaskException {
 			// load positive and negative deltas
-			reasoner_.setIncrementalMode(true);
+			reasoner.setIncrementalMode(true);
 
-			loadChanges(reasoner_);
+			loadChanges(reasoner);
 		}
 
 		protected void loadChanges(Reasoner reasoner) throws TaskException {
@@ -280,7 +279,7 @@ public class IncrementalClassificationMultiDeltas extends
 					@Override
 					public void visit(ElkAxiom elkAxiom) {
 						loader.add(elkAxiom);
-						metrics_.updateLongMetric(ADDED_AXIOM_COUNT, 1);
+						metrics.updateLongMetric(ADDED_AXIOM_COUNT, 1);
 					}
 				});
 
@@ -289,7 +288,7 @@ public class IncrementalClassificationMultiDeltas extends
 					@Override
 					public void visit(ElkAxiom elkAxiom) {
 						loader.remove(elkAxiom);
-						metrics_.updateLongMetric(DELETED_AXIOM_COUNT, 1);
+						metrics.updateLongMetric(DELETED_AXIOM_COUNT, 1);
 					}
 				});
 
@@ -342,8 +341,8 @@ public class IncrementalClassificationMultiDeltas extends
 
 		@Override
 		public void run() throws TaskException {
-			reasoner_.getTaxonomyQuietly();
-			metrics_.incrementRunCount();
+			reasoner.getTaxonomyQuietly();
+			metrics.incrementRunCount();
 		}
 
 		@Override
@@ -352,7 +351,7 @@ public class IncrementalClassificationMultiDeltas extends
 
 		@Override
 		public Metrics getMetrics() {
-			return metrics_;
+			return metrics;
 		}
 	}
 }
