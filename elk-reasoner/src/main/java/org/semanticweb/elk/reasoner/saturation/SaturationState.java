@@ -83,11 +83,6 @@ public class SaturationState {
 	private final Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 
 	/**
-	 * Kept because still need to be cleaned to avoid broken backward links
-	 */
-	private final Queue<IndexedClassExpression> removedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
-
-	/**
 	 * @return the {@link Collection} of {@link Context} stored in this
 	 *         {@link SaturationState}
 	 */
@@ -138,10 +133,6 @@ public class SaturationState {
 
 	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
 		return notSaturatedContexts_;
-	}
-
-	public Collection<IndexedClassExpression> getContextsToBeRemoved() {
-		return removedContexts_;
 	}
 
 	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
@@ -229,11 +220,7 @@ public class SaturationState {
 
 		public boolean markAsNotSaturated(Context context);
 
-		public void markForRemoval(Context context);
-
 		public void clearNotSaturatedContexts();
-
-		public void clearContextsToBeRemoved();
 	}
 
 	/**
@@ -318,25 +305,12 @@ public class SaturationState {
 		}
 
 		@Override
-		public void markForRemoval(Context context) {
-			if (context.setSaturated(false)) {
-				removedContexts_.add(context.getRoot());
-			}
-		}
-
-		@Override
 		public void clearNotSaturatedContexts() {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Clear non-saturated contexts");
 			notSaturatedContexts_.clear();
 		}
 
-		@Override
-		public void clearContextsToBeRemoved() {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Clear contexts to be removed");
-			removedContexts_.clear();
-		}
 	}
 
 	/**
@@ -414,8 +388,7 @@ public class SaturationState {
 		@Override
 		public void initContext(Context context) {
 			produce(context, new PositiveSubsumer(context.getRoot()));
-			// apply all context initialization rules
-			
+			// apply all context initialization rules			
 			LinkRule<Context> initRule = ontologyIndex_
 					.getContextInitRuleHead();
 			while (initRule != null) {

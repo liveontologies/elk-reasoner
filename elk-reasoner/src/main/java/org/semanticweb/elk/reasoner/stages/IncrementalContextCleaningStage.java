@@ -38,10 +38,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
  */
 public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
-	// logger for this class
-	// private static final Logger LOGGER_ = Logger
-	// .getLogger(IncrementalContextCleaningStage.class);
-
 	private ClassExpressionNoInputSaturation cleaning_ = null;
 
 	public IncrementalContextCleaningStage(AbstractReasonerState reasoner,

@@ -105,8 +105,9 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		void checkNew(IndexedClassExpression ice) {
-			if (add(ice))
-				LOGGER_.error("Unexpected reachable class expression: " + ice);
+			if (add(ice)) {
+				LOGGER_.error("Unexpected reachable class expression: " + ice + ", " + ice.printOccurrenceNumbers());
+			}
 		}
 
 		/**

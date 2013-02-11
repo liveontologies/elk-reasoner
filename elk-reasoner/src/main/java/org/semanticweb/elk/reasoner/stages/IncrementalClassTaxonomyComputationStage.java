@@ -134,11 +134,9 @@ class IncrementalClassTaxonomyComputationStage extends
 
 				@Override
 				public int size() {
-					// TODO: this is only an upper bound; calculate exactly
+					// an upper bound
 					return reasoner.classTaxonomyState.classesForModifiedNodes
 							.size();
-					// +
-					// reasoner.incrementalState.diffIndex.getAddedClasses().size();
 				}
 
 			};
