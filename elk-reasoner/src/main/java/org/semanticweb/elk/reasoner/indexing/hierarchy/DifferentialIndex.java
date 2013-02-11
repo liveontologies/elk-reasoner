@@ -58,7 +58,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * if {@code true} all changes will be applied incrementally; otherwise
 	 * changes are applied directly
 	 */
-	boolean incrementaMode = false;
+	boolean incrementalMode = false;
 
 	private final Set<ElkClass> addedClasses_;
 
@@ -212,10 +212,10 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	public void setIncrementalMode(boolean mode) {
-		if (this.incrementaMode = mode)
+		if (this.incrementalMode = mode)
 			// already set
 			return;
-		this.incrementaMode = mode;
+		this.incrementalMode = mode;
 		if (!mode) {
 			clearDeletedRules();
 			commitAddedRules();
@@ -224,7 +224,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	public boolean isIncrementalMode() {
-		return incrementaMode;
+		return incrementalMode;
 	}
 	
 	private Chain<ChainableRule<Context>> getAddedContextInitRuleChain() {
