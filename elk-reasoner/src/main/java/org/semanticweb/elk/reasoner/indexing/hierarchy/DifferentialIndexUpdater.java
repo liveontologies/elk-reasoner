@@ -46,7 +46,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void addClass(ElkClass newClass) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.addClass(newClass);
 		else
 			super.addClass(newClass);
@@ -54,7 +54,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void removeClass(ElkClass oldClass) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.removeClass(oldClass);
 		else
 			super.removeClass(oldClass);
@@ -62,7 +62,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.addNamedIndividual(newIndividual);
 		else
 			super.addNamedIndividual(newIndividual);
@@ -70,7 +70,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void removeNamedIndividual(ElkNamedIndividual newIndividual) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.removeNamedIndividual(newIndividual);
 		else
 			super.removeNamedIndividual(newIndividual);
@@ -78,7 +78,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void add(IndexedClassExpression target, ChainableRule<Context> rule) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.registerAddedContextRule(target, rule);
 		else
 			super.add(target, rule);
@@ -87,7 +87,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 	@Override
 	public void remove(IndexedClassExpression target,
 			ChainableRule<Context> rule) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.registerRemovedContextRule(target, rule);
 		else
 			super.remove(target, rule);
@@ -95,7 +95,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void add(ChainableRule<Context> rule) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.registerAddedContextInitRule(rule);
 		else
 			super.add(rule);
@@ -103,7 +103,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void remove(ChainableRule<Context> rule) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.registerRemovedContextInitRule(rule);
 		else
 			super.remove(rule);
@@ -111,7 +111,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void add(IndexedObject object) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.addIndexedObject(object);
 		else
 			super.add(object);
@@ -119,7 +119,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void remove(IndexedObject object) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.removeIndexedObject(object);
 		else
 			super.remove(object);
@@ -127,7 +127,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void addReflexiveProperty(IndexedObjectProperty property) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.addReflexiveProperty(property);
 		else
 			super.addReflexiveProperty(property);
@@ -135,7 +135,7 @@ public class DifferentialIndexUpdater<I extends DifferentialIndex> extends
 
 	@Override
 	public void removeReflexiveProperty(IndexedObjectProperty property) {
-		if (ontologyIndex.incrementaMode)
+		if (ontologyIndex.incrementalMode)
 			ontologyIndex.removeReflexiveProperty(property);
 		else
 			super.removeReflexiveProperty(property);

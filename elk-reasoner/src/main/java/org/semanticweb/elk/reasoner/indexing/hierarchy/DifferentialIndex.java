@@ -65,7 +65,7 @@ public class DifferentialIndex extends DirectIndex {
 	private final Set<ElkNamedIndividual> addedIndividuals_;
 
 	/**
-	 * object that should be deleted
+	 * Objects that should be deleted
 	 */
 	private final IndexedObjectCache todoDeletions_;
 

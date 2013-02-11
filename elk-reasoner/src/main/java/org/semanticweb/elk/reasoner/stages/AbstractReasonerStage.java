@@ -160,7 +160,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		this.isCompleted = true;
 		this.workerNo = 0;
 		this.progressMonitor = null;
-		initialized = false;
+		this.initialized = false;
 		return true;
 	}
 
