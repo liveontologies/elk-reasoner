@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -90,8 +91,8 @@ public class OWLAPIIncrementalClassificationCorrectnessTest extends
 	}
 
 	@Override
-	protected void dumpChangeToLog(OWLAxiom change) {
-		LOGGER_.trace(change.toString());
+	protected void dumpChangeToLog(OWLAxiom change, Level level) {
+		LOGGER_.log(level, change.toString());
 	}
 
 	@Override

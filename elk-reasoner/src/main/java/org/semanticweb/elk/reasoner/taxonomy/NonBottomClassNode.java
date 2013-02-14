@@ -41,7 +41,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
@@ -69,7 +68,7 @@ class NonBottomClassNode implements
 	/**
 	 * The link to the taxonomy to which this node belongs
 	 */
-	private final ConcurrentTaxonomy taxonomy_;
+	private final ConcurrentClassTaxonomy taxonomy_;
 
 	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
@@ -106,7 +105,7 @@ class NonBottomClassNode implements
 	 * @param members
 	 *            non-empty list of equivalent ElkClass objects
 	 */
-	protected NonBottomClassNode(ConcurrentTaxonomy taxonomy,
+	protected NonBottomClassNode(ConcurrentClassTaxonomy taxonomy,
 			Collection<ElkClass> members) {
 		this.taxonomy_ = taxonomy;
 		this.members_ = new ArrayList<ElkClass>(members);
@@ -114,10 +113,6 @@ class NonBottomClassNode implements
 		this.directSuperNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 		this.directInstanceNodes_ = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>();
 		Collections.sort(this.members_, Comparators.ELK_CLASS_COMPARATOR);
-		
-		/*if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Creating a satisfiable node for " + members);
-		}*/
 	}
 
 	/**
@@ -296,11 +291,6 @@ class NonBottomClassNode implements
 	@Override
 	public final int hashCode() {
 		return hashCode_;
-	}
-
-	@Override
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
-		return this.taxonomy_;
 	}
 
 	@Override

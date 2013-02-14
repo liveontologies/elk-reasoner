@@ -96,7 +96,7 @@ class IncrementalDeletionInitializationStage extends
 
 		final ExtendedWriter satStateWriter = reasoner.saturationState
 				.getExtendedWriter(conclusionVisitor);
-		final TaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState.getWriter();
+		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState.getWriter();
 		
 		for (IndexedClassExpression ice : reasoner.ontologyIndex
 				.getRemovedClassExpressions()) {

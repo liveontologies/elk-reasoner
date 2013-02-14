@@ -36,7 +36,7 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.stages.TaxonomyState;
+import org.semanticweb.elk.reasoner.stages.ClassTaxonomyState;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -54,7 +54,7 @@ public class ClassTaxonomyCleaning extends
 		ReasonerComputation<IndexedClass, ClassTaxonomyCleaningFactory> {
 
 	public ClassTaxonomyCleaning(Collection<IndexedClass> inputs,
-			TaxonomyState taxonomyState,
+			ClassTaxonomyState taxonomyState,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ClassTaxonomyCleaningFactory(taxonomyState),
@@ -66,9 +66,9 @@ public class ClassTaxonomyCleaning extends
 class ClassTaxonomyCleaningFactory implements
 		InputProcessorFactory<IndexedClass, InputProcessor<IndexedClass>> {
 
-	private final TaxonomyState classTaxonomyState_;
+	private final ClassTaxonomyState classTaxonomyState_;
 
-	ClassTaxonomyCleaningFactory(final TaxonomyState classTaxonomyState) {
+	ClassTaxonomyCleaningFactory(final ClassTaxonomyState classTaxonomyState) {
 		classTaxonomyState_ = classTaxonomyState;
 	}
 
@@ -85,7 +85,7 @@ class ClassTaxonomyCleaningFactory implements
 			public void submit(IndexedClass indexedClass) {
 				ElkClass elkClass = indexedClass.getElkClass();
 				UpdateableTaxonomy<ElkClass> taxonomy = classTaxonomyState_.getTaxonomy();
-				TaxonomyState.Writer writer = classTaxonomyState_.getWriter();
+				ClassTaxonomyState.Writer writer = classTaxonomyState_.getWriter();
 				
 				if (elkClass == PredefinedElkClass.OWL_NOTHING){
 					writer.markClassesForModifiedNode(taxonomy.getBottomNode());

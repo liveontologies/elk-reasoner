@@ -49,7 +49,6 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -103,7 +102,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * Taxonomy state that stores (partial) classification
 	 */
-	final TaxonomyState classTaxonomyState = new TaxonomyState();
+	final ClassTaxonomyState classTaxonomyState = new ClassTaxonomyState();
 
 	/**
 	 * Defines reasoning stages and dependencies between them
@@ -114,7 +113,8 @@ public abstract class AbstractReasonerState {
 	 * Taxonomy that stores (partial) classification and (partial) realization
 	 * of individuals
 	 */
-	UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = null;
+	final InstanceTaxonomyState instanceTaxonomyState = new InstanceTaxonomyState();
+	//UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = null;
 
 	/**
 	 * The source where the input ontology can be loaded
@@ -327,10 +327,15 @@ public abstract class AbstractReasonerState {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
-		getStageExecutor().complete(
-				stageManager.instanceTaxonomyComputationStage);
+		if (ontologyIndex.isIncrementalMode()) {
+			getStageExecutor().complete(
+					stageManager.incrementalInstanceTaxonomyComputationStage);
+		} else {
+			getStageExecutor().complete(
+					stageManager.instanceTaxonomyComputationStage);
+		}
 
-		return instanceTaxonomy;
+		return instanceTaxonomyState.taxonomy;
 	}
 
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly() {

@@ -57,7 +57,7 @@ public class TaxonomyValidatorTest {
 	public void testAllGood() throws Exception {
 		Taxonomy<ElkClass> taxonomy = load("io/taxonomy.owl");
 		TaxonomyValidator<ElkClass> validator = new BasicTaxonomyValidator<ElkClass>()
-				.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>()).add(
+				.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>(taxonomy)).add(
 						new TaxonomyLinkConsistencyVisitor<ElkClass>());
 
 		validator.validate(taxonomy);
@@ -81,7 +81,7 @@ public class TaxonomyValidatorTest {
 		taxonomy.getTypeNode(C).members.add(B);
 
 		TaxonomyValidator<ElkClass> validator = new BasicTaxonomyValidator<ElkClass>()
-				.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>());
+				.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>(taxonomy));
 
 		validator.validate(taxonomy);
 	}

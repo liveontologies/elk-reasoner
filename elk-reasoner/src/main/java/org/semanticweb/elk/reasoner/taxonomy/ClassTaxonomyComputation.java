@@ -61,7 +61,7 @@ public class ClassTaxonomyComputation
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, SaturationState saturationState) {
 		this(inputs, executor, maxWorkers, progressMonitor, saturationState,
-				new ConcurrentTaxonomy());
+				new ConcurrentClassTaxonomy());
 	}
 
 	/**

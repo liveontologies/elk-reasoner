@@ -44,7 +44,8 @@ public class ReasonerStageManager {
 			incrementalConsistencyCheckingStage,
 			incrementalTaxonomyCleaningStage,
 			incrementalClassTaxonomyComputationStage,
-			instanceTaxonomyComputationStage;
+			instanceTaxonomyComputationStage,
+			incrementalInstanceTaxonomyComputationStage;
 
 	ReasonerStageManager(AbstractReasonerState reasoner) {
 
@@ -79,6 +80,9 @@ public class ReasonerStageManager {
 
 		this.classTaxonomyComputationStage = new ClassTaxonomyComputationStage(
 				reasoner, consistencyCheckingStage);
+		
+		this.instanceTaxonomyComputationStage = new InstanceTaxonomyComputationStage(
+				reasoner, classTaxonomyComputationStage);
 
 		/* Incremental stages */
 
@@ -116,8 +120,8 @@ public class ReasonerStageManager {
 		this.incrementalClassTaxonomyComputationStage = new IncrementalClassTaxonomyComputationStage(
 				reasoner, incrementalTaxonomyCleaningStage);
 
-		this.instanceTaxonomyComputationStage = new InstanceTaxonomyComputationStage(
-				reasoner, classTaxonomyComputationStage);
+		this.incrementalInstanceTaxonomyComputationStage = new IncrementalInstanceTaxonomyComputationStage(
+				reasoner, incrementalClassTaxonomyComputationStage);
 
 	}
 }

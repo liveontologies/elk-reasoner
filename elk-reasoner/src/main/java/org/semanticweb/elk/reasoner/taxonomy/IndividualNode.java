@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
@@ -64,11 +63,6 @@ public class IndividualNode implements
 			.getLogger(IndividualNode.class);
 
 	/**
-	 * The link to the taxonomy to which this node belongs
-	 */
-	private final ConcurrentTaxonomy taxonomy_;
-
-	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
 	 */
 	private final List<ElkNamedIndividual> members_;
@@ -87,9 +81,8 @@ public class IndividualNode implements
 	 * @param members
 	 *            non-empty list of equivalent ElkClass objects
 	 */
-	protected IndividualNode(ConcurrentTaxonomy taxonomy,
-			Collection<ElkNamedIndividual> members) {
-		this.taxonomy_ = taxonomy;
+	protected IndividualNode(Collection<ElkNamedIndividual> members) {
+
 		this.members_ = new ArrayList<ElkNamedIndividual>(members);
 		this.directTypeNodes_ = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>();
 		Collections.sort(this.members_,
@@ -175,11 +168,6 @@ public class IndividualNode implements
 	@Override
 	public final int hashCode() {
 		return hashCode_;
-	}
-
-	@Override
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy() {
-		return this.taxonomy_;
 	}
 
 	@Override

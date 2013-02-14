@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
@@ -37,23 +38,26 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  */
 public class TaxonomyNodeDisjointnessVisitor<T extends ElkObject> implements
 		TaxonomyNodeVisitor<T> {
+	
+	private final Taxonomy<T> taxonomy_;
+	
+	public TaxonomyNodeDisjointnessVisitor(Taxonomy<T> t) {
+		taxonomy_ = t;
+	}
 
 	@Override
 	public void visit(TaxonomyNode<T> node,
 			List<TaxonomyNode<T>> pathFromStart) {
 		// Check that nodes are disjoint
 		for (T member : node.getMembers()) {
-			if (node != node.getTaxonomy().getNode(member)) {
-				
-				/*TaxonomyNode<T> other = node.getTaxonomy().getNode(member);
-				
-				System.out.println(node.getMembers() + " " + (node == node.getTaxonomy().getBottomNode()));
-				System.out.println(other.getMembers() + " " + (other == other.getTaxonomy().getBottomNode()));*/
+			if (node != taxonomy_.getNode(member)) {
 				
 				throw new InvalidTaxonomyException(
 						"Invalid taxonomy: looks like the object "
 								+ OwlFunctionalStylePrinter.toString(member)
-								+ " appears in more than one node");
+								+ " appears in more than one node: \n" 
+								+ node.toString() + "\n" 
+								+ taxonomy_.getNode(member));
 			}
 		}
 	}

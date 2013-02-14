@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
@@ -68,8 +69,8 @@ public class IncrementalClassificationCorrectnessTest extends
 	}
 
 	@Override
-	protected void dumpChangeToLog(ElkAxiom change) {
-		LOGGER_.trace(OwlFunctionalStylePrinter.toString(change) + ": deleted");
+	protected void dumpChangeToLog(ElkAxiom change, Level level) {
+		LOGGER_.log(level, OwlFunctionalStylePrinter.toString(change) + ": deleted");
 	}
 
 	@Override

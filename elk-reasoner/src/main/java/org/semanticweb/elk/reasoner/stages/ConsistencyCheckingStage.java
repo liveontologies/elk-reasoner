@@ -78,6 +78,13 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		reasoner.inconsistentOntology = computation_.isInconsistent();
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
+		
+		//FIXME Obviously needed a better clean-up after inconsistency
+		/*if (reasoner.inconsistentOntology) {
+			reasoner.classTaxonomyState.taxonomy = null;
+			reasoner.instanceTaxonomyState.taxonomy = null;
+		}*/
+		
 		this.computation_ = null;
 		return true;
 	}

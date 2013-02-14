@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -124,9 +125,9 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 
 			randomFlip(changingAxioms, rnd, DELETE_RATIO);
 
-			if (LOGGER_.isTraceEnabled()) {
+			if (LOGGER_.isDebugEnabled()) {
 				for (T del : changingAxioms.getOnElements()) {
-					dumpChangeToLog(del);
+					dumpChangeToLog(del, Level.DEBUG);
 				}
 			}
 
@@ -165,7 +166,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 
 	protected abstract void applyChanges(Reasoner reasoner, Iterable<T> changes, CHANGE type);	
 	
-	protected abstract void dumpChangeToLog(T change);
+	protected abstract void dumpChangeToLog(T change, Level level);
 	
 	protected abstract void loadAxioms(InputStream stream, List<T> staticAxioms, OnOffVector<T> changingAxioms) throws IOException, Owl2ParseException;
 	

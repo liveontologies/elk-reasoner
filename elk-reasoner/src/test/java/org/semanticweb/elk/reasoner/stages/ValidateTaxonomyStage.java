@@ -62,9 +62,9 @@ public class ValidateTaxonomyStage extends BasePostProcessingStage {
 			if (taxonomy_ != null) {
 									
 				TaxonomyValidator<ElkClass> validator = new BasicTaxonomyValidator<ElkClass>()
-						.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>())
+						.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>(taxonomy_))
 						.add(new TaxonomyLinkConsistencyVisitor<ElkClass>())
-						.add(new TaxonomyNodeIndexConsistencyVisitor<ElkClass>());
+						.add(new TaxonomyNodeIndexConsistencyVisitor<ElkClass>(taxonomy_));
 
 				validator.validate(taxonomy_);
 

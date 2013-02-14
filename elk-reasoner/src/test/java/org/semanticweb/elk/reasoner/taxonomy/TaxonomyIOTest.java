@@ -30,8 +30,10 @@ import static org.junit.Assert.assertSame;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 
 import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
@@ -92,9 +94,9 @@ public class TaxonomyIOTest {
 		Taxonomy<ElkClass> original = loadAndClassify("io/taxonomy.owl");
 		StringWriter writer = new StringWriter();
 
-		// Writer outWriter = new OutputStreamWriter(System.out);
-		// TaxonomyPrinter.dumpClassTaxomomy(original, outWriter, false);
-		// outWriter.flush();
+		 Writer outWriter = new OutputStreamWriter(System.out);
+		 TaxonomyPrinter.dumpClassTaxomomy(original, outWriter, false);
+		 outWriter.flush();
 
 		TaxonomyPrinter.dumpClassTaxomomy(original, writer, false);
 
@@ -103,10 +105,10 @@ public class TaxonomyIOTest {
 		Taxonomy<ElkClass> loaded = MockTaxonomyLoader.load(objectFactory,
 				parser);
 
-		// System.out.println("=================================");
-		// outWriter = new OutputStreamWriter(System.out);
-		// TaxonomyPrinter.dumpClassTaxomomy(loaded, outWriter, false);
-		// outWriter.flush();
+		 System.out.println("=================================");
+		 outWriter = new OutputStreamWriter(System.out);
+		 TaxonomyPrinter.dumpClassTaxomomy(loaded, outWriter, false);
+		 outWriter.flush();
 
 		// compare
 		assertEquals(TaxonomyHasher.hash(original), TaxonomyHasher.hash(loaded));

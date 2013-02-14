@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TaxonomyState {
+public class ClassTaxonomyState {
 
 	UpdateableTaxonomy<ElkClass> taxonomy = null;
 
