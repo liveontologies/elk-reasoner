@@ -134,6 +134,14 @@ public class IndividualNode implements
 
 		};
 	}
+	
+	public void setMembers(Collection<ElkNamedIndividual> members) {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(this + ": updating members to " + members);
+		members_.clear();
+		members_.addAll(members);
+		Collections.sort(this.members_, Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
+	}
 
 	@Override
 	public ElkNamedIndividual getCanonicalMember() {

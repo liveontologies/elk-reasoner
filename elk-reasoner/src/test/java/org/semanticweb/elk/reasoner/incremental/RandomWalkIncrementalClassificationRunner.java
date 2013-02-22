@@ -123,7 +123,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 							+ " iteration " + (i + 1) + ": " + resultHash);
 				}
 
-				printCurrentAxioms(Operations.concat(changingAxioms.getOnElements(), staticAxioms));
+				printCurrentAxioms(Operations.concat(changingAxioms.getOnElements(), staticAxioms), Level.DEBUG);
 
 				if (LOGGER_.isTraceEnabled()) {
 					printResult(reasoner, LOGGER_, Level.TRACE);
@@ -172,10 +172,14 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				
 				io_.revertChanges(reasoner, change);
 				
-				String taxonomyHash = TaxonomyPrinter
-						.getHashString(reasoner.getTaxonomyQuietly());
+				String taxonomyHash = getResultHash(reasoner);
 
-				assertEquals("Seed " + seed, expectedHash, taxonomyHash);
+				try {
+					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
+				} catch (AssertionError e) {
+					//TODO print the taxonomies here?
+					throw e;
+				}
 			}
 			
 			// doubling the change size every round
@@ -220,10 +224,10 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				2 * (31 - Integer.numberOfLeadingZeros(changingAxiomsCount)));
 	}
 
-	private void printCurrentAxioms(Iterable<T> axioms) {
-		if (LOGGER_.isDebugEnabled()) {
+	private void printCurrentAxioms(Iterable<T> axioms, Level level) {
+		if (LOGGER_.isEnabledFor(level)) {
 			for (T axiom : axioms) {
-				io_.printAxiom(axiom, LOGGER_, Level.DEBUG);
+				io_.printAxiom(axiom, LOGGER_, level);
 			}
 		}
 	}

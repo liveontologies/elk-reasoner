@@ -154,15 +154,38 @@ class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	@Override
 	public IndividualNode getCreateIndividualNode(
 			Collection<ElkNamedIndividual> members) {
-        // TODO: use the same technique as for getCreateTypeNode for incremental update
-		// TODO: avoid code duplication!
+		// search if some node is already assigned to some member, and if so
+		// use this node and update its members if necessary
+		IndividualNode previous = null;
 		
-		IndividualNode node = new IndividualNode(/*this, */members);
+		for (ElkNamedIndividual member : members) {
+			previous = individualNodeLookup_.get(getKey(member));
+			if (previous == null)
+				continue;
+			synchronized (previous) {
+				if (previous.getMembers().size() < members.size())
+					previous.setMembers(members);
+				else
+					return previous;
+			}
+			//updating the index
+			for (ElkNamedIndividual newMember : members) {
+				individualNodeLookup_.put(getKey(newMember), previous);
+			}
+			
+			return previous;
+		}
+		
+		// TODO: avoid code duplication, the same technique is used for creating
+		// non-bottom class nodes!
+		
+		IndividualNode node = new IndividualNode(members);
 		// we first assign the node to the canonical member to avoid
 		// concurrency problems
 		ElkNamedIndividual canonical = node.getCanonicalMember();
-		IndividualNode previous = individualNodeLookup_.putIfAbsent(
-				getKey(canonical), node);
+		
+		previous = individualNodeLookup_.putIfAbsent(getKey(canonical), node);
+		
 		if (previous != null)
 			return previous;
 

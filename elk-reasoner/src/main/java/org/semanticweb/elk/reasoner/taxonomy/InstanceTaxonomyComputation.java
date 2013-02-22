@@ -72,13 +72,6 @@ public class InstanceTaxonomyComputation
 				progressMonitor);
 	}	
 
-	/*public InstanceTaxonomyComputation(Collection<IndexedIndividual> inputs,
-			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, SaturationState saturationState) {
-		this(inputs, executor, maxWorkers, progressMonitor, saturationState,
-				new ConcurrentInstanceTaxonomy());
-	}*/
-
 	/**
 	 * @return the taxonomy computed by this computation; the method
 	 *         {@link #process()} should be called first to compute the taxonomy

@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.junit.Ignore;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
@@ -46,7 +45,6 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  *
  * pavel.klinov@uni-ulm.de
  */
-@Ignore
 public class RandomWalkIncrementalRealizationCorrectnessTest extends
 		BaseRandomWalkIncrementalCorrectnessTest {
 
