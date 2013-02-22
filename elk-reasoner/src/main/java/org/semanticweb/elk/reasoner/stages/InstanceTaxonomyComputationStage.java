@@ -59,10 +59,11 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			return false;
 		
 		if (reasoner.doneTaxonomy()) {
+			//the instance taxonomy must already exist
 			this.computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.saturationState, reasoner.classTaxonomyState.taxonomy);
+					reasoner.saturationState, reasoner.instanceTaxonomyState.getTaxonomy());
 		}
 
 		if (LOGGER_.isInfoEnabled()) {
@@ -86,7 +87,6 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		if (!super.postExecute())
 			return false;
 		
-		reasoner.instanceTaxonomyState.taxonomy = computation_.getTaxonomy();
 		this.computation_ = null;
 		
 		return true;

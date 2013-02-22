@@ -82,10 +82,7 @@ public interface RandomWalkRunnerIO<T> {
 
 		@Override
 		public void printAxiom(ElkAxiom axiom, Logger logger, Level level) {
-			logger.log(
-					level,
-					"Current axiom: "
-							+ OwlFunctionalStylePrinter.toString(axiom));
+			logger.log(level, OwlFunctionalStylePrinter.toString(axiom));
 		}
 
 		@Override

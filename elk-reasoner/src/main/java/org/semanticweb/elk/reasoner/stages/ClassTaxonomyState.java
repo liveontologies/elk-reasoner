@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 
@@ -44,7 +45,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
  */
 public class ClassTaxonomyState {
 
-	UpdateableTaxonomy<ElkClass> taxonomy = null;
+	private ConcurrentClassTaxonomy taxonomy = null;
 
 	final Set<ElkClass> classesForModifiedNodes = Collections
 			.newSetFromMap(new ConcurrentHashMap<ElkClass, Boolean>());
@@ -55,6 +56,18 @@ public class ClassTaxonomyState {
 		return taxonomy;
 	}
 
+	public void resetTaxonomy() {
+		taxonomy = null;
+	}
+	
+	public boolean emptyTaxonomy() {
+		return taxonomy == null || taxonomy.getNodes().size() <= 2;
+	}
+	
+	void initTaxonomy(ConcurrentClassTaxonomy classTaxonomy) {
+		taxonomy = classTaxonomy;
+	}
+	
 	public Writer getWriter() {
 		return new Writer();
 	}

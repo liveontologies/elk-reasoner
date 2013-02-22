@@ -60,24 +60,26 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	@Override
 	boolean preExecute() {
-		if (!super.preExecute())
+		if (!basicPreExecute())
 			return false;
 
 		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
 				.getIndexedClasses();
 
 		if (!reasoner.useIncrementalTaxonomy()) {
-			reasoner.classTaxonomyState.taxonomy = null;
+			reasoner.classTaxonomyState.resetTaxonomy();
 		}
 
-		if (reasoner.classTaxonomyState.taxonomy == null) {
-
-			if (LOGGER_.isInfoEnabled())
+		if (reasoner.classTaxonomyState.emptyTaxonomy()) {
+			// the taxonomy is empty (or nearly empty), let's compute from scratch
+			if (LOGGER_.isInfoEnabled()) {
 				LOGGER_.info("Using non-incremental taxonomy");
-
+			}
+			
+			reasoner.initTaxonomies();
 			computation_ = new ClassTaxonomyComputation(Operations.split(
 					indexedClasses, 128), reasoner.getProcessExecutor(),
-					workerNo, progressMonitor, reasoner.saturationState);
+					workerNo, progressMonitor, reasoner.saturationState, reasoner.classTaxonomyState.getTaxonomy());
 		} else {
 			// classes which correspond to changed nodes in the taxonomy
 			// they must include new classes
@@ -144,7 +146,7 @@ class IncrementalClassTaxonomyComputationStage extends
 			this.computation_ = new ClassTaxonomyComputation(Operations.split(
 					modified, 64), reasoner.getProcessExecutor(), workerNo,
 					progressMonitor, reasoner.saturationState,
-					reasoner.classTaxonomyState.taxonomy);
+					reasoner.classTaxonomyState.getTaxonomy());
 		}
 		return true;
 

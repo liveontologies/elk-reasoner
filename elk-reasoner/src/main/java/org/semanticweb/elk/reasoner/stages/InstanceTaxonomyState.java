@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
  */
 public class InstanceTaxonomyState {
 
-	UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
+	private UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
 
 	//final List<IndexedIndividual> removedIndividuals = new LinkedList<IndexedIndividual>();
 
@@ -45,6 +45,14 @@ public class InstanceTaxonomyState {
 		return taxonomy;
 	}
 
+	public void resetTaxonomy() {
+		taxonomy = null;
+	}
+	
+	void initTaxonomy(UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy) {
+		taxonomy = instanceTaxonomy;
+	}	
+	
 	public Writer getWriter() {
 		return new Writer();
 	}
@@ -60,4 +68,6 @@ public class InstanceTaxonomyState {
 
 
 	}
+
+	
 }

@@ -46,6 +46,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -114,7 +116,6 @@ public abstract class AbstractReasonerState {
 	 * of individuals
 	 */
 	final InstanceTaxonomyState instanceTaxonomyState = new InstanceTaxonomyState();
-	//UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = null;
 
 	/**
 	 * The source where the input ontology can be loaded
@@ -297,7 +298,7 @@ public abstract class AbstractReasonerState {
 					stageManager.classTaxonomyComputationStage);
 		}
 
-		return classTaxonomyState.taxonomy;
+		return classTaxonomyState.getTaxonomy();
 	}
 
 	public Taxonomy<ElkClass> getTaxonomyQuietly() {
@@ -335,7 +336,7 @@ public abstract class AbstractReasonerState {
 					stageManager.instanceTaxonomyComputationStage);
 		}
 
-		return instanceTaxonomyState.taxonomy;
+		return instanceTaxonomyState.getTaxonomy();
 	}
 
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly() {
@@ -418,6 +419,14 @@ public abstract class AbstractReasonerState {
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY);
 	}
 
+	public void initTaxonomies() {
+		ConcurrentClassTaxonomy classTaxonomy = new ConcurrentClassTaxonomy();
+
+		classTaxonomyState.initTaxonomy(classTaxonomy);
+		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(classTaxonomy));
+	}	
+
+	
 	// ////////////////////////////////////////////////////////////////
 	/*
 	 * SOME DEBUG METHODS, FIXME: REMOVE

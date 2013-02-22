@@ -69,11 +69,11 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 	/**
 	 * the maximum number of rounds used
 	 */
-	static int MAX_ROUNDS = 5;
+	static int MAX_ROUNDS = 1;
 	/**
 	 * how many changes are generated in every round
 	 */
-	static int ITERATIONS = 5;
+	static int ITERATIONS = 1;
 
 	protected final ReasoningTestManifest<? extends ClassTaxonomyTestOutput, ? extends ClassTaxonomyTestOutput> manifest;
 

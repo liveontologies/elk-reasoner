@@ -111,8 +111,11 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			changingAxioms.setAllOn();
 
 			resultHashHistory.add(originalTaxonomyHash);
+			
 			for (int i = 0; i < iterations_; i++) {
-				io_.loadChanges(reasoner, tracker.generateNextChange());
+				IncrementalChange<T> change = tracker.generateNextChange();
+				
+				io_.loadChanges(reasoner, change);
 				
 				final String resultHash = getResultHash(reasoner);
 				
@@ -121,9 +124,14 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				if (LOGGER_.isDebugEnabled()) {
 					LOGGER_.debug("Taxonomy hash code for round " + (j + 1)
 							+ " iteration " + (i + 1) + ": " + resultHash);
-				}
-
-				printCurrentAxioms(Operations.concat(changingAxioms.getOnElements(), staticAxioms), Level.DEBUG);
+					
+					LOGGER_.debug("Deleted axioms");
+					printCurrentAxioms(change.getDeletions(), Level.DEBUG);
+					LOGGER_.debug("Added axioms");
+					printCurrentAxioms(change.getAdditions(), Level.DEBUG);
+					LOGGER_.debug("Current axioms");
+					printCurrentAxioms(Operations.concat(changingAxioms.getOnElements(), staticAxioms), Level.DEBUG);					
+				}			
 
 				if (LOGGER_.isTraceEnabled()) {
 					printResult(reasoner, LOGGER_, Level.TRACE);

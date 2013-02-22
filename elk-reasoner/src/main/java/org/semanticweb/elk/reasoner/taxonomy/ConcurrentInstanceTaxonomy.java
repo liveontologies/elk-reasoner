@@ -38,7 +38,6 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.LazySetUnion;
@@ -53,7 +52,7 @@ import org.semanticweb.elk.util.collections.LazySetUnion;
  * @author Markus Kroetzsch
  * @author Pavel Klinov
  */
-class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
+public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -65,25 +64,16 @@ class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	private final Set<InstanceNode<ElkClass, ElkNamedIndividual>> allIndividualNodes_;
 	
 	private final ConcurrentClassTaxonomy classTaxonomy_;
-	
-	//private final TypeNode<ElkClass, ElkNamedIndividual> bottomNodeWrapper_;
 
-	ConcurrentInstanceTaxonomy() {
+	public ConcurrentInstanceTaxonomy() {
 		this(new ConcurrentClassTaxonomy());
 	}
 	
-	ConcurrentInstanceTaxonomy(UpdateableTaxonomy<ElkClass> classTaxonomy) {
-		if (classTaxonomy instanceof ConcurrentClassTaxonomy) {
-			this.classTaxonomy_ = (ConcurrentClassTaxonomy) classTaxonomy;
-		}
-		else {
-			throw new IllegalArgumentException("Class taxonomy does not support instances, can't proceed");
-		}
-		
+	public ConcurrentInstanceTaxonomy(ConcurrentClassTaxonomy classTaxonomy) {
+		this.classTaxonomy_ = classTaxonomy;
 		this.individualNodeLookup_ = new ConcurrentHashMap<ElkIri, IndividualNode>();
 		this.allIndividualNodes_ = Collections
 				.newSetFromMap(new ConcurrentHashMap<InstanceNode<ElkClass, ElkNamedIndividual>, Boolean>());
-		//this.bottomNodeWrapper_ = new BottomTypeNodeWrapper(classTaxonomy_.bottomClassNode);
 	}
 
 	/**

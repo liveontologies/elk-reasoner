@@ -65,7 +65,13 @@ public class RandomWalkIncrementalRealizationRunner<T> extends
 
 	@Override
 	protected String getResultHash(Reasoner reasoner) {
-		return TaxonomyPrinter.getInstanceHashString(reasoner.getInstanceTaxonomyQuietly());
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		/*for (TypeNode<ElkClass, ElkNamedIndividual> typeNode : taxonomy.getTypeNodes()) {
+			System.out.println(typeNode + ": " + typeNode.getDirectInstanceNodes());
+		}*/
+		
+		return TaxonomyPrinter.getInstanceHashString(taxonomy);
 	}
 	
 }

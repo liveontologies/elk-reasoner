@@ -54,16 +54,26 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		return "Class Taxonomy Computation";
 	}
 
+	boolean basicPreExecute() {
+		return super.preExecute();
+	}
+	
 	@Override
 	boolean preExecute() {
-		if (!super.preExecute())
+		if (!super.preExecute()) {
 			return false;
-		if (LOGGER_.isInfoEnabled())
+		}
+		
+		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		}
+		
+		reasoner.initTaxonomies();
+		
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				reasoner.ontologyIndex.getIndexedClasses(), 64),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.saturationState);
+				reasoner.saturationState, reasoner.classTaxonomyState.getTaxonomy());
 		return true;
 	}
 
@@ -76,10 +86,8 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.classTaxonomyState.taxonomy = computation_.getTaxonomy();
 		reasoner.classTaxonomyState.classesForModifiedNodes.clear();
-		reasoner.ruleAndConclusionStats.add(computation_
-				.getRuleAndConclusionStatistics());
+		reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;
 		return true;
 	}

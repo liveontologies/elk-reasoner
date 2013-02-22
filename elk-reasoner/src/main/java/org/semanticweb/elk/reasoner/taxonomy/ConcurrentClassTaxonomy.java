@@ -58,7 +58,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  */
-class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
+public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
@@ -78,7 +78,7 @@ class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	 */
 	final BottomClassNode bottomClassNode;
 
-	ConcurrentClassTaxonomy() {
+	public ConcurrentClassTaxonomy() {
 		this.classNodeLookup_ = new ConcurrentHashMap<ElkIri, NonBottomClassNode>();
 		this.allSatisfiableClassNodes_ = Collections
 				.newSetFromMap(new ConcurrentHashMap<NonBottomClassNode, Boolean>());
