@@ -8,7 +8,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,25 +24,19 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
+ * Should be implemented by bottom nodes in updateable taxonomies
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface UpdateableInstanceTaxonomy<T extends ElkObject, I extends ElkObject> extends InstanceTaxonomy<T, I>, UpdateableTaxonomy<T> {
+public interface UpdateableBottomNode<T extends ElkObject> extends TaxonomyNode<T> {
 
-	public UpdateableTypeNode<T, I> getCreateTypeNode(Collection<T> member);
+	public Set<? extends UpdateableTaxonomyNode<T>> getDirectUpdateableSuperNodes();
 	
-	public UpdateableInstanceNode<T, I> getCreateIndividualNode(Collection<I> member);
-	
-	public UpdateableTypeNode<T, I> getUpdateableTypeNode(T elkObject);
-
-	public boolean removeInstanceNode(I instance); 
-	
-	@Override
-	public UpdateableTypeNode<T, I> getUpdateableTopNode();
 }

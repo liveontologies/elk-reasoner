@@ -37,7 +37,7 @@ public interface UpdateableTypeNode<T extends ElkObject, I extends ElkObject>
 		extends TypeNode<T, I>, UpdateableTaxonomyNode<T> {
 
 	@Override
-	public Set<UpdateableTypeNode<T, I>> getDirectUpdateableSubNodes();
+	public Set<? extends UpdateableTypeNode<T, I>> getDirectUpdateableSubNodes();
 
 	/*
 	 * TODO Normally, this method should not exist, getDirectSuperNodes should
@@ -51,7 +51,7 @@ public interface UpdateableTypeNode<T extends ElkObject, I extends ElkObject>
 	 * allegedly fixed in Java 1.7
 	 */
 	@Override
-	public Set<UpdateableTypeNode<T, I>> getDirectUpdateableSuperNodes();
+	public Set<? extends UpdateableTypeNode<T, I>> getDirectUpdateableSuperNodes();
 
 	public void addDirectInstanceNode(
 			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode);

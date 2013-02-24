@@ -36,13 +36,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableBottomNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.LazySetUnion;
@@ -134,6 +132,11 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 
 	@Override
 	public TaxonomyNode<ElkClass> getBottomNode() {
+		return getUpdateableBottomNode();
+	}
+	
+	@Override
+	public UpdateableBottomNode<ElkClass> getUpdateableBottomNode() {
 		return bottomClassNode;
 	}
 
@@ -215,11 +218,17 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	public UpdateableTaxonomyNode<ElkClass> getUpdateableNode(ElkClass elkObject) {
 		return classNodeLookup_.get(getKey(elkObject));
 	}
-
+	
 	@Override
-	public Iterable<? extends UpdateableTaxonomyNode<ElkClass>> getUpdateableNodes() {
-		return classNodeLookup_.values();
+	public UpdateableTaxonomyNode<ElkClass> getUpdateableTopNode() {
+		return getTopNode();
 	}
+	
+	@Override
+	public Set<? extends UpdateableTaxonomyNode<ElkClass>> getUpdateableNodes() {
+		return Collections.unmodifiableSet(allSatisfiableClassNodes_);
+	}
+
 
 	/**
 	 * Special implementation for the bottom node in the taxonomy. Instead of
@@ -227,12 +236,8 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	 * or taken from the taxonomy object directly. This saves memory at the cost
 	 * of some performance if somebody should wish to traverse an ontology
 	 * bottom-up starting from this node.
-	 * 
-	 * FIXME This class shouldn't implement TypeNode. Unfortunately, then it'd
-	 * be difficult to use in subclasses of ConcurrentClassTaxonomy
 	 */
-	protected class BottomClassNode implements
-			TypeNode<ElkClass, ElkNamedIndividual> {
+	protected class BottomClassNode implements UpdateableBottomNode<ElkClass> {
 
 		@Override
 		public Set<ElkClass> getMembers() {
@@ -267,23 +272,18 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 		}
 
 		@Override
-		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
+		public Set<TaxonomyNode<ElkClass>> getDirectSubNodes() {
 			return Collections.emptySet();
 		}
 
 		@Override
-		public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
+		public Set<TaxonomyNode<ElkClass>> getAllSubNodes() {
 			return Collections.emptySet();
 		}
 
 		@Override
-		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
-			return Collections.emptySet();
-		}
-
-		@Override
-		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
-			return Collections.emptySet();
+		public Set<? extends UpdateableTaxonomyNode<ElkClass>> getDirectUpdateableSuperNodes() {
+			return getAllSuperNodes();
 		}
 	}
 }

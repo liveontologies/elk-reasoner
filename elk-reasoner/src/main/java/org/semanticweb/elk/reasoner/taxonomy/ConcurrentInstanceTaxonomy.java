@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,10 +39,17 @@ import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableBottomNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.LazySetUnion;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.FunctorEx;
 
 /**
  * Class taxonomy that is suitable for concurrent processing. Taxonomy objects
@@ -63,17 +72,23 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	/** thread safe set of all individual nodes */
 	private final Set<InstanceNode<ElkClass, ElkNamedIndividual>> allIndividualNodes_;
 	
-	private final ConcurrentClassTaxonomy classTaxonomy_;
+	private final UpdateableTaxonomy<ElkClass> classTaxonomy_;
+	
+	private final ConcurrentMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper> wrapperMap_;
+	
+	private TypeNodeWrapper bottom_;
 
 	public ConcurrentInstanceTaxonomy() {
 		this(new ConcurrentClassTaxonomy());
 	}
 	
-	public ConcurrentInstanceTaxonomy(ConcurrentClassTaxonomy classTaxonomy) {
+	public ConcurrentInstanceTaxonomy(UpdateableTaxonomy<ElkClass> classTaxonomy) {
 		this.classTaxonomy_ = classTaxonomy;
 		this.individualNodeLookup_ = new ConcurrentHashMap<ElkIri, IndividualNode>();
 		this.allIndividualNodes_ = Collections
 				.newSetFromMap(new ConcurrentHashMap<InstanceNode<ElkClass, ElkNamedIndividual>, Boolean>());
+		this.wrapperMap_ = new ConcurrentHashMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper>();
+		this.bottom_ = new BottomTypeNodeWrapper(classTaxonomy_.getUpdateableBottomNode());
 	}
 
 	/**
@@ -94,13 +109,16 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	 */
 	@Override
 	public TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(ElkClass elkClass) {
-		TypeNode<ElkClass, ElkNamedIndividual> result = classTaxonomy_.getNonBottomNode(elkClass);
+		TaxonomyNode<ElkClass> node = classTaxonomy_.getNode(elkClass);
 		
-		if (result == null && classTaxonomy_.unsatisfiableClasses.contains(elkClass)) {
-			result = classTaxonomy_.bottomClassNode;
+		if (node == classTaxonomy_.getBottomNode()) {
+			return bottom_;
 		}
+		else {
+			UpdateableTaxonomyNode<ElkClass> taxNode = classTaxonomy_.getUpdateableNode(elkClass);
 		
-		return result;
+			return getCreateUpdateableTypeNode(taxNode);
+		}
 	}
 
 	/**
@@ -123,11 +141,9 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	@Override
 	public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getTypeNodes() {
-		//return Collections.unmodifiableSet(allClassNodes_);
-		Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> allNodes = classTaxonomy_.allSatisfiableClassNodes_;
-		Set<TypeNode<ElkClass, ElkNamedIndividual>> bottom = Collections.<TypeNode<ElkClass, ElkNamedIndividual>>singleton(classTaxonomy_.bottomClassNode);
+		Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> updateableNodes = Operations.mapEx(classTaxonomy_.getUpdateableNodes(), functor_);
 		
-		return new LazySetUnion<TypeNode<ElkClass, ElkNamedIndividual>>(allNodes, bottom);
+		return new LazySetUnion<TypeNode<ElkClass,ElkNamedIndividual>>(updateableNodes, Collections.singleton(bottom_));
 	}
 
 	@Override
@@ -137,7 +153,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	@Override
 	public Set<? extends TaxonomyNode<ElkClass>> getNodes() {
-		return getTypeNodes();
+		return classTaxonomy_.getNodes();
 	}
 
 
@@ -180,6 +196,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 			return previous;
 
 		allIndividualNodes_.add(node);
+		
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace(OwlFunctionalStylePrinter.toString(canonical)
 					+ ": node created");
@@ -194,33 +211,55 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	@Override
 	public boolean removeInstanceNode(ElkNamedIndividual instance) {
-		// TODO Auto-generated method stub
-		return false;
+		IndividualNode node = individualNodeLookup_.get(instance);
+
+		if (node != null) {
+			synchronized (node) {
+				for (ElkNamedIndividual individual : node.getMembers()) {
+					individualNodeLookup_.remove(individual);
+				}
+
+				allIndividualNodes_.remove(node);
+			}
+
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-
 	@Override
-	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getUpdateableTypeNode(
-			ElkClass elkClass) {
-		//return classNodeLookup_.get(getKey(elkObject));
-		return classTaxonomy_.getNonBottomNode(elkClass);
+	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getUpdateableTypeNode(ElkClass elkClass) {
+		return getCreateUpdateableTypeNode(classTaxonomy_.getUpdateableNode(elkClass));
 	}
 
 	@Override
-	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getCreateTypeNode(
-			Collection<ElkClass> members) {
-		return classTaxonomy_.getCreateNonBottomClassNode(members);
+	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getCreateTypeNode(Collection<ElkClass> members) {
+		UpdateableTaxonomyNode<ElkClass> taxNode = classTaxonomy_.getCreateNode(members);
+		
+		return getCreateUpdateableTypeNode(taxNode);
 	}
 
 	@Override
-	public TypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
-		return classTaxonomy_.getTopNode();
+	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
+		return getUpdateableTopNode();
+	}
+	
+	@Override
+	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getUpdateableTopNode() {
+		return getCreateUpdateableTypeNode(classTaxonomy_.getUpdateableTopNode());
 	}
 
 	@Override
 	public TypeNode<ElkClass, ElkNamedIndividual> getBottomNode() {
-		return classTaxonomy_.bottomClassNode;
+		return bottom_;
 	}
+	
+	@Override
+	public UpdateableBottomNode<ElkClass> getUpdateableBottomNode() {
+		return classTaxonomy_.getUpdateableBottomNode();
+	}
+
 
 	@Override
 	public UpdateableTaxonomyNode<ElkClass> getCreateNode(
@@ -242,11 +281,273 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	public UpdateableTaxonomyNode<ElkClass> getUpdateableNode(ElkClass elkObject) {
 		return classTaxonomy_.getUpdateableNode(elkObject);
 	}
-
+	
 	@Override
-	public Iterable<? extends UpdateableTaxonomyNode<ElkClass>> getUpdateableNodes() {
+	public Set<? extends UpdateableTaxonomyNode<ElkClass>> getUpdateableNodes() {
 		return classTaxonomy_.getUpdateableNodes();
 	}
 
+	private UpdateableTypeNodeWrapper getCreateUpdateableTypeNode(UpdateableTaxonomyNode<ElkClass> taxNode) {
+		if (taxNode == null) {
+			return null;
+		}
+		
+		synchronized (taxNode) {
+			UpdateableTypeNodeWrapper wrapper = wrapperMap_.get(taxNode);
+			
+			if (wrapper == null) {
+				wrapper = new UpdateableTypeNodeWrapper(taxNode);
+				wrapperMap_.put(taxNode, wrapper);
+			}
 
+			return wrapper; 
+		}
+	}	
+	
+	/**
+	 * Transforms updateable taxonomy nodes into updateable type nodes
+	 */
+	private final FunctorEx<UpdateableTaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper> functor_ = new FunctorEx<UpdateableTaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper>(){
+
+		@Override
+		public UpdateableTypeNodeWrapper apply(UpdateableTaxonomyNode<ElkClass> node) {
+			return getCreateUpdateableTypeNode(node);
+		}
+
+		@Override
+		public UpdateableTaxonomyNode<ElkClass> deapply(Object element) {
+			if (element instanceof UpdateableTypeNodeWrapper) {
+				return ((UpdateableTypeNodeWrapper) element).getNode();
+			}
+			else {
+				return null;
+			}
+		}
+		
+	};	
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private abstract class TypeNodeWrapper implements TypeNode<ElkClass, ElkNamedIndividual> {
+		
+		protected final TaxonomyNode<ElkClass> classNode_;
+		
+		TypeNodeWrapper(TaxonomyNode<ElkClass> node) {
+			classNode_ = node;
+		}
+
+		@Override
+		public Set<ElkClass> getMembers() {
+			return classNode_.getMembers();
+		}
+
+		@Override
+		public ElkClass getCanonicalMember() {
+			return classNode_.getCanonicalMember();
+		}
+
+		@Override
+		public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
+			Set<InstanceNode<ElkClass, ElkNamedIndividual>> result;
+			
+			if (!classNode_.getDirectSubNodes().isEmpty()) {
+				result = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>();
+				Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
+				
+				todo.add(this);
+				
+				while (!todo.isEmpty()) {
+					TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
+					result.addAll(next.getDirectInstanceNodes());
+					for (TypeNode<ElkClass, ElkNamedIndividual> nextSubNode : next
+							.getDirectSubNodes()) {
+						todo.add(nextSubNode);
+					}
+				}
+			} else {
+				result = getDirectInstanceNodes();
+			}
+			
+			return Collections.unmodifiableSet(result);
+		}
+
+		@Override
+		public String toString() {
+			return classNode_.toString();
+		}
+
+		@Override
+		public int hashCode() {
+			return classNode_.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof TypeNodeWrapper){
+				return classNode_ == ((TypeNodeWrapper) obj).classNode_;
+			}
+			
+			return false;
+		}
+		
+	}	
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private class UpdateableTypeNodeWrapper extends TypeNodeWrapper implements UpdateableTypeNode<ElkClass, ElkNamedIndividual> {
+		
+		/**
+		 * ElkNamedIndividual nodes whose members are instances of the members of
+		 * this node.
+		 */
+		private final Set<InstanceNode<ElkClass, ElkNamedIndividual>> directInstanceNodes_;
+		
+		UpdateableTypeNodeWrapper(UpdateableTaxonomyNode<ElkClass> node) {
+			super(node);
+			this.directInstanceNodes_ = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>();
+		}
+		
+		private UpdateableTaxonomyNode<ElkClass> getNode() {
+			return (UpdateableTaxonomyNode<ElkClass>) classNode_;
+		}
+		
+		@Override
+		public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
+			return Collections.unmodifiableSet(directInstanceNodes_);
+		}
+		
+		@Override
+		public void addDirectSuperNode(
+				UpdateableTaxonomyNode<ElkClass> superNode) {
+			getNode().addDirectSuperNode(superNode);
+		}
+
+		@Override
+		public void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+			getNode().addDirectSubNode(subNode);			
+		}
+
+		@Override
+		public boolean removeDirectSubNode(
+				UpdateableTaxonomyNode<ElkClass> subNode) {
+			return getNode().removeDirectSubNode(subNode);
+		}
+
+		@Override
+		public boolean removeDirectSuperNode(
+				UpdateableTaxonomyNode<ElkClass> superNode) {
+			return getNode().removeDirectSuperNode(superNode);
+		}
+
+		@Override
+		public void clearMembers() {
+			getNode().clearMembers();
+		}
+
+		@Override
+		public boolean trySetModified(boolean modified) {
+			return getNode().trySetModified(modified);
+		}
+
+		@Override
+		public boolean isModified() {
+			return getNode().isModified();
+		} 
+
+		@Override
+		public Set<UpdateableTypeNodeWrapper> getDirectUpdateableSubNodes() {
+			return Operations.mapEx(getNode().getDirectUpdateableSubNodes(), functor_);
+		}
+
+		@Override
+		public Set<UpdateableTypeNodeWrapper> getDirectUpdateableSuperNodes() {
+			return Operations.mapEx(getNode().getDirectUpdateableSuperNodes(), functor_);
+		}
+		
+		@Override
+		public Set<? extends TypeNodeWrapper> getDirectSuperNodes() {
+			return getDirectUpdateableSuperNodes();
+		}
+
+		@Override
+		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {
+			return getDirectUpdateableSuperNodes();
+
+		}
+
+		@Override
+		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
+			return getDirectUpdateableSubNodes();
+		}
+
+		@Override
+		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
+			return getDirectUpdateableSubNodes();
+		}
+		
+
+		@Override
+		public void addDirectInstanceNode(	UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(getNode() + ": new direct instance-node " + instanceNode);
+			}
+			
+			directInstanceNodes_.add(instanceNode);		
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private class BottomTypeNodeWrapper extends TypeNodeWrapper {
+
+		BottomTypeNodeWrapper(UpdateableBottomNode<ElkClass> node) {
+			super(node);
+		}
+
+		private UpdateableBottomNode<ElkClass> getNode() {
+			return (UpdateableBottomNode<ElkClass>) classNode_;
+		}
+		
+		@Override
+		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
+			return Operations.mapEx(getNode().getDirectUpdateableSuperNodes(), functor_);
+		}
+
+		@Override
+		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {
+			return Operations.mapEx(TaxonomyNodeUtils.getAllUpdateableSuperNodes(getNode()), functor_);
+		}
+
+		@Override
+		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
+			return Collections.emptySet();
+		}
+		
+	}
+	
 }
+
+

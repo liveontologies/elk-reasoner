@@ -25,6 +25,7 @@ package org.semanticweb.elk.util.collections;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.AbstractCollection;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -516,4 +517,75 @@ public class Operations {
 				writer.append(prefix + element + "\n");
 	}
 
+	
+	public interface Functor<I, O> {
+
+		public O apply(I element);
+	}
+	
+	public interface FunctorEx<I, O> extends Functor<I, O> {
+
+		public I deapply(Object element);
+	}
+	
+	private static class MappingIterator<I, O> implements Iterator<O> {
+		
+		private final Iterator<? extends I> iter_;
+		private final Functor<I, O> functor_;
+		
+		MappingIterator(Iterator<? extends I> iter, Functor<I, O> functor) {
+			iter_ = iter;
+			functor_ = functor;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return iter_.hasNext();
+		}
+
+		@Override
+		public O next() {
+			return functor_.apply(iter_.next());
+		}
+
+		@Override
+		public void remove() {
+			iter_.remove();
+		}
+		
+		
+	}
+	
+	public static <I,O> Iterable<O> map(final Set<I> input, final Functor<I,O> functor) {
+		return new Iterable<O>() {
+
+			@Override
+			public Iterator<O> iterator() {
+				return new MappingIterator<I, O>(input.iterator(), functor);
+			}
+		};
+	}
+	
+	public static <I,O> Set<O> mapEx(final Set<? extends I> input, final FunctorEx<I,O> functor) {
+		return new AbstractSet<O>() { 
+
+			@Override
+			public Iterator<O> iterator() {
+				return new MappingIterator<I, O>(input.iterator(), functor);
+			}
+
+			@Override
+			public boolean contains(Object o) {
+				I element = functor.deapply(o);
+				
+				return element == null ? false : input.contains(element);
+			}
+
+			@Override
+			public int size() {
+				return input.size();
+			}
+			
+		};
+	}
 }
