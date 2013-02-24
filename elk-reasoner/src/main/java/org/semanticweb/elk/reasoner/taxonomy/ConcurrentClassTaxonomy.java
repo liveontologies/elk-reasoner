@@ -283,7 +283,7 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 
 		@Override
 		public Set<? extends UpdateableTaxonomyNode<ElkClass>> getDirectUpdateableSuperNodes() {
-			return getAllSuperNodes();
+			return getDirectSuperNodes();
 		}
 	}
 }

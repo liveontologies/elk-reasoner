@@ -43,13 +43,18 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class TaxonomyNodeUtils {
 	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
 	interface GetSuccessors<T extends ElkObject, O extends TaxonomyNode<T>> {
 		
 		Set<? extends O> get(O node);
 	}
 
-	private static <T extends ElkObject, 	O extends TaxonomyNode<T>> Set<O> getAllReachable(Collection<? extends O> direct, GetSuccessors<T, O> succ) {
-		
+	private static <T extends ElkObject, 	O extends TaxonomyNode<T>> Set<O> getAllReachable(Collection<? extends O> direct, GetSuccessors<T, O> succ) {		
 		Set<O> result = new ArrayHashSet<O>(direct.size());
 		Queue<O> todo = new LinkedList<O>();
 		
@@ -86,7 +91,7 @@ public class TaxonomyNodeUtils {
 			}});
 	}	
 	
-	public static <T extends ElkObject> Set<? extends TaxonomyNode<T>> getAllUpdateableSubNodes(UpdateableTaxonomyNode<T> node) {
+	public static <T extends ElkObject> Set<? extends UpdateableTaxonomyNode<T>> getAllUpdateableSubNodes(UpdateableTaxonomyNode<T> node) {
 		return getAllReachable(node.getDirectUpdateableSubNodes(), new GetSuccessors<T, UpdateableTaxonomyNode<T>> () {
 
 			@Override

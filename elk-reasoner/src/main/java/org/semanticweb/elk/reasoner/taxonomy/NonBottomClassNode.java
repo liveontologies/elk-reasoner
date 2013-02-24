@@ -79,12 +79,6 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 */
 	private final Set<UpdateableTaxonomyNode<ElkClass>> directSubNodes_;
 	/**
-	 * ElkNamedIndividual nodes whose members are instances of the members of
-	 * this node.
-	 */
-	//private final Set<InstanceNode<ElkClass, ElkNamedIndividual>> directInstanceNodes_;
-
-	/**
 	 * <tt>true</tt> if the direct super-nodes of this node need to be
 	 * recomputed
 	 */
@@ -105,7 +99,6 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 		this.members_ = new ArrayList<ElkClass>(members);
 		this.directSubNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
 		this.directSuperNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
-		//this.directInstanceNodes_ = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>();
 		Collections.sort(this.members_, Comparators.ELK_CLASS_COMPARATOR);
 	}
 
@@ -143,20 +136,6 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 
 		directSubNodes_.add(subNode);
 	}
-
-	/**
-	 * Add a direct instance node. This method is not thread safe.
-	 * 
-	 * @param instanceNode
-	 *            node to add
-	 */
-	/*@Override
-	public void addDirectInstanceNode(
-			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": new direct instance-node " + instanceNode);
-		directInstanceNodes_.add(instanceNode);
-	}*/
 
 	// TODO: change the type of the output to SortedSet
 	@Override
@@ -207,79 +186,25 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
-	/*public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {
-		Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
-				directSuperNodes_.size());
-		Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
-		todo.addAll(directSuperNodes_);
-		while (!todo.isEmpty()) {
-			TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
-			if (result.add(next)) {
-				for (TypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
-						.getDirectSuperNodes())
-					todo.add(nextSuperNode);
-			}
-		}
-		return Collections.unmodifiableSet(result);
-	}*/
 	public Set<? extends TaxonomyNode<ElkClass>> getAllSuperNodes() {
 		return TaxonomyNodeUtils.getAllSuperNodes(this);
 	}
 
 	@Override
-	/*public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
-		if (!directSubNodes_.isEmpty()) {
-			return Collections
-					.<TypeNode<ElkClass, ElkNamedIndividual>> unmodifiableSet(directSubNodes_);
-		} else {
-			Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
-					1);
-			result.add(this.taxonomy_.bottomClassNode);
-			return Collections.unmodifiableSet(result);
-		}
-	}*/
 	public Set<TaxonomyNode<ElkClass>> getDirectSubNodes() {
 		if (!directSubNodes_.isEmpty()) {
-			return Collections.<TaxonomyNode<ElkClass>> unmodifiableSet(directSubNodes_);
+			return Collections.<TaxonomyNode<ElkClass>>unmodifiableSet(directSubNodes_);
 		} else {
-			Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>(1);
-			result.add(this.taxonomy_.bottomClassNode);
-			
-			return Collections.unmodifiableSet(result);
+			return Collections.singleton(this.taxonomy_.getBottomNode());
 		}
 	}
 
 	@Override
 	public Set<UpdateableTaxonomyNode<ElkClass>> getDirectUpdateableSubNodes() {
-		if (!directSubNodes_.isEmpty()) {
-			return Collections.unmodifiableSet(directSubNodes_);
-		} else {
-			return Collections.emptySet();
-		}
+		return Collections.unmodifiableSet(directSubNodes_);
 	}
 
 	@Override
-	/*public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
-		Set<TypeNode<ElkClass, ElkNamedIndividual>> result;
-		if (!directSubNodes_.isEmpty()) {
-			result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
-					directSubNodes_.size());
-			Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
-			todo.addAll(directSubNodes_);
-			while (!todo.isEmpty()) {
-				TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
-				if (result.add(next)) {
-					for (TypeNode<ElkClass, ElkNamedIndividual> nextSubNode : next
-							.getDirectSubNodes())
-						todo.add(nextSubNode);
-				}
-			}
-		} else {
-			result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(1);
-			result.add(this.taxonomy_.bottomClassNode);
-		}
-		return Collections.unmodifiableSet(result);
-	}*/
 	public Set<? extends TaxonomyNode<ElkClass>> getAllSubNodes() {
 		return TaxonomyNodeUtils.getAllSubNodes(this);
 	}
@@ -295,33 +220,6 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	public String toString() {
 		return members_.toString();
 	}
-
-	/*@Override
-	public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
-		return Collections.unmodifiableSet(directInstanceNodes_);
-	}*/
-
-	/*@Override
-	public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
-		Set<InstanceNode<ElkClass, ElkNamedIndividual>> result;
-		if (!directSubNodes_.isEmpty()) {
-			result = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>(
-					directInstanceNodes_.size());
-			Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
-			todo.add(this);
-			while (!todo.isEmpty()) {
-				TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
-				result.addAll(next.getDirectInstanceNodes());
-				for (TypeNode<ElkClass, ElkNamedIndividual> nextSubNode : next
-						.getDirectSubNodes()) {
-					todo.add(nextSubNode);
-				}
-			}
-		} else {
-			result = getDirectInstanceNodes();
-		}
-		return Collections.unmodifiableSet(result);
-	}*/
 
 	@Override
 	public void clearMembers() {

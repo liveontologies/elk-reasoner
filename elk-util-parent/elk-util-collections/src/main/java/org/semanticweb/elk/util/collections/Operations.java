@@ -517,23 +517,50 @@ public class Operations {
 				writer.append(prefix + element + "\n");
 	}
 
-	
+	/**
+	 * A simple object that transforms objects of type {@link I} to objects of
+	 * type {@link O}
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 */
 	public interface Functor<I, O> {
 
 		public O apply(I element);
 	}
 	
+	/**
+	 * An extension of {@link Functor} which can do the reverse transformation
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
 	public interface FunctorEx<I, O> extends Functor<I, O> {
-
+		
+		/**
+		 * The reason this method takes Objects rather than {@link O} is because
+		 * it's primarily used for an efficient implementation of
+		 * {@link Set.contains}, which takes an Object
+		 * 
+		 * @return Can return null if the transformation is not possible
+		 */
 		public I deapply(Object element);
 	}
 	
-	private static class MappingIterator<I, O> implements Iterator<O> {
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static class MapIterator<I, O> implements Iterator<O> {
 		
 		private final Iterator<? extends I> iter_;
 		private final Functor<I, O> functor_;
 		
-		MappingIterator(Iterator<? extends I> iter, Functor<I, O> functor) {
+		MapIterator(Iterator<? extends I> iter, Functor<I, O> functor) {
 			iter_ = iter;
 			functor_ = functor;
 		}
@@ -556,22 +583,19 @@ public class Operations {
 		
 	}
 	
-	public static <I,O> Iterable<O> map(final Set<I> input, final Functor<I,O> functor) {
-		return new Iterable<O>() {
-
-			@Override
-			public Iterator<O> iterator() {
-				return new MappingIterator<I, O>(input.iterator(), functor);
-			}
-		};
-	}
-	
-	public static <I,O> Set<O> mapEx(final Set<? extends I> input, final FunctorEx<I,O> functor) {
+	/**
+	 * A simple second-order map function
+	 * 
+	 * @param input
+	 * @param functor
+	 * @return
+	 */
+	public static <I,O> Set<O> map(final Set<? extends I> input, final FunctorEx<I,O> functor) {
 		return new AbstractSet<O>() { 
 
 			@Override
 			public Iterator<O> iterator() {
-				return new MappingIterator<I, O>(input.iterator(), functor);
+				return new MapIterator<I, O>(input.iterator(), functor);
 			}
 
 			@Override

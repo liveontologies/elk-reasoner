@@ -94,9 +94,9 @@ public class TaxonomyIOTest {
 		Taxonomy<ElkClass> original = loadAndClassify("io/taxonomy.owl");
 		StringWriter writer = new StringWriter();
 
-		 Writer outWriter = new OutputStreamWriter(System.out);
-		 TaxonomyPrinter.dumpClassTaxomomy(original, outWriter, false);
-		 outWriter.flush();
+		/*Writer outWriter = new OutputStreamWriter(System.out);
+		TaxonomyPrinter.dumpClassTaxomomy(original, outWriter, false);
+		outWriter.flush();*/
 
 		TaxonomyPrinter.dumpClassTaxomomy(original, writer, false);
 
@@ -105,10 +105,10 @@ public class TaxonomyIOTest {
 		Taxonomy<ElkClass> loaded = MockTaxonomyLoader.load(objectFactory,
 				parser);
 
-		 System.out.println("=================================");
-		 outWriter = new OutputStreamWriter(System.out);
-		 TaxonomyPrinter.dumpClassTaxomomy(loaded, outWriter, false);
-		 outWriter.flush();
+		/*System.out.println("=================================");
+		outWriter = new OutputStreamWriter(System.out);
+		TaxonomyPrinter.dumpClassTaxomomy(loaded, outWriter, false);
+		outWriter.flush();*/
 
 		// compare
 		assertEquals(TaxonomyHasher.hash(original), TaxonomyHasher.hash(loaded));
@@ -119,13 +119,11 @@ public class TaxonomyIOTest {
 			Owl2ParseException, ElkInconsistentOntologyException, ElkException {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> original = loadAndClassify("io/instance_taxonomy.owl");
 		StringWriter writer = new StringWriter();
-
-		/*
-		 * Writer outWriter = new OutputStreamWriter(System.out);
-		 * TaxonomyPrinter.dumpInstanceTaxomomy(original, outWriter, false);
-		 * outWriter.flush();
-		 */
-
+		
+		Writer outWriter = new OutputStreamWriter(System.out);
+		TaxonomyPrinter.dumpInstanceTaxomomy(original, outWriter, false);
+		outWriter.flush();
+		
 		TaxonomyPrinter.dumpInstanceTaxomomy(original, writer, false);
 
 		StringReader reader = new StringReader(writer.getBuffer().toString());
@@ -133,12 +131,10 @@ public class TaxonomyIOTest {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> loaded = MockTaxonomyLoader
 				.load(objectFactory, parser);
 
-		/*
-		 * System.out.println("================================="); outWriter =
-		 * new OutputStreamWriter(System.out);
-		 * TaxonomyPrinter.dumpInstanceTaxomomy(loaded, outWriter, false);
-		 * outWriter.flush();
-		 */
+		System.out.println("================================="); 
+		outWriter = new OutputStreamWriter(System.out);
+		TaxonomyPrinter.dumpInstanceTaxomomy(loaded, outWriter, false);
+		outWriter.flush();
 
 		// compare
 		assertEquals(InstanceTaxonomyHasher.hash(original),

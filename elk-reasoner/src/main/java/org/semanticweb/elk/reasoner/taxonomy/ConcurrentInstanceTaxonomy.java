@@ -76,7 +76,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	
 	private final ConcurrentMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper> wrapperMap_;
 	
-	private TypeNodeWrapper bottom_;
+	private final TypeNodeWrapper bottom_;
 
 	public ConcurrentInstanceTaxonomy() {
 		this(new ConcurrentClassTaxonomy());
@@ -141,7 +141,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	@Override
 	public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getTypeNodes() {
-		Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> updateableNodes = Operations.mapEx(classTaxonomy_.getUpdateableNodes(), functor_);
+		Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> updateableNodes = Operations.map(classTaxonomy_.getUpdateableNodes(), functor_);
 		
 		return new LazySetUnion<TypeNode<ElkClass,ElkNamedIndividual>>(updateableNodes, Collections.singleton(bottom_));
 	}
@@ -469,12 +469,12 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 		@Override
 		public Set<UpdateableTypeNodeWrapper> getDirectUpdateableSubNodes() {
-			return Operations.mapEx(getNode().getDirectUpdateableSubNodes(), functor_);
+			return Operations.map(getNode().getDirectUpdateableSubNodes(), functor_);
 		}
 
 		@Override
 		public Set<UpdateableTypeNodeWrapper> getDirectUpdateableSuperNodes() {
-			return Operations.mapEx(getNode().getDirectUpdateableSuperNodes(), functor_);
+			return Operations.map(getNode().getDirectUpdateableSuperNodes(), functor_);
 		}
 		
 		@Override
@@ -490,12 +490,16 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 		@Override
 		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getDirectSubNodes() {
-			return getDirectUpdateableSubNodes();
+			Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> directSubNodes = getDirectUpdateableSubNodes();
+			
+			return directSubNodes.isEmpty() ? Collections.singleton(getBottomNode()) : directSubNodes;
 		}
 
 		@Override
 		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getAllSubNodes() {
-			return getDirectUpdateableSubNodes();
+			Set<? extends UpdateableTaxonomyNode<ElkClass>> subNodes = TaxonomyNodeUtils.getAllUpdateableSubNodes(getNode());
+			//this node is not the bottom one, so the bottom must be in the set
+			return new LazySetUnion<TypeNode<ElkClass,ElkNamedIndividual>>(Operations.map(subNodes, functor_), Collections.singleton(getBottomNode()));
 		}
 		
 
@@ -528,12 +532,12 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		
 		@Override
 		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getDirectSuperNodes() {
-			return Operations.mapEx(getNode().getDirectUpdateableSuperNodes(), functor_);
+			return Operations.map(getNode().getDirectUpdateableSuperNodes(), functor_);
 		}
 
 		@Override
 		public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getAllSuperNodes() {
-			return Operations.mapEx(TaxonomyNodeUtils.getAllUpdateableSuperNodes(getNode()), functor_);
+			return Operations.map(TaxonomyNodeUtils.getAllUpdateableSuperNodes(getNode()), functor_);
 		}
 
 		@Override
