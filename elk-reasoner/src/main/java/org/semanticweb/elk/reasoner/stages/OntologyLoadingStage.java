@@ -75,6 +75,7 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.setIncrementalMode(false);
 		this.ontologyLoader_ = null;
 		return true;
 	}

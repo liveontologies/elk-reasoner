@@ -274,7 +274,7 @@ public class Operations {
 	}
 
 	/**
-	 * An interface for boolean conditions over some type.
+	 * Boolean conditions over some type.
 	 * 
 	 * @param <T>
 	 *            the type of elements which can be used with this condition
@@ -474,6 +474,87 @@ public class Operations {
 
 		};
 
+	}
+
+	/**
+	 * Transformations of input values to output values
+	 * 
+	 * @param <I>
+	 *            the type of the input of the transformation
+	 * @param <O>
+	 *            the type of the output of the transformation
+	 */
+	public interface Transformation<I, O> {
+		/**
+		 * Transforms the input element
+		 * 
+		 * @param element
+		 *            the element to be transformed
+		 * @return the result of the transformation
+		 */
+		public O transform(I element);
+	}
+
+	// TODO: get rid of Conditions in favour of transformations
+	
+	/**
+	 * Transforms elements using a given {@link Transformation} the output
+	 * elements consist of the result of the transformation in the same order;
+	 * if the transformation returns {@code null}, it is not included in the
+	 * output
+	 * 
+	 * @param input
+	 *            the input elements
+	 * @param transformation
+	 *            the transformation for elements
+	 * @return the transformed output elements
+	 * 
+	 */
+	public static <I, O> Iterable<O> map(final Iterable<I> input,
+			final Transformation<? super I, O> transformation) {
+		assert input != null;
+
+		return new Iterable<O>() {
+
+			@Override
+			public Iterator<O> iterator() {
+
+				return new Iterator<O>() {
+					Iterator<I> i = input.iterator();
+					O next;
+					boolean hasNext = advance();
+
+					@Override
+					public boolean hasNext() {
+						return hasNext;
+					}
+
+					@Override
+					public O next() {
+						if (hasNext) {
+							O result = next;
+							hasNext = advance();
+							return result;
+						}
+						throw new NoSuchElementException();
+					}
+
+					@Override
+					public void remove() {
+						i.remove();
+					}
+
+					boolean advance() {
+						while (i.hasNext()) {
+							next = transformation.transform(i.next());
+							if (next != null)
+								return true;
+						}
+						return false;
+					}
+				};
+			}
+		};
 	}
 
 	/**

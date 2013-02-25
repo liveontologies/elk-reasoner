@@ -72,7 +72,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	/**
 	 * Stages that need to be executed before this stage
 	 */
-	final Iterable<? extends ReasonerStage> preStages;
+	final Iterable<AbstractReasonerStage> preStages;
 
 	/**
 	 * Stages that need to be executed after this stage
@@ -213,6 +213,33 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 			}
 		}
 	}
+
+	/**
+	 * Marks this {@link AbstractReasonerStage} and its dependencies as
+	 * completed; next time the stage will not be executed unless some of the
+	 * dependencies are invalidated
+	 * 
+	 * @return
+	 */
+//	boolean markCompleted() {
+//		if (isCompleted)
+//			return false;
+//		Queue<AbstractReasonerStage> toMark = new LinkedList<AbstractReasonerStage>();
+//		toMark.add(this);
+//		for (;;) {
+//			AbstractReasonerStage stage = toMark.poll();
+//			if (stage == null)
+//				return true;
+//			if (!stage.isCompleted) {
+//				if (LOGGER_.isTraceEnabled())
+//					LOGGER_.trace(stage.getName() + ": marked completed");
+//				stage.isCompleted = true;
+//				for (AbstractReasonerStage preStage : stage.preStages) {
+//					toMark.add(preStage);
+//				}
+//			}
+//		}
+//	}
 
 	protected void markAllContextsAsSaturated() {
 		for (IndexedClassExpression ice : reasoner.saturationState

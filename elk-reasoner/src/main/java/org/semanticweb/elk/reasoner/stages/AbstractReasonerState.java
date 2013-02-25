@@ -139,6 +139,10 @@ public abstract class AbstractReasonerState {
 				.getAxiomInserter());
 	}
 
+	public boolean isIncrementalMode() {
+		return ontologyIndex.isIncrementalMode();
+	}
+
 	public void setIncrementalMode(boolean mode) {
 		ontologyIndex.setIncrementalMode(mode);
 	}
@@ -250,7 +254,9 @@ public abstract class AbstractReasonerState {
 	 */
 	public boolean isInconsistent() throws ElkException {
 
-		ReasonerStage stage = ontologyIndex.isIncrementalMode() ? stageManager.incrementalConsistencyCheckingStage
+		getStageExecutor().complete(stageManager.changesLoadingStage);
+
+		ReasonerStage stage = isIncrementalMode() ? stageManager.incrementalConsistencyCheckingStage
 				: stageManager.consistencyCheckingStage;
 
 		getStageExecutor().complete(stage);
@@ -265,7 +271,6 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public void loadOntology() throws ElkException {
-		setIncrementalMode(false);
 		getStageExecutor().complete(stageManager.ontologyLoadingStage);
 	}
 
@@ -291,7 +296,9 @@ public abstract class AbstractReasonerState {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
-		if (ontologyIndex.isIncrementalMode()) {
+		getStageExecutor().complete(stageManager.changesLoadingStage);
+
+		if (isIncrementalMode() && classTaxonomyState.taxonomy != null) {
 			getStageExecutor().complete(
 					stageManager.incrementalClassTaxonomyComputationStage);
 		} else {

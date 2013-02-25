@@ -110,14 +110,6 @@ public class DifferentialIndex extends DirectIndex {
 		return axiomDeleter_;
 	}
 
-	public ElkAxiomProcessor getDirectAxiomInserter() {
-		return super.getAxiomInserter();
-	}
-
-	public ElkAxiomProcessor getDirectAxiomDeleter() {
-		return super.getAxiomDeleter();
-	}
-
 	public ChainableRule<Context> getAddedContextInitRules() {
 		return addedContextInitRules_;
 	}
