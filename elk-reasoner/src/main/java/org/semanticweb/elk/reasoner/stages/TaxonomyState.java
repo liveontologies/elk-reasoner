@@ -25,15 +25,18 @@ package org.semanticweb.elk.reasoner.stages;
  */
 
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 
 /**
- * Stores information about the state of the taxonomy
+ * Stores information about the state of the class taxonomy
  * 
  * @author Pavel Klinov
  * 
@@ -45,6 +48,8 @@ public class TaxonomyState {
 
 	final Set<ElkClass> classesForModifiedNodes = Collections
 			.newSetFromMap(new ConcurrentHashMap<ElkClass, Boolean>());
+	
+	final List<IndexedClass> removedClasses = new LinkedList<IndexedClass>();
 
 	public UpdateableTaxonomy<ElkClass> getTaxonomy() {
 		return taxonomy;
@@ -74,9 +79,17 @@ public class TaxonomyState {
 				}
 			}
 		}
+		
+		public void markRemovedClass(final IndexedClass clazz) {
+			removedClasses.add(clazz);
+		}
 
 		public void clearModifiedNodeObjects() {
 			classesForModifiedNodes.clear();
+		}
+		
+		public void clearRemovedClasses() {
+			removedClasses.clear();
 		}
 	}
 }

@@ -29,6 +29,7 @@ import java.util.Map;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -93,21 +94,24 @@ class IncrementalDeletionInitializationStage extends
 		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
 				.getConclusionStatistics());
 
-		final ExtendedWriter writer = reasoner.saturationState
+		final ExtendedWriter satStateWriter = reasoner.saturationState
 				.getExtendedWriter(conclusionVisitor);
-
+		final TaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState.getWriter();
+		
 		for (IndexedClassExpression ice : reasoner.ontologyIndex
 				.getRemovedClassExpressions()) {
 
 			if (ice.getContext() != null) {
-				writer.initContext(ice.getContext());
-				/*
-				 * TODO This is only needed to clean the taxonomy afterwards
-				 * It's better to delete these nodes from the taxonomy
-				 * immediately and get rid of tracking the removed contexts in
-				 * the saturation state
-				 */
-				writer.markForRemoval(ice.getContext());
+				satStateWriter.initContext(ice.getContext());
+				//otherwise it may not be cleaned
+				//we could use writer.markContextAsNotSaturated
+				//but then the context will end up in the queue
+				//for not saturated contexts, which isn't needed here
+				ice.getContext().setSaturated(false);
+				
+				if (ice instanceof IndexedClass) {
+					taxStateWriter.markRemovedClass((IndexedClass) ice);
+				}
 			}
 		}
 

@@ -101,10 +101,8 @@ public abstract class AbstractReasonerState {
 	boolean inconsistentOntology = false;
 
 	/**
-	 * Taxonomy that stores (partial) classification
+	 * Taxonomy state that stores (partial) classification
 	 */
-	// UpdateableTaxonomy<ElkClass> taxonomy = null;
-
 	final TaxonomyState classTaxonomyState = new TaxonomyState();
 
 	/**

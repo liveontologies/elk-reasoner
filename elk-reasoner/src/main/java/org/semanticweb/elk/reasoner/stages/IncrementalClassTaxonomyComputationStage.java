@@ -42,8 +42,8 @@ import org.semanticweb.elk.util.collections.Operations;
 class IncrementalClassTaxonomyComputationStage extends
 		ClassTaxonomyComputationStage {
 
-//	private static final Logger LOGGER_ = Logger
-//			.getLogger(IncrementalClassTaxonomyComputationStage.class);
+	// private static final Logger LOGGER_ = Logger
+	// .getLogger(IncrementalClassTaxonomyComputationStage.class);
 
 	public IncrementalClassTaxonomyComputationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
@@ -80,16 +80,13 @@ class IncrementalClassTaxonomyComputationStage extends
 		};
 		Collection<IndexedClass> modified = Operations.getCollection(
 				Operations.map(modifiedClassesIter, transformation),
-				// TODO: this is only an upper bound; calculate
-				// exactly
+				// an upper bound
 				reasoner.classTaxonomyState.classesForModifiedNodes.size());
-
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				modified, 64), reasoner.getProcessExecutor(), workerNo,
 				progressMonitor, reasoner.saturationState,
 				reasoner.classTaxonomyState.taxonomy);
 		return true;
-
 	}
 
 	@Override

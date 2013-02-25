@@ -51,8 +51,6 @@ class InitializeContextsAfterDeletionsStage extends
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Initializing contexts with deleted conclusions: "
 					+ reasoner.saturationState.getNotSaturatedContexts());
-			LOGGER_.trace("Initializing contexts which will be removed: "
-					+ reasoner.saturationState.getContextsToBeRemoved());
 		}
 
 		this.todo = reasoner.saturationState.getNotSaturatedContexts()

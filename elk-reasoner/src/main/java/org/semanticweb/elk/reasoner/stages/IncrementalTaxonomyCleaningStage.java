@@ -68,8 +68,10 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		final Collection<IndexedClass> modified = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());
+		/*final Collection<IndexedClass> removed = new ContextRootCollection(
+				reasoner.saturationState.getContextsToBeRemoved());*/
 		final Collection<IndexedClass> removed = new ContextRootCollection(
-				reasoner.saturationState.getContextsToBeRemoved());
+				reasoner.classTaxonomyState.removedClasses);
 		Collection<IndexedClass> inputs = Operations.getCollection(
 				Operations.concat(removed, modified),
 				removed.size() + modified.size());
@@ -108,6 +110,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		// at this point we're done with unsaturated contexts
 		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
 				.clearNotSaturatedContexts();
+		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		this.cleaning_ = null;
 		return true;
 	}
@@ -122,9 +125,9 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	private static class ContextRootCollection extends
 			AbstractCollection<IndexedClass> {
 
-		private final Collection<IndexedClassExpression> ices_;
+		private final Collection<? extends IndexedClassExpression> ices_;
 
-		ContextRootCollection(Collection<IndexedClassExpression> ices) {
+		ContextRootCollection(Collection<? extends IndexedClassExpression> ices) {
 			ices_ = ices;
 		}
 
@@ -133,7 +136,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return new Iterator<IndexedClass>() {
 
 				private IndexedClass curr_ = null;
-				private final Iterator<IndexedClassExpression> iter_ = ices_
+				private final Iterator<? extends IndexedClassExpression> iter_ = ices_
 						.iterator();
 
 				@Override
