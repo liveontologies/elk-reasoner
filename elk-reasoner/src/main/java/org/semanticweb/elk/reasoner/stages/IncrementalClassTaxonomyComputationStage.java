@@ -38,16 +38,19 @@ import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
+ * TODO docs
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class IncrementalClassTaxonomyComputationStage extends
-		ClassTaxonomyComputationStage {
+class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalClassTaxonomyComputationStage.class);
 
+	protected ClassTaxonomyComputation computation_ = null;
+	
 	public IncrementalClassTaxonomyComputationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
@@ -60,7 +63,7 @@ class IncrementalClassTaxonomyComputationStage extends
 
 	@Override
 	boolean preExecute() {
-		if (!basicPreExecute())
+		if (!super.preExecute())
 			return false;
 
 		final Collection<IndexedClass> indexedClasses = reasoner.ontologyIndex
@@ -70,7 +73,7 @@ class IncrementalClassTaxonomyComputationStage extends
 			reasoner.classTaxonomyState.resetTaxonomy();
 		}
 
-		if (reasoner.classTaxonomyState.emptyTaxonomy()) {
+		if (reasoner.classTaxonomyState.getTaxonomy() == null) {
 			// the taxonomy is empty (or nearly empty), let's compute from scratch
 			if (LOGGER_.isInfoEnabled()) {
 				LOGGER_.info("Using non-incremental taxonomy");
@@ -153,12 +156,28 @@ class IncrementalClassTaxonomyComputationStage extends
 	}
 
 	@Override
+	public void executeStage() throws ElkInterruptedException {
+		computation_.process();
+	}
+
+	@Override
 	boolean postExecute() {
-		if (!super.postExecute())
+		if (!super.postExecute()) {
 			return false;
+		}
+		
+		reasoner.classTaxonomyState.classesForModifiedNodes.clear();
 		reasoner.ontologyIndex.clearSignatureChanges();
+		reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;
 		return true;
 	}
+
+	@Override
+	public void printInfo() {
+		if (computation_ != null)
+			computation_.printStatistics();
+	}
+
 
 }

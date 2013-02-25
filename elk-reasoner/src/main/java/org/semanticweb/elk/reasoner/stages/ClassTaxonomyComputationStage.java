@@ -54,10 +54,6 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		return "Class Taxonomy Computation";
 	}
 
-	boolean basicPreExecute() {
-		return super.preExecute();
-	}
-	
 	@Override
 	boolean preExecute() {
 		if (!super.preExecute()) {
