@@ -85,8 +85,9 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 					+ removed);
 		}
 		cleaning_ = new ClassTaxonomyCleaning(inputs,
-				reasoner.classTaxonomyState, reasoner.getProcessExecutor(),
-				workerNo, progressMonitor);
+				reasoner.classTaxonomyState.getTaxonomy(),
+				reasoner.classTaxonomyState.getWriter(),
+				reasoner.getProcessExecutor(), workerNo, progressMonitor);
 		return true;
 	}
 

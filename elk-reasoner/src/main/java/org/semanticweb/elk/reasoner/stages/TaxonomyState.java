@@ -67,7 +67,7 @@ public class TaxonomyState {
 		return Collections.unmodifiableCollection(removedClasses_);
 	}
 
-	public Writer getWriter() {
+	Writer getWriter() {
 		return writer_;
 	}
 

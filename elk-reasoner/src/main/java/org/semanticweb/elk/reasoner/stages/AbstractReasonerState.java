@@ -315,8 +315,8 @@ public abstract class AbstractReasonerState {
 					stageManager.classTaxonomyComputationStage);
 			stageManager.incrementalClassTaxonomyComputationStage
 					.setCompleted();
-		}
-		setIncrementalMode(true);
+			setIncrementalMode(true);
+		}		
 
 		return classTaxonomyState.getTaxonomy();
 	}

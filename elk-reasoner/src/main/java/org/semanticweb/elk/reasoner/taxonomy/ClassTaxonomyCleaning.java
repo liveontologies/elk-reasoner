@@ -54,10 +54,12 @@ public class ClassTaxonomyCleaning extends
 		ReasonerComputation<IndexedClass, ClassTaxonomyCleaningFactory> {
 
 	public ClassTaxonomyCleaning(Collection<IndexedClass> inputs,
-			TaxonomyState taxonomyState,
+			UpdateableTaxonomy<ElkClass> taxonomy,
+			final TaxonomyState.Writer taxonomyWriter,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		super(inputs, new ClassTaxonomyCleaningFactory(taxonomyState),
+		super(inputs,
+				new ClassTaxonomyCleaningFactory(taxonomy, taxonomyWriter),
 				executor, maxWorkers, progressMonitor);
 	}
 
@@ -66,10 +68,13 @@ public class ClassTaxonomyCleaning extends
 class ClassTaxonomyCleaningFactory implements
 		InputProcessorFactory<IndexedClass, InputProcessor<IndexedClass>> {
 
-	private final TaxonomyState classTaxonomyState_;
+	private final UpdateableTaxonomy<ElkClass> taxonomy_;
+	private final TaxonomyState.Writer taxonomyWriter_;
 
-	ClassTaxonomyCleaningFactory(final TaxonomyState classTaxonomyState) {
-		classTaxonomyState_ = classTaxonomyState;
+	ClassTaxonomyCleaningFactory(final UpdateableTaxonomy<ElkClass> taxonomy,
+			final TaxonomyState.Writer taxonomyWriter) {
+		this.taxonomy_ = taxonomy;
+		this.taxonomyWriter_ = taxonomyWriter;
 	}
 
 	@Override
@@ -84,38 +89,37 @@ class ClassTaxonomyCleaningFactory implements
 			@Override
 			public void submit(IndexedClass indexedClass) {
 				ElkClass elkClass = indexedClass.getElkClass();
-				UpdateableTaxonomy<ElkClass> taxonomy = classTaxonomyState_.getTaxonomy();
-				TaxonomyState.Writer writer = classTaxonomyState_.getWriter();
-				
-				if (elkClass == PredefinedElkClass.OWL_NOTHING){
-					writer.markClassesForModifiedNode(taxonomy.getBottomNode());
+
+				if (elkClass == PredefinedElkClass.OWL_NOTHING) {
+					taxonomyWriter_.markClassesForModifiedNode(taxonomy_
+							.getBottomNode());
 					return;
 				}
-				
+
 				/*
 				 * shouldn't modify the set of members and iterate over them (to
 				 * mark as modified) at the same time
 				 */
-				synchronized (taxonomy.getBottomNode()) {
-					if (taxonomy.getBottomNode().getMembers().remove(elkClass)) {
-						writer.markClassesForModifiedNode(taxonomy
+				synchronized (taxonomy_.getBottomNode()) {
+					if (taxonomy_.getBottomNode().getMembers().remove(elkClass)) {
+						taxonomyWriter_.markClassesForModifiedNode(taxonomy_
 								.getBottomNode());
-						writer.markClassForModifiedNode(elkClass);
+						taxonomyWriter_.markClassForModifiedNode(elkClass);
 						return;
 					}
 				}
 
-				UpdateableTaxonomyNode<ElkClass> node = taxonomy
+				UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 						.getUpdateableNode(elkClass);
 
 				if (node == null) {
-					writer.markClassForModifiedNode(elkClass);
+					taxonomyWriter_.markClassForModifiedNode(elkClass);
 					return;
 				}
-				
+
 				if (node.trySetModified(true)) {
 					toRemove.add(node);
-					writer.markClassesForModifiedNode(node);
+					taxonomyWriter_.markClassesForModifiedNode(node);
 				}
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
@@ -123,13 +127,13 @@ class ClassTaxonomyCleaningFactory implements
 							.getDirectUpdateableSubNodes()) {
 						if (subNode.trySetModified(true)) {
 							toRemove.add(subNode);
-							writer.markClassesForModifiedNode(subNode);
+							taxonomyWriter_.markClassesForModifiedNode(subNode);
 						}
 					}
 				}
-				
+
 				// remove node from the taxonomy
-				taxonomy.removeNode(node);
+				taxonomy_.removeNode(node);
 			}
 
 			@Override
@@ -150,9 +154,9 @@ class ClassTaxonomyCleaningFactory implements
 
 						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
 							superNode.removeDirectSubNode(node);
-							node.removeDirectSuperNode(superNode);											
+							node.removeDirectSuperNode(superNode);
 						}
-												
+
 					}
 
 				}
