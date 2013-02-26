@@ -62,7 +62,8 @@ class IncrementalClassTaxonomyComputationStage extends
 
 		// classes which correspond to changed nodes in the taxonomy
 		// they must include new classes
-		final Iterable<ElkClass> modifiedClassesIter = reasoner.classTaxonomyState.classesForModifiedNodes;
+		final Collection<ElkClass> modifiedClasses = reasoner.classTaxonomyState
+				.getClassesForModifiedNodes();
 		final IndexObjectConverter converter = reasoner.objectCache_
 				.getIndexObjectConverter();
 
@@ -79,9 +80,9 @@ class IncrementalClassTaxonomyComputationStage extends
 			}
 		};
 		Collection<IndexedClass> modified = Operations.getCollection(
-				Operations.map(modifiedClassesIter, transformation),
+				Operations.map(modifiedClasses, transformation),
 				// an upper bound
-				reasoner.classTaxonomyState.classesForModifiedNodes.size());
+				modifiedClasses.size());
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				modified, 64), reasoner.getProcessExecutor(), workerNo,
 				progressMonitor, reasoner.saturationState,

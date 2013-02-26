@@ -68,10 +68,12 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		final Collection<IndexedClass> modified = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());
-		/*final Collection<IndexedClass> removed = new ContextRootCollection(
-				reasoner.saturationState.getContextsToBeRemoved());*/
+		/*
+		 * final Collection<IndexedClass> removed = new ContextRootCollection(
+		 * reasoner.saturationState.getContextsToBeRemoved());
+		 */
 		final Collection<IndexedClass> removed = new ContextRootCollection(
-				reasoner.classTaxonomyState.removedClasses);
+				reasoner.classTaxonomyState.getRemovedClasses());
 		Collection<IndexedClass> inputs = Operations.getCollection(
 				Operations.concat(removed, modified),
 				removed.size() + modified.size());

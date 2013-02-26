@@ -99,7 +99,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 			return false;
 		// clear the class taxonomy
 		reasoner.classTaxonomyState.taxonomy = null;
-		reasoner.classTaxonomyState.classesForModifiedNodes.clear();
+		reasoner.classTaxonomyState.getWriter().clearModifiedNodeObjects();
 		todo_ = null;
 		return true;
 	}
