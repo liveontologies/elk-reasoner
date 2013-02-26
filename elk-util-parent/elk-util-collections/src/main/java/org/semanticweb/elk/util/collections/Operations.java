@@ -404,13 +404,13 @@ public class Operations {
 				} catch (ClassCastException cce) {
 					return false;
 				}
-				// here's why the condition must be consistent with equals():
-				// we check it on the passed element while we really need to
-				// check it on the element
-				// which is in the underlying set (and is equal to o according
-				// to equals()).
-				// However, as long as the condition is consistent, the result
-				// will be the same.
+				/*
+				 * here's why the condition must be consistent with equals(): we
+				 * check it on the passed element while we really need to check
+				 * it on the element which is in the underlying set (and is
+				 * equal to o according to equals()). However, as long as the
+				 * condition is consistent, the result will be the same.
+				 */
 				return condition.holds(elem);
 			}
 

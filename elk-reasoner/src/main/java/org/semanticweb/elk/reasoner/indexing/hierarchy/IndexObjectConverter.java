@@ -74,7 +74,7 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	}
 
 	@Override
-	public IndexedClassExpression visit(ElkClass elkClass) {
+	public IndexedClass visit(ElkClass elkClass) {
 		return indexedClassFilter.visit(new IndexedClass(elkClass));
 	}
 

@@ -25,14 +25,12 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectsToIndexedEntitiesSet;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
@@ -74,77 +72,21 @@ class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 		}
 
 		if (reasoner.classTaxonomyState.getTaxonomy() == null) {
-			// the taxonomy is empty (or nearly empty), let's compute from scratch
 			if (LOGGER_.isInfoEnabled()) {
 				LOGGER_.info("Using non-incremental taxonomy");
 			}
 			
-			reasoner.initTaxonomies();
+			reasoner.initClassTaxonomy();
 			computation_ = new ClassTaxonomyComputation(Operations.split(
 					indexedClasses, 128), reasoner.getProcessExecutor(),
 					workerNo, progressMonitor, reasoner.saturationState, reasoner.classTaxonomyState.getTaxonomy());
 		} else {
 			// classes which correspond to changed nodes in the taxonomy
 			// they must include new classes
-			final Iterable<ElkClass> modifiedClassesIter = reasoner.classTaxonomyState.classesForModifiedNodes;
-			final IndexObjectConverter converter = reasoner.objectCache_
-					.getIndexObjectConverter();
-
 			// let's convert to indexed objects and filter out removed classes
-			Collection<IndexedClass> modified = new AbstractSet<IndexedClass>() {
-
-				@Override
-				public Iterator<IndexedClass> iterator() {
-					return new Iterator<IndexedClass>() {
-
-						final Iterator<ElkClass> iter_ = modifiedClassesIter
-								.iterator();
-						IndexedClass curr_ = null;
-
-						@Override
-						public boolean hasNext() {
-							if (curr_ != null) {
-								return true;
-							} else {
-								while (curr_ == null && iter_.hasNext()) {
-									ElkClass elkClass = iter_.next();
-									IndexedClass indexedClass = (IndexedClass) elkClass
-											.accept(converter);
-
-									if (indexedClass.occurs()) {
-										curr_ = indexedClass;
-									}
-								}
-							}
-
-							return curr_ != null;
-						}
-
-						@Override
-						public IndexedClass next() {
-							IndexedClass tmp = curr_;
-
-							curr_ = null;
-
-							return tmp;
-						}
-
-						@Override
-						public void remove() {
-							throw new UnsupportedOperationException();
-						}
-
-					};
-				}
-
-				@Override
-				public int size() {
-					// an upper bound
-					return reasoner.classTaxonomyState.classesForModifiedNodes
-							.size();
-				}
-
-			};
+			Collection<IndexedClass> modified = new ElkObjectsToIndexedEntitiesSet<ElkClass, IndexedClass>(
+					reasoner.classTaxonomyState.classesForModifiedNodes,
+					reasoner.objectCache_.getIndexObjectConverter());
 
 			this.computation_ = new ClassTaxonomyComputation(Operations.split(
 					modified, 64), reasoner.getProcessExecutor(), workerNo,
@@ -166,8 +108,8 @@ class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 			return false;
 		}
 		
-		reasoner.classTaxonomyState.classesForModifiedNodes.clear();
-		reasoner.ontologyIndex.clearSignatureChanges();
+		reasoner.classTaxonomyState.getWriter().clearModifiedNodeObjects();
+		reasoner.ontologyIndex.clearClassSignatureChanges();
 		reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;
 		return true;

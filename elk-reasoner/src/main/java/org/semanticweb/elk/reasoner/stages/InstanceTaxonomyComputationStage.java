@@ -59,8 +59,8 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			return false;
 		
 		if (reasoner.doneTaxonomy()) {
-			//the instance taxonomy must already exist
-			this.computation_ = new InstanceTaxonomyComputation(
+			reasoner.initInstanceTaxonomy();
+			computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
 					reasoner.saturationState, reasoner.instanceTaxonomyState.getTaxonomy());

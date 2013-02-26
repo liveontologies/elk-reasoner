@@ -129,7 +129,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	 * @return instance node object for elkClass, possibly still incomplete
 	 */
 	@Override
-	public InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
+	public UpdateableInstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
 			ElkNamedIndividual individual) {
 		return individualNodeLookup_.get(getKey(individual));
 	}
@@ -214,12 +214,26 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		IndividualNode node = individualNodeLookup_.get(instance);
 
 		if (node != null) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Removing the instance node " + node);
+			}
+			
 			synchronized (node) {
 				for (ElkNamedIndividual individual : node.getMembers()) {
 					individualNodeLookup_.remove(individual);
 				}
 
 				allIndividualNodes_.remove(node);
+				
+				/*for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode : node.getDirectTypeNodes()) {
+					node.removeDirectTypeNode(typeNode);
+				}*/
+			}
+			
+			for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode : node.getDirectTypeNodes()) {
+				synchronized (typeNode) {
+					typeNode.removeDirectInstanceNode(node);
+				}
 			}
 
 			return true;
@@ -274,6 +288,18 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	@Override
 	public boolean removeNode(UpdateableTaxonomyNode<ElkClass> node) {
+		UpdateableTypeNodeWrapper wrapper = wrapperMap_.get(node);
+		
+		if (wrapper != null) {
+			wrapperMap_.remove(node);
+			
+			for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : wrapper.getDirectInstanceNodes()) {
+				synchronized(instanceNode) {
+					instanceNode.removeDirectTypeNode(wrapper);
+				}
+			}
+		}
+		
 		return classTaxonomy_.removeNode(node);
 	}
 
@@ -351,7 +377,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		}
 
 		@Override
-		public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
+		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
 			return Collections.emptySet();
 		}
 
@@ -368,16 +394,18 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 				while (!todo.isEmpty()) {
 					TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
 					result.addAll(next.getDirectInstanceNodes());
+					
 					for (TypeNode<ElkClass, ElkNamedIndividual> nextSubNode : next
 							.getDirectSubNodes()) {
 						todo.add(nextSubNode);
 					}
 				}
+				
+				return Collections.unmodifiableSet(result);
+				
 			} else {
-				result = getDirectInstanceNodes();
+				return Collections.unmodifiableSet(getDirectInstanceNodes());
 			}
-			
-			return Collections.unmodifiableSet(result);
 		}
 
 		@Override
@@ -413,11 +441,11 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		 * ElkNamedIndividual nodes whose members are instances of the members of
 		 * this node.
 		 */
-		private final Set<InstanceNode<ElkClass, ElkNamedIndividual>> directInstanceNodes_;
+		private final Set<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> directInstanceNodes_;
 		
 		UpdateableTypeNodeWrapper(UpdateableTaxonomyNode<ElkClass> node) {
 			super(node);
-			this.directInstanceNodes_ = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>();
+			this.directInstanceNodes_ = new ArrayHashSet<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>();
 		}
 		
 		private UpdateableTaxonomyNode<ElkClass> getNode() {
@@ -425,7 +453,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		}
 		
 		@Override
-		public Set<InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
+		public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
 			return Collections.unmodifiableSet(directInstanceNodes_);
 		}
 		
@@ -510,6 +538,19 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 			}
 			
 			directInstanceNodes_.add(instanceNode);		
+		}
+
+		/*
+		 * This method is not thread safe
+		 */
+		@Override
+		public void removeDirectInstanceNode(
+				UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(getNode() + ": direct instance node removed " + instanceNode);
+			}
+			
+			directInstanceNodes_.remove(instanceNode);
 		}
 		
 	}

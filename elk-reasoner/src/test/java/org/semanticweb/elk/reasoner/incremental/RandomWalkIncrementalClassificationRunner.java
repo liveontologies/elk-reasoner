@@ -164,6 +164,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				standardReasoner.shutdown();
 				throw e;
 			}
+			
 			standardReasoner.shutdown();
 
 			if (LOGGER_.isDebugEnabled()) {
@@ -185,7 +186,9 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				try {
 					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
 				} catch (AssertionError e) {
-					//TODO print the taxonomies here?
+					//TODO print the taxonomies here?					
+					printResult(reasoner, LOGGER_, Level.INFO);
+
 					throw e;
 				}
 			}

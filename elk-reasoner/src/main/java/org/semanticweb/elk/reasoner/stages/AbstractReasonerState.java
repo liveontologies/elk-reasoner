@@ -419,12 +419,13 @@ public abstract class AbstractReasonerState {
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY);
 	}
 
-	public void initTaxonomies() {
-		ConcurrentClassTaxonomy classTaxonomy = new ConcurrentClassTaxonomy();
-
-		classTaxonomyState.initTaxonomy(classTaxonomy);
-		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(classTaxonomy));
+	public void initClassTaxonomy() {
+		classTaxonomyState.initTaxonomy(new ConcurrentClassTaxonomy());
 	}	
+	
+	public void initInstanceTaxonomy() {
+		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(classTaxonomyState.getTaxonomy()));
+	}
 
 	
 	// ////////////////////////////////////////////////////////////////

@@ -45,4 +45,7 @@ public interface UpdateableInstanceTaxonomy<T extends ElkObject, I extends ElkOb
 	
 	@Override
 	public UpdateableTypeNode<T, I> getUpdateableTopNode();
+	
+	@Override
+	public UpdateableInstanceNode<T, I> getInstanceNode(I individual);
 }

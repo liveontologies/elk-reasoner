@@ -116,5 +116,6 @@ public class TaxonomyNodeUtils {
 			public Set<? extends UpdateableTaxonomyNode<T>> get(UpdateableTaxonomyNode<T> node) {
 				return node.getDirectUpdateableSuperNodes();
 			}});
-	}	
+	}
+
 }

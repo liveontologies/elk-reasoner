@@ -31,6 +31,9 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.visitors.AbstractIndexedClassEntityVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -97,9 +100,23 @@ class IncrementalDeletionInitializationStage extends
 		final ExtendedWriter satStateWriter = reasoner.saturationState
 				.getExtendedWriter(conclusionVisitor);
 		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState.getWriter();
+		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState.getWriter();
+		final IndexedClassExpressionVisitor<Object> rootVisitor = new AbstractIndexedClassEntityVisitor<Object>() {
+
+			@Override
+			public Object visit(IndexedClass element) {
+				taxStateWriter.markRemovedClass(element);
+				return null;
+			}
+
+			@Override
+			public Object visit(IndexedIndividual element) {
+				instanceTaxStateWriter.markRemovedIndividual(element);
+				return null;
+			}
+		};
 		
-		for (IndexedClassExpression ice : reasoner.ontologyIndex
-				.getRemovedClassExpressions()) {
+		for (IndexedClassExpression ice : reasoner.ontologyIndex.getRemovedClassExpressions()) {
 
 			if (ice.getContext() != null) {
 				satStateWriter.initContext(ice.getContext());
@@ -108,10 +125,7 @@ class IncrementalDeletionInitializationStage extends
 				//but then the context will end up in the queue
 				//for not saturated contexts, which isn't needed here
 				ice.getContext().setSaturated(false);
-				
-				if (ice instanceof IndexedClass) {
-					taxStateWriter.markRemovedClass((IndexedClass) ice);
-				}
+				ice.getContext().getRoot().accept(rootVisitor);
 			}
 		}
 

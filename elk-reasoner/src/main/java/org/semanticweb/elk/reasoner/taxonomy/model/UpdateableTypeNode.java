@@ -52,8 +52,17 @@ public interface UpdateableTypeNode<T extends ElkObject, I extends ElkObject>
 	 */
 	@Override
 	public Set<? extends UpdateableTypeNode<T, I>> getDirectUpdateableSuperNodes();
+	
+	@Override
+	public Set<? extends UpdateableInstanceNode<T, I>> getDirectInstanceNodes();
+	
+	//@Override
+	//public Set<? extends UpdateableInstanceNode<T, I>> getAllInstanceNodes();	
 
 	public void addDirectInstanceNode(
+			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode);
+	
+	public void removeDirectInstanceNode(
 			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode);
 
 }

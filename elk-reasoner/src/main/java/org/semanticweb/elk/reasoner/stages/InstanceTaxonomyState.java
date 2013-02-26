@@ -24,8 +24,17 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 
 /**
@@ -37,20 +46,31 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
  */
 public class InstanceTaxonomyState {
 
-	private UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
+	private UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy_ = null;
 
-	//final List<IndexedIndividual> removedIndividuals = new LinkedList<IndexedIndividual>();
+	private final Set<ElkNamedIndividual> modifiedIndividuals = Collections
+			.newSetFromMap(new ConcurrentHashMap<ElkNamedIndividual, Boolean>());
+	
+	private final List<IndexedIndividual> removedIndividuals = new LinkedList<IndexedIndividual>();
 
 	public UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
-		return taxonomy;
+		return taxonomy_;
 	}
 
 	public void resetTaxonomy() {
-		taxonomy = null;
+		taxonomy_ = null;
+	}
+	
+	Set<ElkNamedIndividual> getModifiedIndividuals() {
+		return modifiedIndividuals;
+	}
+	
+	Collection<IndexedIndividual> getRemovedIndividuals() {
+		return removedIndividuals;
 	}
 	
 	void initTaxonomy(UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy) {
-		taxonomy = instanceTaxonomy;
+		taxonomy_ = instanceTaxonomy;
 	}	
 	
 	public Writer getWriter() {
@@ -66,7 +86,21 @@ public class InstanceTaxonomyState {
 	 */
 	public class Writer {
 
-
+		public void markModifiedIndividuals(InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
+			modifiedIndividuals.addAll(instanceNode.getMembers());
+		}
+		
+		public void markRemovedIndividual(IndexedIndividual individual) {
+			removedIndividuals.add(individual);
+		}
+		
+		public void clearModifiedIndividuals() {
+			modifiedIndividuals.clear();
+		}
+		
+		public void clearRemovedIndividuals() {
+			removedIndividuals.clear();
+		}
 	}
 
 	

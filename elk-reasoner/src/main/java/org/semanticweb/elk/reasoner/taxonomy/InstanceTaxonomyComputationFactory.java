@@ -104,7 +104,6 @@ public class InstanceTaxonomyComputationFactory implements
 				saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
-		//this.topNode_ = (NonBottomClassNode) partialTaxonomy.getTopNode();
 		this.topNode_ = partialTaxonomy.getUpdateableTopNode();
 	}
 
@@ -158,6 +157,8 @@ public class InstanceTaxonomyComputationFactory implements
 			if (node.getDirectTypeNodes().isEmpty()) {
 				assignDirectTypeNode(node, topNode_);
 			}
+			
+			node.trySetModified(false);
 		}
 
 		@Override
