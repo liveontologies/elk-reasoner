@@ -76,7 +76,8 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.classTaxonomyState.taxonomy = computation_.getTaxonomy();
+		reasoner.classTaxonomyState.getWriter().setTaxonomy(
+				computation_.getTaxonomy());
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
 		this.computation_ = null;

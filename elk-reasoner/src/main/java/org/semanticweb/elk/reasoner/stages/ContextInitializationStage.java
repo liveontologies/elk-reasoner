@@ -71,8 +71,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 		if (!super.preExecute())
 			return false;
 		reasoner.saturationState.resetFirstContext();
-		todo_ = reasoner.ontologyIndex.getIndexedClassExpressions()
-				.iterator();
+		todo_ = reasoner.ontologyIndex.getIndexedClassExpressions().iterator();
 		maxContexts_ = reasoner.ontologyIndex.getIndexedClassExpressions()
 				.size();
 		deletedContexts_ = 0;
@@ -97,9 +96,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		// clear the class taxonomy
-		reasoner.classTaxonomyState.taxonomy = null;
-		reasoner.classTaxonomyState.getWriter().clearModifiedNodeObjects();
+		reasoner.classTaxonomyState.getWriter().clear();
 		todo_ = null;
 		return true;
 	}

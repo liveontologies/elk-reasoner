@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -45,27 +46,29 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
  */
 public class TaxonomyState {
 
-	UpdateableTaxonomy<ElkClass> taxonomy = null;
+	private final Writer writer_ = new Writer();
+
+	private UpdateableTaxonomy<ElkClass> taxonomy_ = null;
 
 	private final Set<ElkClass> classesForModifiedNodes_ = Collections
 			.newSetFromMap(new ConcurrentHashMap<ElkClass, Boolean>());
-	
+
 	private final List<IndexedClass> removedClasses_ = new LinkedList<IndexedClass>();
-	
+
 	public UpdateableTaxonomy<ElkClass> getTaxonomy() {
-		return taxonomy;
+		return taxonomy_;
 	}
-	
+
 	Collection<ElkClass> getClassesForModifiedNodes() {
 		return Collections.unmodifiableCollection(classesForModifiedNodes_);
 	}
-	
+
 	Collection<IndexedClass> getRemovedClasses() {
 		return Collections.unmodifiableCollection(removedClasses_);
 	}
 
 	public Writer getWriter() {
-		return new Writer();
+		return writer_;
 	}
 
 	/**
@@ -76,6 +79,14 @@ public class TaxonomyState {
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	public class Writer {
+
+		public void setTaxonomy(UpdateableTaxonomy<ElkClass> taxonomy) {
+			TaxonomyState.this.taxonomy_ = taxonomy;
+		}
+
+		public void clearTaxonomy() {
+			TaxonomyState.this.taxonomy_ = null;
+		}
 
 		public void markClassForModifiedNode(final ElkClass elkClass) {
 			classesForModifiedNodes_.add(elkClass);
@@ -88,7 +99,7 @@ public class TaxonomyState {
 				}
 			}
 		}
-		
+
 		public void markRemovedClass(final IndexedClass clazz) {
 			removedClasses_.add(clazz);
 		}
@@ -96,9 +107,15 @@ public class TaxonomyState {
 		public void clearModifiedNodeObjects() {
 			classesForModifiedNodes_.clear();
 		}
-		
+
 		public void clearRemovedClasses() {
 			removedClasses_.clear();
+		}
+
+		public void clear() {
+			clearTaxonomy();
+			clearModifiedNodeObjects();
+			clearRemovedClasses();
 		}
 	}
 }

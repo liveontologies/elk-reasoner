@@ -73,8 +73,9 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			// or (better) by initializing instance taxonomy based
 			// on class taxonomy if the latter happens to not be an instance
 			// taxonomy
-			if (reasoner.classTaxonomyState.taxonomy instanceof UpdateableInstanceTaxonomy) {
-				reasoner.instanceTaxonomy = (UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual>) reasoner.classTaxonomyState.taxonomy;
+			if (reasoner.classTaxonomyState.getTaxonomy() instanceof UpdateableInstanceTaxonomy) {
+				reasoner.instanceTaxonomy = (UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual>) reasoner.classTaxonomyState
+						.getTaxonomy();
 			} else {
 				// this should never happen
 				throw new IllegalStateException(
@@ -106,7 +107,8 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		if (!super.postExecute())
 			return false;
 		reasoner.instanceTaxonomy = computation_.getTaxonomy();
-		reasoner.classTaxonomyState.taxonomy = reasoner.instanceTaxonomy;
+		reasoner.classTaxonomyState.getWriter().setTaxonomy(
+				reasoner.instanceTaxonomy);
 		this.computation_ = null;
 		return true;
 	}

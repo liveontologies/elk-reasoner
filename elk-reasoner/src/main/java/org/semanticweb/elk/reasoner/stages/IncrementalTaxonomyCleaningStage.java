@@ -92,10 +92,8 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkException {
-
-		if (reasoner.classTaxonomyState.taxonomy == null) {
-			// perhaps an inconsistency has been detected?
-			// exit
+		if (reasoner.classTaxonomyState.getTaxonomy() == null) {
+			// nothing to do
 			return;
 		}
 		for (;;) {

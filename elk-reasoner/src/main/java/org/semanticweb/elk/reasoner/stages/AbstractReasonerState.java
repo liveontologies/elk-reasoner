@@ -269,7 +269,7 @@ public abstract class AbstractReasonerState {
 		getStageExecutor().complete(stage);
 		stageManager.incrementalConsistencyCheckingStage.setCompleted();
 		setIncrementalMode(true);
-		
+
 		return inconsistentOntology;
 	}
 
@@ -307,7 +307,7 @@ public abstract class AbstractReasonerState {
 
 		getStageExecutor().complete(stageManager.changesLoadingStage);
 
-		if (isIncrementalMode() && classTaxonomyState.taxonomy != null) {
+		if (isIncrementalMode() && classTaxonomyState.getTaxonomy() != null) {
 			getStageExecutor().complete(
 					stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
@@ -318,7 +318,7 @@ public abstract class AbstractReasonerState {
 		}
 		setIncrementalMode(true);
 
-		return classTaxonomyState.taxonomy;
+		return classTaxonomyState.getTaxonomy();
 	}
 
 	public Taxonomy<ElkClass> getTaxonomyQuietly() {
