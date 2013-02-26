@@ -221,25 +221,25 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	 * 
 	 * @return
 	 */
-//	boolean markCompleted() {
-//		if (isCompleted)
-//			return false;
-//		Queue<AbstractReasonerStage> toMark = new LinkedList<AbstractReasonerStage>();
-//		toMark.add(this);
-//		for (;;) {
-//			AbstractReasonerStage stage = toMark.poll();
-//			if (stage == null)
-//				return true;
-//			if (!stage.isCompleted) {
-//				if (LOGGER_.isTraceEnabled())
-//					LOGGER_.trace(stage.getName() + ": marked completed");
-//				stage.isCompleted = true;
-//				for (AbstractReasonerStage preStage : stage.preStages) {
-//					toMark.add(preStage);
-//				}
-//			}
-//		}
-//	}
+	boolean setCompleted() {
+		if (isCompleted)
+			return false;
+		Queue<AbstractReasonerStage> toMark = new LinkedList<AbstractReasonerStage>();
+		toMark.add(this);
+		for (;;) {
+			AbstractReasonerStage stage = toMark.poll();
+			if (stage == null)
+				return true;
+			if (!stage.isCompleted) {
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace(stage.getName() + ": marked completed");
+				stage.isCompleted = true;
+				for (AbstractReasonerStage preStage : stage.preStages) {
+					toMark.add(preStage);
+				}
+			}
+		}
+	}
 
 	protected void markAllContextsAsSaturated() {
 		for (IndexedClassExpression ice : reasoner.saturationState

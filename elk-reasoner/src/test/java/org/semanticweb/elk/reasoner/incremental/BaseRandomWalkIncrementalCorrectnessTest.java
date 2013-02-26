@@ -113,7 +113,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 				changingAxioms, staticAxioms);
 		incrementalReasoner = TestReasonerUtils.createTestReasoner(
 				trackingLoader, new PostProcessingStageExecutor());
-		incrementalReasoner.setIncrementalMode(true);
+		incrementalReasoner.setAllowIncrementalMode(true);
 
 		try {
 			incrementalReasoner.loadOntology();

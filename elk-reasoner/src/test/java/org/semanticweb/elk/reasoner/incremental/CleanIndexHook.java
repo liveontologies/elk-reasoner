@@ -76,7 +76,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 		}
 
 		reasoner.registerOntologyChangesLoader(loader);
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		// trigger removal
 		reasoner.getTaxonomyQuietly();
 		// check that the index is indeed empty
@@ -103,7 +103,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			LOGGER_.error("index size must be " + size + " but is " + cnt);
 		}
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 	}
 
 	private static int getIndexSize(Reasoner reasoner) {

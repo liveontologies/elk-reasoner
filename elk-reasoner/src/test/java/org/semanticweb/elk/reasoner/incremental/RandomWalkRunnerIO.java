@@ -67,7 +67,7 @@ public interface RandomWalkRunnerIO<T> {
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 					new TestAxiomLoader(axioms), new SimpleStageExecutor());
 
-			reasoner.setIncrementalMode(false);
+			reasoner.setAllowIncrementalMode(false);
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			return reasoner;

@@ -92,7 +92,7 @@ public class IncrementalClassificationTask implements Task {
 
 		loadedAxioms = new ArrayList<ElkAxiom>();
 		incrementalReasoner = prepareReasoner(ontologyFile, true);
-		incrementalReasoner.setIncrementalMode(true);
+		incrementalReasoner.setAllowIncrementalMode(true);
 	}
 
 	protected Reasoner prepareReasoner(final File ontologyFile,

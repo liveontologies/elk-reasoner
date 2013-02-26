@@ -94,7 +94,7 @@ public class LowLevelIncrementalTBoxTest {
 	 * 
 	 * Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy(); loader.clear();
 	 * 
-	 * reasoner.setIncrementalMode(true);
+	 * reasoner.setAllowIncrementalMode(true);
 	 * 
 	 * changeLoader.remove(axAsubB);
 	 * 
@@ -113,7 +113,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -136,7 +136,7 @@ public class LowLevelIncrementalTBoxTest {
 		// now delete B [= D, should retract A [= C
 		loader.clear();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.remove(objectFactory.getSubClassOfAxiom(b, d));
 
@@ -154,7 +154,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -180,7 +180,7 @@ public class LowLevelIncrementalTBoxTest {
 		// now delete A subclass R some B, should retract A subclass C
 		loader.clear();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 		changeLoader.remove(posExistential);
 
 		taxonomy = reasoner.getTaxonomy();
@@ -197,7 +197,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -216,7 +216,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		loader.clear();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
@@ -290,7 +290,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -307,7 +307,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		loader.clear();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
@@ -361,7 +361,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -375,7 +375,7 @@ public class LowLevelIncrementalTBoxTest {
 				.contains(taxonomy.getNode(b)));
 		loader.clear();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
@@ -410,7 +410,7 @@ public class LowLevelIncrementalTBoxTest {
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 					initialLoader, new LoggingStageExecutor());
 
-			reasoner.setIncrementalMode(false);
+			reasoner.setAllowIncrementalMode(false);
 			reasoner.registerOntologyChangesLoader(changeLoader);
 
 			for (ElkAxiom axiom : ontology) {
@@ -424,7 +424,7 @@ public class LowLevelIncrementalTBoxTest {
 
 			// System.out.println("===========================================");
 
-			reasoner.setIncrementalMode(true);
+			reasoner.setAllowIncrementalMode(true);
 
 			for (ElkAxiom del : deletions) {
 				changeLoader.remove(del);
@@ -448,7 +448,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -465,7 +465,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		// now delete it one time
 		loader.clear();
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b));
 
@@ -480,7 +480,7 @@ public class LowLevelIncrementalTBoxTest {
 		// now delete it the second time
 
 		loader.clear();
-		// reasoner.setIncrementalMode(true);
+		// reasoner.setAllowIncrementalMode(true);
 		// reasoner.registerOntologyChangesLoader(loader);
 
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b));
@@ -502,7 +502,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -516,7 +516,7 @@ public class LowLevelIncrementalTBoxTest {
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
 		loader.clear();
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b)).add(
 				objectFactory.getSubClassOfAxiom(b, d));
@@ -548,7 +548,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new PostProcessingStageExecutor(), 1);
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -574,7 +574,7 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.getTaxonomy();
 
 		loader.clear();
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.remove(axiom1);
 
@@ -598,7 +598,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -621,7 +621,7 @@ public class LowLevelIncrementalTBoxTest {
 		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
 		// now delete one disjointness, A should remain unsatisfiable
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.remove(disjCB);
 
@@ -650,7 +650,7 @@ public class LowLevelIncrementalTBoxTest {
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 					new LoggingStageExecutor());
 
-			reasoner.setIncrementalMode(false);
+			reasoner.setAllowIncrementalMode(false);
 			reasoner.registerOntologyChangesLoader(changeLoader);
 
 			ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -673,7 +673,7 @@ public class LowLevelIncrementalTBoxTest {
 			assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
 			// now delete one disjointness, A should is still unsatisfiable
-			reasoner.setIncrementalMode(true);
+			reasoner.setAllowIncrementalMode(true);
 			// reasoner.registerOntologyChangesLoader(loader);
 
 			changeLoader.remove(disjABCD);
@@ -699,7 +699,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -720,7 +720,7 @@ public class LowLevelIncrementalTBoxTest {
 		assertTrue(taxonomy.getNode(d).getDirectSuperNodes()
 				.contains(taxonomy.getNode(a)));
 		// A should be deleted, E should appear, D should be a subclass of C now
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader
 				.remove(objectFactory.getSubClassOfAxiom(d, a))
@@ -747,7 +747,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -774,7 +774,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		loader.clear();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
@@ -804,7 +804,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass x = objectFactory.getClass(new ElkFullIri(":X"));
@@ -822,7 +822,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		loader.clear();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
@@ -844,7 +844,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass x = objectFactory.getClass(new ElkFullIri(":X"));
@@ -871,7 +871,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		loader.clear();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
@@ -897,7 +897,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setIncrementalMode(false);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -924,7 +924,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 		changeLoader.remove(toDelete).add(toAdd1).add(toAdd2);
 
 		taxonomy = reasoner.getTaxonomy();

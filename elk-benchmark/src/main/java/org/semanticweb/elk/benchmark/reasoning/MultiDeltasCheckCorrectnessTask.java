@@ -119,7 +119,7 @@ public class MultiDeltasCheckCorrectnessTask extends
 		public void prepare() throws TaskException {
 			super.prepare();
 
-			standardReasoner_.setIncrementalMode(false);
+			standardReasoner_.setAllowIncrementalMode(false);
 			loadChanges(standardReasoner_);
 		}
 

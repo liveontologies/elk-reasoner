@@ -97,6 +97,9 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		// clear the class taxonomy
+		reasoner.classTaxonomyState.taxonomy = null;
+		reasoner.classTaxonomyState.classesForModifiedNodes.clear();
 		todo_ = null;
 		return true;
 	}

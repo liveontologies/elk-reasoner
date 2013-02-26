@@ -125,6 +125,8 @@ public abstract class AbstractReasonerState {
 	 */
 	private ChangesLoader changesLoader_;
 
+	private boolean allowIncrementalMode = true;
+
 	protected AbstractReasonerState(OntologyLoader ontologyLoader,
 			ReasonerConfiguration config) {
 		this.objectCache_ = new IndexedObjectCache();
@@ -137,12 +139,19 @@ public abstract class AbstractReasonerState {
 				.getAxiomInserter());
 	}
 
+	public void setAllowIncrementalMode(boolean allow) {
+		this.allowIncrementalMode = allow;
+		if (!allow)
+			setIncrementalMode(false);
+	}
+
 	public boolean isIncrementalMode() {
 		return ontologyIndex.isIncrementalMode();
 	}
 
-	public void setIncrementalMode(boolean mode) {
-		ontologyIndex.setIncrementalMode(mode);
+	void setIncrementalMode(boolean mode) {
+		if (!mode || allowIncrementalMode)
+			ontologyIndex.setIncrementalMode(mode);
 	}
 
 	/**
@@ -258,7 +267,9 @@ public abstract class AbstractReasonerState {
 				: stageManager.consistencyCheckingStage;
 
 		getStageExecutor().complete(stage);
-
+		stageManager.incrementalConsistencyCheckingStage.setCompleted();
+		setIncrementalMode(true);
+		
 		return inconsistentOntology;
 	}
 
@@ -302,7 +313,10 @@ public abstract class AbstractReasonerState {
 		} else {
 			getStageExecutor().complete(
 					stageManager.classTaxonomyComputationStage);
+			stageManager.incrementalClassTaxonomyComputationStage
+					.setCompleted();
 		}
+		setIncrementalMode(true);
 
 		return classTaxonomyState.taxonomy;
 	}

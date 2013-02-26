@@ -59,6 +59,7 @@ public class IncrementalClassificationCorrectnessTask extends
 		File ontologyFile = BenchmarkUtils.getFile(ontologyFileName);
 		
 		standardReasoner_ = prepareReasoner(ontologyFile, true);
+		standardReasoner_.setAllowIncrementalMode(false);
 	}
 
 	@Override
@@ -76,8 +77,7 @@ public class IncrementalClassificationCorrectnessTask extends
 		Random rnd = new Random(seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
-			// delete some axioms
-			standardReasoner_.setIncrementalMode(false);
+			// delete some axioms			
 
 			Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms, rnd);
 
@@ -88,8 +88,6 @@ public class IncrementalClassificationCorrectnessTask extends
 			remove(changeLoader2, deleted);
 			
 			correctnessCheck(standardReasoner_, incrementalReasoner, seed);
-
-			standardReasoner_.setIncrementalMode(false);
 
 			// add the axioms back
 			changeLoader1.clear();

@@ -220,7 +220,7 @@ public class IncrementalClassificationMultiDeltas extends
 						new Owl2FunctionalStyleParserFactory(), stream);
 				reasoner = new ReasonerFactory().createReasoner(loader,
 						stageExecutor, config);
-				reasoner.setIncrementalMode(false);
+				reasoner.setAllowIncrementalMode(false);
 				reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 				reasoner.loadOntology();
 			} catch (Exception e) {
@@ -263,7 +263,7 @@ public class IncrementalClassificationMultiDeltas extends
 		@Override
 		public void prepare() throws TaskException {
 			// load positive and negative deltas
-			reasoner.setIncrementalMode(true);
+			reasoner.setAllowIncrementalMode(true);
 
 			loadChanges(reasoner);
 		}

@@ -84,7 +84,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		// for storing taxonomy hash history
 		Deque<String> resultHashHistory = new LinkedList<String>();
 
-		reasoner.setIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);
 		
 		final String originalTaxonomyHash = getResultHash(reasoner);
 
