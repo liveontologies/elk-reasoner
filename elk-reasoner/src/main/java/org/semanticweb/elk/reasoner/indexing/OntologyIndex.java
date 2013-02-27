@@ -35,13 +35,20 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 
 /**
- * Interface for public methods of the index of the ontology.
+ * An object representing the compiled logical information about the ontology
+ * that enables execution of reasoning inference rules. There are two type of
+ * rules: the global rules stored for the ontology that can be obtained using {
+ * {@link #getContextInitRuleHead()}, and the local rules associated with
+ * specific {@link IndexedObject}s, such as {@link IndexedClassExpression}s and
+ * {@link IndexedPropertyChain}s. The methods of this class provide access to
+ * such objects.
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
@@ -78,7 +85,7 @@ public interface OntologyIndex {
 	/**
 	 * @return the {@link IndexedClass}es for all {@link ElkClass}es occurring
 	 *         in the ontology (including {@code owl:Thing} and
-	 *         {@code owl:Nothing} )
+	 *         {@code owl:Nothing})
 	 */
 	Collection<IndexedClass> getIndexedClasses();
 

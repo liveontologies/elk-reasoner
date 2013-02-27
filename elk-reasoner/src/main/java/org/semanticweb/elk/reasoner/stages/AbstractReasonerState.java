@@ -34,11 +34,13 @@ import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -86,7 +88,6 @@ public abstract class AbstractReasonerState {
 	 * {@code true} if the reasoner is interrupted
 	 */
 	private volatile boolean isInterrupted_ = false;
-
 	/**
 	 * the cache for indexed objects
 	 */
@@ -96,26 +97,30 @@ public abstract class AbstractReasonerState {
 	 */
 	final DifferentialIndex ontologyIndex;
 	/**
+	 * the object using which axioms are inserted into the index
+	 */
+	private final ElkAxiomProcessor axiomInserter_;
+	/**
+	 * the object using which axioms are deleted from the index
+	 */
+	private final ElkAxiomProcessor axiomDeleter_;
+	/**
 	 * {@code true} if the current ontology is inconsistent
 	 */
 	boolean inconsistentOntology = false;
-
 	/**
 	 * Taxonomy state that stores (partial) classification
 	 */
 	final TaxonomyState classTaxonomyState = new TaxonomyState();
-
 	/**
 	 * Defines reasoning stages and dependencies between them
 	 */
 	final ReasonerStageManager stageManager;
-
 	/**
 	 * Taxonomy that stores (partial) classification and (partial) realization
 	 * of individuals
 	 */
 	UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = null;
-
 	/**
 	 * The source where the input ontology can be loaded
 	 */
@@ -124,19 +129,22 @@ public abstract class AbstractReasonerState {
 	 * The source where changes in ontology can be loaded
 	 */
 	private ChangesLoader changesLoader_;
-
+	/**
+	 * if {@code true}, reasoning will be done incrementally whenever possible
+	 */
 	private boolean allowIncrementalMode = true;
 
 	protected AbstractReasonerState(OntologyLoader ontologyLoader,
 			ReasonerConfiguration config) {
 		this.objectCache_ = new IndexedObjectCache();
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
+		this.axiomInserter_ = new ElkAxiomIndexerVisitor(ontologyIndex, true);
+		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(ontologyIndex, false);
 		this.saturationState = new SaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.config_ = config;
 		this.stageManager = new ReasonerStageManager(this);
-		this.ontologyLoader_ = ontologyLoader.getLoader(ontologyIndex
-				.getAxiomInserter());
+		this.ontologyLoader_ = ontologyLoader.getLoader(axiomInserter_);
 	}
 
 	public void setAllowIncrementalMode(boolean allow) {
@@ -201,8 +209,8 @@ public abstract class AbstractReasonerState {
 		if (changesLoader_ == null) {
 			return null;
 		}
-		return changesLoader_.getLoader(ontologyIndex.getAxiomInserter(),
-				ontologyIndex.getAxiomDeleter());
+
+		return changesLoader_.getLoader(axiomInserter_, axiomDeleter_);
 	}
 
 	/**

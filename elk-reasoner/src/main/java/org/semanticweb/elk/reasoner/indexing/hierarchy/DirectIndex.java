@@ -31,7 +31,6 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -47,9 +46,6 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 	final IndexedObjectCache objectCache;
 
-	private final ElkAxiomIndexerVisitor directAxiomInserter_,
-			directAxiomDeleter_;
-
 	private ChainableRule<Context> contextInitRules_ = null;
 
 	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
@@ -57,13 +53,13 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	public DirectIndex(IndexedObjectCache objectCache) {
 		this.objectCache = objectCache;
 
-		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(this, true);
-		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, false);
 		// index predefined entities
+		ElkAxiomIndexerVisitor tmpAxiomInserter = new ElkAxiomIndexerVisitor(
+				this, true);
 		// TODO: what to do if someone tries to delete them?
-		this.indexedOwlThing = directAxiomInserter_
+		this.indexedOwlThing = tmpAxiomInserter
 				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
-		this.indexedOwlNothing = directAxiomInserter_
+		this.indexedOwlNothing = tmpAxiomInserter
 				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 
 		this.reflexiveObjectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
@@ -165,29 +161,36 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public ElkAxiomProcessor getAxiomInserter() {
-		return directAxiomInserter_;
-	}
-
-	@Override
-	public ElkAxiomProcessor getAxiomDeleter() {
-		return directAxiomDeleter_;
-	}
-
-	@Override
 	public void addClass(ElkClass newClass) {
+		// we do not rack signature changes
 	}
 
 	@Override
 	public void removeClass(ElkClass oldClass) {
+		// we do not rack signature changes
 	}
 
 	@Override
 	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
+		// we do not rack signature changes
 	}
 
 	@Override
-	public void removeNamedIndividual(ElkNamedIndividual newIndividual) {
+	public void removeNamedIndividual(ElkNamedIndividual oldIndividual) {
+		// we do not rack signature changes
+	}
+
+	@Override
+	public void addContextInitRule(ChainableRule<Context> newRule) {
+		newRule.addTo(getContextInitRuleChain());
+	}
+
+	@Override
+	public void removeContextInitRule(ChainableRule<Context> oldRule) {
+		if (!oldRule.removeFrom(getContextInitRuleChain()))
+			throw new ElkUnexpectedIndexingException(
+					"Cannot remove context initialization rule "
+							+ oldRule.getName());
 	}
 
 	@Override
@@ -205,30 +208,17 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public void add(ChainableRule<Context> rule) {
-		rule.addTo(getContextInitRuleChain());
+	public void add(IndexedObject newObject) {
+		newObject.accept(objectCache.inserter);
 	}
 
 	@Override
-	public void remove(ChainableRule<Context> rule) {
-		if (!rule.removeFrom(getContextInitRuleChain()))
+	public void remove(IndexedObject oldObject) {
+		if (!oldObject.accept(objectCache.deletor))
 			throw new ElkUnexpectedIndexingException(
-					"Cannot remove context initialization rule "
-							+ rule.getName());
-	}
-
-	@Override
-	public void add(IndexedObject object) {
-		object.accept(objectCache.inserter);
-	}
-
-	@Override
-	public void remove(IndexedObject object) {
-		if (!object.accept(objectCache.deletor))
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove indexed object from the cache " + object);
-		if (object instanceof IndexedClassExpression) {
-			IndexedClassExpression ice = (IndexedClassExpression) object;
+					"Cannot remove indexed object from the cache " + oldObject);
+		if (oldObject instanceof IndexedClassExpression) {
+			IndexedClassExpression ice = (IndexedClassExpression) oldObject;
 			Context context = ice.getContext();
 			if (context != null)
 				context.removeLinks();
@@ -247,7 +237,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 					"Cannot remove reflexivity of object property " + property);
 	}
 
-	/* other methods */
+	/* class-specific methods */
 
 	/**
 	 * @return a {@link Chain} view of context initialization rules assigned to

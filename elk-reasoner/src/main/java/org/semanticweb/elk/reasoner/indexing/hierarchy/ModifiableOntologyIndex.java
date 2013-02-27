@@ -22,16 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 
 /**
- * Ontology index with methods using which it can be modified
+ * Common methods for constructing an {@link OntologyIndex}. They allow addition
+ * and removal of {@link IndexedObject}s, as well as assigning and removing
+ * rules for such expressions.
+ * 
+ * @see OntologyIndex
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -39,46 +41,139 @@ import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 public interface ModifiableOntologyIndex extends OntologyIndex {
 
 	/**
-	 * @return the {@link IndexedObjectCache} associated with this index
+	 * @return the {@link IndexedObjectCache} associated with this index; this
+	 *         is where all {@link IndexedObject}s of this {@link OntologyIndex}
+	 *         are stored
 	 */
 	IndexedObjectCache getIndexedObjectCache();
 
 	/**
-	 * @return the {@link ElkAxiomProcessor} using which one can add
-	 *         {@link ElkAxiom}s to the ontology
+	 * Adds the given {@link IndexedObject} to this {@link OntologyIndex}
+	 * 
+	 * @param newObject
+	 *            the object to be added
 	 */
-	public ElkAxiomProcessor getAxiomInserter();
+	public void add(IndexedObject newObject);
 
 	/**
-	 * @return the {@link ElkAxiomProcessor} using which one can delete
-	 *         {@link ElkAxiom}s from the ontology
+	 * Removes the given {@link IndexedObject} from this {@link OntologyIndex}
+	 * 
+	 * @param oldObject
+	 *            the object to be removed
+	 * 
+	 * @throws ElkUnexpectedIndexingException
+	 *             if the given object does not occur in this
+	 *             {@link OntologyIndex}
 	 */
-	public ElkAxiomProcessor getAxiomDeleter();
+	public void remove(IndexedObject oldObject)
+			throws ElkUnexpectedIndexingException;
 
-	public void add(final IndexedClassExpression target,
-			final ChainableRule<Context> rule);
-
-	public void remove(final IndexedClassExpression target,
-			final ChainableRule<Context> rule);
-
-	public void add(final ChainableRule<Context> rule);
-
-	public void remove(final ChainableRule<Context> rule);
-
-	public void add(IndexedObject object);
-
-	public void remove(IndexedObject object);
-
+	/**
+	 * Add the given {@link ElkClass} to the signature of this
+	 * {@link OntologyIndex}
+	 * 
+	 * @param newClass
+	 *            the {@link ElkClass} to be added
+	 */
 	public void addClass(ElkClass newClass);
 
-	public void removeClass(ElkClass oldClass);
+	/**
+	 * Removes the given {@link ElkClass} from the signature of this
+	 * {@link OntologyIndex}
+	 * 
+	 * @param newClass
+	 *            the {@link ElkClass} to be removed
+	 */
+	public void removeClass(ElkClass oldClass)
+			throws ElkUnexpectedIndexingException;
 
-	public void addReflexiveProperty(IndexedObjectProperty property);
-
-	public void removeReflexiveProperty(IndexedObjectProperty property);
-
+	/**
+	 * Add the given {@link ElkNamedIndividual} to the signature of this
+	 * {@link OntologyIndex}
+	 * 
+	 * @param newClass
+	 *            the {@link ElkNamedIndividual} to be added
+	 */
 	public void addNamedIndividual(ElkNamedIndividual newIndividual);
 
-	public void removeNamedIndividual(ElkNamedIndividual newIndividual);
+	/**
+	 * Removes the given {@link ElkNamedIndividual} from the signature of this
+	 * {@link OntologyIndex}
+	 * 
+	 * @param newClass
+	 *            the {@link ElkNamedIndividual} to be removed
+	 */
+	public void removeNamedIndividual(ElkNamedIndividual oldIndividual)
+			throws ElkUnexpectedIndexingException;
+
+	/**
+	 * Assert reflexivity of the given {@link IndexedObjectProperty}
+	 * 
+	 * @param property
+	 *            the {@link IndexedObjectProperty} which should be asserted
+	 *            reflexive
+	 */
+	public void addReflexiveProperty(IndexedObjectProperty property);
+
+	/**
+	 * Retracts reflexivity of the given {@link IndexedObjectProperty}
+	 * 
+	 * @param property
+	 *            the {@link IndexedObjectProperty} which should not be
+	 *            reflexive anymore
+	 */
+	public void removeReflexiveProperty(IndexedObjectProperty property)
+			throws ElkUnexpectedIndexingException;
+
+	/**
+	 * Adds a new context initialization for this {@link OntologyIndex}.
+	 * 
+	 * @param newRule
+	 *            the context initialization rule to be added
+	 * @see OntologyIndex#getContextInitRuleHead()
+	 */
+	public void addContextInitRule(ChainableRule<Context> newRule);
+
+	/**
+	 * Removes an existing context initialization for this {@link OntologyIndex}
+	 * 
+	 * @param oldRule
+	 *            the context initialization rule to be removed
+	 * @throws ElkUnexpectedIndexingException
+	 *             if the given rule was not registered with this
+	 *             {@link OntologyIndex}
+	 * 
+	 * @see OntologyIndex#getContextInitRuleHead()
+	 */
+	public void removeContextInitRule(ChainableRule<Context> oldRule)
+			throws ElkUnexpectedIndexingException;
+
+	/**
+	 * Adds a new context rule for the given {@link IndexedClassExpression}
+	 * 
+	 * @param target
+	 *            the {@link IndexedClassExpression} for which to add the rule
+	 * @param newRule
+	 *            the context rule to be added
+	 */
+	public void add(IndexedClassExpression target,
+			ChainableRule<Context> newRule);
+
+	/**
+	 * Removes an existing context rule for the given
+	 * {@link IndexedClassExpression}
+	 * 
+	 * @param target
+	 *            the {@link IndexedClassExpression} for which to remove the
+	 *            rule
+	 * @param oldRule
+	 *            the context rule to be removed
+	 * @throws ElkUnexpectedIndexingException
+	 *             if the given rule was not registered with this
+	 *             {@link IndexedClassExpression}
+	 */
+	public void remove(IndexedClassExpression target,
+			ChainableRule<Context> oldRule)
+			throws ElkUnexpectedIndexingException;
 
 }

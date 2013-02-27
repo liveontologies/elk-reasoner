@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
@@ -65,7 +66,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ModifiableOntologyIndex index = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
 
-		final ElkAxiomProcessor inserter = index.getAxiomInserter();
+		final ElkAxiomProcessor inserter = new ElkAxiomIndexerVisitor(index,
+				true);
 		inserter.visit(objectFactory.getEquivalentClassesAxiom(b, c));
 		inserter.visit(objectFactory.getSubClassOfAxiom(a,
 				objectFactory.getObjectSomeValuesFrom(r, b)));
@@ -110,7 +112,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		final ModifiableOntologyIndex index = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
-		final ElkAxiomProcessor inserter = index.getAxiomInserter();
+		final ElkAxiomProcessor inserter = new ElkAxiomIndexerVisitor(index,
+				true);
 
 		inserter.visit(objectFactory.getSubClassOfAxiom(a, b));
 		inserter.visit(objectFactory.getSubClassOfAxiom(a, c));

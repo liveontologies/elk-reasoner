@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
@@ -60,8 +59,14 @@ public class DifferentialIndex extends DirectIndex {
 	 */
 	boolean incrementalMode = false;
 
+	/**
+	 * the {@link ElkClass} added during the last incremental session
+	 */
 	private final Set<ElkClass> addedClasses_;
 
+	/**
+	 * the {@link ElkNamedIndividual} added during the last incremental session
+	 */
 	private final Set<ElkNamedIndividual> addedIndividuals_;
 
 	/**
@@ -81,8 +86,6 @@ public class DifferentialIndex extends DirectIndex {
 	private final Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
 
-	private final ElkAxiomProcessor axiomInserter_, axiomDeleter_;
-
 	public DifferentialIndex(IndexedObjectCache objectCache) {
 		super(objectCache);
 		this.addedClasses_ = new ArrayHashSet<ElkClass>(127);
@@ -92,8 +95,6 @@ public class DifferentialIndex extends DirectIndex {
 				127);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
-		this.axiomInserter_ = new ElkAxiomIndexerVisitor(this, true);
-		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(this, false);
 	}
 
 	/* read-only methods */
@@ -103,102 +104,127 @@ public class DifferentialIndex extends DirectIndex {
 	/* read-write methods */
 
 	@Override
-	public ElkAxiomProcessor getAxiomInserter() {
-		return axiomInserter_;
-	}
-
-	@Override
-	public ElkAxiomProcessor getAxiomDeleter() {
-		return axiomDeleter_;
-	}
-
-	@Override
 	public void addClass(ElkClass newClass) {
-		if (incrementalMode)
+		if (incrementalMode) {
 			addedClasses_.add(newClass);
-		else
+		} else {
 			super.addClass(newClass);
+		}
+
 	}
 
 	@Override
 	public void removeClass(ElkClass oldClass) {
-		if (incrementalMode)
+		if (incrementalMode) {
 			addedClasses_.remove(oldClass);
-		else
+		} else {
 			super.removeClass(oldClass);
+		}
 	}
 
 	@Override
 	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
-		if (incrementalMode)
+		if (incrementalMode) {
 			addedIndividuals_.add(newIndividual);
-		else
+		} else {
 			super.addNamedIndividual(newIndividual);
+		}
 	}
 
 	@Override
 	public void removeNamedIndividual(ElkNamedIndividual oldIndividual) {
-		if (incrementalMode)
+		if (incrementalMode) {
 			addedIndividuals_.remove(oldIndividual);
-		else
+		} else {
 			super.removeNamedIndividual(oldIndividual);
+		}
 	}
 
 	@Override
-	public void add(IndexedClassExpression target, ChainableRule<Context> rule) {
-		if (incrementalMode)
-			registerAddedContextRule(target, rule);
-		else
-			super.add(target, rule);
+	public void add(IndexedClassExpression target,
+			ChainableRule<Context> newRule) {
+		if (incrementalMode) {
+			newRule.addTo(getAddedContextRuleChain(target));
+		} else {
+			super.add(target, newRule);
+		}
 	}
 
 	@Override
 	public void remove(IndexedClassExpression target,
-			ChainableRule<Context> rule) {
-		if (incrementalMode)
-			registerRemovedContextRule(target, rule);
-		else
-			super.remove(target, rule);
+			ChainableRule<Context> oldRule) {
+		if (incrementalMode) {
+			if (!oldRule.removeFrom(getAddedContextRuleChain(target))) {
+				oldRule.addTo(getRemovedContextRuleChain(target));
+				if (!oldRule.removeFrom(target.getCompositionRuleChain()))
+					throw new ElkUnexpectedIndexingException(
+							"Cannot remove context rule " + oldRule.getName()
+									+ " for " + target);
+			}
+		} else {
+			super.remove(target, oldRule);
+		}
 	}
 
 	@Override
-	public void add(ChainableRule<Context> rule) {
-		if (incrementalMode)
-			registerAddedContextInitRule(rule);
-		else
-			super.add(rule);
+	public void addContextInitRule(ChainableRule<Context> newRule) {
+		if (incrementalMode) {
+			newRule.addTo(getAddedContextInitRuleChain());
+		} else {
+			super.addContextInitRule(newRule);
+		}
+
 	}
 
 	@Override
-	public void remove(ChainableRule<Context> rule) {
-		if (incrementalMode)
-			registerRemovedContextInitRule(rule);
-		else
-			super.remove(rule);
+	public void removeContextInitRule(ChainableRule<Context> oldRule) {
+		if (incrementalMode) {
+			if (!oldRule.removeFrom(getAddedContextInitRuleChain())) {
+				oldRule.addTo(getRemovedContextInitRuleChain());
+				if (!oldRule.removeFrom(getContextInitRuleChain()))
+					throw new ElkUnexpectedIndexingException(
+							"Cannot remove context initialization rule "
+									+ oldRule.getName());
+			}
+		} else {
+			super.removeContextInitRule(oldRule);
+		}
 	}
 
 	@Override
-	public void add(IndexedObject object) {
-		if (incrementalMode)
-			addIndexedObject(object);
-		else
-			super.add(object);
+	public void add(IndexedObject newObject) {
+		if (incrementalMode) {
+			addIndexedObject(newObject);
+		} else {
+			super.add(newObject);
+		}
 	}
 
 	@Override
-	public void remove(IndexedObject object) {
-		if (incrementalMode)
-			removeIndexedObject(object);
-		else
-			super.remove(object);
+	public void remove(IndexedObject oldObject) {
+		if (incrementalMode) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("To remove: " + oldObject);
+			oldObject.accept(todoDeletions_.inserter);
+		} else {
+			super.remove(oldObject);
+		}
 	}
 
 	/* incremental-specific methods */
 
+	/**
+	 * @return the context initialization rules added during the last
+	 *         incremental session
+	 */
 	public ChainableRule<Context> getAddedContextInitRules() {
 		return addedContextInitRules_;
 	}
 
+	/**
+	 * @return the context initialization rules removed during the last
+	 *         incremental session
+	 */
 	public ChainableRule<Context> getRemovedContextInitRules() {
 		return removedContextInitRules_;
 	}
@@ -206,7 +232,6 @@ public class DifferentialIndex extends DirectIndex {
 	/**
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index additions for these class expressions
-	 * 
 	 */
 	public Map<IndexedClassExpression, ChainableRule<Context>> getAddedContextRulesByClassExpressions() {
 		return this.addedContextRuleHeadByClassExpressions_;
@@ -220,14 +245,24 @@ public class DifferentialIndex extends DirectIndex {
 		return this.removedContextRuleHeadByClassExpressions_;
 	}
 
+	/**
+	 * @return the {@link ElkClass} added during the last incremental session
+	 */
 	public Collection<ElkClass> getAddedClasses() {
 		return this.addedClasses_;
 	}
 
+	/**
+	 * @return
+	 */
 	public Collection<ElkNamedIndividual> getAddedIndividuals() {
 		return this.addedIndividuals_;
 	}
 
+	/**
+	 * @return the {@link IndexedClassExpression}s removed during the last
+	 *         incremental session
+	 */
 	public Collection<IndexedClassExpression> getRemovedClassExpressions() {
 		return todoDeletions_.indexedClassExpressionLookup;
 	}
@@ -281,6 +316,10 @@ public class DifferentialIndex extends DirectIndex {
 		addedIndividuals_.clear();
 	}
 
+	/**
+	 * @return {@code true} if there are no uncommitted changes in this
+	 *         {@link DifferentialIndex}
+	 */
 	public boolean isEmpty() {
 		return addedContextInitRules_ == null
 				&& removedContextInitRules_ == null
@@ -288,6 +327,14 @@ public class DifferentialIndex extends DirectIndex {
 				&& removedContextRuleHeadByClassExpressions_.isEmpty();
 	}
 
+	/**
+	 * Sets the incremental mode for this {@code DifferentialIndex}.
+	 * 
+	 * @param mode
+	 *            if {@code true}, deletions and additions to this indexed are
+	 *            stored separately; if {@code false} all changes are
+	 *            immediately applied to the index.
+	 */
 	public void setIncrementalMode(boolean mode) {
 		if (this.incrementalMode == mode)
 			// already set
@@ -300,10 +347,19 @@ public class DifferentialIndex extends DirectIndex {
 		}
 	}
 
+	/**
+	 * @return the current value of the incremental mode for this
+	 *         {@code DifferentialIndex}
+	 * @see #setIncrementalMode(boolean)
+	 */
 	public boolean isIncrementalMode() {
 		return incrementalMode;
 	}
 
+	/**
+	 * @return the chain of added context initialization rules suitable for
+	 *         modifications (addition or deletions) of rules
+	 */
 	private Chain<ChainableRule<Context>> getAddedContextInitRuleChain() {
 		return new AbstractChain<ChainableRule<Context>>() {
 
@@ -319,6 +375,10 @@ public class DifferentialIndex extends DirectIndex {
 		};
 	}
 
+	/**
+	 * @return the chain of removed context initialization rules suitable for
+	 *         modifications (addition or deletions) of rules
+	 */
 	private Chain<ChainableRule<Context>> getRemovedContextInitRuleChain() {
 		return new AbstractChain<ChainableRule<Context>>() {
 
@@ -334,12 +394,30 @@ public class DifferentialIndex extends DirectIndex {
 		};
 	}
 
+	/**
+	 * @param target
+	 *            the {@link IndexedClassExpression} for which to return the
+	 *            chain of added context rules
+	 * 
+	 * @return the chain of added context rules for the given
+	 *         {@link IndexedClassExpression} that is suitable for modifications
+	 *         (addition or deletions) of rules
+	 */
 	private Chain<ChainableRule<Context>> getAddedContextRuleChain(
 			final IndexedClassExpression target) {
 		return AbstractChain.getMapBackedChain(
 				addedContextRuleHeadByClassExpressions_, target);
 	}
 
+	/**
+	 * @param target
+	 *            the {@link IndexedClassExpression} for which to return the
+	 *            chain of removed context rules
+	 * 
+	 * @return the chain of removed context rules for the given
+	 *         {@link IndexedClassExpression} that is suitable for modifications
+	 *         (addition or deletions) of rules
+	 */
 	private Chain<ChainableRule<Context>> getRemovedContextRuleChain(
 			final IndexedClassExpression target) {
 		return AbstractChain.getMapBackedChain(
@@ -353,41 +431,4 @@ public class DifferentialIndex extends DirectIndex {
 			iobj.accept(objectCache.inserter);
 
 	}
-
-	void removeIndexedObject(IndexedObject iobj) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("To remove: " + iobj);
-		iobj.accept(todoDeletions_.inserter);
-	}
-
-	void registerAddedContextInitRule(ChainableRule<Context> rule) {
-		rule.addTo(getAddedContextInitRuleChain());
-	}
-
-	void registerRemovedContextInitRule(ChainableRule<Context> rule) {
-		if (!rule.removeFrom(getAddedContextInitRuleChain())) {
-			rule.addTo(getRemovedContextInitRuleChain());
-			if (!rule.removeFrom(getContextInitRuleChain()))
-				throw new ElkUnexpectedIndexingException(
-						"Cannot remove context initialization rule "
-								+ rule.getName());
-		}
-	}
-
-	void registerAddedContextRule(IndexedClassExpression target,
-			ChainableRule<Context> rule) {
-		rule.addTo(getAddedContextRuleChain(target));
-	}
-
-	void registerRemovedContextRule(IndexedClassExpression target,
-			ChainableRule<Context> rule) {
-		if (!rule.removeFrom(getAddedContextRuleChain(target))) {
-			rule.addTo(getRemovedContextRuleChain(target));
-			if (!rule.removeFrom(target.getCompositionRuleChain()))
-				throw new ElkUnexpectedIndexingException(
-						"Cannot remove context rule " + rule.getName()
-								+ " for " + target);
-		}
-	}
-
 }
