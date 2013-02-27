@@ -37,7 +37,7 @@ public interface UpdateableInstanceTaxonomy<T extends ElkObject, I extends ElkOb
 
 	public UpdateableTypeNode<T, I> getCreateTypeNode(Collection<T> member);
 	
-	public UpdateableInstanceNode<T, I> getCreateIndividualNode(Collection<I> member);
+	public UpdateableInstanceNode<T, I> getCreateInstanceNode(Collection<I> member);
 	
 	public UpdateableTypeNode<T, I> getUpdateableTypeNode(T elkObject);
 

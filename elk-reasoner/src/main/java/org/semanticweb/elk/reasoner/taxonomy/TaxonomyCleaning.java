@@ -26,11 +26,13 @@ package org.semanticweb.elk.reasoner.taxonomy;
  */
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
@@ -52,7 +54,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
- * TODO docs
+ * Cleans both class and instance taxonomies concurrently
  * 
  * @author Pavel Klinov
  * 
@@ -81,6 +83,8 @@ public class TaxonomyCleaning extends
 class TaxonomyCleaningFactory implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
+	private static final Logger LOGGER_ = Logger.getLogger(TaxonomyCleaningFactory.class);
+	
 	private final ClassTaxonomyState classTaxonomyState_;
 	private final InstanceTaxonomyState instanceTaxonomyState_;
 
@@ -92,7 +96,7 @@ class TaxonomyCleaningFactory implements
 	@Override
 	public InputProcessor<IndexedClassEntity> getEngine() {
 		return new InputProcessor<IndexedClassEntity>() {
-			
+			// a simple dispatching visitor
 			private final IndexedClassEntityVisitor<?> submissionVisitor_ = new IndexedClassEntityVisitor<Object>() {
 
 				@Override
@@ -107,13 +111,13 @@ class TaxonomyCleaningFactory implements
 					return null;
 				}
 			};
-
+			// writers have no state so can be safely reused
 			private final ClassTaxonomyState.Writer classStateWriter_ = classTaxonomyState_.getWriter();
 			
 			private final InstanceTaxonomyState.Writer instanceStateWriter_ = instanceTaxonomyState_.getWriter();
 			
 			/**
-			 * Temporary queue of nodes that should be removed from the taxonomy
+			 * Temporary queue of nodes that should be removed from the taxonomies
 			 */
 			private final Queue<UpdateableTaxonomyNode<ElkClass>> classNodesToRemove = new ConcurrentLinkedQueue<UpdateableTaxonomyNode<ElkClass>>();
 
@@ -163,8 +167,10 @@ class TaxonomyCleaningFactory implements
 						synchronized (typeNode) {
 							for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : typeNode.getDirectInstanceNodes()) {
 								if (instanceNode.trySetModified(true)) {
-									instanceStateWriter_.markModifiedIndividuals(instanceNode);		
-									//TODO move this to process
+									instanceStateWriter_.markModifiedIndividuals(instanceNode.getMembers());		
+									// TODO create a separate ToDo for removing
+									// instance nodes and move this line to
+									// process(..)
 									instanceTaxonomy.removeInstanceNode(instanceNode.getCanonicalMember());
 								}
 							}
@@ -181,13 +187,6 @@ class TaxonomyCleaningFactory implements
 						}
 					}
 				}
-				
-				// remove node from the taxonomy
-				/*classTaxonomy.removeNode(node);
-				
-				if (instanceTaxonomy != null) {
-					instanceTaxonomy.removeNode(node);
-				}*/
 			}
 			
 			private void submitIndividual(IndexedIndividual indexedIndividual) {
@@ -195,14 +194,18 @@ class TaxonomyCleaningFactory implements
 					UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = instanceTaxonomyState_.getTaxonomy();
 					ElkNamedIndividual individual = indexedIndividual.getElkNamedIndividual();
 					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy.getInstanceNode(individual);
-					
+
 					if (node != null && node.trySetModified(true)) {
-						instanceStateWriter_.markModifiedIndividuals(node);
+						instanceStateWriter_.markModifiedIndividuals(node.getMembers());
 						taxonomy.removeInstanceNode(individual);
+					}
+					else if (node == null) {
+						instanceStateWriter_.markModifiedIndividuals(Collections.singleton(individual));
 					}
 				}
 				else {
-					//TODO Log it, should never happen
+					//should never happen
+					LOGGER_.error("The instance taxonomy is unexpectedly null during taxonomy cleaning");
 				}
 			}
 
@@ -229,7 +232,11 @@ class TaxonomyCleaningFactory implements
 							node.removeDirectSuperNode(superNode);											
 						}
 						
-						// remove node from the taxonomy
+						/*
+						 * Remove node from both taxonomies. Reasonable
+						 * implementations have only one copy of each class node
+						 * but it's not guaranteed so we still remove it from both taxonomies.
+						 */
 						classTaxonomy.removeNode(node);
 						
 						if (instanceTaxonomy != null) {

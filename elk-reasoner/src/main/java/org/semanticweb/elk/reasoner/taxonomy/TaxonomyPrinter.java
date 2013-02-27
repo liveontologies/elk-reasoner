@@ -341,9 +341,9 @@ public class TaxonomyPrinter {
 		// print the ABox
 		TreeSet<ElkNamedIndividual> canonicalIndividuals = new TreeSet<ElkNamedIndividual>(
 				INDIVIDUAL_COMPARATOR);
-		for (InstanceNode<ElkClass, ElkNamedIndividual> node : taxonomy
-				.getInstanceNodes())
+		for (InstanceNode<ElkClass, ElkNamedIndividual> node : taxonomy	.getInstanceNodes()) {
 			canonicalIndividuals.add(node.getCanonicalMember());
+		}
 
 		for (ElkNamedIndividual individual : canonicalIndividuals) {
 			InstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy

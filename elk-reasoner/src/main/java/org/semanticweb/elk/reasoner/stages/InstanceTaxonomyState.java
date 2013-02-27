@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 
 /**
@@ -86,8 +85,12 @@ public class InstanceTaxonomyState {
 	 */
 	public class Writer {
 
-		public void markModifiedIndividuals(InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
+		/*public void markModifiedIndividuals(InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
 			modifiedIndividuals.addAll(instanceNode.getMembers());
+		}*/
+		
+		public void markModifiedIndividuals(Collection<ElkNamedIndividual> individuals) {
+			modifiedIndividuals.addAll(individuals);
 		}
 		
 		public void markRemovedIndividual(IndexedIndividual individual) {

@@ -142,7 +142,7 @@ public class InstanceTaxonomyComputationFactory implements
 
 			// only supports singleton individuals
 			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
-					.getCreateIndividualNode(Collections.singleton(output
+					.getCreateInstanceNode(Collections.singleton(output
 							.getRoot().getElkNamedIndividual()));
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output

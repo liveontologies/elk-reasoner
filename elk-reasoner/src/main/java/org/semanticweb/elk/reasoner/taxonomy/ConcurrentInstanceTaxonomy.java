@@ -158,8 +158,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 
 	@Override
-	public IndividualNode getCreateIndividualNode(
-			Collection<ElkNamedIndividual> members) {
+	public IndividualNode getCreateInstanceNode(Collection<ElkNamedIndividual> members) {
 		// search if some node is already assigned to some member, and if so
 		// use this node and update its members if necessary
 		IndividualNode previous = null;
@@ -192,45 +191,46 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		
 		previous = individualNodeLookup_.putIfAbsent(getKey(canonical), node);
 		
-		if (previous != null)
+		if (previous != null) {
 			return previous;
+		}
 
 		allIndividualNodes_.add(node);
 		
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(OwlFunctionalStylePrinter.toString(canonical)
-					+ ": node created");
+			LOGGER_.trace(OwlFunctionalStylePrinter.toString(canonical)	+ ": node created");
 		}
+		
 		for (ElkNamedIndividual member : members) {
 			if (member != canonical)
 				individualNodeLookup_.put(getKey(member), node);
 		}
+		
 		return node;
 	}
 
 
 	@Override
 	public boolean removeInstanceNode(ElkNamedIndividual instance) {
-		IndividualNode node = individualNodeLookup_.get(instance);
+		IndividualNode node = individualNodeLookup_.get(getKey(instance));
 
 		if (node != null) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Removing the instance node " + node);
 			}
 			
+			Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypes = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
+			
 			synchronized (node) {
 				for (ElkNamedIndividual individual : node.getMembers()) {
-					individualNodeLookup_.remove(individual);
+					individualNodeLookup_.remove(getKey(individual));
 				}
 
 				allIndividualNodes_.remove(node);
-				
-				/*for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode : node.getDirectTypeNodes()) {
-					node.removeDirectTypeNode(typeNode);
-				}*/
+				directTypes.addAll(node.getDirectTypeNodes());
 			}
-			
-			for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode : node.getDirectTypeNodes()) {
+			// detaching the removed instance node from all its direct types
+			for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode : directTypes) {
 				synchronized (typeNode) {
 					typeNode.removeDirectInstanceNode(node);
 				}
