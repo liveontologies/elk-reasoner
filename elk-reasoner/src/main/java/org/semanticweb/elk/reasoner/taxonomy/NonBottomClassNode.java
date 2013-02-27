@@ -52,6 +52,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
+ * @author Pavel Klinov
  */
 class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 
@@ -251,7 +252,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
-	public synchronized boolean removeDirectSubNode(
+	public /*synchronized*/ boolean removeDirectSubNode(
 			UpdateableTaxonomyNode<ElkClass> subNode) {
 		boolean changed = directSubNodes_.remove(subNode);
 
@@ -267,7 +268,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
-	public synchronized boolean removeDirectSuperNode(
+	public /*synchronized*/ boolean removeDirectSuperNode(
 			UpdateableTaxonomyNode<ElkClass> superNode) {
 		boolean changed = directSuperNodes_.remove(superNode);
 

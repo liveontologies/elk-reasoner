@@ -91,6 +91,16 @@ class TaxonomyCleaningFactory implements
 	TaxonomyCleaningFactory(final ClassTaxonomyState classTaxonomyState, final InstanceTaxonomyState instanceTaxonomyState) {
 		classTaxonomyState_ = classTaxonomyState;
 		instanceTaxonomyState_ = instanceTaxonomyState;
+		
+		/*if (classTaxonomyState_.getTaxonomy() != null) {
+
+			for (UpdateableTaxonomyNode<ElkClass> node : classTaxonomyState_
+					.getTaxonomy().getUpdateableNodes()) {
+				if (node.isModified()) {
+					throw new RuntimeException("node");
+				}
+			}
+		}*/
 	}
 
 	@Override
@@ -119,7 +129,7 @@ class TaxonomyCleaningFactory implements
 			/**
 			 * Temporary queue of nodes that should be removed from the taxonomies
 			 */
-			private final Queue<UpdateableTaxonomyNode<ElkClass>> classNodesToRemove = new ConcurrentLinkedQueue<UpdateableTaxonomyNode<ElkClass>>();
+			private final Queue<UpdateableTaxonomyNode<ElkClass>> toRemove_ = new ConcurrentLinkedQueue<UpdateableTaxonomyNode<ElkClass>>();
 
 			@Override
 			public void submit(IndexedClassEntity entity) {
@@ -149,8 +159,7 @@ class TaxonomyCleaningFactory implements
 					}
 				}
 
-				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy
-						.getUpdateableNode(elkClass);
+				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy.getUpdateableNode(elkClass);
 
 				if (node == null) {
 					classStateWriter_.markClassForModifiedNode(elkClass);
@@ -158,7 +167,7 @@ class TaxonomyCleaningFactory implements
 				}
 				
 				if (node.trySetModified(true)) {
-					classNodesToRemove.add(node);
+					toRemove_.add(node);
 					classStateWriter_.markClassesForModifiedNode(node);
 					
 					if (instanceTaxonomy != null) {
@@ -168,9 +177,6 @@ class TaxonomyCleaningFactory implements
 							for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : typeNode.getDirectInstanceNodes()) {
 								if (instanceNode.trySetModified(true)) {
 									instanceStateWriter_.markModifiedIndividuals(instanceNode.getMembers());		
-									// TODO create a separate ToDo for removing
-									// instance nodes and move this line to
-									// process(..)
 									instanceTaxonomy.removeInstanceNode(instanceNode.getCanonicalMember());
 								}
 							}
@@ -179,14 +185,23 @@ class TaxonomyCleaningFactory implements
 				}
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
-					for (UpdateableTaxonomyNode<ElkClass> subNode : node
-							.getDirectUpdateableSubNodes()) {
+					for (UpdateableTaxonomyNode<ElkClass> subNode : node.getDirectUpdateableSubNodes()) {
 						if (subNode.trySetModified(true)) {
-							classNodesToRemove.add(subNode);
+							toRemove_.add(subNode);
 							classStateWriter_.markClassesForModifiedNode(subNode);
 						}
 					}
 				}
+				/*
+				 * Remove node from both taxonomies. Reasonable
+				 * implementations have only one copy of each class node
+				 * but it's not guaranteed so we still remove it from both taxonomies.
+				 */
+				classTaxonomy.removeNode(node);
+				
+				if (instanceTaxonomy != null) {
+					instanceTaxonomy.removeNode(node);
+				}				
 			}
 			
 			private void submitIndividual(IndexedIndividual indexedIndividual) {
@@ -211,37 +226,28 @@ class TaxonomyCleaningFactory implements
 
 			@Override
 			public void process() throws InterruptedException {
-				UpdateableTaxonomy<ElkClass> classTaxonomy = classTaxonomyState_.getTaxonomy();
-				UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = instanceTaxonomyState_.getTaxonomy();
-				
 				for (;;) {
-					UpdateableTaxonomyNode<ElkClass> node = classNodesToRemove.poll();
+					UpdateableTaxonomyNode<ElkClass> node = toRemove_.poll();
 
 					if (node == null) {
 						return;
 					}
 
+					List<UpdateableTaxonomyNode<ElkClass>> superNodes = null;
+					
 					// remove all super-class links
 					synchronized (node) {
-
-						List<UpdateableTaxonomyNode<ElkClass>> superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>(
-								node.getDirectUpdateableSuperNodes());
+						superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>(node.getDirectUpdateableSuperNodes());
 
 						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
-							superNode.removeDirectSubNode(node);
 							node.removeDirectSuperNode(superNode);											
 						}
-						
-						/*
-						 * Remove node from both taxonomies. Reasonable
-						 * implementations have only one copy of each class node
-						 * but it's not guaranteed so we still remove it from both taxonomies.
-						 */
-						classTaxonomy.removeNode(node);
-						
-						if (instanceTaxonomy != null) {
-							instanceTaxonomy.removeNode(node);
-						}						
+					}
+					
+					for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
+						synchronized (superNode) {
+							superNode.removeDirectSubNode(node);
+						}
 					}
 				}
 			}

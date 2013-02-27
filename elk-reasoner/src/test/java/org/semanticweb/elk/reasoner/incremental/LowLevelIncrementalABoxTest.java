@@ -179,9 +179,17 @@ public class LowLevelIncrementalABoxTest {
 		changeLoader.remove(axiInstA);
 
 		taxonomy = reasoner.getInstanceTaxonomyQuietly();
-		
+		//the individual should be gone
 		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().isEmpty());
 		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().isEmpty());
+		//check that the individual properly re-appears
+		changeLoader.clear();
+		changeLoader.add(axiInstA);
+		
+		taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
 	}	
 	
 	@Test

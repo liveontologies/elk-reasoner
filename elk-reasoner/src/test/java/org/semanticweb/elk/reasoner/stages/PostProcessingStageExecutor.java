@@ -76,7 +76,9 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 		 */
 		// postProcesingMap.add(IncrementalReSaturationStage.class,
 		// RandomContextResaturationStage.class);
-		postProcesingMap.add(IncrementalClassTaxonomyComputationStage.class,
+		/*postProcesingMap.add(IncrementalClassTaxonomyComputationStage.class,
+				ValidateTaxonomyStage.class);*/
+		postProcesingMap.add(IncrementalTaxonomyCleaningStage.class,
 				ValidateTaxonomyStage.class);
 	}
 

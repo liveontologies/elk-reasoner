@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,6 +56,9 @@ import org.semanticweb.elk.util.collections.Operations.FunctorEx;
  * Class taxonomy that is suitable for concurrent processing. Taxonomy objects
  * are only constructed for consistent ontologies, and some consequences of this
  * are hardcoded here.
+ * 
+ * This class wraps an instance of {@link UpdateableTaxonomy} and lazily
+ * generates wrappers for its nodes to store direct instances.
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
@@ -219,7 +223,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 				LOGGER_.trace("Removing the instance node " + node);
 			}
 			
-			Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypes = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
+			List<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypes = new LinkedList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 			
 			synchronized (node) {
 				for (ElkNamedIndividual individual : node.getMembers()) {

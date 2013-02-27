@@ -85,10 +85,6 @@ public class InstanceTaxonomyState {
 	 */
 	public class Writer {
 
-		/*public void markModifiedIndividuals(InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
-			modifiedIndividuals.addAll(instanceNode.getMembers());
-		}*/
-		
 		public void markModifiedIndividuals(Collection<ElkNamedIndividual> individuals) {
 			modifiedIndividuals.addAll(individuals);
 		}

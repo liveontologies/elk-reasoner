@@ -46,18 +46,18 @@ public class TaxonomyNodeDisjointnessVisitor<T extends ElkObject> implements
 	}
 
 	@Override
-	public void visit(TaxonomyNode<T> node,
-			List<TaxonomyNode<T>> pathFromStart) {
+	public void visit(TaxonomyNode<T> node, List<TaxonomyNode<T>> pathFromStart) {
 		// Check that nodes are disjoint
 		for (T member : node.getMembers()) {
-			if (node != taxonomy_.getNode(member)) {
+			if (node != taxonomy_.getNode(member)) {				
+				TaxonomyNode<T> otherNode = taxonomy_.getNode(member);
 				
 				throw new InvalidTaxonomyException(
 						"Invalid taxonomy: looks like the object "
 								+ OwlFunctionalStylePrinter.toString(member)
 								+ " appears in more than one node: \n" 
-								+ node.toString() + "\n" 
-								+ taxonomy_.getNode(member));
+								+ node.toString() + ":" + node.hashCode() + "\n" 
+								+ (otherNode == null ? null : otherNode.toString() + ":" + otherNode.hashCode()));
 			}
 		}
 	}

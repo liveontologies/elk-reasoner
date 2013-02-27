@@ -55,6 +55,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
+ * @author Pavel Klinov
  */
 public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 
@@ -65,27 +66,27 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	/** thread safe map from class IRIs to class nodes */
 	private final ConcurrentMap<ElkIri, NonBottomClassNode> classNodeLookup_;
 	/** thread safe set of all satisfiable class nodes */
-	protected final Set<NonBottomClassNode> allSatisfiableClassNodes_;
+	private final Set<NonBottomClassNode> allSatisfiableClassNodes_;
 	/** counts the number of nodes which have non-bottom sub-classes */
 	final AtomicInteger countNodesWithSubClasses;
 	/** thread safe set of unsatisfiable classes */
-	final Set<ElkClass> unsatisfiableClasses;
+	private final Set<ElkClass> unsatisfiableClasses_;
 
 	/**
 	 * The bottom node.
 	 */
-	final BottomClassNode bottomClassNode;
+	private final BottomClassNode bottomClassNode_;
 
 	public ConcurrentClassTaxonomy() {
 		this.classNodeLookup_ = new ConcurrentHashMap<ElkIri, NonBottomClassNode>();
 		this.allSatisfiableClassNodes_ = Collections
 				.newSetFromMap(new ConcurrentHashMap<NonBottomClassNode, Boolean>());
-		this.bottomClassNode = new BottomClassNode();
+		this.bottomClassNode_ = new BottomClassNode();
 		this.countNodesWithSubClasses = new AtomicInteger(0);
-		this.unsatisfiableClasses = Collections
+		this.unsatisfiableClasses_ = Collections
 				.synchronizedSet(new TreeSet<ElkClass>(
 						Comparators.ELK_CLASS_COMPARATOR));
-		this.unsatisfiableClasses.add(PredefinedElkClass.OWL_NOTHING);
+		this.unsatisfiableClasses_.add(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	/**
@@ -99,31 +100,22 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 
 	@Override
 	public TaxonomyNode<ElkClass> getNode(ElkClass elkClass) {
-		TaxonomyNode<ElkClass> result = getNonBottomNode(elkClass);
+		TaxonomyNode<ElkClass> result = classNodeLookup_.get(getKey(elkClass));
 
-		if (result == null && unsatisfiableClasses.contains(elkClass)) {
-			result = bottomClassNode;
+		if (result == null && unsatisfiableClasses_.contains(elkClass)) {
+			result = bottomClassNode_;
 		}
 
 		return result;
 	}
 
-	protected NonBottomClassNode getNonBottomNode(ElkClass elkClass) {
-		return classNodeLookup_.get(getKey(elkClass));
-	}
-
-	public Set<? extends TaxonomyNode<ElkClass>> getTypeNodes() {
-		Set<? extends TaxonomyNode<ElkClass>> allNodes = allSatisfiableClassNodes_;
-		Set<? extends TaxonomyNode<ElkClass>> bottom = Collections
-				.<TaxonomyNode<ElkClass>> singleton(bottomClassNode);
-
-		return new LazySetUnion<TaxonomyNode<ElkClass>>(allNodes, bottom);
-	}
-
 	@Override
 	public Set<? extends TaxonomyNode<ElkClass>> getNodes() {
-		return getTypeNodes();
-	}
+		Set<? extends TaxonomyNode<ElkClass>> allNodes = allSatisfiableClassNodes_;
+		Set<? extends TaxonomyNode<ElkClass>> bottom = Collections
+				.<TaxonomyNode<ElkClass>> singleton(bottomClassNode_);
+
+		return new LazySetUnion<TaxonomyNode<ElkClass>>(allNodes, bottom);	}
 
 	@Override
 	public NonBottomClassNode getTopNode() {
@@ -137,7 +129,7 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	
 	@Override
 	public UpdateableBottomNode<ElkClass> getUpdateableBottomNode() {
-		return bottomClassNode;
+		return bottomClassNode_;
 	}
 
 	protected NonBottomClassNode getCreateNonBottomClassNode(
@@ -189,7 +181,7 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 
 	@Override
 	public boolean addToBottomNode(ElkClass elkClass) {
-		return unsatisfiableClasses.add(elkClass);
+		return unsatisfiableClasses_.add(elkClass);
 	}
 
 	@Override
@@ -202,13 +194,15 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	public boolean removeNode(UpdateableTaxonomyNode<ElkClass> node) {
 		boolean changed = false;
 
-		allSatisfiableClassNodes_.remove(node);
-		// removing node assignment for members
-		for (ElkClass member : node.getMembers()) {
-			changed |= classNodeLookup_.remove(getKey(member)) != null;
-		}
-		if (changed && LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(node + ": node removed");
+		if (allSatisfiableClassNodes_.remove(node)) {
+			// removing node assignment for members
+			for (ElkClass member : node.getMembers()) {
+				changed |= classNodeLookup_.remove(getKey(member)) != null;
+			}
+
+			if (changed && LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(node + ": node removed");
+			}
 		}
 
 		return changed;
@@ -241,7 +235,7 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 
 		@Override
 		public Set<ElkClass> getMembers() {
-			return unsatisfiableClasses;
+			return unsatisfiableClasses_;
 		}
 
 		@Override
@@ -256,7 +250,7 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 						@Override
 						public boolean holds(NonBottomClassNode element) {
 							return element.getDirectSubNodes().contains(
-									bottomClassNode);
+									bottomClassNode_);
 						}
 						/*
 						 * the direct super nodes of the bottom node are all
