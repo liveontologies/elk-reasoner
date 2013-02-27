@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
@@ -73,7 +74,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 		this(new IndexedObjectCache());
 	}
 
-	/* read-only methods */
+	/* read-only methods required by the interface */
 
 	@Override
 	public LinkRule<Context> getContextInitRuleHead() {
@@ -156,23 +157,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 		return indexedOwlNothing;
 	}
 
-	/* read-write methods */
-
-	@Override
-	public Chain<ChainableRule<Context>> getContextInitRuleChain() {
-		return new AbstractChain<ChainableRule<Context>>() {
-
-			@Override
-			public ChainableRule<Context> next() {
-				return contextInitRules_;
-			}
-
-			@Override
-			public void setNext(ChainableRule<Context> tail) {
-				contextInitRules_ = tail;
-			}
-		};
-	}
+	/* read-write methods required by the interface */
 
 	@Override
 	public IndexedObjectCache getIndexedObjectCache() {
@@ -260,6 +245,28 @@ public class DirectIndex implements ModifiableOntologyIndex {
 		if (!reflexiveObjectProperties_.remove(property))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove reflexivity of object property " + property);
+	}
+
+	/* other methods */
+
+	/**
+	 * @return a {@link Chain} view of context initialization rules assigned to
+	 *         this {@link OntologyIndex}; it can be used for inserting new
+	 *         rules or deleting existing ones
+	 */
+	public Chain<ChainableRule<Context>> getContextInitRuleChain() {
+		return new AbstractChain<ChainableRule<Context>>() {
+
+			@Override
+			public ChainableRule<Context> next() {
+				return contextInitRules_;
+			}
+
+			@Override
+			public void setNext(ChainableRule<Context> tail) {
+				contextInitRules_ = tail;
+			}
+		};
 	}
 
 }

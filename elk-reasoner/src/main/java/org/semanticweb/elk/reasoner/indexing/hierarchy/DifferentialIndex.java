@@ -97,7 +97,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	/* read-only methods */
-	
+
 	// nothing so far
 
 	/* read-write methods */
@@ -289,7 +289,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	public void setIncrementalMode(boolean mode) {
-		if (this.incrementalMode = mode)
+		if (this.incrementalMode == mode)
 			// already set
 			return;
 		this.incrementalMode = mode;

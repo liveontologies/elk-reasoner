@@ -29,7 +29,6 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
  * Ontology index with methods using which it can be modified
@@ -55,13 +54,6 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 *         {@link ElkAxiom}s from the ontology
 	 */
 	public ElkAxiomProcessor getAxiomDeleter();
-
-	/**
-	 * @return a {@link Chain} view of context initialization rules assigned to
-	 *         this {@link OntologyIndex}; it can be used for inserting new
-	 *         rules or deleting existing ones
-	 */
-	Chain<ChainableRule<Context>> getContextInitRuleChain();
 
 	public void add(final IndexedClassExpression target,
 			final ChainableRule<Context> rule);
