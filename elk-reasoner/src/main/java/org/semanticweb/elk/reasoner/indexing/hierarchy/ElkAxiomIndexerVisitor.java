@@ -56,9 +56,9 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 			.getLogger(ElkAxiomIndexerVisitor.class);
 
 	/**
-	 * The object through which the changes in the index are recorded
+	 * The index in which the changes are recorded
 	 */
-	private final ModifiableOntologyIndex indexUpdater_;
+	private final ModifiableOntologyIndex index_;
 
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
@@ -93,15 +93,15 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	private final IndexedClass owlNothing_;
 
 	/**
-	 * @param objectCache
+	 * @param index
+	 *            the {@link ModifiableOntologyIndex} used for indexing axioms
 	 * @param insert
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
-	public ElkAxiomIndexerVisitor(IndexedObjectCache objectCache,
-			IndexedClass owlNothing, ModifiableOntologyIndex updater, boolean insert) {
-		this.objectCache_ = objectCache;
-		this.owlNothing_ = owlNothing;
-		this.indexUpdater_ = updater;
+	public ElkAxiomIndexerVisitor(ModifiableOntologyIndex index, boolean insert) {
+		this.index_ = index;
+		this.objectCache_ = index.getIndexedObjectCache();
+		this.owlNothing_ = index.getIndexedOwlNothing();
 		this.multiplicity = insert ? 1 : -1;
 		IndexedPropertyChainFilter propertyOccurrenceUpdateFilter = new PropertyOccurrenceUpdateFilter(
 				multiplicity);
@@ -174,11 +174,11 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		if (owlNothing_ == null)
 			throw new NullPointerException("owlNothing not provided!");
 
-		if (indexUpdater_ == null)
+		if (index_ == null)
 			throw new NullPointerException("indexUpdater not provided!");
 
-		owlNothing_.updateAndCheckOccurrenceNumbers(indexUpdater_,
-				multiplicity, multiplicity, 0);
+		owlNothing_.updateAndCheckOccurrenceNumbers(index_, multiplicity,
+				multiplicity, 0);
 
 		List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
 				disjointClasses.size());
@@ -199,14 +199,14 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
 				&& multiplicity > 0)
 			// first occurrence of reflexivity axiom
-			indexUpdater_.addReflexiveProperty(indexedReflexiveProperty);
+			index_.addReflexiveProperty(indexedReflexiveProperty);
 
 		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity;
 
 		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
 				&& multiplicity < 0)
 			// no occurrence of reflexivity axiom
-			indexUpdater_.removeReflexiveProperty(indexedReflexiveProperty);
+			index_.removeReflexiveProperty(indexedReflexiveProperty);
 	}
 
 	@Override
@@ -264,13 +264,13 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		public <T extends IndexedClassExpression> T update(T ice) {
 			if (!ice.occurs() && increment > 0)
-				indexUpdater_.add(ice);
+				index_.add(ice);
 
-			ice.updateAndCheckOccurrenceNumbers(indexUpdater_, increment,
+			ice.updateAndCheckOccurrenceNumbers(index_, increment,
 					positiveIncrement, negativeIncrement);
 
 			if (!ice.occurs() && increment < 0)
-				indexUpdater_.remove(ice);
+				index_.remove(ice);
 
 			return ice;
 		}
@@ -325,12 +325,12 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		public <T extends IndexedPropertyChain> T update(T ipc) {
 			if (!ipc.occurs() && increment > 0)
-				indexUpdater_.add(ipc);
+				index_.add(ipc);
 
 			ipc.updateAndCheckOccurrenceNumbers(increment);
 
 			if (!ipc.occurs() && increment < 0)
-				indexUpdater_.remove(ipc);
+				index_.remove(ipc);
 
 			return ipc;
 		}
@@ -367,12 +367,12 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 
 		public <T extends IndexedAxiom> T update(T axiom) {
 			if (!axiom.occurs() && increment > 0)
-				indexUpdater_.add(axiom);
+				index_.add(axiom);
 
-			axiom.updateOccurrenceNumbers(indexUpdater_, increment);
+			axiom.updateOccurrenceNumbers(index_, increment);
 
 			if (!axiom.occurs() && increment < 0)
-				indexUpdater_.remove(axiom);
+				index_.remove(axiom);
 
 			return axiom;
 		}

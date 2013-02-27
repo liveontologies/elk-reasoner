@@ -65,11 +65,11 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
 			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (occurrenceNo_ == 0 && increment > 0) {
-			indexUpdater.addNamedIndividual(elkNamedIndividual_);
+			index.addNamedIndividual(elkNamedIndividual_);
 		}
 
 		occurrenceNo_ += increment;
@@ -77,7 +77,7 @@ public class IndexedIndividual extends IndexedClassEntity {
 		negativeOccurrenceNo += negativeIncrement;
 
 		if (occurrenceNo_ == 0 && increment < 0) {
-			indexUpdater.removeNamedIndividual(elkNamedIndividual_);
+			index.removeNamedIndividual(elkNamedIndividual_);
 		}
 	}
 
@@ -93,7 +93,8 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor, Context context) {
+	public void accept(DecompositionRuleApplicationVisitor visitor,
+			Context context) {
 		// TODO Auto-generated method stub
 	}
 }

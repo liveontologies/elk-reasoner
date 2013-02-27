@@ -149,11 +149,4 @@ public interface OntologyIndex {
 	 */
 	Chain<ChainableRule<Context>> getContextInitRuleChain();
 
-	/**
-	 * @return the {@link IndexedObjectCache} associated with this index
-	 */
-//	IndexedObjectCache getIndexedObjectCache();
-
-//	Collection<IndexedAxiom> getIndexedAxioms();
-
 }

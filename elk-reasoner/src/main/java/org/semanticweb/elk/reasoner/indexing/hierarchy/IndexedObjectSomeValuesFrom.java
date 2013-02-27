@@ -92,14 +92,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
 			final int increment, final int positiveIncrement,
 			final int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			// register the composition rule for the filler
-			indexUpdater.add(filler, new ThisCompositionRule(this));
+			index.add(filler, new ThisCompositionRule(this));
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -107,7 +107,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			indexUpdater.remove(filler, new ThisCompositionRule(this));
+			index.remove(filler, new ThisCompositionRule(this));
 		}
 
 	}

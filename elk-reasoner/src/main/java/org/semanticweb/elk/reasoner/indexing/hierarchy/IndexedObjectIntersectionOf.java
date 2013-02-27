@@ -95,16 +95,16 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(ModifiableOntologyIndex indexUpdater,
+	protected void updateOccurrenceNumbers(ModifiableOntologyIndex index,
 			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			indexUpdater.add(firstConjunct_, new ThisCompositionRule(
-					secondConjunct_, this));
+			index.add(firstConjunct_, new ThisCompositionRule(secondConjunct_,
+					this));
 			// if both conjuncts are the same, do not index the second time
 			if (!secondConjunct_.equals(firstConjunct_))
-				indexUpdater.add(secondConjunct_, new ThisCompositionRule(
+				index.add(secondConjunct_, new ThisCompositionRule(
 						firstConjunct_, this));
 		}
 
@@ -115,11 +115,11 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this conjunction left
-			indexUpdater.remove(firstConjunct_, new ThisCompositionRule(
+			index.remove(firstConjunct_, new ThisCompositionRule(
 					secondConjunct_, this));
 			// if both conjuncts are the same, do not de-index the second time
 			if (!secondConjunct_.equals(firstConjunct_))
-				indexUpdater.remove(secondConjunct_, new ThisCompositionRule(
+				index.remove(secondConjunct_, new ThisCompositionRule(
 						firstConjunct_, this));
 		}
 
@@ -132,7 +132,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor, Context context) {
+	public void accept(DecompositionRuleApplicationVisitor visitor,
+			Context context) {
 		visitor.visit(this, context);
 	}
 
@@ -163,7 +164,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		public String getName() {
 			return NAME;
 		}
-		
+
 		public Map<IndexedClassExpression, IndexedObjectIntersectionOf> getConjunctionsByConjunct() {
 			return conjunctionsByConjunct_;
 		}

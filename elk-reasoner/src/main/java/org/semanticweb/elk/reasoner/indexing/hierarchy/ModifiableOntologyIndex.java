@@ -39,6 +39,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 public interface ModifiableOntologyIndex extends OntologyIndex {
 
 	/**
+	 * @return the {@link IndexedObjectCache} associated with this index
+	 */
+	IndexedObjectCache getIndexedObjectCache();
+
+	/**
 	 * @return the {@link ElkAxiomProcessor} using which one can add
 	 *         {@link ElkAxiom}s to the ontology
 	 */

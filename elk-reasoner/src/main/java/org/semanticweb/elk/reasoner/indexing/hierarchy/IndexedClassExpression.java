@@ -130,12 +130,12 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	abstract void updateOccurrenceNumbers(ModifiableOntologyIndex updater, int increment,
-			int positiveIncrement, int negativeIncrement);
+	abstract void updateOccurrenceNumbers(ModifiableOntologyIndex index,
+			int increment, int positiveIncrement, int negativeIncrement);
 
-	void updateAndCheckOccurrenceNumbers(ModifiableOntologyIndex updater, int increment,
-			int positiveIncrement, int negativeIncrement) {
-		updateOccurrenceNumbers(updater, increment, positiveIncrement,
+	void updateAndCheckOccurrenceNumbers(ModifiableOntologyIndex index,
+			int increment, int positiveIncrement, int negativeIncrement) {
+		updateOccurrenceNumbers(index, increment, positiveIncrement,
 				negativeIncrement);
 		checkOccurrenceNumbers();
 	}
@@ -244,5 +244,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * 
 	 * @param visitor
 	 */
-	public abstract void accept(DecompositionRuleApplicationVisitor visitor, 	Context context);
+	public abstract void accept(DecompositionRuleApplicationVisitor visitor,
+			Context context);
 }

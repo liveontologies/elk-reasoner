@@ -61,10 +61,8 @@ public class CompositionClosureTest {
 		if (!SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES)
 			return;
 
-		IndexedObjectCache objectCache = new IndexedObjectCache();
-		ModifiableOntologyIndex index = new DirectIndex(objectCache);
-		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(
-				objectCache, index.getIndexedOwlNothing(), index, true);
+		ModifiableOntologyIndex index = new DirectIndex();
+		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(index, true);
 
 		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
 				":r"));
@@ -137,10 +135,8 @@ public class CompositionClosureTest {
 		if (!SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES)
 			return;
 
-		IndexedObjectCache objectCache = new IndexedObjectCache();
-		ModifiableOntologyIndex index = new DirectIndex(objectCache);
-		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(
-				objectCache, index.getIndexedOwlNothing(), index, true);
+		ModifiableOntologyIndex index = new DirectIndex();
+		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(index, true);
 
 		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
 				":r"));

@@ -30,7 +30,7 @@ public abstract class IndexedAxiom extends IndexedObject {
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	abstract void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
+	abstract void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
 			final int increment);
 
 	public abstract <O> O accept(IndexedAxiomVisitor<O> visitor);

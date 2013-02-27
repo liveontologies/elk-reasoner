@@ -79,13 +79,12 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
 			final int increment) {
 		if (increment > 0) {
-			indexUpdater.add(subClass_, new ThisCompositionRule(superClass_));
+			index.add(subClass_, new ThisCompositionRule(superClass_));
 		} else {
-			indexUpdater
-					.remove(subClass_, new ThisCompositionRule(superClass_));
+			index.remove(subClass_, new ThisCompositionRule(superClass_));
 		}
 	}
 
@@ -124,7 +123,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		public Collection<IndexedClassExpression> getToldSuperclasses() {
 			return toldSuperClassExpressions_;
 		}
-		
+
 		@Override
 		public String getName() {
 			return NAME;
@@ -212,12 +211,10 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			return toldSuperClassExpressions_.isEmpty();
 		}
 
-		
 		@Override
 		public String toString() {
 			return getName() + ": " + toldSuperClassExpressions_;
 		}
-
 
 		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);

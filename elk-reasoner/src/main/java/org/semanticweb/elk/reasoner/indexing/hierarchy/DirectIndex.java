@@ -61,18 +61,16 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
-		ElkAxiomIndexerVisitor tmpIndexer = new ElkAxiomIndexerVisitor(
-				objectCache, null, this, true);
+		ElkAxiomIndexerVisitor tmpIndexer = new ElkAxiomIndexerVisitor(this,
+				true);
 
 		this.indexedOwlThing = tmpIndexer
 				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
 		this.indexedOwlNothing = tmpIndexer
 				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 
-		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
-				indexedOwlNothing, this, true);
-		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
-				indexedOwlNothing, this, false);
+		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(this, true);
+		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, false);
 
 		this.reflexiveObjectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
 				64);
@@ -83,11 +81,6 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	/* read-only methods */
-
-	// @Override
-	// public IndexedObjectCache getIndexedObjectCache() {
-	// return this.objectCache_;
-	// }
 
 	@Override
 	public LinkRule<Context> getContextInitRuleHead() {
@@ -203,16 +196,6 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public ElkAxiomProcessor getAxiomInserter() {
-		return directAxiomInserter_;
-	}
-
-	@Override
-	public ElkAxiomProcessor getAxiomDeleter() {
-		return directAxiomDeleter_;
-	}
-
-	@Override
 	public IndexedClass getIndexedOwlThing() {
 		return indexedOwlThing;
 	}
@@ -223,6 +206,21 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	/* read-write methods */
+
+	@Override
+	public IndexedObjectCache getIndexedObjectCache() {
+		return this.objectCache;
+	}
+
+	@Override
+	public ElkAxiomProcessor getAxiomInserter() {
+		return directAxiomInserter_;
+	}
+
+	@Override
+	public ElkAxiomProcessor getAxiomDeleter() {
+		return directAxiomDeleter_;
+	}
 
 	@Override
 	public void addClass(ElkClass newClass) {

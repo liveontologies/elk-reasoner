@@ -92,10 +92,8 @@ public class DifferentialIndex extends DirectIndex {
 				127);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
-		this.axiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
-				indexedOwlNothing, this, true);
-		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
-				indexedOwlNothing, this, false);
+		this.axiomInserter_ = new ElkAxiomIndexerVisitor(this, true);
+		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(this, false);
 	}
 
 	@Override

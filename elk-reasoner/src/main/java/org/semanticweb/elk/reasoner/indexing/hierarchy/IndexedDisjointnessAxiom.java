@@ -108,19 +108,19 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
 			final int increment) {
 
 		if (occurrenceNo == 0 && increment > 0) {
 			// first occurrence of this axiom
-			registerCompositionRule(indexUpdater);
+			registerCompositionRule(index);
 		}
 
 		occurrenceNo += increment;
 
 		if (occurrenceNo == 0 && increment < 0) {
 			// last occurrence of this axiom
-			deregisterCompositionRule(indexUpdater);
+			deregisterCompositionRule(index);
 		}
 	}
 
@@ -141,19 +141,19 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		return "DisjointClasses(" + members + ")";
 	}
 
-	private void registerCompositionRule(ModifiableOntologyIndex indexUpdater) {
+	private void registerCompositionRule(ModifiableOntologyIndex index) {
 		for (IndexedClassExpression ice : inconsistentMembers_)
-			indexUpdater.add(ice, new ThisContradictionRule());
+			index.add(ice, new ThisContradictionRule());
 		for (IndexedClassExpression ice : disjointMembers_) {
-			indexUpdater.add(ice, new ThisCompositionRule(this));
+			index.add(ice, new ThisCompositionRule(this));
 		}
 	}
 
-	private void deregisterCompositionRule(ModifiableOntologyIndex indexUpdater) {
+	private void deregisterCompositionRule(ModifiableOntologyIndex index) {
 		for (IndexedClassExpression ice : inconsistentMembers_)
-			indexUpdater.remove(ice, new ThisContradictionRule());
+			index.remove(ice, new ThisContradictionRule());
 		for (IndexedClassExpression ice : disjointMembers_) {
-			indexUpdater.remove(ice, new ThisCompositionRule(this));
+			index.remove(ice, new ThisCompositionRule(this));
 		}
 	}
 
@@ -192,7 +192,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
 			return disjointnessAxioms_;
 		}
-		
+
 		@Override
 		public String getName() {
 			return NAME;

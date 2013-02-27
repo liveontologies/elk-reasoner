@@ -87,16 +87,16 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
 			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (occurrenceNo == 0 && increment > 0) {
-			indexUpdater.addClass(elkClass);
+			index.addClass(elkClass);
 		}
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0
 				&& elkClass.equals(PredefinedElkClass.OWL_THING)) {
-			indexUpdater.add(new OwlThingContextInitializationRule());
+			index.add(new OwlThingContextInitializationRule());
 		}
 
 		occurrenceNo += increment;
@@ -104,12 +104,12 @@ public class IndexedClass extends IndexedClassEntity {
 		negativeOccurrenceNo += negativeIncrement;
 
 		if (occurrenceNo == 0 && increment < 0) {
-			indexUpdater.removeClass(elkClass);
+			index.removeClass(elkClass);
 		}
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0
 				&& elkClass.equals(PredefinedElkClass.OWL_THING)) {
-			indexUpdater.remove(new OwlThingContextInitializationRule());
+			index.remove(new OwlThingContextInitializationRule());
 		}
 	}
 
@@ -136,7 +136,8 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor, Context context) {
+	public void accept(DecompositionRuleApplicationVisitor visitor,
+			Context context) {
 		visitor.visit(this, context);
 	}
 
