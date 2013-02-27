@@ -91,8 +91,8 @@ class ClassTaxonomyCleaningFactory implements
 				ElkClass elkClass = indexedClass.getElkClass();
 
 				if (elkClass == PredefinedElkClass.OWL_NOTHING) {
-					taxonomyWriter_.markClassesForModifiedNode(taxonomy_
-							.getBottomNode());
+//					taxonomyWriter_.markClassesForModifiedNode(taxonomy_
+//							.getBottomNode());
 					return;
 				}
 
@@ -120,14 +120,15 @@ class ClassTaxonomyCleaningFactory implements
 				if (node.trySetModified(true)) {
 					toRemove.add(node);
 					taxonomyWriter_.markClassesForModifiedNode(node);
-				}
-				// add all its direct satisfiable sub-nodes to the queue
-				synchronized (node) {
-					for (UpdateableTaxonomyNode<ElkClass> subNode : node
-							.getDirectUpdateableSubNodes()) {
-						if (subNode.trySetModified(true)) {
-							toRemove.add(subNode);
-							taxonomyWriter_.markClassesForModifiedNode(subNode);
+					// add all its direct satisfiable sub-nodes to the queue
+					synchronized (node) {
+						for (UpdateableTaxonomyNode<ElkClass> subNode : node
+								.getDirectUpdateableSubNodes()) {
+							if (subNode.trySetModified(true)) {
+								toRemove.add(subNode);
+								taxonomyWriter_
+										.markClassesForModifiedNode(subNode);
+							}
 						}
 					}
 				}
