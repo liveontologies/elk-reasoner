@@ -96,7 +96,6 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.classTaxonomyState.getWriter().clear();
 		todo_ = null;
 		return true;
 	}

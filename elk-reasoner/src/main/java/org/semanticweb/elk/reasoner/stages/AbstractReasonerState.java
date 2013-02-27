@@ -142,16 +142,21 @@ public abstract class AbstractReasonerState {
 	public void setAllowIncrementalMode(boolean allow) {
 		this.allowIncrementalMode = allow;
 		if (!allow)
-			setIncrementalMode(false);
+			trySetIncrementalMode(false);
 	}
 
 	public boolean isIncrementalMode() {
 		return ontologyIndex.isIncrementalMode();
 	}
 
-	void setIncrementalMode(boolean mode) {
-		if (!mode || allowIncrementalMode)
-			ontologyIndex.setIncrementalMode(mode);
+	void trySetIncrementalMode(boolean mode) {
+		if (!allowIncrementalMode && mode)
+			// switching to incremental mode not allowed
+			return;
+		ontologyIndex.setIncrementalMode(mode);
+		if (!mode)
+			// clear taxonomy if switched to non-incremental mode
+			classTaxonomyState.getWriter().clear();
 	}
 
 	/**
@@ -260,6 +265,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public boolean isInconsistent() throws ElkException {
+		trySetIncrementalMode(true);
 
 		getStageExecutor().complete(stageManager.changesLoadingStage);
 
@@ -268,7 +274,6 @@ public abstract class AbstractReasonerState {
 
 		getStageExecutor().complete(stage);
 		stageManager.incrementalConsistencyCheckingStage.setCompleted();
-		setIncrementalMode(true);
 
 		return inconsistentOntology;
 	}
@@ -280,6 +285,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public void loadOntology() throws ElkException {
+		trySetIncrementalMode(true);
 		getStageExecutor().complete(stageManager.ontologyLoadingStage);
 	}
 
@@ -290,6 +296,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public void loadChanges() throws ElkException {
+		trySetIncrementalMode(true);
 		getStageExecutor().complete(stageManager.changesLoadingStage);
 	}
 
@@ -302,6 +309,8 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
+		trySetIncrementalMode(true);
+
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
@@ -315,8 +324,7 @@ public abstract class AbstractReasonerState {
 					stageManager.classTaxonomyComputationStage);
 			stageManager.incrementalClassTaxonomyComputationStage
 					.setCompleted();
-			setIncrementalMode(true);
-		}		
+		}
 
 		return classTaxonomyState.getTaxonomy();
 	}
