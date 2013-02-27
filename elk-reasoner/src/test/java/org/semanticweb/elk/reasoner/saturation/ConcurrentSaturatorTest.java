@@ -34,7 +34,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -71,9 +73,13 @@ public class ConcurrentSaturatorTest extends TestCase {
 				objectFactory.getObjectSomeValuesFrom(r, c), d));
 		inserter.visit(objectFactory.getSubObjectPropertyOfAxiom(r, s));
 
-		IndexedClassExpression A = index.getIndexed(a);
-		IndexedClassExpression D = index.getIndexed(d);
-		IndexedPropertyChain R = index.getIndexed(r);
+		IndexedObjectCache objectCache = index.getIndexedObjectCache();
+		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
+				objectCache);
+
+		IndexedClassExpression A = a.accept(converter);
+		IndexedClassExpression D = d.accept(converter);
+		IndexedPropertyChain R = r.accept(converter);
 
 		final TestPropertySaturation propertySaturation = new TestPropertySaturation(
 				executor, 16, index);
@@ -111,12 +117,16 @@ public class ConcurrentSaturatorTest extends TestCase {
 		inserter.visit(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectIntersectionOf(b, c), d));
 
-		IndexedClassExpression A = index.getIndexed(a);
-		IndexedClassExpression B = index.getIndexed(b);
-		IndexedClassExpression C = index.getIndexed(c);
-		IndexedClassExpression D = index.getIndexed(d);
-		IndexedClassExpression I = index.getIndexed(objectFactory
-				.getObjectIntersectionOf(b, c));
+		IndexedObjectCache objectCache = index.getIndexedObjectCache();
+		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
+				objectCache);
+
+		IndexedClassExpression A = a.accept(converter);
+		IndexedClassExpression B = b.accept(converter);
+		IndexedClassExpression C = c.accept(converter);
+		IndexedClassExpression D = d.accept(converter);
+		IndexedClassExpression I = objectFactory.getObjectIntersectionOf(b, c)
+				.accept(converter);
 
 		// assertTrue("A SubClassOf B",
 		// A.getToldSuperClassExpressions().contains(B));
@@ -142,5 +152,4 @@ public class ConcurrentSaturatorTest extends TestCase {
 		assertTrue("A contains I", context.getSubsumers().contains(I));
 		assertTrue("A contains D", context.getSubsumers().contains(D));
 	}
-
 }

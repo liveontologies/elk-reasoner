@@ -38,6 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -90,11 +91,15 @@ public class CompositionClosureTest {
 		objectFactory.getSubObjectPropertyOfAxiom(h2, h5).accept(indexer);
 		objectFactory.getSubObjectPropertyOfAxiom(h5, h1).accept(indexer);
 
-		IndexedPropertyChain ih1 = index.getIndexed(h1);
-		IndexedPropertyChain ih2 = index.getIndexed(h2);
-		IndexedPropertyChain ih3 = index.getIndexed(h3);
-		IndexedBinaryPropertyChain iros = (IndexedBinaryPropertyChain) index
-				.getIndexed(ros);
+		IndexedObjectCache objectCache = index.getIndexedObjectCache();
+		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
+				objectCache);
+
+		IndexedPropertyChain ih1 = h1.accept(converter);
+		IndexedPropertyChain ih2 = h2.accept(converter);
+		IndexedPropertyChain ih3 = h3.accept(converter);
+		IndexedBinaryPropertyChain iros = (IndexedBinaryPropertyChain) ros
+				.accept(converter);
 
 		CompositionClosure closure = new CompositionClosure(iros);
 
@@ -167,11 +172,15 @@ public class CompositionClosureTest {
 
 		// so we have h2 = h3 => h4
 
-		IndexedPropertyChain ih1 = index.getIndexed(h1);
-		IndexedPropertyChain ih2 = index.getIndexed(h2);
-		IndexedPropertyChain ih3 = index.getIndexed(h3);
-		IndexedBinaryPropertyChain iros = (IndexedBinaryPropertyChain) index
-				.getIndexed(ros);
+		IndexedObjectCache objectCache = index.getIndexedObjectCache();
+		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
+				objectCache);
+
+		IndexedPropertyChain ih1 = h1.accept(converter);
+		IndexedPropertyChain ih2 = h2.accept(converter);
+		IndexedPropertyChain ih3 = h3.accept(converter);
+		IndexedBinaryPropertyChain iros = (IndexedBinaryPropertyChain) ros
+				.accept(converter);
 
 		CompositionClosure closure = new ReducingCompositionClosure(iros);
 

@@ -29,9 +29,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -47,7 +45,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	final IndexedClass indexedOwlThing, indexedOwlNothing;
 
 	final IndexedObjectCache objectCache;
-	private final IndexObjectConverter elkObjectIndexer_;
+
 	private final ElkAxiomIndexerVisitor directAxiomInserter_,
 			directAxiomDeleter_;
 
@@ -57,20 +55,15 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 	public DirectIndex(IndexedObjectCache objectCache) {
 		this.objectCache = objectCache;
-		elkObjectIndexer_ = new IndexObjectConverter(objectCache, objectCache);
-
-		// index predefined entities
-		// TODO: what to do if someone tries to delete them?
-		ElkAxiomIndexerVisitor tmpIndexer = new ElkAxiomIndexerVisitor(this,
-				true);
-
-		this.indexedOwlThing = tmpIndexer
-				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
-		this.indexedOwlNothing = tmpIndexer
-				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 
 		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(this, true);
 		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(this, false);
+		// index predefined entities
+		// TODO: what to do if someone tries to delete them?
+		this.indexedOwlThing = directAxiomInserter_
+				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
+		this.indexedOwlNothing = directAxiomInserter_
+				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 
 		this.reflexiveObjectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
 				64);
@@ -88,51 +81,9 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public Chain<ChainableRule<Context>> getContextInitRuleChain() {
-		return new AbstractChain<ChainableRule<Context>>() {
-
-			@Override
-			public ChainableRule<Context> next() {
-				return contextInitRules_;
-			}
-
-			@Override
-			public void setNext(ChainableRule<Context> tail) {
-				contextInitRules_ = tail;
-			}
-		};
-	}
-
-	@Override
-	public IndexedClassExpression getIndexed(ElkClassExpression representative) {
-		IndexedClassExpression result = representative
-				.accept(elkObjectIndexer_);
-		if (result.occurs())
-			return result;
-		else
-			return null;
-	}
-
-	@Override
-	public IndexedPropertyChain getIndexed(
-			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression) {
-		IndexedPropertyChain result = elkSubObjectPropertyExpression
-				.accept(elkObjectIndexer_);
-		if (result.occurs())
-			return result;
-		else
-			return null;
-	}
-
-	@Override
 	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
 		return objectCache.indexedClassExpressionLookup;
 	}
-
-	// @Override
-	// public Collection<IndexedAxiom> getIndexedAxioms() {
-	// return objectCache_.indexedAxiomLookup;
-	// }
 
 	@Override
 	public Collection<IndexedClass> getIndexedClasses() {
@@ -206,6 +157,22 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	/* read-write methods */
+
+	@Override
+	public Chain<ChainableRule<Context>> getContextInitRuleChain() {
+		return new AbstractChain<ChainableRule<Context>>() {
+
+			@Override
+			public ChainableRule<Context> next() {
+				return contextInitRules_;
+			}
+
+			@Override
+			public void setNext(ChainableRule<Context> tail) {
+				contextInitRules_ = tail;
+			}
+		};
+	}
 
 	@Override
 	public IndexedObjectCache getIndexedObjectCache() {

@@ -38,9 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
  * Interface for public methods of the index of the ontology.
@@ -50,30 +48,6 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * 
  */
 public interface OntologyIndex {
-
-	/**
-	 * Return the indexed representation of the given {@link ElkClassExpression}
-	 * 
-	 * @param elkClassExpression
-	 *            an input {@link ElkClassExpression}
-	 * @return the {@link IndexedClassExpression} corresponding to the input if
-	 *         it occurs in the indexed ontology, or {@code null} if the input
-	 *         is not contained in the indexed ontology
-	 */
-	IndexedClassExpression getIndexed(ElkClassExpression elkClassExpression);
-
-	/**
-	 * Return the indexed representation of the given
-	 * {@link ElkSubObjectPropertyExpression}
-	 * 
-	 * @param elkSubObjectPropertyExpression
-	 *            an input {@link ElkSubObjectPropertyExpression}
-	 * @return the {@link IndexedPropertyChain} corresponding to the input if it
-	 *         occurs in the indexed ontology, or {@code null} if the input is
-	 *         not contained in the indexed ontology
-	 */
-	IndexedPropertyChain getIndexed(
-			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression);
 
 	/**
 	 * Return the indexed representation of {@code owl:Thing}
@@ -141,12 +115,5 @@ public interface OntologyIndex {
 	 *         {@link LinkRule#next()}
 	 */
 	LinkRule<Context> getContextInitRuleHead();
-
-	/**
-	 * @return a {@link Chain} view of context initialization rules assigned to
-	 *         this {@link OntologyIndex}; it can be used for inserting new
-	 *         rules or deleting existing ones
-	 */
-	Chain<ChainableRule<Context>> getContextInitRuleChain();
 
 }
