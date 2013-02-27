@@ -27,18 +27,14 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -146,24 +142,6 @@ public interface OntologyIndex {
 	 */
 	LinkRule<Context> getContextInitRuleHead();
 
-	// TODO: separate read-only methods from methods that can modify this index
-
-	/**
-	 * @return the {@link ElkAxiomProcessor} using which one can add
-	 *         {@link ElkAxiom}s to the ontology
-	 */
-	ElkAxiomProcessor getAxiomInserter();
-
-	/**
-	 * @return the {@link ElkAxiomProcessor} using which one can delete
-	 *         {@link ElkAxiom}s from the ontology
-	 */
-	ElkAxiomProcessor getAxiomDeleter();
-
-	boolean addReflexiveProperty(IndexedObjectProperty property);
-
-	boolean removeReflexiveProperty(IndexedObjectProperty property);
-
 	/**
 	 * @return a {@link Chain} view of context initialization rules assigned to
 	 *         this {@link OntologyIndex}; it can be used for inserting new
@@ -174,8 +152,8 @@ public interface OntologyIndex {
 	/**
 	 * @return the {@link IndexedObjectCache} associated with this index
 	 */
-	IndexedObjectCache getIndexedObjectCache();
+//	IndexedObjectCache getIndexedObjectCache();
 
-	Collection<IndexedAxiom> getIndexedAxioms();
+//	Collection<IndexedAxiom> getIndexedAxioms();
 
 }

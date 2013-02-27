@@ -79,7 +79,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
 			final int increment) {
 		if (increment > 0) {
 			indexUpdater.add(subClass_, new ThisCompositionRule(superClass_));

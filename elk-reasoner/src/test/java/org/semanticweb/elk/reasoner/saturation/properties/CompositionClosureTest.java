@@ -36,12 +36,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndexUpdater;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 
 public class CompositionClosureTest {
 
@@ -61,12 +61,10 @@ public class CompositionClosureTest {
 		if (!SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES)
 			return;
 
-		OntologyIndex index = new DirectIndex();
-		DirectIndexUpdater<OntologyIndex> indexUpdater = new DirectIndexUpdater<OntologyIndex>(
-				index);
+		IndexedObjectCache objectCache = new IndexedObjectCache();
+		ModifiableOntologyIndex index = new DirectIndex(objectCache);
 		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(
-				index.getIndexedObjectCache(), index.getIndexedOwlNothing(),
-				indexUpdater, true);
+				objectCache, index.getIndexedOwlNothing(), index, true);
 
 		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
 				":r"));
@@ -139,12 +137,10 @@ public class CompositionClosureTest {
 		if (!SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES)
 			return;
 
-		OntologyIndex index = new DirectIndex();
-		DirectIndexUpdater<OntologyIndex> indexUpdater = new DirectIndexUpdater<OntologyIndex>(
-				index);
+		IndexedObjectCache objectCache = new IndexedObjectCache();
+		ModifiableOntologyIndex index = new DirectIndex(objectCache);
 		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(
-				index.getIndexedObjectCache(), index.getIndexedOwlNothing(),
-				indexUpdater, true);
+				objectCache, index.getIndexedOwlNothing(), index, true);
 
 		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
 				":r"));

@@ -33,10 +33,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -60,7 +60,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(
 				"S"));
 
-		OntologyIndex ontologyIndex = new DirectIndex();
+		ModifiableOntologyIndex ontologyIndex = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
 
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
@@ -102,7 +102,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 
-		final OntologyIndex ontologyIndex = new DirectIndex();
+		final ModifiableOntologyIndex ontologyIndex = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
 		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
 

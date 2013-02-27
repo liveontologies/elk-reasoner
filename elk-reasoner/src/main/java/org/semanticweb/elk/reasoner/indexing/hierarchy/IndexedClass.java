@@ -87,7 +87,7 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
 			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (occurrenceNo == 0 && increment > 0) {

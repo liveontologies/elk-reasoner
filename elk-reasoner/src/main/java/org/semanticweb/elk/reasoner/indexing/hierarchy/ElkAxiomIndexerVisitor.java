@@ -58,7 +58,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	/**
 	 * The object through which the changes in the index are recorded
 	 */
-	private final IndexUpdater indexUpdater_;
+	private final ModifiableOntologyIndex indexUpdater_;
 
 	/**
 	 * The IndexedObjectCache that this indexer writes to.
@@ -98,7 +98,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
 	public ElkAxiomIndexerVisitor(IndexedObjectCache objectCache,
-			IndexedClass owlNothing, IndexUpdater updater, boolean insert) {
+			IndexedClass owlNothing, ModifiableOntologyIndex updater, boolean insert) {
 		this.objectCache_ = objectCache;
 		this.owlNothing_ = owlNothing;
 		this.indexUpdater_ = updater;

@@ -28,11 +28,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
@@ -41,11 +42,11 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
-public class DirectIndex implements OntologyIndex {
+public class DirectIndex implements ModifiableOntologyIndex {
 
 	final IndexedClass indexedOwlThing, indexedOwlNothing;
 
-	private final IndexedObjectCache objectCache_;
+	final IndexedObjectCache objectCache;
 	private final IndexObjectConverter elkObjectIndexer_;
 	private final ElkAxiomIndexerVisitor directAxiomInserter_,
 			directAxiomDeleter_;
@@ -55,14 +56,13 @@ public class DirectIndex implements OntologyIndex {
 	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
 
 	public DirectIndex(IndexedObjectCache objectCache) {
-		objectCache_ = objectCache;
+		this.objectCache = objectCache;
 		elkObjectIndexer_ = new IndexObjectConverter(objectCache, objectCache);
 
 		// index predefined entities
 		// TODO: what to do if someone tries to delete them?
 		ElkAxiomIndexerVisitor tmpIndexer = new ElkAxiomIndexerVisitor(
-				objectCache_, null,
-				new DirectIndexUpdater<OntologyIndex>(this), true);
+				objectCache, null, this, true);
 
 		this.indexedOwlThing = tmpIndexer
 				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
@@ -70,11 +70,9 @@ public class DirectIndex implements OntologyIndex {
 				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
 
 		this.directAxiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
-				indexedOwlNothing, new DirectIndexUpdater<OntologyIndex>(this),
-				true);
+				indexedOwlNothing, this, true);
 		this.directAxiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
-				indexedOwlNothing, new DirectIndexUpdater<OntologyIndex>(this),
-				false);
+				indexedOwlNothing, this, false);
 
 		this.reflexiveObjectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
 				64);
@@ -84,10 +82,12 @@ public class DirectIndex implements OntologyIndex {
 		this(new IndexedObjectCache());
 	}
 
-	@Override
-	public IndexedObjectCache getIndexedObjectCache() {
-		return this.objectCache_;
-	}
+	/* read-only methods */
+
+	// @Override
+	// public IndexedObjectCache getIndexedObjectCache() {
+	// return this.objectCache_;
+	// }
 
 	@Override
 	public LinkRule<Context> getContextInitRuleHead() {
@@ -133,13 +133,13 @@ public class DirectIndex implements OntologyIndex {
 
 	@Override
 	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
-		return objectCache_.indexedClassExpressionLookup;
+		return objectCache.indexedClassExpressionLookup;
 	}
 
-	@Override
-	public Collection<IndexedAxiom> getIndexedAxioms() {
-		return objectCache_.indexedAxiomLookup;
-	}
+	// @Override
+	// public Collection<IndexedAxiom> getIndexedAxioms() {
+	// return objectCache_.indexedAxiomLookup;
+	// }
 
 	@Override
 	public Collection<IndexedClass> getIndexedClasses() {
@@ -152,7 +152,7 @@ public class DirectIndex implements OntologyIndex {
 
 			@Override
 			public int size() {
-				return objectCache_.indexedClassCount;
+				return objectCache.indexedClassCount;
 			}
 		};
 	}
@@ -169,7 +169,7 @@ public class DirectIndex implements OntologyIndex {
 
 			@Override
 			public int size() {
-				return objectCache_.indexedIndividualCount;
+				return objectCache.indexedIndividualCount;
 			}
 
 		};
@@ -177,7 +177,7 @@ public class DirectIndex implements OntologyIndex {
 
 	@Override
 	public Collection<IndexedPropertyChain> getIndexedPropertyChains() {
-		return objectCache_.indexedPropertyChainLookup;
+		return objectCache.indexedPropertyChainLookup;
 	}
 
 	@Override
@@ -192,7 +192,7 @@ public class DirectIndex implements OntologyIndex {
 
 			@Override
 			public int size() {
-				return objectCache_.indexedObjectPropertyCount;
+				return objectCache.indexedObjectPropertyCount;
 			}
 		};
 	}
@@ -200,17 +200,6 @@ public class DirectIndex implements OntologyIndex {
 	@Override
 	public Collection<IndexedObjectProperty> getReflexiveObjectProperties() {
 		return Collections.unmodifiableCollection(reflexiveObjectProperties_);
-	}
-
-	@Override
-	public boolean addReflexiveProperty(IndexedObjectProperty property) {
-		return reflexiveObjectProperties_.add(property);
-
-	}
-
-	@Override
-	public boolean removeReflexiveProperty(IndexedObjectProperty property) {
-		return reflexiveObjectProperties_.remove(property);
 	}
 
 	@Override
@@ -231,6 +220,81 @@ public class DirectIndex implements OntologyIndex {
 	@Override
 	public IndexedClass getIndexedOwlNothing() {
 		return indexedOwlNothing;
+	}
+
+	/* read-write methods */
+
+	@Override
+	public void addClass(ElkClass newClass) {
+	}
+
+	@Override
+	public void removeClass(ElkClass oldClass) {
+	}
+
+	@Override
+	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
+	}
+
+	@Override
+	public void removeNamedIndividual(ElkNamedIndividual newIndividual) {
+	}
+
+	@Override
+	public void add(IndexedClassExpression target, ChainableRule<Context> rule) {
+		rule.addTo(target.getCompositionRuleChain());
+	}
+
+	@Override
+	public void remove(IndexedClassExpression target,
+			ChainableRule<Context> rule) {
+		if (!rule.removeFrom(target.getCompositionRuleChain()))
+			throw new ElkUnexpectedIndexingException(
+					"Cannot remove composition rule " + rule.getName()
+							+ " for " + target);
+	}
+
+	@Override
+	public void add(ChainableRule<Context> rule) {
+		rule.addTo(getContextInitRuleChain());
+	}
+
+	@Override
+	public void remove(ChainableRule<Context> rule) {
+		if (!rule.removeFrom(getContextInitRuleChain()))
+			throw new ElkUnexpectedIndexingException(
+					"Cannot remove context initialization rule "
+							+ rule.getName());
+	}
+
+	@Override
+	public void add(IndexedObject object) {
+		object.accept(objectCache.inserter);
+	}
+
+	@Override
+	public void remove(IndexedObject object) {
+		if (!object.accept(objectCache.deletor))
+			throw new ElkUnexpectedIndexingException(
+					"Cannot remove indexed object from the cache " + object);
+		if (object instanceof IndexedClassExpression) {
+			IndexedClassExpression ice = (IndexedClassExpression) object;
+			Context context = ice.getContext();
+			if (context != null)
+				context.removeLinks();
+		}
+	}
+
+	@Override
+	public void addReflexiveProperty(IndexedObjectProperty property) {
+		reflexiveObjectProperties_.add(property);
+	}
+
+	@Override
+	public void removeReflexiveProperty(IndexedObjectProperty property) {
+		if (!reflexiveObjectProperties_.remove(property))
+			throw new ElkUnexpectedIndexingException(
+					"Cannot remove reflexivity of object property " + property);
 	}
 
 }

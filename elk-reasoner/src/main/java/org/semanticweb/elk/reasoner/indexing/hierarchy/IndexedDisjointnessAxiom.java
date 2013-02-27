@@ -108,7 +108,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
 			final int increment) {
 
 		if (occurrenceNo == 0 && increment > 0) {
@@ -141,7 +141,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		return "DisjointClasses(" + members + ")";
 	}
 
-	private void registerCompositionRule(IndexUpdater indexUpdater) {
+	private void registerCompositionRule(ModifiableOntologyIndex indexUpdater) {
 		for (IndexedClassExpression ice : inconsistentMembers_)
 			indexUpdater.add(ice, new ThisContradictionRule());
 		for (IndexedClassExpression ice : disjointMembers_) {
@@ -149,7 +149,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 	}
 
-	private void deregisterCompositionRule(IndexUpdater indexUpdater) {
+	private void deregisterCompositionRule(ModifiableOntologyIndex indexUpdater) {
 		for (IndexedClassExpression ice : inconsistentMembers_)
 			indexUpdater.remove(ice, new ThisContradictionRule());
 		for (IndexedClassExpression ice : disjointMembers_) {

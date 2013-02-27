@@ -95,7 +95,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(IndexUpdater indexUpdater,
+	protected void updateOccurrenceNumbers(ModifiableOntologyIndex indexUpdater,
 			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {

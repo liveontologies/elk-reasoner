@@ -92,12 +92,10 @@ public class DifferentialIndex extends DirectIndex {
 				127);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				127);
-		this.axiomInserter_ = new ElkAxiomIndexerVisitor(
-				getIndexedObjectCache(), indexedOwlNothing,
-				new DifferentialIndexUpdater<DifferentialIndex>(this), true);
-		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(
-				getIndexedObjectCache(), indexedOwlNothing,
-				new DifferentialIndexUpdater<DifferentialIndex>(this), false);
+		this.axiomInserter_ = new ElkAxiomIndexerVisitor(objectCache,
+				indexedOwlNothing, this, true);
+		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(objectCache,
+				indexedOwlNothing, this, false);
 	}
 
 	@Override
@@ -155,7 +153,7 @@ public class DifferentialIndex extends DirectIndex {
 	public void clearDeletedRules() {
 		removedContextInitRules_ = null;
 		removedContextRuleHeadByClassExpressions_.clear();
-		getIndexedObjectCache().subtract(todoDeletions_);
+		objectCache.subtract(todoDeletions_);
 		todoDeletions_.clear();
 	}
 
@@ -218,7 +216,7 @@ public class DifferentialIndex extends DirectIndex {
 	public boolean isIncrementalMode() {
 		return incrementalMode;
 	}
-	
+
 	private Chain<ChainableRule<Context>> getAddedContextInitRuleChain() {
 		return new AbstractChain<ChainableRule<Context>>() {
 
@@ -261,27 +259,11 @@ public class DifferentialIndex extends DirectIndex {
 				removedContextRuleHeadByClassExpressions_, target);
 	}
 
-	void addClass(ElkClass newClass) {
-		addedClasses_.add(newClass);
-	}
-
-	void removeClass(ElkClass newClass) {
-		addedClasses_.remove(newClass);
-	}
-
-	void addNamedIndividual(ElkNamedIndividual newIndividual) {
-		addedIndividuals_.add(newIndividual);
-	}
-
-	void removeNamedIndividual(ElkNamedIndividual newIndividual) {
-		addedIndividuals_.remove(newIndividual);
-	}
-
 	void addIndexedObject(IndexedObject iobj) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("Adding: " + iobj);
 		if (!iobj.accept(todoDeletions_.deletor))
-			iobj.accept(getIndexedObjectCache().inserter);
+			iobj.accept(objectCache.inserter);
 
 	}
 
@@ -322,12 +304,84 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public boolean removeReflexiveProperty(IndexedObjectProperty property) {
-		boolean result = super.removeReflexiveProperty(property);
-		if (result = false)
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove reflexivity of object property " + property);
-		return result;
+	public void addClass(ElkClass newClass) {
+		if (incrementalMode)
+			addedClasses_.add(newClass);
+		else
+			super.addClass(newClass);
+	}
+
+	@Override
+	public void removeClass(ElkClass oldClass) {
+		if (incrementalMode)
+			addedClasses_.remove(oldClass);
+		else
+			super.removeClass(oldClass);
+	}
+
+	@Override
+	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
+		if (incrementalMode)
+			addedIndividuals_.add(newIndividual);
+		else
+			super.addNamedIndividual(newIndividual);
+	}
+
+	@Override
+	public void removeNamedIndividual(ElkNamedIndividual oldIndividual) {
+		if (incrementalMode)
+			addedIndividuals_.remove(oldIndividual);
+		else
+			super.removeNamedIndividual(oldIndividual);
+	}
+
+	@Override
+	public void add(IndexedClassExpression target, ChainableRule<Context> rule) {
+		if (incrementalMode)
+			registerAddedContextRule(target, rule);
+		else
+			super.add(target, rule);
+	}
+
+	@Override
+	public void remove(IndexedClassExpression target,
+			ChainableRule<Context> rule) {
+		if (incrementalMode)
+			registerRemovedContextRule(target, rule);
+		else
+			super.remove(target, rule);
+	}
+
+	@Override
+	public void add(ChainableRule<Context> rule) {
+		if (incrementalMode)
+			registerAddedContextInitRule(rule);
+		else
+			super.add(rule);
+	}
+
+	@Override
+	public void remove(ChainableRule<Context> rule) {
+		if (incrementalMode)
+			registerRemovedContextInitRule(rule);
+		else
+			super.remove(rule);
+	}
+
+	@Override
+	public void add(IndexedObject object) {
+		if (incrementalMode)
+			addIndexedObject(object);
+		else
+			super.add(object);
+	}
+
+	@Override
+	public void remove(IndexedObject object) {
+		if (incrementalMode)
+			removeIndexedObject(object);
+		else
+			super.remove(object);
 	}
 
 }

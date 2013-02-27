@@ -22,18 +22,33 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 
 /**
- * Functions through which entries for indexed class expressions are updated.
+ * Ontology index with methods using which it can be modified
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-interface IndexUpdater {
+public interface ModifiableOntologyIndex extends OntologyIndex {
+
+	/**
+	 * @return the {@link ElkAxiomProcessor} using which one can add
+	 *         {@link ElkAxiom}s to the ontology
+	 */
+	public ElkAxiomProcessor getAxiomInserter();
+
+	/**
+	 * @return the {@link ElkAxiomProcessor} using which one can delete
+	 *         {@link ElkAxiom}s from the ontology
+	 */
+	public ElkAxiomProcessor getAxiomDeleter();
 
 	public void add(final IndexedClassExpression target,
 			final ChainableRule<Context> rule);

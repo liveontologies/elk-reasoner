@@ -130,10 +130,10 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	abstract void updateOccurrenceNumbers(IndexUpdater updater, int increment,
+	abstract void updateOccurrenceNumbers(ModifiableOntologyIndex updater, int increment,
 			int positiveIncrement, int negativeIncrement);
 
-	void updateAndCheckOccurrenceNumbers(IndexUpdater updater, int increment,
+	void updateAndCheckOccurrenceNumbers(ModifiableOntologyIndex updater, int increment,
 			int positiveIncrement, int negativeIncrement) {
 		updateOccurrenceNumbers(updater, increment, positiveIncrement,
 				negativeIncrement);

@@ -92,7 +92,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final IndexUpdater indexUpdater,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex indexUpdater,
 			final int increment, final int positiveIncrement,
 			final int negativeIncrement) {
 
