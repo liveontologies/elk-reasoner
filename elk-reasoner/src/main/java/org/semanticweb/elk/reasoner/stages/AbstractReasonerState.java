@@ -48,10 +48,11 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -111,7 +112,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * Taxonomy state that stores (partial) classification
 	 */
-	final TaxonomyState classTaxonomyState = new TaxonomyState();
+	final ClassTaxonomyState classTaxonomyState = new ClassTaxonomyState();
 	/**
 	 * Defines reasoning stages and dependencies between them
 	 */
@@ -120,7 +121,7 @@ public abstract class AbstractReasonerState {
 	 * Taxonomy that stores (partial) classification and (partial) realization
 	 * of individuals
 	 */
-	UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = null;
+	final InstanceTaxonomyState instanceTaxonomyState = new InstanceTaxonomyState();
 	/**
 	 * The source where the input ontology can be loaded
 	 */
@@ -162,9 +163,12 @@ public abstract class AbstractReasonerState {
 			// switching to incremental mode not allowed
 			return;
 		ontologyIndex.setIncrementalMode(mode);
-		if (!mode)
+		
+		if (!mode) {
 			// clear taxonomy if switched to non-incremental mode
 			classTaxonomyState.getWriter().clear();
+			instanceTaxonomyState.getWriter().clear();
+		}
 	}
 
 	/**
@@ -364,10 +368,15 @@ public abstract class AbstractReasonerState {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
-		getStageExecutor().complete(
-				stageManager.instanceTaxonomyComputationStage);
+		if (ontologyIndex.isIncrementalMode()) {
+			getStageExecutor().complete(
+					stageManager.incrementalInstanceTaxonomyComputationStage);
+		} else {
+			getStageExecutor().complete(
+					stageManager.instanceTaxonomyComputationStage);
+		}
 
-		return instanceTaxonomy;
+		return instanceTaxonomyState.getTaxonomy();
 	}
 
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly() {
@@ -450,6 +459,15 @@ public abstract class AbstractReasonerState {
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY);
 	}
 
+	public void initClassTaxonomy() {
+		classTaxonomyState.getWriter().setTaxonomy(new ConcurrentClassTaxonomy());
+	}	
+	
+	public void initInstanceTaxonomy() {
+		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(classTaxonomyState.getTaxonomy()));
+	}
+
+	
 	// ////////////////////////////////////////////////////////////////
 	/*
 	 * SOME DEBUG METHODS, FIXME: REMOVE

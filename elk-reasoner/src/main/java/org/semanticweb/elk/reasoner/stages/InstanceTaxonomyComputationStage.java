@@ -23,10 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 
 /**
  * A {@link ReasonerStage} during which the instance taxonomy of the current
@@ -56,40 +53,24 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		return "Instance Taxonomy Computation";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
+		
 		if (reasoner.doneTaxonomy()) {
-			// TODO Think how to get rid of this type cast
-			// it's here b/c our class taxonomy computation outputs
-			// updateable class taxonomy (as it, in principle, should)
-			// while here we have to start with a partial instance taxonomy
-			// we just *know* that concurrent taxonomy is an instance of both
-			// so we can cast here.
-			// This can be avoided either by obliging the class taxonomy
-			// computation to always compute some instance taxonomy
-			// or (better) by initializing instance taxonomy based
-			// on class taxonomy if the latter happens to not be an instance
-			// taxonomy
-			if (reasoner.classTaxonomyState.getTaxonomy() instanceof UpdateableInstanceTaxonomy) {
-				reasoner.instanceTaxonomy = (UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual>) reasoner.classTaxonomyState
-						.getTaxonomy();
-			} else {
-				// this should never happen
-				throw new IllegalStateException(
-						"Class taxonomy does not support instances, can't proceed");
-			}
+			reasoner.initInstanceTaxonomy();
 
-			this.computation_ = new InstanceTaxonomyComputation(
+			computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.saturationState, reasoner.instanceTaxonomy);
+					reasoner.saturationState, reasoner.instanceTaxonomyState.getTaxonomy());
 		}
 
-		if (LOGGER_.isInfoEnabled())
+		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		}
+		
 		return true;
 	}
 
@@ -106,10 +87,9 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.instanceTaxonomy = computation_.getTaxonomy();
-		reasoner.classTaxonomyState.getWriter().setTaxonomy(
-				reasoner.instanceTaxonomy);
+
 		this.computation_ = null;
+		
 		return true;
 	}
 

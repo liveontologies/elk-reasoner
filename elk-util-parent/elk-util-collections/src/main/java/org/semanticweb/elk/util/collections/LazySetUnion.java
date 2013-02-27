@@ -50,8 +50,8 @@ import java.util.Set;
  */
 public class LazySetUnion<E> extends AbstractSet<E> {
 
-	final Set<E> firstSet;
-	final Set<E> secondSet;
+	final Set<? extends E> firstSet;
+	final Set<? extends E> secondSet;
 
 	/**
 	 * Returns a new {@link Set} view for union of two input sets.
@@ -61,7 +61,7 @@ public class LazySetUnion<E> extends AbstractSet<E> {
 	 * @param secondSet
 	 *            the second set of the union
 	 */
-	public LazySetUnion(Set<E> firstSet, Set<E> secondSet) {
+	public LazySetUnion(Set<? extends E> firstSet, Set<? extends E> secondSet) {
 		this.firstSet = firstSet;
 		this.secondSet = secondSet;
 	}
@@ -92,11 +92,11 @@ public class LazySetUnion<E> extends AbstractSet<E> {
 	}
 
 	static class SetUnionIterator<E> implements Iterator<E> {
-		final Iterator<E> firstIterator;
-		final Iterator<E> secondIterator;
-		final Set<E> secondChecker;
+		final Iterator<? extends E> firstIterator;
+		final Iterator<? extends E> secondIterator;
+		final Set<? extends E> secondChecker;
 
-		SetUnionIterator(Set<E> firstSet, Set<E> secondSet) {
+		SetUnionIterator(Set<? extends E> firstSet, Set<? extends E> secondSet) {
 			this.firstIterator = firstSet.iterator();
 			this.secondIterator = secondSet.iterator();
 			this.secondChecker = secondSet;

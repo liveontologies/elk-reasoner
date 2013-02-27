@@ -56,14 +56,6 @@ public class ClassTaxonomyComputation
 				progressMonitor);
 	}
 
-	public ClassTaxonomyComputation(
-			Collection<Collection<IndexedClass>> inputs,
-			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, SaturationState saturationState) {
-		this(inputs, executor, maxWorkers, progressMonitor, saturationState,
-				new ConcurrentTaxonomy());
-	}
-
 	/**
 	 * @return the taxonomy computed by this computation; the method
 	 *         {@link #process()} should be called first to compute the taxonomy

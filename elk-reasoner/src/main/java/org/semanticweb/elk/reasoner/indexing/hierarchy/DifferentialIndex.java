@@ -311,8 +311,11 @@ public class DifferentialIndex extends DirectIndex {
 		addedContextRuleHeadByClassExpressions_.clear();
 	}
 
-	public void clearSignatureChanges() {
+	public void clearClassSignatureChanges() {
 		addedClasses_.clear();
+	}
+	
+	public void clearIndividualSignatureChanges() {
 		addedIndividuals_.clear();
 	}
 
@@ -343,7 +346,8 @@ public class DifferentialIndex extends DirectIndex {
 		if (!mode) {
 			clearDeletedRules();
 			commitAddedRules();
-			clearSignatureChanges();
+			clearClassSignatureChanges();
+			clearIndividualSignatureChanges();
 		}
 	}
 

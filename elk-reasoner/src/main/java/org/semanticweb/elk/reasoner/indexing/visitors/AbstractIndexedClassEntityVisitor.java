@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk;
+package org.semanticweb.elk.reasoner.indexing.visitors;
 /*
  * #%L
  * ELK Reasoner
@@ -24,15 +24,31 @@ package org.semanticweb.elk;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
 /**
- * Provides seed to all randomized tests
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class RandomSeedProvider {
+public abstract class AbstractIndexedClassEntityVisitor<O> implements
+		IndexedClassExpressionVisitor<O> {
 
-	public static long VALUE = System.currentTimeMillis();
+	@Override
+	public O visit(IndexedDataHasValue element) {
+		return null;
+	}
+
+	@Override
+	public O visit(IndexedObjectSomeValuesFrom element) {
+		return null;
+	}
+
+	@Override
+	public O visit(IndexedObjectIntersectionOf element) {
+		return null;
+	}
+
 }

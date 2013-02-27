@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
@@ -37,6 +38,12 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 public class TaxonomyNodeIndexConsistencyVisitor<T extends ElkObject> implements
 		TaxonomyNodeVisitor<T> {
 
+	private final Taxonomy<T> taxonomy_;
+	
+	public TaxonomyNodeIndexConsistencyVisitor(Taxonomy<T> t) {
+		taxonomy_ = t;
+	}
+	
 	@Override
 	public void visit(TaxonomyNode<T> node, List<TaxonomyNode<T>> pathFromStart) {
 		
@@ -45,7 +52,7 @@ public class TaxonomyNodeIndexConsistencyVisitor<T extends ElkObject> implements
 		}
 		
 		for (T obj : node.getMembers()) {
-			TaxonomyNode<T> n = node.getTaxonomy().getNode(obj);
+			TaxonomyNode<T> n = taxonomy_.getNode(obj);
 
 			if (n != node) {
 				throw new InvalidTaxonomyException(

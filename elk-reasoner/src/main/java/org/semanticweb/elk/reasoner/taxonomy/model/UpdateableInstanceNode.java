@@ -34,4 +34,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 public interface UpdateableInstanceNode<T extends ElkObject, I extends ElkObject> extends InstanceNode<T, I>, UpdateableNode<I> {
 
 	public void addDirectTypeNode(UpdateableTypeNode<T, I> typeNode);
+	
+	public void removeDirectTypeNode(UpdateableTypeNode<T, I> typeNode);
 }

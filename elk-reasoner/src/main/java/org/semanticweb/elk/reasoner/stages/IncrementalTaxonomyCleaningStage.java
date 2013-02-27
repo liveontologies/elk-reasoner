@@ -32,14 +32,15 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyCleaning;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyCleaning;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
- * TODO docs
+ * Used to clean both class and instance taxonomies (removed nodes which
+ * super-nodes or types need to be recomputed)
  * 
  * @author Pavel Klinov
  * 
@@ -50,7 +51,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IncrementalTaxonomyCleaningStage.class);
 
-	private ClassTaxonomyCleaning cleaning_ = null;
+	private TaxonomyCleaning cleaning_ = null;
 
 	public IncrementalTaxonomyCleaningStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -64,35 +65,40 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	boolean preExecute() {
-		if (!super.preExecute())
+		if (!super.preExecute()) {
 			return false;
-		final Collection<IndexedClass> modified = new ContextRootCollection(
+		}
+		
+		final Collection<IndexedClassEntity> modified = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());
-		/*
-		 * final Collection<IndexedClass> removed = new ContextRootCollection(
-		 * reasoner.saturationState.getContextsToBeRemoved());
-		 */
-		final Collection<IndexedClass> removed = new ContextRootCollection(
-				reasoner.classTaxonomyState.getRemovedClasses());
-		Collection<IndexedClass> inputs = Operations.getCollection(
-				Operations.concat(removed, modified),
-				removed.size() + modified.size());
+		final Collection<IndexedClassEntity> removedClasses = new ContextRootCollection(
+				reasoner.classTaxonomyState.removedClasses);
+		final Collection<IndexedClassEntity> removedIndividuals = new ContextRootCollection(
+				reasoner.instanceTaxonomyState.getRemovedIndividuals());
+		Collection<IndexedClassEntity> inputs = Operations.getCollection(
+				Operations.concat(Operations.concat(removedClasses, modified), removedIndividuals),
+				removedClasses.size() + modified.size() + removedIndividuals.size());
 
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Taxonomy nodes to be cleaned for modified contexts: "
 					+ modified);
-			LOGGER_.trace("Taxonomy nodes to be cleaned for removed contexts: "
-					+ removed);
+			LOGGER_.trace("Class taxonomy nodes to be cleaned for removed classes: "
+					+ removedClasses);
+			LOGGER_.trace("Instance taxonomy nodes to be cleaned for removed individuals: "
+					+ removedIndividuals);
 		}
-		cleaning_ = new ClassTaxonomyCleaning(inputs,
-				reasoner.classTaxonomyState.getTaxonomy(),
-				reasoner.classTaxonomyState.getWriter(),
+		
+		cleaning_ = new TaxonomyCleaning(inputs,
+				reasoner.classTaxonomyState, reasoner.instanceTaxonomyState,
 				reasoner.getProcessExecutor(), workerNo, progressMonitor);
+		
+
 		return true;
 	}
 
 	@Override
 	public void executeStage() throws ElkException {
+
 		if (reasoner.classTaxonomyState.getTaxonomy() == null) {
 			// nothing to do
 			return;
@@ -106,13 +112,16 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	boolean postExecute() {
-		if (!super.postExecute())
+		if (!super.postExecute()) {
 			return false;
+		}
 		// at this point we're done with unsaturated contexts
 		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
 				.clearNotSaturatedContexts();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
+		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		this.cleaning_ = null;
+		
 		return true;
 	}
 
@@ -124,7 +133,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	 * Used to pass a collection of context's roots without extra copying
 	 */
 	private static class ContextRootCollection extends
-			AbstractCollection<IndexedClass> {
+			AbstractCollection<IndexedClassEntity> {
 
 		private final Collection<? extends IndexedClassExpression> ices_;
 
@@ -133,10 +142,10 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		}
 
 		@Override
-		public Iterator<IndexedClass> iterator() {
-			return new Iterator<IndexedClass>() {
+		public Iterator<IndexedClassEntity> iterator() {
+			return new Iterator<IndexedClassEntity>() {
 
-				private IndexedClass curr_ = null;
+				private IndexedClassEntity curr_ = null;
 				private final Iterator<? extends IndexedClassExpression> iter_ = ices_
 						.iterator();
 
@@ -148,8 +157,8 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 						while (curr_ == null && iter_.hasNext()) {
 							IndexedClassExpression expr = iter_.next();
 
-							if (expr instanceof IndexedClass) {
-								curr_ = ((IndexedClass) expr);// .getElkClass();
+							if (expr instanceof IndexedClassEntity) {
+								curr_ = (IndexedClassEntity) expr;
 							}
 						}
 					}
@@ -158,8 +167,8 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 				}
 
 				@Override
-				public IndexedClass next() {
-					IndexedClass tmp = curr_;
+				public IndexedClassEntity next() {
+					IndexedClassEntity tmp = curr_;
 
 					curr_ = null;
 

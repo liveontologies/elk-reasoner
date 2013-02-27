@@ -27,23 +27,27 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectsToIndexedEntitiesSet;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
+ * TODO docs
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class IncrementalClassTaxonomyComputationStage extends
-		ClassTaxonomyComputationStage {
+class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 
-	// private static final Logger LOGGER_ = Logger
-	// .getLogger(IncrementalClassTaxonomyComputationStage.class);
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IncrementalClassTaxonomyComputationStage.class);
+
+	protected ClassTaxonomyComputation computation_ = null;
 
 	public IncrementalClassTaxonomyComputationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
@@ -60,43 +64,68 @@ class IncrementalClassTaxonomyComputationStage extends
 		if (!super.preExecute())
 			return false;
 
-		// classes which correspond to changed nodes in the taxonomy
-		// they must include new classes
-		final Collection<ElkClass> modifiedClasses = reasoner.classTaxonomyState
-				.getClassesForModifiedNodes();
-		final IndexObjectConverter converter = reasoner.objectCache_
-				.getIndexObjectConverter();
-
 		// let's convert to indexed objects and filter out removed classes
-		Operations.Transformation<ElkClass, IndexedClass> transformation = new Operations.Transformation<ElkClass, IndexedClass>() {
-			@Override
-			public IndexedClass transform(ElkClass element) {
-				IndexedClass indexedClass = (IndexedClass) element
-						.accept(converter);
-				if (indexedClass.occurs())
-					return indexedClass;
-				else
-					return null;
+		/*
+		 * Operations.Transformation<ElkClass, IndexedClass> transformation =
+		 * new Operations.Transformation<ElkClass, IndexedClass>() {
+		 * 
+		 * @Overrides public IndexedClass transform(ElkClass element) {
+		 * IndexedClass indexedClass = (IndexedClass) element
+		 * .accept(converter); if (indexedClass.occurs()) return indexedClass;
+		 * else return null; } };
+		 */
+		if (reasoner.classTaxonomyState.getTaxonomy() == null) {
+			if (LOGGER_.isInfoEnabled()) {
+				LOGGER_.info("Using non-incremental taxonomy");
 			}
-		};
-		Collection<IndexedClass> modified = Operations.getCollection(
-				Operations.map(modifiedClasses, transformation),
-				// an upper bound
-				modifiedClasses.size());
-		this.computation_ = new ClassTaxonomyComputation(Operations.split(
-				modified, 64), reasoner.getProcessExecutor(), workerNo,
-				progressMonitor, reasoner.saturationState,
-				reasoner.classTaxonomyState.getTaxonomy());
+
+			reasoner.initClassTaxonomy();
+			computation_ = new ClassTaxonomyComputation(Operations.split(
+					reasoner.ontologyIndex.getIndexedClasses(), 128),
+					reasoner.getProcessExecutor(), workerNo, progressMonitor,
+					reasoner.saturationState,
+					reasoner.classTaxonomyState.getTaxonomy());
+		} else {
+			// classes which correspond to changed nodes in the taxonomy
+			// they must include new classes
+			// let's convert to indexed objects and filter out removed classes
+			Collection<IndexedClass> modified = new ElkObjectsToIndexedEntitiesSet<ElkClass, IndexedClass>(
+					reasoner.classTaxonomyState.classesForModifiedNodes,
+					reasoner.objectCache_.getIndexObjectConverter());
+
+			this.computation_ = new ClassTaxonomyComputation(Operations.split(
+					modified, 64), reasoner.getProcessExecutor(), workerNo,
+					progressMonitor, reasoner.saturationState,
+					reasoner.classTaxonomyState.getTaxonomy());
+		}
+
 		return true;
 	}
 
 	@Override
+	public void executeStage() throws ElkInterruptedException {
+		computation_.process();
+	}
+
+	@Override
 	boolean postExecute() {
-		if (!super.postExecute())
+		if (!super.postExecute()) {
 			return false;
-		reasoner.ontologyIndex.clearSignatureChanges();
+		}
+
+		reasoner.classTaxonomyState.getWriter().clearModifiedNodeObjects();
+		reasoner.ontologyIndex.clearClassSignatureChanges();
+		reasoner.ruleAndConclusionStats.add(computation_
+				.getRuleAndConclusionStatistics());
 		this.computation_ = null;
+
 		return true;
+	}
+
+	@Override
+	public void printInfo() {
+		if (computation_ != null)
+			computation_.printStatistics();
 	}
 
 }

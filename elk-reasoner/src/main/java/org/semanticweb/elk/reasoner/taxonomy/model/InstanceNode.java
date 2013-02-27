@@ -56,6 +56,4 @@ public interface InstanceNode<T extends ElkObject, I extends ElkObject> extends
 	 */
 	public Set<? extends TypeNode<T, I>> getAllTypeNodes();
 
-	public InstanceTaxonomy<T, I> getInstanceTaxonomy();
-
 }

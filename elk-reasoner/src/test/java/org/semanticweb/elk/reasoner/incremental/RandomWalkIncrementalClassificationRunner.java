@@ -111,8 +111,11 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			changingAxioms.setAllOn();
 
 			resultHashHistory.add(originalTaxonomyHash);
+			
 			for (int i = 0; i < iterations_; i++) {
-				io_.loadChanges(reasoner, tracker.generateNextChange());
+				IncrementalChange<T> change = tracker.generateNextChange();
+				
+				io_.loadChanges(reasoner, change);
 				
 				final String resultHash = getResultHash(reasoner);
 				
@@ -121,9 +124,14 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				if (LOGGER_.isDebugEnabled()) {
 					LOGGER_.debug("Taxonomy hash code for round " + (j + 1)
 							+ " iteration " + (i + 1) + ": " + resultHash);
-				}
-
-				printCurrentAxioms(Operations.concat(changingAxioms.getOnElements(), staticAxioms));
+					
+					LOGGER_.debug("Deleted axioms");
+					printCurrentAxioms(change.getDeletions(), Level.DEBUG);
+					LOGGER_.debug("Added axioms");
+					printCurrentAxioms(change.getAdditions(), Level.DEBUG);
+					LOGGER_.debug("Current axioms");
+					printCurrentAxioms(Operations.concat(changingAxioms.getOnElements(), staticAxioms), Level.DEBUG);					
+				}			
 
 				if (LOGGER_.isTraceEnabled()) {
 					printResult(reasoner, LOGGER_, Level.TRACE);
@@ -156,6 +164,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				standardReasoner.shutdown();
 				throw e;
 			}
+			
 			standardReasoner.shutdown();
 
 			if (LOGGER_.isDebugEnabled()) {
@@ -172,10 +181,16 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				
 				io_.revertChanges(reasoner, change);
 				
-				String taxonomyHash = TaxonomyPrinter
-						.getHashString(reasoner.getTaxonomyQuietly());
+				String taxonomyHash = getResultHash(reasoner);
 
-				assertEquals("Seed " + seed, expectedHash, taxonomyHash);
+				try {
+					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
+				} catch (AssertionError e) {
+					//TODO print the taxonomies here?					
+					printResult(reasoner, LOGGER_, Level.INFO);
+
+					throw e;
+				}
 			}
 			
 			// doubling the change size every round
@@ -220,10 +235,10 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				2 * (31 - Integer.numberOfLeadingZeros(changingAxiomsCount)));
 	}
 
-	private void printCurrentAxioms(Iterable<T> axioms) {
-		if (LOGGER_.isDebugEnabled()) {
+	private void printCurrentAxioms(Iterable<T> axioms, Level level) {
+		if (LOGGER_.isEnabledFor(level)) {
 			for (T axiom : axioms) {
-				io_.printAxiom(axiom, LOGGER_, Level.DEBUG);
+				io_.printAxiom(axiom, LOGGER_, level);
 			}
 		}
 	}

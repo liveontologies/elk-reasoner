@@ -26,12 +26,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -76,7 +82,45 @@ class IncrementalAdditionInitializationStage extends
 		final ExtendedWriter writer = reasoner.saturationState
 				.getExtendedWriter(conclusionVisitor);
 
-		for (ElkClass newClass : reasoner.ontologyIndex.getAddedClasses()) {
+		for (ElkEntity newEntity : Operations.concat(reasoner.ontologyIndex.getAddedClasses(), reasoner.ontologyIndex.getAddedIndividuals())) {
+			IndexedClassExpression ice = newEntity.accept(new ElkEntityVisitor<IndexedClassExpression>(){
+
+				@Override
+				public IndexedClassExpression visit(ElkAnnotationProperty elkAnnotationProperty) {
+					return null;
+				}
+
+				@Override
+				public IndexedClassExpression visit(ElkClass elkClass) {
+					return converter.visit(elkClass);
+				}
+
+				@Override
+				public IndexedClassExpression visit(ElkDataProperty elkDataProperty) {
+					return null;
+				}
+
+				@Override
+				public IndexedClassExpression visit(ElkDatatype elkDatatype) {
+					return null;
+				}
+
+				@Override
+				public IndexedClassExpression visit(ElkNamedIndividual elkNamedIndividual) {
+					return converter.visit(elkNamedIndividual);
+				}
+
+				@Override
+				public IndexedClassExpression visit(ElkObjectProperty elkObjectProperty) {
+					return null;
+				}});
+			
+			if (ice.getContext() == null) {
+				writer.getCreateContext(ice);
+			}
+		}
+		
+		/*for (ElkClass newClass : reasoner.ontologyIndex.getAddedClasses()) {
 			IndexedClass ic = (IndexedClass) converter.visit(newClass);
 
 			if (ic.getContext() == null) {
@@ -87,7 +131,7 @@ class IncrementalAdditionInitializationStage extends
 				// throw new RuntimeException(ic + ": " +
 				// ic.getContext().getSubsumers());
 			}
-		}
+		}*/
 
 		changedInitRules = diffIndex.getAddedContextInitRules();
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
@@ -110,7 +154,9 @@ class IncrementalAdditionInitializationStage extends
 			return false;
 		this.initialization_ = null;
 		reasoner.ontologyIndex.commitAddedRules();
-		reasoner.ontologyIndex.clearSignatureChanges();
+		reasoner.ontologyIndex.clearClassSignatureChanges();
+		reasoner.ontologyIndex.clearIndividualSignatureChanges();
+		
 		return true;
 	}
 

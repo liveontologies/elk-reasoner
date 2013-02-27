@@ -25,8 +25,26 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
+import org.junit.Test;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 
 /**
  * @author Pavel Klinov
@@ -39,39 +57,175 @@ public class LowLevelIncrementalABoxTest {
 
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
-/*	@Test
-	public void testDeleteAssertionCheckTBox() throws ElkException, IOException {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(new PostProcessingStageExecutor());
+	@Test
+	public void testBasicDeletion() throws ElkException, IOException {
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
+		Reasoner reasoner = TestReasonerUtils
+				.createTestReasoner(loader, new PostProcessingStageExecutor());
 
-		reasoner.setIncrementalMode(false);
-		reasoner.registerOntologyLoader(loader);
+		reasoner.setAllowIncrementalMode(false);
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass C = objectFactory.getClass(new ElkFullIri(":C"));
-		ElkNamedIndividual a = objectFactory.getNamedIndividual(new ElkFullIri(":a"));
-		ElkAxiom axaInstB = objectFactory.getClassAssertionAxiom(B, a);
-		ElkAxiom axaInstC = objectFactory.getClassAssertionAxiom(C, a);
-		ElkAxiom axDisj = objectFactory.getDisjointClassesAxiom(A, B, C);
+		ElkNamedIndividual ind = objectFactory.getNamedIndividual(new ElkFullIri(":in"));
+		ElkAxiom axiInstA = objectFactory.getClassAssertionAxiom(A, ind);
+		ElkAxiom axASubB = objectFactory.getSubClassOfAxiom(A, B);
+		ElkAxiom axCSubB = objectFactory.getSubClassOfAxiom(C, B);
 		
-		loader.add(axaInstB).add(axaInstC).add(axDisj);
+		loader.add(axiInstA).add(axASubB).add(axCSubB);
 
-		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
-		loader.clear();
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
 
-		reasoner.setIncrementalMode(true);
-
-		changeLoader.remove(axaInstC);
-
-		taxonomy = reasoner.getTaxonomyQuietly();
+		Writer writer = new OutputStreamWriter(System.out);
 		
-		TaxonomyPrinter.dumpClassTaxomomy(taxonomy, new OutputStreamWriter(System.out), false);
-	}*/		
+		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+		
+		reasoner.setAllowIncrementalMode(true);
+
+		changeLoader.clear();
+		changeLoader.remove(axASubB);
+
+		taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
+		writer.flush();
+		
+		assertFalse(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+	}	
+	
+	@Test
+	public void testInvalidTaxonomyAfterInconsistency() throws ElkException, IOException {
+		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		Reasoner reasoner = TestReasonerUtils
+				.createTestReasoner(loader, new PostProcessingStageExecutor());
+
+		reasoner.setAllowIncrementalMode(false);
+		reasoner.registerOntologyChangesLoader(changeLoader);
+
+		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkNamedIndividual ind = objectFactory.getNamedIndividual(new ElkFullIri(":in"));
+		ElkAxiom axiInstA = objectFactory.getClassAssertionAxiom(A, ind);
+		ElkAxiom axTopSubB = objectFactory.getSubClassOfAxiom(objectFactory.getOwlThing(), B);
+		ElkAxiom axDisj = objectFactory.getDisjointClassesAxiom(A, B);
+		
+		loader.add(axiInstA).add(axTopSubB).add(axDisj);
+
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+
+		Writer writer = new OutputStreamWriter(System.out);
+		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
+		writer.flush();
+		
+		reasoner.setAllowIncrementalMode(true);
+
+		changeLoader.clear();
+		changeLoader.remove(axTopSubB);
+
+		taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
+		writer.flush();
+		
+		changeLoader.clear();
+		changeLoader.add(axTopSubB);
+		
+		taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
+		writer.flush();
+		
+		changeLoader.clear();
+		changeLoader.remove(axDisj);
+		
+		taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
+		writer.flush();
+	}		
 	
 	
+	@Test
+	public void testRemoveIndividual() throws ElkException, IOException {
+		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		Reasoner reasoner = TestReasonerUtils
+				.createTestReasoner(loader, new PostProcessingStageExecutor());
 
+		reasoner.setAllowIncrementalMode(false);
+		reasoner.registerOntologyChangesLoader(changeLoader);
+
+		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkNamedIndividual ind = objectFactory.getNamedIndividual(new ElkFullIri(":in"));
+		ElkAxiom axiInstA = objectFactory.getClassAssertionAxiom(A, ind);
+		ElkAxiom axASubB = objectFactory.getSubClassOfAxiom(A, B);
+		
+		loader.add(axiInstA).add(axASubB);
+
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().size() == 1);
+		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().size() == 1);
+		
+		reasoner.setAllowIncrementalMode(true);
+
+		changeLoader.clear();
+		changeLoader.remove(axiInstA);
+
+		taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		//the individual should be gone
+		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().isEmpty());
+		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().isEmpty());
+		//check that the individual properly re-appears
+		changeLoader.clear();
+		changeLoader.add(axiInstA);
+		
+		taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+	}	
+	
+	@Test
+	public void testNewIndividual() throws ElkException, IOException {
+		TestChangesLoader loader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		Reasoner reasoner = TestReasonerUtils
+				.createTestReasoner(loader, new PostProcessingStageExecutor());
+
+		reasoner.setAllowIncrementalMode(false);
+		reasoner.registerOntologyChangesLoader(changeLoader);
+
+		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkNamedIndividual ind = objectFactory.getNamedIndividual(new ElkFullIri(":in"));
+		ElkNamedIndividual newInd = objectFactory.getNamedIndividual(new ElkFullIri(":new"));
+		ElkAxiom axiInstA = objectFactory.getClassAssertionAxiom(A, ind);
+		ElkAxiom axNewInstB = objectFactory.getClassAssertionAxiom(B, newInd);
+		ElkAxiom axASubB = objectFactory.getSubClassOfAxiom(A, B);
+		
+		loader.add(axiInstA).add(axASubB);
+
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().size() == 1);
+		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().size() == 1);
+		
+		reasoner.setAllowIncrementalMode(true);
+
+		changeLoader.clear();
+		changeLoader.add(axNewInstB);
+
+		taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		
+		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().size() == 1);
+		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+		assertTrue(taxonomy.getTypeNode(B).getDirectInstanceNodes().contains(taxonomy.getInstanceNode(newInd)));
+	}	
 }

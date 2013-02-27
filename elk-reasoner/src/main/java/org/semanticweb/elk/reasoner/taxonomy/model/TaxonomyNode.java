@@ -76,5 +76,5 @@ public interface TaxonomyNode<T extends ElkObject> extends Node<T> {
 	 * 
 	 * @return the taxonomy to which this node belongs
 	 */
-	public Taxonomy<T> getTaxonomy();
+	//public Taxonomy<T> getTaxonomy();
 }

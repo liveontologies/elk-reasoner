@@ -116,7 +116,7 @@ public class ClassTaxonomyComputationFactory implements
 	 */
 	public ClassTaxonomyComputationFactory(SaturationState saturationState,
 			int maxWorkers) {
-		this(saturationState, maxWorkers, new ConcurrentTaxonomy());
+		this(saturationState, maxWorkers, new ConcurrentClassTaxonomy());
 	}
 
 	/**

@@ -98,7 +98,9 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
 				.clearNotSaturatedContexts();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
+		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		completion_ = null;
+		
 		return true;
 	}
 
