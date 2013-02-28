@@ -23,7 +23,6 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
@@ -32,35 +31,33 @@ import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitorEx;
 
 /**
  * A visitor class for converting instances of {@link OWLObjectInverseOf} to the
- * corresponding instances of {@link ElkObjectPropertyExpression}. Note that the
- * instances of {@link OWLObjectInverseOf} cannot be directly converted to
- * {@link ElkObjectInverseOf} since inverse of object properties can be nested
- * in OWL API but not in OWL 2 and thus in ELK OWL model.
+ * corresponding instances of {@link ElkObjectPropertyExpression}. This visitor
+ * assumes that the input is simplified so that there are not nested inverses
+ * and instances of {@link OWLObjectInverseOf} can therefore be directly
+ * converted to {@link ElkObjectInverseOf}.
  * 
- * @author "Yevgeny Kazakov"
- * 
+ * @author Frantisek Simancik
+ *
  */
-public class OwlObjectInverseOfConverterVisitor implements
+public class OwlSimplifiedObjectPropertyExpressionConverterVisitor implements
 		OWLPropertyExpressionVisitorEx<ElkObjectPropertyExpression> {
 
-	private static OwlObjectInverseOfConverterVisitor INSTANCE_ = new OwlObjectInverseOfConverterVisitor();
+	private static OwlSimplifiedObjectPropertyExpressionConverterVisitor INSTANCE_ = new OwlSimplifiedObjectPropertyExpressionConverterVisitor();
 
-	private OwlObjectInverseOfConverterVisitor() {
+	private OwlSimplifiedObjectPropertyExpressionConverterVisitor() {
 	}
 
-	public static OwlObjectInverseOfConverterVisitor getInstance() {
+	public static OwlSimplifiedObjectPropertyExpressionConverterVisitor getInstance() {
 		return INSTANCE_;
 	}
 
 	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectProperty property) {
-		return new ElkObjectInverseOfWrap<OWLObjectProperty>(property);
+		return new ElkObjectPropertyWrap<OWLObjectProperty>(property);
 	}
 
 	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectInverseOf property) {
-		// return property.accept(OWL_OBJECT_INVERSE_OF_CONVERTER);
-		// Isn't the following sufficient?
 		return new ElkObjectInverseOfWrap<OWLObjectProperty>(
 				property.getNamedProperty());
 	}
@@ -69,7 +66,7 @@ public class OwlObjectInverseOfConverterVisitor implements
 	public ElkObjectPropertyExpression visit(OWLDataProperty property) {
 		throw new IllegalArgumentException(property.getClass().getSimpleName()
 				+ " cannot be converted to "
-				+ ElkObjectProperty.class.getSimpleName());
+				+ ElkObjectPropertyExpression.class.getSimpleName());
 	}
 
 }
