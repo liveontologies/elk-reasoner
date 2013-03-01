@@ -163,7 +163,7 @@ public abstract class AbstractReasonerState {
 			// switching to incremental mode not allowed
 			return;
 		ontologyIndex.setIncrementalMode(mode);
-		
+
 		if (!mode) {
 			// clear taxonomy if switched to non-incremental mode
 			classTaxonomyState.getWriter().clear();
@@ -321,7 +321,6 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
-		trySetIncrementalMode(true);
 
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
@@ -365,10 +364,12 @@ public abstract class AbstractReasonerState {
 	 */
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
 			throws ElkException {
+
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
-		if (ontologyIndex.isIncrementalMode()) {
+		if (ontologyIndex.isIncrementalMode()
+				&& instanceTaxonomyState.getTaxonomy() != null) {
 			getStageExecutor().complete(
 					stageManager.incrementalInstanceTaxonomyComputationStage);
 		} else {
@@ -460,14 +461,15 @@ public abstract class AbstractReasonerState {
 	}
 
 	public void initClassTaxonomy() {
-		classTaxonomyState.getWriter().setTaxonomy(new ConcurrentClassTaxonomy());
-	}	
-	
-	public void initInstanceTaxonomy() {
-		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(classTaxonomyState.getTaxonomy()));
+		classTaxonomyState.getWriter().setTaxonomy(
+				new ConcurrentClassTaxonomy());
 	}
 
-	
+	public void initInstanceTaxonomy() {
+		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(
+				classTaxonomyState.getTaxonomy()));
+	}
+
 	// ////////////////////////////////////////////////////////////////
 	/*
 	 * SOME DEBUG METHODS, FIXME: REMOVE

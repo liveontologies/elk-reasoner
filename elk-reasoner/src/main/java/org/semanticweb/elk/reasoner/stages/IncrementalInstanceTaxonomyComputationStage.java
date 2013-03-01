@@ -6,11 +6,11 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectsToIndexedEntitiesSet;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,17 +37,17 @@ import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
  * TODO docs
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalInstanceTaxonomyComputationStage extends 	AbstractReasonerStage {
+public class IncrementalInstanceTaxonomyComputationStage extends
+		AbstractReasonerStage {
 
-	private static final Logger LOGGER_ = Logger
-			.getLogger(IncrementalInstanceTaxonomyComputationStage.class);
+//	private static final Logger LOGGER_ = Logger
+//			.getLogger(IncrementalInstanceTaxonomyComputationStage.class);
 
-	protected InstanceTaxonomyComputation computation_ = null;
-	
-	
+	private InstanceTaxonomyComputation computation_ = null;
+
 	/**
 	 * @param reasoner
 	 * @param preStages
@@ -55,8 +55,8 @@ public class IncrementalInstanceTaxonomyComputationStage extends 	AbstractReason
 	public IncrementalInstanceTaxonomyComputationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
-	}	
-	
+	}
+
 	@Override
 	public String getName() {
 		return "Incremental Instance Taxonomy Computation";
@@ -66,32 +66,21 @@ public class IncrementalInstanceTaxonomyComputationStage extends 	AbstractReason
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
+		/*
+		 * individuals which correspond to removed instance nodes in the
+		 * taxonomy they must include new individuals
+		 */
+		final Set<ElkNamedIndividual> modifiedIndividuals = reasoner.instanceTaxonomyState
+				.getModifiedIndividuals();
+		// let's convert to indexed objects and filter out removed individuals
+		Collection<IndexedIndividual> modified = new ElkObjectsToIndexedEntitiesSet<ElkNamedIndividual, IndexedIndividual>(
+				modifiedIndividuals,
+				reasoner.objectCache_.getIndexObjectConverter());
 
-		if (reasoner.instanceTaxonomyState.getTaxonomy() == null) {
-			if (LOGGER_.isInfoEnabled()) {
-				LOGGER_.info("Using non-incremental taxonomy");
-			}
-			
-			reasoner.initInstanceTaxonomy();
-			computation_ = new InstanceTaxonomyComputation(
-					reasoner.ontologyIndex.getIndexedIndividuals(),
-					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.saturationState, reasoner.instanceTaxonomyState.getTaxonomy());
-		} else {
-			// individuals which correspond to removed instance nodes in the taxonomy
-			// they must include new individuals
-			final Set<ElkNamedIndividual> modifiedIndividuals = reasoner.instanceTaxonomyState.getModifiedIndividuals();
-			// let's convert to indexed objects and filter out removed individuals
-			Collection<IndexedIndividual> modified = new ElkObjectsToIndexedEntitiesSet<ElkNamedIndividual, IndexedIndividual>(
-					modifiedIndividuals,
-					reasoner.objectCache_.getIndexObjectConverter());
-
-			this.computation_ = new InstanceTaxonomyComputation(modified,
-					reasoner.getProcessExecutor(), workerNo,
-					progressMonitor, reasoner.saturationState,
-					reasoner.instanceTaxonomyState.getTaxonomy());
-		}
-		
+		this.computation_ = new InstanceTaxonomyComputation(modified,
+				reasoner.getProcessExecutor(), workerNo, progressMonitor,
+				reasoner.saturationState,
+				reasoner.instanceTaxonomyState.getTaxonomy());
 		return true;
 	}
 
@@ -105,12 +94,12 @@ public class IncrementalInstanceTaxonomyComputationStage extends 	AbstractReason
 		if (!super.postExecute()) {
 			return false;
 		}
-		
+
 		reasoner.instanceTaxonomyState.getWriter().clearModifiedIndividuals();
 		reasoner.ontologyIndex.clearIndividualSignatureChanges();
-		//reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
+		// reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;
-		
+
 		return true;
 
 	}
@@ -121,5 +110,5 @@ public class IncrementalInstanceTaxonomyComputationStage extends 	AbstractReason
 			computation_.printStatistics();
 		}
 	}
-	
+
 }

@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectsToIndexedEntitiesSet;
@@ -44,8 +43,8 @@ import org.semanticweb.elk.util.collections.Operations;
  */
 class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 
-	private static final Logger LOGGER_ = Logger
-			.getLogger(IncrementalClassTaxonomyComputationStage.class);
+	// private static final Logger LOGGER_ = Logger
+	// .getLogger(IncrementalClassTaxonomyComputationStage.class);
 
 	protected ClassTaxonomyComputation computation_ = null;
 
@@ -63,41 +62,19 @@ class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-
-		// let's convert to indexed objects and filter out removed classes
 		/*
-		 * Operations.Transformation<ElkClass, IndexedClass> transformation =
-		 * new Operations.Transformation<ElkClass, IndexedClass>() {
-		 * 
-		 * @Overrides public IndexedClass transform(ElkClass element) {
-		 * IndexedClass indexedClass = (IndexedClass) element
-		 * .accept(converter); if (indexedClass.occurs()) return indexedClass;
-		 * else return null; } };
+		 * classes which correspond to changed nodes in the taxonomy they must
+		 * include new classes let's convert to indexed objects and filter out
+		 * removed classes
 		 */
-		if (reasoner.classTaxonomyState.getTaxonomy() == null) {
-			if (LOGGER_.isInfoEnabled()) {
-				LOGGER_.info("Using non-incremental taxonomy");
-			}
+		Collection<IndexedClass> modified = new ElkObjectsToIndexedEntitiesSet<ElkClass, IndexedClass>(
+				reasoner.classTaxonomyState.classesForModifiedNodes,
+				reasoner.objectCache_.getIndexObjectConverter());
 
-			reasoner.initClassTaxonomy();
-			computation_ = new ClassTaxonomyComputation(Operations.split(
-					reasoner.ontologyIndex.getIndexedClasses(), 128),
-					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.saturationState,
-					reasoner.classTaxonomyState.getTaxonomy());
-		} else {
-			// classes which correspond to changed nodes in the taxonomy
-			// they must include new classes
-			// let's convert to indexed objects and filter out removed classes
-			Collection<IndexedClass> modified = new ElkObjectsToIndexedEntitiesSet<ElkClass, IndexedClass>(
-					reasoner.classTaxonomyState.classesForModifiedNodes,
-					reasoner.objectCache_.getIndexObjectConverter());
-
-			this.computation_ = new ClassTaxonomyComputation(Operations.split(
-					modified, 64), reasoner.getProcessExecutor(), workerNo,
-					progressMonitor, reasoner.saturationState,
-					reasoner.classTaxonomyState.getTaxonomy());
-		}
+		this.computation_ = new ClassTaxonomyComputation(Operations.split(
+				modified, 64), reasoner.getProcessExecutor(), workerNo,
+				progressMonitor, reasoner.saturationState,
+				reasoner.classTaxonomyState.getTaxonomy());
 
 		return true;
 	}
@@ -112,7 +89,6 @@ class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 		if (!super.postExecute()) {
 			return false;
 		}
-
 		reasoner.classTaxonomyState.getWriter().clearModifiedNodeObjects();
 		reasoner.ontologyIndex.clearClassSignatureChanges();
 		reasoner.ruleAndConclusionStats.add(computation_

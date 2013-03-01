@@ -31,7 +31,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
  * A hierarchy of certain ElkObjects. For each such object, the taxonomy holds a
- * TaxonomyNode object from which direct sub- and super- nodes can be retrieved.
+ * {@link TaxonomyNode} object from which direct sub- and super- nodes can be
+ * retrieved.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
