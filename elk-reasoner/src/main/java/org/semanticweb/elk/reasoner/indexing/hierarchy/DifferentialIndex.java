@@ -62,39 +62,64 @@ public class DifferentialIndex extends DirectIndex {
 	/**
 	 * the {@link ElkClass} added during the last incremental session
 	 */
-	private final Set<ElkClass> addedClasses_;
+	private Set<ElkClass> addedClasses_;
 
 	/**
 	 * the {@link ElkNamedIndividual} added during the last incremental session
 	 */
-	private final Set<ElkNamedIndividual> addedIndividuals_;
+	private Set<ElkNamedIndividual> addedIndividuals_;
 
 	/**
 	 * Objects that should be deleted
 	 */
-	private final IndexedObjectCache todoDeletions_;
+	private IndexedObjectCache todoDeletions_;
 
 	/**
 	 * The added and removed initialization {@link Rule}s
 	 */
-	private ChainableRule<Context> addedContextInitRules_ = null,
-			removedContextInitRules_ = null;
+	private ChainableRule<Context> addedContextInitRules_,
+			removedContextInitRules_;
 
 	/**
 	 * The maps of added and removed {@link Rule}s for index class expressions;
 	 */
-	private final Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
+	private Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
 
 	public DifferentialIndex(IndexedObjectCache objectCache) {
 		super(objectCache);
-		this.addedClasses_ = new ArrayHashSet<ElkClass>(127);
-		this.addedIndividuals_ = new ArrayHashSet<ElkNamedIndividual>(127);
-		this.todoDeletions_ = new IndexedObjectCache();
+		init();
+	}
+
+	/**
+	 * Initializes all datastructures
+	 */
+	private void init() {
+		initClassSignatureChanges();
+		initIndividualSignatureChanges();
+		initAdditions();
+		initDeletions();
+	}
+
+	public void initClassSignatureChanges() {
+		this.addedClasses_ = new ArrayHashSet<ElkClass>(32);		
+	}
+	
+	public void initIndividualSignatureChanges() {
+		this.addedIndividuals_ = new ArrayHashSet<ElkNamedIndividual>(32);
+	}
+
+	public void initAdditions() {
+		this.addedContextInitRules_ = null;
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
-				127);
+				32);
+	}
+
+	public void initDeletions() {
+		this.removedContextInitRules_ = null;
+		this.todoDeletions_ = new IndexedObjectCache();
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
-				127);
+				32);
 	}
 
 	/* read-only methods */
@@ -144,7 +169,10 @@ public class DifferentialIndex extends DirectIndex {
 	public void add(IndexedClassExpression target,
 			ChainableRule<Context> newRule) {
 		if (incrementalMode) {
-			newRule.addTo(getAddedContextRuleChain(target));
+			if (newRule.removeFrom(getRemovedContextRuleChain(target))) {
+				newRule.addTo(target.getCompositionRuleChain());
+			} else
+				newRule.addTo(getAddedContextRuleChain(target));
 		} else {
 			super.add(target, newRule);
 		}
@@ -169,7 +197,10 @@ public class DifferentialIndex extends DirectIndex {
 	@Override
 	public void addContextInitRule(ChainableRule<Context> newRule) {
 		if (incrementalMode) {
-			newRule.addTo(getAddedContextInitRuleChain());
+			if (newRule.removeFrom(getRemovedContextInitRuleChain())) {
+				newRule.addTo(getContextInitRuleChain());
+			} else
+				newRule.addTo(getAddedContextInitRuleChain());
 		} else {
 			super.addContextInitRule(newRule);
 		}
@@ -273,10 +304,8 @@ public class DifferentialIndex extends DirectIndex {
 	 * registration
 	 */
 	public void clearDeletedRules() {
-		removedContextInitRules_ = null;
-		removedContextRuleHeadByClassExpressions_.clear();
 		objectCache.subtract(todoDeletions_);
-		todoDeletions_.clear();
+		initDeletions();
 	}
 
 	/**
@@ -294,7 +323,6 @@ public class DifferentialIndex extends DirectIndex {
 			nextRule.addTo(chain);
 			nextRule = nextRule.next();
 		}
-		addedContextInitRules_ = null;
 
 		for (IndexedClassExpression target : addedContextRuleHeadByClassExpressions_
 				.keySet()) {
@@ -308,15 +336,7 @@ public class DifferentialIndex extends DirectIndex {
 				nextRule = nextRule.next();
 			}
 		}
-		addedContextRuleHeadByClassExpressions_.clear();
-	}
-
-	public void clearClassSignatureChanges() {
-		addedClasses_.clear();
-	}
-	
-	public void clearIndividualSignatureChanges() {
-		addedIndividuals_.clear();
+		initAdditions();
 	}
 
 	/**
@@ -326,8 +346,10 @@ public class DifferentialIndex extends DirectIndex {
 	public boolean isEmpty() {
 		return addedContextInitRules_ == null
 				&& removedContextInitRules_ == null
-				&& addedContextRuleHeadByClassExpressions_.isEmpty()
-				&& removedContextRuleHeadByClassExpressions_.isEmpty();
+				&& (addedContextRuleHeadByClassExpressions_ == null || addedContextRuleHeadByClassExpressions_
+						.isEmpty())
+				&& (removedContextRuleHeadByClassExpressions_ == null || removedContextRuleHeadByClassExpressions_
+						.isEmpty());
 	}
 
 	/**
@@ -346,8 +368,8 @@ public class DifferentialIndex extends DirectIndex {
 		if (!mode) {
 			clearDeletedRules();
 			commitAddedRules();
-			clearClassSignatureChanges();
-			clearIndividualSignatureChanges();
+			initClassSignatureChanges();
+			initIndividualSignatureChanges();
 		}
 	}
 

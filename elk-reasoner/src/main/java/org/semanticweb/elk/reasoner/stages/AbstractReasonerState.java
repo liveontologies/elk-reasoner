@@ -299,7 +299,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public void loadOntology() throws ElkException {
-		trySetIncrementalMode(true);
+		trySetIncrementalMode(false);
 		getStageExecutor().complete(stageManager.ontologyLoadingStage);
 	}
 

@@ -351,12 +351,16 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 		return new ElementIterator();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void clear() {
-		for (int i = 0; i < data.length; i++)
-			if (data[i] != null)
-				data[i] = null;
+		int capacity = data.length >> 2;
+		if (capacity == 0)
+			capacity = 1;
 		size = 0;
+		upperSize = computeUpperSize(capacity);
+		lowerSize = computeLowerSize(capacity);
+		this.data = (E[]) new Object[capacity];
 	}
 
 	@Override

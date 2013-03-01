@@ -382,7 +382,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 */
 	private void shrink() {
 		int oldCapacity = keys.length;
-		if (oldCapacity == 1)
+		if (oldCapacity <= DEFAULT_INITIAL_CAPACITY)
 			return;
 		K oldKeys[] = keys;
 		V oldValues[] = values;
@@ -426,14 +426,17 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void clear() {
-		for (int i = 0; i < keys.length; i++)
-			if (keys[i] != null) {
-				keys[i] = null;
-				values[i] = null;
-			}
+		int capacity = keys.length >> 2;
+		if (capacity == 0)
+			capacity = 1;
 		size = 0;
+		upperSize = computeUpperSize(capacity);
+		lowerSize = computeLowerSize(capacity);
+		this.keys = (K[]) new Object[capacity];
+		this.values = (V[]) new Object[capacity];
 	}
 
 	@Override

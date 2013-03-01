@@ -90,7 +90,7 @@ class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 			return false;
 		}
 		reasoner.classTaxonomyState.getWriter().clearModifiedNodeObjects();
-		reasoner.ontologyIndex.clearClassSignatureChanges();
+		reasoner.ontologyIndex.initClassSignatureChanges();
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
 		this.computation_ = null;

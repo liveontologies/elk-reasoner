@@ -96,7 +96,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		}
 
 		reasoner.instanceTaxonomyState.getWriter().clearModifiedIndividuals();
-		reasoner.ontologyIndex.clearIndividualSignatureChanges();
+		reasoner.ontologyIndex.initIndividualSignatureChanges();
 		// reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;
 

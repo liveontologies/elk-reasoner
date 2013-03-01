@@ -82,56 +82,62 @@ class IncrementalAdditionInitializationStage extends
 		final ExtendedWriter writer = reasoner.saturationState
 				.getExtendedWriter(conclusionVisitor);
 
-		for (ElkEntity newEntity : Operations.concat(reasoner.ontologyIndex.getAddedClasses(), reasoner.ontologyIndex.getAddedIndividuals())) {
-			IndexedClassExpression ice = newEntity.accept(new ElkEntityVisitor<IndexedClassExpression>(){
+		for (ElkEntity newEntity : Operations.concat(
+				reasoner.ontologyIndex.getAddedClasses(),
+				reasoner.ontologyIndex.getAddedIndividuals())) {
+			IndexedClassExpression ice = newEntity
+					.accept(new ElkEntityVisitor<IndexedClassExpression>() {
 
-				@Override
-				public IndexedClassExpression visit(ElkAnnotationProperty elkAnnotationProperty) {
-					return null;
-				}
+						@Override
+						public IndexedClassExpression visit(
+								ElkAnnotationProperty elkAnnotationProperty) {
+							return null;
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkClass elkClass) {
-					return converter.visit(elkClass);
-				}
+						@Override
+						public IndexedClassExpression visit(ElkClass elkClass) {
+							return converter.visit(elkClass);
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkDataProperty elkDataProperty) {
-					return null;
-				}
+						@Override
+						public IndexedClassExpression visit(
+								ElkDataProperty elkDataProperty) {
+							return null;
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkDatatype elkDatatype) {
-					return null;
-				}
+						@Override
+						public IndexedClassExpression visit(
+								ElkDatatype elkDatatype) {
+							return null;
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkNamedIndividual elkNamedIndividual) {
-					return converter.visit(elkNamedIndividual);
-				}
+						@Override
+						public IndexedClassExpression visit(
+								ElkNamedIndividual elkNamedIndividual) {
+							return converter.visit(elkNamedIndividual);
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkObjectProperty elkObjectProperty) {
-					return null;
-				}});
-			
+						@Override
+						public IndexedClassExpression visit(
+								ElkObjectProperty elkObjectProperty) {
+							return null;
+						}
+					});
+
 			if (ice.getContext() == null) {
 				writer.getCreateContext(ice);
 			}
 		}
-		
-		/*for (ElkClass newClass : reasoner.ontologyIndex.getAddedClasses()) {
-			IndexedClass ic = (IndexedClass) converter.visit(newClass);
 
-			if (ic.getContext() == null) {
-				writer.getCreateContext(ic);
-			} else {
-				// TODO Figure out why some added classes have contexts
-				// This happens when class is removed and then re-added
-				// throw new RuntimeException(ic + ": " +
-				// ic.getContext().getSubsumers());
-			}
-		}*/
+		/*
+		 * for (ElkClass newClass : reasoner.ontologyIndex.getAddedClasses()) {
+		 * IndexedClass ic = (IndexedClass) converter.visit(newClass);
+		 * 
+		 * if (ic.getContext() == null) { writer.getCreateContext(ic); } else {
+		 * // TODO Figure out why some added classes have contexts // This
+		 * happens when class is removed and then re-added // throw new
+		 * RuntimeException(ic + ": " + // ic.getContext().getSubsumers()); } }
+		 */
 
 		changedInitRules = diffIndex.getAddedContextInitRules();
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
@@ -154,9 +160,8 @@ class IncrementalAdditionInitializationStage extends
 			return false;
 		this.initialization_ = null;
 		reasoner.ontologyIndex.commitAddedRules();
-		reasoner.ontologyIndex.clearClassSignatureChanges();
-		reasoner.ontologyIndex.clearIndividualSignatureChanges();
-		
+		reasoner.ontologyIndex.initClassSignatureChanges();
+		reasoner.ontologyIndex.initIndividualSignatureChanges();
 		return true;
 	}
 
