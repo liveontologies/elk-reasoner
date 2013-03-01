@@ -281,11 +281,13 @@ public abstract class AbstractReasonerState {
 
 		getStageExecutor().complete(stageManager.changesLoadingStage);
 
-		ReasonerStage stage = isIncrementalMode() ? stageManager.incrementalConsistencyCheckingStage
-				: stageManager.consistencyCheckingStage;
-
-		getStageExecutor().complete(stage);
-		stageManager.incrementalConsistencyCheckingStage.setCompleted();
+		if (isIncrementalMode() && !saturationState.getContexts().isEmpty()) {
+			getStageExecutor().complete(
+					stageManager.incrementalConsistencyCheckingStage);
+		} else {
+			getStageExecutor().complete(stageManager.consistencyCheckingStage);
+			stageManager.incrementalConsistencyCheckingStage.setCompleted();
+		}
 
 		return inconsistentOntology;
 	}
@@ -375,6 +377,8 @@ public abstract class AbstractReasonerState {
 		} else {
 			getStageExecutor().complete(
 					stageManager.instanceTaxonomyComputationStage);
+			stageManager.incrementalInstanceTaxonomyComputationStage
+					.setCompleted();
 		}
 
 		return instanceTaxonomyState.getTaxonomy();

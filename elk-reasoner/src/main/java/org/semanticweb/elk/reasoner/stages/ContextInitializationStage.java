@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 // TODO: add progress monitor, make concurrent if possible
 
@@ -54,7 +55,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
-	private Iterator<IndexedClassExpression> todo_ = null;
+	private Iterator<Context> todo_ = null;
 
 	public ContextInitializationStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -70,8 +71,8 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		reasoner.saturationState.resetFirstContext();
-		todo_ = reasoner.ontologyIndex.getIndexedClassExpressions().iterator();
+		todo_ = reasoner.saturationState.getContexts().iterator();
+		// upper limit
 		maxContexts_ = reasoner.ontologyIndex.getIndexedClassExpressions()
 				.size();
 		deletedContexts_ = 0;
@@ -83,8 +84,8 @@ class ContextInitializationStage extends AbstractReasonerStage {
 		for (;;) {
 			if (!todo_.hasNext())
 				break;
-			IndexedClassExpression ice = todo_.next();
-			ice.resetContext();
+			Context context = todo_.next();
+			context.getRoot().resetContext();
 			deletedContexts_++;
 			progressMonitor.report(deletedContexts_, maxContexts_);
 			if (spuriousInterrupt())
@@ -96,6 +97,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		reasoner.saturationState.resetFirstContext();
 		todo_ = null;
 		return true;
 	}

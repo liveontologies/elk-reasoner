@@ -117,6 +117,11 @@ public class SaturationState {
 
 				};
 			}
+			
+			@Override
+			public boolean isEmpty() {
+				return firstContext.get() == null;
+			}
 
 			@Override
 			public int size() {
