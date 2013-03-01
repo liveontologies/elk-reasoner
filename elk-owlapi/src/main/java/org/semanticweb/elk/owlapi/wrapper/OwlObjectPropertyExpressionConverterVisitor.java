@@ -60,7 +60,7 @@ public class OwlObjectPropertyExpressionConverterVisitor implements
 
 	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectInverseOf property) {
-		return property.accept(OWL_OBJECT_INVERSE_OF_CONVERTER_);
+		return property.getInverse().accept(OWL_OBJECT_INVERSE_OF_CONVERTER_);
 	}
 
 	@Override

@@ -26,21 +26,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owlapi.wrapper.OwlObjectPropertyExpressionConverterVisitor;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitorEx;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 
 /**
- * Testing correctness of {@link OWLObjectPropertyExpressionConverterVisitor} 
+ * Testing correctness of {@link OWLObjectPropertyExpressionConverterVisitor}
  * 
  * @author Frantisek Simancik
- *
+ * @author "Yevgeny Kazakov"
+ * 
  */
 public class OwlObjectPropertyExpressionConverterVisitorTest {
 	/**
@@ -49,14 +53,32 @@ public class OwlObjectPropertyExpressionConverterVisitorTest {
 	@Test
 	public void testNestedInverses() {
 		OWLDataFactory factory = new OWLDataFactoryImpl();
-		OWLObjectProperty r1 = factory.getOWLObjectProperty(IRI.create("R"));
-		OWLObjectPropertyExpression s1 = factory.getOWLObjectInverseOf(factory.getOWLObjectInverseOf(r1));
-		
-		ElkObjectPropertyExpression r2 = r1.accept(OwlObjectPropertyExpressionConverterVisitor.getInstance());
-		ElkObjectPropertyExpression s2 = s1.accept(OwlObjectPropertyExpressionConverterVisitor.getInstance());
+		OWLObjectProperty r = factory.getOWLObjectProperty(IRI.create("R"));
+		OWLObjectPropertyExpression ri = factory.getOWLObjectInverseOf(r);
+		OWLObjectPropertyExpression rii = factory.getOWLObjectInverseOf(ri);
+		OWLObjectPropertyExpression riii = factory.getOWLObjectInverseOf(rii);
 
-		assertTrue(r2 instanceof ElkObjectProperty);
-		assertTrue(s2 instanceof ElkObjectProperty);
-		assertEquals(((ElkObjectProperty) r2).getIri(), ((ElkObjectProperty) s2).getIri());
+		OWLPropertyExpressionVisitorEx<ElkObjectPropertyExpression> converter = OwlObjectPropertyExpressionConverterVisitor
+				.getInstance();
+
+		ElkObjectPropertyExpression s = r.accept(converter);
+		ElkObjectPropertyExpression si = ri.accept(converter);
+		ElkObjectPropertyExpression sii = rii.accept(converter);
+		ElkObjectPropertyExpression siii = riii.accept(converter);
+
+		assertTrue(s instanceof ElkObjectProperty);
+		assertTrue(si instanceof ElkObjectInverseOf);
+		assertTrue(sii instanceof ElkObjectProperty);
+		assertTrue(siii instanceof ElkObjectInverseOf);
+
+		ElkIri expectedIri = ((ElkObjectProperty) s).getIri();
+
+		assertEquals(expectedIri, ((ElkObjectInverseOf) si).getObjectProperty()
+				.getIri());
+
+		assertEquals(expectedIri, ((ElkObjectProperty) sii).getIri());
+
+		assertEquals(expectedIri, ((ElkObjectInverseOf) siii)
+				.getObjectProperty().getIri());
 	}
 }
