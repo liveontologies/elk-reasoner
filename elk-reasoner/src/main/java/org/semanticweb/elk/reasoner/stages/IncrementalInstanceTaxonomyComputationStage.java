@@ -7,9 +7,9 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectsToIndexedEntitiesSet;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
+import org.semanticweb.elk.util.collections.Operations;
 
 /*
  * #%L
@@ -73,9 +73,19 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		final Set<ElkNamedIndividual> modifiedIndividuals = reasoner.instanceTaxonomyState
 				.getModifiedIndividuals();
 		// let's convert to indexed objects and filter out removed individuals
-		Collection<IndexedIndividual> modified = new ElkObjectsToIndexedEntitiesSet<ElkNamedIndividual, IndexedIndividual>(
-				modifiedIndividuals,
-				reasoner.objectCache_.getIndexObjectConverter());
+		Operations.Transformation<ElkNamedIndividual, IndexedIndividual> transformation = new Operations.Transformation<ElkNamedIndividual, IndexedIndividual>() {
+			@Override
+			public IndexedIndividual transform(ElkNamedIndividual element) {
+				IndexedIndividual indexedindividual = (IndexedIndividual) element
+						.accept(reasoner.objectCache_.getIndexObjectConverter());
+				
+				return indexedindividual.occurs() ? indexedindividual : null;
+			}
+		};
+		Collection<IndexedIndividual> modified = Operations.getCollection(
+				Operations.map(modifiedIndividuals, transformation),
+				// an upper bound
+				modifiedIndividuals.size());		
 
 		this.computation_ = new InstanceTaxonomyComputation(modified,
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,

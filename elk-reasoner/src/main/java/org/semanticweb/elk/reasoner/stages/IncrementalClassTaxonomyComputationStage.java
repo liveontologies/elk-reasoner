@@ -29,7 +29,6 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkObjectsToIndexedEntitiesSet;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
@@ -67,9 +66,19 @@ class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 		 * include new classes let's convert to indexed objects and filter out
 		 * removed classes
 		 */
-		Collection<IndexedClass> modified = new ElkObjectsToIndexedEntitiesSet<ElkClass, IndexedClass>(
-				reasoner.classTaxonomyState.classesForModifiedNodes,
-				reasoner.objectCache_.getIndexObjectConverter());
+		Operations.Transformation<ElkClass, IndexedClass> transformation = new Operations.Transformation<ElkClass, IndexedClass>() {
+			@Override
+			public IndexedClass transform(ElkClass element) {
+				IndexedClass indexedClass = (IndexedClass) element
+						.accept(reasoner.objectCache_.getIndexObjectConverter());
+				
+				return indexedClass.occurs() ? indexedClass : null;
+			}
+		};
+		Collection<IndexedClass> modified = Operations.getCollection(
+				Operations.map(reasoner.classTaxonomyState.classesForModifiedNodes, transformation),
+				// an upper bound
+				reasoner.classTaxonomyState.classesForModifiedNodes.size());
 
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				modified, 64), reasoner.getProcessExecutor(), workerNo,

@@ -449,7 +449,8 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		
 		UpdateableTypeNodeWrapper(UpdateableTaxonomyNode<ElkClass> node) {
 			super(node);
-			this.directInstanceNodes_ = new ArrayHashSet<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>();
+			this.directInstanceNodes_ = Collections
+					.newSetFromMap(new ConcurrentHashMap<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>, Boolean>());
 		}
 		
 		private UpdateableTaxonomyNode<ElkClass> getNode() {
