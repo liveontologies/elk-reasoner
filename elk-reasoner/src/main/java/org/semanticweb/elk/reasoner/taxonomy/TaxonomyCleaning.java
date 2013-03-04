@@ -68,8 +68,8 @@ public class TaxonomyCleaning extends
 			InstanceTaxonomyState instanceTaxonomyState,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		super(inputs, new TaxonomyCleaningFactory(classTaxonomyState, instanceTaxonomyState),
-				executor, maxWorkers, progressMonitor);
+		super(inputs, new TaxonomyCleaningFactory(classTaxonomyState,
+				instanceTaxonomyState), executor, maxWorkers, progressMonitor);
 	}
 
 }
@@ -77,30 +77,31 @@ public class TaxonomyCleaning extends
 /**
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-class TaxonomyCleaningFactory implements
+class TaxonomyCleaningFactory
+		implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
-	private static final Logger LOGGER_ = Logger.getLogger(TaxonomyCleaningFactory.class);
-	
+	private static final Logger LOGGER_ = Logger
+			.getLogger(TaxonomyCleaningFactory.class);
+
 	private final ClassTaxonomyState classTaxonomyState_;
 	private final InstanceTaxonomyState instanceTaxonomyState_;
 
-	TaxonomyCleaningFactory(final ClassTaxonomyState classTaxonomyState, final InstanceTaxonomyState instanceTaxonomyState) {
+	TaxonomyCleaningFactory(final ClassTaxonomyState classTaxonomyState,
+			final InstanceTaxonomyState instanceTaxonomyState) {
 		classTaxonomyState_ = classTaxonomyState;
 		instanceTaxonomyState_ = instanceTaxonomyState;
-		
-		/*if (classTaxonomyState_.getTaxonomy() != null) {
 
-			for (UpdateableTaxonomyNode<ElkClass> node : classTaxonomyState_
-					.getTaxonomy().getUpdateableNodes()) {
-				if (node.isModified()) {
-					throw new RuntimeException("node");
-				}
-			}
-		}*/
+		/*
+		 * if (classTaxonomyState_.getTaxonomy() != null) {
+		 * 
+		 * for (UpdateableTaxonomyNode<ElkClass> node : classTaxonomyState_
+		 * .getTaxonomy().getUpdateableNodes()) { if (node.isModified()) { throw
+		 * new RuntimeException("node"); } } }
+		 */
 	}
 
 	@Override
@@ -122,12 +123,15 @@ class TaxonomyCleaningFactory implements
 				}
 			};
 			// writers have no state so can be safely reused
-			private final ClassTaxonomyState.Writer classStateWriter_ = classTaxonomyState_.getWriter();
-			
-			private final InstanceTaxonomyState.Writer instanceStateWriter_ = instanceTaxonomyState_.getWriter();
-			
+			private final ClassTaxonomyState.Writer classStateWriter_ = classTaxonomyState_
+					.getWriter();
+
+			private final InstanceTaxonomyState.Writer instanceStateWriter_ = instanceTaxonomyState_
+					.getWriter();
+
 			/**
-			 * Temporary queue of nodes that should be removed from the taxonomies
+			 * Temporary queue of nodes that should be removed from the
+			 * taxonomies
 			 */
 			private final Queue<UpdateableTaxonomyNode<ElkClass>> toRemove_ = new ConcurrentLinkedQueue<UpdateableTaxonomyNode<ElkClass>>();
 
@@ -135,91 +139,115 @@ class TaxonomyCleaningFactory implements
 			public void submit(IndexedClassEntity entity) {
 				entity.accept(submissionVisitor_);
 			}
-			
+
 			private void submitClass(IndexedClass indexedClass) {
 				ElkClass elkClass = indexedClass.getElkClass();
-				UpdateableTaxonomy<ElkClass> classTaxonomy = classTaxonomyState_.getTaxonomy();
-				UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = instanceTaxonomyState_.getTaxonomy();
-				
-				if (elkClass == PredefinedElkClass.OWL_NOTHING){
-					//classStateWriter_.markClassesForModifiedNode(classTaxonomy.getBottomNode());
+				UpdateableTaxonomy<ElkClass> classTaxonomy = classTaxonomyState_
+						.getTaxonomy();
+				UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = instanceTaxonomyState_
+						.getTaxonomy();
+
+				if (elkClass == PredefinedElkClass.OWL_NOTHING) {
+					// classStateWriter_.markClassesForModifiedNode(classTaxonomy.getBottomNode());
 					return;
 				}
-				
+
 				/*
 				 * shouldn't modify the set of members and iterate over them (to
 				 * mark as modified) at the same time
 				 */
 				synchronized (classTaxonomy.getBottomNode()) {
-					if (classTaxonomy.getBottomNode().getMembers().remove(elkClass)) {
-						classStateWriter_.markClassesForModifiedNode(classTaxonomy
-								.getBottomNode());
+					if (classTaxonomy.getBottomNode().getMembers()
+							.remove(elkClass)) {
+						classStateWriter_
+								.markClassesForModifiedNode(classTaxonomy
+										.getBottomNode());
 						classStateWriter_.markClassForModifiedNode(elkClass);
 						return;
 					}
 				}
 
-				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy.getUpdateableNode(elkClass);
+				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy
+						.getUpdateableNode(elkClass);
 
 				if (node == null) {
 					classStateWriter_.markClassForModifiedNode(elkClass);
 					return;
 				}
-				
+
 				if (node.trySetModified(true)) {
 					toRemove_.add(node);
 					classStateWriter_.markClassesForModifiedNode(node);
-					
-					if (instanceTaxonomy != null) {
-						UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy.getUpdateableTypeNode(elkClass);
+				}
 
-						synchronized (typeNode) {
-							for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : typeNode.getDirectInstanceNodes()) {
-								if (instanceNode.trySetModified(true)) {
-									instanceStateWriter_.markModifiedIndividuals(instanceNode.getMembers());		
-									instanceTaxonomy.removeInstanceNode(instanceNode.getCanonicalMember());
-								}
+				// add all its direct satisfiable sub-nodes to the queue
+				synchronized (node) {
+					for (UpdateableTaxonomyNode<ElkClass> subNode : node
+							.getDirectUpdateableSubNodes()) {
+						if (subNode.trySetModified(true)) {
+							toRemove_.add(subNode);
+							classStateWriter_
+									.markClassesForModifiedNode(subNode);
+						}
+					}
+				}
+
+				if (instanceTaxonomy != null) {
+					UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy
+							.getUpdateableTypeNode(elkClass);
+
+					if (typeNode == null)
+						// could be deleted meanwhile in another thread
+						return;
+
+					synchronized (typeNode) {
+						for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : typeNode
+								.getDirectInstanceNodes()) {
+							if (instanceNode.trySetModified(true)) {
+								instanceStateWriter_
+										.markModifiedIndividuals(instanceNode
+												.getMembers());
+								instanceTaxonomy
+										.removeInstanceNode(instanceNode
+												.getCanonicalMember());
 							}
 						}
 					}
 				}
-				// add all its direct satisfiable sub-nodes to the queue
-				synchronized (node) {
-					for (UpdateableTaxonomyNode<ElkClass> subNode : node.getDirectUpdateableSubNodes()) {
-						if (subNode.trySetModified(true)) {
-							toRemove_.add(subNode);
-							classStateWriter_.markClassesForModifiedNode(subNode);
-						}
-					}
-				}
+
 				/*
-				 * Remove node from both taxonomies. Reasonable
-				 * implementations have only one copy of each class node
-				 * but it's not guaranteed so we still remove it from both taxonomies.
+				 * Remove node from both taxonomies. Reasonable implementations
+				 * have only one copy of each class node but it's not guaranteed
+				 * so we still remove it from both taxonomies.
 				 */
 				classTaxonomy.removeNode(node);
-				
+
 				if (instanceTaxonomy != null) {
 					instanceTaxonomy.removeNode(node);
-				}				
+				}
 			}
-			
+
 			private void submitIndividual(IndexedIndividual indexedIndividual) {
-				if (instanceTaxonomyState_ != null && instanceTaxonomyState_.getTaxonomy() != null) {
-					UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = instanceTaxonomyState_.getTaxonomy();
-					ElkNamedIndividual individual = indexedIndividual.getElkNamedIndividual();
-					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy.getInstanceNode(individual);
+				if (instanceTaxonomyState_ != null
+						&& instanceTaxonomyState_.getTaxonomy() != null) {
+					UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = instanceTaxonomyState_
+							.getTaxonomy();
+					ElkNamedIndividual individual = indexedIndividual
+							.getElkNamedIndividual();
+					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
+							.getInstanceNode(individual);
 
 					if (node != null && node.trySetModified(true)) {
-						instanceStateWriter_.markModifiedIndividuals(node.getMembers());
+						instanceStateWriter_.markModifiedIndividuals(node
+								.getMembers());
 						taxonomy.removeInstanceNode(individual);
+					} else if (node == null) {
+						instanceStateWriter_
+								.markModifiedIndividuals(Collections
+										.singleton(individual));
 					}
-					else if (node == null) {
-						instanceStateWriter_.markModifiedIndividuals(Collections.singleton(individual));
-					}
-				}
-				else {
-					//should never happen
+				} else {
+					// should never happen
 					LOGGER_.error("The instance taxonomy is unexpectedly null during taxonomy cleaning");
 				}
 			}
@@ -234,16 +262,17 @@ class TaxonomyCleaningFactory implements
 					}
 
 					List<UpdateableTaxonomyNode<ElkClass>> superNodes = null;
-					
+
 					// remove all super-class links
 					synchronized (node) {
-						superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>(node.getDirectUpdateableSuperNodes());
+						superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>(
+								node.getDirectUpdateableSuperNodes());
 
 						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
-							node.removeDirectSuperNode(superNode);											
+							node.removeDirectSuperNode(superNode);
 						}
 					}
-					
+
 					for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
 						synchronized (superNode) {
 							superNode.removeDirectSubNode(node);
