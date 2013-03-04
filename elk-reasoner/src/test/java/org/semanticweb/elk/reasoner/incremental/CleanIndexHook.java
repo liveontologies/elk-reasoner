@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -55,7 +56,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 	}
 
 	public static void clearIndexTest(Reasoner reasoner,
-			Iterable<ElkAxiom> axioms) {
+			Iterable<ElkAxiom> axioms) throws ElkException {
 		int size = getIndexSize(reasoner);
 
 		if (LOGGER_.isDebugEnabled()) {
@@ -66,7 +67,8 @@ public class CleanIndexHook implements RandomWalkTestHook {
 		TestChangesLoader loader = new TestChangesLoader();
 
 		for (ElkAxiom axiom : axioms) {
-			if (axiom instanceof ElkClassAxiom || axiom instanceof ElkObjectPropertyDomainAxiom) {
+			if (axiom instanceof ElkClassAxiom
+					|| axiom instanceof ElkObjectPropertyDomainAxiom) {
 				loader.remove(axiom);
 			}
 		}
@@ -89,7 +91,8 @@ public class CleanIndexHook implements RandomWalkTestHook {
 		loader.clear();
 
 		for (ElkAxiom axiom : axioms) {
-			if (axiom instanceof ElkClassAxiom || axiom instanceof ElkObjectPropertyDomainAxiom) {
+			if (axiom instanceof ElkClassAxiom
+					|| axiom instanceof ElkObjectPropertyDomainAxiom) {
 				loader.add(axiom);
 			}
 		}

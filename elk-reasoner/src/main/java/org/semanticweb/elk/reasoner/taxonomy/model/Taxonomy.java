@@ -38,7 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
  * @param <T>
- *            the type of the {@link ElkObject}s stored in this taxonomy
+ *            the type of objects stored in this taxonomy
  */
 public interface Taxonomy<T extends ElkObject> {
 

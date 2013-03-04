@@ -23,7 +23,9 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.AxiomChangeListener;
@@ -34,6 +36,7 @@ import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -41,7 +44,9 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -50,10 +55,15 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.OrphanNode;
+import org.semanticweb.elk.reasoner.taxonomy.OrphanTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.SingletoneInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.SingletoneTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -319,10 +329,13 @@ public abstract class AbstractReasonerState {
 	 * if it has not been done yet.
 	 * 
 	 * @return the class taxonomy implied by the current ontology
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public Taxonomy<ElkClass> getTaxonomy() throws ElkException {
+	public Taxonomy<ElkClass> getTaxonomy()
+			throws ElkInconsistentOntologyException, ElkException {
 
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
@@ -342,15 +355,26 @@ public abstract class AbstractReasonerState {
 		return classTaxonomyState.getTaxonomy();
 	}
 
-	public Taxonomy<ElkClass> getTaxonomyQuietly() {
-		Taxonomy<ElkClass> result = null;
+	/**
+	 * Compute the inferred taxonomy of the named classes for the given ontology
+	 * if it has not been done yet.
+	 * 
+	 * @return the class taxonomy implied by the current ontology
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	public Taxonomy<ElkClass> getTaxonomyQuietly() throws ElkException {
+		Taxonomy<ElkClass> result;
 
 		try {
 			result = getTaxonomy();
-		} catch (ElkException e) {
+		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
 
-			result = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
+			OrphanNode<ElkClass> node = new OrphanNode<ElkClass>(
+					getAllClasses(), PredefinedElkClass.OWL_NOTHING);
+			result = new SingletoneTaxonomy<ElkClass, OrphanNode<ElkClass>>(
+					node);
 		}
 
 		return result;
@@ -361,6 +385,8 @@ public abstract class AbstractReasonerState {
 	 * has not been done yet.
 	 * 
 	 * @return the instance taxonomy implied by the current ontology
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
@@ -384,18 +410,61 @@ public abstract class AbstractReasonerState {
 		return instanceTaxonomyState.getTaxonomy();
 	}
 
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly() {
-		InstanceTaxonomy<ElkClass, ElkNamedIndividual> result = null;
+	/**
+	 * Compute the inferred taxonomy of the named classes with instances if this
+	 * has not been done yet.
+	 * 
+	 * @return the instance taxonomy implied by the current ontology
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly()
+			throws ElkException {
+
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> result;
 
 		try {
 			result = getInstanceTaxonomy();
-		} catch (ElkException e) {
+		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
-
-			result = PredefinedTaxonomy.INCONSISTENT_INDIVIDUAL_TAXONOMY;
+			OrphanTypeNode<ElkClass, ElkNamedIndividual> node = new OrphanTypeNode<ElkClass, ElkNamedIndividual>(
+					getAllClasses(), PredefinedElkClass.OWL_NOTHING, 1);
+			Set<ElkNamedIndividual> allNamedIndividuals = getAllNamedIndividuals();
+			Iterator<ElkNamedIndividual> namedIndividualIterator = allNamedIndividuals
+					.iterator();
+			if (namedIndividualIterator.hasNext()) {
+				// there is at least one individual
+				node.addInstanceNode(new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
+						allNamedIndividuals, namedIndividualIterator.next(),
+						node));
+			}
+			result = new SingletoneInstanceTaxonomy<ElkClass, ElkNamedIndividual, OrphanTypeNode<ElkClass, ElkNamedIndividual>>(
+					node);
 		}
 
 		return result;
+	}
+
+	/**
+	 * @return all {@link ElkClass}es occurring in the ontology
+	 */
+	public Set<ElkClass> getAllClasses() {
+		Set<ElkClass> result = new ArrayHashSet<ElkClass>(ontologyIndex
+				.getIndexedClasses().size());
+		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
+			result.add(ic.getElkClass());
+		return result;
+	}
+
+	/**
+	 * @return all {@link ElkNamedIndividual}s occurring in the ontology
+	 */
+	public Set<ElkNamedIndividual> getAllNamedIndividuals() {
+		Set<ElkNamedIndividual> allNamedIndividuals = new ArrayHashSet<ElkNamedIndividual>(
+				ontologyIndex.getIndexedClasses().size());
+		for (IndexedIndividual ii : ontologyIndex.getIndexedIndividuals())
+			allNamedIndividuals.add(ii.getElkNamedIndividual());
+		return allNamedIndividuals;
 	}
 
 	public Map<IndexedClassExpression, Context> getContextMap() {

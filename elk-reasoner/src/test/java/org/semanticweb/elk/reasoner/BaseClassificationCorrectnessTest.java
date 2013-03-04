@@ -28,7 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestOutput;
@@ -40,7 +39,7 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * @param <EO> 
+ * @param <EO>
  * 
  */
 @RunWith(PolySuite.class)
@@ -69,22 +68,9 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 	public void classify() throws TestResultComparisonException, ElkException {
 		Taxonomy<ElkClass> taxonomy;
 
-		try {
-			taxonomy = reasoner.getTaxonomy();
-			
-			/*try {
-				Writer writer = new OutputStreamWriter(System.out);
-				TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-				writer.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}*/
-			
-			manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
-		} catch (ElkInconsistentOntologyException e) {
-			manifest.compare(new ClassTaxonomyTestOutput(
-					PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY));
-		}
+		taxonomy = reasoner.getTaxonomyQuietly();
+
+		manifest.compare(new ClassTaxonomyTestOutput(taxonomy));
 	}
 
 	/**
@@ -115,13 +101,8 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 
 		if (reasoningProcess.exception != null)
 			throw reasoningProcess.exception;
-		if (reasoningProcess.consistent) {
-			manifest.compare(new ClassTaxonomyTestOutput(reasoningProcess
-					.getTaxonomy()));
-		} else {
-			manifest.compare(new ClassTaxonomyTestOutput(
-					PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY));
-		}
+		manifest.compare(new ClassTaxonomyTestOutput(reasoningProcess
+				.getTaxonomy()));
 
 	}
 
@@ -135,15 +116,12 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 	class ReasoningProcess implements Runnable {
 
 		Taxonomy<ElkClass> taxonomy = null;
-		boolean consistent = true;
 		ElkException exception = null;
 
 		@Override
 		public void run() {
 			try {
-				taxonomy = reasoner.getTaxonomy();
-			} catch (ElkInconsistentOntologyException e) {
-				consistent = false;
+				taxonomy = reasoner.getTaxonomyQuietly();
 			} catch (ElkException e) {
 				exception = e;
 			}
@@ -151,10 +129,6 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 
 		public Taxonomy<ElkClass> getTaxonomy() {
 			return this.taxonomy;
-		}
-
-		public boolean isConsistent() {
-			return consistent;
 		}
 
 	};

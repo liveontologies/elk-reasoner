@@ -129,7 +129,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject> impl
 		return instanceTypeMap.keySet();
 	}	
 	
-	protected MockTypeNode makeInconsistent() {
+	protected void makeInconsistent() {
 		parentMap.clear();
 		childrenMap.clear();
 		instanceIndex.clear();
@@ -139,8 +139,6 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject> impl
 		top = bottom;
 		//init the only node in the taxonomy
 		initTypeNode(bottom);
-		
-		return bottom;
 	}
 	
 	public boolean isConsistent() {
@@ -152,7 +150,9 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject> impl
 		// check for inconsistency
 		if (types.contains(top.getCanonicalMember())
 				&& types.contains(bottom.getCanonicalMember())) {
-			return makeInconsistent();
+			makeInconsistent();
+			bottom.addMembers(types);
+			return bottom;
 		} else {
 			// nodes for some types may already exist
 			MutableTypeNode<T,I> node = null;

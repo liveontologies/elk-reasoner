@@ -22,7 +22,12 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.TestOutput;
@@ -41,7 +46,17 @@ public class ClassTaxonomyTestOutput implements TestOutput {
 
 	@Override
 	public String toString() {
-		return String.valueOf(getHashCode());
+
+		Writer writer = new StringWriter();
+		try {
+			TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+		} catch (IOException e) {
+			// TODO: what to return?
+			return e.toString();
+		}
+		return writer.toString();
+
+		// return String.valueOf(getHashCode());
 	}
 
 }

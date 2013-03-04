@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * A node of instances in an InstanceTaxonomy.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  * @param <T>
  *            the type of objects in this node
@@ -44,13 +45,19 @@ public interface InstanceNode<T extends ElkObject, I extends ElkObject> extends
 	 * Get an unmodifiable set of nodes for ElkObjects that are direct types of
 	 * this Node.
 	 * 
-	 * @return list of nodes for direct types of this node's members
+	 * 
+	 * Get an unmodifiable set of {@link TypeNode}s of which the members of this
+	 * {@link InstanceNode} are direct instances. A member is a direct instance
+	 * of a {@link TypeNode} if it is an instance of the {@link TypeNode} and
+	 * not an instance of any sub-node of a {@link TypeNode}.
+	 * 
+	 * @return nodes for direct types of this node's members
 	 */
 	public Set<? extends TypeNode<T, I>> getDirectTypeNodes();
 
 	/**
-	 * Get an unmodifiable set of nodes for ElkObjects that are (possibly
-	 * indirect) types of this Node.
+	 * Get an unmodifiable set of {@link TypeNode}s of which the members of this
+	 * {@link InstanceNode} are (possibly indirect) instances.
 	 * 
 	 * @return list of nodes for instances of this node's members
 	 */

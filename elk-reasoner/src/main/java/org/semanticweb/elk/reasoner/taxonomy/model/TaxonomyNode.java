@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * 
  * @author Markus Kroetzsch
  * @param <T>
- *            the type of objects in the nodes of this taxonomy
+ *            the type of objects stored in the nodes
  */
 public interface TaxonomyNode<T extends ElkObject> extends Node<T> {
 	/**
@@ -70,11 +70,4 @@ public interface TaxonomyNode<T extends ElkObject> extends Node<T> {
 	 * @return set of nodes for sub-objects of this node's members
 	 */
 	public Set<? extends TaxonomyNode<T>> getAllSubNodes();
-
-	/**
-	 * Returns the taxonomy to which this node belongs.
-	 * 
-	 * @return the taxonomy to which this node belongs
-	 */
-	//public Taxonomy<T> getTaxonomy();
 }

@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -56,36 +57,33 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	private final int maxRounds_;
 
 	private final int iterations_;
-	
+
 	private final RandomWalkRunnerIO<T> io_;
 
-	public RandomWalkIncrementalClassificationRunner(int rounds, int iter, RandomWalkRunnerIO<T> io) {
+	public RandomWalkIncrementalClassificationRunner(int rounds, int iter,
+			RandomWalkRunnerIO<T> io) {
 		maxRounds_ = rounds;
 		iterations_ = iter;
 		io_ = io;
 	}
-	
+
 	public void run(final Reasoner reasoner,
-			final OnOffVector<T> changingAxioms,
-			final List<T> staticAxioms,
-			final long seed
-			) throws ElkException,
-			InterruptedException, IOException {
+			final OnOffVector<T> changingAxioms, final List<T> staticAxioms,
+			final long seed) throws ElkException, InterruptedException,
+			IOException {
 		run(reasoner, changingAxioms, staticAxioms, seed, null);
 	}
 
 	public void run(final Reasoner reasoner,
-			final OnOffVector<T> changingAxioms,
-			final List<T> staticAxioms,
-			final long seed,
-			final RandomWalkTestHook hook) throws ElkException,
-			InterruptedException, IOException {
+			final OnOffVector<T> changingAxioms, final List<T> staticAxioms,
+			final long seed, final RandomWalkTestHook hook)
+			throws ElkException, InterruptedException, IOException {
 
 		// for storing taxonomy hash history
 		Deque<String> resultHashHistory = new LinkedList<String>();
 
 		reasoner.setAllowIncrementalMode(true);
-		
+
 		final String originalTaxonomyHash = getResultHash(reasoner);
 
 		if (LOGGER_.isDebugEnabled()) {
@@ -101,8 +99,9 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		}
 
 		int changeSize = getInitialChangeSize(changingAxiomsCount);
-		//this tracker is responsible for generating random changes
-		IncrementalChangeTracker<T> tracker = new IncrementalChangeTracker<T>(changingAxioms, changeSize);
+		// this tracker is responsible for generating random changes
+		IncrementalChangeTracker<T> tracker = new IncrementalChangeTracker<T>(
+				changingAxioms, changeSize);
 
 		for (int j = 0; j < rounds; j++) {
 			if (LOGGER_.isInfoEnabled())
@@ -111,35 +110,38 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			changingAxioms.setAllOn();
 
 			resultHashHistory.add(originalTaxonomyHash);
-			
+
 			for (int i = 0; i < iterations_; i++) {
 				IncrementalChange<T> change = tracker.generateNextChange();
-				
+
 				io_.loadChanges(reasoner, change);
-				
+
 				final String resultHash = getResultHash(reasoner);
-				
+
 				resultHashHistory.add(resultHash);
-				
+
 				if (LOGGER_.isDebugEnabled()) {
 					LOGGER_.debug("Taxonomy hash code for round " + (j + 1)
 							+ " iteration " + (i + 1) + ": " + resultHash);
-					
+
 					LOGGER_.debug("Deleted axioms");
 					printCurrentAxioms(change.getDeletions(), Level.DEBUG);
 					LOGGER_.debug("Added axioms");
 					printCurrentAxioms(change.getAdditions(), Level.DEBUG);
 					LOGGER_.debug("Current axioms");
-					printCurrentAxioms(Operations.concat(changingAxioms.getOnElements(), staticAxioms), Level.DEBUG);					
-				}			
+					printCurrentAxioms(Operations.concat(
+							changingAxioms.getOnElements(), staticAxioms),
+							Level.DEBUG);
+				}
 
 				if (LOGGER_.isTraceEnabled()) {
 					printResult(reasoner, LOGGER_, Level.TRACE);
 				}
-				
-				/*if (hook != null) {
-					hook.apply(reasoner, changingAxioms, staticAxioms);
-				}*/
+
+				/*
+				 * if (hook != null) { hook.apply(reasoner, changingAxioms,
+				 * staticAxioms); }
+				 */
 			}
 
 			if (LOGGER_.isDebugEnabled()) {
@@ -147,9 +149,8 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			}
 
 			String finalResultHash = resultHashHistory.pollLast();
-			Reasoner standardReasoner = io_.createReasoner(
-					Operations.concat(changingAxioms.getOnElements(),
-							staticAxioms));
+			Reasoner standardReasoner = io_.createReasoner(Operations.concat(
+					changingAxioms.getOnElements(), staticAxioms));
 
 			final String expectedResultHash = getResultHash(standardReasoner);
 
@@ -164,35 +165,36 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				standardReasoner.shutdown();
 				throw e;
 			}
-			
+
 			standardReasoner.shutdown();
 
 			if (LOGGER_.isDebugEnabled()) {
 				LOGGER_.debug("Reverting the changes");
 			}
-			
+
 			for (;;) {
-				IncrementalChange<T> change = tracker.getChangeHistory().pollLast();
+				IncrementalChange<T> change = tracker.getChangeHistory()
+						.pollLast();
 				String expectedHash = resultHashHistory.pollLast();
-				
+
 				if (change == null) {
 					break;
 				}
-				
+
 				io_.revertChanges(reasoner, change);
-				
+
 				String taxonomyHash = getResultHash(reasoner);
 
 				try {
 					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
 				} catch (AssertionError e) {
-					//TODO print the taxonomies here?					
+					// TODO print the taxonomies here?
 					printResult(reasoner, LOGGER_, Level.INFO);
 
 					throw e;
 				}
 			}
-			
+
 			// doubling the change size every round
 			changeSize *= 2;
 		}
@@ -202,20 +204,21 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	 * The next methods should be overridden in subclasses which perform other
 	 * reasoning tasks
 	 */
-	
-	protected void printResult(Reasoner reasoner, Logger logger, Level trace) throws IOException {
+
+	protected void printResult(Reasoner reasoner, Logger logger, Level trace)
+			throws IOException, ElkException {
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 		StringWriter writer = new StringWriter();
-		
+
 		TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
 		writer.flush();
-		
+
 		logger.log(trace, "CLASS TAXONOMY");
 		logger.log(trace, writer.getBuffer());
 		writer.close();
 	}
 
-	protected String getResultHash(Reasoner reasoner) {
+	protected String getResultHash(Reasoner reasoner) throws ElkException {
 		return TaxonomyPrinter.getHashString(reasoner.getTaxonomyQuietly());
 	}
 
@@ -242,5 +245,5 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			}
 		}
 	}
-	
+
 }

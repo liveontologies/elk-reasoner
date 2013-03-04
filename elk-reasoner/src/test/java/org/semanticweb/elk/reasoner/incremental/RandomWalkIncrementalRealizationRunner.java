@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,6 +30,7 @@ import java.io.StringWriter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -39,39 +41,44 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
  * TODO docs
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class RandomWalkIncrementalRealizationRunner<T> extends
 		RandomWalkIncrementalClassificationRunner<T> {
 
-	public RandomWalkIncrementalRealizationRunner(int rounds, int iter, RandomWalkRunnerIO<T> io) {
+	public RandomWalkIncrementalRealizationRunner(int rounds, int iter,
+			RandomWalkRunnerIO<T> io) {
 		super(rounds, iter, io);
 	}
 
 	@Override
 	protected void printResult(Reasoner reasoner, Logger logger, Level trace)
-			throws IOException {
-		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
+			throws IOException, ElkException {
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner
+				.getInstanceTaxonomyQuietly();
 		StringWriter writer = new StringWriter();
-		
+
 		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
 		writer.flush();
-		
+
 		logger.log(trace, "INSTANCE TAXONOMY");
 		logger.log(trace, writer.getBuffer());
 		writer.close();
 	}
 
 	@Override
-	protected String getResultHash(Reasoner reasoner) {
-		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
-		
-		/*for (TypeNode<ElkClass, ElkNamedIndividual> typeNode : taxonomy.getTypeNodes()) {
-			System.out.println(typeNode + ": " + typeNode.getDirectInstanceNodes());
-		}*/
-		
+	protected String getResultHash(Reasoner reasoner) throws ElkException {
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner
+				.getInstanceTaxonomyQuietly();
+
+		/*
+		 * for (TypeNode<ElkClass, ElkNamedIndividual> typeNode :
+		 * taxonomy.getTypeNodes()) { System.out.println(typeNode + ": " +
+		 * typeNode.getDirectInstanceNodes()); }
+		 */
+
 		return TaxonomyPrinter.getInstanceHashString(taxonomy);
 	}
-	
+
 }

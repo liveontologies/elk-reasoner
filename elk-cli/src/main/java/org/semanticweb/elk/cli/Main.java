@@ -51,7 +51,6 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
@@ -188,12 +187,7 @@ public class Main {
 			}
 
 			if (options.has(classify)) {
-				Taxonomy<ElkClass> taxonomy = null;
-				try {
-					taxonomy = reasoner.getTaxonomy();
-				} catch (ElkInconsistentOntologyException e) {
-					taxonomy = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
-				}
+				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 				if (options.hasArgument(outputFile))
 					writeClassTaxonomyToFile(options.valueOf(outputFile),
 							taxonomy);
@@ -203,11 +197,7 @@ public class Main {
 
 			if (options.has(realize)) {
 				InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
-				try {
-					taxonomy = reasoner.getInstanceTaxonomy();
-				} catch (ElkInconsistentOntologyException e) {
-					taxonomy = PredefinedTaxonomy.INCONSISTENT_INDIVIDUAL_TAXONOMY;
-				}
+				taxonomy = reasoner.getInstanceTaxonomyQuietly();
 				if (options.hasArgument(outputFile))
 					writeInstanceTaxonomyToFile(options.valueOf(outputFile),
 							taxonomy);
