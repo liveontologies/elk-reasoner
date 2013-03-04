@@ -34,7 +34,9 @@ import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
- * TODO docs
+ * Incrementally updates the class taxonomy by creating nodes for named classes
+ * whose contexts have been either created or modified. The taxonomy is expected
+ * to be previously cleaned.
  * 
  * @author Pavel Klinov
  * 
@@ -75,6 +77,7 @@ class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 				return indexedClass.occurs() ? indexedClass : null;
 			}
 		};
+		
 		Collection<IndexedClass> modified = Operations.getCollection(
 				Operations.map(reasoner.classTaxonomyState.classesForModifiedNodes, transformation),
 				// an upper bound

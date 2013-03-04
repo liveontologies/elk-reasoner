@@ -34,7 +34,9 @@ import org.semanticweb.elk.util.collections.Operations;
  */
 
 /**
- * TODO docs
+ * Incrementally updates the instance taxonomy by creating nodes for individuals
+ * whose contexts have been either created or modified. The taxonomy is expected
+ * to be previously cleaned.
  * 
  * @author Pavel Klinov
  * 
@@ -43,8 +45,8 @@ import org.semanticweb.elk.util.collections.Operations;
 public class IncrementalInstanceTaxonomyComputationStage extends
 		AbstractReasonerStage {
 
-//	private static final Logger LOGGER_ = Logger
-//			.getLogger(IncrementalInstanceTaxonomyComputationStage.class);
+	// private static final Logger LOGGER_ = Logger
+	// .getLogger(IncrementalInstanceTaxonomyComputationStage.class);
 
 	private InstanceTaxonomyComputation computation_ = null;
 
@@ -78,14 +80,14 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 			public IndexedIndividual transform(ElkNamedIndividual element) {
 				IndexedIndividual indexedindividual = (IndexedIndividual) element
 						.accept(reasoner.objectCache_.getIndexObjectConverter());
-				
+
 				return indexedindividual.occurs() ? indexedindividual : null;
 			}
 		};
 		Collection<IndexedIndividual> modified = Operations.getCollection(
 				Operations.map(modifiedIndividuals, transformation),
 				// an upper bound
-				modifiedIndividuals.size());		
+				modifiedIndividuals.size());
 
 		this.computation_ = new InstanceTaxonomyComputation(modified,
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
