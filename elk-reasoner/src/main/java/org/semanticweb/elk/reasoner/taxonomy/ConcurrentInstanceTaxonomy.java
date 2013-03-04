@@ -294,8 +294,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	public boolean removeNode(UpdateableTaxonomyNode<ElkClass> node) {
 		UpdateableTypeNodeWrapper wrapper = wrapperMap_.get(node);
 		
-		if (wrapper != null) {
-			wrapperMap_.remove(node);
+		if (wrapper != null && wrapperMap_.remove(node, wrapper)) {
 			
 			for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : wrapper.getDirectInstanceNodes()) {
 				synchronized(instanceNode) {
