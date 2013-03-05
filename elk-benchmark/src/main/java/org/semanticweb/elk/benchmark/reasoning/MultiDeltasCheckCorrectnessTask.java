@@ -27,6 +27,7 @@ import java.io.File;
 import org.junit.Assert;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
@@ -92,13 +93,17 @@ public class MultiDeltasCheckCorrectnessTask extends
 
 		@Override
 		public void run() throws TaskException {
-			Taxonomy<ElkClass> incrementalTaxonomy = reasoner
-					.getTaxonomyQuietly();
-			Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
-					.getTaxonomyQuietly();
+			try {
+				Taxonomy<ElkClass> incrementalTaxonomy = reasoner
+						.getTaxonomyQuietly();
+				Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
+						.getTaxonomyQuietly();
 
-			Assert.assertEquals(TaxonomyHasher.hash(incrementalTaxonomy),
-					TaxonomyHasher.hash(standardTaxonomy));
+				Assert.assertEquals(TaxonomyHasher.hash(incrementalTaxonomy),
+						TaxonomyHasher.hash(standardTaxonomy));
+			} catch (ElkException e) {
+				throw new TaskException(e);
+			}
 		}
 
 	}
@@ -125,13 +130,17 @@ public class MultiDeltasCheckCorrectnessTask extends
 
 		@Override
 		public void run() throws TaskException {
-			Taxonomy<ElkClass> incrementalTaxonomy = reasoner
-					.getTaxonomyQuietly();
-			Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
-					.getTaxonomyQuietly();
+			try {
+				Taxonomy<ElkClass> incrementalTaxonomy = reasoner
+						.getTaxonomyQuietly();
+				Taxonomy<ElkClass> standardTaxonomy = standardReasoner_
+						.getTaxonomyQuietly();
 
-			Assert.assertEquals(TaxonomyHasher.hash(incrementalTaxonomy),
-					TaxonomyHasher.hash(standardTaxonomy));
+				Assert.assertEquals(TaxonomyHasher.hash(incrementalTaxonomy),
+						TaxonomyHasher.hash(standardTaxonomy));
+			} catch (ElkException e) {
+				throw new TaskException(e);
+			}
 		}
 
 	}

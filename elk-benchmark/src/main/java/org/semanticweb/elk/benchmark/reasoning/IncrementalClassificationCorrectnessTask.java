@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.TaskException;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -101,15 +102,19 @@ public class IncrementalClassificationCorrectnessTask extends
 	
 	
 	protected void correctnessCheck(Reasoner standardReasoner, Reasoner incrementalReasoner, long seed) throws TaskException {
-		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomyQuietly();
-		Taxonomy<ElkClass> incremental = incrementalReasoner.getTaxonomyQuietly();
-		
-		int expectedHashCode = TaxonomyHasher.hash(expected);
-		int gottenHashCode = TaxonomyHasher.hash(incremental);
-		
-		if (expectedHashCode != gottenHashCode) {
+		try {
+			Taxonomy<ElkClass> expected = standardReasoner.getTaxonomyQuietly();
+			Taxonomy<ElkClass> incremental = incrementalReasoner.getTaxonomyQuietly();
 			
-			throw new TaskException("Comparison failed for seed " + seed);
+			int expectedHashCode = TaxonomyHasher.hash(expected);
+			int gottenHashCode = TaxonomyHasher.hash(incremental);
+			
+			if (expectedHashCode != gottenHashCode) {
+				
+				throw new TaskException("Comparison failed for seed " + seed);
+			}
+		} catch (ElkException e) {
+			throw new TaskException(e);
 		}
 	}
 

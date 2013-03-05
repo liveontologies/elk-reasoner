@@ -205,7 +205,11 @@ public class IncrementalClassificationMultiDeltas extends
 
 		@Override
 		public void run() throws TaskException {
-			reasoner.getTaxonomyQuietly();
+			try {
+				reasoner.getTaxonomyQuietly();
+			} catch (ElkException e) {
+				throw new TaskException(e);
+			}
 		}
 
 		protected void createReasoner() throws TaskException {
@@ -341,8 +345,12 @@ public class IncrementalClassificationMultiDeltas extends
 
 		@Override
 		public void run() throws TaskException {
-			reasoner.getTaxonomyQuietly();
-			metrics.incrementRunCount();
+			try {
+				reasoner.getTaxonomyQuietly();
+				metrics.incrementRunCount();
+			} catch (ElkException e) {
+				throw new TaskException(e);
+			}
 		}
 
 		@Override

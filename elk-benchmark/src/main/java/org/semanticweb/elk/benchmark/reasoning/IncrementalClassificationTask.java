@@ -40,6 +40,7 @@ import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2ParserLoader;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -175,25 +176,24 @@ public class IncrementalClassificationTask implements Task {
 		incrementalReasoner.registerOntologyChangesLoader(changeLoader);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
-			// delete some axioms
-			Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms, rnd);
+			try {
+				// delete some axioms
+				Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms, rnd);
 
-			/*
-			 * for (ElkAxiom del : deleted) {
-			 * System.out.println(OwlFunctionalStylePrinter.toString(del)); }
-			 */
+				// incremental changes
+				changeLoader.clear();
 
-			// incremental changes
-			changeLoader.clear();
+				remove(changeLoader, deleted);
+				incrementalReasoner.getTaxonomyQuietly();
+				// add the axioms back
 
-			remove(changeLoader, deleted);
-			incrementalReasoner.getTaxonomyQuietly();
-			// add the axioms back
+				changeLoader.clear();
+				add(changeLoader, deleted);
 
-			changeLoader.clear();
-			add(changeLoader, deleted);
-
-			incrementalReasoner.getTaxonomyQuietly();
+				incrementalReasoner.getTaxonomyQuietly();
+			} catch (ElkException e) {
+				throw new TaskException(e);
+			}
 		}
 	}
 
