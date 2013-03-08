@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
@@ -75,7 +76,19 @@ public class ReasonerFactory {
 	 */
 	public Reasoner createReasoner(OntologyLoader ontologyLoader,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		return new Reasoner(ontologyLoader, stageExecutor,
+		return createReasoner(ontologyLoader, stageExecutor,
 				Executors.newCachedThreadPool(), config);
+	}
+
+	public Reasoner createReasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor, ExecutorService executor,
+			ReasonerConfiguration config) {
+		Reasoner reasoner = new Reasoner(ontologyLoader, stageExecutor,
+				executor, config);
+
+		reasoner.setAllowIncrementalMode(config
+				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
+
+		return reasoner;
 	}
 }

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
@@ -68,5 +69,6 @@ public class ReasonerFactoryTest {
 
 		assertNotNull(reasoner);
 		assertEquals(10, reasoner.getNumberOfWorkers());
+		assertFalse(reasoner.isIncrementalMode());
 	}
 }

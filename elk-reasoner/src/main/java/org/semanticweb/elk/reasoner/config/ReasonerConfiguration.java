@@ -46,8 +46,12 @@ public class ReasonerConfiguration extends BaseConfiguration {
 	@Parameter(type = "org.semanticweb.elk.reasoner.config.UnsupportedFeatureTreatment", value = "IGNORE")
 	public static final String UNSUPPORTED_FEATURE_TREATMENT = "elk.reasoner.unsupported_feature_treatment";
 	
+	//taken into account only if incremental mode is allowed for the reasoner
 	@Parameter(type = "java.lang.Boolean", value = "true")
 	public static final String INCREMENTAL_TAXONOMY = "elk.reasoner.incremental.taxonomy";	
+	
+	@Parameter(type = "java.lang.Boolean", value = "true")
+	public static final String INCREMENTAL_MODE_ALLOWED = "elk.reasoner.incremental.allowed";
 	
 	public final static String REASONER_CONFIG_PREFIX = "elk.reasoner";
 

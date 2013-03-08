@@ -40,14 +40,13 @@ public class TestReasonerUtils {
 
 	public static Reasoner createTestReasoner(OntologyLoader ontologyLoader,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		return new Reasoner(ontologyLoader, stageExecutor,
-				Executors.newSingleThreadExecutor(), config);
+		return new ReasonerFactory().createReasoner(ontologyLoader,
+				stageExecutor, Executors.newSingleThreadExecutor(), config);
 	}
 
 	public static Reasoner createTestReasoner(OntologyLoader ontologyLoader,
 			ReasonerStageExecutor stageExecutor) {
-		return new Reasoner(ontologyLoader, stageExecutor,
-				Executors.newSingleThreadExecutor(),
+		return createTestReasoner(ontologyLoader, stageExecutor,
 				ReasonerConfiguration.getConfiguration());
 	}
 
