@@ -77,7 +77,7 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * Number of workers for concurrent jobs.
 	 */
-	protected final int workerNo;
+	private int workerNo_;
 
 	/**
 	 * Should fresh entities in reasoner queries be accepted (configuration
@@ -91,13 +91,10 @@ public class Reasoner extends AbstractReasonerState {
 	 * {@link ReasonerFactory}.
 	 * */
 	protected Reasoner(OntologyLoader ontologyLoader,
-			ReasonerStageExecutor stageExecutor, ExecutorService executor,
-			ReasonerConfiguration config) {
-		super(ontologyLoader, config);
+			ReasonerStageExecutor stageExecutor, ExecutorService executor) {
+		super(ontologyLoader);
 
 		this.stageExecutor = stageExecutor;
-		this.workerNo = config
-				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
 		if (LOGGER_.isInfoEnabled())
@@ -139,13 +136,37 @@ public class Reasoner extends AbstractReasonerState {
 
 	@Override
 	protected int getNumberOfWorkers() {
-		return workerNo;
+		return workerNo_;
+	}
+	
+	/**
+	 * Sets the number of working threads. Shouldn't be used during reasoning.
+	 * 
+	 * @param workerNo
+	 */
+	public void setNumberOfWorkers(int workerNo) {
+		workerNo_ = workerNo;
+	}
+	
+	/**
+	 * This supposed to be the central place where the reasoner gets its
+	 * configuration options
+	 * 
+	 * @param config
+	 */
+	public final void setConfigurationOptions(ReasonerConfiguration config) {
+		workerNo_ = config
+				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
+		setAllowIncrementalMode(config
+				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
+		setAllowIncrementalTaxonomy(config
+				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY));
 	}
 
 	@Override
 	protected ComputationExecutor getProcessExecutor() {
 		if (executor == null)
-			executor = new ComputationExecutor(workerNo, "elk-reasoner");
+			executor = new ComputationExecutor(workerNo_, "elk-reasoner");
 		return executor;
 	}
 

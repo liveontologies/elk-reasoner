@@ -84,10 +84,9 @@ public class ReasonerFactory {
 			ReasonerStageExecutor stageExecutor, ExecutorService executor,
 			ReasonerConfiguration config) {
 		Reasoner reasoner = new Reasoner(ontologyLoader, stageExecutor,
-				executor, config);
+				executor);
 
-		reasoner.setAllowIncrementalMode(config
-				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
+		reasoner.setConfigurationOptions(config);
 
 		return reasoner;
 	}

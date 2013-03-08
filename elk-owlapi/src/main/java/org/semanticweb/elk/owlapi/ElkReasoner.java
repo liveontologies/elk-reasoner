@@ -208,6 +208,10 @@ public class ElkReasoner implements OWLReasoner {
 	protected Reasoner getInternalReasoner() {
 		return reasoner_;
 	}
+	
+	public void setConfigurationOptions(ReasonerConfiguration config) {
+		reasoner_.setConfigurationOptions(config);
+	}
 
 	/**
 	 * Logs a warning message for unsupported OWL API method

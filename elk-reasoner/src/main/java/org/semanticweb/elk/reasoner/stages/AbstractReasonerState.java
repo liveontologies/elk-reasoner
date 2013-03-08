@@ -40,7 +40,6 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
@@ -80,8 +79,6 @@ public abstract class AbstractReasonerState {
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(AbstractReasonerState.class);
-
-	final ReasonerConfiguration config_;
 
 	final SaturationState saturationState;
 
@@ -144,24 +141,31 @@ public abstract class AbstractReasonerState {
 	 * if {@code true}, reasoning will be done incrementally whenever possible
 	 */
 	private boolean allowIncrementalMode = true;
+	
+	private boolean allowIncrementalTaxonomy = true;
 
-	protected AbstractReasonerState(OntologyLoader ontologyLoader,
-			ReasonerConfiguration config) {
+	protected AbstractReasonerState(OntologyLoader ontologyLoader) {
 		this.objectCache_ = new IndexedObjectCache();
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
 		this.axiomInserter_ = new ElkAxiomIndexerVisitor(ontologyIndex, true);
 		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(ontologyIndex, false);
 		this.saturationState = new SaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
-		this.config_ = config;
 		this.stageManager = new ReasonerStageManager(this);
 		this.ontologyLoader_ = ontologyLoader.getLoader(axiomInserter_);
 	}
 
 	public void setAllowIncrementalMode(boolean allow) {
 		this.allowIncrementalMode = allow;
-		if (!allow)
+		
+		if (!allow) {
 			trySetIncrementalMode(false);
+			allowIncrementalTaxonomy = false;
+		}
+		
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info("Incremental mode is " + (allow ? "allowed" : "disallowed"));
+		}
 	}
 
 	public boolean isIncrementalMode() {
@@ -172,13 +176,8 @@ public abstract class AbstractReasonerState {
 		if (!allowIncrementalMode && mode)
 			// switching to incremental mode not allowed
 			return;
+		
 		ontologyIndex.setIncrementalMode(mode);
-
-		if (!mode) {
-			// clear taxonomy if switched to non-incremental mode
-			classTaxonomyState.getWriter().clear();
-			instanceTaxonomyState.getWriter().clear();
-		}
 	}
 
 	/**
@@ -528,9 +527,22 @@ public abstract class AbstractReasonerState {
 		return ontologyIndex;
 	}
 
+	protected boolean setAllowIncrementalTaxonomy(boolean flag) {
+		if (!flag) {
+			allowIncrementalTaxonomy = false;
+		}
+		else if (allowIncrementalMode) {
+			allowIncrementalTaxonomy = true;
+		}
+		else {
+			return false;
+		}
+		
+		return true;
+	}
+	
 	protected boolean useIncrementalTaxonomy() {
-		return config_
-				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY);
+		return allowIncrementalTaxonomy;
 	}
 
 	public void initClassTaxonomy() {
