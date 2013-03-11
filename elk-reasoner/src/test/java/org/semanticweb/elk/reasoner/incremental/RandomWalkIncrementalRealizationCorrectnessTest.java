@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,7 +28,9 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
@@ -42,14 +45,14 @@ import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class RandomWalkIncrementalRealizationCorrectnessTest extends
 		BaseRandomWalkIncrementalCorrectnessTest {
 
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
-	
+
 	public RandomWalkIncrementalRealizationCorrectnessTest(
 			ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
 		super(testManifest);
@@ -58,10 +61,17 @@ public class RandomWalkIncrementalRealizationCorrectnessTest extends
 	@Override
 	protected RandomWalkIncrementalClassificationRunner<ElkAxiom> getRandomWalkRunner(
 			int rounds, int iterations) {
-		return new RandomWalkIncrementalRealizationRunner<ElkAxiom>(rounds, iterations, new ElkAPIBasedIO());
+		return new RandomWalkIncrementalRealizationRunner<ElkAxiom>(rounds,
+				iterations, new ElkAPIBasedIO());
 	}
-	
-	
+
+	@Override
+	protected OntologyLoader getAxiomTrackingLoader(OntologyLoader fileLoader,
+			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
+		return new ClassAndIndividualAxiomTrackingOntologyLoader(fileLoader,
+				changingAxioms, staticAxioms);
+	}
+
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {

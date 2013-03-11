@@ -28,9 +28,11 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
@@ -68,6 +70,12 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends BaseRand
 		return new RandomWalkIncrementalClassificationRunner<ElkAxiom>(rounds, iterations, new ElkAPIBasedIO());
 	}
 
+	@Override
+	protected OntologyLoader getAxiomTrackingLoader(OntologyLoader fileLoader,
+			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
+		return new ClassAxiomTrackingOntologyLoader(fileLoader, changingAxioms, staticAxioms);
+	}	
+	
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {
@@ -87,5 +95,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends BaseRand
 							}
 						});
 	}
+
+
 
 }

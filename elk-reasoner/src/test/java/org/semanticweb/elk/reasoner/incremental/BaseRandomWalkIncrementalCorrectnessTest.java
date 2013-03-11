@@ -109,7 +109,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		OntologyLoader fileLoader = new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl(
 						new ElkEntityRecycler())), stream);
-		OntologyLoader trackingLoader = new TrackingOntologyLoader(fileLoader,
+		OntologyLoader trackingLoader = getAxiomTrackingLoader(fileLoader,
 				changingAxioms, staticAxioms);
 		incrementalReasoner = TestReasonerUtils.createTestReasoner(
 				trackingLoader, new PostProcessingStageExecutor());
@@ -127,6 +127,10 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 			incrementalReasoner.shutdown();
 		}
 	}
+
+	protected abstract OntologyLoader getAxiomTrackingLoader(
+			OntologyLoader fileLoader, OnOffVector<ElkAxiom> changingAxioms,
+			List<ElkAxiom> staticAxioms);
 
 	protected abstract RandomWalkIncrementalClassificationRunner<ElkAxiom> getRandomWalkRunner(
 			int rounds, int iterations);

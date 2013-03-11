@@ -36,13 +36,13 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TaskCollectionRunner {
+public class RepeatEachTaskRunner {
 
-	private static final Logger LOGGER_ = Logger.getLogger(TaskCollectionRunner.class);	
+	private static final Logger LOGGER_ = Logger.getLogger(RepeatEachTaskRunner.class);	
 	
 	private final TaskRunner runner_;
 	
-	protected TaskCollectionRunner(int warmups, int runs) {
+	protected RepeatEachTaskRunner(int warmups, int runs) {
 		runner_ = new TaskRunner(warmups, runs);
 	}
 

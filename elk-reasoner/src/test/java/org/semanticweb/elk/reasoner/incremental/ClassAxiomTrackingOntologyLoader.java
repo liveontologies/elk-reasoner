@@ -35,30 +35,32 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * collections. The first one keeps changing axioms that can be added or removed
  * by the incremental changes. The second one keeps the remaining axioms.
  * 
+ * The first collection contains only instances of {@link ElkClassAxiom}
+ * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class TrackingOntologyLoader implements OntologyLoader {
+public class ClassAxiomTrackingOntologyLoader implements OntologyLoader {
 
-	private final OntologyLoader loader_;
+	protected final OntologyLoader loader_;
 	/**
 	 * stores axioms that can be added and removed by incremental changes
 	 */
-	private final OnOffVector<ElkAxiom> changingAxioms_;
+	protected final OnOffVector<ElkAxiom> changingAxioms_;
 
 	/**
 	 * stores axioms that should not be added or remove
 	 */
-	private final List<ElkAxiom> staticAxioms_;
+	protected final List<ElkAxiom> staticAxioms_;
 
-	public TrackingOntologyLoader(OntologyLoader loader,
+	public ClassAxiomTrackingOntologyLoader(OntologyLoader loader,
 			OnOffVector<ElkAxiom> trackedAxioms, List<ElkAxiom> untrackedAxioms) {
 		this.loader_ = loader;
 		this.changingAxioms_ = trackedAxioms;
 		this.staticAxioms_ = untrackedAxioms;
 	}
 
-	TrackingOntologyLoader(OntologyLoader loader) {
+	ClassAxiomTrackingOntologyLoader(OntologyLoader loader) {
 		this(loader, new OnOffVector<ElkAxiom>(127), new ArrayList<ElkAxiom>());
 	}
 

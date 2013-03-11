@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.benchmark;
+
 /*
  * #%L
  * ELK Benchmarking Package
@@ -39,6 +40,7 @@ import org.semanticweb.elk.benchmark.reasoning.ClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationMultiDeltas;
 import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificationTask;
+import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificationWithABoxTask;
 
 /**
  * 
@@ -48,36 +50,40 @@ import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificati
  */
 public class BenchmarkTest {
 
-	@Rule public TestName testName = new TestName();
+	@Rule
+	public TestName testName = new TestName();
 	private static Set<String> testsToRun_ = null;
 
 	@BeforeClass
 	public static void before() {
 		String tests = System.getProperty("tests");
-		
+
 		if (tests != null) {
 			testsToRun_ = new HashSet<String>(Arrays.asList(tests.split(",")));
 		}
 	}
-	
+
 	@Test
 	public void classification() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName.getMethodName()));
-		
+		Assume.assumeTrue(testsToRun_ == null
+				|| testsToRun_.contains(testName.getMethodName()));
+
 		BenchmarkUtils.runTask(ClassificationTask.class.getName(),
-				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
-				Integer.valueOf(System.getProperty(Constants.RUNS)),
-				new String[]{System.getProperty("classification.ontology")});
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS, "0")),
+				Integer.valueOf(System.getProperty(Constants.RUNS, "1")),
+				new String[] { System.getProperty("classification.ontology") });
 	}
-	
+
 	@Test
 	public void classificationAll() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName.getMethodName()));
-		
-		BenchmarkUtils.runTaskCollection(AllFilesClassificationTask.class.getName(),
-				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
-				Integer.valueOf(System.getProperty(Constants.RUNS)),
-				new String[]{System.getProperty("classification.dir")});
+		Assume.assumeTrue(testsToRun_ == null
+				|| testsToRun_.contains(testName.getMethodName()));
+
+		BenchmarkUtils.runTaskCollection(
+				AllFilesClassificationTask.class.getName(),
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS, "0")),
+				Integer.valueOf(System.getProperty(Constants.RUNS, "1")),
+				new String[] { System.getProperty("classification.dir") });
 	}
 
 	@Test
@@ -85,13 +91,16 @@ public class BenchmarkTest {
 		Assume.assumeTrue(testsToRun_ == null
 				|| testsToRun_.contains(testName.getMethodName()));
 
-		BenchmarkUtils.runTask(
-				IncrementalClassificationTask.class.getName(),
-				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
-				Integer.valueOf(System.getProperty(Constants.RUNS)),
-				new String[] { System.getProperty("incremental.ontology"), "1" });
-	}	
-	
+		BenchmarkUtils
+				.runTask(
+						IncrementalClassificationTask.class.getName(),
+						Integer.valueOf(System.getProperty(Constants.WARM_UPS,
+								"0")),
+						Integer.valueOf(System.getProperty(Constants.RUNS, "1")),
+						new String[] {
+								System.getProperty("incremental.ontology"), "1" });
+	}
+
 	@Test
 	public void incrementalClassificationRandomWalk() throws Exception {
 		Assume.assumeTrue(testsToRun_ == null
@@ -99,28 +108,58 @@ public class BenchmarkTest {
 
 		BenchmarkUtils.runTask(
 				RandomWalkIncrementalClassificationTask.class.getName(),
-				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
-				Integer.valueOf(System.getProperty(Constants.RUNS)),
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS, "0")),
+				Integer.valueOf(System.getProperty(Constants.RUNS, "1")),
 				new String[] { System.getProperty("incremental.ontology") });
 	}
 
 	@Test
 	public void incrementalClassificationMultiDeltas() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName.getMethodName()));
-		
-		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
-				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
-				Integer.valueOf(System.getProperty(Constants.RUNS)),
-				new String[]{System.getProperty("incremental.dir")});
-	}	
-	
+		Assume.assumeTrue(testsToRun_ == null
+				|| testsToRun_.contains(testName.getMethodName()));
+
+		BenchmarkUtils.runTaskCollection2(
+				IncrementalClassificationMultiDeltas.class.getName(),
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS, "0")),
+				Integer.valueOf(System.getProperty(Constants.RUNS, "1")),
+				new String[] { System.getProperty("incremental.dir") });
+	}
+
 	@Test
 	public void incrementalClassificationAll() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null || testsToRun_.contains(testName.getMethodName()));
-		
-		BenchmarkUtils.runTaskCollection(AllFilesIncrementalClassificationTask.class.getName(),
-				Integer.valueOf(System.getProperty(Constants.WARM_UPS)),
-				Integer.valueOf(System.getProperty(Constants.RUNS)),
-				new String[]{System.getProperty("incremental.dir")});
+		Assume.assumeTrue(testsToRun_ == null
+				|| testsToRun_.contains(testName.getMethodName()));
+
+		BenchmarkUtils.runTaskCollection(
+				AllFilesIncrementalClassificationTask.class.getName(),
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS, "0")),
+				Integer.valueOf(System.getProperty(Constants.RUNS, "1")),
+				new String[] { System.getProperty("incremental.dir") });
+	}
+
+	@Test
+	public void incrementalRandomWalkTBoxABox() throws Exception {
+		Assume.assumeTrue(testsToRun_ == null
+				|| testsToRun_.contains(testName.getMethodName()));
+
+		TaskCollection collection = new AllFilesTaskCollection(
+				new String[] { System.getProperty("incremental.dir") }) {
+
+			@Override
+			public Task instantiateSubTask(String[] args) throws TaskException {
+				return new RandomWalkIncrementalClassificationWithABoxTask(args);
+			}
+		};
+
+		RunAllOnceThenRepeatRunner runner = new RunAllOnceThenRepeatRunner(
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS, "0")),
+				Integer.valueOf(System.getProperty(Constants.RUNS, "1")));
+
+		try {
+			runner.run(collection);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 }

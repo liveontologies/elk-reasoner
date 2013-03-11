@@ -32,20 +32,18 @@ import org.semanticweb.elk.util.logging.ElkTimer;
 /**
  * Runs all sub-tasks before repeating.
  * 
- * TODO Invent a meaningful name!
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TaskCollectionRunner2 {
+public class RunAllOnceThenRepeatRunner {
 
-	private static final Logger LOGGER_ = Logger.getLogger(TaskCollectionRunner2.class);
+	private static final Logger LOGGER_ = Logger.getLogger(RunAllOnceThenRepeatRunner.class);
 	
 	protected final int warmups;
 	protected final int runs;
 	
-	protected TaskCollectionRunner2(int warmups, int runs) {
+	protected RunAllOnceThenRepeatRunner(int warmups, int runs) {
 		this.warmups = warmups;
 		this.runs = runs;
 	}

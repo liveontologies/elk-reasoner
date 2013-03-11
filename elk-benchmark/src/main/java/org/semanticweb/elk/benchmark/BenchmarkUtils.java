@@ -121,7 +121,7 @@ public class BenchmarkUtils {
 		TaskCollection collection = TaskFactory.createTaskCollection(propMap
 				.get(Constants.TASK_CLASS_NAME), BenchmarkUtils
 				.getCommaSeparatedParameter(Constants.TASK_PARAMS));
-		TaskCollectionRunner runner = new TaskCollectionRunner(Integer.valueOf(propMap
+		RepeatEachTaskRunner runner = new RepeatEachTaskRunner(Integer.valueOf(propMap
 				.get(Constants.WARM_UPS)), Integer.valueOf(propMap
 				.get(Constants.RUNS)));
 
@@ -130,7 +130,7 @@ public class BenchmarkUtils {
 	
 	public static void runTaskCollection(String taskClass, int warmups, int runs, String[] params) throws Exception {
 		TaskCollection collection = TaskFactory.createTaskCollection(taskClass, params);
-		TaskCollectionRunner runner = new TaskCollectionRunner(warmups, runs);
+		RepeatEachTaskRunner runner = new RepeatEachTaskRunner(warmups, runs);
 
 		try {
 			runner.run(collection);
@@ -142,7 +142,7 @@ public class BenchmarkUtils {
 	
 	public static void runTaskCollection2(String taskClass, int warmups, int runs, String[] params) throws Exception {
 		TaskCollection collection = TaskFactory.createTaskCollection(taskClass, params);
-		TaskCollectionRunner2 runner = new TaskCollectionRunner2(warmups, runs);
+		RunAllOnceThenRepeatRunner runner = new RunAllOnceThenRepeatRunner(warmups, runs);
 
 		try {
 			runner.run(collection);

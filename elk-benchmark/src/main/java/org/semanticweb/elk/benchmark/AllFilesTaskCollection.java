@@ -38,7 +38,7 @@ public abstract class AllFilesTaskCollection implements TaskCollection {
 
 	private final String[] args_;
 	
-	public AllFilesTaskCollection(String[] args) {
+	public AllFilesTaskCollection(String... args) {
 		args_ = args;
 	}
 	

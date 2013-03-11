@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
@@ -44,10 +45,10 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.incremental.ClassAxiomTrackingOntologyLoader;
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalClassificationRunner;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO;
-import org.semanticweb.elk.reasoner.incremental.TrackingOntologyLoader;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 
 /**
@@ -63,12 +64,12 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RandomWalkIncrementalClassificationTask.class);
 
-	private Reasoner reasoner_;
+	protected Reasoner reasoner_;
 	private final String ontologyFile_;
-	private final ReasonerConfiguration reasonerConfig_;
-	private OnOffVector<ElkAxiom> changingAxioms_ = null;
+	protected final ReasonerConfiguration reasonerConfig_;
+	protected OnOffVector<ElkAxiom> changingAxioms_ = null;
 	// other axioms that do not change
-	private List<ElkAxiom> staticAxioms_ = null;
+	protected List<ElkAxiom> staticAxioms_ = null;
 
 	/**
 	 * how many test rounds is used
@@ -104,7 +105,7 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 					new Owl2FunctionalStyleParserFactory(
 							new ElkObjectFactoryImpl(new ElkEntityRecycler())),
 					ontologyFile);
-			OntologyLoader trackingLoader = new TrackingOntologyLoader(
+			OntologyLoader trackingLoader = getAxiomTrackingLoader(
 					fileLoader, changingAxioms_, staticAxioms_);
 			reasoner_ = TestReasonerUtils.createTestReasoner(trackingLoader,
 					new PostProcessingStageExecutor(), reasonerConfig_);
@@ -118,7 +119,7 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 
 	@Override
 	public void run() throws TaskException {
-		long seed = System.currentTimeMillis();
+		long seed = RandomSeedProvider.VALUE;
 
 		try {
 			new RandomWalkIncrementalClassificationRunner<ElkAxiom>(ROUNDS,
@@ -146,6 +147,12 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 	public Metrics getMetrics() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	protected OntologyLoader getAxiomTrackingLoader(OntologyLoader fileLoader,
+			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
+		return new ClassAxiomTrackingOntologyLoader(fileLoader, changingAxioms,
+				staticAxioms);
 	}
 
 }
