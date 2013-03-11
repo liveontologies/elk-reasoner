@@ -94,14 +94,6 @@ class TaxonomyCleaningFactory
 			final InstanceTaxonomyState instanceTaxonomyState) {
 		classTaxonomyState_ = classTaxonomyState;
 		instanceTaxonomyState_ = instanceTaxonomyState;
-
-		/*
-		 * if (classTaxonomyState_.getTaxonomy() != null) {
-		 * 
-		 * for (UpdateableTaxonomyNode<ElkClass> node : classTaxonomyState_
-		 * .getTaxonomy().getUpdateableNodes()) { if (node.isModified()) { throw
-		 * new RuntimeException("node"); } } }
-		 */
 	}
 
 	@Override
@@ -192,17 +184,24 @@ class TaxonomyCleaningFactory
 					}
 				}
 
+				// delete all direct instance nodes of the type node being
+				// removed
 				if (instanceTaxonomy != null) {
 					UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy
 							.getUpdateableTypeNode(elkClass);
 
-					if (typeNode == null)
+					if (typeNode == null) {
 						// could be deleted meanwhile in another thread
 						return;
+					} else {
+						List<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> directInstances = null;
 
-					synchronized (typeNode) {
-						for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : typeNode
-								.getDirectInstanceNodes()) {
+						synchronized (typeNode) {
+							directInstances = new LinkedList<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>(
+									typeNode.getDirectInstanceNodes());
+						}
+
+						for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
 							if (instanceNode.trySetModified(true)) {
 								instanceStateWriter_
 										.markModifiedIndividuals(instanceNode
