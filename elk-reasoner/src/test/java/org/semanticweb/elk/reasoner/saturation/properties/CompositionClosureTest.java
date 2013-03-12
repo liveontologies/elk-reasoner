@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
@@ -63,7 +63,7 @@ public class CompositionClosureTest {
 			return;
 
 		ModifiableOntologyIndex index = new DirectIndex();
-		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(index, true);
+		MainAxiomIndexerVisitor indexer = new MainAxiomIndexerVisitor(index, true);
 
 		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
 				":r"));
@@ -141,7 +141,7 @@ public class CompositionClosureTest {
 			return;
 
 		ModifiableOntologyIndex index = new DirectIndex();
-		ElkAxiomIndexerVisitor indexer = new ElkAxiomIndexerVisitor(index, true);
+		MainAxiomIndexerVisitor indexer = new MainAxiomIndexerVisitor(index, true);
 
 		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
 				":r"));

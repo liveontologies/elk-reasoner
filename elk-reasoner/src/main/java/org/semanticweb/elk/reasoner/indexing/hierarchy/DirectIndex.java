@@ -54,7 +54,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 		this.objectCache = objectCache;
 
 		// index predefined entities
-		ElkAxiomIndexerVisitor tmpAxiomInserter = new ElkAxiomIndexerVisitor(
+		MainAxiomIndexerVisitor tmpAxiomInserter = new MainAxiomIndexerVisitor(
 				this, true);
 		// TODO: what to do if someone tries to delete them?
 		this.indexedOwlThing = tmpAxiomInserter

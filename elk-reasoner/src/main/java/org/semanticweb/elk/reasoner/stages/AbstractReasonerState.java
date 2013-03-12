@@ -34,20 +34,25 @@ import org.semanticweb.elk.loading.ElkAxiomChange;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexerVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexingVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -107,11 +112,11 @@ public abstract class AbstractReasonerState {
 	/**
 	 * the object using which axioms are inserted into the index
 	 */
-	private final ElkAxiomProcessor axiomInserter_;
+	private final ElkAxiomIndexingVisitor axiomInserter_;
 	/**
 	 * the object using which axioms are deleted from the index
 	 */
-	private final ElkAxiomProcessor axiomDeleter_;
+	private final ElkAxiomIndexingVisitor axiomDeleter_;
 	/**
 	 * {@code true} if the current ontology is inconsistent
 	 */
@@ -140,31 +145,48 @@ public abstract class AbstractReasonerState {
 	/**
 	 * if {@code true}, reasoning will be done incrementally whenever possible
 	 */
-	private boolean allowIncrementalMode = true;
-	
-	private boolean allowIncrementalTaxonomy = true;
+	private boolean allowIncrementalMode_ = true;
+
+	private boolean allowIncrementalTaxonomy_ = true;
+	/**
+	 * The listener used to switch off the incremental mode
+	 */
+	private NonIncrementalChangeListener<ElkAxiom> nonIncrementalChangeListener_ = new NonIncrementalChangeListener<ElkAxiom>() {
+
+		@Override
+		public void notify(ElkAxiom axiom) {
+			if (LOGGER_.isDebugEnabled()) {
+				LOGGER_.debug("Switching to non-incremental mode because of the axiom "
+						+ axiom);
+			}
+
+			setAllowIncrementalMode(false);
+		}
+	};
 
 	protected AbstractReasonerState(OntologyLoader ontologyLoader) {
 		this.objectCache_ = new IndexedObjectCache();
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
-		this.axiomInserter_ = new ElkAxiomIndexerVisitor(ontologyIndex, true);
-		this.axiomDeleter_ = new ElkAxiomIndexerVisitor(ontologyIndex, false);
+		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex, true);
+		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
 		this.saturationState = new SaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
-		this.ontologyLoader_ = ontologyLoader.getLoader(axiomInserter_);
+		this.ontologyLoader_ = ontologyLoader
+				.getLoader(new ChangeIndexingProcessor(axiomInserter_));
 	}
 
 	public void setAllowIncrementalMode(boolean allow) {
-		this.allowIncrementalMode = allow;
-		
+		this.allowIncrementalMode_ = allow;
+
 		if (!allow) {
 			trySetIncrementalMode(false);
-			allowIncrementalTaxonomy = false;
+			allowIncrementalTaxonomy_ = false;
 		}
-		
+
 		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Incremental mode is " + (allow ? "allowed" : "disallowed"));
+			LOGGER_.info("Incremental mode is "
+					+ (allow ? "allowed" : "disallowed"));
 		}
 	}
 
@@ -173,10 +195,10 @@ public abstract class AbstractReasonerState {
 	}
 
 	void trySetIncrementalMode(boolean mode) {
-		if (!allowIncrementalMode && mode)
+		if (!allowIncrementalMode_ && mode)
 			// switching to incremental mode not allowed
 			return;
-		
+
 		ontologyIndex.setIncrementalMode(mode);
 	}
 
@@ -218,12 +240,21 @@ public abstract class AbstractReasonerState {
 	 * @return the source where changes in ontology can be loaded
 	 */
 	Loader getChangesLoader() {
-		// return changesLoader;
+
 		if (changesLoader_ == null) {
 			return null;
 		}
 
-		return changesLoader_.getLoader(axiomInserter_, axiomDeleter_);
+		// wrapping both the inserter and the deleter to receive notifications
+		// if some axiom change can't be incorporated incrementally
+		ElkAxiomProcessor inserterWrapper = new ChangeIndexingProcessor(
+				new NonIncrementalChangeCheckingVisitor(axiomInserter_,
+						nonIncrementalChangeListener_));
+		ElkAxiomProcessor deleterWrapper = new ChangeIndexingProcessor(
+				new NonIncrementalChangeCheckingVisitor(axiomDeleter_,
+						nonIncrementalChangeListener_));
+
+		return changesLoader_.getLoader(inserterWrapper, deleterWrapper);
 	}
 
 	/**
@@ -395,8 +426,7 @@ public abstract class AbstractReasonerState {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
-		if (ontologyIndex.isIncrementalMode()
-				&& instanceTaxonomyState.getTaxonomy() != null) {
+		if (isIncrementalMode() && instanceTaxonomyState.getTaxonomy() != null) {
 			getStageExecutor().complete(
 					stageManager.incrementalInstanceTaxonomyComputationStage);
 		} else {
@@ -529,20 +559,18 @@ public abstract class AbstractReasonerState {
 
 	protected boolean setAllowIncrementalTaxonomy(boolean flag) {
 		if (!flag) {
-			allowIncrementalTaxonomy = false;
-		}
-		else if (allowIncrementalMode) {
-			allowIncrementalTaxonomy = true;
-		}
-		else {
+			allowIncrementalTaxonomy_ = false;
+		} else if (allowIncrementalMode_) {
+			allowIncrementalTaxonomy_ = true;
+		} else {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	protected boolean useIncrementalTaxonomy() {
-		return allowIncrementalTaxonomy;
+		return allowIncrementalTaxonomy_;
 	}
 
 	public void initClassTaxonomy() {
@@ -554,7 +582,7 @@ public abstract class AbstractReasonerState {
 		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(
 				classTaxonomyState.getTaxonomy()));
 	}
-
+	
 	// ////////////////////////////////////////////////////////////////
 	/*
 	 * SOME DEBUG METHODS, FIXME: REMOVE

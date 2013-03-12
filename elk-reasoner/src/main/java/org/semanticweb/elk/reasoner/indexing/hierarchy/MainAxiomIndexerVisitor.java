@@ -25,9 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
@@ -35,11 +32,9 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainFilter;
-import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
  * An object that indexes axioms into a given ontology index. Each instance can
@@ -49,11 +44,7 @@ import org.semanticweb.elk.util.logging.ElkMessage;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ElkAxiomIndexerVisitor.class);
+public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor implements ElkAxiomIndexingVisitor {
 
 	/**
 	 * The index in which the changes are recorded
@@ -68,7 +59,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	/**
 	 * 1 if adding axioms, -1 if removing axioms
 	 */
-	private final int multiplicity;
+	private final int multiplicity_;
 
 	/**
 	 * {@link IndexObjectConverter}s used for indexing a neutral, a positive,
@@ -98,25 +89,30 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 	 * @param insert
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
-	public ElkAxiomIndexerVisitor(ModifiableOntologyIndex index, boolean insert) {
+	public MainAxiomIndexerVisitor(ModifiableOntologyIndex index, boolean insert) {
 		this.index_ = index;
 		this.objectCache_ = index.getIndexedObjectCache();
 		this.owlNothing_ = index.getIndexedOwlNothing();
-		this.multiplicity = insert ? 1 : -1;
+		this.multiplicity_ = insert ? 1 : -1;
 		IndexedPropertyChainFilter propertyOccurrenceUpdateFilter = new PropertyOccurrenceUpdateFilter(
-				multiplicity);
+				multiplicity_);
 		this.neutralIndexer = new IndexObjectConverter(
-				new ClassOccurrenceUpdateFilter(multiplicity, 0, 0),
+				new ClassOccurrenceUpdateFilter(multiplicity_, 0, 0),
 				propertyOccurrenceUpdateFilter);
 		this.positiveIndexer = new IndexObjectConverter(
-				new ClassOccurrenceUpdateFilter(multiplicity, multiplicity, 0),
+				new ClassOccurrenceUpdateFilter(multiplicity_, multiplicity_, 0),
 				propertyOccurrenceUpdateFilter);
 		this.negativeIndexer = new IndexObjectConverter(
-				new ClassOccurrenceUpdateFilter(multiplicity, 0, multiplicity),
+				new ClassOccurrenceUpdateFilter(multiplicity_, 0, multiplicity_),
 				propertyOccurrenceUpdateFilter);
-		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity);
+		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity_);
 	}
 
+	@Override
+	public int getMultiplicity() {
+		return multiplicity_;
+	}
+	
 	@Override
 	public void indexSubClassOfAxiom(ElkClassExpression subElkClass,
 			ElkClassExpression superElkClass) {
@@ -155,7 +151,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		IndexedObjectProperty superIndexedProperty = (IndexedObjectProperty) superElkProperty
 				.accept(positiveIndexer);
 
-		if (multiplicity == 1) {
+		if (multiplicity_ == 1) {
 			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
 			superIndexedProperty.addToldSubPropertyChain(subIndexedProperty);
 		} else {
@@ -177,8 +173,8 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		if (index_ == null)
 			throw new NullPointerException("indexUpdater not provided!");
 
-		owlNothing_.updateAndCheckOccurrenceNumbers(index_, multiplicity,
-				multiplicity, 0);
+		owlNothing_.updateAndCheckOccurrenceNumbers(index_, multiplicity_,
+				multiplicity_, 0);
 
 		List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
 				disjointClasses.size());
@@ -197,14 +193,14 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 				.accept(positiveIndexer);
 
 		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
-				&& multiplicity > 0)
+				&& multiplicity_ > 0)
 			// first occurrence of reflexivity axiom
 			index_.addReflexiveProperty(indexedReflexiveProperty);
 
-		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity;
+		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity_;
 
 		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
-				&& multiplicity < 0)
+				&& multiplicity_ < 0)
 			// no occurrence of reflexivity axiom
 			index_.removeReflexiveProperty(indexedReflexiveProperty);
 	}
@@ -226,23 +222,7 @@ public class ElkAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor {
 		return eni.accept(neutralIndexer);
 	}
 
-	@Override
-	public void visit(ElkAxiom elkAxiom) {
-		try {
-			elkAxiom.accept(this);
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("indexing "
-						+ OwlFunctionalStylePrinter.toString(elkAxiom)
-						+ " with multiplicity = " + multiplicity);
-		} catch (ElkIndexingUnsupportedException e) {
-			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn(new ElkMessage(e.getMessage()
-						+ " Axiom ignored:\n"
-						+ OwlFunctionalStylePrinter.toString(elkAxiom),
-						"reasoner.indexing.axiomIgnored"));
-		}
-	}
-
+	
 	/**
 	 * A {@link ClassOccurrenceUpdateFilter}, which is responsible for updating
 	 * the occurrence counters of {@link IndexedClassExpression}s, as well as
