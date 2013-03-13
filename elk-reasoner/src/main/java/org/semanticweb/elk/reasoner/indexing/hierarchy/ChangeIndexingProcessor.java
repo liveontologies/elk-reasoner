@@ -8,12 +8,11 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
- * Basically an adapter from {@link ElkAxiomVisitor} to
- * {@link ElkAxiomProcessor}
+ * Basically an adapter from {@link ElkAxiomIndexingVisitor} to
+ * {@link ElkAxiomProcessor} specifically for classes which index axioms.
  * 
  * @author Pavel Klinov
  * 
