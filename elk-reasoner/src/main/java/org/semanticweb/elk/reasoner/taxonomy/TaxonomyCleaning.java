@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
@@ -84,8 +83,8 @@ class TaxonomyCleaningFactory
 		implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
-	private static final Logger LOGGER_ = Logger
-			.getLogger(TaxonomyCleaningFactory.class);
+	/*private static final Logger LOGGER_ = Logger
+			.getLogger(TaxonomyCleaningFactory.class);*/
 
 	private final ClassTaxonomyState classTaxonomyState_;
 	private final InstanceTaxonomyState instanceTaxonomyState_;
@@ -246,8 +245,12 @@ class TaxonomyCleaningFactory
 										.singleton(individual));
 					}
 				} else {
-					// should never happen
-					LOGGER_.error("The instance taxonomy is unexpectedly null during taxonomy cleaning");
+					/*
+					 * can happen if the ontology has individuals, the instance
+					 * taxonomy was never constructed, but then some ABox axiom
+					 * was added or deleted. since there's no instance taxonomy,
+					 * we can safely ignore this.
+					 */
 				}
 			}
 
