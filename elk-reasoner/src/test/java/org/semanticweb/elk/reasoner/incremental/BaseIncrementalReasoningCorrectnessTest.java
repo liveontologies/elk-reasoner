@@ -58,10 +58,6 @@ import org.semanticweb.elk.util.collections.Operations;
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends TestOutput, AO extends TestOutput> {
 
-	protected enum CHANGE {
-		ADD, DELETE
-	};
-
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
@@ -136,9 +132,9 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 
 			// incremental changes
 			applyChanges(standardReasoner, changingAxioms.getOnElements(),
-					CHANGE.DELETE);
+					IncrementalChangeType.DELETE);
 			applyChanges(incrementalReasoner, changingAxioms.getOnElements(),
-					CHANGE.DELETE);
+					IncrementalChangeType.DELETE);
 
 			if (LOGGER_.isInfoEnabled())
 				LOGGER_.info("===DELETIONS===");
@@ -147,9 +143,9 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 
 			// add the axioms back
 			applyChanges(standardReasoner, changingAxioms.getOnElements(),
-					CHANGE.ADD);
+					IncrementalChangeType.ADD);
 			applyChanges(incrementalReasoner, changingAxioms.getOnElements(),
-					CHANGE.ADD);
+					IncrementalChangeType.ADD);
 
 			if (LOGGER_.isInfoEnabled())
 				LOGGER_.info("===ADDITIONS===");
@@ -171,7 +167,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 	}
 
 	protected abstract void applyChanges(Reasoner reasoner,
-			Iterable<T> changes, CHANGE type);
+			Iterable<T> changes, IncrementalChangeType type);
 
 	protected abstract void dumpChangeToLog(T change, Level level);
 

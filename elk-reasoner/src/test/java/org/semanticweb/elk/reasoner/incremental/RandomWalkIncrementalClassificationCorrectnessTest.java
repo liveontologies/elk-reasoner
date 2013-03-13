@@ -73,7 +73,8 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends BaseRand
 	@Override
 	protected OntologyLoader getAxiomTrackingLoader(OntologyLoader fileLoader,
 			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
-		return new ClassAxiomTrackingOntologyLoader(fileLoader, changingAxioms, staticAxioms);
+		//return new ClassAxiomTrackingOntologyLoader(fileLoader, changingAxioms, staticAxioms);
+		return new AllAxiomTrackingOntologyLoader(fileLoader, changingAxioms);
 	}	
 	
 	@Config

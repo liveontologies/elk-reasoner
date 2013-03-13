@@ -32,7 +32,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.incremental.IncrementalChangeLoader.DIRECTION;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 
 /**
@@ -65,7 +64,8 @@ public interface RandomWalkRunnerIO<T> {
 		@Override
 		public Reasoner createReasoner(Iterable<ElkAxiom> axioms) {
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					new TestAxiomLoader(axioms), new SimpleStageExecutor());
+					new TestChangesLoader(axioms, IncrementalChangeType.ADD),
+					new SimpleStageExecutor());
 
 			reasoner.setAllowIncrementalMode(false);
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
@@ -76,8 +76,8 @@ public interface RandomWalkRunnerIO<T> {
 		@Override
 		public void loadChanges(final Reasoner reasoner,
 				final IncrementalChange<ElkAxiom> change) {
-			reasoner.registerOntologyChangesLoader(new IncrementalChangeLoader(
-					change, DIRECTION.FORWARD));
+			reasoner.registerOntologyChangesLoader(new TestChangesLoader(
+					change.getAdditions(), change.getDeletions()));
 		}
 
 		@Override
@@ -88,8 +88,8 @@ public interface RandomWalkRunnerIO<T> {
 		@Override
 		public void revertChanges(Reasoner reasoner,
 				IncrementalChange<ElkAxiom> change) {
-			reasoner.registerOntologyChangesLoader(new IncrementalChangeLoader(
-					change, DIRECTION.BACKWARD));
+			reasoner.registerOntologyChangesLoader(new TestChangesLoader(
+					change.getDeletions(), change.getAdditions()));
 		}
 
 	}

@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.benchmark;
 
-import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificationWithABoxTask;
+import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificationTask;
 
 
 
@@ -46,13 +46,13 @@ public class CLIDriver {
 		/*BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
 				0, 2,
 				new String[]{"/home/pavel/ulm/data/go/incremental"});*/
-		/*BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
+		BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
 				0,
 				1,
-				new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl"});*/
-		BenchmarkUtils.runTask(RandomWalkIncrementalClassificationWithABoxTask.class.getName(),
+				new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl"});
+		/*BenchmarkUtils.runTask(RandomWalkIncrementalClassificationWithABoxTask.class.getName(),
 				0,
 				1,
-				new String[]{"/home/pavel/ulm/data/vicodi.owl"});
+				new String[]{"/home/pavel/ulm/data/VFB/fbbt_FC_all_clustered_ind.owl"});*/
 	}
 }

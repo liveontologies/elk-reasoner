@@ -297,7 +297,6 @@ public class IncrementalClassificationMultiDeltas extends
 				});
 
 				reasoner.loadChanges();
-				loader.clear();
 
 			} catch (ElkException e) {
 				throw new TaskException(e);

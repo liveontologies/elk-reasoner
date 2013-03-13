@@ -85,11 +85,6 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		reasoner.setAllowIncrementalMode(true);
 
 		final String originalTaxonomyHash = getResultHash(reasoner);
-
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Original hash code: " + originalTaxonomyHash);
-		}
-
 		int changingAxiomsCount = changingAxioms.size();
 		int rounds = getNumberOfRounds(changingAxiomsCount);
 
@@ -104,9 +99,11 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				changingAxioms, changeSize);
 
 		for (int j = 0; j < rounds; j++) {
-			if (LOGGER_.isInfoEnabled())
+			if (LOGGER_.isInfoEnabled()) {
 				LOGGER_.info("Generating " + iterations_ + " changes of size: "
 						+ changeSize);
+			}
+
 			changingAxioms.setAllOn();
 
 			resultHashHistory.add(originalTaxonomyHash);
@@ -137,11 +134,6 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				if (LOGGER_.isTraceEnabled()) {
 					printResult(reasoner, LOGGER_, Level.TRACE);
 				}
-
-				/*
-				 * if (hook != null) { hook.apply(reasoner, changingAxioms,
-				 * staticAxioms); }
-				 */
 			}
 
 			if (LOGGER_.isDebugEnabled()) {

@@ -32,7 +32,6 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
@@ -63,9 +62,8 @@ public class IncrementalClassificationCorrectnessTest extends
 	@Override
 	protected void applyChanges(final Reasoner reasoner,
 			final Iterable<ElkAxiom> changes,
-			final BaseIncrementalReasoningCorrectnessTest.CHANGE type) {
-		reasoner.registerOntologyChangesLoader(new TestAxiomLoader(changes,
-				type));
+			final IncrementalChangeType type) {
+		reasoner.registerOntologyChangesLoader(new TestChangesLoader(changes, type));
 	}
 
 	@Override
@@ -89,11 +87,13 @@ public class IncrementalClassificationCorrectnessTest extends
 
 			@Override
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-				if (elkAxiom instanceof ElkClassAxiom) {
+				/*if (elkAxiom instanceof ElkClassAxiom) {
 					changingAxioms.add(elkAxiom);
 				} else {
 					staticAxioms.add(elkAxiom);
-				}
+				}*/
+				// all axioms are dynamic
+				changingAxioms.add(elkAxiom);
 			}
 		});
 	}
@@ -101,7 +101,7 @@ public class IncrementalClassificationCorrectnessTest extends
 	@Override
 	protected Reasoner getReasoner(final Iterable<ElkAxiom> axioms) {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new TestAxiomLoader(axioms), new PostProcessingStageExecutor());
+				new TestChangesLoader(axioms, IncrementalChangeType.ADD), new PostProcessingStageExecutor());
 
 		return reasoner;
 	}

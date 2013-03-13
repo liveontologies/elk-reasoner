@@ -181,13 +181,9 @@ public class IncrementalClassificationTask implements Task {
 				Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms, rnd);
 
 				// incremental changes
-				changeLoader.clear();
-
 				remove(changeLoader, deleted);
 				incrementalReasoner.getTaxonomyQuietly();
 				// add the axioms back
-
-				changeLoader.clear();
 				add(changeLoader, deleted);
 
 				incrementalReasoner.getTaxonomyQuietly();

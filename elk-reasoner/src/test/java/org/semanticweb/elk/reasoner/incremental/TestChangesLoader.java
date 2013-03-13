@@ -55,6 +55,33 @@ public class TestChangesLoader implements ChangesLoader, OntologyLoader {
 	private final Queue<Boolean> changes_ = new LinkedList<Boolean>();
 	private AxiomChangeListener listener_ = null;
 
+	public TestChangesLoader() {
+		
+	}
+	
+	public TestChangesLoader(Iterable<ElkAxiom> axioms, IncrementalChangeType type) {
+		for (ElkAxiom axiom : axioms) {
+			switch (type) {
+			case ADD:
+				add(axiom);
+				break;
+			case DELETE:
+				remove(axiom);
+				break;
+			}
+		}
+	}
+	
+	public TestChangesLoader(Iterable<ElkAxiom> additions, Iterable<ElkAxiom> deletions) {
+		for (ElkAxiom addition : additions) {
+			add(addition);
+		}
+		
+		for (ElkAxiom deletion : deletions) {
+			remove(deletion);
+		}
+	}
+	
 	public TestChangesLoader add(final ElkAxiom axiom) {
 		if (listener_ != null) {
 			listener_.notify(new SimpleElkAxiomChange(axiom, 1));
@@ -71,11 +98,6 @@ public class TestChangesLoader implements ChangesLoader, OntologyLoader {
 		axioms_.add(axiom);
 		changes_.add(false);
 		return this;
-	}
-
-	public void clear() {
-		axioms_.clear();
-		changes_.clear();
 	}
 
 	@Override

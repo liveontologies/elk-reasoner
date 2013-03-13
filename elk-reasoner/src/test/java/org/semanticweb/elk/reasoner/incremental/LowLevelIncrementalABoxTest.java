@@ -29,8 +29,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 
 import org.junit.Test;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -43,7 +41,6 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 
 /**
@@ -79,19 +76,19 @@ public class LowLevelIncrementalABoxTest {
 
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
 
-		Writer writer = new OutputStreamWriter(System.out);
+		//Writer writer = new OutputStreamWriter(System.out);
 		
 		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
 		
 		reasoner.setAllowIncrementalMode(true);
 
-		changeLoader.clear();
+		//changeLoader.clear();
 		changeLoader.remove(axASubB);
 
 		taxonomy = reasoner.getInstanceTaxonomyQuietly();
 		
-		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
-		writer.flush();
+		//TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
+		//writer.flush();
 		
 		assertFalse(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
 	}	
@@ -115,38 +112,19 @@ public class LowLevelIncrementalABoxTest {
 		
 		loader.add(axiInstA).add(axTopSubB).add(axDisj);
 
-		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
-		
-
-		Writer writer = new OutputStreamWriter(System.out);
-		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
-		writer.flush();
+		reasoner.getInstanceTaxonomyQuietly();
 		
 		reasoner.setAllowIncrementalMode(true);
-
-		changeLoader.clear();
 		changeLoader.remove(axTopSubB);
-
-		taxonomy = reasoner.getInstanceTaxonomyQuietly();
 		
-		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
-		writer.flush();
+		reasoner.getInstanceTaxonomyQuietly();
 		
-		changeLoader.clear();
 		changeLoader.add(axTopSubB);
 		
-		taxonomy = reasoner.getInstanceTaxonomyQuietly();
-		
-		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
-		writer.flush();
-		
-		changeLoader.clear();
+		reasoner.getInstanceTaxonomyQuietly();
 		changeLoader.remove(axDisj);
 		
-		taxonomy = reasoner.getInstanceTaxonomyQuietly();
-		
-		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
-		writer.flush();
+		reasoner.getInstanceTaxonomyQuietly();
 	}		
 	
 	
@@ -175,7 +153,7 @@ public class LowLevelIncrementalABoxTest {
 		
 		reasoner.setAllowIncrementalMode(true);
 
-		changeLoader.clear();
+		//changeLoader.clear();
 		changeLoader.remove(axiInstA);
 
 		taxonomy = reasoner.getInstanceTaxonomyQuietly();
@@ -183,7 +161,7 @@ public class LowLevelIncrementalABoxTest {
 		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().isEmpty());
 		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().isEmpty());
 		//check that the individual properly re-appears
-		changeLoader.clear();
+		//changeLoader.clear();
 		changeLoader.add(axiInstA);
 		
 		taxonomy = reasoner.getInstanceTaxonomyQuietly();
@@ -219,7 +197,7 @@ public class LowLevelIncrementalABoxTest {
 		
 		reasoner.setAllowIncrementalMode(true);
 
-		changeLoader.clear();
+		//changeLoader.clear();
 		changeLoader.add(axNewInstB);
 
 		taxonomy = reasoner.getInstanceTaxonomyQuietly();

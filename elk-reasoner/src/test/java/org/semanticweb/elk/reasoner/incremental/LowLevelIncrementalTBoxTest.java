@@ -103,7 +103,7 @@ public class LowLevelIncrementalTBoxTest {
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(c)));
 		// now delete B [= D, should retract A [= C
-		loader.clear();
+		//
 
 		reasoner.setAllowIncrementalMode(true);
 
@@ -147,7 +147,7 @@ public class LowLevelIncrementalTBoxTest {
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(c)));
 		// now delete A subclass R some B, should retract A subclass C
-		loader.clear();
+		//
 
 		reasoner.setAllowIncrementalMode(true);
 		changeLoader.remove(posExistential);
@@ -183,11 +183,10 @@ public class LowLevelIncrementalTBoxTest {
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(c)));
 
-		loader.clear();
+		//
 
 		reasoner.setAllowIncrementalMode(true);
 
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		// this should not change anything
@@ -202,7 +201,6 @@ public class LowLevelIncrementalTBoxTest {
 				.contains(taxonomy.getNode(c)));
 		assertEquals(2, taxonomy.getNode(a).getDirectSuperNodes().size());
 
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		// this again should not change anything
@@ -217,7 +215,6 @@ public class LowLevelIncrementalTBoxTest {
 				.contains(taxonomy.getNode(c)));
 		assertEquals(2, taxonomy.getNode(a).getDirectSuperNodes().size());
 
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		// when this axiom removed, we loose node C
@@ -227,7 +224,6 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(1, taxonomy.getNode(a).getDirectSuperNodes().size());
 
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		// this should not change anything
@@ -238,7 +234,6 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(1, taxonomy.getNode(a).getDirectSuperNodes().size());
 
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		// this again should not change anything
@@ -274,11 +269,10 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(2, taxonomy.getNode(a).getMembers().size());
 
-		loader.clear();
+		
 
 		reasoner.setAllowIncrementalMode(true);
 
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		// this should not change anything
@@ -288,7 +282,6 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(2, taxonomy.getNode(a).getMembers().size());
 
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		// when this axiom removed, we loose A=B
@@ -298,7 +291,6 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(1, taxonomy.getNode(a).getMembers().size());
 
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		// this should not change anything
@@ -309,7 +301,6 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(1, taxonomy.getNode(a).getMembers().size());
 
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		// this should change it back
@@ -342,7 +333,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(b)));
-		loader.clear();
+		
 
 		reasoner.setAllowIncrementalMode(true);
 
@@ -433,7 +424,7 @@ public class LowLevelIncrementalTBoxTest {
 				.contains(taxonomy.getNode(b)));
 
 		// now delete it one time
-		loader.clear();
+		
 		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b));
@@ -448,7 +439,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		// now delete it the second time
 
-		loader.clear();
+		
 		// reasoner.setAllowIncrementalMode(true);
 		// reasoner.registerOntologyChangesLoader(loader);
 
@@ -484,7 +475,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
-		loader.clear();
+		
 		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b)).add(
@@ -542,7 +533,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.getTaxonomy();
 
-		loader.clear();
+		
 		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.remove(axiom1);
@@ -551,7 +542,6 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.getTaxonomy();
 
-		changeLoader.clear();
 		changeLoader.remove(axiom2).remove(axiom3);
 
 		System.out.println("===========================================");
@@ -741,10 +731,9 @@ public class LowLevelIncrementalTBoxTest {
 		assertTrue(taxonomy.getNode(d).getDirectSubNodes()
 				.contains(taxonomy.getNode(objectFactory.getOwlNothing())));
 
-		loader.clear();
+		
 
 		reasoner.setAllowIncrementalMode(true);
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		changeLoader.add(axAsubRsomeB);
@@ -789,10 +778,9 @@ public class LowLevelIncrementalTBoxTest {
 		// node for X = [X]
 		assertEquals(1, taxonomy.getNode(x).getMembers().size());
 
-		loader.clear();
+		
 
 		reasoner.setAllowIncrementalMode(true);
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		changeLoader.add(axYsubX);
@@ -838,10 +826,9 @@ public class LowLevelIncrementalTBoxTest {
 		// Y = A
 		assertEquals(2, taxonomy.getNode(y).getMembers().size());
 
-		loader.clear();
+		
 
 		reasoner.setAllowIncrementalMode(true);
-		changeLoader.clear();
 		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		changeLoader.add(axYsubRsomeB);

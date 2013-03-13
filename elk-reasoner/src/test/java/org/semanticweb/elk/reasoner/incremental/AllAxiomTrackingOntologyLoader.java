@@ -21,26 +21,20 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * An {@link OntologyLoader} that additionally saves the loaded axioms into two
- * collections. The first one keeps changing axioms that can be added or removed
- * by the incremental changes. The second one keeps the remaining axioms.
+ * An {@link OntologyLoader} that treats all kinds of axioms as dynamic (changing)
  * 
- * The first collection contains only instances of {@link ElkClassAxiom}
+ * @see ClassAxiomTrackingOntologyLoader and {@link ClassAndIndividualAxiomTrackingOntologyLoader}
  * 
- * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  * 
  */
-public class ClassAxiomTrackingOntologyLoader implements OntologyLoader {
+public class AllAxiomTrackingOntologyLoader implements OntologyLoader {
 
 	protected final OntologyLoader loader_;
 	/**
@@ -48,28 +42,19 @@ public class ClassAxiomTrackingOntologyLoader implements OntologyLoader {
 	 */
 	protected final OnOffVector<ElkAxiom> changingAxioms_;
 
-	/**
-	 * stores axioms that should not be added or remove
-	 */
-	protected final List<ElkAxiom> staticAxioms_;
 
-	public ClassAxiomTrackingOntologyLoader(OntologyLoader loader,
-			OnOffVector<ElkAxiom> trackedAxioms, List<ElkAxiom> untrackedAxioms) {
+	public AllAxiomTrackingOntologyLoader(OntologyLoader loader,
+			OnOffVector<ElkAxiom> trackedAxioms) {
 		this.loader_ = loader;
 		this.changingAxioms_ = trackedAxioms;
-		this.staticAxioms_ = untrackedAxioms;
 	}
 
-	ClassAxiomTrackingOntologyLoader(OntologyLoader loader) {
-		this(loader, new OnOffVector<ElkAxiom>(127), new ArrayList<ElkAxiom>());
+	AllAxiomTrackingOntologyLoader(OntologyLoader loader) {
+		this(loader, new OnOffVector<ElkAxiom>(127));
 	}
 
 	public OnOffVector<ElkAxiom> getChangingAxioms() {
 		return this.changingAxioms_;
-	}
-
-	public List<ElkAxiom> getStaticAxioms() {
-		return this.staticAxioms_;
 	}
 
 	@Override
@@ -80,12 +65,7 @@ public class ClassAxiomTrackingOntologyLoader implements OntologyLoader {
 			@Override
 			public void visit(ElkAxiom elkAxiom) {
 				axiomInserter.visit(elkAxiom);
-				// currently we only allow class axioms to be changed
-				if (elkAxiom instanceof ElkClassAxiom) {
-					changingAxioms_.add(elkAxiom);
-				} else {
-					staticAxioms_.add(elkAxiom);
-				}
+				changingAxioms_.add(elkAxiom);
 			}
 		};
 

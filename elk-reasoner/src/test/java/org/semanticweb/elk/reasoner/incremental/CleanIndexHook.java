@@ -88,7 +88,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			LOGGER_.error("index must be empty but its size is " + cnt);
 		}
 		// add stuff back
-		loader.clear();
+		//loader.clear();
 
 		for (ElkAxiom axiom : axioms) {
 			if (axiom instanceof ElkClassAxiom

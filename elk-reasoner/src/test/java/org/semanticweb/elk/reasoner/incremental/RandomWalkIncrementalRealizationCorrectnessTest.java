@@ -68,8 +68,8 @@ public class RandomWalkIncrementalRealizationCorrectnessTest extends
 	@Override
 	protected OntologyLoader getAxiomTrackingLoader(OntologyLoader fileLoader,
 			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
-		return new ClassAndIndividualAxiomTrackingOntologyLoader(fileLoader,
-				changingAxioms, staticAxioms);
+		//return new ClassAndIndividualAxiomTrackingOntologyLoader(fileLoader, changingAxioms, staticAxioms);
+		return new AllAxiomTrackingOntologyLoader(fileLoader, changingAxioms);
 	}
 
 	@Config

@@ -83,16 +83,12 @@ public class IncrementalClassificationCorrectnessTask extends
 			Set<ElkAxiom> deleted = getRandomSubset(loadedAxioms, rnd);
 
 			// incremental changes
-			changeLoader1.clear();
-			changeLoader2.clear();
 			remove(changeLoader1, deleted);
 			remove(changeLoader2, deleted);
 			
 			correctnessCheck(standardReasoner_, incrementalReasoner, seed);
 
 			// add the axioms back
-			changeLoader1.clear();
-			changeLoader2.clear();
 			add(changeLoader1, deleted);
 			add(changeLoader2, deleted);
 

@@ -38,6 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -156,8 +157,8 @@ public abstract class AbstractReasonerState {
 		@Override
 		public void notify(ElkAxiom axiom) {
 			if (LOGGER_.isDebugEnabled()) {
-				LOGGER_.debug("Switching to non-incremental mode because of the axiom "
-						+ axiom);
+				LOGGER_.debug("Disallowing incremental mode due to "
+						+ OwlFunctionalStylePrinter.toString(axiom));
 			}
 
 			setAllowIncrementalMode(false);
@@ -317,9 +318,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public boolean isInconsistent() throws ElkException {
-		trySetIncrementalMode(true);
-
-		getStageExecutor().complete(stageManager.changesLoadingStage);
+		loadChanges();
 
 		if (isIncrementalMode() && !saturationState.getContexts().isEmpty()) {
 			getStageExecutor().complete(
@@ -351,7 +350,21 @@ public abstract class AbstractReasonerState {
 	 */
 	public void loadChanges() throws ElkException {
 		trySetIncrementalMode(true);
+
 		getStageExecutor().complete(stageManager.changesLoadingStage);
+
+		if (!isIncrementalMode()) {
+			/*
+			 * the mode was switched to non-incremental during change loading.
+			 * As such, we should recompute everything, e.g., the role
+			 * saturation
+			 * 
+			 * FIXME there's a chance the incremental mode was disallowed before
+			 * and no role axiom was changed, then there's no need to recompute
+			 * roles?
+			 */
+			stageManager.propertyInitializationStage.invalidate();
+		}
 	}
 
 	/**
@@ -369,8 +382,6 @@ public abstract class AbstractReasonerState {
 
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
-
-		getStageExecutor().complete(stageManager.changesLoadingStage);
 
 		if (isIncrementalMode() && classTaxonomyState.getTaxonomy() != null) {
 			getStageExecutor().complete(
@@ -582,7 +593,7 @@ public abstract class AbstractReasonerState {
 		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(
 				classTaxonomyState.getTaxonomy()));
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////
 	/*
 	 * SOME DEBUG METHODS, FIXME: REMOVE

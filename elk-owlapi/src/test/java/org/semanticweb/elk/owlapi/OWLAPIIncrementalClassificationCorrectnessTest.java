@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.incremental.BaseIncrementalClassificationCorrectnessTest;
-import org.semanticweb.elk.reasoner.incremental.BaseIncrementalReasoningCorrectnessTest;
+import org.semanticweb.elk.reasoner.incremental.IncrementalChangeType;
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -73,7 +73,7 @@ public class OWLAPIIncrementalClassificationCorrectnessTest extends
 	protected void applyChanges(
 			final Reasoner reasoner,
 			final Iterable<OWLAxiom> changes,
-			final BaseIncrementalReasoningCorrectnessTest.CHANGE type) {
+			final IncrementalChangeType type) {
 		// the changes are applied indirectly by modifying the ontology
 		OWLOntologyManager manager = testOntology_.getOWLOntologyManager();
 		List<OWLOntologyChange> ontologyChanges = new ArrayList<OWLOntologyChange>();

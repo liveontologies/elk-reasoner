@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk;
+package org.semanticweb.elk.reasoner.incremental;
 /*
  * #%L
  * ELK Reasoner
@@ -24,15 +24,11 @@ package org.semanticweb.elk;
  * #L%
  */
 
-
 /**
- * Provides seed to all randomized tests
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class RandomSeedProvider {
-
-	public static long VALUE = 1363192867885L;//System.currentTimeMillis();
+public enum IncrementalChangeType {
+	ADD, DELETE
 }
