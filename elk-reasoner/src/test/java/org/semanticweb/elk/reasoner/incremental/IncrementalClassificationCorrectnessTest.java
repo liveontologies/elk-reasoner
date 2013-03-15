@@ -101,7 +101,7 @@ public class IncrementalClassificationCorrectnessTest extends
 	@Override
 	protected Reasoner getReasoner(final Iterable<ElkAxiom> axioms) {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new TestChangesLoader(axioms, IncrementalChangeType.ADD), new PostProcessingStageExecutor());
+				new TestChangesLoader(axioms, IncrementalChangeType.ADD), new PostProcessingStageExecutor(), 1);
 
 		return reasoner;
 	}

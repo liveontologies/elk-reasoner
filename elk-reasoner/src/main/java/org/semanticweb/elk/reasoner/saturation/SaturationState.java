@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.text.AbstractWriter;
 
@@ -65,10 +64,9 @@ public class SaturationState {
 	private final IndexedClassExpression owlThing_, owlNothing_;
 
 	/**
-	 * the reference to the first context in the link list of contexts
+	 * The first context in the linked list of contexts
 	 */
-	private final AtomicReference<ContextImpl> firstContext = new AtomicReference<ContextImpl>(
-			null);
+	private ContextImpl firstContext;
 
 	/**
 	 * The queue containing all activated contexts. Every activated context
@@ -93,7 +91,7 @@ public class SaturationState {
 			public Iterator<Context> iterator() {
 				return new Iterator<Context>() {
 
-					ContextImpl next = firstContext.get();
+					ContextImpl next = firstContext.next;
 
 					@Override
 					public boolean hasNext() {
@@ -120,7 +118,7 @@ public class SaturationState {
 			
 			@Override
 			public boolean isEmpty() {
-				return firstContext.get() == null;
+				return firstContext.next == null;
 			}
 
 			@Override
@@ -133,7 +131,7 @@ public class SaturationState {
 	}
 
 	public void resetFirstContext() {
-		firstContext.set(null);
+		firstContext = new ContextImpl(null);//a dummy first context
 	}
 
 	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
@@ -150,6 +148,7 @@ public class SaturationState {
 		ontologyIndex_ = index;
 		owlThing_ = index.getIndexedOwlThing();
 		owlNothing_ = index.getIndexedOwlNothing();
+		resetFirstContext();
 	}
 
 	private ExtendedWriter getDefaultWriter(final ConclusionVisitor<?> conclusionVisitor) {
@@ -304,7 +303,6 @@ public class SaturationState {
 
 				return true;
 			} else {
-				// LOGGER_.trace(context + " is already saturated");
 				return false;
 			}
 		}
@@ -354,8 +352,8 @@ public class SaturationState {
 
 		@Override
 		public Context getCreateContext(IndexedClassExpression root) {
-
 			Context context = root.getContext();
+			
 			if (context != null)
 				return context;
 			// else try to assign a new context
@@ -375,15 +373,19 @@ public class SaturationState {
 				markAsNotSaturatedInternal(newContext);
 			}
 
-			/* linking contexts */
-			for (;;) {
-				ContextImpl oldHead = firstContext.get();
-				if (firstContext.compareAndSet(oldHead, newContext)) {
-					if (oldHead != null) {
-						newContext.next = oldHead;
-						oldHead.previous = newContext;
-					}
-					break;
+			/* 
+			 * linking contexts
+			 * TODO how much contention are we going to get here? 
+			*/
+			synchronized(firstContext) {
+				ContextImpl oldHead = firstContext.next;
+				
+				firstContext.next = newContext;
+				newContext.previous = firstContext;
+				
+				if (oldHead != null) {
+					newContext.next = oldHead;
+					oldHead.previous = newContext;
 				}
 			}
 

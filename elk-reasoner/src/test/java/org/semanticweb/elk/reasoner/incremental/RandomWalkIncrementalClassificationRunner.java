@@ -111,6 +111,15 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			for (int i = 0; i < iterations_; i++) {
 				IncrementalChange<T> change = tracker.generateNextChange();
 
+				if (LOGGER_.isDebugEnabled()) {
+					LOGGER_.debug("Change for round " + (j + 1) + " iteration " + (i + 1));
+
+					LOGGER_.debug("Deleted axioms");
+					printCurrentAxioms(change.getDeletions(), Level.DEBUG);
+					LOGGER_.debug("Added axioms");
+					printCurrentAxioms(change.getAdditions(), Level.DEBUG);
+				}
+				
 				io_.loadChanges(reasoner, change);
 
 				final String resultHash = getResultHash(reasoner);
@@ -120,11 +129,6 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				if (LOGGER_.isDebugEnabled()) {
 					LOGGER_.debug("Taxonomy hash code for round " + (j + 1)
 							+ " iteration " + (i + 1) + ": " + resultHash);
-
-					LOGGER_.debug("Deleted axioms");
-					printCurrentAxioms(change.getDeletions(), Level.DEBUG);
-					LOGGER_.debug("Added axioms");
-					printCurrentAxioms(change.getAdditions(), Level.DEBUG);
 					LOGGER_.debug("Current axioms");
 					printCurrentAxioms(Operations.concat(
 							changingAxioms.getOnElements(), staticAxioms),
@@ -174,6 +178,15 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				}
 
 				io_.revertChanges(reasoner, change);
+				
+				if (LOGGER_.isDebugEnabled()) {
+					LOGGER_.debug("Reverting the next change");
+
+					LOGGER_.debug("Adding back:");
+					printCurrentAxioms(change.getDeletions(), Level.DEBUG);
+					LOGGER_.debug("Deleting:");
+					printCurrentAxioms(change.getAdditions(), Level.DEBUG);
+				}				
 
 				String taxonomyHash = getResultHash(reasoner);
 

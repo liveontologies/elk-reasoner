@@ -124,8 +124,12 @@ public class ContextImpl implements Context {
 	
 	@Override
 	public void removeLinks() {
-		if (previous != null && next != null) {
+		//No sync here?
+		if (previous != null) {
 			previous.next = next;
+		}
+		
+		if (next != null) {
 			next.previous = previous;
 		}
 	}
@@ -138,13 +142,6 @@ public class ContextImpl implements Context {
 	@Override
 	public boolean addSubsumer(IndexedClassExpression expression) {
 		return subsumers_.add(expression);
-
-		/*
-		 * if (changed && isSaturated) LOGGER_.error(getRoot() +
-		 * ": adding a superclass to a saturated context: " + expression);
-		 * 
-		 * return changed;
-		 */
 	}
 
 	@Override

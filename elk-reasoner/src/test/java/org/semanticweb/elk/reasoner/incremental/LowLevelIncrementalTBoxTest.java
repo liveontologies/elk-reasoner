@@ -888,7 +888,7 @@ public class LowLevelIncrementalTBoxTest {
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(e)));
 	}
-
+	
 	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
 			Owl2ParseException {
 		return loadAxioms(new InputStreamReader(stream));

@@ -69,7 +69,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 	/**
 	 * the maximum number of rounds used
 	 */
-	static int MAX_ROUNDS = 2;
+	static int MAX_ROUNDS = 5;
 	/**
 	 * how many changes are generated in every round
 	 */
