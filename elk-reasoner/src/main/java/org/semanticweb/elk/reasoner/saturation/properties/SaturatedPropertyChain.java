@@ -140,7 +140,7 @@ public class SaturatedPropertyChain {
 	 */
 	public Set<IndexedPropertyChain> getSubProperties() {
 		return derivedSubProperties == null ? Collections
-				.<IndexedPropertyChain> emptySet() : derivedSubProperties;
+				.<IndexedPropertyChain> singleton(root) : derivedSubProperties;
 	}
 
 	/**
