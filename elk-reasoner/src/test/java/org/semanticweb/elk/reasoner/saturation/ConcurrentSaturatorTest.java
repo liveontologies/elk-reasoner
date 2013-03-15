@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import junit.framework.TestCase;
@@ -35,12 +38,14 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -155,5 +160,49 @@ public class ConcurrentSaturatorTest extends TestCase {
 		assertTrue("A contains C", context.getSubsumers().contains(C));
 		assertTrue("A contains I", context.getSubsumers().contains(I));
 		assertTrue("A contains D", context.getSubsumers().contains(D));
+	}
+	
+	public void testContextLinking() {
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		final ModifiableOntologyIndex index = new DirectIndex();
+		final SaturationState state = new SaturationState(index);
+		IndexedObjectCache objectCache = index.getIndexedObjectCache();
+		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
+				objectCache);
+		IndexedClassExpression A = a.accept(converter);
+		IndexedClassExpression B = b.accept(converter);
+		IndexedClassExpression C = c.accept(converter);
+		
+		ExtendedWriter writer = state.getExtendedWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY, null, new ConclusionInsertionVisitor(), false);
+		
+		Context cA = writer.getCreateContext(A);
+		Context cB = writer.getCreateContext(B);
+		Context cC = writer.getCreateContext(C);
+		
+		assertEquals(3, getRoots(state.getContexts()).size());
+		
+		cC.removeLinks();
+		
+		assertEquals(2, getRoots(state.getContexts()).size());
+		
+		cA.removeLinks();
+		
+		assertEquals(1, getRoots(state.getContexts()).size());
+		
+		cB.removeLinks();
+		
+		assertTrue(state.getContexts().isEmpty());
+	}
+	
+	private Collection<IndexedClassExpression> getRoots(Iterable<Context> contexts) {
+		List<IndexedClassExpression> roots = new ArrayList<IndexedClassExpression>();
+		
+		for (Context c : contexts) {
+			roots.add(c.getRoot());
+		}
+		
+		return roots;
 	}
 }
