@@ -129,16 +129,6 @@ class IncrementalAdditionInitializationStage extends
 			}
 		}
 
-		/*
-		 * for (ElkClass newClass : reasoner.ontologyIndex.getAddedClasses()) {
-		 * IndexedClass ic = (IndexedClass) converter.visit(newClass);
-		 * 
-		 * if (ic.getContext() == null) { writer.getCreateContext(ic); } else {
-		 * // TODO Figure out why some added classes have contexts // This
-		 * happens when class is removed and then re-added // throw new
-		 * RuntimeException(ic + ": " + // ic.getContext().getSubsumers()); } }
-		 */
-
 		changedInitRules = diffIndex.getAddedContextInitRules();
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
 
