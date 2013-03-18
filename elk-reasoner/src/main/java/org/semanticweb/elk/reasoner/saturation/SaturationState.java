@@ -277,7 +277,7 @@ public class SaturationState {
 		@Override
 		public void produce(Context context, Conclusion conclusion) {
 			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context + ": new conclusion " + conclusion);
+				LOGGER_.trace(context + ": produced conclusion " + conclusion);
 			// this may be necessary, e.g., for counting produced conclusions
 			conclusion.accept(producedConclusionVisitor_, context);
 			
