@@ -150,6 +150,12 @@ public abstract class AbstractReasonerState {
 
 	private boolean allowIncrementalTaxonomy_ = true;
 	/**
+	 * Setting this to true during the change loading stage indicates that some
+	 * change, most likely some role axioms, should switch the reasoning mode to
+	 * non-incremental
+	 */
+	private boolean nonIncrementalChange_ = false;
+	/**
 	 * The listener used to switch off the incremental mode
 	 */
 	private NonIncrementalChangeListener<ElkAxiom> nonIncrementalChangeListener_ = new NonIncrementalChangeListener<ElkAxiom>() {
@@ -161,7 +167,7 @@ public abstract class AbstractReasonerState {
 						+ OwlFunctionalStylePrinter.toString(axiom));
 			}
 
-			setAllowIncrementalMode(false);
+			nonIncrementalChange_ = true;
 		}
 	};
 
@@ -350,21 +356,22 @@ public abstract class AbstractReasonerState {
 	 */
 	public void loadChanges() throws ElkException {
 		trySetIncrementalMode(true);
+		
+		nonIncrementalChange_ = false;
 
 		getStageExecutor().complete(stageManager.changesLoadingStage);
 
-		if (!isIncrementalMode()) {
+		if (nonIncrementalChange_/*!isIncrementalMode()*/) {
 			/*
 			 * the mode was switched to non-incremental during change loading.
 			 * As such, we should recompute everything, e.g., the role
 			 * saturation
-			 * 
-			 * FIXME there's a chance the incremental mode was disallowed before
-			 * and no role axiom was changed, then there's no need to recompute
-			 * roles?
 			 */
 			stageManager.propertyInitializationStage.invalidate();
+			setAllowIncrementalMode(false);
 		}
+		
+		nonIncrementalChange_ = false;
 	}
 
 	/**
