@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -77,7 +77,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(
 			IndexedClass.OwlThingContextInitializationRule owlThingContextInitializationRule,
-			SaturationState.Writer writer, Context context) {
+			BasicSaturationStateWriter writer, Context context) {
 		timer_.timeOwlThingContextInitializationRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(owlThingContextInitializationRule, writer, context);
 		timer_.timeOwlThingContextInitializationRule += CachedTimeThread.currentTimeMillis;
@@ -86,7 +86,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(
 			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-			SaturationState.Writer writer, Context context) {
+			BasicSaturationStateWriter writer, Context context) {
 		timer_.timeDisjointnessAxiomCompositionRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(thisCompositionRule, writer, context);
 		timer_.timeDisjointnessAxiomCompositionRule += CachedTimeThread.currentTimeMillis;
@@ -95,7 +95,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(
 			IndexedDisjointnessAxiom.ThisContradictionRule thisContradictionRule,
-			SaturationState.Writer writer, Context context) {
+			BasicSaturationStateWriter writer, Context context) {
 		timer_.timeDisjointnessAxiomContradictionRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(thisContradictionRule, writer, context);
 		timer_.timeDisjointnessAxiomContradictionRule += CachedTimeThread.currentTimeMillis;
@@ -105,7 +105,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(
 			IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-			SaturationState.Writer writer, Context context) {
+			BasicSaturationStateWriter writer, Context context) {
 		timer_.timeObjectIntersectionOfCompositionRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(thisCompositionRule, writer, context);
 		timer_.timeObjectIntersectionOfCompositionRule += CachedTimeThread.currentTimeMillis;
@@ -114,7 +114,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(
 			IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
-			SaturationState.Writer writer, Context context) {
+			BasicSaturationStateWriter writer, Context context) {
 		timer_.timeSubClassOfAxiomCompositionRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(thisCompositionRule, writer, context);
 		timer_.timeSubClassOfAxiomCompositionRule += CachedTimeThread.currentTimeMillis;
@@ -123,7 +123,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(
 			IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
-			SaturationState.Writer writer, Context context) {
+			BasicSaturationStateWriter writer, Context context) {
 		timer_.timeObjectSomeValuesFromCompositionRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(thisCompositionRule, writer, context);
 		timer_.timeObjectSomeValuesFromCompositionRule += CachedTimeThread.currentTimeMillis;
@@ -131,7 +131,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 
 	@Override
 	public void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
-			SaturationState.Writer writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		timer_.timeForwardLinkBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
 		timer_.timeForwardLinkBackwardLinkRule += CachedTimeThread.currentTimeMillis;
@@ -140,7 +140,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 
 	@Override
 	public void visit(Propagation.ThisBackwardLinkRule thisBackwardLinkRule,
-			SaturationState.Writer writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		timer_.timePropagationBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
 		timer_.timePropagationBackwardLinkRule += CachedTimeThread.currentTimeMillis;
@@ -149,7 +149,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(
 			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-			SaturationState.Writer writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		timer_.timeContradictionBottomBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);
 		timer_.timeContradictionBottomBackwardLinkRule += CachedTimeThread.currentTimeMillis;

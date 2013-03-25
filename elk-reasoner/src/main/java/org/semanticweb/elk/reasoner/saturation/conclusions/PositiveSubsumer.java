@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -45,7 +45,7 @@ public class PositiveSubsumer extends Subsumer {
 		super(superClassExpression);
 	}
 
-	public void apply(Writer writer, Context context,
+	public void apply(BasicSaturationStateWriter writer, Context context,
 			RuleApplicationVisitor ruleAppVisitor,
 			DecompositionRuleApplicationVisitor decompVisitor) {
 		// apply decomposition rules
@@ -59,7 +59,7 @@ public class PositiveSubsumer extends Subsumer {
 		return visitor.visit(this, context);
 	}
 
-	public void deapply(Writer writer, Context context,
+	public void deapply(BasicSaturationStateWriter writer, Context context,
 			RuleApplicationVisitor ruleAppVisitor,
 			DecompositionRuleApplicationVisitor decompVisitor) {
 		apply(writer, context, ruleAppVisitor, decompVisitor);

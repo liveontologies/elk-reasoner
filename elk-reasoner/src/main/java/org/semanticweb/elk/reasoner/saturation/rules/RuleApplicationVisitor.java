@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction.ContradictionBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -45,34 +46,34 @@ public interface RuleApplicationVisitor {
 
 	void visit(
 			IndexedClass.OwlThingContextInitializationRule owlThingContextInitializationRule,
-			SaturationState.Writer writer, Context context);
+			BasicSaturationStateWriter writer, Context context);
 
 	void visit(
 			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-			SaturationState.Writer writer, Context context);
+			BasicSaturationStateWriter writer, Context context);
 
 	void visit(
 			IndexedDisjointnessAxiom.ThisContradictionRule thisContradictionRule,
-			SaturationState.Writer writer, Context context);
+			BasicSaturationStateWriter writer, Context context);
 
 	void visit(
 			IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-			SaturationState.Writer writer, Context context);
+			BasicSaturationStateWriter writer, Context context);
 
 	void visit(IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
-			SaturationState.Writer writer, Context context);
+			BasicSaturationStateWriter writer, Context context);
 
 	void visit(
 			IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
-			SaturationState.Writer writer, Context context);
+			BasicSaturationStateWriter writer, Context context);
 
 	void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
-			SaturationState.Writer writer, BackwardLink backwardLink);
+			BasicSaturationStateWriter writer, BackwardLink backwardLink);
 
 	void visit(Propagation.ThisBackwardLinkRule thisBackwardLinkRule,
-			SaturationState.Writer writer, BackwardLink backwardLink);
+			BasicSaturationStateWriter writer, BackwardLink backwardLink);
 
-	void visit(ContradictionBackwardLinkRule bottomBackwardLinkRule, SaturationState.Writer writer,
-			BackwardLink backwardLink);
+	void visit(ContradictionBackwardLinkRule bottomBackwardLinkRule,
+			BasicSaturationStateWriter writer, BackwardLink backwardLink);
 
 }

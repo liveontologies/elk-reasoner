@@ -32,7 +32,10 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -61,7 +64,7 @@ public class IncrementalChangesInitialization extends
 			Collection<Collection<Context>> inputs,
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
-			SaturationState state, ComputationExecutor executor,
+			SaturationStateImpl state, ComputationExecutor executor,
 			RuleApplicationVisitor ruleAppVisitor,
 			ConclusionVisitor<?> conclusionVisitor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
@@ -78,7 +81,7 @@ class ContextInitializationFactory
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ContextInitializationFactory.class);
 
-	private final SaturationState.Writer saturationStateWriter_;
+	private final BasicSaturationStateWriter saturationStateWriter_;
 	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
 	private final LinkRule<Context> changedGlobalRuleHead_;
 	private final RuleApplicationVisitor ruleAppVisitor_;
@@ -89,7 +92,7 @@ class ContextInitializationFactory
 			LinkRule<Context> changedGlobalRuleHead,
 			RuleApplicationVisitor ruleAppVisitor,
 			ConclusionVisitor<?> conclusionVisitor) {
-		saturationStateWriter_ = state.getWriter(conclusionVisitor);
+		saturationStateWriter_ = state.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
 		indexChanges_ = indexChanges;
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
 		ruleAppVisitor_ = ruleAppVisitor;

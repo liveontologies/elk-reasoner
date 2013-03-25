@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -170,7 +170,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(SaturationState.Writer writer, Context context) {
+		public void apply(BasicSaturationStateWriter writer, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + NAME + " to " + context);
 			}
@@ -218,7 +218,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				SaturationState.Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 

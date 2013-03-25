@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -200,12 +200,12 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				SaturationState.Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 
 		@Override
-		public void apply(SaturationState.Writer writer, Context context) {
+		public void apply(BasicSaturationStateWriter writer, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + NAME + " to " + context);
 			}
@@ -283,7 +283,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(SaturationState.Writer writer, Context context) {
+		public void apply(BasicSaturationStateWriter writer, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + NAME + " to " + context);
 			}
@@ -312,7 +312,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				SaturationState.Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 

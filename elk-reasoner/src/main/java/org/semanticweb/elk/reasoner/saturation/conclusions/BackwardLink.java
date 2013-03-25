@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -73,12 +73,12 @@ public class BackwardLink implements Conclusion {// extends AbstractConclusion {
 		return source_;
 	}
 
-	public void deapply(SaturationState.Writer writer, Context context,
+	public void deapply(BasicSaturationStateWriter writer, Context context,
 			RuleApplicationVisitor ruleAppVisitor) {
 		apply(writer, context, ruleAppVisitor);
 	}
 
-	public void apply(SaturationState.Writer writer, Context context,
+	public void apply(BasicSaturationStateWriter writer, Context context,
 			RuleApplicationVisitor ruleAppVisitor) {
 
 		// if this is the first/last backward link for this relation,

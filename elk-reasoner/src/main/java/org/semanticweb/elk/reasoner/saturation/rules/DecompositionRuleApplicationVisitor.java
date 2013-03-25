@@ -30,13 +30,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * Applies decomposition rules for {@link IndexedClassExpression}s.
  * 
- * This visitor does not take any {@link SaturationState.Writer} but is rather
+ * This visitor does not take any {@link SaturationStateImpl.Writer} but is rather
  * supposed to encapsulate it. Then it's easier to use restricted writers, e.g.
  * those which can't create new contexts, in subclasses
  * 

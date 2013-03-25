@@ -172,7 +172,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * @param listener
 	 *            the listener object implementing callback functions
 	 */
-	public ClassExpressionSaturationFactory(SaturationState saturationState,
+	public ClassExpressionSaturationFactory(SaturationStateImpl saturationState,
 			int maxWorkers, ClassExpressionSaturationListener<J> listener) {
 		this(new RuleApplicationFactory(saturationState), maxWorkers, listener);
 	}

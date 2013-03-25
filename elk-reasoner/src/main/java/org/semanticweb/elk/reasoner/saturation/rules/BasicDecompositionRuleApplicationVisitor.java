@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -46,7 +46,7 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 	
 	@Override
 	public void visit(IndexedClass ice, Context context) {
-		Writer writer = getSaturationStateWriter();
+		BasicSaturationStateWriter writer = getSaturationStateWriter();
 		
 		if (ice == getSaturationStateWriter().getOwlNothing()) {
 			if (LOGGER_.isTraceEnabled()) {
@@ -64,12 +64,12 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 
 	@Override
 	public void visit(IndexedObjectIntersectionOf ice, Context context) {
-		Writer writer = getSaturationStateWriter();
+		BasicSaturationStateWriter writer = getSaturationStateWriter();
 		
 		writer.produce(context, new PositiveSubsumer(ice.getFirstConjunct()));
 		writer.produce(context, new PositiveSubsumer(ice.getSecondConjunct()));
 	}
 
-	protected abstract Writer getSaturationStateWriter();
+	protected abstract BasicSaturationStateWriter getSaturationStateWriter();
 
 }

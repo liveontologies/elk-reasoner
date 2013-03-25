@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -47,7 +47,7 @@ public class DisjointnessAxiom extends AbstractConclusion {
 	}
 
 	@Override
-	public void apply(SaturationState.Writer engine, Context context) {
+	public void apply(BasicSaturationStateWriter engine, Context context) {
 		if (context.inconsistencyDisjointnessAxiom(axiom_)) {
 			engine.produce(context, Contradiction.getInstance());
 		}

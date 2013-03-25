@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -30,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom.
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction.ContradictionBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -39,67 +40,63 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class BasicCompositionRuleApplicationVisitor implements RuleApplicationVisitor {
+public class BasicCompositionRuleApplicationVisitor implements
+		RuleApplicationVisitor {
 
 	@Override
-	public void visit(
-			OwlThingContextInitializationRule rule,
-			Writer writer, Context context) {
+	public void visit(OwlThingContextInitializationRule rule,
+			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
 
 	@Override
-	public void visit(ThisCompositionRule rule, Writer writer,
-			Context context) {
+	public void visit(ThisCompositionRule rule,
+			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
 
 	@Override
-	public void visit(
-			IndexedObjectIntersectionOf.ThisCompositionRule rule,
-			Writer writer, Context context) {
+	public void visit(IndexedObjectIntersectionOf.ThisCompositionRule rule,
+			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
 
 	@Override
-	public void visit(
-			IndexedSubClassOfAxiom.ThisCompositionRule rule,
-			Writer writer, Context context) {
+	public void visit(IndexedSubClassOfAxiom.ThisCompositionRule rule,
+			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
 
 	@Override
-	public void visit(
-			IndexedObjectSomeValuesFrom.ThisCompositionRule rule,
-			Writer writer, Context context) {
+	public void visit(IndexedObjectSomeValuesFrom.ThisCompositionRule rule,
+			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
 
 	@Override
 	public void visit(IndexedDisjointnessAxiom.ThisContradictionRule rule,
-			Writer writer, Context context) {
+			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
 
 	@Override
-	public void visit(ForwardLink.ThisBackwardLinkRule rule, Writer writer,
-			BackwardLink backwardLink) {
+	public void visit(ForwardLink.ThisBackwardLinkRule rule,
+			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		rule.apply(writer, backwardLink);
 	}
 
 	@Override
-	public void visit(
-			Propagation.ThisBackwardLinkRule rule,
-			Writer writer, BackwardLink backwardLink) {
+	public void visit(Propagation.ThisBackwardLinkRule rule,
+			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		rule.apply(writer, backwardLink);
 	}
 
 	@Override
 	public void visit(ContradictionBackwardLinkRule rule,
-			Writer writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		rule.apply(writer, backwardLink);
 	}
 }

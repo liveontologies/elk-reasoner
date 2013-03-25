@@ -44,7 +44,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -167,7 +166,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		final ModifiableOntologyIndex index = new DirectIndex();
-		final SaturationState state = new SaturationState(index);
+		final SaturationStateImpl state = new SaturationStateImpl(index);
 		IndexedObjectCache objectCache = index.getIndexedObjectCache();
 		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
 				objectCache);
@@ -175,7 +174,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression B = b.accept(converter);
 		IndexedClassExpression C = c.accept(converter);
 		
-		ExtendedWriter writer = state.getExtendedWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY, null, new ConclusionInsertionVisitor(), false);
+		ExtendedSaturationStateWriter writer = state.getExtendedWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY, null, new ConclusionInsertionVisitor(), false);
 		
 		Context cA = writer.getCreateContext(A);
 		Context cB = writer.getCreateContext(B);

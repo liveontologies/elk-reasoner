@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -35,9 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class ConclusionSourceUnsaturationVisitor implements
 		ConclusionVisitor<Boolean> {
 
-	private final SaturationState.Writer writer_;
+	private final BasicSaturationStateWriter writer_;
 
-	public ConclusionSourceUnsaturationVisitor(SaturationState.Writer writer) {
+	public ConclusionSourceUnsaturationVisitor(BasicSaturationStateWriter writer) {
 		this.writer_ = writer;
 	}
 

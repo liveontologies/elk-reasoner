@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -124,13 +124,15 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		visitor.visit(this, context);
 	}
 
-	public static void generatePropagations(SaturationState.Writer writer,
+	public static void generatePropagations(BasicSaturationStateWriter writer,
 			IndexedPropertyChain property, Context context) {
 		for (IndexedClassExpression ice : context.getSubsumers()) {
 			ThisCompositionRule rule = ice.getCompositionRuleChain().find(
 					ThisCompositionRule.MATCHER_);
+			
 			if (rule == null)
 				continue;
+			
 			rule.apply(writer, property, context);
 		}
 	}
@@ -169,7 +171,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(SaturationState.Writer writer, Context context) {
+		public void apply(BasicSaturationStateWriter writer, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + NAME + " to " + context);
 			}
@@ -237,7 +239,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				SaturationState.Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 
@@ -258,7 +260,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			return negExistentials_.isEmpty();
 		}
 
-		private void apply(SaturationState.Writer writer,
+		private void apply(BasicSaturationStateWriter writer,
 				IndexedPropertyChain property, Context context) {
 
 			for (IndexedObjectSomeValuesFrom e : negExistentials_) {

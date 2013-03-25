@@ -26,8 +26,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -73,7 +72,7 @@ public class ForwardLink extends AbstractConclusion {
 	}
 
 	@Override
-	public void apply(SaturationState.Writer engine, Context context) {
+	public void apply(BasicSaturationStateWriter engine, Context context) {
 
 		/* compose the link with all backward links */
 		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
@@ -168,7 +167,7 @@ public class ForwardLink extends AbstractConclusion {
 		}
 
 		@Override
-		public void apply(SaturationState.Writer engine, BackwardLink link) {
+		public void apply(BasicSaturationStateWriter engine, BackwardLink link) {
 
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + NAME + " to " + link);
@@ -200,7 +199,7 @@ public class ForwardLink extends AbstractConclusion {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor, Writer writer,
+		public void accept(RuleApplicationVisitor visitor, BasicSaturationStateWriter writer,
 				BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}

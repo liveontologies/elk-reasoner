@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -130,7 +130,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(SaturationState.Writer writer, Context context) {
+		public void apply(BasicSaturationStateWriter writer, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + toString() + " to " + context);
 			}
@@ -186,7 +186,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				SaturationState.Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 

@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -36,11 +36,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 public class ConclusionDeapplicationVisitor implements
 		ConclusionVisitor<Boolean> {
 
-	private final SaturationState.Writer writer_;
+	private final BasicSaturationStateWriter writer_;
 	private final RuleApplicationVisitor ruleAppVisitor_;
 	private final DecompositionRuleApplicationVisitor decompRuleAppVisitor_;
 
-	public ConclusionDeapplicationVisitor(SaturationState.Writer writer, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
+	public ConclusionDeapplicationVisitor(BasicSaturationStateWriter writer, RuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
 		this.writer_ = writer;
 		this.ruleAppVisitor_ = ruleAppVisitor;
 		this.decompRuleAppVisitor_ = decompVisitor;

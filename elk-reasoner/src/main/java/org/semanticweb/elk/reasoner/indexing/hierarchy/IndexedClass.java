@@ -27,7 +27,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -171,7 +171,7 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		@Override
-		public void apply(SaturationState.Writer writer, Context context) {
+		public void apply(BasicSaturationStateWriter writer, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + NAME + " to " + context);
 			}
@@ -208,7 +208,7 @@ public class IndexedClass extends IndexedClassEntity {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				SaturationState.Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 

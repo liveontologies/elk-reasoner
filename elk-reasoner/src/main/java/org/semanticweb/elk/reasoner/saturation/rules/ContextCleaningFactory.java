@@ -25,10 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * Creates an engine which works as the de-application engine except that it
@@ -43,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
  */
 public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
-	public ContextCleaningFactory(final SaturationState saturationState) {
+	public ContextCleaningFactory(final SaturationStateImpl saturationState) {
 		super(saturationState, false);
 	}
 
@@ -54,24 +58,82 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		return new CleaningEngine();
 	}
 
-
-
 	/**
 	 * A {@link RuleDeapplicationFactory} that uses a
-	 * {@link SaturationState.Writer} that does not produce conclusions if their
-	 * source is marked as saturated.
+	 * {@link SaturationStateImpl.Writer} that does not produce conclusions if
+	 * their source is marked as saturated.
 	 */
-	public class CleaningEngine extends RuleDeapplicationFactory.DeapplicationEngine {
+	public class CleaningEngine extends
+			RuleDeapplicationFactory.DeapplicationEngine {
 
 		protected CleaningEngine() {
 			super(ContextModificationListener.DUMMY);
 		}
 
 		@Override
-		protected Writer getSaturationStateWriter() {
-			return saturationState
-					.getSaturationCheckingWriter(getEngineConclusionVisitor(localStatistics
-							.getConclusionStatistics()));
+		protected BasicSaturationStateWriter getSaturationStateWriter() {
+			ConclusionVisitor<?> visitor = getEngineConclusionVisitor(localStatistics
+					.getConclusionStatistics());
+			BasicSaturationStateWriter writer = saturationState.getWriter(
+					ContextModificationListener.DUMMY, visitor);
+
+			return new SaturationCheckingWriter(writer);
+			/*
+			 * return saturationState
+			 * .getSaturationCheckingWriter(getEngineConclusionVisitor
+			 * (localStatistics .getConclusionStatistics()));
+			 */
+		}
+	}
+
+	/**
+	 * A {@link Writer} that does not produce conclusions if their source
+	 * context is already saturated.
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 */
+	private static class SaturationCheckingWriter implements
+			BasicSaturationStateWriter {
+
+		private final BasicSaturationStateWriter writer_;
+
+		SaturationCheckingWriter(BasicSaturationStateWriter writer) {
+			writer_ = writer;
+		}
+
+		@Override
+		public void produce(Context context, Conclusion conclusion) {
+			Context sourceContext = conclusion.getSourceContext(context);
+
+			if (sourceContext == null || !sourceContext.isSaturated()) {
+				writer_.produce(context, conclusion);
+			}
+		}
+
+		@Override
+		public IndexedClassExpression getOwlThing() {
+			return writer_.getOwlThing();
+		}
+
+		@Override
+		public IndexedClassExpression getOwlNothing() {
+			return writer_.getOwlNothing();
+		}
+
+		@Override
+		public Context pollForActiveContext() {
+			return writer_.pollForActiveContext();
+		}
+
+		@Override
+		public boolean markAsNotSaturated(Context context) {
+			return writer_.markAsNotSaturated(context);
+		}
+
+		@Override
+		public void clearNotSaturatedContexts() {
+			writer_.clearNotSaturatedContexts();
 		}
 	}
 }

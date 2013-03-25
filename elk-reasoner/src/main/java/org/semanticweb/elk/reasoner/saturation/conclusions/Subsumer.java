@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -64,7 +64,7 @@ public abstract class Subsumer implements Conclusion {
 		return expression.toString() + ": " + expression.hashCode();
 	}
 
-	protected void applyCompositionRules(SaturationState.Writer writer,
+	protected void applyCompositionRules(BasicSaturationStateWriter writer,
 			Context context, RuleApplicationVisitor ruleAppVisitor) {
 
 		LinkRule<Context> compositionRule = expression.getCompositionRuleHead();

@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -228,13 +228,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				OwlThingContextInitializationRule owlThingContextInitializationRule,
-				Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 		}
 
 		@Override
 		public void visit(
 				IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-				Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			for (IndexedDisjointnessAxiom axiom : thisCompositionRule
 					.getDisjointnessAxioms()) {
 				if (!axiom.occurs()) {
@@ -251,7 +251,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-				Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : thisCompositionRule
 					.getConjunctionsByConjunct().entrySet()) {
 				iceValidator_.checkNew(entry.getKey());
@@ -262,7 +262,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
-				Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getToldSuperclasses()) {
 				iceValidator_.checkNew(ice);
@@ -273,7 +273,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
-				Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getNegativeExistentials()) {
 				iceValidator_.checkNew(ice);
@@ -283,13 +283,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				IndexedDisjointnessAxiom.ThisContradictionRule thisContradictionRule,
-				Writer writer, Context context) {
+				BasicSaturationStateWriter writer, Context context) {
 		}
 
 		@Override
 		public void visit(
 				ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
-				Writer writer, BackwardLink backwardLink) {
+				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 			for (IndexedPropertyChain prop : thisBackwardLinkRule
 					.getForwardLinksByObjectProperty().keySet()) {
 				for (Context context : thisBackwardLinkRule
@@ -302,7 +302,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				Propagation.ThisBackwardLinkRule thisBackwardLinkRule,
-				Writer writer, BackwardLink backwardLink) {
+				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 			for (IndexedPropertyChain prop : thisBackwardLinkRule
 					.getPropagationsByObjectProperty().keySet()) {
 				for (IndexedClassExpression ice : thisBackwardLinkRule
@@ -315,7 +315,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-				Writer writer, BackwardLink backwardLink) {
+				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		}
 
 	}

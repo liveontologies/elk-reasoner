@@ -26,7 +26,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -58,14 +58,14 @@ public class Contradiction extends AbstractConclusion {
 	}
 
 	@Override
-	public void deapply(SaturationState.Writer engine, Context context) {
+	public void deapply(BasicSaturationStateWriter engine, Context context) {
 		propagateThroughBackwardLinks(engine, context);
 		context.getBackwardLinkRuleChain().remove(
 				ContradictionBackwardLinkRule.MATCHER_);
 	}
 
 	@Override
-	public void apply(SaturationState.Writer engine, Context context) {
+	public void apply(BasicSaturationStateWriter engine, Context context) {
 		propagateThroughBackwardLinks(engine, context);
 		// register the backward link rule for propagation of bottom
 		context.getBackwardLinkRuleChain().getCreate(
@@ -73,7 +73,7 @@ public class Contradiction extends AbstractConclusion {
 				ContradictionBackwardLinkRule.FACTORY_);
 	}
 
-	private void propagateThroughBackwardLinks(SaturationState.Writer engine,
+	private void propagateThroughBackwardLinks(BasicSaturationStateWriter engine,
 			Context context) {
 
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
@@ -119,7 +119,7 @@ public class Contradiction extends AbstractConclusion {
 		}
 
 		@Override
-		public void apply(SaturationState.Writer engine, BackwardLink link) {
+		public void apply(BasicSaturationStateWriter engine, BackwardLink link) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + NAME + " to " + link);
 			}
@@ -128,7 +128,7 @@ public class Contradiction extends AbstractConclusion {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				SaturationState.Writer writer, BackwardLink backwardLink) {
+				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}
 

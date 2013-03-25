@@ -24,11 +24,12 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.ExtendedWriter;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
@@ -81,11 +82,11 @@ public class RuleApplicationFactory {
 	 */
 	private final boolean trackModifiedContexts_;
 	
-	public RuleApplicationFactory(final SaturationState saturationState) {
+	public RuleApplicationFactory(final SaturationStateImpl saturationState) {
 		this(saturationState, false);
 	}
 
-	public RuleApplicationFactory(final SaturationState saturationState,
+	public RuleApplicationFactory(final SaturationStateImpl saturationState,
 			final boolean trackModifiedContexts) {
 		this.aggregatedStats_ = new SaturationStatistics();
 		this.saturationState = saturationState;
@@ -200,13 +201,13 @@ public class RuleApplicationFactory {
 			this.localContextStatistics = localStatistics.getContextStatistics();
 		}
 
-		protected abstract SaturationState.Writer getSaturationStateWriter();
+		protected abstract BasicSaturationStateWriter getSaturationStateWriter();
 
 		@Override
 		public void process() {
 			localContextStatistics.timeContextProcess -= CachedTimeThread.currentTimeMillis;
 			
-			Writer writer = getSaturationStateWriter();
+			BasicSaturationStateWriter writer = getSaturationStateWriter();
 			
 			if (conclusionProcessor_ == null) {
 				conclusionProcessor_ = getConclusionProcessor(writer, localStatistics);
@@ -216,7 +217,7 @@ public class RuleApplicationFactory {
 				if (Thread.currentThread().isInterrupted())
 					break;
 
-				Context nextContext = writer.pollForContext();
+				Context nextContext = writer.pollForActiveContext();
 
 				if (nextContext == null) {
 					break;
@@ -281,7 +282,7 @@ public class RuleApplicationFactory {
 		 * wrapped in some other code.
 		 * 
 		 * @param saturationStateWriter
-		 *            the {@link SaturationState.AbstractWriter} using which one can
+		 *            the {@link SaturationStateImpl.AbstractWriter} using which one can
 		 *            produce new {@link Conclusion}s in {@link Context}s
 		 * @param localStatistics
 		 *            the object accumulating local statistics for this worker
@@ -289,7 +290,7 @@ public class RuleApplicationFactory {
 		 *         of {@code Conclusion}s within a {@link Context}
 		 */
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				SaturationState.Writer saturationStateWriter,
+				BasicSaturationStateWriter saturationStateWriter,
 				SaturationStatistics localStatistics) {
 
 			return new CombinedConclusionVisitor(
@@ -309,7 +310,7 @@ public class RuleApplicationFactory {
 		 * {@link Context}s
 		 * 
 		 * @param saturationStateWriter
-		 *            the {@link SaturationState.AbstractWriter} using which one can
+		 *            the {@link SaturationStateImpl.AbstractWriter} using which one can
 		 *            produce new {@link Conclusion}s in {@link Context}s
 		 * @param localStatistics
 		 *            the object accumulating local statistics for this worker
@@ -318,7 +319,7 @@ public class RuleApplicationFactory {
 		 *         {@link Context}s
 		 */
 		protected ConclusionVisitor<?> getConclusionProcessor(
-				SaturationState.Writer saturationStateWriter,
+				BasicSaturationStateWriter saturationStateWriter,
 				SaturationStatistics localStatistics) {
 			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(
 					saturationStateWriter, localStatistics);
@@ -346,14 +347,14 @@ public class RuleApplicationFactory {
 	
 	/**
 	 * Default rule application engine which can create new contexts via
-	 * {@link SaturationState.ExtendedWriter} (either directly when a new
+	 * {@link SaturationStateImpl.ExtendedWriter} (either directly when a new
 	 * {@link IndexedClassExpression} is submitted or during decomposition
 	 */
 	public class DefaultEngine extends BaseEngine {
 
-		private final SaturationState.ExtendedWriter saturationStateWriter_;
+		private final ExtendedSaturationStateWriter saturationStateWriter_;
 
-		protected DefaultEngine(SaturationState.ExtendedWriter saturationStateWriter,
+		protected DefaultEngine(ExtendedSaturationStateWriter saturationStateWriter,
 				SaturationStatistics localStatistics) {
 			super(localStatistics);
 			this.saturationStateWriter_ = saturationStateWriter;
@@ -382,7 +383,7 @@ public class RuleApplicationFactory {
 		}
 
 		@Override
-		protected ExtendedWriter getSaturationStateWriter() {
+		protected ExtendedSaturationStateWriter getSaturationStateWriter() {
 			return saturationStateWriter_;
 		}
 

@@ -26,10 +26,10 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationState.Writer;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeapplicationVisitor;
@@ -49,7 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
  */
 public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
-	public RuleDeapplicationFactory(final SaturationState saturationState,
+	public RuleDeapplicationFactory(final SaturationStateImpl saturationState,
 			boolean trackModifiedContexts) {
 		super(saturationState, trackModifiedContexts);
 	}
@@ -66,7 +66,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 */
 	public class DeapplicationEngine extends RuleApplicationFactory.BaseEngine {
 
-		private final SaturationState.Writer writer_;
+		private final BasicSaturationStateWriter writer_;
 		
 		protected DeapplicationEngine(ContextModificationListener listener) {
 			super(new SaturationStatistics());
@@ -80,7 +80,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				SaturationState.Writer saturationStateWriter,
+				BasicSaturationStateWriter saturationStateWriter,
 				SaturationStatistics localStatistics) {
 			
 			return new CombinedConclusionVisitor(
@@ -104,7 +104,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected Writer getSaturationStateWriter() {
+		protected BasicSaturationStateWriter getSaturationStateWriter() {
 			return writer_;
 		}
 
