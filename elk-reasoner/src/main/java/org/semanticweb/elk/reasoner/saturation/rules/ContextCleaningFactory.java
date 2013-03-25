@@ -64,7 +64,6 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	public class CleaningEngine extends RuleDeapplicationFactory.DeapplicationEngine {
 
 		protected CleaningEngine() {
-			//super(saturationState.getSaturationCheckingWriter());
 			super(ContextModificationListener.DUMMY);
 		}
 

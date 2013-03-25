@@ -78,19 +78,6 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 							.getConclusionStatistics()));
 		}
 
-/*		protected DeapplicationEngine(SaturationState.Writer saturationStateWriter,
-				SaturationStatistics factoryStats) {
-			super(factoryStats);
-			
-			writer_ = saturationStateWriter;
-		}
-
-		protected DeapplicationEngine(SaturationState.Writer saturationStateWriter) {
-			super(new SaturationStatistics());
-			
-			writer_ = saturationStateWriter;
-		}*/
-
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
 				SaturationState.Writer saturationStateWriter,

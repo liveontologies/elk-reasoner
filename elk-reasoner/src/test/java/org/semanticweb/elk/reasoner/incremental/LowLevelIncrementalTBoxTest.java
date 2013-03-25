@@ -889,6 +889,88 @@ public class LowLevelIncrementalTBoxTest {
 				.contains(taxonomy.getNode(e)));
 	}
 	
+	
+	@Test
+	public void testDeterministicLinks() throws ElkException, IOException {
+		String ontology = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
+				+ "SubClassOf(:A :B) "
+				+ "SubClassOf(:B ObjectSomeValuesFrom(:R :B1)) "
+				+ "SubClassOf(:B1 :C1) "				
+				+ "SubClassOf(ObjectSomeValuesFrom(:R :C1) :F) "
+				+ "SubClassOf(:A :C) "
+				+ "SubClassOf(:C :E) "
+				+ "TransitiveObjectProperty(:R) "
+				+ "SubClassOf(:D ObjectSomeValuesFrom(:R :A)) "
+				+ ")";
+		
+		ElkClass A = objectFactory.getClass(new ElkFullIri("http://www.test.com/schema#A"));
+		//ElkClass C = objectFactory.getClass(new ElkFullIri("http://www.test.com/schema#C"));
+		ElkClass F = objectFactory.getClass(new ElkFullIri("http://www.test.com/schema#F"));
+
+		List<ElkAxiom> axioms = loadAxioms(new StringReader(ontology));
+		TestChangesLoader initialLoader = new TestChangesLoader();
+		TestChangesLoader changeLoader = new TestChangesLoader();
+
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
+				new LoggingStageExecutor());
+
+		reasoner.setAllowIncrementalMode(false);
+		reasoner.registerOntologyChangesLoader(changeLoader);
+
+		for (ElkAxiom axiom : axioms) {
+			initialLoader.add(axiom);
+		}
+
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+		
+		assertTrue(taxonomy.getNode(A).getAllSuperNodes()
+				.contains(taxonomy.getNode(F)));
+		// at this point there is a backward link from B1 to A, and a (negative) subsumer R some C1 for A
+		System.out.println("\n\n\n\n===========================================");
+		// The subsumer R some C1 already exists, so it won't be processed (decomposed) for A again
+		// as a result, there won't be a backward link from C1 to A
+		String toAdd = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
+				+ "SubClassOf(:C1 :B1) "				
+				+ "SubClassOf(:C ObjectSomeValuesFrom(:R :C1)) "
+				+ ")";
+		List<ElkAxiom> additions = loadAxioms(new StringReader(toAdd));
+
+		reasoner.setAllowIncrementalMode(true);
+		
+		for (ElkAxiom axiom : additions) {
+			changeLoader.add(axiom);
+		}
+
+		taxonomy = reasoner.getTaxonomy();
+		
+		System.out.println("\n\n\n\n===========================================");
+		// this leads to cleaning of A so the backward link A <-R<- B1 will be deleted
+		String toDelete = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
+				+ "SubClassOf(:C :E) "
+				+ ")";
+		List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
+
+		for (ElkAxiom axiom : deletions) {
+			changeLoader.remove(axiom);
+		}
+		
+		taxonomy = reasoner.getTaxonomy();
+		
+		System.out.println("\n\n\n\n===========================================");
+		
+		toDelete = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
+				+ "SubClassOf(:D ObjectSomeValuesFrom(:R :A)) "
+					+ ")";
+		
+		deletions = loadAxioms(new StringReader(toDelete));
+
+		for (ElkAxiom axiom : deletions) {
+			changeLoader.remove(axiom);
+		}
+		
+		taxonomy = reasoner.getTaxonomy();
+	}	
+	
 	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
 			Owl2ParseException {
 		return loadAxioms(new InputStreamReader(stream));
