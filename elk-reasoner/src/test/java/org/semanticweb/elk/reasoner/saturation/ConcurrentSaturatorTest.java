@@ -136,15 +136,6 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression I = objectFactory.getObjectIntersectionOf(b, c)
 				.accept(converter);
 
-		// assertTrue("A SubClassOf B",
-		// A.getToldSuperClassExpressions().contains(B));
-		// assertTrue("A SubClassOf C",
-		// A.getToldSuperClassExpressions().contains(C));
-		// assertFalse("A SubClassOf D", A.getToldSuperClassExpressions()
-		// .contains(D));
-		// assertTrue("I SubClassOf D",
-		// I.getToldSuperClassExpressions().contains(D));
-
 		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, index);
 

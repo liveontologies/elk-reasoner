@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -47,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
-	public ContextCleaningFactory(final SaturationStateImpl saturationState) {
+	public ContextCleaningFactory(final SaturationState saturationState) {
 		super(saturationState, false);
 	}
 
@@ -59,8 +59,7 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	}
 
 	/**
-	 * A {@link RuleDeapplicationFactory} that uses a
-	 * {@link SaturationStateImpl.Writer} that does not produce conclusions if
+	 * A {@link RuleDeapplicationFactory} that its own saturation state riter that does not produce conclusions if
 	 * their source is marked as saturated.
 	 */
 	public class CleaningEngine extends
@@ -87,7 +86,7 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	}
 
 	/**
-	 * A {@link Writer} that does not produce conclusions if their source
+	 * A writer that does not produce conclusions if their source
 	 * context is already saturated.
 	 * 
 	 * @author Pavel Klinov
@@ -134,6 +133,11 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		@Override
 		public void clearNotSaturatedContexts() {
 			writer_.clearNotSaturatedContexts();
+		}
+
+		@Override
+		public void resetContexts() {
+			writer_.resetContexts();
 		}
 	}
 }

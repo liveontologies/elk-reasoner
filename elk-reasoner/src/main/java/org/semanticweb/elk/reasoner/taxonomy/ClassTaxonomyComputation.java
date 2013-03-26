@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -49,7 +49,7 @@ public class ClassTaxonomyComputation
 	public ClassTaxonomyComputation(
 			Collection<Collection<IndexedClass>> inputs,
 			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, SaturationStateImpl saturationState,
+			ProgressMonitor progressMonitor, SaturationState saturationState,
 			UpdateableTaxonomy<ElkClass> partialTaxonomy) {
 		super(inputs, new ClassTaxonomyComputationFactory(saturationState,
 				maxWorkers, partialTaxonomy), executor, maxWorkers,

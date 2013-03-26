@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 // TODO: add progress monitor, make concurrent if possible
@@ -97,7 +98,8 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.saturationState.resetFirstContext();
+		//reasoner.saturationState.resetFirstContext();
+		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY).resetContexts();
 		todo_ = null;
 		return true;
 	}

@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -113,7 +113,7 @@ public class ConsistencyChecking
 	 */
 	public ConsistencyChecking(Collection<IndexedClassEntity> inputEntities,
 			ConsistencyMonitor consistencyMonitor,
-			SaturationStateImpl saturationState, ComputationExecutor executor,
+			SaturationState saturationState, ComputationExecutor executor,
 			int maxWorkers, ProgressMonitor progressMonitor) {
 		this(
 				new TodoJobs(inputEntities, consistencyMonitor),
@@ -186,7 +186,7 @@ public class ConsistencyChecking
 	 */
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
-			SaturationStateImpl saturationState) {
+			SaturationState saturationState) {
 		this(getTestEntities(ontologyIndex), new ConsistencyMonitor(),
 				saturationState, executor, maxWorkers, progressMonitor);
 	}

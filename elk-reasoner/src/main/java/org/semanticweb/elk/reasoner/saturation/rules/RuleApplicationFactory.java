@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
@@ -82,11 +81,11 @@ public class RuleApplicationFactory {
 	 */
 	private final boolean trackModifiedContexts_;
 	
-	public RuleApplicationFactory(final SaturationStateImpl saturationState) {
+	public RuleApplicationFactory(final SaturationState saturationState) {
 		this(saturationState, false);
 	}
 
-	public RuleApplicationFactory(final SaturationStateImpl saturationState,
+	public RuleApplicationFactory(final SaturationState saturationState,
 			final boolean trackModifiedContexts) {
 		this.aggregatedStats_ = new SaturationStatistics();
 		this.saturationState = saturationState;

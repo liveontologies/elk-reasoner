@@ -32,8 +32,6 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.swing.text.AbstractWriter;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -46,11 +44,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
+ * TODO docs
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class SaturationStateImpl implements SaturationState {
+class SaturationStateImpl implements SaturationState {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -131,10 +131,11 @@ public class SaturationStateImpl implements SaturationState {
 		};
 	}
 
-	public void resetFirstContext() {
+	private void resetFirstContext() {
 		firstContext = new ContextImpl(null);//a dummy first context
 	}
 
+	@Override
 	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
 		return notSaturatedContexts_;
 	}
@@ -161,26 +162,20 @@ public class SaturationStateImpl implements SaturationState {
 	/**
 	 * @param visitor a {@link ConclusionVisitor} which will be invoked for each produced {@link Conclusion}
 	 * 
-	 * @return an {@link Writer} for modifying this
-	 *         {@link SaturationStateImpl}. The methods of this
-	 *         {@link Writer} are thread safe
+	 * @return an {@link BasicSaturationStateWriter} for modifying this
+	 *         {@link SaturationState}. The methods of this
+	 *         {@link BasicSaturationStateWriter} are thread safe
 	 */
+	@Override
 	public BasicSaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor) {
 		return getDefaultWriter(conclusionVisitor);
 	}
 
+	@Override
 	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?> conclusionVisitor) {
 		return getDefaultWriter(conclusionVisitor);
 	}
 
-	/**
-	 * Creates a new {@link ExtendedWriter} for modifying this
-	 * {@link SaturationStateImpl} associated with the given
-	 * {@link ContextCreationListener}. If {@link ContextCreationListener} is
-	 * not thread safe, the calls of the methods for the same
-	 * {@link AbstractWriter} should be synchronized
-	 * 
-	 */
 	@Override
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
@@ -269,6 +264,11 @@ public class SaturationStateImpl implements SaturationState {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Clear non-saturated contexts");
 			notSaturatedContexts_.clear();
+		}
+
+		@Override
+		public void resetContexts() {
+			resetFirstContext();
 		}
 
 	}

@@ -3,6 +3,9 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+import java.util.Collection;
+
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -23,7 +26,9 @@ public interface SaturationState {
 	 * 
 	 * @return
 	 */
-	public Iterable<Context> getContexts();
+	public Collection<Context> getContexts();
+	
+	public Collection<IndexedClassExpression> getNotSaturatedContexts();
 
 	/**
 	 * Creates a new {@link ExtendedSaturationStateWriter} for modifying this
@@ -42,5 +47,10 @@ public interface SaturationState {
 	public BasicSaturationStateWriter getWriter(
 			ContextModificationListener contextModificationListener,
 			ConclusionVisitor<?> conclusionVisitor);
+	
+	public BasicSaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor);
+
+	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?> conclusionVisitor);
+	
 
 }

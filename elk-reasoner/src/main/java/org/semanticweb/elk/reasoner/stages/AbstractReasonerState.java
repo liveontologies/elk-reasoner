@@ -54,7 +54,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
@@ -86,7 +87,7 @@ public abstract class AbstractReasonerState {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(AbstractReasonerState.class);
 
-	final SaturationStateImpl saturationState;
+	final SaturationState saturationState;
 
 	/**
 	 * Accumulated statistics regarding produced conclusions and rule
@@ -170,7 +171,7 @@ public abstract class AbstractReasonerState {
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
 		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex, true);
 		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
-		this.saturationState = new SaturationStateImpl(ontologyIndex);
+		this.saturationState = SaturationStateFactory.createSaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
 		this.ontologyLoader_ = ontologyLoader

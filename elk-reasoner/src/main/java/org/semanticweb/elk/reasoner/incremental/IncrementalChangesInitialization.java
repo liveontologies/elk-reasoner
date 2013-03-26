@@ -35,7 +35,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -64,7 +63,7 @@ public class IncrementalChangesInitialization extends
 			Collection<Collection<Context>> inputs,
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
-			SaturationStateImpl state, ComputationExecutor executor,
+			SaturationState state, ComputationExecutor executor,
 			RuleApplicationVisitor ruleAppVisitor,
 			ConclusionVisitor<?> conclusionVisitor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
