@@ -5,6 +5,7 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Collection;
 
+import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -27,6 +28,10 @@ public interface SaturationState {
 	 * @return
 	 */
 	public Collection<Context> getContexts();
+	
+	public Context getContext(IndexedClassExpression ice);
+	
+	public OntologyIndex getOntologyIndex();
 	
 	public Collection<IndexedClassExpression> getNotSaturatedContexts();
 

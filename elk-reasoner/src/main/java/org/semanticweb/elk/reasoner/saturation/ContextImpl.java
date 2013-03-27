@@ -315,7 +315,7 @@ public class ContextImpl implements Context {
 
 	@Override
 	public String toString() {
-		return root_.toString();
+		return root_.toString() + (this != root_.getContext() ? "[local]" : "");
 	}
 
 	@Override

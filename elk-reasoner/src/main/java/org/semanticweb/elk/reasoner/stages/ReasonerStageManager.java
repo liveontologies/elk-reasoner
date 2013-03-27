@@ -37,9 +37,11 @@ public class ReasonerStageManager {
 			contextInitializationStage, consistencyCheckingStage,
 			classSaturationStage, classTaxonomyComputationStage,
 			incrementalCompletionStage, incrementalDeletionInitializationStage,
-			incrementalDeletionStage, initializeContextsAfterDeletionsStage,
-			incrementalContextCleaningStage,
-			initializeContextsAfterCleaningStage,
+			incrementalDeletionStage,
+			//initializeContextsAfterDeletionsStage,
+			//incrementalContextCleaningStage,
+			incrementalContextGapFillingStage,
+			//initializeContextsAfterCleaningStage,
 			incrementalAdditionInitializationStage, incrementalAdditionStage,
 			incrementalConsistencyCheckingStage,
 			incrementalTaxonomyCleaningStage,
@@ -97,17 +99,18 @@ public class ReasonerStageManager {
 		this.incrementalDeletionStage = new IncrementalDeletionStage(reasoner,
 				incrementalDeletionInitializationStage);
 
-		this.initializeContextsAfterDeletionsStage = new InitializeContextsAfterDeletionsStage(
-				reasoner, incrementalDeletionStage);
+		/*this.initializeContextsAfterDeletionsStage = new InitializeContextsAfterDeletionsStage(
+				reasoner, incrementalDeletionStage);*/
 
-		this.incrementalContextCleaningStage = new IncrementalContextCleaningStage(
-				reasoner, initializeContextsAfterDeletionsStage);
+		/*this.incrementalContextCleaningStage = new IncrementalContextCleaningStage(
+				reasoner, initializeContextsAfterDeletionsStage);*/
+		this.incrementalContextGapFillingStage = new IncrementalGapFillingStage(reasoner, incrementalDeletionStage);
 
-		this.initializeContextsAfterCleaningStage = new InitializeContextsAfterCleaningStage(
-				reasoner, incrementalContextCleaningStage);
+		/*this.initializeContextsAfterCleaningStage = new InitializeContextsAfterCleaningStage(
+				reasoner, incrementalContextGapFillingStage);*/
 
 		this.incrementalAdditionInitializationStage = new IncrementalAdditionInitializationStage(
-				reasoner, initializeContextsAfterCleaningStage);
+				reasoner, incrementalContextGapFillingStage/*initializeContextsAfterCleaningStage*/);
 
 		this.incrementalAdditionStage = new IncrementalAdditionStage(reasoner,
 				incrementalAdditionInitializationStage);

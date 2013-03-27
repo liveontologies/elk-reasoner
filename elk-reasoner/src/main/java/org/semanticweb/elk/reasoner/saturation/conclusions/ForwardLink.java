@@ -71,6 +71,14 @@ public class ForwardLink extends AbstractConclusion {
 		this.target_ = target;
 	}
 
+	public IndexedPropertyChain getRelation() {
+		return relation_;
+	}
+	
+	public Context getTarget() {
+		return target_;
+	}
+	
 	@Override
 	public void apply(BasicSaturationStateWriter engine, Context context) {
 

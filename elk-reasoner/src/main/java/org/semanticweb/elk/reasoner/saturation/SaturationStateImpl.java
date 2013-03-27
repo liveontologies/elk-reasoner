@@ -153,6 +153,16 @@ class SaturationStateImpl implements SaturationState {
 		resetFirstContext();
 	}
 
+	@Override
+	public OntologyIndex getOntologyIndex() {
+		return ontologyIndex_;
+	}
+	
+	@Override
+	public Context getContext(IndexedClassExpression ice) {
+		return ice.getContext();
+	}
+	
 	private ExtendedSaturationStateWriter getDefaultWriter(final ConclusionVisitor<?> conclusionVisitor) {
 		return new ContextCreatingWriter(
 				ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
@@ -233,7 +243,16 @@ class SaturationStateImpl implements SaturationState {
 			// this may be necessary, e.g., for counting produced conclusions
 			conclusion.accept(producedConclusionVisitor_, context);
 			
+			/*if (context.toString().startsWith("<:A>")) {
+				System.out.println("ADDING CONCLUSION " + conclusion);
+			}*/
+			
 			if (context.addToDo(conclusion)) {
+				
+				/*if (context.toString().startsWith("<:A>")) {
+					System.out.println("ACTIVATED!");
+				}*/
+				
 				// context was activated
 				activeContexts_.add(context);
 			}

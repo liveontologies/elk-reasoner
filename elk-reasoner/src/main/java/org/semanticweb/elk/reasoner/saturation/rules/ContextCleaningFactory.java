@@ -77,11 +77,6 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 					ContextModificationListener.DUMMY, visitor);
 
 			return new SaturationCheckingWriter(writer);
-			/*
-			 * return saturationState
-			 * .getSaturationCheckingWriter(getEngineConclusionVisitor
-			 * (localStatistics .getConclusionStatistics()));
-			 */
 		}
 	}
 

@@ -218,6 +218,10 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 */
 			R root = initiatorJob.getInput();
 			Context saturation = root.getContext();
+			//FIXME
+			if (root.toString().startsWith("<:A>")) {
+				System.out.println(System.identityHashCode(saturation));
+			}
 
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
@@ -415,8 +419,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			Context context = root.getContext();
 			if (context != null && context.isSaturated()) {
 				jobsWithSaturatedRoot.add(job);
-			} else
+			} else {
 				saturationEngine.submit(new SaturationJobRoot<R, J>(job));
+			}
 		}
 
 		@Override

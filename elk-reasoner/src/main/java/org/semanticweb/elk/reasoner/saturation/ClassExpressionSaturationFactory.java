@@ -266,13 +266,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			}
 			if (countContextsFinished_.compareAndSet(shapshotContextsFinished,
 					shapshotContextsFinished + 1)) {
+				
 				Context nextContext = nonSaturatedContexts_.poll();
-				nextContext.setSaturated(true);
-
-				/*
-				 * if (LOGGER_.isTraceEnabled()) { LOGGER_.trace("Marking " +
-				 * nextContext + " as saturated"); }
-				 */
+				
+				nextContext.setSaturated(true);				 
 			}
 		}
 		for (;;) {
@@ -295,13 +292,15 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 */
 				J nextJob = jobsInProgress_.poll();
 				IndexedClassExpression root = nextJob.getInput();
-				Context rootSaturation = root.getContext();
+				Context rootSaturation = ruleApplicationFactory_.getSaturationState().getContext(root);//root.getContext();
+				
 				rootSaturation.setSaturated(true);
 				nextJob.setOutput(rootSaturation);
+				
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(root + ": saturation finished");
-					// LOGGER_.trace(rootSaturation.isSaturated());
 				}
+				
 				localStatistics.jobsProcessedNo++;
 				listener_.notifyFinished(nextJob);
 			}
@@ -470,7 +469,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 * if the context is already assigned and saturated, this job is
 				 * already complete
 				 */
-				Context rootContext = root.getContext();
+				Context rootContext = ruleApplicationFactory_.getSaturationState().getContext(root);//root.getContext();
+				
 				if (rootContext != null && rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);
 					stats_.jobsAlreadyDoneNo++;
@@ -489,9 +489,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				countJobsSubmitted_.incrementAndGet();
 				ruleApplicationEngine_.submit(root);
 				ruleApplicationEngine_.process();
-				if (Thread.currentThread().isInterrupted())
+				
+				if (Thread.currentThread().isInterrupted()) {
 					updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 							countStartedWorkers_.get());
+				}
+				
 				updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
 				processFinishedCounters(stats_); // can throw
 													// InterruptedException

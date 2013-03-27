@@ -112,7 +112,7 @@ public class BackwardLink implements Conclusion {// extends AbstractConclusion {
 
 	@Override
 	public String toString() {
-		return (relation_ + "<-" + source_.getRoot());
+		return (relation_ + "<-" + source_);
 	}
 
 	@Override

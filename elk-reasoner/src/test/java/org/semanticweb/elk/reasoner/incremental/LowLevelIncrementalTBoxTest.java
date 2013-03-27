@@ -584,7 +584,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		changeLoader.remove(disjCB);
 
-		// System.out.println("===========================================");
+		 System.out.println("\n\n\n\n\n===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
 
@@ -883,6 +883,8 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 		changeLoader.remove(toDelete).add(toAdd1).add(toAdd2);
 
+		System.out.println("\n\n\n\n\n");
+		
 		taxonomy = reasoner.getTaxonomy();
 
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()

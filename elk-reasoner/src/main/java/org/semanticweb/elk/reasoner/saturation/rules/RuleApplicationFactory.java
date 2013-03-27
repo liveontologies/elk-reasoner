@@ -108,6 +108,9 @@ public class RuleApplicationFactory {
 		return aggregatedStats_;
 	}
 
+	public SaturationState getSaturationState() {
+		return saturationState;
+	}
 	
 	static ContextCreationListener getEngineContextCreationListener(
 			final ContextCreationListener listener,
@@ -244,10 +247,17 @@ public class RuleApplicationFactory {
 			localContextStatistics.countProcessedContexts++;
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
-				
+
 				if (conclusion == null)
 					return;
+				
 				conclusion.accept(conclusionProcessor_, context);
+				
+/*				if (context.toString().startsWith("<:A>")) {
+					System.out.println("PROCESSED CONCLUSION " + conclusion);
+					System.out.println(context.getSubsumers());
+					System.out.println(System.identityHashCode(context));
+				}*/				
 			}
 		}
 
