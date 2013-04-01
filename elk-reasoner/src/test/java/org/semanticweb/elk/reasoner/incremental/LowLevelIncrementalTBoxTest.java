@@ -402,6 +402,56 @@ public class LowLevelIncrementalTBoxTest {
 	}
 
 	@Test
+	public void testDeleteFromKangaroo() throws ElkException, IOException {
+		InputStream stream = null;
+		String toDelete = "Prefix(test:=<http://www.test.com/schema#>) Ontology(\n"
+				+ "SubClassOf(<test:KangarooInfant> ObjectIntersectionOf(ObjectSomeValuesFrom(<test:lives-in> <test:Pouch>) <test:Kangaroo>)) \n"
+				+ "DisjointClasses(<test:Irrational> <test:Rational>) \n "
+				+ "SubClassOf(<test:Kangaroo> <test:Beast>) \n" + ")";
+		ElkClass maternityKangaroo = objectFactory.getClass(new ElkFullIri("test:MaternityKangaroo"));
+
+		try {
+			stream = getClass().getClassLoader().getResourceAsStream(
+					"incremental/kangaroo.owl");
+
+			List<ElkAxiom> ontology = loadAxioms(stream);
+			List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
+			TestChangesLoader initialLoader = new TestChangesLoader();
+			TestChangesLoader changeLoader = new TestChangesLoader();
+
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+					initialLoader, new LoggingStageExecutor());
+
+			reasoner.setAllowIncrementalMode(false);
+			reasoner.registerOntologyChangesLoader(changeLoader);
+
+			for (ElkAxiom axiom : ontology) {
+				initialLoader.add(axiom);
+			}
+
+			Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+
+			assertSame(taxonomy.getBottomNode(), taxonomy.getNode(maternityKangaroo));
+
+			// System.out.println("===========================================");
+
+			reasoner.setAllowIncrementalMode(true);
+
+			for (ElkAxiom del : deletions) {
+				changeLoader.remove(del);
+			}
+
+			taxonomy = reasoner.getTaxonomy();
+
+			assertSame(taxonomy.getBottomNode(), taxonomy.getNode(maternityKangaroo));
+
+
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
+	}	
+	
+	@Test
 	public void testDuplicateSubclassAxioms() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 		TestChangesLoader changeLoader = new TestChangesLoader();
