@@ -133,7 +133,7 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
         c.insets = new Insets(0,0,0,12);
     	c.anchor = GridBagConstraints.FIRST_LINE_START;
         c.weightx = 0.0; 
-        panel.add((new JLabel("<html>Allow incremental reasoning<br/>(this feature is experimental)</html>")), c);
+        panel.add((new JLabel("<html>Incremental reasoning<br/>(experimental)</html>")), c);
         
         c.gridx = 1;
         c.gridy = gridybase;

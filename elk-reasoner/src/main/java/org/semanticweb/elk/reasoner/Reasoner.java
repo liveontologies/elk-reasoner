@@ -73,7 +73,7 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * the executor used for concurrent tasks
 	 */
-	protected volatile ComputationExecutor executor;
+	private volatile ComputationExecutor executor_;
 	/**
 	 * Number of workers for concurrent jobs.
 	 */
@@ -155,19 +155,28 @@ public class Reasoner extends AbstractReasonerState {
 	 * @param config
 	 */
 	public final void setConfigurationOptions(ReasonerConfiguration config) {
-		workerNo_ = config
-				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
+		int newWorkerNo = config
+				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS); 
+		
 		setAllowIncrementalMode(config
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
 		setAllowIncrementalTaxonomy(config
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY));
+		
+		if (newWorkerNo > workerNo_) {
+			// need to re-create the executor since it may have already created
+			// a pool with a fixed number of threads
+			executor_ = null;
+		}
+		
+		workerNo_ = newWorkerNo;
 	}
 
 	@Override
 	protected ComputationExecutor getProcessExecutor() {
-		if (executor == null)
-			executor = new ComputationExecutor(workerNo_, "elk-reasoner");
-		return executor;
+		if (executor_ == null)
+			executor_ = new ComputationExecutor(workerNo_, "elk-reasoner");
+		return executor_;
 	}
 
 	@Override
@@ -193,12 +202,12 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public boolean shutdown(long timeout, TimeUnit unit)
 			throws InterruptedException {
-		if (executor == null)
+		if (executor_ == null)
 			return true;
-		executor.shutdown();
-		executor.awaitTermination(timeout, unit);
-		boolean success = executor.isShutdown();
-		executor = null;
+		executor_.shutdown();
+		executor_.awaitTermination(timeout, unit);
+		boolean success = executor_.isShutdown();
+		executor_ = null;
 		if (success) {
 			if (LOGGER_.isInfoEnabled())
 				LOGGER_.info("ELK reasoner has shut down");
