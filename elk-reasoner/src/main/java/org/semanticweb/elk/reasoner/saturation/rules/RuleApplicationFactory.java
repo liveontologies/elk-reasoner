@@ -203,8 +203,6 @@ public class RuleApplicationFactory {
 			this.localContextStatistics = localStatistics.getContextStatistics();
 		}
 
-		protected abstract BasicSaturationStateWriter getSaturationStateWriter();
-
 		@Override
 		public void process() {
 			localContextStatistics.timeContextProcess -= CachedTimeThread.currentTimeMillis;
@@ -252,12 +250,6 @@ public class RuleApplicationFactory {
 					return;
 				
 				conclusion.accept(conclusionProcessor_, context);
-				
-/*				if (context.toString().startsWith("<:A>")) {
-					System.out.println("PROCESSED CONCLUSION " + conclusion);
-					System.out.println(context.getSubsumers());
-					System.out.println(System.identityHashCode(context));
-				}*/				
 			}
 		}
 
@@ -351,6 +343,8 @@ public class RuleApplicationFactory {
 		}
 		
 		protected abstract DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor();
+		
+		protected abstract BasicSaturationStateWriter getSaturationStateWriter();
 	}
 	
 	

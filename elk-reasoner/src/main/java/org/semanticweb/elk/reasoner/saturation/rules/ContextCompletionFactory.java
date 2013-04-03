@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -45,6 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeapplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionOccurranceCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
@@ -67,13 +69,14 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger
-				.getLogger(ContextCompletionFactory.class);
-	
+			.getLogger(ContextCompletionFactory.class);
+
 	private final LocalSaturationState localState_;
 
 	public ContextCompletionFactory(SaturationState saturationState) {
 		super(saturationState);
-		localState_ = new LocalSaturationState(saturationState.getOntologyIndex());
+		localState_ = new LocalSaturationState(
+				saturationState.getOntologyIndex());
 	}
 
 	@Override
@@ -81,7 +84,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			ContextModificationListener modListener) {
 		return new ContextCompletionEngine();
 	}
-	
+
 	@Override
 	public SaturationState getSaturationState() {
 		return localState_;
@@ -96,27 +99,36 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	private class ContextCompletionEngine extends
 			RuleApplicationFactory.BaseEngine {
 
-		private final ExtendedSaturationStateWriter writer_;
+		private ExtendedSaturationStateWriter writer_;
 
 		protected ContextCompletionEngine() {
 			super(new SaturationStatistics());
-			writer_ = localState_.getDefaultWriter();
 		}
 
 		@Override
 		public void submit(IndexedClassExpression root) {
 			// create a local context for this ICE
-			writer_.getCreateContext(root);
+			getSaturationStateWriter().getCreateContext(root);
 		}
 
 		@Override
-		protected BasicSaturationStateWriter getSaturationStateWriter() {
+		protected ExtendedSaturationStateWriter getSaturationStateWriter() {
+			if (writer_ == null) {
+				ConclusionStatistics stats = localStatistics
+						.getConclusionStatistics();
+				ConclusionVisitor<?> visitor = RuleApplicationFactory
+						.getEngineConclusionVisitor(stats);
+
+				writer_ = localState_.getDefaultWriter(visitor);
+			}
+
 			return writer_;
 		}
 
 		@Override
 		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
-			return new ForwardDecompositionRuleApplicationVisitor(writer_);
+			return new ForwardDecompositionRuleApplicationVisitor(
+					getSaturationStateWriter());
 		}
 
 		@Override
@@ -125,10 +137,13 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				SaturationStatistics localStatistics) {
 
 			return new CombinedConclusionVisitor(
-			// this checks for existence in the main context and inserts the
-			// conclusion either into the main context's ToDo or into the local
-			// context
-					new ConditionalInsertionVisitor(saturationState.getWriter(ConclusionVisitor.DUMMY)),
+					// this checks for existence in the main context and inserts
+					// the
+					// conclusion either into the main context's ToDo or into
+					// the local
+					// context
+					new ConditionalInsertionVisitor(
+							saturationState.getWriter(ConclusionVisitor.DUMMY)),
 					// this applies rules in the latter case
 					filterRuleConclusionProcessor(
 							new ConclusionDeapplicationVisitor(
@@ -152,7 +167,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	private static class LocalSaturationState implements SaturationState {
 
 		private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR_ = new BasicCompositionRuleApplicationVisitor();
-		
+
 		private final ConcurrentHashMap<IndexedClassExpression, Context> contextMap_;
 		private final OntologyIndex ontologyIndex_;
 		private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
@@ -166,14 +181,14 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		public OntologyIndex getOntologyIndex() {
 			return ontologyIndex_;
 		}
-		
+
 		@Override
 		public Context getContext(IndexedClassExpression ice) {
-			//synchronized (ice) {
-				return contextMap_.get(ice);
-			//}
+			// synchronized (ice) {
+			return contextMap_.get(ice);
+			// }
 		}
-		
+
 		@Override
 		public Collection<Context> getContexts() {
 			return contextMap_.values();
@@ -191,30 +206,32 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				RuleApplicationVisitor ruleAppVisitor,
 				ConclusionVisitor<?> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
-			return getDefaultWriter();
+			return getDefaultWriter(conclusionVisitor);
 		}
 
 		@Override
 		public BasicSaturationStateWriter getWriter(
 				ContextModificationListener contextModificationListener,
 				ConclusionVisitor<?> conclusionVisitor) {
-			return getDefaultWriter();
+			return getDefaultWriter(conclusionVisitor);
 		}
 
 		@Override
 		public BasicSaturationStateWriter getWriter(
 				ConclusionVisitor<?> conclusionVisitor) {
-			return getDefaultWriter();
+			return getDefaultWriter(conclusionVisitor);
 		}
 
 		@Override
 		public ExtendedSaturationStateWriter getExtendedWriter(
 				ConclusionVisitor<?> conclusionVisitor) {
-			return getDefaultWriter();
+			return getDefaultWriter(conclusionVisitor);
 		}
 
-		private LocalSaturationStateWriter getDefaultWriter() {
-			return new LocalSaturationStateWriter(ontologyIndex_);
+		private LocalSaturationStateWriter getDefaultWriter(
+				ConclusionVisitor<?> conclusionVisitor) {
+			return new LocalSaturationStateWriter(ontologyIndex_,
+					conclusionVisitor);
 		}
 
 		/**
@@ -228,11 +245,12 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			private final OntologyIndex ontologyIndex_;
 			// needed for statistics
-			//private final ConclusionVisitor<?> conclusionVisitor_;
+			private final ConclusionVisitor<?> conclusionVisitor_;
 
-			LocalSaturationStateWriter(OntologyIndex index) {
+			LocalSaturationStateWriter(OntologyIndex index,
+					ConclusionVisitor<?> visitor) {
 				ontologyIndex_ = index;
-				//conclusionVisitor_ = RuleApplicationFactory.getEngineConclusionVisitor(localStatistics);
+				conclusionVisitor_ = visitor;// RuleApplicationFactory.getEngineConclusionVisitor(localStatistics);
 			}
 
 			@Override
@@ -257,7 +275,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 							+ conclusion);
 				}
 
-				//conclusion.accept(conclusionVisitor_, context);
+				conclusion.accept(conclusionVisitor_, context);
 
 				if (context.addToDo(conclusion)) {
 					// context was activated
@@ -284,17 +302,17 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			public Context getCreateContext(IndexedClassExpression root) {
 				Context context = new ContextImpl(root);
 				Context oldContext = contextMap_.putIfAbsent(root, context);
-				
+
 				if (oldContext == null) {
 					initContext(context);
-					
+
 					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace(context.getRoot() + ": local context created");
+						LOGGER_.trace(context.getRoot()
+								+ ": local context created");
 					}
 
 					return context;
-				}
-				else {
+				} else {
 					return oldContext;
 				}
 			}
@@ -302,12 +320,13 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			@Override
 			public void initContext(Context context) {
 				produce(context, new PositiveSubsumer(context.getRoot()));
-				// apply all context initialization rules			
+				// apply all context initialization rules
 				LinkRule<Context> initRule = ontologyIndex_
 						.getContextInitRuleHead();
-				
+
 				while (initRule != null) {
-					initRule.accept(DEFAULT_INIT_RULE_APP_VISITOR_, this, context);
+					initRule.accept(DEFAULT_INIT_RULE_APP_VISITOR_, this,
+							context);
 					initRule = initRule.next();
 				}
 			}
@@ -335,7 +354,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		// this transforming visitor makes sure that all conclusions stored in
 		// the ToDo queues of the main contexts do not reference local contexts.
 		private final ConclusionVisitor<Conclusion> transformer_;
-		
+
 		private final BasicSaturationStateWriter mainStateWriter_;
 
 		ConditionalInsertionVisitor(BasicSaturationStateWriter writer) {
@@ -348,20 +367,24 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		private Boolean defaultVisit(Conclusion conclusion, Context context) {
 			Context mainContext = context.getRoot().getContext();
 			Conclusion transformed = conclusion.accept(transformer_, null);
-			
+
 			if (transformed.accept(checker_, mainContext)) {
 				// insert locally
 				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(context + ": conclusion " + conclusion + " exists in the main context, process it locally");
+					LOGGER_.trace(context + ": conclusion " + conclusion
+							+ " exists in the main context, process it locally");
 				}
-				
+
 				return conclusion.accept(inserter_, context);
 			} else {
 				// insert to the main context's ToDo
 				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(context + ": conclusion " + conclusion + " does not exist in the main context, insert into TODO");
+					LOGGER_.trace(context
+							+ ": conclusion "
+							+ conclusion
+							+ " does not exist in the main context, insert into TODO");
 				}
-				
+
 				mainStateWriter_.produce(mainContext, transformed);
 
 				return false;
@@ -405,20 +428,20 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 	}
-	
-	
+
 	/**
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class ConclusionTransformingVisitor implements ConclusionVisitor<Conclusion> {
+	private static class ConclusionTransformingVisitor implements
+			ConclusionVisitor<Conclusion> {
 
 		private Context getMainContext(Context context) {
 			return context.getRoot().getContext();
 		}
-		
+
 		@Override
 		public Conclusion visit(NegativeSubsumer negSCE, Context context) {
 			return negSCE;
@@ -431,12 +454,14 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		@Override
 		public Conclusion visit(BackwardLink link, Context context) {
-			return new BackwardLink(getMainContext(link.getSource()), link.getRelation());
+			return new BackwardLink(getMainContext(link.getSource()),
+					link.getRelation());
 		}
 
 		@Override
 		public Conclusion visit(ForwardLink link, Context context) {
-			return new ForwardLink(link.getRelation(), getMainContext(link.getTarget()));
+			return new ForwardLink(link.getRelation(),
+					getMainContext(link.getTarget()));
 		}
 
 		@Override
@@ -454,7 +479,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				Context context) {
 			return disjointnessAxiom;
 		}
-		
+
 	}
 
 }
