@@ -7,12 +7,12 @@ Prefix(test:=<http://www.test.com/schema#>)
 
 
 Ontology(
-SubClassOf(<test:Beast> ObjectIntersectionOf(<test:Irrational> <test:Animal>))
-SubClassOf(<test:Human> ObjectIntersectionOf(<test:Rational> <test:Animal>))
+SubClassOf(<test:Beast> <test:Irrational>)
+SubClassOf(<test:Human> <test:Rational>)
 DisjointClasses(<test:Irrational> <test:Rational>)
 SubClassOf(<test:Kangaroo> <test:Beast>)
 SubClassOf(<test:KangarooInfant> <test:Kangaroo>)
-SubClassOf(<test:MaternityKangaroo> ObjectIntersectionOf(<test:Kangaroo> ObjectSomeValuesFrom(<test:has-body-part> <test:Pouch>) ObjectSomeValuesFrom(<test:has-child> <test:KangarooInfant>)))
+SubClassOf(<test:MaternityKangaroo> ObjectIntersectionOf(<test:Kangaroo> ObjectSomeValuesFrom(<test:has-child> <test:KangarooInfant>)))
 DisjointClasses(<test:Rational> <test:Irrational>)
 ObjectPropertyDomain(<test:has-child> <test:Human>)
 )

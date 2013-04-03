@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class BackwardLink implements Conclusion {// extends AbstractConclusion {
+public class BackwardLink implements Conclusion {
 
 	/**
 	 * the source {@link Context} of this {@link BackwardLink}; the root of the

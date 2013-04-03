@@ -329,8 +329,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		private Boolean defaultVisit(Conclusion conclusion, Context context) {
 			Context mainContext = context.getRoot().getContext();
+			Conclusion transformed = conclusion.accept(transformer_, null);
 			
-			if (conclusion.accept(checker_, mainContext)) {
+			if (transformed.accept(checker_, mainContext)) {
 				// insert locally
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace(context + ": conclusion " + conclusion + " exists in the main context, process it locally");
@@ -343,7 +344,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 					LOGGER_.trace(context + ": conclusion " + conclusion + " does not exist in the main context, insert into TODO");
 				}
 				
-				mainStateWriter_.produce(mainContext, conclusion.accept(transformer_, null));
+				mainStateWriter_.produce(mainContext, transformed);
 
 				return false;
 			}
