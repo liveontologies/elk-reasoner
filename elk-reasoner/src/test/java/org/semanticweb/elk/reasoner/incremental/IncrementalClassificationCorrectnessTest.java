@@ -87,11 +87,6 @@ public class IncrementalClassificationCorrectnessTest extends
 
 			@Override
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-				/*if (elkAxiom instanceof ElkClassAxiom) {
-					changingAxioms.add(elkAxiom);
-				} else {
-					staticAxioms.add(elkAxiom);
-				}*/
 				// all axioms are dynamic
 				changingAxioms.add(elkAxiom);
 			}
@@ -101,7 +96,7 @@ public class IncrementalClassificationCorrectnessTest extends
 	@Override
 	protected Reasoner getReasoner(final Iterable<ElkAxiom> axioms) {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new TestChangesLoader(axioms, IncrementalChangeType.ADD), new PostProcessingStageExecutor(), 1);
+				new TestChangesLoader(axioms, IncrementalChangeType.ADD), new PostProcessingStageExecutor());
 
 		return reasoner;
 	}

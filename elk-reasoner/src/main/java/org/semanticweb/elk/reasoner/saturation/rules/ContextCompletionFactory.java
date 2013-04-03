@@ -2,10 +2,31 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
@@ -32,7 +53,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
  * Applies rules to all conclusions of partially completed contexts. Uses a
@@ -133,12 +153,12 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR_ = new BasicCompositionRuleApplicationVisitor();
 		
-		private final Map<IndexedClassExpression, Context> contextMap_;
+		private final ConcurrentHashMap<IndexedClassExpression, Context> contextMap_;
 		private final OntologyIndex ontologyIndex_;
 		private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
 
 		LocalSaturationState(OntologyIndex index) {
-			contextMap_ = new ArrayHashMap<IndexedClassExpression, Context>();
+			contextMap_ = new ConcurrentHashMap<IndexedClassExpression, Context>();
 			ontologyIndex_ = index;
 		}
 
@@ -149,7 +169,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		
 		@Override
 		public Context getContext(IndexedClassExpression ice) {
-			return contextMap_.get(ice);
+			//synchronized (ice) {
+				return contextMap_.get(ice);
+			//}
 		}
 		
 		@Override
@@ -260,25 +282,21 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			@Override
 			public Context getCreateContext(IndexedClassExpression root) {
-				Context context = null;
+				Context context = new ContextImpl(root);
+				Context oldContext = contextMap_.putIfAbsent(root, context);
+				
+				if (oldContext == null) {
+					initContext(context);
+					
+					if (LOGGER_.isTraceEnabled()) {
+						LOGGER_.trace(context.getRoot() + ": local context created");
+					}
 
-				synchronized (root) {
-					context = contextMap_.get(root);
-
-					if (context != null)
-						return context;
-
-					context = new ContextImpl(root);
-					contextMap_.put(root, context);
+					return context;
 				}
-
-				initContext(context);
-
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(context.getRoot() + ": local context created");
+				else {
+					return oldContext;
 				}
-
-				return context;
 			}
 
 			@Override
