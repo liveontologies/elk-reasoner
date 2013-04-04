@@ -79,9 +79,7 @@ public class ForwardLink extends AbstractConclusion {
 		return target_;
 	}
 	
-	@Override
 	public void apply(BasicSaturationStateWriter engine, Context context) {
-
 		/* compose the link with all backward links */
 		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
 				.getSaturated().getCompositionsByLeftSubProperty();

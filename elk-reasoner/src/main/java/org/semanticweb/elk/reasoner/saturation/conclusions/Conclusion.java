@@ -43,4 +43,6 @@ public interface Conclusion {
 	 * @return The context which this conclusion is logically relevant for, or {@code null} if none
 	 */
 	public Context getSourceContext(Context contextWhereStored);
+	
+
 }

@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -36,14 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public abstract class AbstractConclusion implements Conclusion {
 
 
-	public void deapply(BasicSaturationStateWriter writer, Context context) {
-		apply(writer, context);
-	}
-
 	@Override
 	public Context getSourceContext(Context contextWhereStored) {
 		return contextWhereStored;
 	}
 
-	public abstract void apply(BasicSaturationStateWriter writer, Context element);
 }

@@ -48,7 +48,6 @@ public class ConclusionDeapplicationVisitor implements
 
 	@Override
 	public Boolean visit(NegativeSubsumer negSCE, Context context) {
-		//negSCE.deapply(writer_, context, ruleAppVisitor_, decompRuleAppVisitor_);
 		negSCE.applyDecompositionRules(context, decompRuleAppVisitor_);
 		negSCE.apply(writer_, context, ruleAppVisitor_);
 		
@@ -57,21 +56,19 @@ public class ConclusionDeapplicationVisitor implements
 
 	@Override
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
-		//posSCE.deapply(writer_, context, ruleAppVisitor_, decompRuleAppVisitor_);
 		posSCE.apply(writer_, context, ruleAppVisitor_, decompRuleAppVisitor_);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(BackwardLink link, Context context) {
-		//link.deapply(writer_, context, ruleAppVisitor_);
 		link.apply(writer_, context, ruleAppVisitor_);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(ForwardLink link, Context context) {
-		link.deapply(writer_, context);
+		link.apply(writer_, context);
 		return true;
 	}
 
@@ -83,13 +80,13 @@ public class ConclusionDeapplicationVisitor implements
 
 	@Override
 	public Boolean visit(Propagation propagation, Context context) {
-		propagation.deapply(writer_, context);
+		propagation.apply(writer_, context);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
-		disjointnessAxiom.deapply(writer_, context);
+		disjointnessAxiom.apply(writer_, context);
 		return true;
 	}
 }

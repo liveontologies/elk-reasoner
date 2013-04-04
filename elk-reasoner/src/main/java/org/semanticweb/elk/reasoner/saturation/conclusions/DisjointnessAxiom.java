@@ -46,7 +46,6 @@ public class DisjointnessAxiom extends AbstractConclusion {
 		return axiom_;
 	}
 
-	@Override
 	public void apply(BasicSaturationStateWriter engine, Context context) {
 		if (context.inconsistencyDisjointnessAxiom(axiom_)) {
 			engine.produce(context, Contradiction.getInstance());

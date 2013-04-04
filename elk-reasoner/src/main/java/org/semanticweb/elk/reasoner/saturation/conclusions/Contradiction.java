@@ -57,14 +57,12 @@ public class Contradiction extends AbstractConclusion {
 		// do not allow creation of instances outside of this class
 	}
 
-	@Override
 	public void deapply(BasicSaturationStateWriter engine, Context context) {
 		propagateThroughBackwardLinks(engine, context);
 		context.getBackwardLinkRuleChain().remove(
 				ContradictionBackwardLinkRule.MATCHER_);
 	}
 
-	@Override
 	public void apply(BasicSaturationStateWriter engine, Context context) {
 		propagateThroughBackwardLinks(engine, context);
 		// register the backward link rule for propagation of bottom

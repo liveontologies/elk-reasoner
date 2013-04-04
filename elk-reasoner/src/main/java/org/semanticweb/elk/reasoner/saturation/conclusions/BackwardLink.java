@@ -73,11 +73,6 @@ public class BackwardLink implements Conclusion {
 		return source_;
 	}
 
-	/*public void deapply(BasicSaturationStateWriter writer, Context context,
-			RuleApplicationVisitor ruleAppVisitor) {
-		apply(writer, context, ruleAppVisitor);
-	}*/
-
 	public void apply(BasicSaturationStateWriter writer, Context context,
 			RuleApplicationVisitor ruleAppVisitor) {
 

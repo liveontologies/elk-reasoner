@@ -66,7 +66,6 @@ public class Propagation extends AbstractConclusion {
 		return "Propagation " + relation_ + "->" + carry_;
 	}
 
-	@Override
 	public void apply(BasicSaturationStateWriter engine, Context context) {
 		// propagate over all backward links
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
