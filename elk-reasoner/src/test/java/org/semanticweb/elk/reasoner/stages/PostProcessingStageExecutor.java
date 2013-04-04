@@ -56,8 +56,8 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 				ContextSaturationFlagCheckingStage.class);
 		postProcesingMap.add(IncrementalContextCleaningStage.class,
 				CheckCleaningStage.class);
-		postProcesingMap.add(IncrementalContextCleaningStage.class,
-				SaturationGraphValidationStage.class);
+		/*postProcesingMap.add(IncrementalContextCleaningStage.class,
+				SaturationGraphValidationStage.class);*/
 		postProcesingMap.add(IncrementalAdditionInitializationStage.class,
 				SaturationGraphValidationStage.class);
 		/*
