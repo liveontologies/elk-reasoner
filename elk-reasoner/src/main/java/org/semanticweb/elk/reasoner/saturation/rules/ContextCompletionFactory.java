@@ -474,19 +474,20 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean visit(NegativeSubsumer negSCE, Context context) {
-			negSCE.deapply(writer_, context.getRoot().getContext(), ruleAppVisitor_, decompRuleAppVisitor_);
+			negSCE.apply(writer_, context.getRoot().getContext(), ruleAppVisitor_);
+			negSCE.applyDecompositionRules(context.getRoot().getContext(), decompRuleAppVisitor_);
 			return true;
 		}
 
 		@Override
 		public Boolean visit(PositiveSubsumer posSCE, Context context) {
-			posSCE.deapply(writer_, context.getRoot().getContext(), ruleAppVisitor_, decompRuleAppVisitor_);
+			posSCE.apply(writer_, context.getRoot().getContext(), ruleAppVisitor_, decompRuleAppVisitor_);
 			return true;
 		}
 
 		@Override
 		public Boolean visit(BackwardLink link, Context context) {
-			link.deapply(writer_, context.getRoot().getContext(), ruleAppVisitor_);
+			link.apply(writer_, context.getRoot().getContext(), ruleAppVisitor_);
 			return true;
 		}
 

@@ -59,9 +59,9 @@ public class PositiveSubsumer extends Subsumer {
 		return visitor.visit(this, context);
 	}
 
-	public void deapply(BasicSaturationStateWriter writer, Context context,
+	/*public void deapply(BasicSaturationStateWriter writer, Context context,
 			RuleApplicationVisitor ruleAppVisitor,
 			DecompositionRuleApplicationVisitor decompVisitor) {
 		apply(writer, context, ruleAppVisitor, decompVisitor);
-	}
+	}*/
 }
