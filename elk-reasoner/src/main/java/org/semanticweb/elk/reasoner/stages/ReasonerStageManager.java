@@ -66,8 +66,6 @@ public class ReasonerStageManager {
 		this.propertyHierarchyCompositionComputationStage = new PropertyHierarchyCompositionComputationStage(
 				reasoner, propertyReflexivityComputationStage);
 
-		// FIXME: currently it is assumed that changes do not have
-		// property axioms
 		this.changesLoadingStage = new ChangesLoadingStage(reasoner,
 				propertyHierarchyCompositionComputationStage);
 
@@ -104,7 +102,7 @@ public class ReasonerStageManager {
 
 		/*this.incrementalContextCleaningStage = new IncrementalContextCleaningStage(
 				reasoner, initializeContextsAfterDeletionsStage);*/
-		this.incrementalContextGapFillingStage = new IncrementalGapFillingStage(reasoner, incrementalDeletionStage);
+		this.incrementalContextGapFillingStage = new IncrementalOverdeletionPruningStage(reasoner, incrementalDeletionStage);
 
 		/*this.initializeContextsAfterCleaningStage = new InitializeContextsAfterCleaningStage(
 				reasoner, incrementalContextGapFillingStage);*/

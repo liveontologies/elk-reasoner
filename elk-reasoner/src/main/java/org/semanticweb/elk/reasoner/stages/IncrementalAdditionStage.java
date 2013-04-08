@@ -82,13 +82,6 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 				.getRuleAndConclusionStatistics());
 
 		markAllContextsAsSaturated();
-		// /FIXME
-		/*
-		 * for (IndexedClass ic : reasoner.ontologyIndex.getIndexedClasses()) {
-		 * if (ic.getContext() != null)
-		 * 
-		 * System.out.println(ic + ": " + ic.getContext().getSubsumers()); }
-		 */
 		saturation_ = null;
 		return true;
 	}

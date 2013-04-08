@@ -33,32 +33,34 @@ import org.semanticweb.elk.reasoner.saturation.rules.ContextCompletionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 
 /**
- * FIXME Better name
- * 
- * TODO docs
+ * Prunes the set of deleted conclusions by re-deriving those having alternative
+ * derivations (name taken from the original paper on the DRed algorithm). Uses
+ * a {@link ContextCompletionFactory} which "fills gaps" in the set of
+ * conclusions for each context by deriving the missing conclusions.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalGapFillingStage extends AbstractReasonerStage {
+public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 
 	private ClassExpressionSaturation<IndexedClassExpression> completion_;
 
-	public IncrementalGapFillingStage(AbstractReasonerState reasoner,
+	public IncrementalOverdeletionPruningStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
 
 	@Override
 	public String getName() {
-		return "Incremental Gap Filling";
+		return "Incremental Overdeletion Pruning";
 	}
 
 	@Override
 	public void printInfo() {
-		// TODO Auto-generated method stub
-
+		if (completion_ != null) {
+			completion_.printStatistics();
+		}
 	}
 
 	@Override
