@@ -135,6 +135,10 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	protected NonBottomClassNode getCreateNonBottomClassNode(
 			Collection<ElkClass> members) {
 
+		if (members == null || members.isEmpty()) {
+			throw new IllegalArgumentException("Empty class taxonomy nodes must not be created!");
+		}
+		
 		NonBottomClassNode previous;
 
 		// search if some node is already assigned to some member, and if so

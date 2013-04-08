@@ -54,9 +54,9 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 				SaturatedPropertyChainCheckingStage.class);
 		postProcesingMap.add(IncrementalDeletionStage.class,
 				ContextSaturationFlagCheckingStage.class);
-		postProcesingMap.add(IncrementalContextCleaningStage.class,
-				CheckCleaningStage.class);
 		/*postProcesingMap.add(IncrementalContextCleaningStage.class,
+				CheckCleaningStage.class);
+		postProcesingMap.add(IncrementalContextCleaningStage.class,
 				SaturationGraphValidationStage.class);*/
 		postProcesingMap.add(IncrementalAdditionInitializationStage.class,
 				SaturationGraphValidationStage.class);
@@ -80,6 +80,8 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 				ValidateTaxonomyStage.class);*/
 		postProcesingMap.add(IncrementalTaxonomyCleaningStage.class,
 				ValidateTaxonomyStage.class);
+		postProcesingMap.add(IncrementalTaxonomyCleaningStage.class,
+				CheckContextInvariants.class);
 	}
 
 	@Override
