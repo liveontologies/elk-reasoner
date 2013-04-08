@@ -485,11 +485,6 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		}
 
 		@Override
-		public void clearMembers() {
-			getNode().clearMembers();
-		}
-
-		@Override
 		public boolean trySetModified(boolean modified) {
 			return getNode().trySetModified(modified);
 		}

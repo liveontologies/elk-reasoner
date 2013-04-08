@@ -33,8 +33,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  */
 public interface UpdateableNode<T extends ElkObject> extends Node<T> {
 
-	public void clearMembers();
-	
 	public boolean trySetModified(boolean modified);
 	
 	public boolean isModified();	

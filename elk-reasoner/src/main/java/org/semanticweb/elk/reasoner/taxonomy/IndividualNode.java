@@ -193,15 +193,6 @@ public class IndividualNode implements
 	}
 
 	@Override
-	public void clearMembers() {
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(this + ": clear members");
-		}
-		
-		members_.clear();
-	}
-
-	@Override
 	public boolean trySetModified(boolean modified) {
 		boolean result = modified_.compareAndSet(!modified, modified);
 		
