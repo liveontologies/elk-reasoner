@@ -222,13 +222,6 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 		return members_.toString();
 	}
 
-	/*@Override
-	public void clearMembers() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": clear members");
-		members_.clear();
-	}*/
-
 	public void setMembers(Collection<ElkClass> members) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": updating members to " + members);
