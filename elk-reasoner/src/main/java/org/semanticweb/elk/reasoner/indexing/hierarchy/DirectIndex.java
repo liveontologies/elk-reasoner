@@ -28,25 +28,40 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
+import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
+import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
+/**
+ * 
+ * 
+ */
 public class DirectIndex implements ModifiableOntologyIndex {
 
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(DirectIndex.class);
+	
 	final IndexedClass indexedOwlThing, indexedOwlNothing;
 
 	final IndexedObjectCache objectCache;
-
-	private ChainableRule<Context> contextInitRules_ = null;
+	// the context root initialization rule is always registered
+	private ChainableRule<Context> contextInitRules_ = new ContextRootInitializationRule();
 
 	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
 
@@ -258,5 +273,73 @@ public class DirectIndex implements ModifiableOntologyIndex {
 			}
 		};
 	}
+	
+	
+	/**
+	 * Adds root to the context
+	 */
+	public static class ContextRootInitializationRule extends
+			ModifiableLinkImpl<ChainableRule<Context>> implements
+			ChainableRule<Context> {
+
+		public static final String NAME = "Root Introduction";
+
+		private ContextRootInitializationRule(ChainableRule<Context> tail) {
+			super(tail);
+		}
+
+		public ContextRootInitializationRule() {
+			super(null);
+		}
+
+		@Override
+		public String getName() {
+			return NAME;
+		}
+
+		@Override
+		public void apply(BasicSaturationStateWriter writer, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + context);
+			}
+			
+			writer.produce(context, new PositiveSubsumer(context.getRoot()));
+		}
+
+		private static final Matcher<ChainableRule<Context>, ContextRootInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ContextRootInitializationRule>(
+				ContextRootInitializationRule.class);
+
+		private static final ReferenceFactory<ChainableRule<Context>, ContextRootInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ContextRootInitializationRule>() {
+			@Override
+			public ContextRootInitializationRule create(
+					ChainableRule<Context> tail) {
+				return new ContextRootInitializationRule(tail);
+			}
+		};
+
+		@Override
+		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+			ContextRootInitializationRule rule = ruleChain.find(MATCHER_);
+
+			if (rule == null) {
+				ruleChain.getCreate(MATCHER_, FACTORY_);
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+			return ruleChain.remove(MATCHER_) != null;
+		}
+
+		@Override
+		public void accept(RuleApplicationVisitor visitor,
+				BasicSaturationStateWriter writer, Context context) {
+			visitor.visit(this, writer, context);
+		}
+
+	}	
 
 }

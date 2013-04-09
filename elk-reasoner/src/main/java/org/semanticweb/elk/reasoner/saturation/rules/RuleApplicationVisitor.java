@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -48,6 +49,10 @@ public interface RuleApplicationVisitor {
 			IndexedClass.OwlThingContextInitializationRule owlThingContextInitializationRule,
 			BasicSaturationStateWriter writer, Context context);
 
+	void visit(
+			DirectIndex.ContextRootInitializationRule rootInitRule,
+			BasicSaturationStateWriter writer, Context context);
+	
 	void visit(
 			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
 			BasicSaturationStateWriter writer, Context context);

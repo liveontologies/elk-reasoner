@@ -37,10 +37,8 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
@@ -370,14 +368,7 @@ class SaturationStateImpl implements SaturationState {
 
 		@Override
 		public void initContext(Context context) {
-			produce(context, new PositiveSubsumer(context.getRoot()));
-			// apply all context initialization rules			
-			LinkRule<Context> initRule = ontologyIndex_
-					.getContextInitRuleHead();
-			while (initRule != null) {
-				initRule.accept(initRuleAppVisitor_, this, context);
-				initRule = initRule.next();
-			}
+			SaturationUtils.initContext(context, this, ontologyIndex_, initRuleAppVisitor_);
 		}
 
 		@Override

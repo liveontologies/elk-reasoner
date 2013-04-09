@@ -44,6 +44,11 @@ public class RuleApplicationTimer {
 	 * timer for {@link IndexedClass.OwlThingContextInitializationRule}
 	 */
 	int timeOwlThingContextInitializationRule;
+	
+	/**
+	 * timer for {@link DirectIndex.ContextRootInitializationRule}
+	 */
+	int timeContextRootInitializationRule;
 
 	/**
 	 * timer for {@link IndexedDisjointnessAxiom.ThisCompositionRule}
@@ -90,6 +95,7 @@ public class RuleApplicationTimer {
 	 */
 	public void reset() {
 		timeOwlThingContextInitializationRule = 0;
+		timeContextRootInitializationRule = 0;
 		timeDisjointnessAxiomCompositionRule = 0;
 		timeDisjointnessAxiomContradictionRule = 0;
 		timeObjectIntersectionOfCompositionRule = 0;
@@ -107,6 +113,7 @@ public class RuleApplicationTimer {
 	 */
 	public synchronized void add(RuleApplicationTimer timer) {
 		timeOwlThingContextInitializationRule += timer.timeOwlThingContextInitializationRule;
+		timeContextRootInitializationRule += timer.timeContextRootInitializationRule;
 		timeDisjointnessAxiomCompositionRule += timer.timeDisjointnessAxiomCompositionRule;
 		timeDisjointnessAxiomContradictionRule += timer.timeDisjointnessAxiomContradictionRule;
 		timeObjectIntersectionOfCompositionRule += timer.timeObjectIntersectionOfCompositionRule;

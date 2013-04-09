@@ -43,6 +43,11 @@ public class RuleApplicationCounter {
 	 * counter for {@link IndexedClass.OwlThingContextInitializationRule}
 	 */
 	int countOwlThingContextInitializationRule;
+	
+	/**
+	 * counter for {@link DirectIndex.ContextRootInitializationRule}
+	 */
+	int countContextRootInitializationRule;
 
 	/**
 	 * counter for {@link IndexedDisjointnessAxiom.ThisCompositionRule}
@@ -89,6 +94,7 @@ public class RuleApplicationCounter {
 	 */
 	public void reset() {
 		countOwlThingContextInitializationRule = 0;
+		countContextRootInitializationRule = 0;
 		countDisjointnessAxiomCompositionRule = 0;
 		countDisjointnessAxiomContradictionRule = 0;
 		countObjectIntersectionOfCompositionRule = 0;
@@ -106,6 +112,7 @@ public class RuleApplicationCounter {
 	 */
 	public synchronized void add(RuleApplicationCounter counter) {
 		countOwlThingContextInitializationRule += counter.countOwlThingContextInitializationRule;
+		countContextRootInitializationRule += counter.countContextRootInitializationRule;
 		countDisjointnessAxiomCompositionRule += counter.countDisjointnessAxiomCompositionRule;
 		countDisjointnessAxiomContradictionRule += counter.countDisjointnessAxiomContradictionRule;
 		countObjectIntersectionOfCompositionRule += counter.countObjectIntersectionOfCompositionRule;
@@ -118,6 +125,7 @@ public class RuleApplicationCounter {
 
 	public long getTotalRuleAppCount() {
 		return countOwlThingContextInitializationRule
+				+ countContextRootInitializationRule
 				+ countDisjointnessAxiomCompositionRule
 				+ countDisjointnessAxiomContradictionRule
 				+ countObjectIntersectionOfCompositionRule

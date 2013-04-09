@@ -21,6 +21,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -153,6 +154,14 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 		timer_.timeContradictionBottomBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
 		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);
 		timer_.timeContradictionBottomBackwardLinkRule += CachedTimeThread.currentTimeMillis;
+	}
+
+	@Override
+	public void visit(ContextRootInitializationRule rootInitRule,
+			BasicSaturationStateWriter writer, Context context) {
+		timer_.timeContextRootInitializationRule -= CachedTimeThread.currentTimeMillis;
+		visitor_.visit(rootInitRule, writer, context);
+		timer_.timeContextRootInitializationRule += CachedTimeThread.currentTimeMillis;
 	}
 
 }

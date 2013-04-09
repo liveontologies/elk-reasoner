@@ -46,6 +46,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 public class ConcurrentSaturatorTest extends TestCase {
@@ -165,7 +166,11 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression B = b.accept(converter);
 		IndexedClassExpression C = c.accept(converter);
 		
-		ExtendedSaturationStateWriter writer = state.getExtendedWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY, null, new ConclusionInsertionVisitor(), false);
+		ExtendedSaturationStateWriter writer = state.getExtendedWriter(
+				ContextCreationListener.DUMMY,
+				ContextModificationListener.DUMMY,
+				new BasicCompositionRuleApplicationVisitor(),
+				new ConclusionInsertionVisitor(), false);
 		
 		Context cA = writer.getCreateContext(A);
 		Context cB = writer.getCreateContext(B);
