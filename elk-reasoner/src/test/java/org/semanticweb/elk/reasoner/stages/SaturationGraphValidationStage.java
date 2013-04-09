@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
@@ -316,6 +317,11 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public void visit(
 				Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
 				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+		}
+
+		@Override
+		public void visit(ContextRootInitializationRule rootInitRule,
+				BasicSaturationStateWriter writer, Context context) {
 		}
 
 	}

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom.ThisCompositionRule;
@@ -48,6 +49,12 @@ public class BasicCompositionRuleApplicationVisitor implements
 
 	@Override
 	public void visit(OwlThingContextInitializationRule rule,
+			BasicSaturationStateWriter writer, Context context) {
+		rule.apply(writer, context);
+	}
+	
+	@Override
+	public void visit(ContextRootInitializationRule rule,
 			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
