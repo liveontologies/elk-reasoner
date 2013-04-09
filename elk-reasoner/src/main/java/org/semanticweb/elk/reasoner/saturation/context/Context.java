@@ -226,7 +226,7 @@ public interface Context {
 	/**
 	 * Removes and returns one of the unprocessed {@link Conclusion}s of this
 	 * context. This method is thread safe and can be used concurrently with the
-	 * methods {@link #addToDo(Conclusion)} and {@link #deactivate()}.
+	 * method {@link #addToDo(Conclusion)}.
 	 * 
 	 * @return some unprocessed {@link Conclusion} of this context, if there is
 	 *         one, or {@code null} if there is no such {@link Conclusion}
