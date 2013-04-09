@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
@@ -100,7 +101,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	private class ContextCompletionEngine extends
 			RuleApplicationFactory.BaseEngine {
 
-		private ExtendedSaturationStateWriter writer_;
+		private ExtendedSaturationStateWriter iterationWriter_;
+		
+		private ExtendedSaturationStateWriter mainStateWriter_;
 
 		protected ContextCompletionEngine() {
 			super(new SaturationStatistics());
@@ -114,16 +117,17 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		@Override
 		protected ExtendedSaturationStateWriter getSaturationStateWriter() {
-			if (writer_ == null) {
+			if (iterationWriter_ == null) {
 				ConclusionStatistics stats = localStatistics
 						.getConclusionStatistics();
 				ConclusionVisitor<?> visitor = RuleApplicationFactory
 						.getEngineConclusionVisitor(stats);
-
-				writer_ = localState_.getDefaultWriter(visitor);
+				
+				iterationWriter_ = localState_.getDefaultWriter(visitor);
+				mainStateWriter_ = saturationState.getExtendedWriter(visitor);
 			}
 
-			return writer_;
+			return iterationWriter_;
 		}
 
 		@Override
@@ -141,16 +145,17 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 			ConclusionVisitor<?> statsVisitor = RuleApplicationFactory
 					.getEngineConclusionVisitor(conclusionStats);
-			// create two decomposition rule app visitors: one produces
-			// conclusions for both local and the main contexts, the other only
-			// for local contexts
+			// this decomposition visitor applies decomposition rules for iterating over the conclusions
 			DecompositionRuleApplicationVisitor iterationVisitor = getEngineDecompositionRuleApplicationVisitor(
-					new ForwardDecompositionRuleApplicationVisitor(writer_),
+					new GapFillingDecompositionVisitor(iterationWriter_, mainStateWriter_),
 					ruleStats);
+			// this decomposition visitor applies decomposition rules for producing conclusions obtained by decomposing negative subsumers
+			// (those should not be stored in the main contexts)
 			DecompositionRuleApplicationVisitor produceVisitor = getEngineDecompositionRuleApplicationVisitor(
-					new ForwardDecompositionRuleApplicationVisitor(localState_
-							.getWriterForDecompositionVisitor(statsVisitor)),
-					ruleStats);
+					new GapFillingDecompositionVisitor(
+							localState_
+									.getWriterForDecompositionVisitor(statsVisitor),
+							mainStateWriter_), ruleStats);
 			// this visitor applies rules to fill all gaps in the
 			// deductive closure
 			ConclusionGapFillingVisitor gapFiller = new ConclusionGapFillingVisitor(
@@ -235,11 +240,11 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			return getDefaultWriter(conclusionVisitor);
 		}
 
-		private TracingSaturationStateWriter getDefaultWriter(
+		private IterationSaturationStateWriter getDefaultWriter(
 				ConclusionVisitor<?> conclusionVisitor) {
-			return new TracingSaturationStateWriter(ontologyIndex_,
+			return new IterationSaturationStateWriter(ontologyIndex_,
 					conclusionVisitor,
-					saturationState.getWriter(conclusionVisitor));
+					saturationState.getExtendedWriter(conclusionVisitor));
 		}
 
 		private ExtendedSaturationStateWriter getWriterForDecompositionVisitor(
@@ -251,7 +256,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		/**
 		 * Only produces conclusions for the local contexts. Used by the
 		 * decomposition rule application visitor which should not produce the
-		 * results of decomposition of negative subsumers to the main context.
+		 * results of decomposition of negative subsumers to the main contexts.
 		 * 
 		 * @author Pavel Klinov
 		 * 
@@ -289,8 +294,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			}
 
 			boolean existsGlobally(Context context, Conclusion conclusion) {
-				return conclusion.accept(checker_, context.getRoot()
-						.getContext());
+				return conclusion.accept(checker_, context.getRoot().getContext());
 			}
 
 			void produceLocally(Context context, Conclusion conclusion) {
@@ -309,9 +313,15 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				}
 			}
 
-
+			/*
+			 * Normally, since the rules are applied on main contexts, it should
+			 * be the main contexts which are passed into this method. The
+			 * exceptions occur during applications of the initialization rules
+			 * which also happen on local contexts
+			 */
 			@Override
 			public void produce(Context context, Conclusion conclusion) {
+				
 				if (existsGlobally(context, conclusion)) {
 					if (LOGGER_.isTraceEnabled()) {
 						LOGGER_.trace(context + ": conclusion " + conclusion
@@ -380,13 +390,13 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		 * 
 		 *         pavel.klinov@uni-ulm.de
 		 */
-		private class TracingSaturationStateWriter extends OptimizedLocalSaturationStateWriter {
+		private class IterationSaturationStateWriter extends OptimizedLocalSaturationStateWriter {
 
-			private final BasicSaturationStateWriter mainStateWriter_;
+			private final ExtendedSaturationStateWriter mainStateWriter_;
 
-			TracingSaturationStateWriter(OntologyIndex index,
+			IterationSaturationStateWriter(OntologyIndex index,
 					ConclusionVisitor<?> visitor,
-					BasicSaturationStateWriter writer) {
+					ExtendedSaturationStateWriter writer) {
 				super(index, visitor);
 				mainStateWriter_ = writer;
 			}
@@ -437,8 +447,46 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				}
 			}
 		}
-
 	}
+	
+	
+	/**
+	 * Decomposition rule application visitor which can create new global
+	 * contexts when decomposing existentials.
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 */
+	private static class GapFillingDecompositionVisitor extends BasicDecompositionRuleApplicationVisitor {
+		// depending on this writer, results of decompositions may or may not be
+		// produced to main contexts
+		private final BasicSaturationStateWriter localWriter_;
+		
+		private final ExtendedSaturationStateWriter mainWriter_;
+		
+		GapFillingDecompositionVisitor(BasicSaturationStateWriter localWriter, ExtendedSaturationStateWriter mainWriter) {
+			localWriter_ = localWriter;
+			mainWriter_ = mainWriter;
+		}
+		
+		@Override
+		public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
+			// may need to create a new main context for the filler
+			Context fillerContext = mainWriter_.getCreateContext(ice
+					.getFiller());
+
+			localWriter_.produce(fillerContext, new BackwardLink(
+					context, ice.getRelation()));
+		}
+
+		@Override
+		protected BasicSaturationStateWriter getSaturationStateWriter() {
+			return localWriter_;
+		}
+		
+	}	
+	
 
 	/**
 	 * Applies conclusion rules to the main context of the class expression (not
@@ -527,5 +575,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 	}
+
+	
+	
 
 }
