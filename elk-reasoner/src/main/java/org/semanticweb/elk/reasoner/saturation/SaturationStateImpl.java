@@ -241,16 +241,7 @@ class SaturationStateImpl implements SaturationState {
 			// this may be necessary, e.g., for counting produced conclusions
 			conclusion.accept(producedConclusionVisitor_, context);
 			
-			/*if (context.toString().startsWith("<:A>")) {
-				System.out.println("ADDING CONCLUSION " + conclusion);
-			}*/
-			
 			if (context.addToDo(conclusion)) {
-				
-				/*if (context.toString().startsWith("<:A>")) {
-					System.out.println("ACTIVATED!");
-				}*/
-				
 				// context was activated
 				activeContexts_.add(context);
 			}
