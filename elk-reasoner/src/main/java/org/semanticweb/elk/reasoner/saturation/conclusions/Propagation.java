@@ -66,7 +66,7 @@ public class Propagation extends AbstractConclusion {
 		return "Propagation " + relation_ + "->" + carry_;
 	}
 
-	public void apply(BasicSaturationStateWriter engine, Context context) {
+	public void apply(BasicSaturationStateWriter writer, Context context) {
 		// propagate over all backward links
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
 				.getBackwardLinksByObjectProperty();
@@ -74,7 +74,7 @@ public class Propagation extends AbstractConclusion {
 		Collection<Context> targets = backLinks.get(relation_);
 
 		for (Context target : targets) {
-			engine.produce(target, new NegativeSubsumer(carry_));
+			writer.produce(target, new NegativeSubsumer(carry_));
 		}
 	}
 
