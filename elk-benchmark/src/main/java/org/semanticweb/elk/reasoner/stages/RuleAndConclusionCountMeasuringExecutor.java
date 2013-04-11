@@ -59,6 +59,7 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 				.getRuleAndConclusionStatistics();
 
 		stats.reset();
+		stage.preExecute();
 		stage.execute();
 
 		if (stats.getContextStatistics().countCreatedContexts > 0) {
@@ -86,6 +87,8 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 					+ MODIFIED_CONTEXT_COUNT,
 					stats.getContextStatistics().countModifiedContexts);
 		}
+		
+		stage.postExecute();
 	}
 
 }

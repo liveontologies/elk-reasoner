@@ -64,7 +64,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute()) {
 			return false;
 		}
@@ -111,7 +111,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute()) {
 			return false;
 		}

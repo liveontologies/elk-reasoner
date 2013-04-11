@@ -42,7 +42,10 @@ public class FailingOnInterruptStageExecutor extends FailingInterrupter implemen
 			for (ReasonerStage dependentStage : stage.getPreStages()) {
 				complete(dependentStage);
 			}
+			
+			stage.preExecute();
 			stage.execute();
+			stage.postExecute();
 		}
 	}
 

@@ -72,7 +72,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		todo_ = reasoner.ontologyIndex.getIndexedPropertyChains()
@@ -102,7 +102,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		todo_ = null;

@@ -52,7 +52,7 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		ontologyLoader_ = reasoner.getOntologyLoader();
@@ -73,7 +73,7 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;		
 		this.ontologyLoader_ = null;
@@ -83,17 +83,5 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	@Override
 	public void printInfo() {
 	}
-
-	// ///////////////////////////////////////////////////////////////////////////////
-	/*
-	 * POST PROCESSING, FOR DEBUGGING ONLY
-	 */
-	// ////////////////////////////////////////////////////////////////////////////////
-
-	/*
-	 * @Override public Collection<ReasonerStage> getPostProcessingStages() {
-	 * return Arrays .<ReasonerStage> asList(new
-	 * SaturatedPropertyChainCheckingStage( reasoner.ontologyIndex)); }
-	 */
 
 }

@@ -64,7 +64,7 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute()) {
 			return false;
 		}
@@ -92,11 +92,13 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute()) {
 			return false;
 		}
 
+		reasoner.ruleAndConclusionStats.add(completion_
+				.getRuleAndConclusionStatistics());
 		completion_ = null;
 
 		return true;

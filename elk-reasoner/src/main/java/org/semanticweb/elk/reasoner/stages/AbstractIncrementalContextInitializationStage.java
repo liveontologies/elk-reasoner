@@ -87,7 +87,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		final ConclusionVisitor<?> visitor = getConclusionVisitor(stageStatistics_
@@ -117,7 +117,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);

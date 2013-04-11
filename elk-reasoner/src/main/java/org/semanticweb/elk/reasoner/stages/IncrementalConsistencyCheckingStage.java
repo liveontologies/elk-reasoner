@@ -44,7 +44,7 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 
@@ -56,7 +56,7 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		this.computation_ = null;

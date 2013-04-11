@@ -54,7 +54,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
@@ -72,7 +72,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		this.computation_ = null;

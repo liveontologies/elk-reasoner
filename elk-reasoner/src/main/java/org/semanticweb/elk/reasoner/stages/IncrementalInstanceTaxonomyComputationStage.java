@@ -65,7 +65,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		/*
@@ -102,7 +102,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute()) {
 			return false;
 		}

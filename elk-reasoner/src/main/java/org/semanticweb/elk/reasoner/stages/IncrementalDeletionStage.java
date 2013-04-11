@@ -53,7 +53,7 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		desaturation_ = new ClassExpressionNoInputSaturation(
@@ -74,7 +74,7 @@ class IncrementalDeletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		reasoner.ruleAndConclusionStats.add(desaturation_

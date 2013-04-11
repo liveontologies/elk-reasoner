@@ -43,7 +43,7 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		this.computation_ = new ReflexivePropertyComputation(
@@ -62,7 +62,7 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		computation_ = null;

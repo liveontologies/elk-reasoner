@@ -61,7 +61,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		completion_ = new ClassExpressionNoInputSaturation(
@@ -82,7 +82,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		reasoner.ruleAndConclusionStats.add(completion_

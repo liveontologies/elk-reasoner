@@ -60,7 +60,7 @@ class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		/*
@@ -97,7 +97,7 @@ class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute()) {
 			return false;
 		}

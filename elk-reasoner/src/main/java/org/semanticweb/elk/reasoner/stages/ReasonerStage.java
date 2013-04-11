@@ -54,6 +54,13 @@ public interface ReasonerStage {
 	public Iterable<? extends ReasonerStage> getPreStages();
 
 	/**
+	 * Invoked prior to {@code execute} to perform any necessary initialization
+	 * 
+	 * @return {@code true} if the operation is successful
+	 */
+	public boolean preExecute();
+
+	/**
 	 * Performs the execution of this stage; in order to ensure correctness of
 	 * the execution, it is necessary that all staged from the dependencies are
 	 * done. If the execution of this stage has not been interrupted, the
@@ -64,6 +71,13 @@ public interface ReasonerStage {
 	 *             if execution was not successful
 	 */
 	public void execute() throws ElkException;
+
+	/**
+	 * Invoked after {@code execute} to perform any necessary clean-up. Could be invoked before {@code execute} if {@code preExecute) threw an exception.
+	 * 
+	 * @return {@code true} if the operation is successful
+	 */
+	public boolean postExecute();
 
 	/**
 	 * @return {@code true} if this executor was interrupted

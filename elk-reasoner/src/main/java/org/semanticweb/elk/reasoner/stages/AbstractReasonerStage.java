@@ -138,7 +138,8 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	 * 
 	 * @return {@code true} if the operation is successful
 	 */
-	boolean preExecute() {
+	@Override
+	public boolean preExecute() {
 		if (initialized)
 			return false;
 		LOGGER_.trace(getName() + ": initialized");
@@ -153,7 +154,8 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	 * 
 	 * @return {@code true} if the operation is successful
 	 */
-	boolean postExecute() {
+	@Override
+	public boolean postExecute() {
 		if (!initialized)
 			return false;
 		LOGGER_.trace(getName() + ": done");
@@ -173,7 +175,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 
 	@Override
 	public void execute() throws ElkException {
-		preExecute();
+		//preExecute();
 		progressMonitor.start(getName());
 		try {
 			for (;;) {
@@ -184,7 +186,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		postExecute();
+		//postExecute();
 	}
 
 	/**

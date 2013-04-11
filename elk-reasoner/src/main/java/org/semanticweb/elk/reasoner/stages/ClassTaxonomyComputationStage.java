@@ -55,7 +55,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute()) {
 			return false;
 		}
@@ -79,7 +79,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 

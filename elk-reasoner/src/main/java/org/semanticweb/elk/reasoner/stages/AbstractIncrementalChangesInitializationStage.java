@@ -78,7 +78,7 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);

@@ -44,7 +44,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		computation_ = new PropertyHierarchyCompositionComputation(
@@ -63,7 +63,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		computation_ = null;

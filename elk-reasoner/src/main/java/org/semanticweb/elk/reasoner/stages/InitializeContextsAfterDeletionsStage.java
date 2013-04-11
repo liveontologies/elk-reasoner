@@ -44,7 +44,7 @@ class InitializeContextsAfterDeletionsStage extends
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 
@@ -62,7 +62,7 @@ class InitializeContextsAfterDeletionsStage extends
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		this.todo = null;

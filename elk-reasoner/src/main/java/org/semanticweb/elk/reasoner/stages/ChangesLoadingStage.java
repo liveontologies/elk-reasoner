@@ -52,7 +52,7 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		this.changesLoader_ = reasoner.getChangesLoader();
@@ -69,7 +69,7 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		if (changesLoader_ != null)

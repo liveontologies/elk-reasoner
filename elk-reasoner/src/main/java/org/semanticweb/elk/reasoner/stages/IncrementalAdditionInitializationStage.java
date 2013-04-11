@@ -64,7 +64,7 @@ class IncrementalAdditionInitializationStage extends
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 
@@ -145,7 +145,7 @@ class IncrementalAdditionInitializationStage extends
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		this.initialization_ = null;

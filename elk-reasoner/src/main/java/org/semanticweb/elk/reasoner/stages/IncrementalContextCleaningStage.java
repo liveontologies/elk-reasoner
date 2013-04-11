@@ -51,7 +51,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
@@ -73,7 +73,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		reasoner.ruleAndConclusionStats.add(cleaning_

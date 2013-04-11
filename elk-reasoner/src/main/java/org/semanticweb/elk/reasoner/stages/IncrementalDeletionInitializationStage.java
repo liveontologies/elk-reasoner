@@ -59,7 +59,7 @@ class IncrementalDeletionInitializationStage extends
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 
@@ -89,7 +89,7 @@ class IncrementalDeletionInitializationStage extends
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		this.initialization_ = null;

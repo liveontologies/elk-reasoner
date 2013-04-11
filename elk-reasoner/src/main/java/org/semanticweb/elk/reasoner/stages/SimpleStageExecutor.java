@@ -36,6 +36,11 @@ public class SimpleStageExecutor extends AbstractStageExecutor {
 
 	@Override
 	public void execute(ReasonerStage stage)  throws ElkException {
-		stage.execute();
+		try {
+			stage.preExecute();
+			stage.execute();
+		} finally {
+			stage.postExecute();
+		}
 	}
 }

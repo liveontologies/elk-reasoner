@@ -69,7 +69,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean preExecute() {
+	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 		todo_ = reasoner.saturationState.getContexts().iterator();
@@ -95,7 +95,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	boolean postExecute() {
+	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
 		//reasoner.saturationState.resetFirstContext();
