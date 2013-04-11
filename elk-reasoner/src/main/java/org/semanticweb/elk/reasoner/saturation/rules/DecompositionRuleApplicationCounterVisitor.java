@@ -71,27 +71,27 @@ public class DecompositionRuleApplicationCounterVisitor implements
 
 	@Override
 	public void visit(IndexedClass ice, Context context) {
-		counter_.countIndexedClass++;
+		counter_.countIndexedClassDecompositionRule++;
 		visitor_.visit(ice, context);
 	}
 
 	@Override
 	public void visit(IndexedObjectIntersectionOf ice,
 			Context context) {
-		counter_.countIndexedObjectIntersectionOf++;
+		counter_.countIndexedObjectIntersectionOfDecompositionRule++;
 		visitor_.visit(ice, context);
 	}
 
 	@Override
 	public void visit(IndexedObjectSomeValuesFrom ice,
 			Context context) {
-		counter_.countIndexedObjectSomeValuesFrom++;
+		counter_.countIndexedObjectSomeValuesFromDecompositionRule++;
 		visitor_.visit(ice, context);
 	}
 
 	@Override
 	public void visit(IndexedDataHasValue ice, Context context) {
-		counter_.countIndexedDataHasValue++;
+		counter_.countIndexedDataHasValueDecompositionRule++;
 		visitor_.visit(ice, context);
 	}
 

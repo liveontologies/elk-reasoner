@@ -30,7 +30,6 @@ import java.lang.reflect.Field;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounter;
 
 /**
  * Stores total rule and processed conclusion counts after every stage is
@@ -67,6 +66,7 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 		stage.postExecute();
 
 		addregateRuleCounters(stats.getRuleStatistics().ruleCounter, metrics_, stage.getName());
+		addregateRuleCounters(stats.getRuleStatistics().decompositionRuleCounter, metrics_, stage.getName());
 		
 		if (stats.getContextStatistics().countCreatedContexts > 0) {
 			metrics_.updateLongMetric(stage.getName() + "." + NEW_CONTEXT_COUNT,
@@ -95,9 +95,10 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 		}
 	}
 
-	private void addregateRuleCounters(RuleApplicationCounter ruleCounter,
-			Metrics metrics, String prefix) {
+	private void addregateRuleCounters(Object ruleCounter, Metrics metrics,
+			String prefix) {
 		// reflection based
+		// TODO perhaps better to use custom annotations to mark counter fields?
 		for (Field field : ruleCounter.getClass().getDeclaredFields()) {
 			if (field.getType().equals(Integer.TYPE)) {
 				// this must be a counter, get the value
@@ -111,7 +112,6 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 					}
 				} catch (Exception e) {
 					// log it?
-					e.printStackTrace();
 				}
 			}
 		}

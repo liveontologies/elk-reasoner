@@ -118,22 +118,22 @@ public class RuleStatistics {
 					+ " ms)");
 
 		if (ruleCounter.countObjectSomeValuesFromCompositionRule
-				+ decompositionRuleCounter.countIndexedObjectSomeValuesFrom > 0)
+				+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule > 0)
 			logger.debug("SomeValuesFrom composition/decomposition rules: "
 					+ ruleCounter.countObjectSomeValuesFromCompositionRule
 					+ "/"
-					+ decompositionRuleCounter.countIndexedObjectSomeValuesFrom
+					+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule
 					+ " (" + ruleTimer.timeObjectSomeValuesFromCompositionRule
 					/ addCounter + "/"
 					+ decompositionRuleTimer.timeIndexedObjectSomeValuesFrom
 					/ addCounter + " ms)");
 
 		if (ruleCounter.countObjectIntersectionOfCompositionRule
-				+ decompositionRuleCounter.countIndexedObjectIntersectionOf > 0)
+				+ decompositionRuleCounter.countIndexedObjectIntersectionOfDecompositionRule > 0)
 			logger.debug("ObjectIntersectionOf composition/decomposition rules: "
 					+ ruleCounter.countObjectIntersectionOfCompositionRule
 					+ "/"
-					+ decompositionRuleCounter.countIndexedObjectIntersectionOf
+					+ decompositionRuleCounter.countIndexedObjectIntersectionOfDecompositionRule
 					+ " ("
 					+ ruleTimer.timeObjectIntersectionOfCompositionRule
 					/ addCounter
@@ -141,9 +141,9 @@ public class RuleStatistics {
 					+ decompositionRuleTimer.timeIndexedObjectIntersectionOf
 					/ addCounter + " ms)");
 
-		if (decompositionRuleCounter.countIndexedClass > 0)
+		if (decompositionRuleCounter.countIndexedClassDecompositionRule > 0)
 			logger.debug("Class decomposition rules: "
-					+ decompositionRuleCounter.countIndexedClass + " ("
+					+ decompositionRuleCounter.countIndexedClassDecompositionRule + " ("
 					+ decompositionRuleTimer.timeIndexedClass / addCounter
 					+ " ms)");
 

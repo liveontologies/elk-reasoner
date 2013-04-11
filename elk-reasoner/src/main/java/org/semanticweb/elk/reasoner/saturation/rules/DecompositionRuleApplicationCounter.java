@@ -38,28 +38,28 @@ public class DecompositionRuleApplicationCounter {
 	/**
 	 * counter for {@link IndexedClass}
 	 */
-	int countIndexedClass;
+	int countIndexedClassDecompositionRule;
 	/**
 	 * counter for {@link IndexedObjectIntersectionOf}
 	 */
-	int countIndexedObjectIntersectionOf;
+	int countIndexedObjectIntersectionOfDecompositionRule;
 	/**
 	 * counter for {@link IndexedObjectSomeValuesFrom}
 	 */
-	int countIndexedObjectSomeValuesFrom;
+	int countIndexedObjectSomeValuesFromDecompositionRule;
 	/**
 	 * counter for {@link IndexedIndexedDataHasValue}
 	 */
-	int countIndexedDataHasValue;
+	int countIndexedDataHasValueDecompositionRule;
 
 	/**
 	 * Reset all counters to zero.
 	 */
 	public void reset() {
-		countIndexedClass = 0;
-		countIndexedObjectIntersectionOf = 0;
-		countIndexedObjectSomeValuesFrom = 0;
-		countIndexedDataHasValue = 0;
+		countIndexedClassDecompositionRule = 0;
+		countIndexedObjectIntersectionOfDecompositionRule = 0;
+		countIndexedObjectSomeValuesFromDecompositionRule = 0;
+		countIndexedDataHasValueDecompositionRule = 0;
 	}
 
 	/**
@@ -68,15 +68,15 @@ public class DecompositionRuleApplicationCounter {
 	 * @param counter
 	 */
 	public synchronized void add(DecompositionRuleApplicationCounter counter) {
-		countIndexedClass += counter.countIndexedClass;
-		countIndexedObjectIntersectionOf += counter.countIndexedObjectIntersectionOf;
-		countIndexedObjectSomeValuesFrom += counter.countIndexedObjectSomeValuesFrom;
-		countIndexedDataHasValue += counter.countIndexedDataHasValue;
+		countIndexedClassDecompositionRule += counter.countIndexedClassDecompositionRule;
+		countIndexedObjectIntersectionOfDecompositionRule += counter.countIndexedObjectIntersectionOfDecompositionRule;
+		countIndexedObjectSomeValuesFromDecompositionRule += counter.countIndexedObjectSomeValuesFromDecompositionRule;
+		countIndexedDataHasValueDecompositionRule += counter.countIndexedDataHasValueDecompositionRule;
 	}
 	
 	public long getTotalRuleAppCount() {
-		return countIndexedClass + countIndexedObjectIntersectionOf
-				+ countIndexedObjectSomeValuesFrom + countIndexedDataHasValue;
+		return countIndexedClassDecompositionRule + countIndexedObjectIntersectionOfDecompositionRule
+				+ countIndexedObjectSomeValuesFromDecompositionRule + countIndexedDataHasValueDecompositionRule;
 	}
 
 }
