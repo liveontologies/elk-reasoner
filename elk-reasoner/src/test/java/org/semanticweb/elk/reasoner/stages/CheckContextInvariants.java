@@ -25,21 +25,15 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.util.collections.Operations;
 
 /**
- * For now just checks that all classes which correspond to modified taxonomy
- * nodes have themselves as subsumers in their contexts.
+ * For now just checks that all classes have themselves as subsumers in their contexts.
  * 
- * Also checks the same for all contexts in the saturation state
+ * Also checks for emptiness of ToDo for all contexts
  * 
  * @author Pavel Klinov
  * 
@@ -63,36 +57,6 @@ public class CheckContextInvariants extends BasePostProcessingStage {
 
 	@Override
 	public void execute() throws ElkException {
-
-		Operations.Transformation<ElkClass, IndexedClass> transformation = new Operations.Transformation<ElkClass, IndexedClass>() {
-			@Override
-			public IndexedClass transform(ElkClass element) {
-				IndexedClass indexedClass = (IndexedClass) element
-						.accept(reasoner_.objectCache_
-								.getIndexObjectConverter());
-
-				return indexedClass.occurs() ? indexedClass : null;
-			}
-		};
-
-		Collection<IndexedClass> modified = Operations.getCollection(Operations
-				.map(reasoner_.classTaxonomyState.classesForModifiedNodes,
-						transformation),
-		// an upper bound
-		reasoner_.classTaxonomyState.classesForModifiedNodes.size());
-
-		for (IndexedClass clazz : modified) {
-			Context context = clazz.getContext();
-
-			if (context == null) {
-				LOGGER_.error("Context not set for " + clazz);
-			}
-
-			if (!context.getSubsumers().contains(clazz)) {
-				LOGGER_.error(clazz + ": not a subsumer of itself");
-			}
-		}
-		
 		// check roots for all contexts now
 		for (Context context : reasoner_.saturationState.getContexts()) {
 			if (!context.getSubsumers().contains(context.getRoot())) {

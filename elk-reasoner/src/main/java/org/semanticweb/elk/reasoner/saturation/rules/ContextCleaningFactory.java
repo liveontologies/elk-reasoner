@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -71,7 +72,7 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
 		@Override
 		protected BasicSaturationStateWriter getSaturationStateWriter() {
-			ConclusionVisitor<?> visitor = getEngineConclusionVisitor(localStatistics
+			ConclusionVisitor<?> visitor = SaturationUtils.addStatsToConclusionVisitor(localStatistics
 					.getConclusionStatistics());
 			BasicSaturationStateWriter writer = saturationState.getWriter(
 					ContextModificationListener.DUMMY, visitor);

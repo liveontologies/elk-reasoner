@@ -53,15 +53,16 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean preExecute() {
-		if (!super.preExecute())
+		if (!super.preExecute()) {
 			return false;
-		// System.out.println("Active contexts: " +
-		// reasoner.saturationState.activeContexts_);
+		}
+
 		saturation_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), new RuleApplicationFactory(
 						reasoner.saturationState, true),
 				ContextModificationListener.DUMMY);
+		
 		return true;
 	}
 

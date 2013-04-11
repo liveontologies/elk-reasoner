@@ -100,7 +100,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 */
 	private class ContextCompletionEngine extends
 			RuleApplicationFactory.BaseEngine {
-		// used for
+		private RuleApplicationVisitor initRuleAppVisitor_;
+		// used for iteration over conclusions
 		private ExtendedSaturationStateWriter iterationWriter_;
 		// used for producing conclusions to the main contexts' ToDo and
 		// creating main contexts, if needed
@@ -123,13 +124,11 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			if (iterationWriter_ == null) {
 				ConclusionStatistics stats = localStatistics
 						.getConclusionStatistics();
-
-				conclusionStatsVisitor_ = RuleApplicationFactory
-						.getEngineConclusionVisitor(stats);
-				iterationWriter_ = localState_
-						.getDefaultWriter(conclusionStatsVisitor_);
-				mainStateWriter_ = saturationState
-						.getExtendedWriter(conclusionStatsVisitor_);
+				
+				initRuleAppVisitor_ = SaturationUtils.addStatsToCompositionRuleApplicationVisitor(localStatistics.getRuleStatistics());
+				conclusionStatsVisitor_ = SaturationUtils.addStatsToConclusionVisitor(stats);
+				iterationWriter_ = localState_.getExtendedWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY, initRuleAppVisitor_, conclusionStatsVisitor_, false);
+				mainStateWriter_ = saturationState.getExtendedWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY, initRuleAppVisitor_, conclusionStatsVisitor_, true);
 			}
 
 			return iterationWriter_;
@@ -148,22 +147,23 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 			// this decomposition visitor applies decomposition rules for
 			// iterating over the conclusions
-			DecompositionRuleApplicationVisitor iterationVisitor = getEngineDecompositionRuleApplicationVisitor(
+			DecompositionRuleApplicationVisitor iterationVisitor = SaturationUtils.addStatsToDecompositionRuleApplicationVisitor(
 					new GapFillingDecompositionVisitor(iterationWriter_,
 							mainStateWriter_), ruleStats);
 			// this decomposition visitor applies decomposition rules for
 			// producing conclusions obtained by decomposing negative subsumers
 			// (those should not be stored in the main contexts)
-			DecompositionRuleApplicationVisitor produceVisitor = getEngineDecompositionRuleApplicationVisitor(
+			DecompositionRuleApplicationVisitor produceVisitor = SaturationUtils.addStatsToDecompositionRuleApplicationVisitor(
 					new GapFillingDecompositionVisitor(
-							localState_
-									.getWriterForDecompositionVisitor(conclusionStatsVisitor_),
-							mainStateWriter_), ruleStats);
+							localState_.getWriterForDecompositionVisitor(
+									conclusionStatsVisitor_,
+									initRuleAppVisitor_), mainStateWriter_),
+					ruleStats);
 			// this visitor applies rules to fill all gaps in the
 			// deductive closure
 			ConclusionGapFillingVisitor gapFiller = new ConclusionGapFillingVisitor(
 					saturationStateWriter,
-					getEngineCompositionRuleApplicationVisitor(localStatistics
+					SaturationUtils.addStatsToCompositionRuleApplicationVisitor(localStatistics
 							.getRuleStatistics()), iterationVisitor,
 					produceVisitor);
 
@@ -185,7 +185,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 */
 	private class LocalSaturationState implements SaturationState {
 
-		private final RuleApplicationVisitor initRuleAppVisitor_ = new BasicCompositionRuleApplicationVisitor();
+		//private final RuleApplicationVisitor initRuleAppVisitor_ = new BasicCompositionRuleApplicationVisitor();
 		private final ConcurrentHashMap<IndexedClassExpression, Context> contextMap_;
 		private final OntologyIndex ontologyIndex_;
 		private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
@@ -222,7 +222,10 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				RuleApplicationVisitor ruleAppVisitor,
 				ConclusionVisitor<?> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
-			return getDefaultWriter(conclusionVisitor);
+			return new IterationSaturationStateWriter(ontologyIndex_,
+					conclusionVisitor,
+					ruleAppVisitor,
+					saturationState.getExtendedWriter(contextCreationListener, contextModificationListener, ruleAppVisitor, conclusionVisitor, trackNewContextsAsUnsaturated));
 		}
 
 		@Override
@@ -248,13 +251,14 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				ConclusionVisitor<?> conclusionVisitor) {
 			return new IterationSaturationStateWriter(ontologyIndex_,
 					conclusionVisitor,
+					new BasicCompositionRuleApplicationVisitor(),
 					saturationState.getExtendedWriter(conclusionVisitor));
 		}
 
 		private ExtendedSaturationStateWriter getWriterForDecompositionVisitor(
-				ConclusionVisitor<?> conclusionVisitor) {
+				ConclusionVisitor<?> conclusionVisitor, RuleApplicationVisitor initRuleAppVisitor) {
 			return new OptimizedLocalSaturationStateWriter(ontologyIndex_,
-					conclusionVisitor);
+					conclusionVisitor,initRuleAppVisitor);
 		}
 
 		/**
@@ -269,6 +273,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		private class OptimizedLocalSaturationStateWriter implements
 				ExtendedSaturationStateWriter {
 
+			private final RuleApplicationVisitor initRuleAppVisitor_;
+			
 			private final OntologyIndex ontologyIndex_;
 			// needed for statistics
 			private final ConclusionVisitor<?> conclusionVisitor_;
@@ -276,10 +282,11 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			private final ConclusionVisitor<Boolean> checker_;
 
 			OptimizedLocalSaturationStateWriter(OntologyIndex index,
-					ConclusionVisitor<?> visitor) {
+					ConclusionVisitor<?> visitor, RuleApplicationVisitor ruleAppVisitor) {
 				ontologyIndex_ = index;
 				conclusionVisitor_ = visitor;
 				checker_ = new ConclusionOccurranceCheckingVisitor();
+				initRuleAppVisitor_ = ruleAppVisitor;
 			}
 
 			@Override
@@ -404,8 +411,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			IterationSaturationStateWriter(OntologyIndex index,
 					ConclusionVisitor<?> visitor,
+					RuleApplicationVisitor ruleAppVisitor,
 					ExtendedSaturationStateWriter writer) {
-				super(index, visitor);
+				super(index, visitor, ruleAppVisitor);
 				mainStateWriter_ = writer;
 			}
 

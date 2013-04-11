@@ -22,21 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounterVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 
 /**
- * Reverts inferences
+ * The base stage for initializing additions and deletions
  * 
  * @author Pavel Klinov
  * @author "Yevgeny Kazakov"
@@ -44,13 +35,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
  */
 abstract class AbstractIncrementalChangesInitializationStage extends
 		AbstractReasonerStage {
-
-	private static final Logger LOGGER_ = Logger
-			.getLogger(AbstractIncrementalChangesInitializationStage.class);
-
-	static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
 
 	protected IncrementalChangesInitialization initialization_ = null;
 
@@ -81,33 +65,11 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
+		stageStatistics_.reset();
+		
 		return true;
-	}
-
-	protected RuleApplicationVisitor getRuleApplicationVisitor(
-			RuleStatistics ruleStatistics) {
-		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
-
-		if (COLLECT_RULE_COUNTS) {
-			ruleAppVisitor = new RuleApplicationCounterVisitor(ruleAppVisitor,
-					ruleStatistics.ruleCounter);
-		}
-
-		if (COLLECT_RULE_TIMES) {
-			ruleAppVisitor = new RuleApplicationTimerVisitor(ruleAppVisitor,
-					ruleStatistics.ruleTimer);
-		}
-
-		return ruleAppVisitor;
-	}
-
-	protected ConclusionVisitor<?> getConclusionVisitor(
-			ConclusionStatistics conclusionStatistics) {
-
-		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
-				conclusionStatistics.getProducedConclusionCounts())
-				: ConclusionVisitor.DUMMY;
 	}
 
 	@Override

@@ -30,16 +30,13 @@ import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PreprocessedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.TimedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -62,10 +59,10 @@ public class RuleApplicationFactory {
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
-	static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
+	//static final boolean COLLECT_CONCLUSION_COUNTS = true;//LOGGER_.isDebugEnabled();
+	//static final boolean COLLECT_CONCLUSION_TIMES = true;//LOGGER_.isDebugEnabled();
+	//static final boolean COLLECT_RULE_COUNTS = true;//LOGGER_.isDebugEnabled();
+	//static final boolean COLLECT_RULE_TIMES = true;//LOGGER_.isDebugEnabled();
 
 	final SaturationState saturationState;
 
@@ -112,75 +109,6 @@ public class RuleApplicationFactory {
 		return saturationState;
 	}
 	
-	static ContextCreationListener getEngineContextCreationListener(
-			final ContextCreationListener listener,
-			final ContextStatistics contextStats) {
-		return new ContextCreationListener() {
-			@Override
-			public void notifyContextCreation(Context newContext) {
-				contextStats.countCreatedContexts++;
-				listener.notifyContextCreation(newContext);
-			}
-		};
-	}
-	
-	static ContextModificationListener getEngineContextModificationListener(
-			final ContextModificationListener listener,
-			final ContextStatistics contextStats) {
-		return new ContextModificationListener() {
-			@Override
-			public void notifyContextModification(Context context) {
-				contextStats.countModifiedContexts++;
-				listener.notifyContextModification(context);
-			}
-		};
-	}	
-
-	/**
-	 * 
-	 * @param localStatistics
-	 * @return
-	 */
-	static RuleApplicationVisitor getEngineCompositionRuleApplicationVisitor(
-			RuleStatistics localStatistics) {
-		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
-
-		if (COLLECT_RULE_COUNTS) {
-			ruleAppVisitor = new RuleApplicationCounterVisitor(ruleAppVisitor,
-					localStatistics.ruleCounter);
-		}
-
-		if (COLLECT_RULE_TIMES) {
-			ruleAppVisitor = new RuleApplicationTimerVisitor(ruleAppVisitor,
-					localStatistics.ruleTimer);
-		}
-
-		return ruleAppVisitor;
-	}
-
-	static DecompositionRuleApplicationVisitor getEngineDecompositionRuleApplicationVisitor(
-			DecompositionRuleApplicationVisitor decompRuleAppVisitor,
-			RuleStatistics localStatistics) {
-		if (COLLECT_RULE_COUNTS) {
-			decompRuleAppVisitor = new DecompositionRuleApplicationCounterVisitor(
-					decompRuleAppVisitor, localStatistics.decompositionRuleCounter);
-		}
-
-		if (COLLECT_RULE_TIMES) {
-			decompRuleAppVisitor = new DecompositionRuleApplicationTimerVisitor(
-					decompRuleAppVisitor, localStatistics.decompositionRuleTimer);
-		}
-
-		return decompRuleAppVisitor;
-	}
-	
-	
-	static ConclusionVisitor<?> getEngineConclusionVisitor(
-			ConclusionStatistics localStatistics) {
-		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
-				localStatistics.getProducedConclusionCounts())
-				: ConclusionVisitor.DUMMY;
-	}	
 
 	/**
 	 * This engine has all the functionality for applying rules but needs to be
@@ -268,13 +196,14 @@ public class RuleApplicationFactory {
 		protected ConclusionVisitor<Boolean> filterRuleConclusionProcessor(
 				ConclusionVisitor<Boolean> ruleProcessor,
 				SaturationStatistics localStatistics) {
-			if (COLLECT_CONCLUSION_COUNTS) {
+			return SaturationUtils.getUsedConclusionCountingProcessor(ruleProcessor, localStatistics);
+			/*if (COLLECT_CONCLUSION_COUNTS) {
 				return new PreprocessedConclusionVisitor<Boolean>(
 						new CountingConclusionVisitor(localStatistics
 								.getConclusionStatistics()
 								.getUsedConclusionCounts()), ruleProcessor);
 			} else
-				return ruleProcessor;
+				return ruleProcessor;*/
 		}
 
 		/**
@@ -299,8 +228,8 @@ public class RuleApplicationFactory {
 					filterRuleConclusionProcessor(
 							new ConclusionApplicationVisitor(
 									saturationStateWriter,
-									getEngineCompositionRuleApplicationVisitor(localStatistics.getRuleStatistics()),
-									getEngineDecompositionRuleApplicationVisitor(
+									SaturationUtils.addStatsToCompositionRuleApplicationVisitor(localStatistics.getRuleStatistics()),
+									SaturationUtils.addStatsToDecompositionRuleApplicationVisitor(
 											getDecompositionRuleApplicationVisitor(),
 											localStatistics.getRuleStatistics())), localStatistics));
 		}
@@ -328,18 +257,8 @@ public class RuleApplicationFactory {
 				result = new CombinedConclusionVisitor(result,
 						new ConclusionSourceUnsaturationVisitor(
 								saturationStateWriter));
-			if (COLLECT_CONCLUSION_COUNTS) {
-				result = new PreprocessedConclusionVisitor<Boolean>(
-						new CountingConclusionVisitor(localStatistics
-								.getConclusionStatistics()
-								.getProcessedConclusionCounts()), result);
-			}
-			if (COLLECT_CONCLUSION_TIMES)
-				return new TimedConclusionVisitor(localStatistics
-						.getConclusionStatistics().getConclusionTimers(),
-						result);
-			else
-				return result;
+			
+			return SaturationUtils.getProducedConclusionCountingProcessor(result, localStatistics);
 		}
 		
 		protected abstract DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor();
@@ -371,10 +290,10 @@ public class RuleApplicationFactory {
 				final ContextModificationListener modificationListener,
 				final SaturationStatistics localStatistics) {
 			this(saturationState.getExtendedWriter(
-					getEngineContextCreationListener(listener, localStatistics.getContextStatistics()),
-					getEngineContextModificationListener(modificationListener, localStatistics.getContextStatistics()),
-					getEngineCompositionRuleApplicationVisitor(localStatistics.getRuleStatistics()),
-					getEngineConclusionVisitor(localStatistics.getConclusionStatistics()),
+					SaturationUtils.addStatsToContextCreationListener(listener, localStatistics.getContextStatistics()),
+					SaturationUtils.addStatsToContextModificationListener(modificationListener, localStatistics.getContextStatistics()),
+					SaturationUtils.addStatsToCompositionRuleApplicationVisitor(localStatistics.getRuleStatistics()),
+					SaturationUtils.addStatsToConclusionVisitor(localStatistics.getConclusionStatistics()),
 					trackModifiedContexts_),
 					localStatistics
 					);
@@ -396,7 +315,7 @@ public class RuleApplicationFactory {
 			DecompositionRuleApplicationVisitor visitor = new ForwardDecompositionRuleApplicationVisitor(
 					saturationStateWriter_);
 
-			return getEngineDecompositionRuleApplicationVisitor(visitor,
+			return SaturationUtils.addStatsToDecompositionRuleApplicationVisitor(visitor,
 					localStatistics.getRuleStatistics());
 		}
 	}

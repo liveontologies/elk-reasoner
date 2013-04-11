@@ -25,9 +25,12 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import java.lang.reflect.Field;
+
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounter;
 
 /**
  * Stores total rule and processed conclusion counts after every stage is
@@ -61,7 +64,10 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 		stats.reset();
 		stage.preExecute();
 		stage.execute();
+		stage.postExecute();
 
+		addregateRuleCounters(stats.getRuleStatistics().ruleCounter, metrics_, stage.getName());
+		
 		if (stats.getContextStatistics().countCreatedContexts > 0) {
 			metrics_.updateLongMetric(stage.getName() + "." + NEW_CONTEXT_COUNT,
 					stats.getContextStatistics().countCreatedContexts);
@@ -87,8 +93,28 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 					+ MODIFIED_CONTEXT_COUNT,
 					stats.getContextStatistics().countModifiedContexts);
 		}
-		
-		stage.postExecute();
+	}
+
+	private void addregateRuleCounters(RuleApplicationCounter ruleCounter,
+			Metrics metrics, String prefix) {
+		// reflection based
+		for (Field field : ruleCounter.getClass().getDeclaredFields()) {
+			if (field.getType().equals(Integer.TYPE)) {
+				// this must be a counter, get the value
+				try {
+					field.setAccessible(true);
+					
+					Integer counter = (Integer) field.get(ruleCounter);
+
+					if (counter > 0) {
+						metrics.updateLongMetric(prefix + "." + field.getName(), counter);
+					}
+				} catch (Exception e) {
+					// log it?
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }

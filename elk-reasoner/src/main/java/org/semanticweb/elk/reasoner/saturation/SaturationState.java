@@ -62,6 +62,9 @@ public interface SaturationState {
 	 * {@link ContextCreationListener}. If {@link ContextCreationListener} is
 	 * not thread safe, the calls of the methods should be synchronized
 	 * 
+	 * The passed rule application visitor is used to apply initialization rules
+	 * to the newly created contexts
+	 * 
 	 */
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,

@@ -137,6 +137,7 @@ class ContextInitializationFactory
 
 	@Override
 	public void finish() {
+		//aggregatedStats_.add(localStatistics);
 	}
 
 }

@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeapplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeletionVisitor;
@@ -72,9 +73,9 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 			super(new SaturationStatistics());
 			
 			writer_ = saturationState.getWriter(
-					getEngineContextModificationListener(listener,
+					SaturationUtils.addStatsToContextModificationListener(listener,
 							localStatistics.getContextStatistics()),
-					getEngineConclusionVisitor(localStatistics
+							SaturationUtils.addStatsToConclusionVisitor(localStatistics
 							.getConclusionStatistics()));
 		}
 
@@ -89,12 +90,14 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 							filterRuleConclusionProcessor(
 									new ConclusionDeapplicationVisitor(
 											saturationStateWriter,
-											getEngineCompositionRuleApplicationVisitor(localStatistics
-													.getRuleStatistics()),
-											getEngineDecompositionRuleApplicationVisitor(
-													getDecompositionRuleApplicationVisitor(),
-													localStatistics
-															.getRuleStatistics())),
+											SaturationUtils
+													.addStatsToCompositionRuleApplicationVisitor(localStatistics
+															.getRuleStatistics()),
+											SaturationUtils
+													.addStatsToDecompositionRuleApplicationVisitor(
+															getDecompositionRuleApplicationVisitor(),
+															localStatistics
+																	.getRuleStatistics())),
 									localStatistics)),
 					new ConclusionDeletionVisitor());
 		}

@@ -36,8 +36,8 @@ public class RuleStatistics {
 	// TODO: limit access
 	public final RuleApplicationCounter ruleCounter = new RuleApplicationCounter();
 	public final RuleApplicationTimer ruleTimer = new RuleApplicationTimer();
-	final DecompositionRuleApplicationCounter decompositionRuleCounter = new DecompositionRuleApplicationCounter();
-	final DecompositionRuleApplicationTimer decompositionRuleTimer = new DecompositionRuleApplicationTimer();
+	public final DecompositionRuleApplicationCounter decompositionRuleCounter = new DecompositionRuleApplicationCounter();
+	public final DecompositionRuleApplicationTimer decompositionRuleTimer = new DecompositionRuleApplicationTimer();
 
 	/**
 	 * Counts the number of times other rule statistics were added to this one,
@@ -91,6 +91,12 @@ public class RuleStatistics {
 			logger.debug("owl:Thing context init rules: "
 					+ ruleCounter.countOwlThingContextInitializationRule + " ("
 					+ ruleTimer.timeOwlThingContextInitializationRule
+					/ addCounter + " ms)");
+		
+		if (ruleCounter.countContextRootInitializationRule > 0)
+			logger.debug("Context root init rules: "
+					+ ruleCounter.countContextRootInitializationRule + " ("
+					+ ruleTimer.timeContextRootInitializationRule
 					/ addCounter + " ms)");
 
 		if (ruleCounter.countSubClassOfAxiomCompositionRule > 0)
@@ -149,6 +155,7 @@ public class RuleStatistics {
 						+ ruleTimer.timeObjectIntersectionOfCompositionRule
 						+ ruleTimer.timeObjectSomeValuesFromCompositionRule
 						+ ruleTimer.timeOwlThingContextInitializationRule
+						+ ruleTimer.timeContextRootInitializationRule
 						+ ruleTimer.timePropagationBackwardLinkRule
 						+ ruleTimer.timeSubClassOfAxiomCompositionRule
 						+ decompositionRuleTimer.timeIndexedClass

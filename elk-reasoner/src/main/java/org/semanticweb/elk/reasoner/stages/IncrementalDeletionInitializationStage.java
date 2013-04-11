@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.AbstractIndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -67,10 +68,8 @@ class IncrementalDeletionInitializationStage extends
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
 		Collection<Collection<Context>> inputs = Collections.emptyList();
-		RuleApplicationVisitor ruleAppVisitor = getRuleApplicationVisitor(stageStatistics_
-				.getRuleStatistics());
-		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
-				.getConclusionStatistics());
+		RuleApplicationVisitor ruleAppVisitor = SaturationUtils.addStatsToCompositionRuleApplicationVisitor(stageStatistics_.getRuleStatistics());
+		ConclusionVisitor<?> conclusionVisitor = SaturationUtils.addStatsToConclusionVisitor(stageStatistics_.getConclusionStatistics());
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
@@ -94,11 +93,8 @@ class IncrementalDeletionInitializationStage extends
 			return false;
 		this.initialization_ = null;
 		// initializing contexts which will be removed
-		ConclusionVisitor<?> conclusionVisitor = getConclusionVisitor(stageStatistics_
-				.getConclusionStatistics());
-
-		final ExtendedSaturationStateWriter satStateWriter = reasoner.saturationState
-				.getExtendedWriter(conclusionVisitor);
+		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils.addStatsToConclusionVisitor(stageStatistics_.getConclusionStatistics());
+		final ExtendedSaturationStateWriter satStateWriter = reasoner.saturationState.getExtendedWriter(conclusionVisitor);
 		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState.getWriter();
 		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState.getWriter();
 		final IndexedClassExpressionVisitor<Object> rootVisitor = new AbstractIndexedClassEntityVisitor<Object>() {

@@ -54,12 +54,10 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 				SaturatedPropertyChainCheckingStage.class);
 		postProcesingMap.add(IncrementalDeletionStage.class,
 				ContextSaturationFlagCheckingStage.class);
-		/*postProcesingMap.add(IncrementalContextCleaningStage.class,
-				CheckCleaningStage.class);
-		postProcesingMap.add(IncrementalContextCleaningStage.class,
-				SaturationGraphValidationStage.class);*/
-		postProcesingMap.add(IncrementalAdditionInitializationStage.class,
+		postProcesingMap.add(IncrementalDeletionStage.class,
 				SaturationGraphValidationStage.class);
+		postProcesingMap.add(IncrementalAdditionStage.class,
+				CheckContextInvariants.class);
 		/*
 		 * this phase is commented because it uses cleaning to clean up randomly
 		 * picked contexts. Cleaning never deletes anything from other contexts,
@@ -76,12 +74,9 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 		 */
 		// postProcesingMap.add(IncrementalReSaturationStage.class,
 		// RandomContextResaturationStage.class);
-		/*postProcesingMap.add(IncrementalClassTaxonomyComputationStage.class,
-				ValidateTaxonomyStage.class);*/
 		postProcesingMap.add(IncrementalTaxonomyCleaningStage.class,
 				ValidateTaxonomyStage.class);
-		postProcesingMap.add(IncrementalTaxonomyCleaningStage.class,
-				CheckContextInvariants.class);
+		
 	}
 
 	@Override
