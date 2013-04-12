@@ -33,9 +33,8 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
  */
 public class SimpleStageExecutor extends AbstractStageExecutor {
 
-
 	@Override
-	public void execute(ReasonerStage stage)  throws ElkException {
+	public void execute(ReasonerStage stage) throws ElkException {		
 		try {
 			stage.preExecute();
 			stage.execute();

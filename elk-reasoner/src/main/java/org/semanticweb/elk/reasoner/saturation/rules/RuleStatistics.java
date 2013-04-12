@@ -100,7 +100,7 @@ public class RuleStatistics {
 					/ addCounter + " ms)");
 
 		if (ruleCounter.countSubClassOfAxiomCompositionRule > 0)
-			logger.debug("Subclass expantions: "
+			logger.debug("Subclass expansions: "
 					+ ruleCounter.countSubClassOfAxiomCompositionRule + " ("
 					+ ruleTimer.timeSubClassOfAxiomCompositionRule / addCounter
 					+ " ms)");
@@ -119,7 +119,7 @@ public class RuleStatistics {
 
 		if (ruleCounter.countObjectSomeValuesFromCompositionRule
 				+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule > 0)
-			logger.debug("SomeValuesFrom composition/decomposition rules: "
+			logger.debug("ObjectSomeValuesFrom composition/decomposition rules: "
 					+ ruleCounter.countObjectSomeValuesFromCompositionRule
 					+ "/"
 					+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule

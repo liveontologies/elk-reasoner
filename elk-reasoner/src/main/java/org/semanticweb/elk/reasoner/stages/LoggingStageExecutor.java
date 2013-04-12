@@ -45,7 +45,7 @@ public class LoggingStageExecutor extends AbstractStageExecutor {
 		if (LOGGER_.isDebugEnabled()) {
 			LOGGER_.debug(stage.getName() + " stage:");
 		}
-		
+
 		Statistics.logOperationStart(stage.getName(), LOGGER_);
 		
 		try {
@@ -59,8 +59,8 @@ public class LoggingStageExecutor extends AbstractStageExecutor {
 			Statistics.logMemoryUsage(LOGGER_);
 			stage.printInfo();
 			stage.postExecute();
-		}		
-		
+		}
+
 		if (LOGGER_.isDebugEnabled()) {
 			LOGGER_.debug(stage.getName() + " done.");
 		}

@@ -46,6 +46,7 @@ public class RestartingTestStageExecutor extends SimpleInterrupter implements
 			registerCurrentThreadToInterrupt();
 			for (;;) {
 				try {
+					stage.preExecute();
 					stage.execute();
 					break;
 				} catch (ElkException e) {
@@ -55,6 +56,7 @@ public class RestartingTestStageExecutor extends SimpleInterrupter implements
 					} else
 						throw e;
 				} finally {
+					stage.postExecute();
 					finish(stage);
 				}
 			}
