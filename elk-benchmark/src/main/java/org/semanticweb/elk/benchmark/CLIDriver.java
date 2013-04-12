@@ -43,9 +43,12 @@ public class CLIDriver {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
+		/*BenchmarkUtils.runTask(ClassificationTask.class.getName(),
+				0, 1,
+				new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130131.owl"});*/
 		/*BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
-				0, 2,
-				new String[]{"/home/pavel/ulm/data/go/incremental"});*/
+				0, 1,
+				new String[]{"/home/pavel/ulm/data/snomed/old-test/"});*/
 		BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
 				0,
 				1,

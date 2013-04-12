@@ -65,8 +65,8 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 		stage.execute();
 		stage.postExecute();
 
-		addregateRuleCounters(stats.getRuleStatistics().ruleCounter, metrics_, stage.getName());
-		addregateRuleCounters(stats.getRuleStatistics().decompositionRuleCounter, metrics_, stage.getName());
+		//addregateRuleCounters(stats.getRuleStatistics().ruleCounter, metrics_, stage.getName());
+		//addregateRuleCounters(stats.getRuleStatistics().decompositionRuleCounter, metrics_, stage.getName());
 		
 		if (stats.getContextStatistics().countCreatedContexts > 0) {
 			metrics_.updateLongMetric(stage.getName() + "." + NEW_CONTEXT_COUNT,
@@ -95,7 +95,7 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 		}
 	}
 
-	private void addregateRuleCounters(Object ruleCounter, Metrics metrics,
+	void addregateRuleCounters(Object ruleCounter, Metrics metrics,
 			String prefix) {
 		// reflection based
 		// TODO perhaps better to use custom annotations to mark counter fields?
