@@ -42,12 +42,12 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 public class RuleAndConclusionCountMeasuringExecutor extends
 		AbstractStageExecutor {
 
-	public static final String RULE_COUNT = "count.rule-applications";
-	public static final String NEW_CONTEXT_COUNT = "count.new-contexts";
-	public static final String PRODUCED_CONCLUSION_COUNT = "count.produced-conclusions";
-	public static final String UNIQUE_CONCLUSION_COUNT = "count.used-conclusions";
-	public static final String PROCESSED_CONCLUSION_COUNT = "count.processed-conclusions";
-	public static final String MODIFIED_CONTEXT_COUNT = "count.modified-contexts";
+	public static final String RULE_COUNT = ".count.rule-applications";
+	public static final String NEW_CONTEXT_COUNT = ".count.new-contexts";
+	public static final String PRODUCED_CONCLUSION_COUNT = ".count.produced-conclusions";
+	public static final String UNIQUE_CONCLUSION_COUNT = ".count.used-conclusions";
+	public static final String PROCESSED_CONCLUSION_COUNT = ".count.processed-conclusions";
+	public static final String MODIFIED_CONTEXT_COUNT = ".count.modified-contexts";
 	
 	private final Metrics metrics_;
 
@@ -60,18 +60,19 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 	}
 	
 	protected void doMeasure(ReasonerStage stage, SaturationStatistics stats) {
-		metrics_.updateLongMetric(
-				stage.getName() + "." + NEW_CONTEXT_COUNT,
+		recordMetrics(stage.getName(), stats);
+	}
+	
+	protected void recordMetrics(String prefix, SaturationStatistics stats) {
+		metrics_.updateLongMetric(prefix + NEW_CONTEXT_COUNT,
 				stats.getContextStatistics().countCreatedContexts);
-		metrics_.updateLongMetric(stage.getName() + "."
-				+ PRODUCED_CONCLUSION_COUNT, stats
+		metrics_.updateLongMetric(prefix + PRODUCED_CONCLUSION_COUNT, stats
 				.getConclusionStatistics().getProducedConclusionCounts()
 				.getTotalCount());
-		metrics_.updateLongMetric(stage.getName() + "."
-				+ UNIQUE_CONCLUSION_COUNT, stats.getConclusionStatistics()
-				.getUsedConclusionCounts().getTotalCount());
-		metrics_.updateLongMetric(stage.getName() + "."
-				+ MODIFIED_CONTEXT_COUNT,
+		metrics_.updateLongMetric(prefix + UNIQUE_CONCLUSION_COUNT, stats
+				.getConclusionStatistics().getUsedConclusionCounts()
+				.getTotalCount());
+		metrics_.updateLongMetric(prefix + MODIFIED_CONTEXT_COUNT,
 				stats.getContextStatistics().countModifiedContexts);
 	}
 	

@@ -47,7 +47,7 @@ public class CLIDriver {
 				0, 1,
 				new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130131.owl"});*/
 		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
-				1, 5,
+				0, 1,
 				new String[]{"/home/pavel/ulm/data/go/incremental"});
 		/*BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
 				0,
