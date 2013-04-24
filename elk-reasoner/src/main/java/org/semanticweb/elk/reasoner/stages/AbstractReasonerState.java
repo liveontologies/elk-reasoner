@@ -325,6 +325,8 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public boolean isInconsistent() throws ElkException {
+		
+		ruleAndConclusionStats.reset();
 		loadChanges();
 
 		if (isIncrementalMode() && !saturationState.getContexts().isEmpty()) {
@@ -388,6 +390,8 @@ public abstract class AbstractReasonerState {
 	public Taxonomy<ElkClass> getTaxonomy()
 			throws ElkInconsistentOntologyException, ElkException {
 
+		ruleAndConclusionStats.reset();
+		
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
@@ -442,6 +446,8 @@ public abstract class AbstractReasonerState {
 	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
 			throws ElkException {
 
+		ruleAndConclusionStats.reset();
+		
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 

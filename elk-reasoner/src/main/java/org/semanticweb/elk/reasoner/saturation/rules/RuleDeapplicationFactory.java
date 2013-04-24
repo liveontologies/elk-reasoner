@@ -87,7 +87,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 			return new CombinedConclusionVisitor(
 					new CombinedConclusionVisitor(
 							new ConclusionOccurranceCheckingVisitor(),
-							filterRuleConclusionProcessor(
+							getUsedConclusionsCountingVisitor(
 									new ConclusionDeapplicationVisitor(
 											saturationStateWriter,
 											SaturationUtils

@@ -46,7 +46,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  * 
  */
-class IncrementalDeletionInitializationStage extends
+public class IncrementalDeletionInitializationStage extends
 		AbstractIncrementalChangesInitializationStage {
 
 	public IncrementalDeletionInitializationStage(

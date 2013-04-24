@@ -66,8 +66,6 @@ public class SaturationUtils {
 	 */
 	public static void initContext(Context context, BasicSaturationStateWriter writer,
 			OntologyIndex index, RuleApplicationVisitor ruleAppVisitor) {
-		//TODO register this as a global rule
-		//writer.produce(context, new PositiveSubsumer(context.getRoot()));
 		// apply all context initialization rules
 		LinkRule<Context> initRule = index.getContextInitRuleHead();
 
@@ -84,10 +82,10 @@ public class SaturationUtils {
 	 * ------------------------------------------------------------------------------------
 	 */
 	
-	private static final boolean COLLECT_CONCLUSION_COUNTS = true;//LOGGER_.isDebugEnabled();
-	private static final boolean COLLECT_CONCLUSION_TIMES = true;//LOGGER_.isDebugEnabled();
-	private static final boolean COLLECT_RULE_COUNTS = true;//LOGGER_.isDebugEnabled();
-	private static final boolean COLLECT_RULE_TIMES = true;//LOGGER_.isDebugEnabled();
+	private static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
+	private static final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
+	private static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
+	private static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
 	
 	/**
 	 * 
@@ -157,7 +155,7 @@ public class SaturationUtils {
 	/**
 	 * 
 	 */
-	public static ConclusionVisitor<?> getProducedConclusionCountingProcessor(
+	public static ConclusionVisitor<?> getProcessedConclusionCountingProcessor(
 			ConclusionVisitor<Boolean> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 		

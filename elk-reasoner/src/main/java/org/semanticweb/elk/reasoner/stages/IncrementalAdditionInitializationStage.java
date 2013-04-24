@@ -53,7 +53,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  * 
  */
-class IncrementalAdditionInitializationStage extends
+public class IncrementalAdditionInitializationStage extends
 		AbstractIncrementalChangesInitializationStage {
 
 	public IncrementalAdditionInitializationStage(
