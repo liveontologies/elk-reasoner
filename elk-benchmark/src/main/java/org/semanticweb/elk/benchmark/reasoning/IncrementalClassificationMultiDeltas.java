@@ -492,6 +492,7 @@ public class IncrementalClassificationMultiDeltas extends
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
+	@SuppressWarnings("unused")
 	private static class TotalStatsExecutor extends StatsExecutor {
 
 		public TotalStatsExecutor(Metrics m) {
