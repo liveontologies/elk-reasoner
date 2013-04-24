@@ -78,6 +78,7 @@ public class ClassificationTask implements Task {
 			OntologyLoader loader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), ontologyFile);
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
+					//new SimpleStageExecutor(),
 					new RuleAndConclusionCountMeasuringExecutor( metrics_),
 					//new TimingStageExecutor(new SimpleStageExecutor()),
 					reasonerConfig_);

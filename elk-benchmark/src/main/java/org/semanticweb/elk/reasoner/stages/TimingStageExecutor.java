@@ -24,10 +24,8 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.stages.AbstractStageExecutor;
-import org.semanticweb.elk.reasoner.stages.ReasonerStage;
-import org.semanticweb.elk.util.logging.ElkTimer;
 
 /**
  * A simple executor which measures the time spent on stage execution
@@ -40,17 +38,34 @@ public class TimingStageExecutor extends AbstractStageExecutor {
 
 	private final AbstractStageExecutor executor_;
 	
-	public TimingStageExecutor(final AbstractStageExecutor executor) {
+	protected final Metrics metrics;
+	
+	public static final String WALL_TIME = ".wall-time";
+	
+	public TimingStageExecutor(final AbstractStageExecutor executor, Metrics m) {
 		executor_ = executor;
+		metrics = m;
+	}
+	
+	protected boolean measure(ReasonerStage stage) {
+		return true;
+	}
+	
+	protected void executeStage(ReasonerStage stage) throws ElkException {
+		executor_.execute(stage);
 	}
 
 	@Override
 	public void execute(ReasonerStage stage) throws ElkException {
-		ElkTimer timer = ElkTimer.getNamedTimer(stage.getName());
-		
-		timer.start();
-		executor_.execute(stage);
-		timer.stop();
+
+		long ts = System.currentTimeMillis();
+
+		executeStage(stage);
+		ts = System.currentTimeMillis() - ts;
+
+		if (measure(stage)) {
+			metrics.updateLongMetric(stage.getName() + WALL_TIME, ts);
+		}		
 	}
 
 }
