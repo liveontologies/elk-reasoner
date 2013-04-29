@@ -48,7 +48,7 @@ public class ElkTimer {
 	/** Flag for indicating that all supported times should be taken. */
 	public static final int RECORD_ALL = RECORD_CPUTIME | RECORD_WALLTIME;
 
-	static final ThreadMXBean tmxb = ManagementFactory.getThreadMXBean();
+//	static final ThreadMXBean tmxb = ManagementFactory.getThreadMXBean();
 
 	static final ConcurrentHashMap<ElkTimer, ElkTimer> registeredTimers = new ConcurrentHashMap<ElkTimer, ElkTimer>();
 
@@ -86,9 +86,9 @@ public class ElkTimer {
 		this.todoFlags = todoFlags;
 		this.threadId = threadId;
 
-		if (!tmxb.isThreadCpuTimeEnabled()) {
-			tmxb.setThreadCpuTimeEnabled(true);
-		}
+//		if (!tmxb.isThreadCpuTimeEnabled()) {
+//			tmxb.setThreadCpuTimeEnabled(true);
+//		}
 	}
 
 	/**
@@ -568,11 +568,11 @@ public class ElkTimer {
 	}
 
 	protected static long getThreadCpuTime(long threadId) {
-		if (threadId == 0) { // generally invalid
+//		if (threadId == 0) { // generally invalid
 			return 0;
-		} else {
-			return tmxb.getThreadCpuTime(threadId);
-		}
+//		} else {
+//			return tmxb.getThreadCpuTime(threadId);
+//		}
 	}
 
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Elk Reasoner</string>
+    <string name="action_settings">Settings</string>
+    <string name="run">Classify!</string>
+    <string name="stop">Stop.</string>
+    <string name="ontology_name">Ontology name</string>
+    <string name="menu_settings">Settings</string>
+    <string name="pref_logLevel">Log level</string>
+    <string name="pref_OFF">OFF</string>
+    <string name="pref_FATAL">FATAL</string>
+    <string name="pref_ERROR">ERROR</string>
+    <string name="pref_WARN">WARN</string>
+    <string name="pref_INFO">INFO</string>
+    <string name="pref_DEBUG">DEBUG</string>
+    <string name="pref_TRACE">TRACE</string>
+    <string name="pref_ALL">ALL</string>
+
+    <string-array name="pref_logLevels">
+        <item>@string/pref_OFF</item>
+        <item>@string/pref_FATAL</item>
+        <item>@string/pref_ERROR</item>
+        <item>@string/pref_WARN</item>
+        <item>@string/pref_INFO</item>
+        <item>@string/pref_DEBUG</item>
+        <item>@string/pref_TRACE</item>
+        <item>@string/pref_ALL</item>
+    </string-array>
+
+    <string name="pref_logLevel_default">@string/pref_INFO</string>
+
+    <string-array name="pref_workers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </string-array>
+
+    <string name="pref_workerNo">Number of workers</string>
+
+</resources>

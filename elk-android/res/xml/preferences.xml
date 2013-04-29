@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <ListPreference
+        android:defaultValue="@string/pref_logLevel_default"
+        android:dialogTitle="@string/pref_logLevel"
+        android:entries="@array/pref_logLevels"
+        android:entryValues="@array/pref_logLevels"
+        android:key="pref_logLevel"
+        android:title="@string/pref_logLevel" />
+    <ListPreference
+        android:defaultValue="1"
+        android:dialogTitle="@string/pref_workerNo"
+        android:entries="@array/pref_workers"
+        android:entryValues="@array/pref_workers"
+        android:key="pref_workers"
+        android:title="@string/pref_workerNo" />
+
+</PreferenceScreen>
