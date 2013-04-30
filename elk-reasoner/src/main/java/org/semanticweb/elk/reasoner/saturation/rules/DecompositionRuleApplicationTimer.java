@@ -66,4 +66,9 @@ public class DecompositionRuleApplicationTimer {
 		timeIndexedDataHasValue += timer.timeIndexedDataHasValue;
 	}
 
+	public int getTotalRuleAppTime() {
+		return timeIndexedClass + timeIndexedObjectIntersectionOf
+				+ timeIndexedObjectSomeValuesFrom + timeIndexedDataHasValue;
+	}
+
 }

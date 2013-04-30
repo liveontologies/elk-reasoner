@@ -41,6 +41,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
  */
 public class RuleAndConclusionCountMeasuringExecutor extends
 		AbstractStageExecutor {
+	
+	//private static final Logger LOGGER_ = Logger.getLogger(RuleAndConclusionCountMeasuringExecutor.class);
 
 	public static final String RULE_COUNT = ".count.rule-applications";
 	public static final String NEW_CONTEXT_COUNT = ".count.new-contexts";
@@ -48,39 +50,53 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 	public static final String UNIQUE_CONCLUSION_COUNT = ".count.used-conclusions";
 	public static final String PROCESSED_CONCLUSION_COUNT = ".count.processed-conclusions";
 	public static final String MODIFIED_CONTEXT_COUNT = ".count.modified-contexts";
+	public static final String CHANGE_INIT_PROC_TIME = ".time.change-init-context-proc-time";
+	public static final String CHANGE_INIT_CONTEX_COLLECTION_PROC_TIME = ".time.change-init-context-collection-proc-time";
+	public static final String TOTAL_RULE_TIME = ".rule-time";
 	
-	private final Metrics metrics_;
+	private final AbstractStageExecutor executor_;
+	
+	protected final Metrics metrics;
 
-	public RuleAndConclusionCountMeasuringExecutor(Metrics m) {
-		metrics_ = m;
+	public RuleAndConclusionCountMeasuringExecutor(AbstractStageExecutor e, Metrics m) {
+		executor_ = e;
+		metrics = m;
 	}
 	
 	protected boolean measure(ReasonerStage stage) {
 		return true;
 	}
 	
-	protected void doMeasure(ReasonerStage stage, SaturationStatistics stats) {
+	protected void doMeasure(ReasonerStage stage, SaturationStatistics stats) {		
 		recordMetrics(stage.getName(), stats);
 	}
 	
 	protected void recordMetrics(String prefix, SaturationStatistics stats) {
-		metrics_.updateLongMetric(prefix + NEW_CONTEXT_COUNT,
+		metrics.updateLongMetric(prefix + NEW_CONTEXT_COUNT,
 				stats.getContextStatistics().countCreatedContexts);
-		metrics_.updateLongMetric(prefix + PRODUCED_CONCLUSION_COUNT, stats
+		metrics.updateLongMetric(prefix + PRODUCED_CONCLUSION_COUNT, stats
 				.getConclusionStatistics().getProducedConclusionCounts()
 				.getTotalCount());
-		metrics_.updateLongMetric(prefix + UNIQUE_CONCLUSION_COUNT, stats
+		metrics.updateLongMetric(prefix + UNIQUE_CONCLUSION_COUNT, stats
 				.getConclusionStatistics().getUsedConclusionCounts()
 				.getTotalCount());
-		metrics_.updateLongMetric(prefix + MODIFIED_CONTEXT_COUNT,
+		metrics.updateLongMetric(prefix + MODIFIED_CONTEXT_COUNT,
 				stats.getContextStatistics().countModifiedContexts);
+		metrics.updateLongMetric(prefix + CHANGE_INIT_PROC_TIME, stats
+				.getIncrementalProcessingStatistics()
+				.getChangeInitContextProcessingTime());
+		metrics.updateLongMetric(prefix + CHANGE_INIT_CONTEX_COLLECTION_PROC_TIME, stats
+				.getIncrementalProcessingStatistics()
+				.getChangeInitContextCollectionProcessingTime());
+		metrics.updateDoubleMetric(prefix + TOTAL_RULE_TIME,
+				stats.getRuleStatistics().getTotalRuleTime());
+		
+		//addregateRuleCounters(stats.getRuleStatistics().ruleTimer, metrics_, prefix + ".rule.");
 	}
 	
 	protected void executeStage(ReasonerStage stage, SaturationStatistics stats) throws ElkException {
 		stats.reset();
-		stage.preExecute();
-		stage.execute();
-		stage.postExecute();
+		executor_.execute(stage);
 	}
 
 	@Override
@@ -110,7 +126,7 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 					Integer counter = (Integer) field.get(ruleCounter);
 
 					if (counter > 0) {
-						metrics.updateLongMetric(prefix + "." + field.getName(), counter);
+						metrics.updateLongMetric(prefix + field.getName(), counter);
 					}
 				} catch (Exception e) {
 					// log it?

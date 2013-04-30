@@ -36,7 +36,7 @@ import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationMultiDel
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- */
+ */	
 public class CLIDriver {
 
 	/**
@@ -48,7 +48,7 @@ public class CLIDriver {
 				new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130131.owl"});*/
 		BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
 				0, 1,
-				new String[]{"/home/pavel/ulm/data/go/incremental"});
+				new String[]{"/home/pavel/ulm/data/go/incremental", "4"});
 		/*BenchmarkUtils.runTask(RandomWalkIncrementalClassificationTask.class.getName(),
 				0,
 				1,

@@ -175,8 +175,8 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 
 	@Override
 	public void execute() throws ElkException {
-		//preExecute();
 		progressMonitor.start(getName());
+		
 		try {
 			for (;;) {
 				executeStage();
@@ -186,7 +186,6 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		//postExecute();
 	}
 
 	/**

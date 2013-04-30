@@ -68,7 +68,7 @@ public class RuleApplicationTimer {
 	/**
 	 * timer for {@link IndexedSubClassOfAxiom.ThisCompositionRule}
 	 */
-	int timeSubClassOfAxiomCompositionRule;
+	public int timeSubClassOfAxiomCompositionRule;
 
 	/**
 	 * timer for {@link IndexedObjectSomeValuesFrom.ThisCompositionRule}
@@ -122,6 +122,19 @@ public class RuleApplicationTimer {
 		timeForwardLinkBackwardLinkRule += timer.timeForwardLinkBackwardLinkRule;
 		timePropagationBackwardLinkRule += timer.timePropagationBackwardLinkRule;
 		timeContradictionBottomBackwardLinkRule += timer.timeContradictionBottomBackwardLinkRule;
+	}
+
+	public int getTotalRuleAppTime() {
+		return timeOwlThingContextInitializationRule
+				+ timeContextRootInitializationRule
+				+ timeDisjointnessAxiomCompositionRule
+				+ timeDisjointnessAxiomContradictionRule
+				+ timeObjectIntersectionOfCompositionRule
+				+ timeSubClassOfAxiomCompositionRule
+				+ timeObjectSomeValuesFromCompositionRule
+				+ timeForwardLinkBackwardLinkRule
+				+ timePropagationBackwardLinkRule
+				+ timeContradictionBottomBackwardLinkRule;
 	}
 
 }

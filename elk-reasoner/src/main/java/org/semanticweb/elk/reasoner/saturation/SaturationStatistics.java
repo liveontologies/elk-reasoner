@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.incremental.IncrementalProcessingStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
@@ -42,17 +43,21 @@ public class SaturationStatistics {
 	private final RuleStatistics ruleStatistics_ = new RuleStatistics();
 	
 	private final ContextStatistics contextStatistics_ = new ContextStatistics();
+	
+	private final IncrementalProcessingStatistics processingStatistics_ = new IncrementalProcessingStatistics();
 
 	public void reset() {
 		conclusionsStatistics_.reset();
 		ruleStatistics_.reset();
 		contextStatistics_.reset();
+		processingStatistics_.reset();
 	}
 
 	public synchronized void add(SaturationStatistics statistics) {
 		this.conclusionsStatistics_.add(statistics.conclusionsStatistics_);
 		this.ruleStatistics_.add(statistics.ruleStatistics_);
 		this.contextStatistics_.add(statistics.contextStatistics_);
+		this.processingStatistics_.add(statistics.processingStatistics_);
 	}
 
 	public void check(Logger logger) {
@@ -68,6 +73,7 @@ public class SaturationStatistics {
 		conclusionsStatistics_.print(logger);
 		ruleStatistics_.print(logger);
 		contextStatistics_.print(logger, Level.DEBUG);
+		processingStatistics_.print(logger, Level.DEBUG);
 	}
 	
 	public RuleStatistics getRuleStatistics() {
@@ -80,5 +86,9 @@ public class SaturationStatistics {
 	
 	public ContextStatistics getContextStatistics() {
 		return contextStatistics_;
+	}
+	
+	public IncrementalProcessingStatistics getIncrementalProcessingStatistics() {
+		return processingStatistics_;
 	}
 }

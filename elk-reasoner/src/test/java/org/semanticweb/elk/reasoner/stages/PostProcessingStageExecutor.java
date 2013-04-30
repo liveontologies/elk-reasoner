@@ -34,13 +34,14 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.logging.ElkTimer;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class PostProcessingStageExecutor extends LoggingStageExecutor {
+public class PostProcessingStageExecutor extends SimpleStageExecutor {
 
 	static final Multimap<Class<?>, Class<?>> postProcesingMap = new HashListMultimap<Class<?>, Class<?>>();
 
@@ -49,7 +50,7 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 	 */
 	static {
 		// init post processing map
-		postProcesingMap.add(
+		/*postProcesingMap.add(
 				PropertyHierarchyCompositionComputationStage.class,
 				SaturatedPropertyChainCheckingStage.class);
 		postProcesingMap.add(IncrementalDeletionStage.class,
@@ -58,51 +59,36 @@ public class PostProcessingStageExecutor extends LoggingStageExecutor {
 				SaturationGraphValidationStage.class);
 		postProcesingMap.add(IncrementalAdditionStage.class,
 				CheckContextInvariants.class);
-		/*
-		 * this phase is commented because it uses cleaning to clean up randomly
-		 * picked contexts. Cleaning never deletes anything from other contexts,
-		 * which could be back-linked from the cleaned ones. However, there's no
-		 * guarantee that cleaned contexts, once re-saturated, will have exactly
-		 * the same (complex) subsumers as before cleaning. Therefore,
-		 * non-cleaned contexts linked from the cleaned (and re-saturated) ones
-		 * may end up with (complex) subsumers which seemingly have come from
-		 * nowhere.
-		 * 
-		 * A solution would to be de-saturate randomly picked contexts, then
-		 * clean all modified ones, and re-saturate. I.e. do exactly what we do
-		 * in the standard chain of incremental reasoning stages.
-		 */
-		// postProcesingMap.add(IncrementalReSaturationStage.class,
-		// RandomContextResaturationStage.class);
 		postProcesingMap.add(IncrementalTaxonomyCleaningStage.class,
-				ValidateTaxonomyStage.class);
+				ValidateTaxonomyStage.class);*/
 		
+		postProcesingMap.add(IncrementalDeletionInitializationStage.class,
+				EnumerateContextsStage.class);		
 	}
 
+	
+	
 	@Override
-	public void complete(ReasonerStage stage) throws ElkException {
-		super.complete(stage);
-
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Starting post processing...");
-		}
-
+	public void execute(ReasonerStage stage) throws ElkException {
+		super.execute(stage);
+		
 		// FIXME: get rid of casts
 		try {
 			for (PostProcessingStage ppStage : instantiate(
 					postProcesingMap.get(stage.getClass()),
 					((AbstractReasonerStage) stage).reasoner)) {
+				
+				ElkTimer.getNamedTimer(ppStage.getName()).start();
+				
 				ppStage.execute();
+				
+				ElkTimer.getNamedTimer(ppStage.getName()).stop();
 			}
 		} catch (Exception e) {
 			throw new ElkRuntimeException(e);
 		}
-
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Post processing finished");
-		}
-
 	}
+
 
 	private Collection<PostProcessingStage> instantiate(
 			Collection<Class<?>> collection, AbstractReasonerState reasoner)

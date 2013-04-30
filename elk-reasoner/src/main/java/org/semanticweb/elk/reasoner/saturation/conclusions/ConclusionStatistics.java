@@ -38,8 +38,13 @@ public class ConclusionStatistics {
 	 * Number of unique conclusions saved to contexts
 	 */
 	private final ConclusionCounter usedConclusionCounts_;
+	
 	private final ConclusionTimer conclusionProcessingTimer_;
-	private int addCounter = 0;
+	/**
+	 * The number of times measurements were taken in different threads. Used to
+	 * average the wall time results.
+	 */
+	private int numOfMeasurements_ = 0;
 
 	public ConclusionStatistics(ConclusionCounter producedConclusionCounter, ConclusionCounter processedConclusionCounts,
 			ConclusionCounter usedConclusionCounts,
@@ -79,14 +84,19 @@ public class ConclusionStatistics {
 		processedConclusionCounts_.reset();
 		usedConclusionCounts_.reset();
 		conclusionProcessingTimer_.reset();
+		numOfMeasurements_ = 0;
 	}
 
 	public synchronized void add(ConclusionStatistics stats) {
-		this.producedConclusionCounts_.add(stats.producedConclusionCounts_);
-		this.processedConclusionCounts_.add(stats.processedConclusionCounts_);
-		this.usedConclusionCounts_.add(stats.usedConclusionCounts_);
-		this.conclusionProcessingTimer_.add(stats.conclusionProcessingTimer_);
-		addCounter++;
+		if (stats.measurementsTaken()) {
+			this.numOfMeasurements_ += stats.numOfMeasurements_;
+			this.producedConclusionCounts_.add(stats.producedConclusionCounts_);
+			this.processedConclusionCounts_
+					.add(stats.processedConclusionCounts_);
+			this.usedConclusionCounts_.add(stats.usedConclusionCounts_);
+			this.conclusionProcessingTimer_
+					.add(stats.conclusionProcessingTimer_);
+		}
 	}
 
 	private static String ERR_MSG_MORE_USED = ": more used that processed!";
@@ -109,44 +119,48 @@ public class ConclusionStatistics {
 	}
 
 	public void print(Logger logger) {
-		if (!logger.isDebugEnabled())
+		if (!logger.isDebugEnabled()) {
 			return;
-		if (addCounter == 0)
+		}
+		
+		if (!measurementsTaken()) {
 			return;
+		}
+		
 		if (processedConclusionCounts_.countPositiveSubsumers > 0
 				|| conclusionProcessingTimer_.timePositiveSubsumers > 0)
 			logger.debug("Positive Subsumers produced/used: "
 					+ processedConclusionCounts_.countPositiveSubsumers + "/"
 					+ usedConclusionCounts_.countPositiveSubsumers + " ("
 					+ conclusionProcessingTimer_.timePositiveSubsumers
-					/ addCounter + " ms)");
+					/ numOfMeasurements_ + " ms)");
 		if (processedConclusionCounts_.countNegativeSubsumers > 0
 				|| conclusionProcessingTimer_.timeNegativeSubsumers > 0)
 			logger.debug("Negative Subsumers produced/used: "
 					+ processedConclusionCounts_.countNegativeSubsumers + "/"
 					+ usedConclusionCounts_.countNegativeSubsumers + " ("
 					+ conclusionProcessingTimer_.timeNegativeSubsumers
-					/ addCounter + " ms)");
+					/ numOfMeasurements_ + " ms)");
 		if (processedConclusionCounts_.countBackwardLinks > 0
 				|| conclusionProcessingTimer_.timeBackwardLinks > 0)
 			logger.debug("Backward Links produced/used: "
 					+ processedConclusionCounts_.countBackwardLinks + "/"
 					+ usedConclusionCounts_.countBackwardLinks + " ("
-					+ conclusionProcessingTimer_.timeBackwardLinks / addCounter
+					+ conclusionProcessingTimer_.timeBackwardLinks / numOfMeasurements_
 					+ " ms)");
 		if (processedConclusionCounts_.countForwardLinks > 0
 				|| conclusionProcessingTimer_.timeForwardLinks > 0)
 			logger.debug("Forward Links produced/used: "
 					+ processedConclusionCounts_.countForwardLinks + "/"
 					+ usedConclusionCounts_.countForwardLinks + " ("
-					+ conclusionProcessingTimer_.timeForwardLinks / addCounter
+					+ conclusionProcessingTimer_.timeForwardLinks / numOfMeasurements_
 					+ " ms)");
 		if (processedConclusionCounts_.countPropagations > 0
 				|| conclusionProcessingTimer_.timePropagations > 0)
 			logger.debug("Propagations produced/used: "
 					+ processedConclusionCounts_.countPropagations + "/"
 					+ usedConclusionCounts_.countPropagations + " ("
-					+ conclusionProcessingTimer_.timePropagations / addCounter
+					+ conclusionProcessingTimer_.timePropagations / numOfMeasurements_
 					+ " ms)");
 		if (processedConclusionCounts_.countContradictions > 0
 				|| conclusionProcessingTimer_.timeContradictions > 0)
@@ -154,17 +168,28 @@ public class ConclusionStatistics {
 					+ processedConclusionCounts_.countContradictions + "/"
 					+ usedConclusionCounts_.countContradictions + " ("
 					+ conclusionProcessingTimer_.timeContradictions
-					/ addCounter + " ms)");
+					/ numOfMeasurements_ + " ms)");
 		if (processedConclusionCounts_.countDisjointnessAxioms > 0
 				|| conclusionProcessingTimer_.timeDisjointnessAxioms > 0)
 			logger.debug("Disjointness Axioms produced/used: "
 					+ processedConclusionCounts_.countDisjointnessAxioms + "/"
 					+ usedConclusionCounts_.countDisjointnessAxioms + " ("
 					+ conclusionProcessingTimer_.timeDisjointnessAxioms
-					/ addCounter + " ms)");
+					/ numOfMeasurements_ + " ms)");
 		long totalTime = conclusionProcessingTimer_.getTotalTime();
 		if (totalTime > 0)
 			logger.debug("Total conclusion processing time: " + totalTime
-					/ addCounter + " ms");
+					/ numOfMeasurements_ + " ms");
 	}
+	
+	public void startMeasurements() {
+		if (numOfMeasurements_ < 1) {
+			numOfMeasurements_ = 1;
+		}
+	}
+	
+	private boolean measurementsTaken() {
+		return numOfMeasurements_ > 0;
+	}
+
 }

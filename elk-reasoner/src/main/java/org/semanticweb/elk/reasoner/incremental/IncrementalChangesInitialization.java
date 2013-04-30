@@ -35,6 +35,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
@@ -45,6 +47,7 @@ import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Goes through the input class expressions and puts each context's superclass
@@ -64,15 +67,21 @@ public class IncrementalChangesInitialization extends
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
 			SaturationState state, ComputationExecutor executor,
-			RuleApplicationVisitor ruleAppVisitor,
-			ConclusionVisitor<?> conclusionVisitor, int maxWorkers,
+			SaturationStatistics stageStats,
+			int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
-				changedGlobalRules, ruleAppVisitor, conclusionVisitor), executor, maxWorkers,
+				changedGlobalRules, stageStats), executor, maxWorkers,
 				progressMonitor);
 	}
 }
 
+/**
+ * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
 class ContextInitializationFactory
 		implements
 		InputProcessorFactory<Collection<Context>, InputProcessor<Collection<Context>>> {
@@ -80,64 +89,204 @@ class ContextInitializationFactory
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ContextInitializationFactory.class);
 
-	private final BasicSaturationStateWriter saturationStateWriter_;
+	private final SaturationState saturationState_;
 	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
 	private final LinkRule<Context> changedGlobalRuleHead_;
-	private final RuleApplicationVisitor ruleAppVisitor_;
+	private final SaturationStatistics stageStatistics_;
 
 	public ContextInitializationFactory(
 			SaturationState state,
 			Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges,
 			LinkRule<Context> changedGlobalRuleHead,
-			RuleApplicationVisitor ruleAppVisitor,
-			ConclusionVisitor<?> conclusionVisitor) {
-		saturationStateWriter_ = state.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
+			SaturationStatistics stageStats) {
+		
+		saturationState_ = state;
 		indexChanges_ = indexChanges;
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
-		ruleAppVisitor_ = ruleAppVisitor;
+		stageStatistics_ = stageStats;
 	}
 
 	@Override
 	public InputProcessor<Collection<Context>> getEngine() {
+		return getEngine(getBaseContextProcessor());
+	}
 
-		return new BaseInputProcessor<Collection<Context>>() {
-
+	private ContextProcessor getBaseContextProcessor() {
+		
+		final SaturationStatistics localStatistics = new SaturationStatistics();
+		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils.addStatsToConclusionVisitor(localStatistics.getConclusionStatistics());
+		final RuleApplicationVisitor ruleAppVisitor = SaturationUtils.getStatsAwareCompositionRuleAppVisitor(localStatistics.getRuleStatistics());
+		final BasicSaturationStateWriter saturationStateWriter = saturationState_.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
+		
+		return new ContextProcessor() {
+			
 			@Override
-			protected void process(Collection<Context> input) {
-				for (Context context : input) {					
-					// apply all changed global context rules
-					LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
-					while (nextGlobalRule != null) {
-						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace(context + ": applying rule "
-									+ nextGlobalRule.getName());
-						nextGlobalRule.accept(ruleAppVisitor_,
-								saturationStateWriter_, context);
-						nextGlobalRule = nextGlobalRule.next();
-					}
+			public void process(Context context) {
+				// apply all changed global context rules
+				LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
+				while (nextGlobalRule != null) {
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace(context + ": applying rule "
+								+ nextGlobalRule.getName());
+					nextGlobalRule.accept(ruleAppVisitor,
+							saturationStateWriter, context);
+					nextGlobalRule = nextGlobalRule.next();
+				}
 
-					// apply all changed rules for indexed class expressions
-					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
-							indexChanges_.keySet(), context.getSubsumers())) {
-						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace(context + ": applying rules for "
-									+ changedICE);
-						LinkRule<Context> nextLocalRule = indexChanges_
-								.get(changedICE);
-						while (nextLocalRule != null) {
-							nextLocalRule.accept(ruleAppVisitor_,
-									saturationStateWriter_, context);
-							nextLocalRule = nextLocalRule.next();
-						}
+				// apply all changed rules for indexed class expressions
+				for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
+						indexChanges_.keySet(), context.getSubsumers())) {
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace(context + ": applying rules for "
+								+ changedICE);
+					LinkRule<Context> nextLocalRule = indexChanges_
+							.get(changedICE);
+					while (nextLocalRule != null) {
+						nextLocalRule.accept(ruleAppVisitor,
+								saturationStateWriter, context);
+						nextLocalRule = nextLocalRule.next();
 					}
 				}
+			}
+			
+			@Override
+			public void finish() {
+				stageStatistics_.add(localStatistics);
 			}
 		};
 	}
 
+	private InputProcessor<Collection<Context>> getEngine(final ContextProcessor baseProcessor) {	
+		if (SaturationUtils.COLLECT_PROCESSING_TIMES) {
+			return new TimedContextCollectionProcessor(baseProcessor, stageStatistics_.getIncrementalProcessingStatistics());
+		}
+		else {
+			return new ContextCollectionProcessor(baseProcessor);	
+		}
+		
+		
+	}
+
 	@Override
 	public void finish() {
-		//aggregatedStats_.add(localStatistics);
+	}
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static class TimedContextCollectionProcessor extends BaseInputProcessor<Collection<Context>> {
+		
+		private final ContextProcessor contextProcessor_;
+		
+		private final IncrementalProcessingStatistics stageStats_;
+		
+		private final IncrementalProcessingStatistics localStats_ = new IncrementalProcessingStatistics();
+		
+		TimedContextCollectionProcessor(ContextProcessor baseProcessor, IncrementalProcessingStatistics stageStats) {
+			contextProcessor_ = new TimedContextProcessor(baseProcessor, localStats_);
+			stageStats_ = stageStats;
+			localStats_.startMeasurements();
+		}
+		
+		@Override
+		protected void process(Collection<Context> contexts) {
+			long ts = CachedTimeThread.getCurrentTimeMillis();
+			
+			for (Context context : contexts) {					
+				contextProcessor_.process(context);
+			}
+			
+			localStats_.changeInitContextCollectionProcessingTime += (CachedTimeThread.getCurrentTimeMillis() - ts);
+		}
+		
+		@Override
+		public void finish() {
+			super.finish();
+			contextProcessor_.finish();
+			stageStats_.add(localStats_);
+		}
+	}
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static class ContextCollectionProcessor extends BaseInputProcessor<Collection<Context>> {
+
+		private final ContextProcessor contextProcessor_;
+		
+		ContextCollectionProcessor(ContextProcessor contextProcessor) {
+			contextProcessor_ = contextProcessor;
+		}
+		
+		@Override
+		protected void process(Collection<Context> contexts) {
+			for (Context context : contexts) {					
+				contextProcessor_.process(context);
+			}
+		}
+		
+		@Override
+		public void finish() {
+			super.finish();
+			contextProcessor_.finish();
+		}
+		
+	}
+
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static interface ContextProcessor {
+		
+		public void process(Context context);
+		
+		public void finish();
+	}
+	
+	/**
+	 * Measures time it takes to init changes for a context
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static class TimedContextProcessor implements ContextProcessor {
+
+		private final IncrementalProcessingStatistics localStats_;
+		
+		private final ContextProcessor processor_;
+		
+		TimedContextProcessor(ContextProcessor p, IncrementalProcessingStatistics localStats) {
+			processor_ = p;
+			localStats_ = localStats;
+			localStats_.startMeasurements();
+		}
+		
+		@Override
+		public void process(Context context) {
+			long ts = CachedTimeThread.getCurrentTimeMillis();
+			
+			processor_.process(context);
+			
+			localStats_.changeInitContextProcessingTime += (CachedTimeThread.getCurrentTimeMillis() - ts);
+		}
+
+		@Override
+		public void finish() {
+			processor_.finish();
+			// no need to add the local stats to the stage-level stats, as it's
+			// done by the caller
+		}
+		
 	}
 
 }
