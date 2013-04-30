@@ -80,6 +80,9 @@
 					<sdk>
 						<platform>17</platform>
 					</sdk>
+					<proguard>
+						<skip>false</skip>
+					</proguard>
 				</configuration>
 			</plugin>
 		</plugins>
