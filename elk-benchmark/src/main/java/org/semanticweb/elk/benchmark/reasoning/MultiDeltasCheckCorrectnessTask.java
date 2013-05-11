@@ -30,7 +30,7 @@ import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
+import org.semanticweb.elk.reasoner.stages.ReasonerStage;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -87,7 +87,14 @@ public class MultiDeltasCheckCorrectnessTask extends
 		@Override
 		public void prepare() throws TaskException {
 			super.prepare();
-			stageExecutor = new SimpleStageExecutor();
+			stageExecutor = new StatsExecutor(metrics) {
+
+				@Override
+				protected boolean measure(ReasonerStage stage) {
+					return false;
+				}
+				
+			};
 			createReasoner();
 		}
 

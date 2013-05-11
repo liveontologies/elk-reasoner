@@ -42,7 +42,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
+public class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 	// private static final Logger LOGGER_ = Logger
 	// .getLogger(IncrementalClassTaxonomyComputationStage.class);

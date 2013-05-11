@@ -38,7 +38,7 @@ import org.apache.log4j.Priority;
 public class Metrics {
 
 	private int runCount_ = 0;
-	private final Map<String, String> metricMap_ = new TreeMap<String, String>();
+	private final Map<String, MetricBean> metricMap_ = new TreeMap<String, MetricBean>();
 	
 	public void incrementRunCount() {
 		runCount_++;
@@ -48,43 +48,43 @@ public class Metrics {
 		return runCount_;
 	}
 
-	public Map<String, String> getMetricsMap() {
+	public Map<String, MetricBean> getMetricsMap() {
 		return metricMap_;
 	}
 	
-	public long updateLongMetric(String metric, long delta) {
-		String value = metricMap_.get(metric);
-		long longValue = value == null ? 0 : Long.valueOf(value);
-		
-		longValue += delta;
-		metricMap_.put(metric, String.valueOf(longValue));
-		
-		return longValue;
+	
+	public void updateLongMetric(String metric, long measurement) {
+		MetricBean bean = metricMap_.get(metric);
+
+		bean = bean == null ? new MetricBean() : bean;
+		bean.total += measurement;
+		bean.min = Math.min(bean.min, measurement);
+		bean.max = Math.max(bean.max, measurement);
+		bean.count++;
+		metricMap_.put(metric, bean);
 	}
 	
-	public double updateDoubleMetric(String metric, double delta) {
-		String value = metricMap_.get(metric);
-		double doubleValue = value == null ? 0 : Double.valueOf(value);
-		
-		doubleValue += delta;
-		metricMap_.put(metric, String.valueOf(doubleValue));
-		
-		return doubleValue;
+	public void updateDoubleMetric(String metric, double measurement) {
+		MetricBean bean = metricMap_.get(metric);
+
+		bean = bean == null ? new MetricBean() : bean;
+		bean.total += measurement;
+		bean.min = Math.min(bean.min, measurement);
+		bean.max = Math.max(bean.max, measurement);
+		bean.count++;
+		metricMap_.put(metric, bean);
 	}
+	
 	
 	public void reset() {
 		runCount_ = 0;
 		metricMap_.clear();
 	}
 	
-	public String getMetric(String name) {
+	public MetricBean getMetric(String name) {
 		return metricMap_.get(name);
 	}
 	
-	public void setMetric(String name, String value) {
-		metricMap_.put(name, value);
-	}
-
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
@@ -92,7 +92,7 @@ public class Metrics {
 		
 		buffer.append("Run count: " + runCount_).append(delim);
 		
-		for (Map.Entry<String, String> entry : metricMap_.entrySet()) {
+		for (Map.Entry<String, MetricBean> entry : metricMap_.entrySet()) {
 			buffer.append(entry.getKey()).append(" : ").append(entry.getValue()).append(delim);
 		}
 		
@@ -100,7 +100,6 @@ public class Metrics {
 	}
 	
 	/**
-	 * Tries to average all metrics which can be converted to numbers
 	 * @param logger
 	 */
 	public void printAverages(final Logger logger, Priority level) {
@@ -109,19 +108,45 @@ public class Metrics {
 		
 		buffer.append("Run count: " + runCount_).append(delim);
 		
-		for (Map.Entry<String, String> entry : metricMap_.entrySet()) {
-			String value = entry.getValue();
-			
-			try {
-				Double numValue = Double.valueOf(value);
-				
-				buffer.append("Average " + entry.getKey()).append(" : ").append(String.format("%.2f%n", numValue/runCount_)).append(delim);
-			} catch (NumberFormatException e) {
-				buffer.append(entry.getKey()).append(" : ").append(entry.getValue()).append(delim);
+		for (Map.Entry<String, MetricBean> entry : metricMap_.entrySet()) {
+			MetricBean value = entry.getValue();
+
+			if (value.total > 0.0) {
+				buffer.append("Average " + entry.getKey()).append(" : ")
+						.append(value.printAverage()).append(delim);
 			}
 		}
 		
 		logger.log(level, buffer.toString());
 	}
 	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static class MetricBean {
+		
+		double total = 0;
+		double min = Double.MAX_VALUE;
+		double max = Double.MIN_VALUE;
+		int count = 0;
+		
+		@Override
+		public String toString() {
+			return total + (min < Double.MAX_VALUE ? "[" + min + ", " + max + "]" : "");
+		}
+		
+		public String format(double value) {
+			return String.format("%.0f", value);
+		}
+		
+		public String printAverage() {
+			return format(total/count) + " [" + format(min) + "--" + format(max) + "] (" + count + ")";
+		}
+		
+	}
 }
+
+

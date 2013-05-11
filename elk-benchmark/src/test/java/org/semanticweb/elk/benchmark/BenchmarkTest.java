@@ -26,6 +26,7 @@ package org.semanticweb.elk.benchmark;
  */
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -52,7 +53,7 @@ public class BenchmarkTest {
 
 	@Rule
 	public TestName testName = new TestName();
-	private static Set<String> testsToRun_ = null;
+	private static Set<String> testsToRun_ = Collections.emptySet();
 
 	@BeforeClass
 	public static void before() {
@@ -65,8 +66,7 @@ public class BenchmarkTest {
 
 	@Test
 	public void classification() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null
-				|| testsToRun_.contains(testName.getMethodName()));
+		Assume.assumeTrue(testsToRun_.contains(testName.getMethodName()));
 
 		BenchmarkUtils.runTask(ClassificationTask.class.getName(),
 				Integer.valueOf(System.getProperty(Constants.WARM_UPS, "0")),
@@ -76,8 +76,7 @@ public class BenchmarkTest {
 
 	@Test
 	public void classificationAll() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null
-				|| testsToRun_.contains(testName.getMethodName()));
+		Assume.assumeTrue(testsToRun_.contains(testName.getMethodName()));
 
 		BenchmarkUtils.runTaskCollection(
 				AllFilesClassificationTask.class.getName(),
@@ -88,8 +87,7 @@ public class BenchmarkTest {
 
 	@Test
 	public void incrementalClassification() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null
-				|| testsToRun_.contains(testName.getMethodName()));
+		Assume.assumeTrue(testsToRun_.contains(testName.getMethodName()));
 
 		BenchmarkUtils
 				.runTask(
@@ -103,8 +101,7 @@ public class BenchmarkTest {
 
 	@Test
 	public void incrementalClassificationRandomWalk() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null
-				|| testsToRun_.contains(testName.getMethodName()));
+		Assume.assumeTrue(testsToRun_.contains(testName.getMethodName()));
 
 		BenchmarkUtils.runTask(
 				RandomWalkIncrementalClassificationTask.class.getName(),
@@ -115,8 +112,7 @@ public class BenchmarkTest {
 
 	@Test
 	public void incrementalClassificationMultiDeltas() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null
-				|| testsToRun_.contains(testName.getMethodName()));
+		Assume.assumeTrue(testsToRun_.contains(testName.getMethodName()));
 
 		BenchmarkUtils.runTaskCollection2(
 				IncrementalClassificationMultiDeltas.class.getName(),
@@ -127,8 +123,7 @@ public class BenchmarkTest {
 
 	@Test
 	public void incrementalClassificationAll() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null
-				|| testsToRun_.contains(testName.getMethodName()));
+		Assume.assumeTrue(testsToRun_.contains(testName.getMethodName()));
 
 		BenchmarkUtils.runTaskCollection(
 				AllFilesIncrementalClassificationTask.class.getName(),
@@ -139,8 +134,7 @@ public class BenchmarkTest {
 
 	@Test
 	public void incrementalRandomWalkTBoxABox() throws Exception {
-		Assume.assumeTrue(testsToRun_ == null
-				|| testsToRun_.contains(testName.getMethodName()));
+		Assume.assumeTrue(testsToRun_.contains(testName.getMethodName()));
 
 		TaskCollection collection = new AllFilesTaskCollection(
 				new String[] { System.getProperty("incremental.dir") }) {

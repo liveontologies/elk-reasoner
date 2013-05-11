@@ -193,17 +193,10 @@ public class RuleApplicationFactory {
 		 * @return the input {@link ConclusionVisitor} possibly wrapped with
 		 *         some code for producing statistics
 		 */
-		protected ConclusionVisitor<Boolean> filterRuleConclusionProcessor(
+		protected ConclusionVisitor<Boolean> getUsedConclusionsCountingVisitor(
 				ConclusionVisitor<Boolean> ruleProcessor,
 				SaturationStatistics localStatistics) {
 			return SaturationUtils.getUsedConclusionCountingProcessor(ruleProcessor, localStatistics);
-			/*if (COLLECT_CONCLUSION_COUNTS) {
-				return new PreprocessedConclusionVisitor<Boolean>(
-						new CountingConclusionVisitor(localStatistics
-								.getConclusionStatistics()
-								.getUsedConclusionCounts()), ruleProcessor);
-			} else
-				return ruleProcessor;*/
 		}
 
 		/**
@@ -225,7 +218,7 @@ public class RuleApplicationFactory {
 
 			return new CombinedConclusionVisitor(
 					new ConclusionInsertionVisitor(),
-					filterRuleConclusionProcessor(
+					getUsedConclusionsCountingVisitor(
 							new ConclusionApplicationVisitor(
 									saturationStateWriter,
 									SaturationUtils.addStatsToCompositionRuleApplicationVisitor(localStatistics.getRuleStatistics()),
@@ -253,12 +246,13 @@ public class RuleApplicationFactory {
 				SaturationStatistics localStatistics) {
 			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(
 					saturationStateWriter, localStatistics);
-			if (trackModifiedContexts_)
+			if (trackModifiedContexts_) {
 				result = new CombinedConclusionVisitor(result,
 						new ConclusionSourceUnsaturationVisitor(
 								saturationStateWriter));
+			}
 			
-			return SaturationUtils.getProducedConclusionCountingProcessor(result, localStatistics);
+			return SaturationUtils.getProcessedConclusionCountingProcessor(result, localStatistics);
 		}
 		
 		protected abstract DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor();

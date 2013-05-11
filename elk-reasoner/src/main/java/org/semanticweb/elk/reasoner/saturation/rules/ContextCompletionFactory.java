@@ -169,7 +169,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			return new CombinedConclusionVisitor(
 					new ConclusionInsertionVisitor(),
-					filterRuleConclusionProcessor(gapFiller, localStatistics));
+					getUsedConclusionsCountingVisitor(gapFiller, localStatistics));
 		}
 
 	}

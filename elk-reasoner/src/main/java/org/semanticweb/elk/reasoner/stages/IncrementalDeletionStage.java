@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
  * @author Pavel Klinov
  * 
  */
-class IncrementalDeletionStage extends AbstractReasonerStage {
+public class IncrementalDeletionStage extends AbstractReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger

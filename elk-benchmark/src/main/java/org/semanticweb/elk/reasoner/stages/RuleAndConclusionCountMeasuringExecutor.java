@@ -45,53 +45,54 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 	public static final String RULE_COUNT = "count.rule-applications";
 	public static final String NEW_CONTEXT_COUNT = "count.new-contexts";
 	public static final String PRODUCED_CONCLUSION_COUNT = "count.produced-conclusions";
-	public static final String UNIQUE_CONCLUSION_COUNT = "count.unique-conclusions";
+	public static final String UNIQUE_CONCLUSION_COUNT = "count.used-conclusions";
+	public static final String PROCESSED_CONCLUSION_COUNT = "count.processed-conclusions";
 	public static final String MODIFIED_CONTEXT_COUNT = "count.modified-contexts";
-
+	
 	private final Metrics metrics_;
 
 	public RuleAndConclusionCountMeasuringExecutor(Metrics m) {
 		metrics_ = m;
 	}
-
-	@Override
-	protected void execute(ReasonerStage stage) throws ElkException {
-
-		SaturationStatistics stats = ((AbstractReasonerStage) stage)
-				.getRuleAndConclusionStatistics();
-
+	
+	protected boolean measure(ReasonerStage stage) {
+		return true;
+	}
+	
+	protected void doMeasure(ReasonerStage stage, SaturationStatistics stats) {
+		metrics_.updateLongMetric(
+				stage.getName() + "." + NEW_CONTEXT_COUNT,
+				stats.getContextStatistics().countCreatedContexts);
+		metrics_.updateLongMetric(stage.getName() + "."
+				+ PRODUCED_CONCLUSION_COUNT, stats
+				.getConclusionStatistics().getProducedConclusionCounts()
+				.getTotalCount());
+		metrics_.updateLongMetric(stage.getName() + "."
+				+ UNIQUE_CONCLUSION_COUNT, stats.getConclusionStatistics()
+				.getUsedConclusionCounts().getTotalCount());
+		metrics_.updateLongMetric(stage.getName() + "."
+				+ MODIFIED_CONTEXT_COUNT,
+				stats.getContextStatistics().countModifiedContexts);
+	}
+	
+	protected void executeStage(ReasonerStage stage, SaturationStatistics stats) throws ElkException {
 		stats.reset();
 		stage.preExecute();
 		stage.execute();
 		stage.postExecute();
+	}
 
-		//addregateRuleCounters(stats.getRuleStatistics().ruleCounter, metrics_, stage.getName());
-		//addregateRuleCounters(stats.getRuleStatistics().decompositionRuleCounter, metrics_, stage.getName());
-		
-		if (stats.getContextStatistics().countCreatedContexts > 0) {
-			metrics_.updateLongMetric(stage.getName() + "." + NEW_CONTEXT_COUNT,
-					stats.getContextStatistics().countCreatedContexts);
-		}		
-		
-		if (stats.getConclusionStatistics().getProducedConclusionCounts()
-				.getTotalCount() > 0) {
-			metrics_.updateLongMetric(stage.getName() + "."
-					+ PRODUCED_CONCLUSION_COUNT, stats
-					.getConclusionStatistics().getProducedConclusionCounts()
-					.getTotalCount());
+	@Override
+	protected void execute(ReasonerStage stage) throws ElkException {
+		SaturationStatistics stats = ((AbstractReasonerStage) stage)
+				.getRuleAndConclusionStatistics();		
+				
+		if (measure(stage)) {
+			executeStage(stage, stats);
+			doMeasure(stage, stats);		
 		}
-
-		if (stats.getConclusionStatistics().getUsedConclusionCounts()
-				.getTotalCount() > 0) {
-			metrics_.updateLongMetric(stage.getName() + "."
-					+ UNIQUE_CONCLUSION_COUNT, stats.getConclusionStatistics()
-					.getUsedConclusionCounts().getTotalCount());
-		}
-
-		if (stats.getContextStatistics().countModifiedContexts > 0) {
-			metrics_.updateLongMetric(stage.getName() + "."
-					+ MODIFIED_CONTEXT_COUNT,
-					stats.getContextStatistics().countModifiedContexts);
+		else {
+			executeStage(stage, stats);
 		}
 	}
 
