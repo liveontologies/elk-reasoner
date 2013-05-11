@@ -192,13 +192,13 @@ public class Operations {
 	 *         collection
 	 * @see #concat(Iterable)
 	 */
-	public static <T> Iterable<Collection<T>> split(
+	public static <T> Iterable<ArrayList<T>> split(
 			final Iterable<? extends T> elements, final int batchSize) {
-		return new Iterable<Collection<T>>() {
+		return new Iterable<ArrayList<T>>() {
 
 			@Override
-			public Iterator<Collection<T>> iterator() {
-				return new Iterator<Collection<T>>() {
+			public Iterator<ArrayList<T>> iterator() {
+				return new Iterator<ArrayList<T>>() {
 
 					final Iterator<? extends T> elementsIterator = elements
 							.iterator();
@@ -209,8 +209,8 @@ public class Operations {
 					}
 
 					@Override
-					public Collection<T> next() {
-						final List<T> nextBatch = new ArrayList<T>(batchSize);
+					public ArrayList<T> next() {
+						final ArrayList<T> nextBatch = new ArrayList<T>(batchSize);
 						int count = 0;
 						while (count++ < batchSize
 								&& elementsIterator.hasNext()) {
@@ -240,12 +240,12 @@ public class Operations {
 	 * @return a {@link Collection} of batches containing elements from the
 	 *         input collection
 	 */
-	public static <T> Collection<Collection<T>> split(
+	public static <T> Collection<ArrayList<T>> split(
 			final Collection<? extends T> elements, final int batchSize) {
-		return new AbstractCollection<Collection<T>>() {
+		return new AbstractCollection<ArrayList<T>>() {
 
 			@Override
-			public Iterator<Collection<T>> iterator() {
+			public Iterator<ArrayList<T>> iterator() {
 				return split((Iterable<? extends T>) elements, batchSize)
 						.iterator();
 			}

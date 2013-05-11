@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -67,9 +68,13 @@ public class IncrementalDeletionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Collection<Collection<Context>> inputs = Collections.emptyList();
-		RuleApplicationVisitor ruleAppVisitor = SaturationUtils.addStatsToCompositionRuleApplicationVisitor(stageStatistics_.getRuleStatistics());
-		ConclusionVisitor<?> conclusionVisitor = SaturationUtils.addStatsToConclusionVisitor(stageStatistics_.getConclusionStatistics());
+		Collection<ArrayList<Context>> inputs = Collections.emptyList();
+		RuleApplicationVisitor ruleAppVisitor = SaturationUtils
+				.addStatsToCompositionRuleApplicationVisitor(stageStatistics_
+						.getRuleStatistics());
+		ConclusionVisitor<?> conclusionVisitor = SaturationUtils
+				.addStatsToConclusionVisitor(stageStatistics_
+						.getConclusionStatistics());
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
@@ -77,7 +82,7 @@ public class IncrementalDeletionInitializationStage extends
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
 
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
-					128);
+					8 * workerNo);
 		}
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
@@ -93,10 +98,15 @@ public class IncrementalDeletionInitializationStage extends
 			return false;
 		this.initialization_ = null;
 		// initializing contexts which will be removed
-		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils.addStatsToConclusionVisitor(stageStatistics_.getConclusionStatistics());
-		final ExtendedSaturationStateWriter satStateWriter = reasoner.saturationState.getExtendedWriter(conclusionVisitor);
-		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState.getWriter();
-		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState.getWriter();
+		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils
+				.addStatsToConclusionVisitor(stageStatistics_
+						.getConclusionStatistics());
+		final ExtendedSaturationStateWriter satStateWriter = reasoner.saturationState
+				.getExtendedWriter(conclusionVisitor);
+		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState
+				.getWriter();
+		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState
+				.getWriter();
 		final IndexedClassExpressionVisitor<Object> rootVisitor = new AbstractIndexedClassEntityVisitor<Object>() {
 
 			@Override
@@ -111,15 +121,16 @@ public class IncrementalDeletionInitializationStage extends
 				return null;
 			}
 		};
-		
-		for (IndexedClassExpression ice : reasoner.ontologyIndex.getRemovedClassExpressions()) {
+
+		for (IndexedClassExpression ice : reasoner.ontologyIndex
+				.getRemovedClassExpressions()) {
 
 			if (ice.getContext() != null) {
 				satStateWriter.initContext(ice.getContext());
-				//otherwise it may not be cleaned
-				//we could use writer.markContextAsNotSaturated
-				//but then the context will end up in the queue
-				//for not saturated contexts, which isn't needed here
+				// otherwise it may not be cleaned
+				// we could use writer.markContextAsNotSaturated
+				// but then the context will end up in the queue
+				// for not saturated contexts, which isn't needed here
 				ice.getContext().setSaturated(false);
 				ice.getContext().getRoot().accept(rootVisitor);
 			}

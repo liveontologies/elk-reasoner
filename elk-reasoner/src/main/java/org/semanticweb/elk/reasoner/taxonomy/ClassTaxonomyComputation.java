@@ -47,7 +47,7 @@ public class ClassTaxonomyComputation
 		ReasonerComputation<Collection<IndexedClass>, ClassTaxonomyComputationFactory> {
 
 	public ClassTaxonomyComputation(
-			Collection<Collection<IndexedClass>> inputs,
+			Collection<? extends Collection<IndexedClass>> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, SaturationState saturationState,
 			UpdateableTaxonomy<ElkClass> partialTaxonomy) {

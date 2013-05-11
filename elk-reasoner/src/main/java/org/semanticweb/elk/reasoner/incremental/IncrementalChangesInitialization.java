@@ -25,8 +25,11 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -40,7 +43,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -57,10 +59,10 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * @author "Yevgeny Kazakov"
  */
 public class IncrementalChangesInitialization extends
-		ReasonerComputation<Collection<Context>, ContextInitializationFactory> {
+		ReasonerComputation<ArrayList<Context>, ContextInitializationFactory> {
 
 	public IncrementalChangesInitialization(
-			Collection<Collection<Context>> inputs,
+			Collection<ArrayList<Context>> inputs,
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
 			SaturationState state, ComputationExecutor executor,
@@ -68,22 +70,24 @@ public class IncrementalChangesInitialization extends
 			ConclusionVisitor<?> conclusionVisitor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
-				changedGlobalRules, ruleAppVisitor, conclusionVisitor), executor, maxWorkers,
-				progressMonitor);
+				changedGlobalRules, ruleAppVisitor, conclusionVisitor),
+				executor, maxWorkers, progressMonitor);
 	}
 }
 
 class ContextInitializationFactory
 		implements
-		InputProcessorFactory<Collection<Context>, InputProcessor<Collection<Context>>> {
+		InputProcessorFactory<ArrayList<Context>, InputProcessor<ArrayList<Context>>> {
 
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ContextInitializationFactory.class);
 
 	private final BasicSaturationStateWriter saturationStateWriter_;
 	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
+	private final IndexedClassExpression[] indexChangesKeys_;
 	private final LinkRule<Context> changedGlobalRuleHead_;
 	private final RuleApplicationVisitor ruleAppVisitor_;
+	private AtomicInteger ruleHits = new AtomicInteger(0);
 
 	public ContextInitializationFactory(
 			SaturationState state,
@@ -91,20 +95,27 @@ class ContextInitializationFactory
 			LinkRule<Context> changedGlobalRuleHead,
 			RuleApplicationVisitor ruleAppVisitor,
 			ConclusionVisitor<?> conclusionVisitor) {
-		saturationStateWriter_ = state.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
+		saturationStateWriter_ = state.getWriter(
+				ContextModificationListener.DUMMY, conclusionVisitor);
 		indexChanges_ = indexChanges;
+		indexChangesKeys_ = new IndexedClassExpression[indexChanges.keySet()
+				.size()];
+		indexChanges.keySet().toArray(indexChangesKeys_);
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
 		ruleAppVisitor_ = ruleAppVisitor;
 	}
 
 	@Override
-	public InputProcessor<Collection<Context>> getEngine() {
+	public InputProcessor<ArrayList<Context>> getEngine() {
 
-		return new BaseInputProcessor<Collection<Context>>() {
+		return new BaseInputProcessor<ArrayList<Context>>() {
+
+			int localRuleHits = 0;
 
 			@Override
-			protected void process(Collection<Context> input) {
-				for (Context context : input) {					
+			protected void process(ArrayList<Context> input) {
+				for (int i = 0; i < input.size(); i++) {
+					Context context = input.get(i);
 					// apply all changed global context rules
 					LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
 					while (nextGlobalRule != null) {
@@ -117,27 +128,56 @@ class ContextInitializationFactory
 					}
 
 					// apply all changed rules for indexed class expressions
-					for (IndexedClassExpression changedICE : new LazySetIntersection<IndexedClassExpression>(
-							indexChanges_.keySet(), context.getSubsumers())) {
-						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace(context + ": applying rules for "
-									+ changedICE);
-						LinkRule<Context> nextLocalRule = indexChanges_
-								.get(changedICE);
-						while (nextLocalRule != null) {
-							nextLocalRule.accept(ruleAppVisitor_,
-									saturationStateWriter_, context);
-							nextLocalRule = nextLocalRule.next();
+					Set<IndexedClassExpression> subsumers = context
+							.getSubsumers();
+					if (subsumers.size() > indexChangesKeys_.length >> 2) {
+						// iterate over changes, check subsumers
+						for (int j = 0; j < indexChangesKeys_.length; j++) {
+							IndexedClassExpression changedICE = indexChangesKeys_[j];
+							if (subsumers.contains(changedICE)) {
+								applyLocalRules(context, changedICE);
+							}
+						}
+					} else {
+						// iterate over subsumers, check changes
+						for (IndexedClassExpression changedICE : subsumers) {
+							applyLocalRules(context, changedICE);
 						}
 					}
+
 				}
 			}
+
+			private void applyLocalRules(Context context,
+					IndexedClassExpression changedICE) {
+				LinkRule<Context> nextLocalRule = indexChanges_.get(changedICE);
+				if (nextLocalRule != null) {
+					localRuleHits++;
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace(context + ": applying rules for "
+								+ changedICE);
+				}
+				while (nextLocalRule != null) {
+					nextLocalRule.accept(ruleAppVisitor_,
+							saturationStateWriter_, context);
+					nextLocalRule = nextLocalRule.next();
+				}
+			}
+
+			@Override
+			public void finish() {
+				ruleHits.addAndGet(localRuleHits);
+
+			}
+
 		};
 	}
 
 	@Override
 	public void finish() {
-		//aggregatedStats_.add(localStatistics);
+		// aggregatedStats_.add(localStatistics);
+		if (LOGGER_.isDebugEnabled())
+			LOGGER_.debug("Rule hits: " + ruleHits.get());
 	}
 
 }

@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -74,11 +75,21 @@ public class IncrementalAdditionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Collection<Collection<Context>> inputs = Collections.emptyList();
-		RuleApplicationVisitor initRuleAppVisitor = SaturationUtils.addStatsToCompositionRuleApplicationVisitor(stageStatistics_.getRuleStatistics());
-		ContextCreationListener contextCreationListener = SaturationUtils.addStatsToContextCreationListener(ContextCreationListener.DUMMY, stageStatistics_.getContextStatistics());
-		ContextModificationListener contextModificationListener = SaturationUtils.addStatsToContextModificationListener(ContextModificationListener.DUMMY, stageStatistics_.getContextStatistics());
-		ConclusionVisitor<?> conclusionVisitor = SaturationUtils.addStatsToConclusionVisitor(stageStatistics_.getConclusionStatistics()); 
+		Collection<ArrayList<Context>> inputs = Collections.emptyList();
+		RuleApplicationVisitor initRuleAppVisitor = SaturationUtils
+				.addStatsToCompositionRuleApplicationVisitor(stageStatistics_
+						.getRuleStatistics());
+		ContextCreationListener contextCreationListener = SaturationUtils
+				.addStatsToContextCreationListener(
+						ContextCreationListener.DUMMY,
+						stageStatistics_.getContextStatistics());
+		ContextModificationListener contextModificationListener = SaturationUtils
+				.addStatsToContextModificationListener(
+						ContextModificationListener.DUMMY,
+						stageStatistics_.getContextStatistics());
+		ConclusionVisitor<?> conclusionVisitor = SaturationUtils
+				.addStatsToConclusionVisitor(stageStatistics_
+						.getConclusionStatistics());
 		// first, create and init contexts for new classes
 		final IndexObjectConverter converter = reasoner.objectCache_
 				.getIndexObjectConverter();
@@ -139,7 +150,7 @@ public class IncrementalAdditionInitializationStage extends
 
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
-					128);
+					8 * workerNo);
 		}
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
