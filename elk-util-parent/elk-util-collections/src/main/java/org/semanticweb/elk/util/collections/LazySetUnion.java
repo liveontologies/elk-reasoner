@@ -1,4 +1,5 @@
 package org.semanticweb.elk.util.collections;
+
 /*
  * #%L
  * ELK Utilities Collections
@@ -111,6 +112,7 @@ public class LazySetUnion<E> extends AbstractSet<E> {
 		public E next() {
 			while (firstIterator.hasNext()) {
 				E next = firstIterator.next();
+				// make sure that every element will be returned only once
 				if (!secondChecker.contains(next))
 					return next;
 			}

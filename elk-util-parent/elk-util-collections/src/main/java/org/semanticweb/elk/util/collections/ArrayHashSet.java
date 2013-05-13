@@ -45,7 +45,8 @@ import java.util.Set;
  *            the type of the elements in this set
  * 
  */
-public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
+public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
+		DirectAccess<E> {
 
 	/**
 	 * The default initial capacity - MUST be a power of two.
@@ -129,7 +130,7 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 	 *         stretch the table.
 	 */
 	static private int computeUpperSize(int capacity) {
-		if (capacity > 128)
+		if (capacity > 64)
 			return (3 * capacity) / 4; // max 75% filled
 		else
 			return capacity;
@@ -368,6 +369,11 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 		return Arrays.toString(toArray());
 	}
 
+	@Override
+	public E[] getRawData() {
+		return data;
+	}
+
 	private class ElementIterator implements Iterator<E> {
 		// copy of the data
 		final E[] dataSnapshot;
@@ -382,14 +388,15 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 			this.expectedSize = size;
 			this.dataSnapshot = data;
 			cursor = 0;
-
 			seekNext();
 		}
 
 		void seekNext() {
-			for (nextElement = null; cursor < dataSnapshot.length
-					&& (nextElement = dataSnapshot[cursor]) == null; cursor++)
-				;
+			while (cursor < dataSnapshot.length)
+				if ((nextElement = dataSnapshot[cursor++]) != null)
+					return;
+			// no next element
+			nextElement = null;
 		}
 
 		@Override
@@ -404,7 +411,6 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 			if (nextElement == null)
 				throw new NoSuchElementException();
 			E result = nextElement;
-			cursor++;
 			seekNext();
 			return result;
 		}

@@ -42,7 +42,8 @@ import org.junit.Test;
 public class LazySetOperationsTest {
 
 	private Set<Integer> generateSet(Random rnd, int numOfElements) {
-		Set<Integer> set = new HashSet<Integer>();
+		// TODO: generate sets using different classes
+		Set<Integer> set = new ArrayHashSet<Integer>();
 		int firstNoGenerations = rnd.nextInt(numOfElements);
 
 		for (int j = 0; j < firstNoGenerations; j++) {
