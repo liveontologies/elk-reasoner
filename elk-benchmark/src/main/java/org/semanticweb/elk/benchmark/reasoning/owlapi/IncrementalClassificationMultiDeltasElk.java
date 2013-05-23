@@ -1,16 +1,14 @@
 /**
  * 
  */
-package org.semanticweb.elk.benchmark;
-
-import java.util.Collection;
+package org.semanticweb.elk.benchmark.reasoning.owlapi;
 /*
  * #%L
  * ELK Benchmarking Package
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +24,24 @@ import java.util.Collection;
  * #L%
  */
 
+import org.semanticweb.elk.owlapi.ElkReasonerFactory;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface TaskCollection {
+public class IncrementalClassificationMultiDeltasElk extends
+		OWLAPIIncrementalClassificationMultiDeltas {
 
-	public Collection<Task> getTasks() throws TaskException;
-	public Metrics getMetrics();
-	public void dispose();
+	public IncrementalClassificationMultiDeltasElk(String[] args) {
+		super(args);
+	}
+
+	@Override
+	protected OWLReasonerFactory getOWLReasonerFactory() {
+		return new ElkReasonerFactory();
+	}
+
 }

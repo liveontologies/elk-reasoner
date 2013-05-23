@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
@@ -51,17 +52,13 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.stages.AbstractStageExecutor;
-import org.semanticweb.elk.reasoner.stages.IncrementalAdditionInitializationStage;
-import org.semanticweb.elk.reasoner.stages.IncrementalAdditionStage;
 import org.semanticweb.elk.reasoner.stages.IncrementalClassTaxonomyComputationStage;
-import org.semanticweb.elk.reasoner.stages.IncrementalDeletionInitializationStage;
-import org.semanticweb.elk.reasoner.stages.IncrementalDeletionStage;
-import org.semanticweb.elk.reasoner.stages.IncrementalOverdeletionPruningStage;
 import org.semanticweb.elk.reasoner.stages.ReasonerStage;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.stages.TimingStageExecutor;
+import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * Incrementally classifies an ontology wrt multiple deltas. Expects a folder
@@ -76,6 +73,9 @@ import org.semanticweb.elk.reasoner.stages.TimingStageExecutor;
 public class IncrementalClassificationMultiDeltas extends
 		AllFilesTaskCollection {
 
+	// logger for this class
+	protected static final Logger LOGGER_ = Logger.getLogger(IncrementalClassificationMultiDeltas.class);
+	
 	private static final String ADDITION_SUFFIX = "delta-plus";
 	private static final String DELETION_SUFFIX = "delta-minus";
 	public static final String DELETED_AXIOM_COUNT = "deleted-axioms.count";
@@ -206,10 +206,9 @@ public class IncrementalClassificationMultiDeltas extends
 		public void prepare() throws TaskException {
 			stageExecutor =
 			
-			//new TotalStatsExecutor(metrics);
-			//new StatsExecutor(metrics);
-			//new TimingExecutor(new SimpleStageExecutor(), metrics);
-			new TotalTimingExecutor(new SimpleStageExecutor(), metrics);
+			//new StatsExecutor(new SimpleStageExecutor(), metrics);
+			//new StatsExecutor(new PostProcessingStageExecutor(), metrics);
+			new TimingExecutor(new SimpleStageExecutor(), metrics);
 			
 			// always start with a new reasoner
 			createReasoner();
@@ -370,6 +369,7 @@ public class IncrementalClassificationMultiDeltas extends
 				throw new TaskException(e);
 			}
 			finally {
+				//Statistics.logMemoryUsage(LOGGER_);
 				stageExecutor.reset();
 			}
 		}
@@ -436,168 +436,84 @@ public class IncrementalClassificationMultiDeltas extends
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	protected static class StatsExecutor extends RuleAndConclusionCountMeasuringExecutor implements AdditionDeletionListener {
+	static class StatsExecutor extends RuleAndConclusionCountMeasuringExecutor implements AdditionDeletionListener {
 
 		protected int lastAddCount = 0;
 		
 		protected int lastDelCount = 0;
 		
-		public StatsExecutor(Metrics m) {
-			super(m);
+		private SaturationStatistics totalStats_ = new SaturationStatistics();
+		
+		public StatsExecutor(AbstractStageExecutor e, Metrics m) {
+			super(e, m);
 		}
 
 		@Override
 		public void notifyAdditionCount(int addCount) {
-			System.err.println(addCount + " additions");
+			//System.err.println(addCount + " additions");
 			lastAddCount = addCount;
 		}
 
 		@Override
 		public void notifyDeletionCount(int delCount) {
-			System.err.println(delCount + " deletions");
+			//System.err.println(delCount + " deletions");
 			lastDelCount = delCount;
 		}
-
+		
 		@Override
-		protected boolean measure(ReasonerStage stage) {
-			/*if (stage.getClass().equals(IncrementalAdditionStage.class) || stage.getClass().equals(IncrementalAdditionInitializationStage.class)) {
-				return lastAddCount > 0;
+		protected void doMeasure(ReasonerStage stage, SaturationStatistics stats) {
+			recordMetrics(stage.getName(), stats);
+			
+			totalStats_.add(stats);
+			stats.reset();
+			
+			if (stage.getClass().equals(IncrementalClassTaxonomyComputationStage.class)) {
+				recordMetrics("Total", totalStats_);
 			}
-			else if (stage.getClass().equals(IncrementalDeletionStage.class)
-					|| stage.getClass().equals(IncrementalDeletionInitializationStage.class)
-					|| stage.getClass().equals(IncrementalOverdeletionPruningStage.class)) {
-				return lastDelCount > 0;
-			} */
-			
-			if (stage.getClass().equals(IncrementalDeletionStage.class)
-					|| stage.getClass().equals(IncrementalDeletionInitializationStage.class)
-					|| stage.getClass().equals(IncrementalOverdeletionPruningStage.class)
-					|| stage.getClass().equals(IncrementalAdditionStage.class)
-					|| stage.getClass().equals(IncrementalAdditionInitializationStage.class)) {
-				return lastAddCount > 0 && lastDelCount > 0;
-			} 
-			
-			return true;
-		}
-
-		@Override
-		public void reset() {		
 		}
 		
-	}
-	
-	/**
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
-	 */
-	@SuppressWarnings("unused")
-	private static class TotalStatsExecutor extends StatsExecutor {
-
-		public TotalStatsExecutor(Metrics m) {
-			super(m);
-		}
+		
 
 		@Override
 		protected void executeStage(ReasonerStage stage,
 				SaturationStatistics stats) throws ElkException {
-			stage.preExecute();
-			stage.execute();
-			stage.postExecute();
-		}
+			
+			long ts = CachedTimeThread.getCurrentTimeMillis();
 
-		@Override
-		protected void doMeasure(ReasonerStage stage, SaturationStatistics stats) {
-			super.doMeasure(stage, stats);
-			stats.reset();
+			super.executeStage(stage, stats);
+			
+			ts = CachedTimeThread.getCurrentTimeMillis() - ts;
+			
+			if (measure(stage)) {				
+				metrics.updateLongMetric(stage.getName() + ".wall-time", ts);
+				
+				/*if (stage.getClass().equals(IncrementalDeletionInitializationStage.class)) {
+					System.err.println("Del init time: " + ts);
+				}*/
+			}
 		}
 
 		@Override
 		protected boolean measure(ReasonerStage stage) {
-			/*if (lastAddCount + lastDelCount > 0 && stage.getClass().equals(IncrementalClassTaxonomyComputationStage.class)) {
-				return true;
-			}*/
-			// need to have both additions and deletions
-			if (lastAddCount > 0 && lastDelCount > 0 && stage.getClass().equals(IncrementalClassTaxonomyComputationStage.class)) {
-				return true;
-			}
-			
-			return false;
+			return lastAddCount > 0 && lastDelCount > 0;
+		}
+
+		@Override
+		public void reset() {
+			totalStats_ = new SaturationStatistics();
 		}
 		
-		@Override
-		public void reset() {		
-		}
 	}
-
-
+	
 	/**
 	 * 
 	 * @author Pavel Klinov
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	protected static class TimingExecutor extends TimingStageExecutor implements AdditionDeletionListener {
+	static class TimingExecutor extends TimingStageExecutor implements AdditionDeletionListener {
 
 		public TimingExecutor(AbstractStageExecutor executor, Metrics m) {
-			super(executor, m);
-		}
-
-		protected int lastAddCount = 0;
-		
-		protected int lastDelCount = 0;
-		
-		@Override
-		public void notifyAdditionCount(int addCount) {
-			System.err.println(addCount + " additions");
-			lastAddCount = addCount;
-		}
-
-		@Override
-		public void notifyDeletionCount(int delCount) {
-			System.err.println(delCount + " deletions");
-			lastDelCount = delCount;
-		}
-
-		@Override
-		protected boolean measure(ReasonerStage stage) {
-			/*if (stage.getClass().equals(IncrementalAdditionStage.class) || stage.getClass().equals(IncrementalAdditionInitializationStage.class)) {
-				return lastAddCount > 0;
-			}
-			else if (stage.getClass().equals(IncrementalDeletionStage.class)
-					|| stage.getClass().equals(IncrementalDeletionInitializationStage.class)
-					|| stage.getClass().equals(IncrementalOverdeletionPruningStage.class)) {
-				return lastDelCount > 0;
-			}*/
-			
-			if (stage.getClass().equals(IncrementalDeletionStage.class)
-					|| stage.getClass().equals(IncrementalDeletionInitializationStage.class)
-					|| stage.getClass().equals(IncrementalOverdeletionPruningStage.class)
-					|| stage.getClass().equals(IncrementalAdditionStage.class)
-					|| stage.getClass().equals(IncrementalAdditionInitializationStage.class)) {
-				return lastAddCount > 0 && lastDelCount > 0;
-			} 
-			
-			return true;
-		}
-		
-		@Override
-		public void reset() {		
-		}
-		
-	}
-	
-	
-	/**
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
-	 */
-	protected static class TotalTimingExecutor extends TimingStageExecutor implements AdditionDeletionListener {
-
-		public TotalTimingExecutor(AbstractStageExecutor executor, Metrics m) {
 			super(executor, m);
 		}
 
@@ -624,16 +540,21 @@ public class IncrementalClassificationMultiDeltas extends
 
 		@Override
 		public void execute(ReasonerStage stage) throws ElkException {
-
 			long ts = System.currentTimeMillis();
 
 			executeStage(stage);
 			ts = System.currentTimeMillis() - ts;
-			total_ += ts;
-			
-			if (stage.getClass().equals(IncrementalClassTaxonomyComputationStage.class) && (lastAddCount > 0 && lastDelCount > 0)) {
-				metrics.updateLongMetric("total" + WALL_TIME, total_);
-			}		
+
+			if (lastAddCount > 0 && lastDelCount > 0) {
+				total_ += ts;
+
+				metrics.updateLongMetric(stage.getName() + WALL_TIME, ts);
+
+				if (stage.getClass().equals(
+						IncrementalClassTaxonomyComputationStage.class)) {
+					metrics.updateLongMetric("total" + WALL_TIME, total_);
+				}
+			}
 		}
 		
 	}	

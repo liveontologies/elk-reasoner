@@ -66,7 +66,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 	 * and a negative occurrence of {@link IndexedClassExpression}s.
 	 */
 	private final IndexObjectConverter neutralIndexer, positiveIndexer,
-			negativeIndexer;
+			negativeIndexer;//, noOpConverter;
 
 	/**
 	 * An {@link IndexedAxiomFilter} used to update occurrences of
@@ -105,6 +105,9 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 		this.negativeIndexer = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, 0, multiplicity_),
 				propertyOccurrenceUpdateFilter);
+		/*this.noOpConverter = new IndexObjectConverter(
+				new ClassOccurrenceUpdateFilter(0, 0, 0),
+				propertyOccurrenceUpdateFilter);*/
 		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity_);
 	}
 
@@ -116,10 +119,15 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 	@Override
 	public void indexSubClassOfAxiom(ElkClassExpression subElkClass,
 			ElkClassExpression superElkClass) {
-
+		// If this is uncommented, deleting a subsumption C => D would
+		// effectively replace it by C => T. This means there will be fewer
+		// rule deletions during the deletion stage.
+		/*IndexedClassExpression subIndexedClass = multiplicity_ > 0 ? subElkClass
+				.accept(negativeIndexer) : subElkClass.accept(noOpConverter);*/
+		
 		IndexedClassExpression subIndexedClass = subElkClass
 				.accept(negativeIndexer);
-
+		
 		IndexedClassExpression superIndexedClass = superElkClass
 				.accept(positiveIndexer);
 
@@ -249,8 +257,9 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 			ice.updateAndCheckOccurrenceNumbers(index_, increment,
 					positiveIncrement, negativeIncrement);
 
-			if (!ice.occurs() && increment < 0)
+			if (!ice.occurs() && increment < 0) {
 				index_.remove(ice);
+			}
 
 			return ice;
 		}

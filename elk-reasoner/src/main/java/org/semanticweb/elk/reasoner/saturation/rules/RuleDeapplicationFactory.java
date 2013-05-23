@@ -91,10 +91,10 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 									new ConclusionDeapplicationVisitor(
 											saturationStateWriter,
 											SaturationUtils
-													.addStatsToCompositionRuleApplicationVisitor(localStatistics
+													.getStatsAwareCompositionRuleAppVisitor(localStatistics
 															.getRuleStatistics()),
 											SaturationUtils
-													.addStatsToDecompositionRuleApplicationVisitor(
+													.getStatsAwareDecompositionRuleAppVisitor(
 															getDecompositionRuleApplicationVisitor(),
 															localStatistics
 																	.getRuleStatistics())),

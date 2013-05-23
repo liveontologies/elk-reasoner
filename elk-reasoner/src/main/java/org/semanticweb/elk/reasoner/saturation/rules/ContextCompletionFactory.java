@@ -125,7 +125,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				ConclusionStatistics stats = localStatistics
 						.getConclusionStatistics();
 				
-				initRuleAppVisitor_ = SaturationUtils.addStatsToCompositionRuleApplicationVisitor(localStatistics.getRuleStatistics());
+				initRuleAppVisitor_ = SaturationUtils.getStatsAwareCompositionRuleAppVisitor(localStatistics.getRuleStatistics());
 				conclusionStatsVisitor_ = SaturationUtils.addStatsToConclusionVisitor(stats);
 				iterationWriter_ = localState_.getExtendedWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY, initRuleAppVisitor_, conclusionStatsVisitor_, false);
 				mainStateWriter_ = saturationState.getExtendedWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY, initRuleAppVisitor_, conclusionStatsVisitor_, true);
@@ -147,13 +147,13 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 			// this decomposition visitor applies decomposition rules for
 			// iterating over the conclusions
-			DecompositionRuleApplicationVisitor iterationVisitor = SaturationUtils.addStatsToDecompositionRuleApplicationVisitor(
+			DecompositionRuleApplicationVisitor iterationVisitor = SaturationUtils.getStatsAwareDecompositionRuleAppVisitor(
 					new GapFillingDecompositionVisitor(iterationWriter_,
 							mainStateWriter_), ruleStats);
 			// this decomposition visitor applies decomposition rules for
 			// producing conclusions obtained by decomposing negative subsumers
 			// (those should not be stored in the main contexts)
-			DecompositionRuleApplicationVisitor produceVisitor = SaturationUtils.addStatsToDecompositionRuleApplicationVisitor(
+			DecompositionRuleApplicationVisitor produceVisitor = SaturationUtils.getStatsAwareDecompositionRuleAppVisitor(
 					new GapFillingDecompositionVisitor(
 							localState_.getWriterForDecompositionVisitor(
 									conclusionStatsVisitor_,
@@ -163,7 +163,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			// deductive closure
 			ConclusionGapFillingVisitor gapFiller = new ConclusionGapFillingVisitor(
 					saturationStateWriter,
-					SaturationUtils.addStatsToCompositionRuleApplicationVisitor(localStatistics
+					SaturationUtils.getStatsAwareCompositionRuleAppVisitor(localStatistics
 							.getRuleStatistics()), iterationVisitor,
 					produceVisitor);
 

@@ -120,6 +120,15 @@ public class Metrics {
 		logger.log(level, buffer.toString());
 	}
 	
+	//TODO Remove this debug method
+	/*public void printAverage(String name) {
+		MetricBean mb = metricMap_.get(name);
+
+		if (mb.total > 0.0) {
+			System.err.println(mb.printAverage());
+		}
+	}*/
+	
 	/**
 	 * 
 	 * @author Pavel Klinov

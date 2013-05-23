@@ -24,6 +24,8 @@ package org.semanticweb.elk.benchmark;
  * #L%
  */
 
+import java.util.Collection;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.logging.ElkTimer;
@@ -49,15 +51,20 @@ public class RunAllOnceThenRepeatRunner {
 	}
 	
 	private void runOnce(TaskCollection collection) throws TaskException {
-		for (Task task : collection.getTasks()) {
+		int cnt = 0;
+		Collection<Task> tasks = collection.getTasks();
+		
+		for (Task task : tasks) {
 			ElkTimer timer = ElkTimer.getNamedTimer(task.getName());
 			
-			System.err.println("Running " + task.getName());
+			System.err.println("Running " + task.getName() + ", " + (++cnt) + "/" + tasks.size());
 			
 			task.prepare();
 			timer.start();
 			task.run();
 			timer.stop();
+			
+			//logStats(collection);
 		}
 	}
 	
@@ -79,15 +86,18 @@ public class RunAllOnceThenRepeatRunner {
 			runOnce(collection);
 		}
 		
+		logStats(collection);		
+		collection.dispose();
+	}
+	
+	public void logStats(TaskCollection collection) {
 		for (ElkTimer timer : ElkTimer.getNamedTimers()) {
 			timer.log(LOGGER_, Level.INFO);
 		}
-		
-		collection.dispose();
-		
+				
 		if (collection.getMetrics() != null) {
 			System.err.println(collection.getMetrics());
 			collection.getMetrics().printAverages(LOGGER_, Level.WARN);
 		}
-	}	
+	}
 }

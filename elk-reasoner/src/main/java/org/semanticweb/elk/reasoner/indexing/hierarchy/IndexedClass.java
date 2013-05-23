@@ -95,7 +95,7 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0
-				&& elkClass.equals(PredefinedElkClass.OWL_THING)) {
+				&& elkClass == PredefinedElkClass.OWL_THING) {
 			index.addContextInitRule(new OwlThingContextInitializationRule());
 		}
 
@@ -108,7 +108,7 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0
-				&& elkClass.equals(PredefinedElkClass.OWL_THING)) {
+				&& elkClass == PredefinedElkClass.OWL_THING) {
 			index.removeContextInitRule(new OwlThingContextInitializationRule());
 		}
 	}

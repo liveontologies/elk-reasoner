@@ -64,32 +64,32 @@ public class DecompositionRuleApplicationTimerVisitor implements
 
 	@Override
 	public void visit(IndexedClass ice, Context context) {
-		timer_.timeIndexedClass -= CachedTimeThread.currentTimeMillis;
+		timer_.timeIndexedClass -= CachedTimeThread.getCurrentTimeMillis();
 		visitor_.visit(ice, context);
-		timer_.timeIndexedClass += CachedTimeThread.currentTimeMillis;
+		timer_.timeIndexedClass += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
 	public void visit(IndexedObjectIntersectionOf ice,
 			Context context) {
-		timer_.timeIndexedObjectIntersectionOf -= CachedTimeThread.currentTimeMillis;
+		timer_.timeIndexedObjectIntersectionOf -= CachedTimeThread.getCurrentTimeMillis();
 		visitor_.visit(ice, context);
-		timer_.timeIndexedObjectIntersectionOf += CachedTimeThread.currentTimeMillis;
+		timer_.timeIndexedObjectIntersectionOf += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
 	public void visit(IndexedObjectSomeValuesFrom ice,
 			Context context) {
-		timer_.timeIndexedObjectSomeValuesFrom -= CachedTimeThread.currentTimeMillis;
+		timer_.timeIndexedObjectSomeValuesFrom -= CachedTimeThread.getCurrentTimeMillis();
 		visitor_.visit(ice, context);
-		timer_.timeIndexedObjectSomeValuesFrom += CachedTimeThread.currentTimeMillis;
+		timer_.timeIndexedObjectSomeValuesFrom += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
 	public void visit(IndexedDataHasValue ice, Context context) {
-		timer_.timeIndexedDataHasValue -= CachedTimeThread.currentTimeMillis;
+		timer_.timeIndexedDataHasValue -= CachedTimeThread.getCurrentTimeMillis();
 		visitor_.visit(ice, context);
-		timer_.timeIndexedDataHasValue += CachedTimeThread.currentTimeMillis;
+		timer_.timeIndexedDataHasValue += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 }

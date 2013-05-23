@@ -38,51 +38,51 @@ public class TimedConclusionVisitor implements ConclusionVisitor<Long> {
 
 	@Override
 	public Long visit(NegativeSubsumer negSCE, Context context) {
-		timer_.timeNegativeSubsumers -= CachedTimeThread.currentTimeMillis;
+		timer_.timeNegativeSubsumers -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(negSCE, context);
-		return timer_.timeNegativeSubsumers += CachedTimeThread.currentTimeMillis;
+		return timer_.timeNegativeSubsumers += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
 	public Long visit(PositiveSubsumer posSCE, Context context) {
-		timer_.timePositiveSubsumers -= CachedTimeThread.currentTimeMillis;
+		timer_.timePositiveSubsumers -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(posSCE, context);
-		return timer_.timePositiveSubsumers += CachedTimeThread.currentTimeMillis;
+		return timer_.timePositiveSubsumers += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
 	public Long visit(BackwardLink link, Context context) {
-		timer_.timeBackwardLinks -= CachedTimeThread.currentTimeMillis;
+		timer_.timeBackwardLinks -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(link, context);
-		return timer_.timeBackwardLinks += CachedTimeThread.currentTimeMillis;
+		return timer_.timeBackwardLinks += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
 	public Long visit(ForwardLink link, Context context) {
-		timer_.timeForwardLinks -= CachedTimeThread.currentTimeMillis;
+		timer_.timeForwardLinks -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(link, context);
-		return timer_.timeForwardLinks += CachedTimeThread.currentTimeMillis;
+		return timer_.timeForwardLinks += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
 	public Long visit(Contradiction bot, Context context) {
-		timer_.timeContradictions -= CachedTimeThread.currentTimeMillis;
+		timer_.timeContradictions -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(bot, context);
-		return timer_.timeContradictions += CachedTimeThread.currentTimeMillis;
+		return timer_.timeContradictions += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
 	public Long visit(Propagation propagation, Context context) {
-		timer_.timePropagations -= CachedTimeThread.currentTimeMillis;
+		timer_.timePropagations -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(propagation, context);
-		return timer_.timePropagations += CachedTimeThread.currentTimeMillis;
+		return timer_.timePropagations += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
 	public Long visit(DisjointnessAxiom disjointnessAxiom, Context context) {
-		timer_.timeDisjointnessAxioms -= CachedTimeThread.currentTimeMillis;
+		timer_.timeDisjointnessAxioms -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(disjointnessAxiom, context);
-		return timer_.timeDisjointnessAxioms += CachedTimeThread.currentTimeMillis;
+		return timer_.timeDisjointnessAxioms += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 }

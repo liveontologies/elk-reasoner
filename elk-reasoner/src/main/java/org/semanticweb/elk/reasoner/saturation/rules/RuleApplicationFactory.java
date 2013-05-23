@@ -137,7 +137,8 @@ public class RuleApplicationFactory {
 
 		@Override
 		public void process() {
-			localContextStatistics.timeContextProcess -= CachedTimeThread.currentTimeMillis;
+			localContextStatistics.timeContextProcess -= CachedTimeThread
+					.getCurrentTimeMillis();
 
 			BasicSaturationStateWriter writer = getSaturationStateWriter();
 
@@ -159,7 +160,8 @@ public class RuleApplicationFactory {
 				}
 			}
 
-			localContextStatistics.timeContextProcess += CachedTimeThread.currentTimeMillis;
+			localContextStatistics.timeContextProcess += CachedTimeThread
+					.getCurrentTimeMillis();
 		}
 
 		@Override
@@ -229,10 +231,10 @@ public class RuleApplicationFactory {
 							new ConclusionApplicationVisitor(
 									saturationStateWriter,
 									SaturationUtils
-											.addStatsToCompositionRuleApplicationVisitor(localStatistics
+											.getStatsAwareCompositionRuleAppVisitor(localStatistics
 													.getRuleStatistics()),
 									SaturationUtils
-											.addStatsToDecompositionRuleApplicationVisitor(
+											.getStatsAwareDecompositionRuleAppVisitor(
 													getDecompositionRuleApplicationVisitor(),
 													localStatistics
 															.getRuleStatistics())),
@@ -298,6 +300,7 @@ public class RuleApplicationFactory {
 		private DefaultEngine(final ContextCreationListener listener,
 				final ContextModificationListener modificationListener,
 				final SaturationStatistics localStatistics) {
+
 			this(
 					saturationState
 							.getExtendedWriter(
@@ -312,12 +315,13 @@ public class RuleApplicationFactory {
 													localStatistics
 															.getContextStatistics()),
 									SaturationUtils
-											.addStatsToCompositionRuleApplicationVisitor(localStatistics
+											.getStatsAwareCompositionRuleAppVisitor(localStatistics
 													.getRuleStatistics()),
 									SaturationUtils
 											.addStatsToConclusionVisitor(localStatistics
 													.getConclusionStatistics()),
 									trackModifiedContexts_), localStatistics);
+
 		}
 
 		@Override
@@ -337,9 +341,9 @@ public class RuleApplicationFactory {
 			DecompositionRuleApplicationVisitor visitor = new ForwardDecompositionRuleApplicationVisitor(
 					saturationStateWriter_);
 
-			return SaturationUtils
-					.addStatsToDecompositionRuleApplicationVisitor(visitor,
-							localStatistics.getRuleStatistics());
+			return SaturationUtils.getStatsAwareDecompositionRuleAppVisitor(
+					visitor, localStatistics.getRuleStatistics());
+
 		}
 	}
 

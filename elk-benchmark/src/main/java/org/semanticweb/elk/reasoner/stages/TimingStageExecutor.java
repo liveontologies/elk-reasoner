@@ -57,7 +57,6 @@ public class TimingStageExecutor extends AbstractStageExecutor {
 
 	@Override
 	public void execute(ReasonerStage stage) throws ElkException {
-
 		long ts = System.currentTimeMillis();
 
 		executeStage(stage);
