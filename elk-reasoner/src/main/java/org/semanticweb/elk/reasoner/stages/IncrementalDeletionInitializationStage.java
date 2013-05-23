@@ -76,6 +76,8 @@ public class IncrementalDeletionInitializationStage extends
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					128);
 		}
+		
+		//System.err.println(changedRulesByCE.keySet().size());
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,

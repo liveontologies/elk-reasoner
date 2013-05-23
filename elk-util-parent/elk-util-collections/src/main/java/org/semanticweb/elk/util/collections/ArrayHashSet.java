@@ -129,7 +129,7 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 	 *         stretch the table.
 	 */
 	static private int computeUpperSize(int capacity) {
-		if (capacity > 128)
+		if (capacity > 64)
 			return (3 * capacity) / 4; // max 75% filled
 		else
 			return capacity;

@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
@@ -52,10 +53,10 @@ import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.stages.AbstractStageExecutor;
 import org.semanticweb.elk.reasoner.stages.IncrementalClassTaxonomyComputationStage;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStage;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.stages.TimingStageExecutor;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
@@ -72,6 +73,9 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
 public class IncrementalClassificationMultiDeltas extends
 		AllFilesTaskCollection {
 
+	// logger for this class
+	protected static final Logger LOGGER_ = Logger.getLogger(IncrementalClassificationMultiDeltas.class);
+	
 	private static final String ADDITION_SUFFIX = "delta-plus";
 	private static final String DELETION_SUFFIX = "delta-minus";
 	public static final String DELETED_AXIOM_COUNT = "deleted-axioms.count";
@@ -203,8 +207,8 @@ public class IncrementalClassificationMultiDeltas extends
 			stageExecutor =
 			
 			//new StatsExecutor(new SimpleStageExecutor(), metrics);
-			new StatsExecutor(new PostProcessingStageExecutor(), metrics);
-			//new TimingExecutor(new SimpleStageExecutor(), metrics);
+			//new StatsExecutor(new PostProcessingStageExecutor(), metrics);
+			new TimingExecutor(new SimpleStageExecutor(), metrics);
 			
 			// always start with a new reasoner
 			createReasoner();
@@ -365,6 +369,7 @@ public class IncrementalClassificationMultiDeltas extends
 				throw new TaskException(e);
 			}
 			finally {
+				//Statistics.logMemoryUsage(LOGGER_);
 				stageExecutor.reset();
 			}
 		}
@@ -481,6 +486,10 @@ public class IncrementalClassificationMultiDeltas extends
 			
 			if (measure(stage)) {				
 				metrics.updateLongMetric(stage.getName() + ".wall-time", ts);
+				
+				/*if (stage.getClass().equals(IncrementalDeletionInitializationStage.class)) {
+					System.err.println("Del init time: " + ts);
+				}*/
 			}
 		}
 

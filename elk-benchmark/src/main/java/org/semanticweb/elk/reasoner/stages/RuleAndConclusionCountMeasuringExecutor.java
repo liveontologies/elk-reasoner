@@ -53,6 +53,8 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 	public static final String CHANGE_INIT_PROC_TIME = ".time.change-init-context-proc-time";
 	public static final String CHANGE_INIT_CONTEX_COLLECTION_PROC_TIME = ".time.change-init-context-collection-proc-time";
 	public static final String TOTAL_RULE_TIME = ".rule-time";
+	public static final String CONTEXT_COUNT = ".count.all-contexts";
+	public static final String CONTEXT_SUBSUMER_COUNT = ".count.subsumers-per-context";
 	
 	private final AbstractStageExecutor executor_;
 	
@@ -85,9 +87,16 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 		metrics.updateLongMetric(prefix + CHANGE_INIT_PROC_TIME, stats
 				.getIncrementalProcessingStatistics()
 				.getChangeInitContextProcessingTime());
-		metrics.updateLongMetric(prefix + CHANGE_INIT_CONTEX_COLLECTION_PROC_TIME, stats
+		metrics.updateLongMetric(prefix + CHANGE_INIT_PROC_TIME, stats
 				.getIncrementalProcessingStatistics()
-				.getChangeInitContextCollectionProcessingTime());
+				.getChangeInitContextProcessingTime());
+		metrics.updateLongMetric(prefix + CONTEXT_COUNT, stats
+				.getIncrementalProcessingStatistics().getContextCount());
+		metrics.updateLongMetric(prefix + CONTEXT_SUBSUMER_COUNT, stats
+				.getIncrementalProcessingStatistics().getSubsumersPerContextCount());
+		/*metrics.updateLongMetric(prefix + CHANGE_INIT_CONTEX_COLLECTION_PROC_TIME, stats
+				.getIncrementalProcessingStatistics()
+				.getChangeInitContextCollectionProcessingTime());*/
 		metrics.updateDoubleMetric(prefix + TOTAL_RULE_TIME,
 				stats.getRuleStatistics().getTotalRuleTime());
 		

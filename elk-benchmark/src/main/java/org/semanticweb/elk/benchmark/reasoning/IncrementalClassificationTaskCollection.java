@@ -25,6 +25,7 @@ package org.semanticweb.elk.benchmark.reasoning;
  */
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
@@ -48,7 +49,7 @@ public class IncrementalClassificationTaskCollection implements TaskCollection {
 	}
 	
 	@Override
-	public Iterable<Task> getTasks() throws TaskException {
+	public Collection<Task> getTasks() throws TaskException {
 		return Arrays.asList(icTask_, randomWalkTask_);
 	}
 	

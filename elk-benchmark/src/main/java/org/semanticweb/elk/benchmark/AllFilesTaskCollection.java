@@ -43,7 +43,7 @@ public abstract class AllFilesTaskCollection implements TaskCollection {
 	}
 	
 	@Override
-	public Iterable<Task> getTasks() throws TaskException {
+	public Collection<Task> getTasks() throws TaskException {
 		File dir = BenchmarkUtils.getFile(args_[0]);
 		Collection<Task> tasks = new ArrayList<Task>();
 		String[] taskArgs = new String[args_.length];

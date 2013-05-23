@@ -118,6 +118,8 @@ class ContextInitializationFactory
 		final RuleApplicationVisitor ruleAppVisitor = SaturationUtils.getStatsAwareCompositionRuleAppVisitor(localStatistics.getRuleStatistics());
 		final BasicSaturationStateWriter saturationStateWriter = saturationState_.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
 		
+		localStatistics.getConclusionStatistics().startMeasurements();
+		
 		return new ContextProcessor() {
 			
 			@Override
@@ -185,6 +187,8 @@ class ContextInitializationFactory
 		
 		private final IncrementalProcessingStatistics localStats_ = new IncrementalProcessingStatistics();
 		
+		private int procNumber_ = 0;
+		
 		TimedContextCollectionProcessor(ContextProcessor baseProcessor, IncrementalProcessingStatistics stageStats) {
 			contextProcessor_ = new TimedContextProcessor(baseProcessor, localStats_);
 			stageStats_ = stageStats;
@@ -194,18 +198,34 @@ class ContextInitializationFactory
 		@Override
 		protected void process(Collection<Context> contexts) {
 			long ts = CachedTimeThread.getCurrentTimeMillis();
+			int contextCount = 0;
+			int subsumerCount = 0;
+			
+			procNumber_++;
 			
 			for (Context context : contexts) {					
 				contextProcessor_.process(context);
+				contextCount++;
+				subsumerCount += context.getSubsumers().size();
 			}
 			
 			localStats_.changeInitContextCollectionProcessingTime += (CachedTimeThread.getCurrentTimeMillis() - ts);
+			localStats_.countContexts += contextCount;
+			
+			if (contextCount > 0) {
+				localStats_.countContextSubsumers += (subsumerCount / contextCount);
+			}
 		}
 		
 		@Override
 		public void finish() {
 			super.finish();
 			contextProcessor_.finish();
+			
+			if (procNumber_ > 0) {
+				localStats_.countContextSubsumers /= procNumber_;
+			}
+			
 			stageStats_.add(localStats_);
 		}
 	}

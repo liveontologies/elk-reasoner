@@ -43,7 +43,25 @@ public class IncrementalProcessingStatistics {
 	
 	long changeInitContextCollectionProcessingTime;
 	
+	long countContexts;
+	
+	long countContextSubsumers;
+	
 	private int numOfMeasurements_ = 0;
+	
+	
+	public long getContextCount() {
+		return countContexts;
+	}
+	
+	public long getSubsumersPerContextCount() {
+		if (!measurementsTaken()) {
+			return 0;
+		}
+		else {
+			return countContextSubsumers / numOfMeasurements_;
+		}
+	}
 	
 	public long getChangeInitContextProcessingTime() {
 		if (!measurementsTaken()) {
@@ -67,6 +85,8 @@ public class IncrementalProcessingStatistics {
 	public void reset() {
 		changeInitContextProcessingTime = 0;
 		changeInitContextCollectionProcessingTime = 0;
+		countContexts = 0;
+		countContextSubsumers = 0;
 		numOfMeasurements_ = 0;
 	}
 	
@@ -75,6 +95,8 @@ public class IncrementalProcessingStatistics {
 			numOfMeasurements_ += stats.numOfMeasurements_;
 			changeInitContextProcessingTime += stats.changeInitContextProcessingTime;
 			changeInitContextCollectionProcessingTime += stats.changeInitContextCollectionProcessingTime;
+			countContexts += stats.countContexts;
+			countContextSubsumers += stats.countContextSubsumers;
 		}
 	}
 	

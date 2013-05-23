@@ -50,12 +50,22 @@ public class ConclusionSourceUnsaturationVisitor implements
 
 	@Override
 	public Boolean visit(NegativeSubsumer negSCE, Context context) {
-		return mark(negSCE, context);
+		if (negSCE.getExpression().occurs()) {
+			return mark(negSCE, context);
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
-		return mark(posSCE, context);
+		if (posSCE.getExpression().occurs()) {
+			return mark(posSCE, context);
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override

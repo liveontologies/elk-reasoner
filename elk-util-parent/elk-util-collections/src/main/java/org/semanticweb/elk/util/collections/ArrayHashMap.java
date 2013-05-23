@@ -141,7 +141,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 *         stretch the tables.
 	 */
 	static private int computeUpperSize(int capacity) {
-		if (capacity > 128)
+		if (capacity > 64)
 			return (3 * capacity) / 4; // max 75% filled
 		else
 			return capacity;

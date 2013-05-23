@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -36,9 +35,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *         pavel.klinov@uni-ulm.de
  */
 public class EnumerateContextsStage extends BasePostProcessingStage {
-
-	private static final Logger LOGGER_ = Logger
-			.getLogger(CheckContextInvariants.class);
 
 	private final AbstractReasonerState reasoner_;
 
@@ -58,6 +54,8 @@ public class EnumerateContextsStage extends BasePostProcessingStage {
 		for (Context context : reasoner_.saturationState.getContexts()) {
 			cnt += context.getSubsumers().size();
 		}
+		
+		cnt = 2 * cnt - cnt;
 	}
 
 }

@@ -66,7 +66,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 	 * and a negative occurrence of {@link IndexedClassExpression}s.
 	 */
 	private final IndexObjectConverter neutralIndexer, positiveIndexer,
-			negativeIndexer, noOpConverter;
+			negativeIndexer;//, noOpConverter;
 
 	/**
 	 * An {@link IndexedAxiomFilter} used to update occurrences of
@@ -105,9 +105,9 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 		this.negativeIndexer = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, 0, multiplicity_),
 				propertyOccurrenceUpdateFilter);
-		this.noOpConverter = new IndexObjectConverter(
+		/*this.noOpConverter = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(0, 0, 0),
-				propertyOccurrenceUpdateFilter);
+				propertyOccurrenceUpdateFilter);*/
 		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity_);
 	}
 
