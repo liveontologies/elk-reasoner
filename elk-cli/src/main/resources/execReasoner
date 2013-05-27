@@ -1,0 +1,8 @@
+#!/bin/bash
+# 
+# OWL Reasoner Evaluation Workshop (ORE) 2013
+# Example reasoner executor script
+# Last updated: 27-Mar-13
+# 
+java -jar -XX:+AggressiveHeap elk-standalone.jar $*
+		
