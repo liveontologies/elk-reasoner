@@ -354,6 +354,10 @@ public class IncrementalClassificationMultiDeltas extends
 									throws Owl2ParseException {
 								elkAxiomProcessor.visit(elkAxiom);
 							}
+
+							@Override
+							public void finish() throws Owl2ParseException {
+							}
 						});
 
 			} catch (Exception e) {

@@ -22,8 +22,9 @@
  */
 package org.semanticweb.elk.loading;
 
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -49,10 +50,15 @@ public class Owl2ParserLoader implements Loader {
 	 */
 	private final ElkAxiomProcessor axiomLoader_;
 	/**
-	 * a bounded buffer into which the axioms are loaded; if the puffer is full
-	 * the parser will block until axioms are taken
+	 * a bounded queue through which batches of axioms are exchanged between the
+	 * parser and the axiom loader; if the queue is full the parser will block
+	 * until the next axiom batch is taken
 	 */
-	private final BlockingQueue<ElkAxiom> axiomBuffer_;
+	private final BlockingQueue<ArrayList<ElkAxiom>> axiomExchanger_;
+	/**
+	 * the maximum number of axioms in the exchange batch
+	 */
+	private final int batchLength_;
 	/**
 	 * the thread in which the parser is running
 	 */
@@ -89,14 +95,15 @@ public class Owl2ParserLoader implements Loader {
 	 *            the parser used to load the ontology
 	 * @param axiomLoader
 	 *            the loader for the axioms
-	 * @param bufferSize
-	 *            the size of the bounded buffer for loaded axioms
+	 * @param batchLength
+	 *            the size of the batch for exchanging axioms
 	 */
 	public Owl2ParserLoader(Owl2Parser owlParser,
-			ElkAxiomProcessor axiomLoader, int bufferSize) {
+			ElkAxiomProcessor axiomLoader, int batchLength) {
 		this.parser_ = owlParser;
 		this.axiomLoader_ = axiomLoader;
-		this.axiomBuffer_ = new ArrayBlockingQueue<ElkAxiom>(bufferSize);
+		this.axiomExchanger_ = new SynchronousQueue<ArrayList<ElkAxiom>>();
+		this.batchLength_ = batchLength;
 		this.finished_ = false;
 		this.parserThread_ = new Thread(new Parser(), "elk-parser-thread");
 		this.started_ = false;
@@ -113,7 +120,7 @@ public class Owl2ParserLoader implements Loader {
 	 *            the loader for the axioms
 	 */
 	public Owl2ParserLoader(Owl2Parser owlParser, ElkAxiomProcessor axiomLoader) {
-		this(owlParser, axiomLoader, 256);
+		this(owlParser, axiomLoader, 128);
 	}
 
 	@Override
@@ -126,17 +133,17 @@ public class Owl2ParserLoader implements Loader {
 			started_ = true;
 		}
 
-		ElkAxiom axiom = null;
+		ArrayList<ElkAxiom> nextBatch = null;
 
 		try {
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
 				if (finished_) {
-					axiom = axiomBuffer_.poll();
+					nextBatch = axiomExchanger_.poll();
 				} else {
 					try {
-						axiom = axiomBuffer_.take();
+						nextBatch = axiomExchanger_.take();
 					} catch (InterruptedException e) {
 						/*
 						 * we don't know for sure why the thread was
@@ -149,15 +156,18 @@ public class Owl2ParserLoader implements Loader {
 						break;
 					}
 				}
-				if (axiom == null)
+				if (nextBatch == null)
 					break;
-				axiomLoader_.visit(axiom);
+				for (int i = 0; i < nextBatch.size(); i++) {
+					ElkAxiom axiom = nextBatch.get(i);
+					axiomLoader_.visit(axiom);
+				}
 			}
 		} finally {
 			/*
 			 * should be executed in any case
 			 */
-			synchronized (axiomBuffer_) {
+			synchronized (axiomExchanger_) {
 				waiting_ = false;
 			}
 			if (exception != null) {
@@ -176,7 +186,7 @@ public class Owl2ParserLoader implements Loader {
 		@Override
 		public void run() {
 			try {
-				parser_.accept(new AxiomInserter(axiomBuffer_));
+				parser_.accept(new AxiomInserter(axiomExchanger_, batchLength_));
 			} catch (Throwable e) {
 				exception = new ElkLoadingException(
 						"Cannot load the ontology!", e);
@@ -185,7 +195,7 @@ public class Owl2ParserLoader implements Loader {
 				 * this should be executed in any case
 				 */
 				finished_ = true;
-				synchronized (axiomBuffer_) {
+				synchronized (axiomExchanger_) {
 					if (waiting_)
 						controlThread_.interrupt();
 				}
@@ -203,24 +213,47 @@ public class Owl2ParserLoader implements Loader {
 	 */
 	private static class AxiomInserter implements Owl2ParserAxiomProcessor {
 
-		final private BlockingQueue<ElkAxiom> axiomBuffer_;
+		final private BlockingQueue<ArrayList<ElkAxiom>> axiomBuffer_;
+		private final int batchLength_;
 
-		AxiomInserter(BlockingQueue<ElkAxiom> axiomBuffer) {
+		/**
+		 * the next batch of axioms that should be filled
+		 */
+		private ArrayList<ElkAxiom> nextBatch_;
+
+		AxiomInserter(BlockingQueue<ArrayList<ElkAxiom>> axiomBuffer,
+				int batchLength) {
 			this.axiomBuffer_ = axiomBuffer;
+			this.batchLength_ = batchLength;
+			nextBatch_ = new ArrayList<ElkAxiom>(batchLength_);
 		}
 
 		@Override
 		public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-			try {
-				axiomBuffer_.put(elkAxiom);
-			} catch (InterruptedException e) {
-				throw new Owl2ParseException("ELK Parser was interrupted", e);
+			nextBatch_.add(elkAxiom);
+			if (nextBatch_.size() == batchLength_) {
+				submitBatch();
+				nextBatch_ = new ArrayList<ElkAxiom>(batchLength_);
 			}
-
 		}
 
 		@Override
 		public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+			// No additional prefixes can be registered
+		}
+
+		@Override
+		public void finish() throws Owl2ParseException {
+			// submit the last partially filled batch
+			submitBatch();
+		}
+
+		private void submitBatch() throws Owl2ParseException {
+			try {
+				axiomBuffer_.put(nextBatch_);
+			} catch (InterruptedException e) {
+				throw new Owl2ParseException("ELK Parser was interrupted", e);
+			}
 		}
 	}
 
@@ -236,7 +269,7 @@ public class Owl2ParserLoader implements Loader {
 		if (!finished_)
 			parserThread_.interrupt();
 		disposeParserResources();
-		this.axiomBuffer_.clear();
+		this.axiomExchanger_.clear();
 		// this.exception = null;
 	}
 }
