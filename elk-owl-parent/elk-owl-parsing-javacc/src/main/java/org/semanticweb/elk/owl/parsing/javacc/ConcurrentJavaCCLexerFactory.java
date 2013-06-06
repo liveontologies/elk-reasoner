@@ -36,7 +36,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ConcurrentJavaCCLexerFactory implements JavaCCLexerFactory {
+public class ConcurrentJavaCCLexerFactory implements JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> {
 
 	@Override
 	public AbstractOwl2FunctionalStyleParserTokenManager createLexer(
