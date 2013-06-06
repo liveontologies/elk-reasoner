@@ -39,6 +39,6 @@ public class JavaCCBasedOwlFunctionalStylePrinterTest extends AbstractImplOwl2Fu
 
 	@Override
 	protected Owl2Parser instantiateParser(Reader reader) {
-		return new Owl2FunctionalStyleParser(reader, new ElkObjectFactoryImpl());
+		return new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl()).getParser(reader);
 	}
 }
