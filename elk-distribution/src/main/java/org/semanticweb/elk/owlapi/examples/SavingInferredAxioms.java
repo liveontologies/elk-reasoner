@@ -63,8 +63,7 @@ public class SavingInferredAxioms {
 		OWLOntologyManager outputOntologyManager = OWLManager.createOWLOntologyManager();
 
 		// Load your ontology.
-		OWLOntology ont = inputOntologyManager.loadOntologyFromOntologyDocument(new File(
-				"/home/pavel/ulm/data/galens/not-galen.owl"));
+		OWLOntology ont = inputOntologyManager.loadOntologyFromOntologyDocument(new File("path-to-ontology"));
 
 		// Create an ELK reasoner.
 		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
@@ -88,7 +87,7 @@ public class SavingInferredAxioms {
 		// Save the inferred ontology.
 		outputOntologyManager.saveOntology(infOnt,
 				new OWLFunctionalSyntaxOntologyFormat(),
-				IRI.create((new File("/home/pavel/tmp/result.owl").toURI())));
+				IRI.create((new File("path-to-output").toURI())));
 
 		// Terminate the worker threads used by the reasoner.
 		reasoner.dispose();
