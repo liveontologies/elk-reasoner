@@ -55,8 +55,7 @@ public class IncrementalClassification {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
 		// Load your ontology
-		OWLOntology ont = manager.loadOntologyFromOntologyDocument(new File(
-				"path-to-ontology"));
+		OWLOntology ont = manager.loadOntologyFromOntologyDocument(new File("path-to-ontology"));
 
 		// Create an ELK reasoner.
 		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
@@ -66,19 +65,10 @@ public class IncrementalClassification {
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 
 		OWLDataFactory factory = manager.getOWLDataFactory();
-		OWLClass subClass = factory.getOWLClass(IRI
-				.create("http://www.co-ode.org/ontologies/galen#AbsoluteShapeState"));
-		OWLAxiom removed = factory
-				.getOWLSubClassOfAxiom(
-						subClass,
-						factory.getOWLClass(IRI
-								.create("http://www.co-ode.org/ontologies/galen#ShapeState")));
+		OWLClass subClass = factory.getOWLClass(IRI.create("http://www.co-ode.org/ontologies/galen#AbsoluteShapeState"));
+		OWLAxiom removed = factory.getOWLSubClassOfAxiom(subClass, factory.getOWLClass(IRI.create("http://www.co-ode.org/ontologies/galen#ShapeState")));
 		
-		OWLAxiom added = factory
-				.getOWLSubClassOfAxiom(
-						subClass,
-						factory.getOWLClass(IRI
-								.create("http://www.co-ode.org/ontologies/galen#GeneralisedStructure")));
+		OWLAxiom added = factory.getOWLSubClassOfAxiom(subClass, factory.getOWLClass(IRI.create("http://www.co-ode.org/ontologies/galen#GeneralisedStructure")));
 		// Remove an existing axiom, add a new axiom
 		manager.addAxiom(ont, added);
 		manager.removeAxiom(ont, removed);
